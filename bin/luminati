@@ -33,7 +33,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     log: 'WARNING',
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
-    zone: process.env.LUMINATI_ZONE,
+    zone: process.env.LUMINATI_ZONE||'gen',
     max_requests: 1,
     session_timeout: 5000,
 }).help('h').argv;

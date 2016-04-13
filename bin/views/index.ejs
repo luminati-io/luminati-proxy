@@ -1,1 +1,29 @@
-
+<%- include header -%>
+<div class="mdl-grid">
+  <% proxies.forEach(proxy=>{ %>
+  <div class="mdl-cell mdl-cell--4-col" id="proxy_<%= proxy.opt.port %>">
+    <div class="mdl-card mdl-shadow--2dp">
+      <div class="mdl-card__title mdl-card--expand">
+        <h2 class=mdl-card__title-text><%= proxy.opt.port %></h2>
+      </div>
+      <div class=mdl-card__supporting-text>
+        <table class="mdl-data-table mdl-js-data-table">
+          <tbody>
+            <% ['port', 'host', 'log', 'zone', 'country', 'city', 'session_timeout',
+                'dns', 'pool_size', 'max_requests'].filter(key=>proxy.opt[key]).forEach(key=>{ %>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric key"><%= key.replace(/_/g, ' ') %></td>
+              <td class="mdl-data-table__cell--non-numeric opt_<%= key %>"><%= proxy.opt[key] %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <div class="mdl-card__actions mdl-card--border">
+        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"></a>
+      </div>
+    </div>
+  </div>
+  <% }) %>
+</div>
+<%- include footer -%>
