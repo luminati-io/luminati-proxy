@@ -30,6 +30,7 @@
     "ejs": "^2.4.1",
     "express": "^4.13.4",
     "glob": "^7.0.3",
+    "humanize": "0.0.9",
     "request": "^2.69.0",
     "underscore": "^1.8.3",
     "yargs": "^4.3.2"

@@ -9,6 +9,7 @@ const express = require('express');
 const Luminati = require('../lib/luminati.js');
 const glob = require('glob');
 const request = require('request');
+const humanize = require('humanize');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -103,6 +104,11 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
         const timestamp = Date.now();
         const app = express();
         app.set('view engine', 'ejs');
+        app.locals.humanize = humanize;
+        app.use((req, res, next)=>{
+            res.locals.path = req.path;
+            next();
+        });
         app.get('/', (req, res)=>res.render('index', {
             proxies: proxies,
             elapsed: Date.now()-timestamp,

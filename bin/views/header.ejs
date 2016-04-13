@@ -12,6 +12,9 @@
         text-transform:capitalize;
         font-weight: bold;
       }
+      div.card_stats {
+        width: 100%;
+      }
     </style>
     <script defer src=//code.getmdl.io/1.1.3/material.min.js></script>
   </head>
@@ -22,7 +25,11 @@
           <a class=mdl-layout-title href=//luminati.io target=_blank><img src=//luminati.io/img/menu-logo.svg height=40px></a>
           <div class=mdl-layout-spacer></div>
           <nav class=mdl-navigation mdl-layout--large-screen-only>
+            <% if (path=='/') { %>
             <a class=mdl-navigation__link href=/stats>Zones</a>
+            <% } else { %>
+            <a class=mdl-navigation__link href=/>Proxies</a>
+            <% } %>
           </nav>
         </div>
       </header>
