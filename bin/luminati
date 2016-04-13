@@ -8,6 +8,7 @@ const dns = require('dns');
 const express = require('express');
 const Luminati = require('../lib/luminati.js');
 const glob = require('glob');
+const request = require('request');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -27,9 +28,12 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 })
 .default({
     p: 23000,
+    log: 'WARNING',
+    customer: process.env.LUMINATI_CUSTOMER,
+    password: process.env.LUMINATI_PASSWORD,
+    zone: process.env.LUMINATI_ZONE,
     max_requests: 1,
     session_timeout: 5000,
-    log: 'WARNING',
 }).help('h').argv;
 let opts = _.pick(argv, 'zone', 'city', 'max_requests', 'pool_size', 'log',
     'session_timeout', 'direct_include', 'direct_exclude');
@@ -101,6 +105,18 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
             proxies: proxies,
             elapsed: Date.now()-timestamp,
         }));
+        app.get('/stats', (req, res, next)=>{
+            request({
+                url: 'https://luminati.io/api/get_customer_bw?details=1',
+                headers: {'x-hola-auth':
+                    `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+                json: true,
+            }, (err, r, stats)=>{
+                if (err)
+                    return next(err);
+                res.render('stats', {stats: stats[argv.customer]||{}});
+            });
+        });
         app.listen(argv.www, function(){
             console.log(`web interface is listening on port ${this.address().port}`);
         });
