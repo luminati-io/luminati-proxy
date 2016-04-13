@@ -27,6 +27,8 @@
     "email": "gilad@hola.org"
   },
   "dependencies": {
+    "ejs": "^2.4.1",
+    "express": "^4.13.4",
     "glob": "^7.0.3",
     "request": "^2.69.0",
     "underscore": "^1.8.3",

@@ -5,6 +5,7 @@ const _ = require('underscore');
 const fs = require('fs');
 const path = require('path');
 const dns = require('dns');
+const express = require('express');
 const Luminati = require('../lib/luminati.js');
 const glob = require('glob');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
@@ -22,6 +23,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 'Session establish timeout',
     direct_include: 'Include pattern for direct requests',
     direct_exclude: 'Exclude pattern for direct requests',
+    www: 'Local web port',
 })
 .default({
     p: 23000,
@@ -90,4 +92,17 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
             `    ${key}: ${server.opt[key]}`).join('\n');
         console.log(`Server ${server.port} (${server.opt.host})\n${conf}`);
     });
+    if (argv.www)
+    {
+        const timestamp = Date.now();
+        const app = express();
+        app.set('view engine', 'ejs');
+        app.get('/', (req, res)=>res.render('index', {
+            proxies: proxies,
+            elapsed: Date.now()-timestamp,
+        }));
+        app.listen(argv.www, function(){
+            console.log(`web interface is listening on port ${this.address().port}`);
+        });
+    }
 }).catch(err=>console.log(err));
