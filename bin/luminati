@@ -1,0 +1,93 @@
+#!/usr/bin/env node
+// LICENSE_CODE ZON
+'use strict'; /*jslint node:true, esnext:true*/
+const _ = require('underscore');
+const fs = require('fs');
+const path = require('path');
+const dns = require('dns');
+const Luminati = require('../lib/luminati.js');
+const glob = require('glob');
+const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
+.alias({h: 'help'})
+.describe({
+    p: 'Listening port',
+    log: `Log level (${Object.keys(Luminati.log_level).join('|')})`,
+    customer: 'Customer',
+    password: 'Password',
+    proxy: 'Super proxy ip or country',
+    zone: 'Zone',
+    city: 'City',
+    pool_size: 'Pool size',
+    max_requests: 'Requests per session',
+    session_timeout: 'Session establish timeout',
+    direct_include: 'Include pattern for direct requests',
+    direct_exclude: 'Exclude pattern for direct requests',
+})
+.default({
+    p: 23000,
+    max_requests: 1,
+    session_timeout: 5000,
+    log: 'WARNING',
+}).help('h').argv;
+let opts = _.pick(argv, 'zone', 'city', 'max_requests', 'pool_size', 'log',
+    'session_timeout', 'direct_include', 'direct_exclude');
+let config = argv._.reduce((config, pattern)=>{
+    glob.sync(pattern).forEach(filename=>{
+        [].push.apply(config, [].concat(JSON.parse(fs.readFileSync(filename,
+            {encoding: 'utf8'}))).map(conf=>_.extend({}, opts, conf)));
+    });
+    return config;
+}, []);
+config = config.length && config || [opts];
+
+Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
+    if (/^\d+\.\d+\.\d+\.\d+$/.test(host))
+        return host;
+    if (host.length==2)
+        host = `servercountry-${host}-session-${Date.now()}.zproxy.luminati.io`;
+    return new Promise((resolve, reject)=>{
+        dns.resolve(host, (err, ip)=>{
+            if (err)
+                return reject(err);
+            resolve(ip);
+        });
+    });
+})).then(hosts=>{
+    hosts = [].concat.apply([], hosts);
+    return Promise.all(config.map(conf=>{
+        if (!conf.host)
+            hosts.push(conf.host = hosts.shift());
+        conf.port = conf.port || argv.p++;
+        if (conf.direct_include || conf.direct_exclude)
+        {
+            conf.direct = {};
+            if (conf.direct_include)
+                conf.direct.include = new RegExp(conf.direct_include, 'i');
+            if (conf.direct_exclude)
+                conf.direct.exclude = new RegExp(conf.direct_exclude, 'i');
+            delete conf.direct_include;
+            delete conf.direct_exclude;
+        }
+        return new Luminati(_.extend(conf, _.pick(argv, 'customer',
+            'password')));
+    }).map(server=>server.listen()));
+}).then(proxies=>{
+    if (process.platform=='win32')
+    {
+        require('readline').createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        }).on('SIGINT', ()=>process.emit('SIGINT'));
+    }
+    process.on('SIGINT', ()=>{
+        proxies.forEach(proxy=>console.log(proxy.port, proxy.stats));
+        process.exit();
+    });
+    proxies.forEach(server=>{
+        let keys = Object.keys(_.pick(server.opt, 'zone', 'city',
+            'max_requests', 'pool_size', 'log', 'session_timeout'));
+        let conf = keys.map(key=>
+            `    ${key}: ${server.opt[key]}`).join('\n');
+        console.log(`Server ${server.port} (${server.opt.host})\n${conf}`);
+    });
+}).catch(err=>console.log(err));

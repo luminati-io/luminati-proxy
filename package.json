@@ -1,0 +1,35 @@
+{
+  "name": "luminati-proxy",
+  "version": "0.1.0",
+  "description": "A configurable local proxy for luminati.io",
+  "homepage": "https://luminati.io/",
+  "main": "lib/luminati.js",
+  "scripts": {
+    "start": "bin/luminati"
+  },
+  "keywords": [
+    "luminati",
+    "proxy",
+    "hola"
+  ],
+  "author": "Gilad Novik <gilad@hola.org>",
+  "license": "MIT",
+  "preferGlobal": "true",
+  "bin": {
+    "luminati-proxy": "bin/luminati",
+    "luminati": "bin/luminati"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hola/luminati-proxy.git"
+  },
+  "bugs": {
+    "email": "gilad@hola.org"
+  },
+  "dependencies": {
+    "glob": "^7.0.3",
+    "request": "^2.69.0",
+    "underscore": "^1.8.3",
+    "yargs": "^4.3.2"
+  }
+}
