@@ -10,6 +10,7 @@ const Luminati = require('../lib/luminati.js');
 const glob = require('glob');
 const request = require('request');
 const humanize = require('humanize');
+const moment = require('moment');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -37,6 +38,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     zone: process.env.LUMINATI_ZONE||'gen',
     max_requests: 1,
     session_timeout: 5000,
+    www: 22999,
 }).help('h').argv;
 let opts = _.pick(argv, 'zone', 'country', 'city', 'max_requests', 'pool_size',
     'log', 'session_timeout', 'direct_include', 'direct_exclude', 'dns');
@@ -64,8 +66,8 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
 })).then(hosts=>{
     hosts = [].concat.apply([], hosts);
     return Promise.all(config.map(conf=>{
-        if (!conf.host)
-            hosts.push(conf.host = hosts.shift());
+        if (!conf.super_proxy)
+            hosts.push(conf.super_proxy = hosts.shift());
         conf.port = conf.port || argv.p++;
         if (conf.direct_include || conf.direct_exclude)
         {
@@ -97,14 +99,16 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
             'max_requests', 'pool_size', 'log', 'session_timeout', 'dns'));
         let conf = keys.map(key=>
             `    ${key}: ${server.opt[key]}`).join('\n');
-        console.log(`Server ${server.port} (${server.opt.host})\n${conf}`);
+        console.log(`Server ${server.port} (${server.opt.super_proxy})\n${conf}`);
     });
     if (argv.www)
     {
         const timestamp = Date.now();
         const app = express();
+        const server = require('http').Server(app);
+        const io = require('socket.io')(server);
         app.set('view engine', 'ejs');
-        app.locals.humanize = humanize;
+        _.extend(app.locals, {humanize: humanize, moment: moment});
         app.use((req, res, next)=>{
             res.locals.path = req.path;
             next();
@@ -125,8 +129,12 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
                 res.render('stats', {stats: stats[argv.customer]||{}});
             });
         });
-        app.listen(argv.www, function(){
-            console.log(`web interface is listening on port ${this.address().port}`);
+        setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
+            stats[proxy.port] = proxy.stats;
+            return stats;
+        }, {})), 1000);
+        server.listen(argv.www, ()=>{
+            console.log(`web interface is listening on port ${server.address().port}`);
         });
     }
 }).catch(err=>console.log(err));

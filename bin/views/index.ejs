@@ -1,23 +1,30 @@
 <%- include header -%>
 <div class="mdl-grid">
   <% proxies.forEach(proxy=>{ %>
-  <div class="mdl-cell mdl-cell--4-col" id="proxy_<%= proxy.opt.port %>">
+  <div class="mdl-cell mdl-cell--6-col" id="proxy_<%= proxy.opt.port %>">
     <div class="mdl-card mdl-shadow--2dp">
       <div class="mdl-card__title mdl-card--expand">
-        <h2 class=mdl-card__title-text><%= proxy.opt.port %></h2>
+        <h2 class=mdl-card__title-text>http://127.0.0.1:<%= proxy.opt.port %></h2>
       </div>
       <div class=mdl-card__supporting-text>
-        <table class="mdl-data-table mdl-js-data-table">
-          <tbody>
-            <% ['port', 'host', 'log', 'zone', 'country', 'city', 'session_timeout',
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--6-col">
+            <table class="mdl-data-table mdl-js-data-table">
+              <tbody>
+                <% ['port', 'super_proxy', 'log', 'zone', 'country', 'city', 'session_timeout',
                 'dns', 'pool_size', 'max_requests'].filter(key=>proxy.opt[key]).forEach(key=>{ %>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric key"><%= key.replace(/_/g, ' ') %></td>
-              <td class="mdl-data-table__cell--non-numeric opt_<%= key %>"><%= proxy.opt[key] %></td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric key"><%= key.replace(/_/g, ' ') %></td>
+                  <td class="mdl-data-table__cell--non-numeric opt_<%= key %>"><%= proxy.opt[key] %></td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+          <div class="mdl-cell mdl-cell--6-col graph-container">
+            <canvas></canvas>
+          </div>
+        </div>
       </div>
       <div class="mdl-card__actions mdl-card--border">
         <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"></a>
@@ -26,4 +33,40 @@
   </div>
   <% }) %>
 </div>
+<script src=//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js></script>
+<script src=//cdnjs.cloudflare.com/ajax/libs/smoothie/1.27.0/smoothie.min.js></script>
+<script>
+$(function(){
+  $('canvas').each(function(){
+    var opt = {
+      millisPerPixel: 100,
+      grid: {fillStyle: 'rgba(151, 187, 251, 0.15)', strokeStyle: 'transparent', verticalSections: 0},
+      labels: {fillStyle: '#050201'},
+    };
+    opt.yMinFormatter = opt.yMaxFormatter = function(value){
+      return Math.round(value);
+    };
+    var chart = new SmoothieChart(opt);
+    var series = new TimeSeries();
+    chart.addTimeSeries(series, {
+      lineWidth:1,
+      strokeStyle: '#97bbcd',
+      fillStyle: 'rgba(151, 187, 205, 0.5)',
+    });
+    chart.streamTo(this, 1000);
+    $(this).data('series', series);
+  });
+  io().on('stats', function(stats){
+    Object.keys(stats).forEach(function(port){
+      var stat = stats[port];
+      var card = $('#proxy_'+port);
+      var canvas = card.find('canvas');
+      var size = {width: canvas.width(), height: canvas.height()};
+      if (size.width!=canvas.attr('width') || size.height!=canvas.attr('height'))
+        canvas.attr(size);
+      canvas.data('series').append(Date.now(), stat.active_requests);
+    });
+  });
+});
+</script>
 <%- include footer -%>
