@@ -22,6 +22,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     zone: 'Zone',
     country: 'Country',
     city: 'City',
+    asn: 'ASN',
     dns: 'DNS resolving (local|remote)',
     pool_size: 'Pool size',
     max_requests: 'Requests per session',
@@ -40,7 +41,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 5000,
     www: 22999,
 }).help('h').argv;
-let opts = _.pick(argv, 'zone', 'country', 'city', 'max_requests', 'pool_size',
+let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests', 'pool_size',
     'log', 'session_timeout', 'direct_include', 'direct_exclude', 'dns');
 let config = argv._.reduce((config, pattern)=>{
     glob.sync(pattern).forEach(filename=>{
@@ -95,8 +96,9 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
         process.exit();
     });
     proxies.forEach(server=>{
-        let keys = Object.keys(_.pick(server.opt, 'zone', 'city', 'country',
-            'max_requests', 'pool_size', 'log', 'session_timeout', 'dns'));
+        let keys = Object.keys(_.pick(server.opt, 'zone', 'city', 'asn',
+            'country', 'max_requests', 'pool_size', 'log', 'session_timeout',
+            'dns'));
         let conf = keys.map(key=>
             `    ${key}: ${server.opt[key]}`).join('\n');
         console.log(`Server ${server.port} (${server.opt.super_proxy})\n${conf}`);
