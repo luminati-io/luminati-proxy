@@ -38,6 +38,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     password: process.env.LUMINATI_PASSWORD,
     zone: process.env.LUMINATI_ZONE||'gen',
     max_requests: 1,
+    pool_size: 3,
     session_timeout: 5000,
     www: 22999,
 }).help('h').argv;
