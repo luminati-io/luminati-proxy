@@ -108,6 +108,7 @@ Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
         const server = require('http').Server(app);
         const io = require('socket.io')(server);
         app.set('view engine', 'ejs');
+        app.set('views', path.join(__dirname, 'views'));
         _.extend(app.locals, {humanize: humanize, moment: moment});
         app.use((req, res, next)=>{
             res.locals.path = req.path;
