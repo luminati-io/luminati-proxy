@@ -12,6 +12,8 @@ const request = require('request');
 const humanize = require('humanize');
 const moment = require('moment');
 const prompt = require('prompt');
+const http = require('http');
+const socket_io = require('socket.io');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -43,8 +45,9 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 5000,
     www: 22999,
 }).help('h').argv;
-let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests', 'pool_size',
-    'log', 'session_timeout', 'direct_include', 'direct_exclude', 'dns');
+let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests',
+    'pool_size', 'log', 'session_timeout', 'direct_include', 'direct_exclude',
+    'dns');
 let config = argv._.reduce((config, pattern)=>{
     glob.sync(pattern).forEach(filename=>{
         [].push.apply(config, [].concat(JSON.parse(fs.readFileSync(filename,
@@ -54,10 +57,10 @@ let config = argv._.reduce((config, pattern)=>{
 }, []);
 config = config.length && config || [opts];
 
-function check_credentials(conf){
+function check_credentials(){
     return new Promise((resolve, reject)=>{
         prompt.message = 'Luminati credentials';
-        prompt.override = conf;
+        prompt.override = argv;
         prompt.start();
         prompt.get([{
             name: 'customer',
@@ -70,12 +73,12 @@ function check_credentials(conf){
         }], (err, result)=>{
             if (err)
                 return reject(err);
-            resolve(_.extend(conf, result));
+            resolve(_.extend(argv, result));
         });
     });
 }
 
-check_credentials(argv).then(conf=>{
+function resolve_super_proxies(){
     return Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
         if (/^\d+\.\d+\.\d+\.\d+$/.test(host))
             return host;
@@ -88,9 +91,10 @@ check_credentials(argv).then(conf=>{
                 resolve(ip);
             });
         });
-    }));
-}).then(hosts=>{
-    hosts = [].concat.apply([], hosts);
+    })).then(hosts=>[].concat.apply([], hosts));
+}
+
+function create_proxies(hosts){
     return Promise.all(config.map(conf=>{
         if (!conf.super_proxy)
             hosts.push(conf.super_proxy = hosts.shift());
@@ -108,53 +112,51 @@ check_credentials(argv).then(conf=>{
         return new Luminati(_.extend(conf, _.pick(argv, 'customer',
             'password')));
     }).map(server=>server.listen()));
-}).then(proxies=>{
-    if (process.platform=='win32')
-    {
-        require('readline').createInterface({
-            input: process.stdin,
-            output: process.stdout,
-        }).on('SIGINT', ()=>process.emit('SIGINT'));
-    }
-    process.on('SIGINT', ()=>{
-        proxies.forEach(proxy=>console.log(proxy.port, proxy.stats));
-        process.exit();
+}
+
+function create_web_interface(proxies){
+    const timestamp = Date.now();
+    const app = express();
+    const server = http.Server(app);
+    const io = socket_io(server);
+    app.set('view engine', 'ejs');
+    app.set('views', path.join(__dirname, 'views'));
+    _.extend(app.locals, {humanize: humanize, moment: moment});
+    app.use((req, res, next)=>{
+        res.locals.path = req.path;
+        next();
     });
-    if (argv.www)
-    {
-        const timestamp = Date.now();
-        const app = express();
-        const server = require('http').Server(app);
-        const io = require('socket.io')(server);
-        app.set('view engine', 'ejs');
-        app.set('views', path.join(__dirname, 'views'));
-        _.extend(app.locals, {humanize: humanize, moment: moment});
-        app.use((req, res, next)=>{
-            res.locals.path = req.path;
-            next();
+    app.get('/', (req, res)=>res.render('index', {
+        proxies: proxies,
+        elapsed: Date.now()-timestamp,
+    }));
+    app.get('/stats', (req, res, next)=>{
+        request({
+            url: 'https://luminati.io/api/get_customer_bw?details=1',
+            headers: {'x-hola-auth':
+                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+            json: true,
+        }, (err, r, stats)=>{
+            if (err)
+                return next(err);
+            res.render('stats', {stats: stats[argv.customer]||{}});
         });
-        app.get('/', (req, res)=>res.render('index', {
-            proxies: proxies,
-            elapsed: Date.now()-timestamp,
-        }));
-        app.get('/stats', (req, res, next)=>{
-            request({
-                url: 'https://luminati.io/api/get_customer_bw?details=1',
-                headers: {'x-hola-auth':
-                    `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-                json: true,
-            }, (err, r, stats)=>{
-                if (err)
-                    return next(err);
-                res.render('stats', {stats: stats[argv.customer]||{}});
-            });
-        });
-        setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
-            stats[proxy.port] = proxy.stats;
-            return stats;
-        }, {})), 1000);
-        server.listen(argv.www, ()=>{
-            console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`);
-        });
-    }
+    });
+    setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
+        stats[proxy.port] = proxy.stats;
+        return stats;
+    }, {})), 1000);
+    return new Promise((resolve, reject)=>{
+        server.listen(argv.www, ()=>resolve(server)).on('error', reject);
+    });
+}
+
+check_credentials()
+.then(resolve_super_proxies)
+.then(create_proxies)
+.then(proxies=>{
+    if (!argv.www)
+        return;
+    return create_web_interface(proxies).then(server=>
+        console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`));
 }).catch(err=>console.log(err));
