@@ -149,7 +149,7 @@ function create_web_interface(proxies){
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
         })
-        .then(r=>res.render('stats', {stats: r.stats[argv.customer]||{}}))
+        .then(r=>res.render('stats', {stats: r.data[argv.customer]||{}}))
         .catch(next);
     });
     io.on('connection', socket=>{
