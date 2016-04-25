@@ -109,8 +109,8 @@ function create_proxies(hosts){
             delete conf.direct_include;
             delete conf.direct_exclude;
         }
-        return new Luminati(_.extend(conf, _.pick(argv, 'customer',
-            'password')));
+        return new Luminati(_.extend(_.pick(argv, 'customer',
+            'password'), conf));
     }).map(server=>server.listen()));
 }
 
