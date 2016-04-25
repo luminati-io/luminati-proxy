@@ -1,4 +1,35 @@
 <%- include header -%>
+<div>
+  <ul class=mdl-list>
+    <li class=mdl-list__item>
+      <span class=mdl-list__item-primary-content>
+        <span class=mdl-list__item-icon id=network>
+          <div class="mdl-spinner mdl-js-spinner is-active"></div>
+        </span>
+        Network Connectivity
+      </span>
+      <div class=mdl-tooltip for=network>Checks whether proxy was able to access the internet</div>
+    </li>
+    <li class=mdl-list__item>
+      <span class=mdl-list__item-primary-content>
+        <span class=mdl-list__item-icon id=firewall>
+          <div class="mdl-spinner mdl-js-spinner is-active"></div>
+        </span>
+        Firewall Access
+      </span>
+      <div class=mdl-tooltip for=firewall>Checks whether proxy is blocked by a firewall</div>
+    </li>
+    <li class=mdl-list__item>
+      <span class=mdl-list__item-primary-content>
+        <span class=mdl-list__item-icon id=credentials>
+          <div class="mdl-spinner mdl-js-spinner is-active"></div>
+        </span>
+        Credentials
+      </span>
+      <div class=mdl-tooltip for=credentials>Checks whether credentials are set up properly</div>
+    </li>
+  </ul>
+</div>
 <div class="mdl-grid">
   <% proxies.forEach(proxy=>{ %>
   <div class="mdl-cell mdl-cell--6-col" id="proxy_<%= proxy.opt.port %>">
@@ -62,9 +93,17 @@ $(function(){
       var card = $('#proxy_'+port);
       var canvas = card.find('canvas');
       var size = {width: canvas.width(), height: canvas.height()};
-      if (size.width!=canvas.attr('width') || size.height!=canvas.attr('height'))
+      if (size.width!=canvas.attr('width') ||
+          size.height!=canvas.attr('height'))
+      {
         canvas.attr(size);
+      }
       canvas.data('series').append(Date.now(), stat.active_requests);
+    });
+  }).on('health', function(data){
+    Object.keys(data).forEach(function(key){
+      $('<i>', {class: 'material-icons'}).text(data[key] ? 'done' : 'error')
+        .appendTo($('#'+key).empty());
     });
   });
 });

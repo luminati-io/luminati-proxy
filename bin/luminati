@@ -57,6 +57,19 @@ let config = argv._.reduce((config, pattern)=>{
 }, []);
 config = config.length && config || [opts];
 
+function json(opt){
+    if (typeof opt=='string')
+        opt = {url: opt};
+    opt.json = true;
+    return new Promise((resolve, reject)=>{
+        request(opt, (err, res, data)=>{
+            if (err)
+                return reject(err);
+            resolve({status: res.statusCode, data: data});
+        });
+    });
+}
+
 function check_credentials(){
     return new Promise((resolve, reject)=>{
         prompt.message = 'Luminati credentials';
@@ -131,16 +144,32 @@ function create_web_interface(proxies){
         elapsed: Date.now()-timestamp,
     }));
     app.get('/stats', (req, res, next)=>{
-        request({
+        json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-            json: true,
-        }, (err, r, stats)=>{
-            if (err)
-                return next(err);
-            res.render('stats', {stats: stats[argv.customer]||{}});
-        });
+        })
+        .then(r=>res.render('stats', {stats: r.stats[argv.customer]||{}}))
+        .catch(next);
+    });
+    io.on('connection', socket=>{
+        const notify = (name, value)=>{
+            const data = {};
+            data[name] = value;
+            io.emit('health', data);
+        };
+        json('http://lumtest.com/myip')
+            .then(()=>notify('network', true))
+            .catch(()=>notify('network', false));
+        json('http://zproxy.luminati.io:22225/')
+            .then(()=>notify('firewall', true))
+            .catch(()=>notify('firewall', false));
+        json({
+            url: 'http://zproxy.luminati.io:22225/',
+            headers: {'x-hola-auth':
+                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+        }).then(()=>notify('credentials', true))
+        .catch(()=>notify('credentials', false));
     });
     setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
         stats[proxy.port] = proxy.stats;
