@@ -168,7 +168,8 @@ function create_web_interface(proxies){
             url: 'http://zproxy.luminati.io:22225/',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-        }).then(()=>notify('credentials', true))
+        })
+        .then(res=>notify('credentials', res.status!=407))
         .catch(()=>notify('credentials', false));
     });
     setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
@@ -187,5 +188,6 @@ check_credentials()
     if (!argv.www)
         return;
     return create_web_interface(proxies).then(server=>
-        console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`));
-}).catch(err=>console.log(err));
+        console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`))
+})
+.catch(err=>console.log(err));
