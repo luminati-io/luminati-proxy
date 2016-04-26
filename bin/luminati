@@ -14,6 +14,7 @@ const moment = require('moment');
 const prompt = require('prompt');
 const http = require('http');
 const socket_io = require('socket.io');
+const config_file = path.join(process.env.APPDATA||process.env.HOME, '.luminati.json');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -49,13 +50,21 @@ let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests',
     'pool_size', 'log', 'session_timeout', 'direct_include', 'direct_exclude',
     'dns');
 let config = argv._.reduce((config, pattern)=>{
-    glob.sync(pattern).forEach(filename=>{
+    glob.sync(pattern).concat(config_file)
+    .filter(filename=>{
+        try {
+            fs.access(filename, fs.F_OK);
+        } catch(err){ return false; }
+    })
+    .forEach(filename=>{
         [].push.apply(config, [].concat(JSON.parse(fs.readFileSync(filename,
             {encoding: 'utf8'}))).map(conf=>_.extend({}, opts, conf)));
     });
     return config;
 }, []);
 config = config.length && config || [opts];
+config.filter(conf=>!conf.port)
+    .forEach((conf, i)=>_.extend(conf, {port: argv.p+i}));
 
 function log(level, msg, extra){
     if (Luminati.log_level[level]>Luminati.log_level[argv.log])
@@ -128,7 +137,6 @@ function create_proxies(hosts){
     return Promise.all(config.map(conf=>{
         if (!conf.super_proxy)
             hosts.push(conf.super_proxy = hosts.shift());
-        conf.port = conf.port || argv.p++;
         if (conf.direct_include || conf.direct_exclude)
         {
             conf.direct = {};
