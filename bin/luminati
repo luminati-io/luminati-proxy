@@ -23,6 +23,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     customer: 'Customer',
     password: 'Password',
     proxy: 'Super proxy ip or country',
+    proxy_count: 'Number of super proxies to use',
     zone: 'Zone',
     country: 'Country',
     city: 'City',
@@ -44,6 +45,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     max_requests: 1,
     pool_size: 3,
     session_timeout: 5000,
+    proxy_count: 1,
     www: 22999,
 }).help('h').argv;
 let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests',
@@ -120,23 +122,33 @@ function resolve_super_proxies(){
         if (host.length==2)
             host = `servercountry-${host}-session-${Date.now()}.zproxy.luminati.io`;
         return new Promise((resolve, reject)=>{
-            dns.resolve(host, (err, ip)=>{
-                if (err)
-                {
-                    log('ERROR', `could not resolve ${host}`, err);
-                    return reject(err);
-                }
-                log('DEBUG', `resolving ${host}`, ip);
-                resolve(ip);
-            });
+            const hosts = {};
+            const timestamp = Date.now();
+            const fetch = ()=>{
+                dns.resolve(host, (err, ips)=>{
+                    if (err)
+                    {
+                        log('ERROR', `could not resolve ${host}`, err);
+                        return reject(err);
+                    }
+                    log('DEBUG', `resolving ${host}`, ips);
+                    ips.forEach(ip=>hosts[ip] = true);
+                    if (Object.keys(hosts).length>=argv.proxy_count ||
+                        Date.now()-timestamp>=30000)
+                    {
+                        return resolve(Object.keys(hosts));
+                    }
+                    fetch();
+                });
+            };
+            fetch();
         });
     })).then(hosts=>[].concat.apply([], hosts));
 }
 
 function create_proxies(hosts){
     return Promise.all(config.map(conf=>{
-        if (!conf.super_proxy)
-            hosts.push(conf.super_proxy = hosts.shift());
+        conf.proxy = conf.proxy || hosts;
         if (conf.direct_include || conf.direct_exclude)
         {
             conf.direct = {};
@@ -214,6 +226,6 @@ check_credentials()
     if (!argv.www)
         return;
     return create_web_interface(proxies).then(server=>
-        console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`))
+        console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`));
 })
 .catch(err=>console.log(err));
