@@ -78,18 +78,11 @@ $(function(){
       return Math.round(value);
     };
     var chart = new SmoothieChart(opt);
-    var series = new TimeSeries();
-    chart.addTimeSeries(series, {
-      lineWidth:1,
-      strokeStyle: '#97bbcd',
-      fillStyle: 'rgba(151, 187, 205, 0.5)',
-    });
     chart.streamTo(this, 1000);
-    $(this).data('series', series);
+    $(this).data({chart: chart, series: {}});
   });
   io().on('stats', function(stats){
     Object.keys(stats).forEach(function(port){
-      var stat = stats[port];
       var card = $('#proxy_'+port);
       var canvas = card.find('canvas');
       var size = {width: canvas.width(), height: canvas.height()};
@@ -98,7 +91,23 @@ $(function(){
       {
         canvas.attr(size);
       }
-      canvas.data('series').append(Date.now(), stat.active_requests);
+      var data = canvas.data();
+      var now = Date.now();
+      Object.keys(stats[port]).forEach(function(ip, i){
+        var stat = stats[port][ip];
+        var series = data.series[ip];
+        if (!series)
+        {
+          series = data.series[ip] = new TimeSeries();
+          var color = i*(360/Object.keys(stats[port]).length)%360;
+          data.chart.addTimeSeries(series, {
+            lineWidth:1,
+            strokeStyle: '#808080',
+            fillStyle: 'hsla('+color+', 100%, 50%, 0.25)',
+          });
+        }
+        series.append(now, stat.active_requests);
+      });
     });
   }).on('health', function(data){
     Object.keys(data).forEach(function(key){

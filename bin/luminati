@@ -42,7 +42,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
     zone: process.env.LUMINATI_ZONE||'gen',
-    max_requests: 1,
+    max_requests: 50,
     pool_size: 3,
     session_timeout: 5000,
     proxy_count: 1,
@@ -119,19 +119,24 @@ function resolve_super_proxies(){
             log('DEBUG', `using super proxy ${host}`);
             return host;
         }
+        let prefix = '';
         if (host.length==2)
-            host = `servercountry-${host}-session-${Date.now()}.zproxy.luminati.io`;
+        {
+            prefix = `servercountry-${host}-`;
+            host = 'zproxy.luminati.io';
+        }
         return new Promise((resolve, reject)=>{
             const hosts = {};
             const timestamp = Date.now();
             const fetch = ()=>{
-                dns.resolve(host, (err, ips)=>{
+                let domain = `${prefix}session-${Date.now()}.${host}`;
+                dns.resolve(domain, (err, ips)=>{
                     if (err)
                     {
-                        log('ERROR', `could not resolve ${host}`, err);
+                        log('ERROR', `could not resolve ${domain}`, err);
                         return reject(err);
                     }
-                    log('DEBUG', `resolving ${host}`, ips);
+                    log('DEBUG', `resolving ${domain}`, ips);
                     ips.forEach(ip=>hosts[ip] = true);
                     if (Object.keys(hosts).length>=argv.proxy_count ||
                         Date.now()-timestamp>=30000)
