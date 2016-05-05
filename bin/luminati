@@ -30,6 +30,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     asn: 'ASN',
     dns: 'DNS resolving (local|remote)',
     pool_size: 'Pool size',
+    ssl: 'Enable SSL sniffing',
     max_requests: 'Requests per session',
     session_timeout: 'Session establish timeout',
     direct_include: 'Include pattern for direct requests',
@@ -152,6 +153,13 @@ function resolve_super_proxies(){
 }
 
 function create_proxies(hosts){
+    const ssl = argv.ssl && {
+        key: fs.readFileSync('./server.key'),
+        cert: fs.readFileSync('./server.crt'),
+        ca: fs.readFileSync('./ca.crt'),
+        requestCert: true,
+        rejectUnauthorized: false,
+    };
     return Promise.all(config.map(conf=>{
         conf.proxy = conf.proxy || hosts;
         if (conf.direct_include || conf.direct_exclude)
@@ -165,7 +173,7 @@ function create_proxies(hosts){
             delete conf.direct_exclude;
         }
         return new Luminati(_.extend(_.pick(argv, 'customer',
-            'password'), conf));
+            'password'), conf, {ssl: ssl}));
     }).map(server=>server.listen()));
 }
 
@@ -233,4 +241,4 @@ check_credentials()
     return create_web_interface(proxies).then(server=>
         console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`));
 })
-.catch(err=>console.log(err));
+.catch(err=>console.log(err, err.stack));
