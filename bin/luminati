@@ -14,6 +14,8 @@ const moment = require('moment');
 const prompt = require('prompt');
 const http = require('http');
 const socket_io = require('socket.io');
+const hutil = require('hutil');
+const etask = hutil.etask;
 const config_file = path.join(process.env.APPDATA||process.env.HOME, '.luminati.json');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
@@ -78,43 +80,32 @@ function log(level, msg, extra){
     console.log.apply(console, args);
 }
 
-function json(opt){
+const json = opt=>etask(function*(){
     if (typeof opt=='string')
         opt = {url: opt};
     opt.json = true;
-    return new Promise((resolve, reject)=>{
-        request(opt, (err, res, data)=>{
-            if (err)
-                return reject(err);
-            log('DEBUG', `GET ${opt.url} - ${res.statusCode}`);
-            resolve({status: res.statusCode, data: data});
-        });
-    });
-}
+    let res = etask.nfn_apply(request, [opt]);
+    log('DEBUG', `GET ${opt.url} - ${res.statusCode}`);
+    return res;
+});
 
-function check_credentials(){
-    return new Promise((resolve, reject)=>{
-        prompt.message = 'Luminati credentials';
-        prompt.override = argv;
-        prompt.start();
-        prompt.get([{
-            name: 'customer',
-            description: 'CUSTOMER',
-            required: true,
-        }, {
-            name: 'password',
-            description: 'PASSWORD',
-            required: true,
-        }], (err, result)=>{
-            if (err)
-                return reject(err);
-            resolve(_.extend(argv, result));
-        });
-    });
-}
+const check_credentials = ()=>etask(function*(){
+    prompt.message = 'Luminati credentials';
+    prompt.override = argv;
+    prompt.start();
+    return Object.assign(argv, yield etask.nfn_apply(prompt, '.get', [[{
+        name: 'customer',
+        description: 'CUSTOMER',
+        required: true,
+    }, {
+        name: 'password',
+        description: 'PASSWORD',
+        required: true,
+    }]]));
+});
 
-function resolve_super_proxies(){
-    return Promise.all([].concat(argv.proxy||'zproxy.luminati.io').map(host=>{
+const resolve_super_proxies = ()=>etask(function*(){
+    const hosts = [].concat(argv.proxy||'zproxy.luminati.io').map(host=>etask(function*(){
         if (/^\d+\.\d+\.\d+\.\d+$/.test(host))
         {
             log('DEBUG', `using super proxy ${host}`);
@@ -126,33 +117,22 @@ function resolve_super_proxies(){
             prefix = `servercountry-${host}-`;
             host = 'zproxy.luminati.io';
         }
-        return new Promise((resolve, reject)=>{
-            const hosts = {};
-            const timestamp = Date.now();
-            const fetch = ()=>{
-                let domain = `${prefix}session-${Date.now()}.${host}`;
-                dns.resolve(domain, (err, ips)=>{
-                    if (err)
-                    {
-                        log('ERROR', `could not resolve ${domain}`, err);
-                        return reject(err);
-                    }
-                    log('DEBUG', `resolving ${domain}`, ips);
-                    ips.forEach(ip=>hosts[ip] = true);
-                    if (Object.keys(hosts).length>=argv.proxy_count ||
-                        Date.now()-timestamp>=30000)
-                    {
-                        return resolve(Object.keys(hosts));
-                    }
-                    fetch();
-                });
-            };
-            fetch();
-        });
-    })).then(hosts=>[].concat.apply([], hosts));
-}
+        const hosts = {};
+        const timestamp = Date.now();
+        while (Object.keys(hosts).length<argv.proxy_count &&
+            Date.now()-timestamp<30000)
+        {
+            let domain = `${prefix}session-${Date.now()}.${host}`;
+            let ips = yield etask.nfn_apply(dns, '.resolve', [domain]);
+            log('DEBUG', `resolving ${domain}`, ips);
+            ips.forEach(ip=>hosts[ip] = true);
+        }
+        return Object.keys(hosts);
+    }));
+    return [].concat.apply([], yield etask.all(hosts));
+});
 
-function create_proxies(hosts){
+const create_proxies = hosts=>{
     const ssl = argv.ssl && {
         key: fs.readFileSync('./server.key'),
         cert: fs.readFileSync('./server.crt'),
@@ -160,7 +140,7 @@ function create_proxies(hosts){
         requestCert: true,
         rejectUnauthorized: false,
     };
-    return Promise.all(config.map(conf=>{
+    return etask.all(config.map(conf=>etask(function*(){
         conf.proxy = conf.proxy || hosts;
         if (conf.direct_include || conf.direct_exclude)
         {
@@ -172,19 +152,20 @@ function create_proxies(hosts){
             delete conf.direct_include;
             delete conf.direct_exclude;
         }
-        return new Luminati(_.extend(_.pick(argv, 'customer',
+        const server = new Luminati(_.extend(_.pick(argv, 'customer',
             'password'), conf, {ssl: ssl}));
-    }).map(server=>server.listen()));
-}
+        return yield server.listen();
+    })));
+};
 
-function create_web_interface(proxies){
+const create_web_interface = proxies=>etask(function*(){
     const timestamp = Date.now();
     const app = express();
     const server = http.Server(app);
     const io = socket_io(server);
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
-    _.extend(app.locals, {humanize: humanize, moment: moment});
+    Object.assign(app.locals, {humanize: humanize, moment: moment});
     app.use((req, res, next)=>{
         res.locals.path = req.path;
         next();
@@ -193,52 +174,57 @@ function create_web_interface(proxies){
         proxies: proxies,
         elapsed: Date.now()-timestamp,
     }));
-    app.get('/stats', (req, res, next)=>{
-        json({
+    app.get('/stats', (req, res, next)=>etask(function*(){
+        let r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
         })
-        .then(r=>res.render('stats', {stats: r.data[argv.customer]||{}}))
-        .catch(next);
-    });
-    io.on('connection', socket=>{
+        res.render('stats', {stats: r.body[argv.customer]||{}});
+    }));
+    io.on('connection', socket=>etask(function*(){
         const notify = (name, value)=>{
             const data = {};
             data[name] = value;
             io.emit('health', data);
         };
-        json('http://lumtest.com/myip')
-            .then(()=>notify('network', true))
-            .catch(()=>notify('network', false));
-        json('http://zproxy.luminati.io:22225/')
-            .then(()=>notify('firewall', true))
-            .catch(()=>notify('firewall', false));
-        json({
-            url: 'http://zproxy.luminati.io:22225/',
-            headers: {'x-hola-auth':
-                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-        })
-        .then(res=>notify('credentials', res.status!=407))
-        .catch(()=>notify('credentials', false));
-    });
+        try {
+            yield json('http://lumtest.com/myip');
+            notify('network', true);
+        } catch(e){ notify('network', false); }
+
+        try {
+            yield json('http://zproxy.luminati.io:22225/');
+            notify('firewall', true);
+        } catch(e){ notify('firewall', false); }
+        try {
+            let res = yield json({
+                url: 'http://zproxy.luminati.io:22225/',
+                headers: {'x-hola-auth':
+                    `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+            });
+            notify('credentials', res.statusCode!=407);
+        } catch(e){ notify('credentials', false); }
+    }));
     setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
         stats[proxy.port] = proxy.stats;
         return stats;
     }, {})), 1000);
-    return new Promise((resolve, reject)=>{
-        server.listen(argv.www, ()=>resolve(server)).on('error', reject);
-    });
-}
+    server.on('error', err=>this.ethrow(err));
+    yield etask.cb_apply(server, '.listen', [argv.www]);
+    return server;
+});
 
-check_credentials()
-.then(resolve_super_proxies)
-.then(create_proxies)
-.then(proxies=>{
-    proxies.forEach(server=>log('DEBUG', 'created local proxy', server.opt));
-    if (!argv.www)
-        return;
-    return create_web_interface(proxies).then(server=>
-        console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`));
-})
-.catch(err=>console.log(err, err.stack));
+etask(function*(){
+    try {
+        yield check_credentials();
+        const hosts = yield resolve_super_proxies();
+        const proxies = yield create_proxies(hosts);
+        proxies.forEach(server=>log('DEBUG', 'created local proxy', server.opt));
+        if (argv.www)
+        {
+            const server = yield create_web_interface(proxies);
+            console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`);
+        }
+    } catch(e){ console.log(e, e.stack); }
+});
