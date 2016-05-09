@@ -4,7 +4,7 @@ This tool requires a [Luminati] account.
 
 ### Installation
 ```sh
-$ sudo npm install -g hola/luminati-proxy
+$ sudo npm install -g luminati-io/luminati-proxy
 ```
 
 ### Usage
