@@ -63,13 +63,13 @@ let config = argv._.reduce((config, pattern)=>{
     })
     .forEach(filename=>{
         [].push.apply(config, [].concat(JSON.parse(fs.readFileSync(filename,
-            {encoding: 'utf8'}))).map(conf=>_.extend({}, opts, conf)));
+            {encoding: 'utf8'}))).map(conf=>Object.assign({}, opts, conf)));
     });
     return config;
 }, []);
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
-    .forEach((conf, i)=>_.extend(conf, {port: argv.p+i}));
+    .forEach((conf, i)=>Object.assign(conf, {port: argv.p+i}));
 
 function log(level, msg, extra){
     if (Luminati.log_level[level]>Luminati.log_level[argv.log])
@@ -152,7 +152,7 @@ const create_proxies = hosts=>{
             delete conf.direct_include;
             delete conf.direct_exclude;
         }
-        const server = new Luminati(_.extend(_.pick(argv, 'customer',
+        const server = new Luminati(Object.assign(_.pick(argv, 'customer',
             'password'), conf, {ssl: ssl}));
         return yield server.listen();
     })));
