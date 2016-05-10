@@ -7,10 +7,9 @@ This tool requires a [Luminati](https://luminati.io/) account.
 - Connection pool for faster response time
 - Easy setup for multiple configurations using a simple web interface
 - Statistics
-- Automatically switch exit nodes every X requests
+- Automatically rotate IP every X requests
 - Load balancing using multiple Super Proxies
-- Optional SSL sniffing (using a self-signed certificate)
-- Integrated scrapper tool (coming soon...)
+- SSL sniffing (using a self-signed certificate)
 
 ## Installation
 
