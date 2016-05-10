@@ -1,4 +1,6 @@
-# Luminati Proxy Tool
+# Luminati HTTP/HTTPS Proxy manager
+
+A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
 
 This tool requires a [Luminati](https://luminati.io/) account.
 
