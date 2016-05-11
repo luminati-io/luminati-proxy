@@ -105,7 +105,8 @@ const check_credentials = ()=>etask(function*(){
 });
 
 const resolve_super_proxies = ()=>etask(function*(){
-    const hosts = [].concat(argv.proxy||'zproxy.luminati.io').map(host=>etask(function*(){
+    const hosts = [].concat(argv.proxy||'zproxy.luminati.io')
+    .map(host=>etask(function*(){
         if (/^\d+\.\d+\.\d+\.\d+$/.test(host))
         {
             log('DEBUG', `using super proxy ${host}`);
@@ -192,7 +193,6 @@ const create_web_interface = proxies=>etask(function*(){
             yield json('http://lumtest.com/myip');
             notify('network', true);
         } catch(e){ notify('network', false); }
-
         try {
             yield json('http://zproxy.luminati.io:22225/');
             notify('firewall', true);
@@ -206,10 +206,11 @@ const create_web_interface = proxies=>etask(function*(){
             notify('credentials', res.statusCode!=407);
         } catch(e){ notify('credentials', false); }
     }));
-    setInterval(()=>io.emit('stats', proxies.reduce((stats, proxy)=>{
-        stats[proxy.port] = proxy.stats;
-        return stats;
-    }, {})), 1000);
+    setInterval(()=>{
+        const stats = {};
+        proxies.forEach(proxy=>stats[proxy.port] = proxy.stats);
+        io.emit('stats', stats);
+    }, 1000);
     server.on('error', err=>this.ethrow(err));
     yield etask.cb_apply(server, '.listen', [argv.www]);
     return server;
