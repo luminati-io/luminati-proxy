@@ -36,6 +36,7 @@
     "prompt": "^1.0.0",
     "request": "^2.69.0",
     "socket.io": "^1.4.5",
+    "socksv5": "0.0.6",
     "underscore": "^1.8.3",
     "yargs": "^4.3.2"
   }

@@ -8,13 +8,16 @@ const dns = require('dns');
 const express = require('express');
 const Luminati = require('../lib/luminati.js');
 const glob = require('glob');
+const net = require('net');
 const request = require('request');
 const humanize = require('humanize');
 const moment = require('moment');
 const prompt = require('prompt');
 const http = require('http');
 const socket_io = require('socket.io');
+const socks = require('socksv5');
 const hutil = require('hutil');
+const util = require('util');
 const etask = hutil.etask;
 const config_file = path.join(process.env.APPDATA||process.env.HOME, '.luminati.json');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
@@ -38,6 +41,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     direct_include: 'Include pattern for direct requests',
     direct_exclude: 'Exclude pattern for direct requests',
     www: 'Local web port',
+    socks: 'SOCKS5 port (local:remote)',
 })
 .default({
     p: 23000,
@@ -216,6 +220,33 @@ const create_web_interface = proxies=>etask(function*(){
     return server;
 });
 
+const create_socks_server = (local, remote)=>etask(function*(){
+    const server = socks.createServer((info, accept, deny)=>etask(function*(){
+        if (info.dstPort==80)
+        {
+            info.dstAddr = '127.0.0.1',
+            info.dstPort = remote;
+            return accept();
+        }
+        if (info.dstPort==443)
+        {
+            const socket = accept(true);
+            const dst = net.connect(remote, '127.0.0.1');
+            dst.on('connect', ()=>{
+                dst.write(util.format('CONNECT %s:%d HTTP/1.1\r\n'+
+                    'Host: %s:%d\r\n\r\n', info.dstAddr, info.dstPort,
+                    info.dstAddr, info.dstPort));
+                socket.pipe(dst);
+            });
+            return dst.once('data', ()=>{ dst.pipe(socket); });
+        }
+        accept();
+    }));
+    server.useAuth(socks.auth.None());
+    yield etask.cb_apply(server, '.listen', [local]);
+    return server;
+});
+
 etask(function*(){
     try {
         yield check_credentials();
@@ -227,5 +258,10 @@ etask(function*(){
             const server = yield create_web_interface(proxies);
             console.log(`admin interface is available at http://127.0.0.1:${server.address().port}`);
         }
+        [].concat(argv.socks||[]).forEach(ports=>etask(function*(){
+            ports = ports.split(':');
+            const server = yield create_socks_server(+ports[0], +ports[1]);
+            console.log(`SOCKS5 is available at 127.0.0.1:${server.address().port}`);
+        }));
     } catch(e){ console.log(e, e.stack); }
 });
