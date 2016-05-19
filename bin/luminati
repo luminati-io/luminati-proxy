@@ -55,6 +55,13 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     proxy_count: 1,
     www: 22999,
 }).help('h').argv;
+const ssl = {
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.crt'),
+    ca: fs.readFileSync('./ca.crt'),
+    requestCert: true,
+    rejectUnauthorized: false,
+};
 let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests',
     'pool_size', 'log', 'session_timeout', 'direct_include', 'direct_exclude',
     'dns');
@@ -137,30 +144,26 @@ const resolve_super_proxies = ()=>etask(function*(){
     return [].concat.apply([], yield etask.all(hosts));
 });
 
+const create_proxy = conf=>etask(function*(){
+    conf.proxy = [].concat(conf.proxy);
+    if (conf.direct_include || conf.direct_exclude)
+    {
+        conf.direct = {};
+        if (conf.direct_include)
+            conf.direct.include = new RegExp(conf.direct_include, 'i');
+        if (conf.direct_exclude)
+            conf.direct.exclude = new RegExp(conf.direct_exclude, 'i');
+        delete conf.direct_include;
+        delete conf.direct_exclude;
+    }
+    const server = new Luminati(Object.assign(_.pick(argv, 'customer',
+        'password'), conf, {ssl: conf.ssl&&ssl}));
+    return yield server.listen();
+});
+
 const create_proxies = hosts=>{
-    const ssl = argv.ssl && {
-        key: fs.readFileSync('./server.key'),
-        cert: fs.readFileSync('./server.crt'),
-        ca: fs.readFileSync('./ca.crt'),
-        requestCert: true,
-        rejectUnauthorized: false,
-    };
-    return etask.all(config.map(conf=>etask(function*(){
-        conf.proxy = conf.proxy || hosts;
-        if (conf.direct_include || conf.direct_exclude)
-        {
-            conf.direct = {};
-            if (conf.direct_include)
-                conf.direct.include = new RegExp(conf.direct_include, 'i');
-            if (conf.direct_exclude)
-                conf.direct.exclude = new RegExp(conf.direct_exclude, 'i');
-            delete conf.direct_include;
-            delete conf.direct_exclude;
-        }
-        const server = new Luminati(Object.assign(_.pick(argv, 'customer',
-            'password'), conf, {ssl: ssl}));
-        return yield server.listen();
-    })));
+    return etask.all(config.map(conf=>create_proxy(Object.assign(conf,
+        {proxy: conf.proxy||hosts, ssl: argv.ssl}))));
 };
 
 const create_web_interface = proxies=>etask(function*(){
