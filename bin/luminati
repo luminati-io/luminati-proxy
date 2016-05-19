@@ -166,6 +166,19 @@ const create_proxies = hosts=>{
         {proxy: conf.proxy||hosts, ssl: argv.ssl}))));
 };
 
+const create_api_interface = ()=>{
+    const app = express();
+    app.get('/stats', (req, res, next)=>etask(function*(){
+        let r = yield json({
+            url: 'https://luminati.io/api/get_customer_bw?details=1',
+            headers: {'x-hola-auth':
+                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+        })
+        res.json(r.body[argv.customer]||{});
+    }));
+    return app;
+};
+
 const create_web_interface = proxies=>etask(function*(){
     const timestamp = Date.now();
     const app = express();
@@ -174,6 +187,7 @@ const create_web_interface = proxies=>etask(function*(){
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
     Object.assign(app.locals, {humanize: humanize, moment: moment});
+    app.use('/api', create_api_interface());
     app.use((req, res, next)=>{
         res.locals.path = req.path;
         next();
