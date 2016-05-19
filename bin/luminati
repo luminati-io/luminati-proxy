@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const dns = require('dns');
 const express = require('express');
+const body_parser = require('body-parser');
 const Luminati = require('../lib/luminati.js');
 const glob = require('glob');
 const net = require('net');
@@ -56,15 +57,15 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     www: 22999,
 }).help('h').argv;
 const ssl = {
-    key: fs.readFileSync('./server.key'),
-    cert: fs.readFileSync('./server.crt'),
-    ca: fs.readFileSync('./ca.crt'),
+    key: fs.readFileSync(path.join(__dirname, 'server.key')),
+    cert: fs.readFileSync(path.join(__dirname, 'server.crt')),
+    ca: fs.readFileSync(path.join(__dirname, 'ca.crt')),
     requestCert: true,
     rejectUnauthorized: false,
 };
-let opts = _.pick(argv, 'zone', 'country', 'city', 'asn', 'max_requests',
-    'pool_size', 'log', 'session_timeout', 'direct_include', 'direct_exclude',
-    'dns');
+const keys = ['zone', 'country', 'city', 'asn', 'max_requests', 'pool_size',
+      'session_timeout', 'direct_include', 'direct_exclude', 'dns'];
+let opts = _.pick(argv, keys.concat('log'));
 let config = argv._.reduce((config, pattern)=>{
     glob.sync(pattern).concat(config_file)
     .filter(filename=>{
@@ -176,6 +177,47 @@ const create_api_interface = ()=>{
         })
         res.json(r.body[argv.customer]||{});
     }));
+    const proxies = {};
+    app.post('/create', (req, res, next)=>etask(function*(){
+        this.on('ensure', ()=>{
+            if (this.error)
+                return next(this.error);
+        });
+        let key = [];
+        keys.forEach(field=>{
+            if (!req.body[field])
+                return;
+            key.push(field+'-'+req.body[field]);
+        });
+        key = key.join('-');
+        let server = proxies[key];
+        if (server)
+        {
+            if (server.port)
+                return res.json({port: server.port});
+            return server.once('ready', ()=>res.json({port: server.port}));
+        }
+        server = proxies[key] = create_proxy(_.omit(req.body, 'timeout'));
+        if (req.body.timeout)
+        {
+            let timer;
+            server.on('idle', idle=>{
+                if (timer)
+                {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+                if (!idle)
+                    return;
+                timer = setTimeout(()=>etask(function*(){
+                    yield server.stop();
+                    delete proxies[key];
+                }), +req.body.timeout);
+            });
+        }
+        yield server.listen();
+        res.json({port: server.port});
+    }));
     return app;
 };
 
@@ -187,6 +229,8 @@ const create_web_interface = proxies=>etask(function*(){
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
     Object.assign(app.locals, {humanize: humanize, moment: moment});
+    app.use(body_parser.urlencoded({extended: true}));
+    app.use(body_parser.json());
     app.use('/api', create_api_interface());
     app.use((req, res, next)=>{
         res.locals.path = req.path;
@@ -204,6 +248,10 @@ const create_web_interface = proxies=>etask(function*(){
         })
         res.render('stats', {stats: r.body[argv.customer]||{}});
     }));
+    app.use((err, req, res, next)=>{
+        log('ERROR', err.stack);
+        res.status(500).send('Server Error');
+    });
     io.on('connection', socket=>etask(function*(){
         const notify = (name, value)=>{
             const data = {};
