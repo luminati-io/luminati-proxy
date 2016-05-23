@@ -70,8 +70,9 @@ let config = argv._.reduce((config, pattern)=>{
     glob.sync(pattern).concat(config_file)
     .filter(filename=>{
         try {
-            fs.access(filename, fs.F_OK);
+            fs.accessSync(filename, fs.F_OK);
         } catch(err){ return false; }
+        return true;
     })
     .forEach(filename=>{
         [].push.apply(config, [].concat(JSON.parse(fs.readFileSync(filename,
@@ -103,7 +104,17 @@ const json = opt=>etask(function*(){
 
 const check_credentials = ()=>etask(function*(){
     prompt.message = 'Luminati credentials';
-    prompt.override = argv;
+    let cred = {};
+    for (let i=0; i<config.length; i++)
+    {
+        cred.customer = config[i].customer||cred.customer;
+        cred.password = config[i].password||cred.password;
+        if (cred.customer && cred.password)
+            break;
+    }
+    cred.customer = argv.customer||cred.customer;
+    cred.password = argv.password||cred.password;
+    prompt.override = cred;
     prompt.start();
     return Object.assign(argv, yield etask.nfn_apply(prompt, '.get', [[{
         name: 'customer',
