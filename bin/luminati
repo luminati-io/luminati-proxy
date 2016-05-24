@@ -97,7 +97,7 @@ const json = opt=>etask(function*(){
     if (typeof opt=='string')
         opt = {url: opt};
     opt.json = true;
-    let res = etask.nfn_apply(request, [opt]);
+    let res = yield etask.nfn_apply(request, [opt]);
     log('DEBUG', `GET ${opt.url} - ${res.statusCode}`);
     return res;
 });
@@ -185,7 +185,7 @@ const create_api_interface = ()=>{
             url: 'https://luminati.io/api/get_customer_bw?details=1',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-        })
+        });
         res.json(r.body[argv.customer]||{});
     }));
     const proxies = {};
@@ -256,7 +256,7 @@ const create_web_interface = proxies=>etask(function*(){
             url: 'https://luminati.io/api/get_customer_bw?details=1',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-        })
+        });
         res.render('stats', {stats: r.body[argv.customer]||{}});
     }));
     app.use((err, req, res, next)=>{
@@ -297,10 +297,10 @@ const create_web_interface = proxies=>etask(function*(){
 });
 
 const create_socks_server = (local, remote)=>etask(function*(){
-    const server = socks.createServer((info, accept, deny)=>etask(function*(){
+    const server = socks.createServer((info, accept, deny)=>{
         if (info.dstPort==80)
         {
-            info.dstAddr = '127.0.0.1',
+            info.dstAddr = '127.0.0.1';
             info.dstPort = remote;
             return accept();
         }
@@ -317,7 +317,7 @@ const create_socks_server = (local, remote)=>etask(function*(){
             return dst.once('data', ()=>{ dst.pipe(socket); });
         }
         accept();
-    }));
+    });
     server.useAuth(socks.auth.None());
     yield etask.cb_apply(server, '.listen', [local]);
     return server;
