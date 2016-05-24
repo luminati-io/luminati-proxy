@@ -20,8 +20,7 @@ const socks = require('socksv5');
 const hutil = require('hutil');
 const util = require('util');
 const etask = hutil.etask;
-const config_file = path.join(process.env.APPDATA||process.env.HOME,
-    '.luminati.json');
+const config_file = path.join(process.env.APPDATA||process.env.HOME, '.luminati.json');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -329,8 +328,7 @@ etask(function*(){
         yield check_credentials();
         const hosts = yield resolve_super_proxies();
         const proxies = yield create_proxies(hosts);
-        proxies.forEach(server=>log('DEBUG', 'created local proxy',
-            server.opt));
+        proxies.forEach(server=>log('DEBUG', 'created local proxy', server.opt));
         if (argv.www)
         {
             const server = yield create_web_interface(proxies);
