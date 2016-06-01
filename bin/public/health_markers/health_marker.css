@@ -1,0 +1,20 @@
+.health-marker {
+    height: 50px;
+    vertical-align: middle;
+}
+.health-marker-icon {
+    width: 50px;
+    position: relative;
+    top: -5px;
+    text-align: center;
+}
+.health-marker-icon>*{
+    display: block;
+    margin: 0 auto;
+}
+.health-error {
+    color: red;
+}
+.health-done {
+    color: green;
+}
