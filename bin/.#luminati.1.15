@@ -51,7 +51,6 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     www: 'Local web port',
     socks: 'SOCKS5 port (local:remote)',
     history: 'Log history',
-    resolve: 'Reverse DNS lookup file',
 })
 .default({
     p: 23000,
@@ -73,31 +72,8 @@ const ssl = {
     rejectUnauthorized: false,
 };
 const keys = ['zone', 'country', 'city', 'asn', 'max_requests', 'pool_size',
-      'session_timeout', 'direct_include', 'direct_exclude', 'dns', 'resolve'];
+      'session_timeout', 'direct_include', 'direct_exclude', 'dns'];
 let opts = _.pick(argv, keys.concat('log'));
-if (opts.resolve)
-{
-    if (typeof opts.resolve=='boolean')
-    {
-        opts.resolve = ip=>etask(function*(){
-            let domains = yield etask.nfn_apply(dns, '.reverse', [ip]);
-            log('DEBUG', `dns resolve ${ip} => ${domains}`);
-            return domains&&domains.length?domains[0]:ip;
-        });
-    }
-    else
-    {
-        const domains = {};
-        hutil.file.read_lines_e(opts.resolve).forEach(line=>{
-            const m = line.match(/^\s*(\d+\.\d+\.\d+\.\d+)\s+([^\s]+)/);
-            if (!m)
-                return;
-            log('DEBUG', `dns entry: ${m[1]} => ${m[2]}`);
-            domains[m[1]] = m[2];
-        });
-        opts.resolve = ip=>domains[ip]||ip;
-    }
-}
 if (argv.log=='DEBUG')
     sqlite3 = sqlite3.verbose();
 let db;
@@ -484,7 +460,6 @@ etask(function*(){
                 '?,?)');
             proxies.forEach(server=>{
                 server.on('response', res=>{
-                    log('DEBUG', util.inspect(res, {depth: null, colors: 1}));
                     const req = res.request;
                     stmt.run(req.url, req.method, JSON.stringify(req.headers),
                         JSON.stringify(res.headers), res.status_code,

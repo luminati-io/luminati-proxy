@@ -1,7 +1,7 @@
 define(['angular', 'socket.io-client', 'css!./health_marker'],
 function(angular, io){
     'use strict'; /*jslint browser:true*/
-    var health = angular.module('health-markers', ['ngMaterial']);
+    var health = angular.module('lum-health-markers', ['ngMaterial']);
 
     health.service('healthStatus', HealthStatusService);
     HealthStatusService.$inject = ['$q'];
