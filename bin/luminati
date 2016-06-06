@@ -26,7 +26,7 @@ let sqlite3 = require('sqlite3');
 const etask = hutil.etask;
 const assign = Object.assign;
 const is_win = process.platform=='win32';
-const config_file = path.join(process.env.APPDATA||process.env.HOME,
+const config_file = path.join(process.env.APPDATA||process.env.HOME||'/tmp',
     '.luminati.json');
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
