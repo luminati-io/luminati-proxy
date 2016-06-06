@@ -7,6 +7,7 @@
           md-order-by=opt[col.key]>
           {{col.title}}
         </th>
+        <th md-column></th>
       </tr>
     </thead>
     <tbody md-body>
@@ -14,6 +15,14 @@
         <td md-cell>{{proxy.port}}</td>
         <td ng-repeat="col in $vm.opt_columns" md-cell>
           {{proxy.opt[col.key]}}
+        </td>
+        <td md-cell flex=500px>
+          <canvas class="chart chart-line"
+            chart-data=proxy.stats.active_requests
+            chart-series=proxy.stats.hosts
+            chart-labels=proxy.stats.ticks
+            chart-options=$vm.graph_options>
+          </canvas>
         </td>
       </tr>
     </tbody>
