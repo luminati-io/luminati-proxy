@@ -14,10 +14,12 @@
                 google_cdn+'angular_material/1.1.0-rc2/angular-material.min',
             'angular-material-table':
                 cdnjs+'angular-material-data-table/0.10.8/md-data-table.min',
+            'angular-ui-router':
+                cdnjs+'angular-ui-router/0.3.1/angular-ui-router.min',
             'socket.io-client': '/socket.io/socket.io',
             'angular-chart':
-                cdnjs+'angular-chart.js/1.0.0-alpha6/angular-chart',
-            chart: cdnjs+'Chart.js/2.1.4/Chart.bundle' // with moment.js
+                cdnjs+'angular-chart.js/1.0.0-alpha6/angular-chart.min',
+            chart: cdnjs+'Chart.js/2.1.4/Chart.bundle.min' // with moment.js
         },
         shim: { // XXX lee validate that module is loaded into angular
             angular: {exports: 'angular'},
@@ -32,6 +34,7 @@
                 exports: 'angular'},
             'angular-material-table': {deps: ['angular-material'],
                 exports: 'angular'},
+            'angular-ui-router': {deps: ['angular'], exports: 'angular'},
             chart: {exports: 'Chart'}
          },
         map: {

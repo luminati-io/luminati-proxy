@@ -1,0 +1,15 @@
+.loading {
+    padding: 50px;
+}
+.loading>* {
+    margin: 0 auto;
+}
+.zone-title {
+    padding-left: 50px;
+}
+.zone-stats {
+    padding: 15px;
+}
+.zone-stats .row-header {
+    text-align: left;
+}

@@ -13,31 +13,19 @@
   </head>
   <body ng-cloak>
     <header layout=row>
-      <nav class=logo>
+      <nav class=logo flex>
         <a href=//luminati.io target=_blank flex>
           <img src=/img/menu-logo.svg>
         </a>
       </nav>
+      <nav class=states flex>
+        <a ui-sref-active=active ui-sref="proxies">Proxies</a>
+        <a ui-sref-active=active ui-sref="zones">Zones</a>
+      </nav>
     </header>
-    <md-card layout=col class=health-markers>
-      <div flex>
-        <health-marker for=network>
-          Network Connectivity
-        </health-marker>
-        <health-marker for=firewall>
-          Firewall Access
-        </health-marker>
-        <health-marker for=credentials>
-          Credentials
-        </health-marker>
-      </div>
-    </md-card>
-    <md-card>
-      <proxies-table></proxies-table>
-    </md-card>
-    <script
-      src=//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js
-      data-main=/config.js>
+    <div ui-view></div>
+    <script data-main=./config.js
+        src=//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js>
     </script>
   </body>
 </html>

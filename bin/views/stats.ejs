@@ -1,6 +1,6 @@
 <%- include header -%>
 <div class="mdl-grid">
-  <% Object.keys(stats).forEach(name=>{ zone = stats[name]; %>
+  <% for (let name in stats) { zone = stats[name]; %>
   <div class="mdl-cell mdl-cell--12-col">
     <div class="mdl-card mdl-shadow--2dp">
       <div class="mdl-card__title mdl-card--expand">
@@ -50,7 +50,7 @@
       </div>
     </div>
   </div>
-  <% }) %>
+  <% } %>
 </div>
 <%- include footer -%>
 

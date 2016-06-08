@@ -73,7 +73,7 @@ const ssl = {
     rejectUnauthorized: false,
 };
 const keys = ['zone', 'country', 'city', 'asn', 'max_requests', 'pool_size',
-      'session_timeout', 'direct_include', 'direct_exclude', 'dns', 'resolve'];
+      'session_timeout', 'direct_include', 'direct_exclude', 'dns', 'resolve', 'cid'];
 let opts = _.pick(argv, keys.concat('log'));
 if (opts.resolve)
 {
@@ -202,9 +202,11 @@ const prepare_database = ()=>etask(function*(){
             username: 'TEXT',
         },
     };
-    Object.keys(tables).forEach(table=>etask(function*(){
+    for (let table in tables)
+    {
         const fields = [], queries = [];
-        Object.keys(tables[table]).forEach(field=>{
+        for (let field in tables[table])
+        {
             const value = tables[table][field];
             if (typeof value=='string')
                 return fields.push(field+' '+value);
@@ -220,7 +222,7 @@ const prepare_database = ()=>etask(function*(){
                     'ON %s(%s)', value.unique&&'UNIQUE'||'', field, table,
                     field));
             }
-        });
+        }
         queries.unshift(util.format('CREATE TABLE IF NOT EXISTS %s(%s)', table,
             fields.join(', ')));
         for (let i=0; i<queries.length; i++)
@@ -228,7 +230,7 @@ const prepare_database = ()=>etask(function*(){
             log('DEBUG', queries[i]);
             yield sql(queries[i]);
         }
-    }));
+    }
 });
 
 const resolve_super_proxies = ()=>etask(function*(){
@@ -394,6 +396,14 @@ const create_web_interface = proxies=>etask(function*(){
     app.get('/', (req, res)=>res.render('index', {
         proxies: proxies,
         elapsed: Date.now()-timestamp,
+    }));
+    app.get('/stats.json', (req, res, next)=>etask(function*stats(){
+        let r = yield json({
+            url: 'https://luminati.io/api/get_customer_bw?details=1',
+            headers: {'x-hola-auth':
+                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+        });
+	res.json(r.body[argv.customer]||{});
     }));
     app.get('/stats', (req, res, next)=>etask(function*(){
         let r = yield json({

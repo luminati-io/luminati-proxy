@@ -82,7 +82,8 @@ $(function(){
     $(this).data({chart: chart, series: {}});
   });
   io().on('stats', function(stats){
-    Object.keys(stats).forEach(function(port){
+    for (var port in stats)
+    {
       var card = $('#proxy_'+port);
       var canvas = card.find('canvas');
       var size = {width: canvas.width(), height: canvas.height()};
@@ -108,12 +109,13 @@ $(function(){
         }
         series.append(now, stat.active_requests);
       });
-    });
+    }
   }).on('health', function(data){
-    Object.keys(data).forEach(function(key){
+    for (var key in data)
+    {
       $('<i>', {class: 'material-icons'}).text(data[key] ? 'done' : 'error')
         .appendTo($('#'+key).empty());
-    });
+    }
   });
 });
 </script>
