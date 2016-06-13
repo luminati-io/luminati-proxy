@@ -108,7 +108,7 @@ if (is_win)
     readline.createInterface({input: process.stdin, output: process.stdout})
         .on('SIGINT', ()=>process.emit('SIGINT'));
 }
-process.on('SIGINT', ()=>db && db.close(()=>process.exit()));
+process.on('SIGINT', ()=>db ? db.close(()=>process.exit()) : process.exit());
 
 const dot2num = dot=>{
     const d = dot.split('.');

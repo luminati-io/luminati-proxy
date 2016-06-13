@@ -42,7 +42,7 @@
           <div class="mdl-cell mdl-cell--6-col">
             <table class="mdl-data-table mdl-js-data-table">
               <tbody>
-                <% ['port', 'super_proxy', 'log', 'zone', 'country', 'city', 'session_timeout',
+                <% ['port', 'super_proxy', 'log', 'zone', 'country', 'state', 'city', 'session_timeout',
                 'dns', 'pool_size', 'max_requests'].filter(key=>proxy.opt&&proxy.opt[key]).forEach(key=>{ %>
                 <tr>
                   <td class="mdl-data-table__cell--non-numeric key"><%= key.replace(/_/g, ' ') %></td>
