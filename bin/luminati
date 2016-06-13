@@ -39,6 +39,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     proxy_count: 'Number of super proxies to use',
     zone: 'Zone',
     country: 'Country',
+    state: 'State',
     city: 'City',
     asn: 'ASN',
     dns: 'DNS resolving (local|remote)',
@@ -72,7 +73,7 @@ const ssl = {
     requestCert: true,
     rejectUnauthorized: false,
 };
-const keys = ['zone', 'country', 'city', 'asn', 'max_requests', 'pool_size',
+const keys = ['zone', 'country', 'state', 'city', 'asn', 'max_requests', 'pool_size',
       'session_timeout', 'direct_include', 'direct_exclude', 'dns', 'resolve', 'cid'];
 let opts = _.pick(argv, keys.concat('log'));
 if (opts.resolve)
