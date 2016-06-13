@@ -263,7 +263,7 @@ const resolve_super_proxies = ()=>etask(function*(){
     return [].concat.apply([], yield etask.all(hosts));
 });
 
-const create_proxy = conf=>etask(function*(){
+const create_proxy = (conf, port)=>etask(function*(){
     conf.proxy = [].concat(conf.proxy);
     if (conf.direct_include || conf.direct_exclude)
     {
@@ -277,7 +277,7 @@ const create_proxy = conf=>etask(function*(){
     }
     const server = new Luminati(assign(_.pick(argv, 'customer',
         'password'), conf, {ssl: conf.ssl&&ssl}));
-    return yield server.listen();
+    return yield server.listen(port);
 });
 
 const create_proxies = hosts=>{
@@ -315,7 +315,8 @@ const create_api_interface = ()=>{
                 return res.json({port: server.port});
             return server.once('ready', ()=>res.json({port: server.port}));
         }
-        server = proxies[key] = create_proxy(_.omit(req.body, 'timeout'));
+        server = proxies[key] = yield create_proxy(_.omit(req.body, 'timeout'),
+	    req.body.port||0);
         if (req.body.timeout)
         {
             server.on('idle', idle=>{
@@ -332,7 +333,6 @@ const create_api_interface = ()=>{
                 }), +req.body.timeout);
             });
         }
-        yield server.listen();
         res.json({port: server.port});
     }));
     app.post('/delete', (req, res, next)=>etask(function*(){
