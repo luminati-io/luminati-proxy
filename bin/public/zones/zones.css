@@ -1,3 +1,15 @@
+.zones .error {
+    text-align: center;
+    padding: 50px;
+    color: red;
+}
+.zones .error>* {
+    margin: 0 auto;
+}
+.zones .error .material-icons {
+    position: relative;
+    top: -5px;
+}
 .loading {
     padding: 50px;
 }

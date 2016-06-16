@@ -10,6 +10,7 @@
       href=//fonts.googleapis.com/icon?family=Material+Icons>
     <link rel=stylesheet
       href=//cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.8/md-data-table.min.css>
+    <link rel=stylesheet href=//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css integrity=sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7 crossorigin=anonymous>
   </head>
   <body ng-cloak>
     <header layout=row>
@@ -19,8 +20,10 @@
         </a>
       </nav>
       <nav class=states flex>
-        <a ui-sref-active=active ui-sref="proxies">Proxies</a>
-        <a ui-sref-active=active ui-sref="zones">Zones</a>
+        <a ui-sref-active=active ui-sref=cred>Credentials</a>
+        <a ui-sref-active=active ui-sref=create>Create</a>
+        <a ui-sref-active=active ui-sref=proxies>Proxies</a>
+        <a ui-sref-active=active ui-sref=zones>Zones</a>
       </nav>
     </header>
     <div ui-view></div>

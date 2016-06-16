@@ -1,6 +1,4 @@
-header {
-    padding: 10px 50px;
-}
+header { padding: 10px 50px; }
 .logo {
     height: 50px;
     margin: 0 auto;
@@ -17,3 +15,4 @@ header {
     font-weight: bolder;
     font-size: larger;
 }
+.form-signin { max-width: 330px; }

@@ -1,7 +1,7 @@
-// LICENSE CODE ZON
+// LICENSE CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'angular-material',
-    'angular-material-table', 'angular-chart',
+define(['angular', 'socket.io-client', 'es6_shim', 'angular-material',
+    'md-data-table', 'angular-chart',
     '../health_markers/health_markers', 'css!./proxies'],
     function(angular, io){
 
@@ -26,7 +26,7 @@ function ProxyGraphOptions($interval, win_config){
         animation: {duration: 0},
         elements: {
             line: {borderWidth: 0.5},
-            point: {radius: 0}
+            point: {radius: 0},
         },
         fill: true,
         legend: {display: false},
@@ -34,7 +34,7 @@ function ProxyGraphOptions($interval, win_config){
             xAxes: [{
                 display: false,
                 type: 'time',
-                time: this._time_options
+                time: this._time_options,
             }],
             yAxes: [{
                 position: 'right',
@@ -44,12 +44,12 @@ function ProxyGraphOptions($interval, win_config){
                     suggestedMax: 1,
                     beginAtZero: true,
                     callback: function(value){
-                        return Math.floor(value) == value ? value : ''; }
+                        return Math.floor(value)==value ? value : ''; },
                 }
             }],
-            gridLines: {display: false}
+            gridLines: {display: false},
         },
-        tooltips: {enabled: false}
+        tooltips: {enabled: false},
     };
     return this;
 }
@@ -90,7 +90,7 @@ function proxiesService($q, $interval, win_config){
             proxy.stats = {
                 hosts: [],
                 ticks: [],
-                active_requests: []
+                active_requests: [],
             };
         });
         deffered.resolve(proxies);
@@ -104,7 +104,7 @@ function proxiesService($q, $interval, win_config){
                 var proxy = proxies.find(function(p){
                     return p.port==port; });
                 var i = proxy.stats.ticks.findIndex(function(tick){
-                    return tick >= history_start; });
+                    return tick>=history_start; });
                 if (i)
                 {
                     proxy.stats.ticks.splice(0, i);
@@ -114,16 +114,13 @@ function proxiesService($q, $interval, win_config){
                 }
                 for (var host in stats)
                 {
-                    if (proxy.stats.hosts.indexOf(host) === -1)
+                    if (!proxy.stats.hosts.includes(host))
                         proxy.stats.hosts.push(host);
                 }
                 proxy.stats.hosts.forEach(function(host, i){
                     var active_requests = proxy.stats.active_requests[i];
                     if (!active_requests)
-                    {
-                        active_requests = proxy.stats.active_requests[i]
-                            = [];
-                    }
+                        active_requests = proxy.stats.active_requests[i] = [];
                     active_requests.push(stats[host].active_requests);
                 });
                 proxy.stats.ticks.push(now);
@@ -144,7 +141,7 @@ proxies.value('lumOptColumns', [
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
     {key: 'max_requests', title: 'Max requests'},
-    {key: 'log', title: 'Log'}
+    {key: 'log', title: 'Log'},
 ]);
 
 proxies.controller('ProxiesTable', ProxiesTableController);
@@ -174,7 +171,7 @@ proxies.directive('proxiesTable', function(){
         scope: {},
         templateUrl: '/proxies/proxies_table.html',
         controller: 'ProxiesTable',
-        controllerAs: '$vm'
+        controllerAs: '$vm',
     };
 });
 

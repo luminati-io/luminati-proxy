@@ -1,0 +1,11 @@
+<div class=container>
+  <form class=form-signin>
+    <h2 class=form-signin-heading>Enter credentials</h2>
+    <label for=input_login class=sr-only>Login</label>
+    <input ng-model=login id=input_login class=form-control placeholder="Customer name" required autofocus>
+    <label for=input_password class=sr-only>Password</label>
+    <input ng-model=pass id=input_password class=form-control placeholder=Password required>
+    <button class="btn btn-lg btn-primary btn-block" ng-click="save_creds(login, pass)">GO</button>
+  </form>
+</div>
+

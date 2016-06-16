@@ -1,6 +1,13 @@
-<div ng-controller="zones as vm" layout=column>
+<div ng-controller="zones as vm" class=zones layout=column>
+  <md-card ng-if=vm.error class=error flex>
+    <div layout=row>
+      <i class=material-icons>error</i>
+      Failed to get the zones info.
+    </div>
+  </md-card>
   <md-card ng-hide=vm.stats class=loading flex>
-    <md-progress-circular class=md-hue-2 md-diameter=40px md-mode=indeterminate>
+    <md-progress-circular class=md-hue-2 md-diameter=40px
+      md-mode=indeterminate>
     </md-progress-circular>
   </md-card>
   <md-card ng-repeat="(zone, properties) in vm.stats" layout=column flex>

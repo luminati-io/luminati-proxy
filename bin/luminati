@@ -73,11 +73,13 @@ const ssl = {
     requestCert: true,
     rejectUnauthorized: false,
 };
-const keys = ['zone', 'country', 'state', 'city', 'asn', 'max_requests', 'pool_size',
-      'session_timeout', 'direct_include', 'direct_exclude', 'dns', 'resolve', 'cid'];
+const keys = ['zone', 'country', 'state', 'city', 'asn', 'max_requests',
+      'pool_size', 'session_timeout', 'direct_include', 'direct_exclude',
+      'dns', 'resolve', 'cid', 'password'];
 let opts = _.pick(argv, keys.concat('log'));
 if (opts.resolve)
 {
+    console.log(opts);
     if (typeof opts.resolve=='boolean')
     {
         opts.resolve = ip=>etask(function*(){
@@ -99,6 +101,7 @@ if (opts.resolve)
         opts.resolve = ip=>domains[ip]||ip;
     }
 }
+let hosts;
 if (argv.log=='DEBUG')
     sqlite3 = sqlite3.verbose();
 let db;
@@ -275,8 +278,8 @@ const create_proxy = (conf, port)=>etask(function*(){
         delete conf.direct_include;
         delete conf.direct_exclude;
     }
-    const server = new Luminati(assign(_.pick(argv, 'customer',
-        'password'), conf, {ssl: conf.ssl&&ssl}));
+    const server = new Luminati(assign(_.pick(argv, 'customer', 'password'),
+        conf, {ssl: conf.ssl&&ssl}));
     return yield server.listen(port);
 });
 
@@ -296,15 +299,23 @@ const create_api_interface = ()=>{
         res.json(r.body[argv.customer]||{});
     }));
     const proxies = {};
+    app.get('/creds', (req, res)=>{
+        res.json({customer: argv.customer, password: argv.password}); });
+    app.post('/creds', (req, res)=>{
+        argv.customer = req.body.customer||argv.customer;
+        argv.password = req.body.password||argv.password;
+        res.sendStatus(200);
+    });
     app.post('/create', (req, res, next)=>etask(function*(){
         this.on('ensure', ()=>{
             if (this.error)
                 return next(this.error);
         });
-        let key = [];
+        req.body.proxy = hosts;
+        let key = Object.keys(req.body);
         keys.forEach(field=>{
             if (!req.body[field])
-                return;
+                return delete req.body[field];
             key.push(field+'-'+req.body[field]);
         });
         key = key.join('-');
@@ -394,10 +405,6 @@ const create_web_interface = proxies=>etask(function*(){
         res.locals.path = req.path;
         next();
     });
-    app.get('/', (req, res)=>res.render('index', {
-        proxies: proxies,
-        elapsed: Date.now()-timestamp,
-    }));
     app.get('/stats.json', (req, res, next)=>etask(function*stats(){
         let r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
@@ -415,6 +422,8 @@ const create_web_interface = proxies=>etask(function*(){
         res.render('stats', {stats: r.body[argv.customer]||{}});
     }));
     app.use(express.static(path.join(__dirname, 'public')));
+    app.use('/hutil', express.static(path.join(__dirname,
+        '../node_modules/hutil/util')));
     app.use((err, req, res, next)=>{
         log('ERROR', err.stack);
         res.status(500).send('Server Error');
@@ -459,12 +468,14 @@ const create_socks_server = (local, remote)=>etask(function*(){
         {
             info.dstAddr = '127.0.0.1';
             info.dstPort = remote;
+	    log('DEBUG', 'Socks http connection: ', info);
             return accept();
         }
         if (info.dstPort==443)
         {
             const socket = accept(true);
             const dst = net.connect(remote, '127.0.0.1');
+	    log('DEBUG', 'Socks https connection: ', info);
             dst.on('connect', ()=>{
                 dst.write(util.format('CONNECT %s:%d HTTP/1.1\r\n'+
                     'Host: %s:%d\r\n\r\n', info.dstAddr, info.dstPort,
@@ -473,6 +484,7 @@ const create_socks_server = (local, remote)=>etask(function*(){
             });
             return dst.once('data', ()=>{ dst.pipe(socket); });
         }
+	log('DEBUG', 'Socks connection: ', info);
         accept();
     });
     server.useAuth(socks.auth.None());
@@ -484,15 +496,15 @@ etask(function*(){
     try {
         yield check_credentials();
         yield prepare_database();
-        const hosts = yield resolve_super_proxies();
+        hosts = yield resolve_super_proxies();
         const proxies = yield create_proxies(hosts);
         proxies.forEach(server=>log('DEBUG', 'local proxy', server.opt));
         if (argv.history)
         {
-            var stmt = db.prepare('INSERT INTO request (url, method, '+
-                'request_headers, response_headers, status_code, timestamp, '+
-                'elapsed, timeline, proxy, username) VALUES (?,?,?,?,?,?,?,?,'+
-                '?,?)');
+            var stmt = db.prepare('INSERT INTO request (url, method, '
+                +'request_headers, response_headers, status_code, timestamp, '
+                +'elapsed, timeline, proxy, username) VALUES (?,?,?,?,?,?,?,?,'
+                +'?,?)');
             proxies.forEach(server=>{
                 server.on('response', res=>{
                     log('DEBUG', util.inspect(res, {depth: null, colors: 1}));
