@@ -14,11 +14,20 @@
   </head>
   <body ng-cloak>
     <header layout=row>
-      <nav class=logo flex>
-        <a href=//luminati.io target=_blank flex>
-          <img src=/img/menu-logo.svg>
-        </a>
-      </nav>
+      <div flex layout=row>
+        <nav class=logo flex=none>
+          <a href=//luminati.io target=_blank flex>
+            <img src=/img/menu-logo.svg>
+          </a>
+        </nav>
+        <nav ng-controller="version as ver" class=version flex=none>
+          v{{ver.current}}
+          <a ng-if=ver.need_upgrade class=upgrade
+            href=https//www.github.com/luminati-io/luminati-proxy>
+            a new version v{{ver.latest}} is avaliable
+          </a>
+        </nav>
+      </div>
       <nav class=states flex>
         <a ui-sref-active=active ui-sref=cred>Credentials</a>
         <a ui-sref-active=active ui-sref=create>Create</a>

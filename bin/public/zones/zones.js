@@ -1,14 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'angular-material', 'md-data-table',
+define(['angular', 'angular-material', 'md-data-table', '../util',
     'css!./zones'],
 function(angular){
 
-var zones = angular.module('lum-zones', ['ngMaterial']);
+var zones = angular.module('lum-zones', ['ngMaterial', 'lum-util']);
 
 zones.controller('zones', ZonesController);
-ZonesController.$inject = ['$filter', '$http', '$interval'];
-function ZonesController($filter, $http, $interval){
+ZonesController.$inject = ['$filter', 'get_json', '$interval'];
+function ZonesController($filter, get_json, $interval){
     var vm = this;
     var today = new Date();
     var twoDaysAgo = (new Date()).setDate(today.getDate()-2);
@@ -31,7 +31,7 @@ function ZonesController($filter, $http, $interval){
         {key: 'bw_dn', title: 'Download', filter: sizeFilter},
         {key: 'bw_sum', title: 'Total Bandwidth', filter: sizeFilter}
     ];
-    $http.get('/stats.json').then(function(stats){
+    get_json('/stats.json').then(function(stats){
         vm.stats = stats.data;
         if (!Object.keys(vm.stats).length)
             vm.error = true;

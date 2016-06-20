@@ -1,11 +1,11 @@
 {
   "name": "luminati-proxy",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "lib/luminati.js",
   "scripts": {
-    "start": "bin/luminati"
+    "start": "bin/luminati.js"
   },
   "keywords": [
     "luminati",
@@ -16,8 +16,8 @@
   "license": "MIT",
   "preferGlobal": "true",
   "bin": {
-    "luminati-proxy": "bin/luminati",
-    "luminati": "bin/luminati"
+    "luminati-proxy": "bin/luminati.js",
+    "luminati": "bin/luminati.js"
   },
   "repository": {
     "type": "git",
