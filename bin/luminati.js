@@ -26,8 +26,7 @@ let sqlite3 = require('sqlite3');
 const etask = hutil.etask;
 const assign = Object.assign;
 const is_win = process.platform=='win32';
-const config_file = path.join(process.env.APPDATA||process.env.HOME||'/tmp',
-    '.luminati.json');
+const config_path = process.env.APPDATA||process.env.HOME||'/tmp';
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help'})
 .describe({
@@ -55,6 +54,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     history: 'Log history',
     resolve: 'Reverse DNS lookup file',
     version: 'Display current luminati-proxy version',
+    config: 'Config file containing proxy definitions'
 })
 .default({
     p: 24000,
@@ -67,13 +67,18 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 5000,
     proxy_count: 1,
     www: 22999,
+    config: '.luminati.json'
 }).help('h').argv;
-const version = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'))).version;
+const version = JSON.parse(fs.readFileSync(path.join(__dirname,
+    '../package.json'))).version;
 if (argv.version)
 {
     console.log(`luminati-proxy version: ${version}`);
     process.exit();
 }
+let config_file = argv.config;
+if (!/^(\/)|(\.\.?\/)/.test(config_file))
+    config_file = path.join(config_path, argv.config);
 const ssl = {
     key: fs.readFileSync(path.join(__dirname, 'server.key')),
     cert: fs.readFileSync(path.join(__dirname, 'server.crt')),
@@ -131,20 +136,17 @@ function sql(){
         return yield etask.nfn_apply(db, '.all', args); });
 }
 
-let config = argv._.reduce((config, pattern)=>{
-    glob.sync(pattern).concat(config_file)
-    .filter(filename=>{
-        try {
+function load_config(filename){
+    try {
             fs.accessSync(filename, fs.F_OK);
-        } catch(err){ return false; }
-        return true;
-    })
-    .forEach(filename=>{
-        [].push.apply(config, [].concat(JSON.parse(fs.readFileSync(filename,
-            {encoding: 'utf8'}))).map(conf=>assign({}, opts, conf)));
-    });
-    return config;
-}, []);
+            return JSON.parse(fs.readFileSync(filename,
+                {encoding: 'utf8'})).map(conf=>assign({}, opts, conf));
+    } catch(err){ return []; }
+}
+
+let config = load_config(config_file);
+config = argv._.reduce((config, filename)=>config.concat(
+    load_config(filename)), config);
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.p+i}));

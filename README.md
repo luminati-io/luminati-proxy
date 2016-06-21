@@ -68,5 +68,6 @@ Options:
   --history          Log history
   --resolve          Reverse DNS lookup file
   --version          Display current luminati-proxy version
+  --config           Config file containing proxy definitions [default: ".luminati.json"]
   -h, --help         Show help  [boolean]
 ```
