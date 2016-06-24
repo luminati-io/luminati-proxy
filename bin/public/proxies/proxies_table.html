@@ -4,7 +4,7 @@
       <tr md-row>
         <th md-column md-order-by=port md-numeric>Port</th>
         <th ng-repeat="col in $vm.opt_columns" md-column
-          md-order-by=opt[col.key]>
+          md-order-by={{col.key}}>
           {{col.title}}
         </th>
         <th md-column></th>
@@ -16,13 +16,18 @@
         <td ng-repeat="col in $vm.opt_columns" md-cell>
           {{proxy.opt[col.key]}}
         </td>
-        <td md-cell flex=500px>
-          <canvas class="chart chart-line"
-            chart-data=proxy.stats.active_requests
-            chart-series=proxy.stats.hosts
-            chart-labels=proxy.stats.ticks
-            chart-options=$vm.graph_options>
-          </canvas>
+        <td md-cell>
+          <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy(proxy)>
+            Edit
+          </md-button>
+        </td>
+      </tr>
+      <tr md-row>
+        <td md-cell ng-repeat="empty in $vm.opt_columns.concat('port')"></td>
+        <td md-cell>
+          <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy()>
+            Add
+          </md-button>
         </td>
       </tr>
     </tbody>

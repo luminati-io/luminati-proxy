@@ -54,7 +54,8 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     history: 'Log history',
     resolve: 'Reverse DNS lookup file',
     version: 'Display current luminati-proxy version',
-    config: 'Config file containing proxy definitions'
+    config: 'Config file containing proxy definitions',
+    iface: 'Interface or ip to listen on',
 })
 .default({
     p: 24000,
@@ -67,7 +68,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 5000,
     proxy_count: 1,
     www: 22999,
-    config: '.luminati.json'
+    config: '.luminati.json',
 }).help('h').argv;
 const version = JSON.parse(fs.readFileSync(path.join(__dirname,
     '../package.json'))).version;
@@ -128,6 +129,19 @@ process.on('SIGINT', ()=>db ? db.close(()=>process.exit()) : process.exit());
 const dot2num = dot=>{
     const d = dot.split('.');
     return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
+};
+
+const find_iface = iface=>{
+    const ifaces = os.networkInterfaces();
+    for (let name in ifaces)
+    {
+        if (name!=iface)
+            continue;
+        let addresses = ifaces[name].filter(data=>data.family=='IPv4');
+        if (addresses.length)
+            return addresses[0].address;
+    }
+    return iface;
 };
 
 function sql(){
@@ -275,7 +289,7 @@ const resolve_super_proxies = ()=>etask(function*(){
     return [].concat.apply([], yield etask.all(hosts));
 });
 
-const create_proxy = (conf, port)=>etask(function*(){
+const create_proxy = (conf, port, hostname)=>etask(function*(){
     conf.proxy = [].concat(conf.proxy);
     if (conf.direct_include || conf.direct_exclude)
     {
@@ -289,7 +303,7 @@ const create_proxy = (conf, port)=>etask(function*(){
     }
     const server = new Luminati(assign(_.pick(argv, 'customer', 'password'),
         conf, {ssl: conf.ssl&&ssl}));
-    return yield server.listen(port);
+    return yield server.listen(port, hostname);
 });
 
 const create_proxies = hosts=>{
@@ -297,7 +311,7 @@ const create_proxies = hosts=>{
         proxy: conf.proxy||hosts,
         ssl: argv.ssl,
         secure_proxy: argv.secure_proxy,
-    }))));
+    }), conf.port, find_iface(argv.iface))));
 };
 
 const create_api_interface = ()=>{
@@ -339,7 +353,7 @@ const create_api_interface = ()=>{
             return server.once('ready', ()=>res.json({port: server.port}));
         }
         server = proxies[key] = yield create_proxy(_.omit(req.body, 'timeout'),
-	    req.body.port||0);
+	    req.body.port||0, find_iface(req.body.iface));
         if (req.body.timeout)
         {
             server.on('idle', idle=>{
@@ -460,7 +474,8 @@ const create_web_interface = proxies=>etask(function*(){
             let res = yield json({
                 url: 'http://zproxy.luminati.io:22225/',
                 headers: {'x-hola-auth':
-                    `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+                    `lum-customer-${argv.customer}-zone-gen-key-`
+                    .argv.password},
             });
             notify('credentials', res.statusCode!=407);
         } catch(e){ notify('credentials', false); }

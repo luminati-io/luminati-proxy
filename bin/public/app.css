@@ -12,12 +12,7 @@ header { padding: 10px 50px; }
     padding-left: 50px;
 }
 .version {
-    font-size: xx-small;
-    padding: 21px 0 0 3px;
-    color: lightgray;
-}
-.version>.upgrade {
-    color: red;
+    padding: 15px 0 0 3px;
 }
 .states {
     text-align: right;

@@ -1,9 +1,9 @@
-// LICENSE CODE ZON ISC
+// LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'es6_shim', 'angular-material',
-    'md-data-table', 'angular-chart',
+define(['angular', 'socket.io-client', 'lodash', 'es6_shim',
+    'angular-material', 'md-data-table', 'angular-chart',
     '../health_markers/health_markers', 'css!./proxies'],
-    function(angular, io){
+    function(angular, io, _){
 
 var proxies = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
     'chart.js', 'lum-health-markers']);
@@ -146,8 +146,12 @@ proxies.value('lumOptColumns', [
 
 proxies.controller('ProxiesTable', ProxiesTableController);
 ProxiesTableController.$inject = ['lumProxies', 'lumOptColumns',
-    'lumProxyGraphOptions'];
-function ProxiesTableController(lum_proxies, opt_columns, graph_options){
+    'lumProxyGraphOptions', '$mdDialog', '$http'];
+function ProxiesTableController(lum_proxies, opt_columns, graph_options,
+    $mdDialog, $http)
+{
+    this.$mdDialog = $mdDialog;
+    this.$http = $http;
     var $vm = this;
     $vm.resolved = false;
     $vm.proxies = [];
@@ -165,6 +169,38 @@ function ProxiesTableController(lum_proxies, opt_columns, graph_options){
 ProxiesTableController.prototype.$onDestroy = function(){
     this._graph_options_provider.release_options(); };
 
+ProxiesTableController.prototype.edit_proxy = function(proxy){
+    var _proxy;
+    if (proxy && proxy.opt)
+    {
+        _proxy = proxy&&_.pick(proxy, Object.keys(proxy));
+        _proxy.opt = proxy&&_.pick(proxy.opt, Object.keys(proxy.opt));
+    }
+    var _this = this;
+    this.$mdDialog.show({
+        controller: dialog_controller,
+        templateUrl: '/create/dialog.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose: true,
+        locals: {proxy: _proxy},
+        fullscreen: true
+    }).then(function(data){
+        if (data)
+        {
+            if (_proxy)
+            {
+                // XXX gilad/ofir: add /api/edit
+                _this.$http.post('/api/edit', data).then(function(res){});
+            }
+            else
+            {
+                // XXX ofir: refresh proxies when done
+                _this.$http.post('/api/create', data).then(function(res){});
+            }
+        }
+    });
+};
+
 proxies.directive('proxiesTable', function(){
     return {
         restrict: 'E',
@@ -174,5 +210,16 @@ proxies.directive('proxiesTable', function(){
         controllerAs: '$vm',
     };
 });
+
+function dialog_controller($scope, $mdDialog, locals){
+    $scope.form_data = locals&&locals.proxy&&locals.proxy.opt||{};
+    $scope.hide = function(){ $mdDialog.hide(); };
+    $scope.cancel = function(){ $mdDialog.cancel(); };
+    $scope.answer = function(answer){ $mdDialog.hide(answer); };
+    $scope.validate = function(answer){
+        if (answer && answer.zone)
+            $mdDialog.hide(answer);
+    };
+}
 
 });

@@ -20,17 +20,12 @@
             <img src=/img/menu-logo.svg>
           </a>
         </nav>
-        <nav ng-controller="version as ver" class=version flex=none>
-          v{{ver.current}}
-          <a ng-if=ver.need_upgrade class=upgrade
-            href=https//www.github.com/luminati-io/luminati-proxy>
-            a new version v{{ver.latest}} is avaliable
-          </a>
+        <nav class=version flex=none>
+          <lum-version-display></lum-version-display>
         </nav>
       </div>
       <nav class=states flex>
         <a ui-sref-active=active ui-sref=cred>Credentials</a>
-        <a ui-sref-active=active ui-sref=create>Create</a>
         <a ui-sref-active=active ui-sref=proxies>Proxies</a>
         <a ui-sref-active=active ui-sref=zones>Zones</a>
       </nav>

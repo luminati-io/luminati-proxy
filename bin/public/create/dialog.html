@@ -1,0 +1,107 @@
+<md-dialog ng-cloak style="width: 100%">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Proxy Settings</h2>
+      <span flex></span>
+      <md-button class="md-icon-button" ng-click="cancel()">X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <div class="md-dialog-content">
+      <form class=form-horizontal ng-submit=submit()>
+        <div class=form-group>
+          <label for=zone class="col-sm-2 control-label">zone</label>
+          <div class=col-sm-10>
+            <input class=form-control ng-model=form_data.zone placeholder=gen required>
+          </div>
+        </div>
+        <div class=form-group>
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class=checkbox>
+              <label><input type=checkbox ng-model=is_city>city zone</label>
+            </div>
+          </div>
+        </div>
+        <div class=form-group>
+          <label for=password class="col-sm-2 control-label">zone password</label>
+          <div class=col-sm-10>
+            <input class=form-control ng-model=form_data.password placeholder="password (if different from zone gen)">
+          </div>
+        </div>
+        <div class=form-group>
+          <label for=port class="col-sm-2 control-label">port</label>
+          <div class=col-sm-10>
+            <input ng-model=form_data.port class=form-control placeholder=24001>
+          </div>
+        </div>
+        <div class=form-group>
+          <label for=country class="col-sm-2 control-label">country</label>
+          <div class=col-sm-10>
+            <input ng-model=form_data.country class=form-control placeholder=us>
+          </div>
+        </div>
+        <div class=form-group ng-if=is_city>
+          <label for=state class="col-sm-2 control-label">state</label>
+          <div class=col-sm-10>
+            <input ng-model=form_data.state class=form-control placeholder=ny>
+          </div>
+        </div>
+        <div class=form-group ng-if=is_city>
+          <label for=city class="col-sm-2 control-label">city</label>
+          <div class=col-sm-10>
+            <input ng-model=form_data.city class=form-control placeholder=newyork>
+          </div>
+        </div>
+        <div class=form-group>
+          <label for=password class="col-sm-2 control-label">dns resolve</label>
+          <div class=col-sm-10>
+            <select class=form-control ng-model=form_data.dns>
+              <option>local</option>
+              <option>remote</option>
+            </select>
+          </div>
+        </div>
+        <div class=form-group>
+          <label for=pool_size class="col-sm-2 control-label">pool size</label>
+          <div class=col-sm-10>
+            <input ng-model=form_data.pool_size class=form-control placeholder=3>
+          </div>
+        </div>
+        <div class="form-group hidden">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class=checkbox>
+              <label><input type=checkbox ng-model=form_data.history>history</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group hidden">
+          <div class="col-sm-offset-2 col-sm-10">
+            <div class=checkbox>
+              <label><input type=checkbox ng-disabled=!form_data.history ng-model=form_data.ssl>ssl</label>
+            </div>
+          </div>
+        </div>
+        <div class=form-group>
+          <label for=max_requests class="col-sm-2 control-label">max requests</label>
+          <div class=col-sm-10>
+            <input ng-model=form_data.max_requests class=form-control placeholder=50>
+          </div>
+        </div>
+        <div class=form-group>
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type=submit class="btn btn-default">Create</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </md-dialog-content>
+  <md-dialog-actions layout="row">
+    <span flex></span>
+    <md-button ng-click="cancel()">
+      Cancel
+    </md-button>
+    <md-button ng-click="validate(form_data)" style="margin-right:20px;">
+      Save
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

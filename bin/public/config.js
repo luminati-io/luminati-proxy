@@ -13,7 +13,8 @@ var config = {
         'socket.io-client': '/socket.io/socket.io',
         'angular-chart':
             cdnjs+'angular-chart.js/1.0.0-alpha6/angular-chart.min',
-        chart: cdnjs+'Chart.js/2.1.4/Chart.bundle.min' // with moment.js
+        chart: cdnjs+'Chart.js/2.1.4/Chart.bundle.min', // with moment.js
+        lodash: cdnjs+'lodash.js/4.13.1/lodash.min'
     },
     shim: {
         angular: {exports: 'angular'},
@@ -32,7 +33,6 @@ var add_angular_module = function(opt){
         opt.deps = ['angular'];
     else
         opt.deps.unshift('angular');
-
     var name = /\/([^\/]*?)(.min)?$/.exec(opt.url)[1];
     config.paths[name] = opt.url;
     config.shim[name] = {
