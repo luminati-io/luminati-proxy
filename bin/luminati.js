@@ -335,7 +335,10 @@ const create_api_interface = ()=>{
     app.post('/create', (req, res, next)=>etask(function*(){
         this.on('ensure', ()=>{
             if (this.error)
+            {
+                log('ERROR', this.error, this.error.stack);
                 return next(this.error);
+            }
         });
         req.body.proxy = hosts;
         let key = Object.keys(req.body);
@@ -375,7 +378,10 @@ const create_api_interface = ()=>{
     app.post('/delete', (req, res, next)=>etask(function*(){
         this.on('ensure', ()=>{
             if (this.error)
+            {
+                log('ERROR', this.error, this.error.stack);
                 return next(this.error);
+            }
         });
         const ports = (req.body.port||'').split(',');
         for (let i=0; i<ports.length; i++)
