@@ -341,22 +341,9 @@ const create_api_interface = ()=>{
             }
         });
         req.body.proxy = hosts;
-        let key = Object.keys(req.body);
-        keys.forEach(field=>{
-            if (!req.body[field])
-                return delete req.body[field];
-            key.push(field+'-'+req.body[field]);
-        });
-        key = key.join('-');
-        let server = proxies[key];
-        if (server)
-        {
-            if (server.port)
-                return res.json({port: server.port});
-            return server.once('ready', ()=>res.json({port: server.port}));
-        }
-        server = proxies[key] = yield create_proxy(_.omit(req.body, 'timeout'),
-	    req.body.port||0, find_iface(req.body.iface));
+        const server = yield create_proxy(_.omit(req.body, 'timeout'),
+	    +req.body.port||0, find_iface(req.body.iface));
+        proxies[server.port] = server;
         if (req.body.timeout)
         {
             server.on('idle', idle=>{
@@ -369,7 +356,7 @@ const create_api_interface = ()=>{
                     return;
                 server.timer = setTimeout(()=>etask(function*(){
                     yield server.stop();
-                    delete proxies[key];
+                    delete proxies[server.port];
                 }), +req.body.timeout);
             });
         }
