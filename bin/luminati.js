@@ -340,6 +340,7 @@ const create_api_interface = ()=>{
                 return next(this.error);
             }
         });
+        hosts.push(hosts.shift());
         req.body.proxy = hosts;
         const server = yield create_proxy(_.omit(req.body, 'timeout'),
 	    +req.body.port||0, find_iface(req.body.iface));
