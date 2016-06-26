@@ -9,9 +9,9 @@ module.factory('version', VersionService);
 VersionService.$inject = ['get_json', '$q'];
 function VersionService(get_json, $q){
     return {
-        current: get_json('/version.json'),
+        current: get_json('/api/version'),
         latest: get_json('https://raw.githubusercontent.com/luminati-io/'+
-            'luminati-proxy/master/package.json')
+            'luminati-proxy/master/package.json'),
     };
 }
 
@@ -37,21 +37,21 @@ function VersionDisplay(){
         restrict: 'E',
         controller: 'version',
         controllerAs: 'ver',
-        templateUrl: '/version/version_display.html'
+        templateUrl: '/version/version_display.html',
     };
 }
 
 module.factory('lum_upgrade_instructions', lum_upgrade_instructions);
 lum_upgrade_instructions.$inject = ['$mdDialog'];
 function lum_upgrade_instructions($mdDialog){
-    return function() {
+    return function(){
         $mdDialog.show({
             title: 'Upgrade Instructions',
             ariaTitle: 'Upgrade Instructions',
             templateUrl: '/version/upgrade_instructions_dialog.html',
             clickOutsideToClose: true,
             controllerAs: 'dialog',
-            controller: function () { return { hide: $mdDialog.hide }; }
+            controller: function(){ return {hide: $mdDialog.hide}; },
         });
     };
 }

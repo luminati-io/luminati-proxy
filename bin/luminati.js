@@ -316,6 +316,9 @@ const create_proxies = hosts=>{
 
 const create_api_interface = ()=>{
     const app = express();
+    app.get('/version', (req, res, next)=>{
+      res.json({version});
+    });
     app.get('/stats', (req, res, next)=>etask(function*(){
         let r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
@@ -423,25 +426,6 @@ const create_web_interface = proxies=>etask(function*(){
         res.locals.path = req.path;
         next();
     });
-    app.get('/version.json', (req, res, next)=>{
-      res.json({version});
-    });
-    app.get('/stats.json', (req, res, next)=>etask(function*stats(){
-        let r = yield json({
-            url: 'https://luminati.io/api/get_customer_bw?details=1',
-            headers: {'x-hola-auth':
-                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-        });
-	res.json(r.body[argv.customer]||{});
-    }));
-    app.get('/stats', (req, res, next)=>etask(function*(){
-        let r = yield json({
-            url: 'https://luminati.io/api/get_customer_bw?details=1',
-            headers: {'x-hola-auth':
-                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
-        });
-        res.render('stats', {stats: r.body[argv.customer]||{}});
-    }));
     app.use(express.static(path.join(__dirname, 'public')));
     app.use('/hutil', express.static(path.join(__dirname,
         '../node_modules/hutil/util')));
@@ -468,9 +452,9 @@ const create_web_interface = proxies=>etask(function*(){
             let res = yield json({
                 url: 'http://zproxy.luminati.io:22225/',
                 headers: {'x-hola-auth':
-                    `lum-customer-${argv.customer}-zone-gen-key-`
-                    .argv.password},
-            });
+                    `lum-customer-${argv.customer}-zone-gen`
+                    +`-key-${argv.password}`,
+            }});
             notify('credentials', res.statusCode!=407);
         } catch(e){ notify('credentials', false); }
     }));

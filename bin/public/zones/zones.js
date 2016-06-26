@@ -31,7 +31,7 @@ function ZonesController($filter, get_json, $interval){
         {key: 'bw_dn', title: 'Download', filter: sizeFilter},
         {key: 'bw_sum', title: 'Total Bandwidth', filter: sizeFilter}
     ];
-    get_json('/stats.json').then(function(stats){
+    get_json('/api/stats').then(function(stats){
         vm.stats = stats;
         if (!Object.keys(vm.stats).length)
             vm.error = true;
