@@ -10,7 +10,6 @@ const dns = require('dns');
 const express = require('express');
 const body_parser = require('body-parser');
 const Luminati = require('../lib/luminati.js');
-const glob = require('glob');
 const net = require('net');
 const request = require('request');
 const humanize = require('humanize');
@@ -24,6 +23,7 @@ const hutil = require('hutil');
 const util = require('util');
 let sqlite3 = require('sqlite3');
 const etask = hutil.etask;
+const file = hutil.file;
 const assign = Object.assign;
 const is_win = process.platform=='win32';
 const config_path = process.env.APPDATA||process.env.HOME||'/tmp';
@@ -87,10 +87,9 @@ const ssl = {
     requestCert: true,
     rejectUnauthorized: false,
 };
-const keys = ['zone', 'country', 'state', 'city', 'asn', 'max_requests',
-      'pool_size', 'session_timeout', 'direct_include', 'direct_exclude',
-      'dns', 'resolve', 'cid', 'password'];
-let opts = _.pick(argv, keys.concat('log'));
+let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
+    'max_requests', 'pool_size', 'session_timeout', 'direct_include',
+    'direct_exclude', 'dns', 'resolve', 'cid', 'log']);
 if (opts.resolve)
 {
     if (typeof opts.resolve=='boolean')
@@ -150,29 +149,28 @@ function sql(){
         return yield etask.nfn_apply(db, '.all', args); });
 }
 
-function load_config(filename){
-    try {
-            fs.accessSync(filename, fs.F_OK);
-            return JSON.parse(fs.readFileSync(filename,
-                {encoding: 'utf8'})).map(conf=>assign({}, opts, conf));
-    } catch(err){ return []; }
-}
+const load_config = (filename, optional)=>{
+    if (optional && !file.exists(filename))
+        return [];
+    return [].concat(JSON.parse(file.read_e(filename)))
+        .map(conf=>assign({}, opts, conf));
+};
 
-let config = load_config(config_file);
-config = argv._.reduce((config, filename)=>config.concat(
-    load_config(filename)), config);
+let config = load_config(config_file, true);
+argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.p+i}));
 
-function log(level, msg, extra){
+
+const log = (level, msg, extra)=>{
     if (Luminati.log_level[level]>Luminati.log_level[argv.log])
         return;
     let args = [`${level}: ${msg}`];
     if (extra)
         args.push(extra);
     console.log.apply(console, args);
-}
+};
 
 const json = opt=>etask(function*(){
     if (typeof opt=='string')
@@ -301,6 +299,7 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
         delete conf.direct_include;
         delete conf.direct_exclude;
     }
+    console.log(conf);
     const server = new Luminati(assign(_.pick(argv, 'customer', 'password'),
         conf, {ssl: conf.ssl&&ssl}));
     return yield server.listen(port, hostname);
