@@ -87,6 +87,16 @@ const ssl = {
     requestCert: true,
     rejectUnauthorized: false,
 };
+
+const log = (level, msg, extra)=>{
+    if (Luminati.log_level[level]>Luminati.log_level[argv.log])
+        return;
+    let args = [`${level}: ${msg}`];
+    if (extra)
+        args.push(extra);
+    console.log.apply(console, args);
+};
+
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
     'max_requests', 'pool_size', 'session_timeout', 'direct_include',
     'direct_exclude', 'dns', 'resolve', 'cid', 'log']);
@@ -161,16 +171,7 @@ argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.p+i}));
-
-
-const log = (level, msg, extra)=>{
-    if (Luminati.log_level[level]>Luminati.log_level[argv.log])
-        return;
-    let args = [`${level}: ${msg}`];
-    if (extra)
-        args.push(extra);
-    console.log.apply(console, args);
-};
+log('DEBUG', 'Config', config);
 
 const json = opt=>etask(function*(){
     if (typeof opt=='string')
@@ -234,9 +235,15 @@ const prepare_database = ()=>etask(function*(){
         {
             const value = tables[table][field];
             if (typeof value=='string')
-                return fields.push(field+' '+value);
+            {
+                fields.push(field+' '+value);
+                continue;
+            }
             if (value.primary)
-                return fields.push(field+' '+value.type+' PRIMARY KEY');
+            {
+                fields.push(field+' '+value.type+' PRIMARY KEY');
+                continue;
+            }
             let def = field+' '+value.type;
             if (value.default)
                 def += ' DEFAULT '+value.default;
@@ -299,7 +306,6 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
         delete conf.direct_include;
         delete conf.direct_exclude;
     }
-    console.log(conf);
     const server = new Luminati(assign(_.pick(argv, 'customer', 'password'),
         conf, {ssl: conf.ssl&&ssl}));
     return yield server.listen(port, hostname);
