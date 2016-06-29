@@ -137,12 +137,16 @@ if (is_win)
     readline.createInterface({input: process.stdin, output: process.stdout})
         .on('SIGINT', ()=>process.emit('SIGINT'));
 }
+
+var terminate = ()=>db?db.close(()=>process.exit()):process.exit();
+
 process.on('SIGINT', ()=>{
     log('INFO', 'SIGINT recieved');
-    if (db)
-        db.close(()=>process.exit());
-    else
-        process.exit();
+    terminate();
+});
+process.on('uncaughtException', (err)=>{
+    log('ERROR', 'uncaughtException', err);
+    terminate();
 });
 
 const dot2num = dot=>{
@@ -559,6 +563,6 @@ etask(function*(){
         }));
     } catch(e){
         if (e.message!='canceled')
-            console.log(e, e.stack);
+            log('ERROR', e, e.stack);
     }
 });
