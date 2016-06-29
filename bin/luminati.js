@@ -27,10 +27,12 @@ const file = hutil.file;
 const assign = Object.assign;
 const is_win = process.platform=='win32';
 const config_path = process.env.APPDATA||process.env.HOME||'/tmp';
+const version = JSON.parse(fs.readFileSync(path.join(__dirname,
+    '../package.json'))).version;
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
-.alias({h: 'help'})
+.alias({h: 'help', p: 'port'})
 .describe({
-    p: 'Listening port',
+    port: 'Listening port',
     log: `Log level (${Object.keys(Luminati.log_level).join('|')})`,
     customer: 'Customer',
     password: 'Password',
@@ -53,12 +55,11 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     socks: 'SOCKS5 port (local:remote)',
     history: 'Log history',
     resolve: 'Reverse DNS lookup file',
-    version: 'Display current luminati-proxy version',
     config: 'Config file containing proxy definitions',
     iface: 'Interface or ip to listen on',
 })
 .default({
-    p: 24000,
+    port: 24000,
     log: 'WARNING',
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
@@ -69,14 +70,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     proxy_count: 1,
     www: 22999,
     config: '.luminati.json',
-}).help('h').argv;
-const version = JSON.parse(fs.readFileSync(path.join(__dirname,
-    '../package.json'))).version;
-if (argv.version)
-{
-    console.log(`luminati-proxy version: ${version}`);
-    process.exit();
-}
+}).help('h').version(()=>`luminati-proxy version: ${version}`).argv;
 let config_file = argv.config;
 if (!/^(\/)|(\.\.?\/)/.test(config_file))
     config_file = path.join(config_path, argv.config);
@@ -88,18 +82,29 @@ const ssl = {
     rejectUnauthorized: false,
 };
 
-const log = (level, msg, extra)=>{
+let db, log_statment, log_to_db = false;
+
+const log = (level, msg, extra, _log_to_db)=>{
     if (Luminati.log_level[level]>Luminati.log_level[argv.log])
         return;
     let args = [`${level}: ${msg}`];
     if (extra)
         args.push(extra);
     console.log.apply(console, args);
+    if (log_to_db)
+    {
+        if (!log_statment)
+        {
+            log_statment = db.prepare('INSERT INTO log (level, message, extra)'
+                +' VALUES (?,?,?)');
+        }
+        log_statment.run(level, msg, JSON.stringify(extra));
+    }
 };
 
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
     'max_requests', 'pool_size', 'session_timeout', 'direct_include',
-    'direct_exclude', 'dns', 'resolve', 'cid', 'log']);
+    'direct_exclude', 'dns', 'resolve', 'cid', 'ip', 'log']);
 if (opts.resolve)
 {
     if (typeof opts.resolve=='boolean')
@@ -126,14 +131,19 @@ if (opts.resolve)
 let hosts;
 if (argv.log=='DEBUG')
     sqlite3 = sqlite3.verbose();
-let db;
 if (is_win)
 {
     const readline = require('readline');
     readline.createInterface({input: process.stdin, output: process.stdout})
         .on('SIGINT', ()=>process.emit('SIGINT'));
 }
-process.on('SIGINT', ()=>db ? db.close(()=>process.exit()) : process.exit());
+process.on('SIGINT', ()=>{
+    log('INFO', 'SIGINT recieved');
+    if (db)
+        db.close(()=>process.exit());
+    else
+        process.exit();
+});
 
 const dot2num = dot=>{
     const d = dot.split('.');
@@ -170,7 +180,7 @@ let config = load_config(config_file, true);
 argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
-    .forEach((conf, i)=>assign(conf, {port: argv.p+i}));
+    .forEach((conf, i)=>assign(conf, {port: argv.port+i}));
 log('DEBUG', 'Config', config);
 
 const json = opt=>etask(function*(){
@@ -227,6 +237,12 @@ const prepare_database = ()=>etask(function*(){
             proxy: 'TEXT',
             username: 'TEXT',
         },
+        log: {
+            timestamp: {type: 'INTEGER', default: 'CURRENT_TIMESTAMP'},
+            level: 'TEXT',
+            message: 'TEXT',
+            extra: 'TEXT',
+        },
     };
     for (let table in tables)
     {
@@ -263,6 +279,7 @@ const prepare_database = ()=>etask(function*(){
             yield sql(queries[i]);
         }
     }
+    log_to_db = true;
 });
 
 const resolve_super_proxies = ()=>etask(function*(){
