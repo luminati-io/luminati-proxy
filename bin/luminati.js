@@ -37,7 +37,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     customer: 'Customer',
     password: 'Password',
     proxy: 'Super proxy ip or country',
-    proxy_count: 'Number of super proxies to use',
+    proxy_count: 'Minimum number of super proxies to use',
     secure_proxy: 'Use SSL when accessing super proxy',
     zone: 'Zone',
     country: 'Country',
@@ -82,24 +82,13 @@ const ssl = {
     rejectUnauthorized: false,
 };
 
-let db, log_statment, log_to_db = false;
-
-const log = (level, msg, extra, _log_to_db)=>{
+const log = (level, msg, extra)=>{
     if (Luminati.log_level[level]>Luminati.log_level[argv.log])
         return;
     let args = [`${level}: ${msg}`];
     if (extra)
         args.push(extra);
     console.log.apply(console, args);
-    if (log_to_db)
-    {
-        if (!log_statment)
-        {
-            log_statment = db.prepare('INSERT INTO log (level, message, extra)'
-                +' VALUES (?,?,?)');
-        }
-        log_statment.run(level, msg, JSON.stringify(extra));
-    }
 };
 
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
@@ -138,6 +127,7 @@ if (is_win)
         .on('SIGINT', ()=>process.emit('SIGINT'));
 }
 
+let db;
 var terminate = ()=>db?db.close(()=>process.exit()):process.exit();
 
 process.on('SIGINT', ()=>{
@@ -241,12 +231,6 @@ const prepare_database = ()=>etask(function*(){
             proxy: 'TEXT',
             username: 'TEXT',
         },
-        log: {
-            timestamp: {type: 'INTEGER', default: 'CURRENT_TIMESTAMP'},
-            level: 'TEXT',
-            message: 'TEXT',
-            extra: 'TEXT',
-        },
     };
     for (let table in tables)
     {
@@ -283,7 +267,6 @@ const prepare_database = ()=>etask(function*(){
             yield sql(queries[i]);
         }
     }
-    log_to_db = true;
 });
 
 const resolve_super_proxies = ()=>etask(function*(){
@@ -483,7 +466,9 @@ const create_web_interface = proxies=>etask(function*(){
             }});
             notify('credentials', res.statusCode!=407);
         } catch(e){ notify('credentials', false); }
-    }));
+    })).on('error', (error)=>{
+        log('ERROR', 'SocketIO error', {error});
+    });
     setInterval(()=>{
         const stats = {};
         proxies.forEach(proxy=>stats[proxy.port] = proxy.stats);
@@ -513,6 +498,9 @@ const create_socks_server = (local, remote)=>etask(function*(){
                     'Host: %s:%d\r\n\r\n', info.dstAddr, info.dstPort,
                     info.dstAddr, info.dstPort));
                 socket.pipe(dst);
+            }).on('error', (error)=>{
+                log('ERROR', 'Socks connection error', {error, port: local});
+                this.ethrow(error);
             });
             return dst.once('data', ()=>{ dst.pipe(socket); });
         }

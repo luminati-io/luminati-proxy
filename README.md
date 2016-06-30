@@ -41,33 +41,35 @@ NOTE: In versions 0.1.x port 23000 was used by default. In version 0.2.0 this wa
 ## Usage
 ```sh
 $ luminati --help
-Usage: bin/luminati [options] config1 config2 ...
+Usage: luminati [options] config1 config2 ...
 
 Options:
-  -p                 Listening port  [default: 24000]
-  --log              Log level (ERROR|WARNING|INFO|DEBUG)  [default: "WARNING"]
+  --log              Log level (ERROR|WARNING|INFO|DEBUG)   [default: "WARNING"]
   --customer         Customer
   --password         Password
   --proxy            Super proxy ip or country
-  --proxy_count      Number of super proxies to use  [default: 1]
+  --proxy_count      Minimum number of super proxies to use         [default: 1]
   --secure_proxy     Use SSL when accessing super proxy
-  --zone             Zone  [default: "gen"]
+  --zone             Zone                                       [default: "gen"]
   --country          Country
   --state            State
   --city             City
   --asn              ASN
   --dns              DNS resolving (local|remote)
-  --pool_size        Pool size  [default: 3]
+  --pool_size        Pool size                                      [default: 3]
   --ssl              Enable SSL sniffing
-  --max_requests     Requests per session  [default: 50]
-  --session_timeout  Session establish timeout  [default: 5000]
+  --max_requests     Requests per session                          [default: 50]
+  --session_timeout  Session establish timeout                   [default: 5000]
   --direct_include   Include pattern for direct requests
   --direct_exclude   Exclude pattern for direct requests
-  --www              Local web port  [default: 22999]
+  --www              Local web port                             [default: 22999]
   --socks            SOCKS5 port (local:remote)
   --history          Log history
   --resolve          Reverse DNS lookup file
-  --version          Display current luminati-proxy version
-  --config           Config file containing proxy definitions [default: ".luminati.json"]
-  -h, --help         Show help  [boolean]
+  --config           Config file containing proxy definitions
+                                                     [default: ".luminati.json"]
+  --iface            Interface or ip to listen on
+  -h, --help         Show help                                         [boolean]
+  --version          Show version number                               [boolean]
+  -p, --port         Listening port                             [default: 24000]
 ```
