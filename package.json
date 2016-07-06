@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "lib/luminati.js",
@@ -39,6 +39,7 @@
     "socket.io": "^1.4.5",
     "socksv5": "0.0.6",
     "sqlite3": "^3.1.4",
+    "tunnel-agent": "^0.4.3",
     "underscore": "^1.8.3",
     "yargs": "^4.3.2"
   }

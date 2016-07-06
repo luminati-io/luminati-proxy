@@ -21,12 +21,11 @@ const socket_io = require('socket.io');
 const socks = require('socksv5');
 const hutil = require('hutil');
 const util = require('util');
-let sqlite3 = require('sqlite3');
+const sqlite3 = require('sqlite3');
 const etask = hutil.etask;
 const file = hutil.file;
 const assign = Object.assign;
 const is_win = process.platform=='win32';
-const config_path = process.env.APPDATA||process.env.HOME||'/tmp';
 const version = JSON.parse(fs.readFileSync(path.join(__dirname,
     '../package.json'))).version;
 const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
@@ -54,10 +53,12 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     www: 'Local web port',
     socks: 'SOCKS5 port (local:remote)',
     history: 'Log history',
+    database: 'Database path',
     resolve: 'Reverse DNS lookup file',
     config: 'Config file containing proxy definitions',
-    iface: 'Interface or ip to listen on',
+    iface: `Interface or ip to listen on (${Object.keys(os.networkInterfaces()).join(', ')})`,
 })
+.boolean('history')
 .default({
     port: 24000,
     log: 'WARNING',
@@ -69,11 +70,9 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 5000,
     proxy_count: 1,
     www: 22999,
-    config: '.luminati.json',
+    config: path.join(os.homedir(), '.luminati.json'.substr(is_win?1:0)),
+    database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
 }).help('h').version(()=>`luminati-proxy version: ${version}`).argv;
-let config_file = argv.config;
-if (!/^(\/)|(\.\.?\/)/.test(config_file))
-    config_file = path.join(config_path, argv.config);
 const ssl = {
     key: fs.readFileSync(path.join(__dirname, 'server.key')),
     cert: fs.readFileSync(path.join(__dirname, 'server.crt')),
@@ -118,8 +117,6 @@ if (opts.resolve)
     }
 }
 let hosts;
-if (argv.log=='DEBUG')
-    sqlite3 = sqlite3.verbose();
 if (is_win)
 {
     const readline = require('readline');
@@ -128,13 +125,13 @@ if (is_win)
 }
 
 let db;
-var terminate = ()=>db?db.close(()=>process.exit()):process.exit();
+const terminate = ()=>db?db.db.close(()=>process.exit()):process.exit();
 
 process.on('SIGINT', ()=>{
     log('INFO', 'SIGINT recieved');
     terminate();
 });
-process.on('uncaughtException', (err)=>{
+process.on('uncaughtException', err=>{
     log('ERROR', 'uncaughtException', err);
     terminate();
 });
@@ -159,8 +156,9 @@ const find_iface = iface=>{
 
 function sql(){
     const args = [].slice.call(arguments);
+    log('DEBUG', 'SQL: '+args[0], args.slice(1));
     return etask(function*(){
-        return yield etask.nfn_apply(db, '.all', args); });
+        return yield etask.nfn_apply(db.db, '.all', args); });
 }
 
 const load_config = (filename, optional)=>{
@@ -170,7 +168,7 @@ const load_config = (filename, optional)=>{
         .map(conf=>assign({}, opts, conf));
 };
 
-let config = load_config(config_file, true);
+let config = load_config(argv.config, true);
 argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
@@ -212,8 +210,10 @@ const check_credentials = ()=>etask(function*(){
 });
 
 const prepare_database = ()=>etask(function*(){
-    yield etask.nfn_apply((fn, cb)=>db = new sqlite3.Database(fn, cb), null,
-        [path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0))]);
+    const sqlite = (argv.log=='DEBUG') ? sqlite3.verbose() : sqlite3;
+    db = {stmt: {}};
+    yield etask.nfn_apply((fn, cb)=>db.db = new sqlite.Database(fn, cb), null,
+        [argv.database]);
     const tables = {
         ip: {
             ip: {type: 'UNSIGNED INTEGER', primary: true},
@@ -262,10 +262,7 @@ const prepare_database = ()=>etask(function*(){
         queries.unshift(util.format('CREATE TABLE IF NOT EXISTS %s(%s)', table,
             fields.join(', ')));
         for (let i=0; i<queries.length; i++)
-        {
-            log('DEBUG', queries[i]);
             yield sql(queries[i]);
-        }
     }
 });
 
@@ -312,7 +309,21 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
     }
     const server = new Luminati(assign(_.pick(argv, 'customer', 'password'),
         conf, {ssl: conf.ssl&&ssl}));
-    return yield server.listen(port, hostname);
+    server.on('response', res=>{
+        log('DEBUG', util.inspect(res, {depth: null, colors: 1}));
+        const req = res.request;
+        if (argv.history)
+        {
+            db.stmt.history.run(req.url, req.method,
+                JSON.stringify(req.headers), JSON.stringify(res.headers),
+                res.status_code, Math.floor(res.timeline.start/1000),
+                res.timeline.end, JSON.stringify(res.timeline), res.proxy.host,
+                res.proxy.username);
+        }
+    });
+    yield server.listen(port, hostname);
+    log('DEBUG', 'local proxy', server.opt);
+    return server;
 });
 
 const create_proxies = hosts=>{
@@ -325,10 +336,8 @@ const create_proxies = hosts=>{
 
 const create_api_interface = ()=>{
     const app = express();
-    app.get('/version', (req, res, next)=>{
-      res.json({version});
-    });
-    app.get('/stats', (req, res, next)=>etask(function*(){
+    app.get('/version', (req, res)=>res.json({version: version}));
+    app.get('/stats', (req, res)=>etask(function*(){
         let r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
             headers: {'x-hola-auth':
@@ -466,9 +475,7 @@ const create_web_interface = proxies=>etask(function*(){
             }});
             notify('credentials', res.statusCode!=407);
         } catch(e){ notify('credentials', false); }
-    })).on('error', (error)=>{
-        log('ERROR', 'SocketIO error', {error});
-    });
+    })).on('error', err=>log('ERROR', 'SocketIO error', {error: err}));
     setInterval(()=>{
         const stats = {};
         proxies.forEach(proxy=>stats[proxy.port] = proxy.stats);
@@ -498,9 +505,10 @@ const create_socks_server = (local, remote)=>etask(function*(){
                     'Host: %s:%d\r\n\r\n', info.dstAddr, info.dstPort,
                     info.dstAddr, info.dstPort));
                 socket.pipe(dst);
-            }).on('error', (error)=>{
-                log('ERROR', 'Socks connection error', {error, port: local});
-                this.ethrow(error);
+            }).on('error', err=>{
+                log('ERROR', 'Socks connection error', {error: err,
+                    port: local});
+                this.ethrow(err);
             });
             return dst.once('data', ()=>{ dst.pipe(socket); });
         }
@@ -518,24 +526,12 @@ etask(function*(){
         yield prepare_database();
         hosts = yield resolve_super_proxies();
         const proxies = yield create_proxies(hosts);
-        proxies.forEach(server=>log('DEBUG', 'local proxy', server.opt));
         if (argv.history)
         {
-            var stmt = db.prepare('INSERT INTO request (url, method, '
+            db.stmt.history = db.db.prepare('INSERT INTO request (url, method, '
                 +'request_headers, response_headers, status_code, timestamp, '
                 +'elapsed, timeline, proxy, username) VALUES (?,?,?,?,?,?,?,?,'
                 +'?,?)');
-            proxies.forEach(server=>{
-                server.on('response', res=>{
-                    log('DEBUG', util.inspect(res, {depth: null, colors: 1}));
-                    const req = res.request;
-                    stmt.run(req.url, req.method, JSON.stringify(req.headers),
-                        JSON.stringify(res.headers), res.status_code,
-                        Math.floor(res.timeline.start/1000), res.timeline.end,
-                        JSON.stringify(res.timeline), res.proxy.host,
-                        res.proxy.username);
-                });
-            });
         }
         if (argv.www)
         {
