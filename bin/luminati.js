@@ -225,11 +225,12 @@ const prepare_database = ()=>etask(function*(){
             request_headers: 'TEXT',
             response_headers: 'TEXT',
             status_code: {type: 'INTEGER', index: true},
-            timestamp: 'INTEGER',
-            elapsed: 'INTEGER',
+            timestamp: {type: 'INTEGER', index: true},
+            elapsed: {type: 'INTEGER', index: true},
             timeline: 'TEXT',
             proxy: 'TEXT',
             username: 'TEXT',
+            content_size: {type: 'INTEGER', index: true},
         },
     };
     for (let table in tables)
@@ -318,7 +319,7 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
                 JSON.stringify(req.headers), JSON.stringify(res.headers),
                 res.status_code, Math.floor(res.timeline.start/1000),
                 res.timeline.end, JSON.stringify(res.timeline), res.proxy.host,
-                res.proxy.username);
+                res.proxy.username, res.body_size);
         }
     });
     yield server.listen(port, hostname);
@@ -444,8 +445,9 @@ const create_web_interface = proxies=>etask(function*(){
         res.locals.path = req.path;
         next();
     });
-    app.use(express.static(path.join(__dirname, 'public')));
-    app.use('/hutil', express.static(path.join(__dirname,
+    let bin_path = path.dirname(__filename);
+    app.use(express.static(path.join(bin_path, 'public')));
+    app.use('/hutil', express.static(path.join(bin_path,
         '../node_modules/hutil/util')));
     app.use((err, req, res, next)=>{
         log('ERROR', err.stack);
@@ -528,10 +530,10 @@ etask(function*(){
         const proxies = yield create_proxies(hosts);
         if (argv.history)
         {
-            db.stmt.history = db.db.prepare('INSERT INTO request (url, method, '
-                +'request_headers, response_headers, status_code, timestamp, '
-                +'elapsed, timeline, proxy, username) VALUES (?,?,?,?,?,?,?,?,'
-                +'?,?)');
+            db.stmt.history = db.db.prepare('INSERT INTO request (url, method,'
+                +'request_headers, response_headers, status_code, timestamp,'
+                +'elapsed, timeline, proxy, username, content_size) VALUES (?,'
+                +'?,?,?,?,?,?,?,?,?,?)');
         }
         if (argv.www)
         {
