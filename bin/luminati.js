@@ -7,6 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const dns = require('dns');
+const tls = require('tls');
+const crypto = require('crypto');
 const express = require('express');
 const body_parser = require('body-parser');
 const Luminati = require('../lib/luminati.js');
@@ -22,7 +24,10 @@ const socks = require('socksv5');
 const hutil = require('hutil');
 const util = require('util');
 const sqlite3 = require('sqlite3');
+const forge = require('node-forge');
+const pki = forge.pki;
 const etask = hutil.etask;
+const ef = etask.ef;
 const file = hutil.file;
 const assign = Object.assign;
 const is_win = process.platform=='win32';
@@ -74,11 +79,30 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
 }).help('h').version(()=>`luminati-proxy version: ${version}`).argv;
 const ssl = {
-    key: fs.readFileSync(path.join(__dirname, 'server.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'server.crt')),
-    ca: fs.readFileSync(path.join(__dirname, 'ca.crt')),
-    requestCert: true,
-    rejectUnauthorized: false,
+    ca: {
+        cert: fs.readFileSync(path.join(__dirname, 'ca.crt')),
+        key: fs.readFileSync(path.join(__dirname, 'ca.key')),
+    },
+    keys: pki.rsa.generateKeyPair(2048),
+    hosts: {},
+    cb: (name, cb)=>{
+        if (ssl.hosts[name])
+            return cb(null, ssl.hosts[name]);
+        const cert = pki.createCertificate();
+        cert.publicKey = ssl.keys.publicKey;
+        cert.serialNumber = ''+Date.now();
+        cert.validity.notBefore = new Date();
+        cert.validity.notAfter = new Date(Date.now()+10*365*86400000);
+        cert.setSubject([{name: 'commonName', value: name}]);
+        cert.setIssuer(pki.certificateFromPem(ssl.ca.cert).issuer.attributes);
+        cert.sign(pki.privateKeyFromPem(ssl.ca.key), forge.md.sha256.create());
+        ssl.hosts[name] = tls.createSecureContext({
+            key: pki.privateKeyToPem(ssl.keys.privateKey),
+            cert: pki.certificateToPem(cert),
+            ca: ssl.ca.cert,
+        });
+        cb(null, ssl.hosts[name]);
+    },
 };
 
 const log = (level, msg, extra)=>{
@@ -132,7 +156,7 @@ process.on('SIGINT', ()=>{
     terminate();
 });
 process.on('uncaughtException', err=>{
-    log('ERROR', 'uncaughtException', err);
+    log('ERROR', 'uncaughtException: '+err, err.stack);
     terminate();
 });
 
@@ -157,8 +181,9 @@ const find_iface = iface=>{
 function sql(){
     const args = [].slice.call(arguments);
     log('DEBUG', 'SQL: '+args[0], args.slice(1));
-    return etask(function*(){
-        return yield etask.nfn_apply(db.db, '.all', args); });
+    return etask(function*sql(){
+        return yield etask.nfn_apply(db.db, '.all', args);
+    });
 }
 
 const load_config = (filename, optional)=>{
@@ -214,7 +239,18 @@ const prepare_database = ()=>etask(function*(){
     db = {stmt: {}};
     yield etask.nfn_apply((fn, cb)=>db.db = new sqlite.Database(fn, cb), null,
         [argv.database]);
+    let current_hash = null;
+    try {
+        let schema_info = yield sql('SELECT schema_hash FROM schema_info '+
+            'LIMIT 1');
+        current_hash = schema_info[0].schema_hash;
+    } catch(e){ ef(e); }
     const tables = {
+        schema_info: {
+            schema_hash: 'TEXT',
+            luminati_proxy_version: 'TEXT',
+            timestamp: {type: 'INTEGER', default: 'CURRENT_TIMESTAMP'},
+        },
         ip: {
             ip: {type: 'UNSIGNED INTEGER', primary: true},
             timestamp: {type: 'INTEGER', default: 'CURRENT_TIMESTAMP'},
@@ -233,6 +269,27 @@ const prepare_database = ()=>etask(function*(){
             content_size: {type: 'INTEGER', index: true},
         },
     };
+    const schema_hash = crypto.createHash('md5')
+        .update(JSON.stringify(tables)).digest('hex');
+    if (current_hash==schema_hash)
+        return;
+    let prefix = `Archive_${Date.now()}_`;
+    let had_info = false;
+    for (let table in tables)
+    {
+        let exists = yield sql(`SELECT name FROM sqlite_master WHERE
+            type='table' AND name=?`, table);
+        if (exists&&exists.length)
+        {
+            yield sql(`ALTER TABLE ${table} RENAME TO ${prefix+table}`);
+            had_info = true;
+        }
+    }
+    if (had_info)
+    {
+        console.log('DB contains information from a different luminati-proxy '+
+            'schema, information was moved to archive tables');
+    }
     for (let table in tables)
     {
         const fields = [], queries = [];
@@ -255,16 +312,17 @@ const prepare_database = ()=>etask(function*(){
             fields.push(def);
             if (value.index)
             {
-                queries.push(util.format('CREATE %s INDEX IF NOT EXISTS %s '+
-                    'ON %s(%s)', value.unique&&'UNIQUE'||'', field, table,
-                    field));
+                queries.push(`CREATE ${value.unique&&'UNIQUE'||''} INDEX
+                    ${field} ON ${table}(${field})`);
             }
         }
-        queries.unshift(util.format('CREATE TABLE IF NOT EXISTS %s(%s)', table,
-            fields.join(', ')));
+        queries.unshift(
+            `CREATE TABLE ${table}(${fields.join(', ')})`);
         for (let i=0; i<queries.length; i++)
             yield sql(queries[i]);
     }
+    yield sql('INSERT INTO schema_info(schema_hash, '+
+        'luminati_proxy_version) VALUES (?, ?)', schema_hash, version);
 });
 
 const resolve_super_proxies = ()=>etask(function*(){
@@ -296,8 +354,8 @@ const resolve_super_proxies = ()=>etask(function*(){
     return [].concat.apply([], yield etask.all(hosts));
 });
 
+const proxies = {};
 const create_proxy = (conf, port, hostname)=>etask(function*(){
-    conf.proxy = [].concat(conf.proxy);
     if (conf.direct_include || conf.direct_exclude)
     {
         conf.direct = {};
@@ -308,8 +366,13 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
         delete conf.direct_include;
         delete conf.direct_exclude;
     }
-    const server = new Luminati(assign(_.pick(argv, 'customer', 'password'),
-        conf, {ssl: conf.ssl&&ssl}));
+    conf.customer = conf.customer||argv.customer;
+    conf.password = conf.password||argv.password;
+    conf.proxy = [].concat(conf.proxy||hosts);
+    const server = new Luminati(assign(conf, {
+        ssl: argv.ssl && {requestCert: false, SNICallback: ssl.cb},
+        secure_proxy: argv.secure_proxy,
+    }));
     server.on('response', res=>{
         log('DEBUG', util.inspect(res, {depth: null, colors: 1}));
         const req = res.request;
@@ -324,29 +387,36 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
     });
     yield server.listen(port, hostname);
     log('DEBUG', 'local proxy', server.opt);
+    proxies[server.port] = server;
+    server.stop = function(){
+        delete proxies[this.port];
+        return Luminati.prototype.stop.call(this);
+    };
     return server;
 });
 
-const create_proxies = hosts=>{
-    return etask.all(config.map(conf=>create_proxy(assign(conf, {
-        proxy: conf.proxy||hosts,
-        ssl: argv.ssl,
-        secure_proxy: argv.secure_proxy,
-    }), conf.port, find_iface(argv.iface))));
+const create_proxies = ()=>{
+    return etask.all(config.map(conf=>create_proxy(conf, conf.port,
+        find_iface(argv.iface))));
 };
 
 const create_api_interface = ()=>{
     const app = express();
     app.get('/version', (req, res)=>res.json({version: version}));
+    app.get('/proxies', (req, res)=>{
+        const r = _.values(proxies)
+            .sort((a, b)=>a.port-b.port)
+            .map(proxy=>assign({port: proxy.port}, proxy.opt));
+        res.json(r);
+    });
     app.get('/stats', (req, res)=>etask(function*(){
-        let r = yield json({
-            url: 'https://luminati.io/api/get_customer_bw?details=1',
+        const r = yield json({
+            url: 'https://luminati.io/api/bw',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
         });
         res.json(r.body[argv.customer]||{});
     }));
-    const proxies = {};
     app.get('/creds', (req, res)=>{
         res.json({customer: argv.customer, password: argv.password}); });
     app.post('/creds', (req, res)=>{
@@ -365,8 +435,7 @@ const create_api_interface = ()=>{
         hosts.push(hosts.shift());
         req.body.proxy = hosts;
         const server = yield create_proxy(_.omit(req.body, 'timeout'),
-	    +req.body.port||0, find_iface(req.body.iface));
-        proxies[server.port] = server;
+	    +req.body.port||0, find_iface(req.body.iface||argv.iface));
         if (req.body.timeout)
         {
             server.on('idle', idle=>{
@@ -377,10 +446,8 @@ const create_api_interface = ()=>{
                 }
                 if (!idle)
                     return;
-                server.timer = setTimeout(()=>etask(function*(){
-                    yield server.stop();
-                    delete proxies[server.port];
-                }), +req.body.timeout);
+                server.timer = setTimeout(()=>server.stop(),
+                    +req.body.timeout);
             });
         }
         res.json({port: server.port});
@@ -396,20 +463,12 @@ const create_api_interface = ()=>{
         const ports = (req.body.port||'').split(',');
         for (let i=0; i<ports.length; i++)
         {
-            let port = +ports[i].trim();
-            if (!port)
+            const server = proxies[ports[i].trim()];
+            if (!server)
                 continue;
-            for (let key in proxies)
-            {
-                let server = proxies[key];
-                if (server.port!=port)
-                    continue;
-                if (server.timer)
-                    clearTimeout(server.timer);
-                yield server.stop();
-                delete proxies[key];
-                break;
-            }
+            if (server.timer)
+                clearTimeout(server.timer);
+            yield server.stop();
         }
         res.status(204).end();
     }));
@@ -432,7 +491,7 @@ const create_api_interface = ()=>{
     return app;
 };
 
-const create_web_interface = proxies=>etask(function*(){
+const create_web_interface = ()=>etask(function*(){
     const timestamp = Date.now();
     const app = express();
     const server = http.Server(app);
@@ -441,20 +500,21 @@ const create_web_interface = proxies=>etask(function*(){
     app.use(body_parser.urlencoded({extended: true}));
     app.use(body_parser.json());
     app.use('/api', create_api_interface());
+    app.get('/ssl', (req, res)=>{
+        res.set('Content-Type', 'application/x-x509-ca-cert');
+        res.set('Content-Disposition', 'filename=luminati.pem');
+        res.send(ssl.ca.cert);
+    });
     app.use((req, res, next)=>{
         res.locals.path = req.path;
         next();
     });
-    let bin_path = path.dirname(__filename);
-    app.use(express.static(path.join(bin_path, 'public')));
-    app.use('/hutil', express.static(path.join(bin_path,
-        '../node_modules/hutil/util')));
+    app.use(express.static(path.join(__dirname, 'public')));
     app.use((err, req, res, next)=>{
         log('ERROR', err.stack);
         res.status(500).send('Server Error');
     });
     io.on('connection', socket=>etask(function*(){
-        io.emit('proxies', proxies.map(p=>({port: p.port, opt: p.opt})));
         const notify = (name, value)=>{
             const data = {};
             data[name] = value;
@@ -463,11 +523,11 @@ const create_web_interface = proxies=>etask(function*(){
         try {
             yield json('http://lumtest.com/myip');
             notify('network', true);
-        } catch(e){ notify('network', false); }
+        } catch(e){ ef(e); notify('network', false); }
         try {
             yield json('http://zproxy.luminati.io:22225/');
             notify('firewall', true);
-        } catch(e){ notify('firewall', false); }
+        } catch(e){ ef(e); notify('firewall', false); }
         try {
             let res = yield json({
                 url: 'http://zproxy.luminati.io:22225/',
@@ -476,11 +536,12 @@ const create_web_interface = proxies=>etask(function*(){
                     +`-key-${argv.password}`,
             }});
             notify('credentials', res.statusCode!=407);
-        } catch(e){ notify('credentials', false); }
+        } catch(e){ ef(e); notify('credentials', false); }
     })).on('error', err=>log('ERROR', 'SocketIO error', {error: err}));
     setInterval(()=>{
         const stats = {};
-        proxies.forEach(proxy=>stats[proxy.port] = proxy.stats);
+        for (let port in proxies)
+            stats[port] = proxies[port].stats;
         io.emit('stats', stats);
     }, 1000);
     server.on('error', err=>this.ethrow(err));
@@ -527,7 +588,7 @@ etask(function*(){
         yield check_credentials();
         yield prepare_database();
         hosts = yield resolve_super_proxies();
-        const proxies = yield create_proxies(hosts);
+        const proxies = yield create_proxies();
         if (argv.history)
         {
             db.stmt.history = db.db.prepare('INSERT INTO request (url, method,'
@@ -537,7 +598,7 @@ etask(function*(){
         }
         if (argv.www)
         {
-            const server = yield create_web_interface(proxies);
+            const server = yield create_web_interface();
             let port = server.address().port;
             console.log(`admin is available at http://127.0.0.1:${port}`);
         }
@@ -547,7 +608,7 @@ etask(function*(){
             let port = server.address().port;
             console.log(`SOCKS5 is available at 127.0.0.1:${port}`);
         }));
-    } catch(e){
+    } catch(e){ ef(e);
         if (e.message!='canceled')
             log('ERROR', e, e.stack);
     }
