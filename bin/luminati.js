@@ -25,6 +25,7 @@ const hutil = require('hutil');
 const util = require('util');
 const sqlite3 = require('sqlite3');
 const forge = require('node-forge');
+const stringify = require('json-stable-stringify');
 const pki = forge.pki;
 const etask = hutil.etask;
 const ef = etask.ef;
@@ -193,7 +194,14 @@ const load_config = (filename, optional)=>{
         .map(conf=>assign({}, opts, conf));
 };
 
-let config = load_config(argv.config, true);
+const proxies = {};
+const save_config = filename=>{
+    fs.writeFileSync(filename||argv.config,
+        stringify(proxies.map(proxy=>proxy.opt).filter(conf=>conf.persist)));
+};
+
+let config = load_config(argv.config, true).map(conf=>assign(conf,
+    {persist: true}));
 argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
 config = config.length && config || [opts];
 config.filter(conf=>!conf.port)
@@ -234,21 +242,15 @@ const check_credentials = ()=>etask(function*(){
     }]]));
 });
 
-const prepare_database = ()=>etask(function*(){
+const prepare_database = ()=>etask(function*prepare_database(){
     const sqlite = (argv.log=='DEBUG') ? sqlite3.verbose() : sqlite3;
     db = {stmt: {}};
     yield etask.nfn_apply((fn, cb)=>db.db = new sqlite.Database(fn, cb), null,
         [argv.database]);
-    let current_hash = null;
-    try {
-        let schema_info = yield sql('SELECT schema_hash FROM schema_info '+
-            'LIMIT 1');
-        current_hash = schema_info[0].schema_hash;
-    } catch(e){ ef(e); }
     const tables = {
         schema_info: {
-            schema_hash: 'TEXT',
-            luminati_proxy_version: 'TEXT',
+            hash: 'TEXT',
+            version: 'TEXT',
             timestamp: {type: 'INTEGER', default: 'CURRENT_TIMESTAMP'},
         },
         ip: {
@@ -269,60 +271,56 @@ const prepare_database = ()=>etask(function*(){
             content_size: {type: 'INTEGER', index: true},
         },
     };
-    const schema_hash = crypto.createHash('md5')
-        .update(JSON.stringify(tables)).digest('hex');
-    if (current_hash==schema_hash)
-        return;
-    let prefix = `Archive_${Date.now()}_`;
-    let had_info = false;
-    for (let table in tables)
+    const hash = crypto.createHash('md5').update(stringify(tables))
+        .digest('hex');
+    try {
+        if ((yield sql('SELECT hash FROM schema_info LIMIT 1'))[0].hash==hash)
+            return;
+    } catch(e){ ef(e); }
+    const prefix = `Archive_${Date.now()}_`;
+    const archive = yield sql(`SELECT name FROM sqlite_master WHERE
+        type='table' AND name IN ('${Object.keys(tables).join("','")}')`);
+    if (archive.length)
     {
-        let exists = yield sql(`SELECT name FROM sqlite_master WHERE
-            type='table' AND name=?`, table);
-        if (exists&&exists.length)
+        for (let i=0; i<archive.length; i++)
         {
-            yield sql(`ALTER TABLE ${table} RENAME TO ${prefix+table}`);
-            had_info = true;
+            const name = archive[i].name;
+            yield sql(`ALTER TABLE ${name} RENAME TO ${prefix+name}`);
         }
-    }
-    if (had_info)
-    {
-        console.log('DB contains information from a different luminati-proxy '+
-            'schema, information was moved to archive tables');
+        const indexes = yield sql(`SELECT name FROM sqlite_master WHERE
+            type='index' AND sql IS NOT NULL`);
+        for (let i=0; i<indexes.length; i++)
+        {
+            const name = indexes[i].name;
+            yield sql(`DROP INDEX ${name}`);
+        }
+        console.log('DB contains data using an old luminati-proxy schema, '+
+            `data was archived to the following tables: ${prefix}*`);
     }
     for (let table in tables)
     {
         const fields = [], queries = [];
         for (let field in tables[table])
         {
-            const value = tables[table][field];
+            let value = tables[table][field];
             if (typeof value=='string')
-            {
-                fields.push(field+' '+value);
-                continue;
-            }
-            if (value.primary)
-            {
-                fields.push(field+' '+value.type+' PRIMARY KEY');
-                continue;
-            }
-            let def = field+' '+value.type;
-            if (value.default)
-                def += ' DEFAULT '+value.default;
-            fields.push(def);
+                value={type: value};
+            value.primary = value.primary ? 'PRIMARY KEY' : '';
+            value.default = value.default ? `DEFAULT ${value.default}` : '';
+            fields.push(`${field} ${value.type} ${value.primary}
+                ${value.default}`);
             if (value.index)
             {
                 queries.push(`CREATE ${value.unique&&'UNIQUE'||''} INDEX
                     ${field} ON ${table}(${field})`);
             }
         }
-        queries.unshift(
-            `CREATE TABLE ${table}(${fields.join(', ')})`);
+        queries.unshift(`CREATE TABLE ${table}(${fields.join(', ')})`);
         for (let i=0; i<queries.length; i++)
             yield sql(queries[i]);
     }
-    yield sql('INSERT INTO schema_info(schema_hash, '+
-        'luminati_proxy_version) VALUES (?, ?)', schema_hash, version);
+    yield sql('INSERT INTO schema_info(hash, version) VALUES (?, ?)',
+        hash, version);
 });
 
 const resolve_super_proxies = ()=>etask(function*(){
@@ -354,7 +352,6 @@ const resolve_super_proxies = ()=>etask(function*(){
     return [].concat.apply([], yield etask.all(hosts));
 });
 
-const proxies = {};
 const create_proxy = (conf, port, hostname)=>etask(function*(){
     if (conf.direct_include || conf.direct_exclude)
     {
@@ -434,6 +431,7 @@ const create_api_interface = ()=>{
         });
         hosts.push(hosts.shift());
         req.body.proxy = hosts;
+        req.body.persist = +req.body.persist||0;
         const server = yield create_proxy(_.omit(req.body, 'timeout'),
 	    +req.body.port||0, find_iface(req.body.iface||argv.iface));
         if (req.body.timeout)
@@ -450,6 +448,8 @@ const create_api_interface = ()=>{
                     +req.body.timeout);
             });
         }
+        if (res.body.persist)
+            save_config();
         res.json({port: server.port});
     }));
     app.post('/delete', (req, res, next)=>etask(function*(){
@@ -461,6 +461,7 @@ const create_api_interface = ()=>{
             }
         });
         const ports = (req.body.port||'').split(',');
+        let save;
         for (let i=0; i<ports.length; i++)
         {
             const server = proxies[ports[i].trim()];
@@ -469,7 +470,10 @@ const create_api_interface = ()=>{
             if (server.timer)
                 clearTimeout(server.timer);
             yield server.stop();
+            save |= server.opt.persist;
         }
+        if (save)
+            save_config();
         res.status(204).end();
     }));
     app.post('/block', (req, res, next)=>etask(function*(){

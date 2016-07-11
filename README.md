@@ -44,7 +44,8 @@ $ luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
-  --log              Log level (ERROR|WARNING|INFO|DEBUG)   [default: "WARNING"]
+  --log              Log level (NONE|ERROR|WARNING|INFO|DEBUG)
+                                                            [default: "WARNING"]
   --customer         Customer
   --password         Password
   --proxy            Super proxy ip or country
@@ -64,11 +65,14 @@ Options:
   --direct_exclude   Exclude pattern for direct requests
   --www              Local web port                             [default: 22999]
   --socks            SOCKS5 port (local:remote)
-  --history          Log history
+  --history          Log history                                       [boolean]
+  --database         Database path              [default: "~/.luminati.sqlite3"]
   --resolve          Reverse DNS lookup file
   --config           Config file containing proxy definitions
-                                                     [default: ".luminati.json"]
-  --iface            Interface or ip to listen on
+                                                   [default: "~/.luminati.json"]
+  --iface            Interface or ip to listen on (lo, eth0, lxcbr0, br0, eth1,
+                     veth01, veth02, veth03, veth04, veth0d, veth13, veth18,
+                     veth1a, veth20, veth1b, veth26)
   -h, --help         Show help                                         [boolean]
   --version          Show version number                               [boolean]
   -p, --port         Listening port                             [default: 24000]
