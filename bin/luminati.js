@@ -408,7 +408,7 @@ const create_api_interface = ()=>{
     });
     app.get('/stats', (req, res)=>etask(function*(){
         const r = yield json({
-            url: 'https://luminati.io/api/bw',
+            url: 'https://luminati.io/api/get_customer_bw?details=1',
             headers: {'x-hola-auth':
                 `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
         });
