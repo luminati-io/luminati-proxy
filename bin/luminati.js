@@ -448,7 +448,7 @@ const create_api_interface = ()=>{
                     +req.body.timeout);
             });
         }
-        if (res.body.persist)
+        if (req.body.persist)
             save_config();
         res.json({port: server.port});
     }));
