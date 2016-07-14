@@ -48,9 +48,11 @@ Options:
                                                             [default: "WARNING"]
   --customer         Customer
   --password         Password
-  --proxy            Super proxy ip or country
+  --proxy            Super proxy ip or country   [default: "zproxy.luminati.io"]
   --proxy_count      Minimum number of super proxies to use         [default: 1]
   --secure_proxy     Use SSL when accessing super proxy
+  --sticky_ip        Use same session as much as possible to maintain IP
+                                                                       [boolean]
   --zone             Zone                                       [default: "gen"]
   --country          Country
   --state            State
@@ -70,9 +72,10 @@ Options:
   --resolve          Reverse DNS lookup file
   --config           Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
-  --iface            Interface or ip to listen on (lo, eth0, lxcbr0, br0, eth1,
-                     veth01, veth02, veth03, veth04, veth0d, veth13, veth18,
-                     veth1a, veth20, veth1b, veth26)
+  --iface            Interface or ip to listen on (lo, eth0, br0, eth1, veth01,
+                     veth02, veth03, veth04, veth0d, veth18, veth13, veth1b,
+                     veth20, veth1a, veth26)
+  --dns_servers      Space separated list of IPs for DNS resolution
   -h, --help         Show help                                         [boolean]
   --version          Show version number                               [boolean]
   -p, --port         Listening port                             [default: 24000]

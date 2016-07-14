@@ -44,6 +44,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     proxy: 'Super proxy ip or country',
     proxy_count: 'Minimum number of super proxies to use',
     secure_proxy: 'Use SSL when accessing super proxy',
+    sticky_ip: 'Use same session as much as possible to maintain IP',
     zone: 'Zone',
     country: 'Country',
     state: 'State',
@@ -63,13 +64,15 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     resolve: 'Reverse DNS lookup file',
     config: 'Config file containing proxy definitions',
     iface: `Interface or ip to listen on (${Object.keys(os.networkInterfaces()).join(', ')})`,
+    dns_servers: 'Space separated list of IPs for DNS resolution',
 })
-.boolean('history')
+.boolean(['history', 'sticky_ip'])
 .default({
     port: 24000,
     log: 'WARNING',
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
+    proxy: 'zproxy.luminati.io',
     zone: process.env.LUMINATI_ZONE||'gen',
     max_requests: 50,
     pool_size: 3,
@@ -141,7 +144,6 @@ if (opts.resolve)
         opts.resolve = ip=>domains[ip]||ip;
     }
 }
-let hosts;
 if (is_win)
 {
     const readline = require('readline');
@@ -157,7 +159,7 @@ process.on('SIGINT', ()=>{
     terminate();
 });
 process.on('uncaughtException', err=>{
-    log('ERROR', 'uncaughtException: '+err, err.stack);
+    log('ERROR', `uncaughtException (${version}): ${err}`, err.stack);
     terminate();
 });
 
@@ -200,6 +202,8 @@ const save_config = filename=>{
         stringify(proxies.map(proxy=>proxy.opt).filter(conf=>conf.persist)));
 };
 
+if (argv.dns_servers)
+    dns.setServers(argv.dns_servers.split(' '));
 let config = load_config(argv.config, true).map(conf=>assign(conf,
     {persist: true}));
 argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
@@ -323,35 +327,6 @@ const prepare_database = ()=>etask(function*prepare_database(){
         hash, version);
 });
 
-const resolve_super_proxies = ()=>etask(function*(){
-    const hosts = [].concat(argv.proxy||'zproxy.luminati.io')
-    .map(host=>etask(function*(){
-        if (/^\d+\.\d+\.\d+\.\d+$/.test(host))
-        {
-            log('DEBUG', `using super proxy ${host}`);
-            return host;
-        }
-        let prefix = '';
-        if (host.length==2)
-        {
-            prefix = `servercountry-${host}-`;
-            host = 'zproxy.luminati.io';
-        }
-        const hosts = {};
-        const timestamp = Date.now();
-        while (Object.keys(hosts).length<argv.proxy_count &&
-            Date.now()-timestamp<30000)
-        {
-            let domain = `${prefix}session-${Date.now()}.${host}`;
-            let ips = yield etask.nfn_apply(dns, '.resolve', [domain]);
-            log('DEBUG', `resolving ${domain}`, ips);
-            ips.forEach(ip=>hosts[ip] = true);
-        }
-        return Object.keys(hosts);
-    }));
-    return [].concat.apply([], yield etask.all(hosts));
-});
-
 const create_proxy = (conf, port, hostname)=>etask(function*(){
     if (conf.direct_include || conf.direct_exclude)
     {
@@ -365,7 +340,8 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
     }
     conf.customer = conf.customer||argv.customer;
     conf.password = conf.password||argv.password;
-    conf.proxy = [].concat(conf.proxy||hosts);
+    conf.proxy = [].concat(conf.proxy||argv.proxy);
+    conf.proxy_count = conf.proxy_count||argv.proxy_count;
     const server = new Luminati(assign(conf, {
         ssl: argv.ssl && {requestCert: false, SNICallback: ssl.cb},
         secure_proxy: argv.secure_proxy,
@@ -429,8 +405,7 @@ const create_api_interface = ()=>{
                 return next(this.error);
             }
         });
-        hosts.push(hosts.shift());
-        req.body.proxy = hosts;
+        req.body.proxy = argv.proxy;
         req.body.persist = +req.body.persist||0;
         const server = yield create_proxy(_.omit(req.body, 'timeout'),
 	    +req.body.port||0, find_iface(req.body.iface||argv.iface));
@@ -591,7 +566,6 @@ etask(function*(){
     try {
         yield check_credentials();
         yield prepare_database();
-        hosts = yield resolve_super_proxies();
         const proxies = yield create_proxies();
         if (argv.history)
         {
