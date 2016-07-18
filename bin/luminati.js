@@ -64,7 +64,6 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     resolve: 'Reverse DNS lookup file',
     config: 'Config file containing proxy definitions',
     iface: `Interface or ip to listen on (${Object.keys(os.networkInterfaces()).join(', ')})`,
-    dns_servers: 'Space separated list of IPs for DNS resolution',
 })
 .boolean(['history', 'sticky_ip'])
 .default({
@@ -202,8 +201,6 @@ const save_config = filename=>{
         stringify(proxies.map(proxy=>proxy.opt).filter(conf=>conf.persist)));
 };
 
-if (argv.dns_servers)
-    dns.setServers(argv.dns_servers.split(' '));
 let config = load_config(argv.config, true).map(conf=>assign(conf,
     {persist: true}));
 argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
@@ -385,8 +382,8 @@ const create_api_interface = ()=>{
     app.get('/stats', (req, res)=>etask(function*(){
         const r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
-            headers: {'x-hola-auth':
-                `lum-customer-${argv.customer}-zone-gen-key-${argv.password}`},
+            headers: {'x-hola-auth': `lum-customer-${argv.customer}`
+                +`-zone-${argv.zone}-key-${argv.password}`},
         });
         res.json(r.body[argv.customer]||{});
     }));
@@ -511,7 +508,7 @@ const create_web_interface = ()=>etask(function*(){
             let res = yield json({
                 url: 'http://zproxy.luminati.io:22225/',
                 headers: {'x-hola-auth':
-                    `lum-customer-${argv.customer}-zone-gen`
+                    `lum-customer-${argv.customer}-zone-${argv.zone}`
                     +`-key-${argv.password}`,
             }});
             notify('credentials', res.statusCode!=407);

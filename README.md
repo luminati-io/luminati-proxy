@@ -72,11 +72,78 @@ Options:
   --resolve          Reverse DNS lookup file
   --config           Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
-  --iface            Interface or ip to listen on (lo, eth0, br0, eth1, veth01,
-                     veth02, veth03, veth04, veth0d, veth18, veth13, veth1b,
-                     veth20, veth1a, veth26)
-  --dns_servers      Space separated list of IPs for DNS resolution
+  --iface            Interface or ip to listen on (lo, eth0...)
   -h, --help         Show help                                         [boolean]
   --version          Show version number                               [boolean]
   -p, --port         Listening port                             [default: 24000]
+```
+
+## FAQ
+
+### Customer name
+
+The customer name used by luminati-proxy is the luminati customer name and not the username as it appears on [https://luminati.io/cp/api_example](https://luminati.io/cp/api_example) page.
+
+If the username shows: lum-customer-CUSTOMER-zone-gen
+
+Then the customer name is just: CUSTOMER
+
+### SSL Requests
+
+The --ssl parameter is for SSL sniffing, HTTPS requests can be made without it.
+
+## Node.js API
+
+The proxy manager can be used as a required module for node.js applications - eliminating the need to run it as a standalone process.
+
+The API supports both [Promises](https://www.promisejs.org/) and [Generators](https://www.promisejs.org/generators/). Internally, it uses the [request](https://github.com/request/request) module and supports all of its features.
+
+### Promises
+```js
+'use strict';
+const Luminati = require('luminati-proxy');
+
+const proxy = new Luminati({
+    customer: 'CUSTOMER', // your customer name
+    password: 'PASSWORD', // your password
+    zone: 'gen', // zone to use
+    proxy_count: 5, //minimum number of proxies to use for distributing requests
+});
+proxy.on('response', res=>console.log('Response:', res));
+proxy.listen(24000, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
+    proxy.request('http://lumtest.com/myip', (err, res)=>{
+        if (err)
+            return reject(err);
+        resolve(res);
+    });
+})).then(res=>{
+    console.log('Result:', res.statusCode, res.body);
+}, err=>{
+    console.log('Error:', err);
+}).then(()=>proxy.stop());
+```
+
+### Generators
+```js
+'use strict';
+const hutil = require('hutil');
+const Luminati = require('luminati-proxy');
+
+hutil.etask(function*(){
+    const proxy = new Luminati({
+        customer: 'CUSTOMER', // your customer name
+        password: 'PASSWORD', // your password
+        zone: 'gen', // zone to use
+        proxy_count: 5, //minimum number of proxies to use for distributing requests
+    });
+    proxy.on('response', res=>console.log('Response:', res)); // dump some stats to screen
+    yield proxy.listen(24000, '127.0.0.1'); // port and ip to listen to
+    proxy.request('http://lumtest.com/myip', (err, res, body)=>{
+        if (err)
+            console.log('Error:', err);
+        else
+            console.log('Result:', res.statusCode, body);
+        proxy.stop();
+    });
+});
 ```

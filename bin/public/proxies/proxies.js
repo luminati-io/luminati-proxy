@@ -145,6 +145,9 @@ proxies.value('lumOptColumns', [
     {key: 'dns', title: 'DNS'},
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
+    {key: 'proxy_count', title: 'Minimum proxies count'},
+    {key: 'pool_size', title: 'Pool size'},
+    {key: 'sticky_ip', title: 'Sticky IP'},
     {key: 'max_requests', title: 'Max requests'},
     {key: 'log', title: 'Log'},
 ]);
