@@ -57,13 +57,15 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     session_timeout: 'Session establish timeout',
     direct_include: 'Include pattern for direct requests',
     direct_exclude: 'Exclude pattern for direct requests',
+    null_response: 'Url pattern for null response',
     www: 'Local web port',
     socks: 'SOCKS5 port (local:remote)',
     history: 'Log history',
     database: 'Database path',
     resolve: 'Reverse DNS lookup file',
     config: 'Config file containing proxy definitions',
-    iface: `Interface or ip to listen on (${Object.keys(os.networkInterfaces()).join(', ')})`,
+    iface: 'Interface or ip to listen on '
+        +`(${Object.keys(os.networkInterfaces()).join(', ')})`,
 })
 .boolean(['history', 'sticky_ip'])
 .default({
@@ -119,7 +121,7 @@ const log = (level, msg, extra)=>{
 
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
     'max_requests', 'pool_size', 'session_timeout', 'direct_include',
-    'direct_exclude', 'dns', 'resolve', 'cid', 'ip', 'log']);
+    'direct_exclude', 'null_response', 'dns', 'resolve', 'cid', 'ip', 'log']);
 if (opts.resolve)
 {
     if (typeof opts.resolve=='boolean')
@@ -161,11 +163,6 @@ process.on('uncaughtException', err=>{
     log('ERROR', `uncaughtException (${version}): ${err}`, err.stack);
     terminate();
 });
-
-const dot2num = dot=>{
-    const d = dot.split('.');
-    return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3]);
-};
 
 const find_iface = iface=>{
     const ifaces = os.networkInterfaces();
@@ -244,7 +241,7 @@ const check_credentials = ()=>etask(function*(){
 });
 
 const prepare_database = ()=>etask(function*prepare_database(){
-    const sqlite = (argv.log=='DEBUG') ? sqlite3.verbose() : sqlite3;
+    const sqlite = argv.log=='DEBUG' ? sqlite3.verbose() : sqlite3;
     db = {stmt: {}};
     yield etask.nfn_apply((fn, cb)=>db.db = new sqlite.Database(fn, cb), null,
         [argv.database]);
@@ -335,6 +332,8 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
         delete conf.direct_include;
         delete conf.direct_exclude;
     }
+    if (conf.null_response)
+      conf.null_response = new RegExp(conf.null_response, 'i');
     conf.customer = conf.customer||argv.customer;
     conf.password = conf.password||argv.password;
     conf.proxy = [].concat(conf.proxy||argv.proxy);
@@ -365,10 +364,8 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
     return server;
 });
 
-const create_proxies = ()=>{
-    return etask.all(config.map(conf=>create_proxy(conf, conf.port,
-        find_iface(argv.iface))));
-};
+const create_proxies = ()=>etask.all(config.map(conf=>create_proxy(conf,
+    conf.port, find_iface(argv.iface))));
 
 const create_api_interface = ()=>{
     const app = express();
@@ -468,7 +465,6 @@ const create_api_interface = ()=>{
 };
 
 const create_web_interface = ()=>etask(function*(){
-    const timestamp = Date.now();
     const app = express();
     const server = http.Server(app);
     const io = socket_io(server);
@@ -563,7 +559,7 @@ etask(function*(){
     try {
         yield check_credentials();
         yield prepare_database();
-        const proxies = yield create_proxies();
+        yield create_proxies();
         if (argv.history)
         {
             db.stmt.history = db.db.prepare('INSERT INTO request (url, method,'

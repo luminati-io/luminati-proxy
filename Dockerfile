@@ -11,4 +11,4 @@ FROM node:onbuild
 RUN npm install -g luminati-io/luminati-proxy
 
 # Define default command.
-CMD ["luminati"]
+CMD ["luminati", "--help"]

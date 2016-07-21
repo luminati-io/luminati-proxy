@@ -2,6 +2,8 @@
 
 A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
 
+With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IPs or Luminati static IPs.
+
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
 ## Features
@@ -65,6 +67,7 @@ Options:
   --session_timeout  Session establish timeout                   [default: 5000]
   --direct_include   Include pattern for direct requests
   --direct_exclude   Exclude pattern for direct requests
+  --null_response    Url pattern for null response
   --www              Local web port                             [default: 22999]
   --socks            SOCKS5 port (local:remote)
   --history          Log history                                       [boolean]
@@ -76,6 +79,16 @@ Options:
   -h, --help         Show help                                         [boolean]
   --version          Show version number                               [boolean]
   -p, --port         Listening port                             [default: 24000]
+```
+
+### Docker
+
+A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy/](https://hub.docker.com/r/luminati/luminati-proxy/)
+
+```sh
+$ docker pull luminati/luminati-proxy
+
+$ docker run luminati/luminati-proxy
 ```
 
 ## FAQ
