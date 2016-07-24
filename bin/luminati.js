@@ -41,7 +41,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     log: `Log level (${Object.keys(Luminati.log_level).join('|')})`,
     customer: 'Customer',
     password: 'Password',
-    proxy: 'Super proxy ip or country',
+    proxy: 'Super proxy ip or country (us|gb|nl)',
     proxy_count: 'Minimum number of super proxies to use',
     secure_proxy: 'Use SSL when accessing super proxy',
     sticky_ip: 'Use same session as much as possible to maintain IP',
