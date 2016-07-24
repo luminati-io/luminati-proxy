@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'lodash', 'es6_shim',
+define(['angular', 'socket.io-client', 'lodash', 'es6_shim', '../util',
     'angular-material', 'md-data-table', 'angular-chart',
     '../health_markers/health_markers', 'css!./proxies'],
     function(angular, io, _){
 
 var proxies = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
-    'chart.js', 'lum-health-markers']);
+    'chart.js', 'lum-health-markers', 'lum-util']);
 
 proxies.value('lumProxyWindowConfig', {
     refresh: 100,
@@ -82,10 +82,11 @@ ProxyGraphOptions.prototype.release_options = function(){
 };
 
 proxies.factory('lumProxies', proxiesService);
-proxiesService.$inject = ['$q', '$interval', 'lumProxyWindowConfig'];
-function proxiesService($q, $interval, win_config){
+proxiesService.$inject = ['$q', '$interval', 'lumProxyWindowConfig',
+    'get_json'];
+function proxiesService($q, $interval, win_config, get_json){
     var deffered = $q.defer();
-    io().on('proxies', function(proxies){
+    get_json('/api/proxies').then(function(proxies){
         proxies.forEach(function(proxy){
             proxy.stats = {
                 hosts: [],
@@ -94,7 +95,8 @@ function proxiesService($q, $interval, win_config){
             };
         });
         deffered.resolve(proxies);
-    }).on('stats', function(stats_chunk){
+    });
+    io().on('stats', function(stats_chunk){
         var now = Date.now();
         var history_start = now - win_config.history;
         deffered.promise.then(function(proxies){
@@ -143,6 +145,9 @@ proxies.value('lumOptColumns', [
     {key: 'dns', title: 'DNS'},
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
+    {key: 'proxy_count', title: 'Minimum proxies count'},
+    {key: 'pool_size', title: 'Pool size'},
+    {key: 'sticky_ip', title: 'Sticky IP'},
     {key: 'max_requests', title: 'Max requests'},
     {key: 'log', title: 'Log'},
 ]);
@@ -165,7 +170,7 @@ function ProxiesTableController(lum_proxies, opt_columns, graph_options,
         $vm.resolved = true;
         $vm.proxies = proxies;
         $vm.opt_columns = opt_columns.filter(function(col){
-            return proxies.some(function(p){ return p.opt[col.key]; }); });
+            return proxies.some(function(p){ return p[col.key]; }); });
     });
 }
 

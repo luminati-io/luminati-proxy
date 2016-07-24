@@ -14,7 +14,7 @@
       <tr ng-repeat="proxy in $vm.proxies" md-row>
         <td md-cell>{{proxy.port}}</td>
         <td ng-repeat="col in $vm.opt_columns" md-cell>
-          {{proxy.opt[col.key]}}
+          {{proxy[col.key]}}
         </td>
         <td md-cell>
           <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy(proxy)>
