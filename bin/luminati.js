@@ -54,6 +54,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     pool_size: 'Pool size',
     ssl: 'Enable SSL sniffing',
     max_requests: 'Requests per session',
+    proxy_switch: 'Automatically switch proxy on failure',
     session_timeout: 'Session establish timeout',
     direct_include: 'Include pattern for direct requests',
     direct_exclude: 'Exclude pattern for direct requests',
@@ -79,6 +80,7 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     pool_size: 3,
     session_timeout: 5000,
     proxy_count: 1,
+    proxy_switch: 5,
     www: 22999,
     config: path.join(os.homedir(), '.luminati.json'.substr(is_win?1:0)),
     database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
@@ -353,7 +355,7 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
                 res.timeline.end, JSON.stringify(res.timeline), res.proxy.host,
                 res.proxy.username, res.body_size);
         }
-    });
+    }).on('error', this.throw_fn());
     yield server.listen(port, hostname);
     log('DEBUG', 'local proxy', server.opt);
     proxies[server.port] = server;
@@ -367,6 +369,45 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
 const create_proxies = ()=>etask.all(config.map(conf=>create_proxy(conf,
     conf.port, find_iface(argv.iface))));
 
+let proxy_create = (req, res, next)=>etask(function*(){
+    this.on('ensure', ()=>{
+        if (this.error)
+        {
+            log('ERROR', this.error, this.error.stack);
+            return next(this.error);
+        }
+    });
+    req.body.proxy = argv.proxy;
+    req.body.persist = +req.body.persist||0;
+    const server = yield create_proxy(_.omit(req.body, 'timeout'),
+        +req.body.port||0, find_iface(req.body.iface||argv.iface));
+    if (req.body.timeout)
+    {
+        server.on('idle', idle=>{
+            if (server.timer)
+            {
+                clearTimeout(server.timer);
+                delete server.timer;
+            }
+            if (!idle)
+                return;
+            server.timer = setTimeout(()=>server.stop(),
+                +req.body.timeout);
+        });
+    }
+    if (req.body.persist)
+        save_config();
+    res.json({port: server.port});
+});
+
+let proxy_update = (req, res)=>{
+    let port = req.params.port;
+    let proxy = proxies[port];
+    assign(proxy.opt, _.omit(req.body, 'port'));
+    proxy = assign({port: port}, proxy.opt);
+    res.json(proxy);
+};
+
 const create_api_interface = ()=>{
     const app = express();
     app.get('/version', (req, res)=>res.json({version: version}));
@@ -376,6 +417,8 @@ const create_api_interface = ()=>{
             .map(proxy=>assign({port: proxy.port}, proxy.opt));
         res.json(r);
     });
+    app.post('/create', proxy_create);
+    app.put('/proxies/:port', proxy_update);
     app.get('/stats', (req, res)=>etask(function*(){
         const r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
@@ -391,36 +434,6 @@ const create_api_interface = ()=>{
         argv.password = req.body.password||argv.password;
         res.sendStatus(200);
     });
-    app.post('/create', (req, res, next)=>etask(function*(){
-        this.on('ensure', ()=>{
-            if (this.error)
-            {
-                log('ERROR', this.error, this.error.stack);
-                return next(this.error);
-            }
-        });
-        req.body.proxy = argv.proxy;
-        req.body.persist = +req.body.persist||0;
-        const server = yield create_proxy(_.omit(req.body, 'timeout'),
-	    +req.body.port||0, find_iface(req.body.iface||argv.iface));
-        if (req.body.timeout)
-        {
-            server.on('idle', idle=>{
-                if (server.timer)
-                {
-                    clearTimeout(server.timer);
-                    delete server.timer;
-                }
-                if (!idle)
-                    return;
-                server.timer = setTimeout(()=>server.stop(),
-                    +req.body.timeout);
-            });
-        }
-        if (req.body.persist)
-            save_config();
-        res.json({port: server.port});
-    }));
     app.post('/delete', (req, res, next)=>etask(function*(){
         this.on('ensure', ()=>{
             if (this.error)
@@ -516,7 +529,7 @@ const create_web_interface = ()=>etask(function*(){
             stats[port] = proxies[port].stats;
         io.emit('stats', stats);
     }, 1000);
-    server.on('error', err=>this.ethrow(err));
+    server.on('error', this.throw_fn());
     yield etask.cb_apply(server, '.listen', [argv.www]);
     return server;
 });
@@ -527,27 +540,27 @@ const create_socks_server = (local, remote)=>etask(function*(){
         {
             info.dstAddr = '127.0.0.1';
             info.dstPort = remote;
-	    log('DEBUG', 'Socks http connection: ', info);
+	    log('DEBUG', `${local} Socks http connection`, info);
             return accept();
         }
         if (info.dstPort==443)
         {
             const socket = accept(true);
             const dst = net.connect(remote, '127.0.0.1');
-	    log('DEBUG', 'Socks https connection: ', info);
+	    log('DEBUG', `${local} Socks https connection`, info);
             dst.on('connect', ()=>{
                 dst.write(util.format('CONNECT %s:%d HTTP/1.1\r\n'+
                     'Host: %s:%d\r\n\r\n', info.dstAddr, info.dstPort,
                     info.dstAddr, info.dstPort));
                 socket.pipe(dst);
             }).on('error', err=>{
-                log('ERROR', 'Socks connection error', {error: err,
+                log('ERROR', `${local} Socks connection error`, {error: err,
                     port: local});
-                this.ethrow(err);
+                this.throw(err);
             });
             return dst.once('data', ()=>{ dst.pipe(socket); });
         }
-	log('DEBUG', 'Socks connection: ', info);
+	log('DEBUG', `${local} Socks connection`, info);
         accept();
     });
     server.useAuth(socks.auth.None());

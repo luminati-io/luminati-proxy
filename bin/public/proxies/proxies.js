@@ -85,18 +85,38 @@ proxies.factory('lumProxies', proxiesService);
 proxiesService.$inject = ['$q', '$interval', 'lumProxyWindowConfig',
     'get_json'];
 function proxiesService($q, $interval, win_config, get_json){
-    var deffered = $q.defer();
-    get_json('/api/proxies').then(function(proxies){
-        proxies.forEach(function(proxy){
-            proxy.stats = {
-                hosts: [],
-                ticks: [],
-                active_requests: [],
-            };
+    var service = {
+        subscribe: subscribe,
+        proxies: null,
+        update: update_proxies
+    };
+    var deffered;
+    var listeners = [];
+    service.update();
+    io().on('stats', stats_event);
+    return service;
+    function subscribe(func){
+        listeners.push(func);
+        if (service.proxies)
+            func(service.proxies);
+    }
+    function update_proxies(){
+        deffered = $q.defer();
+        get_json('/api/proxies').then(function(proxies){
+            proxies.forEach(function(proxy){
+                proxy.stats = {
+                    hosts: [],
+                    ticks: [],
+                    active_requests: [],
+                };
+            });
+            service.proxies = proxies;
+            deffered.resolve(proxies);
+            listeners.forEach(function(cb){ cb(proxies); });
         });
-        deffered.resolve(proxies);
-    });
-    io().on('stats', function(stats_chunk){
+        return deffered.promise;
+    }
+    function stats_event(stats_chunk){
         var now = Date.now();
         var history_start = now - win_config.history;
         deffered.promise.then(function(proxies){
@@ -128,8 +148,7 @@ function proxiesService($q, $interval, win_config, get_json){
                 proxy.stats.ticks.push(now);
             }
         });
-    });
-    return deffered.promise;
+    }
 }
 
 proxies.value('lumOptColumns', [
@@ -160,13 +179,14 @@ function ProxiesTableController(lum_proxies, opt_columns, graph_options,
 {
     this.$mdDialog = $mdDialog;
     this.$http = $http;
+    this.lum_proxies = lum_proxies;
     var $vm = this;
     $vm.resolved = false;
     $vm.proxies = [];
     $vm.opt_columns = [];
     $vm.graph_options = graph_options.get_options();
     $vm._graph_options_provider = graph_options;
-    lum_proxies.then(function(proxies){
+    lum_proxies.subscribe(function(proxies){
         $vm.resolved = true;
         $vm.proxies = proxies;
         $vm.opt_columns = opt_columns.filter(function(col){
@@ -178,12 +198,7 @@ ProxiesTableController.prototype.$onDestroy = function(){
     this._graph_options_provider.release_options(); };
 
 ProxiesTableController.prototype.edit_proxy = function(proxy){
-    var _proxy;
-    if (proxy && proxy.opt)
-    {
-        _proxy = proxy&&_.pick(proxy, Object.keys(proxy));
-        _proxy.opt = proxy&&_.pick(proxy.opt, Object.keys(proxy.opt));
-    }
+    var _proxy = proxy ? _.cloneDeep(proxy) : null;
     var _this = this;
     this.$mdDialog.show({
         controller: dialog_controller,
@@ -197,13 +212,14 @@ ProxiesTableController.prototype.edit_proxy = function(proxy){
         {
             if (_proxy)
             {
-                // XXX gilad/ofir: add /api/edit
-                _this.$http.post('/api/edit', data).then(function(res){});
+                _this.$http.put('/api/proxies/'+proxy.port, data)
+                    .then(function(res){ _this.lum_proxies.update(); });
             }
             else
             {
-                // XXX ofir: refresh proxies when done
-                _this.$http.post('/api/create', data).then(function(res){});
+                _this.$http.post('/api/create', data).then(function(res){
+                    _this.lum_proxies.update();
+                });
             }
         }
     });
@@ -220,7 +236,7 @@ proxies.directive('proxiesTable', function(){
 });
 
 function dialog_controller($scope, $mdDialog, locals){
-    $scope.form_data = locals&&locals.proxy&&locals.proxy.opt||{};
+    $scope.form_data = _.get(locals, 'proxy', {});
     $scope.hide = function(){ $mdDialog.hide(); };
     $scope.cancel = function(){ $mdDialog.cancel(); };
     $scope.answer = function(answer){ $mdDialog.hide(answer); };

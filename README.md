@@ -50,7 +50,8 @@ Options:
                                                             [default: "WARNING"]
   --customer         Customer
   --password         Password
-  --proxy            Super proxy ip or country   [default: "zproxy.luminati.io"]
+  --proxy            Super proxy ip or country (us|gb|nl)
+                                                 [default: "zproxy.luminati.io"]
   --proxy_count      Minimum number of super proxies to use         [default: 1]
   --secure_proxy     Use SSL when accessing super proxy
   --sticky_ip        Use same session as much as possible to maintain IP
@@ -64,6 +65,7 @@ Options:
   --pool_size        Pool size                                      [default: 3]
   --ssl              Enable SSL sniffing
   --max_requests     Requests per session                          [default: 50]
+  --proxy_switch     Automatically switch proxy on failure          [default: 5]
   --session_timeout  Session establish timeout                   [default: 5000]
   --direct_include   Include pattern for direct requests
   --direct_exclude   Exclude pattern for direct requests
