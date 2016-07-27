@@ -34,7 +34,7 @@ const assign = Object.assign;
 const is_win = process.platform=='win32';
 const version = JSON.parse(fs.readFileSync(path.join(__dirname,
     '../package.json'))).version;
-const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
+const yargs = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .alias({h: 'help', p: 'port'})
 .describe({
     port: 'Listening port',
@@ -84,7 +84,21 @@ const argv = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     www: 22999,
     config: path.join(os.homedir(), '.luminati.json'.substr(is_win?1:0)),
     database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
-}).help('h').version(()=>`luminati-proxy version: ${version}`).argv;
+}).help('h').version(()=>`luminati-proxy version: ${version}`);
+let argv = yargs.argv;
+
+const load_json = (filename, optional, def)=>{
+    if (optional && !file.exists(filename))
+        return def;
+    try {
+        let s = file.read_e(filename);
+        return JSON.parse(s);
+    } catch(e){}
+    return def;
+};
+
+yargs.config(load_json(argv.config, true, {_defaults: {}})._defaults);
+argv = yargs.argv;
 const ssl = {
     ca: {
         cert: fs.readFileSync(path.join(__dirname, 'ca.crt')),
@@ -120,6 +134,16 @@ const log = (level, msg, extra)=>{
         args.push(extra);
     console.log.apply(console, args);
 };
+
+function ensure_default(_this, next){
+    _this.on('ensure', ()=>{
+        if (_this.error)
+        {
+            log('ERROR', _this.error, _this.error.stack);
+            return next(_this.error);
+        }
+    });
+}
 
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
     'max_requests', 'pool_size', 'session_timeout', 'direct_include',
@@ -187,23 +211,23 @@ function sql(){
     });
 }
 
-const load_config = (filename, optional)=>{
-    if (optional && !file.exists(filename))
-        return [];
-    return [].concat(JSON.parse(file.read_e(filename)))
-        .map(conf=>assign({}, opts, conf));
+let load_config = (filename, optional)=>{
+    let proxies = load_json(filename, optional, []);
+    return proxies.proxies || proxies;
 };
 
-const proxies = {};
-const save_config = filename=>{
-    fs.writeFileSync(filename||argv.config,
-        stringify(proxies.map(proxy=>proxy.opt).filter(conf=>conf.persist)));
+let proxies = {};
+let save_config = filename=>{
+    let data = _.values(proxies).map(proxy=>proxy.opt)
+        .filter(conf=>conf.persist);
+    let s = stringify({proxies: data, _defaults: argv}, {space: '  '});
+    fs.writeFileSync(filename||argv.config, s);
 };
 
 let config = load_config(argv.config, true).map(conf=>assign(conf,
     {persist: true}));
 argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
-config = config.length && config || [opts];
+config = config.length && config || [assign({persist: true}, opts)];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.port+i}));
 log('DEBUG', 'Config', config);
@@ -323,7 +347,22 @@ const prepare_database = ()=>etask(function*prepare_database(){
         hash, version);
 });
 
-const create_proxy = (conf, port, hostname)=>etask(function*(){
+function proxy_fields(conf){
+    conf.customer = conf.customer||argv.customer;
+    conf.password = conf.password||argv.password;
+    conf.proxy_count = conf.proxy_count||argv.proxy_count;
+    conf.proxy = [].concat(conf.proxy||argv.proxy);
+    let numbers = ['port', 'session_timeout', 'proxy_count', 'pool_size',
+        'max_requests'];
+    numbers.forEach(field=>{
+        if (conf[field])
+            conf[field] = +conf[field];
+    });
+}
+
+let create_proxy = (c, iface)=>etask(function*(){
+    let conf = assign({}, _.omit(opts, 'port'), c);
+    proxy_fields(conf);
     if (conf.direct_include || conf.direct_exclude)
     {
         conf.direct = {};
@@ -336,11 +375,7 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
     }
     if (conf.null_response)
       conf.null_response = new RegExp(conf.null_response, 'i');
-    conf.customer = conf.customer||argv.customer;
-    conf.password = conf.password||argv.password;
-    conf.proxy = [].concat(conf.proxy||argv.proxy);
-    conf.proxy_count = conf.proxy_count||argv.proxy_count;
-    const server = new Luminati(assign(conf, {
+    let server = new Luminati(assign(conf, {
         ssl: argv.ssl && {requestCert: false, SNICallback: ssl.cb},
         secure_proxy: argv.secure_proxy,
     }));
@@ -350,13 +385,16 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
         if (argv.history)
         {
             db.stmt.history.run(req.url, req.method,
-                JSON.stringify(req.headers), JSON.stringify(res.headers),
+                stringify(req.headers), stringify(res.headers),
                 res.status_code, Math.floor(res.timeline.start/1000),
-                res.timeline.end, JSON.stringify(res.timeline), res.proxy.host,
+                res.timeline.end, stringify(res.timeline), res.proxy.host,
                 res.proxy.username, res.body_size);
         }
     }).on('error', this.throw_fn());
+    let hostname = find_iface(iface||argv.iface);
+    let port = conf.port ? conf.port : 0;
     yield server.listen(port, hostname);
+    server.opt.port = server.port;
     log('DEBUG', 'local proxy', server.opt);
     proxies[server.port] = server;
     server.stop = function(){
@@ -366,22 +404,16 @@ const create_proxy = (conf, port, hostname)=>etask(function*(){
     return server;
 });
 
-const create_proxies = ()=>etask.all(config.map(conf=>create_proxy(conf,
-    conf.port, find_iface(argv.iface))));
+let create_proxies = ()=>etask(function*(){
+    for (let c of config)
+        try { yield create_proxy(c); } catch(e){ log('ERROR', e); }
+});
 
-let proxy_create = (req, res, next)=>etask(function*(){
-    this.on('ensure', ()=>{
-        if (this.error)
-        {
-            log('ERROR', this.error, this.error.stack);
-            return next(this.error);
-        }
-    });
-    req.body.proxy = argv.proxy;
-    req.body.persist = +req.body.persist||0;
-    const server = yield create_proxy(_.omit(req.body, 'timeout'),
-        +req.body.port||0, find_iface(req.body.iface||argv.iface));
-    if (req.body.timeout)
+let proxy_create = data=>etask(function*(){
+    let proxy = data.proxy;
+    let server = yield create_proxy(proxy, data.iface);
+    let timeout = data.timeout;
+    if (timeout)
     {
         server.on('idle', idle=>{
             if (server.timer)
@@ -391,22 +423,57 @@ let proxy_create = (req, res, next)=>etask(function*(){
             }
             if (!idle)
                 return;
-            server.timer = setTimeout(()=>server.stop(),
-                +req.body.timeout);
+            server.timer = setTimeout(()=>server.stop(), +timeout);
         });
     }
-    if (req.body.persist)
+    if (proxy.persist)
         save_config();
+    return server;
+});
+
+let proxy_delete = port=>etask(function*(){
+    let server = proxies[port];
+    if (!server)
+        return;
+    if (server.timer)
+        clearTimeout(server.timer);
+    yield server.stop();
+    if (server.opt.persist)
+        save_config();
+});
+
+let proxy_create_api = (req, res, next)=>etask(function*(){
+    ensure_default(this, next);
+    let server = yield proxy_create(req.body);
     res.json({port: server.port});
 });
 
-let proxy_update = (req, res)=>{
+let proxy_update = (req, res, next)=>etask(function*(){
+    ensure_default(this, next);
     let port = req.params.port;
-    let proxy = proxies[port];
-    assign(proxy.opt, _.omit(req.body, 'port'));
-    proxy = assign({port: port}, proxy.opt);
-    res.json(proxy);
-};
+    let old_proxy = proxies[port];
+    if (!old_proxy)
+        throw `No proxy at port ${port}`;
+    let proxy = assign({}, old_proxy.opts, req.body.proxy);
+    yield proxy_delete(port);
+    let server = yield proxy_create({proxy: proxy});
+    res.json({proxy: server.opts});
+});
+
+let proxies_delete_api = (req, res, next)=>etask(function*(){
+    ensure_default(this, next);
+    let ports = (req.body.port||'').split(',');
+    for (let p of ports)
+        yield proxy_delete(p.trim());
+    res.status(204).end();
+});
+
+let proxy_delete_api = (req, res, next)=>etask(function*(){
+    ensure_default(this, next);
+    let port = req.params.port;
+    yield proxy_delete(port);
+    res.status(204).end();
+});
 
 const create_api_interface = ()=>{
     const app = express();
@@ -417,8 +484,12 @@ const create_api_interface = ()=>{
             .map(proxy=>assign({port: proxy.port}, proxy.opt));
         res.json(r);
     });
-    app.post('/create', proxy_create);
+    // XXX stanislav - can be removed in favor of post('proxies')
+    app.post('/create', proxy_create_api);
+    app.post('/proxies', proxy_create_api);
     app.put('/proxies/:port', proxy_update);
+    app.post('/delete', proxies_delete_api);
+    app.delete('/proxies/:port', proxy_delete_api);
     app.get('/stats', (req, res)=>etask(function*(){
         const r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
@@ -432,32 +503,9 @@ const create_api_interface = ()=>{
     app.post('/creds', (req, res)=>{
         argv.customer = req.body.customer||argv.customer;
         argv.password = req.body.password||argv.password;
+        save_config();
         res.sendStatus(200);
     });
-    app.post('/delete', (req, res, next)=>etask(function*(){
-        this.on('ensure', ()=>{
-            if (this.error)
-            {
-                log('ERROR', this.error, this.error.stack);
-                return next(this.error);
-            }
-        });
-        const ports = (req.body.port||'').split(',');
-        let save;
-        for (let i=0; i<ports.length; i++)
-        {
-            const server = proxies[ports[i].trim()];
-            if (!server)
-                continue;
-            if (server.timer)
-                clearTimeout(server.timer);
-            yield server.stop();
-            save |= server.opt.persist;
-        }
-        if (save)
-            save_config();
-        res.status(204).end();
-    }));
     app.post('/block', (req, res, next)=>etask(function*(){
         this.on('ensure', ()=>{
             if (this.error)

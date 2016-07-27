@@ -8,65 +8,69 @@
   </md-toolbar>
   <md-dialog-content>
     <div class="md-dialog-content">
-      <form class=form-horizontal ng-submit=submit()>
-        <div class=form-group>
-          <label for=zone class="col-sm-2 control-label">zone</label>
-          <div class=col-sm-10>
-            <input class=form-control ng-model=form_data.zone placeholder=gen required>
-          </div>
+      <form ng-sumbit=submit()>
+        <div layout-gt-sm="row">
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Zone</label>
+            <input ng-model=form_data.zone placeholder=gen required md-autofocus>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Zone password (if different from zone)</label>
+            <input ng-model=form_data.password>
+          </md-input-container>
         </div>
-        <div class=form-group>
-          <div class="col-sm-offset-2 col-sm-10">
-            <div class=checkbox>
-              <label><input type=checkbox ng-model=is_city>city zone</label>
-            </div>
-          </div>
+        <div layout-gt-sm="row">
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Port</label>
+            <input type=number ng-model=form_data.port placeholder=24001 min=24000>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Country</label>
+            <input ng-model=form_data.country placeholder=us>
+          </md-input-container>
         </div>
-        <div class=form-group>
-          <label for=password class="col-sm-2 control-label">zone password</label>
-          <div class=col-sm-10>
-            <input class=form-control ng-model=form_data.password placeholder="password (if different from zone gen)">
-          </div>
+        <div layout-gt-sm="row">
+          <md-input-container class=md-block flex-gt-sm ng-style="is_city ? {} : {marginTop: 0}">
+            <md-checkbox ng-model=is_city>City zone</md-checkbox>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm ng-if=is_city>
+            <label>State</label>
+            <input ng-model=form_data.state placeholder=ny>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm ng-if=is_city>
+            <label>City</label>
+            <input ng-model=form_data.city placeholder=newyork>
+          </md-input-container>
         </div>
-        <div class=form-group>
-          <label for=port class="col-sm-2 control-label">port</label>
-          <div class=col-sm-10>
-            <input ng-model=form_data.port class=form-control placeholder=24001>
-          </div>
+        <div layout-gt-sm="row">
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Session timeout</label>
+            <input type=number ng-model=form_data.session_timeout placeholder=5000>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Minimum proxies count</label>
+            <input type=number ng-model=form_data.proxy_count placeholder=1>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Pool size</label>
+            <input type=number ng-model=form_data.pool_size placeholder=3>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Max requests</label>
+            <input type=number ng-model=form_data.max_requests placeholder=50>
+          </md-input-container>
         </div>
-        <div class=form-group>
-          <label for=country class="col-sm-2 control-label">country</label>
-          <div class=col-sm-10>
-            <input ng-model=form_data.country class=form-control placeholder=us>
-          </div>
+        <div layout-gt-sm="row">
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Dns resolve</label>
+             <md-select ng-model="form_data.dns">
+              <md-option>local</md-option>
+              <md-option>remote</md-option>
+            </md-select>
+          </md-input-container>
         </div>
-        <div class=form-group ng-if=is_city>
-          <label for=state class="col-sm-2 control-label">state</label>
-          <div class=col-sm-10>
-            <input ng-model=form_data.state class=form-control placeholder=ny>
-          </div>
-        </div>
-        <div class=form-group ng-if=is_city>
-          <label for=city class="col-sm-2 control-label">city</label>
-          <div class=col-sm-10>
-            <input ng-model=form_data.city class=form-control placeholder=newyork>
-          </div>
-        </div>
-        <div class=form-group>
-          <label for=password class="col-sm-2 control-label">dns resolve</label>
-          <div class=col-sm-10>
-            <select class=form-control ng-model=form_data.dns>
-              <option>local</option>
-              <option>remote</option>
-            </select>
-          </div>
-        </div>
-        <div class=form-group>
-          <label for=pool_size class="col-sm-2 control-label">pool size</label>
-          <div class=col-sm-10>
-            <input ng-model=form_data.pool_size class=form-control placeholder=3>
-          </div>
-        </div>
+      </form>
+      <!--
         <div class="form-group hidden">
           <div class="col-sm-offset-2 col-sm-10">
             <div class=checkbox>
@@ -81,18 +85,7 @@
             </div>
           </div>
         </div>
-        <div class=form-group>
-          <label for=max_requests class="col-sm-2 control-label">max requests</label>
-          <div class=col-sm-10>
-            <input ng-model=form_data.max_requests class=form-control placeholder=50>
-          </div>
-        </div>
-        <div class=form-group>
-          <div class="col-sm-offset-2 col-sm-10">
-            <button type=submit class="btn btn-default">Create</button>
-          </div>
-        </div>
-      </form>
+      -->
     </div>
   </md-dialog-content>
   <md-dialog-actions layout="row">

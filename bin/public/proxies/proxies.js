@@ -165,7 +165,6 @@ proxies.value('lumOptColumns', [
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
     {key: 'proxy_count', title: 'Minimum proxies count'},
-    {key: 'pool_size', title: 'Pool size'},
     {key: 'sticky_ip', title: 'Sticky IP'},
     {key: 'max_requests', title: 'Max requests'},
     {key: 'log', title: 'Log'},
@@ -197,8 +196,8 @@ function ProxiesTableController(lum_proxies, opt_columns, graph_options,
 ProxiesTableController.prototype.$onDestroy = function(){
     this._graph_options_provider.release_options(); };
 
-ProxiesTableController.prototype.edit_proxy = function(proxy){
-    var _proxy = proxy ? _.cloneDeep(proxy) : null;
+ProxiesTableController.prototype.edit_proxy = function(proxy_old){
+    var _proxy = proxy_old ? _.cloneDeep(proxy_old) : null;
     var _this = this;
     this.$mdDialog.show({
         controller: dialog_controller,
@@ -207,22 +206,24 @@ ProxiesTableController.prototype.edit_proxy = function(proxy){
         clickOutsideToClose: true,
         locals: {proxy: _proxy},
         fullscreen: true
-    }).then(function(data){
-        if (data)
-        {
-            if (_proxy)
-            {
-                _this.$http.put('/api/proxies/'+proxy.port, data)
-                    .then(function(res){ _this.lum_proxies.update(); });
-            }
-            else
-            {
-                _this.$http.post('/api/create', data).then(function(res){
-                    _this.lum_proxies.update();
-                });
-            }
-        }
+    }).then(function(proxy){
+        if (!proxy)
+          return;
+        proxy.persist = true;
+        var data = {proxy: proxy};
+        var promise;
+        if (_proxy)
+            promise = _this.$http.put('/api/proxies/'+proxy_old.port, data);
+        else
+            promise = _this.$http.post('/api/proxies', data);
+        promise.then(function(){ _this.lum_proxies.update(); });
     });
+};
+
+ProxiesTableController.prototype.delete_proxy = function(proxy){
+    var _this = this;
+    return this.$http.delete('/api/proxies/'+proxy.port)
+        .then(function(){ _this.lum_proxies.update(); });
 };
 
 proxies.directive('proxiesTable', function(){

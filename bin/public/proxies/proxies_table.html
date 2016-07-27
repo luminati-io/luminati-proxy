@@ -20,6 +20,10 @@
           <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy(proxy)>
             Edit
           </md-button>
+          <md-button class="md-fab md-mini" ng-click=$vm.remove_proxy(proxy)>
+            <md-icon md-font-library=material-icons
+              ng-click=$vm.delete_proxy(proxy)>delete</md-icon>
+          </md-button>
         </td>
       </tr>
       <tr md-row>
