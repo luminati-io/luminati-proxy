@@ -6,7 +6,7 @@ define(['angular', 'socket.io-client', 'lodash', 'es6_shim', '../util',
     function(angular, io, _){
 
 var proxies = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
-    'chart.js', 'lum-health-markers', 'lum-util']);
+    'chart.js', 'lum-health-markers', 'lum-util', 'lum-consts']);
 
 proxies.value('lumProxyWindowConfig', {
     refresh: 100,
@@ -172,14 +172,15 @@ proxies.value('lumOptColumns', [
 
 proxies.controller('ProxiesTable', ProxiesTableController);
 ProxiesTableController.$inject = ['lumProxies', 'lumOptColumns',
-    'lumProxyGraphOptions', '$mdDialog', '$http'];
+    'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts'];
 function ProxiesTableController(lum_proxies, opt_columns, graph_options,
-    $mdDialog, $http)
+    $mdDialog, $http, consts)
 {
     this.$mdDialog = $mdDialog;
     this.$http = $http;
     this.lum_proxies = lum_proxies;
     var $vm = this;
+    $vm.consts = consts.proxy;
     $vm.resolved = false;
     $vm.proxies = [];
     $vm.opt_columns = [];
@@ -204,7 +205,7 @@ ProxiesTableController.prototype.edit_proxy = function(proxy_old){
         templateUrl: '/create/dialog.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
-        locals: {proxy: _proxy},
+        locals: {proxy: _proxy, consts: this.consts},
         fullscreen: true
     }).then(function(proxy){
         if (!proxy)
@@ -237,13 +238,13 @@ proxies.directive('proxiesTable', function(){
 });
 
 function dialog_controller($scope, $mdDialog, locals){
-    $scope.form_data = _.get(locals, 'proxy', {});
+    $scope.form = _.get(locals, 'proxy', {});
+    $scope.consts = locals.consts;
     $scope.hide = function(){ $mdDialog.hide(); };
     $scope.cancel = function(){ $mdDialog.cancel(); };
-    $scope.answer = function(answer){ $mdDialog.hide(answer); };
-    $scope.validate = function(answer){
-        if (answer && answer.zone)
-            $mdDialog.hide(answer);
+    $scope.validate = function(data){
+        data = data||{};
+        $mdDialog.hide(data);
     };
 }
 

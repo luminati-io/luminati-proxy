@@ -2,7 +2,7 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'angular-material', 'angular-ui-router', 'util',
     'proxies/proxies', 'zones/zones', 'version/version', 'cred/cred',
-    'css!/app'],
+    'consts/consts', 'css!/app'],
 function(angular){
 
 var module = angular.module('lumLocal', ['ngMaterial', 'ui.router', 'lum-util',

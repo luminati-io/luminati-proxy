@@ -9,64 +9,137 @@
   <md-dialog-content>
     <div class="md-dialog-content">
       <form ng-sumbit=submit()>
-        <div layout-gt-sm="row">
+        <div layout-gt-sm=row>
           <md-input-container class=md-block flex-gt-sm>
             <label>Zone</label>
-            <input ng-model=form_data.zone placeholder=gen required md-autofocus>
+            <input ng-model=form.zone placeholder={{consts.zone.def}}
+              md-autofocus>
           </md-input-container>
           <md-input-container class=md-block flex-gt-sm>
-            <label>Zone password (if different from zone)</label>
-            <input ng-model=form_data.password>
+            <label>Zone password</label>
+            <input ng-model=form.password>
+            <div class=hint>If different from zone</div>
           </md-input-container>
-        </div>
-        <div layout-gt-sm="row">
           <md-input-container class=md-block flex-gt-sm>
             <label>Port</label>
-            <input type=number ng-model=form_data.port placeholder=24001 min=24000>
+            <input type=number ng-model=form.port
+              placeholder={{consts.port.def}} min=24000>
           </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Interface</label>
+            <md-select ng-model=form.iface>
+              <md-option ng-repeat="c in consts.iface.values">
+                {{c}}
+              </md-option>
+            </md-select>
+          </md-input-container>
+        </div>
+        <div layout-gt-sm=row>
           <md-input-container class=md-block flex-gt-sm>
             <label>Country</label>
-            <input ng-model=form_data.country placeholder=us>
+            <md-select ng-model=form.country>
+              <md-option ng-repeat="c in consts.country.values">
+                {{c}}
+              </md-option>
+            </md-select>
           </md-input-container>
-        </div>
-        <div layout-gt-sm="row">
-          <md-input-container class=md-block flex-gt-sm ng-style="is_city ? {} : {marginTop: 0}">
+          <md-input-container class=md-block flex-gt-sm>
             <md-checkbox ng-model=is_city>City zone</md-checkbox>
           </md-input-container>
-          <md-input-container class=md-block flex-gt-sm ng-if=is_city>
+          <md-input-container class=md-block flex-gt-sm ng-class="{invisible: !is_city}">
             <label>State</label>
-            <input ng-model=form_data.state placeholder=ny>
+            <input ng-model=form.state placeholder=ny>
           </md-input-container>
-          <md-input-container class=md-block flex-gt-sm ng-if=is_city>
+          <md-input-container class=md-block flex-gt-sm ng-class="{invisible: !is_city}">
             <label>City</label>
-            <input ng-model=form_data.city placeholder=newyork>
+            <input ng-model=form.city placeholder=newyork>
           </md-input-container>
         </div>
-        <div layout-gt-sm="row">
+        <div layout-gt-sm=row>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>{{consts.asn.desc}}</label>
+            <input type=number ng-model=form.asc>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>{{consts.proxy.desc}}</label>
+            <input ng-model=form.proxy>
+            <div class=hidden>{{consts.proxy.desc}}</div>
+          </md-input-container>
+        </div>
+        <div layout-gt-sm=row>
           <md-input-container class=md-block flex-gt-sm>
             <label>Session timeout</label>
-            <input type=number ng-model=form_data.session_timeout placeholder=5000>
+            <input type=number ng-model=form.session_timeout
+              placeholder={{consts.session_timeout.def}}>
           </md-input-container>
           <md-input-container class=md-block flex-gt-sm>
             <label>Minimum proxies count</label>
-            <input type=number ng-model=form_data.proxy_count placeholder=1>
+            <input type=number ng-model=form.proxy_count
+              placeholder={{consts.proxy_count.def}}>
           </md-input-container>
           <md-input-container class=md-block flex-gt-sm>
             <label>Pool size</label>
-            <input type=number ng-model=form_data.pool_size placeholder=3>
+            <input type=number ng-model=form.pool_size
+              placeholder={{consts.pool_size.def}}>
           </md-input-container>
           <md-input-container class=md-block flex-gt-sm>
             <label>Max requests</label>
-            <input type=number ng-model=form_data.max_requests placeholder=50>
+            <input type=number ng-model=form.max_requests
+              placeholder={{consts.max_requests.def}}>
           </md-input-container>
         </div>
-        <div layout-gt-sm="row">
+        <div layout-gt-sm=row>
           <md-input-container class=md-block flex-gt-sm>
             <label>Dns resolve</label>
-             <md-select ng-model="form_data.dns">
-              <md-option>local</md-option>
-              <md-option>remote</md-option>
+            <md-select ng-model="form.dns">
+              <md-option ng-repeat="c in consts.dns.values">
+                {{c}}
+              </md-option>
             </md-select>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Log</label>
+            <md-select ng-model=form.log>
+              <md-option ng-repeat="c in consts.log.values">
+                {{c}}
+              </md-option>
+            </md-select>
+            <div class=hint ng-if="consts.log.def&&!form.log">
+              {{consts.log.def}} by default
+            </div>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Proxy switch</label>
+            <input type=number ng-model=form.proxy_switch
+              placeholder={{consts.proxy_switch.def}}>
+            <span class=hint>Switch proxy on failure</span>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <md-checkbox ng-model=form.sticky_ip>Sticky ip</md-checkbox>
+            <span class="hint hidden">Same IP as much as possible</span>
+          </md-input-container>
+        </div>
+        <div layout-gt-sm=row>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Direct include</label>
+            <input ng-model=form.direct.include>
+            <div class=hint>
+              {{consts.direct_include.desc}}
+            </div>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Direct exclude</label>
+            <input ng-model=form.direct.exclude>
+            <div class=hint>
+              {{consts.direct_exclude.desc}}
+            </div>
+          </md-input-container>
+          <md-input-container class=md-block flex-gt-sm>
+            <label>Null response</label>
+            <input ng-model=form.null_response>
+            <div class=hint>
+              {{consts.null_response.desc}}
+            </div>
           </md-input-container>
         </div>
       </form>
@@ -74,26 +147,26 @@
         <div class="form-group hidden">
           <div class="col-sm-offset-2 col-sm-10">
             <div class=checkbox>
-              <label><input type=checkbox ng-model=form_data.history>history</label>
+              <label><input type=checkbox ng-model=form.history>history</label>
             </div>
           </div>
         </div>
         <div class="form-group hidden">
           <div class="col-sm-offset-2 col-sm-10">
             <div class=checkbox>
-              <label><input type=checkbox ng-disabled=!form_data.history ng-model=form_data.ssl>ssl</label>
+              <label><input type=checkbox ng-disabled=!form.history ng-model=form_data.ssl>ssl</label>
             </div>
           </div>
         </div>
       -->
     </div>
   </md-dialog-content>
-  <md-dialog-actions layout="row">
+  <md-dialog-actions layout=row>
     <span flex></span>
     <md-button ng-click="cancel()">
       Cancel
     </md-button>
-    <md-button ng-click="validate(form_data)" style="margin-right:20px;">
+    <md-button ng-click="validate(form)" style="margin-right:20px;">
       Save
     </md-button>
   </md-dialog-actions>

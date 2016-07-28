@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true, esnext:true*/
-const _ = require('underscore');
+const _ = require('lodash');
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const dns = require('dns');
-const tls = require('tls');
 const crypto = require('crypto');
 const express = require('express');
 const body_parser = require('body-parser');
 const Luminati = require('../lib/luminati.js');
+const ssl = require('./ssl.js');
 const net = require('net');
 const request = require('request');
 const humanize = require('humanize');
@@ -24,9 +24,8 @@ const socks = require('socksv5');
 const hutil = require('hutil');
 const util = require('util');
 const sqlite3 = require('sqlite3');
-const forge = require('node-forge');
 const stringify = require('json-stable-stringify');
-const pki = forge.pki;
+const countries = require('country-data').countries;
 const etask = hutil.etask;
 const ef = etask.ef;
 const file = hutil.file;
@@ -34,9 +33,7 @@ const assign = Object.assign;
 const is_win = process.platform=='win32';
 const version = JSON.parse(fs.readFileSync(path.join(__dirname,
     '../package.json'))).version;
-const yargs = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
-.alias({h: 'help', p: 'port'})
-.describe({
+let proxy_fields = {
     port: 'Listening port',
     log: `Log level (${Object.keys(Luminati.log_level).join('|')})`,
     customer: 'Customer',
@@ -67,11 +64,10 @@ const yargs = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     config: 'Config file containing proxy definitions',
     iface: 'Interface or ip to listen on '
         +`(${Object.keys(os.networkInterfaces()).join(', ')})`,
-})
-.boolean(['history', 'sticky_ip'])
-.default({
+};
+let defs = {
     port: 24000,
-    log: 'WARNING',
+    log: 'ERROR',
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
     proxy: 'zproxy.luminati.io',
@@ -84,7 +80,12 @@ const yargs = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
     www: 22999,
     config: path.join(os.homedir(), '.luminati.json'.substr(is_win?1:0)),
     database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
-}).help('h').version(()=>`luminati-proxy version: ${version}`);
+};
+const yargs = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
+.alias({h: 'help', p: 'port'})
+.describe(proxy_fields)
+.boolean(['history', 'sticky_ip'])
+.default(defs).help('h').version(()=>`luminati-proxy version: ${version}`);
 let argv = yargs.argv;
 
 const load_json = (filename, optional, def)=>{
@@ -99,32 +100,6 @@ const load_json = (filename, optional, def)=>{
 
 yargs.config(load_json(argv.config, true, {_defaults: {}})._defaults);
 argv = yargs.argv;
-const ssl = {
-    ca: {
-        cert: fs.readFileSync(path.join(__dirname, 'ca.crt')),
-        key: fs.readFileSync(path.join(__dirname, 'ca.key')),
-    },
-    keys: pki.rsa.generateKeyPair(2048),
-    hosts: {},
-    cb: (name, cb)=>{
-        if (ssl.hosts[name])
-            return cb(null, ssl.hosts[name]);
-        const cert = pki.createCertificate();
-        cert.publicKey = ssl.keys.publicKey;
-        cert.serialNumber = ''+Date.now();
-        cert.validity.notBefore = new Date();
-        cert.validity.notAfter = new Date(Date.now()+10*365*86400000);
-        cert.setSubject([{name: 'commonName', value: name}]);
-        cert.setIssuer(pki.certificateFromPem(ssl.ca.cert).issuer.attributes);
-        cert.sign(pki.privateKeyFromPem(ssl.ca.key), forge.md.sha256.create());
-        ssl.hosts[name] = tls.createSecureContext({
-            key: pki.privateKeyToPem(ssl.keys.privateKey),
-            cert: pki.certificateToPem(cert),
-            ca: ssl.ca.cert,
-        });
-        cb(null, ssl.hosts[name]);
-    },
-};
 
 const log = (level, msg, extra)=>{
     if (Luminati.log_level[level]>Luminati.log_level[argv.log])
@@ -147,7 +122,8 @@ function ensure_default(_this, next){
 
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
     'max_requests', 'pool_size', 'session_timeout', 'direct_include',
-    'direct_exclude', 'null_response', 'dns', 'resolve', 'cid', 'ip', 'log']);
+    'direct_exclude', 'null_response', 'dns', 'resolve', 'cid', 'ip', 'log',
+    'proxy_switch']);
 if (opts.resolve)
 {
     if (typeof opts.resolve=='boolean')
@@ -218,15 +194,15 @@ let load_config = (filename, optional)=>{
 
 let proxies = {};
 let save_config = filename=>{
-    let data = _.values(proxies).map(proxy=>proxy.opt)
+    let proxs = _.values(proxies).map(proxy=>_.omit(proxy.opt, 'stats'))
         .filter(conf=>conf.persist);
-    let s = stringify({proxies: data, _defaults: argv}, {space: '  '});
+    let s = stringify({proxies: proxs, _defaults: argv}, {space: '  '});
     fs.writeFileSync(filename||argv.config, s);
 };
 
 let config = load_config(argv.config, true).map(conf=>assign(conf,
     {persist: true}));
-argv._.forEach(filename=>config.push.apply(config, load_config(filename)));
+config = config.concat(argv._.map(filename=>load_config(filename)));
 config = config.length && config || [assign({persist: true}, opts)];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.port+i}));
@@ -347,7 +323,26 @@ const prepare_database = ()=>etask(function*prepare_database(){
         hash, version);
 });
 
-function proxy_fields(conf){
+function get_consts(req, res){
+    let proxy = _.mapValues(proxy_fields, desc=>({desc: desc}));
+    _.forOwn(defs, (def, prop)=>{
+        if (proxy[prop])
+            proxy[prop].def = def;
+    });
+    let countries_codes = _.values(countries).filter(c=>c.status=='assigned')
+        .map(c=>c.alpha2.toLowerCase());
+    countries_codes = _.uniq(countries_codes);
+    _.merge(proxy, {
+        dns: {values: ['', 'local', 'remote']},
+        iface: {values: [''].concat(_.keys(os.networkInterfaces()))},
+        log: {def: opts.log, values: [''].concat(_.keys(Luminati.log_level))},
+        country: {def: 'us', values: [''].concat(countries_codes)}
+    });
+    let data = {proxy: proxy};
+    res.json(data);
+}
+
+function proxy_validator(conf){
     conf.customer = conf.customer||argv.customer;
     conf.password = conf.password||argv.password;
     conf.proxy_count = conf.proxy_count||argv.proxy_count;
@@ -358,25 +353,18 @@ function proxy_fields(conf){
         if (conf[field])
             conf[field] = +conf[field];
     });
+    // XXX stanislav: this workaround for command line only
+    conf.direct = _.merge({}, conf.direct, {include: conf.direct_include,
+        exclude: conf.direct_exclude});
+    delete conf.direct_include;
+    delete conf.direct_exclude;
 }
 
 let create_proxy = (c, iface)=>etask(function*(){
     let conf = assign({}, _.omit(opts, 'port'), c);
-    proxy_fields(conf);
-    if (conf.direct_include || conf.direct_exclude)
-    {
-        conf.direct = {};
-        if (conf.direct_include)
-            conf.direct.include = new RegExp(conf.direct_include, 'i');
-        if (conf.direct_exclude)
-            conf.direct.exclude = new RegExp(conf.direct_exclude, 'i');
-        delete conf.direct_include;
-        delete conf.direct_exclude;
-    }
-    if (conf.null_response)
-      conf.null_response = new RegExp(conf.null_response, 'i');
+    proxy_validator(conf);
     let server = new Luminati(assign(conf, {
-        ssl: argv.ssl && {requestCert: false, SNICallback: ssl.cb},
+        ssl: argv.ssl && assign(ssl(), {requestCert: false}),
         secure_proxy: argv.secure_proxy,
     }));
     server.on('response', res=>{
@@ -478,13 +466,14 @@ let proxy_delete_api = (req, res, next)=>etask(function*(){
 const create_api_interface = ()=>{
     const app = express();
     app.get('/version', (req, res)=>res.json({version: version}));
+    app.get('/consts', get_consts);
     app.get('/proxies', (req, res)=>{
         const r = _.values(proxies)
             .sort((a, b)=>a.port-b.port)
             .map(proxy=>assign({port: proxy.port}, proxy.opt));
         res.json(r);
     });
-    // XXX stanislav - can be removed in favor of post('proxies')
+    // XXX stanislav: can be removed in favor of post('proxies')
     app.post('/create', proxy_create_api);
     app.post('/proxies', proxy_create_api);
     app.put('/proxies/:port', proxy_update);
@@ -536,7 +525,7 @@ const create_web_interface = ()=>etask(function*(){
     app.get('/ssl', (req, res)=>{
         res.set('Content-Type', 'application/x-x509-ca-cert');
         res.set('Content-Disposition', 'filename=luminati.pem');
-        res.send(ssl.ca.cert);
+        res.send(fs.readFileSync(path.join(__dirname, 'ca.crt')));
     });
     app.use((req, res, next)=>{
         res.locals.path = req.path;
