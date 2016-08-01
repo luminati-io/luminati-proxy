@@ -1,3 +1,21 @@
+.page-proxies {
+    display: flex;
+    flex-direction: column;
+    bottom: 0;
+}
+.proxies-body {
+    flex-grow: 1;
+    overflow-y: auto;
+}
 .health-markers {
     padding-top: 25px;
+}
+.proxies-footer {
+    flex-shrink: 0;
+    border-top: 1px solid #ccc;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding-left: 2rem;
 }

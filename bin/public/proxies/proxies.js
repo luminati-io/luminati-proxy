@@ -167,7 +167,7 @@ proxies.value('lumOptColumns', [
     {key: 'proxy_count', title: 'Minimum proxies count'},
     {key: 'sticky_ip', title: 'Sticky IP'},
     {key: 'max_requests', title: 'Max requests'},
-    {key: 'log', title: 'Log'},
+    {key: 'log', title: 'Log Level'},
 ]);
 
 proxies.controller('ProxiesTable', ProxiesTableController);

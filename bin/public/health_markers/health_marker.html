@@ -1,10 +1,10 @@
-<div ng-class="'health-'+$marker.stateName" class=health-marker layout=row>
+<span ng-class="'health-'+$marker.stateName" class=health-marker>
+  <span ng-transclude></span>
   <span class=health-marker-icon>
-    <i ng-show=$marker.resolved class=material-icons flex=none>
+    <i ng-show=$marker.resolved class=material-icons>
       {{$marker.stateName}}
     </i>
     <md-progress-circular class=md-hue-2 md-diameter=20px md-mode=indeterminate
-      ng-hide=$marker.resolved flex=none></md-progress-circular>
+      ng-hide=$marker.resolved></md-progress-circular>
   </span>
-  <div ng-transclude flex></div>
-</div>
+</span>

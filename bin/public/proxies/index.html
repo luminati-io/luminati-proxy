@@ -1,5 +1,10 @@
-<md-card layout=col class=health-markers>
-  <div flex>
+<div class="page page-proxies">
+  <div class=proxies-body>
+    <md-card>
+      <proxies-table></proxies-table>
+    </md-card>
+  </div>
+  <div class=proxies-footer>
     <health-marker for=network>
       Network Connectivity
     </health-marker>
@@ -10,7 +15,4 @@
       Credentials
     </health-marker>
   </div>
-</md-card>
-<md-card>
-  <proxies-table></proxies-table>
-</md-card>
+</div>

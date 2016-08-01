@@ -202,7 +202,8 @@ let save_config = filename=>{
 
 let config = load_config(argv.config, true).map(conf=>assign(conf,
     {persist: true}));
-config = config.concat(argv._.map(filename=>load_config(filename)));
+config = config.concat.apply(config, argv._.map(
+    filename=>load_config(filename)));
 config = config.length && config || [assign({persist: true}, opts)];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.port+i}));

@@ -1,16 +1,17 @@
+health-marker {
+    display: inline-block;
+}
 .health-marker {
-    height: 50px;
-    vertical-align: middle;
+    display: flex;
+    align-items: center;
 }
 .health-marker-icon {
-    width: 50px;
-    position: relative;
-    top: -5px;
-    text-align: center;
+    margin-right: 2em;
+    margin-left: .2em;
 }
-.health-marker-icon>*{
-    display: block;
-    margin: 0 auto;
+.health-marker-icon>* {
+    display: inline-block;
+    width: 20px;
 }
 .health-error {
     color: red;

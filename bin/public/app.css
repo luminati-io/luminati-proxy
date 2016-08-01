@@ -7,6 +7,17 @@ header { padding: 10px 50px; }
 .logo {
     height: 50px;
 }
+.body {
+    min-height: calc(100vh - 70px);
+    position: relative;
+}
+.body>.page {
+    min-height: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+}
 .logo img {
     height: 70%;
     padding-left: 50px;
