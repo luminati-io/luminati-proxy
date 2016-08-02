@@ -1,10 +1,34 @@
-<div class=container>
-  <form class=form-signin ng-controller="credentials as cred">
-    <h2 class=form-signin-heading>Enter credentials</h2>
-    <label for=input_login class=sr-only>Login</label>
-    <input ng-model=cred.customer id=input_login class=form-control placeholder="Customer name" required autofocus>
-    <label for=input_password class=sr-only>Password</label>
-    <input ng-model=cred.password id=input_password class=form-control placeholder=Password required>
-    <button class="btn btn-lg btn-primary btn-block" ng-click="cred.save()">GO</button>
-  </form>
+<div class=page-credentials>
+  <div layout=row layout-align=center>
+    <div flex-xs flex-sm=70 flex-gt-sm=50>
+      <md-card>
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">Enter credentials</span>
+          </md-card-title-text>
+        </md-card-title>
+        <form ng-controller="credentials as cred">
+          <div layout-padding>
+            <div layout-gt-sm=row>
+              <md-input-container class=md-block flex-gt-sm>
+                <label>Login</label>
+                <input ng-model=cred.customer placeholder="Customer name" required md-autofocus>
+              </md-input-container>
+            </div>
+            <div layout-gt-sm=row>
+              <md-input-container class=md-block flex-gt-sm>
+                <label>Password</label>
+                <input ng-model=cred.password placeholder=Password required>
+              </md-input-container>
+            </div>
+            <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+              <md-button class="md-raised md-primary" ng-click="cred.save()">
+                Save
+              </md-button>
+            </section>
+          </div>
+        </form>
+      </md-card>
+    </div>
+  </div>
 </div>

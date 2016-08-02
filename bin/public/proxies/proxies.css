@@ -6,6 +6,9 @@
 .proxies-body {
     flex-grow: 1;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .health-markers {
     padding-top: 25px;
@@ -18,4 +21,10 @@
     align-items: center;
     height: 40px;
     padding-left: 2rem;
+}
+.proxies-tabs {
+    min-height: 325px;
+}
+.proxies-tabs md-content {
+    padding: 18px 18px 0;
 }

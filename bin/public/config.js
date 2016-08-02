@@ -53,7 +53,7 @@ add_angular_module({module: 'ngMessages',
     url: angular_cdn+'angular-messages.min'});
 add_angular_module({
     module: 'ngMaterial',
-    url: google_cdn+'angular_material/1.1.0-rc2/angular-material.min',
+    url: google_cdn+'angular_material/1.1.0-rc.5/angular-material.min',
     deps: ['angular-aria', 'angular-messages', 'angular-animate']
 });
 add_angular_module({

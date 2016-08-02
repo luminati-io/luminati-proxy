@@ -25,6 +25,12 @@ function route_config($stateProvider, $urlRouterProvider){
     });
 }
 
+module.run(function($rootScope, get_json){
+    get_json('/api/creds').then(function(auth){
+        $rootScope.login = auth.customer;
+    });
+});
+
 angular.bootstrap(document, ['lumLocal']);
 
 });

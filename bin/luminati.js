@@ -193,8 +193,9 @@ let load_config = (filename, optional)=>{
 };
 
 let proxies = {};
+let proxies_running = {};
 let save_config = filename=>{
-    let proxs = _.values(proxies).map(proxy=>_.omit(proxy.opt, 'stats'))
+    let proxs = _.values(proxies).map(p=>_.omit(p, 'stats'))
         .filter(conf=>conf.persist);
     let s = stringify({proxies: proxs, _defaults: argv}, {space: '  '});
     fs.writeFileSync(filename||argv.config, s);
@@ -204,7 +205,7 @@ let config = load_config(argv.config, true).map(conf=>assign(conf,
     {persist: true}));
 config = config.concat.apply(config, argv._.map(
     filename=>load_config(filename)));
-config = config.length && config || [assign({persist: true}, opts)];
+config = config.length && config || [{persist: true}];
 config.filter(conf=>!conf.port)
     .forEach((conf, i)=>assign(conf, {port: argv.port+i}));
 log('DEBUG', 'Config', config);
@@ -361,8 +362,8 @@ function proxy_validator(conf){
     delete conf.direct_exclude;
 }
 
-let create_proxy = (c, iface)=>etask(function*(){
-    let conf = assign({}, _.omit(opts, 'port'), c);
+let create_proxy = (proxy, iface)=>etask(function*(){
+    let conf = assign({}, _.omit(opts, 'port'), proxy);
     proxy_validator(conf);
     let server = new Luminati(assign(conf, {
         ssl: argv.ssl && assign(ssl(), {requestCert: false}),
@@ -384,10 +385,13 @@ let create_proxy = (c, iface)=>etask(function*(){
     let port = conf.port ? conf.port : 0;
     yield server.listen(port, hostname);
     server.opt.port = server.port;
+    proxy.port = server.port;
     log('DEBUG', 'local proxy', server.opt);
-    proxies[server.port] = server;
+    proxies[server.port] = proxy;
+    proxies_running[server.port] = server;
     server.stop = function(){
         delete proxies[this.port];
+        delete proxies_running[this.port];
         return Luminati.prototype.stop.call(this);
     };
     return server;
@@ -421,7 +425,7 @@ let proxy_create = data=>etask(function*(){
 });
 
 let proxy_delete = port=>etask(function*(){
-    let server = proxies[port];
+    let server = proxies_running[port];
     if (!server)
         return;
     if (server.timer)
@@ -443,7 +447,7 @@ let proxy_update = (req, res, next)=>etask(function*(){
     let old_proxy = proxies[port];
     if (!old_proxy)
         throw `No proxy at port ${port}`;
-    let proxy = assign({}, old_proxy.opts, req.body.proxy);
+    let proxy = assign({}, old_proxy, req.body.proxy);
     yield proxy_delete(port);
     let server = yield proxy_create({proxy: proxy});
     res.json({proxy: server.opts});
@@ -469,9 +473,8 @@ const create_api_interface = ()=>{
     app.get('/version', (req, res)=>res.json({version: version}));
     app.get('/consts', get_consts);
     app.get('/proxies', (req, res)=>{
-        const r = _.values(proxies)
-            .sort((a, b)=>a.port-b.port)
-            .map(proxy=>assign({port: proxy.port}, proxy.opt));
+        let r = _.values(proxies)
+            .sort((a, b)=>a.port-b.port);
         res.json(r);
     });
     // XXX stanislav: can be removed in favor of post('proxies')

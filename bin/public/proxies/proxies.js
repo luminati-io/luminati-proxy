@@ -183,14 +183,17 @@ function ProxiesTableController(lum_proxies, opt_columns, graph_options,
     $vm.consts = consts.proxy;
     $vm.resolved = false;
     $vm.proxies = [];
-    $vm.opt_columns = [];
+    $vm.columns = [];
     $vm.graph_options = graph_options.get_options();
     $vm._graph_options_provider = graph_options;
     lum_proxies.subscribe(function(proxies){
         $vm.resolved = true;
         $vm.proxies = proxies;
-        $vm.opt_columns = opt_columns.filter(function(col){
-            return proxies.some(function(p){ return p[col.key]; }); });
+        var always = ['zone', 'session_timeout', 'pool_size'];
+        $vm.columns = opt_columns.filter(function(col){
+            var key = col.key;
+            return always.indexOf(key)>-1 || _.some(proxies, key);
+        });
     });
 }
 

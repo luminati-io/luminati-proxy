@@ -3,13 +3,27 @@ body {
     padding: 0;
     height: 100%;
 }
-header { padding: 10px 50px; }
 .logo {
-    height: 50px;
+    width: 200px;
 }
 .body {
-    min-height: calc(100vh - 70px);
+    min-height: calc(100vh - 112px);
     position: relative;
+}
+.md-nav-bar .md-nav-item {
+    margin: 0;
+}
+.md-nav-bar ._md-nav-button {
+    width: 100%;
+}
+.md-nav-bar ._md-nav-button{
+    margin: 0;
+}
+.login {
+    font-size: 0.85em;
+}
+.login:hover, .login:visited {
+    color: #fff;
 }
 .body>.page {
     min-height: 100%;

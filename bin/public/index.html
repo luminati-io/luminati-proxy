@@ -5,7 +5,7 @@
     <title>Luminati Proxy</title>
     <meta name=viewport
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel=stylesheet href=//ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css>
+    <link rel=stylesheet href=//ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc.5/angular-material.min.css>
     <link rel=stylesheet
       href=//fonts.googleapis.com/icon?family=Material+Icons>
     <link rel=stylesheet
@@ -14,22 +14,26 @@
     <style>[ng-cloak] { display: none; }</style>
   </head>
   <body ng-cloak>
-    <header layout=row>
-      <div flex layout=row>
-        <nav class=logo flex=none>
-          <a href=//luminati.io target=_blank flex>
-            <img src=/img/menu-logo.svg>
+    <header layout=column>
+      <md-toolbar class="md-primary md-hue-1">
+        <div class=md-toolbar-tools>
+          <a href=//luminati.io target=_blank>
+            <img src=/img/menu-logo.svg class=logo>
           </a>
-        </nav>
-        <nav class=version flex=none>
-          <lum-version-display></lum-version-display>
-        </nav>
-      </div>
-      <nav class=states flex>
-        <a ui-sref-active=active ui-sref=cred>Credentials</a>
-        <a ui-sref-active=active ui-sref=proxies>Proxies</a>
-        <a ui-sref-active=active ui-sref=zones>Zones</a>
-      </nav>
+          <nav class=version flex=none>
+            <lum-version-display></lum-version-display>
+          </nav>
+          <span flex></span>
+          <a class=login href="https://luminati.io/cp" target=_blank>
+            {{$root.login}}
+          </a>
+        </div>
+      </md-toolbar>
+      <md-nav-bar nav-bar-aria-label="navigation links">
+        <md-nav-item md-nav-href=#cred flex>Credentials</md-nav-item>
+        <md-nav-item md-nav-href=#proxies flex>Proxies</md-nav-item>
+        <md-nav-item md-nav-href=#zones flex>Zones</md-nav-item>
+      </md-nav-bar>
     </header>
     <div class=body ui-view></div>
     <script data-main=./config.js

@@ -3,7 +3,7 @@
     <thead md-head>
       <tr md-row>
         <th md-column md-order-by=port md-numeric>Port</th>
-        <th ng-repeat="col in $vm.opt_columns" md-column
+        <th ng-repeat="col in $vm.columns" md-column
           md-order-by={{col.key}}>
           {{col.title}}
         </th>
@@ -13,7 +13,7 @@
     <tbody md-body>
       <tr ng-repeat="proxy in $vm.proxies" md-row>
         <td md-cell>{{proxy.port}}</td>
-        <td ng-repeat="col in $vm.opt_columns" md-cell>
+        <td ng-repeat="col in $vm.columns" md-cell>
           {{proxy[col.key]}}
         </td>
         <td md-cell>
@@ -27,12 +27,14 @@
         </td>
       </tr>
       <tr md-row>
-        <td md-cell ng-repeat="empty in $vm.opt_columns.concat('port')"></td>
+        <td md-cell></td>
+        <td md-cell ng-repeat="empty in $vm.columns"></td>
         <td md-cell>
           <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy()>
             Add
           </md-button>
         </td>
+        <td></td>
       </tr>
     </tbody>
   </table>
