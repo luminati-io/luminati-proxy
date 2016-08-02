@@ -22,9 +22,9 @@
     height: 40px;
     padding-left: 2rem;
 }
-.proxies-tabs {
-    min-height: 325px;
-}
 .proxies-tabs md-content {
+    background-color: #fff;
+    min-height: 276px;
     padding: 18px 18px 0;
+    margin-bottom: -2rem;
 }

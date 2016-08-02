@@ -1,3 +1,6 @@
+<md-button class="md-fab md-fab-bottom-right" ng-click=$vm.edit_proxy()>
+  <md-icon md-font-library=material-icons>add</md-icon>
+</md-button>
 <md-table-container>
   <table md-table class=proxies-table>
     <thead md-head>
@@ -17,24 +20,14 @@
           {{proxy[col.key]}}
         </td>
         <td md-cell>
-          <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy(proxy)>
-            Edit
+          <md-button class="md-fab md-mini md-primary"
+            ng-click=$vm.edit_proxy(proxy)>
+            <md-icon md-font-library=material-icons>edit</md-icon>
           </md-button>
-          <md-button class="md-fab md-mini" ng-click=$vm.remove_proxy(proxy)>
-            <md-icon md-font-library=material-icons
-              ng-click=$vm.delete_proxy(proxy)>delete</md-icon>
-          </md-button>
-        </td>
-      </tr>
-      <tr md-row>
-        <td md-cell></td>
-        <td md-cell ng-repeat="empty in $vm.columns"></td>
-        <td md-cell>
-          <md-button class="md-primary md-raised" ng-click=$vm.edit_proxy()>
-            Add
+          <md-button class="md-fab md-mini" ng-click=$vm.delete_proxy(proxy)>
+            <md-icon md-font-library=material-icons>delete</md-icon>
           </md-button>
         </td>
-        <td></td>
       </tr>
     </tbody>
   </table>

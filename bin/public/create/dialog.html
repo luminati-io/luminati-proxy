@@ -46,8 +46,9 @@
               <md-input-container class=md-block flex-gt-sm>
                 <label>Country</label>
                 <md-select ng-model=form.country>
-                  <md-option ng-repeat="c in consts.country.values">
-                    {{c}}
+                  <md-option ng-repeat="c in consts.country.values"
+                    ng-value=c.value>
+                    {{c.key}}
                   </md-option>
                 </md-select>
               </md-input-container>
@@ -59,13 +60,17 @@
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
                 <label>City</label>
-                <input ng-model=form.city placeholder=newyork>
+                <input ng-model=form.city placeholder=new_york>
               </md-input-container>
             </div>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
                 <label>{{consts.asn.desc}}</label>
                 <input type=number ng-model=form.asn>
+                <a href="http://bgp.potaroo.net/cidr/autnums.html"
+                  target=_blank style="position: relative; top: 0.2em">
+                  ASN list
+                </a>
               </md-input-container>
             </div>
           </md-content>
@@ -104,23 +109,21 @@
                 </md-select>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Log level</label>
+                <label>Log level
+                  {{form.log ? '' : '('+consts.log.def+' by default)'}}
+                </label>
                 <md-select ng-model=form.log>
                   <md-option ng-repeat="c in consts.log.values">
                     {{c}}
                   </md-option>
                 </md-select>
-                <div class=hint ng-if="consts.log.def&&!form.log">
-                  {{consts.log.def}} by default
-                </div>
               </md-input-container>
             </div>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Proxy switch</label>
+                <label>{{consts.proxy_switch.desc}}</label>
                 <input type=number ng-model=form.proxy_switch
                   placeholder={{consts.proxy_switch.def}}>
-                <span class=hint>Switch proxy on failure</span>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
                 <md-checkbox ng-model=form.sticky_ip>Sticky ip</md-checkbox>
@@ -138,6 +141,12 @@
         </md-tab>
         <md-tab label="Special urls">
           <md-content>
+            <p>You can use
+              <a href="https://en.wikipedia.org/wiki/Regular_expression"
+                  target=_blank>
+                regular expressions
+              </a> for url patterns.
+            </p>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Direct include</label>

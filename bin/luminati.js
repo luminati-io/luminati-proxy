@@ -98,7 +98,7 @@ const load_json = (filename, optional, def)=>{
     return def;
 };
 
-yargs.config(load_json(argv.config, true, {_defaults: {}})._defaults);
+yargs.config(load_json(argv.config, true, {})._defaults||{});
 argv = yargs.argv;
 
 const log = (level, msg, extra)=>{
@@ -331,14 +331,16 @@ function get_consts(req, res){
         if (proxy[prop])
             proxy[prop].def = def;
     });
-    let countries_codes = _.values(countries).filter(c=>c.status=='assigned')
-        .map(c=>c.alpha2.toLowerCase());
-    countries_codes = _.uniq(countries_codes);
+    let countries_list = _.values(countries).filter(c=>c.status=='assigned')
+        .map(c=>({value: c.alpha2.toLowerCase(), key: c.name.split(',')[0]}));
+    countries_list = _.uniqBy(countries_list, 'value');
+    countries_list.forEach(c=>c.key=`${c.value}: ${c.key}`);
+    countries_list.unshift({key: '', value: ''});
     _.merge(proxy, {
         dns: {values: ['', 'local', 'remote']},
         iface: {values: [''].concat(_.keys(os.networkInterfaces()))},
         log: {def: opts.log, values: [''].concat(_.keys(Luminati.log_level))},
-        country: {def: 'us', values: [''].concat(countries_codes)}
+        country: {def: 'us', values: countries_list}
     });
     let data = {proxy: proxy};
     res.json(data);
