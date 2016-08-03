@@ -1,0 +1,29 @@
+<md-dialog ng-cloak style="width: 100%">
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>Proxy Stats</h2>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content class=md-padding layout-gt-sm=row>
+    <div flex flex-sm=80 layout-align-sm=center>
+      <h4 class="md-title text-center">Active requests</h4>
+      <canvas class="chart chart-line" chart-data=requests
+        chart-series=requests_series chart-labels=labels chart-options=options>
+      </canvas>
+    </div>
+    <div flex flex-sm=80>
+      <h4 class="md-title text-center">Status codes</h4>
+      <canvas class="chart chart-line" chart-data=codes chart-series=codes_series
+        chart-labels=labels chart-options=codes_options>
+      </canvas>
+    </div>
+  </md-dialog-content>
+  <md-dialog-actions layout=row>
+    <span flex></span>
+    <md-button ng-click=hide()>
+      Close
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

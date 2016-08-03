@@ -567,9 +567,7 @@ const create_web_interface = ()=>etask(function*(){
         } catch(e){ ef(e); notify('credentials', false); }
     })).on('error', err=>log('ERROR', 'SocketIO error', {error: err}));
     setInterval(()=>{
-        const stats = {};
-        for (let port in proxies)
-            stats[port] = proxies[port].stats;
+        let stats = _.mapValues(proxies_running, 'stats');
         io.emit('stats', stats);
     }, 1000);
     server.on('error', this.throw_fn());

@@ -1,9 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'lodash', 'es6_shim', '../util',
-    'angular-material', 'md-data-table', 'angular-chart',
-    '../health_markers/health_markers', 'css!./proxies'],
-    function(angular, io, _){
+define(['angular', 'socket.io-client', 'lodash', 'moment',
+    'es6_shim', '../util', 'angular-material', 'md-data-table',
+    'angular-chart', '../health_markers/health_markers', 'css!./proxies'],
+    function(angular, io, _, moment){
 
 var proxies = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
     'chart.js', 'lum-health-markers', 'lum-util', 'lum-consts']);
@@ -90,7 +90,6 @@ function proxiesService($q, $interval, win_config, get_json){
         proxies: null,
         update: update_proxies
     };
-    var deffered;
     var listeners = [];
     service.update();
     io().on('stats', stats_event);
@@ -101,53 +100,51 @@ function proxiesService($q, $interval, win_config, get_json){
             func(service.proxies);
     }
     function update_proxies(){
-        deffered = $q.defer();
-        get_json('/api/proxies').then(function(proxies){
+        return get_json('/api/proxies').then(function(proxies){
             proxies.forEach(function(proxy){
-                proxy.stats = {
-                    hosts: [],
-                    ticks: [],
-                    active_requests: [],
-                };
+                proxy.stats = {total: {active_requests: [],
+                        status: {codes: ['2xx'], values: [[]]}}, ticks: []};
             });
             service.proxies = proxies;
-            deffered.resolve(proxies);
             listeners.forEach(function(cb){ cb(proxies); });
+            return proxies;
         });
-        return deffered.promise;
     }
     function stats_event(stats_chunk){
-        var now = Date.now();
-        var history_start = now - win_config.history;
-        deffered.promise.then(function(proxies){
-            for (var port in stats_chunk)
-            {
-                var stats = stats_chunk[port];
-                var proxy = proxies.find(function(p){
-                    return p.port==port; });
-                var i = proxy.stats.ticks.findIndex(function(tick){
-                    return tick>=history_start; });
-                if (i)
+        if (!service.proxies)
+            return;
+        var now = moment().format('hh:mm:ss');
+        for (var port in stats_chunk)
+        {
+            var chunk = stats_chunk[port];
+            var proxy = _.find(service.proxies, {port: +port});
+            var data = _.values(chunk);
+            var stats = proxy.stats;
+            var status = stats.total.status;
+            stats.ticks.push(now);
+            var active_requests = _.sumBy(data, 'active_requests');
+            stats.total.active_requests.push(active_requests);
+            var codes = data.reduce(function(r, host){
+                return r.concat(_.keys(host.status_code)); }, []);
+            codes = _.uniq(codes);
+            codes.forEach(function(code){
+                var i = status.codes.indexOf(code);
+                if (i==-1)
                 {
-                    proxy.stats.ticks.splice(0, i);
-                    proxy.stats.active_requests.forEach(
-                        function(active_requests){
-                            active_requests.splice(0, i); });
+                    status.codes.push(code);
+                    i = status.codes.length-1;
+                    status.values.push(new Array(stats.ticks.length-1));
+                    _.fill(status.values[i], 0);
                 }
-                for (var host in stats)
-                {
-                    if (!proxy.stats.hosts.includes(host))
-                        proxy.stats.hosts.push(host);
-                }
-                proxy.stats.hosts.forEach(function(host, i){
-                    var active_requests = proxy.stats.active_requests[i];
-                    if (!active_requests)
-                        active_requests = proxy.stats.active_requests[i] = [];
-                    active_requests.push(stats[host].active_requests);
-                });
-                proxy.stats.ticks.push(now);
-            }
-        });
+                var total = _.sumBy(data, 'status_code.'+code);
+                status.values[i].push(total);
+            });
+            var len = stats.ticks.length;
+            status.values.forEach(function(values){
+                if (values.length<len)
+                    values.push(0);
+            });
+        }
     }
 }
 
@@ -170,11 +167,11 @@ proxies.value('lumOptColumns', [
     {key: 'log', title: 'Log Level'},
 ]);
 
-proxies.controller('ProxiesTable', ProxiesTableController);
-ProxiesTableController.$inject = ['lumProxies', 'lumOptColumns',
+proxies.controller('ProxiesTable', proxy_table);
+proxy_table.$inject = ['lumProxies', 'lumOptColumns',
     'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts'];
-function ProxiesTableController(lum_proxies, opt_columns, graph_options,
-    $mdDialog, $http, consts)
+function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
+    consts)
 {
     this.$mdDialog = $mdDialog;
     this.$http = $http;
@@ -197,14 +194,14 @@ function ProxiesTableController(lum_proxies, opt_columns, graph_options,
     });
 }
 
-ProxiesTableController.prototype.$onDestroy = function(){
+proxy_table.prototype.$onDestroy = function(){
     this._graph_options_provider.release_options(); };
 
-ProxiesTableController.prototype.edit_proxy = function(proxy_old){
+proxy_table.prototype.edit_proxy = function(proxy_old){
     var _proxy = proxy_old ? _.cloneDeep(proxy_old) : null;
     var _this = this;
     this.$mdDialog.show({
-        controller: dialog_controller,
+        controller: edit_controller,
         templateUrl: '/create/dialog.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
@@ -224,7 +221,18 @@ ProxiesTableController.prototype.edit_proxy = function(proxy_old){
     });
 };
 
-ProxiesTableController.prototype.delete_proxy = function(proxy){
+proxy_table.prototype.show_stats = function(proxy){
+    this.$mdDialog.show({
+        controller: stats_controller,
+        templateUrl: '/proxies/dialog_stats.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose: true,
+        locals: {proxy: proxy},
+        fullscreen: true
+    });
+};
+
+proxy_table.prototype.delete_proxy = function(proxy){
     var _this = this;
     return this.$http.delete('/api/proxies/'+proxy.port)
         .then(function(){ _this.lum_proxies.update(); });
@@ -240,15 +248,40 @@ proxies.directive('proxiesTable', function(){
     };
 });
 
-function dialog_controller($scope, $mdDialog, locals){
+function edit_controller($scope, $mdDialog, locals){
     $scope.form = _.get(locals, 'proxy', {});
     $scope.consts = locals.consts;
-    $scope.hide = function(){ $mdDialog.hide(); };
-    $scope.cancel = function(){ $mdDialog.cancel(); };
+    $scope.hide = $mdDialog.hide.bind($mdDialog);
+    $scope.cancel = $mdDialog.cancel.bind($mdDialog);
     $scope.validate = function(data){
         data = data||{};
         $mdDialog.hide(data);
     };
+}
+
+function stats_controller($scope, $mdDialog, locals){
+    var stats = locals.proxy.stats;
+    var total = stats.total;
+    $scope.requests = [total.active_requests];
+    $scope.requests_series = ['Active requests'];
+    $scope.codes = total.status.values;
+    $scope.codes_series = total.status.codes;
+    $scope.labels = stats.ticks;
+    $scope.hide = $mdDialog.hide.bind($mdDialog);
+    $scope.options = {
+        animation: {duration: 0},
+        elements: {line: {borderWidth: 0.5}, point: {radius: 0}},
+        scales: {
+            yAxes: [{
+                position: 'right',
+                gridLines: {display: false},
+                ticks: {beginAtZero: true, suggestedMax: 6},
+            }],
+        },
+    };
+    $scope.codes_options = _.merge({elements: {line: {fill: false}},
+        legend: {display: true, labels: {boxWidth: 6}},
+        grindLines: {display: false}}, $scope.options);
 }
 
 });

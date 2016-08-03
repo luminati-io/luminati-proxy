@@ -10,6 +10,10 @@
     flex-direction: column;
     justify-content: center;
 }
+.proxies-table td:last-child, .proxies-table th.md-column:last-child {
+    text-align: center;
+    width: 20rem;
+}
 .health-markers {
     padding-top: 25px;
 }

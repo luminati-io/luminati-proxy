@@ -18,7 +18,7 @@ function HealthStatusService($q){
 
 HealthStatusService.prototype.getState = function(key){
     if (this.states[key])
-        return this.states[key];
+        return this.q.when(this.states[key]);
     if (!this.pending[key])
         this.pending[key] = this.q.defer();
     return this.pending[key].promise;

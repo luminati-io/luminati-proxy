@@ -10,10 +10,11 @@ var hutil = '//cdn.rawgit.com/hola/hutil/0.1.4/util/';
 var config = {
     paths: {
         es6_shim: hutil+'es6_shim',
+        moment: cdnjs+'moment.js/2.14.1/moment.min',
         angular: angular_cdn+'angular.min',
         'socket.io-client': '/socket.io/socket.io',
         'angular-chart':
-            cdnjs+'angular-chart.js/1.0.0-alpha6/angular-chart.min',
+            cdnjs+'angular-chart.js/1.0.0/angular-chart.min',
         chart: cdnjs+'Chart.js/2.1.4/Chart.bundle.min', // with moment.js
         lodash: cdnjs+'lodash.js/4.13.1/lodash.min',
     },

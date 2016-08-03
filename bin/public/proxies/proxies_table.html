@@ -10,7 +10,7 @@
           md-order-by={{col.key}}>
           {{col.title}}
         </th>
-        <th md-column></th>
+        <th md-column>Actions</th>
       </tr>
     </thead>
     <tbody md-body>
@@ -20,11 +20,16 @@
           {{proxy[col.key]}}
         </td>
         <td md-cell>
-          <md-button class="md-fab md-mini md-primary"
-            ng-click=$vm.edit_proxy(proxy)>
+          <md-button class="md-icon-button" ng-click=$vm.edit_proxy(proxy)
+             title=Edit>
             <md-icon md-font-library=material-icons>edit</md-icon>
           </md-button>
-          <md-button class="md-fab md-mini" ng-click=$vm.delete_proxy(proxy)>
+          <md-button class="md-icon-button" ng-click=$vm.show_stats(proxy)
+            title=Stats>
+            <md-icon md-font-library=material-icons>info</md-icon>
+          </md-button>
+          <md-button class="md-icon-button md-warn"
+            ng-click=$vm.delete_proxy(proxy) title=Delete>
             <md-icon md-font-library=material-icons>delete</md-icon>
           </md-button>
         </td>

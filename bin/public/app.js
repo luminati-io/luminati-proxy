@@ -2,13 +2,12 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'angular-material', 'angular-ui-router', 'util',
     'proxies/proxies', 'zones/zones', 'version/version', 'cred/cred',
-    'consts/consts', 'css!/app'],
+    'consts/consts', 'css!/app', 'angular-chart'],
 function(angular){
 
 var module = angular.module('lumLocal', ['ngMaterial', 'ui.router', 'lum-util',
     'lum-proxies', 'lum-zones', 'lum-version', 'lum-cred']);
 module.config(route_config);
-route_config.$inject = ['$stateProvider', '$urlRouterProvider'];
 function route_config($stateProvider, $urlRouterProvider){
     $urlRouterProvider.otherwise('/proxies');
     $stateProvider.state('proxies', {
@@ -24,6 +23,11 @@ function route_config($stateProvider, $urlRouterProvider){
         templateUrl: './zones/',
     });
 }
+
+module.config(function(ChartJsProvider){
+    window.Chart.defaults.global.colors = ['#803690', '#00ADF9', '#46BFBD',
+        '#FDB45C', '#949FB1', '#4D5360'];
+});
 
 module.run(function($rootScope, get_json){
     get_json('/api/creds').then(function(auth){
