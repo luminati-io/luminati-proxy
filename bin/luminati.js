@@ -158,10 +158,11 @@ if (is_win)
 let db;
 const terminate = ()=>db?db.db.close(()=>process.exit()):process.exit();
 
-process.on('SIGINT', ()=>{
-    log('INFO', 'SIGINT recieved');
+['SIGTERM', 'SIGINT'].forEach(sig=>process.on(sig, ()=>{
+    log('INFO', `${sig} recieved`);
     terminate();
-});
+}));
+
 process.on('uncaughtException', err=>{
     log('ERROR', `uncaughtException (${version}): ${err}`, err.stack);
     terminate();
@@ -190,7 +191,7 @@ function sql(){
 
 let load_config = (filename, optional)=>{
     let proxies = load_json(filename, optional, []);
-    return proxies.proxies || proxies;
+    return [].concat(proxies.proxies || proxies);
 };
 
 let proxies = {};
@@ -486,11 +487,12 @@ let history_get = (req, res)=>{
 
 const create_api_interface = ()=>{
     const app = express();
+    app.get('/proxies_running', (req, res)=>res.json(_.values(proxies_running).map(p=>p.opt)));
     app.get('/version', (req, res)=>res.json({version: version}));
     app.get('/consts', get_consts);
     app.get('/proxies', (req, res)=>{
         let r = _.values(proxies)
-            .sort((a, b)=>a.port-b.port);
+            .sort((a, b)=>a.port-b.port); // TODO the sorting should be in UI
         res.json(r);
     });
     // XXX stanislav: can be removed in favor of post('proxies')
