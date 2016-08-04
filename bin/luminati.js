@@ -87,6 +87,7 @@ const yargs = require('yargs').usage('Usage: $0 [options] config1 config2 ...')
 .boolean(['history', 'sticky_ip'])
 .default(defs).help('h').version(()=>`luminati-proxy version: ${version}`);
 let argv = yargs.argv;
+let io;
 
 const load_json = (filename, optional, def)=>{
     if (optional && !file.exists(filename))
@@ -377,11 +378,18 @@ let create_proxy = (proxy, iface)=>etask(function*(){
         let req = res.request;
         if (argv.history)
         {
-            db.stmt.history.run(server.port, req.url, req.method,
-                stringify(req.headers), stringify(res.headers),
-                res.status_code, Math.floor(res.timeline.start/1000),
-                res.timeline.end, stringify(res.timeline), res.proxy.host,
-                res.proxy.username, res.body_size);
+            let data = {port: server.port, url: req.url, method: req.method,
+                request_headers: stringify(req.headers),
+                response_headers: stringify(res.headers),
+                status_code: res.status_code,
+                timestamp: Math.floor(res.timeline.start/1000),
+                elapsed: res.timeline.end, timeline: stringify(res.timeline),
+                proxy: res.proxy.host, username: res.proxy.username,
+                content_size: res.body_size};
+            if (io)
+                io.emit(`history/${server.port}`, data);
+            let row = _.values(data);
+            db.stmt.history.run(...row);
         }
     }).on('error', this.throw_fn());
     let hostname = find_iface(iface||argv.iface);
@@ -530,7 +538,7 @@ const create_api_interface = ()=>{
 const create_web_interface = ()=>etask(function*(){
     const app = express();
     const server = http.Server(app);
-    const io = socket_io(server);
+    io = socket_io(server);
     assign(app.locals, {humanize: humanize, moment: moment});
     app.use(body_parser.urlencoded({extended: true}));
     app.use(body_parser.json());
@@ -627,9 +635,9 @@ etask(function*(){
                 +'method, request_headers, response_headers, status_code,'
                 +'timestamp, elapsed, timeline, proxy, username, content_size)'
                 +' VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
-            db.stmt.query_history = db.db.prepare('SELECT * FROM request '
-                +'WHERE port = ? ORDER BY timestamp DESC LIMIT 1000');
         }
+        db.stmt.query_history = db.db.prepare('SELECT * FROM request WHERE '
+            +'port = ? ORDER BY timestamp DESC LIMIT 1000');
         if (argv.www)
         {
             const server = yield create_web_interface();

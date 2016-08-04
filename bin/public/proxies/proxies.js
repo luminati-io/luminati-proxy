@@ -235,8 +235,11 @@ proxy_table.prototype.show_stats = function(proxy){
 
 proxy_table.prototype.show_history = function(proxy){
     var locals = {};
+    var uri = 'history/'+proxy.port;
+    var socket = io();
     this.get_json('/api/history/'+proxy.port).then(function(history){
         locals.history = history;
+        socket.on(uri, locals.history.unshift.bind(locals.history));
     });
     this.$mdDialog.show({
         controller: history_controller,
@@ -245,13 +248,16 @@ proxy_table.prototype.show_history = function(proxy){
         clickOutsideToClose: true,
         locals: locals,
         fullscreen: true
-    });
+    }).then(function(){ socket.removeAllListeners(uri); });
 };
 
 proxy_table.prototype.delete_proxy = function(proxy){
     var _this = this;
-    return this.$http.delete('/api/proxies/'+proxy.port)
-        .then(function(){ _this.lum_proxies.update(); });
+    var confirm = this.$mdDialog.confirm({ok: 'ok', cancel: 'cancel',
+        title: 'Are you sure you want to delete proxy?'});
+    this.$mdDialog.show(confirm).then(function(){
+        return _this.$http.delete('/api/proxies/'+proxy.port);
+    }).then(function(){ _this.lum_proxies.update(); });
 };
 
 proxies.directive('proxiesTable', function(){
