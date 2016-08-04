@@ -15,6 +15,8 @@ var config = {
         'socket.io-client': '/socket.io/socket.io',
         'angular-chart':
             cdnjs+'angular-chart.js/1.0.0/angular-chart.min',
+        'angular-moment':
+            cdnjs+'angular-moment/0.10.3/angular-moment.min',
         chart: cdnjs+'Chart.js/2.1.4/Chart.bundle.min', // with moment.js
         lodash: cdnjs+'lodash.js/4.13.1/lodash.min',
     },

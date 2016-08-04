@@ -12,7 +12,15 @@
 }
 .proxies-table td:last-child, .proxies-table th.md-column:last-child {
     text-align: center;
-    width: 20rem;
+    width: 25rem;
+}
+.proxies-table.md-table td.md-cell:first-child,
+.proxies-table.md-table th.md-column:first-child {
+    text-align: center;
+    width: 10rem;
+}
+.proxies-table th:first-child md-icon {
+    display: none;
 }
 .health-markers {
     padding-top: 25px;

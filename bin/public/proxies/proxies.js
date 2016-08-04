@@ -169,12 +169,13 @@ proxies.value('lumOptColumns', [
 
 proxies.controller('ProxiesTable', proxy_table);
 proxy_table.$inject = ['lumProxies', 'lumOptColumns',
-    'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts'];
+    'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts', 'get_json'];
 function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
-    consts)
+    consts, get_json)
 {
     this.$mdDialog = $mdDialog;
     this.$http = $http;
+    this.get_json = get_json;
     this.lum_proxies = lum_proxies;
     var $vm = this;
     $vm.consts = consts.proxy;
@@ -232,6 +233,21 @@ proxy_table.prototype.show_stats = function(proxy){
     });
 };
 
+proxy_table.prototype.show_history = function(proxy){
+    var locals = {};
+    this.get_json('/api/history/'+proxy.port).then(function(history){
+        locals.history = history;
+    });
+    this.$mdDialog.show({
+        controller: history_controller,
+        templateUrl: '/proxies/dialog_history.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose: true,
+        locals: locals,
+        fullscreen: true
+    });
+};
+
 proxy_table.prototype.delete_proxy = function(proxy){
     var _this = this;
     return this.$http.delete('/api/proxies/'+proxy.port)
@@ -282,6 +298,11 @@ function stats_controller($scope, $mdDialog, locals){
     $scope.codes_options = _.merge({elements: {line: {fill: false}},
         legend: {display: true, labels: {boxWidth: 6}},
         grindLines: {display: false}}, $scope.options);
+}
+
+function history_controller($scope, $mdDialog, locals){
+    $scope.data = locals;
+    $scope.hide = $mdDialog.hide.bind($mdDialog);
 }
 
 });

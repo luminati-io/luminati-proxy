@@ -2,11 +2,11 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'angular-material', 'angular-ui-router', 'util',
     'proxies/proxies', 'zones/zones', 'version/version', 'cred/cred',
-    'consts/consts', 'css!/app', 'angular-chart'],
+    'consts/consts', 'css!/app', 'angular-chart', 'angular-moment'],
 function(angular){
 
 var module = angular.module('lumLocal', ['ngMaterial', 'ui.router', 'lum-util',
-    'lum-proxies', 'lum-zones', 'lum-version', 'lum-cred']);
+    'lum-proxies', 'lum-zones', 'lum-version', 'lum-cred', 'angularMoment']);
 module.config(route_config);
 function route_config($stateProvider, $urlRouterProvider){
     $urlRouterProvider.otherwise('/proxies');

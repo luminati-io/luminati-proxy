@@ -28,7 +28,11 @@
             title=Stats>
             <md-icon md-font-library=material-icons>info</md-icon>
           </md-button>
-          <md-button class="md-icon-button md-warn"
+          <md-button class="md-icon-button" ng-click=$vm.show_history(proxy)
+            title=History>
+            <md-icon md-font-library=material-icons>history</md-icon>
+          </md-button>
+          <md-button class="md-icon-button"
             ng-click=$vm.delete_proxy(proxy) title=Delete>
             <md-icon md-font-library=material-icons>delete</md-icon>
           </md-button>

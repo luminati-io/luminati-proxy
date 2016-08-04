@@ -260,6 +260,7 @@ const prepare_database = ()=>etask(function*prepare_database(){
             timestamp: {type: 'INTEGER', default: 'CURRENT_TIMESTAMP'},
         },
         request: {
+            port: {type: 'INTEGER'},
             url: 'TEXT',
             method: 'TEXT',
             request_headers: 'TEXT',
@@ -373,10 +374,10 @@ let create_proxy = (proxy, iface)=>etask(function*(){
     }));
     server.on('response', res=>{
         log('DEBUG', util.inspect(res, {depth: null, colors: 1}));
-        const req = res.request;
+        let req = res.request;
         if (argv.history)
         {
-            db.stmt.history.run(req.url, req.method,
+            db.stmt.history.run(server.port, req.url, req.method,
                 stringify(req.headers), stringify(res.headers),
                 res.status_code, Math.floor(res.timeline.start/1000),
                 res.timeline.end, stringify(res.timeline), res.proxy.host,
@@ -470,6 +471,11 @@ let proxy_delete_api = (req, res, next)=>etask(function*(){
     res.status(204).end();
 });
 
+let history_get = (req, res)=>{
+    let port = req.params.port;
+    db.stmt.query_history.all([port], (err, rows)=>res.json(rows));
+};
+
 const create_api_interface = ()=>{
     const app = express();
     app.get('/version', (req, res)=>res.json({version: version}));
@@ -485,6 +491,7 @@ const create_api_interface = ()=>{
     app.put('/proxies/:port', proxy_update);
     app.post('/delete', proxies_delete_api);
     app.delete('/proxies/:port', proxy_delete_api);
+    app.get('/history/:port', history_get);
     app.get('/stats', (req, res)=>etask(function*(){
         const r = yield json({
             url: 'https://luminati.io/api/get_customer_bw?details=1',
@@ -616,10 +623,12 @@ etask(function*(){
         yield create_proxies();
         if (argv.history)
         {
-            db.stmt.history = db.db.prepare('INSERT INTO request (url, method,'
-                +'request_headers, response_headers, status_code, timestamp,'
-                +'elapsed, timeline, proxy, username, content_size) VALUES (?,'
-                +'?,?,?,?,?,?,?,?,?,?)');
+            db.stmt.history = db.db.prepare('INSERT INTO request (port, url,'
+                +'method, request_headers, response_headers, status_code,'
+                +'timestamp, elapsed, timeline, proxy, username, content_size)'
+                +' VALUES (?,?,?,?,?,?,?,?,?,?,?,?)');
+            db.stmt.query_history = db.db.prepare('SELECT * FROM request '
+                +'WHERE port = ? ORDER BY timestamp DESC LIMIT 1000');
         }
         if (argv.www)
         {
