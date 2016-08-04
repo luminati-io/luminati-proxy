@@ -389,7 +389,7 @@ let create_proxy = (proxy, iface)=>etask(function*(){
             if (io)
                 io.emit(`history/${server.port}`, data);
             let row = _.values(data);
-            db.stmt.history.run(...row);
+            db.stmt.history.run.apply(db.stmt.history, row);
         }
     }).on('error', this.throw_fn());
     let hostname = find_iface(iface||argv.iface);
