@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// LICENSE_CODE ZON
+// LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const _ = require('lodash');
 const assert = require('assert');
@@ -53,8 +53,8 @@ let proxy_fields = {
     max_requests: 'Requests per session',
     proxy_switch: 'Automatically switch proxy on failure',
     session_timeout: 'Session establish timeout',
-    direct_include: 'Include pattern for direct requests',
-    direct_exclude: 'Exclude pattern for direct requests',
+    'direct_include': 'Include pattern for direct requests',
+    'direct_exclude': 'Exclude pattern for direct requests',
     null_response: 'Url pattern for null response',
     www: 'Local web port',
     socks: 'SOCKS5 port (local:remote)',
@@ -122,7 +122,7 @@ function ensure_default(_this, next){
 }
 
 let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
-    'max_requests', 'pool_size', 'session_timeout', 'direct_include',
+    'max_requests', 'pool_size', 'session_timeout', 'direct', 'direct_include',
     'direct_exclude', 'null_response', 'dns', 'resolve', 'cid', 'ip', 'log',
     'proxy_switch']);
 if (opts.resolve)

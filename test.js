@@ -1,4 +1,4 @@
-// LICENSE_CODE ZON
+// LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const _ = require('lodash');
 const spawn = require('child_process').spawn;
@@ -65,7 +65,7 @@ const http_proxy = port=>etask(function*(){
             const auth = body.headers['proxy-authorization'];
             if (auth)
             {
-                const cred = Buffer.from(auth.split(' ')[1], 'base64')
+                const cred = (new Buffer(auth.split(' ')[1], 'base64'))
                     .toString('ascii').split(':');
                 body.auth = {password: cred[1]};
                 for (let args=cred[0].split('-'); args.length; )
@@ -239,9 +239,22 @@ describe('proxy', ()=>{
             yield l.test();
             assert.equal(proxy.history.length, 1);
         }));
+        describe('direct', ()=>{
+            const t = (name, expected)=>it(name, ()=>etask(function*(){
+                var direct = {};
+                direct[name] = 'match';
+                l = yield lum({direct});
+                const match = yield l.test({url: 'http://match.com'});
+                assert.equal(!!match.body.auth.direct, expected);
+                const no_match = yield l.test({url: 'http://m-a-t-c-h.com'});
+                assert.notEqual(!!no_match.body.auth.direct, expected);
+            }));
+            t('include', true);
+            t('exclude', false);
+        });
         describe('luminati params', ()=>{
             const t = (name, target)=>it(name, ()=>etask(function*(){
-                l = yield lum(_.assign({}, target, {port: 24400}));
+                l = yield lum(_.assign({}, target, {}));
                 const res = yield l.test();
                 assert_has(res.body.auth, target);
             }));

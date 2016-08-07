@@ -1,4 +1,4 @@
-// LICENSE_CODE ZON
+// LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const path = require('path');
 const fs = require('fs');
