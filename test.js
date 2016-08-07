@@ -211,7 +211,7 @@ describe('proxy', ()=>{
             l = yield lum({pool_size: 3});
             const res = yield l.test({headers: {
                 'proxy-authorization': 'Basic '+
-                    Buffer.from('lum-customer-user:pass').toString('base64'),
+                    (new Buffer('lum-customer-user:pass')).toString('base64'),
             }});
             assert(!l.sessions);
             assert.equal(proxy.history.length, 1);
