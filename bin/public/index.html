@@ -29,10 +29,11 @@
           </a>
         </div>
       </md-toolbar>
-      <md-nav-bar nav-bar-aria-label="navigation links">
-        <md-nav-item md-nav-href=#cred flex>Credentials</md-nav-item>
-        <md-nav-item md-nav-href=#proxies flex>Proxies</md-nav-item>
-        <md-nav-item md-nav-href=#zones flex>Zones</md-nav-item>
+      <md-nav-bar nav-bar-aria-label="navigation links"
+        md-selected-nav-item=$root.current_state>
+        <md-nav-item md-nav-href=#cred name=cred flex>Credentials</md-nav-item>
+        <md-nav-item md-nav-href=#proxies name=proxies flex>Proxies</md-nav-item>
+        <md-nav-item md-nav-href=#zones name=zones flex>Zones</md-nav-item>
       </md-nav-bar>
     </header>
     <div class=body ui-view></div>

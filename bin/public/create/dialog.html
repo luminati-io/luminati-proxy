@@ -14,7 +14,7 @@
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Port</label>
-                <input type=number ng-model=form.port
+                <input type=number ng-model=form.port md-autofocus
                   placeholder={{consts.port.def}} min=24000>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
@@ -29,8 +29,7 @@
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Zone</label>
-                <input ng-model=form.zone placeholder={{consts.zone.def}}
-                  md-autofocus>
+                <input ng-model=form.zone placeholder={{consts.zone.def}}>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Zone password</label>

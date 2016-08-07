@@ -29,9 +29,12 @@ module.config(function(ChartJsProvider){
         '#FDB45C', '#949FB1', '#4D5360'];
 });
 
-module.run(function($rootScope, get_json){
+module.run(function($rootScope, get_json, $state){
     get_json('/api/creds').then(function(auth){
         $rootScope.login = auth.customer;
+    });
+    $rootScope.$on('$stateChangeSuccess', function(event, current){
+        $rootScope.current_state = current.name;
     });
 });
 

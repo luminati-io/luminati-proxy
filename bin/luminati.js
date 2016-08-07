@@ -394,7 +394,12 @@ let create_proxy = (proxy, iface)=>etask(function*(){
         }
     }).on('error', this.throw_fn());
     let hostname = find_iface(iface||argv.iface);
-    let port = conf.port ? conf.port : 0;
+    let port = conf.port;
+    if (!port)
+    {
+        let ports = _.keys(proxies).map(p=>+p);
+        port = ports.length ? _.max(ports)+1 : null;
+    }
     yield server.listen(port, hostname);
     server.opt.port = server.port;
     proxy.port = server.port;
@@ -487,7 +492,8 @@ let history_get = (req, res)=>{
 
 const create_api_interface = ()=>{
     const app = express();
-    app.get('/proxies_running', (req, res)=>res.json(_.values(proxies_running).map(p=>p.opt)));
+    app.get('/proxies_running', (req, res)=>
+        res.json(_.values(proxies_running).map(p=>p.opt)));
     app.get('/version', (req, res)=>res.json({version: version}));
     app.get('/consts', get_consts);
     app.get('/proxies', (req, res)=>{

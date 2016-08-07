@@ -73,6 +73,11 @@ const http_proxy = port=>etask(function*(){
                     const key = args.shift();
                     if (key=='lum')
                         continue;
+                    if (key=='direct')
+                    {
+                        body.auth.direct = true;
+                        continue;
+                    }
                     body.auth[key] = args.shift();
                 }
             }
@@ -178,29 +183,29 @@ describe('proxy', ()=>{
     describe('options', ()=>{
         let l;
         beforeEach(()=>proxy.history = []);
-    afterEach(()=>etask(function*(){
-        if (!l)
-            return;
-        yield l.stop();
-        l = null;
-    }));
-    it('pool', ()=>etask(function*(){
-        l = yield lum({pool_size: 3});
-        const res = yield l.test();
-        assert(proxy.history.length==4);
-        for (let i=0; i<3; i++)
-        {
-            assert.equal(proxy.history[i].url,
-                'http://lumtest.com/myip.json');
-        }
-        assert.equal(proxy.history[3].url, 'http://test/');
-        assert.equal(l.sessions.length, 3);
-        for (let i=0; i<3; i++)
-        {
-            assert.equal(l.sessions[i].proxy, '127.0.0.1');
-            assert.equal(l.sessions[i].session, '24000_'+(i+1));
-        }
-        assert.equal(res.body.auth.session, '24000_1');
+        afterEach(()=>etask(function*(){
+            if (!l)
+                return;
+            yield l.stop();
+            l = null;
+        }));
+        it('pool', ()=>etask(function*(){
+            l = yield lum({pool_size: 3});
+            const res = yield l.test();
+            assert(proxy.history.length==4);
+            for (let i=0; i<3; i++)
+            {
+                assert.equal(proxy.history[i].url,
+                    'http://lumtest.com/myip.json');
+            }
+            assert.equal(proxy.history[3].url, 'http://test/');
+            assert.equal(l.sessions.length, 3);
+            for (let i=0; i<3; i++)
+            {
+                assert.equal(l.sessions[i].proxy, '127.0.0.1');
+                assert.equal(l.sessions[i].session, '24000_'+(i+1));
+            }
+            assert.equal(res.body.auth.session, '24000_1');
         }));
         it('passthrough', ()=>etask(function*(){
             l = yield lum({pool_size: 3});
@@ -224,11 +229,35 @@ describe('proxy', ()=>{
                 }
             }
         }));
+        it('null_response', ()=>etask(function*(){
+            l = yield lum({null_response: 'match'});
+            const res = yield l.test({url: 'http://match.com/'});
+            assert.equal(proxy.history.length, 0);
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.statusMessage, 'NULL');
+            assert.equal(res.body, undefined);
+            yield l.test();
+            assert.equal(proxy.history.length, 1);
+        }));
+        describe('luminati params', ()=>{
+            const t = (name, target)=>it(name, ()=>etask(function*(){
+                l = yield lum(_.assign({}, target, {port: 24400}));
+                const res = yield l.test();
+                assert_has(res.body.auth, target);
+            }));
+            t('auth', {customer: 'a', password: 'p'});
+            t('zone', {zone: 'abc'});
+            t('country', {country: 'il'});
+            t('city', {country: 'us', state:'ny', city: 'newyork'});
+            t('static', {zone: 'static', ip: '127.0.0.1'});
+            t('ASN', {zone: 'asn', asn: 28133});
+            t('DNS', {dns: 'local'});
+        });
     });
-    it.skip('busy', ()=>etask(function*(){
-        before(()=>proxy.busy = true);
-        after(()=>proxy.busy = false);
-    }));
+    //it.skip('busy', ()=>etask(function*(){
+    //    before(()=>proxy.busy = true);
+    //    after(()=>proxy.busy = false);
+    //}));
 
     describe('config_load', ()=>{
         const start_app = args=>etask(function*start_app(){
