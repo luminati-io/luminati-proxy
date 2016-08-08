@@ -14,7 +14,7 @@ const ssl = require('./bin/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
-const luminati = require('./lib/luminati.js');
+const Luminati = require('./lib/luminati.js');
 const customer = 'abc';
 const password = 'xyz';
 
@@ -27,7 +27,7 @@ const assert_has = (value, has, prefix)=>{
         if (value.length < has.length)
             throw new assert.AssertionError(`${prefix}.length is `
                 +`${value.lengthi} should be at least ${has.length}`);
-        for(let i = 0; i < has.length; ++i)
+        for (let i = 0; i < has.length; ++i)
         {
             if (has[i]===undefined)
                 continue;
@@ -68,7 +68,7 @@ const http_proxy = port=>etask(function*(){
                 const cred = (new Buffer(auth.split(' ')[1], 'base64'))
                     .toString('ascii').split(':');
                 body.auth = {password: cred[1]};
-                for (let args=cred[0].split('-'); args.length; )
+                for (let args=cred[0].split('-'); args.length;)
                 {
                     const key = args.shift();
                     if (key=='lum')
@@ -164,7 +164,7 @@ describe('proxy', ()=>{
         proxy = null;
     }));
     const lum = opt=>etask(function*(){
-        const l = new luminati(_.assign({
+        const l = new Luminati(_.assign({
             proxy: '127.0.0.1',
             customer: customer,
             password: password,
@@ -261,16 +261,12 @@ describe('proxy', ()=>{
             t('auth', {customer: 'a', password: 'p'});
             t('zone', {zone: 'abc'});
             t('country', {country: 'il'});
-            t('city', {country: 'us', state:'ny', city: 'newyork'});
+            t('city', {country: 'us', state: 'ny', city: 'newyork'});
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('DNS', {dns: 'local'});
         });
     });
-    //it.skip('busy', ()=>etask(function*(){
-    //    before(()=>proxy.busy = true);
-    //    after(()=>proxy.busy = false);
-    //}));
 
     describe('config_load', ()=>{
         const start_app = args=>etask(function*start_app(){
@@ -289,7 +285,7 @@ describe('proxy', ()=>{
                     this.continue();
                 }
             };
-            //app.stdout.pipe(process.stdout);
+            // app.stdout.pipe(process.stdout);
             app.stdout.on('data', app_start);
             yield this.wait();
             return {app, admin};
@@ -298,7 +294,7 @@ describe('proxy', ()=>{
         const stop_app = pm=>etask(function*stop_app(){
             pm.app.on('exit', this.continue_fn());
             pm.app.kill();
-            this.wait();
+            yield this.wait();
         });
 
         const t = (name, config, expected)=>it(name, etask._fn(
@@ -337,8 +333,7 @@ describe('proxy', ()=>{
                     url: pm.admin+'/api/proxies_running'
                 }]);
                 proxies = JSON.parse(res.body);
-            }
-            finally {
+            } finally {
                 yield stop_app(pm);
                 temp_files.forEach(f=>f.done());
             }
