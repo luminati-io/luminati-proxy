@@ -46,11 +46,11 @@ const assert_has = (value, has, prefix)=>{
 };
 
 let tmp_file_counter = 0;
-const temp_file_path = (pre, ext)=>path.join(os.tmpdir(),
+const temp_file_path = (ext, pre)=>path.join(os.tmpdir(),
     `${pre||'test'}-${Date.now()}-${tmp_file_counter++}.${ext||'tmp'}`);
 
-const temp_file = (content, pre, ext)=>{
-    const path = temp_file_path(pre, ext);
+const temp_file = (content, ext, pre)=>{
+    const path = temp_file_path(ext, pre);
     const done = ()=>fs.unlinkSync(path);
     fs.writeFileSync(path, JSON.stringify(content));
     return {path, done};
@@ -265,6 +265,7 @@ describe('proxy', ()=>{
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('DNS', {dns: 'local'});
+            t('timeout', {timeout: 10});
         });
     });
 
@@ -280,13 +281,17 @@ describe('proxy', ()=>{
             let log = get_param(args, '--log');
             if (!log)
                 args = args.concat(['--log', 'NONE']);
+            let db_file = temp_file_path('.sqlite3');
+            if (!get_param(args, '--database'))
+                args = args.concat(['--database', db_file]);
             let app = yield luminati_app.main(args||[]);
             let admin = 'http://127.0.0.1:'+www;
-            return {app, admin};
+            return {app, admin, db_file};
         });
 
         const stop_app = pm=>etask(function*stop_app(){
             yield luminati_app.terminate();
+            fs.unlink(pm.db_file);
         });
 
         const t = (name, config, expected)=>it(name, ()=>etask(
@@ -305,14 +310,14 @@ describe('proxy', ()=>{
                 args.push('--'+k);
                 args.push(cli[k]);
             });
-            const config_file = temp_file(config.config||[]);
+            const config_file = temp_file(config.config||[], 'json');
             args.push('--config');
             args.push(config_file.path);
             let temp_files = [config_file];
             if (config.files)
             {
                 config.files.forEach(c=>{
-                    const file = temp_file(c);
+                    const file = temp_file(c, 'json');
                     args.push(file.path);
                     temp_files.push(file);
                 });

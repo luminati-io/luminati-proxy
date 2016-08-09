@@ -14,10 +14,10 @@ body {
     margin: 0;
 }
 .md-nav-bar ._md-nav-button {
-    width: 100%;
+    text-transform: none; width: 100%;
 }
 .md-nav-bar ._md-nav-button{
-    margin: 0;
+    text-transform: none; margin: 0;
 }
 .login {
     font-size: 0.85em;

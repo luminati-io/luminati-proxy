@@ -66,6 +66,7 @@ Options:
   --city             City
   --asn              ASN
   --dns              DNS resolving (local|remote)
+  --timeout          Timeout for request on the super proxy
   --pool_size        Pool size                                      [default: 3]
   --ssl              Enable SSL sniffing
   --max_requests     Requests per session                          [default: 50]

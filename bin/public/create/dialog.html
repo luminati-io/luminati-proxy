@@ -131,6 +131,11 @@
             </div>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
+                <label>{{consts.timeout.desc}}</label>
+                <input type=number ng-model=form.timeout
+                  placeholder={{consts.timeout.def}}>
+              </md-input-container>
+              <md-input-container class=md-block flex-gt-sm>
                 <label>{{consts.proxy.desc}}</label>
                 <input ng-model=form.proxy>
                 <div class=hidden>{{consts.proxy.desc}}</div>

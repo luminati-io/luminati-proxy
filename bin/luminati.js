@@ -50,14 +50,15 @@ const proxy_fields = {
     city: 'City',
     asn: 'ASN',
     dns: 'DNS resolving (local|remote)',
+    timeout: 'Timeout for request on the super proxy',
     pool_size: 'Pool size',
     ssl: 'Enable SSL sniffing',
     max_requests: 'Requests per session',
     proxy_switch: 'Automatically switch proxy on failure',
     session_timeout: 'Session establish timeout',
-    'direct_include': 'Include pattern for direct requests',
-    'direct_exclude': 'Exclude pattern for direct requests',
-    null_response: 'Url pattern for null response',
+    direct_include: 'Include pattern for direct requests',
+    direct_exclude: 'Exclude pattern for direct requests',
+    null_response: 'URL pattern for null response',
     www: 'Local web port',
     socks: 'SOCKS5 port (local:remote)',
     history: 'Log history',
@@ -66,6 +67,7 @@ const proxy_fields = {
     config: 'Config file containing proxy definitions',
     iface: 'Interface or ip to listen on '
         +`(${Object.keys(os.networkInterfaces()).join(', ')})`,
+    no_dropin: 'Disable drop-in mode for migrating',
 };
 const defs = E.defs = {
     port: 24000,
@@ -269,12 +271,12 @@ const prepare_config = args=>{
     _yargs.usage('Usage: $0 [options] config1 config2 ...')
     .alias({h: 'help', p: 'port'})
     .describe(proxy_fields)
-    .boolean(['history', 'sticky_ip'])
+    .boolean(['history', 'sticky_ip', 'no_dropin'])
     .default(defs).help('h').version(()=>`luminati-proxy version: ${version}`);
     _yargs.config(load_json(_yargs.argv.config, true, {})._defaults||{});
     argv = _yargs.argv;
     opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
-        'max_requests', 'pool_size', 'session_timeout', 'direct',
+        'max_requests', 'pool_size', 'session_timeout', 'direct', 'timeout',
         'direct_include', 'direct_exclude', 'null_response', 'dns', 'resolve',
         'cid', 'ip', 'log', 'proxy_switch']);
     if (opts.resolve)
@@ -513,9 +515,8 @@ const create_proxy = (proxy, iface)=>etask(function*create_proxy(){
 });
 
 const create_proxies = ()=>etask(function*create_proxies(){
-    // TODO convert to use etask.all
     for (let c of config)
-        try { yield create_proxy(c); } catch(e){ log('ERROR', e); }
+        yield create_proxy(c);
 });
 
 const proxy_create = data=>etask(function*proxy_create(){
@@ -733,12 +734,15 @@ const create_socks_server = (local, remote)=>etask(function*(){
     return server;
 });
 
-const main = E.main = args=>etask(function*main(){
+E.main = args=>etask(function*main(){
     try {
         prepare_config(args);
         yield check_credentials();
         yield prepare_database();
         yield create_proxies();
+        if (!argv.no_dropin)
+        {
+        }
         if (argv.history)
         {
             db.stmt.history = db.db.prepare('INSERT INTO request (port, url,'
@@ -784,4 +788,4 @@ process.on('uncaughtException', err=>{
 });
 
 if (!module.parent)
-   main(process.argv.slice(2));
+   E.main(process.argv.slice(2));

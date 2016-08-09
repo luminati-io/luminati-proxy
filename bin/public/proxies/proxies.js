@@ -159,6 +159,7 @@ proxies.value('lumOptColumns', [
     {key: 'ip', title: 'IP'},
     {key: 'session_timeout', title: 'Session timeout'},
     {key: 'dns', title: 'DNS'},
+    {key: 'timeout', title: 'Timeout'},
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
     {key: 'proxy_count', title: 'Minimum proxies count'},
