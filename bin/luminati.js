@@ -26,7 +26,7 @@ const util = require('util');
 const sqlite3 = require('sqlite3');
 const stringify = require('json-stable-stringify');
 const countries = require('country-data').countries;
-const yargs = require('yargs');
+const yargs = require('yargs/yargs');
 const E = module.exports = {};
 const etask = hutil.etask;
 const ef = etask.ef;
@@ -67,7 +67,7 @@ const proxy_fields = {
     iface: 'Interface or ip to listen on '
         +`(${Object.keys(os.networkInterfaces()).join(', ')})`,
 };
-const defs = {
+const defs = E.defs = {
     port: 24000,
     log: 'ERROR',
     customer: process.env.LUMINATI_CUSTOMER,
@@ -83,7 +83,8 @@ const defs = {
     config: path.join(os.homedir(), '.luminati.json'.substr(is_win?1:0)),
     database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
 };
-let argv, io, db, opts, proxies = {}, proxies_running = {}, config = [];
+let argv, io, db, opts, www_server, proxies = {}, proxies_running = {},
+    config = [];
 
 const load_json = (filename, optional, def)=>{
     if (optional && !file.exists(filename))
@@ -114,7 +115,33 @@ const ensure_default = (_this, next)=>{
     });
 };
 
-const terminate = ()=>db?db.db.close(()=>process.exit()):process.exit();
+const terminate = E.terminate = done=>{
+    if (!done)
+        done = ()=>{};
+    if (!module.parent)
+        done = ()=>process.exit();
+    if (www_server)
+    {
+        try {
+            www_server.close(); // TODO lee turn into async
+        } catch(e) {
+            log('ERROR', 'Failed to stop www: '+e.message, {www: www_server,
+                error: e});
+        }
+    }
+    _.values(proxies_running).forEach(p=>{
+        try {
+            p.stop();
+        } catch(e) {
+            log('ERROR', 'Failed to stop proxy: '+e.message, {proxy: p,
+                error: e});
+        }
+    });
+    if (db)
+        db.db.close(done);
+    else
+        done();
+};
 
 const find_iface = iface=>{
     const ifaces = os.networkInterfaces();
@@ -236,15 +263,17 @@ const save_config = filename=>{
     fs.writeFileSync(filename||argv.config, s);
 };
 
-const prepare_config = ()=>{
-    yargs.usage('Usage: $0 [options] config1 config2 ...')
+const prepare_config = args=>{
+    args = args.map(p=>''+p); // TODO lee hack until yargs accept PR#46
+    let _yargs = yargs(args);
+    _yargs.usage('Usage: $0 [options] config1 config2 ...')
     .alias({h: 'help', p: 'port'})
     .describe(proxy_fields)
     .boolean(['history', 'sticky_ip'])
-    .default(defs).help('h').version(()=>`luminati-proxy version: ${version}`)
-    .config(load_json(yargs.argv.config, true, {})._defaults||{});
-    argv = yargs.argv;
-    let opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
+    .default(defs).help('h').version(()=>`luminati-proxy version: ${version}`);
+    _yargs.config(load_json(_yargs.argv.config, true, {})._defaults||{});
+    argv = _yargs.argv;
+    opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
         'max_requests', 'pool_size', 'session_timeout', 'direct',
         'direct_include', 'direct_exclude', 'null_response', 'dns', 'resolve',
         'cid', 'ip', 'log', 'proxy_switch']);
@@ -704,9 +733,9 @@ const create_socks_server = (local, remote)=>etask(function*(){
     return server;
 });
 
-const main = E.main = ()=>etask(function*main(){
+const main = E.main = args=>etask(function*main(){
     try {
-        prepare_config();
+        prepare_config(args);
         yield check_credentials();
         yield prepare_database();
         yield create_proxies();
@@ -721,8 +750,8 @@ const main = E.main = ()=>etask(function*main(){
             +'port = ? ORDER BY timestamp DESC LIMIT 1000');
         if (argv.www)
         {
-            const server = yield create_web_interface();
-            let port = server.address().port;
+            www_server = yield create_web_interface();
+            let port = www_server.address().port;
             console.log(`admin is available at http://127.0.0.1:${port}`);
         }
         [].concat(argv.socks||[]).forEach(ports=>etask(function*(){
@@ -755,4 +784,4 @@ process.on('uncaughtException', err=>{
 });
 
 if (!module.parent)
-   E.main();
+   main(process.argv.slice(2));

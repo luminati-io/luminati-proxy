@@ -1,7 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const _ = require('lodash');
-const spawn = require('child_process').spawn;
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
@@ -15,6 +14,7 @@ const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
 const Luminati = require('./lib/luminati.js');
+const luminati_app = require('./bin/luminati.js');
 const customer = 'abc';
 const password = 'xyz';
 
@@ -269,37 +269,28 @@ describe('proxy', ()=>{
     });
 
     describe('config_load', ()=>{
+        const get_param = (args, param)=>{
+            let i = args.indexOf(param)+1;
+            return i?args[i]:null;
+        };
+
         const start_app = args=>etask(function*start_app(){
-            const app = spawn('bin/luminati.js', args,
-                {stdio: [0, 'pipe', 2]});
-            let admin, out = '';
-            const app_start = data=>{
-                out += data;
-                const match = /admin is available at (https?:\/\/[^:]*:\d*)/
-                    .exec(out);
-                if (match)
-                {
-                    app.stdout.pipe(process.stdout);
-                    app.stdout.removeListener('data', app_start);
-                    admin = match[1];
-                    this.continue();
-                }
-            };
-            // app.stdout.pipe(process.stdout);
-            app.stdout.on('data', app_start);
-            yield this.wait();
+            args = args||[];
+            let www = get_param(args, '--www')||luminati_app.defs.www;
+            let log = get_param(args, '--log');
+            if (!log)
+                args = args.concat(['--log', 'NONE']);
+            let app = yield luminati_app.main(args||[]);
+            let admin = 'http://127.0.0.1:'+www;
             return {app, admin};
         });
 
         const stop_app = pm=>etask(function*stop_app(){
-            pm.app.on('exit', this.continue_fn());
-            pm.app.kill();
-            yield this.wait();
+            yield luminati_app.terminate();
         });
 
-        const t = (name, config, expected)=>it(name, etask._fn(
-        function*(_this){
-            _this.timeout(5000);
+        const t = (name, config, expected)=>it(name, ()=>etask(
+        function*(){
             let args = [];
             const cli = config.cli||{};
             Object.keys(cli).forEach(k=>{
