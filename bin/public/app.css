@@ -14,10 +14,12 @@ body {
     margin: 0;
 }
 .md-nav-bar ._md-nav-button {
-    text-transform: none; width: 100%;
+    text-transform: none;
+    width: 100%;
 }
 .md-nav-bar ._md-nav-button{
-    text-transform: none; margin: 0;
+    text-transform: none;
+    margin: 0;
 }
 .login {
     font-size: 0.85em;
@@ -60,4 +62,7 @@ md-input-container .hint {
 }
 md-checkbox + .hint {
     bottom: 0;
+}
+md-toolbar.def-lum-bgcolor.md-hue-1 {
+    background-color: #0c334d;
 }
