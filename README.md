@@ -43,9 +43,12 @@ $ sudo npm install -g luminati-io/luminati-proxy
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
 NOTEs:
-- v0.4.22 - the rest api /api/proxies the timeout parameter was replaced by 
+- v0.4.22
+  - the rest api /api/proxies the timeout parameter was replaced by 
   idle_timeout
-- v0.2.0 - Default proxy port was changed from 23000 to 24000
+  - the cli/config parameter timeout was replaced by the request_timeout
+- v0.2.0
+  - Default proxy port was changed from 23000 to 24000
 
 ## Usage
 ```sh
