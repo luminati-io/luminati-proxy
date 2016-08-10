@@ -253,10 +253,11 @@ describe('proxy', ()=>{
             t('exclude', false);
         });
         describe('luminati params', ()=>{
-            const t = (name, target)=>it(name, ()=>etask(function*(){
+            const t = (name, target, expected)=>it(name, ()=>etask(function*(){
+                expected = expected||target;
                 l = yield lum(_.assign({}, target, {}));
                 const res = yield l.test();
-                assert_has(res.body.auth, target);
+                assert_has(res.body.auth, expected);
             }));
             t('auth', {customer: 'a', password: 'p'});
             t('zone', {zone: 'abc'});
@@ -265,7 +266,7 @@ describe('proxy', ()=>{
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('DNS', {dns: 'local'});
-            t('timeout', {timeout: 10});
+            t('request_timeout', {request_timeout: 10}, {timeout: 10});
         });
     });
 

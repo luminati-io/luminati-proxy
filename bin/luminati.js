@@ -29,6 +29,7 @@ const countries = require('country-data').countries;
 const yargs = require('yargs/yargs');
 const E = module.exports = {};
 const etask = hutil.etask;
+const qw = hutil.string.qw;
 const ef = etask.ef;
 const file = hutil.file;
 const assign = Object.assign;
@@ -50,7 +51,7 @@ const proxy_fields = {
     city: 'City',
     asn: 'ASN',
     dns: 'DNS resolving (local|remote)',
-    timeout: 'Timeout for request on the super proxy',
+    request_timeout: 'Timeout for request on the super proxy (seconds)',
     pool_size: 'Pool size',
     ssl: 'Enable SSL sniffing',
     max_requests: 'Requests per session',
@@ -265,20 +266,22 @@ const save_config = filename=>{
     fs.writeFileSync(filename||argv.config, s);
 };
 
+const numeric_fields = qw`port session_timeout proxy_count pool_size
+    max_requests`;
 const prepare_config = args=>{
     args = args.map(p=>''+p); // TODO lee hack until yargs accept PR#46
     let _yargs = yargs(args);
     _yargs.usage('Usage: $0 [options] config1 config2 ...')
     .alias({h: 'help', p: 'port'})
     .describe(proxy_fields)
-    .boolean(['history', 'sticky_ip', 'no_dropin'])
+    .boolean(qw`history sticky_ip no_dropin`)
+    .number(numeric_fields)
     .default(defs).help('h').version(()=>`luminati-proxy version: ${version}`);
     _yargs.config(load_json(_yargs.argv.config, true, {})._defaults||{});
     argv = _yargs.argv;
-    opts = _.pick(argv, ['zone', 'country', 'state', 'city', 'asn',
-        'max_requests', 'pool_size', 'session_timeout', 'direct', 'timeout',
-        'direct_include', 'direct_exclude', 'null_response', 'dns', 'resolve',
-        'cid', 'ip', 'log', 'proxy_switch']);
+    opts = _.pick(argv, qw`zone country state city asn max_requests pool_size
+        session_timeout direct idle_timeout request_timeout direct_include
+        direct_exclude null_response dns resolve cid ip log proxy_switch`);
     if (opts.resolve)
     {
         if (typeof opts.resolve=='boolean')
@@ -454,9 +457,7 @@ const proxy_validator = conf=>{
     conf.password = conf.password||argv.password;
     conf.proxy_count = conf.proxy_count||argv.proxy_count;
     conf.proxy = [].concat(conf.proxy||argv.proxy);
-    let numbers = ['port', 'session_timeout', 'proxy_count', 'pool_size',
-        'max_requests'];
-    numbers.forEach(field=>{
+    numeric_fields.forEach(field=>{
         if (conf[field])
             conf[field] = +conf[field];
     });
@@ -522,7 +523,7 @@ const create_proxies = ()=>etask(function*create_proxies(){
 const proxy_create = data=>etask(function*proxy_create(){
     let proxy = data.proxy;
     let server = yield create_proxy(proxy, data.iface);
-    let timeout = data.timeout;
+    let timeout = data.idle_timeout;
     if (timeout)
     {
         server.on('idle', idle=>{

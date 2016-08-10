@@ -42,7 +42,10 @@ $ sudo npm install -g luminati-io/luminati-proxy
 ```sh
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
-NOTE: In versions 0.1.x port 23000 was used by default. In version 0.2.0 this was changed to port 24000.
+NOTEs:
+- v0.4.22 - the rest api /api/proxies the timeout parameter was replaced by 
+  idle_timeout
+- v0.2.0 - Default proxy port was changed from 23000 to 24000
 
 ## Usage
 ```sh
@@ -66,7 +69,7 @@ Options:
   --city             City
   --asn              ASN
   --dns              DNS resolving (local|remote)
-  --timeout          Timeout for request on the super proxy
+  --request_timeout  Timeout for request on the super proxy (seconds)
   --pool_size        Pool size                                      [default: 3]
   --ssl              Enable SSL sniffing
   --max_requests     Requests per session                          [default: 50]
