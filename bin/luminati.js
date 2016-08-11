@@ -281,7 +281,8 @@ const prepare_config = args=>{
     argv = _yargs.argv;
     opts = _.pick(argv, qw`zone country state city asn max_requests pool_size
         session_timeout direct idle_timeout request_timeout direct_include
-        direct_exclude null_response dns resolve cid ip log proxy_switch`);
+        direct_exclude null_response dns resolve cid ip log proxy_switch
+        sticky_ip`);
     if (opts.resolve)
     {
         if (typeof opts.resolve=='boolean')
