@@ -744,6 +744,8 @@ E.main = args=>etask(function*main(){
         yield create_proxies();
         if (!argv.no_dropin)
         {
+            proxies_running['22225'] = yield create_proxy({port: 22225,
+                sticky_ip: true, allow_proxy_auth: true});
         }
         if (argv.history)
         {

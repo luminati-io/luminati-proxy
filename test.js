@@ -207,16 +207,29 @@ describe('proxy', ()=>{
             }
             assert.equal(res.body.auth.session, '24000_1');
         }));
-        it('passthrough', ()=>etask(function*(){
+        it('passthrough_disabled', ()=>etask(function*(){
             l = yield lum({pool_size: 3});
             const res = yield l.test({headers: {
                 'proxy-authorization': 'Basic '+
-                    (new Buffer('lum-customer-user:pass')).toString('base64'),
+                    (new Buffer('lum-customer-user-zone-zzz:pass')).toString('base64'),
             }});
             assert(!l.sessions);
             assert.equal(proxy.history.length, 1);
-            assert.equal(res.body.auth.customer, 'user');
-            assert.equal(res.body.auth.password, 'pass');
+            assert.equal(res.body.auth.customer, customer);
+            assert.equal(res.body.auth.password, password);
+            assert.equal(res.body.auth.zone, 'gen');
+        }));
+        it('passthrough_enabled', ()=>etask(function*(){
+            l = yield lum({pool_size: 3, allow_proxy_auth: true});
+            const res = yield l.test({headers: {
+                'proxy-authorization': 'Basic '+
+                    (new Buffer('lum-customer-user-zone-zzz:pass')).toString('base64'),
+            }});
+            assert(!l.sessions);
+            assert.equal(proxy.history.length, 1);
+            assert.equal(res.body.auth.customer, customer);
+            assert.equal(res.body.auth.password, password);
+            assert.equal(res.body.auth.zone, 'zzz');
         }));
         it('max_requests', ()=>etask(function*(){
             l = yield lum({pool_size: 1, max_requests: 2});
@@ -285,6 +298,7 @@ describe('proxy', ()=>{
             let db_file = temp_file_path('.sqlite3');
             if (!get_param(args, '--database'))
                 args = args.concat(['--database', db_file]);
+            args.push('--no_dropin');
             let app = yield luminati_app.main(args||[]);
             let admin = 'http://127.0.0.1:'+www;
             return {app, admin, db_file};
