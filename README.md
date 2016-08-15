@@ -43,6 +43,10 @@ $ sudo npm install -g luminati-io/luminati-proxy
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
+- v0.4.25
+  - Null response for HTTPS connect requests return error code 501
+- v0.4.24
+  - Drop-in mode is now on by default
 - v0.4.22
   - The rest api /api/proxies the timeout parameter was replaced by 
   idle_timeout
@@ -89,6 +93,7 @@ Options:
   --config           Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
   --iface            Interface or ip to listen on (lo, eth0...)
+  --no_dropin        Disable drop-in mode for migrating                [boolean]
   -h, --help         Show help                                         [boolean]
   --version          Show version number                               [boolean]
   -p, --port         Listening port                             [default: 24000]

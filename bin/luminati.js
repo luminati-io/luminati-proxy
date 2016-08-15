@@ -86,8 +86,8 @@ const defs = E.defs = {
     config: path.join(os.homedir(), '.luminati.json'.substr(is_win?1:0)),
     database: path.join(os.homedir(), '.luminati.sqlite3'.substr(is_win?1:0)),
 };
-let argv, io, db, opts, www_server, proxies = {}, proxies_running = {},
-    config = [];
+let argv = {log: defs.log}, io, db, opts, www_server, proxies = {},
+    proxies_running = {}, config = [], global_handlers = [];
 
 const load_json = (filename, optional, def)=>{
     if (optional && !file.exists(filename))
@@ -134,12 +134,13 @@ const terminate = E.terminate = done=>{
     }
     _.values(proxies_running).forEach(p=>{
         try {
-            p.stop();
+            p.stop(true);
         } catch(e) {
             log('ERROR', 'Failed to stop proxy: '+e.message, {proxy: p,
                 error: e});
         }
     });
+    global_handlers.forEach(g=>g.emitter.removeListener(g.event, g.handler));
     if (db)
         db.db.close(done);
     else
@@ -575,7 +576,7 @@ const proxy_update = (req, res, next)=>etask(function*proxy_update(){
 const proxies_delete_api = (req, res, next)=>etask(
 function*proxies_delete_api(){
     ensure_default(this, next);
-    let ports = (req.body.port||'').split(',');
+    let ports = `${req.body.port||''}`.split(',');
     for (let p of ports)
         yield proxy_delete(p.trim());
     res.status(204).end();
@@ -777,19 +778,30 @@ E.main = args=>etask(function*main(){
 if (is_win)
 {
     const readline = require('readline');
-    readline.createInterface({input: process.stdin, output: process.stdout})
-        .on('SIGINT', ()=>process.emit('SIGINT'));
+    global_handlers.push({
+        emitter: readline.createInterface({input: process.stdin,
+            output: process.stdout}),
+        event: 'SIGINT',
+        handler: ()=>process.emit('SIGINT'),
+    });
 }
-
-['SIGTERM', 'SIGINT'].forEach(sig=>process.on(sig, ()=>{
-    log('INFO', `${sig} recieved`);
-    terminate();
+['SIGTERM', 'SIGINT'].forEach(sig=>global_handlers.push({
+    emitter: process,
+    event: sig,
+    handler: ()=>{
+        log('INFO', `${sig} recieved`);
+        terminate();
+    },
 }));
-
-process.on('uncaughtException', err=>{
-    log('ERROR', `uncaughtException (${version}): ${err}`, err.stack);
-    terminate();
+global_handlers.push({
+    emitter: process,
+    event: 'uncaughtException',
+    handler: err=>{
+        log('ERROR', `uncaughtException (${version}): ${err}`, err.stack);
+        terminate();
+    },
 });
+global_handlers.forEach(g=>g.emitter.on(g.event, g.handler));
 
 if (!module.parent)
    E.main(process.argv.slice(2));

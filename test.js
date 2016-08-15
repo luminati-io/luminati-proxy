@@ -163,21 +163,26 @@ describe('proxy', ()=>{
         yield proxy.close();
         proxy = null;
     }));
+    const test_url = 'http://lumtest.com/test';
     const lum = opt=>etask(function*(){
+        opt = opt||{};
+        if (opt.ssl===true)
+            opt.ssl = _.assign(ssl(), {requestCert: false});
         const l = new Luminati(_.assign({
             proxy: '127.0.0.1',
             customer: customer,
             password: password,
             log: 'NONE',
-        }, opt||{}));
+        }, opt));
         l.test = etask._fn(function*(_this, opt){
             opt = opt||{};
-            opt.url = opt.url||'http://test/';
+            opt.url = opt.url||test_url;
             opt.json = true;
+            opt.rejectUnauthorized = false;
             return yield etask.nfn_apply(_this, '.request',
                 [opt]);
         });
-        yield l.listen(opt&&opt.port||24000);
+        yield l.listen(opt.port||24000);
         return l;
     });
     describe('options', ()=>{
@@ -186,7 +191,7 @@ describe('proxy', ()=>{
         afterEach(()=>etask(function*(){
             if (!l)
                 return;
-            yield l.stop();
+            yield l.stop(true);
             l = null;
         }));
         it('pool', ()=>etask(function*(){
@@ -198,7 +203,7 @@ describe('proxy', ()=>{
                 assert.equal(proxy.history[i].url,
                     'http://lumtest.com/myip.json');
             }
-            assert.equal(proxy.history[3].url, 'http://test/');
+            assert.equal(proxy.history[3].url, test_url);
             assert.equal(l.sessions.length, 3);
             for (let i=0; i<3; i++)
             {
@@ -211,7 +216,8 @@ describe('proxy', ()=>{
             l = yield lum({pool_size: 3});
             const res = yield l.test({headers: {
                 'proxy-authorization': 'Basic '+
-                    (new Buffer('lum-customer-user-zone-zzz:pass')).toString('base64'),
+                    (new Buffer('lum-customer-user-zone-zzz:pass'))
+                    .toString('base64'),
             }});
             assert(!l.sessions);
             assert.equal(proxy.history.length, 1);
@@ -223,7 +229,8 @@ describe('proxy', ()=>{
             l = yield lum({pool_size: 3, allow_proxy_auth: true});
             const res = yield l.test({headers: {
                 'proxy-authorization': 'Basic '+
-                    (new Buffer('lum-customer-user-zone-zzz:pass')).toString('base64'),
+                    (new Buffer('lum-customer-user-zone-zzz:pass'))
+                    .toString('base64'),
             }});
             assert(!l.sessions);
             assert.equal(proxy.history.length, 1);
@@ -242,16 +249,32 @@ describe('proxy', ()=>{
                 }
             }
         }));
-        it('null_response', ()=>etask(function*(){
-            l = yield lum({null_response: 'match'});
-            const res = yield l.test({url: 'http://match.com/'});
-            assert.equal(proxy.history.length, 0);
-            assert.equal(res.statusCode, 200);
-            assert.equal(res.statusMessage, 'NULL');
-            assert.equal(res.body, undefined);
-            yield l.test();
-            assert.equal(proxy.history.length, 1);
-        }));
+        describe('null_response', ()=>{
+            const t = (name, ssl)=>it(name, ()=>etask(function*(){
+                l = yield lum({null_response: 'echo\.json', ssl: ssl});
+                let protocol = ssl?'https':'http';
+                let url = `${protocol}://lumtest.com/echo.json`;
+                const res = yield l.test({url});
+                assert.equal(proxy.history.length, 0);
+                assert.equal(res.statusCode, 200);
+                assert.equal(res.statusMessage, 'NULL');
+                assert.equal(res.body, undefined);
+                yield l.test({url: `${protocol}://lumtest.com/myip.json`});
+                assert.equal(proxy.history.length, 1);
+            }));
+            t('http');
+            // t('https sniffing', true); // TODO lee fix
+            it('https connect', ()=>etask(function*(){
+                l = yield lum({null_response: 'match', log: 'DEBUG'});
+                try {
+                    yield l.test({url: 'https://match.com'});
+                } catch(err) {
+                    assert(/statusCode=501/.test(err.message));
+                }
+                yield l.test();
+                assert.equal(proxy.history.length, 1);
+            }));
+        });
         describe('direct', ()=>{
             const t = (name, expected)=>it(name, ()=>etask(function*(){
                 var direct = {};
@@ -304,11 +327,17 @@ describe('proxy', ()=>{
             return {app, admin, db_file};
         });
 
-        const stop_app = pm=>etask(function*stop_app(){
+        let app;
+        afterEach(()=>etask(function*(){
+            if (!app)
+                return;
             yield luminati_app.terminate();
-            fs.unlink(pm.db_file);
-        });
-
+            fs.unlink(app.db_file);
+            app = null;
+        }));
+        let temp_files;
+        beforeEach(()=>temp_files = []);
+        afterEach(()=>temp_files.forEach(f=>f.done()));
         const t = (name, config, expected)=>it(name, ()=>etask(
         function*(){
             let args = [];
@@ -328,7 +357,7 @@ describe('proxy', ()=>{
             const config_file = temp_file(config.config||[], 'json');
             args.push('--config');
             args.push(config_file.path);
-            let temp_files = [config_file];
+            temp_files.push(config_file);
             if (config.files)
             {
                 config.files.forEach(c=>{
@@ -337,17 +366,11 @@ describe('proxy', ()=>{
                     temp_files.push(file);
                 });
             }
-            const pm = yield start_app(args);
-            let proxies;
-            try {
-                let res = yield etask.nfn_apply(request, [{
-                    url: pm.admin+'/api/proxies_running'
-                }]);
-                proxies = JSON.parse(res.body);
-            } finally {
-                yield stop_app(pm);
-                temp_files.forEach(f=>f.done());
-            }
+            app = yield start_app(args);
+            let res = yield etask.nfn_apply(request, [{
+                url: app.admin+'/api/proxies_running'
+            }]);
+            let proxies = JSON.parse(res.body);
             assert_has(proxies, expected, 'proxies');
         }));
         t.skip = it.skip;
