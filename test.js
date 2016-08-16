@@ -14,7 +14,7 @@ const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
 const Luminati = require('./lib/luminati.js');
-const luminati_app = require('./bin/luminati.js');
+const Manager = require('./bin/luminati.js');
 const customer = 'abc';
 const password = 'xyz';
 
@@ -306,7 +306,7 @@ describe('proxy', ()=>{
         });
     });
 
-    describe('config_load', ()=>{
+    describe('config load', ()=>{
         const get_param = (args, param)=>{
             let i = args.indexOf(param)+1;
             return i?args[i]:null;
@@ -314,7 +314,7 @@ describe('proxy', ()=>{
 
         const start_app = args=>etask(function*start_app(){
             args = args||[];
-            let www = get_param(args, '--www')||luminati_app.defs.www;
+            let www = get_param(args, '--www')||Manager.defs.www;
             let log = get_param(args, '--log');
             if (!log)
                 args = args.concat(['--log', 'NONE']);
@@ -322,16 +322,17 @@ describe('proxy', ()=>{
             if (!get_param(args, '--database'))
                 args = args.concat(['--database', db_file]);
             args.push('--no_dropin');
-            let app = yield luminati_app.main(args||[]);
+            let manager = new Manager(args||[]);
+            yield manager.start();
             let admin = 'http://127.0.0.1:'+www;
-            return {app, admin, db_file};
+            return {manager, admin, db_file};
         });
 
         let app;
         afterEach(()=>etask(function*(){
             if (!app)
                 return;
-            yield luminati_app.terminate();
+            yield app.manager.stop();
             fs.unlink(app.db_file);
             app = null;
         }));
@@ -379,7 +380,7 @@ describe('proxy', ()=>{
             customer: customer,
             password: password,
             port: 24024,
-            //log: 'DEBUG',
+            // log: 'DEBUG',
         };
         t('cli only', {cli: simple_proxy, config: []},
             [_.assign({}, simple_proxy, {persist: true})]);
