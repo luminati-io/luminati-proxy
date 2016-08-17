@@ -8,12 +8,8 @@ const is_win = process.platform=='win32';
 if (is_win)
 {
     const readline = require('readline');
-    this.global_handlers.push({
-        emitter: readline.createInterface({input: process.stdin,
-            output: process.stdout}),
-        event: 'SIGINT',
-        handler: ()=>process.emit('SIGINT'),
-    });
+    readline.createInterface({input: process.stdin, output: process.stdout})
+        .on('SIGINT', ()=>process.emit('SIGINT'));
 }
 const manager = new Manager(process.argv.slice(2));
 etask(function*(){ yield manager.start(); });
