@@ -21,7 +21,7 @@
         </td>
         <td md-cell>
           <md-button class="md-icon-button" ng-click=$vm.edit_proxy(proxy)
-             title=Edit>
+             ng-if=proxy.persist title=Edit>
             <md-icon md-font-library=material-icons>edit</md-icon>
           </md-button>
           <md-button class="md-icon-button" ng-click=$vm.show_stats(proxy)

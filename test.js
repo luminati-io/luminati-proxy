@@ -9,6 +9,7 @@ const url = require('url');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const socks = require('socksv5');
 const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
@@ -22,23 +23,17 @@ const assert_has = (value, has, prefix)=>{
     prefix = prefix||'';
     if (value==has)
         return;
-    if (Array.isArray(has))
+    if (Array.isArray(has) && Array.isArray(value))
     {
         if (value.length < has.length)
             throw new assert.AssertionError(`${prefix}.length is `
                 +`${value.lengthi} should be at least ${has.length}`);
-        for (let i = 0; i < has.length; ++i)
-        {
-            if (has[i]===undefined)
-                continue;
-            assert_has(value[i], has[i], `${prefix}[${i}]`);
-        }
+        has.forEach((h,i)=>assert_has(value[i], h, `${prefix}[${i}]`));
         return;
     }
-    const keys = Object.keys(has);
-    if (keys.length)
+    if (has instanceof Object && value instanceof Object)
     {
-        keys.forEach(k=>
+        Object.keys(has).forEach(k=>
             assert_has(value[k], has[k], `${prefix}.${k}`));
         return;
     }
@@ -152,17 +147,16 @@ const http_proxy = port=>etask(function*(){
     });
     return proxy;
 });
-
+let proxy;
+before(()=>etask(function*(){
+    proxy = yield http_proxy();
+    proxy.fake = true;
+}));
+after(()=>etask(function*(){
+    yield proxy.close();
+    proxy = null;
+}));
 describe('proxy', ()=>{
-    let proxy;
-    before(()=>etask(function*(){
-        proxy = yield http_proxy();
-        proxy.fake = true;
-    }));
-    after(()=>etask(function*(){
-        yield proxy.close();
-        proxy = null;
-    }));
     const test_url = 'http://lumtest.com/test';
     const lum = opt=>etask(function*(){
         opt = opt||{};
@@ -305,42 +299,77 @@ describe('proxy', ()=>{
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
         });
     });
+});
+describe('manager', ()=>{
+    let app, temp_files;
 
-    describe('config load', ()=>{
-        const get_param = (args, param)=>{
-            let i = args.indexOf(param)+1;
-            return i?args[i]:null;
-        };
+    const get_param = (args, param)=>{
+        let i = args.indexOf(param)+1;
+        return i?args[i]:null;
+    };
 
-        const start_app = args=>etask(function*start_app(){
-            args = args||[];
-            let www = get_param(args, '--www')||Manager.defs.www;
-            let log = get_param(args, '--log');
-            if (!log)
-                args = args.concat(['--log', 'NONE']);
-            let db_file = temp_file_path('.sqlite3');
-            if (!get_param(args, '--database'))
-                args = args.concat(['--database', db_file]);
-            args.push('--no_dropin');
-            let manager = new Manager(args||[]);
-            yield manager.start();
-            let admin = 'http://127.0.0.1:'+www;
-            return {manager, admin, db_file};
-        });
+    const start_app = args=>etask(function*start_app(){
+        args = args||[];
+        let www = get_param(args, '--www')||Manager.defs.www;
+        let log = get_param(args, '--log');
+        if (!log)
+            args = args.concat(['--log', 'NONE']);
+        let db_file = temp_file_path('.sqlite3');
+        if (!get_param(args, '--database'))
+            args = args.concat(['--database', db_file]);
+        if (!get_param(args, '--proxy'))
+            args = args.concat(['--proxy', '127.0.0.1']);
+        if (!get_param(args, '--config'))
+        {
+            const config_file = temp_file([], 'json');
+            args.push('--config');
+            args.push(config_file.path);
+            temp_files.push(config_file);
+        }
+        if (!get_param(args, '--customer'))
+          args = args.concat(['--customer', customer]);
+        if (!get_param(args, '--password'))
+          args = args.concat(['--password', password]);
+        args.push('--no_dropin');
+        let manager = new Manager(args||[]);
+        yield manager.start();
+        let admin = 'http://127.0.0.1:'+www;
+        return {manager, admin, db_file};
+    });
 
-        let app;
-        afterEach(()=>etask(function*(){
-            if (!app)
-                return;
-            yield app.manager.stop();
-            fs.unlink(app.db_file);
-            app = null;
+    afterEach(()=>etask(function*(){
+        if (!app)
+            return;
+        yield app.manager.stop();
+        fs.unlink(app.db_file);
+        app = null;
+    }));
+    beforeEach(()=>temp_files = []);
+    afterEach(()=>temp_files.forEach(f=>f.done()));
+    describe('socks', ()=>{
+        beforeEach(()=>proxy.fake = false);
+        afterEach(()=>proxy.fake = true);
+        const t = (name, url, expected)=>it(name, ()=>etask(function*(){
+            let args = [
+                '--socks', '25000:24000',
+            ];
+            app = yield start_app(args);
+            let res = yield etask.nfn_apply(request, [{
+                agent: new socks.HttpAgent({
+                    proxyHost: '127.0.0.1',
+                    proxyPort: 25000,
+                    auths: [socks.auth.None()],
+                }),
+                url: url,
+            }]);
+            let body = JSON.parse(res.body);
+            assert_has(body, expected);
         }));
-        let temp_files;
-        beforeEach(()=>temp_files = []);
-        afterEach(()=>temp_files.forEach(f=>f.done()));
-        const t = (name, config, expected)=>it(name, ()=>etask(
-        function*(){
+        t('http', 'http://lumtest.com/echo.json', {method: 'GET',
+            url:'/echo.json'});
+    });
+    describe('config load', ()=>{
+        const t = (name, config, expected)=>it(name, ()=>etask(function*(){
             let args = [];
             const cli = config.cli||{};
             Object.keys(cli).forEach(k=>{
@@ -369,19 +398,14 @@ describe('proxy', ()=>{
             }
             app = yield start_app(args);
             let res = yield etask.nfn_apply(request, [{
-                url: app.admin+'/api/proxies_running'
+                url: app.admin+'/api/proxies_running',
             }]);
             let proxies = JSON.parse(res.body);
             assert_has(proxies, expected, 'proxies');
         }));
         t.skip = it.skip;
 
-        const simple_proxy = {
-            customer: customer,
-            password: password,
-            port: 24024,
-            // log: 'DEBUG',
-        };
+        const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
             [_.assign({}, simple_proxy, {persist: true})]);
         t('main config only', {config: simple_proxy},

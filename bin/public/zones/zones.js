@@ -37,6 +37,12 @@ function ZonesController($filter, get_json, $interval){
             vm.error = true;
     })
     .catch(function(e){ vm.error = true; });
+    get_json('/api/whitelist').then(function(whitelist){
+        vm.whitelist = whitelist;
+    });
+    get_json('/api/recent_ips').then(function(recent_ips){
+        vm.recent_ips = recent_ips;
+    });
     return vm;
 }
 

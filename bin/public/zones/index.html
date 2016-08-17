@@ -31,6 +31,16 @@
           </tr>
         </tbody>
       </table>
+      <md-card ng-if="vm.whitelist&&vm.whitelist[zone]" flex>
+        <div layout=row>
+          Whitelist: {{ vm.whitelist[zone].join(', ') }}
+        </div>
+      </md-card>
+      <md-card ng-if="vm.recent_ips&&vm.recent_ips[zone]" flex>
+        <div layout=row>
+          Recent IPs: {{ vm.recent_ips[zone].join(', ') }}
+        </div>
+      </md-card>
     </md-table-container>
   </md-card>
 </div>
