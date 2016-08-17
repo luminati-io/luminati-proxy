@@ -144,6 +144,15 @@ function proxiesService($q, $interval, win_config, get_json){
                 if (values.length<len)
                     values.push(0);
             });
+            ['requests', 'codes'].forEach(function(chart){
+                var canvas;
+                if ((canvas = chart_container(chart)) && canvas.att_chart)
+                {
+                    canvas.att_chart.data.datasets = chart_data(
+                        canvas.att_chart_pars).datasets;
+                    canvas.att_chart.update();
+                }
+            });
         }
     }
 }
@@ -282,6 +291,40 @@ function edit_controller($scope, $mdDialog, locals){
     };
 }
 
+function chart_container(chart){
+    return document.getElementsByClassName('chart-'+chart)[0];
+}
+
+function chart_color(color){
+    var rgba = function(color, alpha){
+        return 'rgba('+color.concat(alpha).join(',')+')';
+    };
+    var hex = color.substr(1);
+    var int = parseInt(hex, 16);
+    var r = int>>16&255, g = int>>8&255, b = int&255;
+    color = [r, g, b];
+    return {
+        backgroundColor: rgba(color, 0.2),
+        pointBackgroundColor: rgba(color, 1),
+        pointHoverBackgroundColor: rgba(color, 0.8),
+        borderColor: rgba(color, 1),
+        pointBorderColor: '#fff',
+        pointHoverBorderColor: rgba(color, 1),
+    };
+}
+
+function chart_data(params){
+    return {
+        labels: params.labels,
+        datasets: params.data.map(function(item, i){
+            return angular.extend({
+                data: item,
+                label: params.series[i],
+            }, chart_color(window.Chart.defaults.global.colors[i]));
+        }),
+    };
+}
+
 function stats_controller($scope, $mdDialog, locals){
     var stats = locals.proxy.stats;
     var total = stats.total;
@@ -305,6 +348,34 @@ function stats_controller($scope, $mdDialog, locals){
     $scope.codes_options = _.merge({elements: {line: {fill: false}},
         legend: {display: true, labels: {boxWidth: 6}},
         grindLines: {display: false}}, $scope.options);
+    setTimeout(function(){
+        var charts = [
+            {
+                name: 'requests',
+                labels: $scope.labels,
+                data: $scope.requests,
+                series: $scope.requests_series,
+                options: $scope.options,
+            },
+            {
+                name: 'codes',
+                labels: $scope.labels,
+                data: $scope.codes,
+                series: $scope.codes_series,
+                options: $scope.codes_options,
+            },
+        ];
+        charts.forEach(function(chart){
+            var canvas = chart_container(chart.name);
+            var params = {
+                type: 'line',
+                data: chart_data(chart),
+                options: chart.options,
+            };
+            canvas.att_chart_pars = chart;
+            canvas.att_chart = new window.Chart(canvas, params);
+        });
+    }, 0);
 }
 
 function history_controller($scope, $mdDialog, locals){

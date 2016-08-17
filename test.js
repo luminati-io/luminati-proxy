@@ -9,12 +9,12 @@ const url = require('url');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const ssl = require('./bin/ssl.js');
+const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
 const Luminati = require('./lib/luminati.js');
-const Manager = require('./bin/luminati.js');
+const Manager = require('./lib/manager.js');
 const customer = 'abc';
 const password = 'xyz';
 
