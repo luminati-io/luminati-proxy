@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'angular-material', '../util', 'css!./version'],
+define(['angular', 'angular-material', './util', '_css!css/version'],
 function(angular){
 
 var module = angular.module('lum-version', ['ngMaterial', 'lum-util']);
@@ -37,7 +37,7 @@ function VersionDisplay(){
         restrict: 'E',
         controller: 'version',
         controllerAs: 'ver',
-        templateUrl: '/version/version_display.html',
+        templateUrl: '/inc/version_display.html',
     };
 }
 
@@ -48,7 +48,7 @@ function lum_upgrade_instructions($mdDialog){
         $mdDialog.show({
             title: 'Upgrade Instructions',
             ariaTitle: 'Upgrade Instructions',
-            templateUrl: '/version/upgrade_instructions_dialog.html',
+            templateUrl: '/inc/upgrade_instructions_dialog.html',
             clickOutsideToClose: true,
             controllerAs: 'dialog',
             controller: function(){ return {hide: $mdDialog.hide}; },

@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'css!./health_marker'],
+define(['angular', 'socket.io-client', '_css!css/health_marker'],
 function(angular, io){
 
 var health = angular.module('lum-health-markers', ['ngMaterial']);
@@ -56,7 +56,7 @@ health.directive('healthMarker', function(){
     return {
         restrict: 'E',
         scope: {},
-        templateUrl: '/health_markers/health_marker.html',
+        templateUrl: '/inc/health_marker.html',
         controller: 'HealthMarker',
         controllerAs: '$marker',
         transclude: true

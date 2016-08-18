@@ -1,0 +1,167 @@
+.page-proxies {
+    display: flex;
+    flex-direction: column;
+    bottom: 0;
+}
+.proxies-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.proxies-table td:last-child, .proxies-table th.md-column:last-child {
+    text-align: center;
+    width: 25rem;
+}
+.proxies-table.md-table td.md-cell:first-child,
+.proxies-table.md-table th.md-column:first-child {
+    text-align: center;
+    width: 10rem;
+}
+.proxies-table th:first-child md-icon {
+    display: none;
+}
+.health-markers {
+    padding-top: 25px;
+}
+.proxies-footer {
+    flex-shrink: 0;
+    border-top: 1px solid #ccc;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding-left: 2rem;
+}
+.proxies-tabs md-content {
+    background-color: #fff;
+    min-height: 276px;
+    padding: 18px 18px 0;
+    margin-bottom: -2rem;
+}
+.proxies-graph-container {
+    margin-left: -32px;
+    padding: 0 28px 30px 60px;
+    position: relative;
+    overflow: hidden;
+}
+.proxies-graph-time {
+    position: absolute;
+    left: 60px;
+    bottom: 0;
+    height: 36px;
+    font-size: 12px;
+    background: white;
+}
+.proxies-graph-time:before {
+    content: '';
+    display: block;
+    position: absolute;
+    background: #ff4081;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    height: 4px;
+}
+.proxies-graph-left, .proxies-graph-right {
+    position: absolute;
+    bottom: 10px;
+}
+.proxies-graph-left {
+    left: -6px;
+}
+.proxies-graph-right {
+    right: -6px;
+}
+.proxies-graph-left span, .proxies-graph-right span {
+    position: relative;
+    top: 12px;
+    cursor: default;
+}
+.proxies-graph-left span {
+    left: 12px;
+}
+.proxies-graph-right span {
+    right: 12px;
+}
+.proxies-graph-left:after, .proxies-graph-right:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background: #ff4081;
+    bottom: 6px;
+}
+.proxies-graph-left:after {
+    left: 0;
+}
+.proxies-graph-right:after {
+    right: 0;
+}
+.proxies-graph-indicator {
+    position: absolute;
+    width: 0;
+    height: 0;
+    bottom: 22px;
+    display: none;
+}
+.proxies-graph-time:hover .proxies-graph-indicator {
+    display: block;
+}
+.proxies-graph-indicator:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    height: 2000px;
+    background: #ff4081;
+}
+.proxies-graph-indicator span {
+    position: absolute;
+    display: block;
+    color: white;
+    background: #ff4081;
+    bottom: -8px;
+    border-radius: 8px;
+    height: 16px;
+    line-height: 16px;
+    width: 64px;
+    left: -32px;
+    text-align: center;
+    cursor: default;
+}
+.proxies-history-update {
+    font-size: 14px;
+    margin-left: 20px;
+    text-decoration: underline !important;
+}
+.proxies-history-update:hover, .proxies-history-update:focus {
+    color: white !important;
+}
+.proxies-history {
+    width: auto !important;
+    margin: auto !important;
+}
+.proxies-history td {
+    padding: 4px !important;
+    text-align: center !important;
+}
+.proxies-history td:nth-child(1) {
+    text-align: left !important;
+}
+.proxies-history th {
+    font-size: 13px !important;
+    padding: 4px !important;
+    text-align: center !important;
+}
+.proxies-history tr {
+    height: auto !important;
+}
+.proxies-history-container {
+    padding: 12px;
+}

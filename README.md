@@ -43,6 +43,8 @@ $ sudo npm install -g luminati-io/luminati-proxy
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
+- v0.5.0
+  - NodeJS api has changed its require method: from require('luminati-proxy') to require('luminati-proxy').Luminati
 - v0.4.25
   - Null response for HTTPS connect requests return error code 501
 - v0.4.24
@@ -132,7 +134,7 @@ The API supports both [Promises](https://www.promisejs.org/) and [Generators](ht
 ### Promises
 ```js
 'use strict';
-const Luminati = require('luminati-proxy');
+const Luminati = require('luminati-proxy').Luminati;
 
 const proxy = new Luminati({
     customer: 'CUSTOMER', // your customer name
@@ -158,7 +160,7 @@ proxy.listen(24000, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
 ```js
 'use strict';
 const hutil = require('hutil');
-const Luminati = require('luminati-proxy');
+const Luminati = require('luminati-proxy').Luminati;
 
 hutil.etask(function*(){
     const proxy = new Luminati({

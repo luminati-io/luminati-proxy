@@ -26,8 +26,7 @@ var config = {
     },
     map: {
         '*': {
-            css: '//cdnjs.cloudflare.com/ajax/libs/require-css/0.1.8/'
-            +'css.min.js',
+            _css: cdnjs+'require-css/0.1.8/css.min.js',
         },
     },
 };

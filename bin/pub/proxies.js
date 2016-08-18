@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
 define(['angular', 'socket.io-client', 'lodash', 'moment',
-    'es6_shim', '../util', 'angular-material', 'md-data-table',
-    'angular-chart', '../health_markers/health_markers', 'css!./proxies'],
+    'es6_shim', './util', './consts', 'angular-material', 'md-data-table',
+    'angular-chart', './health_markers', '_css!css/proxies'],
     function(angular, io, _, moment){
 
 var proxies = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
@@ -102,8 +102,14 @@ function proxiesService($q, $interval, win_config, get_json){
     function update_proxies(){
         return get_json('/api/proxies').then(function(proxies){
             proxies.forEach(function(proxy){
-                proxy.stats = {total: {active_requests: [],
-                        status: {codes: ['2xx'], values: [[]]}}, ticks: []};
+                proxy.stats = {
+                    total: {
+                        active_requests: [],
+                        status: {codes: ['2xx'], values: [[]]},
+                        max: {requests: 0, codes: 0},
+                    },
+                    ticks: [],
+                };
             });
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
@@ -124,6 +130,8 @@ function proxiesService($q, $interval, win_config, get_json){
             stats.ticks.push(now);
             var active_requests = _.sumBy(data, 'active_requests');
             stats.total.active_requests.push(active_requests);
+            stats.total.max.requests = Math.max(stats.total.max.requests,
+                active_requests);
             var codes = data.reduce(function(r, host){
                 return r.concat(_.keys(host.status_code)); }, []);
             codes = _.uniq(codes);
@@ -138,6 +146,7 @@ function proxiesService($q, $interval, win_config, get_json){
                 }
                 var total = _.sumBy(data, 'status_code.'+code);
                 status.values[i].push(total);
+                stats.total.max.codes = Math.max(stats.total.max.codes, total);
             });
             var len = stats.ticks.length;
             status.values.forEach(function(values){
@@ -181,8 +190,7 @@ proxies.controller('ProxiesTable', proxy_table);
 proxy_table.$inject = ['lumProxies', 'lumOptColumns',
     'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts', 'get_json'];
 function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
-    consts, get_json)
-{
+    consts, get_json){
     this.$mdDialog = $mdDialog;
     this.$http = $http;
     this.get_json = get_json;
@@ -213,7 +221,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
     var _this = this;
     this.$mdDialog.show({
         controller: edit_controller,
-        templateUrl: '/create/dialog.html',
+        templateUrl: '/inc/dialog.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxy: _proxy, consts: this.consts},
@@ -235,7 +243,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
 proxy_table.prototype.show_stats = function(proxy){
     this.$mdDialog.show({
         controller: stats_controller,
-        templateUrl: '/proxies/dialog_stats.html',
+        templateUrl: '/inc/dialog_stats.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxy: proxy},
@@ -253,7 +261,7 @@ proxy_table.prototype.show_history = function(proxy){
     });
     this.$mdDialog.show({
         controller: history_controller,
-        templateUrl: '/proxies/dialog_history.html',
+        templateUrl: '/inc/dialog_history.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: locals,
@@ -269,16 +277,6 @@ proxy_table.prototype.delete_proxy = function(proxy){
         return _this.$http.delete('/api/proxies/'+proxy.port);
     }).then(function(){ _this.lum_proxies.update(); });
 };
-
-proxies.directive('proxiesTable', function(){
-    return {
-        restrict: 'E',
-        scope: {},
-        templateUrl: '/proxies/proxies_table.html',
-        controller: 'ProxiesTable',
-        controllerAs: '$vm',
-    };
-});
 
 function edit_controller($scope, $mdDialog, locals){
     $scope.form = _.get(locals, 'proxy', {});
@@ -318,11 +316,27 @@ function chart_data(params){
         labels: params.labels,
         datasets: params.data.map(function(item, i){
             return angular.extend({
+                lineTension: 0,
                 data: item,
                 label: params.series[i],
             }, chart_color(window.Chart.defaults.global.colors[i]));
         }),
     };
+}
+
+function chart_mousemove(type, $event, x_ar, t_ar, labels){
+    var rect = $event.currentTarget.getBoundingClientRect();
+    var width = rect.right-rect.left;
+    var x = $event.pageX;
+    x -= rect.left;
+    x -= window.pageXOffset;
+    x = Math.max(0, Math.min(width-1, x));
+    x_ar[type] = x;
+    t_ar[type] = x/width;
+}
+
+function chart_indicator(labels, p){
+    return labels[Math.round(p*(labels.length-1))];
 }
 
 function stats_controller($scope, $mdDialog, locals){
@@ -338,6 +352,9 @@ function stats_controller($scope, $mdDialog, locals){
         animation: {duration: 0},
         elements: {line: {borderWidth: 0.5}, point: {radius: 0}},
         scales: {
+            xAxes: [{
+                display: false,
+            }],
             yAxes: [{
                 position: 'right',
                 gridLines: {display: false},
@@ -348,6 +365,11 @@ function stats_controller($scope, $mdDialog, locals){
     $scope.codes_options = _.merge({elements: {line: {fill: false}},
         legend: {display: true, labels: {boxWidth: 6}},
         grindLines: {display: false}}, $scope.options);
+    $scope.max_values = total.max;
+    $scope.chart_indicator = chart_indicator;
+    $scope.chart_mousemove = chart_mousemove;
+    $scope.chart_x = {requests: 0, codes: 0};
+    $scope.chart_time = {requests: 0, codes: 0};
     setTimeout(function(){
         var charts = [
             {
@@ -378,8 +400,30 @@ function stats_controller($scope, $mdDialog, locals){
     }, 0);
 }
 
-function history_controller($scope, $mdDialog, locals){
+function history_controller($scope, $filter, $mdDialog, locals){
     $scope.data = locals;
+    $scope.history_fields = [
+        {field: 'url', title: 'Url'},
+        {field: 'method', title: 'Method'},
+        {field: 'status_code', title: 'Code'},
+        {field: 'timestamp', title: 'Time'},
+        {field: 'elapsed', title: 'Elapsed'},
+        {field: 'proxy', title: 'Proxy'},
+    ];
+    $scope.history_update = function(){
+        $scope.history = $filter('orderBy')($scope.data.history,
+            $scope.history_sort_field, !$scope.history_sort_asc);
+    };
+    $scope.history_sort = function(field){
+        if ($scope.history_sort_field==field)
+            $scope.history_sort_asc = !$scope.history_sort_asc;
+        else
+        {
+            $scope.history_sort_field = field;
+            $scope.history_sort_asc = true;
+        }
+        $scope.history_update();
+    };
     $scope.hide = $mdDialog.hide.bind($mdDialog);
 }
 

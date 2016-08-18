@@ -1,0 +1,55 @@
+<md-dialog class=dialog-history ng-cloak style="width: 100%">
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>History</h2>
+      <a ng-if=history ng-click=history_update() href="#"
+        class=proxies-history-update>Update</a>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content aria-label=History>
+    <div class=proxies-history-container>
+      <table ng-if="data.history&&data.history.length" md-table
+        class=proxies-history>
+        <thead md-head>
+          <tr md-row>
+            <th ng-repeat="f in history_fields" md-column>
+              <a href=# ng-click=history_sort(f.field)>
+                {{f.title}}
+                <span ng-if=history_sort_field==f.field&&history_sort_asc>
+                  &darr;
+                </span>
+                <span ng-if=history_sort_field==f.field&&!history_sort_asc>
+                  &uarr;
+                </span>
+              </a>
+            </th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr ng-repeat="r in history||data.history" md-row>
+            <td md-cell><a href={{r.url}} target=_blank>{{r.url}}</a></td>
+            <td md-cell>{{r.method}}</td>
+            <td md-cell>{{r.status_code}}</td>
+            <td md-cell><span am-time-ago="r.timestamp"></span></td>
+            <td md-cell>{{r.elapsed}} ms</td>
+            <td md-cell>{{r.proxy}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <md-toolbar ng-if="data.history&&!data.history.length" class=md-warn
+      style="margin: 20px 0">
+      <div class="md-toolbar-tools">
+        <h4 class="md-flex">No history yet</h4>
+      </div>
+    </md-toolbar>
+  </md-dialog-content>
+  <md-dialog-actions layout=row>
+    <span flex></span>
+    <md-button ng-click=hide()>
+      Close
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

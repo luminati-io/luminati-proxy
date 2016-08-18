@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'lodash'],
+define(['angular', 'lodash', './consts'],
 function(angular, _){
 var module = angular.module('lum-consts', ['lum-util']);
 

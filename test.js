@@ -28,7 +28,7 @@ const assert_has = (value, has, prefix)=>{
         if (value.length < has.length)
             throw new assert.AssertionError(`${prefix}.length is `
                 +`${value.lengthi} should be at least ${has.length}`);
-        has.forEach((h,i)=>assert_has(value[i], h, `${prefix}[${i}]`));
+        has.forEach((h, i)=>assert_has(value[i], h, `${prefix}[${i}]`));
         return;
     }
     if (has instanceof Object && value instanceof Object)
@@ -366,7 +366,7 @@ describe('manager', ()=>{
             assert_has(body, expected);
         }));
         t('http', 'http://lumtest.com/echo.json', {method: 'GET',
-            url:'/echo.json'});
+            url: '/echo.json'});
     });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, ()=>etask(function*(){

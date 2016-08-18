@@ -1,9 +1,9 @@
 {
   "name": "luminati-proxy",
-  "version": "0.4.29",
+  "version": "0.5.0",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
-  "main": "lib/luminati.js",
+  "main": "index.js",
   "scripts": {
     "start": "bin/luminati.js",
     "test": "./node_modules/mocha/bin/mocha"

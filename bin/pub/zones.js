@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'angular-material', 'md-data-table', '../util',
-    'css!./zones'],
+define(['angular', 'angular-material', 'md-data-table', './util',
+    '_css!css/zones'],
 function(angular){
 
 var zones = angular.module('lum-zones', ['ngMaterial', 'lum-util']);
