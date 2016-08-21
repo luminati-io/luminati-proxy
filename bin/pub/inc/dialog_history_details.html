@@ -1,0 +1,62 @@
+<md-dialog ng-cloak>
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>History Details</h2>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content aria-label="History Details">
+    <div class=proxies-history-container>
+      <table md-table class=proxies-history>
+        <thead md-head>
+          <tr md-row>
+            <th ng-repeat="f in fields" md-column>{{f.title}}</th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr md-row>
+            <td md-cell><a href={{row.url}} target=_blank>{{row.url}}</a></td>
+            <td md-cell>{{row.method}}</td>
+            <td md-cell>{{row.status_code}}</td>
+            <td md-cell><span am-time-ago="row.timestamp"></span></td>
+            <td md-cell>{{row.elapsed}} ms</td>
+            <td md-cell>{{row.proxy}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table md-table class="proxies-history-headers">
+        <thead md-head>
+          <tr md-row>
+            <th colspan=2 md-column>Request headers</th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr ng-repeat="h in request_headers">
+            <td md-cell>{{h[0]}}</td>
+            <td md-cell>{{h[1]}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table md-table class="proxies-history-headers">
+        <thead md-head>
+          <tr md-row>
+            <th colspan=2 md-column>Response headers</th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr ng-repeat="h in response_headers">
+            <td md-cell>{{h[0]}}</td>
+            <td md-cell>{{h[1]}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </md-dialog-content>
+  <md-dialog-actions layout=row>
+    <span flex></span>
+    <md-button ng-click=hide()>
+      Close
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

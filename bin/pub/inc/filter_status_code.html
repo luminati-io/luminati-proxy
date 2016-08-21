@@ -1,0 +1,26 @@
+<md-dialog ng-cloak>
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>Code Filter</h2>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content class=md-dialog-content aria-label="Code Filter">
+    <md-input-container class=md-block>
+      <label>Response code</label>
+      <md-select md-autofocus ng-keypress="keypress($event)" ng-model=value>
+        <md-option ng-repeat="opt in options" ng-value="opt">
+          {{opt||'No filter'}}
+        </md-option>
+      </md-select>
+    </md-input-container>
+    <p>The requests with this response code will be shown.</p>
+  </md-dialog-content>
+  <md-dialog-actions layout=row>
+    <span flex></span>
+    <md-button ng-click=apply()>
+      Apply
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

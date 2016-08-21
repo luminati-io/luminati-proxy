@@ -190,7 +190,8 @@ proxies.controller('ProxiesTable', proxy_table);
 proxy_table.$inject = ['lumProxies', 'lumOptColumns',
     'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts', 'get_json'];
 function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
-    consts, get_json){
+    consts, get_json)
+{
     this.$mdDialog = $mdDialog;
     this.$http = $http;
     this.get_json = get_json;
@@ -410,9 +411,97 @@ function history_controller($scope, $filter, $mdDialog, locals){
         {field: 'elapsed', title: 'Elapsed'},
         {field: 'proxy', title: 'Proxy'},
     ];
-    $scope.history_update = function(){
-        $scope.history = $filter('orderBy')($scope.data.history,
-            $scope.history_sort_field, !$scope.history_sort_asc);
+    $scope.history_sort_field = 'timestamp';
+    $scope.history_sort_asc = false;
+    $scope.history_filters = {
+        url: '',
+        method: '',
+        status_code: '',
+        timestamp: '',
+        timestamp_min: null,
+        timestamp_max: null,
+        elapsed: '',
+        elapsed_min: '',
+        elapsed_max: '',
+        proxy: '',
+    };
+    $scope.history_update = function(changing_page){
+        if (changing_page)
+        {
+            if ($scope.history_full)
+            {
+                $scope.history = $scope.history_full.slice(
+                    ($scope.history_page-1)*$scope.history_page_size,
+                    Math.min($scope.history_page*$scope.history_page_size,
+                    $scope.history_full.length));
+                return;
+            }
+        }
+        else
+            $scope.history_page = 1;
+        $scope.history = $scope.data.history;
+        if ($scope.history_filters.url)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {url: $scope.history_filters.url});
+        }
+        if ($scope.history_filters.method)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {method: $scope.history_filters.method}, true);
+        }
+        if ($scope.history_filters.status_code)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {status_code: $scope.history_filters.status_code}, true);
+        }
+        if ($scope.history_filters.timestamp_min)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {timestamp: $scope.history_filters.timestamp_min},
+                function(actual, expected){
+                    return actual>=expected;
+                });
+        }
+        if ($scope.history_filters.timestamp_max)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {timestamp: $scope.history_filters.timestamp_max},
+                function(actual, expected){
+                    return actual<=expected;
+                });
+        }
+        if ($scope.history_filters.elapsed_min)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {elapsed: $scope.history_filters.elapsed_min},
+                function(actual, expected){
+                    return actual>=expected;
+                });
+        }
+        if ($scope.history_filters.elapsed_max)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {elapsed: $scope.history_filters.elapsed_max},
+                function(actual, expected){
+                    return actual<=expected;
+                });
+        }
+        if ($scope.history_filters.proxy)
+        {
+            $scope.history = $filter('filter')($scope.history,
+                {proxy: $scope.history_filters.proxy});
+        }
+        $scope.history = $filter('orderBy')($scope.history,
+            $scope.history_sort_field!='proxy' ? $scope.history_sort_field :
+            function(a){
+                return a.proxy.split('.').map(function(v){
+                    return ('00'+v).slice(-3);
+                }).join('.');
+            }, !$scope.history_sort_asc);
+        $scope.history_full = $scope.history;
+        if (changing_page)
+            $scope.history_update(true);
     };
     $scope.history_sort = function(field){
         if ($scope.history_sort_field==field)
@@ -424,6 +513,122 @@ function history_controller($scope, $filter, $mdDialog, locals){
         }
         $scope.history_update();
     };
+    $scope.history_filter = function(field){
+        var options = [];
+        if (field=='method'||field=='status_code')
+        {
+            options = _.uniq(_.map($scope.data.history, field));
+            options.push('');
+            options.sort();
+        }
+        $mdDialog.show({
+            controller: filter_controller(field),
+            templateUrl: '/inc/filter_'+field+'.html',
+            parent: angular.element(document.body),
+            clickOutsideToClose: true,
+            skipHide: true,
+            locals: {
+                filters: $scope.history_filters,
+                update: $scope.history_update,
+                options: options,
+            },
+        });
+    };
+    $scope.history_details = function(row){
+        $mdDialog.show({
+            controller: details_controller,
+            templateUrl: '/inc/dialog_history_details.html',
+            parent: angular.element(document.body),
+            clickOutsideToClose: true,
+            skipHide: true,
+            locals: {row: row, fields: $scope.history_fields},
+        });
+    };
+    $scope.history_page_size = 10;
+    $scope.history_page = 1;
+    $scope.history_pages = function(){
+        var cnt = Math.ceil(
+            ($scope.history_full||$scope.data.history||[]).length
+            /$scope.history_page_size);
+        var result = [];
+        for (var i = 1; i <= cnt; i++)
+            result.push(i);
+        return result;
+    };
+    $scope.history_set_page = function(page){
+        $scope.history_page = page;
+        $scope.history_update(true);
+    };
+    $scope.hide = $mdDialog.hide.bind($mdDialog);
+}
+
+function filter_controller(field){
+    var range = field=='elapsed'||field=='timestamp';
+    return function($scope, $filter, $mdDialog, locals){
+        $scope.value = locals.filters[field];
+        if (range)
+        {
+            $scope.value_min = locals.filters[field+'_min'];
+            $scope.value_max = locals.filters[field+'_max'];
+            if (field=='timestamp'&&$scope.value_max)
+                $scope.value_max.setDate($scope.value_max.getDate()-1);
+        }
+        $scope.options = locals.options;
+        $scope.keypress = function(event){
+            if (event.which==13)
+                $scope.apply();
+        };
+        $scope.apply = function(){
+            if (range)
+            {
+                var display_min, display_max;
+                if (field=='timestamp')
+                {
+                    display_min = moment($scope.value_min)
+                    .format('YYYY/MM/DD');
+                    display_max = moment($scope.value_max)
+                    .format('YYYY/MM/DD');
+                    if ($scope.value_max)
+                        $scope.value_max.setDate($scope.value_max.getDate()+1);
+                }
+                else
+                {
+                    display_min = $scope.value_min;
+                    display_max = $scope.value_max;
+                }
+                if ($scope.value_min&&$scope.value_max)
+                    $scope.value = display_min+'-'+display_max;
+                else if ($scope.value_min)
+                    $scope.value = 'From '+display_min;
+                else if ($scope.value_max)
+                    $scope.value = 'Up to '+display_max;
+                else
+                    $scope.value = '';
+                locals.filters[field+'_min'] = $scope.value_min;
+                locals.filters[field+'_max'] = $scope.value_max;
+            }
+            if ($scope.value!=locals.filters[field])
+            {
+                locals.filters[field] = $scope.value;
+                locals.update();
+            }
+            $mdDialog.hide();
+        };
+        $scope.hide = $mdDialog.hide.bind($mdDialog);
+    };
+}
+
+function details_controller($scope, $filter, $mdDialog, locals){
+    $scope.row = locals.row;
+    var request_headers = JSON.parse($scope.row.request_headers);
+    $scope.request_headers = Object.keys(request_headers).map(function(key){
+            return [key, request_headers[key]];
+        });
+    var response_headers = JSON.parse($scope.row.response_headers);
+    $scope.response_headers = Object.keys(response_headers).map(function(key){
+            return [key, response_headers[key]];
+        });
+    $scope.fields = locals.fields;
     $scope.hide = $mdDialog.hide.bind($mdDialog);
 }
 

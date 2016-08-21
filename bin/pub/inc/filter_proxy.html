@@ -1,0 +1,23 @@
+<md-dialog ng-cloak>
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>Proxy Filter</h2>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content class=md-dialog-content aria-label="Proxy Filter">
+    <md-input-container class=md-block>
+      <label>Proxy or substring</label>
+      <input class=md-input placeholder="No filter" md-autofocus
+        md-select-on-focus ng-keypress="keypress($event)" ng-model=value>
+    </md-input-container>
+    <p>The proxies containing this substring will be shown.</p>
+  </md-dialog-content>
+  <md-dialog-actions layout=row>
+    <span flex></span>
+    <md-button ng-click=apply()>
+      Apply
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

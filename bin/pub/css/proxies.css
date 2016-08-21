@@ -138,30 +138,76 @@
 .proxies-history-update {
     font-size: 14px;
     margin-left: 20px;
-    text-decoration: underline !important;
+    text-decoration: underline;
 }
-.proxies-history-update:hover, .proxies-history-update:focus {
+.proxies-history-update:hover {
     color: white !important;
 }
-.proxies-history {
+.proxies-history, .proxies-history-headers {
     width: auto !important;
     margin: auto !important;
+}
+.proxies-history-headers {
+    margin-top: 20px !important;
 }
 .proxies-history td {
     padding: 4px !important;
     text-align: center !important;
 }
+.proxies-history-headers td {
+    padding: 4px !important;
+    text-align: left !important;
+}
+.proxies-history-headers td:first-child {
+    padding-right: 12px !important;
+    font-weight: bold;
+}
 .proxies-history td:nth-child(1) {
     text-align: left !important;
 }
-.proxies-history th {
+.proxies-history th, .proxies-history-headers th {
     font-size: 13px !important;
     padding: 4px !important;
     text-align: center !important;
 }
-.proxies-history tr {
+.proxies-history tr, .proxies-history-headers tr {
     height: auto !important;
+}
+.proxies-history tr.proxy-history-clickable:hover {
+    background: #eeeeee;
 }
 .proxies-history-container {
     padding: 12px;
+}
+.proxies-history-filter {
+    font-size: 11px;
+    border-bottom: 1px dashed;
+}
+.proxies-date-filter {
+    height: 130px;
+}
+.proxies-date-filter label {
+    color: rgba(0, 0, 0, 0.38);
+    font-size: 12px;
+}
+.proxies-date-filter .md-datepicker-input-container.md-datepicker-focused {
+    border-bottom-width: 1px !important;
+}
+.proxies-history-pages {
+    text-align: center;
+    padding: 10px;
+}
+.proxies-history-pages span {
+    display: inline-block;
+    margin: 0 6px;
+    text-decoration: underline;
+}
+.proxies-history-pages span:hover {
+    color: #ff4081;
+}
+.proxies-history-page-active {
+    font-weight: bold;
+    color: #ff4081;
+    text-decoration: none !important;
+    cursor: default;
 }

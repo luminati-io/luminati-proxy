@@ -298,6 +298,22 @@ describe('proxy', ()=>{
             t('DNS', {dns: 'local'});
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
         });
+        describe('socks', ()=>{
+            const t = (name, url)=>it(name, ()=>etask(function*(){
+                l = yield lum({socks: 25000});
+                let res = yield etask.nfn_apply(request, [{
+                    agent: new socks.HttpAgent({
+                        proxyHost: '127.0.0.1',
+                        proxyPort: 25000,
+                        auths: [socks.auth.None()],
+                    }),
+                    url: url,
+                }]);
+                assert.equal(proxy.history.length, 1);
+                assert.equal(proxy.history[0].url, url);
+            }));
+            t('http', test_url);
+        });
     });
 });
 describe('manager', ()=>{

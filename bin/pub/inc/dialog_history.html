@@ -2,8 +2,8 @@
   <md-toolbar>
     <div class=md-toolbar-tools>
       <h2>History</h2>
-      <a ng-if=history ng-click=history_update() href="#"
-        class=proxies-history-update>Update</a>
+      <span ng-if=history ng-click=history_update()
+        class=proxies-history-update>Update</span>
       <span flex></span>
       <md-button class=md-icon-button ng-click=hide()>X</md-button>
     </div>
@@ -15,7 +15,7 @@
         <thead md-head>
           <tr md-row>
             <th ng-repeat="f in history_fields" md-column>
-              <a href=# ng-click=history_sort(f.field)>
+              <span ng-click=history_sort(f.field)>
                 {{f.title}}
                 <span ng-if=history_sort_field==f.field&&history_sort_asc>
                   &darr;
@@ -23,12 +23,22 @@
                 <span ng-if=history_sort_field==f.field&&!history_sort_asc>
                   &uarr;
                 </span>
-              </a>
+              </span><br>
+              <span class=proxies-history-filter
+                ng-click=history_filter(f.field)>
+                <span ng-if=history_filters[f.field]>
+                  {{history_filters[f.field]}}
+                </span>
+                <span ng-if=!history_filters[f.field]>
+                  No filter
+                </span>
+              </span>
             </th>
           </tr>
         </thead>
         <tbody md-body>
-          <tr ng-repeat="r in history||data.history" md-row>
+          <tr ng-repeat="r in history||data.history|limitTo:history_page_size"
+            ng-click="history_details(r)" class=proxy-history-clickable md-row>
             <td md-cell><a href={{r.url}} target=_blank>{{r.url}}</a></td>
             <td md-cell>{{r.method}}</td>
             <td md-cell>{{r.status_code}}</td>
@@ -39,10 +49,16 @@
         </tbody>
       </table>
     </div>
-    <md-toolbar ng-if="data.history&&!data.history.length" class=md-warn
+    <div ng-if="history_pages().length&gt;1" class=proxies-history-pages>
+      <span class="proxies-history-page-{{p==history_page ? 'active' : 'n'}}"
+        ng-repeat="p in history_pages()" ng-click="history_set_page(p)">
+        {{p}}
+      </span>
+    </div>
+    <md-toolbar ng-if="(history||data.history)&&!(history||data.history).length" class=md-warn
       style="margin: 20px 0">
       <div class="md-toolbar-tools">
-        <h4 class="md-flex">No history yet</h4>
+        <h4 class="md-flex">No records to show</h4>
       </div>
     </md-toolbar>
   </md-dialog-content>
