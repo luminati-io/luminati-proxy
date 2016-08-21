@@ -179,6 +179,16 @@
 .proxies-history-container {
     padding: 12px;
 }
+.proxies-history-content {
+    min-height: 200px;
+}
+.proxies-history-loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+}
 .proxies-history-filter {
     font-size: 11px;
     border-bottom: 1px dashed;

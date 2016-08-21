@@ -28,6 +28,13 @@
             </div>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
+                <label>SOCKS Port</label>
+                <input type=number ng-model=form.socks md-autofocus
+                  placeholder={{consts.socks.def}}>
+              </md-input-container>
+            </div>
+            <div layout-gt-sm=row>
+              <md-input-container class=md-block flex-gt-sm>
                 <label>Zone</label>
                 <input ng-model=form.zone placeholder={{consts.zone.def}}>
               </md-input-container>

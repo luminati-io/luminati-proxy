@@ -43,8 +43,12 @@ $ sudo npm install -g luminati-io/luminati-proxy
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
+- v0.5.2
+  - SOCKS Interface can now be configured using UI and config files for each
+  proxy
 - v0.5.0
-  - NodeJS api has changed its require method: from require('luminati-proxy') to require('luminati-proxy').Luminati
+  - NodeJS api has changed its require method: from require('luminati-proxy')
+  to require('luminati-proxy').Luminati
 - v0.4.25
   - Null response for HTTPS connect requests return error code 501
 - v0.4.24
@@ -88,7 +92,7 @@ Options:
   --direct_exclude   Exclude pattern for direct requests
   --null_response    Url pattern for null response
   --www              Local web port                             [default: 22999]
-  --socks            SOCKS5 port (local:remote)
+  --socks            SOCKS5 port
   --history          Log history                                       [boolean]
   --database         Database path              [default: "~/.luminati.sqlite3"]
   --resolve          Reverse DNS lookup file
