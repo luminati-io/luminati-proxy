@@ -14,8 +14,7 @@ const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
-const Luminati = require('./lib/luminati.js');
-const Manager = require('./lib/manager.js');
+const luminati = require('./index.js');
 const customer = 'abc';
 const password = 'xyz';
 
@@ -162,7 +161,7 @@ describe('proxy', ()=>{
         opt = opt||{};
         if (opt.ssl===true)
             opt.ssl = _.assign(ssl(), {requestCert: false});
-        const l = new Luminati(_.assign({
+        const l = new luminati.Luminati(_.assign({
             proxy: '127.0.0.1',
             customer: customer,
             password: password,
@@ -179,19 +178,27 @@ describe('proxy', ()=>{
         yield l.listen(opt.port||24000);
         return l;
     });
+
+    let l;
+    beforeEach(()=>proxy.history = []);
+    afterEach(()=>etask(function*(){
+        if (!l)
+            return;
+        yield l.stop(true);
+        l = null;
+    }));
+    it('X-Hola-Agent', ()=>etask(function*(){
+        l = yield lum();
+        yield l.test();
+        assert.equal(proxy.history.length, 1);
+        assert.equal(proxy.history[0].headers['x-hola-agent'],
+            luminati.version);
+    }));
     describe('options', ()=>{
-        let l;
-        beforeEach(()=>proxy.history = []);
-        afterEach(()=>etask(function*(){
-            if (!l)
-                return;
-            yield l.stop(true);
-            l = null;
-        }));
         it('pool', ()=>etask(function*(){
             l = yield lum({pool_size: 3});
             const res = yield l.test();
-            assert(proxy.history.length==4);
+            assert.equal(proxy.history.length, 4);
             for (let i=0; i<3; i++)
             {
                 assert.equal(proxy.history[i].url,
@@ -301,7 +308,7 @@ describe('proxy', ()=>{
         describe('socks', ()=>{
             const t = (name, url)=>it(name, ()=>etask(function*(){
                 l = yield lum({socks: 25000});
-                let res = yield etask.nfn_apply(request, [{
+                yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
                         proxyHost: '127.0.0.1',
                         proxyPort: 25000,
@@ -326,7 +333,7 @@ describe('manager', ()=>{
 
     const start_app = args=>etask(function*start_app(){
         args = args||[];
-        let www = get_param(args, '--www')||Manager.defs.www;
+        let www = get_param(args, '--www')||luminati.Manager.defs.www;
         let log = get_param(args, '--log');
         if (!log)
             args = args.concat(['--log', 'NONE']);
@@ -347,7 +354,7 @@ describe('manager', ()=>{
         if (!get_param(args, '--password'))
           args = args.concat(['--password', password]);
         args.push('--no_dropin');
-        let manager = new Manager(args||[]);
+        let manager = new luminati.Manager(args||[]);
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
         return {manager, admin, db_file};
