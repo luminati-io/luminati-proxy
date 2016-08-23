@@ -1,12 +1,12 @@
-.zones .error {
+.info .error {
     text-align: center;
     padding: 50px;
     color: red;
 }
-.zones .error>* {
+.info .error>* {
     margin: 0 auto;
 }
-.zones .error .material-icons {
+.info .error .material-icons {
     position: relative;
     top: -5px;
 }

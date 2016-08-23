@@ -64,6 +64,6 @@ add_angular_module({
     deps: ['angular-material']
 });
 requirejs.config(config);
-requirejs(['./app']);
+requirejs(['app']);
 
 }());

@@ -2,7 +2,9 @@
   <md-toolbar>
     <div class=md-toolbar-tools>
       <h2>History</h2>
-      <span ng-click=history_update() class=proxies-history-update>Update</span>
+      <span ng-click=update(true) class=proxies-history-update>
+        Update
+      </span>
       <span flex></span>
       <md-button class=md-icon-button ng-click=hide()>X</md-button>
     </div>
@@ -10,35 +12,30 @@
   <md-dialog-content aria-label=History class=proxies-history-content>
     <div class=proxies-history-container>
       <md-progress-circular md-diameter="100px" class=proxies-history-loader
-        ng-if="history_show_loader()">
+        ng-if="show_loader()">
       </md-progress-circular>
       <table ng-if="history" md-table class=proxies-history>
         <thead md-head>
           <tr md-row>
-            <th ng-repeat="f in history_fields" md-column>
-              <span ng-click=history_sort(f.field)>
+            <th ng-repeat="f in fields" md-column>
+              <span ng-click=sort(f.field)>
                 {{f.title}}
-                <span ng-if=history_sort_field==f.field&&history_sort_asc>
+                <span ng-if=sort_field==f.field&&sort_asc>
                   &darr;
                 </span>
-                <span ng-if=history_sort_field==f.field&&!history_sort_asc>
+                <span ng-if=sort_field==f.field&&!sort_asc>
                   &uarr;
                 </span>
               </span><br>
-              <span class=proxies-history-filter
-                ng-click=history_filter(f.field)>
-                <span ng-if=history_filters[f.field]>
-                  {{history_filters[f.field]}}
-                </span>
-                <span ng-if=!history_filters[f.field]>
-                  No filter
-                </span>
+              <span class=proxies-history-filter ng-click=filter(f.field)>
+                <span ng-if=filters[f.field]>{{filters[f.field]}}</span>
+                <span ng-if=!filters[f.field]>No filter</span>
               </span>
             </th>
           </tr>
         </thead>
         <tbody md-body>
-          <tr ng-repeat="r in history" ng-click="history_details(r)"
+          <tr ng-repeat="r in history" ng-click="details(r)"
             class=proxy-history-clickable md-row>
             <td md-cell><a href={{r.url}} target=_blank>{{r.url}}</a></td>
             <td md-cell>{{r.method}}</td>
@@ -50,23 +47,16 @@
         </tbody>
       </table>
     </div>
-    <div ng-if="history_pages_cnt&gt;1" class=proxies-history-pages>
-      <span class="proxies-history-page-{{p==history_page ? 'active' : 'n'}}"
-        ng-repeat="p in history_pages()" ng-click="history_set_page(p)">
-        {{p}}
-      </span>
+    <div class=proxies-history-navigation ng-if=show_next()>
+      <md-button ng-click=next() ng-disabled=loading>
+        Show {{page_size}} more entries
+      </md-button>
     </div>
     <md-toolbar ng-if="history&&!history.length" class=md-warn
       style="margin: 20px 0">
       <div class="md-toolbar-tools">
-        <h4 class="md-flex">No records to show</h4>
+        <h4 class="md-flex">No records to display</h4>
       </div>
     </md-toolbar>
   </md-dialog-content>
-  <md-dialog-actions layout=row>
-    <span flex></span>
-    <md-button ng-click=hide()>
-      Close
-    </md-button>
-  </md-dialog-actions>
 </md-dialog>

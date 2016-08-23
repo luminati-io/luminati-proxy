@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'angular-material', './util', '_css!css/version'],
+define(['angular', 'angular-material', 'util', '_css!css/version'],
 function(angular){
 
 var module = angular.module('lum-version', ['ngMaterial', 'lum-util']);

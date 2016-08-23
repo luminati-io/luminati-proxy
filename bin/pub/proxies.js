@@ -1,90 +1,23 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'lodash', 'moment',
-    'es6_shim', './util', './consts', 'angular-material', 'md-data-table',
-    'angular-chart', './health_markers', '_css!css/proxies'],
+define(['angular', 'socket.io-client', 'lodash', 'moment', 'es6_shim',
+    'util', 'angular-material', 'md-data-table', 'angular-chart',
+    'health_markers', '_css!css/proxies'],
     function(angular, io, _, moment){
 
-var proxies = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
-    'chart.js', 'lum-health-markers', 'lum-util', 'lum-consts']);
+var module = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
+    'chart.js', 'lum-health-markers', 'lum-util']);
 
-proxies.value('lumProxyWindowConfig', {
-    refresh: 100,
-    size: 25*1000,
-    delay: 2*1000,
-    history: 50*1000
-});
-
-proxies.service('lumProxyGraphOptions', ProxyGraphOptions);
-ProxyGraphOptions.$inject = ['$interval', 'lumProxyWindowConfig'];
-function ProxyGraphOptions($interval, win_config){
-    this.$interval = $interval;
-    this._config = win_config;
-    this._time_options = {};
-    this._usage_counter = 0;
-    this._options = {
-        animation: {duration: 0},
-        elements: {
-            line: {borderWidth: 0.5},
-            point: {radius: 0},
-        },
-        fill: true,
-        legend: {display: false},
-        scales: {
-            xAxes: [{
-                display: false,
-                type: 'time',
-                time: this._time_options,
-            }],
-            yAxes: [{
-                position: 'right',
-                ticks: {
-                    min: 0,
-                    stepSize: 1,
-                    suggestedMax: 1,
-                    beginAtZero: true,
-                    callback: function(value){
-                        return Math.floor(value)==value ? value : ''; },
-                }
-            }],
-            gridLines: {display: false},
-        },
-        tooltips: {enabled: false},
-    };
-    return this;
+module.factory('lumConsts', ['get_json', '$q', consts_service]);
+function consts_service(get_json, $q){
+    var data = {proxy: {}};
+    get_json('/api/consts').then(function(res){ _.merge(data, res); });
+    return data;
 }
 
-ProxyGraphOptions.prototype.calculate_window = function(){
-    var end = Date.now() - this._config.delay;
-    var start = end - this._config.size;
-    this._time_options.min = start;
-    this._time_options.max = end;
-};
-
-ProxyGraphOptions.prototype.get_options = function(){
-    ++this._usage_counter;
-    if (!this._interval)
-    {
-        this.calculate_window();
-        // XXX lee - causes browser to show as if reloading
-        this._interval = this.$interval(this.calculate_window.bind(this),
-            this._config.refresh);
-    }
-    return this._options;
-};
-
-ProxyGraphOptions.prototype.release_options = function(){
-    if (!--this._usage_counter)
-    {
-        this.$interval.cancel(this._interval);
-        this._interval = null;
-    }
-};
-
-proxies.factory('lumProxies', proxiesService);
-proxiesService.$inject = ['$q', '$interval', 'lumProxyWindowConfig',
-    'get_json'];
-function proxiesService($q, $interval, win_config, get_json){
+module.factory('lumProxies', proxiesService);
+proxiesService.$inject = ['get_json'];
+function proxiesService(get_json){
     var service = {
         subscribe: subscribe,
         proxies: null,
@@ -166,7 +99,7 @@ function proxiesService($q, $interval, win_config, get_json){
     }
 }
 
-proxies.value('lumOptColumns', [
+module.value('lumOptColumns', [
     {key: 'super_proxy', title: 'Host'},
     {key: 'zone', title: 'Zone'},
     {key: 'socks', title: 'SOCKS'},
@@ -187,10 +120,10 @@ proxies.value('lumOptColumns', [
     {key: 'log', title: 'Log Level'},
 ]);
 
-proxies.controller('ProxiesTable', proxy_table);
-proxy_table.$inject = ['lumProxies', 'lumOptColumns',
-    'lumProxyGraphOptions', '$mdDialog', '$http', 'lumConsts', 'get_json'];
-function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
+module.controller('ProxiesTable', proxy_table);
+proxy_table.$inject = ['lumProxies', 'lumOptColumns', '$mdDialog', '$http',
+    'lumConsts', 'get_json'];
+function proxy_table(lum_proxies, opt_columns, $mdDialog, $http,
     consts, get_json)
 {
     this.$mdDialog = $mdDialog;
@@ -202,8 +135,6 @@ function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
     $vm.resolved = false;
     $vm.proxies = [];
     $vm.columns = [];
-    $vm.graph_options = graph_options.get_options();
-    $vm._graph_options_provider = graph_options;
     lum_proxies.subscribe(function(proxies){
         $vm.resolved = true;
         $vm.proxies = proxies;
@@ -214,9 +145,6 @@ function proxy_table(lum_proxies, opt_columns, graph_options, $mdDialog, $http,
         });
     });
 }
-
-proxy_table.prototype.$onDestroy = function(){
-    this._graph_options_provider.release_options(); };
 
 proxy_table.prototype.edit_proxy = function(proxy_old){
     var _proxy = proxy_old ? _.cloneDeep(proxy_old) : null;
@@ -260,6 +188,17 @@ proxy_table.prototype.show_history = function(proxy){
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {port: proxy.port, get_json: this.get_json},
+        fullscreen: true,
+    });
+};
+
+proxy_table.prototype.show_test = function(){
+    this.$mdDialog.show({
+        controller: test_controller,
+        templateUrl: '/inc/dialog_test.html',
+        parent: angular.element(document.body),
+        clickOutsideToClose: true,
+        locals: {proxies: this.proxies, $http: this.$http},
         fullscreen: true,
     });
 };
@@ -396,7 +335,7 @@ function stats_controller($scope, $mdDialog, locals){
 }
 
 function history_controller($scope, $filter, $mdDialog, locals){
-    $scope.history_fields = [
+    $scope.fields = [
         {field: 'url', title: 'Url'},
         {field: 'method', title: 'Method'},
         {field: 'status_code', title: 'Code'},
@@ -404,9 +343,9 @@ function history_controller($scope, $filter, $mdDialog, locals){
         {field: 'elapsed', title: 'Elapsed'},
         {field: 'proxy', title: 'Proxy'},
     ];
-    $scope.history_sort_field = 'timestamp';
-    $scope.history_sort_asc = false;
-    $scope.history_filters = {
+    $scope.sort_field = 'timestamp';
+    $scope.sort_asc = false;
+    $scope.filters = {
         url: '',
         method: '',
         status_code: '',
@@ -418,71 +357,73 @@ function history_controller($scope, $filter, $mdDialog, locals){
         elapsed_max: '',
         proxy: '',
     };
-    $scope.history_page = 1;
-    $scope.history_update = function(changing_page){
-        if (!changing_page)
-            $scope.history_page = 1;
+    $scope.page = 1;
+    $scope.page_size = 10;
+    $scope.update = function(preserving_page){
+        if (!preserving_page)
+            $scope.page = 1;
         var params = {
-            page: $scope.history_page,
-            sort: $scope.history_sort_field,
+            count: $scope.page*$scope.page_size,
+            sort: $scope.sort_field,
         };
-        if (!$scope.history_sort_asc)
+        if (!$scope.sort_asc)
             params.sort_desc = 1;
-        if ($scope.history_filters.url)
-            params.url = $scope.history_filters.url;
-        if ($scope.history_filters.method)
-            params.method = $scope.history_filters.method;
-        if ($scope.history_filters.status_code)
-            params.status_code = $scope.history_filters.status_code;
-        if ($scope.history_filters.timestamp_min)
+        if ($scope.filters.url)
+            params.url = $scope.filters.url;
+        if ($scope.filters.method)
+            params.method = $scope.filters.method;
+        if ($scope.filters.status_code)
+            params.status_code = $scope.filters.status_code;
+        if ($scope.filters.timestamp_min)
         {
-            params.timestamp_min = $scope.history_filters.timestamp_min
+            params.timestamp_min = $scope.filters.timestamp_min
             .getTime();
         }
-        if ($scope.history_filters.timestamp_max)
+        if ($scope.filters.timestamp_max)
         {
-            params.timestamp_max = $scope.history_filters.timestamp_max
+            params.timestamp_max = $scope.filters.timestamp_max
             .getTime();
         }
-        if ($scope.history_filters.elapsed_min)
-            params.elapsed_min = $scope.history_filters.elapsed_min;
-        if ($scope.history_filters.elapsed_max)
-            params.elapsed_max = $scope.history_filters.elapsed_max;
-        if ($scope.history_filters.proxy)
-            params.proxy = $scope.history_filters.proxy;
+        if ($scope.filters.elapsed_min)
+            params.elapsed_min = $scope.filters.elapsed_min;
+        if ($scope.filters.elapsed_max)
+            params.elapsed_max = $scope.filters.elapsed_max;
+        if ($scope.filters.proxy)
+            params.proxy = $scope.filters.proxy;
         var params_arr = [];
         for (var param in params)
-            params_arr.push(param+'='+params[param]);
+            params_arr.push(param+'='+encodeURIComponent(params[param]));
         var url = '/api/history/'+locals.port+'?'+params_arr.join('&');
-        $scope.history_loading = new Date();
+        $scope.loading = new Date();
         locals.get_json(url).then(function(history){
-            $scope.history_loading = null;
-            $scope.history = history.rows;
-            $scope.history_pages_cnt = history.pages;
-            $scope.history_page = history.page;
-            $scope.history_methods = history.methods;
-            $scope.history_status_codes = history.status_codes;
+            $scope.loading = null;
+            $scope.loading_page = false;
+            $scope.history = history;
         });
     };
-    $scope.history_show_loader = function(){
-        return $scope.history_loading&&new Date()-$scope.history_loading>500;
+    $scope.show_loader = function(){
+        return $scope.loading&&new Date()-$scope.loading>500;
     };
-    $scope.history_sort = function(field){
-        if ($scope.history_sort_field==field)
-            $scope.history_sort_asc = !$scope.history_sort_asc;
+    $scope.show_next = function(){
+        return $scope.loading_page||$scope.history&&
+        $scope.history.length>=$scope.page*$scope.page_size;
+    };
+    $scope.sort = function(field){
+        if ($scope.sort_field==field)
+            $scope.sort_asc = !$scope.sort_asc;
         else
         {
-            $scope.history_sort_field = field;
-            $scope.history_sort_asc = true;
+            $scope.sort_field = field;
+            $scope.sort_asc = true;
         }
-        $scope.history_update();
+        $scope.update();
     };
-    $scope.history_filter = function(field){
+    $scope.filter = function(field){
         var options;
         if (field=='method')
-            options = $scope.history_methods;
-        else if (field=='status_code')
-            options = $scope.history_status_codes;
+            options = ['', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY',
+                'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK',
+                'PROPFIND', 'VIEW', 'TRACE', 'CONNECT'];
         $mdDialog.show({
             controller: filter_controller(field),
             templateUrl: '/inc/filter_'+field+'.html',
@@ -490,34 +431,29 @@ function history_controller($scope, $filter, $mdDialog, locals){
             clickOutsideToClose: true,
             skipHide: true,
             locals: {
-                filters: $scope.history_filters,
-                update: $scope.history_update,
+                filters: $scope.filters,
+                update: $scope.update,
                 options: options,
             },
         });
     };
-    $scope.history_details = function(row){
+    $scope.details = function(row){
         $mdDialog.show({
             controller: details_controller,
             templateUrl: '/inc/dialog_history_details.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,
-            locals: {row: row, fields: $scope.history_fields},
+            locals: {row: row, fields: $scope.fields},
         });
     };
-    $scope.history_pages = function(){
-        var result = [];
-        for (var i = 1; i <= $scope.history_pages_cnt; i++)
-            result.push(i);
-        return result;
-    };
-    $scope.history_set_page = function(page){
-        $scope.history_page = page;
-        $scope.history_update(true);
+    $scope.next = function(){
+        $scope.loading_page = true;
+        $scope.page++;
+        $scope.update(true);
     };
     $scope.hide = $mdDialog.hide.bind($mdDialog);
-    $scope.history_update();
+    $scope.update();
 }
 
 function filter_controller(field){
@@ -587,6 +523,49 @@ function details_controller($scope, $filter, $mdDialog, locals){
             return [key, response_headers[key]];
         });
     $scope.fields = locals.fields;
+    $scope.hide = $mdDialog.hide.bind($mdDialog);
+}
+
+function test_controller($scope, $filter, $mdDialog, locals){
+    $scope.proxies = locals.proxies;
+    $scope.methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD',
+        'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND',
+        'VIEW'];
+    $scope.request = {};
+    $scope.go = function(proxy, url, method, headers, body){
+        var headers_obj = {};
+        headers.forEach(function(h){ headers_obj[h.key] = h.value; });
+        var req = {
+            method: 'POST',
+            url: '/api/test/'+(proxy||0),
+            data: {
+                url: url,
+                method: method,
+                headers: headers_obj,
+                body: body,
+            },
+        };
+        $scope.loading = true;
+        locals.$http(req).then(function(r){
+            $scope.loading = false;
+            r = r.data;
+            if (!r.error)
+            {
+                r.response.headers = Object.keys(r.response.headers).sort()
+                .map(function(key){
+                    return [key, r.response.headers[key]];
+                });
+            }
+            $scope.request = r;
+        });
+    };
+    $scope.headers = [];
+    $scope.add_header = function(){
+        $scope.headers.push({key: '', value: ''});
+    };
+    $scope.remove_header = function(index){
+        $scope.headers.splice(index, 1);
+    };
     $scope.hide = $mdDialog.hide.bind($mdDialog);
 }
 

@@ -181,6 +181,7 @@
 }
 .proxies-history-content {
     min-height: 200px;
+    padding-bottom: 12px;
 }
 .proxies-history-loader {
     position: absolute;
@@ -203,21 +204,47 @@
 .proxies-date-filter .md-datepicker-input-container.md-datepicker-focused {
     border-bottom-width: 1px !important;
 }
-.proxies-history-pages {
+.proxies-history-navigation {
     text-align: center;
-    padding: 10px;
 }
-.proxies-history-pages span {
-    display: inline-block;
-    margin: 0 6px;
-    text-decoration: underline;
+.proxies-test-content md-input-container {
+    margin-bottom: 0;
 }
-.proxies-history-pages span:hover {
-    color: #ff4081;
+.proxies-test-content md-input-container .md-errors-spacer:empty {
+    display: none;
 }
-.proxies-history-page-active {
+.proxies-test-port, .proxies-test-method {
+    max-width: 200px;
+}
+.proxies-test-button {
+    position: relative;
+    text-align: center;
+    height: 50px;
+}
+.proxies-test-button .md-button {
+    width: 200px;
+}
+.proxies-test-button md-progress-circular {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+}
+.proxies-test-body {
+    margin-top: 20px;
+}
+.proxies-test-error {
+    margin-top: 20px;
+    color: red;
     font-weight: bold;
-    color: #ff4081;
-    text-decoration: none !important;
-    cursor: default;
+}
+.proxies-test-headers, .proxies-test-body {
+    margin: 12px 0 6px 0;
+}
+.proxies-test-header {
+    max-width: 200px;
+}
+.proxies-test-rm-header {
+    margin-right: 0;
 }

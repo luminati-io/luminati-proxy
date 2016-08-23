@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
 define(['angular', 'angular-material', 'angular-ui-router', 'util',
-    './proxies', './zones', './version', './cred',
-    './consts', '_css!css/app', 'angular-chart', 'angular-moment'],
+    'proxies', 'info', 'version', 'cred', '_css!css/app', 'angular-chart',
+    'angular-moment'],
 function(angular){
 
 var module = angular.module('lumLocal', ['ngMaterial', 'ui.router', 'lum-util',
-    'lum-proxies', 'lum-zones', 'lum-version', 'lum-cred', 'angularMoment']);
+    'lum-proxies', 'lum-info', 'lum-version', 'lum-cred', 'angularMoment']);
 module.config(route_config);
 function route_config($stateProvider, $urlRouterProvider){
     $urlRouterProvider.otherwise('/proxies');
@@ -18,9 +18,9 @@ function route_config($stateProvider, $urlRouterProvider){
         url: '/cred',
         templateUrl: '/inc/cred.html',
     })
-    .state('zones', {
-        url: '/zones',
-        templateUrl: '/inc/zones.html',
+    .state('info', {
+        url: '/info',
+        templateUrl: '/inc/info.html',
     });
 }
 

@@ -9,11 +9,8 @@
   <md-dialog-content class=md-dialog-content aria-label="Code Filter">
     <md-input-container class=md-block>
       <label>Response code</label>
-      <md-select md-autofocus ng-keypress="keypress($event)" ng-model=value>
-        <md-option ng-repeat="opt in options" ng-value="opt">
-          {{opt||'No filter'}}
-        </md-option>
-      </md-select>
+      <input type=number class=md-input placeholder="No filter" md-autofocus
+        md-select-on-focus ng-keypress="keypress($event)" ng-model=value>
     </md-input-container>
     <p>The requests with this response code will be shown.</p>
   </md-dialog-content>

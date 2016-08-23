@@ -1,14 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'angular-material', 'md-data-table', './util',
-    '_css!css/zones'],
+define(['angular', 'angular-material', 'md-data-table', 'util',
+    '_css!css/info'],
 function(angular){
 
-var zones = angular.module('lum-zones', ['ngMaterial', 'lum-util']);
+var module = angular.module('lum-info', ['ngMaterial', 'lum-util']);
 
-zones.controller('zones', ZonesController);
-ZonesController.$inject = ['$filter', 'get_json', '$interval'];
-function ZonesController($filter, get_json, $interval){
+module.controller('info', InfoController);
+InfoController.$inject = ['$filter', 'get_json', '$interval'];
+function InfoController($filter, get_json, $interval){
     var vm = this;
     var today = new Date();
     var twoDaysAgo = (new Date()).setDate(today.getDate()-2);
@@ -46,7 +46,7 @@ function ZonesController($filter, get_json, $interval){
     return vm;
 }
 
-zones.filter('requests', requestsFilter);
+module.filter('requests', requestsFilter);
 requestsFilter.$inject = ['$filter'];
 function requestsFilter($filter){
     var numberFilter = $filter('number');
@@ -63,7 +63,7 @@ function requestsFilter($filter){
 }
 
 var units = [' bytes', ' kB', ' MB', ' GB', ' TB', ' PB'];
-zones.filter('bytes', bytesFilter);
+module.filter('bytes', bytesFilter);
 bytesFilter.$inject = ['$filter'];
 function bytesFilter($filter){
     var numberFilter = $filter('number');

@@ -113,6 +113,8 @@ A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy
 $ docker pull luminati/luminati-proxy
 
 $ docker run luminati/luminati-proxy
+
+$ docker run luminati/luminati-proxy luminati --version
 ```
 
 ## FAQ
@@ -163,24 +165,20 @@ proxy.listen(24000, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
 ### Generators
 ```js
 'use strict';
-const hutil = require('hutil');
+const etask = require('hutil').etask;
 const Luminati = require('luminati-proxy').Luminati;
 
-hutil.etask(function*(){
+etask(function*(){
     const proxy = new Luminati({
         customer: 'CUSTOMER', // your customer name
         password: 'PASSWORD', // your password
         zone: 'gen', // zone to use
         proxy_count: 5, //minimum number of proxies to use for distributing requests
     });
-    proxy.on('response', res=>console.log('Response:', res)); // dump some stats to screen
     yield proxy.listen(24000, '127.0.0.1'); // port and ip to listen to
-    proxy.request('http://lumtest.com/myip', (err, res, body)=>{
-        if (err)
-            console.log('Error:', err);
-        else
-            console.log('Result:', res.statusCode, body);
-        proxy.stop();
-    });
+    let res = yield etask.nfn_apply(proxy, '.request',
+        ['http://lumtest.com/myip']);
+    console.log('Result:', res.statusCode, res.body);
+    yield proxy.stop();
 });
 ```
