@@ -12,15 +12,15 @@ function route_config($stateProvider, $urlRouterProvider){
     $urlRouterProvider.otherwise('/proxies');
     $stateProvider.state('proxies', {
         url: '/proxies',
-        templateUrl: '/inc/proxies.html',
+        templateUrl: '/proxies.html',
     })
     .state('cred', {
         url: '/cred',
-        templateUrl: '/inc/cred.html',
+        templateUrl: '/cred.html',
     })
     .state('info', {
         url: '/info',
-        templateUrl: '/inc/info.html',
+        templateUrl: '/info.html',
     });
 }
 

@@ -178,10 +178,16 @@
 }
 .proxies-history-container {
     padding: 12px;
+    max-height: 100%;
+    overflow: auto;
+}
+.proxies-history-cc {
+    height: 100%;
 }
 .proxies-history-content {
     min-height: 200px;
     padding-bottom: 12px;
+    position: relative;
 }
 .proxies-history-loader {
     position: absolute;
@@ -204,8 +210,13 @@
 .proxies-date-filter .md-datepicker-input-container.md-datepicker-focused {
     border-bottom-width: 1px !important;
 }
+.proxies-history-tools {
+    max-width: 250px;
+    padding: 12px;
+    height: 100%;
+}
 .proxies-history-navigation {
-    text-align: center;
+    margin-bottom: 40px;
 }
 .proxies-test-content md-input-container {
     margin-bottom: 0;

@@ -56,7 +56,7 @@ health.directive('healthMarker', function(){
     return {
         restrict: 'E',
         scope: {},
-        templateUrl: '/inc/health_marker.html',
+        templateUrl: '/health_marker.html',
         controller: 'HealthMarker',
         controllerAs: '$marker',
         transclude: true

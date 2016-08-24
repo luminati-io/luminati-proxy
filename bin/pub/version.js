@@ -37,7 +37,7 @@ function VersionDisplay(){
         restrict: 'E',
         controller: 'version',
         controllerAs: 'ver',
-        templateUrl: '/inc/version_display.html',
+        templateUrl: '/version_display.html',
     };
 }
 
@@ -48,7 +48,7 @@ function lum_upgrade_instructions($mdDialog){
         $mdDialog.show({
             title: 'Upgrade Instructions',
             ariaTitle: 'Upgrade Instructions',
-            templateUrl: '/inc/upgrade_instructions_dialog.html',
+            templateUrl: '/upgrade.html',
             clickOutsideToClose: true,
             controllerAs: 'dialog',
             controller: function(){ return {hide: $mdDialog.hide}; },

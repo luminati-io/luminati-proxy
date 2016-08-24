@@ -151,7 +151,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
     var _this = this;
     this.$mdDialog.show({
         controller: edit_controller,
-        templateUrl: '/inc/dialog_settings.html',
+        templateUrl: '/settings.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxy: _proxy, consts: this.consts},
@@ -173,7 +173,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
 proxy_table.prototype.show_stats = function(proxy){
     this.$mdDialog.show({
         controller: stats_controller,
-        templateUrl: '/inc/dialog_stats.html',
+        templateUrl: '/stats.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxy: proxy},
@@ -184,7 +184,7 @@ proxy_table.prototype.show_stats = function(proxy){
 proxy_table.prototype.show_history = function(proxy){
     this.$mdDialog.show({
         controller: history_controller,
-        templateUrl: '/inc/dialog_history.html',
+        templateUrl: '/history.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {port: proxy.port, get_json: this.get_json},
@@ -195,7 +195,7 @@ proxy_table.prototype.show_history = function(proxy){
 proxy_table.prototype.show_test = function(){
     this.$mdDialog.show({
         controller: test_controller,
-        templateUrl: '/inc/dialog_test.html',
+        templateUrl: '/test.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxies: this.proxies, $http: this.$http},
@@ -359,11 +359,11 @@ function history_controller($scope, $filter, $mdDialog, locals){
     };
     $scope.page = 1;
     $scope.page_size = 10;
-    $scope.update = function(preserving_page){
+    $scope.update = function(preserving_page, export_type){
         if (!preserving_page)
             $scope.page = 1;
         var params = {
-            count: $scope.page*$scope.page_size,
+            count: export_type=='all' ? -1 : $scope.page*$scope.page_size,
             sort: $scope.sort_field,
         };
         if (!$scope.sort_asc)
@@ -393,16 +393,24 @@ function history_controller($scope, $filter, $mdDialog, locals){
         var params_arr = [];
         for (var param in params)
             params_arr.push(param+'='+encodeURIComponent(params[param]));
-        var url = '/api/history/'+locals.port+'?'+params_arr.join('&');
-        $scope.loading = new Date();
-        locals.get_json(url).then(function(history){
-            $scope.loading = null;
-            $scope.loading_page = false;
-            $scope.history = history;
-        });
+        var url = '/api/'+(export_type ? 'har' : 'history')+'/'+locals.port
+        +'?'+params_arr.join('&');
+        if (export_type)
+        {
+            window.location = url;
+        }
+        else
+        {
+            $scope.loading = true;
+            locals.get_json(url).then(function(history){
+                $scope.loading = false;
+                $scope.loading_page = false;
+                $scope.history = history;
+            });
+        }
     };
     $scope.show_loader = function(){
-        return $scope.loading&&new Date()-$scope.loading>500;
+        return $scope.loading;
     };
     $scope.show_next = function(){
         return $scope.loading_page||$scope.history&&
@@ -426,7 +434,7 @@ function history_controller($scope, $filter, $mdDialog, locals){
                 'PROPFIND', 'VIEW', 'TRACE', 'CONNECT'];
         $mdDialog.show({
             controller: filter_controller(field),
-            templateUrl: '/inc/filter_'+field+'.html',
+            templateUrl: '/filter_'+field+'.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,
@@ -440,7 +448,7 @@ function history_controller($scope, $filter, $mdDialog, locals){
     $scope.details = function(row){
         $mdDialog.show({
             controller: details_controller,
-            templateUrl: '/inc/dialog_history_details.html',
+            templateUrl: '/history_details.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,
@@ -451,6 +459,10 @@ function history_controller($scope, $filter, $mdDialog, locals){
         $scope.loading_page = true;
         $scope.page++;
         $scope.update(true);
+    };
+    $scope.export_type = 'visible';
+    $scope.export = function(){
+        $scope.update(true, $scope.export_type);
     };
     $scope.hide = $mdDialog.hide.bind($mdDialog);
     $scope.update();
