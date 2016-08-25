@@ -3,11 +3,11 @@
 define(['angular', 'angular-material', 'util', '_css!css/cred'],
 function(angular){
 
-var module = angular.module('lum-cred', ['ngMaterial', 'lum-util']);
+var module = angular.module('cred', ['ngMaterial', 'util']);
 
-module.service('credentials', CredentialsService);
-CredentialsService.$inject = ['get_json', '$http', '$q'];
-function CredentialsService(get_json, $http, $q){
+module.service('credentials', credentials_service);
+credentials_service.$inject = ['get_json', '$http', '$q'];
+function credentials_service(get_json, $http, $q){
     var has_credentials = $q.defer();
     this.has_credentials = has_credentials.promise;
     this.$http = $http;
@@ -18,11 +18,11 @@ function CredentialsService(get_json, $http, $q){
     return this;
 }
 
-CredentialsService.prototype.get = function(){
+credentials_service.prototype.get = function(){
     return this.get_json('/api/creds');
 };
 
-CredentialsService.prototype.save = function(opt){
+credentials_service.prototype.save = function(opt){
     var _this = this;
     var req = this.$http.post('/api/creds', {
         customer: opt.customer,
@@ -32,9 +32,9 @@ CredentialsService.prototype.save = function(opt){
     return req;
 };
 
-module.controller('credentials', CredentialsController);
-CredentialsController.$inject = ['credentials', '$state'];
-function CredentialsController(credentials, $state){
+module.controller('credentials', credentials_controller);
+credentials_controller.$inject = ['credentials', '$state'];
+function credentials_controller(credentials, $state){
     var vm = this;
     vm.service = credentials;
     vm.$state = $state;
@@ -44,7 +44,7 @@ function CredentialsController(credentials, $state){
     });
 }
 
-CredentialsController.prototype.save = function(){
+credentials_controller.prototype.save = function(){
     var vm = this;
     vm.service.save({
         customer: this.customer,

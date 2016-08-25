@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "body-parser": "^1.15.1",
-    "country-data": "^0.0.27",
+    "country-data": "^0.0.28",
     "express": "^4.13.4",
     "humanize": "0.0.9",
     "hutil": "^0.1.6",

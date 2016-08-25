@@ -66,14 +66,13 @@ $ luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
-  --log              Log level (NONE|ERROR|WARNING|INFO|DEBUG)
-                                                            [default: "WARNING"]
+  --log              Log level (NONE|ERROR|WARNING|INFO|DEBUG)[default: "ERROR"]
   --customer         Customer
   --password         Password
   --proxy            Super proxy ip or country (us|gb|nl)
                                                  [default: "zproxy.luminati.io"]
-  --proxy_count      Minimum number of super proxies to use         [default: 1]
-  --secure_proxy     Use SSL when accessing super proxy
+  --proxy_count      Minimum number of super proxies to use[number] [default: 1]
+  --secure_proxy     Use SSL when accessing super proxy                [boolean]
   --sticky_ip        Use same session as much as possible to maintain IP
                                                                        [boolean]
   --zone             Zone                                       [default: "gen"]
@@ -82,15 +81,16 @@ Options:
   --city             City
   --asn              ASN
   --dns              DNS resolving (local|remote)
+  --debug            Luminati request debug info (none|full)
   --request_timeout  Timeout for request on the super proxy (seconds)
-  --pool_size        Pool size                                      [default: 3]
-  --ssl              Enable SSL sniffing
-  --max_requests     Requests per session                          [default: 50]
+  --pool_size        Pool size                             [number] [default: 3]
+  --ssl              Enable SSL sniffing                               [boolean]
+  --max_requests     Requests per session                 [number] [default: 50]
   --proxy_switch     Automatically switch proxy on failure          [default: 5]
-  --session_timeout  Session establish timeout                   [default: 5000]
+  --session_timeout  Session establish timeout          [number] [default: 5000]
   --direct_include   Include pattern for direct requests
   --direct_exclude   Exclude pattern for direct requests
-  --null_response    Url pattern for null response
+  --null_response    URL pattern for null response
   --www              Local web port                             [default: 22999]
   --socks            SOCKS5 port
   --history          Log history                                       [boolean]
@@ -98,11 +98,11 @@ Options:
   --resolve          Reverse DNS lookup file
   --config           Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
-  --iface            Interface or ip to listen on (lo, eth0...)
+  --iface            Interface or ip to listen on (lo|eth0|...)
   --no_dropin        Disable drop-in mode for migrating                [boolean]
   -h, --help         Show help                                         [boolean]
   --version          Show version number                               [boolean]
-  -p, --port         Listening port                             [default: 24000]
+  -p, --port         Listening port                    [number] [default: 24000]
 ```
 
 ### Docker

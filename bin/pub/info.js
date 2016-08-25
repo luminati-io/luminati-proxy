@@ -4,11 +4,11 @@ define(['angular', 'angular-material', 'md-data-table', 'util',
     '_css!css/info'],
 function(angular){
 
-var module = angular.module('lum-info', ['ngMaterial', 'lum-util']);
+var module = angular.module('info', ['ngMaterial', 'util']);
 
-module.controller('info', InfoController);
-InfoController.$inject = ['$filter', 'get_json', '$interval'];
-function InfoController($filter, get_json, $interval){
+module.controller('info', info_controller);
+info_controller.$inject = ['$filter', 'get_json', '$interval'];
+function info_controller($filter, get_json, $interval){
     var vm = this;
     var today = new Date();
     var twoDaysAgo = (new Date()).setDate(today.getDate()-2);

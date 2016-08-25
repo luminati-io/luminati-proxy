@@ -2,11 +2,11 @@
 'use strict'; /*jslint browser:true*/
 define(['angular'], function(angular){
 
-var module = angular.module('lum-util', ['ng']);
+var module = angular.module('util', ['ng']);
 
-module.factory('get_json', get_json_factory);
-get_json_factory.$inject = ['$q', '$http'];
-function get_json_factory($q, $http){
+module.factory('get_json', get_json_service);
+get_json_service.$inject = ['$q', '$http'];
+function get_json_service($q, $http){
     return function get_json(url){
         var deferred = $q.defer();
         $http.get(url)

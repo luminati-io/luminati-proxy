@@ -1,15 +1,15 @@
-health-marker {
+health {
     display: inline-block;
 }
-.health-marker {
+.health {
     display: flex;
     align-items: center;
 }
-.health-marker-icon {
+.health-icon {
     margin-right: 2em;
     margin-left: .2em;
 }
-.health-marker-icon>* {
+.health-icon>* {
     display: inline-block;
     width: 20px;
 }

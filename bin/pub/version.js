@@ -3,11 +3,11 @@
 define(['angular', 'angular-material', 'util', '_css!css/version'],
 function(angular){
 
-var module = angular.module('lum-version', ['ngMaterial', 'lum-util']);
+var module = angular.module('version', ['ngMaterial', 'util']);
 
-module.factory('version', VersionService);
-VersionService.$inject = ['get_json', '$q'];
-function VersionService(get_json, $q){
+module.factory('version', version_service);
+version_service.$inject = ['get_json', '$q'];
+function version_service(get_json, $q){
     return {
         current: get_json('/api/version'),
         latest: get_json('https://raw.githubusercontent.com/luminati-io/'+
@@ -15,35 +15,35 @@ function VersionService(get_json, $q){
     };
 }
 
-module.controller('version', VersionController);
-VersionController.$inject = ['version', 'lum_upgrade_instructions'];
-function VersionController(version, lum_upgrade_instructions){
+module.controller('version', version_controller);
+version_controller.$inject = ['version', 'upgrade_instructions'];
+function version_controller(version, upgrade_instructions){
     var vm = this;
-    vm.upgrade_instructions = lum_upgrade_instructions;
+    vm.upgrade_instructions = upgrade_instructions;
     version.current.then(function(current){
         vm.current = current.version;
 
         version.latest.then(function(latest){
             vm.latest = latest.version;
-            vm.need_upgrade = (vm.latest!=vm.current);
+            vm.need_upgrade = vm.latest!=vm.current;
         });
     });
 }
 
-module.directive('lumVersionDisplay', VersionDisplay);
-VersionDisplay.$inject = [];
-function VersionDisplay(){
+module.directive('version', version);
+version.$inject = [];
+function version(){
     return {
         restrict: 'E',
         controller: 'version',
         controllerAs: 'ver',
-        templateUrl: '/version_display.html',
+        templateUrl: '/version.html',
     };
 }
 
-module.factory('lum_upgrade_instructions', lum_upgrade_instructions);
-lum_upgrade_instructions.$inject = ['$mdDialog'];
-function lum_upgrade_instructions($mdDialog){
+module.factory('upgrade_instructions', upgrade_instructions);
+upgrade_instructions.$inject = ['$mdDialog'];
+function upgrade_instructions($mdDialog){
     return function(){
         $mdDialog.show({
             title: 'Upgrade Instructions',

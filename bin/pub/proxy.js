@@ -2,22 +2,23 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'socket.io-client', 'lodash', 'moment', 'es6_shim',
     'util', 'angular-material', 'md-data-table', 'angular-chart',
-    'health_markers', '_css!css/proxies'],
+    'health', '_css!css/proxy'],
     function(angular, io, _, moment){
 
-var module = angular.module('lum-proxies', ['ngMaterial', 'md.data.table',
-    'chart.js', 'lum-health-markers', 'lum-util']);
+var module = angular.module('proxy', ['ngMaterial', 'md.data.table',
+    'chart.js', 'health', 'util']);
 
-module.factory('lumConsts', ['get_json', '$q', consts_service]);
-function consts_service(get_json, $q){
+module.factory('consts', consts_service);
+consts_service.$inject = ['get_json'];
+function consts_service(get_json){
     var data = {proxy: {}};
     get_json('/api/consts').then(function(res){ _.merge(data, res); });
     return data;
 }
 
-module.factory('lumProxies', proxiesService);
-proxiesService.$inject = ['get_json'];
-function proxiesService(get_json){
+module.factory('proxies', proxies_service);
+proxies_service.$inject = ['get_json'];
+function proxies_service(get_json){
     var service = {
         subscribe: subscribe,
         proxies: null,
@@ -99,7 +100,7 @@ function proxiesService(get_json){
     }
 }
 
-module.value('lumOptColumns', [
+var opt_columns = [
     {key: 'super_proxy', title: 'Host'},
     {key: 'zone', title: 'Zone'},
     {key: 'socks', title: 'SOCKS'},
@@ -118,24 +119,21 @@ module.value('lumOptColumns', [
     {key: 'sticky_ip', title: 'Sticky IP'},
     {key: 'max_requests', title: 'Max requests'},
     {key: 'log', title: 'Log Level'},
-]);
+    {key: 'debug', title: 'Luminati debug'},
+];
 
-module.controller('ProxiesTable', proxy_table);
-proxy_table.$inject = ['lumProxies', 'lumOptColumns', '$mdDialog', '$http',
-    'lumConsts', 'get_json'];
-function proxy_table(lum_proxies, opt_columns, $mdDialog, $http,
-    consts, get_json)
-{
+module.controller('proxy_table', proxy_table);
+proxy_table.$inject = ['proxies', '$mdDialog', '$http', 'consts'];
+function proxy_table(proxies, $mdDialog, $http, consts){
     this.$mdDialog = $mdDialog;
     this.$http = $http;
-    this.get_json = get_json;
-    this.lum_proxies = lum_proxies;
+    this.proxies = proxies;
     var $vm = this;
     $vm.consts = consts.proxy;
     $vm.resolved = false;
     $vm.proxies = [];
     $vm.columns = [];
-    lum_proxies.subscribe(function(proxies){
+    proxies.subscribe(function(proxies){
         $vm.resolved = true;
         $vm.proxies = proxies;
         var always = ['zone', 'session_timeout', 'pool_size'];
@@ -154,7 +152,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
         templateUrl: '/settings.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
-        locals: {proxy: _proxy, consts: this.consts},
+        locals: {proxy: _proxy},
         fullscreen: true
     }).then(function(proxy){
         if (!proxy)
@@ -166,7 +164,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
             promise = _this.$http.put('/api/proxies/'+proxy_old.port, data);
         else
             promise = _this.$http.post('/api/proxies', data);
-        promise.then(function(){ _this.lum_proxies.update(); });
+        promise.then(function(){ _this.proxies.update(); });
     });
 };
 
@@ -187,7 +185,7 @@ proxy_table.prototype.show_history = function(proxy){
         templateUrl: '/history.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
-        locals: {port: proxy.port, get_json: this.get_json},
+        locals: {port: proxy.port},
         fullscreen: true,
     });
 };
@@ -198,7 +196,7 @@ proxy_table.prototype.show_test = function(){
         templateUrl: '/test.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
-        locals: {proxies: this.proxies, $http: this.$http},
+        locals: {proxies: this.proxies},
         fullscreen: true,
     });
 };
@@ -209,12 +207,13 @@ proxy_table.prototype.delete_proxy = function(proxy){
         title: 'Are you sure you want to delete proxy?'});
     this.$mdDialog.show(confirm).then(function(){
         return _this.$http.delete('/api/proxies/'+proxy.port);
-    }).then(function(){ _this.lum_proxies.update(); });
+    }).then(function(){ _this.proxies.update(); });
 };
 
-function edit_controller($scope, $mdDialog, locals){
+edit_controller.$inject = ['$scope', '$mdDialog', 'consts', 'locals'];
+function edit_controller($scope, $mdDialog, consts, locals){
     $scope.form = _.get(locals, 'proxy', {});
-    $scope.consts = locals.consts;
+    $scope.consts = consts.proxy;
     $scope.hide = $mdDialog.hide.bind($mdDialog);
     $scope.cancel = $mdDialog.cancel.bind($mdDialog);
     $scope.validate = function(data){
@@ -273,6 +272,7 @@ function chart_indicator(labels, p){
     return labels[Math.round(p*(labels.length-1))];
 }
 
+stats_controller.$inject = ['$scope', '$mdDialog', 'locals'];
 function stats_controller($scope, $mdDialog, locals){
     var stats = locals.proxy.stats;
     var total = stats.total;
@@ -334,7 +334,9 @@ function stats_controller($scope, $mdDialog, locals){
     }, 0);
 }
 
-function history_controller($scope, $filter, $mdDialog, locals){
+history_controller.$inject = ['$scope', '$filter', '$mdDialog', 'get_json',
+    'locals'];
+function history_controller($scope, $filter, $mdDialog, get_json, locals){
     $scope.fields = [
         {field: 'url', title: 'Url'},
         {field: 'method', title: 'Method'},
@@ -402,7 +404,7 @@ function history_controller($scope, $filter, $mdDialog, locals){
         else
         {
             $scope.loading = true;
-            locals.get_json(url).then(function(history){
+            get_json(url).then(function(history){
                 $scope.loading = false;
                 $scope.loading_page = false;
                 $scope.history = history;
@@ -434,7 +436,7 @@ function history_controller($scope, $filter, $mdDialog, locals){
                 'PROPFIND', 'VIEW', 'TRACE', 'CONNECT'];
         $mdDialog.show({
             controller: filter_controller(field),
-            templateUrl: '/filter_'+field+'.html',
+            templateUrl: '/filter/'+field+'.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,
@@ -468,6 +470,7 @@ function history_controller($scope, $filter, $mdDialog, locals){
     $scope.update();
 }
 
+filter_controller.$inject = ['field'];
 function filter_controller(field){
     var range = field=='elapsed'||field=='timestamp';
     return function($scope, $filter, $mdDialog, locals){
@@ -524,6 +527,7 @@ function filter_controller(field){
     };
 }
 
+details_controller.$inject = ['$scope', '$filter', '$mdDialog', 'locals'];
 function details_controller($scope, $filter, $mdDialog, locals){
     $scope.row = locals.row;
     var request_headers = JSON.parse($scope.row.request_headers);
@@ -538,7 +542,9 @@ function details_controller($scope, $filter, $mdDialog, locals){
     $scope.hide = $mdDialog.hide.bind($mdDialog);
 }
 
-function test_controller($scope, $filter, $mdDialog, locals){
+test_controller.$inject = ['$scope', '$filter', '$mdDialog', '$http',
+    'locals'];
+function test_controller($scope, $filter, $mdDialog, $http, locals){
     $scope.proxies = locals.proxies;
     $scope.methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD',
         'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND',
@@ -558,7 +564,7 @@ function test_controller($scope, $filter, $mdDialog, locals){
             },
         };
         $scope.loading = true;
-        locals.$http(req).then(function(r){
+        $http(req).then(function(r){
             $scope.loading = false;
             r = r.data;
             if (!r.error)

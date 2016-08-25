@@ -1,6 +1,6 @@
 <div class="page page-proxies">
   <div class=proxies-body>
-    <md-card ng-controller="ProxiesTable as vm">
+    <md-card ng-controller="proxy_table as vm">
       <md-button class="md-fab md-fab-bottom-right" ng-click=vm.edit_proxy()>
         <md-icon md-font-library=material-icons>add</md-icon>
       </md-button>
@@ -50,14 +50,14 @@
     </md-card>
   </div>
   <div class=proxies-footer>
-    <health-marker for=network>
+    <health for=network>
       Network Connectivity
-    </health-marker>
-    <health-marker for=firewall>
+    </health>
+    <health for=firewall>
       Firewall Access
-    </health-marker>
-    <health-marker for=credentials>
+    </health>
+    <health for=credentials>
       Credentials
-    </health-marker>
+    </health>
   </div>
 </div>

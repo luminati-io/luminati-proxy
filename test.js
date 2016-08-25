@@ -254,13 +254,13 @@ describe('proxy', ()=>{
             const t = (name, ssl)=>it(name, ()=>etask(function*(){
                 l = yield lum({null_response: 'echo\.json', ssl: ssl});
                 let protocol = ssl?'https':'http';
-                let url = `${protocol}://lumtest.com/echo.json`;
+                let url = protocol+'://lumtest.com/echo.json';
                 const res = yield l.test({url});
                 assert.equal(proxy.history.length, 0);
                 assert.equal(res.statusCode, 200);
                 assert.equal(res.statusMessage, 'NULL');
                 assert.equal(res.body, undefined);
-                yield l.test({url: `${protocol}://lumtest.com/myip.json`});
+                yield l.test({url: protocol+'://lumtest.com/myip.json'});
                 assert.equal(proxy.history.length, 1);
             }));
             t('http');
@@ -303,6 +303,7 @@ describe('proxy', ()=>{
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('DNS', {dns: 'local'});
+            t('debug', {debug: 'none'});
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
         });
         describe('socks', ()=>{

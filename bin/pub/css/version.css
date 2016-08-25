@@ -1,7 +1,7 @@
-.version-display {
+.version {
     font-size: xx-small;
     color: lightgray;
 }
-.version-display>.upgrade {
+.version>.upgrade {
     color: red;
 }
