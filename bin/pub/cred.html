@@ -12,7 +12,8 @@
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Customer</label>
-                <input ng-model=cred.customer placeholder="Customer name" required md-autofocus>
+                <input ng-model=cred.customer placeholder="Customer name"
+                  required md-autofocus>
               </md-input-container>
             </div>
             <div layout-gt-sm=row>
@@ -21,11 +22,32 @@
                 <input ng-model=cred.password placeholder=Password required>
               </md-input-container>
             </div>
-            <section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
-              <md-button class="md-raised md-primary" ng-click="cred.save()">
+            <div layout-gt-sm=row>
+              <md-input-container class=md-block flex-gt-sm>
+                <label>Proxy</label>
+                <input ng-model=cred.proxy placeholder=Proxy required>
+              </md-input-container>
+            </div>
+            <div layout-gt-sm=row>
+              <md-input-container class=md-block flex-gt-sm>
+                <label>Port</label>
+                <input type=number ng-model=cred.proxy_port placeholder=Port
+                  required>
+              </md-input-container>
+            </div>
+            <section layout="row" layout-sm="column"
+              layout-align="center center" layout-wrap>
+              <md-button class="md-raised md-primary" ng-click="cred.save()"
+                ng-if=!saving>
                 Save
               </md-button>
+              <md-progress-circular md-diameter=48
+                ng-if=saving>
+              </md-progress-circular>
             </section>
+            <div layout-gt-sm=row>
+              <p>Config path: <strong>{{cred.config}}</strong></p>
+            </div>
           </div>
         </form>
       </md-card>

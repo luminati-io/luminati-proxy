@@ -31,9 +31,15 @@
       </md-toolbar>
       <md-nav-bar nav-bar-aria-label="navigation links"
         md-selected-nav-item=$root.current_state>
-        <md-nav-item md-nav-href=#cred name=cred flex>Credentials</md-nav-item>
-        <md-nav-item md-nav-href=#proxy name=proxy flex>Proxies</md-nav-item>
-        <md-nav-item md-nav-href=#info name=info flex>Info</md-nav-item>
+        <md-nav-item md-nav-href=#cred name=cred flex>
+          Credentials
+        </md-nav-item>
+        <md-nav-item md-nav-href=#proxy name=proxy ng-if=$root.login flex>
+          Proxies
+        </md-nav-item>
+        <md-nav-item md-nav-href=#info name=info ng-if=$root.login flex>
+          Info
+        </md-nav-item>
       </md-nav-bar>
     </header>
     <div class=body ui-view></div>

@@ -9,7 +9,7 @@ var module = angular.module('app', ['ngMaterial', 'ui.router', 'util', 'proxy',
     'info', 'version', 'cred', 'angularMoment']);
 module.config(route_config);
 function route_config($stateProvider, $urlRouterProvider){
-    $urlRouterProvider.otherwise('/proxy');
+    $urlRouterProvider.otherwise('/cred');
     $stateProvider.state('proxy', {
         url: '/proxy',
         templateUrl: '/proxy.html',
@@ -30,9 +30,16 @@ module.config(function(ChartJsProvider){
 });
 
 module.run(function($rootScope, get_json, $state){
-    get_json('/api/creds').then(function(auth){
-        $rootScope.login = auth.customer;
-    });
+    var check_creds = function(){
+        get_json('/api/creds').then(function(auth){
+            $rootScope.login = auth.customer;
+            if (!$rootScope.login)
+                setTimeout(check_creds, 2000);
+            else
+                setTimeout(function(){ window.location = '#proxy'; }, 1000);
+        });
+    };
+    check_creds();
     $rootScope.$on('$stateChangeSuccess', function(event, current){
         $rootScope.current_state = current.name;
     });
