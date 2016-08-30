@@ -1,0 +1,26 @@
+<md-dialog ng-cloak>
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>Country Filter</h2>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content class=md-dialog-content aria-label="Country Filter">
+    <md-input-container class=md-block>
+      <label>Node country</label>
+      <md-select md-autofocus ng-keypress="keypress($event)" ng-model=value>
+        <md-option ng-repeat="opt in options" ng-value="opt.value">
+          {{opt.key||'No filter'}}
+        </md-option>
+      </md-select>
+    </md-input-container>
+    <p>The requests with exit node in this country will be shown.</p>
+  </md-dialog-content>
+  <md-dialog-actions layout=row>
+    <span flex></span>
+    <md-button ng-click=apply()>
+      Apply
+    </md-button>
+  </md-dialog-actions>
+</md-dialog>

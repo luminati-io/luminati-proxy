@@ -21,11 +21,25 @@
             <td md-cell>{{row.status_code}}</td>
             <td md-cell><span am-time-ago="row.timestamp"></span></td>
             <td md-cell>{{row.elapsed}} ms</td>
+            <td md-cell>{{row.country}}</td>
             <td md-cell>{{row.proxy}}</td>
           </tr>
         </tbody>
       </table>
-      <table md-table class="proxies-history-headers">
+      <table md-table class=proxies-history-headers>
+        <thead md-head>
+          <tr md-row>
+            <th colspan=2 md-column>Timings</th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr ng-repeat="t in timings">
+            <td md-cell>{{t[0]}}</td>
+            <td md-cell>{{t[1]}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table md-table class=proxies-history-headers>
         <thead md-head>
           <tr md-row>
             <th colspan=2 md-column>Request headers</th>
@@ -38,7 +52,7 @@
           </tr>
         </tbody>
       </table>
-      <table md-table class="proxies-history-headers">
+      <table md-table class=proxies-history-headers>
         <thead md-head>
           <tr md-row>
             <th colspan=2 md-column>Response headers</th>
@@ -48,6 +62,44 @@
           <tr ng-repeat="h in response_headers">
             <td md-cell>{{h[0]}}</td>
             <td md-cell>{{h[1]}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table md-table class="proxies-history-headers proxies-history-alerts"
+        ng-if=alerts.length>
+        <thead md-head>
+          <tr md-row>
+            <th colspan=3 md-column>Alerts</th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr ng-repeat="a in alerts">
+            <td md-cell>{{a.title}}</td>
+            <td md-cell>{{a.description}}</td>
+            <td md-cell>
+              <md-button class=md-warn ng-click=disable_alert(a.type)>
+                Disable alert
+              </md-button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <table md-table class="proxies-history-headers proxies-history-dalerts"
+        ng-if=disabled_alerts.length>
+        <thead md-head>
+          <tr md-row>
+            <th colspan=3 md-column>Disabled alerts</th>
+          </tr>
+        </thead>
+        <tbody md-body>
+          <tr ng-repeat="a in disabled_alerts">
+            <td md-cell>{{a.title}}</td>
+            <td md-cell>{{a.description}}</td>
+            <td md-cell>
+              <md-button ng-click=enable_alert(a.type)>
+                Enable alert
+              </md-button>
+            </td>
           </tr>
         </tbody>
       </table>

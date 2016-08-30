@@ -13,8 +13,8 @@
     <md-progress-circular md-diameter="100px" class=proxies-history-loader
       ng-if="show_loader()">
     </md-progress-circular>
-    <div layout=row class=proxies-history-cc>
-      <div class=proxies-history-container flex>
+    <div class=proxies-history-cc>
+      <div class=proxies-history-container>
         <table ng-if="history" md-table class=proxies-history>
           <thead md-head>
             <tr md-row>
@@ -28,27 +28,37 @@
                     &uarr;
                   </span>
                 </span><br>
-                <span class=proxies-history-filter ng-click=filter(f.field)>
-                  <span ng-if=filters[f.field]>{{filters[f.field]}}</span>
-                  <span ng-if=!filters[f.field]>No filter</span>
+                <span class=proxies-history-filter>
+                  <span ng-if=filters[f.field] ng-click=filter(f.field)>
+                    {{filters[f.field]}}
+                  </span>
+                  <span ng-if=filters[f.field] ng-click=filter_cancel(f.field)>
+                    &times;
+                  </span>
+                  <span ng-if=!filters[f.field] ng-click=filter(f.field)>
+                    No filter
+                  </span>
                 </span>
               </th>
             </tr>
           </thead>
           <tbody md-body>
             <tr ng-repeat="r in history" ng-click="details(r)"
-              class=proxy-history-clickable md-row>
+              class="proxies-history-clickable{{r.alerts.length ?
+              ' proxies-history-walerts' : ''}}" md-row
+              title="{{r.alerts.length ? r.alerts.length+' alert(s)' : ''}}">
               <td md-cell><a href={{r.url}} target=_blank>{{r.url}}</a></td>
               <td md-cell>{{r.method}}</td>
               <td md-cell>{{r.status_code}}</td>
               <td md-cell><span am-time-ago="r.timestamp"></span></td>
               <td md-cell>{{r.elapsed}} ms</td>
+              <td md-cell>{{r.country}}</td>
               <td md-cell>{{r.proxy}}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div class=proxies-history-tools flex>
+      <div class=proxies-history-tools>
         <div class=proxies-history-navigation ng-if=show_next()>
           <md-button ng-click=next() ng-disabled=loading
             class="md-primary md-raised">
@@ -65,6 +75,24 @@
             class="md-primary md-raised">
             Export to HAR
           </md-button>
+          <table md-table class=proxies-history-headers>
+            <thead md-head>
+              <tr md-row>
+                <th md-column>Timing</th>
+                <th md-column>Min</th>
+                <th md-column>Avg</th>
+                <th md-column>Max</th>
+              </tr>
+            </thead>
+            <tbody md-body>
+              <tr ng-repeat="t in timings">
+                <td md-cell>{{t[0]}}</td>
+                <td md-cell>{{t[1]}}</td>
+                <td md-cell>{{t[2]}}</td>
+                <td md-cell>{{t[3]}}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

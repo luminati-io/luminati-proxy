@@ -69,8 +69,8 @@ function credentials_controller(credentials, $state, $scope){
 credentials_controller.prototype.save = function(){
     var vm = this;
     vm.service.save({
-        customer: this.customer,
-        password: this.password,
+        customer: this.customer.trim(),
+        password: this.password.trim(),
         proxy: this.proxy,
         proxy_port: this.proxy_port,
     }, vm.$scope);

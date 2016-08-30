@@ -173,7 +173,10 @@
 .proxies-history tr, .proxies-history-headers tr {
     height: auto !important;
 }
-.proxies-history tr.proxy-history-clickable:hover {
+.proxies-history tr.proxies-history-walerts {
+    background: #ffd0d0;
+}
+.proxies-history tr.proxies-history-clickable:hover {
     background: #eeeeee;
 }
 .proxies-history-container {
@@ -182,7 +185,8 @@
     overflow: auto;
 }
 .proxies-history-cc {
-    height: 100%;
+    margin-left: 250px;
+    position: relative;
 }
 .proxies-history-content {
     min-height: 200px;
@@ -193,7 +197,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    margin-top: -50px;
+    margin-top: -50px !important;
     margin-left: -50px;
 }
 .proxies-history-filter {
@@ -211,12 +215,17 @@
     border-bottom-width: 1px !important;
 }
 .proxies-history-tools {
-    max-width: 250px;
+    position: fixed;
+    left: 0;
+    top: 70px;
     padding: 12px;
     height: 100%;
 }
 .proxies-history-navigation {
     margin-bottom: 40px;
+}
+table.md-table.proxies-history-alerts th.md-column {
+    color: red;
 }
 .proxies-test-content md-input-container {
     margin-bottom: 0;

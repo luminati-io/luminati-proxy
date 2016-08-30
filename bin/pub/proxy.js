@@ -127,7 +127,7 @@ proxy_table.$inject = ['proxies', '$mdDialog', '$http', 'consts'];
 function proxy_table(proxies, $mdDialog, $http, consts){
     this.$mdDialog = $mdDialog;
     this.$http = $http;
-    this.proxies = proxies;
+    this.lum_proxies = proxies;
     var $vm = this;
     $vm.consts = consts.proxy;
     $vm.resolved = false;
@@ -164,7 +164,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
             promise = _this.$http.put('/api/proxies/'+proxy_old.port, data);
         else
             promise = _this.$http.post('/api/proxies', data);
-        promise.then(function(){ _this.proxies.update(); });
+        promise.then(function(){ _this.lum_proxies.update(); });
     });
 };
 
@@ -207,7 +207,7 @@ proxy_table.prototype.delete_proxy = function(proxy){
         title: 'Are you sure you want to delete proxy?'});
     this.$mdDialog.show(confirm).then(function(){
         return _this.$http.delete('/api/proxies/'+proxy.port);
-    }).then(function(){ _this.proxies.update(); });
+    }).then(function(){ _this.lum_proxies.update(); });
 };
 
 edit_controller.$inject = ['$scope', '$mdDialog', 'consts', 'locals'];
@@ -335,14 +335,17 @@ function stats_controller($scope, $mdDialog, locals){
 }
 
 history_controller.$inject = ['$scope', '$filter', '$mdDialog', 'get_json',
-    'locals'];
-function history_controller($scope, $filter, $mdDialog, get_json, locals){
+    'consts', 'locals'];
+function history_controller($scope, $filter, $mdDialog, get_json, consts,
+    locals)
+{
     $scope.fields = [
         {field: 'url', title: 'Url'},
         {field: 'method', title: 'Method'},
         {field: 'status_code', title: 'Code'},
         {field: 'timestamp', title: 'Time'},
         {field: 'elapsed', title: 'Elapsed'},
+        {field: 'country', title: 'Country'},
         {field: 'proxy', title: 'Proxy'},
     ];
     $scope.sort_field = 'timestamp';
@@ -357,6 +360,7 @@ function history_controller($scope, $filter, $mdDialog, get_json, locals){
         elapsed: '',
         elapsed_min: '',
         elapsed_max: '',
+        country: '',
         proxy: '',
     };
     $scope.page = 1;
@@ -390,6 +394,8 @@ function history_controller($scope, $filter, $mdDialog, get_json, locals){
             params.elapsed_min = $scope.filters.elapsed_min;
         if ($scope.filters.elapsed_max)
             params.elapsed_max = $scope.filters.elapsed_max;
+        if ($scope.filters.country)
+            params.country = $scope.filters.country;
         if ($scope.filters.proxy)
             params.proxy = $scope.filters.proxy;
         var params_arr = [];
@@ -407,7 +413,125 @@ function history_controller($scope, $filter, $mdDialog, get_json, locals){
             get_json(url).then(function(history){
                 $scope.loading = false;
                 $scope.loading_page = false;
-                $scope.history = history;
+                $scope.history = history.map(function(r){
+                    var alerts = [];
+                    var disabled_alerts = [];
+                    var add_alert = function(alert){
+                        if (localStorage.getItem(
+                            'request-alert-disabled-'+alert.type))
+                        {
+                            disabled_alerts.push(alert);
+                        }
+                        else
+                            alerts.push(alert);
+                    };
+                    var request_headers = JSON.parse(r.request_headers);
+                    if (!request_headers['user-agent'])
+                    {
+                        add_alert({
+                            type: 'agent_empty',
+                            title: 'Empty user agent',
+                            description: 'The User-Agent header '
+                                +'is not set to any value.',
+                        });
+                    }
+                    else if (!request_headers['user-agent'].match(
+                        /^Mozilla\//))
+                    {
+                        add_alert({
+                            type: 'agent_suspicious',
+                            title: 'Suspicious user agent',
+                            description: 'The User-Agent header is set to a '
+                                +'value not corresponding to any of the major '
+                                +'web browsers.',
+                        });
+                    }
+                    if (!request_headers.accept)
+                    {
+                        add_alert({
+                            type: 'accept_empty',
+                            title: 'Empty accept types',
+                            description: 'The Accept header is not set to any '
+                                +'value.',
+                        });
+                    }
+                    if (!request_headers['accept-encoding'])
+                    {
+                        add_alert({
+                            type: 'accept_encoding_empty',
+                            title: 'Empty accept encoding',
+                            description: 'The Accept-Encoding header is not '
+                                +'set to any value.',
+                        });
+                    }
+                    if (!request_headers['accept-language'])
+                    {
+                        add_alert({
+                            type: 'accept_language_empty',
+                            title: 'Empty accept language',
+                            description: 'The Accept-Language header is not '
+                                +'set to any value.',
+                        });
+                    }
+                    if (request_headers.connection != 'keep-alive')
+                    {
+                        add_alert({
+                            type: 'connection_suspicious',
+                            title: 'Suspicious connection type',
+                            description: 'The Connection header is not set to '
+                                +'"keep-alive".',
+                        });
+                    }
+                    if (!r.url.match(/^https?:\/\/[^\/\?]+\/?$/)
+                        &&!request_headers.referer)
+                    {
+                        add_alert({
+                            type: 'referer_empty',
+                            title: 'Empty referrer',
+                            description: 'The Referer header is not set even '
+                                +'though the requested URL is not the home '
+                                +'page of the site.',
+                        });
+                    }
+                    r.alerts = alerts;
+                    r.disabled_alerts = disabled_alerts;
+                    return r;
+                });
+                var history_cnt = $scope.history.length;
+                var timings = ['node_latency', 'response_time', 'elapsed'];
+                var timings_val = {};
+                var timing, i;
+                for (i=0; i<timings.length; i++)
+                {
+                    timing = timings[i];
+                    timings_val[timing] = {
+                        min: Number.MAX_VALUE,
+                        max: -1,
+                        sum: 0,
+                    };
+                }
+                $scope.history.forEach(function(r){
+                    for (var i=0; i<timings.length; i++)
+                    {
+                        var timing = timings[i];
+                        timings_val[timing].min = Math.min(
+                            timings_val[timing].min, r[timing]);
+                        timings_val[timing].max = Math.max(
+                            timings_val[timing].max, r[timing]);
+                        timings_val[timing].sum += r[timing];
+                    }
+                });
+                $scope.timings = [];
+                for (i=0; i<timings.length; i++)
+                {
+                    timing = timings[i];
+                    $scope.timings.push([
+                        timing.replace(/_/g, ' '),
+                        timings_val[timing].min,
+                        Math.round(timings_val[timing].sum/history_cnt),
+                        timings_val[timing].max,
+                    ]);
+                }
             });
         }
     };
@@ -431,9 +555,13 @@ function history_controller($scope, $filter, $mdDialog, get_json, locals){
     $scope.filter = function(field){
         var options;
         if (field=='method')
+        {
             options = ['', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY',
                 'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK',
                 'PROPFIND', 'VIEW', 'TRACE', 'CONNECT'];
+        }
+        else if (field=='country')
+            options = consts.proxy.country.values;
         $mdDialog.show({
             controller: filter_controller(field),
             templateUrl: '/filter/'+field+'.html',
@@ -447,6 +575,20 @@ function history_controller($scope, $filter, $mdDialog, get_json, locals){
             },
         });
     };
+    $scope.filter_cancel = function(field){
+        if (field=='elapsed')
+        {
+            $scope.filters.elapsed_min = '';
+            $scope.filters.elapsed_max = '';
+        }
+        if (field=='timestamp')
+        {
+            $scope.filters.timestamp_min = null;
+            $scope.filters.timestamp_max = null;
+        }
+        $scope.filters[field] = '';
+        $scope.update();
+    };
     $scope.details = function(row){
         $mdDialog.show({
             controller: details_controller,
@@ -454,7 +596,11 @@ function history_controller($scope, $filter, $mdDialog, get_json, locals){
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,
-            locals: {row: row, fields: $scope.fields},
+            locals: {
+                row: row,
+                fields: $scope.fields,
+                update: $scope.update,
+            },
         });
     };
     $scope.next = function(){
@@ -538,7 +684,40 @@ function details_controller($scope, $filter, $mdDialog, locals){
     $scope.response_headers = Object.keys(response_headers).map(function(key){
             return [key, response_headers[key]];
         });
+    $scope.timings = [
+        ['Exit node latency', $scope.row.node_latency+' ms'],
+        ['Response sent', $scope.row.response_time+' ms'],
+        ['Response received', $scope.row.elapsed+' ms'],
+    ];
+    $scope.alerts = $scope.row.alerts;
+    $scope.disabled_alerts = $scope.row.disabled_alerts;
     $scope.fields = locals.fields;
+    $scope.disable_alert = function(type){
+        localStorage.setItem('request-alert-disabled-'+type, 1);
+        for (var i=0; i<$scope.alerts.length; i++)
+        {
+            if ($scope.alerts[i].type==type)
+            {
+                $scope.disabled_alerts.push($scope.alerts[i]);
+                $scope.alerts.splice(i, 1);
+                break;
+            }
+        }
+        locals.update();
+    };
+    $scope.enable_alert = function(type){
+        localStorage.removeItem('request-alert-disabled-'+type);
+        for (var i=0; i<$scope.disabled_alerts.length; i++)
+        {
+            if ($scope.disabled_alerts[i].type==type)
+            {
+                $scope.alerts.push($scope.disabled_alerts[i]);
+                $scope.disabled_alerts.splice(i, 1);
+                break;
+            }
+        }
+        locals.update();
+    };
     $scope.hide = $mdDialog.hide.bind($mdDialog);
 }
 
