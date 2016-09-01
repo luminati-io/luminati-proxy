@@ -81,7 +81,7 @@
             </div>
           </md-content>
         </md-tab>
-        <md-tab label=perfomance>
+        <md-tab label=performance>
           <md-content>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
@@ -90,7 +90,7 @@
                   placeholder={{consts.session_timeout.def}}>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Minimum proxies count</label>
+                <label>Minimum number of super proxies to use</label>
                 <input type=number ng-model=form.proxy_count
                   placeholder={{consts.proxy_count.def}}>
               </md-input-container>
@@ -107,7 +107,7 @@
             </div>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Dns resolve</label>
+                <label>DNS resolve</label>
                 <md-select ng-model="form.dns">
                   <md-option ng-repeat="c in consts.dns.values">
                     {{c}}
@@ -132,7 +132,7 @@
                   placeholder={{consts.proxy_switch.def}}>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
-                <md-checkbox ng-model=form.sticky_ip>Sticky ip</md-checkbox>
+                <md-checkbox ng-model=form.sticky_ip>Sticky IP</md-checkbox>
                 <span class="hint hidden">Same IP as much as possible</span>
               </md-input-container>
             </div>

@@ -81,6 +81,7 @@ Options:
   --password         Password
   --proxy            Super proxy ip or country (us|gb|nl)
                                                  [default: "zproxy.luminati.io"]
+  --proxy_port       Super proxy port                           [default: 22225]
   --proxy_count      Minimum number of super proxies to use[number] [default: 1]
   --secure_proxy     Use SSL when accessing super proxy                [boolean]
   --sticky_ip        Use same session as much as possible to maintain IP
