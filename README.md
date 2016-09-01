@@ -1,4 +1,4 @@
-# Luminati HTTP/HTTPS Proxy manager
+# Luminati Proxy manager
 
 [![Build Status](https://travis-ci.org/luminati-io/luminati-proxy.png)](https://travis-ci.org/luminati-io/luminati-proxy)
 [![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
@@ -36,7 +36,6 @@ npm install -g luminati-io/luminati-proxy
 ```sh
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
-
 ### Upgrade
 - Use npm to upgrade
 ```sh
@@ -61,6 +60,17 @@ $ sudo npm install -g luminati-io/luminati-proxy
   - Default proxy port was changed from 23000 to 24000
 
 ## Usage
+
+### First run
+After running the app for the first time:
+```sh
+$ luminati
+```
+Point your browser to the app admin UI
+[http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
+and configure your proxies.
+
+### Complete list of command line options
 ```sh
 $ luminati --help
 Usage: luminati [options] config1 config2 ...
@@ -117,19 +127,19 @@ $ docker run luminati/luminati-proxy
 $ docker run luminati/luminati-proxy luminati --version
 ```
 
-## FAQ
-
-### Customer name
-
-The customer name used by luminati-proxy is the luminati customer name and not the username as it appears on [https://luminati.io/cp/api_example](https://luminati.io/cp/api_example) page.
-
-If the username shows: lum-customer-CUSTOMER-zone-gen
-
-Then the customer name is just: CUSTOMER
-
 ### SSL Requests
 
 The --ssl parameter is for SSL sniffing, HTTPS requests can be made without it.
+
+## Help
+
+The FAQ can be found on the luminati
+[FAQ](https://luminati.io/faq#github-proxy)
+
+If you do not find the answer there, feel free to open an
+[issue on github](issues).
+
+Or contact [support@luminati.io](mailto:support@luminati.io).
 
 ## Node.js API
 

@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.5.10",
+  "version": "0.5.11",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -29,24 +29,24 @@
     "email": "gilad@hola.org"
   },
   "dependencies": {
-    "body-parser": "^1.15.1",
-    "country-data": "^0.0.28",
-    "express": "^4.13.4",
+    "body-parser": "^1.15.2",
+    "country-data": "^0.0.29",
+    "express": "^4.14.0",
     "humanize": "0.0.9",
     "hutil": "^0.1.6",
     "json-stable-stringify": "^1.0.1",
-    "lodash": "^4.14.0",
-    "moment": "^2.12.0",
-    "netmask": "^1.0.5",
-    "node-forge": "^0.6.40",
+    "lodash": "^4.15.0",
+    "moment": "^2.14.1",
+    "netmask": "^1.0.6",
+    "node-forge": "^0.6.42",
     "prompt": "^1.0.0",
     "request": "^2.69.0",
-    "socket.io": "^1.4.5",
+    "socket.io": "^1.4.8",
     "socksv5": "0.0.6",
     "sqlite3": "^3.1.4",
     "yargs": "^5.0.0"
   },
   "devDependencies": {
-    "mocha": "^3.0.1"
+    "mocha": "^3.0.2"
   }
 }

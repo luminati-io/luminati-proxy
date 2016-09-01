@@ -203,8 +203,14 @@ proxy_table.prototype.show_test = function(){
 
 proxy_table.prototype.delete_proxy = function(proxy){
     var _this = this;
-    var confirm = this.$mdDialog.confirm({ok: 'ok', cancel: 'cancel',
-        title: 'Are you sure you want to delete proxy?'});
+    var confirm = this.$mdDialog.confirm({
+        ok: 'ok',
+        cancel: 'cancel',
+        title: 'Are you sure you want to delete the proxy?',
+        onComplete: function(scope, el){
+            el.find('button').eq(0).focus();
+        },
+    });
     this.$mdDialog.show(confirm).then(function(){
         return _this.$http.delete('/api/proxies/'+proxy.port);
     }).then(function(){ _this.lum_proxies.update(); });

@@ -22,6 +22,9 @@
 .proxies-table th:first-child md-icon {
     display: none;
 }
+.proxies-table .md-button[disabled] md-icon {
+    color: rgba(0,0,0, 0.2);
+}
 .health-markers {
     padding-top: 25px;
 }
