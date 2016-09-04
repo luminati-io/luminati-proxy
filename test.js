@@ -239,17 +239,33 @@ describe('proxy', ()=>{
             assert.equal(res.body.auth.password, password);
             assert.equal(res.body.auth.zone, 'zzz');
         }));
-        it('max_requests', ()=>etask(function*(){
-            l = yield lum({pool_size: 1, max_requests: 2});
-            for (let session=1; session<=3; session++)
-            {
-                for (let i=0; i<l.opt.max_requests; i++)
+        describe('max_requests', ()=>{
+            const t = (name, opt)=>it(name, ()=>etask(function*(){
+                l = yield lum(opt);
+                const pool_size = l.opt.pool_size || 1;
+                for (let r=0; r<3; r++)
                 {
-                    const res = yield l.test();
-                    assert.equal(res.body.auth.session, '24000_'+session);
+                    for (let p=1; p<=pool_size; p++)
+                    {
+                        for (let i=0; i<l.opt.max_requests; i++)
+                        {
+                            const res = yield l.test();
+                            assert.equal(res.body.auth.session,
+                                '24000_'+(r*pool_size+p),
+                                `trial/request/pool ${r}/${i}/${p}`);
+                        }
+                    }
                 }
-            }
-        }));
+            }));
+            t('1, pool 3', {max_requests: 1, pool_size: 3});
+            t('2, pool 3', {max_requests: 2, pool_size: 3});
+            t('5, pool 3', {max_requests: 5, pool_size: 3});
+            t('10, pool 3', {max_requests: 10, pool_size: 3});
+            t('1, no pool', {max_requests: 1});
+            t('2, no pool', {max_requests: 2});
+            t('5, no pool', {max_requests: 5});
+            t('10, no pool', {max_requests: 10});
+        });
         describe('null_response', ()=>{
             const t = (name, ssl)=>it(name, ()=>etask(function*(){
                 l = yield lum({null_response: 'echo\.json', ssl: ssl});
