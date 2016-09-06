@@ -8,8 +8,12 @@ body {
     width: 200px;
 }
 .body {
-    min-height: calc(100vh - 112px);
+    min-height: calc(100vh - 114px);
+    padding: 1px;
     position: relative;
+}
+.md-nav-bar {
+    overflow: hidden;
 }
 .md-nav-bar .md-nav-item {
     margin: 0;

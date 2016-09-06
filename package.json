@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.5.14",
+  "version": "0.6.1",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -31,19 +31,20 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "country-data": "^0.0.29",
+    "country-language": "^0.1.7",
     "express": "^4.14.0",
-    "humanize": "0.0.9",
     "hutil": "^0.1.6",
     "json-stable-stringify": "^1.0.1",
     "lodash": "^4.15.0",
-    "moment": "^2.14.1",
     "netmask": "^1.0.6",
     "node-forge": "^0.6.42",
+    "phantomjs-prebuilt": "^2.1.12",
     "prompt": "^1.0.0",
     "request": "^2.69.0",
     "socket.io": "^1.4.8",
     "socksv5": "0.0.6",
     "sqlite3": "^3.1.4",
+    "webshot": "^0.18.0",
     "yargs": "^5.0.0"
   },
   "devDependencies": {

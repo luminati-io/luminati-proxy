@@ -44,10 +44,12 @@
       <div class=proxies-test-headers>
         <div layout=row ng-repeat="(i, header) in headers">
           <md-input-container flex class=proxies-test-header>
-            <input class=md-input placeholder=Header ng-model=headers[i].key>
+            <input class=md-input placeholder=Header ng-model=headers[i].key
+              required>
           </md-input-container>
           <md-input-container flex>
-            <input class=md-input placeholder=Value ng-model=headers[i].value>
+            <input class=md-input placeholder=Value ng-model=headers[i].value
+              required>
           </md-input-container>
           <md-button ng-click=remove_header(i) class=proxies-test-rm-header>
             &times;

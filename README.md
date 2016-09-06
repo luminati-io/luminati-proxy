@@ -42,6 +42,9 @@ $ sudo npm install -g luminati-io/luminati-proxy
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
+- v0.6.0
+  - session_timeout was replaced by session_init_timeout, and its usints have
+  been changed from milliseconds to seconds.
 - v0.5.2
   - SOCKS Interface can now be configured using UI and config files for each
   proxy
@@ -76,44 +79,50 @@ $ luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
-  --log              Log level (NONE|ERROR|WARNING|INFO|DEBUG)[default: "ERROR"]
-  --customer         Customer
-  --password         Password
-  --proxy            Super proxy ip or country (us|gb|nl)
+  --log                   Log level (NONE|ERROR|WARNING|INFO|DEBUG)
+                                                              [default: "ERROR"]
+  --customer              Customer
+  --password              Password
+  --proxy                 Super proxy ip or country (us|gb|nl)
                                                  [default: "zproxy.luminati.io"]
-  --proxy_port       Super proxy port                           [default: 22225]
-  --proxy_count      Minimum number of super proxies to use[number] [default: 1]
-  --secure_proxy     Use SSL when accessing super proxy                [boolean]
-  --sticky_ip        Use same session as much as possible to maintain IP
+  --proxy_port            Super proxy port                      [default: 22225]
+  --proxy_count           Minimum number of super proxies to use
+                                                           [number] [default: 1]
+  --secure_proxy          Use SSL when accessing super proxy           [boolean]
+  --sticky_ip             Use same session as much as possible to maintain IP
                                                                        [boolean]
-  --zone             Zone                                       [default: "gen"]
-  --country          Country
-  --state            State
-  --city             City
-  --asn              ASN
-  --dns              DNS resolving (local|remote)
-  --debug            Luminati request debug info (none|full)
-  --request_timeout  Timeout for request on the super proxy (seconds)
-  --pool_size        Pool size                             [number] [default: 3]
-  --ssl              Enable SSL sniffing                               [boolean]
-  --max_requests     Requests per session                 [number] [default: 50]
-  --proxy_switch     Automatically switch proxy on failure          [default: 5]
-  --session_timeout  Session establish timeout          [number] [default: 5000]
-  --direct_include   Include pattern for direct requests
-  --direct_exclude   Exclude pattern for direct requests
-  --null_response    URL pattern for null response
-  --www              Local web port                             [default: 22999]
-  --socks            SOCKS5 port
-  --history          Log history                                       [boolean]
-  --database         Database path              [default: "~/.luminati.sqlite3"]
-  --resolve          Reverse DNS lookup file
-  --config           Config file containing proxy definitions
+  --zone                  Zone                                  [default: "gen"]
+  --country               Country
+  --state                 State
+  --city                  City
+  --asn                   ASN
+  --dns                   DNS resolving (local|remote)
+  --debug                 Luminati request debug info (none|full)
+  --request_timeout       Timeout for request on the super proxy (seconds)
+                                                                        [number]
+  --pool_size             Pool size                        [number] [default: 3]
+  --ssl                   Enable SSL sniffing                          [boolean]
+  --max_requests          Requests per session            [number] [default: 50]
+  --session_duration      Maximum duration of session (seconds)
+  --proxy_switch          Automatically switch super proxy on failure
+                                                                    [default: 5]
+  --session_init_timeout  Session establish timeout (seconds)
+                                                           [number] [default: 5]
+  --direct_include        Include pattern for direct requests
+  --direct_exclude        Exclude pattern for direct requests
+  --null_response         URL pattern for null response
+  --www                   Local web port                        [default: 22999]
+  --socks                 SOCKS5 port
+  --history               Log history                                  [boolean]
+  --database              Database path         [default: "~/.luminati.sqlite3"]
+  --resolve               Reverse DNS lookup file
+  --config                Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
-  --iface            Interface or ip to listen on (lo|eth0|...)
-  --no_dropin        Disable drop-in mode for migrating                [boolean]
-  -h, --help         Show help                                         [boolean]
-  --version          Show version number                               [boolean]
-  -p, --port         Listening port                    [number] [default: 24000]
+  --iface                 Interface or ip to listen on (lo|eth0|...)
+  --no_dropin             Disable drop-in mode for migrating           [boolean]
+  -h, --help              Show help                                    [boolean]
+  --version               Show version number                          [boolean]
+  -p, --port              Listening port               [number] [default: 24000]
 ```
 
 ### Docker

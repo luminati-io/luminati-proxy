@@ -91,7 +91,11 @@ const http_proxy = port=>etask(function*(){
             _res.pipe(res);
         }));
     };
-    proxy.http = http.createServer(handler);
+    proxy.http = http.createServer((req, res, head)=>{
+        if (!proxy.connection)
+            return handler(req, res, head);
+        proxy.connection(()=>handler(req, res, head));
+    });
     const headers = {};
     proxy.http.on('connect', (req, res, head)=>etask(function*(){
         let _url = req.url;

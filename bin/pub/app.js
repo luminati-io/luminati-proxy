@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
 define(['angular', 'angular-material', 'angular-ui-router', 'util',
-    'proxy', 'info', 'version', 'cred', '_css!css/app', 'angular-chart',
-    'angular-moment'],
+    'proxy', 'info', 'version', 'cred', 'countries', '_css!css/app',
+    'angular-chart', 'angular-moment'],
 function(angular){
 
 var module = angular.module('app', ['ngMaterial', 'ui.router', 'util', 'proxy',
-    'info', 'version', 'cred', 'angularMoment']);
+    'info', 'version', 'cred', 'countries', 'angularMoment']);
 module.config(route_config);
 function route_config($stateProvider, $urlRouterProvider){
     $urlRouterProvider.otherwise('/cred');
@@ -21,6 +21,10 @@ function route_config($stateProvider, $urlRouterProvider){
     .state('info', {
         url: '/info',
         templateUrl: '/info.html',
+    })
+    .state('countries', {
+        url: '/countries',
+        templateUrl: '/countries.html',
     });
 }
 
@@ -36,7 +40,10 @@ module.run(function($rootScope, get_json, $state){
             if (!$rootScope.login)
                 setTimeout(check_creds, 2000);
             else
-                setTimeout(function(){ window.location = '#proxy'; }, 1000);
+                setTimeout(function(){
+                    if ($rootScope.current_state=='cred')
+                        window.location = '#proxy';
+                }, 1000);
         });
     };
     check_creds();
