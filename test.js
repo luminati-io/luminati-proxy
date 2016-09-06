@@ -354,7 +354,7 @@ describe('manager', ()=>{
 
     const start_app = args=>etask(function*start_app(){
         args = args||[];
-        let www = get_param(args, '--www')||luminati.Manager.defs.www;
+        let www = get_param(args, '--www')||luminati.Manager.default.www;
         let log = get_param(args, '--log');
         if (!log)
             args = args.concat(['--log', 'NONE']);

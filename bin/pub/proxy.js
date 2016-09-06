@@ -691,7 +691,7 @@ function details_controller($scope, $filter, $mdDialog, locals){
             return [key, response_headers[key]];
         });
     $scope.timings = [
-        ['Exit node latency', $scope.row.node_latency+' ms'],
+        ['Proxy peer latency', $scope.row.node_latency+' ms'],
         ['Response sent', $scope.row.response_time+' ms'],
         ['Response received', $scope.row.elapsed+' ms'],
     ];
