@@ -33,12 +33,28 @@
     white-space: nowrap;
     overflow: hidden;
     text-align: left;
+    position: relative;
 }
 .countries-done {
     color: green;
 }
 .countries-error {
     color: red;
+}
+.countries-canceled {
+    color: orange;
+}
+.countries-op {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    width: 40px;
+    padding-left: 10px;
+    background: white;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), white 25%)
+}
+.countries-op md-icon:hover {
+    color: orange;
 }
 .countries-view {
     border-bottom: 1px dashed;

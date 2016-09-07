@@ -39,34 +39,63 @@
           ng-disabled=!countries.$valid>
           Go
         </md-button>
+        <md-button class="md-raised md-warn" ng-disabled=!c.num_loading
+          ng-click=c.cancel_all()>
+          Stop
+        </md-button>
       </div>
     </form>
   </md-card>
   <md-card ng-if=c.started>
     <div class=countries-list>
       <md-card ng-repeat="country in c.countries">
-        <md-icon ng-if=country.status==0 md-font-library=material-icons>
+        <md-icon ng-if=country.status==0 md-font-library=material-icons
+          title=Scheduled>
           arrow_downward
         </md-icon>
-        <md-progress-circular ng-if=country.status==1
-          md-diameter=18>
+        <md-progress-circular ng-if=country.status==1 md-diameter=18
+          title=Loading>
         </md-progress-circular>
         <md-icon ng-if=country.status==1 md-font-library=material-icons>
           empty
         </md-icon>
         <md-icon ng-if=country.status==2 md-font-library=material-icons
-          class=countries-error>
+          class=countries-canceled title=Canceled>
           close
         </md-icon>
         <md-icon ng-if=country.status==3 md-font-library=material-icons
-          class=countries-done>
+          class=countries-error title=Failed>
+          close
+        </md-icon>
+        <md-icon ng-if=country.status==4 md-font-library=material-icons
+          class=countries-done title="Successfully loaded">
           check
         </md-icon>
-        <span ng-if=country.status<3>{{country.name}}</span>
-        <span ng-if=country.status==3 class=countries-view
-          ng-click="c.view(country.name, country.url)">
+        <span ng-if=country.status&lt;4 title={{country.name}}>
           {{country.name}}
         </span>
+        <span ng-if=country.status==4 class=countries-view
+          ng-click="c.view(country)" title={{country.name}}>
+          {{country.name}}
+        </span>
+        <div class=countries-op>
+          <md-icon ng-if=country.status&lt;2 md-font-library=material-icons
+            ng-click=c.cancel(country) title=Cancel>
+            close
+          </md-icon>
+          <md-icon ng-if=country.status==2 md-font-library=material-icons
+            ng-click=c.retry(country) title=Reschedule>
+            replay
+          </md-icon>
+          <md-icon ng-if=country.status==3 md-font-library=material-icons
+            ng-click=c.retry(country) title=Retry>
+            replay
+          </md-icon>
+          <md-icon ng-if=country.status==4 md-font-library=material-icons
+            ng-click=c.retry(country) title=Replay>
+            replay
+          </md-icon>
+        </div>
       </md-card>
     </div>
   </md-card>

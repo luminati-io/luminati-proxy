@@ -81,28 +81,47 @@
             </div>
           </md-content>
         </md-tab>
-        <md-tab label=performance>
+        <md-tab label="IP Policy">
           <md-content>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Session timeout</label>
-                <input type=number ng-model=form.session_timeout
-                  placeholder={{consts.session_timeout.def}}>
+                <label>Max requests</label>
+                <input type=number ng-model=form.max_requests
+                  placeholder={{consts.max_requests.def}}>
               </md-input-container>
+            </div>
+            <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Minimum number of super proxies to use</label>
-                <input type=number ng-model=form.proxy_count
-                  placeholder={{consts.proxy_count.def}}>
+                <label>Session duration</label>
+                <input type=number ng-model=form.session_durtion
+                  placeholder={{consts.session_duration.def}}>
+              </md-input-container>
+            </div>
+            <div layout-gt-sm=row>
+              <md-input-container class=md-block flex-gt-sm>
+                <md-checkbox ng-model=form.sticky_ip>Sticky IP</md-checkbox>
+                <span class="hint hidden">Same IP as much as possible</span>
               </md-input-container>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Pool size</label>
                 <input type=number ng-model=form.pool_size
                   placeholder={{consts.pool_size.def}}>
               </md-input-container>
+            </div>
+          </md-content>
+        </md-tab>
+        <md-tab label=performance>
+          <md-content>
+            <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
-                <label>Max requests</label>
-                <input type=number ng-model=form.max_requests
-                  placeholder={{consts.max_requests.def}}>
+                <label>Session init timeout</label>
+                <input type=number ng-model=form.session_init_timeout
+                  placeholder={{consts.session_init_timeout.def}}>
+              </md-input-container>
+              <md-input-container class=md-block flex-gt-sm>
+                <label>Minimum number of super proxies to use</label>
+                <input type=number ng-model=form.proxy_count
+                  placeholder={{consts.proxy_count.def}}>
               </md-input-container>
             </div>
             <div layout-gt-sm=row>
@@ -130,10 +149,6 @@
                 <label>{{consts.proxy_switch.desc}}</label>
                 <input type=number ng-model=form.proxy_switch
                   placeholder={{consts.proxy_switch.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <md-checkbox ng-model=form.sticky_ip>Sticky IP</md-checkbox>
-                <span class="hint hidden">Same IP as much as possible</span>
               </md-input-container>
             </div>
             <div layout-gt-sm=row>

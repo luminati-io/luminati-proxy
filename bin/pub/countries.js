@@ -14,6 +14,7 @@ function countries($scope, $mdDialog, consts){
     this.path = '';
     this.headers = [];
     this.started = 0;
+    this.num_loading = 0;
     this.add_header = function(){
         _this.headers.push({key: '', value: ''});
     };
@@ -31,16 +32,20 @@ function countries($scope, $mdDialog, consts){
             _this.started++;
             _this.countries = [];
             var max_concur = 4;
-            var cur_concur = 0;
-            var cur_index = 0;
+            _this.num_loading = 0;
+            _this.cur_index = 0;
             var progress = function(apply){
-                while (cur_index<_this.countries.length&&cur_concur<max_concur)
+                while (_this.cur_index<_this.countries.length&&
+                    _this.num_loading<max_concur)
                 {
-                    _this.countries[cur_index].status = 1;
-                    _this.countries[cur_index].img.src =
-                    _this.countries[cur_index].url;
-                    cur_index++;
-                    cur_concur++;
+                    if (_this.countries[_this.cur_index].status == 0)
+                    {
+                        _this.countries[_this.cur_index].status = 1;
+                        _this.countries[_this.cur_index].img.src =
+                        _this.countries[_this.cur_index].url;
+                        _this.num_loading++;
+                    }
+                    _this.cur_index++;
                 }
                 if (apply)
                     $scope.$apply();
@@ -67,13 +72,14 @@ function countries($scope, $mdDialog, consts){
                     status: 0,
                     url: '/api/country?'+nparams.join('&'),
                     img: new Image(),
+                    index: _this.countries.length,
                 };
                 data.img.onerror = (function(data, started){
                     return function(){
                         if (_this.started!=started)
                             return;
-                        data.status = 2;
-                        cur_concur--;
+                        data.status = 3;
+                        _this.num_loading--;
                         progress(true);
                     };
                 })(data, _this.started);
@@ -81,8 +87,8 @@ function countries($scope, $mdDialog, consts){
                     return function(){
                         if (_this.started!=started)
                             return;
-                        data.status = 3;
-                        cur_concur--;
+                        data.status = 4;
+                        _this.num_loading--;
                         progress(true);
                     };
                 })(data, _this.started);
@@ -106,15 +112,51 @@ function countries($scope, $mdDialog, consts){
         else
             process();
     };
-    this.view = function(country, url){
+    this.view = function(country){
         $mdDialog.show({
             controller: screenshot_controller,
             templateUrl: '/screenshot.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
-            locals: {country: country, url: url},
+            locals: {country: country.name, url: country.url},
             fullscreen: true,
         });
+    };
+    this.cancel = function(country){
+        if (country.status==0)
+            country.status = 2;
+        else if (country.status==1)
+            country.img.src = '';
+    };
+    this.cancel_all = function(){
+        var confirm = $mdDialog.confirm({
+            ok: 'ok',
+            cancel: 'cancel',
+            title: 'Do you want to cancel all the remaining countries?',
+            onComplete: function(scope, el){
+                el.find('button').eq(0).focus();
+            },
+        });
+        $mdDialog.show(confirm).then(function(){
+            for (var c_index=_this.countries.length-1; c_index>=0; c_index--)
+            {
+                var country = _this.countries[c_index];
+                if (country.status<2)
+                    _this.cancel(country);
+            }
+        });
+    };
+    this.retry = function(country){
+        if (_this.cur_index>country.index)
+        {
+            country.status = 1;
+            country.url = country.url.replace(/&\d+$/, '')
+            +'&'+new Date().getTime();
+            _this.num_loading++;
+            country.img.src = country.url;
+        }
+        else
+            country.status = 0;
     };
 }
 
