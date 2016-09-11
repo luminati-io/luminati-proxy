@@ -31,7 +31,8 @@ npm install -g luminati-io/luminati-proxy
 ```
 
 ### Linux/MacOS
-- Install Node.js (preferably using [nave](https://github.com/isaacs/nave))
+- Install Node.js 4 or above (preferably using
+  [nave](https://github.com/isaacs/nave))
 - Install Luminati Proxy from the terminal prompt:
 ```sh
 $ sudo npm install -g luminati-io/luminati-proxy
@@ -111,6 +112,9 @@ Options:
   --direct_include        Include pattern for direct requests
   --direct_exclude        Exclude pattern for direct requests
   --null_response         URL pattern for null response
+  --throttle              Throttle requests above given number          [number]
+  --allow_proxy_auth      Allow Luminati authentication per request
+                                                      [boolean] [default: false]
   --www                   Local web port                        [default: 22999]
   --socks                 SOCKS5 port
   --history               Log history                                  [boolean]

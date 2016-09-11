@@ -110,14 +110,17 @@ var opt_columns = [
     {key: 'asn', title: 'ASN'},
     {key: 'cid', title: 'Client ID'},
     {key: 'ip', title: 'IP'},
-    {key: 'session_timeout', title: 'Session timeout'},
+    {key: 'session_init_timeout', title: 'Session init timeout'},
     {key: 'dns', title: 'DNS'},
     {key: 'request_timeout', title: 'Request Timeout'},
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
     {key: 'proxy_count', title: 'Minimum proxies count'},
     {key: 'sticky_ip', title: 'Sticky IP'},
+    {key: 'allow_proxy_auth', title: 'Allow request authentication'},
     {key: 'max_requests', title: 'Max requests'},
+    {key: 'session_duration', title: 'Max session duration'},
+    {key: 'throttle', title: 'Throttle concurrent connections'},
     {key: 'log', title: 'Log Level'},
     {key: 'debug', title: 'Luminati debug'},
 ];
@@ -136,10 +139,10 @@ function proxy_table(proxies, $mdDialog, $http, consts){
     proxies.subscribe(function(proxies){
         $vm.resolved = true;
         $vm.proxies = proxies;
-        var always = ['zone', 'session_timeout', 'pool_size'];
         $vm.columns = opt_columns.filter(function(col){
-            var key = col.key;
-            return always.indexOf(key)>-1 || _.some(proxies, key);
+            return _.some(proxies, function(p){
+                    return p.hasOwnProperty(col.key);
+                });
         });
     });
 }

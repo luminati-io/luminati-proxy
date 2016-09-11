@@ -93,7 +93,7 @@
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
                 <label>Session duration</label>
-                <input type=number ng-model=form.session_durtion
+                <input type=number ng-model=form.session_duration
                   placeholder={{consts.session_duration.def}}>
               </md-input-container>
             </div>
@@ -150,6 +150,11 @@
                 <input type=number ng-model=form.proxy_switch
                   placeholder={{consts.proxy_switch.def}}>
               </md-input-container>
+              <md-input-container class=md-block flex-gt-sm>
+                <label>{{consts.throttle.desc}}</label>
+                <input type=number ng-model=form.throttle
+                  placeholder={{consts.throttle.def}}>
+              </md-input-container>
             </div>
             <div layout-gt-sm=row>
               <md-input-container class=md-block flex-gt-sm>
@@ -168,6 +173,12 @@
                 <label>{{consts.debug.desc}}</label>
                 <input ng-model=form.debug>
                 <div class=hidden>{{consts.proxy.desc}}</div>
+              </md-input-container>
+              <md-input-container class=md-block flex-gt-sm>
+                <md-checkbox ng-model=form.allow_proxy_auth>Allow request
+                  authentication</md-checkbox>
+                <span class="hint hidden">Allow Luminati authentication per
+                  request</span>
               </md-input-container>
             </div>
           </md-content>

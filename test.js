@@ -153,8 +153,11 @@ const http_proxy = port=>etask(function*(){
 let proxy;
 before(()=>etask(function*(){
     proxy = yield http_proxy();
-    proxy.fake = true;
 }));
+beforeEach(()=>{
+    proxy.fake = true;
+    proxy.connection = null;
+});
 after(()=>etask(function*(){
     yield proxy.close();
     proxy = null;
@@ -217,32 +220,34 @@ describe('proxy', ()=>{
             }
             assert.equal(res.body.auth.session, '24000_1');
         }));
-        it('passthrough_disabled', ()=>etask(function*(){
-            l = yield lum({pool_size: 3});
-            const res = yield l.test({headers: {
-                'proxy-authorization': 'Basic '+
-                    (new Buffer('lum-customer-user-zone-zzz:pass'))
-                    .toString('base64'),
-            }});
-            assert(!l.sessions);
-            assert.equal(proxy.history.length, 1);
-            assert.equal(res.body.auth.customer, customer);
-            assert.equal(res.body.auth.password, password);
-            assert.equal(res.body.auth.zone, 'gen');
-        }));
-        it('passthrough_enabled', ()=>etask(function*(){
-            l = yield lum({pool_size: 3, allow_proxy_auth: true});
-            const res = yield l.test({headers: {
-                'proxy-authorization': 'Basic '+
-                    (new Buffer('lum-customer-user-zone-zzz:pass'))
-                    .toString('base64'),
-            }});
-            assert(!l.sessions);
-            assert.equal(proxy.history.length, 1);
-            assert.equal(res.body.auth.customer, customer);
-            assert.equal(res.body.auth.password, password);
-            assert.equal(res.body.auth.zone, 'zzz');
-        }));
+        describe('passthrough (allow_proxy_auth)', ()=>{
+            it('disabled', ()=>etask(function*(){
+                l = yield lum({pool_size: 3});
+                const res = yield l.test({headers: {
+                    'proxy-authorization': 'Basic '+
+                        (new Buffer('lum-customer-user-zone-zzz:pass'))
+                        .toString('base64'),
+                }});
+                assert(!l.sessions);
+                assert.equal(proxy.history.length, 1);
+                assert.equal(res.body.auth.customer, customer);
+                assert.equal(res.body.auth.password, password);
+                assert.equal(res.body.auth.zone, 'gen');
+            }));
+            it('enabled', ()=>etask(function*(){
+                l = yield lum({pool_size: 3, allow_proxy_auth: true});
+                const res = yield l.test({headers: {
+                    'proxy-authorization': 'Basic '+
+                        (new Buffer('lum-customer-user-zone-zzz:pass'))
+                        .toString('base64'),
+                }});
+                assert(!l.sessions);
+                assert.equal(proxy.history.length, 1);
+                assert.equal(res.body.auth.customer, customer);
+                assert.equal(res.body.auth.password, password);
+                assert.equal(res.body.auth.zone, 'zzz');
+            }));
+        });
         describe('max_requests', ()=>{
             const t = (name, opt)=>it(name, ()=>etask(function*(){
                 l = yield lum(opt);
@@ -327,7 +332,8 @@ describe('proxy', ()=>{
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
         });
         describe('socks', ()=>{
-            const t = (name, url)=>it(name, ()=>etask(function*(){
+            const t = (name, url)=>it(name, etask._fn(function*(_this){
+                _this.timeout(3000);
                 l = yield lum({socks: 25000});
                 yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
@@ -391,9 +397,9 @@ describe('manager', ()=>{
     beforeEach(()=>temp_files = []);
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('socks', ()=>{
-        beforeEach(()=>proxy.fake = false);
-        afterEach(()=>proxy.fake = true);
-        const t = (name, url, expected)=>it(name, ()=>etask(function*(){
+        const t = (name, url, expected)=>it(name, etask._fn(function*(_this){
+            _this.timeout(3000);
+            proxy.fake = false;
             let args = [
                 '--socks', '25000:24000',
             ];
