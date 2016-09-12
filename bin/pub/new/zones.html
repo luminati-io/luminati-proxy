@@ -1,0 +1,39 @@
+<div ng-controller=zones>
+  <div ng-if=error class="alert alert-danger">
+    Failed to get the zones info.
+  </div>
+  <div ng-hide=stats||error class="alert alert-info">
+    Loading...
+  </div>
+  <div ng-repeat="(zone, properties) in stats" class="panel panel-default">
+    <div class=panel-heading>{{zone}}</div>
+    <div class=panel-body>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th></th>
+            <th ng-repeat="time in times">
+              {{time.title}}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="field in fields">
+            <th>{{field.title}}</th>
+            <td ng-repeat="time in times">
+              {{field.filter(properties[time.key][field.key])}}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class=panel-footer>
+      <div ng-if="whitelist&&whitelist[zone]">
+        <strong>Whitelist</strong>: {{whitelist[zone].join(', ')}}
+      </div>
+      <div ng-if="recent_ips&&recent_ips[zone]" flex>
+        <strong>Recent IPs</strong>: {{recent_ips[zone].join(', ')}}
+      </div>
+    </div>
+  </div>
+</div>

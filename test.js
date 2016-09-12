@@ -348,6 +348,32 @@ describe('proxy', ()=>{
             }));
             t('http', test_url);
         });
+        describe('throttle', ()=>{
+            const t = throttle=>it(throttle, ()=>etask(function*(){
+                let waiting = [];
+                const release = n=>{
+                    while(waiting.length&&n--)
+                        waiting.shift()();
+                };
+                proxy.connection = next=>{
+                    waiting.push(next);
+                };
+                l = yield lum({throttle});
+                let requests = [];
+                for (let i=throttle+1; i--;)
+                    requests.push(l.test());
+                yield etask.sleep(100);
+                assert.equal(waiting.length, throttle);
+                release(1);
+                yield etask.sleep(10);
+                assert.equal(waiting.length, throttle);
+                release(throttle);
+                yield etask.all(requests);
+            }));
+            t(1);
+            t(3);
+            t(10);
+        });
     });
 });
 describe('manager', ()=>{
