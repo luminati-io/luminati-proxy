@@ -97,6 +97,7 @@ Options:
   --state                 State
   --city                  City
   --asn                   ASN
+  --ip                    Datacenter IP
   --dns                   DNS resolving (local|remote)
   --debug                 Luminati request debug info (none|full)
   --request_timeout       Timeout for request on the super proxy (seconds)

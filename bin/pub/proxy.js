@@ -109,7 +109,7 @@ var opt_columns = [
     {key: 'city', title: 'City'},
     {key: 'asn', title: 'ASN'},
     {key: 'cid', title: 'Client ID'},
-    {key: 'ip', title: 'IP'},
+    {key: 'ip', title: 'Datacenter IP'},
     {key: 'session_init_timeout', title: 'Session init timeout'},
     {key: 'dns', title: 'DNS'},
     {key: 'request_timeout', title: 'Request Timeout'},
