@@ -102,6 +102,8 @@ Options:
   --request_timeout       Timeout for request on the super proxy (seconds)
                                                                         [number]
   --pool_size             Pool size                        [number] [default: 3]
+  --pool_type             Pool session iteration order (sequential|round-robin)
+                                                         [default: "sequential"]
   --ssl                   Enable SSL sniffing                          [boolean]
   --max_requests          Requests per session            [number] [default: 50]
   --session_duration      Maximum duration of session (seconds)

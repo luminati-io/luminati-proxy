@@ -202,24 +202,6 @@ describe('proxy', ()=>{
             luminati.version);
     }));
     describe('options', ()=>{
-        it('pool', ()=>etask(function*(){
-            l = yield lum({pool_size: 3});
-            const res = yield l.test();
-            assert.equal(proxy.history.length, 4);
-            for (let i=0; i<3; i++)
-            {
-                assert.equal(proxy.history[i].url,
-                    'http://lumtest.com/myip.json');
-            }
-            assert.equal(proxy.history[3].url, test_url);
-            assert.equal(l.sessions.length, 3);
-            for (let i=0; i<3; i++)
-            {
-                assert.equal(l.sessions[i].proxy, '127.0.0.1');
-                assert.equal(l.sessions[i].session, '24000_'+(i+1));
-            }
-            assert.equal(res.body.auth.session, '24000_1');
-        }));
         describe('passthrough (allow_proxy_auth)', ()=>{
             it('disabled', ()=>etask(function*(){
                 l = yield lum({pool_size: 3});
@@ -248,32 +230,81 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.zone, 'zzz');
             }));
         });
-        describe('max_requests', ()=>{
-            const t = (name, opt)=>it(name, ()=>etask(function*(){
-                l = yield lum(opt);
-                const pool_size = l.opt.pool_size || 1;
-                for (let r=0; r<3; r++)
-                {
-                    for (let p=1; p<=pool_size; p++)
+        describe('pool', ()=>{
+            describe('pool_size', ()=>{
+                const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
+                    l = yield lum({pool_size});
+                    const res = yield l.test();
+                    assert.equal(proxy.history.length, pool_size+1);
+                    for (let i=0; i<pool_size; i++)
                     {
-                        for (let i=0; i<l.opt.max_requests; i++)
+                        assert.equal(proxy.history[i].url,
+                            'http://lumtest.com/myip.json');
+                    }
+                    assert.equal(proxy.history[pool_size].url, test_url);
+                    assert.equal(l.sessions.length, pool_size);
+                    for (let i=0; i<pool_size; i++)
+                    {
+                        assert.equal(l.sessions[i].proxy, '127.0.0.1');
+                        assert.equal(l.sessions[i].session, '24000_'+(i+1));
+                    }
+                    assert.equal(res.body.auth.session, '24000_1');
+                }));
+                t(1);
+                t(3);
+                t(10);
+            });
+            describe('max_requests', ()=>{
+                const t = (name, opt)=>it(name, ()=>etask(function*(){
+                    l = yield lum(opt);
+                    const pool_size = l.opt.pool_size || 1;
+                    for (let r=0; r<3; r++)
+                    {
+                        if (opt.pool_type=='round-robin')
                         {
-                            const res = yield l.test();
-                            assert.equal(res.body.auth.session,
-                                '24000_'+(r*pool_size+p),
-                                `trial/request/pool ${r}/${i}/${p}`);
+                            for (let i=0; i<l.opt.max_requests; i++)
+                            {
+                                for (let p=1; p<=pool_size; p++)
+                                {
+                                    const res = yield l.test();
+                                    assert.equal(res.body.auth.session,
+                                        '24000_'+(r*pool_size+p),
+                                        `trial/request/pool ${r}/${i}/${p}`);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (let p=1; p<=pool_size; p++)
+                            {
+                                for (let i=0; i<l.opt.max_requests; i++)
+                                {
+                                    const res = yield l.test();
+                                    assert.equal(res.body.auth.session,
+                                        '24000_'+(r*pool_size+p),
+                                        `trial/request/pool ${r}/${i}/${p}`);
+                                }
+                            }
                         }
                     }
-                }
-            }));
-            t('1, pool 3', {max_requests: 1, pool_size: 3});
-            t('2, pool 3', {max_requests: 2, pool_size: 3});
-            t('5, pool 3', {max_requests: 5, pool_size: 3});
-            t('10, pool 3', {max_requests: 10, pool_size: 3});
-            t('1, no pool', {max_requests: 1});
-            t('2, no pool', {max_requests: 2});
-            t('5, no pool', {max_requests: 5});
-            t('10, no pool', {max_requests: 10});
+                }));
+                t('1, round-robin pool', {max_requests: 1, pool_size: 1,
+                    pool_type: 'round-robin'});
+                t('2, round-robin pool', {max_requests: 2, pool_size: 2,
+                    pool_type: 'round-robin'});
+                t('5, round-robin pool', {max_requests: 5, pool_size: 5,
+                    pool_type: 'round-robin'});
+                t('10, round-robin pool', {max_requests: 10, pool_size: 10,
+                    pool_type: 'round-robin'});
+                t('1, sequential pool', {max_requests: 1, pool_size: 1});
+                t('2, sequential pool', {max_requests: 2, pool_size: 2});
+                t('5, sequential pool', {max_requests: 5, pool_size: 5});
+                t('10, sequential pool', {max_requests: 10, pool_size: 10});
+                t('1, no pool', {max_requests: 1});
+                t('2, no pool', {max_requests: 2});
+                t('5, no pool', {max_requests: 5});
+                t('10, no pool', {max_requests: 10});
+            });
         });
         describe('null_response', ()=>{
             const t = (name, ssl)=>it(name, ()=>etask(function*(){
@@ -349,10 +380,10 @@ describe('proxy', ()=>{
             t('http', test_url);
         });
         describe('throttle', ()=>{
-            const t = throttle=>it(throttle, ()=>etask(function*(){
+            const t = throttle=>it(''+throttle, ()=>etask(function*(){
                 let waiting = [];
                 const release = n=>{
-                    while(waiting.length&&n--)
+                    while (waiting.length&&n--)
                         waiting.shift()();
                 };
                 proxy.connection = next=>{

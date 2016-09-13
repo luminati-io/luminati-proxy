@@ -115,6 +115,7 @@ var opt_columns = [
     {key: 'request_timeout', title: 'Request Timeout'},
     {key: 'resolve', title: 'Resolve'},
     {key: 'pool_size', title: 'Pool size'},
+    {key: 'pool_type', title: 'Pool type'},
     {key: 'proxy_count', title: 'Minimum proxies count'},
     {key: 'sticky_ip', title: 'Sticky IP'},
     {key: 'allow_proxy_auth', title: 'Allow request authentication'},
