@@ -1,20 +1,111 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', '_css!app'],
-function(angular){
+define(['angular', 'socket.io-client', 'lodash', 'moment', 'angular-chart',
+    'jquery', 'bootstrap', '_css!app'],
+function(angular, io, _, moment){
 
 var module = angular.module('app', []);
 
 module.run(function($rootScope, $window){
+    $window.Chart.defaults.global.colors = ['#803690', '#00ADF9', '#46BFBD',
+        '#FDB45C', '#949FB1', '#4D5360'];
     $rootScope.section = $window.location.pathname.split('/').pop();
 });
+
+module.factory('$proxies', $proxies);
+$proxies.$inject = ['$http'];
+function $proxies($http){
+    var service = {
+        subscribe: subscribe,
+        proxies: null,
+        update: update_proxies
+    };
+    var listeners = [];
+    service.update();
+    io().on('stats', stats_event);
+    return service;
+    function subscribe(func){
+        listeners.push(func);
+        if (service.proxies)
+            func(service.proxies);
+    }
+    function update_proxies(){
+        return $http.get('/api/proxies').then(function(proxies){
+            proxies = proxies.data;
+            proxies.forEach(function(proxy){
+                proxy.stats = {
+                    total: {
+                        active_requests: [],
+                        status: {codes: ['2xx'], values: [[]]},
+                        max: {requests: 0, codes: 0},
+                    },
+                    ticks: [],
+                };
+            });
+            service.proxies = proxies;
+            listeners.forEach(function(cb){ cb(proxies); });
+            return proxies;
+        });
+    }
+    function stats_event(stats_chunk){
+        if (!service.proxies)
+            return;
+        var now = moment().format('hh:mm:ss');
+        for (var port in stats_chunk)
+        {
+            var chunk = stats_chunk[port];
+            var proxy = _.find(service.proxies, {port: +port});
+            var data = _.values(chunk);
+            var stats = proxy.stats;
+            var status = stats.total.status;
+            stats.ticks.push(now);
+            var active_requests = _.sumBy(data, 'active_requests');
+            stats.total.active_requests.push(active_requests);
+            stats.total.max.requests = Math.max(stats.total.max.requests,
+                active_requests);
+            var codes = data.reduce(function(r, host){
+                return r.concat(_.keys(host.status_code)); }, []);
+            codes = _.uniq(codes);
+            codes.forEach(function(code){
+                var i = status.codes.indexOf(code);
+                if (i==-1)
+                {
+                    status.codes.push(code);
+                    i = status.codes.length-1;
+                    status.values.push(new Array(stats.ticks.length-1));
+                    _.fill(status.values[i], 0);
+                }
+                var total = _.sumBy(data, 'status_code.'+code);
+                status.values[i].push(total);
+                stats.total.max.codes = Math.max(stats.total.max.codes, total);
+            });
+            var len = stats.ticks.length;
+            status.values.forEach(function(values){
+                if (values.length<len)
+                    values.push(0);
+            });
+            ['requests', 'codes'].forEach(function(chart){
+                var canvas;
+                if ((canvas = chart_container(chart)) && canvas.att_chart)
+                {
+                    canvas.att_chart.data.datasets = chart_data(
+                        canvas.att_chart_pars).datasets;
+                    canvas.att_chart.update();
+                    canvas.att_scope.$apply();
+                }
+            });
+        }
+    }
+}
 
 module.controller('root', root);
 root.$inject = ['$rootScope', '$scope', '$http', '$window'];
 function root($rootScope, $scope, $http, $window){
     $scope.sections = [
         {name: 'settings', title: 'Settings'},
+        {name: 'proxies', title: 'Proxies'},
         {name: 'zones', title: 'Zones'},
+        {name: 'tools', title: 'Tools'},
     ];
     for (var s in $scope.sections)
     {
@@ -32,23 +123,28 @@ function root($rootScope, $scope, $http, $window){
     $http.get('/api/version').then(function(version){
         $scope.ver_cur = version.data.version;
     });
-    $http.get('https://raw.githubusercontent.com/luminati-io/'
-        +'luminati-proxy/master/package.json').then(function(version){
+    $http.get('/api/last_version').then(function(version){
         $scope.ver_last = version.data.version;
+    });
+    $http.get('/api/consts').then(function(consts){
+        $scope.consts = consts.data;
     });
 }
 
 module.controller('settings', settings);
 settings.$inject = ['$scope', '$http'];
 function settings($scope, $http){
+    $http.get('/api/status').then(function(status){
+        $scope.status = status.data;
+    });
     $scope.save = function(){
         $scope.saving = true;
         $scope.error = false;
         $scope.saved = false;
         $http.post('/api/creds', {
-            customer: $scope.$parent.settings.customer,
-            password: $scope.$parent.settings.password,
-            proxy: $scope.$parent.settings.proxy,
+            customer: $scope.$parent.settings.customer.trim(),
+            password: $scope.$parent.settings.password.trim(),
+            proxy: $scope.$parent.settings.proxy.trim(),
             proxy_port: $scope.$parent.settings.proxy_port,
         }).error(function(){
             $scope.saving = false;
@@ -56,6 +152,11 @@ function settings($scope, $http){
         }).then(function(){
             $scope.saving = false;
             $scope.saved = true;
+            $scope.status = {
+                status: 'ok',
+                description: 'Your proxy is up and running, but you might '
+                    +' need to restart the application.',
+            };
         });
     };
 }
@@ -98,6 +199,309 @@ function zones($scope, $http, $filter){
     });
 }
 
+module.controller('test', test);
+test.$inject = ['$scope', '$http', '$filter'];
+function test($scope, $http, $filter){
+    $http.get('/api/proxies').then(function(proxies){
+        $scope.proxies = proxies.data;
+    });
+    $scope.methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD',
+        'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND',
+        'VIEW'];
+    $scope.request = {};
+    $scope.go = function(proxy, url, method, headers, body){
+        var headers_obj = {};
+        headers.forEach(function(h){ headers_obj[h.key] = h.value; });
+        var req = {
+            method: 'POST',
+            url: '/api/test/'+proxy,
+            data: {
+                url: url,
+                method: method,
+                headers: headers_obj,
+                body: body,
+            },
+        };
+        $scope.loading = true;
+        $http(req).then(function(r){
+            $scope.loading = false;
+            r = r.data;
+            if (!r.error)
+            {
+                r.response.headers = Object.keys(r.response.headers).sort()
+                .map(function(key){
+                    return [key, r.response.headers[key]];
+                });
+            }
+            $scope.request = r;
+        });
+    };
+    $scope.headers = [];
+    $scope.add_header = function(){
+        $scope.headers.push({key: '', value: ''});
+    };
+    $scope.remove_header = function(index){
+        $scope.headers.splice(index, 1);
+    };
+}
+
+module.controller('countries', countries);
+countries.$inject = ['$scope', '$http', '$window'];
+function countries($scope, $http, $window){
+    $scope.url = '';
+    $scope.ua = '';
+    $scope.path = '';
+    $scope.headers = [];
+    $scope.started = 0;
+    $scope.num_loading = 0;
+    $scope.add_header = function(){
+        $scope.headers.push({key: '', value: ''});
+    };
+    $scope.remove_header = function(index){
+        $scope.headers.splice(index, 1);
+    };
+    var normalize_headers = function(headers){
+        var result = {};
+        for (var h in headers)
+            result[headers[h].key] = headers[h].value;
+        return result;
+    };
+    $scope.go = function(){
+        var process = function(){
+            $scope.started++;
+            $scope.countries = [];
+            var max_concur = 4;
+            $scope.num_loading = 0;
+            $scope.cur_index = 0;
+            var progress = function(apply){
+                while ($scope.cur_index<$scope.countries.length&&
+                    $scope.num_loading<max_concur)
+                {
+                    if ($scope.countries[$scope.cur_index].status == 0)
+                    {
+                        $scope.countries[$scope.cur_index].status = 1;
+                        $scope.countries[$scope.cur_index].img.src =
+                        $scope.countries[$scope.cur_index].url;
+                        $scope.num_loading++;
+                    }
+                    $scope.cur_index++;
+                }
+                if (apply)
+                    $scope.$apply();
+            };
+            var nheaders = JSON.stringify(normalize_headers($scope.headers));
+            for (var c_index in $scope.$parent.consts.proxy.country.values)
+            {
+                var c = $scope.$parent.consts.proxy.country.values[c_index];
+                if (!c.value)
+                    continue;
+                var params = {
+                    country: c.value,
+                    url: $scope.url,
+                    path: $scope.path,
+                    ua: $scope.ua,
+                    headers: nheaders,
+                };
+                var nparams = [];
+                for (var p in params)
+                    nparams.push(p+'='+encodeURIComponent(params[p]));
+                var data = {
+                    code: c.value,
+                    name: c.key,
+                    status: 0,
+                    url: '/api/country?'+nparams.join('&'),
+                    img: new Image(),
+                    index: $scope.countries.length,
+                };
+                data.img.onerror = (function(data, started){
+                    return function(){
+                        if ($scope.started!=started)
+                            return;
+                        data.status = 3;
+                        $scope.num_loading--;
+                        progress(true);
+                    };
+                })(data, $scope.started);
+                data.img.onload = (function(data, started){
+                    return function(){
+                        if ($scope.started!=started)
+                            return;
+                        data.status = 4;
+                        $scope.num_loading--;
+                        progress(true);
+                    };
+                })(data, $scope.started);
+                $scope.countries.push(data);
+            }
+            progress(false);
+        };
+        if ($scope.started)
+        {
+            $scope.$parent.$parent.confirmation = {
+                text: 'The currently made screenshots will be lost. '
+                    +'Do you want to continue?',
+                confirmed: process,
+            };
+            $window.$('#confirmation').modal();
+        }
+        else
+            process();
+    };
+    $scope.view = function(country){
+        $scope.screenshot = {
+            country: country.name,
+            url: country.url,
+        };
+        $window.$('#countries-screenshot').one('shown.bs.modal', function(){
+            $window.$('#countries-screenshot .modal-body > div')
+            .scrollTop(0).scrollLeft(0);
+        }).modal();
+    };
+    $scope.cancel = function(country){
+        if (country.status==0)
+            country.status = 2;
+        else if (country.status==1)
+            country.img.src = '';
+    };
+    $scope.cancel_all = function(){
+        $scope.$parent.$parent.confirmation = {
+            text: 'Do you want to stop all the remaining countries?',
+            confirmed: function(){
+                    for (var c_i=$scope.countries.length-1; c_i>=0; c_i--)
+                    {
+                        var country = $scope.countries[c_i];
+                        if (country.status<2)
+                            $scope.cancel(country);
+                    }
+                },
+            };
+        $window.$('#confirmation').modal();
+    };
+    $scope.retry = function(country){
+        if ($scope.cur_index>country.index)
+        {
+            country.status = 1;
+            country.url = country.url.replace(/&\d+$/, '')
+            +'&'+new Date().getTime();
+            $scope.num_loading++;
+            country.img.src = country.url;
+        }
+        else
+            country.status = 0;
+    };
+}
+
+module.controller('proxies', proxies);
+proxies.$inject = ['$scope', '$http', '$proxies', '$window'];
+function proxies($scope, $http, $proxies, $window){
+    var opt_columns = [
+        {key: 'super_proxy', title: 'Host'},
+        {key: 'zone', title: 'Zone'},
+        {key: 'socks', title: 'SOCKS'},
+        {key: 'country', title: 'Country'},
+        {key: 'state', title: 'State'},
+        {key: 'city', title: 'City'},
+        {key: 'asn', title: 'ASN'},
+        {key: 'cid', title: 'Client ID'},
+        {key: 'ip', title: 'IP'},
+        {key: 'session_init_timeout', title: 'Session init timeout'},
+        {key: 'dns', title: 'DNS'},
+        {key: 'request_timeout', title: 'Request Timeout'},
+        {key: 'resolve', title: 'Resolve'},
+        {key: 'pool_size', title: 'Pool size'},
+        {key: 'pool_type', title: 'Pool type'},
+        {key: 'proxy_count', title: 'Minimum proxies count'},
+        {key: 'sticky_ip', title: 'Sticky IP'},
+        {key: 'allow_proxy_auth', title: 'Allow request authentication'},
+        {key: 'max_requests', title: 'Max requests'},
+        {key: 'session_duration', title: 'Max session duration'},
+        {key: 'throttle', title: 'Throttle concurrent connections'},
+        {key: 'log', title: 'Log Level'},
+        {key: 'debug', title: 'Luminati debug'},
+    ];
+    $proxies.subscribe(function(proxies){
+        $scope.proxies = proxies;
+        $scope.columns = opt_columns.filter(function(col){
+            return _.some(proxies, function(p){
+                    return p.hasOwnProperty(col.key);
+                });
+        });
+    });
+    $scope.delete_proxy = function(proxy){
+        $scope.$parent.$parent.confirmation = {
+            text: 'Are you sure you want to delete the proxy?',
+            confirmed: function(){
+                $http.delete('/api/proxies/'+proxy.port).then(function(){
+                    $proxies.update();
+                });
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
+    $scope.show_stats = function(proxy){
+        $scope.selected_proxy = proxy;
+        var stats = $scope.selected_proxy.stats;
+        var total = stats.total;
+        $scope.requests = [total.active_requests];
+        $scope.requests_series = ['Active requests'];
+        $scope.codes = total.status.values;
+        $scope.codes_series = total.status.codes;
+        $scope.labels = stats.ticks;
+        $scope.options = {
+            animation: {duration: 0},
+            elements: {line: {borderWidth: 0.5}, point: {radius: 0}},
+            scales: {
+                xAxes: [{
+                    display: false,
+                }],
+                yAxes: [{
+                    position: 'right',
+                    gridLines: {display: false},
+                    ticks: {beginAtZero: true, suggestedMax: 6},
+                }],
+            },
+        };
+        $scope.codes_options = _.merge({elements: {line: {fill: false}},
+            legend: {display: true, labels: {boxWidth: 6}},
+            grindLines: {display: false}}, $scope.options);
+        $scope.max_values = total.max;
+        $scope.chart_indicator = chart_indicator;
+        $scope.chart_mousemove = chart_mousemove;
+        $scope.chart_x = {requests: 0, codes: 0};
+        $scope.chart_time = {requests: 0, codes: 0};
+        setTimeout(function(){
+            var charts = [
+                {
+                    name: 'requests',
+                    labels: $scope.labels,
+                    data: $scope.requests,
+                    series: $scope.requests_series,
+                    options: $scope.options,
+                },
+                {
+                    name: 'codes',
+                    labels: $scope.labels,
+                    data: $scope.codes,
+                    series: $scope.codes_series,
+                    options: $scope.codes_options,
+                },
+            ];
+            charts.forEach(function(chart){
+                var canvas = chart_container(chart.name);
+                var params = {
+                    type: 'line',
+                    data: chart_data(chart),
+                    options: chart.options,
+                };
+                canvas.att_chart_pars = chart;
+                canvas.att_chart = new $window.Chart(canvas, params);
+                canvas.att_scope = $scope;
+            });
+        }, 0);
+        $window.$('#stats').modal();
+    };
+}
+
 module.filter('requests', requestsFilter);
 requestsFilter.$inject = ['$filter'];
 function requestsFilter($filter){
@@ -130,5 +534,55 @@ function bytesFilter($filter){
 }
 
 angular.bootstrap(document, ['app']);
+
+function chart_container(chart){
+    return document.getElementsByClassName('chart-'+chart)[0];
+}
+
+function chart_color(color){
+    var rgba = function(color, alpha){
+        return 'rgba('+color.concat(alpha).join(',')+')';
+    };
+    var hex = color.substr(1);
+    var int = parseInt(hex, 16);
+    var r = int>>16&255, g = int>>8&255, b = int&255;
+    color = [r, g, b];
+    return {
+        backgroundColor: rgba(color, 0.2),
+        pointBackgroundColor: rgba(color, 1),
+        pointHoverBackgroundColor: rgba(color, 0.8),
+        borderColor: rgba(color, 1),
+        pointBorderColor: '#fff',
+        pointHoverBorderColor: rgba(color, 1),
+    };
+}
+
+function chart_data(params){
+    return {
+        labels: params.labels,
+        datasets: params.data.map(function(item, i){
+            return angular.extend({
+                lineTension: 0,
+                data: item,
+                label: params.series[i],
+            }, chart_color(window.Chart.defaults.global.colors[i]));
+        }),
+    };
+}
+
+function chart_mousemove(type, $event, x_ar, t_ar, labels){
+    var rect = $event.currentTarget.getBoundingClientRect();
+    var width = rect.right-rect.left;
+    var x = $event.pageX;
+    x -= rect.left;
+    x -= window.pageXOffset;
+    x = Math.max(0, Math.min(width-1, x));
+    x_ar[type] = x;
+    t_ar[type] = x/width;
+}
+
+function chart_indicator(labels, p){
+    return labels[Math.round(p*(labels.length-1))];
+}
 
 });

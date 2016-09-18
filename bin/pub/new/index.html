@@ -5,9 +5,9 @@
     <title>Luminati Proxy</title>
     <meta name=viewport
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel=stylesheet href=//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css integrity=sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7 crossorigin=anonymous>
+    <link rel=stylesheet href=/bootstrap/css/bootstrap.min.css>
+    <link rel=stylesheet href=/notosans/css/notosans-fontface.min.css>
     <style>[ng-cloak] { display: none; }</style>
-    <link rel=stylesheet href=//fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic,700italic>
   </head>
   <body ng-cloak ng-controller=root>
     <div class=header>
@@ -24,17 +24,37 @@
           {{section.title}}
         </div>
         <div class=items>
-          <span ng-repeat="s in sections">
-            <span ng-if="!$first"> &nbsp;|&nbsp; </span>
+          <span ng-repeat="s in sections" ng-if="s!=section">
+            <span> &nbsp;|&nbsp; </span>
             <a href={{s.name}}>{{s.title}}</a>
           </span>
         </div>
       </div>
       <ng-include src="section.name+'.html'"></ng-include>
     </div>
-    <script data-main=./config.js
-        src=//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js>
-    </script>
+    <div id=confirmation class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <button type=button class=close data-dismiss=modal>
+              &times;
+            </button>
+            <h4 class=modal-title>{{confirmation.text}}</h4>
+          </div>
+          <div class=modal-footer>
+            <button type=button class="btn btn-default"
+              data-dismiss=modal>
+              Cancel
+            </button>
+            <button type=button class="btn btn-success"
+              data-dismiss=modal ng-click=confirmation.confirmed()>
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script data-main=./config.js src=/require.js></script>
   </body>
 </html>
 

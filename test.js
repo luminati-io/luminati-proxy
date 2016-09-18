@@ -24,8 +24,7 @@ const assert_has = (value, has, prefix)=>{
         return;
     if (Array.isArray(has) && Array.isArray(value))
     {
-        if (value.length < has.length)
-            throw new assert.AssertionError(`${prefix}.length is `
+        assert.ok(value.length >= has.length, `${prefix}.length is `
                 +`${value.lengthi} should be at least ${has.length}`);
         has.forEach((h, i)=>assert_has(value[i], h, `${prefix}[${i}]`));
         return;
@@ -325,7 +324,7 @@ describe('proxy', ()=>{
                 l = yield lum({null_response: 'match', log: 'DEBUG'});
                 try {
                     yield l.test({url: 'https://match.com'});
-                } catch(err) {
+                } catch(err){
                     assert(/statusCode=501/.test(err.message));
                 }
                 yield l.test();
@@ -396,7 +395,7 @@ describe('proxy', ()=>{
                 yield etask.sleep(100);
                 assert.equal(waiting.length, throttle);
                 release(1);
-                yield etask.sleep(10);
+                yield etask.sleep(100);
                 assert.equal(waiting.length, throttle);
                 release(throttle);
                 yield etask.all(requests);
@@ -447,7 +446,7 @@ describe('manager', ()=>{
     afterEach(()=>etask(function*(){
         if (!app)
             return;
-        yield app.manager.stop();
+        yield app.manager.stop(true);
         fs.unlink(app.db_file);
         app = null;
     }));

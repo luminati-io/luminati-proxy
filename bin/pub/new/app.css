@@ -41,6 +41,9 @@ a:hover {
 .navigation .items {
     float: right;
 }
+.navigation .items >span:first-child span {
+    display: none;
+}
 .block {
     background: #eeeeee;
     padding: 1em;
@@ -55,3 +58,209 @@ a:hover {
     position: relative;
     top: 2px;
 }
+.tester-body {
+    margin-bottom: 18px;
+}
+.tester-body textarea {
+    height: 100px;
+}
+.tools-header {
+    margin-bottom: 12px;
+}
+.tester-body:after, .tools-header:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+.tools-add-header {
+    margin-bottom: 18px;
+}
+.tester-alert {
+    margin-top: 20px;
+    padding: 7.5px 11.5px;
+}
+.tester-results {
+    margin-top: 20px;
+}
+.tools-table {
+    width: auto;
+    float: none;
+    margin: 20px auto;
+}
+.tools-table th {
+    text-align: center;
+}
+.countries-list {
+    text-align: center;
+    margin-top: 20px;
+}
+.countries-list > div {
+    padding: 10px;
+    display: inline-block;
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: left;
+    position: relative;
+    border: 1px solid black;
+    margin: 5px 10px;
+}
+.countries-list .glyphicon {
+    color: grey;
+}
+.countries-list .glyphicon-ok {
+    color: green !important;
+}
+.countries-list .glyphicon-download-alt {
+    color: blue !important;
+}
+.countries-failed {
+    color: red !important;
+}
+.countries-canceled {
+    color: orange !important;
+}
+.countries-op {
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    width: 40px;
+    padding-left: 10px;
+    background: white;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), white 25%);
+}
+.countries-op span:hover {
+    color: orange;
+    cursor: pointer;
+}
+.countries-view {
+    border-bottom: 1px dashed;
+    cursor: pointer;
+}
+#countries-screenshot .modal-dialog {
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+#countries-screenshot .modal-body > div {
+    overflow: auto;
+    max-height: calc(100vh - 164px);
+}
+table.proxies {
+    width: auto;
+    float: none;
+    margin: auto;
+}
+table.proxies td, table.proxies th {
+    text-align: center;
+}
+.proxies-action {
+    cursor: pointer;
+    margin: 0 4px;
+}
+.proxies-action:hover {
+    color: orange;
+}
+.proxies-action-disabled {
+    opacity: 0.5;
+    margin: 0 4px;
+}
+.proxies-graph:first-child {
+    margin-bottom: 48px;
+}
+.proxies-graph-container {
+    margin-left: -32px;
+    padding: 0 28px 30px 60px;
+    position: relative;
+    overflow: hidden;
+}
+.proxies-graph-time {
+    position: absolute;
+    left: 60px;
+    bottom: 0;
+    height: 36px;
+    font-size: 12px;
+    background: white;
+}
+.proxies-graph-time:before {
+    content: '';
+    display: block;
+    position: absolute;
+    background: #ff4081;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    height: 4px;
+}
+.proxies-graph-left, .proxies-graph-right {
+    position: absolute;
+    bottom: 10px;
+}
+.proxies-graph-left {
+    left: -6px;
+}
+.proxies-graph-right {
+    right: -6px;
+}
+.proxies-graph-left span, .proxies-graph-right span {
+    position: relative;
+    top: 12px;
+    cursor: default;
+}
+.proxies-graph-left span {
+    left: 12px;
+}
+.proxies-graph-right span {
+    right: 12px;
+}
+.proxies-graph-left:after, .proxies-graph-right:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background: #ff4081;
+    bottom: 6px;
+}
+.proxies-graph-left:after {
+    left: 0;
+}
+.proxies-graph-right:after {
+    right: 0;
+}
+.proxies-graph-indicator {
+    position: absolute;
+    width: 0;
+    height: 0;
+    bottom: 22px;
+    display: none;
+}
+.proxies-graph-time:hover .proxies-graph-indicator {
+    display: block;
+}
+.proxies-graph-indicator:before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    height: 2000px;
+    background: #ff4081;
+}
+.proxies-graph-indicator span {
+    position: absolute;
+    display: block;
+    color: white;
+    background: #ff4081;
+    bottom: -8px;
+    border-radius: 8px;
+    height: 16px;
+    line-height: 16px;
+    width: 64px;
+    left: -32px;
+    text-align: center;
+    cursor: default;
+}
+

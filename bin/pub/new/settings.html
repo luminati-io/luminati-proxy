@@ -1,7 +1,10 @@
 <div ng-controller=settings>
-  <div class="alert alert-info">
-    Path to the configuration file:
-    <strong>{{$parent.settings.config}}</strong>
+  <div ng-if=!status class="alert alert-info">
+    Determining the status of your proxy...
+  </div>
+  <div ng-if=status class=alert ng-class="{'alert-success':
+    status.status=='ok', 'alert-danger': status.status=='error'}">
+    {{status.description}}
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
@@ -53,4 +56,8 @@
       </div>
     </div>
   </form>
+  <div class="alert alert-info">
+    Path to the configuration file:
+    <strong>{{$parent.settings.config}}</strong>
+  </div>
 </div>
