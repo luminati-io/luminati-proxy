@@ -13,13 +13,13 @@
     <strong>{{$parent.ver_last}}</strong>. You are using
     <strong>{{$parent.ver_cur}}</strong>. To upgrade, run the following
     command: <pre>$ npm install -g luminati-io/luminati-proxy</pre>
-    The source code of the tool is available at
+    The source code of the Luminati local proxy tool is available at
     <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
   </div>
   <form name=settings ng-submit="save(); settings.$setPristine()">
     <div class=block>
       <div class=form-group>
-        <label for=customer class=control-label>Customer</label>
+        <label for=customer class=control-label>Customer/Username</label>
         <input type=text ng-required=true ng-model=$parent.settings.customer
           class=form-control id=customer>
       </div>

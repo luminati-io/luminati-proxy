@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
 define(['angular', 'socket.io-client', 'lodash', 'moment', 'angular-chart',
-    'jquery', 'bootstrap', '_css!app'],
+    'jquery', 'bootstrap', 'bootstrap-datepicker', '_css!app'],
 function(angular, io, _, moment){
 
 var module = angular.module('app', []);
@@ -149,7 +149,8 @@ function settings($scope, $http){
         }).error(function(){
             $scope.saving = false;
             $scope.error = true;
-        }).then(function(){
+        }).then(function(settings){
+            $scope.$parent.settings = settings.data;
             $scope.saving = false;
             $scope.saved = true;
             $scope.status = {
@@ -423,7 +424,7 @@ function proxies($scope, $http, $proxies, $window){
         $scope.proxies = proxies;
         $scope.columns = opt_columns.filter(function(col){
             return _.some(proxies, function(p){
-                    return p.hasOwnProperty(col.key);
+                    return p.hasOwnProperty(col.key)&&p[col.key];
                 });
         });
     });
@@ -499,6 +500,465 @@ function proxies($scope, $http, $proxies, $window){
             });
         }, 0);
         $window.$('#stats').modal();
+    };
+    $scope.show_history = function(proxy){
+        $scope.history_dialog = [{port: proxy.port}];
+    };
+    $scope.edit_proxy = function(proxy){
+        $scope.proxy_dialog = [{proxy: proxy||{}}];
+    };
+}
+
+module.controller('history', history);
+history.$inject = ['$scope', '$http', '$filter', '$window'];
+function history($scope, $http, $filter, $window){
+    $scope.init = function(locals){
+        var loader_delay = 100;
+        $scope.initial_loading = true;
+        $scope.port = locals.port;
+        $scope.show_modal = function(){ $window.$('#history').modal(); };
+        $scope.fields = [
+            {
+                field: 'url',
+                title: 'Url',
+                type: 'string',
+                filter_label: 'URL or substring',
+            },
+            {
+                field: 'method',
+                title: 'Method',
+                type: 'options',
+                filter_label: 'Request method',
+            },
+            {
+                field: 'status_code',
+                title: 'Code',
+                type: 'number',
+                filter_label: 'Response code',
+            },
+            {
+                field: 'timestamp',
+                title: 'Time',
+                type: 'daterange',
+            },
+            {
+                field: 'elapsed',
+                title: 'Elapsed',
+                type: 'numrange',
+            },
+            {
+                field: 'country',
+                title: 'Country',
+                type: 'options',
+                filter_label: 'Node country',
+            },
+            {
+                field: 'proxy',
+                title: 'Proxy',
+                type: 'string',
+                filter_label: 'Proxy or substring',
+            },
+        ];
+        $scope.sort_field = 'timestamp';
+        $scope.sort_asc = false;
+        $scope.filters = {
+            url: '',
+            method: '',
+            status_code: '',
+            timestamp: '',
+            timestamp_min: null,
+            timestamp_max: null,
+            elapsed: '',
+            elapsed_min: '',
+            elapsed_max: '',
+            country: '',
+            proxy: '',
+        };
+        $scope.page = 1;
+        $scope.page_size = 10;
+        $scope.update = function(preserving_page, export_type){
+            if (!preserving_page)
+                $scope.page = 1;
+            var params = {
+                count: export_type=='all' ? -1 : $scope.page*$scope.page_size,
+                sort: $scope.sort_field,
+            };
+            if (!$scope.sort_asc)
+                params.sort_desc = 1;
+            if ($scope.filters.url)
+                params.url = $scope.filters.url;
+            if ($scope.filters.method)
+                params.method = $scope.filters.method;
+            if ($scope.filters.status_code)
+                params.status_code = $scope.filters.status_code;
+            if ($scope.filters.timestamp_min)
+            {
+                params.timestamp_min = moment($scope.filters.timestamp_min,
+                    'YYYY/MM/DD').valueOf();
+            }
+            if ($scope.filters.timestamp_max)
+            {
+                params.timestamp_max = moment($scope.filters.timestamp_max,
+                    'YYYY/MM/DD').add(1, 'd').valueOf();
+            }
+            if ($scope.filters.elapsed_min)
+                params.elapsed_min = $scope.filters.elapsed_min;
+            if ($scope.filters.elapsed_max)
+                params.elapsed_max = $scope.filters.elapsed_max;
+            if ($scope.filters.country)
+                params.country = $scope.filters.country;
+            if ($scope.filters.proxy)
+                params.proxy = $scope.filters.proxy;
+            var params_arr = [];
+            for (var param in params)
+                params_arr.push(param+'='+encodeURIComponent(params[param]));
+            var url = '/api/'+(export_type ? 'har' : 'history')+'/'+locals.port
+            +'?'+params_arr.join('&');
+            if (export_type)
+                $window.location = url;
+            else
+            {
+                $scope.loading = new Date().getTime();
+                setTimeout(function(){ $scope.$apply(); }, loader_delay);
+                $http.get(url).then(function(history){
+                    history = history.data;
+                    $scope.initial_loading = false;
+                    $scope.loading = false;
+                    $scope.loading_page = false;
+                    $scope.history = history.map(function(r){
+                        var alerts = [];
+                        var disabled_alerts = [];
+                        var add_alert = function(alert){
+                            if (localStorage.getItem(
+                                'request-alert-disabled-'+alert.type))
+                            {
+                                disabled_alerts.push(alert);
+                            }
+                            else
+                                alerts.push(alert);
+                        };
+                        var request_headers = JSON.parse(r.request_headers);
+                        if (!request_headers['user-agent'])
+                        {
+                            add_alert({
+                                type: 'agent_empty',
+                                title: 'Empty user agent',
+                                description: 'The User-Agent header '
+                                    +'is not set to any value.',
+                            });
+                        }
+                        else if (!request_headers['user-agent'].match(
+                            /^Mozilla\//))
+                        {
+                            add_alert({
+                                type: 'agent_suspicious',
+                                title: 'Suspicious user agent',
+                                description: 'The User-Agent header is set to '
+                                    +'a value not corresponding to any of the '
+                                    +'major web browsers.',
+                            });
+                        }
+                        if (!request_headers.accept)
+                        {
+                            add_alert({
+                                type: 'accept_empty',
+                                title: 'Empty accept types',
+                                description: 'The Accept header is not set to '
+                                    +'any value.',
+                            });
+                        }
+                        if (!request_headers['accept-encoding'])
+                        {
+                            add_alert({
+                                type: 'accept_encoding_empty',
+                                title: 'Empty accept encoding',
+                                description: 'The Accept-Encoding header is '
+                                    +'not set to any value.',
+                            });
+                        }
+                        if (!request_headers['accept-language'])
+                        {
+                            add_alert({
+                                type: 'accept_language_empty',
+                                title: 'Empty accept language',
+                                description: 'The Accept-Language header is '
+                                    +'not set to any value.',
+                            });
+                        }
+                        if (request_headers.connection != 'keep-alive')
+                        {
+                            add_alert({
+                                type: 'connection_suspicious',
+                                title: 'Suspicious connection type',
+                                description: 'The Connection header is not '
+                                    +'set to "keep-alive".',
+                            });
+                        }
+                        if (!r.url.match(/^https?:\/\/[^\/\?]+\/?$/)
+                            &&!request_headers.referer)
+                        {
+                            add_alert({
+                                type: 'referer_empty',
+                                title: 'Empty referrer',
+                                description: 'The Referer header is not set '
+                                    +'even though the requested URL is not '
+                                    +'the home page of the site.',
+                            });
+                        }
+                        r.alerts = alerts;
+                        r.disabled_alerts = disabled_alerts;
+                        return r;
+                    });
+                    var history_cnt = $scope.history.length;
+                    var timings = ['node_latency', 'response_time', 'elapsed'];
+                    var timings_val = {};
+                    var timing, i;
+                    for (i=0; i<timings.length; i++)
+                    {
+                        timing = timings[i];
+                        timings_val[timing] = {
+                            min: Number.MAX_VALUE,
+                            max: -1,
+                            sum: 0,
+                        };
+                    }
+                    $scope.history.forEach(function(r){
+                        for (var i=0; i<timings.length; i++)
+                        {
+                            var timing = timings[i];
+                            timings_val[timing].min = Math.min(
+                                timings_val[timing].min, r[timing]);
+                            timings_val[timing].max = Math.max(
+                                timings_val[timing].max, r[timing]);
+                            timings_val[timing].sum += r[timing];
+                        }
+                    });
+                    $scope.timings = [];
+                    for (i=0; i<timings.length; i++)
+                    {
+                        timing = timings[i];
+                        $scope.timings.push([
+                            timing.replace(/_/g, ' '),
+                            timings_val[timing].min,
+                            Math.round(timings_val[timing].sum/history_cnt),
+                            timings_val[timing].max,
+                        ]);
+                    }
+                });
+            }
+        };
+        $scope.show_loader = function(){
+            return $scope.loading
+            &&new Date().getTime()-$scope.loading>=loader_delay;
+        };
+        $scope.show_next = function(){
+            return $scope.loading_page||$scope.history&&
+            $scope.history.length>=$scope.page*$scope.page_size;
+        };
+        $scope.sort = function(field){
+            if ($scope.sort_field==field.field)
+                $scope.sort_asc = !$scope.sort_asc;
+            else
+            {
+                $scope.sort_field = field.field;
+                $scope.sort_asc = true;
+            }
+            $scope.update();
+        };
+        $scope.filter = function(field){
+            var options;
+            if (field.field=='method')
+            {
+                options = ['', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY',
+                    'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK',
+                    'UNLOCK', 'PROPFIND', 'VIEW', 'TRACE', 'CONNECT'].map(
+                    function(e){ return {key: e, value: e}; }
+                );
+            }
+            else if (field.field=='country')
+                options = $scope.$parent.$parent.consts.proxy.country.values;
+            $scope.filter_dialog = [{
+                field: field,
+                filters: $scope.filters,
+                update: $scope.update,
+                options: options,
+            }];
+            setTimeout(function(){
+                $window.$('#history_filter').one('shown.bs.modal', function(){
+                    $window.$('#history_filter .history-filter-autofocus')
+                    .select().focus();
+                }).modal();
+            }, 0);
+        };
+        $scope.filter_cancel = function(field){
+            if (field.field=='elapsed')
+            {
+                $scope.filters.elapsed_min = '';
+                $scope.filters.elapsed_max = '';
+            }
+            if (field.field=='timestamp')
+            {
+                $scope.filters.timestamp_min = null;
+                $scope.filters.timestamp_max = null;
+            }
+            $scope.filters[field.field] = '';
+            $scope.update();
+        };
+        $scope.details = function(row){
+            $scope.details_dialog = [{
+                row: row,
+                fields: $scope.fields,
+                update: $scope.update,
+            }];
+            setTimeout(function(){
+                $window.$('#history_details').modal();
+            }, 0);
+        };
+        $scope.next = function(){
+            $scope.loading_page = true;
+            $scope.page++;
+            $scope.update(true);
+        };
+        $scope.export_type = 'visible';
+        $scope.export = function(){
+            $scope.update(true, $scope.export_type);
+        };
+        $scope.update();
+    };
+}
+
+module.controller('history_filter', history_filter);
+history_filter.$inject = ['$scope', '$window'];
+function history_filter($scope, $window){
+    $scope.init = function(locals){
+        $scope.field = locals.field;
+        var field = locals.field.field;
+        var range = field=='elapsed'||field=='timestamp';
+        $scope.value = {composite: locals.filters[field]};
+        if (range)
+        {
+            $scope.value.min = locals.filters[field+'_min'];
+            $scope.value.max = locals.filters[field+'_max'];
+        }
+        $scope.options = locals.options;
+        $scope.keypress = function(event){
+            if (event.which==13)
+            {
+                $scope.apply();
+                $window.$('#history_filter').modal('hide');
+            }
+        };
+        $scope.daterange = function(event){
+            $window.$(event.currentTarget).closest('.input-group')
+            .datepicker({
+                autoclose: true,
+                format: 'yyyy/mm/dd',
+            }).datepicker('show');
+        };
+        $scope.apply = function(){
+            if (range)
+            {
+                var display_min, display_max;
+                display_min = $scope.value.min;
+                display_max = $scope.value.max;
+                if ($scope.value.min&&$scope.value.max)
+                    $scope.value.composite = display_min+'-'+display_max;
+                else if ($scope.value.min)
+                    $scope.value.composite = 'From '+display_min;
+                else if ($scope.value.max)
+                    $scope.value.composite = 'Up to '+display_max;
+                else
+                    $scope.value.composite = '';
+                locals.filters[field+'_min'] = $scope.value.min;
+                locals.filters[field+'_max'] = $scope.value.max;
+            }
+            if ($scope.value.composite!=locals.filters[field])
+            {
+                locals.filters[field] = $scope.value.composite;
+                locals.update();
+            }
+        };
+    };
+}
+
+module.controller('history_details', history_details);
+history_details.$inject = ['$scope'];
+function history_details($scope){
+    $scope.init = function(locals){
+        $scope.row = locals.row;
+        var request_headers = JSON.parse($scope.row.request_headers);
+        $scope.request_headers = Object.keys(request_headers).map(
+            function(key){
+                return [key, request_headers[key]];
+            });
+        var response_headers = JSON.parse($scope.row.response_headers);
+        $scope.response_headers = Object.keys(response_headers).map(
+            function(key){
+                return [key, response_headers[key]];
+            });
+        $scope.timings = [
+            ['Proxy peer latency', $scope.row.node_latency+' ms'],
+            ['Response sent', $scope.row.response_time+' ms'],
+            ['Response received', $scope.row.elapsed+' ms'],
+        ];
+        $scope.alerts = $scope.row.alerts;
+        $scope.disabled_alerts = $scope.row.disabled_alerts;
+        $scope.fields = locals.fields;
+        $scope.disable_alert = function(type){
+            localStorage.setItem('request-alert-disabled-'+type, 1);
+            for (var i=0; i<$scope.alerts.length; i++)
+            {
+                if ($scope.alerts[i].type==type)
+                {
+                    $scope.disabled_alerts.push($scope.alerts[i]);
+                    $scope.alerts.splice(i, 1);
+                    break;
+                }
+            }
+            locals.update();
+        };
+        $scope.enable_alert = function(type){
+            localStorage.removeItem('request-alert-disabled-'+type);
+            for (var i=0; i<$scope.disabled_alerts.length; i++)
+            {
+                if ($scope.disabled_alerts[i].type==type)
+                {
+                    $scope.alerts.push($scope.disabled_alerts[i]);
+                    $scope.disabled_alerts.splice(i, 1);
+                    break;
+                }
+            }
+            locals.update();
+        };
+    };
+}
+
+module.controller('proxy', proxy);
+proxy.$inject = ['$scope', '$http', '$proxies', '$window'];
+function proxy($scope, $http, $proxies, $window){
+    $scope.init = function(locals){
+        $scope.port = locals.proxy.port;
+        $scope.form = _.cloneDeep(locals.proxy);
+        $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
+        $scope.show_modal = function(){ $window.$('#proxy').modal(); };
+        $scope.save = function(proxy){
+            proxy.persist = true;
+            var data = {proxy: proxy};
+            var promise;
+            if ($scope.port)
+                promise = $http.put('/api/proxies/'+$scope.port, data);
+            else
+                promise = $http.post('/api/proxies', data);
+            promise.then(function(){ $proxies.update(); });
+        };
+    };
+}
+
+module.filter('timestamp', timestampFilter);
+timestampFilter.$inject = [];
+function timestampFilter(){
+    return function(timestamp){
+        return moment(timestamp).format('YYYY/MM/DD HH:mm');
     };
 }
 

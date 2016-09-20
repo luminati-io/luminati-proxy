@@ -7,6 +7,8 @@ var config = {
     paths: {
         jquery: '/jquery/jquery.min',
         bootstrap: '/bootstrap/js/bootstrap.min',
+       'bootstrap-datepicker':
+           '/bootstrap-datepicker/js/bootstrap-datepicker.min',
         moment: '/moment/moment.min',
         angular: '/angular.min',
         'socket.io-client': '/socket.io/socket.io',

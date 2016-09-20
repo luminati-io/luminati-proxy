@@ -453,9 +453,8 @@ describe('manager', ()=>{
     beforeEach(()=>temp_files = []);
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('socks', ()=>{
-        const t = (name, url, expected)=>it(name, etask._fn(function*(_this){
+        const t = (name, url)=>it(name, etask._fn(function*(_this){
             _this.timeout(3000);
-            proxy.fake = false;
             let args = [
                 '--socks', '25000:24000',
             ];
@@ -469,10 +468,9 @@ describe('manager', ()=>{
                 url: url,
             }]);
             let body = JSON.parse(res.body);
-            assert_has(body, expected);
+            assert.equal(body.url, url);
         }));
-        t('http', 'http://lumtest.com/echo.json', {method: 'GET',
-            url: '/echo.json'});
+        t('http', 'http://lumtest.com/echo.json');
     });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, ()=>etask(function*(){

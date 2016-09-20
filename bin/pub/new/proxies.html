@@ -1,42 +1,58 @@
 <div ng-controller=proxies>
-  <table class="table table-hover proxies">
-    <thead>
-      <tr>
-        <th>Port</th>
-        <th ng-repeat="col in columns">
-          {{col.title}}
-        </th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr ng-repeat="proxy in proxies">
-        <td>{{proxy.port}}</td>
-        <td ng-repeat="col in columns">
-          <span ng-if=proxy[col.key]===true
-            class="glyphicon glyphicon-ok">
-          </span>
-          <span ng-if=proxy[col.key]!==true>
-            {{proxy[col.key]}}
-          </span>
-        </td>
-        <td>
-          <span class="proxies-action glyphicon glyphicon-stats"
-            ng-click=show_stats(proxy) title=Statistics>
-          </span>
-          <span class="proxies-action glyphicon glyphicon-time"
-            ng-click=show_history(proxy) title=History>
-          </span>
-          <span class="proxies-action glyphicon glyphicon-trash"
-            ng-if=proxy.persist ng-click=delete_proxy(proxy) title=Delete>
-          </span>
-          <span class="proxies-action-disabled glyphicon glyphicon-trash"
-            ng-if=!proxy.persist title="This proxy cannot be deleted">
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="panel panel-default">
+    <div class=panel-heading>Proxies</div>
+    <div class="panel-body proxies-panel">
+      <table class="table table-hover proxies">
+        <thead>
+          <tr>
+            <th>Port</th>
+            <th>Actions</th>
+            <th ng-repeat="col in columns">
+              {{col.title}}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="proxy in proxies">
+            <td>{{proxy.port}}</td>
+            <td class=proxies-actions>
+              <span class="proxies-action glyphicon glyphicon-pencil"
+                ng-if=proxy.persist ng-click=edit_proxy(proxy) title=Edit>
+              </span>
+              <span class="proxies-action-disabled glyphicon glyphicon-pencil"
+                ng-if=!proxy.persist title="This proxy cannot be edited">
+              </span>
+              <span class="proxies-action glyphicon glyphicon-stats"
+                ng-click=show_stats(proxy) title=Statistics>
+              </span>
+              <span class="proxies-action glyphicon glyphicon-time"
+                ng-click=show_history(proxy) title=History>
+              </span>
+              <span class="proxies-action glyphicon glyphicon-trash"
+                ng-if=proxy.persist ng-click=delete_proxy(proxy) title=Delete>
+              </span>
+              <span class="proxies-action-disabled glyphicon glyphicon-trash"
+                ng-if=!proxy.persist title="This proxy cannot be deleted">
+              </span>
+            </td>
+            <td ng-repeat="col in columns">
+              <span ng-if=proxy[col.key]===true
+                class="glyphicon glyphicon-ok">
+              </span>
+              <span ng-if=proxy[col.key]!==true&&proxy[col.key]!==false>
+                {{proxy[col.key]}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel-footer text-center">
+      <button type=button class="btn btn-default" ng-click=edit_proxy()>
+        Add a proxy
+      </button>
+    </div>
+  </div>
   <div id=stats class="modal fade" role=dialog>
     <div class=modal-dialog>
       <div class=modal-content>
@@ -86,5 +102,11 @@
         </div>
       </div>
     </div>
+  </div>
+  <div ng-repeat="h in history_dialog" ng-controller=history
+    ng-include="'history.html'" ng-init=init(h)>
+  </div>
+  <div ng-repeat="p in proxy_dialog" ng-controller=proxy
+    ng-include="'proxy.html'" ng-init=init(p)>
   </div>
 </div>

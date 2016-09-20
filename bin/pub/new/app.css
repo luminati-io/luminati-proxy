@@ -16,6 +16,12 @@ a:hover {
     box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
     border-radius: .15em;
 }
+.btn-title {
+    float: right;
+    margin-top: -4px;
+    margin-right: 15px;
+    margin-bottom: -5px;
+}
 .header {
     height: 60px;
     background: #0c334d;
@@ -146,13 +152,14 @@ a:hover {
     overflow: auto;
     max-height: calc(100vh - 164px);
 }
-table.proxies {
-    width: auto;
-    float: none;
-    margin: auto;
+.proxies-panel {
+    overflow: auto;
 }
 table.proxies td, table.proxies th {
     text-align: center;
+}
+.proxies-actions {
+    white-space: nowrap;
 }
 .proxies-action {
     cursor: pointer;
@@ -263,4 +270,67 @@ table.proxies td, table.proxies th {
     text-align: center;
     cursor: default;
 }
-
+#history .modal-dialog, #history_details .modal-dialog {
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+#history .modal-body > div {
+    overflow: auto;
+    max-height: calc(100vh - 164px);
+}
+#history label {
+    font-weight: normal;
+}
+.proxies-history-tools {
+    position: fixed;
+    left: 20px;
+    top: 80px;
+    height: 100%;
+}
+.proxies-history-navigation {
+    margin-bottom: 25px;
+}
+.proxies-history-content {
+    min-height: 250px;
+    padding-bottom: 12px;
+    position: relative;
+    margin-left: 300px;
+}
+.proxies-history-stats {
+    margin-top: 20px;
+}
+.proxies-history-filter {
+    font-size: 11px;
+    border-bottom: 1px dashed;
+    border-color: #428bca;
+}
+.proxies-history th {
+    line-height: 15px !important;
+    white-space: nowrap;
+}
+.proxies-history th span, .proxies-history th a {
+    cursor: pointer;
+}
+.proxies-history th, .proxies-history td {
+    text-align: center;
+}
+.proxies-history td:first-child {
+    text-align: left;
+}
+#history .proxies-history tr {
+    cursor: pointer;
+}
+#history .proxies-history thead tr {
+    cursor: default;
+}
+.proxies-history-loading {
+    padding: 4px;
+    width: 200px;
+    text-align: center;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -100px;
+    z-index: 2;
+}
