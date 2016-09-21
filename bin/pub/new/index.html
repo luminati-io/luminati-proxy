@@ -20,18 +20,27 @@
       <div class=navigation>
         <div class=active>
           <span ng-if=settings.customer>
-            <a href=settings>{{settings.customer}}</a> &nbsp;/&nbsp;
+            <a href=/new/settings>{{settings.customer}}</a>
+            <span class=separator>&nbsp;/&nbsp;</span>
           </span>
-          {{section.title}}
+          <span ng-if=!subsection>
+            {{section.title}}
+          </span>
+          <span ng-if=subsection>
+            <a href=/new/{{section.name}}>{{section.title}}</a>
+            <span class=separator>&nbsp;/&nbsp;</span>
+            {{subsection}}
+          </span>
         </div>
         <div class=items>
-          <span ng-repeat="s in sections" ng-if="s!=section">
-            <span> &nbsp;|&nbsp; </span>
-            <a href={{s.name}}>{{s.title}}</a>
+          <span ng-repeat="s in sections">
+            <span ng-if="$index&gt;0" class=separator>&nbsp;|&nbsp;</span>
+            <a ng-if=s!=section||subsection href=/new/{{s.name}}>{{s.title}}</a>
+            <span ng-if=s==section&&!subsection>{{s.title}}</span>
           </span>
         </div>
       </div>
-      <ng-include src="section.name+'.html'"></ng-include>
+      <ng-include src="'/new/'+section.name+'.html'"></ng-include>
     </div>
     <div id=confirmation class="modal fade" role=dialog>
       <div class=modal-dialog>
@@ -55,7 +64,7 @@
         </div>
       </div>
     </div>
-    <script data-main=./config.js src=/require.js></script>
+    <script data-main=/new/config.js src=/require.js></script>
   </body>
 </html>
 

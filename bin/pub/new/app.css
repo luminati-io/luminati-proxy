@@ -35,6 +35,7 @@ a:hover {
     padding: 8px 15px;
     border-radius: 4px;
     margin-bottom: 20px;
+    color: #777;
 }
 .navigation:after {
     content: '';
@@ -44,11 +45,14 @@ a:hover {
 .navigation .active {
     float: left;
 }
+.navigation .active .separator {
+    color: #ccc;
+}
 .navigation .items {
     float: right;
 }
-.navigation .items >span:first-child span {
-    display: none;
+.navigation .items .separator {
+    color: #0c334d;
 }
 .block {
     background: #eeeeee;
@@ -152,6 +156,10 @@ a:hover {
     overflow: auto;
     max-height: calc(100vh - 164px);
 }
+.proxies-settings {
+    overflow: auto;
+    max-height: calc(100vh - 190px);
+}
 .proxies-panel {
     overflow: auto;
 }
@@ -172,8 +180,17 @@ table.proxies td, table.proxies th {
     opacity: 0.5;
     margin: 0 4px;
 }
-.proxies-graph:first-child {
-    margin-bottom: 48px;
+.proxies-graph {
+    float: left;
+    width: 50%;
+}
+#stats .modal-body h4 {
+    text-align: center;
+}
+#stats .modal-body:after {
+    content: '';
+    display: block;
+    clear: both;
 }
 .proxies-graph-container {
     margin-left: -32px;
@@ -270,7 +287,7 @@ table.proxies td, table.proxies th {
     text-align: center;
     cursor: default;
 }
-#history .modal-dialog, #history_details .modal-dialog {
+#history .modal-dialog, #history_details .modal-dialog, #stats .modal-dialog {
     width: auto;
     margin-left: 20px;
     margin-right: 20px;

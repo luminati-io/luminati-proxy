@@ -9,7 +9,14 @@ var module = angular.module('app', []);
 module.run(function($rootScope, $window){
     $window.Chart.defaults.global.colors = ['#803690', '#00ADF9', '#46BFBD',
         '#FDB45C', '#949FB1', '#4D5360'];
-    $rootScope.section = $window.location.pathname.split('/').pop();
+    var l = $window.location.pathname;
+    if (l.match(/zones\/[^\/]+/))
+    {
+        $rootScope.section = 'zones';
+        $rootScope.subsection = l.split('/').pop();
+    }
+    else
+        $rootScope.section = l.split('/').pop();
 });
 
 module.factory('$proxies', $proxies);
@@ -166,16 +173,17 @@ module.controller('zones', zones);
 zones.$inject = ['$scope', '$http', '$filter'];
 function zones($scope, $http, $filter){
     var today = new Date();
+    var oneDayAgo = (new Date()).setDate(today.getDate()-1);
     var twoDaysAgo = (new Date()).setDate(today.getDate()-2);
-    var date_filter = $filter('date');
-    var twoMonthsAgo = (new Date()).setMonth(today.getMonth()-2);
+    var oneMonthAgo = (new Date()).setMonth(today.getMonth()-1, 1);
+    var twoMonthsAgo = (new Date()).setMonth(today.getMonth()-2, 1);
     $scope.times = [
-        {title: 'Today', key: 'back_d0'},
-        {title: 'Yesterday', key: 'back_d1'},
-        {title: date_filter(twoDaysAgo, 'dd-MMM-yyyy'), key: 'back_d2'},
-        {title: 'This Month', key: 'back_m0'},
-        {title: 'Last Month', key: 'back_m1'},
-        {title: date_filter(twoMonthsAgo, 'MMM-yyyy'), key: 'back_m2'},
+        {title: moment(twoMonthsAgo).format('MMM-YYYY'), key: 'back_m2'},
+        {title: moment(oneMonthAgo).format('MMM-YYYY'), key: 'back_m1'},
+        {title: moment(today).format('MMM-YYYY'), key: 'back_m0'},
+        {title: moment(twoDaysAgo).format('DD-MMM-YYYY'), key: 'back_d2'},
+        {title: moment(oneDayAgo).format('DD-MMM-YYYY'), key: 'back_d1'},
+        {title: moment(today).format('DD-MMM-YYYY'), key: 'back_d0'},
     ];
     var numberFilter = $filter('requests');
     var sizeFilter = $filter('bytes');
@@ -504,8 +512,8 @@ function proxies($scope, $http, $proxies, $window){
     $scope.show_history = function(proxy){
         $scope.history_dialog = [{port: proxy.port}];
     };
-    $scope.edit_proxy = function(proxy){
-        $scope.proxy_dialog = [{proxy: proxy||{}}];
+    $scope.edit_proxy = function(proxy, duplicate){
+        $scope.proxy_dialog = [{proxy: proxy||{}, duplicate: duplicate}];
     };
 }
 
@@ -937,15 +945,16 @@ module.controller('proxy', proxy);
 proxy.$inject = ['$scope', '$http', '$proxies', '$window'];
 function proxy($scope, $http, $proxies, $window){
     $scope.init = function(locals){
-        $scope.port = locals.proxy.port;
+        $scope.port = locals.duplicate ? '' : locals.proxy.port;
         $scope.form = _.cloneDeep(locals.proxy);
+        $scope.form.port = $scope.port;
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.show_modal = function(){ $window.$('#proxy').modal(); };
         $scope.save = function(proxy){
             proxy.persist = true;
             var data = {proxy: proxy};
             var promise;
-            if ($scope.port)
+            if ($scope.port&&!locals.duplicate)
                 promise = $http.put('/api/proxies/'+$scope.port, data);
             else
                 promise = $http.post('/api/proxies', data);

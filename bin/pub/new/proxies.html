@@ -22,6 +22,14 @@
               <span class="proxies-action-disabled glyphicon glyphicon-pencil"
                 ng-if=!proxy.persist title="This proxy cannot be edited">
               </span>
+              <span class="proxies-action glyphicon glyphicon-duplicate"
+                ng-if=proxy.persist ng-click="edit_proxy(proxy, true)"
+                title=Duplicate>
+              </span>
+              <span class="proxies-action-disabled glyphicon
+                glyphicon-duplicate" ng-if=!proxy.persist
+                title="This proxy cannot be duplicated">
+              </span>
               <span class="proxies-action glyphicon glyphicon-stats"
                 ng-click=show_stats(proxy) title=Statistics>
               </span>

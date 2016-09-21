@@ -9,5 +9,4 @@ if (process.platform=='win32')
     .on('SIGINT', ()=>process.emit('SIGINT'));
 }
 const manager = new Manager(process.argv.slice(2));
-manager.on('stop', ()=>process.exit())
-.start();
+manager.on('stop', ()=>process.exit()).start();
