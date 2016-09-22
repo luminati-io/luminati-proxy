@@ -56,7 +56,7 @@ module.directive('health', function(){
     return {
         restrict: 'E',
         scope: {},
-        templateUrl: '/health.html',
+        templateUrl: '/old/health.html',
         controller: 'health',
         controllerAs: '$health',
         transclude: true

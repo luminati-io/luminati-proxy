@@ -1,11 +1,13 @@
 <div ng-controller=proxies>
-  <div class="panel panel-default">
+  <div ng-hide=proxies class="alert alert-info">
+    Loading...
+  </div>
+  <div ng-if=proxies class="panel panel-default">
     <div class=panel-heading>Proxies</div>
     <div class="panel-body proxies-panel">
       <table class="table table-hover proxies">
         <thead>
           <tr>
-            <th>Port</th>
             <th>Actions</th>
             <th ng-repeat="col in columns">
               {{col.title}}
@@ -14,21 +16,16 @@
         </thead>
         <tbody>
           <tr ng-repeat="proxy in proxies">
-            <td>{{proxy.port}}</td>
             <td class=proxies-actions>
               <span class="proxies-action glyphicon glyphicon-pencil"
-                ng-if=proxy.persist ng-click=edit_proxy(proxy) title=Edit>
+                ng-if=proxy.persist ng-click=edit_proxy(proxy.config)
+                title=Edit>
               </span>
               <span class="proxies-action-disabled glyphicon glyphicon-pencil"
                 ng-if=!proxy.persist title="This proxy cannot be edited">
               </span>
               <span class="proxies-action glyphicon glyphicon-duplicate"
-                ng-if=proxy.persist ng-click="edit_proxy(proxy, true)"
-                title=Duplicate>
-              </span>
-              <span class="proxies-action-disabled glyphicon
-                glyphicon-duplicate" ng-if=!proxy.persist
-                title="This proxy cannot be duplicated">
+                ng-click="edit_proxy(proxy.config, true)" title=Duplicate>
               </span>
               <span class="proxies-action glyphicon glyphicon-stats"
                 ng-click=show_stats(proxy) title=Statistics>
@@ -44,11 +41,47 @@
               </span>
             </td>
             <td ng-repeat="col in columns">
-              <span ng-if=proxy[col.key]===true
-                class="glyphicon glyphicon-ok">
-              </span>
-              <span ng-if=proxy[col.key]!==true&&proxy[col.key]!==false>
-                {{proxy[col.key]}}
+              <span ng-click="inline_edit_click(proxy, col)"
+                title="{{proxy[col.key]&&proxy[col.key]!==proxy.config[col.key]
+                ? (proxy.persist ? 'Set non-default value' :
+                'This proxy\'s settings cannot be changed')
+                : (proxy.persist ? 'Change value' :
+                'This proxy\'s settings cannot be changed')}}"
+                ng-class="{'proxies-default':
+                proxy[col.key]&&proxy[col.key]!==proxy.config[col.key],
+                'proxies-editable': proxy.persist}">
+                <span ng-if=proxy[col.key]===true
+                  class="glyphicon glyphicon-ok">
+                </span>
+                <span ng-if=proxy[col.key]!==true>
+                  <span ng-if=proxy[col.key]>
+                    {{proxy[col.key]}}
+                  </span>
+                  <span ng-if=!proxy[col.key]>
+                    &mdash;
+                  </span>
+                </span>
+                <span ng-if="(col.type=='number'||col.type=='text')
+                  &&proxy.edited_field==col.key"
+                  class=proxies-table-input>
+                  <input type={{col.type}} class=form-control
+                    init-input-select ng-value=proxy.config[col.key]
+                    ng-blur=inline_edit_blur(proxy)
+                    ng-keyup="inline_edit_input(proxy, col, $event)"
+                    ng-mouseup="inline_edit_input(proxy, col, $event)">
+                </span>
+                <span ng-if="col.type=='options'&&proxy.edited_field==col.key"
+                  class=proxies-table-input>
+                  <select class=form-control init-select-open
+                    ng-blur=inline_edit_blur(proxy)
+                    ng-model=proxy.dummy_model
+                    ng-init=proxy.dummy_model=proxy.config[col.key]
+                    ng-change="
+                    inline_edit_select_change(proxy, col, proxy.dummy_model)"
+                    ng-keyup="inline_edit_select(proxy, col, $event)"
+                    ng-options="v.value as v.key for v in col.options()">
+                  </select>
+                </span>
               </span>
             </td>
           </tr>

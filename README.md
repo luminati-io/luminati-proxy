@@ -43,25 +43,8 @@ $ sudo npm install -g luminati-io/luminati-proxy
 $ sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
-- v0.6.0
-  - session_timeout was replaced by session_init_timeout, and its usints have
-  been changed from milliseconds to seconds.
-- v0.5.2
-  - SOCKS Interface can now be configured using UI and config files for each
-  proxy
-- v0.5.0
-  - NodeJS api has changed its require method: from require('luminati-proxy')
-  to require('luminati-proxy').Luminati
-- v0.4.25
-  - Null response for HTTPS connect requests return error code 501
-- v0.4.24
-  - Drop-in mode is now on by default
-- v0.4.22
-  - The rest api /api/proxies the timeout parameter was replaced by 
-  idle_timeout
-  - The cli & config parameter timeout was replaced by the request_timeout
-- v0.2.0
-  - Default proxy port was changed from 23000 to 24000
+
+You can review the [CHANGELOG.md](CHANGELOG.md) for additional features, bug fixes and breaking changes.
 
 ## Usage
 
@@ -92,6 +75,7 @@ Options:
   --secure_proxy          Use SSL when accessing super proxy           [boolean]
   --sticky_ip             Use same session as much as possible to maintain IP
                                                                        [boolean]
+  --keep_alive            Generate request to keep alive every n seconds[number]
   --zone                  Zone                                  [default: "gen"]
   --country               Country
   --state                 State

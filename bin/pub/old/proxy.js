@@ -153,7 +153,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
     var _this = this;
     this.$mdDialog.show({
         controller: edit_controller,
-        templateUrl: '/settings.html',
+        templateUrl: '/old/settings.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxy: _proxy},
@@ -175,7 +175,7 @@ proxy_table.prototype.edit_proxy = function(proxy_old){
 proxy_table.prototype.show_stats = function(proxy){
     this.$mdDialog.show({
         controller: stats_controller,
-        templateUrl: '/stats.html',
+        templateUrl: '/old/stats.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxy: proxy},
@@ -186,7 +186,7 @@ proxy_table.prototype.show_stats = function(proxy){
 proxy_table.prototype.show_history = function(proxy){
     this.$mdDialog.show({
         controller: history_controller,
-        templateUrl: '/history.html',
+        templateUrl: '/old/history.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {port: proxy.port},
@@ -197,7 +197,7 @@ proxy_table.prototype.show_history = function(proxy){
 proxy_table.prototype.show_test = function(){
     this.$mdDialog.show({
         controller: test_controller,
-        templateUrl: '/test.html',
+        templateUrl: '/old/test.html',
         parent: angular.element(document.body),
         clickOutsideToClose: true,
         locals: {proxies: this.proxies},
@@ -574,7 +574,7 @@ function history_controller($scope, $filter, $mdDialog, get_json, consts,
             options = consts.proxy.country.values;
         $mdDialog.show({
             controller: filter_controller(field),
-            templateUrl: '/filter/'+field+'.html',
+            templateUrl: '/old/filter/'+field+'.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,
@@ -602,7 +602,7 @@ function history_controller($scope, $filter, $mdDialog, get_json, consts,
     $scope.details = function(row){
         $mdDialog.show({
             controller: details_controller,
-            templateUrl: '/history_details.html',
+            templateUrl: '/old/history_details.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             skipHide: true,

@@ -37,7 +37,7 @@ function version(){
         restrict: 'E',
         controller: 'version',
         controllerAs: 'ver',
-        templateUrl: '/version.html',
+        templateUrl: '/old/version.html',
     };
 }
 
@@ -48,7 +48,7 @@ function upgrade_instructions($mdDialog){
         $mdDialog.show({
             title: 'Upgrade Instructions',
             ariaTitle: 'Upgrade Instructions',
-            templateUrl: '/upgrade.html',
+            templateUrl: '/old/upgrade.html',
             clickOutsideToClose: true,
             controllerAs: 'dialog',
             controller: function(){ return {hide: $mdDialog.hide}; },

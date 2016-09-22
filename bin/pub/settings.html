@@ -1,263 +1,63 @@
-<md-dialog ng-cloak style="width: 100%">
-  <md-toolbar>
-    <div class="md-toolbar-tools">
-      <h2>Proxy Settings</h2>
-      <span flex></span>
-      <md-button class="md-icon-button" ng-click="cancel()">X</md-button>
+<div ng-controller=settings>
+  <div ng-if=!status class="alert alert-info">
+    Determining the status of your proxy...
+  </div>
+  <div ng-if=status class=alert ng-class="{'alert-success':
+    status.status=='ok', 'alert-danger': status.status=='error'}">
+    {{status.description}}
+  </div>
+  <div
+    ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
+    class="alert alert-warning">
+    The latest version of the tool available is
+    <strong>{{$parent.ver_last}}</strong>. You are using
+    <strong>{{$parent.ver_cur}}</strong>. To upgrade, run the following
+    command: <pre>$ npm install -g luminati-io/luminati-proxy</pre>
+    The source code of the Luminati local proxy tool is available at
+    <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
+  </div>
+  <form name=settings ng-submit="save(); settings.$setPristine()">
+    <div class=block>
+      <div class=form-group>
+        <label for=customer class=control-label>Customer/Username</label>
+        <input type=text ng-required=true ng-model=$parent.settings.customer
+          class=form-control id=customer>
+      </div>
+      <div class=form-group>
+        <label for=password class=control-label>Password</label>
+        <input type=password ng-required=true
+          ng-model=$parent.settings.password class=form-control id=password>
+      </div>
+      <div class=form-group>
+        <label for=proxy class=control-label>Default proxy</label>
+        <input type=text ng-required=true ng-model=$parent.settings.proxy
+          class=form-control id=proxy>
+      </div>
+      <div class=form-group>
+        <label for=proxy_port class=control-label>Default proxy port</label>
+        <input type=number ng-required=true
+          ng-model=$parent.settings.proxy_port class=form-control
+          id=proxy_port>
+      </div>
+      <button type=submit class="btn btn-success"
+        ng-disabled=saving||!settings.$valid>
+        Save settings
+      </button>
+      <div ng-if=saving class="alert alert-info alert-inline">
+        Saving...
+      </div>
+      <div ng-if=saved&&settings.$pristine
+        class="alert alert-success alert-inline">
+        Saved
+      </div>
+      <div ng-if=error&&settings.$pristine
+        class="alert alert-danger alert-inline">
+        The credentials are wrong
+      </div>
     </div>
-  </md-toolbar>
-  <md-dialog-content>
-    <form ng-sumbit=submit()>
-      <md-tabs class=proxies-tabs md-dynamic-height md-border-bottom>
-        <md-tab label=general>
-          <md-content>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Port</label>
-                <input type=number ng-model=form.port md-autofocus
-                  placeholder={{consts.port.def}} min=24000>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Interface</label>
-                <md-select ng-model=form.iface>
-                  <md-option ng-repeat="c in consts.iface.values">
-                    {{c}}
-                  </md-option>
-                </md-select>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>SOCKS Port</label>
-                <input type=number ng-model=form.socks md-autofocus
-                  placeholder={{consts.socks.def}}>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Zone</label>
-                <input ng-model=form.zone placeholder={{consts.zone.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Zone password</label>
-                <input ng-model=form.password>
-                <div class=hint>If different from zone</div>
-              </md-input-container>
-            </div>
-          </md-content>
-        </md-tab>
-        <md-tab label=targeting>
-          <md-content>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Country</label>
-                <md-select ng-model=form.country>
-                  <md-option ng-repeat="c in consts.country.values"
-                    ng-value=c.value>
-                    {{c.key}}
-                  </md-option>
-                </md-select>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>State</label>
-                <input ng-model=form.state placeholder=ny>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>City</label>
-                <input ng-model=form.city placeholder=new_york>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>{{consts.asn.desc}}</label>
-                <input type=number ng-model=form.asn>
-                <a href="http://bgp.potaroo.net/cidr/autnums.html"
-                  target=_blank style="position: relative; top: 0.2em">
-                  ASN list
-                </a>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Datacenter IP</label>
-                <input ng-model=form.ip>
-              </md-input-container>
-            </div>
-          </md-content>
-        </md-tab>
-        <md-tab label="IP Policy">
-          <md-content>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Max requests</label>
-                <input type=number ng-model=form.max_requests
-                  placeholder={{consts.max_requests.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Session duration</label>
-                <input type=number ng-model=form.session_duration
-                  placeholder={{consts.session_duration.def}}>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Pool size</label>
-                <input type=number ng-model=form.pool_size
-                  placeholder={{consts.pool_size.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Pool type</label>
-                <md-select ng-model="form.pool_type">
-                  <md-option ng-repeat="c in consts.pool_type.values">
-                    {{c}}
-                  </md-option>
-                </md-select>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <md-checkbox ng-model=form.sticky_ip>Sticky IP</md-checkbox>
-                <span class="hint hidden">Same IP as much as possible</span>
-              </md-input-container>
-            </div>
-          </md-content>
-        </md-tab>
-        <md-tab label=performance>
-          <md-content>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Session init timeout</label>
-                <input type=number ng-model=form.session_init_timeout
-                  placeholder={{consts.session_init_timeout.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Minimum number of super proxies to use</label>
-                <input type=number ng-model=form.proxy_count
-                  placeholder={{consts.proxy_count.def}}>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>DNS resolve</label>
-                <md-select ng-model="form.dns">
-                  <md-option ng-repeat="c in consts.dns.values">
-                    {{c}}
-                  </md-option>
-                </md-select>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Log level
-                  {{form.log ? '' : '('+consts.log.def+' by default)'}}
-                </label>
-                <md-select ng-model=form.log>
-                  <md-option ng-repeat="c in consts.log.values">
-                    {{c}}
-                  </md-option>
-                </md-select>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>{{consts.proxy_switch.desc}}</label>
-                <input type=number ng-model=form.proxy_switch
-                  placeholder={{consts.proxy_switch.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>{{consts.throttle.desc}}</label>
-                <input type=number ng-model=form.throttle
-                  placeholder={{consts.throttle.def}}>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>{{consts.request_timeout.desc}}</label>
-                <input type=number ng-model=form.request_timeout
-                  placeholder={{consts.request_timeout.def}}>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>{{consts.proxy.desc}}</label>
-                <input ng-model=form.proxy>
-                <div class=hidden>{{consts.proxy.desc}}</div>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>{{consts.debug.desc}}</label>
-                <input ng-model=form.debug>
-                <div class=hidden>{{consts.proxy.desc}}</div>
-              </md-input-container>
-              <md-input-container class=md-block flex-gt-sm>
-                <md-checkbox ng-model=form.allow_proxy_auth>Allow request
-                  authentication</md-checkbox>
-                <span class="hint hidden">Allow Luminati authentication per
-                  request</span>
-              </md-input-container>
-            </div>
-          </md-content>
-        </md-tab>
-        <md-tab label="Special urls">
-          <md-content>
-            <p>You can use
-              <a href="https://en.wikipedia.org/wiki/Regular_expression"
-                  target=_blank>
-                regular expressions
-              </a> for url patterns.
-            </p>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Direct include</label>
-                <input ng-model=form.direct.include>
-                <div class=hint>
-                  {{consts.direct_include.desc}}
-                </div>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Direct exclude</label>
-                <input ng-model=form.direct.exclude>
-                <div class=hint>
-                  {{consts.direct_exclude.desc}}
-                </div>
-              </md-input-container>
-            </div>
-            <div layout-gt-sm=row>
-              <md-input-container class=md-block flex-gt-sm>
-                <label>Null response</label>
-                <input ng-model=form.null_response>
-                <div class=hint>
-                  {{consts.null_response.desc}}
-                </div>
-              </md-input-container>
-            </div>
-          </md-content>
-        </md-tab>
-      </md-tabs>
-    </form>
-      <!--
-        <div class="form-group hidden">
-          <div class="col-sm-offset-2 col-sm-10">
-            <div class=checkbox>
-              <label><input type=checkbox ng-model=form.history>history</label>
-            </div>
-          </div>
-        </div>
-        <div class="form-group hidden">
-          <div class="col-sm-offset-2 col-sm-10">
-            <div class=checkbox>
-              <label><input type=checkbox ng-disabled=!form.history ng-model=form_data.ssl>ssl</label>
-            </div>
-          </div>
-        </div>
-      -->
-  </md-dialog-content>
-  <md-dialog-actions layout=row>
-    <span flex></span>
-    <md-button ng-click="cancel()">
-      Cancel
-    </md-button>
-    <md-button ng-click="validate(form)" style="margin-right:20px;">
-      Save
-    </md-button>
-  </md-dialog-actions>
-</md-dialog>
+  </form>
+  <div class="alert alert-info">
+    Path to the configuration file:
+    <strong>{{$parent.settings.config}}</strong>
+  </div>
+</div>

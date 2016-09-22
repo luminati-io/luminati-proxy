@@ -1,0 +1,106 @@
+<md-dialog class=dialog-history ng-cloak style="width: 100%">
+  <md-toolbar>
+    <div class=md-toolbar-tools>
+      <h2>History</h2>
+      <span ng-click=update(true) class=proxies-history-update>
+        Update
+      </span>
+      <span flex></span>
+      <md-button class=md-icon-button ng-click=hide()>X</md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content aria-label=History class=proxies-history-content>
+    <md-progress-circular md-diameter="100px" class=proxies-history-loader
+      ng-if="show_loader()">
+    </md-progress-circular>
+    <div class=proxies-history-cc>
+      <div class=proxies-history-container>
+        <table ng-if="history" md-table class=proxies-history>
+          <thead md-head>
+            <tr md-row>
+              <th ng-repeat="f in fields" md-column>
+                <span ng-click=sort(f.field)>
+                  {{f.title}}
+                  <span ng-if=sort_field==f.field&&sort_asc>
+                    &darr;
+                  </span>
+                  <span ng-if=sort_field==f.field&&!sort_asc>
+                    &uarr;
+                  </span>
+                </span><br>
+                <span class=proxies-history-filter>
+                  <span ng-if=filters[f.field] ng-click=filter(f.field)>
+                    {{filters[f.field]}}
+                  </span>
+                  <span ng-if=filters[f.field] ng-click=filter_cancel(f.field)>
+                    &times;
+                  </span>
+                  <span ng-if=!filters[f.field] ng-click=filter(f.field)>
+                    No filter
+                  </span>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody md-body>
+            <tr ng-repeat="r in history" ng-click="details(r)"
+              class="proxies-history-clickable{{r.alerts.length ?
+              ' proxies-history-walerts' : ''}}" md-row
+              title="{{r.alerts.length ? r.alerts.length+' alert(s)' : ''}}">
+              <td md-cell><a href={{r.url}} target=_blank>{{r.url}}</a></td>
+              <td md-cell>{{r.method}}</td>
+              <td md-cell>{{r.status_code}}</td>
+              <td md-cell><span am-time-ago="r.timestamp"></span></td>
+              <td md-cell>{{r.elapsed}} ms</td>
+              <td md-cell>{{r.country}}</td>
+              <td md-cell>{{r.proxy}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class=proxies-history-tools>
+        <div class=proxies-history-navigation ng-if=show_next()>
+          <md-button ng-click=next() ng-disabled=loading
+            class="md-primary md-raised">
+            Show {{page_size}} more entries
+          </md-button>
+        </div>
+        <div class=proxies-history-export ng-if=history.length>
+          <md-radio-group ng-model=$parent.$parent.export_type
+            ng-if=show_next()>
+            <md-radio-button value=visible>Visible records</md-radio-button>
+            <md-radio-button value=all>All filtered records</md-radio-button>
+          </md-radio-group>
+          <md-button ng-click=export() ng-disabled=loading
+            class="md-primary md-raised">
+            Export to HAR
+          </md-button>
+          <table md-table class=proxies-history-headers>
+            <thead md-head>
+              <tr md-row>
+                <th md-column>Timing</th>
+                <th md-column>Min</th>
+                <th md-column>Avg</th>
+                <th md-column>Max</th>
+              </tr>
+            </thead>
+            <tbody md-body>
+              <tr ng-repeat="t in timings">
+                <td md-cell>{{t[0]}}</td>
+                <td md-cell>{{t[1]}}</td>
+                <td md-cell>{{t[2]}}</td>
+                <td md-cell>{{t[3]}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <md-toolbar ng-if="history&&!history.length" class=md-warn
+      style="margin: 20px 0">
+      <div class="md-toolbar-tools">
+        <h4 class="md-flex">No records to display</h4>
+      </div>
+    </md-toolbar>
+  </md-dialog-content>
+</md-dialog>

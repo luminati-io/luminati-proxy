@@ -1,0 +1,63 @@
+<div class="page page-proxies">
+  <div class=proxies-body>
+    <md-card ng-controller="proxy_table as vm">
+      <md-button class="md-fab md-fab-bottom-right" ng-click=vm.edit_proxy()>
+        <md-icon md-font-library=material-icons>add</md-icon>
+      </md-button>
+      <md-table-container>
+        <table md-table class=proxies-table>
+          <thead md-head>
+            <tr md-row>
+              <th md-column md-order-by=port md-numeric>Port</th>
+              <th ng-repeat="col in vm.columns" md-column
+                md-order-by={{col.key}}>
+                {{col.title}}
+              </th>
+              <th md-column>Actions</th>
+            </tr>
+          </thead>
+          <tbody md-body>
+            <tr ng-repeat="proxy in vm.proxies" md-row>
+              <td md-cell>{{proxy.port}}</td>
+              <td ng-repeat="col in vm.columns" md-cell>
+                {{proxy[col.key]}}
+              </td>
+              <td md-cell>
+                <md-button class="md-icon-button" ng-click=vm.edit_proxy(proxy)
+                   ng-disabled=!proxy.persist title=Edit>
+                  <md-icon md-font-library=material-icons>edit</md-icon>
+                </md-button>
+                <md-button class="md-icon-button" ng-click=vm.show_stats(proxy)
+                  title=Stats>
+                  <md-icon md-font-library=material-icons>info</md-icon>
+                </md-button>
+                <md-button class="md-icon-button" ng-click=vm.show_history(proxy)
+                  title=History>
+                  <md-icon md-font-library=material-icons>history</md-icon>
+                </md-button>
+                <md-button class="md-icon-button" ng-disabled=!proxy.persist
+                  ng-click=vm.delete_proxy(proxy) title=Delete>
+                  <md-icon md-font-library=material-icons>delete</md-icon>
+                </md-button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </md-table-container>
+      <md-button class="md-raised md-primary" ng-click=vm.show_test()>
+        Test proxies
+      </md-button>
+    </md-card>
+  </div>
+  <div class=proxies-footer>
+    <health for=network>
+      Network Connectivity
+    </health>
+    <health for=firewall>
+      Firewall Access
+    </health>
+    <health for=credentials>
+      Credentials
+    </health>
+  </div>
+</div>

@@ -5,51 +5,67 @@
     <title>Luminati Proxy</title>
     <meta name=viewport
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel=stylesheet href=//ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc.5/angular-material.min.css>
-    <link rel=stylesheet
-      href=//fonts.googleapis.com/icon?family=Material+Icons>
-    <link rel=stylesheet
-      href=//cdnjs.cloudflare.com/ajax/libs/angular-material-data-table/0.10.8/md-data-table.min.css>
-    <link rel=stylesheet href=//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css integrity=sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7 crossorigin=anonymous>
+    <link rel="shortcut icon" href=/favicon.ico>
+    <link rel=stylesheet href=/bootstrap/css/bootstrap.min.css>
+    <link rel=stylesheet href=/bootstrap-datepicker/css/bootstrap-datepicker3.min.css>
+    <link rel=stylesheet href=/notosans/css/notosans-fontface.min.css>
     <style>[ng-cloak] { display: none; }</style>
   </head>
-  <body ng-cloak>
-    <header layout=column>
-      <md-toolbar class="md-primary md-hue-1 def-lum-bgcolor">
-        <div class=md-toolbar-tools>
-          <a href=//luminati.io target=_blank>
-            <img src=/img/menu_logo.svg class=logo>
-          </a>
-          <nav class=version flex=none>
-            <version></version>
-          </nav>
-          <span flex></span>
-          <a class=login href="https://luminati.io/cp" target=_blank>
-            {{$root.login}}
-          </a>
+  <body ng-cloak ng-controller=root>
+    <div class=header>
+      <div class=container>
+        <img src=/img/menu_logo.svg>
+      </div>
+    </div>
+    <div class=container>
+      <div class=navigation>
+        <div class=active>
+          <span ng-if=settings.customer>
+            <a href=/settings>{{settings.customer}}</a>
+            <span class=separator>&nbsp;/&nbsp;</span>
+          </span>
+          <span ng-if=!subsection>
+            {{section.title}}
+          </span>
+          <span ng-if=subsection>
+            <a href=/{{section.name}}>{{section.title}}</a>
+            <span class=separator>&nbsp;/&nbsp;</span>
+            {{subsection}}
+          </span>
         </div>
-      </md-toolbar>
-      <md-nav-bar nav-bar-aria-label="navigation links"
-        md-selected-nav-item=$root.current_state>
-        <md-nav-item md-nav-href=#cred name=cred flex>
-          Credentials
-        </md-nav-item>
-        <md-nav-item md-nav-href=#proxy name=proxy ng-if=$root.login flex>
-          Proxies
-        </md-nav-item>
-        <md-nav-item md-nav-href=#info name=info ng-if=$root.login flex>
-          Info
-        </md-nav-item>
-        <md-nav-item md-nav-href=#countries name=countries ng-if=$root.login
-          flex>
-          Countries
-        </md-nav-item>
-      </md-nav-bar>
-    </header>
-    <div class=body ui-view></div>
-    <script data-main=./config.js
-        src=//cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js>
-    </script>
+        <div class=items>
+          <span ng-repeat="s in sections">
+            <span ng-if="$index&gt;0" class=separator>&nbsp;|&nbsp;</span>
+            <a ng-if=s!=section||subsection href=/{{s.name}}>{{s.title}}</a>
+            <span ng-if=s==section&&!subsection>{{s.title}}</span>
+          </span>
+        </div>
+      </div>
+      <ng-include src="'/'+section.name+'.html'"></ng-include>
+    </div>
+    <div id=confirmation class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <button type=button class=close data-dismiss=modal>
+              &times;
+            </button>
+            <h4 class=modal-title>{{confirmation.text}}</h4>
+          </div>
+          <div class=modal-footer>
+            <button type=button class="btn btn-default"
+              data-dismiss=modal>
+              Cancel
+            </button>
+            <button type=button class="btn btn-success"
+              data-dismiss=modal ng-click=confirmation.confirmed()>
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script data-main=/config.js src=/require.js></script>
   </body>
 </html>
 

@@ -1,63 +1,325 @@
-<div class="page page-proxies">
-  <div class=proxies-body>
-    <md-card ng-controller="proxy_table as vm">
-      <md-button class="md-fab md-fab-bottom-right" ng-click=vm.edit_proxy()>
-        <md-icon md-font-library=material-icons>add</md-icon>
-      </md-button>
-      <md-table-container>
-        <table md-table class=proxies-table>
-          <thead md-head>
-            <tr md-row>
-              <th md-column md-order-by=port md-numeric>Port</th>
-              <th ng-repeat="col in vm.columns" md-column
-                md-order-by={{col.key}}>
-                {{col.title}}
-              </th>
-              <th md-column>Actions</th>
-            </tr>
-          </thead>
-          <tbody md-body>
-            <tr ng-repeat="proxy in vm.proxies" md-row>
-              <td md-cell>{{proxy.port}}</td>
-              <td ng-repeat="col in vm.columns" md-cell>
-                {{proxy[col.key]}}
-              </td>
-              <td md-cell>
-                <md-button class="md-icon-button" ng-click=vm.edit_proxy(proxy)
-                   ng-disabled=!proxy.persist title=Edit>
-                  <md-icon md-font-library=material-icons>edit</md-icon>
-                </md-button>
-                <md-button class="md-icon-button" ng-click=vm.show_stats(proxy)
-                  title=Stats>
-                  <md-icon md-font-library=material-icons>info</md-icon>
-                </md-button>
-                <md-button class="md-icon-button" ng-click=vm.show_history(proxy)
-                  title=History>
-                  <md-icon md-font-library=material-icons>history</md-icon>
-                </md-button>
-                <md-button class="md-icon-button" ng-disabled=!proxy.persist
-                  ng-click=vm.delete_proxy(proxy) title=Delete>
-                  <md-icon md-font-library=material-icons>delete</md-icon>
-                </md-button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </md-table-container>
-      <md-button class="md-raised md-primary" ng-click=vm.show_test()>
-        Test proxies
-      </md-button>
-    </md-card>
-  </div>
-  <div class=proxies-footer>
-    <health for=network>
-      Network Connectivity
-    </health>
-    <health for=firewall>
-      Firewall Access
-    </health>
-    <health for=credentials>
-      Credentials
-    </health>
+<div id=proxy class="modal fade" role=dialog ng-init=show_modal()>
+  <div class=modal-dialog>
+    <div class=modal-content>
+      <form ng-submit=save(form)>
+        <div class=modal-header>
+          <button type=button class=close data-dismiss=modal>
+            &times;
+          </button>
+          <h4 class=modal-title ng-if=port>
+            Proxy Settings: {{port}}
+          </h4>
+          <h4 class=modal-title ng-if=!port>Adding Proxy</h4>
+        </div>
+        <div class="modal-body proxies-settings">
+          <div class=panel-group id=proxy-tabs>
+            <div class="panel panel-default">
+              <div class=panel-heading>
+                <a data-toggle=collapse data-parent=#proxy-tabs
+                  href=#proxy-general>
+                  General
+                </a>
+              </div>
+              <div id=proxy-general class="panel-collapse collapse in">
+                <div class=panel-body>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-port>
+                      Port
+                    </label>
+                    <input id=proxy-field-port class=form-control type=number
+                      ng-model=form.port
+                      placeholder={{consts.port.def}} min=24000>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-interface>
+                      Interface
+                    </label>
+                    <select id=proxy-field-interface ng-model=form.iface
+                      class=form-control ng-init="form.iface=form.iface||''"
+                      ng-options="v for v in consts.iface.values">
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-socks-port>
+                      SOCKS Port
+                    </label>
+                    <input id=proxy-field-socks-port type=number
+                      ng-model=form.socks placeholder={{consts.socks.def}}
+                      class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-zone>
+                      Zone
+                    </label>
+                    <input id=proxy-field-zone ng-model=form.zone
+                      placeholder={{consts.zone.def}} class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label
+                      for=proxy-field-zone-password>
+                      Zone password (if different from zone)
+                    </label>
+                    <input type=password id=proxy-field-zone-password
+                      ng-model=form.password class=form-control>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class=panel-heading>
+                <a data-toggle=collapse data-parent=#proxy-tabs
+                  href=#proxy-targeting>
+                  Targeting
+                </a>
+              </div>
+              <div id=proxy-targeting class="panel-collapse collapse">
+                <div class=panel-body>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-country>
+                      Country
+                    </label>
+                    <select id=proxy-field-country ng-model=form.country
+                      class=form-control ng-options="c.value as c.key for c in
+                      consts.country.values"
+                      ng-init="form.country=form.country||''">
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-state>
+                      State
+                    </label>
+                    <input id=proxy-field-state ng-model=form.state
+                      placeholder=ny class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-city>
+                      City
+                    </label>
+                    <input id=proxy-field-city ng-model=form.city
+                      placeholder=new_york class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-asn>
+                      {{consts.asn.desc}}
+                      (<a href=http://bgp.potaroo.net/cidr/autnums.html
+                        target=_blank>ASN list</a>)
+                    </label>
+                    <input id=proxy-field-asn type=number ng-model=form.asn
+                      class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-datacenter-ip>
+                      Datacenter IP
+                    </label>
+                    <input id=proxy-field-datacenter-ip ng-model=form.ip
+                      class=form-control>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class=panel-heading>
+                <a data-toggle=collapse data-parent=#proxy-tabs
+                  href=#proxy-ip-policy>
+                  IP Policy
+                </a>
+              </div>
+              <div id=proxy-ip-policy class="panel-collapse collapse">
+                <div class=panel-body>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-max-requests>
+                      Max requests
+                    </label>
+                    <input id=proxy-field-max-requests type=number
+                      ng-model=form.max_requests class=form-control
+                      placeholder={{consts.max_requests.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-session-dur>
+                      Session duration
+                    </label>
+                    <input id=proxy-field-session-dur type=number
+                      ng-model=form.session_duration class=form-control
+                      placeholder={{consts.session_duration.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-pool-size>
+                      Pool size
+                    </label>
+                    <input id=proxy-field-pool-size type=number
+                      ng-model=form.pool_size class=form-control
+                      placeholder={{consts.pool_size.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-pool-type>
+                      Pool type
+                    </label>
+                    <select id=proxy-field-pool-type ng-model=form.pool_type
+                      ng-options="v for v in consts.pool_type.values"
+                      ng-init="form.pool_type=form.pool_type||''"
+                      class=form-control>
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label
+                      title="Keep same IP address for as long as possible">
+                      <input type=checkbox ng-model=form.sticky_ip> Sticky IP
+                    </label>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-keep-alive>
+                      Keep-alive
+                    </label>
+                    <input id=proxy-field-keep-alive type=number
+                      ng-model=form.keep_alive class=form-control
+                      placeholder={{consts.keep_alive.def}}>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class=panel-heading>
+                <a data-toggle=collapse data-parent=#proxy-tabs
+                  href=#proxy-performance>
+                  Performance
+                </a>
+              </div>
+              <div id=proxy-performance class="panel-collapse collapse">
+                <div class=panel-body>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-sinit-timeout>
+                      Session init timeout
+                    </label>
+                    <input id=proxy-field-sinit-timeout type=number
+                      ng-model=form.session_init_timeout class=form-control
+                      placeholder={{consts.session_init_timeout.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-min-super>
+                      Minimum number of super proxies to use
+                    </label>
+                    <input id=proxy-field-min-super type=number
+                      ng-model=form.proxy_count class=form-control
+                      placeholder={{consts.proxy_count.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-dns-resolve>
+                      DNS resolve
+                    </label>
+                    <select id=proxy-field-dns-resolve ng-model=form.dns
+                      class=form-control ng-init="form.dns=form.dns||''"
+                      ng-options="v for v in consts.dns.values">
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-log-level>
+                      Log level
+                      {{form.log ? '' : '('+consts.log.def+' by default)'}}
+                    </label>
+                    <select id=proxy-field-log-level ng-model=form.log
+                      class=form-control ng-init="form.log=form.log||''"
+                      ng-options="v for v in consts.log.values">
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-proxy-switch>
+                      {{consts.proxy_switch.desc}}
+                    </label>
+                    <input id=proxy-field-proxy-switch type=number
+                      ng-model=form.proxy_switch class=form-control
+                      placeholder={{consts.proxy_switch.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-throttle>
+                      {{consts.throttle.desc}}
+                    </label>
+                    <input id=proxy-field-throttle type=number
+                      ng-model=form.throttle class=form-control
+                      placeholder={{consts.throttle.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-req-timeout>
+                      {{consts.request_timeout.desc}}
+                    </label>
+                    <input id=proxy-field-req-timeout type=number
+                      ng-model=form.request_timeout class=form-control
+                      placeholder={{consts.request_timeout.def}}>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-proxy>
+                      {{consts.proxy.desc}}
+                    </label>
+                    <input id=proxy-field-proxy ng-model=form.proxy
+                      class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-debug>
+                      {{consts.debug.desc}}
+                    </label>
+                    <input id=proxy-field-debug ng-model=form.debug
+                      class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label
+                      title="Allow Luminati authentication per request">
+                      <input type=checkbox ng-model=form.allow_proxy_auth>
+                      Allow request authentication
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class=panel-heading>
+                <a data-toggle=collapse data-parent=#proxy-tabs
+                  href=#proxy-special-urls>
+                  Special URLs
+                </a>
+              </div>
+              <div id=proxy-special-urls class="panel-collapse collapse">
+                <div class=panel-body>
+                  <p>
+                    You can use
+                    <a href=https://en.wikipedia.org/wiki/Regular_expression
+                      target=_blank>regular expressions</a>
+                    for URL patterns.
+                  </p>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-direct-include>
+                      {{consts.direct_include.desc}}
+                    </label>
+                    <input id=proxy-field-direct-include
+                      ng-model=form.direct.include class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-direct-exclude>
+                      {{consts.direct_exclude.desc}}
+                    </label>
+                    <input id=proxy-field-direct-exclude
+                      ng-model=form.direct.exclude class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-null-response>
+                      {{consts.null_response.desc}}
+                    </label>
+                    <input id=proxy-field-null-response
+                      ng-model=form.null_response class=form-control>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class=modal-footer>
+          <button type=button class="btn btn-default"
+            data-dismiss=modal>
+            Cancel
+          </button>
+          <button type=submit class="btn btn-success">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

@@ -254,6 +254,15 @@ describe('proxy', ()=>{
                 t(10);
             });
             describe('max_requests', ()=>{
+                const test_call = (r, i, p, s)=>etask(function*(){
+                    const res = yield l.test();
+                    const id = `trial/request/pool ${r}/${i}/${p} `;
+                    assert.ok(res.body, id+'no body');
+                    assert.ok(res.body.auth, id+'no auth');
+                    assert.equal(res.body.auth.session,
+                        '24000_'+(r*s+p), id+'session mismatch');
+                });
+
                 const t = (name, opt)=>it(name, ()=>etask(function*(){
                     l = yield lum(opt);
                     const pool_size = l.opt.pool_size || 1;
@@ -264,12 +273,7 @@ describe('proxy', ()=>{
                             for (let i=0; i<l.opt.max_requests; i++)
                             {
                                 for (let p=1; p<=pool_size; p++)
-                                {
-                                    const res = yield l.test();
-                                    assert.equal(res.body.auth.session,
-                                        '24000_'+(r*pool_size+p),
-                                        `trial/request/pool ${r}/${i}/${p}`);
-                                }
+                                    yield test_call(r, i, p, pool_size);
                             }
                         }
                         else
@@ -277,12 +281,7 @@ describe('proxy', ()=>{
                             for (let p=1; p<=pool_size; p++)
                             {
                                 for (let i=0; i<l.opt.max_requests; i++)
-                                {
-                                    const res = yield l.test();
-                                    assert.equal(res.body.auth.session,
-                                        '24000_'+(r*pool_size+p),
-                                        `trial/request/pool ${r}/${i}/${p}`);
-                                }
+                                    yield test_call(r, i, p, pool_size);
                             }
                         }
                     }
@@ -304,6 +303,19 @@ describe('proxy', ()=>{
                 t('5, no pool', {max_requests: 5});
                 t('10, no pool', {max_requests: 10});
             });
+            it('keep_alive', etask._fn(function*(_this){
+                _this.timeout(6000);
+                l = yield lum({keep_alive: 1}); // actual 1sec
+                assert.equal(proxy.history.length, 0);
+                yield l.test();
+                assert.equal(proxy.history.length, 2);
+                yield etask.sleep(500);
+                assert.equal(proxy.history.length, 2);
+                yield l.test();
+                assert.equal(proxy.history.length, 3);
+                yield etask.sleep(1500);
+                assert.equal(proxy.history.length, 4);
+            }));
         });
         describe('null_response', ()=>{
             const t = (name, ssl)=>it(name, ()=>etask(function*(){
@@ -378,7 +390,7 @@ describe('proxy', ()=>{
             }));
             t('http', test_url);
         });
-        describe('throttle', ()=>{
+        describe.skip('throttle', ()=>{
             const t = throttle=>it(''+throttle, ()=>etask(function*(){
                 let waiting = [];
                 const release = n=>{
@@ -419,12 +431,12 @@ describe('manager', ()=>{
         let www = get_param(args, '--www')||luminati.Manager.default.www;
         let log = get_param(args, '--log');
         if (!log)
-            args = args.concat(['--log', 'NONE']);
+            args = [...args, '--log', 'NONE'];
         let db_file = temp_file_path('.sqlite3');
         if (!get_param(args, '--database'))
-            args = args.concat(['--database', db_file]);
+            args = [...args, '--database', db_file];
         if (!get_param(args, '--proxy'))
-            args = args.concat(['--proxy', '127.0.0.1']);
+            args = [...args, '--proxy', '127.0.0.1'];
         if (!get_param(args, '--config'))
         {
             const config_file = temp_file([], 'json');
@@ -433,9 +445,9 @@ describe('manager', ()=>{
             temp_files.push(config_file);
         }
         if (!get_param(args, '--customer'))
-          args = args.concat(['--customer', customer]);
+          args = [...args,'--customer', customer];
         if (!get_param(args, '--password'))
-          args = args.concat(['--password', password]);
+          args = [...args, '--password', password];
         args.push('--no_dropin');
         let manager = new luminati.Manager(args||[]);
         yield manager.start();
@@ -525,7 +537,7 @@ describe('manager', ()=>{
         t('multiple config files', {files: multiple_proxies},
             multiple_proxies);
         t('main + config files', {config: simple_proxy,
-            files: multiple_proxies}, [].concat([_.assign({}, simple_proxy,
-            {persist: true})], multiple_proxies));
+            files: multiple_proxies}, [_.assign({}, simple_proxy,
+            {persist: true}), ...multiple_proxies]);
     });
 });

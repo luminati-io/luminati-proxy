@@ -6,10 +6,10 @@
     Loading...
   </div>
   <div ng-if=!$root.subsection>
-    <table class="table table-hover" ng-if=stats>
+    <table class="table table-hover zones-table" ng-if=stats&&!error>
       <thead>
         <tr>
-          <th>Zone</th>
+          <th class=zones-zone>Zone</th>
           <th ng-repeat="time in times">
             {{time.title}}
           </th>
@@ -17,10 +17,10 @@
       </thead>
       <tbody>
         <tr ng-repeat="(zone, properties) in stats">
-          <td><a href=zones/{{zone}}>{{zone}}</a></td>
+          <td class=zones-zone><a href=zones/{{zone}}>{{zone}}</a></td>
           <td ng-repeat="time in times">
             <span ng-repeat="field in fields" ng-if="field.key=='bw_sum'">
-              {{field.filter(properties[time.key][field.key])}}
+              {{field.filter(properties[time.key][field.key])||'&mdash;'}}
             </span>
           </td>
         </tr>
@@ -32,7 +32,7 @@
       class="panel panel-default">
       <div class=panel-heading>{{zone}}</div>
       <div class=panel-body>
-        <table class="table table-hover">
+        <table class="table table-hover zones-table">
           <thead>
             <tr>
               <th></th>
@@ -45,7 +45,7 @@
             <tr ng-repeat="field in fields">
               <th>{{field.title}}</th>
               <td ng-repeat="time in times">
-                {{field.filter(properties[time.key][field.key])}}
+                {{field.filter(properties[time.key][field.key])||'&mdash;'}}
               </td>
             </tr>
           </tbody>

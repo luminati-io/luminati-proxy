@@ -166,6 +166,27 @@ a:hover {
 table.proxies td, table.proxies th {
     text-align: center;
 }
+.proxies-default {
+    color: gray;
+}
+.proxies-editable {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+}
+.proxies-editable:hover {
+    color: orange;
+}
+.proxies-table-input {
+    position: absolute;
+    z-index: 2;
+    left: -25px;
+    right: -25px;
+    top: -7px;
+}
+.proxies-table-input input, .proxies-table-input select {
+    width: 100%;
+}
 .proxies-actions {
     white-space: nowrap;
 }
@@ -350,4 +371,10 @@ table.proxies td, table.proxies th {
     top: 50%;
     margin-left: -100px;
     z-index: 2;
+}
+.zones-table td, .zones-table thead th {
+    text-align: right;
+}
+.zones-table td.zones-zone, .zones-table thead th.zones-zone {
+    text-align: left;
 }

@@ -115,7 +115,7 @@ function countries($scope, $mdDialog, consts){
     this.view = function(country){
         $mdDialog.show({
             controller: screenshot_controller,
-            templateUrl: '/screenshot.html',
+            templateUrl: '/old/screenshot.html',
             parent: angular.element(document.body),
             clickOutsideToClose: true,
             locals: {country: country.name, url: country.url},
