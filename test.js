@@ -431,12 +431,12 @@ describe('manager', ()=>{
         let www = get_param(args, '--www')||luminati.Manager.default.www;
         let log = get_param(args, '--log');
         if (!log)
-            args = [...args, '--log', 'NONE'];
+            args = args.concat(['--log', 'NONE']);
         let db_file = temp_file_path('.sqlite3');
         if (!get_param(args, '--database'))
-            args = [...args, '--database', db_file];
+            args = args.concat(['--database', db_file]);
         if (!get_param(args, '--proxy'))
-            args = [...args, '--proxy', '127.0.0.1'];
+            args = args.concat(['--proxy', '127.0.0.1']);
         if (!get_param(args, '--config'))
         {
             const config_file = temp_file([], 'json');
@@ -445,9 +445,9 @@ describe('manager', ()=>{
             temp_files.push(config_file);
         }
         if (!get_param(args, '--customer'))
-          args = [...args,'--customer', customer];
+          args = args.concat(['--customer', customer]);
         if (!get_param(args, '--password'))
-          args = [...args, '--password', password];
+          args = args.concat(['--password', password]);
         args.push('--no_dropin');
         let manager = new luminati.Manager(args||[]);
         yield manager.start();
@@ -537,7 +537,7 @@ describe('manager', ()=>{
         t('multiple config files', {files: multiple_proxies},
             multiple_proxies);
         t('main + config files', {config: simple_proxy,
-            files: multiple_proxies}, [_.assign({}, simple_proxy,
-            {persist: true}), ...multiple_proxies]);
+            files: multiple_proxies}, [].concat([_.assign({}, simple_proxy,
+            {persist: true})], multiple_proxies));
     });
 });

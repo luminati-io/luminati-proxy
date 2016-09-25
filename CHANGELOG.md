@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.1
+  - :star: PhantomJS is now an optional dependency
 - v0.7.0
   - :star: Major changes to the UI
   - :star: Adding `keep_alive` support that keeps unused pool sessions alive
