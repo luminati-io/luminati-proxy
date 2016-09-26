@@ -5,6 +5,11 @@
   <div ng-if=status class=alert ng-class="{'alert-success':
     status.status=='ok', 'alert-danger': status.status=='error'}">
     {{status.description}}
+    <ul ng-if=status.description_list>
+      <li ng-repeat="item in status.description_list">
+        {{item}}
+      </li>
+    </ul>
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last

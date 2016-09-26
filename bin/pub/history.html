@@ -44,6 +44,7 @@
                         </a>
                       </span>
                     </th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,13 +52,23 @@
                     class="proxies-history-clickable{{r.alerts.length ?
                     ' warning' : ''}}"
                     title="{{r.alerts.length ? r.alerts.length+' alert(s)' : ''}}">
-                    <td><a href={{r.url}} target=_blank>{{r.url}}</a></td>
+                    <td>
+                      <a ng-click=$event.stopPropagation() href={{r.url}}>
+                        {{r.url}}
+                      </a>
+                    </td>
                     <td>{{r.method}}</td>
                     <td>{{r.status_code}}</td>
                     <td>{{r.timestamp | timestamp}}</td>
                     <td>{{r.elapsed}} ms</td>
                     <td>{{r.country}}</td>
                     <td>{{r.proxy}}</td>
+                    <td>
+                      <a title=Replay href="{{r | request}}"
+                        ng-click=$event.stopPropagation()>
+                        <span class="glyphicon glyphicon-repeat"></span>
+                      </a>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -239,17 +250,40 @@
             <thead>
               <tr>
                 <th ng-repeat="f in fields">{{f.title}}</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><a href={{row.url}} target=_blank>{{row.url}}</a></td>
+                <td>
+                  <a ng-click=$event.stopPropagation() href={{row.url}}>
+                    {{row.url}}
+                  </a>
+                </td>
                 <td>{{row.method}}</td>
                 <td>{{row.status_code}}</td>
                 <td>{{row.timestamp | timestamp}}</td>
                 <td>{{row.elapsed}} ms</td>
                 <td>{{row.country}}</td>
                 <td>{{row.proxy}}</td>
+                <td>
+                  <a title=Replay href="{{row | request}}"
+                    ng-click=$event.stopPropagation()>
+                    <span class="glyphicon glyphicon-repeat"></span>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table ng-if=row.request_body class="table tools-table">
+            <thead>
+              <tr>
+                <th>Request body</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><pre>{{row.request_body}}</pre></td>
               </tr>
             </tbody>
           </table>

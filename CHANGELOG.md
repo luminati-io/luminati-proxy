@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.2
+  - :star: Allow SSL connections/sniffing to insecure domains
+  - :star: Bug fix - do not parse password as numbers even if format fit
 - v0.7.1
   - :star: PhantomJS is now an optional dependency
 - v0.7.0
@@ -25,4 +28,3 @@
   `request_timeout`
 - v0.2.0
   - :boom: Default proxy port was changed from `23000` to `24000`
-

@@ -65,10 +65,10 @@ Usage: luminati [options] config1 config2 ...
 Options:
   --log                   Log level (NONE|ERROR|WARNING|INFO|DEBUG)
                                                               [default: "ERROR"]
-  --customer              Customer
-  --password              Password
+  --customer              Customer                                      [string]
+  --password              Password                                      [string]
   --proxy                 Super proxy ip or country (us|gb|nl)
-                                                 [default: "zproxy.luminati.io"]
+                                        [string] [default: "zproxy.luminati.io"]
   --proxy_port            Super proxy port                      [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]
@@ -76,12 +76,12 @@ Options:
   --sticky_ip             Use same session as much as possible to maintain IP
                                                                        [boolean]
   --keep_alive            Generate request to keep alive every n seconds[number]
-  --zone                  Zone                                  [default: "gen"]
-  --country               Country
-  --state                 State
-  --city                  City
-  --asn                   ASN
-  --ip                    Datacenter IP
+  --zone                  Zone                         [string] [default: "gen"]
+  --country               Country                                       [string]
+  --state                 State                                         [string]
+  --city                  City                                          [string]
+  --asn                   ASN                                           [number]
+  --ip                    Datacenter IP                                 [string]
   --dns                   DNS resolving (local|remote)
   --debug                 Luminati request debug info (none|full)
   --request_timeout       Timeout for request on the super proxy (seconds)
@@ -90,6 +90,8 @@ Options:
   --pool_type             Pool session iteration order (sequential|round-robin)
                                                          [default: "sequential"]
   --ssl                   Enable SSL sniffing                          [boolean]
+  --insecure              Enable SSL connection/sniffing to insecure hosts
+                                                                       [boolean]
   --max_requests          Requests per session            [number] [default: 50]
   --session_duration      Maximum duration of session (seconds)
   --proxy_switch          Automatically switch super proxy on failure

@@ -5,19 +5,17 @@
         Proxies tester
       </a>
     </div>
-    <div id=test class="panel-collapse collapse">
-      <div class=panel-body ng-controller=test>
+    <div id=test class="panel-collapse collapse" ng-controller=test
+      ng-class="{in: expand}">
+      <div class=panel-body>
         <form name=test ng-submit="go(proxy, url, method, headers, body)">
           <div>
             <div class="form-group col-xs-2" ng-class="{'has-error':
               test.port.$touched&&test.port.$invalid}">
               <label class=control-label for=tester-port>Proxy</label>
               <select id=tester-port name=port ng-model=proxy
-                class=form-control required>
-                <option ng-value=0>No proxy</option>
-                <option ng-repeat="proxy in proxies" ng-value=proxy.port>
-                  {{proxy.port}}
-                </option>
+                class=form-control required
+                ng-options="p[0] as p[1] for p in proxies">
               </select>
             </div>
             <div class="form-group col-xs-8" ng-class="{'has-error':
@@ -30,11 +28,7 @@
               test.method.$touched&&test.method.$invalid}">
               <label class=control-label for=tester-method>Method</label>
               <select id=tester-method name=method ng-model=method
-                class=form-control required>
-                <option ng-repeat="(i, method) in methods" ng-value=method
-                  ng-selected="i==0">
-                  {{method}}
-                </option>
+                class=form-control required ng-options="m for m in methods">
               </select>
             </div>
           </div>
@@ -76,6 +70,9 @@
             <button ng-disabled=loading||test.$invalid type=submit
               class="btn btn-success">
               Go
+            </button>
+            <button type=reset class="btn btn-warning" ng-click=reset()>
+              Reset
             </button>
           </div>
           <div ng-if=loading class="alert alert-info tester-alert">
@@ -131,8 +128,8 @@
         Countries
       </a>
     </div>
-    <div id=countries class="panel-collapse collapse">
-      <div class=panel-body ng-controller=countries>
+    <div id=countries class="panel-collapse collapse" ng-controller=countries>
+      <div class=panel-body>
         <div>
           <form name=countries ng-submit=go()>
             <div>

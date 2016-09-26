@@ -215,10 +215,25 @@ function zones($scope, $http, $filter){
 }
 
 module.controller('test', test);
-test.$inject = ['$scope', '$http', '$filter'];
-function test($scope, $http, $filter){
+test.$inject = ['$scope', '$http', '$filter', '$window'];
+function test($scope, $http, $filter, $window){
+    var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
+        /[?&]test=([^&]+)/)||['', 'null'])[1]));
+    if (preset)
+    {
+        $scope.expand = true;
+        $scope.proxy = ''+preset.port;
+        $scope.url = preset.url;
+        $scope.method = preset.method;
+        $scope.body = preset.body;
+    }
     $http.get('/api/proxies').then(function(proxies){
-        $scope.proxies = proxies.data;
+        $scope.proxies = [['0', 'No proxy']];
+        for (var i=0; i<proxies.data.length; i++)
+        {
+            $scope.proxies.push(
+                [''+proxies.data[i].port, ''+proxies.data[i].port]);
+        }
     });
     $scope.methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD',
         'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND',
@@ -251,12 +266,18 @@ function test($scope, $http, $filter){
             $scope.request = r;
         });
     };
-    $scope.headers = [];
+    $scope.headers = preset&&preset.headers ? Object.keys(preset.headers).map(
+        function(h){
+        return {key: h, value: preset.headers[h]};
+    }) : [];
     $scope.add_header = function(){
         $scope.headers.push({key: '', value: ''});
     };
     $scope.remove_header = function(index){
         $scope.headers.splice(index, 1);
+    };
+    $scope.reset = function(){
+        $scope.headers = [];
     };
 }
 
@@ -1121,6 +1142,19 @@ function bytesFilter($filter){
             precision = number ? 2 : 0;
         return numberFilter(bytes / Math.pow(1024, Math.floor(number)),
             precision)+' '+['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
+    };
+}
+
+module.filter('request', requestFilter);
+function requestFilter(){
+    return function(r){
+        return '/tools?test='+encodeURIComponent(JSON.stringify({
+            port: r.port,
+            url: r.url,
+            method: r.method,
+            body: r.request_body,
+            headers: JSON.parse(r.request_headers),
+        }));
     };
 }
 
