@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.3
+  - :star: History now stores body of each request
+  - :star: Requests from history can now be modified and replayed
+  - :star: Resettable statistics on local proxies
 - v0.7.2
   - :star: Allow SSL connections/sniffing to insecure domains
   - :star: Bug fix - do not parse password as numbers even if format fit

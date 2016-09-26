@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -49,6 +49,7 @@
     "notosans-fontface": "^1.0.1",
     "prompt": "^1.0.0",
     "request": "^2.69.0",
+    "request-stats": "^1.0.1",
     "require-css": "^0.1.8",
     "requirejs": "^2.3.2",
     "socket.io": "^1.4.8",

@@ -24,10 +24,12 @@ $proxies.$inject = ['$http', '$window'];
 function $proxies($http, $window){
     var service = {
         subscribe: subscribe,
+        subscribe_stats: subscribe_stats,
         proxies: null,
         update: update_proxies
     };
     var listeners = [];
+    var listeners_stats = [];
     service.update();
     io().on('stats', stats_event);
     return service;
@@ -35,6 +37,9 @@ function $proxies($http, $window){
         listeners.push(func);
         if (service.proxies)
             func(service.proxies);
+    }
+    function subscribe_stats(func){
+        listeners_stats.push(func);
     }
     function update_proxies(){
         return $window.Promise.all([$http.get('/api/proxies_running'),
@@ -54,6 +59,12 @@ function $proxies($http, $window){
                     ticks: [],
                 };
                 proxy.config = config_index[proxy.port];
+                var data = _.values(proxy._stats);
+                proxy.total_stats = {
+                    requests: _.sumBy(data, 'total_requests'),
+                    inbound: _.sumBy(data, 'total_inbound'),
+                    outbound: _.sumBy(data, 'total_outbound'),
+                };
             });
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
@@ -107,6 +118,7 @@ function $proxies($http, $window){
                     canvas.att_scope.$apply();
                 }
             });
+            listeners_stats.forEach(function(cb){ cb(stats_chunk); });
         }
     }
 }
@@ -497,6 +509,20 @@ function proxies($scope, $http, $proxies, $window){
         $scope.proxies = proxies;
         $scope.$apply();
     });
+    $proxies.subscribe_stats(function(stats){
+        if (!$scope.proxies)
+            return;
+        for (var i=0; i<$scope.proxies.length; i++)
+        {
+            var data = _.values(stats[$scope.proxies[i].port]);
+            $scope.proxies[i].total_stats = {
+                requests: _.sumBy(data, 'total_requests'),
+                inbound: _.sumBy(data, 'total_inbound'),
+                outbound: _.sumBy(data, 'total_outbound'),
+            };
+        }
+        $scope.$apply();
+    });
     $scope.delete_proxy = function(proxy){
         $scope.$parent.$parent.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
@@ -634,6 +660,9 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.inline_edit_blur = function(proxy){
         proxy.edited_field = '';
+    };
+    $scope.reset_total_stats = function(proxy){
+        $http.put('/api/proxies/'+proxy.port, {reset_total_stats: true});
     };
 }
 
@@ -1141,7 +1170,7 @@ function bytesFilter($filter){
         if (typeof precision==='undefined')
             precision = number ? 2 : 0;
         return numberFilter(bytes / Math.pow(1024, Math.floor(number)),
-            precision)+' '+['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
+            precision)+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
     };
 }
 

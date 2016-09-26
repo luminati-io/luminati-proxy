@@ -16,6 +16,9 @@ a:hover {
     box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
     border-radius: .15em;
 }
+.nowrap {
+    white-space: nowrap;
+}
 .btn-title {
     float: right;
     margin-top: -4px;
@@ -192,14 +195,26 @@ table.proxies td, table.proxies th {
 }
 .proxies-action {
     cursor: pointer;
+    color: #428bca;
+    outline: 3px solid transparent;
+    border: 1px solid transparent;
+    line-height: 20px;
     margin: 0 4px;
 }
 .proxies-action:hover {
-    color: orange;
+    color: white;
+    background: #428bca;
+    border-color: #428bca;
+    text-decoration: none;
+    box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
+    border-radius: .15em;
 }
 .proxies-action-disabled {
-    opacity: 0.5;
+    outline: 3px solid transparent;
+    border: 1px solid transparent;
+    line-height: 20px;
     margin: 0 4px;
+    color: grey;
 }
 .proxies-graph {
     float: left;

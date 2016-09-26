@@ -21,6 +21,12 @@
     The source code of the Luminati local proxy tool is available at
     <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
   </div>
+  <div
+    ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur==$parent.ver_last
+    class="alert alert-success">
+    You are using the latest version of the Luminati local proxy tool
+    (<strong>{{$parent.ver_cur}}</strong>).
+  </div>
   <form name=settings ng-submit="save(); settings.$setPristine()">
     <div class=block>
       <div class=form-group>

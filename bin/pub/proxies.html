@@ -12,6 +12,7 @@
             <th ng-repeat="col in columns">
               {{col.title}}
             </th>
+            <th>Request statistics</th>
           </tr>
         </thead>
         <tbody>
@@ -82,6 +83,25 @@
                     ng-options="v.value as v.key for v in col.options()">
                   </select>
                 </span>
+              </span>
+            </td>
+            <td>
+              <span ng-if=proxy.total_stats.requests>
+                <span class=nowrap title="Number of requests">
+                  {{proxy.total_stats.requests | requests}}
+                </span> /
+                <span class=nowrap title="Amound of data downloaded">
+                  {{proxy.total_stats.inbound | bytes}}
+                </span> /
+                <span class=nowrap title="Amount of data uploaded">
+                  {{proxy.total_stats.outbound | bytes}}
+                </span>
+                <a href=# ng-click=reset_total_stats(proxy)>
+                  [reset]
+                </a>
+              </span>
+              <span ng-if=!proxy.total_stats.requests>
+                &mdash;
               </span>
             </td>
           </tr>

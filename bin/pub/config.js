@@ -5,16 +5,16 @@
 
 var config = {
     paths: {
-        jquery: '/jquery/jquery.min',
-        bootstrap: '/bootstrap/js/bootstrap.min',
+        jquery: '/req/jquery/dist/jquery.min',
+        bootstrap: '/req/bootstrap/dist/js/bootstrap.min',
        'bootstrap-datepicker':
-           '/bootstrap-datepicker/js/bootstrap-datepicker.min',
-        moment: '/moment/moment.min',
-        angular: '/angular.min',
+           '/req/bootstrap-datepicker/dist/js/bootstrap-datepicker.min',
+        moment: '/req/moment/min/moment.min',
+        angular: '/req/angular/angular.min',
         'socket.io-client': '/socket.io/socket.io',
-        'angular-chart': '/angular-chartjs/angular-chart.min',
-        chart: '/chartjs/Chart.bundle.min', // with moment.js
-        lodash: '/lodash.min',
+        'angular-chart': '/req/angular-chart.js/dist/angular-chart.min',
+        chart: '/req/chart.js/dist/Chart.bundle.min', // with moment.js
+        lodash: '/req/lodash/lodash.min',
     },
     shim: {
         angular: {exports: 'angular'},
@@ -23,7 +23,7 @@ var config = {
     },
     map: {
         '*': {
-            _css: '/css.min.js',
+            _css: '/req/require-css/css.min.js',
         },
     },
 };

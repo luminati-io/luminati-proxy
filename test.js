@@ -263,7 +263,8 @@ describe('proxy', ()=>{
                         '24000_'+(r*s+p), id+'session mismatch');
                 });
 
-                const t = (name, opt)=>it(name, ()=>etask(function*(){
+                const t = (name, opt)=>it(name, etask._fn(function*(_this){
+                    _this.timeout(4000);
                     l = yield lum(opt);
                     const pool_size = l.opt.pool_size || 1;
                     for (let r=0; r<3; r++)
