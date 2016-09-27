@@ -162,7 +162,7 @@ const proxy = new Luminati({
     proxy_count: 5, //minimum number of proxies to use for distributing requests
 });
 proxy.on('response', res=>console.log('Response:', res));
-proxy.listen(24000, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
+proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
     proxy.request('http://lumtest.com/myip', (err, res)=>{
         if (err)
             return reject(err);
@@ -188,7 +188,7 @@ etask(function*(){
         zone: 'gen', // zone to use
         proxy_count: 5, //minimum number of proxies to use for distributing requests
     });
-    yield proxy.listen(24000, '127.0.0.1'); // port and ip to listen to
+    yield proxy.listen(0, '127.0.0.1'); // port and ip to listen to
     let res = yield etask.nfn_apply(proxy, '.request',
         ['http://lumtest.com/myip']);
     console.log('Result:', res.statusCode, res.body);

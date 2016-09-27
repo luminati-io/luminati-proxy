@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.4
+  - :star: UI Preselect avaliable port for new proxy
+  - :star: nodejs API now does not have to be bound to a specific port
 - v0.7.3
   - :star: History now stores body of each request
   - :star: Requests from history can now be modified and replayed

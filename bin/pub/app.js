@@ -1097,6 +1097,15 @@ function proxy($scope, $http, $proxies, $window){
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         $scope.form = _.cloneDeep(locals.proxy);
         $scope.form.port = $scope.port;
+        if (!$scope.form.port||$scope.form.port=='')
+        {
+            var port = 24000;
+            $scope.proxies.forEach(function(p){
+                if (p.port >= port)
+                    port = p.port+1;
+            });
+            $scope.form.port = port;
+        }
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.show_modal = function(){
             $window.$('#proxy').one('shown.bs.modal', function(){

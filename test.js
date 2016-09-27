@@ -172,6 +172,7 @@ describe('proxy', ()=>{
             customer: customer,
             password: password,
             log: 'NONE',
+            port: 24000,
         }, opt));
         l.test = etask._fn(function*(_this, opt){
             opt = opt||{};
@@ -181,7 +182,7 @@ describe('proxy', ()=>{
             return yield etask.nfn_apply(_this, '.request',
                 [opt]);
         });
-        yield l.listen(opt.port||24000);
+        yield l.listen();
         return l;
     });
 
@@ -199,6 +200,11 @@ describe('proxy', ()=>{
         assert.equal(proxy.history.length, 1);
         assert.equal(proxy.history[0].headers['x-hola-agent'],
             luminati.version);
+    }));
+    it('Listening without specifing port', ()=>etask(function*(){
+        l = yield lum({port: false});
+        yield l.test();
+        assert.equal(proxy.history.length, 1);
     }));
     describe('options', ()=>{
         describe('passthrough (allow_proxy_auth)', ()=>{
