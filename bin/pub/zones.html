@@ -29,8 +29,13 @@
   </div>
   <div ng-if=$root.subsection>
     <div ng-repeat="(zone, properties) in stats" ng-if=zone==$root.subsection
-      class="panel panel-default">
-      <div class=panel-heading>{{zone}}</div>
+      class="panel panel-default" id=zone>
+      <div class=panel-heading>
+        {{zone}}
+        <button type=submit class="btn btn-default" ng-click=edit_zone(zone)>
+          Edit
+        </button>
+      </div>
       <div class=panel-body>
         <table class="table table-hover zones-table">
           <thead>

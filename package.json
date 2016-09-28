@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -35,6 +35,7 @@
     "bootstrap": "^3.3.7",
     "bootstrap-datepicker": "^1.6.4",
     "chart.js": "^2.1.4",
+    "codemirror": "^5.19.0",
     "country-data": "^0.0.29",
     "country-language": "^0.1.7",
     "express": "^4.14.0",

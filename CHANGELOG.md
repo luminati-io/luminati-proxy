@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v?
+  - :star: Configuration can be edited from within web interface
 - v0.7.4
   - :star: UI Preselect avaliable port for new proxy
   - :star: nodejs API now does not have to be bound to a specific port

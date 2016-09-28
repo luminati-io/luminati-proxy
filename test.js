@@ -158,7 +158,8 @@ beforeEach(()=>{
     proxy.connection = null;
 });
 after(()=>etask(function*(){
-    yield proxy.close();
+    if (proxy)
+        yield proxy.close();
     proxy = null;
 }));
 describe('proxy', ()=>{
@@ -384,6 +385,8 @@ describe('proxy', ()=>{
             const t = (name, url)=>it(name, etask._fn(function*(_this){
                 _this.timeout(3000);
                 l = yield lum({socks: 25000});
+                yield l.test();
+                assert.equal(proxy.history.length, 1);
                 yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
                         proxyHost: '127.0.0.1',
@@ -392,8 +395,8 @@ describe('proxy', ()=>{
                     }),
                     url: url,
                 }]);
-                assert.equal(proxy.history.length, 1);
-                assert.equal(proxy.history[0].url, url);
+                assert.equal(proxy.history.length, 2);
+                assert.equal(proxy.history[1].url, url);
             }));
             t('http', test_url);
         });
@@ -534,8 +537,8 @@ describe('manager', ()=>{
         t('main config only', {config: simple_proxy},
             [_.assign({}, simple_proxy, {persist: true})]);
         t('config file', {files: [simple_proxy]}, [simple_proxy]);
-        t('config override cli', {cli: simple_proxy, config: {port: 49049}},
-            [_.assign({}, simple_proxy, {persist: true, port: 49049})]);
+        t('config override cli', {cli: simple_proxy, config: {port: 24042}},
+            [_.assign({}, simple_proxy, {persist: true, port: 24042})]);
         const multiple_proxies = [
             _.assign({}, simple_proxy, {port: 25025}),
             _.assign({}, simple_proxy, {port: 26026}),

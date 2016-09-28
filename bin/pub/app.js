@@ -1,8 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'lodash', 'moment', 'angular-chart',
-    'jquery', 'bootstrap', 'bootstrap-datepicker', '_css!app'],
-function(angular, io, _, moment){
+define(['angular', 'socket.io-client', 'lodash', 'moment',
+    'codemirror/lib/codemirror', 'codemirror/mode/javascript/javascript',
+    'angular-chart', 'jquery', 'bootstrap', 'bootstrap-datepicker',
+    '_css!app'],
+function(angular, io, _, moment, codemirror){
 
 var module = angular.module('app', []);
 
@@ -157,10 +159,17 @@ function root($rootScope, $scope, $http, $window){
 }
 
 module.controller('settings', settings);
-settings.$inject = ['$scope', '$http'];
-function settings($scope, $http){
+settings.$inject = ['$scope', '$http', '$window'];
+function settings($scope, $http, $window){
     $http.get('/api/status').then(function(status){
         $scope.status = status.data;
+    });
+    $http.get('/api/config').then(function(config){
+        $scope.config = config.data.config;
+        $scope.codemirror = codemirror.fromTextArea(
+            $window.$('#config textarea').get(0), {
+            mode: 'javascript',
+        });
     });
     $scope.save = function(){
         $scope.saving = true;
@@ -185,11 +194,32 @@ function settings($scope, $http){
             };
         });
     };
+    $scope.edit_config = function(){
+        $scope.$parent.$parent.confirmation = {
+            text: 'Editing the configuration manually may result in your '
+                +'proxies working incorrectly. Do you still want to modify '
+                +'the configuration file?',
+            confirmed: function(){
+                $scope.codemirror.setValue($scope.config);
+                setTimeout(function(){
+                    $window.$('#config').one('shown.bs.modal', function(){
+                        $scope.codemirror.scrollTo(0, 0);
+                        $scope.codemirror.refresh();
+                    }).modal();
+                }, 360);
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
+    $scope.save_config = function(){
+        $scope.config = $scope.codemirror.getValue();
+        $http.post('/api/config', {config: $scope.config});
+    };
 }
 
 module.controller('zones', zones);
-zones.$inject = ['$scope', '$http', '$filter'];
-function zones($scope, $http, $filter){
+zones.$inject = ['$scope', '$http', '$filter', '$window'];
+function zones($scope, $http, $filter, $window){
     var today = new Date();
     var oneDayAgo = (new Date()).setDate(today.getDate()-1);
     var twoDaysAgo = (new Date()).setDate(today.getDate()-2);
@@ -224,6 +254,9 @@ function zones($scope, $http, $filter){
     $http.get('/api/recent_ips').then(function(recent_ips){
         $scope.recent_ips = recent_ips.data;
     });
+    $scope.edit_zone = function(zone){
+        $window.location = 'https://luminati.io/cp/zones/'+zone;
+    };
 }
 
 module.controller('test', test);

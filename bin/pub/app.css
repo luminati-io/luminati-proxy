@@ -393,3 +393,33 @@ table.proxies td, table.proxies th {
 .zones-table td.zones-zone, .zones-table thead th.zones-zone {
     text-align: left;
 }
+#zone .panel-heading {
+    position: relative;
+}
+#zone .panel-heading button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+.settings-config-edit {
+    position: relative;
+}
+.settings-config-edit > span {
+    padding-right: 60px;
+    display: inline-block;
+}
+.settings-config-edit button {
+    position: absolute;
+    right: 10px;
+    top: 9px;
+}
+#config textarea, #config .CodeMirror {
+    width: 100%;
+    height: calc(100vh - 320px);
+    margin-bottom: 10px;
+    padding: 0;
+    border: 1px solid black;
+}
+#config .modal-body .alert:last-child {
+    margin-bottom: 0;
+}
