@@ -1,7 +1,0 @@
-.version {
-    font-size: xx-small;
-    color: lightgray;
-}
-.version>.upgrade {
-    color: red;
-}

@@ -162,7 +162,8 @@ module.controller('settings', settings);
 settings.$inject = ['$scope', '$http', '$window'];
 function settings($scope, $http, $window){
     $http.get('/api/status').then(function(status){
-        $scope.status = status.data;
+        if (!$scope.status)
+            $scope.status = status.data;
     });
     $http.get('/api/config').then(function(config){
         $scope.config = config.data.config;
@@ -178,8 +179,6 @@ function settings($scope, $http, $window){
         $http.post('/api/creds', {
             customer: $scope.$parent.settings.customer.trim(),
             password: $scope.$parent.settings.password.trim(),
-            proxy: $scope.$parent.settings.proxy.trim(),
-            proxy_port: $scope.$parent.settings.proxy_port,
         }).error(function(){
             $scope.saving = false;
             $scope.error = true;
@@ -189,11 +188,14 @@ function settings($scope, $http, $window){
             $scope.saved = true;
             $scope.status = {
                 status: 'ok',
-                description: 'Your proxy is up and running, but you might '
-                    +' need to restart the application.',
+                description: 'Your proxy is up and running.',
             };
+            $http.get('/api/config').then(function(config){
+                $scope.config = config.data.config;
+            });
         });
     };
+    var modals_time = 400;
     $scope.edit_config = function(){
         $scope.$parent.$parent.confirmation = {
             text: 'Editing the configuration manually may result in your '
@@ -206,14 +208,44 @@ function settings($scope, $http, $window){
                         $scope.codemirror.scrollTo(0, 0);
                         $scope.codemirror.refresh();
                     }).modal();
-                }, 360);
+                }, modals_time);
             },
         };
         $window.$('#confirmation').modal();
     };
     $scope.save_config = function(){
         $scope.config = $scope.codemirror.getValue();
-        $http.post('/api/config', {config: $scope.config});
+        setTimeout(function(){
+            $window.$('#restarting').modal({
+                backdrop: 'static',
+                keyboard: false,
+            });
+        }, modals_time);
+        $http.post('/api/config', {config: $scope.config}).then(function(){
+            $http.get('/api/restart').then(function(){
+                var test = function(){
+                    $http.get('/api/config').error(test).then(function(){
+                        $window.location.reload();
+                    });
+                };
+                test();
+            });
+        });
+    };
+    $scope.shutdown = function(){
+        $scope.$parent.$parent.confirmation = {
+            text: 'Are you sure you want to shut down the local proxies?',
+            confirmed: function(){
+                $http.get('/api/shutdown');
+                setTimeout(function(){
+                    $window.$('#shutdown').modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                    });
+                }, modals_time);
+            },
+        };
+        $window.$('#confirmation').modal();
     };
 }
 

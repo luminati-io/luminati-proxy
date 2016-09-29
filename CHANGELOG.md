@@ -1,7 +1,10 @@
 # Luminati Proxy manager - Change Log
 
-- v?
-  - :star: Configuration can be edited from within web interface
+- v0.7.6
+  - :star: Graceful shutdown from the UI and automatic restart on configuration
+  change
+- v0.7.5
+  - :star: Configuration can be edited from within the UI
 - v0.7.4
   - :star: UI Preselect avaliable port for new proxy
   - :star: nodejs API now does not have to be bound to a specific port

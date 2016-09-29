@@ -1,25 +1,44 @@
 <div ng-controller=settings>
-  <div ng-if=!status class="alert alert-info">
-    Determining the status of your proxy...
+  <div ng-if=!status class="alert alert-info settings-alert">
+    <div>
+      Determining the status of your proxy...
+    </div>
+    <button type=button class="btn btn-danger" ng-click=shutdown()>
+      Shut down
+    </button>
   </div>
-  <div ng-if=status class=alert ng-class="{'alert-success':
+  <div ng-if=status class="alert settings-alert" ng-class="{'alert-success':
     status.status=='ok', 'alert-danger': status.status=='error'}">
-    {{status.description}}
-    <ul ng-if=status.description_list>
-      <li ng-repeat="item in status.description_list">
-        {{item}}
-      </li>
-    </ul>
+    <div>
+      {{status.description}}
+      <ul ng-if=status.description_list>
+        <li ng-repeat="item in status.description_list">
+          {{item}}
+        </li>
+      </ul>
+    </div>
+    <button type=button class="btn btn-danger" ng-click=shutdown()>
+      Shut down
+    </button>
+  </div>
+  <div ng-if=$parent.$parent.settings.argv class="alert alert-info">
+    The application is running with the following arguments:
+    <strong>{{$parent.$parent.settings.argv}}</strong>
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
     class="alert alert-warning">
-    The latest version of the tool available is
-    <strong>{{$parent.ver_last}}</strong>. You are using
-    <strong>{{$parent.ver_cur}}</strong>. To upgrade, run the following
-    command: <pre>$ npm install -g luminati-io/luminati-proxy</pre>
-    The source code of the Luminati proxy manager tool is available at
-    <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
+    <div>
+      The latest version of the tool available is
+      <strong>{{$parent.ver_last}}</strong>. You are using
+      <strong>{{$parent.ver_cur}}</strong>. To upgrade, run the following
+      command:
+    </div>
+    <pre>$ npm install -g luminati-io/luminati-proxy</pre>
+    <div>
+      The source code of the Luminati proxy manager tool is available at
+      <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
+    </div>
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur==$parent.ver_last
@@ -39,17 +58,6 @@
         <input type=password ng-required=true
           ng-model=$parent.settings.password class=form-control id=password>
       </div>
-      <div class=form-group>
-        <label for=proxy class=control-label>Default proxy</label>
-        <input type=text ng-required=true ng-model=$parent.settings.proxy
-          class=form-control id=proxy>
-      </div>
-      <div class=form-group>
-        <label for=proxy_port class=control-label>Default proxy port</label>
-        <input type=number ng-required=true
-          ng-model=$parent.settings.proxy_port class=form-control
-          id=proxy_port>
-      </div>
       <button type=submit class="btn btn-success"
         ng-disabled=saving||!settings.$valid>
         Save settings
@@ -67,11 +75,11 @@
       </div>
     </div>
   </form>
-  <div class="alert alert-info settings-config-edit">
-    <span>
+  <div class="alert alert-info settings-alert">
+    <div>
       Path to the configuration file:
       <strong>{{$parent.settings.config}}</strong>
-    </span>
+    </div>
     <button type=button class="btn btn-warning" ng-click=edit_config()>
       Edit
     </button>
@@ -87,10 +95,6 @@
         </div>
         <div class=modal-body>
           <textarea>{{config}}</textarea>
-          <div class="alert alert-warning">
-            Note that you might need to restart the application in order for
-            your changes to take effect.
-          </div>
         </div>
         <div class=modal-footer>
           <button type=button class="btn btn-default"
@@ -99,8 +103,34 @@
           </button>
           <button type=button class="btn btn-success"
             data-dismiss=modal ng-click=save_config()>
-            Save
+            Save and restart
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id=restarting class="modal fade" role=dialog>
+    <div class=modal-dialog>
+      <div class=modal-content>
+        <div class=modal-header>
+          <h4 class=modal-title>Restarting...</h4>
+        </div>
+        <div class=modal-body>
+          Please wait. The page will be reloaded automatically
+          once the application has restarted.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id=shutdown class="modal fade" role=dialog>
+    <div class=modal-dialog>
+      <div class=modal-content>
+        <div class=modal-header>
+          <h4 class=modal-title>Shutdown</h4>
+        </div>
+        <div class=modal-body>
+          The application has been shut down. To restart,
+          please run it manually and reload this page.
         </div>
       </div>
     </div>

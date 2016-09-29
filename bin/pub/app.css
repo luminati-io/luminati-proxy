@@ -19,6 +19,9 @@ a:hover {
 .nowrap {
     white-space: nowrap;
 }
+.alert div + pre {
+    margin-top: 4px;
+}
 .btn-title {
     float: right;
     margin-top: -4px;
@@ -401,25 +404,20 @@ table.proxies td, table.proxies th {
     right: 5px;
     top: 5px;
 }
-.settings-config-edit {
+.settings-alert {
     position: relative;
 }
-.settings-config-edit > span {
-    padding-right: 60px;
-    display: inline-block;
+.settings-alert > div {
+    padding-right: 100px;
 }
-.settings-config-edit button {
+.settings-alert button {
     position: absolute;
     right: 10px;
     top: 9px;
 }
 #config textarea, #config .CodeMirror {
     width: 100%;
-    height: calc(100vh - 320px);
-    margin-bottom: 10px;
+    height: calc(100vh - 240px);
     padding: 0;
     border: 1px solid black;
-}
-#config .modal-body .alert:last-child {
-    margin-bottom: 0;
 }
