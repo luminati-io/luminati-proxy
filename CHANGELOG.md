@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.7
+  - :bug: Restarting is fixed under Windows
 - v0.7.6
   - :star: Graceful shutdown from the UI and automatic restart on configuration
   change
