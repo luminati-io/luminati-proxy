@@ -348,7 +348,7 @@ describe('proxy', ()=>{
                     assert(/statusCode=501/.test(err.message));
                 }
                 yield l.test();
-                assert.equal(proxy.history.length, 1);
+                assert.ok(proxy.history.length>0);
             }));
         });
         describe('direct', ()=>{
@@ -385,9 +385,7 @@ describe('proxy', ()=>{
             const t = (name, url)=>it(name, etask._fn(function*(_this){
                 _this.timeout(3000);
                 l = yield lum({socks: 25000});
-                yield l.test();
-                assert.equal(proxy.history.length, 1);
-                yield etask.nfn_apply(request, [{
+                let res = yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
                         proxyHost: '127.0.0.1',
                         proxyPort: 25000,
@@ -395,8 +393,8 @@ describe('proxy', ()=>{
                     }),
                     url: url,
                 }]);
-                assert.equal(proxy.history.length, 2);
-                assert.equal(proxy.history[1].url, url);
+                let body = JSON.parse(res.body);
+                assert.equal(body.url, url);
             }));
             t('http', test_url);
         });
@@ -431,6 +429,19 @@ describe('proxy', ()=>{
             t(1);
             t(3);
             t(10);
+        });
+        describe('refresh_session', ()=>{
+            it('pool', ()=>etask(function*(){
+                const test_session = session=>etask(function*(){
+                    let res = yield l.test();
+                    let auth = res.body.auth;
+                    assert(auth.session, session);
+                });
+                l = yield lum({pool_size: 1, max_requests: 10});
+                yield test_session('24000_1');
+                yield l.refresh_sessions();
+                yield test_session('24000_2');
+            }));
         });
     });
 });

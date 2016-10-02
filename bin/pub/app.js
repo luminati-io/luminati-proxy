@@ -600,6 +600,11 @@ function proxies($scope, $http, $proxies, $window){
         };
         $window.$('#confirmation').modal();
     };
+    $scope.refresh_sessions = function(proxy){
+        $http.post('/api/refresh_sessions/'+proxy.port).then(function(){
+            $proxies.update();
+        });
+    };
     $scope.show_stats = function(proxy){
         $scope.selected_proxy = proxy;
         var stats = $scope.selected_proxy.stats;

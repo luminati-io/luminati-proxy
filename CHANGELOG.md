@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.9
+  - :star: Sessions can now be refreshed from the UI/Rest without removing or
+  changing proxy settings
 - v0.7.7
   - :bug: Restarting is fixed under Windows
 - v0.7.6
@@ -16,7 +19,7 @@
   - :star: Resettable statistics on local proxies
 - v0.7.2
   - :star: Allow SSL connections/sniffing to insecure domains
-  - :star: Bug fix - do not parse password as numbers even if format fit
+  - :bug: do not parse password as numbers even if format fit
 - v0.7.1
   - :star: PhantomJS is now an optional dependency
 - v0.7.0
