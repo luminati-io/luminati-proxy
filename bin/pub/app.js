@@ -133,6 +133,7 @@ function root($rootScope, $scope, $http, $window){
         {name: 'proxies', title: 'Proxies'},
         {name: 'zones', title: 'Zones'},
         {name: 'tools', title: 'Tools'},
+        {name: 'faq', title: 'FAQ'},
     ];
     for (var s in $scope.sections)
     {
@@ -222,15 +223,13 @@ function settings($scope, $http, $window){
             });
         }, modals_time);
         $http.post('/api/config', {config: $scope.config}).then(function(){
-            $http.get('/api/restart').then(function(){
-                var check = function(){
-                    $http.get('/api/config').error(
-                        function(){ setTimeout(check, 500); }).then(function(){
-                        $window.location.reload();
-                    });
-                };
-                check();
-            });
+            var check = function(){
+                $http.get('/api/config').error(
+                    function(){ setTimeout(check, 500); }).then(function(){
+                    $window.location.reload();
+                });
+            };
+            check();
         });
     };
     $scope.shutdown = function(){
@@ -292,6 +291,21 @@ function zones($scope, $http, $filter, $window){
     };
 }
 
+module.controller('faq', faq);
+faq.$inject = ['$scope'];
+function faq($scope){
+    $scope.questions = [
+        {
+            name: 'upgrade',
+            title: 'How can I upgrade Luminati proxy manager tool?',
+        },
+        {
+            name: 'ssl',
+            title: 'How do I enable HTTPS sniffing?',
+        },
+    ];
+}
+
 module.controller('test', test);
 test.$inject = ['$scope', '$http', '$filter', '$window'];
 function test($scope, $http, $filter, $window){
@@ -305,6 +319,8 @@ function test($scope, $http, $filter, $window){
         $scope.method = preset.method;
         $scope.body = preset.body;
     }
+    else
+        $scope.method = 'GET';
     $http.get('/api/proxies').then(function(proxies){
         $scope.proxies = [['0', 'No proxy']];
         for (var i=0; i<proxies.data.length; i++)
@@ -312,6 +328,8 @@ function test($scope, $http, $filter, $window){
             $scope.proxies.push(
                 [''+proxies.data[i].port, ''+proxies.data[i].port]);
         }
+        if (!$scope.proxy)
+            $scope.proxy = $scope.proxies[1][0];
     });
     $scope.methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD',
         'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND',

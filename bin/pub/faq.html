@@ -1,0 +1,14 @@
+<div class=panel-group id=faq ng-controller=faq>
+  <div class="panel panel-default" ng-repeat="q in questions">
+    <div class=panel-heading>
+      <a data-toggle=collapse data-parent=#faq href=#{{q.name}}>
+        {{q.title}}
+      </a>
+    </div>
+    <div id={{q.name}} class="panel-collapse collapse">
+      <div class=panel-body>
+        <ng-include src="'/faq/'+q.name+'.html'"></ng-include>
+      </div>
+    </div>
+  </div>
+</div>

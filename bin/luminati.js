@@ -10,11 +10,9 @@ if (process.platform=='win32')
 }
 const run = ()=>{
     const manager = new Manager(process.argv.slice(2));
-    manager.on('stop', restart=>{
-        if (restart)
-            setTimeout(run, 0);
-        else
-            process.exit();
+    manager.on('stop', ()=>process.exit()).on('config_changed', ()=>{
+        manager.stop(true, null, true);
+        setTimeout(run, 0);
     }).start();
 };
 run();

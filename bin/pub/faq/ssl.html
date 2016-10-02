@@ -1,0 +1,86 @@
+<div>
+  Please note that in order for HTTPS sniffing to work, you will have to run
+  the proxy manager tool with the <code>--ssl</code> flag.
+</div><br>
+<div>
+  Please download the <a href=/ssl>certificate</a> and install it as described
+  below. If installed correctly, you will be able to inspect detailed logs of
+  both HTTP and HTTPS requests (request logging occurs only in case the proxy
+  tool has been launched with the <code>--history</code> flag).
+</div><br>
+<h4>Firefox browser</h4>
+<ul>
+  <li>
+    Type in <code>about:preferences#advanced</code> in the address bar.
+  </li>
+  <li>
+    Go to Certificates tab and click View Certificates.
+  </li>
+  <li>
+    Go to Authorities tab and click Import.
+  </li>
+  <li>
+    Select the certificate file you have downloaded.
+  </li>
+  <li>
+    Make sure that "Trust this CA to identify websites" is checked and click
+    OK.
+  </li>
+  <li>
+    Click OK and go to an SSL-protected website to check that everything is
+    working as expected.
+  </li>
+</ul><br>
+<h4>Other browsers under Windows</h4>
+<ul>
+  <li>
+    Double click the downloaded certificate file.
+  </li>
+  <li>
+    Click Install Certificate.
+  </li>
+  <li>
+    Choose whether you want the installation to be working for current user
+    only or for all Windows users. Click Next.
+  </li>
+  <li>
+    Select "Place all certificates in the following store" and click Browse.
+  </li>
+  <li>
+    Select "Trusted Root Certification Authorities", click OK and then Next.
+  </li>
+  <li>
+    Click Finish. "The import was successful message" should appear.
+  </li>
+</ul><br>
+<h4>Other browsers under Linux</h4>
+<ul>
+  <li>
+    Copy the downloaded certificate file <code>luminati.crt</code> to
+    the <code>/usr/local/share/ca-certificates/</code> folder.
+  </li>
+  <li>
+    Run <code>sudo update-ca-certificates</code>. The output of the command
+    should state that 1 certificate was added.
+  </li>
+  <li>
+    Go to an SSL-protected website to check that everything is working as
+    expected.
+  </li>
+</ul><br>
+<h4>Other browsers under Mac OS</h4>
+<ul>
+  <li>
+    Double click the downloaded certificate file.
+  </li>
+  <li>
+    Select "X509 Anchors" from the Keychain drop-down list.
+  </li>
+  <li>
+    Click OK and enter your credentials when asked.
+  </li>
+  <li>
+    Click OK and go to an SSL-protected website to check that everything is
+    working as expected.
+  </li>
+</ul>

@@ -16,10 +16,15 @@ a:hover {
     box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
     border-radius: .15em;
 }
+code {
+    background: lightgrey;
+    color: black;
+    white-space: nowrap;
+}
 .nowrap {
     white-space: nowrap;
 }
-.alert div + pre {
+pre.top-margin {
     margin-top: 4px;
 }
 .btn-title {

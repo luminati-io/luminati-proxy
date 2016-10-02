@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.10
+  - :star: FAQ section added
 - v0.7.9
   - :star: Sessions can now be refreshed from the UI/Rest without removing or
   changing proxy settings
