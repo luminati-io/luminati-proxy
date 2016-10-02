@@ -93,7 +93,7 @@ const http_proxy = port=>etask(function*(){
     proxy.http = http.createServer((req, res, head)=>{
         if (!proxy.connection)
             return handler(req, res, head);
-        proxy.connection(()=>handler(req, res, head));
+        proxy.connection(()=>handler(req, res, head), req);
     });
     const headers = {};
     proxy.http.on('connect', (req, res, head)=>etask(function*(){
@@ -336,7 +336,7 @@ describe('proxy', ()=>{
                 assert.equal(res.statusMessage, 'NULL');
                 assert.equal(res.body, undefined);
                 yield l.test({url: protocol+'://lumtest.com/myip.json'});
-                assert.equal(proxy.history.length, 1);
+                assert.ok(proxy.history.length>0);
             }));
             t('http');
             // t('https sniffing', true); // TODO lee fix
@@ -400,25 +400,31 @@ describe('proxy', ()=>{
             }));
             t('http', test_url);
         });
-        describe.skip('throttle', ()=>{
-            const t = throttle=>it(''+throttle, ()=>etask(function*(){
-                let waiting = [];
-                const release = n=>{
-                    while (waiting.length&&n--)
-                        waiting.shift()();
+        describe('throttle', ()=>{
+            const t = throttle=>it(''+throttle, etask._fn(function*(_this){
+                _this.timeout(3000);
+                let waiting = [], requests = [];
+                const repeat =(n, action)=>{
+                    while (n--)
+                        action();
                 };
-                proxy.connection = next=>{
+                const request = n=>repeat(n, ()=>requests.push(l.test()));
+                const release = n=>repeat(n, ()=>waiting.shift()());
+                proxy.connection = (next, req)=>{
+                    if (req.url!=test_url)
+                        return next();
                     waiting.push(next);
                 };
                 l = yield lum({throttle});
-                let requests = [];
-                for (let i=throttle+1; i--;)
-                    requests.push(l.test());
+                request(2*throttle);
                 yield etask.sleep(100);
                 assert.equal(waiting.length, throttle);
-                release(1);
-                yield etask.sleep(100);
-                assert.equal(waiting.length, throttle);
+                for (let i=0; i < throttle; ++i)
+                {
+                    release(1);
+                    yield etask.sleep(100);
+                    assert.equal(waiting.length, throttle);
+                }
                 release(throttle);
                 yield etask.all(requests);
             }));

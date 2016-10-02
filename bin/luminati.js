@@ -8,5 +8,13 @@ if (process.platform=='win32')
     readline.createInterface({input: process.stdin, output: process.stdout})
     .on('SIGINT', ()=>process.emit('SIGINT'));
 }
-const manager = new Manager(process.argv.slice(2));
-manager.on('stop', ()=>process.exit()).start();
+const run = ()=>{
+    const manager = new Manager(process.argv.slice(2));
+    manager.on('stop', restart=>{
+        if (restart)
+            setTimeout(run, 0);
+        else
+            process.exit();
+    }).start();
+};
+run();

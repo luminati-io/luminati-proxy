@@ -223,12 +223,13 @@ function settings($scope, $http, $window){
         }, modals_time);
         $http.post('/api/config', {config: $scope.config}).then(function(){
             $http.get('/api/restart').then(function(){
-                var test = function(){
-                    $http.get('/api/config').error(test).then(function(){
+                var check = function(){
+                    $http.get('/api/config').error(
+                        function(){ setTimeout(check, 500); }).then(function(){
                         $window.location.reload();
                     });
                 };
-                test();
+                check();
             });
         });
     };

@@ -136,7 +136,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-session-dur>
-                      Session duration
+                      Session duration (seconds)
                     </label>
                     <input id=proxy-field-session-dur type=number
                       ng-model=form.session_duration class=form-control
@@ -188,7 +188,7 @@
                 <div class=panel-body>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-sinit-timeout>
-                      Session init timeout
+                      {{consts.session_init_timeout.desc}}
                     </label>
                     <input id=proxy-field-sinit-timeout type=number
                       ng-model=form.session_init_timeout class=form-control
