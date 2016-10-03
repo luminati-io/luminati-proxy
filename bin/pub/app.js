@@ -688,6 +688,9 @@ function proxies($scope, $http, $proxies, $window){
     $scope.show_history = function(proxy){
         $scope.history_dialog = [{port: proxy.port}];
     };
+    $scope.show_pool = function(proxy){
+        $scope.pool_dialog = [{port: proxy.port}];
+    };
     $scope.edit_proxy = function(proxy, duplicate){
         $scope.proxy_dialog = [{proxy: proxy||{}, duplicate: duplicate}];
     };
@@ -1176,6 +1179,22 @@ function history_details($scope){
             }
             locals.update();
         };
+    };
+}
+
+module.controller('pool', pool);
+pool.$inject = ['$scope', '$http', '$window'];
+function pool($scope, $http, $window){
+    $scope.init = function(locals){
+        $scope.port = locals.port;
+        $scope.show_modal = function(){ $window.$('#pool').modal(); };
+        $scope.update = function(){
+            $scope.pool = null;
+            $http.get('/api/sessions/'+$scope.port).then(function(pool){
+                $scope.pool = pool.data;
+            });
+        };
+        $scope.update();
     };
 }
 

@@ -1,0 +1,47 @@
+<div id=pool class="modal fade" role=dialog ng-init=show_modal()>
+  <div class=modal-dialog>
+    <div class=modal-content>
+      <div class=modal-header>
+        <button type=button class=close data-dismiss=modal>
+          &times;
+        </button>
+        <button type=button class="btn btn-default btn-title"
+          ng-click=update() ng-if=pool>
+          Update
+        </button>
+        <h4 class=modal-title>Pool: {{port}}</h4>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div class="alert alert-info" ng-if=!pool>
+            Loading...
+          </div>
+          <div ng-if=pool&&!pool.length class="alert alert-warning">
+            There are no active sessions for this proxy.
+          </div>
+          <table ng-if=pool&&pool.length class="table table-hover">
+            <thead>
+              <tr>
+                <th>IP</th>
+                <th>Country</th>
+                <th>City</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="p in pool">
+                <td>{{p.info.ip}}</td>
+                <td>{{p.info.country}}</td>
+                <td>{{p.info.geo.city}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class=modal-footer>
+        <button type=button class="btn btn-default" data-dismiss=modal>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

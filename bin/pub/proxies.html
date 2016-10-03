@@ -37,6 +37,9 @@
               <span class="proxies-action glyphicon glyphicon-time"
                 ng-click=show_history(proxy) title=History>
               </span>
+              <span class="proxies-action glyphicon glyphicon-list-alt"
+                ng-click=show_pool(proxy) title="Current pool">
+              </span>
               <span class="proxies-action glyphicon glyphicon-trash"
                 ng-if=proxy.persist ng-click=delete_proxy(proxy) title=Delete>
               </span>
@@ -169,6 +172,9 @@
   </div>
   <div ng-repeat="h in history_dialog" ng-controller=history
     ng-include="'history.html'" ng-init=init(h)>
+  </div>
+  <div ng-repeat="p in pool_dialog" ng-controller=pool
+    ng-include="'pool.html'" ng-init=init(p)>
   </div>
   <div ng-repeat="p in proxy_dialog" ng-controller=proxy
     ng-include="'proxy.html'" ng-init=init(p)>
