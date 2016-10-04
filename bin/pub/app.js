@@ -183,6 +183,9 @@ function settings($scope, $http, $window){
         }).error(function(){
             $scope.saving = false;
             $scope.error = true;
+            $http.get('/api/config').then(function(config){
+                $scope.config = config.data.config;
+            });
         }).then(function(settings){
             $scope.$parent.settings = settings.data;
             $scope.saving = false;

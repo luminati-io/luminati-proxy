@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.12
+  - :star: Quicker credentials check
 - v0.7.11
   - :star: IP pool for a given local proxy can now be viewed
 - v0.7.10
