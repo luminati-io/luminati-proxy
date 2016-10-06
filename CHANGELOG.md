@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.14
+  - :star: Quick start wizard for beginner users
 - v0.7.13
   - :star: Statistics on sessions from IP pool are now available
   - :bug: Various minor bugs fixed

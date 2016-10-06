@@ -27,6 +27,24 @@ code {
 pre.top-margin {
     margin-top: 4px;
 }
+.container {
+    width: auto;
+    max-width: 1170px;
+}
+.main-container-qs {
+    width: 75%;
+    margin-left: 25%;
+}
+.quickstart {
+    width: 25%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow: auto;
+    border-right: 1px solid black;
+    padding: 12px;
+}
 .btn-title {
     float: right;
     margin-top: -4px;
@@ -437,4 +455,24 @@ div.proxies .panel-footer {
     height: calc(100vh - 240px);
     padding: 0;
     border: 1px solid black;
+}
+.quickstart li {
+    display: block;
+    margin-bottom: 10px;
+}
+.quickstart li:before {
+    font-family: 'Glyphicons Halflings';
+    float: left;
+    margin-left: -22px;
+}
+.quickstart li:before {
+    content: '\e092';
+}
+.quickstart li.quickstart-completed:before {
+    content: '\e013';
+    color: green;
+}
+.quickstart li.quickstart-completed + li:not(.quickstart-completed):before,
+.quickstart li:not(.quickstart-completed):first-child:before {
+    color: red;
 }

@@ -13,36 +13,41 @@
     <style>[ng-cloak] { display: none; }</style>
   </head>
   <body ng-cloak ng-controller=root>
-    <div class=header>
+    <div ng-class="{'main-container-qs': quickstart()}">
+      <div class=header>
+        <div class=container>
+          <img src=/img/menu_logo.svg>
+        </div>
+      </div>
       <div class=container>
-        <img src=/img/menu_logo.svg>
+        <div class=navigation>
+          <div class=active>
+            <span ng-if=settings.customer>
+              <a href=/settings>{{settings.customer}}</a>
+              <span class=separator>&nbsp;/&nbsp;</span>
+            </span>
+            <span ng-if=!subsection>
+              {{section.title}}
+            </span>
+            <span ng-if=subsection>
+              <a href=/{{section.name}}>{{section.title}}</a>
+              <span class=separator>&nbsp;/&nbsp;</span>
+              {{subsection}}
+            </span>
+          </div>
+          <div class=items>
+            <span ng-repeat="s in sections">
+              <span ng-if="$index&gt;0" class=separator>&nbsp;|&nbsp;</span>
+              <a ng-if=s!=section||subsection href=/{{s.name}}>{{s.title}}</a>
+              <span ng-if=s==section&&!subsection>{{s.title}}</span>
+            </span>
+          </div>
+        </div>
+        <ng-include src="'/'+section.name+'.html'"></ng-include>
       </div>
     </div>
-    <div class=container>
-      <div class=navigation>
-        <div class=active>
-          <span ng-if=settings.customer>
-            <a href=/settings>{{settings.customer}}</a>
-            <span class=separator>&nbsp;/&nbsp;</span>
-          </span>
-          <span ng-if=!subsection>
-            {{section.title}}
-          </span>
-          <span ng-if=subsection>
-            <a href=/{{section.name}}>{{section.title}}</a>
-            <span class=separator>&nbsp;/&nbsp;</span>
-            {{subsection}}
-          </span>
-        </div>
-        <div class=items>
-          <span ng-repeat="s in sections">
-            <span ng-if="$index&gt;0" class=separator>&nbsp;|&nbsp;</span>
-            <a ng-if=s!=section||subsection href=/{{s.name}}>{{s.title}}</a>
-            <span ng-if=s==section&&!subsection>{{s.title}}</span>
-          </span>
-        </div>
-      </div>
-      <ng-include src="'/'+section.name+'.html'"></ng-include>
+    <div ng-if=quickstart() class=quickstart>
+      <ng-include src="'/quickstart.html'"></ng-include>
     </div>
     <div id=confirmation class="modal fade" role=dialog>
       <div class=modal-dialog>

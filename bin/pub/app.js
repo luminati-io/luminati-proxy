@@ -128,6 +128,22 @@ function $proxies($http, $q){
 module.controller('root', root);
 root.$inject = ['$rootScope', '$scope', '$http', '$window'];
 function root($rootScope, $scope, $http, $window){
+    $scope.quickstart = function(){
+        return $window.localStorage.getItem('quickstart')=='show';
+    };
+    $scope.quickstart_completed = function(s){
+        return $window.localStorage.getItem('quickstart-'+s);
+    };
+    $scope.quickstart_dismiss = function(){
+        var mc = $window.$('body > .main-container-qs');
+        var qs = $window.$('body > .quickstart');
+        var w = qs.outerWidth();
+        mc.animate({marginLeft: 0, width: '100%'});
+        qs.animate({left: -w}, {done: function(){
+            $window.localStorage.setItem('quickstart', 'dismissed');
+            $scope.$apply();
+        }});
+    };
     $scope.sections = [
         {name: 'settings', title: 'Settings'},
         {name: 'proxies', title: 'Proxies'},
@@ -145,8 +161,13 @@ function root($rootScope, $scope, $http, $window){
     }
     $http.get('/api/creds').then(function(settings){
         $scope.settings = settings.data;
-        if (!$scope.settings.customer&&$scope.section.name!='settings')
-            $window.location = 'settings';
+        if (!$scope.settings.customer)
+        {
+            if ($scope.section.name!='settings')
+                $window.location = 'settings';
+            else if (!$window.localStorage.getItem('quickstart'))
+                $window.localStorage.setItem('quickstart', 'show');
+        }
     });
     $http.get('/api/version').then(function(version){
         $scope.ver_cur = version.data.version;
@@ -197,6 +218,7 @@ function settings($scope, $http, $window){
             $http.get('/api/config').then(function(config){
                 $scope.config = config.data.config;
             });
+            $window.localStorage.setItem('quickstart-creds', true);
         });
     };
     var modals_time = 400;
@@ -255,6 +277,7 @@ function settings($scope, $http, $window){
 module.controller('zones', zones);
 zones.$inject = ['$scope', '$http', '$filter', '$window'];
 function zones($scope, $http, $filter, $window){
+    $window.localStorage.setItem('quickstart-zones-tools', true);
     var today = new Date();
     var oneDayAgo = (new Date()).setDate(today.getDate()-1);
     var twoDaysAgo = (new Date()).setDate(today.getDate()-2);
@@ -312,6 +335,7 @@ function faq($scope){
 module.controller('test', test);
 test.$inject = ['$scope', '$http', '$filter', '$window'];
 function test($scope, $http, $filter, $window){
+    $window.localStorage.setItem('quickstart-zones-tools', true);
     var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
         /[?&]test=([^&]+)/)||['', 'null'])[1]));
     if (preset)
@@ -1262,11 +1286,16 @@ function proxy($scope, $http, $proxies, $window){
             proxy.persist = true;
             var data = {proxy: proxy};
             var promise;
-            if ($scope.port&&!locals.duplicate)
+            var edit = $scope.port&&!locals.duplicate;
+            if (edit)
                 promise = $http.put('/api/proxies/'+$scope.port, data);
             else
                 promise = $http.post('/api/proxies', data);
-            promise.then(function(){ $proxies.update(); });
+            promise.then(function(){
+                $proxies.update();
+                $window.localStorage.setItem('quickstart-'+
+                    (edit ? 'edit' : 'create')+'-proxy', true);
+            });
         };
     };
 }
