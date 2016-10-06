@@ -442,13 +442,19 @@ div.proxies .panel-footer {
 .settings-alert {
     position: relative;
 }
-.settings-alert > div {
-    padding-right: 100px;
+.settings-alert > div:not(.settings-inner-alert), .settings-alert pre {
+    margin-right: 120px;
 }
 .settings-alert button {
     position: absolute;
     right: 10px;
     top: 9px;
+}
+.settings-alert .settings-inner-alert {
+    position: absolute;
+    right: 10px;
+    top: 47px;
+    padding: 4px 8px;
 }
 #config textarea, #config .CodeMirror {
     width: 100%;

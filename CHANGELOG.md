@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.15
+  - :star: The application can now be updated semiautomatically via the UI
 - v0.7.14
   - :star: Quick start wizard for beginner users
 - v0.7.13

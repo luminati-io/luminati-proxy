@@ -222,6 +222,7 @@ function settings($scope, $http, $window){
         });
     };
     var modals_time = 400;
+    var reload_check_time = 500;
     $scope.edit_config = function(){
         $scope.$parent.$parent.confirmation = {
             text: 'Editing the configuration manually may result in your '
@@ -250,9 +251,8 @@ function settings($scope, $http, $window){
         $http.post('/api/config', {config: $scope.config}).then(function(){
             var check = function(){
                 $http.get('/api/config').error(
-                    function(){ setTimeout(check, 500); }).then(function(){
-                    $window.location.reload();
-                });
+                    function(){ setTimeout(check, reload_check_time); })
+                .then(function(){ $window.location.reload(); });
             };
             check();
         });
@@ -261,13 +261,38 @@ function settings($scope, $http, $window){
         $scope.$parent.$parent.confirmation = {
             text: 'Are you sure you want to shut down the local proxies?',
             confirmed: function(){
-                $http.get('/api/shutdown');
+                $http.post('/api/shutdown');
                 setTimeout(function(){
                     $window.$('#shutdown').modal({
                         backdrop: 'static',
                         keyboard: false,
                     });
                 }, modals_time);
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
+    $scope.upgrade = function(){
+        $scope.$parent.$parent.confirmation = {
+            text: 'The application will be upgraded and restarted.',
+            confirmed: function(){
+                $scope.upgrading = true;
+                $http.post('/api/upgrade').error(function(){
+                    $scope.upgrading = false;
+                    $scope.upgrade_error = true;
+                }).then(function(data){
+                    $scope.upgrading = false;
+                    $window.$('#restarting').modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                    });
+                    var check = function(){
+                        $http.get('/api/config').error(function(){
+                            setTimeout(check, reload_check_time);
+                        }).then(function(){ $window.location.reload(); });
+                    };
+                    check();
+                });
             },
         };
         $window.$('#confirmation').modal();

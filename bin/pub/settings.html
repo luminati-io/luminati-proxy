@@ -3,7 +3,8 @@
     <div>
       Determining the status of your proxy...
     </div>
-    <button type=button class="btn btn-danger" ng-click=shutdown()>
+    <button type=button class="btn btn-danger" ng-click=shutdown()
+      ng-disabled=upgrading>
       Shut down
     </button>
   </div>
@@ -17,7 +18,8 @@
         </li>
       </ul>
     </div>
-    <button type=button class="btn btn-danger" ng-click=shutdown()>
+    <button type=button class="btn btn-danger" ng-click=shutdown()
+      ng-disabled=upgrading>
       Shut down
     </button>
   </div>
@@ -27,7 +29,7 @@
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
-    class="alert alert-warning">
+    class="alert alert-warning settings-alert">
     <div>
       The latest version of the tool available is
       <strong>{{$parent.ver_last}}</strong>. You are using
@@ -38,6 +40,16 @@
     <div>
       The source code of the Luminati proxy manager tool is available at
       <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
+    </div>
+    <button type=button class="btn btn-primary" ng-click=upgrade()
+      ng-disabled=upgrading||upgrade_error>
+      Upgrade
+    </button>
+    <div class="alert alert-info settings-inner-alert" ng-if=upgrading>
+      Upgrading...
+    </div>
+    <div class="alert alert-danger settings-inner-alert" ng-if=upgrade_error>
+      Error
     </div>
   </div>
   <div
