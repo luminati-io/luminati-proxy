@@ -6,7 +6,7 @@
           &times;
         </button>
         <button type=button class="btn btn-default btn-title"
-          ng-click=update() ng-if=pool>
+          ng-click=update(true) ng-if=pool>
           Update
         </button>
         <h4 class=modal-title>Pool: {{port}}</h4>
@@ -25,6 +25,9 @@
                 <th>IP</th>
                 <th>Country</th>
                 <th>City</th>
+                <th>Requests</th>
+                <th>Estimated Bandwidth</th>
+                <th>Created</th>
               </tr>
             </thead>
             <tbody>
@@ -32,6 +35,12 @@
                 <td>{{p.info.ip}}</td>
                 <td>{{p.info.country}}</td>
                 <td>{{p.info.geo.city}}</td>
+                <td>{{p.count}}</td>
+                <td>
+                  <span ng-if=p.bandwidth>{{p.bandwidth | bytes}}/s</span>
+                  <span ng-if=!p.bandwidth>&mdash;</span>
+                </td>
+                <td>{{p.created | timestamp}}</td>
               </tr>
             </tbody>
           </table>

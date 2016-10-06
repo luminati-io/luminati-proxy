@@ -65,6 +65,9 @@ pre.top-margin {
 .navigation .items .separator {
     color: #0c334d;
 }
+nav a:hover {
+    box-shadow: none;
+}
 .block {
     background: #eeeeee;
     padding: 1em;
@@ -176,6 +179,14 @@ pre.top-margin {
 }
 table.proxies td, table.proxies th {
     text-align: center;
+}
+div.proxies .panel-footer {
+    position: relative;
+}
+.proxy-pagination {
+    position: absolute;
+    right: 11px;
+    top: -11px;
 }
 .proxies-default {
     color: gray;
@@ -331,7 +342,8 @@ table.proxies td, table.proxies th {
     text-align: center;
     cursor: default;
 }
-#history .modal-dialog, #history_details .modal-dialog, #stats .modal-dialog {
+#history .modal-dialog, #history_details .modal-dialog, #stats .modal-dialog,
+#pool .modal-dialog {
     width: auto;
     margin-left: 20px;
     margin-right: 20px;

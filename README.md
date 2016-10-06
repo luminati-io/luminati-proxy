@@ -111,6 +111,7 @@ Options:
   --resolve               Reverse DNS lookup file
   --config                Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
+  --no-config             Working without a config file
   --iface                 Interface or ip to listen on (lo|eth0|...)
   --no_dropin             Disable drop-in mode for migrating           [boolean]
   -h, --help              Show help                                    [boolean]

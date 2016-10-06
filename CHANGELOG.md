@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.13
+  - :star: Statistics on sessions from IP pool are now available
+  - :bug: Various minor bugs fixed
 - v0.7.12
   - :star: Quicker credentials check
 - v0.7.11

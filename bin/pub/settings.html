@@ -75,10 +75,10 @@
       </div>
     </div>
   </form>
-  <div class="alert alert-info settings-alert">
+  <div class="alert alert-info settings-alert" ng-if=$parent.settings.config>
     <div>
       Path to the configuration file:
-      <strong>{{$parent.settings.config}}</strong>
+      <strong>{{$parent.$parent.settings.config}}</strong>
     </div>
     <button type=button class="btn btn-warning" ng-click=edit_config()>
       Edit

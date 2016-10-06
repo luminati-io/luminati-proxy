@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -36,7 +36,7 @@
     "bootstrap-datepicker": "^1.6.4",
     "chart.js": "^2.1.4",
     "codemirror": "^5.19.0",
-    "country-data": "^0.0.29",
+    "country-data": "^0.0.30",
     "country-language": "^0.1.7",
     "express": "^4.14.0",
     "http-shutdown": "^1.1.0",
@@ -55,7 +55,7 @@
     "requirejs": "^2.3.2",
     "socket.io": "^1.4.8",
     "socksv5": "0.0.6",
-    "sqlite3": "^3.1.4",
+    "sqlite3": "^3.1.5",
     "yargs": "^6.0.0"
   },
   "optionalDependencies": {

@@ -22,8 +22,8 @@ module.run(function($rootScope, $window){
 });
 
 module.factory('$proxies', $proxies);
-$proxies.$inject = ['$http', '$window'];
-function $proxies($http, $window){
+$proxies.$inject = ['$http', '$q'];
+function $proxies($http, $q){
     var service = {
         subscribe: subscribe,
         subscribe_stats: subscribe_stats,
@@ -44,7 +44,7 @@ function $proxies($http, $window){
         listeners_stats.push(func);
     }
     function update_proxies(){
-        return $window.Promise.all([$http.get('/api/proxies_running'),
+        return $q.all([$http.get('/api/proxies_running'),
             $http.get('/api/proxies')]).then(function(data){
             var proxies = data[0].data;
             var config = data[1].data;
@@ -526,6 +526,12 @@ function countries($scope, $http, $window){
     };
 }
 
+module.filter('startFrom', function(){
+    return function(input, start){
+        return input.slice(+start);
+    };
+});
+
 module.controller('proxies', proxies);
 proxies.$inject = ['$scope', '$http', '$proxies', '$window'];
 function proxies($scope, $http, $proxies, $window){
@@ -544,7 +550,7 @@ function proxies($scope, $http, $proxies, $window){
             title: 'Zone',
             type: 'text',
             check: function(v){
-                return v.trim();
+                return true;
             },
         },
         {key: 'socks', title: 'SOCKS'},
@@ -580,7 +586,7 @@ function proxies($scope, $http, $proxies, $window){
             title: 'Max requests',
             type: 'number',
             check: function(v){
-                return v.match(/^\d+$/);
+                return v.trim()==''||v.match(/^\d+$/);
             },
         },
         {key: 'session_duration', title: 'Max session duration'},
@@ -588,13 +594,22 @@ function proxies($scope, $http, $proxies, $window){
         {key: 'log', title: 'Log Level'},
         {key: 'debug', title: 'Luminati debug'},
     ];
+    $scope.page_size = 50;
+    $scope.page = 1;
+    $scope.set_page = function(p){
+        if (p < 1)
+            p = 1;
+        if (p*$scope.page_size>$scope.proxies.length)
+            p = Math.ceil($scope.proxies.length/$scope.page_size);
+        $scope.page = p;
+    };
     $scope.columns = opt_columns.filter(function(col){
         return ['port', 'zone', 'country', 'max_requests', 'sticky_ip']
         .indexOf(col.key)!=-1;
     });
     $proxies.subscribe(function(proxies){
         $scope.proxies = proxies;
-        $scope.$apply();
+        $scope.set_page($scope.page);
     });
     $proxies.subscribe_stats(function(stats){
         if (!$scope.proxies)
@@ -729,7 +744,7 @@ function proxies($scope, $http, $proxies, $window){
         if (event.which!=13)
             return;
         if (col.type=='number')
-            v = +v;
+            v = v.trim()=='' ? null : +v;
         if (col.type=='text')
             v = v.trim();
         if (proxy.config[col.key]==v)
@@ -1191,9 +1206,10 @@ function pool($scope, $http, $window){
     $scope.init = function(locals){
         $scope.port = locals.port;
         $scope.show_modal = function(){ $window.$('#pool').modal(); };
-        $scope.update = function(){
+        $scope.update = function(refresh){
             $scope.pool = null;
-            $http.get('/api/sessions/'+$scope.port).then(function(pool){
+            $http.get('/api/sessions/'+$scope.port+(refresh ? '?refresh' : ''))
+            .then(function(pool){
                 $scope.pool = pool.data;
             });
         };
