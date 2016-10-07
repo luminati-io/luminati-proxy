@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.16
+  - :star: Default zone can now be changed
+  - :bug: Proxies info is now correctly updated on credentials change
 - v0.7.15
   - :star: The application can now be updated semiautomatically via the UI
 - v0.7.14

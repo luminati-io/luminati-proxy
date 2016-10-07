@@ -58,32 +58,29 @@
     You are using the latest version of the Luminati proxy manager tool
     (<strong>{{$parent.ver_cur}}</strong>).
   </div>
-  <form name=settings ng-submit="save(); settings.$setPristine()">
+  <form name=settings ng-submit="save()">
     <div class=block>
       <div class=form-group>
-        <label for=customer class=control-label>Customer/Username</label>
+        <label for=customer class=control-label>Customer/username</label>
         <input type=text ng-required=true ng-model=$parent.settings.customer
-          class=form-control id=customer>
+          class=form-control id=customer ng-blur=fix_username()>
       </div>
       <div class=form-group>
-        <label for=password class=control-label>Password</label>
+        <label for=zone class=control-label>Default zone</label>
+        <input type=text ng-required=true ng-model=$parent.settings.zone
+          class=form-control id=zone>
+      </div>
+      <div class=form-group>
+        <label for=password class=control-label>Default password</label>
         <input type=password ng-required=true
           ng-model=$parent.settings.password class=form-control id=password>
       </div>
       <button type=submit class="btn btn-success"
-        ng-disabled=saving||!settings.$valid>
-        Save settings
+        ng-disabled=saving||!settings.$valid||settings.$pristine>
+        Save and restart
       </button>
       <div ng-if=saving class="alert alert-info alert-inline">
         Saving...
-      </div>
-      <div ng-if=saved&&settings.$pristine
-        class="alert alert-success alert-inline">
-        Saved
-      </div>
-      <div ng-if=error&&settings.$pristine
-        class="alert alert-danger alert-inline">
-        The credentials are wrong
       </div>
     </div>
   </form>

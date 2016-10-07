@@ -194,35 +194,67 @@ function settings($scope, $http, $window){
             mode: 'javascript',
         });
     });
-    $scope.save = function(){
-        $scope.saving = true;
-        $scope.error = false;
-        $scope.saved = false;
-        $http.post('/api/creds', {
-            customer: $scope.$parent.settings.customer.trim(),
-            password: $scope.$parent.settings.password.trim(),
-        }).error(function(){
-            $scope.saving = false;
-            $scope.error = true;
-            $http.get('/api/config').then(function(config){
-                $scope.config = config.data.config;
-            });
-        }).then(function(settings){
-            $scope.$parent.settings = settings.data;
-            $scope.saving = false;
-            $scope.saved = true;
-            $scope.status = {
-                status: 'ok',
-                description: 'Your proxy is up and running.',
-            };
-            $http.get('/api/config').then(function(config){
-                $scope.config = config.data.config;
-            });
-            $window.localStorage.setItem('quickstart-creds', true);
-        });
+    var parse_username = function(username){
+        var values = {};
+        username = username.split('-');
+        username.shift();
+        var p = 0;
+        while (p+1 < username.length)
+        {
+            values[username[p]] = username[p+1];
+            p += 2;
+        }
+        return values;
+    };
+    $scope.fix_username = function(){
+        var customer = $scope.$parent.settings.customer.trim();
+        var zone = ($scope.$parent.settings.zone||'').trim();
+        if (!customer.match(/^lum-/))
+            return false;
+        var values = parse_username(customer);
+        if (!values.customer)
+            return false;
+        $scope.$parent.settings.customer = values.customer;
+        if (!values.zone||values.zone==zone)
+            return true;
+        $scope.$parent.$parent.confirmation = {
+            text: 'It appears you have entered a composite username which '
+                +'contains a zone name. Do you want "'+values.zone+'" to be '
+                +'your default zone?',
+            confirmed: function(){
+                $scope.$parent.settings.zone = values.zone;
+            },
+        };
+        $window.$('#confirmation').modal();
+        return true;
     };
     var modals_time = 400;
-    var reload_check_time = 500;
+    var show_reload = function(){
+        $window.$('#restarting').modal({
+            backdrop: 'static',
+            keyboard: false,
+        });
+    };
+    var check_reload = function(){
+        $http.get('/api/config').error(
+            function(){ setTimeout(check_reload, 500); })
+        .then(function(){ $window.location.reload(); });
+    };
+    $scope.save = function(){
+        if ($scope.fix_username())
+            return;
+        $scope.saving = true;
+        $http.post('/api/creds', {
+            customer: $scope.$parent.settings.customer.trim(),
+            zone: $scope.$parent.settings.zone.trim(),
+            password: $scope.$parent.settings.password.trim(),
+        }).then(function(){
+            $scope.saving = false;
+            $window.localStorage.setItem('quickstart-creds', true);
+            show_reload();
+            check_reload();
+        });
+    };
     $scope.edit_config = function(){
         $scope.$parent.$parent.confirmation = {
             text: 'Editing the configuration manually may result in your '
@@ -242,20 +274,8 @@ function settings($scope, $http, $window){
     };
     $scope.save_config = function(){
         $scope.config = $scope.codemirror.getValue();
-        setTimeout(function(){
-            $window.$('#restarting').modal({
-                backdrop: 'static',
-                keyboard: false,
-            });
-        }, modals_time);
-        $http.post('/api/config', {config: $scope.config}).then(function(){
-            var check = function(){
-                $http.get('/api/config').error(
-                    function(){ setTimeout(check, reload_check_time); })
-                .then(function(){ $window.location.reload(); });
-            };
-            check();
-        });
+        setTimeout(show_reload, modals_time);
+        $http.post('/api/config', {config: $scope.config}).then(check_reload);
     };
     $scope.shutdown = function(){
         $scope.$parent.$parent.confirmation = {
@@ -282,16 +302,8 @@ function settings($scope, $http, $window){
                     $scope.upgrade_error = true;
                 }).then(function(data){
                     $scope.upgrading = false;
-                    $window.$('#restarting').modal({
-                        backdrop: 'static',
-                        keyboard: false,
-                    });
-                    var check = function(){
-                        $http.get('/api/config').error(function(){
-                            setTimeout(check, reload_check_time);
-                        }).then(function(){ $window.location.reload(); });
-                    };
-                    check();
+                    show_reload();
+                    check_reload();
                 });
             },
         };
