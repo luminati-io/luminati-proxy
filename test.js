@@ -464,13 +464,8 @@ describe('manager', ()=>{
             args = args.concat(['--database', db_file]);
         if (!get_param(args, '--proxy'))
             args = args.concat(['--proxy', '127.0.0.1']);
-        if (!get_param(args, '--config'))
-        {
-            const config_file = temp_file([], 'json');
-            args.push('--config');
-            args.push(config_file.path);
-            temp_files.push(config_file);
-        }
+        if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
+            args.push('--no-config');
         if (!get_param(args, '--customer'))
           args = args.concat(['--customer', customer]);
         if (!get_param(args, '--password'))

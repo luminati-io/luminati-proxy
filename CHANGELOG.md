@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.18
+  - :bug: :boom: Socks interface now listen only on selected interface
+  - :bug: do not initiate and use more sessions then pool_size if refresh is
+  hit multiple times
+  - :star: logs now contain timestamp information
 - v0.7.17
   - :bug: Semiautomatic upgrade fixed for Windows
 - v0.7.16
