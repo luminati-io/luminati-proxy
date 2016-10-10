@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.20
+  - :sparkles: moving the allow_proxy_auth from performance to IP policy
+  - :sparkles: improve debug log
 - v0.7.19
   - :bug: credentials UI now works when using --no-config
 - v0.7.18

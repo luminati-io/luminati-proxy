@@ -47,7 +47,9 @@ function $proxies($http, $q){
         return $q.all([$http.get('/api/proxies_running'),
             $http.get('/api/proxies')]).then(function(data){
             var proxies = data[0].data;
+            proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
             var config = data[1].data;
+            config.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
             var config_index = {};
             for (var i=0; i<config.length; i++)
                 config_index[config[i].port] = config[i];
@@ -387,6 +389,7 @@ function test($scope, $http, $filter, $window){
         $scope.method = 'GET';
     $http.get('/api/proxies').then(function(proxies){
         $scope.proxies = [['0', 'No proxy']];
+        proxies.data.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
         for (var i=0; i<proxies.data.length; i++)
         {
             $scope.proxies.push(

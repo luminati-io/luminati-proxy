@@ -174,6 +174,13 @@
                       ng-model=form.keep_alive class=form-control
                       placeholder={{consts.keep_alive.def}}>
                   </div>
+                  <div class=form-group>
+                    <label class=control-label
+                      title="Allow Luminati authentication per request">
+                      <input type=checkbox ng-model=form.allow_proxy_auth>
+                      Allow request authentication
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -258,13 +265,6 @@
                     </label>
                     <input id=proxy-field-debug ng-model=form.debug
                       class=form-control>
-                  </div>
-                  <div class=form-group>
-                    <label class=control-label
-                      title="Allow Luminati authentication per request">
-                      <input type=checkbox ng-model=form.allow_proxy_auth>
-                      Allow request authentication
-                    </label>
                   </div>
                 </div>
               </div>
