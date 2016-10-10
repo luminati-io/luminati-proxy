@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.19
+  - :bug: credentials UI now works when using --no-config
 - v0.7.18
   - :bug: :boom: Socks interface now listen only on selected interface
   - :bug: do not initiate and use more sessions then pool_size if refresh is
