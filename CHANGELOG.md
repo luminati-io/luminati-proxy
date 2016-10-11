@@ -1,6 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.22
+  - :bug: Session info was not displayed
 - v0.7.21
+  - :star: iOS certificate instructions in the FAQ
   - :bug: Empty proxy settings are no longer stored in the configuration file
 - v0.7.20
   - :sparkles: Moving the allow_proxy_auth from performance to IP policy
