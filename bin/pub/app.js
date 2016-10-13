@@ -196,6 +196,15 @@ function settings($scope, $http, $window){
             mode: 'javascript',
         });
     });
+    $scope.resolve_file =
+    $scope.$parent.settings.resolve&&$scope.$parent.settings.resolve!==true;
+    $scope.update_resolve = function(){
+        $http.get('/api/resolve').then(function(resolve){
+            $scope.resolve = {text: resolve.data.resolve};
+        });
+    };
+    if ($scope.resolve_file)
+        $scope.update_resolve();
     var parse_username = function(username){
         var values = {};
         username = username.split('-');
@@ -207,6 +216,13 @@ function settings($scope, $http, $window){
             p += 2;
         }
         return values;
+    };
+    $scope.parse_arguments = function(args){
+        return args.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
+        .split('|||');
+    };
+    $scope.show_password = function(){
+        $scope.args_password = true;
     };
     $scope.fix_username = function(){
         var customer = $scope.$parent.settings.customer.trim();
@@ -278,6 +294,42 @@ function settings($scope, $http, $window){
         $scope.config = $scope.codemirror.getValue();
         setTimeout(show_reload, modals_time);
         $http.post('/api/config', {config: $scope.config}).then(check_reload);
+    };
+    $scope.edit_resolve = function(){
+        $window.$('#resolve').modal();
+    };
+    $scope.save_resolve = function(){
+        setTimeout(show_reload, modals_time);
+        $http.post('/api/resolve', {resolve: $scope.resolve.text})
+        .then(check_reload);
+    };
+    $scope.resolve_new = function(){
+        $window.$('#resolve_add').one('shown.bs.modal', function(){
+            $window.$('#resolve_add input').select();
+        }).modal();
+    };
+    $scope.resolve_add = function(){
+        $scope.resolve_adding = true;
+        $scope.resolve_error = false;
+        var host = $scope.resolve_host.host.trim();
+        $http.get('/api/resolve_host/'+host)
+        .then(function(ips){
+            $scope.resolve_adding = false;
+            if (ips.data.ips&&ips.data.ips.length)
+            {
+                for (var i=0; i<ips.data.ips.length; i++)
+                    $scope.resolve.text += '\n'+ips.data.ips[i]+' '+host;
+                setTimeout(function(){
+                    var textarea = $window.$('#resolve textarea');
+                    textarea.scrollTop(textarea.prop('scrollHeight'));
+                }, 0);
+                $scope.resolve_host.host = '';
+                $scope.resolve_frm.$setPristine();
+                $window.$('#resolve_add').modal('hide');
+            }
+            else
+                $scope.resolve_error = true;
+        });
     };
     $scope.shutdown = function(){
         $scope.$parent.$parent.confirmation = {

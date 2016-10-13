@@ -25,7 +25,16 @@
   </div>
   <div ng-if=$parent.$parent.settings.argv class="alert alert-info">
     The application is running with the following arguments:
-    <strong>{{$parent.$parent.settings.argv}}</strong>
+    <strong>
+      <span ng-repeat="p in parse_arguments($parent.$parent.settings.argv)">
+        <span ng-if=!($index%2)||args_password>
+          {{p}}
+        </span>
+        <span ng-if=$index%2&&!args_password>
+          <a ng-click=show_password() href=#>(show)</a>
+        </span>
+      </span>
+    </strong>
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
@@ -58,7 +67,7 @@
     You are using the latest version of the Luminati proxy manager tool
     (<strong>{{$parent.ver_cur}}</strong>).
   </div>
-  <form name=settings ng-submit="save()">
+  <form name=settings ng-submit=save()>
     <div class=block>
       <div class=form-group>
         <label for=customer class=control-label>Customer/username</label>
@@ -93,6 +102,15 @@
       Edit
     </button>
   </div>
+  <div class="alert alert-info settings-alert" ng-if=resolve_file>
+    <div>
+      Path to the IP resolution file:
+      <strong>{{$parent.$parent.settings.resolve}}</strong>
+    </div>
+    <button type=button class="btn btn-warning" ng-click=edit_resolve()>
+      Edit
+    </button>
+  </div>
   <div id=config class="modal fade" role=dialog>
     <div class=modal-dialog>
       <div class=modal-content>
@@ -115,6 +133,73 @@
             Save and restart
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+  <div id=resolve class="modal fade" role=dialog>
+    <div class=modal-dialog>
+      <div class=modal-content>
+        <div class=modal-header>
+          <button type=button class=close data-dismiss=modal>
+            &times;
+          </button>
+          <h4 class=modal-title>IP Resolution</h4>
+        </div>
+        <div class=modal-body>
+          <textarea class=form-control ng-model=resolve.text></textarea>
+        </div>
+        <div class=form-group>
+          <button type=button class="btn btn-primary center-block"
+            ng-click=resolve_new()>
+            Add a host
+          </button>
+        </div>
+        <div class=modal-footer>
+          <button type=button class="btn btn-default"
+            data-dismiss=modal ng-click=update_resolve()>
+            Cancel
+          </button>
+          <button type=button class="btn btn-success"
+            data-dismiss=modal ng-click=save_resolve()>
+            Save and restart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id=resolve_add class="modal fade" role=dialog>
+    <div class=modal-dialog>
+      <div class=modal-content>
+        <form name=resolve_frm
+          ng-submit="resolve_add(); resolve_frm.$setPristine()">
+          <div class=modal-header>
+            <button type=button class=close data-dismiss=modal>
+              &times;
+            </button>
+            <h4 class=modal-title>Adding Host</h4>
+          </div>
+          <div class=modal-body>
+            <input type=text class=form-control placeholder=Host
+              ng-model=resolve_host.host ng-required=true>
+          </div>
+          <div class=modal-footer>
+            <div class="alert alert-danger alert-inline"
+              ng-if=resolve_error&&resolve_frm.$pristine>
+              The host could not be resolved
+            </div>
+            <button type=button class="btn btn-default" ng-if=!resolve_adding
+              data-dismiss=modal>
+              Cancel
+            </button>
+            <div class="alert alert-info alert-inline" ng-if=resolve_adding>
+              Resolving...
+            </div>
+            <button type=submit class="btn btn-success"
+              ng-disabled=!resolve_frm.$valid||resolve_frm.$pristine||resolve_adding>
+              Add
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

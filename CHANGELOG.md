@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.23
+  - :star: IP resolution file can now be edited from within the UI
+  - :bug: "Delaying pool for 10 seconds" messages were shown even when the
+  problem had been already resolved as well as after the application had been
+  terminated
 - v0.7.22
   - :bug: Session info was not displayed
 - v0.7.21

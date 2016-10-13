@@ -63,8 +63,8 @@ $ luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
-  --log                   Log level (NONE|ERROR|WARNING|INFO|DEBUG)
-                                                              [default: "ERROR"]
+  --log                   Log level (none|error|warn|info|verbose|debug|silly)
+                                                              [default: "error"]
   --customer              Customer                                      [string]
   --password              Password                                      [string]
   --proxy                 Super proxy ip or country (us|gb|nl)
@@ -72,9 +72,10 @@ Options:
   --proxy_port            Super proxy port                      [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]
-  --secure_proxy          Use SSL when accessing super proxy           [boolean]
+  --secure_proxy          Use SSL when accessing super proxy
+                                                      [boolean] [default: false]
   --sticky_ip             Use same session as much as possible to maintain IP
-                                                                       [boolean]
+                                                      [boolean] [default: false]
   --keep_alive            Generate request to keep alive every n seconds[number]
   --zone                  Zone                         [string] [default: "gen"]
   --country               Country                                       [string]
@@ -89,9 +90,9 @@ Options:
   --pool_size             Pool size                        [number] [default: 3]
   --pool_type             Pool session iteration order (sequential|round-robin)
                                                          [default: "sequential"]
-  --ssl                   Enable SSL sniffing                          [boolean]
+  --ssl                   Enable SSL sniffing         [boolean] [default: false]
   --insecure              Enable SSL connection/sniffing to insecure hosts
-                                                                       [boolean]
+                                                      [boolean] [default: false]
   --max_requests          Requests per session            [number] [default: 50]
   --session_duration      Maximum duration of session (seconds)
   --proxy_switch          Automatically switch super proxy on failure
@@ -105,15 +106,18 @@ Options:
   --allow_proxy_auth      Allow Luminati authentication per request
                                                       [boolean] [default: false]
   --www                   Local web port                        [default: 22999]
+  --no-www                Disable local web
   --socks                 SOCKS5 port
-  --history               Log history                                  [boolean]
+  --history               Log history                 [boolean] [default: false]
   --database              Database path         [default: "~/.luminati.sqlite3"]
   --resolve               Reverse DNS lookup file
   --config                Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
   --no-config             Working without a config file
   --iface                 Interface or ip to listen on (lo|eth0|...)
-  --no_dropin             Disable drop-in mode for migrating           [boolean]
+                                                            [default: "0.0.0.0"]
+  --no_dropin             Disable drop-in mode for migrating
+                                                      [boolean] [default: false]
   -h, --help              Show help                                    [boolean]
   --version               Show version number                          [boolean]
   -p, --port              Listening port               [number] [default: 24000]
