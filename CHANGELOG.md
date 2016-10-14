@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.24
+  - :star: Archived request logs can now be viewed via the UI
+  - :sparkles: Displaying extra arguments in --no-config mode only
 - v0.7.23
   - :star: IP resolution file can now be edited from within the UI
   - :bug: "Delaying pool for 10 seconds" messages were shown even when the

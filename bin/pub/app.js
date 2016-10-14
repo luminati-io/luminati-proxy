@@ -992,6 +992,8 @@ function history($scope, $http, $filter, $window){
                 params.country = $scope.filters.country;
             if ($scope.filters.proxy)
                 params.proxy = $scope.filters.proxy;
+            if ($scope.archive>-1)
+                params.archive = $scope.archive_timestamps[$scope.archive];
             var params_arr = [];
             for (var param in params)
                 params_arr.push(param+'='+encodeURIComponent(params[param]));
@@ -1205,6 +1207,37 @@ function history($scope, $http, $filter, $window){
         $scope.export_type = 'visible';
         $scope.export = function(){
             $scope.update(true, $scope.export_type);
+        };
+        $scope.archive = -1;
+        $http.get('/api/archive_timestamps').then(function(timestamps){
+            $scope.archive_timestamps = timestamps.data.timestamps;
+        });
+        $scope.archive_name = function(index){
+            if (!$scope.archive_timestamps)
+                return '';
+            var date = function(index){
+                return moment($scope.archive_timestamps[index])
+                .format('YYYY/MM/DD');
+            };
+            if (index==$scope.archive_timestamps.length-1)
+                return 'Up to '+date(index);
+            return 'From '+date(index+1)+' until '
+            +(index==-1 ? 'now' : date(index));
+        };
+        $scope.show_archives = function(){
+            var sel = $window.$('#history_archives select');
+            sel.val($scope.archive);
+            $window.$('#history_archives').one('shown.bs.modal', function(){
+                sel.focus();
+            }).modal();
+        };
+        $scope.archive_apply = function(){
+            var val = +$window.$('#history_archives select').val();
+            if ($scope.archive!=val)
+            {
+                $scope.archive = val;
+                $scope.update();
+            }
         };
         $scope.update();
     };

@@ -426,6 +426,21 @@ div.proxies .panel-footer {
     margin-left: -100px;
     z-index: 2;
 }
+.proxies-history-archive {
+    float: right;
+    font-size: 11px;
+    line-height: 14px;
+    margin-top: -1px;
+    margin-bottom: -2px;
+    margin-right: 32px;
+    text-align: right;
+}
+.proxies-history-archive > span {
+    border-bottom: 1px dashed;
+    border-color: #428bca;
+    cursor: pointer;
+    text-transform: lowercase;
+}
 .zones-table td, .zones-table thead th {
     text-align: right;
 }
