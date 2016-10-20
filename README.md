@@ -102,6 +102,8 @@ Options:
   --direct_include        Include pattern for direct requests
   --direct_exclude        Exclude pattern for direct requests
   --null_response         URL pattern for null response
+  --bypass_proxy          URL pattern for bypassing the proxy and connect
+                          directly
   --throttle              Throttle requests above given number          [number]
   --allow_proxy_auth      Allow Luminati authentication per request
                                                       [boolean] [default: false]
@@ -121,6 +123,7 @@ Options:
   -h, --help              Show help                                    [boolean]
   --version               Show version number                          [boolean]
   -p, --port              Listening port               [number] [default: 24000]
+  -d, --daemon            Start as a daemon
 ```
 
 ### Docker

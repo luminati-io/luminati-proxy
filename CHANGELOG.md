@@ -1,5 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.25
+  - :star: Display and save the Proxy Peer IP in the history
+  - :star: Added bypass_proxy regexp for accessing assets directly
+  - :star: deamon mode using pm2
+  - :sparkles: Removed per-proxy local statistics to avoid discrepancies with
+  the global statistics
 - v0.7.24
   - :star: Archived request logs can now be viewed via the UI
   - :sparkles: Displaying extra arguments in --no-config mode only

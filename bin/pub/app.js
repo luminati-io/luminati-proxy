@@ -727,20 +727,6 @@ function proxies($scope, $http, $proxies, $window){
         $scope.proxies = proxies;
         $scope.set_page($scope.page);
     });
-    $proxies.subscribe_stats(function(stats){
-        if (!$scope.proxies)
-            return;
-        for (var i=0; i<$scope.proxies.length; i++)
-        {
-            var data = _.values(stats[$scope.proxies[i].port]);
-            $scope.proxies[i].total_stats = {
-                requests: _.sumBy(data, 'total_requests'),
-                inbound: _.sumBy(data, 'total_inbound'),
-                outbound: _.sumBy(data, 'total_outbound'),
-            };
-        }
-        $scope.$apply();
-    });
     $scope.delete_proxy = function(proxy){
         $scope.$parent.$parent.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
@@ -937,9 +923,15 @@ function history($scope, $http, $filter, $window){
             },
             {
                 field: 'proxy',
-                title: 'Proxy',
+                title: 'Super Proxy',
                 type: 'string',
                 filter_label: 'Proxy or substring',
+            },
+            {
+                field: 'proxy_peer',
+                title: 'Proxy Peer',
+                type: 'string',
+                filter_label: 'IP or substring',
             },
         ];
         $scope.sort_field = 'timestamp';
@@ -956,6 +948,7 @@ function history($scope, $http, $filter, $window){
             elapsed_max: '',
             country: '',
             proxy: '',
+            proxy_peer: '',
         };
         $scope.page = 1;
         $scope.page_size = 10;
@@ -992,6 +985,8 @@ function history($scope, $http, $filter, $window){
                 params.country = $scope.filters.country;
             if ($scope.filters.proxy)
                 params.proxy = $scope.filters.proxy;
+            if ($scope.filters.proxy_peer)
+                params.proxy_peer = $scope.filters.proxy_peer;
             if ($scope.archive>-1)
                 params.archive = $scope.archive_timestamps[$scope.archive];
             var params_arr = [];
@@ -1014,6 +1009,11 @@ function history($scope, $http, $filter, $window){
                         var alerts = [];
                         var disabled_alerts = [];
                         var add_alert = function(alert){
+                            if (r.method=='CONNECT'
+                                ||request_headers.host=='lumtest.com')
+                            {
+                                return;
+                            }
                             if (localStorage.getItem(
                                 'request-alert-disabled-'+alert.type))
                             {
@@ -1079,7 +1079,9 @@ function history($scope, $http, $filter, $window){
                                     +'set to "keep-alive".',
                             });
                         }
-                        if (!r.url.match(/^https?:\/\/[^\/\?]+\/?$/)
+                        if (r.method=='GET'
+                            &&!r.url.match(/^https?:\/\/[^\/\?]+\/?$/)
+                            &&!r.url.match(/[^\w]favicon[^\w]/)
                             &&!request_headers.referer)
                         {
                             add_alert({

@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
+//require('longjohn');
 const _ = require('lodash');
 const assert = require('assert');
 const http = require('http');
@@ -135,7 +136,7 @@ const http_proxy = port=>etask(function*(){
         proxy.http.maxConnections = m;
 	proxy.http._connections--;
     };
-    proxy.close = proxy.stop = etask._fn(function*(_this){
+    proxy.stop = etask._fn(function*(_this){
         yield etask.nfn_apply(_this.http, '.close', []);
         if (_this.https)
             yield etask.nfn_apply(_this.https, '.close', []);
@@ -149,9 +150,26 @@ const http_proxy = port=>etask(function*(){
     });
     return proxy;
 });
-let proxy;
+const http_ping = ()=>etask(function*http_ping(){
+    // XXX todo add ssl for it
+    let ping = {};
+    let _http = ping.http = http.createServer((req, res)=>{
+        res.writeHead(200, 'PONG', {'content-length': 0});
+        res.end();
+    });
+    yield etask.nfn_apply(_http, '.listen', [0]);
+    _http.on('error', this.throw_fn());
+    ping.port = _http.address().port;
+    ping.url = 'http://127.0.0.1:'+ping.port;
+    ping.stop = etask._fn(function*(_this){
+        yield etask.nfn_apply(_this.http, '.close', []);
+    });
+    return ping;
+});
+let proxy, ping;
 before(()=>etask(function*(){
     proxy = yield http_proxy();
+    // ping = yield http_ping();
 }));
 beforeEach(()=>{
     proxy.fake = true;
@@ -159,8 +177,11 @@ beforeEach(()=>{
 });
 after(()=>etask(function*(){
     if (proxy)
-        yield proxy.close();
+        yield proxy.stop();
     proxy = null;
+    if (ping)
+        yield ping.stop();
+    ping = null;
 }));
 describe('proxy', ()=>{
     const test_url = 'http://lumtest.com/test';
@@ -176,6 +197,8 @@ describe('proxy', ()=>{
             port: 24000,
         }, opt));
         l.test = etask._fn(function*(_this, opt){
+            if (typeof opt=='string')
+                opt = {url: opt};
             opt = opt||{};
             opt.url = opt.url||test_url;
             opt.json = true;
@@ -330,12 +353,12 @@ describe('proxy', ()=>{
                 l = yield lum({null_response: 'echo\.json', ssl: ssl});
                 let protocol = ssl?'https':'http';
                 let url = protocol+'://lumtest.com/echo.json';
-                const res = yield l.test({url});
+                const res = yield l.test(url);
                 assert.equal(proxy.history.length, 0);
                 assert.equal(res.statusCode, 200);
                 assert.equal(res.statusMessage, 'NULL');
                 assert.equal(res.body, undefined);
-                yield l.test({url: protocol+'://lumtest.com/myip.json'});
+                yield l.test(protocol+'://lumtest.com/myip.json');
                 assert.ok(proxy.history.length>0);
             }));
             t('http');
@@ -343,7 +366,7 @@ describe('proxy', ()=>{
             it('https connect', ()=>etask(function*(){
                 l = yield lum({null_response: 'match', log: 'DEBUG'});
                 try {
-                    yield l.test({url: 'https://match.com'});
+                    yield l.test('https://match.com');
                 } catch(err){
                     assert(/statusCode=501/.test(err.message));
                 }
@@ -356,13 +379,43 @@ describe('proxy', ()=>{
                 var direct = {};
                 direct[name] = 'match';
                 l = yield lum({direct});
-                const match = yield l.test({url: 'http://match.com'});
+                const match = yield l.test('http://match.com');
                 assert.equal(!!match.body.auth.direct, expected);
-                const no_match = yield l.test({url: 'http://m-a-t-c-h.com'});
+                const no_match = yield l.test('http://m-a-t-c-h.com');
                 assert.notEqual(!!no_match.body.auth.direct, expected);
             }));
             t('include', true);
             t('exclude', false);
+        });
+        describe.skip('bypass_proxy', ()=>{ // XXX lee - in progress
+            const test = query=>etask(function*(){
+                let before = proxy.history.length;
+                console.log('test url: ', {url: ping.url+query}); // XXX lee
+                yield l.test(ping.url+query);
+                let after = proxy.history.length;
+                return {before, after};
+            });
+            const t = protocol=>it(protocol, ()=>etask(function*(){
+                let res = yield etask.nfn_apply(request, [{url: ping.url}]); // XXX lee
+                console.log({ping: res}); // XXX lee
+                l = yield lum({bypass_proxy: 'm-a-t-c-h'});
+                proxy.fake = false;
+                console.log('1 proxy created'); // XXX leee
+                // let missmatch = yield test(protocol+'://lumtest.com/echo.json?m-a-t-c-h');
+                res = yield test('');
+                console.log('1.5 ping call'); // XXX leee
+                let missmatch = yield test('/m-a-t-c-h');
+                console.log('2 missmatch call'); // XXX leee
+                assert.notEqual(missmatch.before, missmatch.after);
+                // let match = yield test(protocol+'://lumtest.com/echo.json?match');
+                let match = yield test('/match');
+                console.log('3 match call'); // XXX leee
+                assert.equal(match.before, match.after);
+                console.log('4 done');
+            }));
+            t('http');
+            // t('https');
+            // t('https sniffing');
         });
         describe('luminati params', ()=>{
             const t = (name, target, expected)=>it(name, ()=>etask(function*(){
