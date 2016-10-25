@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.26
+  - :star: Request history archives can now be viewed along with the newer
+  records
+  - :bug: history no longer crush in case requests completes come before
+  history initiation is complete
 - v0.7.25
   - :star: Display and save the Proxy Peer IP in the history
   - :star: Added bypass_proxy regexp for accessing assets directly

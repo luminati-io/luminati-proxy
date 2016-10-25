@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
-//require('longjohn');
 const _ = require('lodash');
 const assert = require('assert');
 const http = require('http');

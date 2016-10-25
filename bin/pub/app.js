@@ -922,10 +922,10 @@ function history($scope, $http, $filter, $window){
                 filter_label: 'Node country',
             },
             {
-                field: 'proxy',
+                field: 'super_proxy',
                 title: 'Super Proxy',
                 type: 'string',
-                filter_label: 'Proxy or substring',
+                filter_label: 'Super proxy or substring',
             },
             {
                 field: 'proxy_peer',
@@ -947,7 +947,7 @@ function history($scope, $http, $filter, $window){
             elapsed_min: '',
             elapsed_max: '',
             country: '',
-            proxy: '',
+            super_proxy: '',
             proxy_peer: '',
         };
         $scope.page = 1;
@@ -983,8 +983,8 @@ function history($scope, $http, $filter, $window){
                 params.elapsed_max = $scope.filters.elapsed_max;
             if ($scope.filters.country)
                 params.country = $scope.filters.country;
-            if ($scope.filters.proxy)
-                params.proxy = $scope.filters.proxy;
+            if ($scope.filters.super_proxy)
+                params.super_proxy = $scope.filters.super_proxy;
             if ($scope.filters.proxy_peer)
                 params.proxy_peer = $scope.filters.proxy_peer;
             if ($scope.archive>-1)
