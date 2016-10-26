@@ -5,6 +5,9 @@
   <div ng-hide=stats||error class="alert alert-info">
     Loading...
   </div>
+  <div ng-if=stats&&!error>
+    Note that a kilobyte is counted as <strong>1000</strong> bytes.
+  </div><br>
   <div ng-if=!$root.subsection>
     <table class="table table-hover zones-table" ng-if=stats&&!error>
       <thead>

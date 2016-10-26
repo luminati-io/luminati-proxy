@@ -1,9 +1,14 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.29
+  - :star: User can now view IPs for accessing each proxy from outside of
+  localhost
+  - :star: History backup archives are being removed after a month
+  - :bug: Kilobyte is now counted as 1000 bytes instead of 1024
 - v0.7.26
   - :star: Request history archives can now be viewed along with the newer
   records
-  - :bug: history no longer crush in case requests completes come before
+  - :bug: History no longer crushes in case requests completes come before
   history initiation is complete
 - v0.7.25
   - :star: Display and save the Proxy Peer IP in the history

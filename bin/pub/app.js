@@ -811,6 +811,9 @@ function proxies($scope, $http, $proxies, $window){
     $scope.show_pool = function(proxy){
         $scope.pool_dialog = [{port: proxy.port}];
     };
+    $scope.show_iface_ips = function(proxy){
+        $scope.iface_ips_dialog = [{port: proxy.port, ips: proxy._iface_ips}];
+    };
     $scope.edit_proxy = function(proxy, duplicate){
         $scope.proxy_dialog = [{proxy: proxy||{}, duplicate: duplicate}];
     };
@@ -1368,6 +1371,16 @@ function pool($scope, $http, $window){
     };
 }
 
+module.controller('iface_ips', iface_ips);
+iface_ips.$inject = ['$scope', '$window'];
+function iface_ips($scope, $window){
+    $scope.init = function(locals){
+        $scope.port = locals.port;
+        $scope.ips = locals.ips;
+        $scope.show_modal = function(){ $window.$('#iface_ips').modal(); };
+    };
+}
+
 module.controller('proxy', proxy);
 proxy.$inject = ['$scope', '$http', '$proxies', '$window'];
 function proxy($scope, $http, $proxies, $window){
@@ -1458,10 +1471,10 @@ function bytesFilter($filter){
     return function(bytes, precision){
         if (bytes==0 || isNaN(parseFloat(bytes)) || !isFinite(bytes))
             return '';
-        var number = Math.floor(Math.log(bytes) / Math.log(1024));
+        var number = Math.floor(Math.log(bytes) / Math.log(1000));
         if (typeof precision==='undefined')
             precision = number ? 2 : 0;
-        return numberFilter(bytes / Math.pow(1024, Math.floor(number)),
+        return numberFilter(bytes / Math.pow(1000, Math.floor(number)),
             precision)+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
     };
 }
