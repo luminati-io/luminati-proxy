@@ -161,10 +161,27 @@
                     </select>
                   </div>
                   <div class=form-group>
-                    <label class=control-label
+                    <label class=control-label for=proxy-field-sticky-ip
                       title="Keep same IP address for as long as possible">
-                      <input type=checkbox ng-model=form.sticky_ip> Sticky IP
+                      Sticky IP
                     </label>
+                    <select id=proxy-field-sticky-ip class=form-control
+                      ng-model=_sticky_ip ng-init="_sticky_ip =
+                      form.sticky_ip ? 'yes' : (form.sticky_ip===undefined
+                      ||form.sticky_ip==='' ? 'default' : 'no')"
+                      ng-change="binary_changed(form, 'sticky_ip', _sticky_ip)">
+                      <option value=no
+                        ng-selected=!form.sticky_ip&&form.sticky_ip!==undefined>
+                        no
+                      </option>
+                      <option value=default
+                        ng-selected="form.sticky_ip===undefined||form.sticky_ip===''">
+                        default ({{defaults.sticky_ip ? 'yes' : 'no'}})
+                      </option>
+                      <option value=yes ng-selected=form.sticky_ip>
+                        yes
+                      </option>
+                    </select>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-keep-alive>
@@ -175,11 +192,27 @@
                       placeholder={{consts.keep_alive.def}}>
                   </div>
                   <div class=form-group>
-                    <label class=control-label
+                    <label class=control-label for=proxy-field-allow-proxy-auth
                       title="Allow Luminati authentication per request">
-                      <input type=checkbox ng-model=form.allow_proxy_auth>
                       Allow request authentication
                     </label>
+                    <select id=proxy-field-allow-proxy-auth class=form-control
+                      ng-model=_allow_proxy_auth ng-init="_allow_proxy_auth =
+                      form.allow_proxy_auth ? 'yes' : (form.allow_proxy_auth===undefined
+                      ||form.allow_proxy_auth==='' ? 'default' : 'no')"
+                      ng-change="binary_changed(form, 'allow_proxy_auth', _allow_proxy_auth)">
+                      <option value=no
+                        ng-selected=!form.allow_proxy_auth&&form.allow_proxy_auth!==undefined>
+                        no
+                      </option>
+                      <option value=default
+                        ng-selected="form.allow_proxy_auth===undefined||form.allow_proxy_auth===''">
+                        default ({{defaults.allow_proxy_auth ? 'yes' : 'no'}})
+                      </option>
+                      <option value=yes ng-selected=form.allow_proxy_auth>
+                        yes
+                      </option>
+                    </select>
                   </div>
                 </div>
               </div>

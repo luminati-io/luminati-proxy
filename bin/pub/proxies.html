@@ -40,7 +40,8 @@
                 ng-click=show_pool(proxy) title="Current pool">
               </span>
               <span class="proxies-action glyphicon glyphicon-link"
-                ng-if=proxy._iface_ips&&proxy._iface_ips.length ng-click=show_iface_ips(proxy)
+                ng-if=proxy._iface_ips&&proxy._iface_ips.length
+                ng-click=show_iface_ips(proxy)
                 title="IPs for accessing proxy from outside localhost">
               </span>
               <span class="proxies-action-disabled glyphicon glyphicon-link"
@@ -55,6 +56,14 @@
               </span>
             </td>
             <td ng-repeat="col in columns">
+              <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
+                &&proxy.config.iface&&proxy.config.iface!=='0.0.0.0'">
+                <span title="{{'This proxy has been binded to all network '
+                  +'interfaces since '+proxy.config.iface+' is not available '
+                  +'for binding'}}"
+                  class="proxies-warning glyphicon glyphicon-exclamation-sign">
+                </span>
+              </span>
               <span ng-click="inline_edit_click(proxy, col)"
                 title="{{proxy[col.key]&&proxy[col.key]!==proxy.config[col.key]
                 ? (proxy.persist ? 'Set non-default value' :

@@ -254,6 +254,9 @@ div.proxies .panel-footer {
     margin: 0 4px;
     color: grey;
 }
+.proxies-warning {
+    color: red;
+}
 .proxies-graph {
     float: left;
     width: 50%;

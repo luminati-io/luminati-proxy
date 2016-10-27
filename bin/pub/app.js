@@ -279,16 +279,28 @@ function settings($scope, $http, $window){
                 +'proxies working incorrectly. Do you still want to modify '
                 +'the configuration file?',
             confirmed: function(){
-                $scope.codemirror.setValue($scope.config);
-                setTimeout(function(){
-                    $window.$('#config').one('shown.bs.modal', function(){
-                        $scope.codemirror.scrollTo(0, 0);
-                        $scope.codemirror.refresh();
-                    }).modal();
-                }, modals_time);
+                var ctime = Date.now();
+                $http.get('/api/config').then(function(config){
+                    $scope.config = config.data.config;
+                    $scope.codemirror.setValue($scope.config);
+                    setTimeout(function(){
+                        $window.$('#config').one('shown.bs.modal', function(){
+                            $scope.codemirror.scrollTo(0, 0);
+                            $scope.codemirror.refresh();
+                        }).modal();
+                    }, Math.max(0, modals_time-(Date.now()-ctime)));
+                });
             },
         };
         $window.$('#confirmation').modal();
+    };
+    $scope.update_config = function(){
+        $http.get('/api/config').then(function(config){
+            $scope.config = config.data.config;
+            var scroll = $scope.codemirror.getScrollInfo();
+            $scope.codemirror.setValue($scope.config);
+            $scope.codemirror.scrollTo(scroll.left, scroll.top);
+        });
     };
     $scope.save_config = function(){
         $scope.config = $scope.codemirror.getValue();
@@ -827,7 +839,7 @@ function proxies($scope, $http, $proxies, $window){
         case 'options': proxy.edited_field = col.key; break;
         case 'boolean':
             var config = _.cloneDeep(proxy.config);
-            config[col.key] = !config[col.key];
+            config[col.key] = !proxy[col.key];
             config.persist = true;
             $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
                 function(){ $proxies.update(); });
@@ -1398,6 +1410,10 @@ function proxy($scope, $http, $proxies, $window){
             $scope.form.port = port;
         }
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
+        $scope.defaults = {};
+        $http.get('/api/defaults').then(function(defaults){
+            $scope.defaults = defaults.data;
+        });
         $scope.show_modal = function(){
             $window.$('#proxy').one('shown.bs.modal', function(){
                 $window.$('#proxy-field-port').select().focus();
@@ -1420,6 +1436,9 @@ function proxy($scope, $http, $proxies, $window){
                     container.animate({'scrollTop': top}, 250);
                 });
             }).modal();
+        };
+        $scope.binary_changed = function(proxy, field, value){
+            proxy[field] = {'yes': true, 'no': false, 'default': ''}[value];
         };
         $scope.save = function(proxy){
             $window.$('#proxy').modal('hide');

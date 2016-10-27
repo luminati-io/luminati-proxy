@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.30
+  - :bug: Proxies with unavailable network interfaces no longer cause errors
+  - :bug: Default values for binary options are now working correctly
 - v0.7.29
   - :star: User can now view IPs for accessing each proxy from outside of
   localhost
