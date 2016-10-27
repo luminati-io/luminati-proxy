@@ -40,6 +40,28 @@
                     </select>
                   </div>
                   <div class=form-group>
+                    <label class=control-label for=proxy-field-sticky-ip>
+                      {{consts.ssl.desc}}
+                    </label>
+                    <select id=proxy-field-ssl class=form-control
+                      ng-model=_ssl ng-init="_ssl =
+                      form.ssl ? 'yes' : (form.sticky_ip===undefined
+                      ||form.ssl==='' ? 'default' : 'no')"
+                      ng-change="binary_changed(form, 'ssl', _ssl)">
+                      <option value=no
+                        ng-selected=!form.ssl&&form.ssl!==undefined>
+                        no
+                      </option>
+                      <option value=default
+                        ng-selected="form.ssl===undefined||form.ssl===''">
+                        default ({{defaults.ssl ? 'yes' : 'no'}})
+                      </option>
+                      <option value=yes ng-selected=form.ssl>
+                        yes
+                      </option>
+                    </select>
+                  </div>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-socks-port>
                       SOCKS Port
                     </label>
@@ -61,6 +83,28 @@
                     </label>
                     <input type=password id=proxy-field-zone-password
                       ng-model=form.password class=form-control>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-secure-proxy>
+                      {{consts.secure_proxy.desc}}
+                    </label>
+                    <select id=proxy-field-secure-proxy class=form-control
+                      ng-model=_secure_proxy ng-init="_secure_proxy =
+                      form.secure_proxy ? 'yes' : (form.secure_proxy===undefined
+                      ||form.secure_proxy==='' ? 'default' : 'no')"
+                      ng-change="binary_changed(form, 'secure_proxy', _secure_proxy)">
+                      <option value=no
+                        ng-selected=!form.secure_proxy&&form.secure_proxy!==undefined>
+                        no
+                      </option>
+                      <option value=default
+                        ng-selected="form.secure_proxy===undefined||form.secure_proxy===''">
+                        default ({{defaults.secure_proxy ? 'yes' : 'no'}})
+                      </option>
+                      <option value=yes ng-selected=form.secure_proxy>
+                        yes
+                      </option>
+                    </select>
                   </div>
                 </div>
               </div>

@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.31
+  - :boom: secure_proxy can not be configured per proxy (like all other
+  parameters) with command line giving advantage only over defaults settings
+  - :star: ssl sniffing can now be turned on/off individually for each proxy
 - v0.7.30
   - :bug: Proxies with unavailable network interfaces no longer cause errors
   - :bug: Default values for binary options are now working correctly
@@ -8,7 +12,7 @@
   localhost
   - :star: History backup archives are being removed after a month
   - :bug: Kilobyte is now counted as 1000 bytes instead of 1024
-- v0.7.26
+- v0.7.28
   - :star: Request history archives can now be viewed along with the newer
   records
   - :bug: History no longer crushes in case requests completes come before

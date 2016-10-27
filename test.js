@@ -85,10 +85,11 @@ const http_proxy = port=>etask(function*(){
             method: req.method,
             path: url.parse(req.url).path,
             headers: _.omit(req.headers, 'proxy-authorization'),
-        }).on('response', _res=>{
-            res.writeHead(_res.statusCode, _res.statusMessage, _res.headers);
-            _res.pipe(res);
-        }));
+            }).on('response', _res=>{
+                res.writeHead(_res.statusCode, _res.statusMessage,
+                    _res.headers);
+                _res.pipe(res);
+            }).on('error', this.throw_fn()));
     };
     proxy.http = http.createServer((req, res, head)=>{
         if (!proxy.connection)
@@ -150,25 +151,39 @@ const http_proxy = port=>etask(function*(){
     return proxy;
 });
 const http_ping = ()=>etask(function*http_ping(){
-    // XXX todo add ssl for it
     let ping = {};
-    let _http = ping.http = http.createServer((req, res)=>{
-        res.writeHead(200, 'PONG', {'content-length': 0});
+    const handler = (req, res)=>{
+        console.log('Ping: ', req.url);
+        res.writeHead(200, 'PONG', {'content-type': 'application/json'});
+        res.write(JSON.stringify('PONG'));
         res.end();
-    });
+    };
+    const _http = http.createServer(handler);
     yield etask.nfn_apply(_http, '.listen', [0]);
     _http.on('error', this.throw_fn());
-    ping.port = _http.address().port;
-    ping.url = 'http://127.0.0.1:'+ping.port;
+    ping.http = {
+        server: _http,
+        port: _http.address().port,
+        url: 'http://127.0.0.1:'+_http.address().port,
+    };
+    const _https = https.createServer(ssl(), handler);
+    yield etask.nfn_apply(_https, '.listen', [0]);
+    _https.on('error', this.throw_fn());
+    ping.https = {
+        server: _https,
+        port: _https.address().port,
+        url: 'https://127.0.0.1:'+_https.address().port,
+    };
     ping.stop = etask._fn(function*(_this){
-        yield etask.nfn_apply(_this.http, '.close', []);
+        yield etask.nfn_apply(_this.http.server, '.close', []);
+        yield etask.nfn_apply(_this.https.server, '.close', []);
     });
     return ping;
 });
 let proxy, ping;
 before(()=>etask(function*(){
     proxy = yield http_proxy();
-    // ping = yield http_ping();
+    ping = yield http_ping();
 }));
 beforeEach(()=>{
     proxy.fake = true;
@@ -380,41 +395,31 @@ describe('proxy', ()=>{
                 l = yield lum({direct});
                 const match = yield l.test('http://match.com');
                 assert.equal(!!match.body.auth.direct, expected);
-                const no_match = yield l.test('http://m-a-t-c-h.com');
+                const no_match = yield l.test('http://n-o--m-a-t-c-h.com');
                 assert.notEqual(!!no_match.body.auth.direct, expected);
             }));
             t('include', true);
             t('exclude', false);
         });
-        describe.skip('bypass_proxy', ()=>{ // XXX lee - in progress
-            const test = query=>etask(function*(){
+        describe('bypass_proxy', ()=>{
+            const test = (protocol, query)=>etask(function*(){
                 let before = proxy.history.length;
-                console.log('test url: ', {url: ping.url+query}); // XXX lee
-                yield l.test(ping.url+query);
+                yield l.test(ping[protocol].url+query);
                 let after = proxy.history.length;
                 return {before, after};
             });
-            const t = protocol=>it(protocol, ()=>etask(function*(){
-                let res = yield etask.nfn_apply(request, [{url: ping.url}]); // XXX lee
-                console.log({ping: res}); // XXX lee
-                l = yield lum({bypass_proxy: 'm-a-t-c-h'});
-                proxy.fake = false;
-                console.log('1 proxy created'); // XXX leee
-                // let missmatch = yield test(protocol+'://lumtest.com/echo.json?m-a-t-c-h');
-                res = yield test('');
-                console.log('1.5 ping call'); // XXX leee
-                let missmatch = yield test('/m-a-t-c-h');
-                console.log('2 missmatch call'); // XXX leee
-                assert.notEqual(missmatch.before, missmatch.after);
-                // let match = yield test(protocol+'://lumtest.com/echo.json?match');
-                let match = yield test('/match');
-                console.log('3 match call'); // XXX leee
+            const t = (name, protocol, opt)=>it(name, ()=>etask(function*(){
+                l = yield lum(_.assign({bypass_proxy: 'match', log: 'debug'},
+                    opt));
+                let match = yield test(protocol, '/match');
                 assert.equal(match.before, match.after);
-                console.log('4 done');
+                let missmatch = yield test(protocol, '/n-o--m-a-t-c-h');
+                assert.notEqual(missmatch.before, missmatch.after);
             }));
-            t('http');
-            // t('https');
-            // t('https sniffing');
+            t('http', 'http');
+            // XXX lee - in progress
+            // t('https connect', 'https');
+            // t('https sniffing', 'https', {ssl: true});
         });
         describe('luminati params', ()=>{
             const t = (name, target, expected)=>it(name, ()=>etask(function*(){
