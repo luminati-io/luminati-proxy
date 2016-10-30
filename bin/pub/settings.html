@@ -36,6 +36,19 @@
       </span>
     </strong>
   </div>
+  <div ng-if=$parent.ver_node&&!$parent.ver_node.satisfied class="alert
+    alert-warning settings-alert">
+    <div>
+      The recommended version of node.js is
+      <strong>{{$parent.ver_node.recommended}}</strong>. You are using version
+      <strong>{{$parent.ver_node.current}}</strong>.
+    </div>
+    <div>
+      Please upgrade your node
+      using nvm, nave or visit <a href=https://nodejs.org>node.js</a> and
+      download a newer version.
+    </div>
+  </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
     class="alert alert-warning settings-alert">

@@ -60,9 +60,9 @@
                     ' warning' : ''}}"
                     title="{{r.alerts.length ? r.alerts.length+' alert(s)' : ''}}">
                     <td>
-                      <a ng-click=$event.stopPropagation() href={{r.url}}>
-                        {{r.url}}
-                      </a>
+                      <span title={{r.url}}>
+                        {{r.url | shorten:40}}
+                      </span>
                     </td>
                     <td>{{r.method}}</td>
                     <td>{{r.status_code}}</td>
@@ -304,8 +304,9 @@
             <tbody>
               <tr>
                 <td>
-                  <a ng-click=$event.stopPropagation() href={{row.url}}>
-                    {{row.url}}
+                  <a ng-click=$event.stopPropagation() href={{row.url}}
+                    title={{row.url}}>
+                    {{row.url | shorten:60}}
                   </a>
                 </td>
                 <td>{{row.method}}</td>

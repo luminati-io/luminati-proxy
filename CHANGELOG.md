@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.32
+  - :star: notification about recommended version of node (6+)
+  - :bug: obtain proxy peer IP & country for https requests from headers
 - v0.7.31
   - :boom: secure_proxy can not be configured per proxy (like all other
   parameters) with command line giving advantage only over defaults settings

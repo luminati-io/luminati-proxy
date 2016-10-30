@@ -15,6 +15,7 @@ const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
 const luminati = require('./index.js');
+const pkg = require('./package.json');
 const customer = 'abc';
 const password = 'xyz';
 
@@ -598,7 +599,6 @@ describe('manager', ()=>{
             let proxies = JSON.parse(res.body);
             assert_has(proxies, expected, 'proxies');
         }));
-        t.skip = it.skip;
 
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
@@ -618,5 +618,29 @@ describe('manager', ()=>{
         t('main + config files', {config: simple_proxy,
             files: multiple_proxies}, [].concat([_.assign({}, simple_proxy,
             {persist: true})], multiple_proxies));
+    });
+    describe('api', ()=>{
+        it('ssl', ()=>etask(function*(){
+            app = yield start_app();
+            let res = yield etask.nfn_apply(request, [{
+                url: app.admin+'/ssl',
+            }]);
+            assert_has(res.headers, {
+                'content-type': 'application/x-x509-ca-cert',
+                'content-disposition': 'filename=luminati.crt',
+            }, 'headers');
+            assert.equal(res.body, fs.readFileSync(path.join(__dirname,
+                'bin/ca.crt')), 'certificate');
+        }));
+        describe('version info', ()=>{
+            it('current', ()=>etask(function*(){
+                app = yield start_app();
+                const res = yield etask.nfn_apply(request, [{
+                    url: app.admin+'/api/version',
+                }]);
+                const body = JSON.parse(res.body);
+                assert.equal(body.version, pkg.version);
+            }));
+        });
     });
 });

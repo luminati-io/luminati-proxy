@@ -180,6 +180,9 @@ function root($rootScope, $scope, $http, $window){
     $http.get('/api/consts').then(function(consts){
         $scope.consts = consts.data;
     });
+    $http.get('/api/node_version').then(function(node){
+        $scope.ver_node = node.data;
+    });
 }
 
 module.controller('settings', settings);
@@ -1534,6 +1537,16 @@ module.directive('initSelectOpen', ['$window', function($window){
         },
     };
 }]);
+
+module.filter('shorten', shortenFilter);
+shortenFilter.$inject = ['$filter'];
+function shortenFilter($filter){
+    return function(s, chars){
+        if (s.length<=chars+2)
+            return s;
+        return s.substr(0, chars)+'...';
+    };
+}
 
 angular.bootstrap(document, ['app']);
 
