@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.33
+  - :bug: Specifying --socks port will not longer create conflict on the
+    drop-in proxy
+  - :star: Notify on Auto IP resolution and warn about missing IP resolution
+    when using SOCKs (#18)
 - v0.7.32
   - :star: notification about recommended version of node (6+)
   - :bug: obtain proxy peer IP & country for https requests from headers

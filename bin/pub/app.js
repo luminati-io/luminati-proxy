@@ -199,6 +199,9 @@ function settings($scope, $http, $window){
             mode: 'javascript',
         });
     });
+    $scope.resolve_missing =
+        !$scope.$parent.settings.resolve&&$scope.$parent.settings.socks;
+    $scope.resolve_auto = $scope.$parent.settings.resolve===true;
     $scope.resolve_file =
     $scope.$parent.settings.resolve&&$scope.$parent.settings.resolve!==true;
     $scope.update_resolve = function(){

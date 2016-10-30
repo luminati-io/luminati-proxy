@@ -115,6 +115,13 @@
       Edit
     </button>
   </div>
+  <div class="alert alert-warning settings-alert" ng-if=resolve_missing>
+    SOCKs is in use without IP resolution - HTTPS requests will not be served
+    from the proxy peer.
+  </div>
+  <div class="alert alert-info settings-alert" ng-if=resolve_auto>
+    IP resolution is done automatically.
+  </div>
   <div class="alert alert-info settings-alert" ng-if=resolve_file>
     <div>
       Path to the IP resolution file:
