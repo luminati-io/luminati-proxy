@@ -48,6 +48,12 @@
       using nvm, nave or visit <a href=https://nodejs.org>node.js</a> and
       download a newer version.
     </div>
+    <div>
+      After node upgrade you should uninstall and then reinstall this tool
+      using:
+    </div>
+    <pre class=top-margin>$ npm uninstall -g luminati-io/luminati-proxy</pre>
+    <pre class=top-margin>$ npm install -g luminati-io/luminati-proxy</pre>
   </div>
   <div
     ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
@@ -114,6 +120,10 @@
     <button type=button class="btn btn-warning" ng-click=edit_config()>
       Edit
     </button>
+  </div>
+  <div class="alert alert-warning settings-alert" ng-if=ssl_missing>
+    History is used withou SSL sniffing. Https URLs will not be fully recorded
+    in the history, only the CONNECT requests will be added to the history.
   </div>
   <div class="alert alert-warning settings-alert" ng-if=resolve_missing>
     SOCKs is in use without IP resolution - HTTPS requests will not be served

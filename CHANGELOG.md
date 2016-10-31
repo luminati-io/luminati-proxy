@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.34
+  - :star: Added warning when enabling history with not SSL sniffing.
+  - :sparkles: Added history alert for IP urls
+  - :sparkles: Add uninstall/install instructions to node upgrade notice
 - v0.7.33
   - :bug: Specifying --socks port will not longer create conflict on the
     drop-in proxy
@@ -117,3 +121,11 @@
   `request_timeout`
 - v0.2.0
   - :boom: Default proxy port was changed from `23000` to `24000`
+
+## Legend
+
+- :star: additional features
+- :sparkles: improvements
+- :bug: bug fixes
+- :boom: breaking changes
+

@@ -45,7 +45,7 @@ $ sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
 
-You can review the [CHANGELOG.md](CHANGELOG.md) for additional features, bug fixes and breaking changes.
+You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every version
 
 ## Usage
 

@@ -161,7 +161,7 @@ function root($rootScope, $scope, $http, $window){
             break;
         }
     }
-    $http.get('/api/creds').then(function(settings){
+    $http.get('/api/settings').then(function(settings){
         $scope.settings = settings.data;
         if (!$scope.settings.customer)
         {
@@ -199,6 +199,8 @@ function settings($scope, $http, $window){
             mode: 'javascript',
         });
     });
+    $scope.ssl_missing =
+        $scope.$parent.settings.history&&!$scope.$parent.settings.ssl;
     $scope.resolve_missing =
         !$scope.$parent.settings.resolve&&$scope.$parent.settings.socks;
     $scope.resolve_auto = $scope.$parent.settings.resolve===true;
@@ -1111,6 +1113,18 @@ function history($scope, $http, $filter, $window){
                                 description: 'The Referer header is not set '
                                     +'even though the requested URL is not '
                                     +'the home page of the site.',
+                            });
+                        }
+                        if (r.url
+                            .match(/^https?:\/\/\d+\.\d+\.\d+\.\d+[$\/\?]/))
+                        {
+                            add_alert({
+                                type: 'ip_url',
+                                title: 'IP URL',
+                                description: 'The url uses IP and not '
+                                    +'hostname, it will not be served from the'
+                                    +' proxy peer. It could mean a resolve '
+                                    +'configuration issue when using SOCKS.',
                             });
                         }
                         r.alerts = alerts;
