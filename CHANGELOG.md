@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.38
+  - :bug: Handle password that contain special characters properly
 - v0.7.37
   - :star: Column list in proxies overview is now configurable
 - v0.7.34
