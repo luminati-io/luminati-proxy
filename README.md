@@ -125,6 +125,8 @@ Options:
   --version               Show version number                          [boolean]
   -p, --port              Listening port               [number] [default: 24000]
   -d, --daemon            Start as a daemon
+  --mode                  Mode to run the web UI in (root, normal, or guest)
+                                                               [default: "root"]
 ```
 
 ### Docker

@@ -8,7 +8,7 @@ function(angular, io, _, moment, codemirror){
 
 var module = angular.module('app', []);
 
-module.run(function($rootScope, $window){
+module.run(function($rootScope, $http, $window){
     $window.Chart.defaults.global.colors = ['#803690', '#00ADF9', '#46BFBD',
         '#FDB45C', '#949FB1', '#4D5360'];
     var l = $window.location.pathname;
@@ -19,6 +19,9 @@ module.run(function($rootScope, $window){
     }
     else
         $rootScope.section = l.split('/').pop();
+    $http.get('/api/mode').then(function(mode){
+        $rootScope.mode = mode.data.mode;
+    });
 });
 
 module.factory('$proxies', $proxies);
@@ -165,7 +168,7 @@ function root($rootScope, $scope, $http, $window){
     }
     $http.get('/api/settings').then(function(settings){
         $scope.settings = settings.data;
-        if (!$scope.settings.customer)
+        if (!$scope.settings.request_disallowed&&!$scope.settings.customer)
         {
             if ($scope.section.name!='settings')
                 $window.location = 'settings';
@@ -188,11 +191,12 @@ function root($rootScope, $scope, $http, $window){
 }
 
 module.controller('settings', settings);
-settings.$inject = ['$scope', '$http', '$window'];
-function settings($scope, $http, $window){
+settings.$inject = ['$scope', '$http', '$window', '$sce'];
+function settings($scope, $http, $window, $sce){
     $http.get('/api/status').then(function(status){
-        if (!$scope.status)
-            $scope.status = status.data;
+        $scope.status = status.data;
+        $scope.status.description =
+            $sce.trustAsHtml($scope.status.description);
     });
     $http.get('/api/config').then(function(config){
         $scope.config = config.data.config;
@@ -921,7 +925,7 @@ function proxies($scope, $http, $proxies, $window){
         sticky_ip: true,
     };
     $scope.cols_conf = JSON.parse(
-        $window.localStorage.getItem('columns'))||default_cols;
+        $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
     $scope.page_size = 50;
     $scope.page = 1;
     $scope.set_page = function(p){

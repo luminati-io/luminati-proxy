@@ -23,17 +23,19 @@
           <tr ng-repeat="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size">
             <td class=proxies-actions>
               <span class="proxies-action glyphicon glyphicon-pencil"
-                ng-if=proxy.persist ng-click=edit_proxy(proxy.config)
+                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=edit_proxy(proxy.config)
                 title=Edit>
               </span>
               <span class="proxies-action-disabled glyphicon glyphicon-pencil"
-                ng-if=!proxy.persist title="This proxy cannot be edited">
+                ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be edited">
               </span>
               <span class="proxies-action glyphicon glyphicon-duplicate"
-                ng-click="edit_proxy(proxy.config, true)" title=Duplicate>
+                ng-click="edit_proxy(proxy.config, true)" title=Duplicate
+                ng-if="$root.mode!='guest'">
               </span>
               <span class="proxies-action glyphicon glyphicon-refresh"
-                ng-click="refresh_sessions(proxy)" title="Refresh sessions">
+                ng-click="refresh_sessions(proxy)" title="Refresh sessions"
+                ng-if="$root.mode!='guest'">
               </span>
               <span class="proxies-action glyphicon glyphicon-stats"
                 ng-click=show_stats(proxy) title=Statistics>
@@ -54,10 +56,10 @@
                 title="This proxy cannot be accessed from outside localhost">
               </span>
               <span class="proxies-action glyphicon glyphicon-trash"
-                ng-if=proxy.persist ng-click=delete_proxy(proxy) title=Delete>
+                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=delete_proxy(proxy) title=Delete>
               </span>
               <span class="proxies-action-disabled glyphicon glyphicon-trash"
-                ng-if=!proxy.persist title="This proxy cannot be deleted">
+                ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be deleted">
               </span>
             </td>
             <td ng-repeat="col in columns()">
@@ -69,6 +71,19 @@
                   class="proxies-warning glyphicon glyphicon-exclamation-sign">
                 </span>
               </span>
+              <span ng-if="$root.mode=='guest'">
+                <span ng-if=proxy[col.key]===true
+                  class="glyphicon glyphicon-ok">
+                </span>
+                <span ng-if=proxy[col.key]!==true>
+                  <span ng-if=proxy[col.key]>
+                    {{proxy[col.key]}}
+                  </span>
+                  <span ng-if=!proxy[col.key]>
+                    &mdash;
+                  </span>
+                </span>
+              </span>
               <span ng-click="inline_edit_click(proxy, col)"
                 title="{{proxy[col.key]&&proxy[col.key]!==proxy.config[col.key]
                 ? (proxy.persist ? 'Set non-default value' :
@@ -77,7 +92,8 @@
                 'This proxy\'s settings cannot be changed')}}"
                 ng-class="{'proxies-default':
                 proxy[col.key]&&proxy[col.key]!==proxy.config[col.key],
-                'proxies-editable': proxy.persist}">
+                'proxies-editable': proxy.persist}"
+                ng-if="$root.mode!='guest'">
                 <span ng-if=proxy[col.key]===true
                   class="glyphicon glyphicon-ok">
                 </span>
@@ -117,7 +133,8 @@
       </table>
     </div>
     <div class="panel-footer text-center">
-      <button type=button class="btn btn-default" ng-click=edit_proxy()>
+      <button type=button class="btn btn-default" ng-click=edit_proxy()
+        ng-if="$root.mode!='guest'">
         Add a proxy
       </button>
       <div class=proxy-pagination ng-if=page_size&lt;proxies.length>

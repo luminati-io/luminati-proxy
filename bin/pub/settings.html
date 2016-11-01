@@ -4,14 +4,14 @@
       Determining the status of your proxy...
     </div>
     <button type=button class="btn btn-danger" ng-click=shutdown()
-      ng-disabled=upgrading>
+      ng-disabled=upgrading ng-if="$root.mode=='root'">
       Shut down
     </button>
   </div>
   <div ng-if=status class="alert settings-alert" ng-class="{'alert-success':
     status.status=='ok', 'alert-danger': status.status=='error'}">
     <div>
-      {{status.description}}
+      <span ng-bind-html=status.description></span>
       <ul ng-if=status.description_list>
         <li ng-repeat="item in status.description_list">
           {{item}}
@@ -19,11 +19,11 @@
       </ul>
     </div>
     <button type=button class="btn btn-danger" ng-click=shutdown()
-      ng-disabled=upgrading>
+      ng-disabled=upgrading ng-if="$root.mode=='root'">
       Shut down
     </button>
   </div>
-  <div ng-if=$parent.$parent.settings.argv class="alert alert-info">
+  <div ng-if="$root.mode=='root'&&$parent.$parent.settings.argv" class="alert alert-info">
     The application is running with the following arguments:
     <strong>
       <span ng-repeat="p in parse_arguments($parent.$parent.settings.argv)">
@@ -36,7 +36,8 @@
       </span>
     </strong>
   </div>
-  <div ng-if=$parent.ver_node&&!$parent.ver_node.satisfied class="alert
+  <div
+    ng-if="$root.mode=='root'&&$parent.ver_node&&!$parent.ver_node.satisfied" class="alert
     alert-warning settings-alert">
     <div>
       The recommended version of node.js is
@@ -56,7 +57,7 @@
     <pre class=top-margin>$ npm install -g luminati-io/luminati-proxy</pre>
   </div>
   <div
-    ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last
+    ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last"
     class="alert alert-warning settings-alert">
     <div>
       The latest version of the tool available is
@@ -81,12 +82,12 @@
     </div>
   </div>
   <div
-    ng-if=$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur==$parent.ver_last
+    ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur==$parent.ver_last"
     class="alert alert-success">
     You are using the latest version of the Luminati proxy manager tool
     (<strong>{{$parent.ver_cur}}</strong>).
   </div>
-  <form name=settings ng-submit=save()>
+  <form ng-if="$root.mode=='root'" name=settings ng-submit=save()>
     <div class=block>
       <div class=form-group>
         <label for=customer class=control-label>Customer/username</label>
@@ -112,7 +113,8 @@
       </div>
     </div>
   </form>
-  <div class="alert alert-info settings-alert" ng-if=$parent.settings.config>
+  <div class="alert alert-info settings-alert"
+    ng-if="$root.mode=='root'&&$parent.settings.config">
     <div>
       Path to the configuration file:
       <strong>{{$parent.$parent.settings.config}}</strong>
@@ -121,18 +123,22 @@
       Edit
     </button>
   </div>
-  <div class="alert alert-warning settings-alert" ng-if=ssl_missing>
-    History is used withou SSL sniffing. Https URLs will not be fully recorded
+  <div class="alert alert-warning settings-alert"
+    ng-if="$root.mode=='root'&&ssl_missing">
+    History is used without SSL sniffing. HTTPS URLs will not be fully recorded
     in the history, only the CONNECT requests will be added to the history.
   </div>
-  <div class="alert alert-warning settings-alert" ng-if=resolve_missing>
+  <div class="alert alert-warning settings-alert"
+    ng-if="$root.mode=='root'&&resolve_missing">
     SOCKs is in use without IP resolution - HTTPS requests will not be served
     from the proxy peer.
   </div>
-  <div class="alert alert-info settings-alert" ng-if=resolve_auto>
+  <div class="alert alert-info settings-alert"
+    ng-if="$root.mode=='root'&&resolve_auto">
     IP resolution is done automatically.
   </div>
-  <div class="alert alert-info settings-alert" ng-if=resolve_file>
+  <div class="alert alert-info settings-alert"
+    ng-if="$root.mode=='root'&&resolve_file">
     <div>
       Path to the IP resolution file:
       <strong>{{$parent.$parent.settings.resolve}}</strong>

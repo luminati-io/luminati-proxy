@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.39
+  - :boom: The web UI can now be run in normal and guest modes as well as in
+  root mode (default)
+  - :sparkles: Improved tests
+  - :sparkles: Improved proxy error message
 - v0.7.38
   - :bug: Handle password that contain special characters properly
 - v0.7.37

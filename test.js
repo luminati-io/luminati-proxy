@@ -14,6 +14,7 @@ const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
+const assign = Object.assign;
 const luminati = require('./index.js');
 const pkg = require('./package.json');
 const customer = 'abc';
@@ -104,25 +105,31 @@ const http_proxy = port=>etask(function*(){
         {
             if (!proxy.https)
             {
-                proxy.https = https.createServer(ssl(), (req, res, head)=>{
-                    _.defaults(req.headers,
-                        headers[req.socket.remotePort]||{});
-                    handler(req, res, head);
-                });
+                proxy.https = https.createServer(
+                    assign({requestCert: false}, ssl()),
+                    (req, res, head)=>{
+                        _.defaults(req.headers,
+                            headers[req.socket.remotePort]||{});
+                        handler(req, res, head);
+                    }
+                );
                 yield etask.nfn_apply(proxy.https, '.listen', [0]);
             }
             _url = '127.0.0.1:'+proxy.https.address().port;
         }
         let port;
+        res.write('HTTP/1.1 200 OK\r\n\r\n');
         const socket = net.connect({
             host: _url.split(':')[0],
             port: _url.split(':')[1]||443,
-        }).on('connect', ()=>{
+        });
+        socket.setNoDelay();
+        socket.on('connect', ()=>{
             port = socket.localPort;
             headers[port] = req.headers||{};
-            res.write('HTTP/1.1 200 OK\r\n\r\n');
-            res.pipe(socket).pipe(res);
-        }).on('close', ()=>delete headers[port]);
+        }).on('close', ()=>delete headers[port]).on('error', this.throw_fn());
+        res.pipe(socket).pipe(res);
+        req.on('end', ()=>socket.end());
     }));
     yield etask.nfn_apply(proxy.http, '.listen', [port||22225]);
     proxy.port = proxy.http.address().port;
@@ -203,8 +210,8 @@ describe('proxy', ()=>{
     const lum = opt=>etask(function*(){
         opt = opt||{};
         if (opt.ssl===true)
-            opt.ssl = _.assign(ssl(), {requestCert: false});
-        const l = new luminati.Luminati(_.assign({
+            opt.ssl = assign({requestCert: false}, ssl());
+        const l = new luminati.Luminati(assign({
             proxy: '127.0.0.1',
             customer: customer,
             password: password,
@@ -365,7 +372,11 @@ describe('proxy', ()=>{
         });
         describe('null_response', ()=>{
             const t = (name, ssl)=>it(name, ()=>etask(function*(){
-                l = yield lum({null_response: 'echo\.json', ssl: ssl});
+                l = yield lum({
+                    null_response: 'echo\\.json',
+                    ssl: ssl,
+                    insecure: ssl,
+                });
                 let protocol = ssl?'https':'http';
                 let url = protocol+'://lumtest.com/echo.json';
                 const res = yield l.test(url);
@@ -377,7 +388,7 @@ describe('proxy', ()=>{
                 assert.ok(proxy.history.length>0);
             }));
             t('http');
-            // t('https sniffing', true); // TODO lee fix
+            t('https sniffing', true);
             it('https connect', ()=>etask(function*(){
                 l = yield lum({null_response: 'match', log: 'DEBUG'});
                 try {
@@ -403,29 +414,32 @@ describe('proxy', ()=>{
             t('exclude', false);
         });
         describe('bypass_proxy', ()=>{
-            const test = (protocol, query)=>etask(function*(){
+            const test = url=>etask(function*(){
                 let before = proxy.history.length;
-                yield l.test(ping[protocol].url+query);
+                yield l.test(url);
                 let after = proxy.history.length;
                 return {before, after};
             });
-            const t = (name, protocol, opt)=>it(name, ()=>etask(function*(){
-                l = yield lum(_.assign({bypass_proxy: 'match', log: 'debug'},
-                    opt));
-                let match = yield test(protocol, '/match');
-                assert.equal(match.before, match.after);
-                let missmatch = yield test(protocol, '/n-o--m-a-t-c-h');
-                assert.notEqual(missmatch.before, missmatch.after);
+            const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
+            function*(){
+                l = yield lum(assign({bypass_proxy: 'match'}, opt));
+                let match = yield test(match_url());
+                assert.equal(match.after, match.before);
+                let missmatch = yield test(no_match_url());
+                assert.notEqual(missmatch.after, missmatch.before);
             }));
-            t('http', 'http');
-            // XXX lee - in progress
-            // t('https connect', 'https');
-            // t('https sniffing', 'https', {ssl: true});
+            t('http', ()=>ping.http.url+'/match',
+                ()=>ping.http.url+'/n-o--m-a-t-c-h');
+            t('https sniffing', ()=>ping.https.url+'/match',
+                ()=>ping.https.url+'/n-o--m-a-t-c-h',
+                {ssl: true, insecure: true});
+            it('https connect', ()=>'https://match.com/', ()=>ping.https.url,
+                {insecure: true});
         });
         describe('luminati params', ()=>{
             const t = (name, target, expected)=>it(name, ()=>etask(function*(){
                 expected = expected||target;
-                l = yield lum(_.assign({}, target, {}));
+                l = yield lum(assign({}, target, {}));
                 const res = yield l.test();
                 assert_has(res.body.auth, expected);
             }));
@@ -602,21 +616,21 @@ describe('manager', ()=>{
 
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
-            [_.assign({}, simple_proxy, {persist: true})]);
+            [assign({}, simple_proxy, {persist: true})]);
         t('main config only', {config: simple_proxy},
-            [_.assign({}, simple_proxy, {persist: true})]);
+            [assign({}, simple_proxy, {persist: true})]);
         t('config file', {files: [simple_proxy]}, [simple_proxy]);
         t('config override cli', {cli: simple_proxy, config: {port: 24042}},
-            [_.assign({}, simple_proxy, {persist: true, port: 24042})]);
+            [assign({}, simple_proxy, {persist: true, port: 24042})]);
         const multiple_proxies = [
-            _.assign({}, simple_proxy, {port: 25025}),
-            _.assign({}, simple_proxy, {port: 26026}),
-            _.assign({}, simple_proxy, {port: 27027}),
+            assign({}, simple_proxy, {port: 25025}),
+            assign({}, simple_proxy, {port: 26026}),
+            assign({}, simple_proxy, {port: 27027}),
         ];
         t('multiple config files', {files: multiple_proxies},
             multiple_proxies);
         t('main + config files', {config: simple_proxy,
-            files: multiple_proxies}, [].concat([_.assign({}, simple_proxy,
+            files: multiple_proxies}, [].concat([assign({}, simple_proxy,
             {persist: true})], multiple_proxies));
     });
     describe('api', ()=>{
