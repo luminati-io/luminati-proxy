@@ -189,9 +189,12 @@ nav a:hover {
     overflow: auto;
     max-height: calc(100vh - 164px);
 }
-.proxies-settings {
+.proxies-settings, .columns-settings {
     overflow: auto;
     max-height: calc(100vh - 190px);
+}
+.columns-settings {
+    padding-left: 100px;
 }
 .proxies-panel {
     overflow: auto;
@@ -199,8 +202,13 @@ nav a:hover {
 table.proxies td, table.proxies th {
     text-align: center;
 }
-div.proxies .panel-footer {
+div.proxies .panel-footer, div.proxies .panel-heading {
     position: relative;
+}
+div.proxies .panel-heading button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
 }
 .proxy-pagination {
     position: absolute;

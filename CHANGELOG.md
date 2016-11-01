@@ -1,7 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.7.37
+  - :star: Column list in proxies overview is now configurable
 - v0.7.34
-  - :star: Added warning when enabling history with not SSL sniffing.
+  - :star: Added warning when enabling history with not SSL sniffing
   - :sparkles: Added history alert for IP urls
   - :sparkles: Add uninstall/install instructions to node upgrade notice
 - v0.7.33

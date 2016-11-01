@@ -3,13 +3,18 @@
     Loading...
   </div>
   <div ng-if=proxies class="panel panel-default proxies">
-    <div class=panel-heading>Proxies</div>
+    <div class=panel-heading>
+      Proxies
+      <button type=button class="btn btn-default" ng-click=edit_cols()>
+        Configure columns
+      </button>
+    </div>
     <div class="panel-body proxies-panel">
       <table class="table table-hover proxies">
         <thead>
           <tr>
             <th>Actions</th>
-            <th ng-repeat="col in columns">
+            <th ng-repeat="col in columns()">
               {{col.title}}
             </th>
           </tr>
@@ -55,7 +60,7 @@
                 ng-if=!proxy.persist title="This proxy cannot be deleted">
               </span>
             </td>
-            <td ng-repeat="col in columns">
+            <td ng-repeat="col in columns()">
               <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
                 &&proxy.config.iface&&proxy.config.iface!=='0.0.0.0'">
                 <span title="{{'This proxy has been binded to all network '
@@ -98,7 +103,7 @@
                   <select class=form-control init-select-open
                     ng-blur=inline_edit_blur(proxy)
                     ng-model=proxy.dummy_model
-                    ng-init=proxy.dummy_model=proxy.config[col.key]
+                    ng-init="proxy.dummy_model=proxy.config[col.key]||''"
                     ng-change="
                     inline_edit_select_change(proxy, col, proxy.dummy_model)"
                     ng-keyup="inline_edit_select(proxy, col, $event)"
@@ -198,5 +203,8 @@
   </div>
   <div ng-repeat="p in proxy_dialog" ng-controller=proxy
     ng-include="'proxy.html'" ng-init=init(p)>
+  </div>
+  <div ng-repeat="c in columns_dialog" ng-controller=columns
+    ng-include="'proxy_cols.html'" ng-init=init(c)>
   </div>
 </div>

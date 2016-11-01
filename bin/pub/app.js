@@ -54,6 +54,8 @@ function $proxies($http, $q){
             for (var i=0; i<config.length; i++)
                 config_index[config[i].port] = config[i];
             proxies.forEach(function(proxy){
+                if (Array.isArray(proxy.proxy)&&proxy.proxy.length==1)
+                    proxy.proxy = proxy.proxy[0];
                 proxy.stats = {
                     total: {
                         active_requests: [],
@@ -671,6 +673,18 @@ module.filter('startFrom', function(){
 module.controller('proxies', proxies);
 proxies.$inject = ['$scope', '$http', '$proxies', '$window'];
 function proxies($scope, $http, $proxies, $window){
+    var prepare_opts = function(opts){
+        var res = [];
+        for (var i=0; i<opts.length; i++)
+            res.push({key: opts[i], value: opts[i]});
+        return res;
+    };
+    var iface_opts = prepare_opts($scope.$parent.consts.proxy.iface.values);
+    var country_opts = $scope.$parent.consts.proxy.country.values;
+    var pool_type_opts = prepare_opts(
+        $scope.$parent.consts.proxy.pool_type.values);
+    var dns_opts = prepare_opts($scope.$parent.consts.proxy.dns.values);
+    var log_opts = prepare_opts($scope.$parent.consts.proxy.log.values);
     var opt_columns = [
         {
             key: 'port',
@@ -680,7 +694,27 @@ function proxies($scope, $http, $proxies, $window){
                 return v.match(/^\d+$/)&&v>=24000;
             },
         },
-        {key: 'super_proxy', title: 'Host'},
+        {
+            key: 'iface',
+            title: 'Interface',
+            type: 'options',
+            options: function(){
+                return iface_opts;
+            },
+        },
+        {
+            key: 'ssl',
+            title: 'SSL sniffing',
+            type: 'boolean',
+        },
+        {
+            key: 'socks',
+            title: 'SOCKS port',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
         {
             key: 'zone',
             title: 'Zone',
@@ -689,47 +723,205 @@ function proxies($scope, $http, $proxies, $window){
                 return true;
             },
         },
-        {key: 'socks', title: 'SOCKS'},
+        {
+            key: 'secure_proxy',
+            title: 'SSL for super proxy',
+            type: 'boolean',
+        },
         {
             key: 'country',
             title: 'Country',
             type: 'options',
             options: function(){
-                return $scope.$parent.consts.proxy.country.values;
+                return country_opts;
             },
         },
-        {key: 'state', title: 'State'},
-        {key: 'city', title: 'City'},
-        {key: 'asn', title: 'ASN'},
-        {key: 'cid', title: 'Client ID'},
-        {key: 'ip', title: 'IP'},
-        {key: 'session_init_timeout', title: 'Session init timeout'},
-        {key: 'dns', title: 'DNS'},
-        {key: 'request_timeout', title: 'Request Timeout'},
-        {key: 'resolve', title: 'Resolve'},
-        {key: 'pool_size', title: 'Pool size'},
-        {key: 'pool_type', title: 'Pool type'},
-        {key: 'proxy_count', title: 'Minimum proxies count'},
         {
-            key: 'sticky_ip',
-            title: 'Sticky IP',
-            type: 'boolean',
+            key: 'state',
+            title: 'State',
+            type: 'text',
+            check: function(v){
+                return true;
+            },
         },
-        {key: 'keep_alive', title: 'Keep-alive'},
-        {key: 'allow_proxy_auth', title: 'Allow request authentication'},
+        {
+            key: 'city',
+            title: 'City',
+            type: 'text',
+            check: function(v){
+                return true;
+            },
+        },
+        {
+            key: 'asn',
+            title: 'ASN',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/)&&v<400000;
+            },
+        },
+        {
+            key: 'ip',
+            title: 'Datacenter IP',
+            type: 'text',
+            check: function(v){
+                v = v.trim();
+                if (v=='')
+                    return true;
+                var m = v.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+                if (!m)
+                    return false;
+                for (var i=1; i<=4; i++)
+                {
+                    if (m[i]!=='0'&&m[i].charAt(0)=='0'||m[i]>255)
+                        return false;
+                }
+                return true;
+            },
+        },
         {
             key: 'max_requests',
             title: 'Max requests',
             type: 'number',
             check: function(v){
-                return v.trim()==''||v.match(/^\d+$/);
+                return v.trim()==''||v.trim().match(/^\d+$/);
             },
         },
-        {key: 'session_duration', title: 'Max session duration'},
-        {key: 'throttle', title: 'Throttle concurrent connections'},
-        {key: 'log', title: 'Log Level'},
-        {key: 'debug', title: 'Luminati debug'},
+        {
+            key: 'session_duration',
+            title: 'Session duration (sec)',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'pool_size',
+            title: 'Pool size',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'pool_type',
+            title: 'Pool type',
+            type: 'options',
+            options: function(){
+                return pool_type_opts;
+            },
+        },
+        {
+            key: 'sticky_ip',
+            title: 'Sticky IP',
+            type: 'boolean',
+        },
+        {
+            key: 'keep_alive',
+            title: 'Keep-alive',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'allow_proxy_auth',
+            title: 'Allow request authentication',
+            type: 'boolean',
+        },
+        {
+            key: 'session_init_timeout',
+            title: 'Session init timeout (sec)',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'proxy_count',
+            title: 'Min number of super proxies',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'dns',
+            title: 'DNS',
+            type: 'options',
+            options: function(){
+                return dns_opts;
+            },
+        },
+        {
+            key: 'log',
+            title: 'Log Level',
+            type: 'options',
+            options: function(){
+                return log_opts;
+            },
+        },
+        {
+            key: 'proxy_switch',
+            title: 'Autoswitch super proxy on failure',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'throttle',
+            title: 'Throttle concurrent connections',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'request_timeout',
+            title: 'Request timeout (sec)',
+            type: 'number',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^\d+$/);
+            },
+        },
+        {
+            key: 'proxy',
+            title: 'Super proxy IP or country',
+            type: 'text',
+            check: function(v){
+                v = v.trim();
+                if (v==''||v.match(/^[a-z][a-z]$/))
+                    return true;
+                var m = v.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+                if (!m)
+                    return false;
+                for (var i=1; i<=4; i++)
+                {
+                    if (m[i]!=='0'&&m[i].charAt(0)=='0'||m[i]>255)
+                        return false;
+                }
+                return true;
+            },
+        },
+        {
+            key: 'debug',
+            title: 'Debug info',
+            type: 'text',
+            check: function(v){
+                return v.trim()==''||v.trim().match(/^(none|full)$/);
+            },
+        },
     ];
+    var default_cols = {
+        port: true,
+        zone: true,
+        country: true,
+        max_requests: true,
+        sticky_ip: true,
+    };
+    $scope.cols_conf = JSON.parse(
+        $window.localStorage.getItem('columns'))||default_cols;
     $scope.page_size = 50;
     $scope.page = 1;
     $scope.set_page = function(p){
@@ -739,10 +931,11 @@ function proxies($scope, $http, $proxies, $window){
             p = Math.ceil($scope.proxies.length/$scope.page_size);
         $scope.page = p;
     };
-    $scope.columns = opt_columns.filter(function(col){
-        return ['port', 'zone', 'country', 'max_requests', 'sticky_ip']
-        .indexOf(col.key)!=-1;
-    });
+    $scope.columns = function(){
+        return opt_columns.filter(function(col){
+            return $scope.cols_conf[col.key];
+        });
+    };
     $proxies.subscribe(function(proxies){
         $scope.proxies = proxies;
         $scope.set_page($scope.page);
@@ -836,6 +1029,13 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.edit_proxy = function(proxy, duplicate){
         $scope.proxy_dialog = [{proxy: proxy||{}, duplicate: duplicate}];
+    };
+    $scope.edit_cols = function(){
+        $scope.columns_dialog = [{
+            columns: opt_columns,
+            cols_conf: $scope.cols_conf,
+            default_cols: default_cols,
+        }];
     };
     $scope.inline_edit_click = function(proxy, col){
         if (!proxy.persist)
@@ -1479,6 +1679,39 @@ function proxy($scope, $http, $proxies, $window){
     };
 }
 
+module.controller('columns', columns);
+columns.$inject = ['$scope', '$window'];
+function columns($scope, $window){
+    $scope.init = function(locals){
+        $scope.columns = locals.columns;
+        $scope.form = _.cloneDeep(locals.cols_conf);
+        $scope.show_modal = function(){
+            $window.$('#proxy-cols').modal();
+        };
+        $scope.save = function(config){
+            $window.$('#proxy-cols').modal('hide');
+            $window.localStorage.setItem('columns', JSON.stringify(config));
+            for (var c in config)
+                locals.cols_conf[c] = config[c];
+        };
+        $scope.all = function(){
+            for (var c in $scope.columns)
+                $scope.form[$scope.columns[c].key] = true;
+        };
+        $scope.none = function(){
+            for (var c in $scope.columns)
+                $scope.form[$scope.columns[c].key] = false;
+        };
+        $scope.default = function(){
+            for (var c in $scope.columns)
+            {
+                $scope.form[$scope.columns[c].key] =
+                locals.default_cols[$scope.columns[c].key];
+            }
+        };
+    };
+}
+
 module.filter('timestamp', timestampFilter);
 timestampFilter.$inject = [];
 function timestampFilter(){
@@ -1548,9 +1781,7 @@ module.directive('initSelectOpen', ['$window', function($window){
         link: function(scope, element, attrs){
             setTimeout(function(){
                 element.focus();
-                var event = new $window.MouseEvent('mousedown');
-                element[0].dispatchEvent(event);
-            }, 0);
+            }, 100);
         },
     };
 }]);
