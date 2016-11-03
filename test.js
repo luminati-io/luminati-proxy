@@ -386,6 +386,7 @@ describe('proxy', ()=>{
                 let protocol = ssl?'https':'http';
                 let no_match = yield match_test(
                     protocol+'://lumtest.com/myip.json');
+                yield etask.sleep(10); // XXX lee - temp hack for stability
                 let match = yield match_test(
                     protocol+'://lumtest.com/echo.json');
                 assert.notEqual(no_match.after, no_match.before);
