@@ -370,6 +370,12 @@ describe('proxy', ()=>{
                 assert.equal(proxy.history.length, 4);
             }));
         });
+        const match_test = url=>etask(function*(){
+            let before = proxy.history.length;
+            let res = yield l.test(url);
+            let after = proxy.history.length;
+            return {before, after, res};
+        });
         describe('null_response', ()=>{
             const t = (name, ssl)=>it(name, ()=>etask(function*(){
                 l = yield lum({
@@ -378,14 +384,15 @@ describe('proxy', ()=>{
                     insecure: ssl,
                 });
                 let protocol = ssl?'https':'http';
-                let url = protocol+'://lumtest.com/echo.json';
-                const res = yield l.test(url);
-                assert.equal(proxy.history.length, 0);
-                assert.equal(res.statusCode, 200);
-                assert.equal(res.statusMessage, 'NULL');
-                assert.equal(res.body, undefined);
-                yield l.test(protocol+'://lumtest.com/myip.json');
-                assert.ok(proxy.history.length>0);
+                let no_match = yield match_test(
+                    protocol+'://lumtest.com/myip.json');
+                let match = yield match_test(
+                    protocol+'://lumtest.com/echo.json');
+                assert.notEqual(no_match.after, no_match.before);
+                assert.equal(match.after, match.before);
+                assert.equal(match.res.statusCode, 200);
+                assert.equal(match.res.statusMessage, 'NULL');
+                assert.equal(match.res.body, undefined);
             }));
             t('http');
             t('https sniffing', true);
@@ -414,18 +421,12 @@ describe('proxy', ()=>{
             t('exclude', false);
         });
         describe('bypass_proxy', ()=>{
-            const test = url=>etask(function*(){
-                let before = proxy.history.length;
-                yield l.test(url);
-                let after = proxy.history.length;
-                return {before, after};
-            });
             const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
             function*(){
                 l = yield lum(assign({bypass_proxy: 'match'}, opt));
-                let match = yield test(match_url());
+                let missmatch = yield match_test(no_match_url());
+                let match = yield match_test(match_url());
                 assert.equal(match.after, match.before);
-                let missmatch = yield test(no_match_url());
                 assert.notEqual(missmatch.after, missmatch.before);
             }));
             t('http', ()=>ping.http.url+'/match',
