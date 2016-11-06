@@ -1627,11 +1627,15 @@ function proxy($scope, $http, $proxies, $window){
         if (!$scope.form.port||$scope.form.port=='')
         {
             var port = 24000;
+            var socks = $scope.form.socks;
             $scope.proxies.forEach(function(p){
                 if (p.port >= port)
                     port = p.port+1;
+                if (socks && p.socks==socks)
+                    socks++;
             });
             $scope.form.port = port;
+            $scope.form.socks = socks;
         }
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.defaults = {};

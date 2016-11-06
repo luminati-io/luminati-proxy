@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.4
+  - :bug: Fix SOCKS port handling in arguments and clone using UI
 - v0.7.39
   - :boom: The web UI can now be run in normal and guest modes as well as in
   root mode (default)

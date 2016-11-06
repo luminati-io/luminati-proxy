@@ -87,20 +87,21 @@
     You are using the latest version of the Luminati proxy manager tool
     (<strong>{{$parent.ver_cur}}</strong>).
   </div>
+  <h3>Your credentials:</h3>
   <form ng-if="$root.mode=='root'" name=settings ng-submit=save()>
     <div class=block>
       <div class=form-group>
-        <label for=customer class=control-label>Customer/username</label>
+        <label for=customer class=control-label>Customer:</label>
         <input type=text ng-required=true ng-model=$parent.settings.customer
           class=form-control id=customer ng-blur=fix_username()>
       </div>
       <div class=form-group>
-        <label for=zone class=control-label>Default zone</label>
+        <label for=zone class=control-label>Zone:</label>
         <input type=text ng-required=true ng-model=$parent.settings.zone
           class=form-control id=zone>
       </div>
       <div class=form-group>
-        <label for=password class=control-label>Default password</label>
+        <label for=password class=control-label>Password:</label>
         <input type=password ng-required=true
           ng-model=$parent.settings.password class=form-control id=password>
       </div>
