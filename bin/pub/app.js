@@ -1788,10 +1788,11 @@ function requestFilter(){
     };
 }
 
-module.filter('actualizeZone', actualizeZone);
-function actualizeZone(){
+module.filter('actualizeZone', actualizeZoneFilter);
+actualizeZoneFilter.$inject = ['$sce'];
+function actualizeZoneFilter($sce){
     return function(input, zone){
-        return input.replace('[[zone]]', zone);
+        return $sce.trustAsHtml($sce.valueOf(input).replace('[[zone]]', zone));
     };
 }
 

@@ -11,7 +11,7 @@
   <div ng-if=status class="alert settings-alert" ng-class="{'alert-success':
     status.status=='ok', 'alert-danger': status.status=='error'}">
     <div>
-      <span ng-bind-html=status.description></span>
+      <span ng-bind-html="status.description | actualizeZone: $parent.settings.zone"></span>
       <ul ng-if=status.description_list>
         <li ng-repeat="item in status.description_list">
           {{item}}
