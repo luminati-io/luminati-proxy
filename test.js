@@ -527,7 +527,7 @@ describe('manager', ()=>{
         return i?args[i]:null;
     };
 
-    const start_app = args=>etask(function*start_app(){
+    const app_with_args = args=>etask(function*app_with_args(){
         args = args||[];
         let www = get_param(args, '--www')||luminati.Manager.default.www;
         let log = get_param(args, '--log');
@@ -550,6 +550,52 @@ describe('manager', ()=>{
         let admin = 'http://127.0.0.1:'+www;
         return {manager, admin, db_file};
     });
+    const app_with_config = opt=>etask(function*app_with_config(){
+        let args = [];
+        const cli = opt.cli||{};
+        Object.keys(cli).forEach(k=>{
+            if (typeof cli[k]=='boolean')
+            {
+                if (cli[k])
+                    args.push('--'+k);
+                else
+                    args.push('--no-'+k);
+                return;
+            }
+            args.push('--'+k);
+            args.push(cli[k]);
+        });
+        if (opt.config)
+        {
+            const config_file = temp_file(opt.config||[], 'json');
+            args.push('--config');
+            args.push(config_file.path);
+            temp_files.push(config_file);
+        }
+        (opt.files||[]).forEach(c=>{
+            const file = temp_file(c, 'json');
+            args.push(file.path);
+            temp_files.push(file);
+        });
+        return yield app_with_args(args);
+    });
+    const app_with_proxies = (proxies, cli)=>etask(function*app_with_proxies(){
+        return yield app_with_config({config: {proxies}, cli: cli});
+    });
+    const api = (path, method, data, json)=>etask(function*api(){
+        const opt = {
+            url: app.admin+'/'+path,
+            method: method||'GET',
+            json: json,
+            body: data,
+        };
+        return yield etask.nfn_apply(request, [opt]);
+    });
+    const json = (path, method, data)=>etask(function*json(){
+        const res = yield api(path, method, data, true);
+        assert.equal(res.statusCode, 200);
+        return res.body;
+    });
 
     afterEach(()=>etask(function*(){
         if (!app)
@@ -566,7 +612,7 @@ describe('manager', ()=>{
             let args = [
                 '--socks', '25000:24000',
             ];
-            app = yield start_app(args);
+            app = yield app_with_args(args);
             let res = yield etask.nfn_apply(request, [{
                 agent: new socks.HttpAgent({
                     proxyHost: '127.0.0.1',
@@ -582,37 +628,8 @@ describe('manager', ()=>{
     });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, ()=>etask(function*(){
-            let args = [];
-            const cli = config.cli||{};
-            Object.keys(cli).forEach(k=>{
-                if (typeof cli[k]=='boolean')
-                {
-                    if (cli[k])
-                        args.push('--'+k);
-                    else
-                        args.push('--no-'+k);
-                    return;
-                }
-                args.push('--'+k);
-                args.push(cli[k]);
-            });
-            const config_file = temp_file(config.config||[], 'json');
-            args.push('--config');
-            args.push(config_file.path);
-            temp_files.push(config_file);
-            if (config.files)
-            {
-                config.files.forEach(c=>{
-                    const file = temp_file(c, 'json');
-                    args.push(file.path);
-                    temp_files.push(file);
-                });
-            }
-            app = yield start_app(args);
-            let res = yield etask.nfn_apply(request, [{
-                url: app.admin+'/api/proxies_running',
-            }]);
-            let proxies = JSON.parse(res.body);
+            app = yield app_with_config(config);
+            let proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
         }));
 
@@ -637,10 +654,8 @@ describe('manager', ()=>{
     });
     describe('api', ()=>{
         it('ssl', ()=>etask(function*(){
-            app = yield start_app();
-            let res = yield etask.nfn_apply(request, [{
-                url: app.admin+'/ssl',
-            }]);
+            app = yield app_with_args();
+            let res = yield api('ssl');
             assert_has(res.headers, {
                 'content-type': 'application/x-x509-ca-cert',
                 'content-disposition': 'filename=luminati.crt',
@@ -650,13 +665,51 @@ describe('manager', ()=>{
         }));
         describe('version info', ()=>{
             it('current', ()=>etask(function*(){
-                app = yield start_app();
-                const res = yield etask.nfn_apply(request, [{
-                    url: app.admin+'/api/version',
-                }]);
-                const body = JSON.parse(res.body);
+                app = yield app_with_args();
+                const body = yield json('api/version');
                 assert.equal(body.version, pkg.version);
             }));
         });
+        describe('proxies', ()=>{
+            it('new', ()=>etask(function*(){
+                app = yield app_with_args();
+                const before = yield json('api/proxies_running');
+                assert.equal(before.length, 1);
+                const proxy = {port: 24001};
+                const res = yield json('api/proxies', 'POST', {proxy});
+                assert_has(res, proxy);
+                const after = yield json('api/proxies_running');
+                assert.equal(after.length, 2);
+                assert_has(after[1], proxy);
+            }));
+        });
+    });
+    describe('errors', ()=>{
+        describe('crush on load error', ()=>{
+            const t = (name, proxies)=>it(name, ()=>etask(function*(){
+                try {
+                    app = yield app_with_proxies(proxies);
+                    assert.fail('Should crush');
+                } catch(e){
+                    if (e instanceof assert.AssertionError)
+                        throw e;
+                }
+            }));
+            t('conflict proxy port', [
+                {port: 24024},
+                {port: 24024},
+            ]);
+            t('conflict socks port', [
+                {port: 24000, socks: 25000},
+                {port: 24001, socks: 25000},
+            ]);
+        });
+        // XXX lee - WIP
+        it.skip('do not crush on api error', ()=>etask(function*(){
+            app = yield app_with_proxies([
+                {port: 25025},
+            ]);
+            // const before = yield json('api/proxies');
+        }));
     });
 });

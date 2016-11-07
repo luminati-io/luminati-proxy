@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.5
+  - :star: cache super-proxy IPs between runs in local DB
+  - :boom: /api/create endpoint was removed, the same functionality can be done using a POST request to /api/proxies
+  - :sparkles: Improved tests
 - v0.8.4
   - :bug: Fix SOCKS port handling in arguments and clone using UI
 - v0.7.39

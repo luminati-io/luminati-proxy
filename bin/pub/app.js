@@ -210,8 +210,8 @@ function settings($scope, $http, $window, $sce){
     $scope.resolve_missing =
         !$scope.$parent.settings.resolve&&$scope.$parent.settings.socks;
     $scope.resolve_auto = $scope.$parent.settings.resolve===true;
-    $scope.resolve_file =
-    $scope.$parent.settings.resolve&&$scope.$parent.settings.resolve!==true;
+    $scope.resolve_file = $scope.$parent.settings.resolve &&
+        $scope.$parent.settings.resolve!==true;
     $scope.update_resolve = function(){
         $http.get('/api/resolve').then(function(resolve){
             $scope.resolve = {text: resolve.data.resolve};
@@ -558,7 +558,7 @@ function countries($scope, $http, $window){
                     {
                         $scope.countries[$scope.cur_index].status = 1;
                         $scope.countries[$scope.cur_index].img.src =
-                        $scope.countries[$scope.cur_index].url;
+                            $scope.countries[$scope.cur_index].url;
                         $scope.num_loading++;
                     }
                     $scope.cur_index++;
@@ -1714,7 +1714,7 @@ function columns($scope, $window){
             for (var c in $scope.columns)
             {
                 $scope.form[$scope.columns[c].key] =
-                locals.default_cols[$scope.columns[c].key];
+                    locals.default_cols[$scope.columns[c].key];
             }
         };
     };
