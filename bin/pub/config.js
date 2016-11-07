@@ -13,6 +13,7 @@ var config = {
         angular: '/req/angular/angular.min',
         'socket.io-client': '/socket.io/socket.io',
         'angular-chart': '/req/angular-chart.js/dist/angular-chart.min',
+        'angular-sanitize': '/req/angular-sanitize/angular-sanitize.min',
         chart: '/req/chart.js/dist/Chart.bundle.min', // with moment.js
         lodash: '/req/lodash/lodash.min',
         codemirror: '/req/codemirror',
@@ -21,6 +22,7 @@ var config = {
         angular: {exports: 'angular'},
         chart: {exports: 'Chart'},
         bootstrap: {deps: ['jquery']},
+        'angular-sanitize': {deps: ['angular']},
     },
     map: {
         '*': {

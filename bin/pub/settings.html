@@ -87,7 +87,23 @@
     You are using the latest version of the Luminati proxy manager tool
     (<strong>{{$parent.ver_cur}}</strong>).
   </div>
-  <h3>Your credentials:</h3>
+  <h3 class=creds-popover>
+    Your credentials
+    <span class="glyphicon glyphicon-question-sign" data-content="
+      Fill in your credentials from the <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}'>zone page</a>, make sure your IP address
+      {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist (at the same <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}'>zone page</a>),
+      and click <strong>Save and restart</strong>.<br><br>
+      <div class='panel panel-default'><div class=panel-heading>Authentication</div><div class=panel-body>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Customer</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Zone</label></div><div class=col-xs-8>{{$parent.settings.zone}}</div></div>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Password</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Permissions</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Whitelist<br>IPs</label></div><div class='col-xs-8 empty'>&nbsp;<br>&nbsp;</div></div>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Username</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+      </div></div>
+      " id=creds-popover data-toggle=popover>
+    </span>
+  </h3>
   <form ng-if="$root.mode=='root'" name=settings ng-submit=save()>
     <div class=block>
       <div class=form-group>

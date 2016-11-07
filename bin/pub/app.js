@@ -2,11 +2,11 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'socket.io-client', 'lodash', 'moment',
     'codemirror/lib/codemirror', 'codemirror/mode/javascript/javascript',
-    'angular-chart', 'jquery', 'bootstrap', 'bootstrap-datepicker',
-    '_css!app'],
+    'angular-chart', 'jquery', 'angular-sanitize', 'bootstrap',
+    'bootstrap-datepicker', '_css!app'],
 function(angular, io, _, moment, codemirror){
 
-var module = angular.module('app', []);
+var module = angular.module('app', ['ngSanitize']);
 
 module.run(function($rootScope, $http, $window){
     $window.Chart.defaults.global.colors = ['#803690', '#00ADF9', '#46BFBD',
@@ -176,6 +176,9 @@ function root($rootScope, $scope, $http, $window){
                 $window.localStorage.setItem('quickstart', 'show');
         }
     });
+    $http.get('/api/ip').then(function(ip){
+        $scope.ip = ip.data.ip;
+    });
     $http.get('/api/version').then(function(version){
         $scope.ver_cur = version.data.version;
     });
@@ -239,7 +242,7 @@ function settings($scope, $http, $window, $sce){
         $scope.args_password = true;
     };
     $scope.fix_username = function(){
-        var customer = $scope.$parent.settings.customer.trim();
+        var customer = ($scope.$parent.settings.customer||'').trim();
         var zone = ($scope.$parent.settings.zone||'').trim();
         if (!customer.match(/^lum-/))
             return false;
@@ -389,6 +392,19 @@ function settings($scope, $http, $window, $sce){
         };
         $window.$('#confirmation').modal();
     };
+    $window.$('#creds-popover').popover({html: true});
+    $window.$($window.document).on('click', function(e){
+        $window.$('[data-toggle="popover"], [data-original-title]').each(
+            function(){
+            if (!$window.$(this).is(e.target) &&
+                $window.$(this).has(e.target).length==0 &&
+                $window.$('.popover').has(e.target).length==0)
+            {
+                (($window.$(this).popover('hide').data('bs.popover')||{})
+                    .inState||{}).click = false;
+            }
+        });
+    });
 }
 
 module.controller('zones', zones);
@@ -1769,6 +1785,13 @@ function requestFilter(){
             body: r.request_body,
             headers: JSON.parse(r.request_headers),
         }));
+    };
+}
+
+module.filter('actualizeZone', actualizeZone);
+function actualizeZone(){
+    return function(input, zone){
+        return input.replace('[[zone]]', zone);
     };
 }
 
