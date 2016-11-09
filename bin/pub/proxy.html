@@ -41,11 +41,33 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-sticky-ip>
+                      {{consts.history.desc}}
+                    </label>
+                    <select id=proxy-field-history class=form-control
+                      ng-model=_history ng-init="_history =
+                      form.history ? 'yes' : (form.history===undefined
+                      ||form.history==='' ? 'default' : 'no')"
+                      ng-change="binary_changed(form, 'history', _history)">
+                      <option value=no
+                        ng-selected=!form.history&&form.history!==undefined>
+                        no
+                      </option>
+                      <option value=default
+                        ng-selected="form.history===undefined||form.history===''">
+                        default ({{defaults.history ? 'yes' : 'no'}})
+                      </option>
+                      <option value=yes ng-selected=form.history>
+                        yes
+                      </option>
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-sticky-ip>
                       {{consts.ssl.desc}}
                     </label>
                     <select id=proxy-field-ssl class=form-control
                       ng-model=_ssl ng-init="_ssl =
-                      form.ssl ? 'yes' : (form.sticky_ip===undefined
+                      form.ssl ? 'yes' : (form.ssl===undefined
                       ||form.ssl==='' ? 'default' : 'no')"
                       ng-change="binary_changed(form, 'ssl', _ssl)">
                       <option value=no

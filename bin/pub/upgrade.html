@@ -1,14 +1,7 @@
-<div
-  ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last"
+<div ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last"
   class="alert alert-warning settings-alert">
   <div>
-    The latest version of the tool available is
-    <strong>{{$parent.ver_last}}</strong>. You are using
-    <strong>{{$parent.ver_cur}}</strong>.
-  </div>
-  <div class=github>
-    The source code of the Luminati proxy manager tool is available at
-    <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
+    A new version <strong>{{$parent.ver_last}}</strong> is available.
   </div>
   <button type=button class="btn btn-primary" ng-click=upgrade()
     ng-disabled=upgrading||upgrade_error>

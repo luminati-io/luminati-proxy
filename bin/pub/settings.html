@@ -1,15 +1,6 @@
 <div ng-controller=settings>
-  <div ng-if=!status class="alert alert-info settings-alert">
-    <div>
-      Determining the status of your proxy...
-    </div>
-    <button type=button class="btn btn-danger" ng-click=shutdown()
-      ng-disabled=upgrading ng-if="$root.mode=='root'">
-      Shut down
-    </button>
-  </div>
-  <div ng-if=status class="alert settings-alert" ng-class="{'alert-success':
-    status.status=='ok', 'alert-danger': status.status=='error'}">
+  <div ng-if="status && status.status!='ok'"
+    class="alert alert-danger settings-alert">
     <div>
       <span ng-bind-html="status.description | actualizeZone: $parent.settings.zone"></span>
       <ul ng-if=status.description_list>
@@ -18,10 +9,6 @@
         </li>
       </ul>
     </div>
-    <button type=button class="btn btn-danger" ng-click=shutdown()
-      ng-disabled=upgrading ng-if="$root.mode=='root'">
-      Shut down
-    </button>
   </div>
   <div ng-if="$root.mode=='root'&&$parent.$parent.settings.argv" class="alert alert-info">
     The application is running with the following arguments:
@@ -59,9 +46,11 @@
   <h3 class=creds-popover ng-hide="$root.mode!='root'">
     Your credentials
     <span class="glyphicon glyphicon-question-sign" data-content="
-      Fill in your credentials from the <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}'>zone page</a>, make sure your IP address
-      {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist (at the same <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}'>zone page</a>),
-      and click <strong>Save and restart</strong>.<br><br>
+      Fill in your credentials from the <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}' target=_blank>zone page</a>, make sure your IP address
+      {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist (at the same
+      <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}' target=_blank>zone page</a>),
+      and click <strong>Save and restart</strong>.<br>
+      <br>
       <div class='panel panel-default'><div class=panel-heading>Authentication</div><div class=panel-body>
       <div class='form-group clearfix'><div class=col-xs-4><label>Customer</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
       <div class='form-group clearfix'><div class=col-xs-4><label>Zone</label></div><div class=col-xs-8>{{$parent.settings.zone}}</div></div>
@@ -99,27 +88,4 @@
       </div>
     </div>
   </form>
-  <div class="alert alert-warning settings-alert"
-    ng-if="$root.mode=='root'&&ssl_missing">
-    History is used without SSL sniffing. HTTPS URLs will not be fully recorded
-    in the history, only the CONNECT requests will be added to the history.
-  </div>
-  <div class="alert alert-warning settings-alert"
-    ng-if="$root.mode=='root'&&resolve_missing">
-    SOCKs is in use without IP resolution - HTTPS requests will not be served
-    from the proxy peer.
-  </div>
-  <div id=shutdown class="modal fade" role=dialog>
-    <div class=modal-dialog>
-      <div class=modal-content>
-        <div class=modal-header>
-          <h4 class=modal-title>Shutdown</h4>
-        </div>
-        <div class=modal-body>
-          The application has been shut down. To restart,
-          please run it manually and reload this page.
-        </div>
-      </div>
-    </div>
-  </div>
 </div>

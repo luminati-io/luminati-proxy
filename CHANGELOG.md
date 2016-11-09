@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.11
+  - :star: History can now be configured at the proxy level
+  - :sparkles: Warnings on saving proxy if there are any small issues with the
+    settings.
 - v0.8.10
   - :boom: IP resolution file is now to be edited from the tools tab
 - v0.8.9

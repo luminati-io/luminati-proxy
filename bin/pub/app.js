@@ -219,6 +219,21 @@ function root($rootScope, $scope, $http, $window){
         };
         $window.$('#confirmation').modal();
     };
+    $scope.shutdown = function(){
+        $scope.confirmation = {
+            text: 'Are you sure you want to shut down the local proxies?',
+            confirmed: function(){
+                $http.post('/api/shutdown');
+                setTimeout(function(){
+                    $window.$('#shutdown').modal({
+                        backdrop: 'static',
+                        keyboard: false,
+                    });
+                }, 400);
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
 }
 
 module.controller('config', config);
@@ -349,10 +364,6 @@ function settings($scope, $http, $window, $sce){
         $scope.status.description =
             $sce.trustAsHtml($scope.status.description);
     });
-    $scope.ssl_missing =
-        $scope.$parent.settings.history&&!$scope.$parent.settings.ssl;
-    $scope.resolve_missing =
-        !$scope.$parent.settings.resolve&&$scope.$parent.settings.socks;
     var parse_username = function(username){
         var values = {};
         username = username.split('-');
@@ -394,7 +405,6 @@ function settings($scope, $http, $window, $sce){
         $window.$('#confirmation').modal();
         return true;
     };
-    var modals_time = 400;
     var show_reload = function(){
         $window.$('#restarting').modal({
             backdrop: 'static',
@@ -420,21 +430,6 @@ function settings($scope, $http, $window, $sce){
             show_reload();
             check_reload();
         });
-    };
-    $scope.shutdown = function(){
-        $scope.$parent.$parent.confirmation = {
-            text: 'Are you sure you want to shut down the local proxies?',
-            confirmed: function(){
-                $http.post('/api/shutdown');
-                setTimeout(function(){
-                    $window.$('#shutdown').modal({
-                        backdrop: 'static',
-                        keyboard: false,
-                    });
-                }, modals_time);
-            },
-        };
-        $window.$('#confirmation').modal();
     };
     $window.$('#creds-popover').popover({html: true});
     $window.$($window.document).on('click', function(e){
@@ -1751,20 +1746,55 @@ function proxy($scope, $http, $proxies, $window){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value];
         };
         $scope.save = function(proxy){
+            var warnings = [];
+            if ((proxy.history
+                ||proxy.history===undefined&&$scope.defaults.history)
+                &&!(proxy.ssl||proxy.ssl===undefined&&$scope.defaults.ssl))
+            {
+                warnings.push('History without SSL sniffing will not record '
+                    +'HTTPS requests in full, it will only record the CONNECT '
+                    +'request');
+            }
+            if (proxy.socks&&!$scope.defaults.resolve)
+            {
+                warnings.push('SOCKS without using a resolve file will make '
+                    +'HTTPS requests from the super proxy and not from the '
+                    +'proxy peer');
+            }
+            if ((proxy.direct&&(proxy.direct.include||proxy.direct.exclude)
+                ||proxy.bypass_proxy)
+                &&!(proxy.ssl||proxy.ssl===undefined&&$scope.defaults.ssl))
+            {
+                warnings.push('Special URL handling without SSL sniffing will '
+                    +'only be able to handle HTTPS domains, and not specific '
+                    +'URLs');
+            }
+            var save_cont = function(){
             $window.$('#proxy').modal('hide');
-            proxy.persist = true;
-            var data = {proxy: proxy};
-            var promise;
-            var edit = $scope.port&&!locals.duplicate;
-            if (edit)
-                promise = $http.put('/api/proxies/'+$scope.port, data);
-            else
-                promise = $http.post('/api/proxies', data);
-            promise.then(function(){
-                $proxies.update();
-                $window.localStorage.setItem('quickstart-'+
-                    (edit ? 'edit' : 'create')+'-proxy', true);
-            });
+                proxy.persist = true;
+                var data = {proxy: proxy};
+                var promise;
+                var edit = $scope.port&&!locals.duplicate;
+                if (edit)
+                    promise = $http.put('/api/proxies/'+$scope.port, data);
+                else
+                    promise = $http.post('/api/proxies', data);
+                promise.then(function(){
+                    $proxies.update();
+                    $window.localStorage.setItem('quickstart-'+
+                        (edit ? 'edit' : 'create')+'-proxy', true);
+                });
+            };
+            if (warnings.length)
+            {
+                $scope.$parent.$parent.$parent.$parent.confirmation = {
+                    text: 'Warning'+(warnings.length>1?'s':'')+':',
+                    items: warnings,
+                    confirmed: save_cont,
+                };
+                return $window.$('#confirmation').modal();
+            }
+            save_cont();
         };
     };
 }

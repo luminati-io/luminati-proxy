@@ -18,9 +18,17 @@
         <div class=container>
           <img src=/img/menu_logo.svg>
           <span id=version ng-if=ver_cur>V{{ver_cur}}</span>
+          <div class=dropdown ng-if=settings.customer>
+            <a href=# class=dropdown-toggle data-toggle=dropdown>
+              {{settings.customer}}<span class=caret></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href=# ng-click=shutdown()>Shut down</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-      <div class=container>
+      <div class="container page-body">
         <div class=navigation>
           <div class=active>
             <span ng-if=settings.customer>
@@ -58,6 +66,9 @@
               &times;
             </button>
             <h4 class=modal-title>{{confirmation.text}}</h4>
+            <ul ng-if=confirmation.items>
+              <li ng-repeat="i in confirmation.items">{{i}}</li>
+            </ul>
           </div>
           <div class=modal-footer>
             <button type=button class="btn btn-default"
@@ -81,6 +92,19 @@
           <div class=modal-body>
             Please wait. The page will be reloaded automatically
             once the application has restarted.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id=shutdown class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>Shutdown</h4>
+          </div>
+          <div class=modal-body>
+            The application has been shut down. To restart,
+            please run it manually and reload this page.
           </div>
         </div>
       </div>

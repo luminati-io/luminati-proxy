@@ -6,12 +6,12 @@ body {
 .popover {
     font-family: "Noto Sans", sans-serif;
 }
-a {
+.page-body a {
     color: #428bca;
     outline: 3px solid transparent;
     border: 1px solid transparent;
 }
-a:hover {
+.page-body a:hover {
     color: white;
     background: #428bca;
     border-color: #428bca;
@@ -29,6 +29,28 @@ code {
 }
 pre.top-margin {
     margin-top: 4px;
+}
+.header .dropdown {
+    float: right;
+    margin: 18px 5px 0 0;
+    font-size: 14px;
+}
+.header .dropdown-toggle {
+    background: white;
+    color: #2d404c;
+    border-radius: 5px;
+    padding: 3px 17px 3px 5px;
+    position: relative;
+    text-decoration: none;
+}
+.header .dropdown-toggle:hover {
+    background-color: #e6e6e6;
+}
+.header .dropdown-toggle .caret {
+    position: absolute;
+    right: 6px;
+    top: 12px;
+    margin: 0;
 }
 .container {
     width: auto;
