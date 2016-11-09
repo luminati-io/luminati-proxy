@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.10
+  - :boom: IP resolution file is now to be edited from the tools tab
 - v0.8.9
   - :boom: Configuration file is now to be edited from the tools tab
 - v0.8.5

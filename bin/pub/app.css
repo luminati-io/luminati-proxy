@@ -541,8 +541,12 @@ div.proxies .panel-heading button {
 .github {
     margin-top: 12px;
 }
-#config-textarea, #config-textarea + .CodeMirror {
+#config-textarea, #config-textarea + .CodeMirror, #resolve-textarea {
     width: 100%;
     height: 400px;
+    margin-bottom: 18px;
+}
+.resolve-add-host {
+    margin-top: -6px;
     margin-bottom: 18px;
 }

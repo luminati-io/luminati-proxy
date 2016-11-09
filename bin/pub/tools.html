@@ -273,9 +273,74 @@
           <button type=button class="btn btn-success" ng-click=save()>
             Save and restart
           </button>
-          <button type=button class="btn btn-warning" ng-click=update()>
-            Restore/update
+          <button type=button class="btn btn-default" ng-click=cancel()>
+            Cancel
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default" id=resolve-panel
+    ng-if="$root.mode=='root' && $parent.settings.resolve &&
+    $parent.settings.resolve!==true">
+    <div class=panel-heading>
+      <a data-toggle=collapse data-parent=#tools href=#resolve>
+        IP resolution file
+      </a>
+    </div>
+    <div id=resolve class="panel-collapse collapse" ng-controller=resolve>
+      <div class=panel-body>
+        <textarea class=form-control ng-model=resolve.text
+          id=resolve-textarea></textarea>
+        <div class=resolve-add-host>
+          <button type=button ng-click=new_host()
+            class="center-block btn btn-primary">
+            Add host
+          </button>
+        </div>
+        <div class=text-center>
+          <button type=button class="btn btn-success" ng-click=save()>
+            Save and restart
+          </button>
+          <button type=button class="btn btn-default" ng-click=cancel()>
+            Cancel
+          </button>
+        </div>
+      </div>
+      <div id=resolve_add class="modal fade" role=dialog>
+        <div class=modal-dialog>
+          <div class=modal-content>
+            <form name=resolve_frm
+              ng-submit="add_host(); resolve_frm.$setPristine()">
+              <div class=modal-header>
+                <button type=button class=close data-dismiss=modal>
+                  &times;
+                </button>
+                <h4 class=modal-title>Adding Host</h4>
+              </div>
+              <div class=modal-body>
+                <input type=text class=form-control placeholder=Host
+                  ng-model=host.host ng-required=true>
+              </div>
+              <div class=modal-footer>
+                <div class="alert alert-danger alert-inline"
+                  ng-if=error&&resolve_frm.$pristine>
+                  The host could not be resolved
+                </div>
+                <button type=button class="btn btn-default"
+                  ng-if=!adding data-dismiss=modal>
+                  Cancel
+                </button>
+                <div class="alert alert-info alert-inline" ng-if=adding>
+                  Resolving...
+                </div>
+                <button type=submit class="btn btn-success"
+                  ng-disabled=!resolve_frm.$valid||resolve_frm.$pristine||adding>
+                  Add
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

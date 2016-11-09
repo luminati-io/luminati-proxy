@@ -229,9 +229,6 @@ function config($scope, $http, $window){
         setTimeout(function(){
             $scope.codemirror = codemirror.fromTextArea(
                 $window.$('#config-textarea').get(0), {mode: 'javascript'});
-            $window.$('#config-panel').on('shown.bs.collapse', function(){
-                $scope.codemirror.refresh();
-            });
         }, 0);
     });
     var show_reload = function(){
@@ -260,24 +257,87 @@ function config($scope, $http, $window){
         $window.$('#confirmation').modal();
     };
     $scope.update = function(){
-        var do_update = function(){
-            $http.get('/api/config').then(function(config){
-                $scope.config = config.data.config;
-                $scope.codemirror.setValue($scope.config);
-                $scope.codemirror.scrollTo(0, 0);
-                $scope.codemirror.refresh();
-            });
-        };
-        if ($scope.codemirror.getValue() == $scope.config)
-            do_update();
-        else
-        {
-            $scope.$parent.$parent.$parent.confirmation = {
-                text: 'Are you sure you want to discard all the changes?',
-                confirmed: do_update,
-            };
-            $window.$('#confirmation').modal();
-        }
+        $http.get('/api/config').then(function(config){
+            $scope.config = config.data.config;
+            $scope.codemirror.setValue($scope.config);
+        });
+    };
+    $window.$('#config-panel')
+    .on('hidden.bs.collapse', $scope.update)
+    .on('show.bs.collapse', function(){
+        setTimeout(function(){
+            $scope.codemirror.scrollTo(0, 0);
+            $scope.codemirror.refresh();
+        }, 0);
+    });
+    $scope.cancel = function(){
+        $window.$('#config-panel > .collapse').collapse('hide');
+    };
+}
+
+module.controller('resolve', resolve);
+resolve.$inject = ['$scope', '$http', '$window'];
+function resolve($scope, $http, $window){
+    $scope.resolve = {text: ''};
+    $scope.update = function(){
+        $http.get('/api/resolve').then(function(resolve){
+            $scope.resolve.text = resolve.data.resolve;
+        });
+    };
+    $scope.update();
+    var show_reload = function(){
+        $window.$('#restarting').modal({
+            backdrop: 'static',
+            keyboard: false,
+        });
+    };
+    var check_reload = function(){
+        $http.get('/api/config').error(
+            function(){ setTimeout(check_reload, 500); })
+        .then(function(){ $window.location.reload(); });
+    };
+    $scope.save = function(){
+        show_reload();
+        $http.post('/api/resolve', {resolve: $scope.resolve.text})
+        .then(check_reload);
+    };
+    $window.$('#resolve-panel')
+    .on('hidden.bs.collapse', $scope.update)
+    .on('show.bs.collapse', function(){
+        setTimeout(function(){
+            $window.$('#resolve-textarea').scrollTop(0).scrollLeft(0);
+        }, 0);
+    });
+    $scope.cancel = function(){
+        $window.$('#resolve-panel > .collapse').collapse('hide');
+    };
+    $scope.new_host = function(){
+        $window.$('#resolve_add').one('shown.bs.modal', function(){
+            $window.$('#resolve_add input').select();
+        }).modal();
+    };
+    $scope.add_host = function(){
+        $scope.adding = true;
+        $scope.error = false;
+        var host = $scope.host.host.trim();
+        $http.get('/api/resolve_host/'+host)
+        .then(function(ips){
+            $scope.adding = false;
+            if (ips.data.ips&&ips.data.ips.length)
+            {
+                for (var i=0; i<ips.data.ips.length; i++)
+                    $scope.resolve.text += '\n'+ips.data.ips[i]+' '+host;
+                setTimeout(function(){
+                    var textarea = $window.$('#resolve-textarea');
+                    textarea.scrollTop(textarea.prop('scrollHeight'));
+                }, 0);
+                $scope.host.host = '';
+                $scope.resolve_frm.$setPristine();
+                $window.$('#resolve_add').modal('hide');
+            }
+            else
+                $scope.error = true;
+        });
     };
 }
 
@@ -293,16 +353,6 @@ function settings($scope, $http, $window, $sce){
         $scope.$parent.settings.history&&!$scope.$parent.settings.ssl;
     $scope.resolve_missing =
         !$scope.$parent.settings.resolve&&$scope.$parent.settings.socks;
-    $scope.resolve_auto = $scope.$parent.settings.resolve===true;
-    $scope.resolve_file = $scope.$parent.settings.resolve &&
-        $scope.$parent.settings.resolve!==true;
-    $scope.update_resolve = function(){
-        $http.get('/api/resolve').then(function(resolve){
-            $scope.resolve = {text: resolve.data.resolve};
-        });
-    };
-    if ($scope.resolve_file)
-        $scope.update_resolve();
     var parse_username = function(username){
         var values = {};
         username = username.split('-');
@@ -369,42 +419,6 @@ function settings($scope, $http, $window, $sce){
             $window.localStorage.setItem('quickstart-creds', true);
             show_reload();
             check_reload();
-        });
-    };
-    $scope.edit_resolve = function(){
-        $window.$('#resolve').modal();
-    };
-    $scope.save_resolve = function(){
-        setTimeout(show_reload, modals_time);
-        $http.post('/api/resolve', {resolve: $scope.resolve.text})
-        .then(check_reload);
-    };
-    $scope.resolve_new = function(){
-        $window.$('#resolve_add').one('shown.bs.modal', function(){
-            $window.$('#resolve_add input').select();
-        }).modal();
-    };
-    $scope.resolve_add = function(){
-        $scope.resolve_adding = true;
-        $scope.resolve_error = false;
-        var host = $scope.resolve_host.host.trim();
-        $http.get('/api/resolve_host/'+host)
-        .then(function(ips){
-            $scope.resolve_adding = false;
-            if (ips.data.ips&&ips.data.ips.length)
-            {
-                for (var i=0; i<ips.data.ips.length; i++)
-                    $scope.resolve.text += '\n'+ips.data.ips[i]+' '+host;
-                setTimeout(function(){
-                    var textarea = $window.$('#resolve textarea');
-                    textarea.scrollTop(textarea.prop('scrollHeight'));
-                }, 0);
-                $scope.resolve_host.host = '';
-                $scope.resolve_frm.$setPristine();
-                $window.$('#resolve_add').modal('hide');
-            }
-            else
-                $scope.resolve_error = true;
         });
     };
     $scope.shutdown = function(){

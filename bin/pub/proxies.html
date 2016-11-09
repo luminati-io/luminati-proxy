@@ -1,4 +1,8 @@
 <ng-include src="'/upgrade.html'"></ng-include>
+<div class="alert alert-info settings-alert"
+  ng-if="$root.mode=='root'&&$parent.settings.resolve===true">
+  IP resolution is done automatically.
+</div>
 <div ng-controller=proxies>
   <div ng-hide=proxies class="alert alert-info">
     Loading...
