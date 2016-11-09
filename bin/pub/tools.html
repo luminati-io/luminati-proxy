@@ -1,3 +1,4 @@
+<ng-include src="'/upgrade.html'"></ng-include>
 <div class=panel-group id=tools>
   <div class="panel panel-default">
     <div class=panel-heading>
@@ -255,6 +256,26 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default" id=config-panel ng-if="$root.mode=='root'">
+    <div class=panel-heading>
+      <a data-toggle=collapse data-parent=#tools href=#config>
+        Configuration file
+      </a>
+    </div>
+    <div id=config class="panel-collapse collapse" ng-controller=config>
+      <div class=panel-body>
+        <textarea id=config-textarea>{{config}}</textarea>
+        <div class=text-center>
+          <button type=button class="btn btn-success" ng-click=save()>
+            Save and restart
+          </button>
+          <button type=button class="btn btn-warning" ng-click=update()>
+            Restore/update
+          </button>
         </div>
       </div>
     </div>

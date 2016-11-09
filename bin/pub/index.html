@@ -17,6 +17,7 @@
       <div class=header>
         <div class=container>
           <img src=/img/menu_logo.svg>
+          <span id=version ng-if=ver_cur>V{{ver_cur}}</span>
         </div>
       </div>
       <div class=container>
@@ -67,6 +68,19 @@
               data-dismiss=modal ng-click=confirmation.confirmed()>
               OK
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id=restarting class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>Restarting...</h4>
+          </div>
+          <div class=modal-body>
+            Please wait. The page will be reloaded automatically
+            once the application has restarted.
           </div>
         </div>
       </div>

@@ -191,6 +191,94 @@ function root($rootScope, $scope, $http, $window){
     $http.get('/api/node_version').then(function(node){
         $scope.ver_node = node.data;
     });
+    var show_reload = function(){
+        $window.$('#restarting').modal({
+            backdrop: 'static',
+            keyboard: false,
+        });
+    };
+    var check_reload = function(){
+        $http.get('/api/config').error(
+            function(){ setTimeout(check_reload, 500); })
+        .then(function(){ $window.location.reload(); });
+    };
+    $scope.upgrade = function(){
+        $scope.confirmation = {
+            text: 'The application will be upgraded and restarted.',
+            confirmed: function(){
+                $scope.upgrading = true;
+                $http.post('/api/upgrade').error(function(){
+                    $scope.upgrading = false;
+                    $scope.upgrade_error = true;
+                }).then(function(data){
+                    $scope.upgrading = false;
+                    show_reload();
+                    check_reload();
+                });
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
+}
+
+module.controller('config', config);
+config.$inject = ['$scope', '$http', '$window'];
+function config($scope, $http, $window){
+    $http.get('/api/config').then(function(config){
+        $scope.config = config.data.config;
+        setTimeout(function(){
+            $scope.codemirror = codemirror.fromTextArea(
+                $window.$('#config-textarea').get(0), {mode: 'javascript'});
+            $window.$('#config-panel').on('shown.bs.collapse', function(){
+                $scope.codemirror.refresh();
+            });
+        }, 0);
+    });
+    var show_reload = function(){
+        $window.$('#restarting').modal({
+            backdrop: 'static',
+            keyboard: false,
+        });
+    };
+    var check_reload = function(){
+        $http.get('/api/config').error(
+            function(){ setTimeout(check_reload, 500); })
+        .then(function(){ $window.location.reload(); });
+    };
+    $scope.save = function(){
+        $scope.$parent.$parent.$parent.confirmation = {
+            text: 'Editing the configuration manually may result in your '
+                +'proxies working incorrectly. Do you still want to modify '
+                +'the configuration file?',
+            confirmed: function(){
+                $scope.config = $scope.codemirror.getValue();
+                show_reload();
+                $http.post('/api/config', {config: $scope.config})
+                .then(check_reload);
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
+    $scope.update = function(){
+        var do_update = function(){
+            $http.get('/api/config').then(function(config){
+                $scope.config = config.data.config;
+                $scope.codemirror.setValue($scope.config);
+                $scope.codemirror.scrollTo(0, 0);
+                $scope.codemirror.refresh();
+            });
+        };
+        if ($scope.codemirror.getValue() == $scope.config)
+            do_update();
+        else
+        {
+            $scope.$parent.$parent.$parent.confirmation = {
+                text: 'Are you sure you want to discard all the changes?',
+                confirmed: do_update,
+            };
+            $window.$('#confirmation').modal();
+        }
+    };
 }
 
 module.controller('settings', settings);
@@ -200,13 +288,6 @@ function settings($scope, $http, $window, $sce){
         $scope.status = status.data;
         $scope.status.description =
             $sce.trustAsHtml($scope.status.description);
-    });
-    $http.get('/api/config').then(function(config){
-        $scope.config = config.data.config;
-        $scope.codemirror = codemirror.fromTextArea(
-            $window.$('#config textarea').get(0), {
-            mode: 'javascript',
-        });
     });
     $scope.ssl_missing =
         $scope.$parent.settings.history&&!$scope.$parent.settings.ssl;
@@ -290,40 +371,6 @@ function settings($scope, $http, $window, $sce){
             check_reload();
         });
     };
-    $scope.edit_config = function(){
-        $scope.$parent.$parent.confirmation = {
-            text: 'Editing the configuration manually may result in your '
-                +'proxies working incorrectly. Do you still want to modify '
-                +'the configuration file?',
-            confirmed: function(){
-                var ctime = Date.now();
-                $http.get('/api/config').then(function(config){
-                    $scope.config = config.data.config;
-                    $scope.codemirror.setValue($scope.config);
-                    setTimeout(function(){
-                        $window.$('#config').one('shown.bs.modal', function(){
-                            $scope.codemirror.scrollTo(0, 0);
-                            $scope.codemirror.refresh();
-                        }).modal();
-                    }, Math.max(0, modals_time-(Date.now()-ctime)));
-                });
-            },
-        };
-        $window.$('#confirmation').modal();
-    };
-    $scope.update_config = function(){
-        $http.get('/api/config').then(function(config){
-            $scope.config = config.data.config;
-            var scroll = $scope.codemirror.getScrollInfo();
-            $scope.codemirror.setValue($scope.config);
-            $scope.codemirror.scrollTo(scroll.left, scroll.top);
-        });
-    };
-    $scope.save_config = function(){
-        $scope.config = $scope.codemirror.getValue();
-        setTimeout(show_reload, modals_time);
-        $http.post('/api/config', {config: $scope.config}).then(check_reload);
-    };
     $scope.edit_resolve = function(){
         $window.$('#resolve').modal();
     };
@@ -371,23 +418,6 @@ function settings($scope, $http, $window, $sce){
                         keyboard: false,
                     });
                 }, modals_time);
-            },
-        };
-        $window.$('#confirmation').modal();
-    };
-    $scope.upgrade = function(){
-        $scope.$parent.$parent.confirmation = {
-            text: 'The application will be upgraded and restarted.',
-            confirmed: function(){
-                $scope.upgrading = true;
-                $http.post('/api/upgrade').error(function(){
-                    $scope.upgrading = false;
-                    $scope.upgrade_error = true;
-                }).then(function(data){
-                    $scope.upgrading = false;
-                    show_reload();
-                    check_reload();
-                });
             },
         };
         $window.$('#confirmation').modal();
@@ -1124,6 +1154,10 @@ function proxies($scope, $http, $proxies, $window){
 module.controller('history', history);
 history.$inject = ['$scope', '$http', '$filter', '$window'];
 function history($scope, $http, $filter, $window){
+    $scope.hola_headers = [];
+    $http.get('/api/hola_headers').then(function(h){
+        $scope.hola_headers = h.data;
+    });
     $scope.init = function(locals){
         var loader_delay = 100;
         $scope.initial_loading = true;
@@ -1345,6 +1379,24 @@ function history($scope, $http, $filter, $window){
                                     +'hostname, it will not be served from the'
                                     +' proxy peer. It could mean a resolve '
                                     +'configuration issue when using SOCKS.',
+                            });
+                        }
+                        var sensitive_headers = [];
+                        for (var i in $scope.hola_headers)
+                        {
+                            if (request_headers[$scope.hola_headers[i]])
+                                sensitive_headers.push($scope.hola_headers[i]);
+                        }
+                        if (sensitive_headers.length)
+                        {
+                            add_alert({
+                                type: 'sensitive_header',
+                                title: 'Sensitive request header',
+                                description: (sensitive_headers.length>1 ?
+                                    'There are sensitive request headers' :
+                                    'There is sensitive request header')
+                                    +' in the request: '
+                                    +sensitive_headers.join(', '),
                             });
                         }
                         r.alerts = alerts;

@@ -42,12 +42,12 @@ npm install -g luminati-io/luminati-proxy
   [nave](https://github.com/isaacs/nave))
 - Install Luminati Proxy from the terminal prompt:
 ```sh
-$ sudo npm install -g luminati-io/luminati-proxy
+sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Upgrade
 - Use npm to upgrade
 ```sh
-$ sudo npm install -g luminati-io/luminati-proxy
+sudo npm install -g luminati-io/luminati-proxy
 ```
 ### Release Notes
 

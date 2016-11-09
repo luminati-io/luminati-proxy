@@ -53,41 +53,10 @@
       After node upgrade you should uninstall and then reinstall this tool
       using:
     </div>
-    <pre class=top-margin>$ npm uninstall -g luminati-io/luminati-proxy</pre>
-    <pre class=top-margin>$ npm install -g luminati-io/luminati-proxy</pre>
+    <pre class=top-margin>npm uninstall -g luminati-io/luminati-proxy</pre>
+    <pre class=top-margin>npm install -g luminati-io/luminati-proxy</pre>
   </div>
-  <div
-    ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last"
-    class="alert alert-warning settings-alert">
-    <div>
-      The latest version of the tool available is
-      <strong>{{$parent.ver_last}}</strong>. You are using
-      <strong>{{$parent.ver_cur}}</strong>. To upgrade, run the following
-      command:
-    </div>
-    <pre class=top-margin>$ npm install -g luminati-io/luminati-proxy</pre>
-    <div>
-      The source code of the Luminati proxy manager tool is available at
-      <a href=https://github.com/luminati-io/luminati-proxy>GitHub</a>.
-    </div>
-    <button type=button class="btn btn-primary" ng-click=upgrade()
-      ng-disabled=upgrading||upgrade_error>
-      Upgrade
-    </button>
-    <div class="alert alert-info settings-inner-alert" ng-if=upgrading>
-      Upgrading...
-    </div>
-    <div class="alert alert-danger settings-inner-alert" ng-if=upgrade_error>
-      Error
-    </div>
-  </div>
-  <div
-    ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur==$parent.ver_last"
-    class="alert alert-success">
-    You are using the latest version of the Luminati proxy manager tool
-    (<strong>{{$parent.ver_cur}}</strong>).
-  </div>
-  <h3 class=creds-popover>
+  <h3 class=creds-popover ng-hide="$root.mode!='root'">
     Your credentials
     <span class="glyphicon glyphicon-question-sign" data-content="
       Fill in your credentials from the <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}'>zone page</a>, make sure your IP address
@@ -98,7 +67,7 @@
       <div class='form-group clearfix'><div class=col-xs-4><label>Zone</label></div><div class=col-xs-8>{{$parent.settings.zone}}</div></div>
       <div class='form-group clearfix'><div class=col-xs-4><label>Password</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
       <div class='form-group clearfix'><div class=col-xs-4><label>Permissions</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Whitelist<br>IPs</label></div><div class='col-xs-8 empty'>&nbsp;<br>&nbsp;</div></div>
+      <div class='form-group clearfix'><div class=col-xs-4><label>Whitelist<br>IPs</label></div><div class=col-xs-8>{{$parent.ip}}</div></div>
       <div class='form-group clearfix'><div class=col-xs-4><label>Username</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
       </div></div>
       " id=creds-popover data-toggle=popover>
@@ -130,16 +99,6 @@
       </div>
     </div>
   </form>
-  <div class="alert alert-info settings-alert"
-    ng-if="$root.mode=='root'&&$parent.settings.config">
-    <div>
-      Path to the configuration file:
-      <strong>{{$parent.$parent.settings.config}}</strong>
-    </div>
-    <button type=button class="btn btn-warning" ng-click=edit_config()>
-      Edit
-    </button>
-  </div>
   <div class="alert alert-warning settings-alert"
     ng-if="$root.mode=='root'&&ssl_missing">
     History is used without SSL sniffing. HTTPS URLs will not be fully recorded
@@ -163,35 +122,6 @@
     <button type=button class="btn btn-warning" ng-click=edit_resolve()>
       Edit
     </button>
-  </div>
-  <div id=config class="modal fade" role=dialog>
-    <div class=modal-dialog>
-      <div class=modal-content>
-        <div class=modal-header>
-          <button type=button class=close data-dismiss=modal>
-            &times;
-          </button>
-          <button type=button class="btn btn-default btn-title"
-            ng-click=update_config()>
-            Update
-          </button>
-          <h4 class=modal-title>Configuration</h4>
-        </div>
-        <div class=modal-body>
-          <textarea>{{config}}</textarea>
-        </div>
-        <div class=modal-footer>
-          <button type=button class="btn btn-default"
-            data-dismiss=modal>
-            Cancel
-          </button>
-          <button type=button class="btn btn-success"
-            data-dismiss=modal ng-click=save_config()>
-            Save and restart
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
   <div id=resolve class="modal fade" role=dialog>
     <div class=modal-dialog>
@@ -257,19 +187,6 @@
             </button>
           </div>
         </form>
-      </div>
-    </div>
-  </div>
-  <div id=restarting class="modal fade" role=dialog>
-    <div class=modal-dialog>
-      <div class=modal-content>
-        <div class=modal-header>
-          <h4 class=modal-title>Restarting...</h4>
-        </div>
-        <div class=modal-body>
-          Please wait. The page will be reloaded automatically
-          once the application has restarted.
-        </div>
       </div>
     </div>
   </div>
