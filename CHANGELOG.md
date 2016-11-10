@@ -1,15 +1,19 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.13
+  - :star: Support core dump on crush using optional dependency in
+    [core-dump](https://www.npmjs.com/package/core-dump)
+  - :bug: History bug fix
 - v0.8.12
-  - :boom: Settings page replaced with login flow
+  - :star: Settings page replaced with login flow
 - v0.8.11
   - :star: History can now be configured at the proxy level
   - :sparkles: Warnings on saving proxy if there are any small issues with the
     settings.
 - v0.8.10
-  - :boom: IP resolution file is now to be edited from the tools tab
+  - :sparkles: IP resolution file is now to be edited from the tools tab
 - v0.8.9
-  - :boom: Configuration file is now to be edited from the tools tab
+  - :sparkles: Configuration file is now to be edited from the tools tab
 - v0.8.5
   - :star: cache super-proxy IPs between runs in local DB
   - :boom: /api/create endpoint was removed, the same functionality can be done   using a POST request to /api/proxies

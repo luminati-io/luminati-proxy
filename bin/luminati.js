@@ -5,6 +5,9 @@ const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const pm2 = require('pm2');
 const etask = hutil.etask;
+try{
+    require('core-dump');
+} catch(e){}
 let manager, args = process.argv.slice(2);
 if (args.some(arg=>arg=='-d' || arg=='--daemon'))
 {
@@ -26,17 +29,13 @@ if (process.platform=='win32')
     .on('SIGINT', ()=>process.emit('SIGINT'));
 }
 
-const config_changed = ()=>{
-    if (!manager.argv.config)
-        args = manager.get_params();
-    manager.stop(true, null, true);
-    setTimeout(run, 0);
-};
-
-const run = ()=>{
+(function run(){
     manager = new Manager(args);
-    manager.on('stop', ()=>process.exit()).on('config_changed', config_changed)
-    .start();
-};
-
-run();
+    manager.on('stop', ()=>process.exit());
+    manager.on('config_changed', etask.fn(function*(){
+        args = manager.argv.config ? args : manager.get_params();
+        yield manager.stop(true, true);
+        setTimeout(run, 0);
+    }));
+    manager.start();
+})();

@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.8.12",
+  "version": "0.8.13",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -18,7 +18,7 @@
     "hola"
   ],
   "author": "Gilad Novik <gilad@hola.org>",
-  "license": "MIT",
+  "license": "ISC",
   "preferGlobal": "true",
   "bin": {
     "luminati-proxy": "bin/luminati.js",
@@ -82,9 +82,6 @@
     "webpack": "^1.13.3",
     "winston": "^2.3.0",
     "yargs": "^6.3.0"
-  },
-  "optionalDependencies": {
-    "webshot": "^0.18.0"
   },
   "devDependencies": {
     "mocha": "^3.1.2"

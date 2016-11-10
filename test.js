@@ -190,8 +190,11 @@ const http_ping = ()=>etask(function*http_ping(){
 });
 let proxy, ping;
 before(()=>etask(function*(){
+    console.log('Initiate test super-proxy'); // XXX lee temp output for travis
     proxy = yield http_proxy();
+    console.log('Initiate test target site');
     ping = yield http_ping();
+    console.log('Initiation done');
 }));
 beforeEach(()=>{
     proxy.fake = true;
