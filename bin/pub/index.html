@@ -18,21 +18,22 @@
         <div class=container>
           <img src=/img/menu_logo.svg>
           <span id=version ng-if=ver_cur>V{{ver_cur}}</span>
-          <div class=dropdown ng-if=settings.customer>
+          <div class=dropdown ng-if="$root.section!='settings'">
             <a href=# class=dropdown-toggle data-toggle=dropdown>
               {{settings.customer}}<span class=caret></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
+              <li><a href=# ng-click=logout()>Log out</a></li>
               <li><a href=# ng-click=shutdown()>Shut down</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="container page-body">
-        <div class=navigation>
+        <div class=navigation ng-if="$root.section!='settings'">
           <div class=active>
             <span ng-if=settings.customer>
-              <a href=/settings>{{settings.customer}}</a>
+              {{settings.customer}}
               <span class=separator>&nbsp;/&nbsp;</span>
             </span>
             <span ng-if=!subsection>
@@ -45,8 +46,8 @@
             </span>
           </div>
           <div class=items>
-            <span ng-repeat="s in sections">
-              <span ng-if="$index&gt;0" class=separator>&nbsp;|&nbsp;</span>
+            <span ng-repeat="s in sections" ng-if=$index&gt;0>
+              <span ng-if="$index&gt;1" class=separator>&nbsp;|&nbsp;</span>
               <a ng-if=s!=section||subsection href=/{{s.name}}>{{s.title}}</a>
               <span ng-if=s==section&&!subsection>{{s.title}}</span>
             </span>

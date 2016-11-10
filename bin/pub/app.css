@@ -572,3 +572,6 @@ div.proxies .panel-heading button {
     margin-top: -6px;
     margin-bottom: 18px;
 }
+#settings-page {
+    padding-top: 20px;
+}

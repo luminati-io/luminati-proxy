@@ -18,9 +18,17 @@ module.run(function($rootScope, $http, $window){
         $rootScope.subsection = l.split('/').pop();
     }
     else
-        $rootScope.section = l.split('/').pop();
-    $http.get('/api/mode').then(function(mode){
-        $rootScope.mode = mode.data.mode;
+        $rootScope.section = l.split('/').pop()||'settings';
+    $http.get('/api/mode').then(function(data){
+        var logged_in = data.data.logged_in;
+        if (logged_in)
+            $window.localStorage.setItem('quickstart-creds', true);
+        if (!logged_in && $rootScope.section!='settings')
+            $window.location = '/';
+        if (logged_in && $rootScope.section=='settings')
+            $window.location = '/proxies';
+        $rootScope.mode = data.data.mode;
+        $rootScope.login_failure = data.data.login_failure;
     });
 });
 
@@ -170,9 +178,7 @@ function root($rootScope, $scope, $http, $window){
         $scope.settings = settings.data;
         if (!$scope.settings.request_disallowed&&!$scope.settings.customer)
         {
-            if ($scope.section.name!='settings')
-                $window.location = 'settings';
-            else if (!$window.localStorage.getItem('quickstart'))
+            if (!$window.localStorage.getItem('quickstart'))
                 $window.localStorage.setItem('quickstart', 'show');
         }
     });
@@ -233,6 +239,11 @@ function root($rootScope, $scope, $http, $window){
             },
         };
         $window.$('#confirmation').modal();
+    };
+    $scope.logout = function(){
+        $http.post('/api/logout').then(function(){
+            $window.location = '/';
+        });
     };
 }
 
@@ -359,11 +370,6 @@ function resolve($scope, $http, $window){
 module.controller('settings', settings);
 settings.$inject = ['$scope', '$http', '$window', '$sce'];
 function settings($scope, $http, $window, $sce){
-    $http.get('/api/status').then(function(status){
-        $scope.status = status.data;
-        $scope.status.description =
-            $sce.trustAsHtml($scope.status.description);
-    });
     var parse_username = function(username){
         var values = {};
         username = username.split('-');
@@ -414,7 +420,7 @@ function settings($scope, $http, $window, $sce){
     var check_reload = function(){
         $http.get('/api/config').error(
             function(){ setTimeout(check_reload, 500); })
-        .then(function(){ $window.location.reload(); });
+        .then(function(){ $window.location = '/proxies'; });
     };
     $scope.save = function(){
         if ($scope.fix_username())
@@ -426,7 +432,6 @@ function settings($scope, $http, $window, $sce){
             password: $scope.$parent.settings.password.trim(),
         }).then(function(){
             $scope.saving = false;
-            $window.localStorage.setItem('quickstart-creds', true);
             show_reload();
             check_reload();
         });
@@ -1881,14 +1886,6 @@ function requestFilter(){
             body: r.request_body,
             headers: JSON.parse(r.request_headers),
         }));
-    };
-}
-
-module.filter('actualizeZone', actualizeZoneFilter);
-actualizeZoneFilter.$inject = ['$sce'];
-function actualizeZoneFilter($sce){
-    return function(input, zone){
-        return $sce.trustAsHtml($sce.valueOf(input).replace('[[zone]]', zone));
     };
 }
 
