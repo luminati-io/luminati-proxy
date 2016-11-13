@@ -875,17 +875,17 @@ function proxies($scope, $http, $proxies, $window){
         {
             key: 'max_requests',
             title: 'Max requests',
-            type: 'number',
+            type: 'text',
             check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
+                return v.trim()==''||v.trim().match(/^\d+(:\d*)?$/);
             },
         },
         {
             key: 'session_duration',
             title: 'Session duration (sec)',
-            type: 'number',
+            type: 'text',
             check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
+                return v.trim()==''||v.trim().match(/^\d+(:\d*)?$/);
             },
         },
         {
@@ -1729,6 +1729,21 @@ function proxy($scope, $http, $proxies, $window){
             $scope.form.port = port;
             $scope.form.socks = socks;
         }
+        if ($scope.form.max_requests)
+        {
+            var max_requests = (''+$scope.form.max_requests).split(':');
+            $scope.form.max_requests_start = +max_requests[0];
+            $scope.form.max_requests_end = +max_requests[1];
+        }
+        if ($scope.form.max_requests==0)
+            $scope.form.max_requests_start = 0;
+        if ($scope.form.session_duration)
+        {
+            var session_duration = (''+$scope.form.session_duration)
+                .split(':');
+            $scope.form.duration_start = +session_duration[0];
+            $scope.form.duration_end = +session_duration[1];
+        }
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.defaults = {};
         $http.get('/api/defaults').then(function(defaults){
@@ -1761,6 +1776,25 @@ function proxy($scope, $http, $proxies, $window){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value];
         };
         $scope.save = function(proxy){
+            if (!proxy.max_requests_start&&!proxy.max_requests_end
+                &&(proxy.max_requests_start=='0'||proxy.max_requests_end=='0'))
+            {
+                proxy.max_requests = 0;
+            }
+            else if (proxy.max_requests_start&&proxy.max_requests_end)
+            {
+                proxy.max_requests =
+                    proxy.max_requests_start+':'+proxy.max_requests_end;
+            }
+            else
+            {
+                proxy.max_requests =
+                    proxy.max_requests_start||proxy.max_requests_end;
+            }
+            proxy.session_duration =
+                proxy.duration_start&&proxy.duration_end
+                    ?proxy.duration_start+':'+proxy.duration_end
+                    :proxy.duration_start||proxy.duration_end;
             var warnings = [];
             if ((proxy.history
                 ||proxy.history===undefined&&$scope.defaults.history)
@@ -1787,6 +1821,10 @@ function proxy($scope, $http, $proxies, $window){
             var save_cont = function(){
             $window.$('#proxy').modal('hide');
                 proxy.persist = true;
+                delete proxy.max_requests_start;
+                delete proxy.max_requests_end;
+                delete proxy.duration_start;
+                delete proxy.duration_end;
                 var data = {proxy: proxy};
                 var promise;
                 var edit = $scope.port&&!locals.duplicate;

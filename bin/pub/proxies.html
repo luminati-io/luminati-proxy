@@ -11,7 +11,7 @@
     <div class=panel-heading>
       Proxies
       <button type=button class="btn btn-default" ng-click=edit_cols()>
-        Configure columns
+        Columns
       </button>
     </div>
     <div class="panel-body proxies-panel">
@@ -103,10 +103,10 @@
                   class="glyphicon glyphicon-ok">
                 </span>
                 <span ng-if=proxy[col.key]!==true>
-                  <span ng-if=proxy[col.key]>
+                  <span ng-if=proxy[col.key]||proxy[col.key]=='0'>
                     {{proxy[col.key]}}
                   </span>
-                  <span ng-if=!proxy[col.key]>
+                  <span ng-if=!proxy[col.key]&&proxy[col.key]!='0'>
                     &mdash;
                   </span>
                 </span>

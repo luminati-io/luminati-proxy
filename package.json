@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.8.14",
+  "version": "0.8.15",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -85,5 +85,10 @@
   },
   "devDependencies": {
     "mocha": "^3.1.2"
+  },
+  "optionalDependencies": {
+    "core-dump": "0.0.3",
+    "phantomjs-prebuilt": "^2.1.13",
+    "webshot": "^0.18.0"
   }
 }

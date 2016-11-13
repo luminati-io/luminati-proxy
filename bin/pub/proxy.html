@@ -193,20 +193,31 @@
               <div id=proxy-ip-policy class="panel-collapse collapse">
                 <div class=panel-body>
                   <div class=form-group>
-                    <label class=control-label for=proxy-field-max-requests>
+                    <label class=control-label
+                      for=proxy-field-max-requests-start>
                       Max requests
                     </label>
-                    <input id=proxy-field-max-requests type=number
-                      ng-model=form.max_requests class=form-control
-                      placeholder={{consts.max_requests.def}}>
+                    <div class=form-range>
+                      <input id=proxy-field-max-requests-start type=number
+                        ng-model=form.max_requests_start class=form-control
+                        placeholder={{consts.max_requests.def}}>
+                      <span class=range-seperator>:</span>
+                      <input type=number ng-model=form.max_requests_end
+                        class=form-control>
+                    </div>
                   </div>
                   <div class=form-group>
-                    <label class=control-label for=proxy-field-session-dur>
+                    <label class=control-label for=proxy-field-duration-start>
                       Session duration (seconds)
                     </label>
-                    <input id=proxy-field-session-dur type=number
-                      ng-model=form.session_duration class=form-control
-                      placeholder={{consts.session_duration.def}}>
+                    <div class=form-range>
+                      <input id=proxy-field-duration-start type=number
+                        ng-model=form.duration_start class=form-control
+                        placeholder={{consts.session_duration.def}}>
+                      <span class=range-seperator>:</span>
+                      <input type=number ng-model=form.duration_end
+                        class=form-control>
+                    </div>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-pool-size>

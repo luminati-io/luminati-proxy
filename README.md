@@ -58,7 +58,7 @@ You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every ver
 ### First run
 After running the app for the first time:
 ```sh
-$ luminati
+luminati
 ```
 Point your browser to the app admin UI
 [http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
@@ -66,7 +66,7 @@ and configure your proxies.
 
 ### Complete list of command line options
 ```sh
-$ luminati --help
+luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
@@ -138,11 +138,11 @@ Options:
 A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy/](https://hub.docker.com/r/luminati/luminati-proxy/)
 
 ```sh
-$ docker pull luminati/luminati-proxy
+docker pull luminati/luminati-proxy
 
-$ docker run luminati/luminati-proxy
+docker run luminati/luminati-proxy
 
-$ docker run luminati/luminati-proxy luminati --version
+docker run luminati/luminati-proxy luminati --version
 ```
 
 ### SSL Requests

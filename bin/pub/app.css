@@ -584,3 +584,15 @@ div.proxies .panel-heading button {
 .confirmation-items {
     margin-top: 11px;
 }
+.form-range {
+    width: 100%;
+}
+.form-range .form-control {
+    display: inline-block;
+    width: 48%;
+}
+.form-range .range-seperator {
+    display: inline-block;
+    width: 2%;
+    text-align: center;
+}

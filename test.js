@@ -189,12 +189,13 @@ const http_ping = ()=>etask(function*http_ping(){
     return ping;
 });
 let proxy, ping;
-before(()=>etask(function*(){
-    console.log('Initiate test super-proxy'); // XXX lee temp output for travis
+before(etask._fn(function*before(_this){
+    _this.timeout(10000);
+    // XXX lee - temp output for checking travis times
+    console.log('Start prep', new Date());
     proxy = yield http_proxy();
-    console.log('Initiate test target site');
     ping = yield http_ping();
-    console.log('Initiation done');
+    console.log('End prep', new Date());
 }));
 beforeEach(()=>{
     proxy.fake = true;
@@ -309,6 +310,37 @@ describe('proxy', ()=>{
                 t(10);
             });
             describe('max_requests', ()=>{
+                describe('range', ()=>{
+                    const pool = 50;
+                    const t=(name, start, end)=>it(name, ()=>etask(function*(){
+                        l = yield lum({max_requests: start+':'+end,
+                            pool_size: pool});
+                        yield l.refresh_sessions();
+                        let max_requests = l.sessions.map(s=>s.max_requests);
+                        let count = {};
+                        max_requests.forEach(m=>{
+                            if (!start || !end)
+                                assert.equal(m, start || end);
+                            else
+                                assert.ok(start<=m && m<=end);
+                            count[m] = count[m] ? count[m]+1 : 1;
+                        });
+                        if (start && end && start!=end)
+                        {
+                            for (let c in count)
+                                assert.notEqual(count[c], pool);
+                        }
+                    }));
+                    t('valid', 60, 70);
+                    t('same', 50, 50);
+                    t('only end', '', 30);
+                    t('only start', 15, '');
+                });
+                it('disabled', ()=>etask(function*(){
+                    l = yield lum({max_requests: '0'});
+                    assert.equal(l.max_requests, 0);
+                }));
+
                 const test_call = (r, i, p, s)=>etask(function*(){
                     const res = yield l.test();
                     const id = `trial/request/pool ${r}/${i}/${p} `;
