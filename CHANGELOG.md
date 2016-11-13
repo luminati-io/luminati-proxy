@@ -1,11 +1,17 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.14
+  - :boom: Remove support for country specific super proxy (will use super
+    proxy from any country if already configured for a specific country)
+  - :boom: Credential will be rechecked every hour and after every proxy
+    modification
 - v0.8.13
   - :star: Support core dump on crush using optional dependency in
     [core-dump](https://www.npmjs.com/package/core-dump)
   - :bug: History bug fix
 - v0.8.12
   - :star: Settings page replaced with login flow
+  - :boom: Removed /api/status API
 - v0.8.11
   - :star: History can now be configured at the proxy level
   - :sparkles: Warnings on saving proxy if there are any small issues with the

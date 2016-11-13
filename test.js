@@ -460,7 +460,7 @@ describe('proxy', ()=>{
         });
         describe('socks', ()=>{
             const t = (name, url)=>it(name, etask._fn(function*(_this){
-                _this.timeout(3000);
+                _this.timeout(30000);
                 l = yield lum({socks: 25000});
                 let res = yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
@@ -611,7 +611,7 @@ describe('manager', ()=>{
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('socks', ()=>{
         const t = (name, url)=>it(name, etask._fn(function*(_this){
-            _this.timeout(3000);
+            _this.timeout(30000);
             let args = [
                 '--socks', '25000:24000',
             ];

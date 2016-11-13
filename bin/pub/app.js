@@ -29,6 +29,19 @@ module.run(function($rootScope, $http, $window){
             $window.location = '/proxies';
         $rootScope.mode = data.data.mode;
         $rootScope.login_failure = data.data.login_failure;
+        if (logged_in)
+        {
+            var p = 60*60*1000;
+            var recheck = function(){
+                $http.post('/api/recheck').then(function(r){
+                    if (r.data.login_failure)
+                        $window.location = '/';
+                });
+                setTimeout(recheck, p);
+            };
+            var t = +new Date();
+            setTimeout(recheck, p-t%p);
+        }
     });
 });
 
@@ -158,6 +171,22 @@ function root($rootScope, $scope, $http, $window){
             $window.localStorage.setItem('quickstart', 'dismissed');
             $scope.$apply();
         }});
+    };
+    $scope.quickstart_mousedown = function(e){
+        var qs = $window.$('#quickstart');
+        var container = $window.$('.main-container-qs');
+        var width = qs.outerWidth();
+        var body_width = $window.$('body').width();
+        var cx = e.pageX;
+        var mousemove = function(e){
+            var new_width = Math.min(
+                Math.max(width+e.pageX-cx, 150), body_width-250);
+            qs.css('width', new_width+'px');
+            container.css('margin-left', new_width+'px');
+        };
+        $window.$('body').on('mousemove', mousemove).one('mouseup', function(){
+            $window.$('body').off('mousemove', mousemove).css('cursor', '');
+        }).css('cursor', 'col-resize');
     };
     $scope.sections = [
         {name: 'settings', title: 'Settings'},
@@ -456,26 +485,26 @@ zones.$inject = ['$scope', '$http', '$filter', '$window'];
 function zones($scope, $http, $filter, $window){
     $window.localStorage.setItem('quickstart-zones-tools', true);
     var today = new Date();
-    var oneDayAgo = (new Date()).setDate(today.getDate()-1);
-    var twoDaysAgo = (new Date()).setDate(today.getDate()-2);
-    var oneMonthAgo = (new Date()).setMonth(today.getMonth()-1, 1);
-    var twoMonthsAgo = (new Date()).setMonth(today.getMonth()-2, 1);
+    var one_day_ago = (new Date()).setDate(today.getDate()-1);
+    var two_days_ago = (new Date()).setDate(today.getDate()-2);
+    var one_month_ago = (new Date()).setMonth(today.getMonth()-1, 1);
+    var two_months_ago = (new Date()).setMonth(today.getMonth()-2, 1);
     $scope.times = [
-        {title: moment(twoMonthsAgo).format('MMM-YYYY'), key: 'back_m2'},
-        {title: moment(oneMonthAgo).format('MMM-YYYY'), key: 'back_m1'},
+        {title: moment(two_months_ago).format('MMM-YYYY'), key: 'back_m2'},
+        {title: moment(one_month_ago).format('MMM-YYYY'), key: 'back_m1'},
         {title: moment(today).format('MMM-YYYY'), key: 'back_m0'},
-        {title: moment(twoDaysAgo).format('DD-MMM-YYYY'), key: 'back_d2'},
-        {title: moment(oneDayAgo).format('DD-MMM-YYYY'), key: 'back_d1'},
+        {title: moment(two_days_ago).format('DD-MMM-YYYY'), key: 'back_d2'},
+        {title: moment(one_day_ago).format('DD-MMM-YYYY'), key: 'back_d1'},
         {title: moment(today).format('DD-MMM-YYYY'), key: 'back_d0'},
     ];
-    var numberFilter = $filter('requests');
-    var sizeFilter = $filter('bytes');
+    var number_filter = $filter('requests');
+    var size_filter = $filter('bytes');
     $scope.fields = [
-        {key: 'http_svc_req', title: 'HTTP', filter: numberFilter},
-        {key: 'https_svc_req', title: 'HTTPS', filter: numberFilter},
-        {key: 'bw_up', title: 'Upload', filter: sizeFilter},
-        {key: 'bw_dn', title: 'Download', filter: sizeFilter},
-        {key: 'bw_sum', title: 'Total Bandwidth', filter: sizeFilter}
+        {key: 'http_svc_req', title: 'HTTP', filter: number_filter},
+        {key: 'https_svc_req', title: 'HTTPS', filter: number_filter},
+        {key: 'bw_up', title: 'Upload', filter: size_filter},
+        {key: 'bw_dn', title: 'Download', filter: size_filter},
+        {key: 'bw_sum', title: 'Total Bandwidth', filter: size_filter}
     ];
     $http.get('/api/stats').then(function(stats){
         $scope.stats = stats.data;
@@ -947,25 +976,6 @@ function proxies($scope, $http, $proxies, $window){
             type: 'number',
             check: function(v){
                 return v.trim()==''||v.trim().match(/^\d+$/);
-            },
-        },
-        {
-            key: 'proxy',
-            title: 'Super proxy IP or country',
-            type: 'text',
-            check: function(v){
-                v = v.trim();
-                if (v==''||v.match(/^[a-z][a-z]$/))
-                    return true;
-                var m = v.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-                if (!m)
-                    return false;
-                for (var i=1; i<=4; i++)
-                {
-                    if (m[i]!=='0'&&m[i].charAt(0)=='0'||m[i]>255)
-                        return false;
-                }
-                return true;
             },
         },
         {
@@ -1788,6 +1798,10 @@ function proxy($scope, $http, $proxies, $window){
                     $proxies.update();
                     $window.localStorage.setItem('quickstart-'+
                         (edit ? 'edit' : 'create')+'-proxy', true);
+                    $http.post('/api/recheck').then(function(r){
+                        if (r.data.login_failure)
+                            $window.location = '/';
+                    });
                 });
             };
             if (warnings.length)
@@ -1848,7 +1862,7 @@ function timestampFilter(){
 module.filter('requests', requestsFilter);
 requestsFilter.$inject = ['$filter'];
 function requestsFilter($filter){
-    var numberFilter = $filter('number');
+    var number_filter = $filter('number');
     return function(requests, precision){
         if (requests==0 || isNaN(parseFloat(requests))
             || !isFinite(requests))
@@ -1857,21 +1871,21 @@ function requestsFilter($filter){
         }
         if (typeof precision==='undefined')
             precision = 0;
-        return numberFilter(requests, precision);
+        return number_filter(requests, precision);
     };
 }
 
 module.filter('bytes', bytesFilter);
 bytesFilter.$inject = ['$filter'];
 function bytesFilter($filter){
-    var numberFilter = $filter('number');
+    var number_filter = $filter('number');
     return function(bytes, precision){
         if (bytes==0 || isNaN(parseFloat(bytes)) || !isFinite(bytes))
             return '';
         var number = Math.floor(Math.log(bytes) / Math.log(1000));
         if (typeof precision==='undefined')
             precision = number ? 2 : 0;
-        return numberFilter(bytes / Math.pow(1000, Math.floor(number)),
+        return number_filter(bytes / Math.pow(1000, Math.floor(number)),
             precision)+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
     };
 }

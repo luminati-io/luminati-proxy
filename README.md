@@ -74,8 +74,6 @@ Options:
                                                               [default: "error"]
   --customer              Customer                                      [string]
   --password              Password                                      [string]
-  --proxy                 Super proxy ip or country (us|gb|nl)
-                                        [string] [default: "zproxy.luminati.io"]
   --proxy_port            Super proxy port                      [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]

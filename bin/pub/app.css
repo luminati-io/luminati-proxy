@@ -57,7 +57,6 @@ pre.top-margin {
     max-width: 1170px;
 }
 .main-container-qs {
-    width: 75%;
     margin-left: 25%;
 }
 .quickstart {
@@ -69,6 +68,13 @@ pre.top-margin {
     overflow: auto;
     border-right: 1px solid black;
     padding: 12px;
+}
+.qs-move-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    cursor: col-resize;
 }
 .btn-title {
     float: right;
@@ -574,4 +580,7 @@ div.proxies .panel-heading button {
 }
 #settings-page {
     padding-top: 20px;
+}
+.confirmation-items {
+    margin-top: 11px;
 }
