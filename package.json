@@ -10,7 +10,8 @@
   "recomendedNode": "6",
   "scripts": {
     "start": "bin/luminati.js",
-    "test": "./node_modules/mocha/bin/mocha"
+    "test": "./node_modules/mocha/bin/mocha",
+    "test-win": "node node_modules/mocha/bin/mocha"
   },
   "keywords": [
     "luminati",
