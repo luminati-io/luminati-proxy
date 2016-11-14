@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.16
+  - :bug: bypass_proxy bug fix
 - v0.8.15
   - :star: max_requests now support range - where each session gets a random
     max_request value in the range

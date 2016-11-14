@@ -507,6 +507,11 @@ function zones($scope, $http, $filter, $window){
         {key: 'bw_sum', title: 'Total Bandwidth', filter: size_filter}
     ];
     $http.get('/api/stats').then(function(stats){
+        if (stats.data.login_failure)
+        {
+            $window.location = '/';
+            return;
+        }
         $scope.stats = stats.data;
         if (!Object.keys($scope.stats).length)
             $scope.error = true;
@@ -984,6 +989,17 @@ function proxies($scope, $http, $proxies, $window){
             type: 'text',
             check: function(v){
                 return v.trim()==''||v.trim().match(/^(none|full)$/);
+            },
+        },
+        {
+            key: 'bypass_proxy',
+            title: 'Bypass proxy',
+            type: 'text',
+            check: function(v){
+                try {
+                    return v.trim()==''||new RegExp(v.trim(), 'i');
+                }
+                catch(e){ return false; }
             },
         },
     ];
