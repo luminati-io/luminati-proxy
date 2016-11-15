@@ -459,7 +459,7 @@ describe('proxy', ()=>{
         describe('bypass_proxy', ()=>{
             const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
             function*(){
-                l = yield lum(assign({bypass_proxy: 'match'}, opt));
+                l = yield lum(assign({bypass_proxy: 'match', pool_size: 1}, opt));
                 let missmatch = yield match_test(no_match_url());
                 let match = yield match_test(match_url());
                 assert.equal(match.after, match.before);
