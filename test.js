@@ -636,6 +636,8 @@ describe('manager', ()=>{
         if (!app)
             return;
         yield app.manager.stop(true);
+	if (process.platform=='win32')
+            yield etask.sleep(1);
         fs.unlinkSync(app.db_file);
         app = null;
     }));
