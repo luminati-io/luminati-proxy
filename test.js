@@ -636,7 +636,7 @@ describe('manager', ()=>{
         if (!app)
             return;
         yield app.manager.stop(true);
-        fs.unlink(app.db_file);
+        fs.unlinkSync(app.db_file);
         app = null;
     }));
     beforeEach(()=>temp_files = []);
