@@ -190,7 +190,7 @@ const http_ping = ()=>etask(function*http_ping(){
 });
 let proxy, ping;
 before(etask._fn(function*before(_this){
-    _this.timeout(10000);
+    _this.timeout(30000);
     // XXX lee - temp output for checking travis times
     console.log('Start prep', new Date());
     proxy = yield http_proxy();
@@ -235,9 +235,22 @@ describe('proxy', ()=>{
         yield l.listen();
         return l;
     });
+    let l, waiting;
+    const repeat =(n, action)=>{
+        while (n--)
+            action();
+    };
+    const release = n=>repeat(n||1, ()=>waiting.shift()());
+    const hold_request = (next, req)=>{
+        if (req.url!=test_url)
+            return next();
+        waiting.push(next);
+    };
 
-    let l;
-    beforeEach(()=>proxy.history = []);
+    beforeEach(()=>{
+        proxy.history = [];
+        waiting = [];
+    });
     afterEach(()=>etask(function*(){
         if (!l)
             return;
@@ -404,6 +417,27 @@ describe('proxy', ()=>{
                 yield etask.sleep(1500);
                 assert.equal(proxy.history.length, 4);
             }));
+            describe('fastest', ()=>{
+                const t = size=>it(''+size, etask._fn(function*(_this){
+                    // _this.timeout(1000); // XXX lee ====
+                    proxy.connection = hold_request;
+                    l = yield lum({pool_type: 'fastest', pool_size: size});
+                    for (let i = 0; i < size; ++i)
+                    {
+                        assert.equal(waiting.length, 0);
+                        let req = l.test();
+                        yield etask.sleep(100);
+                        assert.equal(waiting.length, size);
+                        waiting.splice(i, 1)[0]();
+                        yield req;
+                        if (waiting.length)
+                            release(waiting.length);
+                        yield etask.sleep(100);
+                    }
+                }));
+                t(1);
+                // t(2);
+            });
         });
         const match_test = url=>etask(function*(){
             let before = proxy.history.length;
@@ -459,7 +493,8 @@ describe('proxy', ()=>{
         describe('bypass_proxy', ()=>{
             const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
             function*(){
-                l = yield lum(assign({bypass_proxy: 'match', pool_size: 1}, opt));
+                l = yield lum(assign({bypass_proxy: 'match', pool_size: 1},
+                    opt));
                 let missmatch = yield match_test(no_match_url());
                 let match = yield match_test(match_url());
                 assert.equal(match.after, match.before);
@@ -510,18 +545,9 @@ describe('proxy', ()=>{
         describe('throttle', ()=>{
             const t = throttle=>it(''+throttle, etask._fn(function*(_this){
                 _this.timeout(3000);
-                let waiting = [], requests = [];
-                const repeat =(n, action)=>{
-                    while (n--)
-                        action();
-                };
+                let requests = [];
                 const request = n=>repeat(n, ()=>requests.push(l.test()));
-                const release = n=>repeat(n, ()=>waiting.shift()());
-                proxy.connection = (next, req)=>{
-                    if (req.url!=test_url)
-                        return next();
-                    waiting.push(next);
-                };
+                proxy.connection = hold_request;
                 l = yield lum({throttle});
                 request(2*throttle);
                 yield etask.sleep(100);
@@ -636,7 +662,7 @@ describe('manager', ()=>{
         if (!app)
             return;
         yield app.manager.stop(true);
-	if (process.platform=='win32')
+        if (process.platform=='win32')
             yield etask.sleep(10);
         fs.unlinkSync(app.db_file);
         app = null;

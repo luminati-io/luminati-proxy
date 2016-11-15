@@ -50,12 +50,10 @@ $proxies.$inject = ['$http', '$q'];
 function $proxies($http, $q){
     var service = {
         subscribe: subscribe,
-        subscribe_stats: subscribe_stats,
         proxies: null,
         update: update_proxies
     };
     var listeners = [];
-    var listeners_stats = [];
     service.update();
     io().on('stats', stats_event);
     return service;
@@ -63,9 +61,6 @@ function $proxies($http, $q){
         listeners.push(func);
         if (service.proxies)
             func(service.proxies);
-    }
-    function subscribe_stats(func){
-        listeners_stats.push(func);
     }
     function update_proxies(){
         return $q.all([$http.get('/api/proxies_running'),
@@ -80,21 +75,20 @@ function $proxies($http, $q){
             proxies.forEach(function(proxy){
                 if (Array.isArray(proxy.proxy)&&proxy.proxy.length==1)
                     proxy.proxy = proxy.proxy[0];
-                proxy.stats = {
-                    total: {
-                        active_requests: [],
-                        status: {codes: ['2xx'], values: [[]]},
-                        max: {requests: 0, codes: 0},
-                    },
-                    ticks: [],
+                proxy.stats_reset = function(){
+                    this.stats = {
+                        total: {
+                            active_requests: [],
+                            status: {codes: ['2xx'], values: [[]]},
+                            max: {requests: 0, codes: 0},
+                        },
+                        ticks: [],
+                    };
+                };
+                proxy.stats_stop = function(){
+                    delete this.stats;
                 };
                 proxy.config = config_index[proxy.port];
-                var data = _.values(proxy._stats);
-                proxy.total_stats = {
-                    requests: _.sumBy(data, 'total_requests'),
-                    inbound: _.sumBy(data, 'total_inbound'),
-                    outbound: _.sumBy(data, 'total_outbound'),
-                };
             });
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
@@ -109,6 +103,8 @@ function $proxies($http, $q){
         {
             var chunk = stats_chunk[port];
             var proxy = _.find(service.proxies, {port: +port});
+            if (!proxy.stats)
+                continue;
             var data = _.values(chunk);
             var stats = proxy.stats;
             var status = stats.total.status;
@@ -148,7 +144,6 @@ function $proxies($http, $q){
                     canvas.att_scope.$apply();
                 }
             });
-            listeners_stats.forEach(function(cb){ cb(stats_chunk); });
         }
     }
 }
@@ -1048,6 +1043,7 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.show_stats = function(proxy){
         $scope.selected_proxy = proxy;
+        $scope.selected_proxy.stats_reset();
         var stats = $scope.selected_proxy.stats;
         var total = stats.total;
         $scope.requests = [total.active_requests];
@@ -1106,7 +1102,9 @@ function proxies($scope, $http, $proxies, $window){
                 canvas.att_scope = $scope;
             });
         }, 0);
-        $window.$('#stats').modal();
+        $window.$('#stats').modal().one('hidden.bs.modal', function(){
+            $scope.selected_proxy.stats_stop();
+        });
     };
     $scope.show_history = function(proxy){
         $scope.history_dialog = [{port: proxy.port}];
@@ -1185,9 +1183,6 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.inline_edit_blur = function(proxy){
         proxy.edited_field = '';
-    };
-    $scope.reset_total_stats = function(proxy){
-        $http.put('/api/proxies/'+proxy.port, {reset_total_stats: true});
     };
 }
 

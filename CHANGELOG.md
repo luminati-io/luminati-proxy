@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.17
+  - :sparkles: Fixed laggy behavior of the proxies page when it has been open
+    for a long time
 - v0.8.16
   - :bug: bypass_proxy bug fix
 - v0.8.15
@@ -21,7 +24,7 @@
 - v0.8.11
   - :star: History can now be configured at the proxy level
   - :sparkles: Warnings on saving proxy if there are any small issues with the
-    settings.
+    settings
 - v0.8.10
   - :sparkles: IP resolution file is now to be edited from the tools tab
 - v0.8.9
