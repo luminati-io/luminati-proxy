@@ -460,6 +460,22 @@ function settings($scope, $http, $window, $sce){
             check_reload();
         });
     };
+    $scope.user_data = {username: '', password: ''};
+    $scope.save_user = function(){
+        $scope.saving_user = true;
+        $scope.user_error = false;
+        $http.post('/api/creds_user', {
+            username: $scope.user_data.username,
+            password: $scope.user_data.password,
+        }).then(function(){
+            $scope.saving_user = false;
+            show_reload();
+            check_reload();
+        }).catch(function(){
+            $scope.saving_user = false;
+            $scope.user_error = true;
+        });
+    };
     $window.$('#creds-popover').popover({html: true});
     $window.$($window.document).on('click', function(e){
         $window.$('[data-toggle="popover"], [data-original-title]').each(
@@ -1787,6 +1803,10 @@ function proxy($scope, $http, $proxies, $window){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value];
         };
         $scope.save = function(proxy){
+            var effective = function(prop){
+                return proxy[prop]===undefined ? $scope.defaults[prop]
+                    : proxy[prop];
+            };
             if (!proxy.max_requests_start&&!proxy.max_requests_end
                 &&(proxy.max_requests_start=='0'||proxy.max_requests_end=='0'))
             {
@@ -1807,9 +1827,7 @@ function proxy($scope, $http, $proxies, $window){
                     ?proxy.duration_start+':'+proxy.duration_end
                     :proxy.duration_start||proxy.duration_end;
             var warnings = [];
-            if ((proxy.history
-                ||proxy.history===undefined&&$scope.defaults.history)
-                &&!(proxy.ssl||proxy.ssl===undefined&&$scope.defaults.ssl))
+            if (effective('history')&&!effective('ssl'))
             {
                 warnings.push('History without SSL sniffing will not record '
                     +'HTTPS requests in full, it will only record the CONNECT '
@@ -1822,12 +1840,17 @@ function proxy($scope, $http, $proxies, $window){
                     +'proxy peer');
             }
             if ((proxy.direct&&(proxy.direct.include||proxy.direct.exclude)
-                ||proxy.bypass_proxy)
-                &&!(proxy.ssl||proxy.ssl===undefined&&$scope.defaults.ssl))
+                ||proxy.bypass_proxy)&&!effective('ssl'))
             {
                 warnings.push('Special URL handling without SSL sniffing will '
                     +'only be able to handle HTTPS domains, and not specific '
                     +'URLs');
+            }
+            if ((effective('max_requests')||effective('session_ducation')
+                ||effective('keep_alive')) && !effective('pool_size'))
+            {
+                warnings.push('max_requests, sesson_duration and keep_alive '
+                    +'will not take effect without specifing pool_size');
             }
             var save_cont = function(){
             $window.$('#proxy').modal('hide');

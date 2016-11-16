@@ -1,5 +1,13 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.19
+  - :boom: You can now login with Luminati.io credentials
+- v0.8.18
+  - :boom: Removed core-dump support, can still be used when installed on the
+    machine independently
+  - :boom: Setting max_requests, keep_alive or session_duration no longer
+    automatically enable pool behaviors, you have to explicitly specify
+    pool_size
 - v0.8.17
   - :sparkles: Fixed laggy behavior of the proxies page when it has been open
     for a long time
@@ -16,7 +24,7 @@
     modification
 - v0.8.13
   - :star: Support core dump on crush using optional dependency in
-    [core-dump](https://www.npmjs.com/package/core-dump)
+    [core-dump](https://www.npmjs.com/package/core-dump) - removed on v0.8.18
   - :bug: History bug fix
 - v0.8.12
   - :star: Settings page replaced with login flow

@@ -399,14 +399,10 @@ describe('proxy', ()=>{
                 t('2, sequential pool', {max_requests: 2, pool_size: 2});
                 t('5, sequential pool', {max_requests: 5, pool_size: 5});
                 t('10, sequential pool', {max_requests: 10, pool_size: 10});
-                t('1, no pool', {max_requests: 1});
-                t('2, no pool', {max_requests: 2});
-                t('5, no pool', {max_requests: 5});
-                t('10, no pool', {max_requests: 10});
             });
             it('keep_alive', etask._fn(function*(_this){
                 _this.timeout(6000);
-                l = yield lum({keep_alive: 1}); // actual 1sec
+                l = yield lum({keep_alive: 1, pool_size: 1}); // actual 1sec
                 assert.equal(proxy.history.length, 0);
                 yield l.test();
                 assert.equal(proxy.history.length, 2);

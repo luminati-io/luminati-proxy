@@ -596,3 +596,59 @@ div.proxies .panel-heading button {
     width: 2%;
     text-align: center;
 }
+.luminati-login h3 {
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.luminati-login .alert-danger {
+    color: #d00;
+}
+.luminati-login label {
+    color: #818c93;
+    font-weight: normal;
+}
+.luminati-login button {
+    margin-top: 15px;
+    font-weight: bold;
+    padding: 10px 12px;
+    background-image: -o-linear-gradient(top, #37a3eb, #2181cf);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));
+    background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);
+    background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);
+    background-image: linear-gradient(top, #37a3eb, #2181cf);
+    border: 1px solid #1c74b3;
+    border-bottom-color: #0d5b97;
+    border-top-color: #2c8ed1;
+    box-shadow: 0 1px 0 #ddd,inset 0 1px 0 rgba(255,255,255,0.2);
+    color: #fff !important;
+    text-shadow: rgba(0,0,0,0.2) 0 1px 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.luminati-login button:hover:enabled {
+    background-color: #3baaf4;
+    background-image: -o-linear-gradient(top, #3baaf4, #2389dc);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#3baaf4), to(#2389dc));
+    background-image: -webkit-linear-gradient(top, #3baaf4, #2389dc);
+    background-image: -moz-linear-gradient(top, #3baaf4, #2389dc);
+    background-image: linear-gradient(top, #3baaf4, #2389dc);
+}
+.luminati-login button:active {
+    background-image: -o-linear-gradient(top, #37a3eb, #2181cf);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));
+    background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);
+    background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);
+    background-image: linear-gradient(top, #37a3eb, #2181cf);
+}
+.luminati-login .signup {
+    color: #818c93;
+    font-size: 16.5px;
+    margin-top: 12px;
+}

@@ -5,9 +5,6 @@ const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const pm2 = require('pm2');
 const etask = hutil.etask;
-try{
-    require('core-dump');
-} catch(e){}
 let manager, args = process.argv.slice(2);
 if (args.some(arg=>arg=='-d' || arg=='--daemon'))
 {

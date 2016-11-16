@@ -49,44 +49,74 @@
     <pre class=top-margin>npm uninstall -g luminati-io/luminati-proxy</pre>
     <pre class=top-margin>npm install -g luminati-io/luminati-proxy</pre>
   </div>
-  <h3 class=creds-popover ng-hide="$root.mode!='root'">
-    Your credentials
-    <span class="glyphicon glyphicon-question-sign" data-content="
-      Fill in your credentials from the <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}' target=_blank>zone page</a>, make sure your IP address
-      {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist (at the same <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}' target=_blank>zone page</a>),
-      and click <strong>Log in</strong>.<br><br>
-      <div class='panel panel-default'><div class=panel-heading>Authentication</div><div class=panel-body>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Customer</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Zone</label></div><div class=col-xs-8>{{$parent.settings.zone}}</div></div>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Password</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Permissions</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Whitelist<br>IPs</label></div><div class=col-xs-8>{{$parent.ip}}</div></div>
-      <div class='form-group clearfix'><div class=col-xs-4><label>Username</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
-      </div></div>
-      " id=creds-popover data-toggle=popover>
-    </span>
-  </h3>
-  <form ng-if="$root.mode=='root'" name=settings ng-submit=save()>
-    <div class=block>
-      <div class=form-group>
-        <label for=customer class=control-label>Customer:</label>
-        <input type=text ng-required=true ng-model=$parent.settings.customer
-          class=form-control id=customer ng-blur=fix_username()>
-      </div>
-      <div class=form-group>
-        <label for=zone class=control-label>Zone:</label>
-        <input type=text ng-required=true ng-model=$parent.settings.zone
-          class=form-control id=zone>
-      </div>
-      <div class=form-group>
-        <label for=password class=control-label>Password:</label>
-        <input type=password ng-required=true
-          ng-model=$parent.settings.password class=form-control id=password>
-      </div>
-      <button type=submit class="btn btn-success"
-        ng-disabled=saving||!settings.$valid>
-        Log in
-      </button>
+  <div class=row>
+    <div class="col-xs-5 luminati-login">
+      <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
+        <h3>Login with your luminati.io credentials</h3>
+        <div class="alert alert-danger" ng-if=user_error>
+          Please enter valid credentials.
+        </div>
+        <div class=form-group>
+          <label for=username>Email</label>
+          <input type=text name=username id=username class=form-control
+            ng-required=true ng-model=user_data.username>
+        </div>
+        <div class=form-group>
+          <label for=user_password>Password</label>
+          <input type=password name=password id=user_password
+            class=form-control ng-required=true ng-model=user_data.password>
+        </div>
+        <button type=submit class="btn btn-flat-blue btn-block"
+          ng-disabled=saving_user||!user.$valid>
+          {{saving_user ? 'Logging in...' : 'Log in'}}
+        </button>
+        <div class=signup>
+          You do not have an account? <a href="https://luminati.io">Sign up</a>
+        </div>
+      </form>
     </div>
-  </form>
+    <div class=col-xs-2></div>
+    <div class=col-xs-5>
+      <h3 class=creds-popover ng-hide="$root.mode!='root'">
+        Your credentials
+        <span class="glyphicon glyphicon-question-sign" data-content="
+          Fill in your credentials from the <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}' target=_blank>zone page</a>, make sure your IP address
+          {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist (at the same <a href='https://luminati.io/cp/zones/{{$parent.settings.zone}}' target=_blank>zone page</a>),
+          and click <strong>Log in</strong>.<br><br>
+          <div class='panel panel-default'><div class=panel-heading>Authentication</div><div class=panel-body>
+          <div class='form-group clearfix'><div class=col-xs-4><label>Customer</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+          <div class='form-group clearfix'><div class=col-xs-4><label>Zone</label></div><div class=col-xs-8>{{$parent.settings.zone}}</div></div>
+          <div class='form-group clearfix'><div class=col-xs-4><label>Password</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+          <div class='form-group clearfix'><div class=col-xs-4><label>Permissions</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+          <div class='form-group clearfix'><div class=col-xs-4><label>Whitelist<br>IPs</label></div><div class=col-xs-8>{{$parent.ip}}</div></div>
+          <div class='form-group clearfix'><div class=col-xs-4><label>Username</label></div><div class='col-xs-8 empty'>&nbsp;</div></div>
+          </div></div>
+          " id=creds-popover data-toggle=popover>
+        </span>
+      </h3>
+      <form ng-if="$root.mode=='root'" name=settings ng-submit=save()>
+        <div class=block>
+          <div class=form-group>
+            <label for=customer class=control-label>Customer:</label>
+            <input type=text ng-required=true ng-model=$parent.settings.customer
+              class=form-control id=customer ng-blur=fix_username()>
+          </div>
+          <div class=form-group>
+            <label for=zone class=control-label>Zone:</label>
+            <input type=text ng-required=true ng-model=$parent.settings.zone
+              class=form-control id=zone>
+          </div>
+          <div class=form-group>
+            <label for=password class=control-label>Password:</label>
+            <input type=password ng-required=true
+              ng-model=$parent.settings.password class=form-control id=password>
+          </div>
+          <button type=submit class="btn btn-success"
+            ng-disabled=saving||!settings.$valid>
+            Log in
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
