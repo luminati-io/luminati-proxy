@@ -91,15 +91,15 @@ Options:
   --dns                   DNS resolving (local|remote)
   --debug                 Luminati request debug info (none|full)
   --request_timeout       Timeout for request on the super proxy (seconds)
-                                                                        [number]
+                                                                        [string]
   --pool_size             Pool size                        [number] [default: 3]
   --pool_type             Pool session iteration order (sequential|round-robin)
                                                          [default: "sequential"]
   --ssl                   Enable SSL sniffing         [boolean] [default: false]
   --insecure              Enable SSL connection/sniffing to insecure hosts
                                                       [boolean] [default: false]
-  --max_requests          Requests per session            [number] [default: 50]
-  --session_duration      Maximum duration of session (seconds)
+  --max_requests          Requests per session            [string] [default: 50]
+  --session_duration      Maximum duration of session (seconds)         [string]
   --proxy_switch          Automatically switch super proxy on failure
                                                                     [default: 5]
   --session_init_timeout  Session establish timeout (seconds)
@@ -123,14 +123,17 @@ Options:
   --no-config             Working without a config file
   --iface                 Interface or ip to listen on (lo|eth0|...)
                                                             [default: "0.0.0.0"]
-  --no_dropin             Disable drop-in mode for migrating
+  --dropin                Enable drop-in mode proxy for migrating
                                                       [boolean] [default: false]
+  --no-dropin             Disable drop-in mode proxy for migration
+  --mode                  Defines a set of permissible operations within the web
+                          UI: either root (default), normal, or guest
+                                                               [default: "root"]
   -h, --help              Show help                                    [boolean]
   --version               Show version number                          [boolean]
   -p, --port              Listening port               [number] [default: 24000]
   -d, --daemon            Start as a daemon
-  --mode                  Mode to run the web UI in (root, normal, or guest)
-                                                               [default: "root"]
+  --proxy                               [string] [default: "zproxy.luminati.io"]
 ```
 
 ### Docker

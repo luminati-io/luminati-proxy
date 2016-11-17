@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.21
+  - :boom: Drop-in proxy was changed to be disabled by default, and enabled
+    only by the dropin cli argument or config value
 - v0.8.20
   - :bug: Fix pool_size 0 behavior and load proxy bug
 - v0.8.19

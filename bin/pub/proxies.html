@@ -51,10 +51,6 @@
               <span class="proxies-action glyphicon glyphicon-list-alt"
                 ng-click=show_pool(proxy) title="Current pool">
               </span>
-              <span class="proxies-action-disabled glyphicon glyphicon-link"
-                ng-if=!proxy._iface_ips||!proxy._iface_ips.length
-                title="This proxy cannot be accessed from outside localhost">
-              </span>
               <span class="proxies-action glyphicon glyphicon-trash"
                 ng-if="$root.mode!='guest'&&proxy.persist" ng-click=delete_proxy(proxy) title=Delete>
               </span>
@@ -214,9 +210,6 @@
   </div>
   <div ng-repeat="p in pool_dialog" ng-controller=pool
     ng-include="'pool.html'" ng-init=init(p)>
-  </div>
-  <div ng-repeat="i in iface_ips_dialog" ng-controller=iface_ips
-    ng-include="'iface_ips.html'" ng-init=init(i)>
   </div>
   <div ng-repeat="p in proxy_dialog" ng-controller=proxy
     ng-include="'proxy.html'" ng-init=init(p)>

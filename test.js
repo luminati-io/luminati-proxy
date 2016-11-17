@@ -81,9 +81,9 @@ const http_proxy = port=>etask(function*(){
             proxy.history.push(body);
             return res.end();
         }
-        req.pipe(http.request({
+        req.pipe(request({
             host: req.headers.host,
-            port: url.parse(req.url).port||80,
+            uri: req.url,
             method: req.method,
             path: url.parse(req.url).path,
             headers: _.omit(req.headers, 'proxy-authorization'),
@@ -159,9 +159,9 @@ const http_proxy = port=>etask(function*(){
     return proxy;
 });
 const http_ping = ()=>etask(function*http_ping(){
-    let ping = {};
+    let ping = {count: 0};
     const handler = (req, res)=>{
-        console.log('Ping: ', req.url);
+        ping.count++;
         res.writeHead(200, 'PONG', {'content-type': 'application/json'});
         res.write(JSON.stringify('PONG'));
         res.end();
@@ -201,7 +201,7 @@ beforeEach(()=>{
     proxy.fake = true;
     proxy.connection = null;
 });
-after(()=>etask(function*(){
+after(()=>etask(function*after(){
     if (proxy)
         yield proxy.stop();
     proxy = null;
@@ -250,6 +250,7 @@ describe('proxy', ()=>{
     beforeEach(()=>{
         proxy.history = [];
         waiting = [];
+        ping.count = 0;
     });
     afterEach(()=>etask(function*(){
         if (!l)
@@ -257,6 +258,23 @@ describe('proxy', ()=>{
         yield l.stop(true);
         l = null;
     }));
+    describe('sanity', ()=>{
+        const t = (name, url, opt)=>it(name, ()=>etask(function*(){
+            proxy.fake = false;
+            const _url = url();
+            l = yield lum(opt);
+            let res = yield l.test(_url);
+            assert.equal(ping.count, 1);
+            assert_has(res, {
+                body: 'PONG',
+                statusCode: 200,
+                statusMessage: 'PONG',
+            });
+        }));
+        t('http', ()=>ping.http.url);
+        t('https', ()=>ping.https.url);
+        t('https sniffing', ()=>ping.https.url, {ssl: true, insecure: true});
+    });
     it('X-Hola-Agent', ()=>etask(function*(){
         l = yield lum();
         yield l.test();
@@ -491,6 +509,7 @@ describe('proxy', ()=>{
             function*(){
                 l = yield lum(assign({bypass_proxy: 'match', pool_size: 1},
                     opt));
+                yield l.test();
                 let missmatch = yield match_test(no_match_url());
                 let match = yield match_test(match_url());
                 assert.equal(match.after, match.before);
@@ -601,7 +620,6 @@ describe('manager', ()=>{
           args = args.concat(['--customer', customer]);
         if (!get_param(args, '--password'))
           args = args.concat(['--password', password]);
-        args.push('--no_dropin');
         let manager = new luminati.Manager(args||[]);
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;

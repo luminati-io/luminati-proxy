@@ -1128,9 +1128,6 @@ function proxies($scope, $http, $proxies, $window){
     $scope.show_pool = function(proxy){
         $scope.pool_dialog = [{port: proxy.port}];
     };
-    $scope.show_iface_ips = function(proxy){
-        $scope.iface_ips_dialog = [{port: proxy.port, ips: proxy._iface_ips}];
-    };
     $scope.edit_proxy = function(proxy, duplicate){
         $scope.proxy_dialog = [{proxy: proxy||{}, duplicate: duplicate}];
     };
@@ -1723,16 +1720,6 @@ function pool($scope, $http, $window){
             });
         };
         $scope.update();
-    };
-}
-
-module.controller('iface_ips', iface_ips);
-iface_ips.$inject = ['$scope', '$window'];
-function iface_ips($scope, $window){
-    $scope.init = function(locals){
-        $scope.port = locals.port;
-        $scope.ips = locals.ips;
-        $scope.show_modal = function(){ $window.$('#iface_ips').modal(); };
     };
 }
 
