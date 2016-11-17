@@ -704,7 +704,9 @@ describe('manager', ()=>{
         t('http', 'http://lumtest.com/echo.json');
     });
     describe('config load', ()=>{
-        const t = (name, config, expected)=>it(name, ()=>etask(function*(){
+        const t = (name, config, expected)=>it(name, etask._fn(
+        function*(_this){
+            _this.timeout(4000);
             app = yield app_with_config(config);
             let proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');

@@ -464,16 +464,27 @@ function settings($scope, $http, $window, $sce){
     $scope.save_user = function(){
         $scope.saving_user = true;
         $scope.user_error = false;
-        $http.post('/api/creds_user', {
+        var creds = {
             username: $scope.user_data.username,
             password: $scope.user_data.password,
-        }).then(function(){
+        };
+        if ($scope.user_customers)
+            creds.customer = $scope.user_data.customer;
+        $http.post('/api/creds_user', creds).then(function(d){
             $scope.saving_user = false;
-            show_reload();
-            check_reload();
-        }).catch(function(){
+            if (d.data.customers)
+            {
+                $scope.user_customers = d.data.customers;
+                $scope.user_data.customer = $scope.user_customers[0];
+            }
+            else
+            {
+                show_reload();
+                check_reload();
+            }
+        }).catch(function(error){
             $scope.saving_user = false;
-            $scope.user_error = true;
+            $scope.user_error = error.data.error;
         });
     };
     $window.$('#creds-popover').popover({html: true});

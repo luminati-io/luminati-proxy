@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:onbuild
+FROM node:6
 
 # Install Bower & Gulp
 RUN npm install -g luminati-io/luminati-proxy
