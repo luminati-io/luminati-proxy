@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- v0.8.20
+  - :bug: Fix pool_size 0 behavior and load proxy bug
 - v0.8.19
   - :boom: You can now login with Luminati.io credentials
 - v0.8.18
@@ -16,7 +18,7 @@
 - v0.8.15
   - :star: max_requests now support range - where each session gets a random
     max_request value in the range
-  - :sparkles: UI now allow define ranges for session_ducation
+  - :sparkles: UI now allow define ranges for session_duration
 - v0.8.14
   - :boom: Remove support for country specific super proxy (will use super
     proxy from any country if already configured for a specific country)

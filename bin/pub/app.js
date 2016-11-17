@@ -1846,7 +1846,7 @@ function proxy($scope, $http, $proxies, $window){
                     +'only be able to handle HTTPS domains, and not specific '
                     +'URLs');
             }
-            if ((effective('max_requests')||effective('session_ducation')
+            if ((effective('max_requests')||effective('session_duration')
                 ||effective('keep_alive')) && !effective('pool_size'))
             {
                 warnings.push('max_requests, sesson_duration and keep_alive '
