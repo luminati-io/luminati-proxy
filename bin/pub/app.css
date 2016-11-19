@@ -540,11 +540,10 @@ div.proxies .panel-heading button {
 .creds-popover .popover {
     max-width: 342px;
 }
-.creds-popover .panel-heading {
-    font-size: 13px;
-}
 .creds-popover .panel-body {
     color: #004d74;
+}
+.creds-popover .panel-heading, .creds-popover .panel-body {
     font-size: 13px;
 }
 .creds-popover .form-group {
@@ -651,4 +650,41 @@ div.proxies .panel-heading button {
     color: #818c93;
     font-size: 16.5px;
     margin-top: 12px;
+}
+#google {
+    min-width: 300px;
+}
+#google a.google {
+    color: white;
+    display: block;
+    padding: 0;
+    margin: auto;
+    margin-top: 50px;
+    margin-bottom: 40px;
+    height: 35px;
+    font-size: 16px;
+    padding-top: 6px;
+    padding-left: 95px;
+    cursor: pointer;
+    max-width: 300px;
+    text-align: left;
+    text-decoration: none;
+    border: none;
+    position: relative;
+    white-space: nowrap;
+}
+#google a.google, #google a.google:hover {
+    background: url(/img/social_btns.svg) no-repeat 50% 100%;
+}
+#google a.google:focus {
+    outline: 0;
+    top: 1px;
+}
+#google a.google:hover {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+#google a.google:active {
+    top: 1px;
 }

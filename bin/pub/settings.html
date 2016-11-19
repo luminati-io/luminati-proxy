@@ -53,6 +53,12 @@
     <div class="col-xs-5 luminati-login">
       <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
         <h3>Login with your luminati.io credentials</h3>
+        <div id=google>
+          <a class=google ng-click=google_click($event)
+            href="https://accounts.google.com/o/oauth2/v2/auth?client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.googleusercontent.com&response_type=code&redirect_uri=https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email">
+            Log in with Google
+          </a>
+        </div>
         <div class="alert alert-danger" ng-if=user_error>
           {{user_error}}
         </div>

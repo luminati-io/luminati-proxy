@@ -446,6 +446,28 @@ function settings($scope, $http, $window, $sce){
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location = '/proxies'; });
     };
+    var get_param = function(name){
+        var url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]'+name+'(=([^&#]*)|&|#|$)');
+        var results = regex.exec(url);
+        if (!results)
+            return null;
+        if (!results[2])
+            return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    };
+    if (get_param('google_login'))
+    {
+        $http.post('/api/creds', {
+            customer: get_param('customer'),
+            zone: get_param('zone'),
+            password: get_param('password'),
+        }).then(function(){
+            show_reload();
+            check_reload();
+        });
+    }
     $scope.save = function(){
         if ($scope.fix_username())
             return;
@@ -500,6 +522,11 @@ function settings($scope, $http, $window, $sce){
             }
         });
     });
+    $scope.google_click = function(e){
+        var google = $window.$(e.currentTarget);
+        google.attr('href', google.attr('href')+'&state='
+            +encodeURIComponent($window.location+'?google_login=1'));
+    };
 }
 
 module.controller('zones', zones);
