@@ -5,12 +5,6 @@
   </div>
   <button type=button class="btn btn-primary" ng-click=upgrade()
     ng-disabled=upgrading||upgrade_error>
-    Upgrade
+    {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
   </button>
-  <div class="alert alert-info settings-inner-alert" ng-if=upgrading>
-    Upgrading...
-  </div>
-  <div class="alert alert-danger settings-inner-alert" ng-if=upgrade_error>
-    Error
-  </div>
 </div>

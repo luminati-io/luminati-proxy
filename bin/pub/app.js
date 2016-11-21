@@ -26,6 +26,14 @@ module.run(function($rootScope, $http, $window){
         if (logged_in && $rootScope.section=='settings')
             $window.location = '/proxies';
         $rootScope.mode = data.data.mode;
+        $rootScope.run_config = data.data.run_config;
+        if ($window.localStorage.getItem('last_run_id')!=
+            $rootScope.run_config.id)
+        {
+            $window.localStorage.setItem('last_run_id',
+                $rootScope.run_config.id);
+            $window.localStorage.setItem('suppressed_warnings', '');
+        }
         $rootScope.login_failure = data.data.login_failure;
         if (logged_in)
         {
@@ -201,6 +209,27 @@ function root($rootScope, $scope, $http, $window){
         $http.post('/api/logout').then(function(){
             $window.location = '/';
         });
+    };
+    $scope.warnings = function(){
+        if (!$rootScope.run_config||!$rootScope.run_config.warnings)
+            return [];
+        var suppressed =
+            $window.localStorage.getItem('suppressed_warnings').split('|||');
+        var warnings = [];
+        for (var i=0; i<$rootScope.run_config.warnings.length; i++)
+        {
+            var w = $rootScope.run_config.warnings[i];
+            if (suppressed.indexOf(w)==-1)
+                warnings.push(w);
+        }
+        return warnings;
+    };
+    $scope.dismiss_warning = function(warning){
+        var warnings =
+            $window.localStorage.getItem('suppressed_warnings').split('|||');
+        warnings.push(warning);
+        $window.localStorage.setItem('suppressed_warnings',
+            warnings.join('|||'));
     };
 }
 
@@ -392,7 +421,7 @@ function settings($scope, $http, $window, $sce){
     };
     if (get_param('google_login'))
     {
-        $http.post('/api/creds', {
+        $http.post('/api/creds?autoupdate=1', {
             customer: get_param('customer'),
             zone: get_param('zone'),
             password: get_param('password'),

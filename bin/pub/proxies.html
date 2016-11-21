@@ -1,3 +1,10 @@
+<div ng-repeat="warning in warnings()"
+  class="alert alert-info settings-alert">
+  {{warning}}
+  <button class="btn btn-default" ng-click=dismiss_warning(warning)>
+    Dismiss
+  </button>
+</div>
 <ng-include src="'/upgrade.html'"></ng-include>
 <div class="alert alert-info settings-alert"
   ng-if="$root.mode=='root'&&$parent.settings.resolve===true">

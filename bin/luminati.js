@@ -26,13 +26,16 @@ if (process.platform=='win32')
     .on('SIGINT', ()=>process.emit('SIGINT'));
 }
 
-(function run(){
-    manager = new Manager(args);
+(function run(run_config){
+    manager = new Manager(args, run_config);
     manager.on('stop', ()=>process.exit());
-    manager.on('config_changed', etask.fn(function*(){
+    manager.on('config_changed', etask.fn(function*(zone_autoupdate){
         args = manager.argv.config ? args : manager.get_params();
         yield manager.stop(true, true);
-        setTimeout(run, 0);
+        setTimeout(()=>run(zone_autoupdate ? {
+            warnings: [`Your default zone has been automatically changed from `
+                +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
+        } : {}), 0);
     }));
     manager.start();
 })();
