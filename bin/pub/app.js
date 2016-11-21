@@ -2,15 +2,13 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'socket.io-client', 'lodash', 'moment',
     'codemirror/lib/codemirror', 'codemirror/mode/javascript/javascript',
-    'angular-chart', 'jquery', 'angular-sanitize', 'bootstrap',
-    'bootstrap-datepicker', '_css!app'],
+    'jquery', 'angular-sanitize', 'bootstrap', 'bootstrap-datepicker',
+    '_css!app'],
 function(angular, io, _, moment, codemirror){
 
 var module = angular.module('app', ['ngSanitize']);
 
 module.run(function($rootScope, $http, $window){
-    $window.Chart.defaults.global.colors = ['#803690', '#00ADF9', '#46BFBD',
-        '#FDB45C', '#949FB1', '#4D5360'];
     var l = $window.location.pathname;
     if (l.match(/zones\/[^\/]+/))
     {
@@ -55,7 +53,6 @@ function $proxies($http, $q){
     };
     var listeners = [];
     service.update();
-    io().on('stats', stats_event);
     return service;
     function subscribe(func){
         listeners.push(func);
@@ -75,76 +72,12 @@ function $proxies($http, $q){
             proxies.forEach(function(proxy){
                 if (Array.isArray(proxy.proxy)&&proxy.proxy.length==1)
                     proxy.proxy = proxy.proxy[0];
-                proxy.stats_reset = function(){
-                    this.stats = {
-                        total: {
-                            active_requests: [],
-                            status: {codes: ['2xx'], values: [[]]},
-                            max: {requests: 0, codes: 0},
-                        },
-                        ticks: [],
-                    };
-                };
-                proxy.stats_stop = function(){
-                    delete this.stats;
-                };
                 proxy.config = config_index[proxy.port];
             });
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
             return proxies;
         });
-    }
-    function stats_event(stats_chunk){
-        if (!service.proxies)
-            return;
-        var now = moment().format('hh:mm:ss');
-        for (var port in stats_chunk)
-        {
-            var chunk = stats_chunk[port];
-            var proxy = _.find(service.proxies, {port: +port});
-            if (!proxy.stats)
-                continue;
-            var data = _.values(chunk);
-            var stats = proxy.stats;
-            var status = stats.total.status;
-            stats.ticks.push(now);
-            var active_requests = _.sumBy(data, 'active_requests');
-            stats.total.active_requests.push(active_requests);
-            stats.total.max.requests = Math.max(stats.total.max.requests,
-                active_requests);
-            var codes = data.reduce(function(r, host){
-                return r.concat(_.keys(host.status_code)); }, []);
-            codes = _.uniq(codes);
-            codes.forEach(function(code){
-                var i = status.codes.indexOf(code);
-                if (i==-1)
-                {
-                    status.codes.push(code);
-                    i = status.codes.length-1;
-                    status.values.push(new Array(stats.ticks.length-1));
-                    _.fill(status.values[i], 0);
-                }
-                var total = _.sumBy(data, 'status_code.'+code);
-                status.values[i].push(total);
-                stats.total.max.codes = Math.max(stats.total.max.codes, total);
-            });
-            var len = stats.ticks.length;
-            status.values.forEach(function(values){
-                if (values.length<len)
-                    values.push(0);
-            });
-            ['requests', 'codes'].forEach(function(chart){
-                var canvas;
-                if ((canvas = chart_container(chart)) && canvas.att_chart)
-                {
-                    canvas.att_chart.data.datasets = chart_data(
-                        canvas.att_chart_pars).datasets;
-                    canvas.att_chart.update();
-                    canvas.att_scope.$apply();
-                }
-            });
-        }
     }
 }
 
@@ -1095,71 +1028,6 @@ function proxies($scope, $http, $proxies, $window){
             $proxies.update();
         });
     };
-    $scope.show_stats = function(proxy){
-        $scope.selected_proxy = proxy;
-        $scope.selected_proxy.stats_reset();
-        var stats = $scope.selected_proxy.stats;
-        var total = stats.total;
-        $scope.requests = [total.active_requests];
-        $scope.requests_series = ['Active requests'];
-        $scope.codes = total.status.values;
-        $scope.codes_series = total.status.codes;
-        $scope.labels = stats.ticks;
-        $scope.options = {
-            animation: {duration: 0},
-            elements: {line: {borderWidth: 0.5}, point: {radius: 0}},
-            scales: {
-                xAxes: [{
-                    display: false,
-                }],
-                yAxes: [{
-                    position: 'right',
-                    gridLines: {display: false},
-                    ticks: {beginAtZero: true, suggestedMax: 6},
-                }],
-            },
-        };
-        $scope.codes_options = _.merge({elements: {line: {fill: false}},
-            legend: {display: true, labels: {boxWidth: 6}},
-            grindLines: {display: false}}, $scope.options);
-        $scope.max_values = total.max;
-        $scope.chart_indicator = chart_indicator;
-        $scope.chart_mousemove = chart_mousemove;
-        $scope.chart_x = {requests: 0, codes: 0};
-        $scope.chart_time = {requests: 0, codes: 0};
-        setTimeout(function(){
-            var charts = [
-                {
-                    name: 'requests',
-                    labels: $scope.labels,
-                    data: $scope.requests,
-                    series: $scope.requests_series,
-                    options: $scope.options,
-                },
-                {
-                    name: 'codes',
-                    labels: $scope.labels,
-                    data: $scope.codes,
-                    series: $scope.codes_series,
-                    options: $scope.codes_options,
-                },
-            ];
-            charts.forEach(function(chart){
-                var canvas = chart_container(chart.name);
-                var params = {
-                    type: 'line',
-                    data: chart_data(chart),
-                    options: chart.options,
-                };
-                canvas.att_chart_pars = chart;
-                canvas.att_chart = new $window.Chart(canvas, params);
-                canvas.att_scope = $scope;
-            });
-        }, 0);
-        $window.$('#stats').modal().one('hidden.bs.modal', function(){
-            $scope.selected_proxy.stats_stop();
-        });
-    };
     $scope.show_history = function(proxy){
         $scope.history_dialog = [{port: proxy.port}];
     };
@@ -2033,55 +1901,5 @@ function shortenFilter($filter){
 }
 
 angular.bootstrap(document, ['app']);
-
-function chart_container(chart){
-    return document.getElementsByClassName('chart-'+chart)[0];
-}
-
-function chart_color(color){
-    var rgba = function(color, alpha){
-        return 'rgba('+color.concat(alpha).join(',')+')';
-    };
-    var hex = color.substr(1);
-    var int = parseInt(hex, 16);
-    var r = int>>16&255, g = int>>8&255, b = int&255;
-    color = [r, g, b];
-    return {
-        backgroundColor: rgba(color, 0.2),
-        pointBackgroundColor: rgba(color, 1),
-        pointHoverBackgroundColor: rgba(color, 0.8),
-        borderColor: rgba(color, 1),
-        pointBorderColor: '#fff',
-        pointHoverBorderColor: rgba(color, 1),
-    };
-}
-
-function chart_data(params){
-    return {
-        labels: params.labels,
-        datasets: params.data.map(function(item, i){
-            return angular.extend({
-                lineTension: 0,
-                data: item,
-                label: params.series[i],
-            }, chart_color(window.Chart.defaults.global.colors[i]));
-        }),
-    };
-}
-
-function chart_mousemove(type, $event, x_ar, t_ar, labels){
-    var rect = $event.currentTarget.getBoundingClientRect();
-    var width = rect.right-rect.left;
-    var x = $event.pageX;
-    x -= rect.left;
-    x -= window.pageXOffset;
-    x = Math.max(0, Math.min(width-1, x));
-    x_ar[type] = x;
-    t_ar[type] = x/width;
-}
-
-function chart_indicator(labels, p){
-    return labels[Math.round(p*(labels.length-1))];
-}
 
 });

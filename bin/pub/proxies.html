@@ -42,9 +42,6 @@
                 ng-click="refresh_sessions(proxy)" title="Refresh sessions"
                 ng-if="$root.mode!='guest'">
               </span>
-              <span class="proxies-action glyphicon glyphicon-stats"
-                ng-click=show_stats(proxy) title=Statistics>
-              </span>
               <span class="proxies-action glyphicon glyphicon-time"
                 ng-click=show_history(proxy) title=History>
               </span>
@@ -152,56 +149,6 @@
             </li>
           </ul>
         </nav>
-      </div>
-    </div>
-  </div>
-  <div id=stats class="modal fade" role=dialog>
-    <div class=modal-dialog>
-      <div class=modal-content>
-        <div class=modal-header>
-          <button type=button class=close data-dismiss=modal>&times;</button>
-          <h4 class=modal-title>Statistics: {{selected_proxy.port}}</h4>
-        </div>
-        <div class=modal-body>
-          <div class=proxies-graph>
-            <h4>Active requests</h4>
-            <div class=proxies-graph-container>
-              <canvas class="chart chart-line chart-requests"></canvas>
-              <div class=proxies-graph-time
-                style="right: {{max_values.requests.toString().length*6+50+'px'}}"
-                ng-mousemove="chart_mousemove('requests', $event, chart_x, chart_time, labels)">
-                <div class=proxies-graph-left>
-                  <span>{{labels[0]}}</span>
-                </div>
-                <div class=proxies-graph-right>
-                  <span>{{labels[labels.length-1]}}</span>
-                </div>
-                <div class=proxies-graph-indicator style="left: {{chart_x.requests+'px'}}">
-                  <span>{{chart_indicator(labels, chart_time.requests)}}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class=proxies-graph>
-            <h4>Status codes</h4>
-            <div class=proxies-graph-container>
-              <canvas class="chart chart-line chart-codes"></canvas>
-              <div class=proxies-graph-time
-                style="right: {{max_values.codes.toString().length*6+50+'px'}}"
-                ng-mousemove="chart_mousemove('codes', $event, chart_x, chart_time, labels)">
-                <div class=proxies-graph-left>
-                  <span>{{labels[0]}}</span>
-                </div>
-                <div class=proxies-graph-right>
-                  <span>{{labels[labels.length-1]}}</span>
-                </div>
-                <div class=proxies-graph-indicator style="left: {{chart_x.codes+'px'}}">
-                  <span>{{chart_indicator(labels, chart_time.codes)}}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
