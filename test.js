@@ -56,7 +56,8 @@ const http_proxy = port=>etask(function*(){
     const handler = (req, res, head)=>{
         if (proxy.fake)
         {
-            const body = _.pick(req, 'method', 'url', 'headers');
+            const body = assign({ip: '127.0.0.1'},
+                _.pick(req, 'method', 'url', 'headers'));
             const auth = body.headers['proxy-authorization'];
             if (auth)
             {
@@ -329,12 +330,14 @@ describe('proxy', ()=>{
                     }
                     assert.equal(proxy.history[pool_size].url, test_url);
                     assert.equal(l.sessions.length, pool_size);
+                    let sessions = {};
                     for (let i=0; i<pool_size; i++)
                     {
-                        assert.equal(l.sessions[i].proxy, '127.0.0.1');
-                        assert.equal(l.sessions[i].session, '24000_'+(i+1));
+                        let s = l.sessions[i];
+                        assert.equal(s.proxy, '127.0.0.1');
+                        assert.ok(!sessions[s.session]);
+                        sessions[s.session] = true;
                     }
-                    assert.equal(res.body.auth.session, '24000_1');
                 }));
                 t(1);
                 t(3);
@@ -372,36 +375,51 @@ describe('proxy', ()=>{
                     assert.equal(l.max_requests, 0);
                 }));
 
-                const test_call = (r, i, p, s)=>etask(function*(){
+                const test_call = ()=>etask(function*(){
                     const res = yield l.test();
-                    const id = `trial/request/pool ${r}/${i}/${p} `;
-                    assert.ok(res.body, id+'no body');
-                    assert.ok(res.body.auth, id+'no auth');
-                    assert.equal(res.body.auth.session,
-                        '24000_'+(r*s+p), id+'session mismatch');
+                    assert.ok(res.body);
+                    assert.ok(res.body.auth);
+                    return res.body.auth.session;
                 });
 
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(4000);
+                    _this.timeout(10000);
+                    const trials = 3;
                     l = yield lum(opt);
-                    const pool_size = l.opt.pool_size || 1;
-                    for (let r=0; r<3; r++)
+                    let sessions = [];
+                    for (let t=0; t<trials; t++)
                     {
+                        sessions[t] = [];
                         if (opt.pool_type=='round-robin')
                         {
-                            for (let i=0; i<l.opt.max_requests; i++)
+                            for (let req=0; req<opt.max_requests; req++)
                             {
-                                for (let p=1; p<=pool_size; p++)
-                                    yield test_call(r, i, p, pool_size);
+                                for (let s=0; s<opt.pool_size; s++)
+                                {
+                                    sessions[t][s] = sessions[t][s]||[];
+                                    sessions[t][s][req] = yield test_call();
+                                }
                             }
                         }
                         else
                         {
-                            for (let p=1; p<=pool_size; p++)
+                            for (let s=0; s<opt.pool_size; s++)
                             {
-                                for (let i=0; i<l.opt.max_requests; i++)
-                                    yield test_call(r, i, p, pool_size);
+                                sessions[t][s] = [];
+                                for (let req=0; req<opt.max_requests; req++)
+                                    sessions[t][s][req] = yield test_call();
                             }
+                        }
+                    }
+                    let used = [];
+                    for (let t=0; t<trials; t++)
+                    {
+                        for (let s=0; s<opt.pool_size; s++)
+                        {
+                            let id = sessions[t][s][0];
+                            used.forEach(u=>assert.notEqual(id, u));
+                            used.push(id);
+                            sessions[t][s].forEach(req=>assert.equal(req, id));
                         }
                     }
                 }));
@@ -421,15 +439,15 @@ describe('proxy', ()=>{
             it('keep_alive', etask._fn(function*(_this){
                 _this.timeout(6000);
                 l = yield lum({keep_alive: 1, pool_size: 1}); // actual 1sec
-                assert.equal(proxy.history.length, 0);
                 yield l.test();
-                assert.equal(proxy.history.length, 2);
+                const start = proxy.history.length;
+                assert.equal(proxy.history.length, start);
                 yield etask.sleep(500);
-                assert.equal(proxy.history.length, 2);
+                assert.equal(proxy.history.length, start);
                 yield l.test();
-                assert.equal(proxy.history.length, 3);
+                assert.equal(proxy.history.length, 1+start);
                 yield etask.sleep(1500);
-                assert.equal(proxy.history.length, 4);
+                assert.equal(proxy.history.length, 2+start);
             }));
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
