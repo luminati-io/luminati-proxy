@@ -446,12 +446,29 @@ function settings($scope, $http, $window, $sce){
     };
     $scope.user_data = {username: '', password: ''};
     $scope.save_user = function(){
+        var username = $scope.user_data.username;
+        var password = $scope.user_data.password;
+        if (!username)
+        {
+            $scope.user_error = {
+                message: 'Please enter a valid email address.',
+                username: true,
+            };
+            return;
+        }
+        else
+            username = username.trim();
+        if (!password)
+        {
+            $scope.user_error = {
+                message: 'Please enter a password.',
+                password: true,
+            };
+            return;
+        }
         $scope.saving_user = true;
         $scope.user_error = false;
-        var creds = {
-            username: $scope.user_data.username,
-            password: $scope.user_data.password,
-        };
+        var creds = {username: username, password: password};
         if ($scope.user_customers)
             creds.customer = $scope.user_data.customer;
         $http.post('/api/creds_user', creds).then(function(d){

@@ -59,19 +59,20 @@
             Log in with Google
           </a>
         </div>
-        <div class="alert alert-danger" ng-if=user_error>
-          {{user_error}}
+        <div class="alert alert-danger" ng-if=user_error
+          ng-bind-html=user_error.message>
         </div>
-        <div class=form-group>
+        <div class=form-group
+          ng-class="{'has-error': user_error&&user_error.username}">
           <label for=username>Email</label>
-          <input type=text name=username id=username class=form-control
-            ng-required=true ng-model=user_data.username
-            ng-disabled=user_customers>
+          <input type=email name=username id=username class=form-control
+            ng-model=user_data.username ng-disabled=user_customers>
         </div>
-        <div class=form-group>
+        <div class=form-group
+          ng-class="{'has-error': user_error&&user_error.password}">
           <label for=user_password>Password</label>
           <input type=password name=password id=user_password
-            class=form-control ng-required=true ng-model=user_data.password
+            class=form-control ng-model=user_data.password
             ng-disabled=user_customers>
         </div>
         <div class=form-group ng-if=user_customers>
@@ -85,7 +86,7 @@
           Please choose a customer.
         </div>
         <button type=submit class="btn btn-flat-blue btn-block"
-          ng-disabled=saving_user||!user.$valid>
+          ng-disabled=saving_user>
           {{saving_user ? 'Logging in...' : 'Log in'}}
         </button>
         <div class=signup>
