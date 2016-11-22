@@ -50,7 +50,8 @@
                 ng-if="$root.mode!='guest'">
               </span>
               <span class="proxies-action glyphicon glyphicon-time"
-                ng-click=show_history(proxy) title=History>
+                ng-click=show_history(proxy) title=History
+                ng-if=proxy._history>
               </span>
               <span class="proxies-action glyphicon glyphicon-list-alt"
                 ng-click=show_pool(proxy) title="Current pool">

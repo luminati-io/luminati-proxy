@@ -1,5 +1,22 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.29
+  - :sparkles: Improved stability and reduces memory
+- 0.8.28
+  - :sparkles: Improve email login
+- 0.8.27
+  - :sparkles: Added warning on default zone change
+- 0.8.26
+  - :boom: Remove statistics
+- 0.8.25
+  - :sparkles: Improve tests
+  - :sparkles: Improve SSL load time
+- 0.8.24
+  - :star: Google login to luminati
+- 0.8.23
+  - :bug: history bug fix
+- v0.8.22
+  - Improved login message
 - v0.8.21
   - :boom: Drop-in proxy was changed to be disabled by default, and enabled
     only by the dropin cli argument or config value

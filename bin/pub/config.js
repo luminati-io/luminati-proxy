@@ -11,7 +11,6 @@ var config = {
            '/req/bootstrap-datepicker/dist/js/bootstrap-datepicker.min',
         moment: '/req/moment/min/moment.min',
         angular: '/req/angular/angular.min',
-        'socket.io-client': '/socket.io/socket.io',
         'angular-sanitize': '/req/angular-sanitize/angular-sanitize.min',
         lodash: '/req/lodash/lodash.min',
         codemirror: '/req/codemirror',

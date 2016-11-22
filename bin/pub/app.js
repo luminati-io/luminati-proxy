@@ -1,10 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true*/
-define(['angular', 'socket.io-client', 'lodash', 'moment',
-    'codemirror/lib/codemirror', 'codemirror/mode/javascript/javascript',
-    'jquery', 'angular-sanitize', 'bootstrap', 'bootstrap-datepicker',
-    '_css!app'],
-function(angular, io, _, moment, codemirror){
+define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
+    'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
+    'bootstrap', 'bootstrap-datepicker', '_css!app'],
+function(angular, _, moment, codemirror){
 
 var module = angular.module('app', ['ngSanitize']);
 
@@ -479,10 +478,7 @@ function settings($scope, $http, $window, $sce){
                 $scope.user_data.customer = $scope.user_customers[0];
             }
             else
-            {
-                show_reload();
                 check_reload();
-            }
         }).catch(function(error){
             $scope.saving_user = false;
             $scope.user_error = error.data.error;
@@ -1035,7 +1031,6 @@ function proxies($scope, $http, $proxies, $window){
         port: true,
         zone: true,
         country: true,
-        max_requests: true,
         sticky_ip: true,
     };
     $scope.cols_conf = JSON.parse(
@@ -1666,7 +1661,7 @@ function pool($scope, $http, $window){
         $scope.show_modal = function(){ $window.$('#pool').modal(); };
         $scope.update = function(refresh){
             $scope.pool = null;
-            $http.get('/api/sessions/'+$scope.port+(refresh ? '?refresh' : ''))
+            $http.get('/api/sessions/'+$scope.port+'?refresh')
             .then(function(pool){
                 $scope.pool = pool.data;
             });
@@ -1792,7 +1787,7 @@ function proxy($scope, $http, $proxies, $window){
                     +'will not take effect without specifing pool_size');
             }
             var save_cont = function(){
-            $window.$('#proxy').modal('hide');
+                $window.$('#proxy').modal('hide');
                 proxy.persist = true;
                 delete proxy.max_requests_start;
                 delete proxy.max_requests_end;
