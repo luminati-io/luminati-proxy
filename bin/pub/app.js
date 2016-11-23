@@ -1033,6 +1033,14 @@ function proxies($scope, $http, $proxies, $window){
         country: true,
         sticky_ip: true,
     };
+    $http.get('/api/stats').then(function(stats){
+        if (stats.data.login_failure)
+        {
+            $window.location = '/';
+            return;
+        }
+        $scope.zones = Object.keys(stats.data);
+    });
     $scope.cols_conf = JSON.parse(
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
     $scope.page_size = 50;
@@ -1706,6 +1714,7 @@ function proxy($scope, $http, $proxies, $window){
             $scope.form.duration_end = +session_duration[1];
         }
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
+        $scope.zones = $scope.$parent.$parent.zones;
         $scope.defaults = {};
         $http.get('/api/defaults').then(function(defaults){
             $scope.defaults = defaults.data;

@@ -321,7 +321,7 @@ describe('proxy', ()=>{
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
                     l = yield lum({pool_size});
-                    const res = yield l.test();
+                    yield l.test();
                     assert.equal(proxy.history.length, pool_size+1);
                     for (let i=0; i<pool_size; i++)
                     {

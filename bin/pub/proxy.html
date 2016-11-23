@@ -97,8 +97,9 @@
                     <label class=control-label for=proxy-field-zone>
                       Zone
                     </label>
-                    <input id=proxy-field-zone ng-model=form.zone autocomplete=off
-                      placeholder={{consts.zone.def}} class=form-control>
+                    <select id=proxy-field-zone class=form-control
+                      ng-model=form.zone ng-init="form.zone=form.zone||'gen'"
+                      ng-options="v for v in zones"></select>
                   </div>
                   <div class=form-group>
                     <label class=control-label

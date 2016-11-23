@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.30
+  - :sparkles: Improved proxy edit form
 - 0.8.29
   - :sparkles: Improved stability and reduces memory
 - 0.8.28
