@@ -1743,7 +1743,27 @@ function proxy($scope, $http, $proxies, $window){
             }).modal();
         };
         $scope.binary_changed = function(proxy, field, value){
-            proxy[field] = {'yes': true, 'no': false, 'default': ''}[value];
+            proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
+        $scope.update_regions = function(changed){
+            // XXX marka: temporary fix, use countries from city.db
+            var country = ($scope.form.country||'').toUpperCase();
+            if (changed)
+                $scope.form.city = $scope.form.state = '';
+            if (!country || country=='*')
+                return;
+            $http.get('/api/regions/'+country).then(function(res){
+                $scope.regions = res.data; });
+        };
+        $scope.update_cities = function(changed){
+            // XXX marka: temporary fix, use countries from city.db
+            var country = ($scope.form.country||'').toUpperCase();
+            var region = $scope.form.state;
+            if (changed)
+                $scope.form.city = '';
+            if (!country || country=='*' || !region || region=='*')
+                return;
+            $http.get('/api/cities/'+country+'/'+region).then(function(res){
+                $scope.cities = res.data; });
         };
         $scope.save = function(proxy){
             var effective = function(prop){

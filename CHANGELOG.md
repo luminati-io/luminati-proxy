@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.32
+  - :star: Replce text inputs for city and state by comboboxes
+- 0.8.31
+  - :sparkles: Separate "Default" and "Any" options for country
+  - :sparkles: Hide pool dialog for proxies that have no pool
 - 0.8.30
   - :sparkles: Improved proxy edit form
 - 0.8.29

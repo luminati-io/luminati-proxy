@@ -2,8 +2,8 @@
   <div class=modal-dialog>
     <div class=modal-content>
       <form ng-submit=save(form)>
-        <input style="display:none;" type="text" name="dummy1" />
-        <input style="display:none;" type="password" name="dummy2" />
+        <input style="display:none;" type="text" name="dummy1">
+        <input style="display:none;" type="password" name="dummy2">
         <div class=modal-header>
           <button type=button class=close data-dismiss=modal>
             &times;
@@ -149,23 +149,29 @@
                     </label>
                     <select id=proxy-field-country ng-model=form.country
                       class=form-control ng-options="c.value as c.key for c in
-                      consts.country.values"
-                      ng-init="form.country=form.country||''">
+                      consts.country.values" ng-change="update_regions(true)"
+                      ng-init="form.country=form.country||''; update_regions();">
                     </select>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-state>
                       State
                     </label>
-                    <input id=proxy-field-state ng-model=form.state
-                      placeholder=ny class=form-control>
+                    <select id=proxy-field-state ng-model=form.state
+                      class=form-control ng-disabled="!form.country || form.country=='*' || !regions || !regions.length"
+                      ng-change="update_cities(true)" ng-options="c.value as c.key for c in regions"
+                      ng-init="form.state=form.state||''; update_cities();">
+                    </select>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-city>
                       City
                     </label>
-                    <input id=proxy-field-city ng-model=form.city
-                      placeholder=new_york class=form-control>
+                    <select id=proxy-field-city ng-model=form.city
+                      class=form-control ng-disabled="!form.state || form.state=='*' || !cities || !cities.length"
+                      ng-options="c.value as c.key for c in cities"
+                      ng-init="form.city=form.city||''">
+                    </select>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-asn>

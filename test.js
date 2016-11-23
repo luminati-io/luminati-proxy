@@ -41,14 +41,25 @@ const assert_has = (value, has, prefix)=>{
 };
 
 let tmp_file_counter = 0;
-const temp_file_path = (ext, pre)=>path.join(os.tmpdir(),
-    `${pre||'test'}-${Date.now()}-${tmp_file_counter++}.${ext||'tmp'}`);
+const temp_file_path = (ext, pre)=>{
+    const p = path.join(os.tmpdir(),
+        `${pre||'test'}-${Date.now()}-${tmp_file_counter++}.${ext||'tmp'}`);
+    const done = ()=>{
+        if (this.path)
+        {
+            try {
+            fs.unlinkSync(path);
+            } catch(e){}
+            this.path = null;
+        }
+    };
+    return {path: p, done: done};
+};
 
 const temp_file = (content, ext, pre)=>{
-    const path = temp_file_path(ext, pre);
-    const done = ()=>fs.unlinkSync(path);
-    fs.writeFileSync(path, JSON.stringify(content));
-    return {path, done};
+    const temp = temp_file_path(ext, pre);
+    fs.writeFileSync(temp.path, JSON.stringify(content));
+    return temp;
 };
 
 const http_proxy = port=>etask(function*(){
@@ -629,7 +640,7 @@ describe('manager', ()=>{
             args = args.concat(['--log', 'NONE']);
         let db_file = temp_file_path('.sqlite3');
         if (!get_param(args, '--database'))
-            args = args.concat(['--database', db_file]);
+            args = args.concat(['--database', db_file.path]);
         if (!get_param(args, '--proxy'))
             args = args.concat(['--proxy', '127.0.0.1']);
         if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
@@ -696,7 +707,7 @@ describe('manager', ()=>{
         yield app.manager.stop(true);
         if (process.platform=='win32')
             yield etask.sleep(10);
-        fs.unlinkSync(app.db_file);
+        app.db_file.done();
         app = null;
     }));
     beforeEach(()=>temp_files = []);

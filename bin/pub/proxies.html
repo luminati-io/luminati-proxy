@@ -54,7 +54,8 @@
                 ng-if=proxy._history>
               </span>
               <span class="proxies-action glyphicon glyphicon-list-alt"
-                ng-click=show_pool(proxy) title="Current pool">
+                ng-click=show_pool(proxy) title="Current pool"
+                ng-if="proxy.pool_size">
               </span>
               <span class="proxies-action glyphicon glyphicon-trash"
                 ng-if="$root.mode!='guest'&&proxy.persist" ng-click=delete_proxy(proxy) title=Delete>
