@@ -650,6 +650,7 @@ describe('manager', ()=>{
         if (!get_param(args, '--password'))
           args = args.concat(['--password', password]);
         let manager = new luminati.Manager(args||[]);
+        manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
         return {manager, admin, db_file};

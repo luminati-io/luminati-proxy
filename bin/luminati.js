@@ -9,7 +9,8 @@ let manager, args = process.argv.slice(2);
 if (args.some(arg=>arg=='-d' || arg=='--daemon'))
 {
     return etask(function*(){
-        this.on('uncaught', err=>console.log(err, err.stack));
+        this.on('uncaught', err=>console.log('Uncaught exception:', err,
+            err.stack));
         yield etask.nfn_apply(pm2, '.connect', []);
         yield etask.nfn_apply(pm2, '.start', [{
             name: 'luminati',
@@ -28,10 +29,14 @@ if (process.platform=='win32')
 
 (function run(run_config){
     manager = new Manager(args, run_config);
-    manager.on('stop', ()=>process.exit());
-    manager.on('config_changed', etask.fn(function*(zone_autoupdate){
+    manager.on('stop', ()=>process.exit())
+    .on('error', err=>{
+        console.log('Unhandled error:', err);
+        process.exit();
+    })
+    .on('config_changed', etask.fn(function*(zone_autoupdate){
         args = manager.argv.config ? args : manager.get_params();
-        yield manager.stop(true, true);
+        yield manager.stop('config change', true, true);
         setTimeout(()=>run(zone_autoupdate ? {
             warnings: [`Your default zone has been automatically changed from `
                 +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],

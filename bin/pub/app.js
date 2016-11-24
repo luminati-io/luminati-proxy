@@ -1033,14 +1033,6 @@ function proxies($scope, $http, $proxies, $window){
         country: true,
         sticky_ip: true,
     };
-    $http.get('/api/stats').then(function(stats){
-        if (stats.data.login_failure)
-        {
-            $window.location = '/';
-            return;
-        }
-        $scope.zones = Object.keys(stats.data);
-    });
     $scope.cols_conf = JSON.parse(
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
     $scope.page_size = 50;
@@ -1684,6 +1676,7 @@ function proxy($scope, $http, $proxies, $window){
     $scope.init = function(locals){
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         $scope.form = _.cloneDeep(locals.proxy);
+        $scope.form.zone = $scope.form.zone||'gen';
         $scope.form.port = $scope.port;
         if (!$scope.form.port||$scope.form.port=='')
         {
@@ -1714,7 +1707,6 @@ function proxy($scope, $http, $proxies, $window){
             $scope.form.duration_end = +session_duration[1];
         }
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
-        $scope.zones = $scope.$parent.$parent.zones;
         $scope.defaults = {};
         $http.get('/api/defaults').then(function(defaults){
             $scope.defaults = defaults.data;
@@ -1770,6 +1762,11 @@ function proxy($scope, $http, $proxies, $window){
                 return proxy[prop]===undefined ? $scope.defaults[prop]
                     : proxy[prop];
             };
+            for (var field in proxy)
+            {
+                if (!$scope.is_valid_field(field))
+                    proxy[field] = '';
+            }
             if (!proxy.max_requests_start&&!proxy.max_requests_end
                 &&(proxy.max_requests_start=='0'||proxy.max_requests_end=='0'))
             {
@@ -1849,6 +1846,15 @@ function proxy($scope, $http, $proxies, $window){
                 return $window.$('#confirmation').modal();
             }
             save_cont();
+        };
+        $scope.is_valid_field = function(name){
+            var perms =
+                $scope.defaults.zones[$scope.form.zone].perm.split(' ');
+            if (name === 'password')
+                return $scope.form.zone !== 'gen';
+            if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
+                return perms.includes(name);
+            return true;
         };
     };
 }
