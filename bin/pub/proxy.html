@@ -168,8 +168,8 @@
                       City
                     </label>
                     <select id=proxy-field-city ng-model=form.city
-                      class=form-control ng-disabled="!form.state || form.state=='*' || !cities || !cities.length"
-                      ng-options="c.value as c.key for c in cities"
+                      class=form-control ng-disabled="!form.country || form.country=='*' || !cities || !cities.length"
+                      ng-change="update_region_by_city()" ng-options="c.value as (c.key+(c.region ? ' ('+c.region+')' : '')) for c in cities"
                       ng-init="form.city=form.city||''">
                     </select>
                   </div>

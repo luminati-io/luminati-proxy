@@ -26,12 +26,19 @@ if (process.platform=='win32')
     readline.createInterface({input: process.stdin, output: process.stdout})
     .on('SIGINT', ()=>process.emit('SIGINT'));
 }
-
+['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
+    console.log(sig, err||'recieved');
+    if (manager)
+        manager.stop(sig, true);
+}));
 (function run(run_config){
     manager = new Manager(args, run_config);
     manager.on('stop', ()=>process.exit())
     .on('error', err=>{
-        console.log('Unhandled error:', err);
+        if (err.raw)
+            console.log(err.message);
+        else
+            console.log('Unhandled error:', err);
         process.exit();
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){

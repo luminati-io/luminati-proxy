@@ -1,7 +1,7 @@
 # Luminati Proxy manager
 
 [![Build Status](https://travis-ci.org/luminati-io/luminati-proxy.png)](https://travis-ci.org/luminati-io/luminati-proxy)
-[![Win Status](https://ci.appveyor.com/api/projects/status/github/luminati-io/luminati-proxy?svg=true&failingText=Win%20-%20Failed&pendingText=Win%20-%20Pending&passingText=Win%20-%20Passing)
+[![Win Status](https://ci.appveyor.com/api/projects/status/github/luminati-io/luminati-proxy?svg=true&failingText=Win%20-%20Failed&pendingText=Win%20-%20Pending&passingText=Win%20-%20Passing)](https://ci.appveyor.com/project/lee-elenbaas/luminati-proxy)
 [![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
 [![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
 [![optionalDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/optional-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=optional)

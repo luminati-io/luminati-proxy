@@ -80,6 +80,13 @@ function $proxies($http, $q){
                 if (Array.isArray(proxy.proxy)&&proxy.proxy.length==1)
                     proxy.proxy = proxy.proxy[0];
                 proxy.config = config_index[proxy.port];
+                if (!proxy._status)
+                {
+                    $http.get('/api/proxy_status/'+proxy.port)
+                    .then(function(data){
+                        proxy._status = data.data.status;
+                    });
+                }
             });
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
@@ -205,10 +212,10 @@ function root($rootScope, $scope, $http, $window){
         $window.$('#confirmation').modal();
     };
     $scope.logout = function(){
-        $http.post('/api/logout').then(function(){
-            $window.location = '/';
-        });
-    };
+        $http.post('/api/logout').then(function cb(){
+            $http.get('/api/config').error(function(){ setTimeout(cb, 500); })
+                .then(function(){ $window.location = '/'; });
+        }); };
     $scope.warnings = function(){
         if (!$rootScope.run_config||!$rootScope.run_config.warnings)
             return [];
@@ -471,9 +478,9 @@ function settings($scope, $http, $window, $sce){
         if ($scope.user_customers)
             creds.customer = $scope.user_data.customer;
         $http.post('/api/creds_user', creds).then(function(d){
-            $scope.saving_user = false;
             if (d.data.customers)
             {
+                $scope.saving_user = false;
                 $scope.user_customers = d.data.customers;
                 $scope.user_data.customer = $scope.user_customers[0];
             }
@@ -817,6 +824,11 @@ function proxies($scope, $http, $proxies, $window){
             },
         },
         {
+            key: '_status',
+            title: 'Status',
+            type: 'status',
+        },
+        {
             key: 'iface',
             title: 'Interface',
             type: 'options',
@@ -1029,6 +1041,7 @@ function proxies($scope, $http, $proxies, $window){
     ];
     var default_cols = {
         port: true,
+        _status: true,
         zone: true,
         country: true,
         sticky_ip: true,
@@ -1046,7 +1059,7 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.columns = function(){
         return opt_columns.filter(function(col){
-            return $scope.cols_conf[col.key];
+            return col.key.match(/^_/)||$scope.cols_conf[col.key];
         });
     };
     $proxies.subscribe(function(proxies){
@@ -1080,7 +1093,9 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.edit_cols = function(){
         $scope.columns_dialog = [{
-            columns: opt_columns,
+            columns: opt_columns.filter(function(col){
+                return !col.key.match(/^_/);
+            }),
             cols_conf: $scope.cols_conf,
             default_cols: default_cols,
         }];
@@ -1745,6 +1760,7 @@ function proxy($scope, $http, $proxies, $window){
                 return;
             $http.get('/api/regions/'+country).then(function(res){
                 $scope.regions = res.data; });
+            $scope.update_cities(changed);
         };
         $scope.update_cities = function(changed){
             // XXX marka: temporary fix, use countries from city.db
@@ -1752,10 +1768,23 @@ function proxy($scope, $http, $proxies, $window){
             var region = $scope.form.state;
             if (changed)
                 $scope.form.city = '';
-            if (!country || country=='*' || !region || region=='*')
+            if (!country || country=='*')
                 return;
-            $http.get('/api/cities/'+country+'/'+region).then(function(res){
-                $scope.cities = res.data; });
+            $http.get('/api/cities/'+country+'/'+(region=='*' ? '' : region))
+                .then(function(res){$scope.cities = res.data; });
+        };
+        $scope.update_region_by_city = function(){
+            var city = $scope.form.city;
+            if (city=='')
+                return;
+            var found = $scope.cities.some(function(c){
+                if (c.value!=city)
+                    return;
+                $scope.form.state = c.region;
+                return true;
+            });
+            if (found)
+                $scope.update_cities(false);
         };
         $scope.save = function(proxy){
             var effective = function(prop){

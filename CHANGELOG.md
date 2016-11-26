@@ -1,8 +1,12 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.33:
+  - :sparkles: allow to select city w/o selected state
+  - :boom: delete credentials from config and stop proxies after log-out
 - 0.8.32
   - :star: Replace text inputs for city and state by comboboxes
   - :sparkles: Hide irrelevant fields
+  - :star: Proxy status UI and API
 - 0.8.31
   - :sparkles: Separate "Default" and "Any" options for country
   - :sparkles: Hide pool dialog for proxies that have no pool

@@ -73,7 +73,12 @@
                   class="proxies-warning glyphicon glyphicon-exclamation-sign">
                 </span>
               </span>
-              <span ng-if="$root.mode=='guest'">
+              <span ng-if="col.key=='_status'" class=proxies-status
+                ng-class="{green: proxy._status=='ok',
+                red: proxy._status&&proxy._status!='ok'}"
+                title="{{proxy._status ? proxy._status : 'Determining...'}}">
+              </span>
+              <span ng-if="col.key!='_status'&&$root.mode=='guest'">
                 <span ng-if=proxy[col.key]===true
                   class="glyphicon glyphicon-ok">
                 </span>
@@ -95,7 +100,7 @@
                 ng-class="{'proxies-default':
                 proxy[col.key]&&proxy[col.key]!==proxy.config[col.key],
                 'proxies-editable': proxy.persist}"
-                ng-if="$root.mode!='guest'">
+                ng-if="col.key!='_status'&&$root.mode!='guest'">
                 <span ng-if=proxy[col.key]===true
                   class="glyphicon glyphicon-ok">
                 </span>

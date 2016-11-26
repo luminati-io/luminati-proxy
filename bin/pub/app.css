@@ -296,6 +296,21 @@ div.proxies .panel-heading button {
 .proxies-warning {
     color: red;
 }
+.proxies-status {
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background: yellow;
+    display: inline-block;
+    position: relative;
+    top: 2px;
+}
+.proxies-status.green {
+    background: #55ff0d;
+}
+.proxies-status.red {
+    background: red;
+}
 #history .modal-dialog, #history_details .modal-dialog, #pool .modal-dialog {
     width: auto;
     margin-left: 20px;

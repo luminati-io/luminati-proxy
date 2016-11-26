@@ -16,6 +16,8 @@ const request = require('request');
 const etask = hutil.etask;
 const assign = Object.assign;
 const luminati = require('./index.js');
+const Luminati = luminati.Luminati;
+const Manager = luminati.Manager;
 const pkg = require('./package.json');
 const customer = 'abc';
 const password = 'xyz';
@@ -203,7 +205,6 @@ const http_ping = ()=>etask(function*http_ping(){
 let proxy, ping;
 before(etask._fn(function*before(_this){
     _this.timeout(30000);
-    // XXX lee - temp output for checking travis times
     console.log('Start prep', new Date());
     proxy = yield http_proxy();
     ping = yield http_ping();
@@ -227,8 +228,9 @@ describe('proxy', ()=>{
         opt = opt||{};
         if (opt.ssl===true)
             opt.ssl = assign({requestCert: false}, ssl());
-        const l = new luminati.Luminati(assign({
+        const l = new Luminati(assign({
             proxy: '127.0.0.1',
+            proxy_port: proxy.port,
             customer: customer,
             password: password,
             log: 'NONE',
@@ -462,7 +464,6 @@ describe('proxy', ()=>{
             }));
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
-                    // _this.timeout(1000); // XXX lee ====
                     proxy.connection = hold_request;
                     l = yield lum({pool_type: 'fastest', pool_size: size});
                     for (let i = 0; i < size; ++i)
@@ -498,7 +499,7 @@ describe('proxy', ()=>{
                 let protocol = ssl?'https':'http';
                 let no_match = yield match_test(
                     protocol+'://lumtest.com/myip.json');
-                yield etask.sleep(10); // XXX lee - temp hack for stability
+                yield etask.sleep(10);
                 let match = yield match_test(
                     protocol+'://lumtest.com/echo.json');
                 assert.notEqual(no_match.after, no_match.before);
@@ -634,7 +635,7 @@ describe('manager', ()=>{
 
     const app_with_args = args=>etask(function*app_with_args(){
         args = args||[];
-        let www = get_param(args, '--www')||luminati.Manager.default.www;
+        let www = get_param(args, '--www')||Manager.default.www;
         let log = get_param(args, '--log');
         if (!log)
             args = args.concat(['--log', 'NONE']);
@@ -643,13 +644,15 @@ describe('manager', ()=>{
             args = args.concat(['--database', db_file.path]);
         if (!get_param(args, '--proxy'))
             args = args.concat(['--proxy', '127.0.0.1']);
+        if (!get_param(args, '--proxy_port'))
+            args = args.concat(['--proxy_port', proxy.port]);
         if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
             args.push('--no-config');
         if (!get_param(args, '--customer'))
           args = args.concat(['--customer', customer]);
         if (!get_param(args, '--password'))
           args = args.concat(['--password', password]);
-        let manager = new luminati.Manager(args||[]);
+        let manager = new Manager(args||[]);
         manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
@@ -812,6 +815,7 @@ describe('manager', ()=>{
                 {port: 24000, socks: 25000},
                 {port: 24001, socks: 25000},
             ]);
+            t('conflict with www', [{port: Manager.default.www}]);
         });
         // XXX lee - WIP
         it.skip('do not crush on api error', ()=>etask(function*(){
