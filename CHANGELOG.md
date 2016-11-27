@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.35:
+  - :bug: delete proxies after logout
 - 0.8.34:
   - :sparkles: Improved proxy edit form
 - 0.8.33:
