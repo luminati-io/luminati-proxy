@@ -490,37 +490,44 @@ describe('proxy', ()=>{
             return {before, after, res};
         });
         describe('null_response', ()=>{
-            const t = (name, ssl)=>it(name, ()=>etask(function*(){
-                l = yield lum({
-                    null_response: 'echo\\.json',
-                    ssl: ssl,
-                    insecure: ssl,
-                });
-                let protocol = ssl?'https':'http';
-                let no_match = yield match_test(
-                    protocol+'://lumtest.com/myip.json');
-                yield etask.sleep(10);
-                let match = yield match_test(
-                    protocol+'://lumtest.com/echo.json');
-                assert.notEqual(no_match.after, no_match.before);
-                assert.equal(match.after, match.before);
-                assert.equal(match.res.statusCode, 200);
-                assert.equal(match.res.statusMessage, 'NULL');
-                assert.equal(match.res.body, undefined);
-            }));
-            t('http');
-            t('https sniffing', true);
-            it('https connect', ()=>etask(function*(){
-                l = yield lum({null_response: 'match', log: 'DEBUG'});
-                try {
-                    yield l.test('https://match.com');
-                } catch(err){
-                    assert(/statusCode=501/.test(err.message));
+            const t =
+                (name, null_response, no_match_url, match_url, ssl, code)=>it(
+                    name, ()=>etask(function*(){
+                        l = yield lum({
+                            null_response: null_response,
+                            ssl: ssl,
+                            insecure: ssl,
+                        });
+                        let no_match = yield match_test(no_match_url);
+                        yield etask.sleep(10);
+                        let match = yield match_test(match_url);
+                        assert.notEqual(no_match.after, no_match.before);
+                        assert.equal(match.after, match.before);
+                        assert.equal(match.res.statusCode, 200);
+                        assert.equal(match.res.statusMessage, 'NULL');
+                        assert.equal(match.res.body, undefined);
+                    }));
+                    t('http', 'echo\\.json', 'http://lumtest.com/myip.json',
+                        'http://lumtest.com/echo.json');
+                    t('https sniffing by path', 'echo\\.json',
+                        'https://lumtest.com/myip.json',
+                        'https://lumtest.com/echo.json', true);
+                    t('https sniffing by domain', 'lumtest\.com',
+                        'https://httpsbin.org/ip',
+                        'http://lumtest.com/myip.json',
+                        true);
+                    it('https connect', ()=>etask(function*(){
+                        l = yield lum({null_response: 'match', log: 'DEBUG'});
+                        try {
+                            yield l.test('https://match.com');
+                        } catch(err){
+                            assert(/statusCode=501/.test(err.message));
+                        }
+                        yield l.test();
+                        assert.ok(proxy.history.length>0);
+                    }));
                 }
-                yield l.test();
-                assert.ok(proxy.history.length>0);
-            }));
-        });
+            );
         describe('direct', ()=>{
             const t = (name, expected)=>it(name, ()=>etask(function*(){
                 var direct = {};

@@ -2,6 +2,7 @@
 
 - 0.8.35:
   - :bug: delete proxies after logout
+  - :bug: fix #25 null_response now filter by domain as well
 - 0.8.34:
   - :sparkles: Improved proxy edit form
 - 0.8.33:
