@@ -1691,8 +1691,9 @@ function proxy($scope, $http, $proxies, $window){
     $scope.init = function(locals){
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         $scope.form = _.cloneDeep(locals.proxy);
-        $scope.form.zone = $scope.form.zone||'gen';
         $scope.form.port = $scope.port;
+        $scope.form.zone = $scope.form.zone||'gen';
+        $scope.form.debug = $scope.form.debug||'';
         if (!$scope.form.port||$scope.form.port=='')
         {
             var port = 24000;
@@ -1721,6 +1722,7 @@ function proxy($scope, $http, $proxies, $window){
             $scope.form.duration_start = +session_duration[0];
             $scope.form.duration_end = +session_duration[1];
         }
+        $scope.form_errors = {};
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.defaults = {};
         $http.get('/api/defaults').then(function(defaults){
@@ -1771,7 +1773,7 @@ function proxy($scope, $http, $proxies, $window){
             if (!country || country=='*')
                 return;
             $http.get('/api/cities/'+country+'/'+(region=='*' ? '' : region))
-                .then(function(res){$scope.cities = res.data; });
+                .then(function(res){ $scope.cities = res.data; });
         };
         $scope.update_region_by_city = function(){
             var city = $scope.form.city;
@@ -1815,6 +1817,15 @@ function proxy($scope, $http, $proxies, $window){
                 proxy.duration_start&&proxy.duration_end
                     ?proxy.duration_start+':'+proxy.duration_end
                     :proxy.duration_start||proxy.duration_end;
+            $scope.form_errors = {};
+            var proxy_with_same_port = $proxies.proxies.filter(function(v){
+                return v.port == proxy.port && v.port != $scope.port; })[0];
+            if (proxy_with_same_port)
+                $scope.form_errors.port = 'port already in use';
+            if (!['', 'none', 'full'].includes(proxy.debug))
+                $scope.form_errors.debug = 'invalid value';
+            if (Object.keys($scope.form_errors).length)
+                return;
             var warnings = [];
             if (effective('history')&&!effective('ssl'))
             {
@@ -1877,6 +1888,8 @@ function proxy($scope, $http, $proxies, $window){
             save_cont();
         };
         $scope.is_valid_field = function(name){
+            if (!$scope.defaults.zones)
+                return true;
             var perms =
                 $scope.defaults.zones[$scope.form.zone].perm.split(' ');
             if (name === 'password')

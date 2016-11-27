@@ -1,6 +1,30 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+const path = require('path');
+const pkg = require('../package.json');
+const excluded = ['angular', 'angular-sanitize', 'bootstrap',
+      'bootstrap-datepicker', 'codemirror', 'notosans-fontface',
+      'react-bootstrap', 'react-lite', 'react-redux', 'react-router',
+      'require-css'];
+for (let dep in pkg.dependencies)
+{
+    if (!excluded.includes(dep))
+    {
+        try {
+            require(dep);
+        } catch(e){
+            console.log(`Installation problem was detected (${dep} package).\n`
+                +'Please run the following command to recover:');
+            const d = path.resolve(__dirname, '../node_modules');
+            console.log(process.platform=='win32' ?
+                `rd /s /q ${d} && npm install -g luminati-io/luminati-proxy` :
+                `sudo rm -rf ${d} && `+
+                `sudo npm install -g luminati-io/luminati-proxy`);
+            process.exit();
+        }
+    }
+}
 const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const pm2 = require('pm2');

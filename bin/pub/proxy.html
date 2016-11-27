@@ -24,13 +24,16 @@
               </div>
               <div id=proxy-general class="panel-collapse collapse in">
                 <div class=panel-body>
-                  <div class=form-group>
+                  <div class=form-group
+                    ng-class="{'has-error': form_errors.port}">
                     <label class=control-label for=proxy-field-port>
                       Port
                     </label>
                     <input id=proxy-field-port class=form-control type=number
                       ng-model=form.port
                       placeholder={{consts.port.def}} min=24000>
+                    <span ng-show=form_errors.port class="help-block">
+                      {{form_errors.port}}</span>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-interface>
@@ -101,7 +104,7 @@
                       ng-model=form.zone
                       ng-options="k as k for (k, v) in defaults.zones"></select>
                   </div>
-                  <div class=form-group ng-show=is_valid_field('password')>
+                  <div class=form-group ng-show="is_valid_field('password')">
                     <label class=control-label
                       for=proxy-field-zone-password>
                       Zone password (if different from zone)
@@ -143,7 +146,7 @@
               </div>
               <div id=proxy-targeting class="panel-collapse collapse">
                 <div class=panel-body>
-                  <div class=form-group ng-show=is_valid_field('country')>
+                  <div class=form-group ng-show="is_valid_field('country')">
                     <label class=control-label for=proxy-field-country>
                       Country
                     </label>
@@ -153,7 +156,7 @@
                       ng-init="form.country=form.country||''; update_regions();">
                     </select>
                   </div>
-                  <div class=form-group ng-show=is_valid_field('state')>
+                  <div class=form-group ng-show="is_valid_field('state')">
                     <label class=control-label for=proxy-field-state>
                       State
                     </label>
@@ -163,7 +166,7 @@
                       ng-init="form.state=form.state||''; update_cities();">
                     </select>
                   </div>
-                  <div class=form-group ng-show=is_valid_field('city')>
+                  <div class=form-group ng-show="is_valid_field('city')">
                     <label class=control-label for=proxy-field-city>
                       City
                     </label>
@@ -173,7 +176,7 @@
                       ng-init="form.city=form.city||''">
                     </select>
                   </div>
-                  <div class=form-group  ng-show=is_valid_field('asn')>
+                  <div class=form-group  ng-show="is_valid_field('asn')">
                     <label class=control-label for=proxy-field-asn>
                       {{consts.asn.desc}}
                       (<a href=http://bgp.potaroo.net/cidr/autnums.html
@@ -182,7 +185,7 @@
                     <input id=proxy-field-asn type=number ng-model=form.asn
                       class=form-control>
                   </div>
-                  <div class=form-group  ng-show=is_valid_field('ip')>
+                  <div class=form-group  ng-show="is_valid_field('ip')">
                     <label class=control-label for=proxy-field-datacenter-ip>
                       Datacenter IP
                     </label>
@@ -371,12 +374,15 @@
                       ng-model=form.request_timeout class=form-control
                       placeholder={{consts.request_timeout.def}}>
                   </div>
-                  <div class=form-group>
+                  <div class=form-group
+                    ng-class="{'has-error': form_errors.debug}">
                     <label class=control-label for=proxy-field-debug>
                       {{consts.debug.desc}}
                     </label>
                     <input id=proxy-field-debug ng-model=form.debug
                       class=form-control>
+                    <span ng-show=form_errors.debug class="help-block">
+                      {{form_errors.debug}}</span>
                   </div>
                 </div>
               </div>

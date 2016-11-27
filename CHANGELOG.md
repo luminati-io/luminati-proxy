@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.34:
+  - :sparkles: Improved proxy edit form
 - 0.8.33:
   - :sparkles: allow to select city w/o selected state
   - :boom: delete credentials from config and stop proxies after log-out
