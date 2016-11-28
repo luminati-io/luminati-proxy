@@ -102,15 +102,19 @@
                     </label>
                     <select id=proxy-field-zone class=form-control
                       ng-model=form.zone
-                      ng-options="k as k for (k, v) in defaults.zones"></select>
+                      ng-options="k as k for (k, v) in zones">
+                    </select>
                   </div>
-                  <div class=form-group ng-show="is_valid_field('password')">
+                  <div class=form-group ng-show="is_valid_field('password')"
+                       ng-class="{'has-error': form_errors.password}">
                     <label class=control-label
                       for=proxy-field-zone-password>
                       Zone password (if different from zone)
                     </label>
                     <input type=password id=proxy-field-zone-password autocomplete=off
                       ng-model=form.password class=form-control>
+                    <span ng-show=form_errors.password class="help-block">
+                      {{form_errors.password}}</span>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-secure-proxy>
@@ -436,6 +440,9 @@
           </div>
         </div>
         <div class=modal-footer>
+          <p ng-class="'text-'+status.type" style="display: inline-block">
+            {{status.message}}
+          </p>
           <button type=button class="btn btn-default"
             data-dismiss=modal>
             Cancel

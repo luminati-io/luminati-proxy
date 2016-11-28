@@ -1,8 +1,13 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.37:
+  - :bug: Avoid crush if proxies have been deleted, while request comes in
+  - :sparkles: check proxy before saving to config file
+  - :boom: Force login in order to perform management operations through the UI
+- 0.8.36:
+  - :bug: fix #25 null_response now filter by domain as well
 - 0.8.35:
   - :bug: delete proxies after logout
-  - :bug: fix #25 null_response now filter by domain as well
 - 0.8.34:
   - :sparkles: Improved proxy edit form
 - 0.8.33:

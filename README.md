@@ -131,7 +131,7 @@ Options:
                           UI: either root (default), normal, or guest
                                                                [default: "root"]
   -h, --help              Show help                                    [boolean]
-  --version               Show version number                          [boolean]
+  -v, --version           Show version number                          [boolean]
   -p, --port              Listening port               [number] [default: 24000]
   -d, --daemon            Start as a daemon
   --proxy                               [string] [default: "zproxy.luminati.io"]

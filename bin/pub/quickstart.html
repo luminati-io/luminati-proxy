@@ -1,12 +1,8 @@
 <h4>Quick start wizard</h4>
 <ul>
-  <li ng-if="quickstart_completed('creds')" class=quickstart-completed>
-    Provide your credentials.
-  </li>
-  <li ng-if="!quickstart_completed('creds')">
-    Fill in your credentials from the <a href="https://luminati.io/cp/zones/{{$parent.settings.zone}}" target=_blank>zone page</a>, make sure your IP address
-    {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist (at the same <a href="https://luminati.io/cp/zones/{{$parent.settings.zone}}" target=_blank>zone page</a>),
-    and click <strong>Log in</strong>.
+  <li
+    ng-class="{'quickstart-completed': quickstart_completed('creds')}">
+    Provide your Luminati.io credentials.
   </li>
   <li
     ng-class="{'quickstart-completed': quickstart_completed('create-proxy')}">

@@ -17,53 +17,28 @@
   <div ng-if=proxies class="panel panel-default proxies">
     <div class=panel-heading>
       Proxies
-      <button type=button class="btn btn-default" ng-click=edit_cols()>
-        Columns
-      </button>
+      <div class=btn-wrapper>
+        <button type=button class="btn btn-default" ng-click=edit_cols()>
+          <i class="glyphicon glyphicon-th" aria-hidden=true></i>
+        </button>
+        <button type=button class="btn btn-default" ng-click=edit_proxy()
+          ng-if="$root.mode!='guest'">
+          Add a proxy
+        </button>
+      </div>
     </div>
     <div class="panel-body proxies-panel">
       <table class="table table-hover proxies">
         <thead>
           <tr>
-            <th>Actions</th>
             <th ng-repeat="col in columns()">
               {{col.title}}
             </th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size">
-            <td class=proxies-actions>
-              <span class="proxies-action glyphicon glyphicon-pencil"
-                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=edit_proxy(proxy.config)
-                title=Edit>
-              </span>
-              <span class="proxies-action-disabled glyphicon glyphicon-pencil"
-                ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be edited">
-              </span>
-              <span class="proxies-action glyphicon glyphicon-duplicate"
-                ng-click="edit_proxy(proxy.config, true)" title=Duplicate
-                ng-if="$root.mode!='guest'">
-              </span>
-              <span class="proxies-action glyphicon glyphicon-refresh"
-                ng-click="refresh_sessions(proxy)" title="Refresh sessions"
-                ng-if="$root.mode!='guest'">
-              </span>
-              <span class="proxies-action glyphicon glyphicon-time"
-                ng-click=show_history(proxy) title=History
-                ng-if=proxy._history>
-              </span>
-              <span class="proxies-action glyphicon glyphicon-list-alt"
-                ng-click=show_pool(proxy) title="Current pool"
-                ng-if="proxy.pool_size">
-              </span>
-              <span class="proxies-action glyphicon glyphicon-trash"
-                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=delete_proxy(proxy) title=Delete>
-              </span>
-              <span class="proxies-action-disabled glyphicon glyphicon-trash"
-                ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be deleted">
-              </span>
-            </td>
             <td ng-repeat="col in columns()">
               <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
                 &&proxy.config.iface&&proxy.config.iface!=='0.0.0.0'">
@@ -135,16 +110,43 @@
                 </span>
               </span>
             </td>
+            <td class=proxies-actions>
+              <span class="proxies-action glyphicon glyphicon-pencil"
+                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=edit_proxy(proxy.config)
+                title=Edit>
+              </span>
+              <span class="proxies-action-disabled glyphicon glyphicon-pencil"
+                ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be edited">
+              </span>
+              <span class="proxies-action glyphicon glyphicon-duplicate"
+                ng-click="edit_proxy(proxy.config, true)" title=Duplicate
+                ng-if="$root.mode!='guest'">
+              </span>
+              <span class="proxies-action glyphicon glyphicon-refresh"
+                ng-click="refresh_sessions(proxy)" title="Refresh sessions"
+                ng-if="$root.mode!='guest'">
+              </span>
+              <span class="proxies-action glyphicon glyphicon-time"
+                ng-click=show_history(proxy) title=History
+                ng-if=proxy._history>
+              </span>
+              <span class="proxies-action glyphicon glyphicon-list-alt"
+                ng-click=show_pool(proxy) title="Current pool"
+                ng-if="proxy.pool_size">
+              </span>
+              <span class="proxies-action glyphicon glyphicon-trash"
+                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=delete_proxy(proxy) title=Delete>
+              </span>
+              <span class="proxies-action-disabled glyphicon glyphicon-trash"
+                ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be deleted">
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="panel-footer text-center">
-      <button type=button class="btn btn-default" ng-click=edit_proxy()
-        ng-if="$root.mode!='guest'">
-        Add a proxy
-      </button>
-      <div class=proxy-pagination ng-if=page_size&lt;proxies.length>
+    <div class="panel-footer text-center" ng-if="page_size<proxies.length">
+      <div class=proxy-pagination>
         <nav aria-label="Page navigation">
           <ul class=pagination>
             <li class=page-item ng-if=page&gt;1 ng-click=set_page(page-1)>

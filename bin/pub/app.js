@@ -22,8 +22,25 @@ module.run(function($rootScope, $http, $window){
             $window.localStorage.setItem('quickstart-creds', true);
         if (!logged_in && $rootScope.section!='settings')
             $window.location = '/';
-        if (logged_in && $rootScope.section=='settings')
-            $window.location = '/proxies';
+        if (logged_in)
+        {
+            if ($rootScope.section=='settings' && data.data.mode == 'guest')
+                $window.location = '/proxies';
+            else if (data.data.mode != 'guest')
+            {
+                $http.get('/api/zones').then(function(res){
+                    if (Object.keys(res.data).length)
+                    {
+                        if ($rootScope.section=='settings')
+                            $window.location = '/proxies';
+                    }
+                    else if ($rootScope.section!='settings')
+                        $window.location = '/';
+                    else if ($rootScope.section=='settings')
+                        $rootScope.relogin_required = true;
+                });
+            }
+        }
         $rootScope.mode = data.data.mode;
         $rootScope.run_config = data.data.run_config;
         if ($window.localStorage.getItem('last_run_id')!=
@@ -362,46 +379,12 @@ function resolve($scope, $http, $window){
 module.controller('settings', settings);
 settings.$inject = ['$scope', '$http', '$window', '$sce'];
 function settings($scope, $http, $window, $sce){
-    var parse_username = function(username){
-        var values = {};
-        username = username.split('-');
-        username.shift();
-        var p = 0;
-        while (p+1 < username.length)
-        {
-            values[username[p]] = username[p+1];
-            p += 2;
-        }
-        return values;
-    };
     $scope.parse_arguments = function(args){
         return args.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
         .split('|||');
     };
     $scope.show_password = function(){
         $scope.args_password = true;
-    };
-    $scope.fix_username = function(){
-        var customer = ($scope.$parent.settings.customer||'').trim();
-        var zone = ($scope.$parent.settings.zone||'').trim();
-        if (!customer.match(/^lum-/))
-            return false;
-        var values = parse_username(customer);
-        if (!values.customer)
-            return false;
-        $scope.$parent.settings.customer = values.customer;
-        if (!values.zone||values.zone==zone)
-            return true;
-        $scope.$parent.$parent.confirmation = {
-            text: 'It appears you have entered a composite username which '
-                +'contains a zone name. Do you want "'+values.zone+'" to be '
-                +'your default zone?',
-            confirmed: function(){
-                $scope.$parent.settings.zone = values.zone;
-            },
-        };
-        $window.$('#confirmation').modal();
-        return true;
     };
     var show_reload = function(){
         $window.$('#restarting').modal({
@@ -436,20 +419,6 @@ function settings($scope, $http, $window, $sce){
             check_reload();
         });
     }
-    $scope.save = function(){
-        if ($scope.fix_username())
-            return;
-        $scope.saving = true;
-        $http.post('/api/creds', {
-            customer: $scope.$parent.settings.customer.trim(),
-            zone: $scope.$parent.settings.zone.trim(),
-            password: $scope.$parent.settings.password.trim(),
-        }).then(function(){
-            $scope.saving = false;
-            show_reload();
-            check_reload();
-        });
-    };
     $scope.user_data = {username: '', password: ''};
     $scope.save_user = function(){
         var username = $scope.user_data.username;
@@ -491,19 +460,6 @@ function settings($scope, $http, $window, $sce){
             $scope.user_error = error.data.error;
         });
     };
-    $window.$('#creds-popover').popover({html: true});
-    $window.$($window.document).on('click', function(e){
-        $window.$('[data-toggle="popover"], [data-original-title]').each(
-            function(){
-            if (!$window.$(this).is(e.target) &&
-                $window.$(this).has(e.target).length==0 &&
-                $window.$('.popover').has(e.target).length==0)
-            {
-                (($window.$(this).popover('hide').data('bs.popover')||{})
-                    .inState||{}).click = false;
-            }
-        });
-    });
     $scope.google_click = function(e){
         var google = $window.$(e.currentTarget);
         google.attr('href', google.attr('href')+'&state='
@@ -1686,14 +1642,15 @@ function pool($scope, $http, $window){
 }
 
 module.controller('proxy', proxy);
-proxy.$inject = ['$scope', '$http', '$proxies', '$window'];
-function proxy($scope, $http, $proxies, $window){
+proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
+function proxy($scope, $http, $proxies, $window, $q){
     $scope.init = function(locals){
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         $scope.form = _.cloneDeep(locals.proxy);
         $scope.form.port = $scope.port;
         $scope.form.zone = $scope.form.zone||'gen';
         $scope.form.debug = $scope.form.debug||'';
+        $scope.status = {};
         if (!$scope.form.port||$scope.form.port=='')
         {
             var port = 24000;
@@ -1728,6 +1685,10 @@ function proxy($scope, $http, $proxies, $window){
         $http.get('/api/defaults').then(function(defaults){
             $scope.defaults = defaults.data;
         });
+        $scope.zones = {};
+        $http.get('/api/zones').then(function(res){
+            $scope.zones = res.data;
+        });
         $scope.show_modal = function(){
             $window.$('#proxy').one('shown.bs.modal', function(){
                 $window.$('#proxy-field-port').select().focus();
@@ -1754,7 +1715,6 @@ function proxy($scope, $http, $proxies, $window){
         $scope.binary_changed = function(proxy, field, value){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
         $scope.update_regions = function(changed){
-            // XXX marka: temporary fix, use countries from city.db
             var country = ($scope.form.country||'').toUpperCase();
             if (changed)
                 $scope.form.city = $scope.form.state = '';
@@ -1765,7 +1725,6 @@ function proxy($scope, $http, $proxies, $window){
             $scope.update_cities(changed);
         };
         $scope.update_cities = function(changed){
-            // XXX marka: temporary fix, use countries from city.db
             var country = ($scope.form.country||'').toUpperCase();
             var region = $scope.form.state;
             if (changed)
@@ -1853,28 +1812,64 @@ function proxy($scope, $http, $proxies, $window){
                     +'will not take effect without specifing pool_size');
             }
             var save_cont = function(){
-                $window.$('#proxy').modal('hide');
                 proxy.persist = true;
                 delete proxy.max_requests_start;
                 delete proxy.max_requests_end;
                 delete proxy.duration_start;
                 delete proxy.duration_end;
-                var data = {proxy: proxy};
-                var promise;
+                var data = {proxy: Object.assign({}, proxy)};
+                var promise = $q.when();
                 var edit = $scope.port&&!locals.duplicate;
                 if (edit)
-                    promise = $http.put('/api/proxies/'+$scope.port, data);
-                else
-                    promise = $http.post('/api/proxies', data);
-                promise.then(function(){
-                    $proxies.update();
-                    $window.localStorage.setItem('quickstart-'+
-                        (edit ? 'edit' : 'create')+'-proxy', true);
-                    $http.post('/api/recheck').then(function(r){
-                        if (r.data.login_failure)
-                            $window.location = '/';
+                {
+                    promise = $http.get('/api/free_port').then(function(res){
+                        data.proxy.port = parseInt(res.data, 10); });
+                }
+                var is_ok_cb = function(){
+                    var promise = $q.when();
+                    if (edit)
+                    {
+                        promise = $http.delete('/api/proxies/'+$scope.port)
+                            .then(function(){
+                                var url = '/api/proxies/'+data.proxy.port;
+                                return $http.put(url,
+                                    {proxy: {port: $scope.port}});
+                            });
+                    }
+                    return promise
+                        .then(function(){
+                            $window.$('#proxy').modal('hide');
+                            $proxies.update();
+                            $window.localStorage.setItem('quickstart-'+
+                                (edit ? 'edit' : 'create')+'-proxy', true);
+                            return $http.post('/api/recheck').then();
+                        })
+                        .then(function(r){
+                            if (r.data.login_failure)
+                                $window.location = '/';
+                        });
+                };
+                var is_not_ok_cb = function(res){
+                    var password_err = 'The provided password is not valid.';
+                    if (res.data.status == password_err)
+                        $scope.form_errors.password = password_err;
+                    $scope.status.type = 'danger';
+                    $scope.status.message = 'Error: ' + res.data.status;
+                    return $http.delete('/api/proxies/'+data.proxy.port);
+                };
+                promise
+                    .then(function(){
+                        return $http.post('/api/proxies', data); })
+                    .then(function(){
+                        $scope.status.type = 'warning';
+                        $scope.status.message = 'Check the settings...';
+                        return $http.get('/api/proxy_status/'+data.proxy.port);
+                    })
+                    .then(function(res){
+                        if (res.data.status == 'ok')
+                            return is_ok_cb(res);
+                        return is_not_ok_cb(res);
                     });
-                });
             };
             if (warnings.length)
             {
@@ -1888,10 +1883,10 @@ function proxy($scope, $http, $proxies, $window){
             save_cont();
         };
         $scope.is_valid_field = function(name){
-            if (!$scope.defaults.zones)
+            if (!Object.keys($scope.zones).length)
                 return true;
             var perms =
-                $scope.defaults.zones[$scope.form.zone].perm.split(' ');
+                $scope.zones[$scope.form.zone].perm.split(' ');
             if (name === 'password')
                 return $scope.form.zone !== 'gen';
             if (['country', 'state', 'city', 'asn', 'ip'].includes(name))

@@ -3,9 +3,6 @@ body {
     font-size: 15px;
     line-height: 23px;
 }
-.popover {
-    font-family: "Noto Sans", sans-serif;
-}
 .page-body a {
     color: #428bca;
     outline: 3px solid transparent;
@@ -236,7 +233,7 @@ table.proxies td, table.proxies th {
 div.proxies .panel-footer, div.proxies .panel-heading {
     position: relative;
 }
-div.proxies .panel-heading button {
+div.proxies .btn-wrapper {
     position: absolute;
     right: 5px;
     top: 5px;
@@ -440,26 +437,6 @@ div.proxies .panel-heading button {
 .quickstart li.quickstart-completed + li:not(.quickstart-completed):before,
 .quickstart li:not(.quickstart-completed):first-child:before {
     color: red;
-}
-#creds-popover {
-    cursor: pointer;
-}
-.creds-popover .popover {
-    max-width: 342px;
-}
-.creds-popover .panel-body {
-    color: #004d74;
-}
-.creds-popover .panel-heading, .creds-popover .panel-body {
-    font-size: 13px;
-}
-.creds-popover .form-group {
-    margin: 0 -15px 5px !important;
-}
-.creds-popover .empty {
-    background: #004d74;
-    border-left: 15px solid white;
-    border-right: 15px solid white;
 }
 #version {
     background: #f04844;
