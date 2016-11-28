@@ -24,9 +24,9 @@ module.run(function($rootScope, $http, $window){
             $window.location = '/';
         if (logged_in)
         {
-            if ($rootScope.section=='settings' && data.data.mode == 'guest')
+            if ($rootScope.section=='settings' && data.data.mode=='guest')
                 $window.location = '/proxies';
-            else if (data.data.mode != 'guest')
+            else if (data.data.mode!='guest')
             {
                 $http.get('/api/zones').then(function(res){
                     if (Object.keys(res.data).length)
@@ -383,42 +383,15 @@ function settings($scope, $http, $window, $sce){
         return args.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
         .split('|||');
     };
-    $scope.show_password = function(){
-        $scope.args_password = true;
-    };
-    var show_reload = function(){
-        $window.$('#restarting').modal({
-            backdrop: 'static',
-            keyboard: false,
-        });
-    };
+    $scope.show_password = function(){ $scope.args_password = true; };
     var check_reload = function(){
         $http.get('/api/config').error(
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location = '/proxies'; });
     };
-    var get_param = function(name){
-        var url = window.location.href;
-        name = name.replace(/[\[\]]/g, '\\$&');
-        var regex = new RegExp('[?&]'+name+'(=([^&#]*)|&|#|$)');
-        var results = regex.exec(url);
-        if (!results)
-            return null;
-        if (!results[2])
-            return '';
-        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    var show_reload = function(){
+        $window.$('#restarting').modal({backdrop: 'static', keyboard: false});
     };
-    if (get_param('google_login'))
-    {
-        $http.post('/api/creds?autoupdate=1', {
-            customer: get_param('customer'),
-            zone: get_param('zone'),
-            password: get_param('password'),
-        }).then(function(){
-            show_reload();
-            check_reload();
-        });
-    }
     $scope.user_data = {username: '', password: ''};
     $scope.save_user = function(){
         var username = $scope.user_data.username;
@@ -461,10 +434,22 @@ function settings($scope, $http, $window, $sce){
         });
     };
     $scope.google_click = function(e){
-        var google = $window.$(e.currentTarget);
-        google.attr('href', google.attr('href')+'&state='
-            +encodeURIComponent($window.location+'?google_login=1'));
+        var google = $window.$(e.currentTarget), loc = $window.location;
+        google.attr('href', google.attr('href')+'&state='+encodeURIComponent(
+            loc.protocol+'//'+loc.hostname+':'+(loc.port||80)));
     };
+    var t = $window.location.search, m;
+    if (!(m = t.match(/\?t=([a-zA-Z0-9_\-=]+)$/)) || !(t = m[1]))
+        return;
+    try { t = JSON.parse(atob(t)); }
+    catch(e){
+        $scope.user_error = 'Invalid auth parameter';
+        return;
+    }
+    $http.post('/api/creds?autoupdate=1', t).then(function(d){
+        show_reload();
+        check_reload();
+    }).catch(function(e){ $scope.user_error = e.data.error; });
 }
 
 module.controller('zones', zones);
@@ -756,8 +741,8 @@ module.filter('startFrom', function(){
 });
 
 module.controller('proxies', proxies);
-proxies.$inject = ['$scope', '$http', '$proxies', '$window'];
-function proxies($scope, $http, $proxies, $window){
+proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
+function proxies($scope, $http, $proxies, $window, $q){
     var prepare_opts = function(opts){
         var res = [];
         for (var i=0; i<opts.length; i++)
@@ -1006,6 +991,7 @@ function proxies($scope, $http, $proxies, $window){
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
     $scope.page_size = 50;
     $scope.page = 1;
+    $scope.selected_proxies = {};
     $scope.set_page = function(p){
         if (p < 1)
             p = 1;
@@ -1022,21 +1008,27 @@ function proxies($scope, $http, $proxies, $window){
         $scope.proxies = proxies;
         $scope.set_page($scope.page);
     });
-    $scope.delete_proxy = function(proxy){
+    $scope.delete_proxies = function(){
         $scope.$parent.$parent.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
             confirmed: function(){
-                $http.delete('/api/proxies/'+proxy.port).then(function(){
-                    $proxies.update();
-                });
+                var selected = $scope.get_selected_proxies();
+                var promises = $scope.proxies
+                    .filter(function(p){
+                        return p.persist&&selected.includes(p.port); })
+                    .map(function(p){
+                        return $http.delete('/api/proxies/'+p.port); });
+                $scope.selected_proxies = {};
+                $q.all(promises).then(function(){ return $proxies.update(); });
             },
         };
         $window.$('#confirmation').modal();
     };
-    $scope.refresh_sessions = function(proxy){
-        $http.post('/api/refresh_sessions/'+proxy.port).then(function(){
-            $proxies.update();
-        });
+    $scope.refresh_sessions = function(){
+        var promises = $scope.get_selected_proxies().map(function(p){
+                return $http.post('/api/refresh_sessions/'+p); });
+        $scope.selected_proxies = {};
+        $q.all(promises).then(function(){ return $proxies.update(); });
     };
     $scope.show_history = function(proxy){
         $scope.history_dialog = [{port: proxy.port}];
@@ -1114,6 +1106,11 @@ function proxies($scope, $http, $proxies, $window){
     };
     $scope.inline_edit_blur = function(proxy){
         proxy.edited_field = '';
+    };
+    $scope.get_selected_proxies = function(){
+        return Object.keys($scope.selected_proxies)
+            .filter(function(p){ return $scope.selected_proxies[p]; })
+            .map(function(p){ return +p; });
     };
 }
 

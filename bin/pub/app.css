@@ -572,3 +572,7 @@ div.proxies .btn-wrapper {
 #google a.google:active {
     top: 1px;
 }
+.ic-columns {
+    width: 18px;
+    height: 18px;
+}

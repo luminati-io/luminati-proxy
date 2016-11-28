@@ -16,10 +16,19 @@
   </div>
   <div ng-if=proxies class="panel panel-default proxies">
     <div class=panel-heading>
-      Proxies
+      <button type=button class="btn btn-default"
+        ng-if="$root.mode!='guest'" ng-click="refresh_sessions()"
+        ng-disabled="!get_selected_proxies().length" title="Refresh sessions">
+        <i class="glyphicon glyphicon-refresh"></i>
+      </button>
+      <button type=button class="btn btn-default"
+        ng-if="$root.mode!='guest'" ng-click=delete_proxies()
+        ng-disabled="!get_selected_proxies().length"  title=Delete>
+        <span class="glyphicon glyphicon-trash"></span>
+      </button>
       <div class=btn-wrapper>
         <button type=button class="btn btn-default" ng-click=edit_cols()>
-          <i class="glyphicon glyphicon-th" aria-hidden=true></i>
+          <img class=ic-columns src="/img/ic_columns.svg">
         </button>
         <button type=button class="btn btn-default" ng-click=edit_proxy()
           ng-if="$root.mode!='guest'">
@@ -31,6 +40,7 @@
       <table class="table table-hover proxies">
         <thead>
           <tr>
+            <th></th>
             <th ng-repeat="col in columns()">
               {{col.title}}
             </th>
@@ -39,6 +49,9 @@
         </thead>
         <tbody>
           <tr ng-repeat="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size">
+            <td>
+                <input ng-model="selected_proxies[proxy.port]" type=checkbox>
+            </td>
             <td ng-repeat="col in columns()">
               <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
                 &&proxy.config.iface&&proxy.config.iface!=='0.0.0.0'">
@@ -122,10 +135,6 @@
                 ng-click="edit_proxy(proxy.config, true)" title=Duplicate
                 ng-if="$root.mode!='guest'">
               </span>
-              <span class="proxies-action glyphicon glyphicon-refresh"
-                ng-click="refresh_sessions(proxy)" title="Refresh sessions"
-                ng-if="$root.mode!='guest'">
-              </span>
               <span class="proxies-action glyphicon glyphicon-time"
                 ng-click=show_history(proxy) title=History
                 ng-if=proxy._history>
@@ -133,9 +142,6 @@
               <span class="proxies-action glyphicon glyphicon-list-alt"
                 ng-click=show_pool(proxy) title="Current pool"
                 ng-if="proxy.pool_size">
-              </span>
-              <span class="proxies-action glyphicon glyphicon-trash"
-                ng-if="$root.mode!='guest'&&proxy.persist" ng-click=delete_proxy(proxy) title=Delete>
               </span>
               <span class="proxies-action-disabled glyphicon glyphicon-trash"
                 ng-if="$root.mode!='guest'&&!proxy.persist" title="This proxy cannot be deleted">

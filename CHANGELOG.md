@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- 0.8.38:
+  - :sparkles: Use encoded creds instead of plain-text for Google OAuth login
+  - :sparkles: Move refresh and delete buttons to the top
+  - :sparkles: Update columns icon
 - 0.8.37:
   - :bug: Avoid crush if proxies have been deleted, while request comes in
   - :sparkles: check proxy before saving to config file
