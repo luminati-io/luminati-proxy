@@ -659,7 +659,9 @@ describe('manager', ()=>{
           args = args.concat(['--customer', customer]);
         if (!get_param(args, '--password'))
           args = args.concat(['--password', password]);
-        let manager = new Manager(args||[]);
+        if (!get_param(args, '--mode'))
+          args = args.concat(['--mode', 'guest']);
+        let manager = new Manager(args, {bypass_credentials_check: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
@@ -791,15 +793,15 @@ describe('manager', ()=>{
         });
         describe('proxies', ()=>{
             it('new', ()=>etask(function*(){
-                app = yield app_with_args();
+                app = yield app_with_args(['--mode', 'root']);
                 const before = yield json('api/proxies_running');
                 assert.equal(before.length, 1);
                 const proxy = {port: 24001};
                 const res = yield json('api/proxies', 'POST', {proxy});
-                assert_has(res, proxy);
+                assert_has(res, proxy, 'proxies');
                 const after = yield json('api/proxies_running');
                 assert.equal(after.length, 2);
-                assert_has(after[1], proxy);
+                assert_has(after[1], proxy, 'proxies_running');
             }));
         });
     });

@@ -4,7 +4,11 @@
     A new version <strong>{{$parent.ver_last}}</strong> is available.
   </div>
   <button type=button class="btn btn-primary" ng-click=upgrade()
-    ng-disabled=upgrading||upgrade_error>
+    ng-disabled=upgrading||upgrade_error||!ver_node.satisfied>
     {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
   </button>
+  <div ng-if=ver_node&&!ver_node.satisfied>
+    To upgrade Luminati Proxy Manager, you need to update Node.js to version
+    {{ver_node.recommended}}.
+  </div>
 </div>

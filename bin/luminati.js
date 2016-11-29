@@ -1,6 +1,16 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+if (!Array.prototype.includes)
+{
+    console.log(`Luminati proxy manager requires Node.js V6.\n`
+        +`Please upgrade your Node using nvm or nave, or visit nodejs.org and `
+        +`download a newer version.\nAfter that run the following command to `
+        +`reinstall Luminati Proxy Manager:\n`
+        +`npm uninstall -g luminati-proxy && `
+        +`npm install -g luminati-io/luminati-proxy`);
+    process.exit();
+}
 const path = require('path');
 const pkg = require('../package.json');
 const excluded = ['angular', 'angular-sanitize', 'bootstrap',

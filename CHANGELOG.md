@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.4:
+  - :boom: Luminati Proxy Manager will now refuse to run on older versions of
+    Node.js
 - 0.9.3:
   - :sparkle: delete credentials from config after logout
 - 0.9.2:
