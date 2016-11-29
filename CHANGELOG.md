@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.3:
+  - :sparkle: delete credentials from config after logout
 - 0.9.2:
   - :sparkle: Allow installation for node 4 & 5 to allow upgrades to continue
     to work

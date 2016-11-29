@@ -229,8 +229,9 @@ function root($rootScope, $scope, $http, $window){
         $window.$('#confirmation').modal();
     };
     $scope.logout = function(){
-        $http.post('/api/logout').then(function(){
-            $window.location ='/';
+        $http.post('/api/logout').then(function cb(){
+            $http.get('/api/config').error(function(){ setTimeout(cb, 500); })
+                .then(function(){ $window.location = '/'; });
         });
     };
     $scope.warnings = function(){
