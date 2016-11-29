@@ -68,7 +68,7 @@ if (process.platform=='win32')
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         args = manager.argv.config ? args : manager.get_params();
         yield manager.stop('config change', true, true);
-        setTimeout(()=>run(zone_autoupdate ? {
+        setTimeout(()=>run(zone_autoupdate&&zone_autoupdate.prev ? {
             warnings: [`Your default zone has been automatically changed from `
                 +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
         } : {}), 0);

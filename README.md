@@ -28,7 +28,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 Software requirements for Luminati proxy manager are:
 
 - Git from version 1.7+
-- Node.js from version 4+ (recommended 6)
+- Node.js from version 6+
 
 ### Windows
 - Install [Git](https://git-scm.com/download/win)
@@ -39,7 +39,7 @@ npm install -g luminati-io/luminati-proxy
 ```
 
 ### Linux/MacOS
-- Install Node.js 4 or above (preferably using
+- Install Node.js 6 or above (preferably using
   [nave](https://github.com/isaacs/nave))
 - Install Luminati Proxy from the terminal prompt:
 ```sh

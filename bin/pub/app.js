@@ -404,8 +404,7 @@ function settings($scope, $http, $window, $sce){
             };
             return;
         }
-        else
-            username = username.trim();
+        username = username.trim();
         if (!password)
         {
             $scope.user_error = {
