@@ -1,6 +1,9 @@
 # Luminati Proxy manager - Change Log
 
-- 0.9.0:
+- 0.9.2:
+  - :sparkle: Allow installation for node 4 & 5 to allow upgrades to continue
+    to work
+- 0.9.1:
   - :boom: Dropping support for node 4 & 5, please upgrade to node 6 or above
 - 0.8.38:
   - :sparkles: Use encoded creds instead of plain-text for Google OAuth login

@@ -1,11 +1,11 @@
 {
   "name": "luminati-proxy",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
   "engines": {
-    "node": ">=6&&<7"
+    "node": ">=4.9&&<7"
   },
   "recomendedNode": "6",
   "scripts": {
