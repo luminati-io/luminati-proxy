@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.5:
+  - :bug: Maintain the letter casing of the header names
+  - :star: improve upgrade process
 - 0.9.4:
   - :boom: Luminati Proxy Manager will now refuse to run on older versions of
     Node.js

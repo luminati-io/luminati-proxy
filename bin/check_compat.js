@@ -1,0 +1,38 @@
+// LICENSE_CODE ZON
+'use strict'; /*jslint node:true*/
+
+const E = exports;
+
+E.is_env_compat = ()=>{
+    if (!Array.prototype.includes)
+    {
+        console.log('Luminati proxy manager requires Node.js V6.\n'
+            +'Please upgrade your Node using nvm or nave, or visit nodejs.org '
+            +'and download a newer version.\nAfter that run the following '
+            +'command to reinstall Luminati Proxy Manager:\nnpm uninstall -g '
+            +'luminati-proxy && npm install -g luminati-io/luminati-proxy');
+        return false;
+    }
+    const path = require('path');
+    const pkg = require('../package.json');
+    const excluded = ['angular', 'angular-sanitize', 'bootstrap',
+        'bootstrap-datepicker', 'codemirror', 'notosans-fontface',
+        'react-bootstrap', 'react-lite', 'react-redux', 'react-router',
+        'require-css'];
+    for (let dep in pkg.dependencies)
+    {
+        if (excluded.includes(dep))
+            continue;
+        try { require(dep); } catch(e){
+            console.log(`Installation problem was detected (${dep} package).\n`
+                +'Please run the following command to recover:');
+            const d = path.resolve(__dirname, '../node_modules');
+            console.log(process.platform=='win32' ?
+                `rd /s /q ${d} && npm install -g luminati-io/luminati-proxy` :
+                `sudo rm -rf ${d} && `+
+                'sudo npm install -g luminati-io/luminati-proxy');
+            return false;
+        }
+    }
+    return true;
+};

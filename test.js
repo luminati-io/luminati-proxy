@@ -14,6 +14,7 @@ const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
+const qw = hutil.string.qw;
 const assign = Object.assign;
 const luminati = require('./index.js');
 const Luminati = luminati.Luminati;
@@ -50,7 +51,7 @@ const temp_file_path = (ext, pre)=>{
         if (this.path)
         {
             try {
-            fs.unlinkSync(path);
+                fs.unlinkSync(path);
             } catch(e){}
             this.path = null;
         }
@@ -64,13 +65,15 @@ const temp_file = (content, ext, pre)=>{
     return temp;
 };
 
+const to_body = req=>assign({ip: '127.0.0.1'},
+    _.pick(req, qw`method url headers rawHeaders`));
+
 const http_proxy = port=>etask(function*(){
     const proxy = {history: []};
     const handler = (req, res, head)=>{
         if (proxy.fake)
         {
-            const body = assign({ip: '127.0.0.1'},
-                _.pick(req, 'method', 'url', 'headers'));
+            const body = to_body(req);
             const auth = body.headers['proxy-authorization'];
             if (auth)
             {
@@ -101,11 +104,11 @@ const http_proxy = port=>etask(function*(){
             method: req.method,
             path: url.parse(req.url).path,
             headers: _.omit(req.headers, 'proxy-authorization'),
-            }).on('response', _res=>{
-                res.writeHead(_res.statusCode, _res.statusMessage,
-                    _res.headers);
-                _res.pipe(res);
-            }).on('error', this.throw_fn()));
+        }).on('response', _res=>{
+            res.writeHead(_res.statusCode, _res.statusMessage,
+                _res.headers);
+            _res.pipe(res);
+        }).on('error', this.throw_fn()));
     };
     proxy.http = http.createServer((req, res, head)=>{
         if (!proxy.connection)
@@ -153,10 +156,10 @@ const http_proxy = port=>etask(function*(){
             return onconnection.apply(proxy.http._handle, arguments);
         let m = proxy.http.maxConnections;
         proxy.http.maxConnections = 1;
-	proxy.http._connections++;
+        proxy.http._connections++;
         onconnection.apply(proxy.http._handle, arguments);
         proxy.http.maxConnections = m;
-	proxy.http._connections--;
+        proxy.http._connections--;
     };
     proxy.stop = etask._fn(function*(_this){
         yield etask.nfn_apply(_this.http, '.close', []);
@@ -177,7 +180,7 @@ const http_ping = ()=>etask(function*http_ping(){
     const handler = (req, res)=>{
         ping.count++;
         res.writeHead(200, 'PONG', {'content-type': 'application/json'});
-        res.write(JSON.stringify('PONG'));
+        res.write(JSON.stringify(to_body(req)));
         res.end();
     };
     const _http = http.createServer(handler);
@@ -280,7 +283,6 @@ describe('proxy', ()=>{
             let res = yield l.test(_url);
             assert.equal(ping.count, 1);
             assert_has(res, {
-                body: 'PONG',
                 statusCode: 200,
                 statusMessage: 'PONG',
             });
@@ -289,13 +291,48 @@ describe('proxy', ()=>{
         t('https', ()=>ping.https.url);
         t('https sniffing', ()=>ping.https.url, {ssl: true, insecure: true});
     });
-    it('X-Hola-Agent', ()=>etask(function*(){
-        l = yield lum();
-        yield l.test();
-        assert.equal(proxy.history.length, 1);
-        assert.equal(proxy.history[0].headers['x-hola-agent'],
-            luminati.version);
-    }));
+    describe('headers', ()=>{
+        describe('X-Hola-Agent', ()=>{
+            it('added to super proxy request', ()=>etask(function*(){
+                l = yield lum();
+                yield l.test();
+                assert.equal(proxy.history.length, 1);
+                assert.equal(proxy.history[0].headers['x-hola-agent'],
+                    luminati.version);
+            }));
+            it('not added when accessing site directly', ()=>etask(function*(){
+                l = yield lum({bypass_proxy: '.*'});
+                let res = yield l.test(ping.http.url);
+                assert.ok(!res.body.headers['x-hola-agent']);
+            }));
+        });
+        describe('keep letter caseing', ()=>{
+            const t = (name, url, opt)=>it(name, ()=>etask(function*(){
+                const headers = {
+                    'Keep-Alive': 'Close',
+                    'X-Just-Testing': 'value',
+                    'X-bizzare-Letter-cAsE': 'test',
+                };
+                l = yield lum(opt);
+                let res = yield l.test({url: url(), headers: headers});
+                let raw_headers = {};
+                for (let i=0; i<res.body.rawHeaders.length;)
+                {
+                    raw_headers[res.body.rawHeaders[i++]] =
+                        res.body.rawHeaders[i++];
+                }
+                assert_has(raw_headers, headers, 'headers');
+            }));
+            t('http', ()=>test_url);
+            t('https', ()=>ping.https.url);
+            t('https sniffing', ()=>ping.https.url,
+                {ssl: true, insecure: true});
+            t('bypass http', ()=>ping.http.url, {bypass_proxy: '.*'});
+            t('bypass https', ()=>ping.https.url, {bypass_proxy: '.*'});
+            t('bypass https sniffing', ()=>ping.https.url+'?match',
+                {bypass_proxy: 'match', ssl: true, insecure: true});
+        });
+    });
     it('Listening without specifing port', ()=>etask(function*(){
         l = yield lum({port: false});
         yield l.test();
@@ -544,7 +581,7 @@ describe('proxy', ()=>{
         describe('bypass_proxy', ()=>{
             const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
             function*(){
-                l = yield lum(assign({bypass_proxy: 'match', pool_size: 1},
+                l = yield lum(assign({bypass_proxy: 'match'},
                     opt));
                 yield l.test();
                 let missmatch = yield match_test(no_match_url());

@@ -206,8 +206,12 @@ function root($rootScope, $scope, $http, $window){
                     $scope.upgrade_error = true;
                 }).then(function(data){
                     $scope.upgrading = false;
-                    show_reload();
-                    check_reload();
+                    $http.post('/api/restart').error(function(){
+                        $scope.upgrade_error = true;
+                    }).then(function(d){
+                        show_reload();
+                        check_reload();
+                    });
                 });
             },
         };
@@ -1859,7 +1863,7 @@ function proxy($scope, $http, $proxies, $window, $q){
                         return $http.post('/api/proxies', data); })
                     .then(function(){
                         $scope.status.type = 'warning';
-                        $scope.status.message = 'Check the settings...';
+                        $scope.status.message = 'Checking the settings...';
                         return $http.get('/api/proxy_status/'+data.proxy.port);
                     })
                     .then(function(res){
