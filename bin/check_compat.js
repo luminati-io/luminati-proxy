@@ -17,7 +17,6 @@ E.is_env_compat = ()=>{
     const pkg = require('../package.json');
     const excluded = ['angular', 'angular-sanitize', 'bootstrap',
         'bootstrap-datepicker', 'codemirror', 'notosans-fontface',
-        'react-bootstrap', 'react-lite', 'react-redux', 'react-router',
         'require-css'];
     for (let dep in pkg.dependencies)
     {

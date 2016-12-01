@@ -5,11 +5,13 @@
 const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;
-let manager, args = process.argv.slice(2);
+let manager, args = process.argv.slice(2), shutdowning = false;
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
+    if (!manager || shutdowning)
+        return;
     console.log(sig, err||'recieved');
-    if (manager)
-        manager.stop(sig, true);
+    shutdowning = true;
+    manager.stop(sig, true);
 }));
 let on_upgrade_finished;
 (function run(run_config){

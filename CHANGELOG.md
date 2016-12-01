@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.6:
+  - :boom: remove experimantal React version
+  - :bug: close HTTPS connection after "Refresh session" clicked to allow
+    software to connect to new residental IP
 - 0.9.5:
   - :bug: Maintain the letter casing of the header names
   - :star: improve upgrade process

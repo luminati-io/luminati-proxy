@@ -29,6 +29,9 @@ module.run(function($rootScope, $http, $window){
             else if (data.data.mode!='guest')
             {
                 $http.get('/api/zones').then(function(res){
+                    if ($rootScope.section=='settings')
+                        $window.location = '/proxies';
+/*
                     if (Object.keys(res.data).length)
                     {
                         if ($rootScope.section=='settings')
@@ -38,6 +41,7 @@ module.run(function($rootScope, $http, $window){
                         $window.location = '/';
                     else if ($rootScope.section=='settings')
                         $rootScope.relogin_required = true;
+*/
                 });
             }
         }

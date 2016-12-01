@@ -39,7 +39,9 @@ if (process.platform=='win32')
 let child;
 
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
-    child.kill(err ? undefined : sig); }));
+    child.removeListener('exit', shutdown_on_child_exit);
+    child.kill(err ? undefined : sig);
+}));
 
 let shutdown_on_child_exit = ()=>process.exit();
 
