@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.7:
+  - :bug: fix upgrade for Windows
 - 0.9.6:
   - :boom: remove experimantal React version
   - :bug: close HTTPS connection after "Refresh session" clicked to allow

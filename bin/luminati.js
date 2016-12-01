@@ -14,7 +14,7 @@ const child_process = require('child_process');
 const path = require('path');
 const sudo_prompt = require('sudo-prompt');
 const etask = hutil.etask;
-let args = process.argv.slice(2);
+let args = process.argv.slice(2), is_win = process.platform=='win32';
 if (args.some(arg=>arg=='-d' || arg=='--daemon'))
 {
     return etask(function*(){
@@ -29,7 +29,7 @@ if (args.some(arg=>arg=='-d' || arg=='--daemon'))
         yield etask.nfn_apply(pm2, '.disconnect', []);
     });
 }
-if (process.platform=='win32')
+if (is_win)
 {
     const readline = require('readline');
     readline.createInterface({input: process.stdin, output: process.stdout})
@@ -62,7 +62,15 @@ let msg_handler = function(msg){
         child.kill();
         break;
     case 'upgrade':
-        const cmd = 'npm install -g luminati-io/luminati-proxy';
+        const cmd = 'npm install -g luminati-io/luminati-proxy'+(is_win ?
+            ' && luminati-proxy' : '');
+        if (is_win)
+        {
+            setTimeout(()=>{
+                child.send({command: 'upgrade_finished'});
+                process.exit();
+            }, 5000);
+        }
         sudo_prompt.exec(cmd, {name: 'Luminati Proxy Manager'}, e=>{
             child.send({command: 'upgrade_finished', error: e});
             if (e)

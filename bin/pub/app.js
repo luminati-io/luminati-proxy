@@ -211,7 +211,9 @@ function root($rootScope, $scope, $http, $window){
                 }).then(function(data){
                     $scope.upgrading = false;
                     $http.post('/api/restart').error(function(){
-                        $scope.upgrade_error = true;
+                        // $scope.upgrade_error = true;
+                        show_reload();
+                        check_reload();
                     }).then(function(d){
                         show_reload();
                         check_reload();
