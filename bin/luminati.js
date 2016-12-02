@@ -39,8 +39,8 @@ if (is_win)
 let child;
 
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
-    child.removeListener('exit', shutdown_on_child_exit);
-    child.kill(err ? undefined : sig);
+    child.send({command: 'shutdown', reason: sig+(err ? 'error = '+err : '')});
+    setTimeout(()=>process.exit(), 5000);
 }));
 
 let shutdown_on_child_exit = ()=>process.exit();
@@ -62,15 +62,7 @@ let msg_handler = function(msg){
         child.kill();
         break;
     case 'upgrade':
-        const cmd = 'npm install -g luminati-io/luminati-proxy'+(is_win ?
-            ' && luminati-proxy' : '');
-        if (is_win)
-        {
-            setTimeout(()=>{
-                child.send({command: 'upgrade_finished'});
-                process.exit();
-            }, 5000);
-        }
+        const cmd = 'npm install -g luminati-io/luminati-proxy';
         sudo_prompt.exec(cmd, {name: 'Luminati Proxy Manager'}, e=>{
             child.send({command: 'upgrade_finished', error: e});
             if (e)

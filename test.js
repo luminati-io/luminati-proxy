@@ -189,7 +189,7 @@ const http_ping = ()=>etask(function*http_ping(){
     ping.http = {
         server: _http,
         port: _http.address().port,
-        url: 'http://127.0.0.1:'+_http.address().port,
+        url: `http://127.0.0.1:${_http.address().port}/`,
     };
     const _https = https.createServer(ssl(), handler);
     yield etask.nfn_apply(_https, '.listen', [0]);
@@ -197,7 +197,7 @@ const http_ping = ()=>etask(function*http_ping(){
     ping.https = {
         server: _https,
         port: _https.address().port,
-        url: 'https://127.0.0.1:'+_https.address().port,
+        url: `https://127.0.0.1:${_https.address().port}/`,
     };
     ping.stop = etask._fn(function*(_this){
         yield etask.nfn_apply(_this.http.server, '.close', []);
@@ -589,10 +589,10 @@ describe('proxy', ()=>{
                 assert.equal(match.after, match.before);
                 assert.notEqual(missmatch.after, missmatch.before);
             }));
-            t('http', ()=>ping.http.url+'/match',
-                ()=>ping.http.url+'/n-o--m-a-t-c-h');
+            t('http', ()=>ping.http.url+'match',
+                ()=>ping.http.url+'n-o--m-a-t-c-h');
             t('https sniffing', ()=>ping.https.url+'/match',
-                ()=>ping.https.url+'/n-o--m-a-t-c-h',
+                ()=>ping.https.url+'n-o--m-a-t-c-h',
                 {ssl: true, insecure: true});
             it('https connect', ()=>'https://match.com/', ()=>ping.https.url,
                 {insecure: true});
@@ -666,6 +666,45 @@ describe('proxy', ()=>{
                 yield l.refresh_sessions();
                 yield test_session('24000_2');
             }));
+        });
+        describe('history aggregation', ()=>{
+            let history;
+            const aggregator = data=>history.push(data);
+            const t = (name, url, expected, opt)=>it(name, ()=>etask(
+            function*(){
+                history = [];
+                ping.headers = ping.headers||{};
+                ping.headers.connection = 'close';
+                l = yield lum(assign({history: true,
+                    history_aggregator: aggregator}, opt));
+                assert.equal(history.length, 0);
+                yield l.test({url: url(), headers: {connection:'close'}});
+                assert.equal(history.length, 1);
+                assert_has(history[0], expected());
+            }));
+            t('http', ()=>ping.http.url, ()=>({
+                port: 24000,
+                url: ping.http.url,
+                method: 'GET',
+                super_proxy: '127.0.0.1'
+            }));
+            t('https', ()=>ping.https.url, ()=>({
+                port: 24000,
+                method: 'CONNECT',
+            }), {insecure: true});
+            if (0) t('bypass http', ()=>ping.http.url, ()=>({
+                port: 24000,
+                url: ping.http.url,
+                method: 'GET',
+                super_proxy: null,
+            }), {bypass_proxy: '.*'});
+            // XXX lee WIP
+            //t('bypass https', ()=>ping.https.url, ()=>({
+            //    port: 24000,
+            //    url: ping.https.url,
+            //    method: 'GET',
+            //    super_proxy: null,
+            //}), {bypass_proxy: '.*', insecure: true});
         });
     });
 });
@@ -843,11 +882,11 @@ describe('manager', ()=>{
         });
     });
     describe('errors', ()=>{
-        describe('crush on load error', ()=>{
+        describe('crash on load error', ()=>{
             const t = (name, proxies)=>it(name, ()=>etask(function*(){
                 try {
                     app = yield app_with_proxies(proxies);
-                    assert.fail('Should crush');
+                    assert.fail('Should crash');
                 } catch(e){
                     if (e instanceof assert.AssertionError)
                         throw e;
@@ -864,7 +903,7 @@ describe('manager', ()=>{
             t('conflict with www', [{port: Manager.default.www}]);
         });
         // XXX lee - WIP
-        it.skip('do not crush on api error', ()=>etask(function*(){
+        it.skip('do not crash on api error', ()=>etask(function*(){
             app = yield app_with_proxies([
                 {port: 25025},
             ]);

@@ -227,16 +227,13 @@ nav a:hover {
 .proxies-panel {
     overflow: auto;
 }
-table.proxies td, table.proxies th {
-    text-align: center;
-}
 div.proxies .panel-footer, div.proxies .panel-heading {
     position: relative;
 }
 div.proxies .btn-wrapper {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: 10px;
+    top: 10px;
 }
 .proxy-pagination {
     position: absolute;
@@ -292,21 +289,6 @@ div.proxies .btn-wrapper {
 }
 .proxies-warning {
     color: red;
-}
-.proxies-status {
-    width: 16px;
-    height: 16px;
-    border-radius: 8px;
-    background: yellow;
-    display: inline-block;
-    position: relative;
-    top: 2px;
-}
-.proxies-status.green {
-    background: #55ff0d;
-}
-.proxies-status.red {
-    background: red;
 }
 #history .modal-dialog, #history_details .modal-dialog, #pool .modal-dialog {
     width: auto;
@@ -572,7 +554,16 @@ div.proxies .btn-wrapper {
 #google a.google:active {
     top: 1px;
 }
-.ic-columns {
-    width: 18px;
-    height: 18px;
+.panel .panel-heading button.btn.btn-ico {
+    padding: 7px;
+    border: solid 1px #c8c2bf;
+    background-color: #fcfcfc;
+    width: 35px;
+    height: 34px;
+    margin: 0 1px;
+}
+.panel .panel-heading button.btn.btn-ico img {
+    width: 100%;
+    height: 100%;
+    vertical-align: baseline;
 }

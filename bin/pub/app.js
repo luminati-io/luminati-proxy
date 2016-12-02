@@ -1696,6 +1696,8 @@ function proxy($scope, $http, $proxies, $window, $q){
         $http.get('/api/zones').then(function(res){
             $scope.zones = res.data;
         });
+        $scope.get_zones_names = function(){
+            return Object.keys($scope.zones); };
         $scope.show_modal = function(){
             $window.$('#proxy').one('shown.bs.modal', function(){
                 $window.$('#proxy-field-port').select().focus();

@@ -6,13 +6,15 @@ const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;
 let manager, args = process.argv.slice(2), shutdowning = false;
-['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
+let shutdown = (reason)=>{
     if (!manager || shutdowning)
         return;
-    console.log(sig, err||'recieved');
+    console.log('Shtudown, reason is '+reason);
     shutdowning = true;
-    manager.stop(sig, true);
-}));
+    manager.stop(reason, true);
+}
+['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>
+    shutdown(sig+(err ? ', error = '+err : ''))));
 let on_upgrade_finished;
 (function run(run_config){
     manager = new Manager(args, run_config);
@@ -42,8 +44,12 @@ let on_upgrade_finished;
 })();
 
 process.on('message', (msg)=>{
-    if (msg.command!='upgrade_finished')
-        return;
-    on_upgrade_finished(msg.error);
-    on_upgrade_finished = undefined;
+    switch (msg.command)
+    {
+    case 'upgrade_finished':
+        on_upgrade_finished(msg.error);
+        on_upgrade_finished = undefined;
+        break;
+    case 'shutdown': shutdown(msg.reason); break;
+    }
 });
