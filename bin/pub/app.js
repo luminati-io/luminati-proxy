@@ -40,7 +40,10 @@ module.run(function($rootScope, $http, $window){
                     else if ($rootScope.section!='settings')
                         $window.location = '/';
                     else if ($rootScope.section=='settings')
+                    {
                         $rootScope.relogin_required = true;
+                        $rootScope.$broadcast('error_update');
+                    }
 */
                 });
             }
@@ -55,6 +58,7 @@ module.run(function($rootScope, $http, $window){
             $window.localStorage.setItem('suppressed_warnings', '');
         }
         $rootScope.login_failure = data.data.login_failure;
+        $rootScope.$broadcast('error_update');
         if (logged_in)
         {
             var p = 60*60*1000;
@@ -185,6 +189,7 @@ function root($rootScope, $scope, $http, $window){
     });
     $http.get('/api/consts').then(function(consts){
         $scope.consts = consts.data;
+        $scope.$broadcast('consts', consts.data);
     });
     $http.get('/api/node_version').then(function(node){
         $scope.ver_node = node.data;
@@ -388,8 +393,34 @@ function resolve($scope, $http, $window){
 }
 
 module.controller('settings', settings);
-settings.$inject = ['$scope', '$http', '$window', '$sce'];
-function settings($scope, $http, $window, $sce){
+settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope'];
+function settings($scope, $http, $window, $sce, $rootScope){
+    var update_error = function(){
+        if ($rootScope.relogin_required)
+            return $scope.user_error = {message: 'Please log in again.'};
+        if (!$rootScope.login_failure)
+            return;
+        switch ($rootScope.login_failure)
+        {
+        case 'eval_expired':
+            $scope.user_error = {message: 'Evaluation expired!'
+                +'<a href=https://luminati.io/#contact>Please contact your '
+                +'Luminati rep.</a>'};
+            break;
+        case 'invalid_creds':
+        case 'unknown':
+            $scope.user_error = {message: 'Your proxy is not responding.<br>'
+                +'Please go to the <a href=https://luminati.io/cp/zones/'
+                +$scope.$parent.settings.zone+'>zone page</a> and verify that '
+                +'your IP address '+($scope.$parent.ip ? '('+$scope.$parent.ip
+                +')' : '')+' is in the whitelist.'};
+            break;
+        default:
+            $scope.user_error = {message: $rootScope.login_failure};
+        }
+    };
+    update_error();
+    $scope.$on('error_update', update_error);
     $scope.parse_arguments = function(args){
         return args.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
         .split('|||');
@@ -425,7 +456,7 @@ function settings($scope, $http, $window, $sce){
             return;
         }
         $scope.saving_user = true;
-        $scope.user_error = false;
+        $scope.user_error = null;
         var creds = {username: username, password: password};
         if ($scope.user_customers)
             creds.customer = $scope.user_data.customer;
@@ -453,7 +484,7 @@ function settings($scope, $http, $window, $sce){
         return;
     try { t = JSON.parse(atob(t)); }
     catch(e){
-        $scope.user_error = 'Invalid auth parameter';
+        $scope.user_error = {message: 'Invalid auth parameter'};
         return;
     }
     $http.post('/api/creds?autoupdate=1', t).then(function(d){
@@ -753,26 +784,18 @@ module.filter('startFrom', function(){
 module.controller('proxies', proxies);
 proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
 function proxies($scope, $http, $proxies, $window, $q){
-    var prepare_opts = function(opts){
-        var res = [];
-        for (var i=0; i<opts.length; i++)
-            res.push({key: opts[i], value: opts[i]});
-        return res;
-    };
-    var iface_opts = prepare_opts($scope.$parent.consts.proxy.iface.values);
-    var country_opts = $scope.$parent.consts.proxy.country.values;
-    var pool_type_opts = prepare_opts(
-        $scope.$parent.consts.proxy.pool_type.values);
-    var dns_opts = prepare_opts($scope.$parent.consts.proxy.dns.values);
-    var log_opts = prepare_opts($scope.$parent.consts.proxy.log.values);
+    var prepare_opts = function(opt){
+        return opt.map(function(o){ return {key: o, value: o}; }); };
+    var iface_opts = [], country_opts = [], pool_type_opts = [], dns_opts = [];
+    var log_opts = [];
+    var check_by_re = function(r, v){ return (v = v.trim()) && r.test(v); };
+    var check_number = check_by_re.bind(null, /^\d+$/);
     var opt_columns = [
         {
             key: 'port',
             title: 'Port',
             type: 'number',
-            check: function(v){
-                return v.match(/^\d+$/)&&v>=24000;
-            },
+            check: function(v){ return check_number(v) && v>=24000; },
         },
         {
             key: '_status',
@@ -783,9 +806,7 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'iface',
             title: 'Interface',
             type: 'options',
-            options: function(){
-                return iface_opts;
-            },
+            options: function(){ return iface_opts; },
         },
         {
             key: 'ssl',
@@ -796,17 +817,13 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'socks',
             title: 'SOCKS port',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'zone',
             title: 'Zone',
             type: 'text',
-            check: function(v){
-                return true;
-            },
+            check: function(v){ return true; },
         },
         {
             key: 'secure_proxy',
@@ -817,48 +834,39 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'country',
             title: 'Country',
             type: 'options',
-            options: function(){
-                return country_opts;
-            },
+            options: function(){ return country_opts; },
         },
         {
             key: 'state',
             title: 'State',
             type: 'text',
-            check: function(v){
-                return true;
-            },
+            check: function(v){ return true; },
         },
         {
             key: 'city',
             title: 'City',
             type: 'text',
-            check: function(v){
-                return true;
-            },
+            check: function(v){ return true; },
         },
         {
             key: 'asn',
             title: 'ASN',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/)&&v<400000;
-            },
+            check: function(v){ return check_number(v) && v<400000; },
         },
         {
             key: 'ip',
             title: 'Datacenter IP',
             type: 'text',
             check: function(v){
-                v = v.trim();
-                if (v=='')
+                if (!(v = v.trim()))
                     return true;
                 var m = v.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
                 if (!m)
                     return false;
-                for (var i=1; i<=4; i++)
+                for (var i = 1; i<=4; i++)
                 {
-                    if (m[i]!=='0'&&m[i].charAt(0)=='0'||m[i]>255)
+                    if (m[i]!=='0' && m[i].charAt(0)=='0' || m[i]>255)
                         return false;
                 }
                 return true;
@@ -868,33 +876,25 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'max_requests',
             title: 'Max requests',
             type: 'text',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+(:\d*)?$/);
-            },
+            check: check_by_re.bind(null, /^\d+(:\d*)?$/),
         },
         {
             key: 'session_duration',
             title: 'Session duration (sec)',
             type: 'text',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+(:\d*)?$/);
-            },
+            check: check_by_re.bind(null, /^\d+(:\d*)?$/),
         },
         {
             key: 'pool_size',
             title: 'Pool size',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'pool_type',
             title: 'Pool type',
             type: 'options',
-            options: function(){
-                return pool_type_opts;
-            },
+            options: function(){ return pool_type_opts; },
         },
         {
             key: 'sticky_ip',
@@ -905,9 +905,7 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'keep_alive',
             title: 'Keep-alive',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'allow_proxy_auth',
@@ -918,74 +916,56 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'session_init_timeout',
             title: 'Session init timeout (sec)',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'proxy_count',
             title: 'Min number of super proxies',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'dns',
             title: 'DNS',
             type: 'options',
-            options: function(){
-                return dns_opts;
-            },
+            options: function(){ return dns_opts; },
         },
         {
             key: 'log',
             title: 'Log Level',
             type: 'options',
-            options: function(){
-                return log_opts;
-            },
+            options: function(){ return log_opts; },
         },
         {
             key: 'proxy_switch',
             title: 'Autoswitch super proxy on failure',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'throttle',
             title: 'Throttle concurrent connections',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'request_timeout',
             title: 'Request timeout (sec)',
             type: 'number',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^\d+$/);
-            },
+            check: check_number,
         },
         {
             key: 'debug',
             title: 'Debug info',
             type: 'text',
-            check: function(v){
-                return v.trim()==''||v.trim().match(/^(none|full)$/);
-            },
+            check: check_by_re.bind(null, /^(none|full)$/),
         },
         {
             key: 'bypass_proxy',
             title: 'Bypass proxy',
             type: 'text',
             check: function(v){
-                try {
-                    return v.trim()==''||new RegExp(v.trim(), 'i');
-                }
+                try { return (v = v.trim()) || new RegExp(v, 'i'); }
                 catch(e){ return false; }
             },
         },
@@ -999,6 +979,18 @@ function proxies($scope, $http, $proxies, $window, $q){
     };
     $scope.cols_conf = JSON.parse(
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
+    var update_columns = function(data){
+        iface_opts = prepare_opts(data.iface.values);
+        country_opts = data.country.values;
+        pool_type_opts = prepare_opts(data.pool_type.values);
+        dns_opts = prepare_opts(data.dns.values);
+        log_opts = prepare_opts(data.log.values);
+        $scope.columns = opt_columns.filter(function(col){
+            return col.key.match(/^_/) || $scope.cols_conf[col.key]; });
+    };
+    $scope.$on('consts', function(e, data){ update_columns(data.proxy); });
+    if ($scope.$parent.consts)
+        update_columns($scope.$parent.consts.proxy);
     $scope.page_size = 50;
     $scope.page = 1;
     $scope.selected_proxies = {};
@@ -1008,11 +1000,6 @@ function proxies($scope, $http, $proxies, $window, $q){
         if (p*$scope.page_size>$scope.proxies.length)
             p = Math.ceil($scope.proxies.length/$scope.page_size);
         $scope.page = p;
-    };
-    $scope.columns = function(){
-        return opt_columns.filter(function(col){
-            return col.key.match(/^_/)||$scope.cols_conf[col.key];
-        });
     };
     $proxies.subscribe(function(proxies){
         $scope.proxies = proxies;

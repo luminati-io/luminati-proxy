@@ -36,12 +36,12 @@
         </button>
       </div>
     </div>
-    <div class="panel-body proxies-panel">
+    <div class="panel-body proxies-panel" ng-show="columns">
       <table class="table table-hover proxies">
         <thead>
           <tr>
             <th></th>
-            <th ng-repeat="col in columns()">
+            <th ng-repeat="col in columns">
               {{col.title}}
             </th>
             <th>Actions</th>
@@ -52,7 +52,7 @@
             <td>
                 <input ng-model="selected_proxies[proxy.port]" type=checkbox>
             </td>
-            <td ng-repeat="col in columns()">
+            <td ng-repeat="col in columns">
               <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
                 &&proxy.config.iface&&proxy.config.iface!=='0.0.0.0'">
                 <span title="{{'This proxy has been binded to all network '
@@ -69,14 +69,23 @@
                 <img src=/img/ic_status_undefined.svg title="Determining..."
                   ng-if=!proxy._status>
               </span>
-              <span ng-if="col.key!='_status'&&$root.mode=='guest'">
-                <img src=/img/ic_checkmark.svg ng-if=proxy[col.key]===true>
-                <span ng-if=proxy[col.key]!==true>
-                  <span ng-if=proxy[col.key]>
-                    {{proxy[col.key]}}
+              <span ng-if="$root.mode=='guest'">
+                <span ng-if="col.key=='country'">
+                  <span ng-if="proxy[col.key]&&proxy[col.key]!='*'"
+                    class="flag-icon flag-icon-{{proxy[col.key]}}">
                   </span>
-                  <span ng-if=!proxy[col.key]>
-                    &mdash;
+                  <img src=/img/flag_any_country.svg
+                    ng-if="!proxy[col.key]||proxy[col.key]=='*'">
+                </span>
+                <span ng-if="col.key!='_status'&&col.key!='country'">
+                  <img src=/img/ic_checkmark.svg ng-if=proxy[col.key]===true>
+                  <span ng-if=proxy[col.key]!==true>
+                    <span ng-if=proxy[col.key]>
+                      {{proxy[col.key]}}
+                    </span>
+                    <span ng-if=!proxy[col.key]>
+                      &mdash;
+                    </span>
                   </span>
                 </span>
               </span>
@@ -90,8 +99,15 @@
                 proxy[col.key]&&proxy[col.key]!==proxy.config[col.key],
                 'proxies-editable': proxy.persist}"
                 ng-if="col.key!='_status'&&$root.mode!='guest'">
+                <span ng-if="col.key=='country'">
+                  <span ng-if="proxy[col.key]&&proxy[col.key]!='*'"
+                    class="flag-icon flag-icon-{{proxy[col.key]}}">
+                  </span>
+                  <img src=/img/flag_any_country.svg
+                    ng-if="!proxy[col.key]||proxy[col.key]=='*'">
+                </span>
                 <img src=/img/ic_checkmark.svg ng-if=proxy[col.key]===true>
-                <span ng-if=proxy[col.key]!==true>
+                <span ng-if="col.key!='country'&&proxy[col.key]!==true">
                   <span ng-if=proxy[col.key]||proxy[col.key]===0>
                     {{proxy[col.key]}}
                   </span>

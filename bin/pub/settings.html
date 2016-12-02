@@ -1,30 +1,5 @@
 <div ng-controller=settings id=settings-page>
-  <div ng-if="$root.login_failure&&$root.login_failure!='eval_expired'"
-    class="alert alert-danger settings-alert">
-    <div>
-      <span>
-        Your proxy is not responding.<br>
-        Please go to the <a href=https://luminati.io/cp/zones/{{$parent.settings.zone}}>zone page</a>
-        and verify that your IP address {{$parent.ip ? '('+$parent.ip+')' : ''}} is in the whitelist.
-      </span>
-    </div>
-  </div>
-  <div ng-if="$root.login_failure&&$root.login_failure=='eval_expired'"
-    class="alert alert-danger settings-alert">
-    <div>
-      <span>
-        Evaluation expired!
-        <a href=https://luminati.io/#contact>
-          Please contact your Luminati rep.
-        </a>
-      </span>
-    </div>
-  </div>
-  <div ng-if=$root.relogin_required class="alert alert-danger settings-alert">
-    <div>
-      <span>Please log in again.</span>
-    </div>
-  </div>
+  <div class="alert alert-danger settings-alert" ng-if=user_error ng-bind-html=user_error.message></div>
   <div ng-if="$root.mode=='root'&&$parent.$parent.settings.argv" class="alert alert-info">
     The application is running with the following arguments:
     <strong>
@@ -59,31 +34,35 @@
     <pre class=top-margin>npm install -g luminati-io/luminati-proxy</pre>
   </div>
   <div class=row>
+    <div class="col-xs-12 text-center">
+      <h3>Login with your luminati.io credentials</h3>
+    </div>
+  </div>
+  <div class=row>
     <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8
       col-md-offset-3 col-md-6 col-lg-offset-4 col-lg-4 luminati-login">
       <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
-        <h3>Login with your luminati.io credentials</h3>
         <div id=google>
           <a class=google ng-click=google_click($event)
             href="https://accounts.google.com/o/oauth2/v2/auth?client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.googleusercontent.com&response_type=code&redirect_uri=https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account">
             Log in with Google
           </a>
         </div>
-        <div class="alert alert-danger" ng-if=user_error
-          ng-bind-html=user_error.message>
-        </div>
-        <div class=form-group
+        <div class=form-group ng-hide=user_customers
           ng-class="{'has-error': user_error&&user_error.username}">
           <label for=username>Email</label>
           <input type=email name=username id=username class=form-control
             ng-model=user_data.username ng-disabled=user_customers>
         </div>
-        <div class=form-group
+        <div class=form-group ng-hide=user_customers
           ng-class="{'has-error': user_error&&user_error.password}">
           <label for=user_password>Password</label>
           <input type=password name=password id=user_password
             class=form-control ng-model=user_data.password
             ng-disabled=user_customers>
+        </div>
+        <div class="alert alert-info" ng-if=user_customers>
+          Please choose a customer.
         </div>
         <div class=form-group ng-if=user_customers>
           <label for=user_customer>Customer</label>
@@ -91,9 +70,6 @@
             class=form-control>
             <option ng-repeat="c in user_customers" ng-value=c>{{c}}</option>
           </select>
-        </div>
-        <div class="alert alert-info" ng-if=user_customers>
-          Please choose a customer.
         </div>
         <button type=submit class="btn btn-flat-blue btn-block"
           ng-disabled=saving_user>

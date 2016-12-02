@@ -17,7 +17,7 @@ E.is_env_compat = ()=>{
     const pkg = require('../package.json');
     const excluded = ['angular', 'angular-sanitize', 'bootstrap',
         'bootstrap-datepicker', 'codemirror', 'notosans-fontface',
-        'require-css'];
+        'require-css', 'flag-icon-css'];
     for (let dep in pkg.dependencies)
     {
         if (excluded.includes(dep))

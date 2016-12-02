@@ -230,6 +230,9 @@ nav a:hover {
 div.proxies .panel-footer, div.proxies .panel-heading {
     position: relative;
 }
+div.proxies .panel-heading {
+    height: 65px;
+}
 div.proxies .btn-wrapper {
     position: absolute;
     right: 10px;

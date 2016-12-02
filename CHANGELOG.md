@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.11:
+  - :sparkle: visual changes for login screen
+  - :bug: fix freezes of /proxies page
+- 0.9.10
+  - :sparkle: improve upgrade process
 - 0.9.7:
   - :bug: fix upgrade for Windows
 - 0.9.6:

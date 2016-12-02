@@ -12,7 +12,7 @@ let shutdown = (reason)=>{
     console.log('Shtudown, reason is '+reason);
     shutdowning = true;
     manager.stop(reason, true);
-}
+};
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>
     shutdown(sig+(err ? ', error = '+err : ''))));
 let on_upgrade_finished;
