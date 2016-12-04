@@ -679,11 +679,8 @@ describe('proxy', ()=>{
                     history_aggregator: aggregator}, opt));
                 assert.equal(history.length, 0);
                 let res = yield l.test(url());
-                if (close)
-                {
-                    res.socket.destroy();
-                    yield etask.sleep(10);
-                }
+                res.socket.destroy();
+                yield etask.sleep(10);
                 assert.equal(history.length, 1);
                 assert_has(history[0], expected());
             }));
@@ -692,7 +689,7 @@ describe('proxy', ()=>{
                 url: ping.http.url,
                 method: 'GET',
                 super_proxy: '127.0.0.1'
-            }), true);
+            }));
             t('https', ()=>ping.https.url, ()=>({
                 port: 24000,
                 method: 'CONNECT',
@@ -709,7 +706,7 @@ describe('proxy', ()=>{
                 url: ping.https.url,
                 method: 'CONNECT',
                 super_proxy: null,
-            }), {bypass_proxy: '.*', insecure: true}, true);
+            }), {bypass_proxy: '.*', insecure: true});
         });
     });
 });
