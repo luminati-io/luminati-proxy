@@ -690,10 +690,10 @@ describe('proxy', ()=>{
                 method: 'GET',
                 super_proxy: '127.0.0.1'
             }));
-            t('https', ()=>ping.https.url, ()=>({
-                port: 24000,
-                method: 'CONNECT',
-            }), {insecure: true});
+            //t('https', ()=>ping.https.url, ()=>({
+            //    port: 24000,
+            //    method: 'CONNECT',
+            //}), {insecure: true});
             t('bypass http', ()=>ping.http.url, ()=>({
                 port: 24000,
                 url: ping.http.url,
