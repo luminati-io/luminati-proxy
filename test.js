@@ -670,7 +670,7 @@ describe('proxy', ()=>{
         describe('history aggregation', ()=>{
             let history;
             const aggregator = data=>history.push(data);
-            const t = (name, url, expected, opt, close)=>it(name, ()=>etask(
+            const t = (name, url, expected, opt)=>it(name, ()=>etask(
             function*(){
                 history = [];
                 ping.headers = ping.headers||{};
@@ -690,17 +690,22 @@ describe('proxy', ()=>{
                 method: 'GET',
                 super_proxy: '127.0.0.1'
             }));
-            //t('https', ()=>ping.https.url, ()=>({
-            //    port: 24000,
-            //    method: 'CONNECT',
-            //}), {insecure: true});
+            t('https connect', ()=>ping.https.url, ()=>({
+                port: 24000,
+                url: '127.0.0.1:'+ping.https.port,
+                method: 'CONNECT',
+            }), {insecure: true});
+            t('https sniffing', ()=>ping.https.url, ()=>({
+                port: 24000,
+                method: 'GET',
+                url: ping.https.url,
+            }), {ssl: true, insecure: true});
             t('bypass http', ()=>ping.http.url, ()=>({
                 port: 24000,
                 url: ping.http.url,
                 method: 'GET',
                 super_proxy: null,
             }), {bypass_proxy: '.*'});
-            // XXX lee WIP
             t('bypass https', ()=>ping.https.url, ()=>({
                 port: 24000,
                 url: ping.https.url,

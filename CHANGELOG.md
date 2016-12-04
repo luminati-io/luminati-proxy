@@ -1,12 +1,15 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.13:
+  - :bug: handle gracefully old data table that do not exists
+  - :sparkles: delete zones from local DB after logout
 - 0.9.12:
-  - :sparkle: improve tests
+  - :sparkles: improve tests
 - 0.9.11:
-  - :sparkle: visual changes for login screen
+  - :sparkles: visual changes for login screen
   - :bug: fix freezes of /proxies page
 - 0.9.10
-  - :sparkle: improve upgrade process
+  - :sparklse: improve upgrade process
 - 0.9.7:
   - :bug: fix upgrade for Windows
 - 0.9.6:
@@ -20,9 +23,9 @@
   - :boom: Luminati Proxy Manager will now refuse to run on older versions of
     Node.js
 - 0.9.3:
-  - :sparkle: delete credentials from config after logout
+  - :sparkles: delete credentials from config after logout
 - 0.9.2:
-  - :sparkle: Allow installation for node 4 & 5 to allow upgrades to continue
+  - :sparkles: Allow installation for node 4 & 5 to allow upgrades to continue
     to work
 - 0.9.1:
   - :boom: Dropping support for node 4 & 5, please upgrade to node 6 or above
