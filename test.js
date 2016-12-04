@@ -692,7 +692,7 @@ describe('proxy', ()=>{
                 url: ping.http.url,
                 method: 'GET',
                 super_proxy: '127.0.0.1'
-            }));
+            }), true);
             t('https', ()=>ping.https.url, ()=>({
                 port: 24000,
                 method: 'CONNECT',
