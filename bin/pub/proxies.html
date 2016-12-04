@@ -111,9 +111,8 @@
                   <span ng-if=proxy[col.key]||proxy[col.key]===0>
                     {{proxy[col.key]}}
                   </span>
-                  <span ng-if=!proxy[col.key]&&proxy[col.key]!==0>
-                    &mdash;
-                  </span>
+                  <img src=/img/ic_off.svg
+                    ng-if=!proxy[col.key]&&proxy[col.key]!==0>
                 </span>
                 <span ng-if="(col.type=='number'||col.type=='text')
                   &&proxy.edited_field==col.key"

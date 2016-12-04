@@ -670,7 +670,7 @@ describe('proxy', ()=>{
         describe('history aggregation', ()=>{
             let history;
             const aggregator = data=>history.push(data);
-            const t = (name, url, expected, opt)=>it(name, ()=>etask(
+            const t = (name, url, expected, opt, close)=>it(name, ()=>etask(
             function*(){
                 history = [];
                 ping.headers = ping.headers||{};
@@ -678,7 +678,12 @@ describe('proxy', ()=>{
                 l = yield lum(assign({history: true,
                     history_aggregator: aggregator}, opt));
                 assert.equal(history.length, 0);
-                yield l.test({url: url(), headers: {connection:'close'}});
+                let res = yield l.test(url());
+                if (close)
+                {
+                    res.socket.destroy();
+                    yield etask.sleep(10);
+                }
                 assert.equal(history.length, 1);
                 assert_has(history[0], expected());
             }));
@@ -692,19 +697,19 @@ describe('proxy', ()=>{
                 port: 24000,
                 method: 'CONNECT',
             }), {insecure: true});
-            if (0) t('bypass http', ()=>ping.http.url, ()=>({
+            t('bypass http', ()=>ping.http.url, ()=>({
                 port: 24000,
                 url: ping.http.url,
                 method: 'GET',
                 super_proxy: null,
             }), {bypass_proxy: '.*'});
             // XXX lee WIP
-            //t('bypass https', ()=>ping.https.url, ()=>({
-            //    port: 24000,
-            //    url: ping.https.url,
-            //    method: 'GET',
-            //    super_proxy: null,
-            //}), {bypass_proxy: '.*', insecure: true});
+            t('bypass https', ()=>ping.https.url, ()=>({
+                port: 24000,
+                url: ping.https.url,
+                method: 'CONNECT',
+                super_proxy: null,
+            }), {bypass_proxy: '.*', insecure: true}, true);
         });
     });
 });

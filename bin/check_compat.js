@@ -26,10 +26,10 @@ E.is_env_compat = ()=>{
             console.log(`Installation problem was detected (${dep} package).\n`
                 +'Please run the following command to recover:');
             const d = path.resolve(__dirname, '../node_modules');
-            console.log(process.platform=='win32' ?
-                `rd /s /q ${d} && npm install -g luminati-io/luminati-proxy` :
-                `sudo rm -rf ${d} && `+
-                'sudo npm install -g luminati-io/luminati-proxy');
+            console.log(
+                (process.platform=='win32'
+                ? `rmdir /s /q ${d} && ` : `sudo rm -rf ${d} && sudo `)
+                +'npm install -g luminati-io/luminati-proxy');
             return false;
         }
     }
