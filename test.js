@@ -326,6 +326,7 @@ describe('proxy', ()=>{
                 {
                     const target_req = target();
                     assert.equal(target_req['x-hola-context'], undefined);
+                    yield etask.sleep(10);
                     assert.equal(history.length, 1);
                     assert.equal(history[0].context, context);
                 }
@@ -556,6 +557,7 @@ describe('proxy', ()=>{
         const match_test = url=>etask(function*(){
             let before = proxy.history.length;
             let res = yield l.test(url);
+            yield etask.sleep(10);
             let after = proxy.history.length;
             return {before, after, res};
         });
