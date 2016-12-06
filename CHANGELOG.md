@@ -1,5 +1,12 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.15:
+  - :sparkles: show proxy status details in popup
+- 0.9.14:
+  - :star: add X-Hola-Context header, that will not be passed over outside the
+    manager, but will be added to the response and history
+  - :sparkles: improve checks for proxy saving
+  - :sparkles: visual changes for proxies table
 - 0.9.13:
   - :bug: handle gracefully old data table that do not exists
   - :sparkles: delete zones from local DB after logout

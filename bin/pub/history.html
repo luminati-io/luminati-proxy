@@ -71,6 +71,7 @@
                     <td>{{r.country}}</td>
                     <td>{{r.super_proxy}}</td>
                     <td>{{r.proxy_peer}}</td>
+                    <td>{{r.context}}</td>
                     <td>
                       <a title=Replay href="{{r | request}}"
                         ng-click=$event.stopPropagation()>
@@ -316,6 +317,7 @@
                 <td>{{row.country}}</td>
                 <td>{{row.super_proxy}}</td>
                 <td>{{row.proxy_peer}}</td>
+                <td>{{row.context}}</td>
                 <td>
                   <a title=Replay href="{{row | request}}"
                     ng-click=$event.stopPropagation()>

@@ -96,7 +96,8 @@
                       ng-model=form.socks placeholder={{consts.socks.def}}
                       class=form-control>
                   </div>
-                  <div class=form-group>
+                  <div class=form-group
+                    ng-class="{'has-error': form_errors.zone}">
                     <label class=control-label for=proxy-field-zone>
                       Zone
                     </label>
@@ -106,6 +107,8 @@
                     </select>
                     <input type="text" class=form-control
                       ng-if="get_zones_names().length==0" ng-model=form.zone>
+                    <span ng-show=form_errors.zone class="help-block">
+                      {{form_errors.zone}}</span>
                   </div>
                   <div class=form-group ng-show="is_valid_field('password')"
                        ng-class="{'has-error': form_errors.password}">

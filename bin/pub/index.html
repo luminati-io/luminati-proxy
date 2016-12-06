@@ -114,6 +114,25 @@
         </div>
       </div>
     </div>
+    <div id=proxy-status-details class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <button type=button class=close data-dismiss=modal>
+              &times;
+            </button>
+            <h4 class=modal-title>Proxy Status Details</h4>
+          </div>
+          <div class=modal-body>
+            <p ng-repeat="i in proxy_status_details"
+              ng-class="{'bg-warning':i.lvl=='warn', 'bg-danger':i.lvl=='err'}"
+              class="proxy-status-row">
+              {{i.msg}}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
     <script data-main=/config.js src=/req/requirejs/require.js></script>
   </body>
 </html>

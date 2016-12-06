@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>7D92815F-7922-4B57-9540-7B0CAC1A8257</title>
+    <desc>Created with sketchtool.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Luminati-PM" transform="translate(-246.000000, -351.000000)">
+            <g id="Group-8" transform="translate(-779.000000, -22.000000)">
+                <g id="Luminati-proxy-manager-new" transform="translate(0.000000, 135.000000)">
+                    <g id="Group-7" transform="translate(0.000000, 9.000000)">
+                        <g id="states" transform="translate(1025.000000, 120.000000)">
+                            <g id="Group-5" transform="translate(0.000000, 109.000000)">
+                                <path d="M17.15,9.18 C17.15,13.6 13.57,17.18 9.15,17.18 C4.73,17.18 1.15,13.6 1.15,9.18 C1.15,4.76 4.73,1.18 9.15,1.18 C13.57,1.18 17.15,4.76 17.15,9.18" id="Fill-82" fill="#4CA16A"></path>
+                                <path d="M9,18 C4.58,18 1,14.42 1,10 C1,5.58 4.58,2 9,2 C13.42,2 9,6.54013672 9,10.9601367 C9,15.3801367 13.42,18 9,18 Z" id="Fill-82" fill="#FFFFFF" opacity="0.147384511"></path>
+                                <text id="!" font-family="NotoSans-Bold, Noto Sans" font-size="12" font-weight="bold" fill="#FFFFFF">
+                                    <tspan x="6.8499" y="13.6982031">!</tspan>
+                                </text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

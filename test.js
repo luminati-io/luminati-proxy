@@ -176,11 +176,12 @@ const http_proxy = port=>etask(function*(){
     return proxy;
 });
 const http_ping = ()=>etask(function*http_ping(){
-    let ping = {count: 0};
+    let ping = {history: []};
     const handler = (req, res)=>{
-        ping.count++;
+        let body = to_body(req);
+        ping.history.push(body);
         res.writeHead(200, 'PONG', {'content-type': 'application/json'});
-        res.write(JSON.stringify(to_body(req)));
+        res.write(JSON.stringify(body));
         res.end();
     };
     const _http = http.createServer(handler);
@@ -267,7 +268,7 @@ describe('proxy', ()=>{
     beforeEach(()=>{
         proxy.history = [];
         waiting = [];
-        ping.count = 0;
+        ping.history = [];
     });
     afterEach(()=>etask(function*(){
         if (!l)
@@ -281,7 +282,7 @@ describe('proxy', ()=>{
             const _url = url();
             l = yield lum(opt);
             let res = yield l.test(_url);
-            assert.equal(ping.count, 1);
+            assert.equal(ping.history.length, 1);
             assert_has(res, {
                 statusCode: 200,
                 statusMessage: 'PONG',
@@ -305,6 +306,38 @@ describe('proxy', ()=>{
                 let res = yield l.test(ping.http.url);
                 assert.ok(!res.body.headers['x-hola-agent']);
             }));
+        });
+        describe('X-Hola-Context', ()=>{
+            let history;
+            const aggregator = data=>history.push(data);
+            const t = (name, url, opt, target, skip_res)=>it(name, ()=>etask(
+            function*(){
+                const context = 'context-1';
+                history = [];
+                l = yield lum(assign({history: true, history_aggregator:
+                    aggregator}, opt));
+                let res = yield l.test({
+                    url: url(),
+                    headers: {'x-hola-context': context},
+                });
+                if (!skip_res)
+                    assert.equal(res.headers['x-hola-context'], context);
+                if (target)
+                {
+                    const target_req = target();
+                    assert.equal(target_req['x-hola-context'], undefined);
+                    assert.equal(history.length, 1);
+                    assert.equal(history[0].context, context);
+                }
+            }));
+            t('null response', ()=>ping.http.url, {null_response: '.*'});
+            t('bypass proxy', ()=>ping.http.url, {bypass_proxy: '.*'},
+                ()=>ping.history[0]);
+            t('http', ()=>test_url, {}, ()=>proxy.history[0]);
+            t('https sniffing', ()=>ping.https.url,
+                {ssl: true, insecure: true}, ()=>proxy.history[0]);
+            t('https connect', ()=>ping.https.url, {ssl: true, insecure: true},
+                ()=>proxy.history[0]);
         });
         describe('keep letter caseing', ()=>{
             const t = (name, url, opt)=>it(name, ()=>etask(function*(){
