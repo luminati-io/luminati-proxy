@@ -565,5 +565,22 @@ div.proxies .btn-wrapper {
     opacity: 0.25;
 }
 .proxy-status-row {
-    padding: 10px;
+    padding: 5px 10px;
+}
+.tooltip-proxy-status .tooltip-inner {
+    border: solid 1px #d8d8d8;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
+    background: #fff;
+}
+.tooltip-proxy-status .text-err {
+    color: #d8393c;
+}
+.tooltip-proxy-status .text-ok {
+    color: #4ca16a;
+}
+.tooltip-proxy-status .text-warn {
+    color: #f5a623;
+}
+.tooltip-proxy-status.in {
+    opacity: 1;
 }

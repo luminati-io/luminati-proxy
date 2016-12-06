@@ -2,10 +2,10 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
-    'bootstrap', 'bootstrap-datepicker', '_css!app'],
+    'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap'],
 function(angular, _, moment, codemirror){
 
-var module = angular.module('app', ['ngSanitize']);
+var module = angular.module('app', ['ngSanitize', 'ui.bootstrap']);
 
 module.run(function($rootScope, $http, $window){
     var l = $window.location.pathname;

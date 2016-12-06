@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.16:
+  - :sparkles: use HTML tooltip for proxy status icon
 - 0.9.15:
   - :sparkles: show proxy status details in popup
 - 0.9.14:

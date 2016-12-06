@@ -62,23 +62,18 @@
                 </span>
               </span>
               <span ng-if="col.key=='_status'"
-                ng-switch="proxy._status||'?'">
+                ng-click="show_proxy_status_details(proxy)"
+                uib-tooltip-template="'/tooltip_proxy_status.html'"
+                tooltip-class="tooltip-proxy-status"
+                tooltip-placement="bottom">
                 <img ng-if="proxy._status=='error'"
-                  ng-click="show_proxy_status_details(proxy)"
-                  src="/img/ic_status_red.svg"
-                  title="The proxy is unavailable, click here for more info">
+                  src="/img/ic_status_red.svg">
                 <img ng-if="!proxy._status"
-                  ng-click="show_proxy_status_details(proxy)"
-                  src="/img/ic_status_undefined.svg"
-                  title="Determining...">
+                  src="/img/ic_status_undefined.svg">
                 <img ng-if="proxy._status=='ok'&&proxy._status_details.length"
-                  ng-click="show_proxy_status_details(proxy)"
-                  src="/img/ic_status_ok_with_warning.svg"
-                  title="The proxy is available with warnings, click here for more info">
+                  src="/img/ic_status_ok_with_warning.svg">
                 <img ng-if="proxy._status=='ok'&&!proxy._status_details.length"
-                  ng-click="show_proxy_status_details(proxy)"
-                  src="/img/ic_status_ok.svg"
-                  title="The proxy is available">
+                  src="/img/ic_status_ok.svg">
               </span>
               <span ng-if="$root.mode=='guest'">
                 <span ng-if="col.key=='country'"

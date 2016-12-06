@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.9.16",
+  "version": "0.9.17",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -35,6 +35,7 @@
   "dependencies": {
     "angular": "^1.5.8",
     "angular-sanitize": "^1.5.8",
+    "angular-ui-bootstrap": "^2.3.0",
     "body-parser": "^1.15.2",
     "bootstrap": "^3.3.7",
     "bootstrap-datepicker": "^1.6.4",
