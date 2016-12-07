@@ -793,8 +793,8 @@ proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
 function proxies($scope, $http, $proxies, $window, $q){
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
-    var iface_opts = [], country_opts = [], pool_type_opts = [], dns_opts = [];
-    var log_opts = [];
+    var iface_opts = [], country_opts = [], region_opts = {};
+    var pool_type_opts = [], dns_opts = [], log_opts = [];
     var check_by_re = function(r, v){ return (v = v.trim()) && r.test(v); };
     var check_number = check_by_re.bind(null, /^\d+$/);
     var opt_columns = [
@@ -846,8 +846,8 @@ function proxies($scope, $http, $proxies, $window, $q){
         {
             key: 'state',
             title: 'State',
-            type: 'text',
-            check: function(v){ return true; },
+            type: 'options',
+            options: function(proxy){ return load_regions(proxy.country); },
         },
         {
             key: 'city',
@@ -1126,6 +1126,13 @@ function proxies($scope, $http, $proxies, $window, $q){
         $scope.$parent.$parent.proxy_status_details = proxy._status_details;
         $window.$('#proxy-status-details').modal();
     };
+    var load_regions = function(country){
+        if (!country||country=='*')
+            return [];
+        return region_opts[country] || (region_opts[country] =
+            $http.get('/api/regions/'+country.toUpperCase()).then(function(r){
+                return region_opts[country] = r.data; }));
+    };
 }
 
 module.controller('history', history);
@@ -1282,7 +1289,10 @@ function history($scope, $http, $filter, $window){
                             else
                                 alerts.push(alert);
                         };
-                        var request_headers = JSON.parse(r.request_headers);
+                        var raw_headers = JSON.parse(r.request_headers);
+                        var request_headers = {};
+                        for (var h in raw_headers)
+                            request_headers[h.toLowerCase()] = raw_headers[h];
                         if (!request_headers['user-agent'])
                         {
                             add_alert({
@@ -1790,7 +1800,7 @@ function proxy($scope, $http, $proxies, $window, $q){
                 proxy.duration_end);
             delete proxy.duration_start;
             delete proxy.duration_end;
-            proxy.histroy = effective('history');
+            proxy.history = effective('history');
             proxy.ssl = effective('ssl');
             proxy.max_requests = effective('max_requests');
             proxy.session_duration = effective('session_duration');

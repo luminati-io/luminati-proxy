@@ -63,10 +63,16 @@ let msg_handler = function(msg){
         break;
     case 'upgrade':
         const cmd = 'npm install -g luminati-io/luminati-proxy';
-        sudo_prompt.exec(cmd, {name: 'Luminati Proxy Manager'}, e=>{
+        const opt = {name: 'Luminati Proxy Manager'};
+        sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
             child.send({command: 'upgrade_finished', error: e});
             if (e)
+            {
+                console.log('Error during upgrade: '+e);
                 return;
+            }
+            if (stderr)
+                console.log('NPM stderr: '+stderr);
             check_compat = null;
             delete require.cache[require.resolve('./check_compat.js')];
             check_compat = require('./check_compat.js');

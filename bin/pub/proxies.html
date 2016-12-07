@@ -135,7 +135,7 @@
                     ng-change="
                     inline_edit_select_change(proxy, col, proxy.dummy_model)"
                     ng-keyup="inline_edit_select(proxy, col, $event)"
-                    ng-options="v.value as v.key for v in col.options()">
+                    ng-options="v.value as v.key for v in col.options(proxy)">
                   </select>
                 </span>
               </span>
@@ -159,6 +159,8 @@
               <img src=/img/ic_table.svg class=proxies-action
                 ng-click=show_pool(proxy) title="Current pool"
                 ng-if=proxy.pool_size>
+              <img src=/img/ic_table_disabled.svg class=proxies-action-disabled
+                title="Pool empty; size is set to zero" ng-if=!proxy.pool_size>
             </td>
           </tr>
         </tbody>

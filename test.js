@@ -85,11 +85,6 @@ const http_proxy = port=>etask(function*(){
                     const key = args.shift();
                     if (key=='lum')
                         continue;
-                    if (key=='direct')
-                    {
-                        body.auth.direct = true;
-                        continue;
-                    }
                     body.auth[key] = args.shift();
                 }
             }
@@ -348,14 +343,19 @@ describe('proxy', ()=>{
                     'X-bizzare-Letter-cAsE': 'test',
                 };
                 l = yield lum(opt);
-                let res = yield l.test({url: url(), headers: headers});
-                let raw_headers = {};
+                const res = yield l.test({url: url(), headers: headers});
+                const raw_headers = {};
                 for (let i=0; i<res.body.rawHeaders.length;)
                 {
                     raw_headers[res.body.rawHeaders[i++]] =
                         res.body.rawHeaders[i++];
                 }
-                assert_has(raw_headers, headers, 'headers');
+                assert_has(raw_headers, headers, 'value');
+                const raw_order = _.toPairs(raw_headers)
+                    .filter(p=>headers[p[0]]);
+                const header_order = _.toPairs(headers)
+                    .filter(p=>raw_headers[p[0]]);
+                assert_has(header_order, raw_order, 'order');
             }));
             t('http', ()=>test_url);
             t('https', ()=>ping.https.url);
@@ -600,19 +600,6 @@ describe('proxy', ()=>{
                     }));
                 }
             );
-        describe('direct', ()=>{
-            const t = (name, expected)=>it(name, ()=>etask(function*(){
-                var direct = {};
-                direct[name] = 'match';
-                l = yield lum({direct});
-                const match = yield l.test('http://match.com');
-                assert.equal(!!match.body.auth.direct, expected);
-                const no_match = yield l.test('http://n-o--m-a-t-c-h.com');
-                assert.notEqual(!!no_match.body.auth.direct, expected);
-            }));
-            t('include', true);
-            t('exclude', false);
-        });
         describe('bypass_proxy', ()=>{
             const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
             function*(){

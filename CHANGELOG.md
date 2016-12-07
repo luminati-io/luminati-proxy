@@ -1,5 +1,12 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.18:
+  - :boom: `--direct_include` and `--direct_exclude` options have been
+    removed; use `--bypass_proxy` instead
+  - :sparkles: Use a drop-down to select the State/Province/Region in the
+    proxies table, instead of free form text
+  - :bug: fix bug in saving history setting in UI
+  - :bug: fix request alerts on headers
 - 0.9.16:
   - :sparkles: use HTML tooltip for proxy status icon
 - 0.9.15:
@@ -18,7 +25,7 @@
   - :sparkles: visual changes for login screen
   - :bug: fix freezes of /proxies page
 - 0.9.10
-  - :sparklse: improve upgrade process
+  - :sparkles: improve upgrade process
 - 0.9.7:
   - :bug: fix upgrade for Windows
 - 0.9.6:

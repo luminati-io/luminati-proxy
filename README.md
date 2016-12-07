@@ -105,8 +105,6 @@ Options:
                                                                     [default: 5]
   --session_init_timeout  Session establish timeout (seconds)
                                                            [number] [default: 5]
-  --direct_include        Include pattern for direct requests
-  --direct_exclude        Exclude pattern for direct requests
   --null_response         URL pattern for null response
   --bypass_proxy          URL pattern for bypassing the proxy and connect
                           directly
