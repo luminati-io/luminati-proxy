@@ -351,11 +351,6 @@ describe('proxy', ()=>{
                         res.body.rawHeaders[i++];
                 }
                 assert_has(raw_headers, headers, 'value');
-                const raw_order = _.toPairs(raw_headers)
-                    .filter(p=>headers[p[0]]);
-                const header_order = _.toPairs(headers)
-                    .filter(p=>raw_headers[p[0]]);
-                assert_has(header_order, raw_order, 'order');
             }));
             t('http', ()=>test_url);
             t('https', ()=>ping.https.url);
@@ -418,7 +413,7 @@ describe('proxy', ()=>{
                     for (let i=0; i<pool_size; i++)
                     {
                         let s = l.sessions[i];
-                        assert.equal(s.proxy, '127.0.0.1');
+                        assert.equal(s.host, '127.0.0.1');
                         assert.ok(!sessions[s.session]);
                         sessions[s.session] = true;
                     }

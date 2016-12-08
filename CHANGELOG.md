@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.19:
+  - :sparkles: show proxy status details in next line
 - 0.9.18:
   - :boom: `--direct_include` and `--direct_exclude` options have been
     removed; use `--bypass_proxy` instead

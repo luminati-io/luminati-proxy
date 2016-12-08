@@ -48,7 +48,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size">
+          <tr ng-repeat-start="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size"
+            ng-class="{active: showed_status_proxies[proxy.port]}">
             <td>
                 <input ng-model="selected_proxies[proxy.port]" type=checkbox>
             </td>
@@ -62,7 +63,8 @@
                 </span>
               </span>
               <span ng-if="col.key=='_status'"
-                ng-click="show_proxy_status_details(proxy)"
+                ng-click="toggle_proxy_status_details(proxy)"
+                ng-class="{pointer: proxy._status_details.length}"
                 uib-tooltip-template="'/tooltip_proxy_status.html'"
                 tooltip-class="tooltip-proxy-status"
                 tooltip-placement="bottom">
@@ -74,6 +76,10 @@
                   src="/img/ic_status_ok_with_warning.svg">
                 <img ng-if="proxy._status=='ok'&&!proxy._status_details.length"
                   src="/img/ic_status_ok.svg">
+                <i ng-if="proxy._status_details.length"
+                  ng-class="{'glyphicon-triangle-bottom': showed_status_proxies[proxy.port], 'glyphicon-triangle-right': !showed_status_proxies[proxy.port]}"
+                  class="glyphicon ic-status-triangle">
+                </i>
               </span>
               <span ng-if="$root.mode=='guest'">
                 <span ng-if="col.key=='country'"
@@ -161,6 +167,17 @@
                 ng-if=proxy.pool_size>
               <img src=/img/ic_table_disabled.svg class=proxies-action-disabled
                 title="Pool empty; size is set to zero" ng-if=!proxy.pool_size>
+            </td>
+          </tr>
+          <tr ng-repeat-end ng-if="showed_status_proxies[proxy.port]"
+            class=status-details-wrapper>
+            <td colspan="{{get_colspans()[0]}}"></td>
+            <td colspan="{{get_colspans()[1]}}">
+              <p ng-repeat="i in proxy._status_details"
+                ng-class="{'text-warn':i.lvl=='warn', 'text-err':i.lvl=='err'}"
+                class=status-details-line>
+                {{i.msg}}
+              </p>
             </td>
           </tr>
         </tbody>

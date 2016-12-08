@@ -564,23 +564,34 @@ div.proxies .btn-wrapper {
 .panel .panel-heading button.btn.btn-ico[disabled] img {
     opacity: 0.25;
 }
-.proxy-status-row {
-    padding: 5px 10px;
-}
 .tooltip-proxy-status .tooltip-inner {
     border: solid 1px #d8d8d8;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
     background: #fff;
 }
-.tooltip-proxy-status .text-err {
-    color: #d8393c;
-}
-.tooltip-proxy-status .text-ok {
-    color: #4ca16a;
-}
-.tooltip-proxy-status .text-warn {
-    color: #f5a623;
-}
 .tooltip-proxy-status.in {
     opacity: 1;
+}
+.status-details-wrapper {
+    background: #eee;
+    font-size: 12px;
+}
+.status-details-line {
+    margin: 0 0 5px 25px;
+}
+.ic-status-triangle {
+    font-size: 12px;
+    color: #979797;
+}
+.text-err {
+    color: #d8393c;
+}
+.text-ok {
+    color: #4ca16a;
+}
+.text-warn {
+    color: #f5a623;
+}
+.pointer {
+    cursor: pointer;
 }

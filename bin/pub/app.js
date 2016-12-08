@@ -92,24 +92,34 @@ function $proxies($http, $q){
             func(service.proxies);
     }
     function update_proxies(){
+        var proxy_check = function(p){
+            return $http.post('/api/proxy_check/'+p.port, p.config); };
+        var proxy_status = function(p){
+            return $http.get('/api/proxy_status/'+p.port); };
         return $q.all([$http.get('/api/proxies_running'),
-            $http.get('/api/proxies')]).then(function(data){
+            $http.get('/api/proxies')])
+        .then(function(data){
             var proxies = data[0].data;
             proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
             var config = data[1].data;
             var config_index = {};
             for (var i=0; i<config.length; i++)
                 config_index[config[i].port] = config[i];
+            var promises = [];
             proxies.forEach(function(proxy){
                 if (Array.isArray(proxy.proxy)&&proxy.proxy.length==1)
                     proxy.proxy = proxy.proxy[0];
                 proxy.config = config_index[proxy.port];
-                $http.post('/api/proxy_check/'+proxy.port, proxy.config)
-                .then(function(res){
+                promises.push(proxy_check(proxy).then(function(res){
                     proxy._status_details = res.data;
-                    return $http.get('/api/proxy_status/'+proxy.port);
-                })
-                .then(function(res){
+                    return proxy;
+                }));
+            });
+            return $q.all(promises);
+        })
+        .then(function(proxies){
+            proxies.forEach(function(proxy){
+                proxy_status(proxy).then(function(res){
                     if (res.data.status=='ok')
                         proxy._status = 'ok';
                     else
@@ -1003,6 +1013,7 @@ function proxies($scope, $http, $proxies, $window, $q){
     $scope.page_size = 50;
     $scope.page = 1;
     $scope.selected_proxies = {};
+    $scope.showed_status_proxies = {};
     $scope.set_page = function(p){
         if (p < 1)
             p = 1;
@@ -1013,6 +1024,10 @@ function proxies($scope, $http, $proxies, $window, $q){
     $proxies.subscribe(function(proxies){
         $scope.proxies = proxies;
         $scope.set_page($scope.page);
+        proxies.forEach(function(p){
+            $scope.showed_status_proxies[p.port] =
+                $scope.showed_status_proxies[p.port]&&p._status_details.length;
+        });
     });
     $scope.delete_proxies = function(){
         $scope.$parent.$parent.confirmation = {
@@ -1122,9 +1137,20 @@ function proxies($scope, $http, $proxies, $window, $q){
         var opt = col.options().find(function(opt){ return opt.value==val; });
         return opt&&opt.key;
     };
-    $scope.show_proxy_status_details = function(proxy){
-        $scope.$parent.$parent.proxy_status_details = proxy._status_details;
-        $window.$('#proxy-status-details').modal();
+    $scope.toggle_proxy_status_details = function(proxy){
+        if (proxy._status_details.length)
+        {
+            $scope.showed_status_proxies[proxy.port] =
+                !$scope.showed_status_proxies[proxy.port];
+        }
+    };
+    $scope.get_colspans = function(){
+        for (var i = 0; i<$scope.columns.length; i++)
+        {
+            if ($scope.columns[i].key=='_status')
+                return [i+1, $scope.columns.length-i+1];
+        }
+        return [0, 0];
     };
     var load_regions = function(country){
         if (!country||country=='*')
