@@ -550,6 +550,7 @@ describe('proxy', ()=>{
             });
         });
         const match_test = url=>etask(function*(){
+            yield etask.sleep(10);
             let before = proxy.history.length;
             let res = yield l.test(url);
             yield etask.sleep(10);
@@ -566,7 +567,6 @@ describe('proxy', ()=>{
                             insecure: ssl,
                         });
                         let no_match = yield match_test(no_match_url);
-                        yield etask.sleep(10);
                         let match = yield match_test(match_url);
                         assert.notEqual(no_match.after, no_match.before);
                         assert.equal(match.after, match.before);
