@@ -321,10 +321,10 @@ describe('proxy', ()=>{
                 {
                     const target_req = target();
                     assert.equal(target_req['x-hola-context'], undefined);
-                    yield etask.sleep(10);
-                    assert.equal(history.length, 1);
-                    assert.equal(history[0].context, context);
                 }
+                yield etask.sleep(10);
+                assert.equal(history.length, 1);
+                assert.equal(history[0].context, context);
             }));
             t('null response', ()=>ping.http.url, {null_response: '.*'});
             t('bypass proxy', ()=>ping.http.url, {bypass_proxy: '.*'},
@@ -376,8 +376,8 @@ describe('proxy', ()=>{
                         (new Buffer('lum-customer-user-zone-zzz:pass'))
                         .toString('base64'),
                 }});
-                assert(!l.sessions);
-                assert.equal(proxy.history.length, 1);
+                assert.ok(l.sessions);
+                assert.equal(proxy.history.length, 4);
                 assert.equal(res.body.auth.customer, customer);
                 assert.equal(res.body.auth.password, password);
                 assert.equal(res.body.auth.zone, 'gen');
@@ -389,10 +389,10 @@ describe('proxy', ()=>{
                         (new Buffer('lum-customer-user-zone-zzz:pass'))
                         .toString('base64'),
                 }});
-                assert(!l.sessions);
+                assert.ok(!l.sessions);
                 assert.equal(proxy.history.length, 1);
-                assert.equal(res.body.auth.customer, customer);
-                assert.equal(res.body.auth.password, password);
+                assert.equal(res.body.auth.customer, 'user');
+                assert.equal(res.body.auth.password, 'pass');
                 assert.equal(res.body.auth.zone, 'zzz');
             }));
         });
@@ -687,9 +687,9 @@ describe('proxy', ()=>{
         describe('history aggregation', ()=>{
             let history;
             const aggregator = data=>history.push(data);
+            beforeEach(()=>history = []);
             const t = (name, url, expected, opt)=>it(name, ()=>etask(
             function*(){
-                history = [];
                 ping.headers = ping.headers||{};
                 ping.headers.connection = 'close';
                 l = yield lum(assign({history: true,
@@ -729,6 +729,30 @@ describe('proxy', ()=>{
                 method: 'CONNECT',
                 super_proxy: null,
             }), {bypass_proxy: '.*', insecure: true});
+            t('null_response', ()=>ping.http.url, ()=>({
+                port: 24000,
+                status_code: 200,
+                status_message: 'NULL',
+                super_proxy: null,
+                content_size: 0,
+                download_size: 0,
+                upload_size: 0,
+            }), {null_response: '.*'});
+            it('pool', etask._fn(function*(_this){
+                _this.timeout(4000);
+                l = yield lum({pool_size: 1, keep_alive: 1, history: true,
+                    history_aggregator: aggregator});
+                l.refresh_sessions();
+                yield etask.sleep(1200);
+                l.update_all_sessions();
+                yield etask.sleep(10);
+                assert.equal(history.length, 3);
+                assert_has(history, [
+                    {context: 'SESSION INIT'},
+                    {context: 'SESSION KEEP ALIVE'},
+                    {context: 'SESSION INFO'},
+                ]);
+            }));
         });
     });
 });

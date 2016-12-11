@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.21:
+  - :bug: login/logout issues
 - 0.9.20:
   - :bug: fix cases with Google sign-in with non-configured proxies
 - 0.9.19:

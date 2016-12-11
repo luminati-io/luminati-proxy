@@ -218,7 +218,7 @@ function root($rootScope, $scope, $http, $window){
         });
     };
     var check_reload = function(){
-        $http.get('/api/config').error(
+        $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location.reload(); });
     };
@@ -227,12 +227,12 @@ function root($rootScope, $scope, $http, $window){
             text: 'The application will be upgraded and restarted.',
             confirmed: function(){
                 $scope.upgrading = true;
-                $http.post('/api/upgrade').error(function(){
+                $http.post('/api/upgrade').catch(function(){
                     $scope.upgrading = false;
                     $scope.upgrade_error = true;
                 }).then(function(data){
                     $scope.upgrading = false;
-                    $http.post('/api/restart').error(function(){
+                    $http.post('/api/restart').catch(function(){
                         // $scope.upgrade_error = true;
                         show_reload();
                         check_reload();
@@ -262,7 +262,7 @@ function root($rootScope, $scope, $http, $window){
     };
     $scope.logout = function(){
         $http.post('/api/logout').then(function cb(){
-            $http.get('/api/config').error(function(){ setTimeout(cb, 500); })
+            $http.get('/api/config').catch(function(){ setTimeout(cb, 500); })
                 .then(function(){ $window.location = '/'; });
         });
     };
@@ -306,7 +306,7 @@ function config($scope, $http, $window){
         });
     };
     var check_reload = function(){
-        $http.get('/api/config').error(
+        $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location.reload(); });
     };
@@ -360,7 +360,7 @@ function resolve($scope, $http, $window){
         });
     };
     var check_reload = function(){
-        $http.get('/api/config').error(
+        $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location.reload(); });
     };
@@ -444,7 +444,7 @@ function settings($scope, $http, $window, $sce, $rootScope){
     };
     $scope.show_password = function(){ $scope.args_password = true; };
     var check_reload = function(){
-        $http.get('/api/config').error(
+        $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location = '/proxies'; });
     };
