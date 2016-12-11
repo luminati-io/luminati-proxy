@@ -19,3 +19,9 @@ test_script:
 
 # Don't actually build.
 build: off
+
+notifications:
+  - provider: Email
+    to:
+      - lee@hola.org
+      - guyg@hola.org

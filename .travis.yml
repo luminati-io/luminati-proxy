@@ -10,3 +10,4 @@ os:
 notifications:
   email:
     - lee@hola.org
+    - guyg@hola.org

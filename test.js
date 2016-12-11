@@ -608,7 +608,7 @@ describe('proxy', ()=>{
             }));
             t('http', ()=>ping.http.url+'match',
                 ()=>ping.http.url+'n-o--m-a-t-c-h');
-            t('https sniffing', ()=>ping.https.url+'/match',
+            t('https sniffing', ()=>ping.https.url+'match',
                 ()=>ping.https.url+'n-o--m-a-t-c-h',
                 {ssl: true, insecure: true});
             it('https connect', ()=>'https://match.com/', ()=>ping.https.url,
@@ -905,33 +905,24 @@ describe('manager', ()=>{
             }));
         });
     });
-    describe('errors', ()=>{
-        describe('crash on load error', ()=>{
-            const t = (name, proxies)=>it(name, ()=>etask(function*(){
-                try {
-                    app = yield app_with_proxies(proxies);
-                    assert.fail('Should crash');
-                } catch(e){
-                    if (e instanceof assert.AssertionError)
-                        throw e;
-                }
-            }));
-            t('conflict proxy port', [
-                {port: 24024},
-                {port: 24024},
-            ]);
-            t('conflict socks port', [
-                {port: 24000, socks: 25000},
-                {port: 24001, socks: 25000},
-            ]);
-            t('conflict with www', [{port: Manager.default.www}]);
-        });
-        // XXX lee - WIP
-        it.skip('do not crash on api error', ()=>etask(function*(){
-            app = yield app_with_proxies([
-                {port: 25025},
-            ]);
-            // const before = yield json('api/proxies');
+    describe('crash on load error', ()=>{
+        const t = (name, proxies)=>it(name, ()=>etask(function*(){
+            try {
+                app = yield app_with_proxies(proxies);
+                assert.fail('Should crash');
+            } catch(e){
+                if (e instanceof assert.AssertionError)
+                    throw e;
+            }
         }));
+        t('conflict proxy port', [
+            {port: 24024},
+            {port: 24024},
+        ]);
+        t('conflict socks port', [
+            {port: 24000, socks: 25000},
+            {port: 24001, socks: 25000},
+        ]);
+        t('conflict with www', [{port: Manager.default.www}]);
     });
 });

@@ -1,7 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.20:
+  - :bug: fix cases with Google sign-in with non-configured proxies
 - 0.9.19:
   - :sparkles: show proxy status details in next line
+  - :star: history now includes all requests made by proxy-manager for that
+  proxy
 - 0.9.18:
   - :boom: `--direct_include` and `--direct_exclude` options have been
     removed; use `--bypass_proxy` instead
