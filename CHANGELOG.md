@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.22:
+  - :sparkles: register IP in zone whitelist during login
 - 0.9.21:
   - :bug: login/logout issues
 - 0.9.20:

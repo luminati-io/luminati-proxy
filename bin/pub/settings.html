@@ -42,19 +42,19 @@
     <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8
       col-md-offset-3 col-md-6 col-lg-offset-4 col-lg-4 luminati-login">
       <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
-        <div id=google ng-hide=user_customers>
+        <div id=google ng-hide="user_customers || google_login">
           <a class=google ng-click=google_click($event)
             href="https://accounts.google.com/o/oauth2/v2/auth?client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.googleusercontent.com&response_type=code&redirect_uri=https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account">
             Log in with Google
           </a>
         </div>
-        <div class=form-group ng-hide=user_customers
+        <div class=form-group ng-hide="user_customers || google_login"
           ng-class="{'has-error': user_error&&user_error.username}">
           <label for=username>Email</label>
           <input type=email name=username id=username class=form-control
             ng-model=user_data.username ng-disabled=user_customers>
         </div>
-        <div class=form-group ng-hide=user_customers
+        <div class=form-group ng-hide="user_customers || google_login"
           ng-class="{'has-error': user_error&&user_error.password}">
           <label for=user_password>Password</label>
           <input type=password name=password id=user_password

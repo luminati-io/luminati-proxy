@@ -294,7 +294,7 @@ describe('proxy', ()=>{
                 yield l.test();
                 assert.equal(proxy.history.length, 1);
                 assert.equal(proxy.history[0].headers['x-hola-agent'],
-                    luminati.version);
+                    `proxy=${luminati.version} node=${process.version}`);
             }));
             it('not added when accessing site directly', ()=>etask(function*(){
                 l = yield lum({bypass_proxy: '.*'});

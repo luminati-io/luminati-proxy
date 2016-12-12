@@ -448,33 +448,33 @@ function settings($scope, $http, $window, $sce, $rootScope){
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location = '/proxies'; });
     };
-    var show_reload = function(){
-        $window.$('#restarting').modal({backdrop: 'static', keyboard: false});
-    };
     $scope.user_data = {username: '', password: ''};
+    var token;
     $scope.save_user = function(){
-        var username = $scope.user_data.username;
-        var password = $scope.user_data.password;
-        if (!username)
+        var creds = {};
+        if (token)
+            creds = {token: token};
+        else
         {
-            $scope.user_error = {
-                message: 'Please enter a valid email address.',
-                username: true,
-            };
-            return;
-        }
-        username = username.trim();
-        if (!password)
-        {
-            $scope.user_error = {
-                message: 'Please enter a password.',
-                password: true,
-            };
-            return;
+            var username = $scope.user_data.username;
+            var password = $scope.user_data.password;
+            if (!(username = username.trim()))
+            {
+                $scope.user_error = {
+                    message: 'Please enter a valid email address.',
+                    username: true};
+                return;
+            }
+            if (!password)
+            {
+                $scope.user_error = {message: 'Please enter a password.',
+                    password: true};
+                return;
+            }
+            creds = {username: username, password: password};
         }
         $scope.saving_user = true;
         $scope.user_error = null;
-        var creds = {username: username, password: password};
         if ($scope.user_customers)
             creds.customer = $scope.user_data.customer;
         $http.post('/api/creds_user', creds).then(function(d){
@@ -492,22 +492,17 @@ function settings($scope, $http, $window, $sce, $rootScope){
         });
     };
     $scope.google_click = function(e){
-        var google = $window.$(e.currentTarget), loc = $window.location;
+        var google = $window.$(e.currentTarget), l = $window.location;
         google.attr('href', google.attr('href')+'&state='+encodeURIComponent(
-            loc.protocol+'//'+loc.hostname+':'+(loc.port||80)));
+            l.protocol+'//'+l.hostname+':'+(l.port||80)+'?api_version=3'));
     };
-    var t = $window.location.search, m;
-    if (!(m = t.match(/\?t=([a-zA-Z0-9_\-=]+)$/)) || !(t = m[1]))
-        return;
-    try { t = JSON.parse(atob(t)); }
-    catch(e){
-        $scope.user_error = {message: 'Invalid auth parameter'};
-        return;
+    var m, qs_regex = /\&t=([a-zA-Z0-9\+\/=]+)$/;
+    if (m = $window.location.search.match(qs_regex))
+    {
+        $scope.google_login = true;
+        token = m[1];
+        $scope.save_user();
     }
-    $http.post('/api/creds?autoupdate=1', t).then(function(d){
-        show_reload();
-        check_reload();
-    }).catch(function(e){ $scope.user_error = e.data.error; });
 }
 
 module.controller('zones', zones);
