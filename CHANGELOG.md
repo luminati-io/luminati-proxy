@@ -1,5 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.24:
+  - :sparkles: prevent edit field if zone has no permissions for it
+  - :sparkles: prevent memory leak warning for large pool_size
+- 0.9.23:
+  - :sparkles: improve layout of proxies table
+  - :sparkles: do not show not relevant errors
 - 0.9.22:
   - :sparkles: register IP in zone whitelist during login
 - 0.9.21:
