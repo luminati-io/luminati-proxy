@@ -1072,8 +1072,13 @@ function proxies($scope, $http, $proxies, $window, $q){
     $scope.show_pool = function(proxy){
         $scope.pool_dialog = [{port: proxy.port}];
     };
-    $scope.edit_proxy = function(proxy, duplicate){
-        $scope.proxy_dialog = [{proxy: proxy||{}, duplicate: duplicate}];
+    $scope.add_proxy = function(){
+        $scope.proxy_dialog = [{proxy: {}}];
+    };
+    $scope.edit_proxy = function(duplicate){
+        var port = $scope.get_selected_proxies()[0];
+        var proxy = $scope.proxies.filter(function(p){ return p.port==port; });
+        $scope.proxy_dialog = [{proxy: proxy[0].config, duplicate: duplicate}];
     };
     $scope.edit_cols = function(){
         $scope.columns_dialog = [{

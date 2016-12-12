@@ -1,9 +1,11 @@
 # Luminati Proxy manager - Change Log
 
 - 0.9.24:
-  - :sparkles: prevent edit field if zone has no permissions for it
-  - :sparkles: prevent memory leak warning for large pool_size
+  - :bug: Maintain HTTP header order and casing
+  - :sparkles: move 'add' and 'duplicate' buttons on top of the table
 - 0.9.23:
+  - :sparkles: prevent memory leak warning for large pool_size
+  - :sparkles: prevent edit field if zone has no permissions for it
   - :sparkles: improve layout of proxies table
   - :sparkles: do not show not relevant errors
 - 0.9.22:

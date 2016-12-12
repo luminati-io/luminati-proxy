@@ -14,6 +14,7 @@ const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const etask = hutil.etask;
+const restore_case = hutil.http_hdr.restore_case;
 const qw = hutil.string.qw;
 const assign = Object.assign;
 const luminati = require('./index.js');
@@ -65,8 +66,12 @@ const temp_file = (content, ext, pre)=>{
     return temp;
 };
 
-const to_body = req=>assign({ip: '127.0.0.1'},
-    _.pick(req, qw`method url headers rawHeaders`));
+const to_body = req=>({
+    ip: '127.0.0.1',
+    method: req.method,
+    url: req.url,
+    headers: restore_case(req.headers, req.rawHeaders),
+});
 
 const http_proxy = port=>etask(function*(){
     const proxy = {history: []};
@@ -335,7 +340,7 @@ describe('proxy', ()=>{
             t('https connect', ()=>ping.https.url, {ssl: true, insecure: true},
                 ()=>proxy.history[0]);
         });
-        describe('keep letter caseing', ()=>{
+        describe('keep letter caseing and order', ()=>{
             const t = (name, url, opt)=>it(name, ()=>etask(function*(){
                 const headers = {
                     'Keep-Alive': 'Close',
@@ -344,13 +349,11 @@ describe('proxy', ()=>{
                 };
                 l = yield lum(opt);
                 const res = yield l.test({url: url(), headers: headers});
-                const raw_headers = {};
-                for (let i=0; i<res.body.rawHeaders.length;)
-                {
-                    raw_headers[res.body.rawHeaders[i++]] =
-                        res.body.rawHeaders[i++];
-                }
-                assert_has(raw_headers, headers, 'value');
+                const site_headers = _.omit(res.body.headers,
+                    qw`proxy-authorization x-hola-agent`);
+                assert_has(site_headers, headers, 'value');
+                assert_has(Object.keys(site_headers), Object.keys(headers),
+                    'order');
             }));
             t('http', ()=>test_url);
             t('https', ()=>ping.https.url);

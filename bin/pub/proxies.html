@@ -16,10 +16,23 @@
   </div>
   <div ng-if=proxies class="panel panel-default proxies">
     <div class=panel-heading>
+      <button ng-if="$root.mode!='guest'"
+        ng-disabled="get_selected_proxies().length!=1"
+        ng-click="edit_proxy()"
+        uib-tooltip="Edit Proxy" type=button class="btn btn-ico">
+        <img src=/img/ic_edit.svg>
+      </button>
+      <button ng-if="$root.mode!='guest'"
+        ng-disabled="get_selected_proxies().length!=1"
+        uib-tooltip="Duplicate Proxy"
+        ng-click="edit_proxy(true)"
+        type=button class="btn btn-ico">
+        <img src=/img/ic_dup.svg>
+      </button>
       <button type=button class="btn btn-ico"
         ng-if="$root.mode!='guest'" ng-click="refresh_sessions()"
         ng-disabled="!get_selected_proxies().length"
-        uib-tooltip="Refresh sessions">
+        uib-tooltip="Refresh Sessions">
         <img src=/img/ic_refresh.svg>
       </button>
       <button type=button class="btn btn-ico"
@@ -32,7 +45,7 @@
         <button type=button class="btn btn-ico" ng-click=edit_cols()>
           <img src=/img/ic_columns.svg uib-tooltip="Edit Columns">
         </button>
-        <button type=button class="btn btn-ico" ng-click=edit_proxy()
+        <button type=button class="btn btn-ico" ng-click=add_proxy()
           ng-if="$root.mode!='guest'" uib-tooltip="Add Proxy">
           <img src=/img/ic_plus.svg>
         </button>
@@ -143,15 +156,6 @@
               </span>
             </td>
             <td class=proxies-actions>
-              <img src=/img/ic_edit.svg class=proxies-action
-                ng-if="$root.mode!='guest'&&proxy.persist"
-                ng-click=edit_proxy(proxy.config) uib-tooltip=Edit>
-              <img src=/img/ic_edit_disabled.svg class=proxies-action-disabled
-                ng-if="$root.mode!='guest'&&!proxy.persist"
-                uib-tooltip="This proxy cannot be edited">
-              <img src=/img/ic_dup.svg class=proxies-action
-                ng-click="edit_proxy(proxy.config, true)" uib-tooltip=Duplicate
-                ng-if="$root.mode!='guest'">
               <img src=/img/ic_history.svg class=proxies-action
                 ng-click=show_history(proxy) uib-tooltip=History
                 ng-if=proxy._history>
