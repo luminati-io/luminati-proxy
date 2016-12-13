@@ -572,6 +572,14 @@ div.proxies .btn-wrapper {
 .panel .panel-heading button.btn.btn-ico[disabled] img {
     opacity: 0.25;
 }
+.tooltip-default .tooltip-inner {
+    max-width: 250px;
+    border: solid 1px #d8d8d8;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
+    background: #fff;
+    color: #3f505b;
+    white-space: nowrap;
+}
 .tooltip-proxy-status .tooltip-inner {
     border: solid 1px #d8d8d8;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);

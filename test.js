@@ -31,7 +31,7 @@ const assert_has = (value, has, prefix)=>{
     if (Array.isArray(has) && Array.isArray(value))
     {
         assert.ok(value.length >= has.length, `${prefix}.length is `
-                +`${value.lengthi} should be at least ${has.length}`);
+                +`${value.length} should be at least ${has.length}`);
         has.forEach((h, i)=>assert_has(value[i], h, `${prefix}[${i}]`));
         return;
     }
@@ -768,6 +768,11 @@ describe('manager', ()=>{
     };
 
     const app_with_args = args=>etask(function*app_with_args(){
+        let manager;
+        this.finally(()=>{
+            if (this.error && manager)
+                return manager.stop(true);
+        });
         args = args||[];
         let www = get_param(args, '--www')||Manager.default.www;
         let log = get_param(args, '--log');
@@ -788,7 +793,7 @@ describe('manager', ()=>{
           args = args.concat(['--password', password]);
         if (!get_param(args, '--mode'))
           args = args.concat(['--mode', 'guest']);
-        let manager = new Manager(args, {bypass_credentials_check: true});
+        manager = new Manager(args, {bypass_credentials_check: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
@@ -899,6 +904,27 @@ describe('manager', ()=>{
         t('main + config files', {config: simple_proxy,
             files: multiple_proxies}, [].concat([assign({}, simple_proxy,
             {persist: true})], multiple_proxies));
+    });
+    describe('dropin', ()=>{
+        const t = (name, args, expected)=>it(name, etask._fn(
+        function*(_this){
+            _this.timeout(4000);
+            app = yield app_with_args(args);
+            let proxies = yield json('api/proxies_running');
+            assert_has(proxies, expected, 'proxies');
+        }));
+
+        t('default', [], [{port: 24000}]);
+        t('off', ['--no-dropin'], [{port: 24000}]);
+        it('on', ()=>etask(function*(){
+            try {
+                app = yield app_with_args(['--dropin']);
+                assert.fail('Should crash');
+            } catch(e){
+                if (e instanceof assert.AssertionError)
+                    throw e;
+            }
+        }));
     });
     describe('api', ()=>{
         it('ssl', ()=>etask(function*(){

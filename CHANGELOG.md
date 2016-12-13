@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.25:
+  - :sparkles: lock UI during upgrade
+  - :sparkles: use select for zone field in inline edit
+  - :sparkles: update tooltips
+  - :bug: show working URL for admin in case iface is used
 - 0.9.24:
   - :bug: Maintain HTTP header order and casing
   - :sparkles: move 'add' and 'duplicate' buttons on top of the table

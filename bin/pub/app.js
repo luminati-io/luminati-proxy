@@ -18,6 +18,10 @@ var is_valid_field = function(zones, proxy, name){
 
 var module = angular.module('app', ['ngSanitize', 'ui.bootstrap']);
 
+module.config(function($uibTooltipProvider){
+    $uibTooltipProvider.options({placement: 'bottom'});
+});
+
 module.run(function($rootScope, $http, $window){
     var l = $window.location.pathname;
     if (l.match(/zones\/[^\/]+/))
@@ -244,6 +248,8 @@ function root($rootScope, $scope, $http, $window){
         $scope.confirmation = {
             text: 'The application will be upgraded and restarted.',
             confirmed: function(){
+                $window.$('#upgrading').modal({backdrop: 'static',
+                    keyboard: false});
                 $scope.upgrading = true;
                 $http.post('/api/upgrade').catch(function(){
                     $scope.upgrading = false;
@@ -816,7 +822,8 @@ proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
 function proxies($scope, $http, $proxies, $window, $q){
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
-    var iface_opts = [], country_opts = [], region_opts = {};
+    var iface_opts = [], zone_opts = [];
+    var country_opts = [], region_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [];
     var check_by_re = function(r, v){ return (v = v.trim()) && r.test(v); };
     var check_number = check_by_re.bind(null, /^\d+$/);
@@ -852,8 +859,8 @@ function proxies($scope, $http, $proxies, $window, $q){
         {
             key: 'zone',
             title: 'Zone',
-            type: 'text',
-            check: function(v){ return true; },
+            type: 'options',
+            options: function(){ return zone_opts; },
         },
         {
             key: 'secure_proxy',
@@ -1027,6 +1034,7 @@ function proxies($scope, $http, $proxies, $window, $q){
         apply_consts($scope.$parent.consts.proxy);
     $scope.page_size = 50;
     $scope.page = 1;
+    $scope.zones = {};
     $scope.selected_proxies = {};
     $scope.showed_status_proxies = {};
     $scope.set_page = function(p){
@@ -1172,16 +1180,18 @@ function proxies($scope, $http, $proxies, $window, $q){
         }
         return [0, 0];
     };
-    $scope.get_column_tooltip = function(proxy, name){
+    $scope.get_column_tooltip = function(proxy, col){
         if (!proxy.persist)
             return 'This proxy\'s settings cannot be changed';
-        if (!$scope.is_valid_field(proxy, name))
+        if (!$scope.is_valid_field(proxy, col.key))
         {
-            return 'You don\'t have \''+ name+'\' permission. '
+            return 'You don\'t have \''+ col.key+'\' permission.<br>'
             +'Please contact your success manager.';
         }
-        var config_val = proxy.config[name];
-        var real_val = proxy[name];
+        if (col.key=='country')
+            return $scope.option_key(col, proxy[col.key]);
+        var config_val = proxy.config[col.key];
+        var real_val = proxy[col.key];
         if (real_val&&real_val!==config_val)
             return 'Set non-default value';
         return 'Change value';
@@ -1198,6 +1208,9 @@ function proxies($scope, $http, $proxies, $window, $q){
     };
     $http.get('/api/zones').then(function(res){
         $scope.zones = res.data;
+        zone_opts = [];
+        for (var zone in $scope.zones)
+            zone_opts.push({key: zone, value: zone});
     });
 }
 
