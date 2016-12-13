@@ -571,6 +571,10 @@ describe('proxy', ()=>{
                         });
                         let no_match = yield match_test(no_match_url);
                         let match = yield match_test(match_url);
+                        // XXX lee - info for finding out why we have periodic crushes of tests
+                        console.log({match_before: match.before, match_after:
+                            match.after, no_match_before: no_match.before,
+                            no_match_after: no_match.after, history: proxy.history});
                         assert.notEqual(no_match.after, no_match.before);
                         assert.equal(match.after, match.before);
                         assert.equal(match.res.statusCode, 200);
@@ -919,7 +923,8 @@ describe('manager', ()=>{
         it('on', ()=>etask(function*(){
             try {
                 app = yield app_with_args(['--dropin']);
-                assert.fail('Should crash');
+                let proxies = yield json('api/proxies_running');
+                assert_has(proxies, [{port: 22225}, {port: 24000}], 'proxies');
             } catch(e){
                 if (e instanceof assert.AssertionError)
                     throw e;

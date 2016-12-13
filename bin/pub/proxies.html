@@ -67,7 +67,7 @@
         </thead>
         <tbody>
           <tr ng-repeat-start="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size"
-            ng-class="{active: showed_status_proxies[proxy.port]}">
+            ng-class="{opened: showed_status_proxies[proxy.port]}">
             <td>
                 <input ng-model="selected_proxies[proxy.port]" type=checkbox>
             </td>
@@ -180,9 +180,12 @@
             <td colspan="{{get_colspans()[0]}}"></td>
             <td colspan="{{get_colspans()[1]}}">
               <p ng-repeat="i in proxy._status_details"
-                ng-class="{'text-warn':i.lvl=='warn', 'text-err':i.lvl=='err'}"
                 class=status-details-line>
-                {{i.msg}}
+                <img ng-if="i.lvl=='err'" class=status-details-icon-err
+                  src="/img/ic_status_details_error.svg">
+                <img ng-if="i.lvl=='warn'" class=status-details-icon-warn
+                  src="/img/ic_status_details_warning.svg">
+                <span class=status-details-text>{{i.msg}}</span>
               </p>
             </td>
           </tr>

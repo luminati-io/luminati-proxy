@@ -1751,11 +1751,15 @@ module.controller('proxy', proxy);
 proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
 function proxy($scope, $http, $proxies, $window, $q){
     $scope.init = function(locals){
+        var regions = {};
+        var cities = {};
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         $scope.form = _.cloneDeep(locals.proxy);
         $scope.form.port = $scope.port;
         $scope.form.zone = $scope.form.zone||'gen';
         $scope.form.debug = $scope.form.debug||'';
+        $scope.form.country = $scope.form.country||'';
+        $scope.form.state = $scope.form.state||'';
         $scope.status = {};
         if (!$scope.form.port||$scope.form.port=='')
         {
@@ -1792,6 +1796,8 @@ function proxy($scope, $http, $proxies, $window, $q){
             $scope.defaults = defaults.data;
         });
         $scope.zones = $scope.$parent.$parent.zones;
+        $scope.regions = [];
+        $scope.cities = [];
         $scope.get_zones_names = function(){
             return Object.keys($scope.zones); };
         $scope.show_modal = function(){
@@ -1819,38 +1825,58 @@ function proxy($scope, $http, $proxies, $window, $q){
         };
         $scope.binary_changed = function(proxy, field, value){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
-        $scope.update_regions = function(changed){
+        $scope.update_regions_and_cities = function(){
+            $scope.form.region = $scope.form.city = '';
+            $scope.regions = [];
+            $scope.cities = [];
             var country = ($scope.form.country||'').toUpperCase();
-            if (changed)
-                $scope.form.city = $scope.form.state = '';
-            if (!country || country=='*')
+            if (!country||country=='*')
                 return;
-            $http.get('/api/regions/'+country).then(function(res){
-                $scope.regions = res.data; });
-            $scope.update_cities(changed);
+            if (regions[country])
+                $scope.regions = regions[country];
+            else
+            {
+                regions[country] = [];
+                $http.get('/api/regions/'+country).then(function(res){
+                    $scope.regions = regions[country] = res.data; });
+            }
+            if (cities[country])
+                $scope.cities = cities[country];
+            else
+            {
+                cities[country] = [];
+                $http.get('/api/cities/'+country).then(function(res){
+                    cities[country] = res.data.map(function(city){
+                        if (city.region)
+                            city.value = city.value+' ('+city.region+')';
+                        return city;
+                    });
+                    $scope.cities = cities[country];
+                });
+            }
         };
-        $scope.update_cities = function(changed){
-            var country = ($scope.form.country||'').toUpperCase();
-            var region = $scope.form.state;
-            if (changed)
+        $scope.update_cities = function(){
+            var country = $scope.form.country.toUpperCase();
+            var state = $scope.form.state;
+            if (state==''||state=='*')
+            {
                 $scope.form.city = '';
-            if (!country || country=='*')
-                return;
-            $http.get('/api/cities/'+country+'/'+(region=='*' ? '' : region))
-                .then(function(res){ $scope.cities = res.data; });
+                $scope.cities = cities[country];
+            }
+            else
+            {
+                $scope.cities = cities[country].filter(function(item){
+                    return !item.region || item.region==state; });
+                var exist = $scope.cities.filter(function(item){
+                    return item.key==$scope.form.city; }).length>0;
+                if (!exist)
+                    $scope.form.city = '';
+            }
         };
-        $scope.update_region_by_city = function(){
-            var city = $scope.form.city;
-            if (city=='')
-                return;
-            var found = $scope.cities.some(function(c){
-                if (c.value!=city)
-                    return;
-                $scope.form.state = c.region;
-                return true;
-            });
-            if (found)
-                $scope.update_cities(false);
+        $scope.update_region_by_city = function(city){
+            if (city.region)
+                $scope.form.state = city.region;
+            $scope.update_cities();
         };
         $scope.save = function(model){
             var proxy = angular.copy(model);
@@ -1961,6 +1987,10 @@ function proxy($scope, $http, $proxies, $window, $q){
         $scope.is_valid_field = function(name){
             return is_valid_field($scope.zones, $scope.form, name);
         };
+        $scope.starts_with = function(actual, expected){
+            return actual.toLowerCase().startsWith(expected.toLowerCase());
+        };
+        $scope.update_regions_and_cities();
     };
 }
 

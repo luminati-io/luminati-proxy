@@ -160,9 +160,9 @@
                       Country
                     </label>
                     <select id=proxy-field-country ng-model=form.country
-                      class=form-control ng-options="c.value as c.key for c in
-                      consts.country.values" ng-change="update_regions(true)"
-                      ng-init="form.country=form.country||''; update_regions();">
+                      ng-options="c.value as c.key for c in consts.country.values"
+                      ng-change="update_regions_and_cities()"
+                      class=form-control>
                     </select>
                   </div>
                   <div class=form-group ng-show="is_valid_field('state')">
@@ -170,20 +170,25 @@
                       State
                     </label>
                     <select id=proxy-field-state ng-model=form.state
-                      class=form-control ng-disabled="!form.country || form.country=='*' || !regions || !regions.length"
-                      ng-change="update_cities(true)" ng-options="c.value as c.key for c in regions"
-                      ng-init="form.state=form.state||''; update_cities();">
+                      ng-options="c.value as c.key for c in regions"
+                      ng-disabled="!regions.length"
+                      ng-change="update_cities()" class=form-control >
                     </select>
                   </div>
                   <div class=form-group ng-show="is_valid_field('city')">
                     <label class=control-label for=proxy-field-city>
                       City
                     </label>
-                    <select id=proxy-field-city ng-model=form.city
-                      class=form-control ng-disabled="!form.country || form.country=='*' || !cities || !cities.length"
-                      ng-change="update_region_by_city()" ng-options="c.value as (c.key+(c.region ? ' ('+c.region+')' : '')) for c in cities"
-                      ng-init="form.city=form.city||''">
-                    </select>
+                    <input id=proxy-field-city ng-model=form.city
+                      ng-disabled="!cities.length"
+                      uib-typeahead="c.key as c.value for c in cities | filter:{value:$viewValue}:starts_with"
+                      typeahead-editable=false
+                      typeahead-min-length=2
+                      typeahead-select-on-blur=true
+                      typeahead-on-select="update_region_by_city($item)"
+                      autocomplete=off
+                      placeholder="Start typing or leave it empty for all cities"
+                      type="text" class=form-control>
                   </div>
                   <div class=form-group  ng-show="is_valid_field('asn')">
                     <label class=control-label for=proxy-field-asn>

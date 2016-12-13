@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.28:
+  - :sparkles: use autocomplete for 'city' field in proxy edit form
 - 0.9.25:
   - :sparkles: lock UI during upgrade
   - :sparkles: use select for zone field in inline edit
