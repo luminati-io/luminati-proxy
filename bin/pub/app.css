@@ -2,6 +2,7 @@ body {
     font-family: "Noto Sans", sans-serif;
     font-size: 15px;
     line-height: 23px;
+    overflow-y: scroll;
 }
 .page-body a {
     color: #428bca;

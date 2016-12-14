@@ -823,7 +823,7 @@ function proxies($scope, $http, $proxies, $window, $q){
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     var iface_opts = [], zone_opts = [];
-    var country_opts = [], region_opts = {};
+    var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [];
     var check_by_re = function(r, v){ return (v = v.trim()) && r.test(v); };
     var check_number = check_by_re.bind(null, /^\d+$/);
@@ -882,8 +882,9 @@ function proxies($scope, $http, $proxies, $window, $q){
         {
             key: 'city',
             title: 'City',
-            type: 'text',
-            check: function(v){ return true; },
+            type: 'autocomplete',
+            check: function(){ return true; },
+            options: function(proxy){ return load_cities(proxy); },
         },
         {
             key: 'asn',
@@ -1104,6 +1105,7 @@ function proxies($scope, $http, $proxies, $window, $q){
         {
         case 'number':
         case 'text':
+        case 'autocomplete':
         case 'options': proxy.edited_field = col.key; break;
         case 'boolean':
             var config = _.cloneDeep(proxy.config);
@@ -1150,6 +1152,8 @@ function proxies($scope, $http, $proxies, $window, $q){
         var config = _.cloneDeep(proxy.config);
         config[col.key] = v;
         config.persist = true;
+        if (col.key=='state')
+            config.city = '';
         $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
             function(){ $proxies.update(); });
     };
@@ -1199,12 +1203,48 @@ function proxies($scope, $http, $proxies, $window, $q){
     $scope.is_valid_field = function(proxy, name){
         return is_valid_field($scope.zones, proxy, name);
     };
+    $scope.starts_with = function(actual, expected){
+        return expected.length>1 &&
+            actual.toLowerCase().startsWith(expected.toLowerCase());
+    };
+    $scope.typeahead_on_select = function(proxy, col, item){
+        if (col.key=='city')
+        {
+            var config = _.cloneDeep(proxy.config);
+            config.city = item.key;
+            config.state = item.region||'';
+            $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
+                function(){ $proxies.update(); });
+        }
+    };
     var load_regions = function(country){
         if (!country||country=='*')
             return [];
         return region_opts[country] || (region_opts[country] =
             $http.get('/api/regions/'+country.toUpperCase()).then(function(r){
                 return region_opts[country] = r.data; }));
+    };
+    var load_cities = function(proxy){
+        var country = proxy.country.toUpperCase();
+        var state = proxy.state;
+        if (!country||country=='*')
+            return [];
+        if (!cities_opts[country])
+        {
+            cities_opts[country] = [];
+            $http.get('/api/cities/'+country).then(function(res){
+                return cities_opts[country] = res.data.map(function(city){
+                    if (city.region)
+                        city.value = city.value+' ('+city.region+')';
+                    return city;
+                });
+            });
+        }
+        var options = cities_opts[country];
+        if (state&&state!='*')
+            options = options.filter(function(i){ return i.region==state; });
+        return options;
+
     };
     $http.get('/api/zones').then(function(res){
         $scope.zones = res.data;
@@ -1226,6 +1266,9 @@ function history($scope, $http, $filter, $window){
         $scope.initial_loading = true;
         $scope.port = locals.port;
         $scope.show_modal = function(){ $window.$('#history').modal(); };
+        $http.get('/api/history_context/'+locals.port).then(function(c){
+            $scope.history_context = c.data;
+        });
         $scope.fields = [
             {
                 field: 'url',
@@ -1276,6 +1319,7 @@ function history($scope, $http, $filter, $window){
             {
                 field: 'context',
                 title: 'Context',
+                type: 'options',
                 filter_label: 'Request context',
             },
         ];
@@ -1543,6 +1587,8 @@ function history($scope, $http, $filter, $window){
             }
             else if (field.field=='country')
                 options = $scope.$parent.$parent.consts.proxy.country.values;
+            else if (field.field=='context')
+                options = $scope.history_context;
             $scope.filter_dialog = [{
                 field: field,
                 filters: $scope.filters,
@@ -1760,6 +1806,7 @@ function proxy($scope, $http, $proxies, $window, $q){
         $scope.form.debug = $scope.form.debug||'';
         $scope.form.country = $scope.form.country||'';
         $scope.form.state = $scope.form.state||'';
+        $scope.form.city = $scope.form.city||'';
         $scope.status = {};
         if (!$scope.form.port||$scope.form.port=='')
         {
@@ -1825,8 +1872,9 @@ function proxy($scope, $http, $proxies, $window, $q){
         };
         $scope.binary_changed = function(proxy, field, value){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
-        $scope.update_regions_and_cities = function(){
-            $scope.form.region = $scope.form.city = '';
+        $scope.update_regions_and_cities = function(is_init){
+            if (!is_init)
+                $scope.form.region = $scope.form.city = '';
             $scope.regions = [];
             $scope.cities = [];
             var country = ($scope.form.country||'').toUpperCase();
@@ -1852,6 +1900,7 @@ function proxy($scope, $http, $proxies, $window, $q){
                         return city;
                     });
                     $scope.cities = cities[country];
+                    $scope.update_cities();
                 });
             }
         };
@@ -1882,7 +1931,7 @@ function proxy($scope, $http, $proxies, $window, $q){
             var proxy = angular.copy(model);
             for (var field in proxy)
             {
-                if (!$scope.is_valid_field(field))
+                if (!$scope.is_valid_field(field) || proxy[field]===null)
                     proxy[field] = '';
             }
             var make_int_range = function(start, end){
@@ -1990,7 +2039,7 @@ function proxy($scope, $http, $proxies, $window, $q){
         $scope.starts_with = function(actual, expected){
             return actual.toLowerCase().startsWith(expected.toLowerCase());
         };
-        $scope.update_regions_and_cities();
+        $scope.update_regions_and_cities(true);
     };
 }
 

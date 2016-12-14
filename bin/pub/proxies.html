@@ -155,6 +155,19 @@
                     ng-options="v.value as v.key for v in col.options(proxy)">
                   </select>
                 </span>
+                <span ng-if="col.type=='autocomplete'&&proxy.edited_field==col.key"
+                  class=proxies-table-input>
+                  <input
+                    ng-model=proxy.dummy_model
+                    ng-init="proxy.dummy_model=proxy.config[col.key]||''"
+                    ng-keyup="inline_edit_input(proxy, col, $event)"
+                    uib-typeahead="c.key as c.value for c in col.options(proxy) | filter:{value:$viewValue}:starts_with"
+                    typeahead-append-to-body=true
+                    typeahead-editable=false
+                    typeahead-min-length=0
+                    typeahead-on-select="typeahead_on_select(proxy, col, $item)"
+                    init-input-select type="text" class=form-control>
+                </span>
               </span>
             </td>
             <td class=proxies-actions>

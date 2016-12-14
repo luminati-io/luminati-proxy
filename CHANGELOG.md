@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.29:
+  - :sparkles: use autocomplete for 'city' field in inline edit
+  - :bug: History can now be filtered by context
 - 0.9.28:
   - :sparkles: use autocomplete for 'city' field in proxy edit form
 - 0.9.25:
