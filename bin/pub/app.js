@@ -946,6 +946,12 @@ function proxies($scope, $http, $proxies, $window, $q){
             check: check_number,
         },
         {
+            key: 'seed',
+            title: 'Seed',
+            type: 'text',
+            check: check_by_re.bind(/^[^\.\-]*$/),
+        },
+        {
             key: 'allow_proxy_auth',
             title: 'Allow request authentication',
             type: 'boolean',

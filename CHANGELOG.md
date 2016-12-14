@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.30:
+  - :star: Auto generate random seed for proxies, to avoid multiple instances
+  share the same session
+  - :star: allow specifing seed for proxies to make them share the same IPs
 - 0.9.29:
   - :sparkles: use autocomplete for 'city' field in inline edit
   - :bug: History can now be filtered by context

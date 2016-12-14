@@ -96,6 +96,8 @@ Options:
   --pool_size             Pool size                        [number] [default: 3]
   --pool_type             Pool session iteration order (sequential|round-robin)
                                                          [default: "sequential"]
+  --seed                  Session ID Seed used for identifing sessions from this
+                          proxy (default to random)
   --ssl                   Enable SSL sniffing         [boolean] [default: false]
   --insecure              Enable SSL connection/sniffing to insecure hosts
                                                       [boolean] [default: false]
