@@ -24,4 +24,3 @@ notifications:
   - provider: Email
     to:
       - lee@hola.org
-      - guyg@hola.org

@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.31:
+  - :sparkles: Shuffle proxy hosts before using them, to spread traffic
+  - :bug: Avoid checking proper installation of optional dependencies
 - 0.9.30:
   - :star: Auto generate random seed for proxies, to avoid multiple instances
   share the same session
