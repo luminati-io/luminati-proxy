@@ -14,30 +14,33 @@ const child_process = require('child_process');
 const path = require('path');
 const sudo_prompt = require('sudo-prompt');
 const etask = hutil.etask;
+
+const pm2_cmd = (command, opt)=>etask(function*pm2_cmd(){
+    this.on('uncaught', err=>console.log('Uncaught exception:', err,
+        err.stack));
+    yield etask.nfn_apply(pm2, '.connect', []);
+    yield etask.nfn_apply(pm2, '.'+command, [opt]);
+    yield etask.nfn_apply(pm2, '.disconnect', []);
+});
 let args = process.argv.slice(2), is_win = process.platform=='win32';
 if (args.some(arg=>arg=='-d' || arg=='--daemon'))
 {
-    return etask(function*(){
-        this.on('uncaught', err=>console.log('Uncaught exception:', err,
-            err.stack));
-        yield etask.nfn_apply(pm2, '.connect', []);
-        yield etask.nfn_apply(pm2, '.start', [{
-            name: 'luminati',
-            script: process.argv[1],
-            args: args.filter(arg=>arg!='-d' && arg!='daemon'),
-        }]);
-        yield etask.nfn_apply(pm2, '.disconnect', []);
+    return pm2_cmd('start', {
+        name: 'luminati',
+        script: process.argv[1],
+        args: args.filter(arg=>arg!='-d' && arg!='--daemon'
+            && arg!='--stop-daemon'),
     });
 }
+if (args.some(arg=>arg=='--stop-daemon'))
+    return pm2_cmd('stop', 'luminati');
 if (is_win)
 {
     const readline = require('readline');
     readline.createInterface({input: process.stdin, output: process.stdout})
         .on('SIGINT', ()=>process.emit('SIGINT'));
 }
-
 let child;
-
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
     child.send({command: 'shutdown', reason: sig+(err ? 'error = '+err : '')});
     setTimeout(()=>process.exit(), 5000);

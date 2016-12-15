@@ -1261,20 +1261,32 @@ function proxies($scope, $http, $proxies, $window, $q){
 }
 
 module.controller('history', history);
-history.$inject = ['$scope', '$http', '$filter', '$window'];
-function history($scope, $http, $filter, $window){
+history.$inject = ['$scope', '$http', '$window'];
+function history($scope, $http, $window){
     $scope.hola_headers = [];
     $http.get('/api/hola_headers').then(function(h){
         $scope.hola_headers = h.data;
     });
     $scope.init = function(locals){
         var loader_delay = 100;
+        var timestamp_changed_by_select = false;
         $scope.initial_loading = true;
         $scope.port = locals.port;
         $scope.show_modal = function(){ $window.$('#history').modal(); };
         $http.get('/api/history_context/'+locals.port).then(function(c){
             $scope.history_context = c.data;
         });
+        $scope.periods = [
+            {label: 'all time', value: '*'},
+            {label: '1 year', value: {y: 1}},
+            {label: '3 months', value: {M: 3}},
+            {label: '2 months', value: {M: 2}},
+            {label: '1 month', value: {M: 1}},
+            {label: '1 week', value: {w: 1}},
+            {label: '3 days', value: {d: 3}},
+            {label: '1 day', value: {d: 1}},
+            {label: 'custom', value: ''},
+        ];
         $scope.fields = [
             {
                 field: 'url',
@@ -1331,6 +1343,7 @@ function history($scope, $http, $filter, $window){
         ];
         $scope.sort_field = 'timestamp';
         $scope.sort_asc = false;
+        $scope.virtual_filters = {period: $scope.periods[0].value};
         $scope.filters = {
             url: '',
             method: '',
@@ -1346,15 +1359,19 @@ function history($scope, $http, $filter, $window){
             proxy_peer: '',
             context: '',
         };
-        $scope.page = 1;
-        $scope.page_size = 10;
-        $scope.update = function(preserving_page, export_type){
-            if (!preserving_page)
-                $scope.page = 1;
-            var params = {
-                count: export_type=='all' ? -1 : $scope.page*$scope.page_size,
-                sort: $scope.sort_field,
-            };
+        $scope.pagination = {
+            current_page_number: 1,
+            items_per_page: 10,
+            total_items: 100,
+        };
+        $scope.update = function(export_type){
+            var params = {sort: $scope.sort_field};
+            if (!export_type)
+            {
+                params.limit = $scope.pagination.items_per_page;
+                params.skip = ($scope.pagination.current_page_number-1)
+                    *$scope.pagination.items_per_page;
+            }
             if (!$scope.sort_asc)
                 params.sort_desc = 1;
             if ($scope.filters.url)
@@ -1390,186 +1407,148 @@ function history($scope, $http, $filter, $window){
                 params_arr.push(param+'='+encodeURIComponent(params[param]));
             var url = '/api/'+(export_type ? 'har' : 'history')+'/'+locals.port
             +'?'+params_arr.join('&');
-            if (export_type)
-                $window.location = url;
-            else
-            {
-                $scope.loading = new Date().getTime();
-                setTimeout(function(){ $scope.$apply(); }, loader_delay);
-                $http.get(url).then(function(history){
-                    history = history.data;
-                    $scope.initial_loading = false;
-                    $scope.loading = false;
-                    $scope.loading_page = false;
-                    $scope.history = history.map(function(r){
-                        var alerts = [];
-                        var disabled_alerts = [];
-                        var add_alert = function(alert){
-                            if (r.method=='CONNECT'
-                                ||request_headers.host=='lumtest.com')
-                            {
-                                return;
-                            }
-                            if (localStorage.getItem(
-                                'request-alert-disabled-'+alert.type))
-                            {
-                                disabled_alerts.push(alert);
-                            }
-                            else
-                                alerts.push(alert);
-                        };
-                        var raw_headers = JSON.parse(r.request_headers);
-                        var request_headers = {};
-                        for (var h in raw_headers)
-                            request_headers[h.toLowerCase()] = raw_headers[h];
-                        if (!request_headers['user-agent'])
+            if (export_type=='har')
+                return $window.location = url;
+            else if (export_type)
+                return;
+            $scope.loading = new Date().getTime();
+            setTimeout(function(){ $scope.$apply(); }, loader_delay);
+            $http.get(url).then(function(res){
+                $scope.pagination.total_items = res.data.total;
+                var history = res.data.items;
+                $scope.initial_loading = false;
+                $scope.loading = false;
+                $scope.history = history.map(function(r){
+                    var alerts = [];
+                    var disabled_alerts = [];
+                    var add_alert = function(alert){
+                        if (r.method=='CONNECT'
+                            ||request_headers.host=='lumtest.com')
                         {
-                            add_alert({
-                                type: 'agent_empty',
-                                title: 'Empty user agent',
-                                description: 'The User-Agent header '
-                                    +'is not set to any value.',
-                            });
+                            return;
                         }
-                        else if (!request_headers['user-agent'].match(
-                            /^Mozilla\//))
+                        if (localStorage.getItem(
+                            'request-alert-disabled-'+alert.type))
                         {
-                            add_alert({
-                                type: 'agent_suspicious',
-                                title: 'Suspicious user agent',
-                                description: 'The User-Agent header is set to '
-                                    +'a value not corresponding to any of the '
-                                    +'major web browsers.',
-                            });
+                            disabled_alerts.push(alert);
                         }
-                        if (!request_headers.accept)
-                        {
-                            add_alert({
-                                type: 'accept_empty',
-                                title: 'Empty accept types',
-                                description: 'The Accept header is not set to '
-                                    +'any value.',
-                            });
-                        }
-                        if (!request_headers['accept-encoding'])
-                        {
-                            add_alert({
-                                type: 'accept_encoding_empty',
-                                title: 'Empty accept encoding',
-                                description: 'The Accept-Encoding header is '
-                                    +'not set to any value.',
-                            });
-                        }
-                        if (!request_headers['accept-language'])
-                        {
-                            add_alert({
-                                type: 'accept_language_empty',
-                                title: 'Empty accept language',
-                                description: 'The Accept-Language header is '
-                                    +'not set to any value.',
-                            });
-                        }
-                        if (request_headers.connection != 'keep-alive')
-                        {
-                            add_alert({
-                                type: 'connection_suspicious',
-                                title: 'Suspicious connection type',
-                                description: 'The Connection header is not '
-                                    +'set to "keep-alive".',
-                            });
-                        }
-                        if (r.method=='GET'
-                            &&!r.url.match(/^https?:\/\/[^\/\?]+\/?$/)
-                            &&!r.url.match(/[^\w]favicon[^\w]/)
-                            &&!request_headers.referer)
-                        {
-                            add_alert({
-                                type: 'referer_empty',
-                                title: 'Empty referrer',
-                                description: 'The Referer header is not set '
-                                    +'even though the requested URL is not '
-                                    +'the home page of the site.',
-                            });
-                        }
-                        if (r.url
-                            .match(/^https?:\/\/\d+\.\d+\.\d+\.\d+[$\/\?]/))
-                        {
-                            add_alert({
-                                type: 'ip_url',
-                                title: 'IP URL',
-                                description: 'The url uses IP and not '
-                                    +'hostname, it will not be served from the'
-                                    +' proxy peer. It could mean a resolve '
-                                    +'configuration issue when using SOCKS.',
-                            });
-                        }
-                        var sensitive_headers = [];
-                        for (var i in $scope.hola_headers)
-                        {
-                            if (request_headers[$scope.hola_headers[i]])
-                                sensitive_headers.push($scope.hola_headers[i]);
-                        }
-                        if (sensitive_headers.length)
-                        {
-                            add_alert({
-                                type: 'sensitive_header',
-                                title: 'Sensitive request header',
-                                description: (sensitive_headers.length>1 ?
-                                    'There are sensitive request headers' :
-                                    'There is sensitive request header')
-                                    +' in the request: '
-                                    +sensitive_headers.join(', '),
-                            });
-                        }
-                        r.alerts = alerts;
-                        r.disabled_alerts = disabled_alerts;
-                        return r;
-                    });
-                    var history_cnt = $scope.history.length;
-                    var timings = ['node_latency', 'response_time', 'elapsed'];
-                    var timings_val = {};
-                    var timing, i;
-                    for (i=0; i<timings.length; i++)
+                        else
+                            alerts.push(alert);
+                    };
+                    var raw_headers = JSON.parse(r.request_headers);
+                    var request_headers = {};
+                    for (var h in raw_headers)
+                        request_headers[h.toLowerCase()] = raw_headers[h];
+                    if (!request_headers['user-agent'])
                     {
-                        timing = timings[i];
-                        timings_val[timing] = {
-                            min: Number.MAX_VALUE,
-                            max: -1,
-                            sum: 0,
-                        };
+                        add_alert({
+                            type: 'agent_empty',
+                            title: 'Empty user agent',
+                            description: 'The User-Agent header '
+                                +'is not set to any value.',
+                        });
                     }
-                    $scope.history.forEach(function(r){
-                        for (var i=0; i<timings.length; i++)
-                        {
-                            var timing = timings[i];
-                            timings_val[timing].min = Math.min(
-                                timings_val[timing].min, r[timing]);
-                            timings_val[timing].max = Math.max(
-                                timings_val[timing].max, r[timing]);
-                            timings_val[timing].sum += r[timing];
-                        }
-                    });
-                    $scope.timings = [];
-                    for (i=0; i<timings.length; i++)
+                    else if (!request_headers['user-agent'].match(
+                        /^Mozilla\//))
                     {
-                        timing = timings[i];
-                        $scope.timings.push([
-                            timing.replace(/_/g, ' '),
-                            timings_val[timing].min,
-                            Math.round(timings_val[timing].sum/history_cnt),
-                            timings_val[timing].max,
-                        ]);
+                        add_alert({
+                            type: 'agent_suspicious',
+                            title: 'Suspicious user agent',
+                            description: 'The User-Agent header is set to '
+                                +'a value not corresponding to any of the '
+                                +'major web browsers.',
+                        });
                     }
+                    if (!request_headers.accept)
+                    {
+                        add_alert({
+                            type: 'accept_empty',
+                            title: 'Empty accept types',
+                            description: 'The Accept header is not set to '
+                                +'any value.',
+                        });
+                    }
+                    if (!request_headers['accept-encoding'])
+                    {
+                        add_alert({
+                            type: 'accept_encoding_empty',
+                            title: 'Empty accept encoding',
+                            description: 'The Accept-Encoding header is '
+                                +'not set to any value.',
+                        });
+                    }
+                    if (!request_headers['accept-language'])
+                    {
+                        add_alert({
+                            type: 'accept_language_empty',
+                            title: 'Empty accept language',
+                            description: 'The Accept-Language header is '
+                                +'not set to any value.',
+                        });
+                    }
+                    if (request_headers.connection != 'keep-alive')
+                    {
+                        add_alert({
+                            type: 'connection_suspicious',
+                            title: 'Suspicious connection type',
+                            description: 'The Connection header is not '
+                                +'set to "keep-alive".',
+                        });
+                    }
+                    if (r.method=='GET'
+                        &&!r.url.match(/^https?:\/\/[^\/\?]+\/?$/)
+                        &&!r.url.match(/[^\w]favicon[^\w]/)
+                        &&!request_headers.referer)
+                    {
+                        add_alert({
+                            type: 'referer_empty',
+                            title: 'Empty referrer',
+                            description: 'The Referer header is not set '
+                                +'even though the requested URL is not '
+                                +'the home page of the site.',
+                        });
+                    }
+                    if (r.url
+                        .match(/^https?:\/\/\d+\.\d+\.\d+\.\d+[$\/\?]/))
+                    {
+                        add_alert({
+                            type: 'ip_url',
+                            title: 'IP URL',
+                            description: 'The url uses IP and not '
+                                +'hostname, it will not be served from the'
+                                +' proxy peer. It could mean a resolve '
+                                +'configuration issue when using SOCKS.',
+                        });
+                    }
+                    var sensitive_headers = [];
+                    for (var i in $scope.hola_headers)
+                    {
+                        if (request_headers[$scope.hola_headers[i]])
+                            sensitive_headers.push($scope.hola_headers[i]);
+                    }
+                    if (sensitive_headers.length)
+                    {
+                        add_alert({
+                            type: 'sensitive_header',
+                            title: 'Sensitive request header',
+                            description: (sensitive_headers.length>1 ?
+                                'There are sensitive request headers' :
+                                'There is sensitive request header')
+                                +' in the request: '
+                                +sensitive_headers.join(', '),
+                        });
+                    }
+                    r.request_headers = request_headers;
+                    r.response_headers = JSON.parse(r.response_headers);
+                    r.alerts = alerts;
+                    r.disabled_alerts = disabled_alerts;
+                    return r;
                 });
-            }
+            });
         };
         $scope.show_loader = function(){
             return $scope.loading
             &&new Date().getTime()-$scope.loading>=loader_delay;
-        };
-        $scope.show_next = function(){
-            return $scope.loading_page||$scope.history&&
-            $scope.history.length>=$scope.page*$scope.page_size;
         };
         $scope.sort = function(field){
             if ($scope.sort_field==field.field)
@@ -1622,25 +1601,10 @@ function history($scope, $http, $filter, $window){
             $scope.filters[field.field] = '';
             $scope.update();
         };
-        $scope.details = function(row){
-            $scope.details_dialog = [{
-                row: row,
-                fields: $scope.fields,
-                update: $scope.update,
-            }];
-            setTimeout(function(){
-                $window.$('#history_details').modal();
-            }, 0);
-        };
-        $scope.next = function(){
-            $scope.loading_page = true;
-            $scope.page++;
-            $scope.update(true);
+        $scope.toggle_prop = function(row, prop){
+            row[prop] = !row[prop];
         };
         $scope.export_type = 'visible';
-        $scope.export = function(){
-            $scope.update(true, $scope.export_type);
-        };
         $scope.archive = -1;
         $http.get('/api/archive_timestamps').then(function(timestamps){
             $scope.archive_timestamps = timestamps.data.timestamps;
@@ -1672,6 +1636,57 @@ function history($scope, $http, $filter, $window){
                 $scope.update();
             }
         };
+        $scope.disable_alert = function(row, alert){
+            localStorage.setItem('request-alert-disabled-'+alert.type, 1);
+            for (var i=0; i<row.alerts.length; i++)
+            {
+                if (row.alerts[i].type==alert.type)
+                {
+                    row.disabled_alerts.push(row.alerts.splice(i, 1)[0]);
+                    break;
+                }
+            }
+        };
+        $scope.enable_alert = function(row, alert){
+            localStorage.removeItem('request-alert-disabled-'+alert.type);
+            for (var i=0; i<row.disabled_alerts.length; i++)
+            {
+                if (row.disabled_alerts[i].type==alert.type)
+                {
+                    row.alerts.push(row.disabled_alerts.splice(i, 1)[0]);
+                    break;
+                }
+            }
+        };
+        $scope.on_period_change = function(){
+            var period = $scope.virtual_filters.period;
+            if (!period)
+                return;
+            if (period!='*')
+            {
+                var from = moment().subtract($scope.virtual_filters.period)
+                .format('YYYY/MM/DD');
+                var to = moment().format('YYYY/MM/DD');
+                $scope.filters.timestamp_min = from;
+                $scope.filters.timestamp_max = to;
+                $scope.filters.timestamp = from+'-'+to;
+            }
+            else
+            {
+                $scope.filters.timestamp_min = null;
+                $scope.filters.timestamp_max = null;
+                $scope.filters.timestamp = '';
+            }
+            timestamp_changed_by_select = true;
+            $scope.update();
+        };
+        $scope.$watch('filters.timestamp', function(after){
+            if (!after)
+                $scope.virtual_filters.period = '*';
+            else if (!timestamp_changed_by_select)
+                $scope.virtual_filters.period = '';
+            timestamp_changed_by_select = false;
+        });
         $scope.update();
     };
 }
@@ -1726,58 +1741,6 @@ function history_filter($scope, $window){
                 locals.filters[field] = $scope.value.composite;
                 locals.update();
             }
-        };
-    };
-}
-
-module.controller('history_details', history_details);
-history_details.$inject = ['$scope'];
-function history_details($scope){
-    $scope.init = function(locals){
-        $scope.row = locals.row;
-        var request_headers = JSON.parse($scope.row.request_headers);
-        $scope.request_headers = Object.keys(request_headers).map(
-            function(key){
-                return [key, request_headers[key]];
-            });
-        var response_headers = JSON.parse($scope.row.response_headers);
-        $scope.response_headers = Object.keys(response_headers).map(
-            function(key){
-                return [key, response_headers[key]];
-            });
-        $scope.timings = [
-            ['Proxy peer latency', $scope.row.node_latency+' ms'],
-            ['Response sent', $scope.row.response_time+' ms'],
-            ['Response received', $scope.row.elapsed+' ms'],
-        ];
-        $scope.alerts = $scope.row.alerts;
-        $scope.disabled_alerts = $scope.row.disabled_alerts;
-        $scope.fields = locals.fields;
-        $scope.disable_alert = function(type){
-            localStorage.setItem('request-alert-disabled-'+type, 1);
-            for (var i=0; i<$scope.alerts.length; i++)
-            {
-                if ($scope.alerts[i].type==type)
-                {
-                    $scope.disabled_alerts.push($scope.alerts[i]);
-                    $scope.alerts.splice(i, 1);
-                    break;
-                }
-            }
-            locals.update();
-        };
-        $scope.enable_alert = function(type){
-            localStorage.removeItem('request-alert-disabled-'+type);
-            for (var i=0; i<$scope.disabled_alerts.length; i++)
-            {
-                if ($scope.disabled_alerts[i].type==type)
-                {
-                    $scope.alerts.push($scope.disabled_alerts[i]);
-                    $scope.disabled_alerts.splice(i, 1);
-                    break;
-                }
-            }
-            locals.update();
         };
     };
 }
@@ -2129,7 +2092,7 @@ function request_filter(){
             url: r.url,
             method: r.method,
             body: r.request_body,
-            headers: JSON.parse(r.request_headers),
+            headers: r.request_headers,
         }));
     };
 }

@@ -305,23 +305,8 @@ div.proxies .btn-wrapper {
 #history label {
     font-weight: normal;
 }
-.proxies-history-tools {
-    position: fixed;
-    left: 20px;
-    top: 80px;
-    height: 100%;
-}
 .proxies-history-navigation {
     margin-bottom: 25px;
-}
-.proxies-history-content {
-    min-height: 250px;
-    padding-bottom: 12px;
-    position: relative;
-    margin-left: 300px;
-}
-.proxies-history-stats {
-    margin-top: 20px;
 }
 .proxies-history-filter {
     font-size: 11px;
@@ -330,22 +315,9 @@ div.proxies .btn-wrapper {
 }
 .proxies-history th {
     line-height: 15px !important;
-    white-space: nowrap;
 }
-.proxies-history th span, .proxies-history th a {
+.clickable {
     cursor: pointer;
-}
-.proxies-history th, .proxies-history td {
-    text-align: center;
-}
-.proxies-history td:first-child {
-    text-align: left;
-}
-#history .proxies-history tr {
-    cursor: pointer;
-}
-#history .proxies-history thead tr {
-    cursor: default;
 }
 .proxies-history-loading {
     padding: 4px;
@@ -623,3 +595,26 @@ div.proxies .btn-wrapper {
 .table-hover>tbody>tr.opened:hover {
     background-color: #d7f6ff;
 }
+.table-hover .no-hover:hover {
+    background: none;
+}
+.pull-none {
+    float: none !important;
+}
+.history__header {
+    margin-top: 10px;
+}
+.history-details__column-first {
+    width: 300px;
+}
+.modal-open .modal {
+    overflow-y: scroll;
+}
+.blue {
+    color: #4a90e2;
+}
+.pagination>li>a:hover,
+.pagination>.disabled>a:hover {
+    box-shadow: none;
+}
+

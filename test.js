@@ -299,7 +299,8 @@ describe('proxy', ()=>{
                 yield l.test();
                 assert.equal(proxy.history.length, 1);
                 assert.equal(proxy.history[0].headers['x-hola-agent'],
-                    `proxy=${luminati.version} node=${process.version}`);
+                    'proxy='+luminati.version+' node='+process.version
+                        +' platform='+process.platform);
             }));
             it('not added when accessing site directly', ()=>etask(function*(){
                 l = yield lum({bypass_proxy: '.*'});
@@ -742,8 +743,6 @@ describe('proxy', ()=>{
                 status_message: 'NULL',
                 super_proxy: null,
                 content_size: 0,
-                download_size: 0,
-                upload_size: 0,
             }), {null_response: '.*'});
             it('pool', etask._fn(function*(_this){
                 _this.timeout(4000);

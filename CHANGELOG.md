@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.32:
+  - :sparkles: show history details below instead of modal
+  - :star: support stopping a running daemon using --stop-daemon
+  - :sparkles: use pagination in history details
 - 0.9.31:
   - :sparkles: Shuffle proxy hosts before using them, to spread traffic
   - :bug: Avoid checking proper installation of optional dependencies

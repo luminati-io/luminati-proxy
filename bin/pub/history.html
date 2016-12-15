@@ -2,133 +2,250 @@
   <div class=modal-dialog>
     <div class=modal-content>
       <div class=modal-header>
-        <button type=button class=close data-dismiss=modal>
-          &times;
-        </button>
-        <button type=button class="btn btn-default btn-title"
-          ng-disabled=archive&gt;-1 ng-click=update(true)>
-          Update
-        </button>
-        <div ng-if=archive_timestamps&&archive_timestamps.length
-          class=proxies-history-archive>
-          You are viewing the following data set:<br>
-          <span>
-            <a ng-click=show_archives()>{{archive_name(archive)}}</a>
-          </span>
+        <div class=text-right>
+          <button type=button class="close pull-none" data-dismiss=modal>
+            &times;
+          </button>
         </div>
-        <h4 class=modal-title>History: {{port}}</h4>
+        <div class=history__header>
+          <form class="form-inline pull-right">
+            <select ng-model=virtual_filters.period
+              ng-options="p.value as p.label for p in periods"
+              ng-change=on_period_change()
+              class=form-control>
+            </select>
+            <button ng-click="update('har')" ng-disabled=show_loader()
+              type=button class="btn btn-default">
+              <img src=/img/ic_download_mini.svg>
+              HAR
+            </button>
+            <button type=button class="btn btn-default"
+              ng-disabled=archive&gt;-1 ng-click=update()>
+              <img src=/img/ic_refresh_mini.svg>
+              Update
+            </button>
+          </form>
+          <div ng-if=archive_timestamps&&archive_timestamps.length
+            class=proxies-history-archive>
+            You are viewing the following data set:<br>
+            <span>
+              <a ng-click=show_archives()>{{archive_name(archive)}}</a>
+            </span>
+          </div>
+          <h3 class=modal-title>
+            History: <span class=blue>{{port}}</span>
+          </h3>
+        </div>
       </div>
-      <div class="modal-body proxies-history-content">
+      <div class=modal-body>
         <div>
-          <div class="alert alert-info proxies-history-loading" ng-if=show_loader()>
+          <div class="alert alert-info proxies-history-loading"
+            ng-if=show_loader()>
             Loading...
           </div>
           <div class=proxies-history-cc ng-if=!initial_loading>
-            <div class=proxies-history-container>
-              <table ng-if=history class="table table-hover proxies-history">
-                <thead>
-                  <tr>
-                    <th ng-repeat="f in fields">
-                      <span ng-click=sort(f)>
-                        {{f.title}}
-                        <span ng-if=sort_field==f.field&&sort_asc>
-                          &#9650;
-                        </span>
-                        <span ng-if=sort_field==f.field&&!sort_asc>
-                          &#9660;
-                        </span>
-                      </span><br>
-                      <span class=proxies-history-filter>
-                        <a ng-if=filters[f.field] ng-click=filter(f)>
-                          {{filters[f.field]}}
-                        </a>
-                        <a ng-if=filters[f.field]
-                          ng-click=filter_cancel(f)>
-                          &times;
-                        </a>
-                        <a ng-if=!filters[f.field] ng-click=filter(f)>
-                          No filter
-                        </a>
+            <table
+              class="table table-hover proxies-history">
+              <thead>
+                <tr class=nowrap>
+                  <th ng-repeat="f in fields" class=text-center>
+                    <span ng-click=sort(f)>
+                      {{f.title}}
+                      <span ng-if=sort_field==f.field&&sort_asc>
+                        &#9650;
                       </span>
-                    </th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="r in history" ng-click=details(r)
-                    class="proxies-history-clickable{{r.alerts.length ?
-                    ' warning' : ''}}"
-                    title="{{r.alerts.length ? r.alerts.length+' alert(s)' : ''}}">
-                    <td>
-                      <span title={{r.url}}>
-                        {{r.url | shorten:40}}
+                      <span ng-if=sort_field==f.field&&!sort_asc>
+                        &#9660;
                       </span>
-                    </td>
-                    <td>{{r.method}}</td>
-                    <td>{{r.status_code}}</td>
-                    <td>{{r.timestamp | timestamp}}</td>
-                    <td>{{r.elapsed}} ms</td>
-                    <td>{{r.country}}</td>
-                    <td>{{r.super_proxy}}</td>
-                    <td>{{r.proxy_peer}}</td>
-                    <td>{{r.context}}</td>
-                    <td>
-                      <a title=Replay href="{{r | request}}"
-                        ng-click=$event.stopPropagation()>
-                        <span class="glyphicon glyphicon-repeat"></span>
+                    </span><br>
+                    <span class="proxies-history-filter clickable">
+                      <a ng-if=filters[f.field] ng-click=filter(f)>
+                        {{filters[f.field]}}
                       </a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      <a ng-if=filters[f.field]
+                        ng-click=filter_cancel(f)>
+                        &times;
+                      </a>
+                      <a ng-if=!filters[f.field] ng-click=filter(f)>
+                        No filter
+                      </a>
+                    </span>
+                  </th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat-start="r in history"
+                  ng-click="toggle_prop(r, '_show_details')"
+                  ng-class="{opened: r._show_details,
+                  warning: !r._show_details&&r.alerts.length}"
+                  class="clickable nowrap"
+                  title="{{r.alerts.length ?
+                  r.alerts.length+' alert(s)' : ''}}">
+                  <td class=blue>
+                    <span title={{r.url}}>
+                      <small>
+                        <i class="glyphicon glyphicon-triangle-{{
+                          r._show_details ? 'bottom' : 'right' }}"></i>
+                      </small>
+                      {{r.url | shorten:40}}
+                    </span>
+                  </td>
+                  <td>{{r.method}}</td>
+                  <td class=text-center>{{r.status_code}}</td>
+                  <td class=text-center>{{r.timestamp | timestamp}}</td>
+                  <td class=text-right>
+                    {{r.elapsed}} <span class="text-muted">ms</span>
+                  </td>
+                  <td class=text-center>
+                    <span class="flag-icon flag-icon-{{r.country}}"></span>
+                  </td>
+                  <td>{{r.super_proxy}}</td>
+                  <td>{{r.proxy_peer}}</td>
+                  <td>{{r.context}}</td>
+                  <td>
+                    <a title=Replay href="{{r | request}}"
+                      ng-click=$event.stopPropagation()>
+                      <span class="glyphicon glyphicon-repeat"></span>
+                    </a>
+                  </td>
+                </tr>
+                <tr ng-repeat-end ng-if=r._show_details class=no-hover>
+                  <td colspan=10>
+                    <div class=col-xs-12>
+                      <table class=table>
+                        <tr ng-if=r.request_body>
+                          <th class=history-details__column-first>
+                            Request body</th>
+                          <td><pre>{{r.request_body}}</pre></td>
+                        </tr>
+                        <tr>
+                          <th>Timing</th>
+                          <td>
+                            <div class=col-xs-4>
+                              Proxy peer latency
+                              <h4 class=blue>
+                                {{r.node_latency}} ms
+                              </h4>
+                            </div>
+                            <div class=col-xs-4>
+                              Response sent
+                              <h4 class=blue>
+                                {{r.response_time}} ms
+                              </h4>
+                            </div>
+                            <div class=col-xs-4>
+                              Response received
+                              <h4 class=blue>
+                                {{r.elapsed}} ms
+                              </h4>
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                      <table class=table>
+                        <thead>
+                          <th ng-click="toggle_prop(r,
+                            '_show_details_request_headers')"
+                            class="clickable history-details__column-first">
+                            <small>
+                              <i class="glyphicon glyphicon-triangle-{{
+                                r._show_details_request_headers ?
+                                'bottom' : 'right' }}">
+                              </i>
+                            </small>
+                            Request headers
+                          </th>
+                          <th></th>
+                        </thead>
+                        <tbody ng-if=r._show_details_request_headers>
+                          <tr ng-repeat="(name, value) in r.request_headers">
+                            <td class=column-header-name>{{name}}</td>
+                            <td>{{value}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <table class=table>
+                        <thead>
+                          <th ng-click="toggle_prop(r,
+                            '_show_details_response_headers')"
+                            class="clickable history-details__column-first">
+                            <small>
+                              <i class="glyphicon glyphicon-triangle-{{
+                                r._show_details_response_headers ?
+                                'bottom' : 'right' }}">
+                              </i>
+                            </small>
+                            Response headers
+                          </th>
+                          <th></th>
+                        </thead>
+                        <tbody ng-if=r._show_details_response_headers>
+                          <tr ng-repeat="(name, value) in r.response_headers">
+                            <td class=column-header-name>{{name}}</td>
+                            <td>{{value}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <table class=table>
+                        <thead>
+                          <tr ng-class="{warning: r.alerts.length}">
+                            <th ng-click="toggle_prop(r,
+                              '_show_details_alerts')"
+                              class="clickable history-details__column-first">
+                              <small>
+                                <i class="glyphicon glyphicon-triangle-{{
+                                  r._show_details_alerts ?
+                                  'bottom' : 'right' }}">
+                                </i>
+                              </small>
+                              Alerts
+                            </th>
+                            <th></th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody ng-if=r._show_details_alerts>
+                          <tr ng-repeat="a in r.alerts" class=warning>
+                            <td>{{a.title}}</td>
+                            <td>{{a.description}}</td>
+                            <td>
+                              <button ng-click="disable_alert(r, a)"
+                                class="btn btn-warning">
+                                Disable
+                              </button>
+                            </td>
+                          </tr>
+                          <tr ng-repeat="a in r.disabled_alerts">
+                            <td>{{a.title}}</td>
+                            <td>{{a.description}}</td>
+                            <td>
+                              <button ng-click="enable_alert(r, a)"
+                                class="btn btn-default">
+                                Enable
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div ng-if=history&&history.length
+              uib-pagination
+              ng-model=pagination.current_page_number
+              ng_change=update()
+              ng-disabled=show_loader()
+              items-per-page=pagination.items_per_page
+              total-items=pagination.total_items
+              boundary-link-numbers=true max-size=3 force-ellipses=true
+              previous-text="&lsaquo;" next-text="&rsaquo;">
             </div>
-            <div class=proxies-history-tools>
-              <div class=proxies-history-navigation ng-if=show_next()>
-                <button type=button class="btn btn-primary" ng-click=next()
-                  ng-disabled=show_loader()>
-                  Show {{page_size}} more entries
-                </button>
-              </div>
-              <div class=proxies-history-export ng-if=history.length>
-                <div ng-if=show_next()>
-                  <label>
-                    <input type=radio value=visible
-                      ng-model=$parent.$parent.$parent.$parent.export_type>
-                    Visible records
-                  </label><br>
-                  <label>
-                    <input type=radio value=all
-                      ng-model=$parent.$parent.$parent.$parent.export_type>
-                    All filtered records
-                  </label>
-                </div>
-                <button type=button class="btn btn-primary" ng-click=export()
-                  ng-disabled=show_loader()>
-                  Export to HAR
-                </button>
-                <table class="table proxies-history-stats">
-                  <thead>
-                    <tr>
-                      <th>Timing</th>
-                      <th>Min</th>
-                      <th>Avg</th>
-                      <th>Max</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr ng-repeat="t in timings">
-                      <td>{{t[0]}}</td>
-                      <td>{{t[1]}}</td>
-                      <td>{{t[2]}}</td>
-                      <td>{{t[3]}}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+            <div class="alert alert-warning" ng-if=history&&!history.length>
+              No records to display
             </div>
-          </div>
-          <div class="alert alert-warning" ng-if=history&&!history.length>
-            No records to display
           </div>
         </div>
       </div>
@@ -219,7 +336,7 @@
         </div>
         <div ng-if="field.type=='options'">
           <div class=form-group>
-            <label class=control-label for=history_filter_options>
+            <label class=control-label for=history-filter-options>
               {{field.filter_label}}
             </label>
             <select id=history-filter-options
@@ -278,152 +395,6 @@
         <button type=button class="btn btn-success" data-dismiss=modal
           ng-click=archive_apply()>
           Apply
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-<div id=history_details class="modal fade" role=dialog ng-init=init(d)
-  ng-repeat="d in details_dialog" ng-controller=history_details>
-  <div class=modal-dialog>
-    <div class=modal-content>
-      <div class=modal-header>
-        <button type=button class=close data-dismiss=modal>
-          &times;
-        </button>
-        <h4 class=modal-title>History Details</h4>
-      </div>
-      <div class=modal-body>
-        <div class=proxies-history-container>
-          <table class="table proxies-history">
-            <thead>
-              <tr>
-                <th ng-repeat="f in fields">{{f.title}}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <a ng-click=$event.stopPropagation() href={{row.url}}
-                    title={{row.url}}>
-                    {{row.url | shorten:60}}
-                  </a>
-                </td>
-                <td>{{row.method}}</td>
-                <td>{{row.status_code}}</td>
-                <td>{{row.timestamp | timestamp}}</td>
-                <td>{{row.elapsed}} ms</td>
-                <td>{{row.country}}</td>
-                <td>{{row.super_proxy}}</td>
-                <td>{{row.proxy_peer}}</td>
-                <td>{{row.context}}</td>
-                <td>
-                  <a title=Replay href="{{row | request}}"
-                    ng-click=$event.stopPropagation()>
-                    <span class="glyphicon glyphicon-repeat"></span>
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <table ng-if=row.request_body class="table tools-table">
-            <thead>
-              <tr>
-                <th>Request body</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><pre>{{row.request_body}}</pre></td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table table-hover tools-table">
-            <thead>
-              <tr>
-                <th colspan=2>Timings</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="t in timings">
-                <td>{{t[0]}}</td>
-                <td>{{t[1]}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table table-hover tools-table">
-            <thead>
-              <tr>
-                <th colspan=2>Request headers</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="h in request_headers">
-                <td>{{h[0]}}</td>
-                <td>{{h[1]}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table table-hover tools-table">
-            <thead>
-              <tr>
-                <th colspan=2>Response headers</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="h in response_headers">
-                <td>{{h[0]}}</td>
-                <td>{{h[1]}}</td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table table-hover tools-table"
-            ng-if=alerts.length>
-            <thead>
-              <tr>
-                <th colspan=3>Alerts</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="a in alerts" class=warning>
-                <td>{{a.title}}</td>
-                <td>{{a.description}}</td>
-                <td>
-                  <button type=button class="btn btn-warning"
-                    ng-click=disable_alert(a.type)>
-                    Disable alert
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <table class="table table-hover tools-table"
-            ng-if=disabled_alerts.length>
-            <thead>
-              <tr>
-                <th colspan=3>Disabled alerts</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr ng-repeat="a in disabled_alerts">
-                <td>{{a.title}}</td>
-                <td>{{a.description}}</td>
-                <td>
-                  <button type=button class="btn btn-default"
-                    ng-click=enable_alert(a.type)>
-                    Enable alert
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class=modal-footer>
-        <button type=button class="btn btn-default"
-          data-dismiss=modal>
-          Cancel
         </button>
       </div>
     </div>

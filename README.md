@@ -127,13 +127,14 @@ Options:
   --dropin                Enable drop-in mode proxy for migrating
                                                       [boolean] [default: false]
   --no-dropin             Disable drop-in mode proxy for migration
+  --stop-daemon           Stop running daemon
   --mode                  Defines a set of permissible operations within the web
                           UI: either root (default), normal, or guest
                                                                [default: "root"]
   -h, --help              Show help                                    [boolean]
-  -v, --version           Show version number                          [boolean]
   -p, --port              Listening port               [number] [default: 24000]
   -d, --daemon            Start as a daemon
+  -v, --version           Show version number                          [boolean]
   --proxy                               [string] [default: "zproxy.luminati.io"]
 ```
 
