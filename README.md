@@ -110,6 +110,8 @@ Options:
   --null_response         URL pattern for null response
   --bypass_proxy          URL pattern for bypassing the proxy and connect
                           directly
+  --direct_include        Include URL pattern for direct requests
+  --direct_exclude        Exclude URL pattern for direct requests
   --throttle              Throttle requests above given number          [number]
   --allow_proxy_auth      Allow Luminati authentication per request
                                                       [boolean] [default: false]

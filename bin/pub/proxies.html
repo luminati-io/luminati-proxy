@@ -66,7 +66,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat-start="proxy in proxies|startFrom:(page-1)*page_size|limitTo:page_size"
+          <tr ng-repeat-start="proxy in proxies
+            |startFrom:(pagination.page-1)*pagination.per_page
+            |limitTo:pagination.per_page"
             ng-class="{opened: showed_status_proxies[proxy.port]}">
             <td>
                 <input ng-model="selected_proxies[proxy.port]" type=checkbox>
@@ -94,7 +96,11 @@
                 <img ng-if="proxy._status=='ok'&&!proxy._status_details.length"
                   src="/img/ic_status_ok.svg">
                 <i ng-if="proxy._status_details.length"
-                  ng-class="{'glyphicon-triangle-bottom': showed_status_proxies[proxy.port], 'glyphicon-triangle-right': !showed_status_proxies[proxy.port]}"
+                  ng-class="{
+                  'glyphicon-triangle-bottom':
+                   showed_status_proxies[proxy.port],
+                   'glyphicon-triangle-right':
+                   !showed_status_proxies[proxy.port]}"
                   class="glyphicon ic-status-triangle">
                 </i>
               </span>
@@ -205,26 +211,14 @@
         </tbody>
       </table>
     </div>
-    <div class="panel-footer text-center" ng-if="page_size<proxies.length">
-      <div class=proxy-pagination>
-        <nav aria-label="Page navigation">
-          <ul class=pagination>
-            <li class=page-item ng-if=page&gt;1 ng-click=set_page(page-1)>
-              <a class=page-link href=# aria-label=Previous
-                title="Previous page">
-                <span aria-hidden=true>&laquo;</span>
-                <span class=sr-only>Previous</span>
-              </a>
-            </li>
-            <li class=page-item ng-if=page*page_size&lt;proxies.length
-              ng-click=set_page(page+1)>
-              <a class=page-link href=# aria-label=Next title="Next page">
-                <span aria-hidden=true>&raquo;</span>
-                <span class=sr-only>Next</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
+    <div class=panel-footer>
+      <div uib-pagination
+        ng-model=pagination.page
+        ng-change=on_page_change()
+        items-per-page=pagination.per_page
+        total-items=proxies.length
+        boundary-link-numbers=true max-size=3 force-ellipses=true
+        previous-text="&lsaquo;" next-text="&rsaquo;">
       </div>
     </div>
   </div>

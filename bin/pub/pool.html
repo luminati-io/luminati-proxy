@@ -2,14 +2,23 @@
   <div class=modal-dialog>
     <div class=modal-content>
       <div class=modal-header>
-        <button type=button class=close data-dismiss=modal>
-          &times;
-        </button>
-        <button type=button class="btn btn-default btn-title"
-          ng-click=update(true) ng-if=pool>
-          Update
-        </button>
-        <h4 class=modal-title>Pool: {{port}}</h4>
+        <div class=text-right>
+          <button type=button class="close pull-none" data-dismiss=modal>
+            &times;
+          </button>
+        </div>
+        <div class=history__header>
+          <form class="form-inline pull-right">
+            <button type=button class="btn btn-default"
+              ng-click=update(true) ng-if=pool>
+              <img src=/img/ic_refresh_mini.svg>
+              Update
+            </button>
+          </form>
+        </div>
+        <h3 class=modal-title>
+          Pool: <span class=blue>{{port}}</span>
+        </h3>
       </div>
       <div class="modal-body">
         <div>
@@ -31,7 +40,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="p in pool">
+              <tr ng-repeat="p in pool
+                |startFrom:(pagination.page-1)*pagination.per_page
+                |limitTo:pagination.per_page">
                 <td>{{p.info.ip}}</td>
                 <td>{{p.info.country}}</td>
                 <td>{{p.info.geo.city}}</td>
@@ -44,12 +55,15 @@
               </tr>
             </tbody>
           </table>
+          <div ng-if=pool&&pool.length
+            uib-pagination
+            ng-model=pagination.page
+            items-per-page=pagination.per_page
+            total-items=proxies.length
+            boundary-link-numbers=true max-size=3 force-ellipses=true
+            previous-text="&lsaquo;" next-text="&rsaquo;">
+          </div>
         </div>
-      </div>
-      <div class=modal-footer>
-        <button type=button class="btn btn-default" data-dismiss=modal>
-          Cancel
-        </button>
       </div>
     </div>
   </div>

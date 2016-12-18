@@ -817,6 +817,13 @@ module.filter('startFrom', function(){
     };
 });
 
+function check_by_re(r, v){ return (v = v.trim()) && r.test(v); }
+var check_number = check_by_re.bind(null, /^\d+$/);
+function check_reg_exp(v){
+    try { return (v = v.trim()) || new RegExp(v, 'i'); }
+    catch(e){ return false; }
+}
+
 module.controller('proxies', proxies);
 proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
 function proxies($scope, $http, $proxies, $window, $q){
@@ -825,8 +832,6 @@ function proxies($scope, $http, $proxies, $window, $q){
     var iface_opts = [], zone_opts = [];
     var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [];
-    var check_by_re = function(r, v){ return (v = v.trim()) && r.test(v); };
-    var check_number = check_by_re.bind(null, /^\d+$/);
     var opt_columns = [
         {
             key: 'port',
@@ -1005,13 +1010,28 @@ function proxies($scope, $http, $proxies, $window, $q){
             check: check_by_re.bind(null, /^(none|full)$/),
         },
         {
+            key: 'null_response',
+            title: 'NULL response',
+            type: 'text',
+            check: check_reg_exp,
+        },
+        {
             key: 'bypass_proxy',
             title: 'Bypass proxy',
             type: 'text',
-            check: function(v){
-                try { return (v = v.trim()) || new RegExp(v, 'i'); }
-                catch(e){ return false; }
-            },
+            check: check_reg_exp,
+        },
+        {
+            key: 'direct_include',
+            title: 'Direct include',
+            type: 'text',
+            check: check_reg_exp,
+        },
+        {
+            key: 'direct_exclude',
+            title: 'Direct exclude',
+            type: 'text',
+            check: check_reg_exp,
         },
     ];
     var default_cols = {
@@ -1025,7 +1045,7 @@ function proxies($scope, $http, $proxies, $window, $q){
     };
     $scope.cols_conf = JSON.parse(
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
-    $scope.$watch('cols_conf', function(cols_conf){
+    $scope.$watch('cols_conf', function(){
         $scope.columns = opt_columns.filter(function(col){
             return col.key.match(/^_/) || $scope.cols_conf[col.key]; });
     }, true);
@@ -1039,17 +1059,17 @@ function proxies($scope, $http, $proxies, $window, $q){
     $scope.$on('consts', function(e, data){ apply_consts(data.proxy); });
     if ($scope.$parent.consts)
         apply_consts($scope.$parent.consts.proxy);
-    $scope.page_size = 50;
-    $scope.page = 1;
     $scope.zones = {};
     $scope.selected_proxies = {};
     $scope.showed_status_proxies = {};
+    $scope.pagination = {page: 1, per_page: 10};
     $scope.set_page = function(p){
+        var per_page = $scope.pagination.per_page;
         if (p < 1)
             p = 1;
-        if (p*$scope.page_size>$scope.proxies.length)
-            p = Math.ceil($scope.proxies.length/$scope.page_size);
-        $scope.page = p;
+        if (p*per_page>$scope.proxies.length)
+            p = Math.ceil($scope.proxies.length/per_page);
+        $scope.pagination.page = p;
     };
     $proxies.subscribe(function(proxies){
         $scope.proxies = proxies;
@@ -1223,6 +1243,8 @@ function proxies($scope, $http, $proxies, $window, $q){
                 function(){ $proxies.update(); });
         }
     };
+    $scope.on_page_change = function(){
+        $scope.selected_proxies = {}; };
     var load_regions = function(country){
         if (!country||country=='*')
             return [];
@@ -1360,17 +1382,17 @@ function history($scope, $http, $window){
             context: '',
         };
         $scope.pagination = {
-            current_page_number: 1,
-            items_per_page: 10,
-            total_items: 100,
+            page: 1,
+            per_page: 10,
+            total: 1,
         };
         $scope.update = function(export_type){
             var params = {sort: $scope.sort_field};
             if (!export_type)
             {
-                params.limit = $scope.pagination.items_per_page;
-                params.skip = ($scope.pagination.current_page_number-1)
-                    *$scope.pagination.items_per_page;
+                params.limit = $scope.pagination.per_page;
+                params.skip = ($scope.pagination.page-1)
+                    *$scope.pagination.per_page;
             }
             if (!$scope.sort_asc)
                 params.sort_desc = 1;
@@ -1405,12 +1427,12 @@ function history($scope, $http, $window){
             var params_arr = [];
             for (var param in params)
                 params_arr.push(param+'='+encodeURIComponent(params[param]));
-            var url = '/api/'+(export_type ? 'har' : 'history')+'/'+locals.port
-            +'?'+params_arr.join('&');
-            if (export_type=='har')
+            var url = '/api/history';
+            if (export_type=='har'||export_type=='csv')
+                url += '_'+export_type;
+            url += '/'+locals.port+'?'+params_arr.join('&');
+            if (export_type)
                 return $window.location = url;
-            else if (export_type)
-                return;
             $scope.loading = new Date().getTime();
             setTimeout(function(){ $scope.$apply(); }, loader_delay);
             $http.get(url).then(function(res){
@@ -1750,10 +1772,11 @@ pool.$inject = ['$scope', '$http', '$window'];
 function pool($scope, $http, $window){
     $scope.init = function(locals){
         $scope.port = locals.port;
+        $scope.pagination = {page: 1, per_page: 10};
         $scope.show_modal = function(){ $window.$('#pool').modal(); };
         $scope.update = function(refresh){
             $scope.pool = null;
-            $http.get('/api/sessions/'+$scope.port+'?refresh')
+            $http.get('/api/sessions/'+$scope.port+(refresh ? '?refresh' : ''))
             .then(function(pool){
                 $scope.pool = pool.data;
             });

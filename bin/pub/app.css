@@ -244,11 +244,6 @@ div.proxies .btn-wrapper {
     right: 10px;
     top: 10px;
 }
-.proxy-pagination {
-    position: absolute;
-    right: 11px;
-    top: -11px;
-}
 .proxies-default {
     color: gray;
 }

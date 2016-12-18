@@ -21,6 +21,7 @@ const luminati = require('./index.js');
 const Luminati = luminati.Luminati;
 const Manager = luminati.Manager;
 const pkg = require('./package.json');
+const username = require('./lib/username.js');
 const customer = 'abc';
 const password = 'xyz';
 
@@ -74,28 +75,19 @@ const to_body = req=>({
 });
 
 const http_proxy = port=>etask(function*(){
-    const proxy = {history: []};
+    const proxy = {history: [], full_history: []};
     const handler = (req, res, head)=>{
         if (proxy.fake)
         {
             const body = to_body(req);
-            const auth = body.headers['proxy-authorization'];
+            const auth = username.parse(body.headers['proxy-authorization']);
             if (auth)
-            {
-                const cred = (new Buffer(auth.split(' ')[1], 'base64'))
-                    .toString('ascii').split(':');
-                body.auth = {password: cred[1]};
-                for (let args=cred[0].split('-'); args.length;)
-                {
-                    const key = args.shift();
-                    if (key=='lum')
-                        continue;
-                    body.auth[key] = args.shift();
-                }
-            }
+                body.auth = auth;
             res.writeHead(200, {'content-type': 'application/json'});
             res.write(JSON.stringify(body));
-            proxy.history.push(body);
+            proxy.full_history.push(body);
+            if (body.url!='http://lumtest.com/myip.json')
+                proxy.history.push(body);
             return res.end();
         }
         req.pipe(request({
@@ -267,6 +259,7 @@ describe('proxy', ()=>{
 
     beforeEach(()=>{
         proxy.history = [];
+        proxy.full_history = [];
         waiting = [];
         ping.history = [];
     });
@@ -381,7 +374,8 @@ describe('proxy', ()=>{
                         .toString('base64'),
                 }});
                 assert.ok(l.sessions);
-                assert.equal(proxy.history.length, 4);
+                assert.equal(proxy.history.length, 1);
+                assert.equal(proxy.full_history.length, 4);
                 assert.equal(res.body.auth.customer, customer);
                 assert.equal(res.body.auth.password, password);
                 assert.equal(res.body.auth.zone, 'gen');
@@ -405,13 +399,15 @@ describe('proxy', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
                     l = yield lum({pool_size});
                     yield l.test();
-                    assert.equal(proxy.history.length, pool_size+1);
+                    assert.equal(proxy.history.length, 1);
+                    assert.equal(proxy.history[0].url, test_url);
+                    assert.equal(proxy.full_history.length, pool_size+1);
                     for (let i=0; i<pool_size; i++)
                     {
-                        assert.equal(proxy.history[i].url,
+                        assert.equal(proxy.full_history[i].url,
                             'http://lumtest.com/myip.json');
                     }
-                    assert.equal(proxy.history[pool_size].url, test_url);
+                    assert.equal(proxy.full_history[pool_size].url, test_url);
                     assert.equal(l.sessions.length, pool_size);
                     let sessions = {};
                     for (let i=0; i<pool_size; i++)
@@ -523,14 +519,16 @@ describe('proxy', ()=>{
                 _this.timeout(6000);
                 l = yield lum({keep_alive: 1, pool_size: 1}); // actual 1sec
                 yield l.test();
-                const start = proxy.history.length;
-                assert.equal(proxy.history.length, start);
+                const start = proxy.full_history.length;
+                assert.equal(proxy.full_history.length, start);
                 yield etask.sleep(500);
-                assert.equal(proxy.history.length, start);
+                assert.equal(proxy.full_history.length, start);
+                assert.equal(proxy.history.length, 1);
                 yield l.test();
-                assert.equal(proxy.history.length, 1+start);
+                assert.equal(proxy.full_history.length, 1+start);
                 yield etask.sleep(1500);
-                assert.equal(proxy.history.length, 2+start);
+                assert.equal(proxy.full_history.length, 2+start);
+                assert.equal(proxy.history.length, 2);
             }));
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
@@ -572,31 +570,27 @@ describe('proxy', ()=>{
                         });
                         let no_match = yield match_test(no_match_url);
                         let match = yield match_test(match_url);
-                        // XXX lee - info for finding out why we have periodic crushes of tests
-                        console.log({match_before: match.before, match_after:
-                            match.after, no_match_before: no_match.before,
-                            no_match_after: no_match.after, history: proxy.history});
                         assert.notEqual(no_match.after, no_match.before);
                         assert.equal(match.after, match.before);
                         assert.equal(match.res.statusCode, 200);
                         assert.equal(match.res.statusMessage, 'NULL');
                         assert.equal(match.res.body, undefined);
                     }));
-                    t('http', 'echo\\.json', 'http://lumtest.com/myip.json',
+                    t('http', 'echo\\.json', 'http://lumtest.com/myip',
                         'http://lumtest.com/echo.json');
                     t('https sniffing by path', 'echo\\.json',
-                        'https://lumtest.com/myip.json',
+                        'https://lumtest.com/myip',
                         'https://lumtest.com/echo.json', true);
                     t('https sniffing by domain', 'lumtest\.com',
                         'https://httpsbin.org/ip',
-                        'http://lumtest.com/myip.json',
+                        'http://lumtest.com/myip',
                         true);
                     it('https connect', ()=>etask(function*(){
                         l = yield lum({null_response: 'match', log: 'DEBUG'});
                         try {
                             yield l.test('https://match.com');
                         } catch(err){
-                            assert(/statusCode=501/.test(err.message));
+                            assert.ok(/statusCode=501/.test(err.message));
                         }
                         yield l.test();
                         assert.ok(proxy.history.length>0);
@@ -638,6 +632,9 @@ describe('proxy', ()=>{
             t('DNS', {dns: 'local'});
             t('debug', {debug: 'none'});
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
+            t('raw', {raw: true});
+            t('direct_include', {direct_include: '.*'}, {direct: true});
+            t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
         });
         describe('socks', ()=>{
             const t = (name, url)=>it(name, etask._fn(function*(_this){
@@ -679,18 +676,26 @@ describe('proxy', ()=>{
             t(3);
             t(10);
         });
-        describe('refresh_session', ()=>{
-            it('pool', ()=>etask(function*(){
-                const test_session = session=>etask(function*(){
-                    let res = yield l.test();
-                    let auth = res.body.auth;
-                    assert(auth.session, session);
-                });
-                l = yield lum({pool_size: 1, max_requests: 10});
-                yield test_session('24000_1');
+        describe('refresh_sessions', ()=>{
+            const test_session = session=>etask(function*(){
+                let res = yield l.test();
+                let auth = res.body.auth;
+                assert.ok(session.test(auth.session));
+            });
+
+            const t = (name, opt, before, after)=>it(name, ()=>etask(
+            function*(){
+                l = yield lum(opt);
+                yield test_session(before);
                 yield l.refresh_sessions();
-                yield test_session('24000_2');
+                yield test_session(after);
             }));
+
+            t('pool', {pool_size: 1, max_requests: 10}, /24000_[0-9a-f]+_1/,
+                /24000_[0-9a-f]+_2/);
+            t('sticky_ip', {sticky_ip: true, pool_size: 0},
+                /24000_127_0_0_1_[0-9a-f]+_1/,
+                /24000_127_0_0_1_[0-9a-f]+_2/);
         });
         describe('history aggregation', ()=>{
             let history;

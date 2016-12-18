@@ -1,5 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.33:
+  - :bug: refresh_sessions now refresh sticky_ip sessions properly
+  - :sparkles: export history to CSV
+  - :star: Reintroducing direct_include/direct_exclude
+  - :sparkles: use pagination in proxies
+  - :sparkles: use pagination in pool
 - 0.9.32:
   - :sparkles: show history details below instead of modal
   - :star: support stopping a running daemon using --stop-daemon
@@ -41,7 +47,7 @@
   proxy
 - 0.9.18:
   - :boom: `--direct_include` and `--direct_exclude` options have been
-    removed; use `--bypass_proxy` instead
+    removed; use `--bypass_proxy` instead (was restored on version 0.9.33)
   - :sparkles: Use a drop-down to select the State/Province/Region in the
     proxies table, instead of free form text
   - :bug: fix bug in saving history setting in UI

@@ -19,6 +19,11 @@
               <img src=/img/ic_download_mini.svg>
               HAR
             </button>
+            <button ng-click="update('csv')" ng-disabled=show_loader()
+              type=button class="btn btn-default">
+              <img src=/img/ic_download_mini.svg>
+              CSV
+            </button>
             <button type=button class="btn btn-default"
               ng-disabled=archive&gt;-1 ng-click=update()>
               <img src=/img/ic_refresh_mini.svg>
@@ -235,11 +240,11 @@
             </table>
             <div ng-if=history&&history.length
               uib-pagination
-              ng-model=pagination.current_page_number
+              ng-model=pagination.page
               ng_change=update()
               ng-disabled=show_loader()
-              items-per-page=pagination.items_per_page
-              total-items=pagination.total_items
+              items-per-page=pagination.per_page
+              total-items=pagination.total
               boundary-link-numbers=true max-size=3 force-ellipses=true
               previous-text="&lsaquo;" next-text="&rsaquo;">
             </div>
