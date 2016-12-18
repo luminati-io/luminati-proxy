@@ -116,17 +116,17 @@ const http_proxy = port=>etask(function*(){
             {
                 proxy.https = https.createServer(
                     assign({requestCert: false}, ssl()),
-                    (req, res, head)=>{
-                        _.defaults(req.headers,
-                            headers[req.socket.remotePort]||{});
-                        handler(req, res, head);
+                    (_req, _res, _head)=>{
+                        _.defaults(_req.headers,
+                            headers[_req.socket.remotePort]||{});
+                        handler(_req, _res, _head);
                     }
                 );
                 yield etask.nfn_apply(proxy.https, '.listen', [0]);
             }
             _url = '127.0.0.1:'+proxy.https.address().port;
         }
-        let port;
+        let req_port;
         res.write('HTTP/1.1 200 OK\r\n\r\n');
         const socket = net.connect({
             host: _url.split(':')[0],
@@ -134,9 +134,10 @@ const http_proxy = port=>etask(function*(){
         });
         socket.setNoDelay();
         socket.on('connect', ()=>{
-            port = socket.localPort;
-            headers[port] = req.headers||{};
-        }).on('close', ()=>delete headers[port]).on('error', this.throw_fn());
+            req_port = socket.localPort;
+            headers[req_port] = req.headers||{};
+        }).on('close', ()=>delete headers[req_port]).on('error',
+            this.throw_fn());
         res.pipe(socket).pipe(res);
         req.on('end', ()=>socket.end());
     }));
@@ -158,9 +159,9 @@ const http_proxy = port=>etask(function*(){
         if (_this.https)
             yield etask.nfn_apply(_this.https, '.close', []);
     });
-    proxy.request = etask._fn(function*(_this, url){
+    proxy.request = etask._fn(function*(_this, _url){
         return yield etask.nfn_apply(request, [{
-            url: url||'http://lumtest.com/myip',
+            url: _url||'http://lumtest.com/myip',
             proxy: `http://${customer}:${password}@127.0.0.1:${proxy.port}`,
             strictSSL: false,
         }]);
@@ -232,15 +233,15 @@ describe('proxy', ()=>{
             log: 'NONE',
             port: 24000,
         }, opt));
-        l.test = etask._fn(function*(_this, opt){
-            if (typeof opt=='string')
-                opt = {url: opt};
-            opt = opt||{};
-            opt.url = opt.url||test_url;
-            opt.json = true;
-            opt.rejectUnauthorized = false;
+        l.test = etask._fn(function*(_this, req_opt){
+            if (typeof req_opt=='string')
+                req_opt = {url: req_opt};
+            req_opt = req_opt||{};
+            req_opt.url = req_opt.url||test_url;
+            req_opt.json = true;
+            req_opt.rejectUnauthorized = false;
             return yield etask.nfn_apply(_this, '.request',
-                [opt]);
+                [req_opt]);
         });
         yield l.listen();
         return l;
@@ -270,9 +271,9 @@ describe('proxy', ()=>{
         l = null;
     }));
     describe('sanity', ()=>{
-        const t = (name, url, opt)=>it(name, ()=>etask(function*(){
+        const t = (name, _url, opt)=>it(name, ()=>etask(function*(){
             proxy.fake = false;
-            const _url = url();
+            _url = _url();
             l = yield lum(opt);
             let res = yield l.test(_url);
             assert.equal(ping.history.length, 1);
@@ -304,14 +305,14 @@ describe('proxy', ()=>{
         describe('X-Hola-Context', ()=>{
             let history;
             const aggregator = data=>history.push(data);
-            const t = (name, url, opt, target, skip_res)=>it(name, ()=>etask(
+            const t = (name, _url, opt, target, skip_res)=>it(name, ()=>etask(
             function*(){
                 const context = 'context-1';
                 history = [];
                 l = yield lum(assign({history: true, history_aggregator:
                     aggregator}, opt));
                 let res = yield l.test({
-                    url: url(),
+                    url: _url(),
                     headers: {'x-hola-context': context},
                 });
                 if (!skip_res)
@@ -335,14 +336,14 @@ describe('proxy', ()=>{
                 ()=>proxy.history[0]);
         });
         describe('keep letter caseing and order', ()=>{
-            const t = (name, url, opt)=>it(name, ()=>etask(function*(){
+            const t = (name, _url, opt)=>it(name, ()=>etask(function*(){
                 const headers = {
                     'Keep-Alive': 'Close',
                     'X-Just-Testing': 'value',
                     'X-bizzare-Letter-cAsE': 'test',
                 };
                 l = yield lum(opt);
-                const res = yield l.test({url: url(), headers: headers});
+                const res = yield l.test({url: _url(), headers: headers});
                 const site_headers = _.omit(res.body.headers,
                     qw`proxy-authorization x-hola-agent`);
                 assert_has(site_headers, headers, 'value');
@@ -466,17 +467,17 @@ describe('proxy', ()=>{
                     const trials = 3;
                     l = yield lum(opt);
                     let sessions = [];
-                    for (let t=0; t<trials; t++)
+                    for (let tr=0; tr<trials; tr++)
                     {
-                        sessions[t] = [];
+                        sessions[tr] = [];
                         if (opt.pool_type=='round-robin')
                         {
                             for (let req=0; req<opt.max_requests; req++)
                             {
                                 for (let s=0; s<opt.pool_size; s++)
                                 {
-                                    sessions[t][s] = sessions[t][s]||[];
-                                    sessions[t][s][req] = yield test_call();
+                                    sessions[tr][s] = sessions[tr][s]||[];
+                                    sessions[tr][s][req] = yield test_call();
                                 }
                             }
                         }
@@ -484,21 +485,22 @@ describe('proxy', ()=>{
                         {
                             for (let s=0; s<opt.pool_size; s++)
                             {
-                                sessions[t][s] = [];
+                                sessions[tr][s] = [];
                                 for (let req=0; req<opt.max_requests; req++)
-                                    sessions[t][s][req] = yield test_call();
+                                    sessions[tr][s][req] = yield test_call();
                             }
                         }
                     }
                     let used = [];
-                    for (let t=0; t<trials; t++)
+                    for (let tr=0; tr<trials; tr++)
                     {
                         for (let s=0; s<opt.pool_size; s++)
                         {
-                            let id = sessions[t][s][0];
+                            let id = sessions[tr][s][0];
                             used.forEach(u=>assert.notEqual(id, u));
                             used.push(id);
-                            sessions[t][s].forEach(req=>assert.equal(req, id));
+                            sessions[tr][s].forEach(
+                                req=>assert.equal(req, id));
                         }
                     }
                 }));
@@ -551,22 +553,22 @@ describe('proxy', ()=>{
                 // t(2);
             });
         });
-        const match_test = url=>etask(function*(){
+        const match_test = _url=>etask(function*(){
             yield etask.sleep(10);
             let before = proxy.history.length;
-            let res = yield l.test(url);
+            let res = yield l.test(_url);
             yield etask.sleep(10);
             let after = proxy.history.length;
             return {before, after, res};
         });
         describe('null_response', ()=>{
             const t =
-                (name, null_response, no_match_url, match_url, ssl, code)=>it(
+                (name, null_response, no_match_url, match_url, _ssl, code)=>it(
                     name, ()=>etask(function*(){
                         l = yield lum({
                             null_response: null_response,
-                            ssl: ssl,
-                            insecure: ssl,
+                            ssl: _ssl,
+                            insecure: _ssl,
                         });
                         let no_match = yield match_test(no_match_url);
                         let match = yield match_test(match_url);
@@ -589,8 +591,8 @@ describe('proxy', ()=>{
                         l = yield lum({null_response: 'match', log: 'DEBUG'});
                         try {
                             yield l.test('https://match.com');
-                        } catch(err){
-                            assert.ok(/statusCode=501/.test(err.message));
+                        } catch(e){
+                            assert.ok(/statusCode=501/.test(e.message));
                         }
                         yield l.test();
                         assert.ok(proxy.history.length>0);
@@ -637,7 +639,7 @@ describe('proxy', ()=>{
             t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
         });
         describe('socks', ()=>{
-            const t = (name, url)=>it(name, etask._fn(function*(_this){
+            const t = (name, _url)=>it(name, etask._fn(function*(_this){
                 _this.timeout(30000);
                 l = yield lum({socks: 25000});
                 let res = yield etask.nfn_apply(request, [{
@@ -646,10 +648,10 @@ describe('proxy', ()=>{
                         proxyPort: 25000,
                         auths: [socks.auth.None()],
                     }),
-                    url: url,
+                    url: _url,
                 }]);
                 let body = JSON.parse(res.body);
-                assert.equal(body.url, url);
+                assert.equal(body.url, _url);
             }));
             t('http', test_url);
         });
@@ -657,10 +659,9 @@ describe('proxy', ()=>{
             const t = throttle=>it(''+throttle, etask._fn(function*(_this){
                 _this.timeout(3000);
                 let requests = [];
-                const request = n=>repeat(n, ()=>requests.push(l.test()));
                 proxy.connection = hold_request;
                 l = yield lum({throttle});
-                request(2*throttle);
+                repeat(2*throttle, ()=>requests.push(l.test()));
                 yield etask.sleep(100);
                 assert.equal(waiting.length, throttle);
                 for (let i=0; i < throttle; ++i)
@@ -683,7 +684,7 @@ describe('proxy', ()=>{
                 assert.ok(session.test(auth.session));
             });
 
-            const t = (name, opt, before, after)=>it(name, ()=>etask(
+            const t1 = (name, opt, before, after)=>it(name, ()=>etask(
             function*(){
                 l = yield lum(opt);
                 yield test_session(before);
@@ -691,24 +692,43 @@ describe('proxy', ()=>{
                 yield test_session(after);
             }));
 
-            t('pool', {pool_size: 1, max_requests: 10}, /24000_[0-9a-f]+_1/,
+            t1('pool', {pool_size: 1, max_requests: 10}, /24000_[0-9a-f]+_1/,
                 /24000_[0-9a-f]+_2/);
-            t('sticky_ip', {sticky_ip: true, pool_size: 0},
+            t1('sticky_ip', {sticky_ip: true, pool_size: 0},
                 /24000_127_0_0_1_[0-9a-f]+_1/,
                 /24000_127_0_0_1_[0-9a-f]+_2/);
+
+            const t2 = (name, opt, test)=>it(name, ()=>etask(function*(){
+                l = yield lum(opt);
+                assert.ok(!l.sessions);
+                yield l.refresh_sessions();
+                let pre = l.sessions.map(s=>s.session);
+                yield l.refresh_sessions();
+                let after = l.sessions.map(s=>s.session);
+                test(pre, after);
+            }));
+
+            t2('round-robin', {pool_size: 3, pool_type: 'round-robin'},
+                (pre, after)=>after.forEach(a=>pre.forEach(
+                    p=>assert.notEqual(p, a))));
+            t2('sequential', {pool_size: 3}, (pre, after)=>{
+                let first = pre.shift();
+                after.forEach(a=>assert.notEqual(a, first));
+                assert_has(after, pre);
+            });
         });
         describe('history aggregation', ()=>{
             let history;
             const aggregator = data=>history.push(data);
             beforeEach(()=>history = []);
-            const t = (name, url, expected, opt)=>it(name, ()=>etask(
+            const t = (name, _url, expected, opt)=>it(name, ()=>etask(
             function*(){
                 ping.headers = ping.headers||{};
                 ping.headers.connection = 'close';
                 l = yield lum(assign({history: true,
                     history_aggregator: aggregator}, opt));
                 assert.equal(history.length, 0);
-                let res = yield l.test(url());
+                let res = yield l.test(_url());
                 res.socket.destroy();
                 yield etask.sleep(10);
                 assert.equal(history.length, 1);
@@ -839,9 +859,9 @@ describe('manager', ()=>{
     const app_with_proxies = (proxies, cli)=>etask(function*app_with_proxies(){
         return yield app_with_config({config: {proxies}, cli: cli});
     });
-    const api = (path, method, data, json)=>etask(function*api(){
+    const api = (_path, method, data, json)=>etask(function*api(){
         const opt = {
-            url: app.admin+'/'+path,
+            url: app.admin+'/'+_path,
             method: method||'GET',
             json: json,
             body: data,
@@ -866,7 +886,7 @@ describe('manager', ()=>{
     beforeEach(()=>temp_files = []);
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('socks', ()=>{
-        const t = (name, url)=>it(name, etask._fn(function*(_this){
+        const t = (name, _url)=>it(name, etask._fn(function*(_this){
             _this.timeout(30000);
             let args = [
                 '--socks', '25000:24000',
@@ -878,10 +898,10 @@ describe('manager', ()=>{
                     proxyPort: 25000,
                     auths: [socks.auth.None()],
                 }),
-                url: url,
+                url: _url,
             }]);
             let body = JSON.parse(res.body);
-            assert.equal(body.url, url);
+            assert.equal(body.url, _url);
         }));
         t('http', 'http://lumtest.com/echo.json');
     });
@@ -958,12 +978,12 @@ describe('manager', ()=>{
                 app = yield app_with_args(['--mode', 'root']);
                 const before = yield json('api/proxies_running');
                 assert.equal(before.length, 1);
-                const proxy = {port: 24001};
-                const res = yield json('api/proxies', 'POST', {proxy});
-                assert_has(res, proxy, 'proxies');
+                const _proxy = {port: 24001};
+                const res = yield json('api/proxies', 'POST', {proxy: _proxy});
+                assert_has(res, _proxy, 'proxies');
                 const after = yield json('api/proxies_running');
                 assert.equal(after.length, 2);
-                assert_has(after[1], proxy, 'proxies_running');
+                assert_has(after[1], _proxy, 'proxies_running');
             }));
         });
     });

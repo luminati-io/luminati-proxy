@@ -1,8 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+- NEXT-VERSION:
+  - :star: refresh_sessions for sequential pools will only refresh the used
+  session, and not all
 - 0.9.35:
-  - :sparkles: Proxy settings dialog will not prevent port conflicts when
-  saving proxy
+  - :sparkles: Proxy settings dialog will prevent port conflicts when saving
+  proxy
 - 0.9.34:
   - :bug: refresh_sessions now refresh sticky_ip sessions properly
   - :sparkles: export history to CSV
