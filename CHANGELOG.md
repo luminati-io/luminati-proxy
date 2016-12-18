@@ -1,6 +1,9 @@
 # Luminati Proxy manager - Change Log
 
-- 0.9.33:
+- 0.9.35:
+  - :sparkles: Proxy settings dialog will not prevent port conflicts when
+  saving proxy
+- 0.9.34:
   - :bug: refresh_sessions now refresh sticky_ip sessions properly
   - :sparkles: export history to CSV
   - :star: Reintroducing direct_include/direct_exclude

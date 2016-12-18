@@ -88,13 +88,16 @@
                       </option>
                     </select>
                   </div>
-                  <div class=form-group>
+                  <div class=form-group
+                    ng-class="{'has-error': form_errors.socks}">
                     <label class=control-label for=proxy-field-socks-port>
                       SOCKS port
                     </label>
                     <input id=proxy-field-socks-port type=number
                       ng-model=form.socks placeholder={{consts.socks.def}}
                       class=form-control>
+                    <span ng-show=form_errors.socks class="help-block">
+                      {{form_errors.socks}}</span>
                   </div>
                   <div class=form-group
                     ng-class="{'has-error': form_errors.zone}">
