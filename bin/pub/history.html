@@ -24,19 +24,11 @@
               <img src=/img/ic_download_mini.svg>
               CSV
             </button>
-            <button type=button class="btn btn-default"
-              ng-disabled=archive&gt;-1 ng-click=update()>
+            <button type=button class="btn btn-default" ng-click=update()>
               <img src=/img/ic_refresh_mini.svg>
               Update
             </button>
           </form>
-          <div ng-if=archive_timestamps&&archive_timestamps.length
-            class=proxies-history-archive>
-            You are viewing the following data set:<br>
-            <span>
-              <a ng-click=show_archives()>{{archive_name(archive)}}</a>
-            </span>
-          </div>
           <h3 class=modal-title>
             History: <span class=blue>{{port}}</span>
           </h3>
@@ -359,46 +351,6 @@
         </button>
         <button type=button class="btn btn-success"
           data-dismiss=modal ng-click=apply()>
-          Apply
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-<div id=history_archives class="modal fade" role=dialog>
-  <div class=modal-dialog>
-    <div class=modal-content>
-      <div class=modal-header>
-        <button type=button class=close data-dismiss=modal>
-          &times;
-        </button>
-        <h4 class=modal-title>Choosing Data Set</h4>
-      </div>
-      <div class=modal-body>
-        <div>
-          <div class=form-group>
-            <label class=control-label for=history-archive-options>
-              Data set
-            </label>
-            <select id=history-archive-options class=form-control>
-              <option value=-1 ng-selected=archive==-1>
-                {{archive_name(-1)}}
-              </option>
-              <option ng-repeat="t in archive_timestamps" ng-value=$index
-                ng-selected=archive==$index>
-                {{archive_name($index)}}
-              </option>
-            </select>
-          </div>
-          Note that earlier data sets may lack some data.
-        </div>
-      </div>
-      <div class=modal-footer>
-        <button type=button class="btn btn-default" data-dismiss=modal>
-          Cancel
-        </button>
-        <button type=button class="btn btn-success" data-dismiss=modal
-          ng-click=archive_apply()>
           Apply
         </button>
       </div>

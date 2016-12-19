@@ -697,7 +697,7 @@ function countries($scope, $http, $window){
                 while ($scope.cur_index<$scope.countries.length&&
                     $scope.num_loading<max_concur)
                 {
-                    if ($scope.countries[$scope.cur_index].status == 0)
+                    if (!$scope.countries[$scope.cur_index].status)
                     {
                         $scope.countries[$scope.cur_index].status = 1;
                         $scope.countries[$scope.cur_index].img.src =
@@ -778,7 +778,7 @@ function countries($scope, $http, $window){
         }).modal();
     };
     $scope.cancel = function(country){
-        if (country.status==0)
+        if (!country.status)
             country.status = 2;
         else if (country.status==1)
             country.img.src = '';
@@ -1445,7 +1445,8 @@ function history($scope, $http, $window){
                     var disabled_alerts = [];
                     var add_alert = function(alert){
                         if (r.method=='CONNECT'
-                            ||request_headers.host=='lumtest.com')
+                            ||request_headers.host=='lumtest.com'
+                            ||r.url.match(/^https?:\/\/lumtest.com[$\/\?]/))
                         {
                             return;
                         }
@@ -1627,37 +1628,6 @@ function history($scope, $http, $window){
             row[prop] = !row[prop];
         };
         $scope.export_type = 'visible';
-        $scope.archive = -1;
-        $http.get('/api/archive_timestamps').then(function(timestamps){
-            $scope.archive_timestamps = timestamps.data.timestamps;
-        });
-        $scope.archive_name = function(index){
-            if (!$scope.archive_timestamps)
-                return '';
-            var date = function(index){
-                return moment($scope.archive_timestamps[index])
-                .format('YYYY/MM/DD');
-            };
-            if (index==$scope.archive_timestamps.length-1)
-                return 'Up to '+date(index);
-            return 'From '+date(index+1)+' until '
-            +(index==-1 ? 'now' : date(index));
-        };
-        $scope.show_archives = function(){
-            var sel = $window.$('#history_archives select');
-            sel.val($scope.archive);
-            $window.$('#history_archives').one('shown.bs.modal', function(){
-                sel.focus();
-            }).modal();
-        };
-        $scope.archive_apply = function(){
-            var val = +$window.$('#history_archives select').val();
-            if ($scope.archive!=val)
-            {
-                $scope.archive = val;
-                $scope.update();
-            }
-        };
         $scope.disable_alert = function(row, alert){
             localStorage.setItem('request-alert-disabled-'+alert.type, 1);
             for (var i=0; i<row.alerts.length; i++)
@@ -1819,7 +1789,7 @@ function proxy($scope, $http, $proxies, $window, $q){
             $scope.form.max_requests_start = +max_requests[0];
             $scope.form.max_requests_end = +max_requests[1];
         }
-        if ($scope.form.max_requests==0)
+        if (!$scope.form.max_requests)
             $scope.form.max_requests_start = 0;
         if ($scope.form.session_duration)
         {
@@ -2081,7 +2051,7 @@ requests_filter.$inject = ['$filter'];
 function requests_filter($filter){
     var number_filter = $filter('number');
     return function(requests, precision){
-        if (requests==0 || isNaN(parseFloat(requests))
+        if (!requests || isNaN(parseFloat(requests))
             || !isFinite(requests))
         {
             return '';
@@ -2097,7 +2067,7 @@ bytes_filter.$inject = ['$filter'];
 function bytes_filter($filter){
     var number_filter = $filter('number');
     return function(bytes, precision){
-        if (bytes==0 || isNaN(parseFloat(bytes)) || !isFinite(bytes))
+        if (!bytes || isNaN(parseFloat(bytes)) || !isFinite(bytes))
             return '';
         var number = Math.floor(Math.log(bytes) / Math.log(1000));
         if (typeof precision==='undefined')
