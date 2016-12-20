@@ -1,9 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.38:
+  - :star: FAQ now contain REST api documentation
 - 0.9.37:
   - :bug: drop in mode proxy use sticky_ip sessions and not pool sessions
   - :bug: do not show alerts for lumtest.com requests
-  - :bug: avoid crushing when there is a new host for collecting stats
+  - :bug: avoid crashing when there is a new host for collecting stats
 - 0.9.36:
   - :star: refresh_sessions for sequential pools will only refresh the used
   session, and not all

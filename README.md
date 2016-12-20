@@ -71,70 +71,68 @@ luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
-  --log                   Log level (none|error|warn|info|verbose|debug|silly)
-                                                              [default: "error"]
-  --customer              Customer                                      [string]
-  --password              Password                                      [string]
+  --history               Log request history         [boolean] [default: false]
+  --ssl                   Enable SSL sniffing         [boolean] [default: false]
+  --socks                 SOCKS5 port
+  --log                   Log level                           [default: "error"]
+  --iface                 Interface or IP to listen on      [default: "0.0.0.0"]
+  --customer              Luminati customer                             [string]
+  --zone                  Zone                         [string] [default: "gen"]
+  --password              Zone password                                 [string]
   --proxy_port            Super proxy port                      [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]
   --secure_proxy          Use SSL when accessing super proxy
                                                       [boolean] [default: false]
-  --sticky_ip             Use same session as much as possible to maintain IP
+  --proxy_switch          Automatically switch super proxy on failure
+                                                                    [default: 5]
+  --insecure              Enable SSL connection/sniffing to insecure hosts
                                                       [boolean] [default: false]
-  --keep_alive            Generate request to keep alive every n seconds[number]
-  --zone                  Zone                         [string] [default: "gen"]
   --country               Country                                       [string]
   --state                 State                                         [string]
   --city                  City                                          [string]
   --asn                   ASN                                           [number]
   --ip                    Datacenter IP                                 [string]
-  --dns                   DNS resolving (local|remote)
-  --debug                 Luminati request debug info (none|full)
+  --dns                   DNS resolving
+  --debug                 Luminati request debug info
   --request_timeout       Timeout for request on the super proxy (seconds)
                                                                         [string]
-  --pool_size             Pool size                        [number] [default: 3]
-  --pool_type             Pool session iteration order (sequential|round-robin)
-                                                         [default: "sequential"]
-  --seed                  Session ID Seed used for identifing sessions from this
-                          proxy (default to random)
-  --ssl                   Enable SSL sniffing         [boolean] [default: false]
-  --insecure              Enable SSL connection/sniffing to insecure hosts
+  --allow_proxy_auth      Allow Luminati authentication per request
                                                       [boolean] [default: false]
-  --max_requests          Requests per session            [string] [default: 50]
-  --session_duration      Maximum duration of session (seconds)         [string]
-  --proxy_switch          Automatically switch super proxy on failure
-                                                                    [default: 5]
+  --sticky_ip             Use session per requesting host to maintain IP per
+                          host                        [boolean] [default: false]
+  --pool_size             Session pool size                [number] [default: 3]
+  --pool_type             Pool session iteration order   [default: "sequential"]
   --session_init_timeout  Session establish timeout (seconds)
                                                            [number] [default: 5]
+  --keep_alive            Generate request to keep session alive after given
+                          idle time (seconds)                           [number]
+  --seed                  Session ID seed used for identifing sessions from this
+                          proxy
+  --max_requests          Maximum requests per session    [string] [default: 50]
+  --session_duration      Maximum duration of session (seconds)         [string]
+  --throttle              Throttle requests above given number          [number]
   --null_response         URL pattern for null response
   --bypass_proxy          URL pattern for bypassing the proxy and connect
                           directly
   --direct_include        Include URL pattern for direct requests
-  --direct_exclude        Exclude URL pattern for direct requests
-  --throttle              Throttle requests above given number          [number]
-  --allow_proxy_auth      Allow Luminati authentication per request
-                                                      [boolean] [default: false]
-  --www                   Local web port                        [default: 22999]
-  --no-www                Disable local web
-  --socks                 SOCKS5 port
-  --history               Log history                 [boolean] [default: false]
-  --database              Database path         [default: "~/.luminati.sqlite3"]
-  --resolve               Reverse DNS lookup file
+  --exclude_include       Exclude URL pattern for direct requests
+  --www                   UI/API port                           [default: 22999]
   --config                Config file containing proxy definitions
                                                    [default: "~/.luminati.json"]
+  --database              Database file containing history and cached values
+                                                [default: "~/.luminati.sqlite3"]
+  --resolve               Reverse DNS lookup file
+  --mode                  Defines a set of permissible operations within the
+                          UI/API                               [default: "root"]
+  --no-www                Disable local web
   --no-config             Working without a config file
-  --iface                 Interface or ip to listen on (lo|eth0|...)
-                                                            [default: "0.0.0.0"]
   --dropin                Enable drop-in mode proxy for migrating
                                                       [boolean] [default: false]
   --no-dropin             Disable drop-in mode proxy for migration
   --stop-daemon           Stop running daemon
-  --mode                  Defines a set of permissible operations within the web
-                          UI: either root (default), normal, or guest
-                                                               [default: "root"]
   -h, --help              Show help                                    [boolean]
-  -p, --port              Listening port               [number] [default: 24000]
+  -p, --port              Port for the HTTP proxy      [number] [default: 24000]
   -d, --daemon            Start as a daemon
   -v, --version           Show version number                          [boolean]
   --proxy                               [string] [default: "zproxy.luminati.io"]

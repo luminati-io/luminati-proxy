@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.9.37",
+  "version": "0.9.38",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -62,6 +62,7 @@
     "socksv5": "0.0.6",
     "sqlite3": "^3.1.8",
     "sudo-prompt": "^6.2.1",
+    "swagger-ui": "^2.2.8",
     "winston": "^2.3.0",
     "yargs": "^6.5.0",
     "yauzl": "^2.7.0"

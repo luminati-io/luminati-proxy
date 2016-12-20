@@ -1,0 +1,479 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.9.38",
+        "title": "Luminati Proxy Manager",
+        "license": {
+            "name": "MIT",
+            "url": "http://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "127.0.0.1:22999",
+    "basePath": "/api",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json# Describe your paths here"
+    ],
+    "paths": {
+        "/swagger": {
+            "get": {
+                "description": "Returns the swagger definition json",
+                "tags": [
+                    "Manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/version": {
+            "get": {
+                "description": "Returns the version of the running Luminati Proxy Manager\n",
+                "tags": [
+                    "Manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/package_version"
+                        }
+                    }
+                }
+            }
+        },
+        "/last_version": {
+            "get": {
+                "description": "Returns the latest public version avaliable\n",
+                "tags": [
+                    "Manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/package_version"
+                        }
+                    }
+                }
+            }
+        },
+        "/node_version": {
+            "get": {
+                "description": "Return the currently running node version\n",
+                "tags": [
+                    "Manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "current": {
+                                    "type": "string"
+                                },
+                                "recomended": {
+                                    "type": "string"
+                                },
+                                "satisfied": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/proxies_running": {
+            "get": {
+                "description": "Return the effective configuration for all running proxies\n",
+                "tags": [
+                    "Proxy",
+                    "Manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/proxy"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/proxies": {
+            "get": {
+                "description": "Return the explicit configuration for all running proxies\n",
+                "tags": [
+                    "Proxy",
+                    "Manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/proxy"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Add a new proxy",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "proxy",
+                        "in": "body",
+                        "description": "The proxy explicit configuration",
+                        "schema": {
+                            "$ref": "#/definitions/proxy"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/proxies/{port}": {
+            "put": {
+                "description": "Update existing proxy",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "proxy",
+                        "in": "body",
+                        "description": "The proxy explicit configuration",
+                        "schema": {
+                            "$ref": "#/definitions/proxy"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing proxy",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/delete": {
+            "post": {
+                "description": "Delete multiple existing proxies",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "body",
+                        "description": "Comma seperated list of proxy ports to delete",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^\\d+(.\\d+)*$"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/refresh_sessions/{port}": {
+            "post": {
+                "description": "Switch luminati sessions to new sessions (get new IPs)",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Proxy port",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/proxy_status/{port}": {
+            "get": {
+                "description": "Return the status of the proxy",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Proxy port",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "package_version": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "manager": {
+            "type": "object",
+            "properties": {
+                "www": {
+                    "type": "integer",
+                    "description": "UI/API port"
+                },
+                "config": {
+                    "type": "string",
+                    "description": "Config file containing proxy definitions"
+                },
+                "database": {
+                    "type": "string",
+                    "description": "Database file containing history and cached values"
+                },
+                "resolve": {
+                    "type": "string",
+                    "description": "Reverse DNS lookup file"
+                },
+                "mode": {
+                    "type": "string",
+                    "pattern": "^root|normal|guest$",
+                    "description": "Defines a set of permissible operations within the UI/API"
+                }
+            }
+        },
+        "proxy": {
+            "type": "object",
+            "properties": {
+                "port": {
+                    "type": "integer",
+                    "description": "Port for the HTTP proxy"
+                },
+                "history": {
+                    "type": "boolean",
+                    "description": "Log request history"
+                },
+                "ssl": {
+                    "type": "boolean",
+                    "description": "Enable SSL sniffing"
+                },
+                "socks": {
+                    "type": "integer",
+                    "description": "SOCKS5 port"
+                },
+                "log": {
+                    "type": "string",
+                    "pattern": "^none|error|warn|info|verbose|debug|silly$",
+                    "description": "Log level"
+                },
+                "iface": {
+                    "type": "string",
+                    "description": "Interface or IP to listen on"
+                },
+                "customer": {
+                    "type": "string",
+                    "description": "Luminati customer"
+                },
+                "zone": {
+                    "type": "string",
+                    "description": "Zone"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Zone password"
+                },
+                "proxy_port": {
+                    "type": "integer",
+                    "description": "Super proxy port"
+                },
+                "proxy_count": {
+                    "type": "integer",
+                    "description": "Minimum number of super proxies to use"
+                },
+                "secure_proxy": {
+                    "type": "boolean",
+                    "description": "Use SSL when accessing super proxy"
+                },
+                "proxy_switch": {
+                    "type": "integer",
+                    "description": "Automatically switch super proxy on failure"
+                },
+                "insecure": {
+                    "type": "boolean",
+                    "description": "Enable SSL connection/sniffing to insecure hosts"
+                },
+                "country": {
+                    "type": "string",
+                    "description": "Country"
+                },
+                "state": {
+                    "type": "string",
+                    "description": "State"
+                },
+                "city": {
+                    "type": "string",
+                    "description": "City"
+                },
+                "asn": {
+                    "type": "integer",
+                    "description": "ASN"
+                },
+                "ip": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+$",
+                    "description": "Datacenter IP"
+                },
+                "dns": {
+                    "type": "string",
+                    "pattern": "^local|remote$",
+                    "description": "DNS resolving"
+                },
+                "debug": {
+                    "type": "string",
+                    "pattern": "^none|full$",
+                    "description": "Luminati request debug info"
+                },
+                "request_timeout": {
+                    "type": "integer",
+                    "description": "Timeout for request on the super proxy (seconds)"
+                },
+                "allow_proxy_auth": {
+                    "type": "boolean",
+                    "description": "Allow Luminati authentication per request"
+                },
+                "sticky_ip": {
+                    "type": "boolean",
+                    "description": "Use session per requesting host to maintain IP per host"
+                },
+                "pool_size": {
+                    "type": "integer",
+                    "description": "Session pool size"
+                },
+                "pool_type": {
+                    "type": "string",
+                    "pattern": "^sequential|round-robin$",
+                    "description": "Pool session iteration order"
+                },
+                "session_init_timeout": {
+                    "type": "integer",
+                    "description": "Session establish timeout (seconds)"
+                },
+                "keep_alive": {
+                    "type": "integer",
+                    "description": "Generate request to keep session alive after given idle time (seconds)"
+                },
+                "seed": {
+                    "type": "string",
+                    "description": "Session ID seed used for identifing sessions from this proxy"
+                },
+                "max_requests": {
+                    "type": "string",
+                    "pattern": "^\\d+(:\\d+)?$",
+                    "description": "Maximum requests per session"
+                },
+                "session_duration": {
+                    "type": "string",
+                    "pattern": "^\\d+(:\\d+)?$",
+                    "description": "Maximum duration of session (seconds)"
+                },
+                "throttle": {
+                    "type": "integer",
+                    "description": "Throttle requests above given number"
+                },
+                "null_response": {
+                    "type": "string",
+                    "description": "URL pattern for null response"
+                },
+                "bypass_proxy": {
+                    "type": "string",
+                    "description": "URL pattern for bypassing the proxy and connect directly"
+                },
+                "direct_include": {
+                    "type": "string",
+                    "description": "Include URL pattern for direct requests"
+                },
+                "exclude_include": {
+                    "type": "string",
+                    "description": "Exclude URL pattern for direct requests"
+                }
+            }
+        }
+    }
+}
+

@@ -589,6 +589,10 @@ function faq($scope){
             name: 'ssl',
             title: 'How do I enable HTTPS sniffing?',
         },
+        {
+            name: 'api',
+            title: 'REST API to contorl Luminati proxy manager',
+        },
     ];
 }
 
