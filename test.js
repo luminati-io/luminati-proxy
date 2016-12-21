@@ -526,20 +526,21 @@ describe('proxy', ()=>{
                     _this.timeout(6000);
                     l = yield lum(assign({keep_alive: 1}, opt)); // actual 1sec
                     yield l.test();
-                    const start = proxy.full_history.length;
-                    assert.equal(proxy.full_history.length, start);
+                    proxy.full_history = [];
                     yield etask.sleep(500);
-                    assert.equal(proxy.full_history.length, start);
+                    assert.equal(proxy.full_history.length, 0);
                     assert.equal(proxy.history.length, 1);
                     yield l.test();
-                    assert.equal(proxy.full_history.length, 1+start);
+                    assert.equal(proxy.full_history.length, 1);
+                    assert.equal(proxy.history.length, 2);
                     yield etask.sleep(1500);
-                    assert.equal(proxy.full_history.length, 2+start);
+                    assert.equal(proxy.full_history.length, 2);
                     assert.equal(proxy.history.length, 2);
                 }));
 
                 t('pool', {pool_size: 1});
                 t('sticky_ip', {sticky_ip: true});
+                t('session', {session: 'test'});
             });
             describe('session_duration', ()=>{
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){

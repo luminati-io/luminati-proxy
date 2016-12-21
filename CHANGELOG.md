@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.41:
+  - :star: make keep_alive support single session
+  - :sparkles: get last version using cdn
 - 0.9.40:
   - :sparkles: make --session visible in UI and CLI
 - 0.9.39:
