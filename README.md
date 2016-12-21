@@ -71,21 +71,25 @@ luminati --help
 Usage: luminati [options] config1 config2 ...
 
 Options:
+  --port, -p              Port for the HTTP proxy      [number] [default: 24000]
   --history               Log request history         [boolean] [default: false]
   --ssl                   Enable SSL sniffing         [boolean] [default: false]
-  --socks                 SOCKS5 port
-  --log                   Log level                           [default: "error"]
-  --iface                 Interface or IP to listen on      [default: "0.0.0.0"]
+  --socks                 SOCKS5 port                                   [number]
+  --log                   Log level                  [string] [default: "error"]
+  --iface                 Interface or IP to listen on
+                                                   [string] [default: "0.0.0.0"]
   --customer              Luminati customer                             [string]
   --zone                  Zone                         [string] [default: "gen"]
   --password              Zone password                                 [string]
-  --proxy_port            Super proxy port                      [default: 22225]
+  --proxy                 Hostname or IP of super proxy
+                                        [string] [default: "zproxy.luminati.io"]
+  --proxy_port            Super proxy port             [number] [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]
   --secure_proxy          Use SSL when accessing super proxy
                                                       [boolean] [default: false]
   --proxy_switch          Automatically switch super proxy on failure
-                                                                    [default: 5]
+                                                           [number] [default: 5]
   --insecure              Enable SSL connection/sniffing to insecure hosts
                                                       [boolean] [default: false]
   --country               Country                                       [string]
@@ -93,49 +97,47 @@ Options:
   --city                  City                                          [string]
   --asn                   ASN                                           [number]
   --ip                    Datacenter IP                                 [string]
-  --dns                   DNS resolving
-  --debug                 Luminati request debug info
+  --dns                   DNS resolving                                 [string]
+  --debug                 Luminati request debug info                   [string]
   --request_timeout       Timeout for request on the super proxy (seconds)
-                                                                        [string]
+                                                                        [number]
   --allow_proxy_auth      Allow Luminati authentication per request
                                                       [boolean] [default: false]
   --sticky_ip             Use session per requesting host to maintain IP per
                           host                        [boolean] [default: false]
   --pool_size             Session pool size                [number] [default: 3]
-  --pool_type             Pool session iteration order   [default: "sequential"]
+  --pool_type             Pool session iteration order
+                                                [string] [default: "sequential"]
   --session_init_timeout  Session establish timeout (seconds)
                                                            [number] [default: 5]
   --keep_alive            Generate request to keep session alive after given
                           idle time (seconds)                           [number]
   --seed                  Session ID seed used for identifing sessions from this
-                          proxy
+                          proxy                                         [string]
   --max_requests          Maximum requests per session    [string] [default: 50]
   --session_duration      Maximum duration of session (seconds)         [string]
   --throttle              Throttle requests above given number          [number]
-  --null_response         URL pattern for null response
+  --null_response         URL pattern for null response                 [string]
   --bypass_proxy          URL pattern for bypassing the proxy and connect
-                          directly
-  --direct_include        Include URL pattern for direct requests
-  --exclude_include       Exclude URL pattern for direct requests
+                          directly                                      [string]
+  --direct_include        Include URL pattern for direct requests       [string]
+  --exclude_include       Exclude URL pattern for direct requests       [string]
   --www                   UI/API port                           [default: 22999]
   --config                Config file containing proxy definitions
-                                                   [default: "~/.luminati.json"]
+                                  [string] [default: "/home/lee/.luminati.json"]
   --database              Database file containing history and cached values
-                                                [default: "~/.luminati.sqlite3"]
-  --resolve               Reverse DNS lookup file
+                               [string] [default: "/home/lee/.luminati.sqlite3"]
+  --resolve               Reverse DNS lookup file                       [string]
   --mode                  Defines a set of permissible operations within the
-                          UI/API                               [default: "root"]
+                          UI/API                      [string] [default: "root"]
+  --dropin                Create dropin mode proxy on port 22225
+                                                      [boolean] [default: false]
   --no-www                Disable local web
   --no-config             Working without a config file
-  --dropin                Enable drop-in mode proxy for migrating
-                                                      [boolean] [default: false]
-  --no-dropin             Disable drop-in mode proxy for migration
+  --daemon, -d            Start as a daemon
   --stop-daemon           Stop running daemon
-  -h, --help              Show help                                    [boolean]
-  -p, --port              Port for the HTTP proxy      [number] [default: 24000]
-  -d, --daemon            Start as a daemon
-  -v, --version           Show version number                          [boolean]
-  --proxy                               [string] [default: "zproxy.luminati.io"]
+  --version, -v           Show version number                          [boolean]
+  --help, -h, -?          Show help                                    [boolean]
 ```
 
 ### Docker
@@ -163,6 +165,12 @@ If you do not find the answer there, feel free to open an
 [issue on github](issues).
 
 Or contact [support@luminati.io](mailto:support@luminati.io).
+
+## REST API
+
+Working documentation of the API can be found inside the app.
+
+A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json)
 
 ## Node.js API
 

@@ -464,7 +464,7 @@ describe('proxy', ()=>{
 
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
                     _this.timeout(10000);
-                    const trials = 3;
+                    const trials = 3, pool_size = opt.pool_size || 1;
                     l = yield lum(opt);
                     let sessions = [];
                     for (let tr=0; tr<trials; tr++)
@@ -474,7 +474,7 @@ describe('proxy', ()=>{
                         {
                             for (let req=0; req<opt.max_requests; req++)
                             {
-                                for (let s=0; s<opt.pool_size; s++)
+                                for (let s=0; s<pool_size; s++)
                                 {
                                     sessions[tr][s] = sessions[tr][s]||[];
                                     sessions[tr][s][req] = yield test_call();
@@ -483,7 +483,7 @@ describe('proxy', ()=>{
                         }
                         else
                         {
-                            for (let s=0; s<opt.pool_size; s++)
+                            for (let s=0; s<pool_size; s++)
                             {
                                 sessions[tr][s] = [];
                                 for (let req=0; req<opt.max_requests; req++)
@@ -494,7 +494,7 @@ describe('proxy', ()=>{
                     let used = [];
                     for (let tr=0; tr<trials; tr++)
                     {
-                        for (let s=0; s<opt.pool_size; s++)
+                        for (let s=0; s<pool_size; s++)
                         {
                             let id = sessions[tr][s][0];
                             used.forEach(u=>assert.notEqual(id, u));
@@ -516,22 +516,65 @@ describe('proxy', ()=>{
                 t('2, sequential pool', {max_requests: 2, pool_size: 2});
                 t('5, sequential pool', {max_requests: 5, pool_size: 5});
                 t('10, sequential pool', {max_requests: 10, pool_size: 10});
+                t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
+                t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
+                t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
+                t('10, sticky_ip', {max_requests: 10, sticky_ip: true});
             });
-            it('keep_alive', etask._fn(function*(_this){
-                _this.timeout(6000);
-                l = yield lum({keep_alive: 1, pool_size: 1}); // actual 1sec
-                yield l.test();
-                const start = proxy.full_history.length;
-                assert.equal(proxy.full_history.length, start);
-                yield etask.sleep(500);
-                assert.equal(proxy.full_history.length, start);
-                assert.equal(proxy.history.length, 1);
-                yield l.test();
-                assert.equal(proxy.full_history.length, 1+start);
-                yield etask.sleep(1500);
-                assert.equal(proxy.full_history.length, 2+start);
-                assert.equal(proxy.history.length, 2);
-            }));
+            describe('keep_alive', ()=>{
+                const t = (name, opt)=>it(name, etask._fn(function*(_this){
+                    _this.timeout(6000);
+                    l = yield lum(assign({keep_alive: 1}, opt)); // actual 1sec
+                    yield l.test();
+                    const start = proxy.full_history.length;
+                    assert.equal(proxy.full_history.length, start);
+                    yield etask.sleep(500);
+                    assert.equal(proxy.full_history.length, start);
+                    assert.equal(proxy.history.length, 1);
+                    yield l.test();
+                    assert.equal(proxy.full_history.length, 1+start);
+                    yield etask.sleep(1500);
+                    assert.equal(proxy.full_history.length, 2+start);
+                    assert.equal(proxy.history.length, 2);
+                }));
+
+                t('pool', {pool_size: 1});
+                t('sticky_ip', {sticky_ip: true});
+            });
+            describe('session_duration', ()=>{
+                const t = (name, opt)=>it(name, etask._fn(function*(_this){
+                    _this.timeout(4000);
+                    l = yield lum(assign({session_duration: 1}, // actual 1sec
+                        opt));
+                    const start = Date.now();
+                    const initial = yield l.test();
+                    const results = [];
+                    let interval = setInterval(etask._fn(function*(){
+                        const time = Date.now();
+                        const _res = yield l.test();
+                        if (interval)
+                            results.push({time: time, res: _res});
+                    }), 100);
+                    etask.sleep(1500);
+                    clearInterval(interval);
+                    interval = null;
+                    results.forEach(r=>{
+                        if (r.time - start < 1000)
+                        {
+                            assert.equal(initial.body.auth.session,
+                                r.res.body.auth.session);
+                        }
+                        else
+                        {
+                            assert.notEqual(initial.body.auth.session,
+                                r.res.body.auth.session);
+                        }
+                    });
+                }));
+
+                t('pool', {pool_size: 1});
+                t('sticky_ip', {sticky_ip: true});
+            });
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
                     proxy.connection = hold_request;
@@ -806,7 +849,7 @@ describe('manager', ()=>{
         let log = get_param(args, '--log');
         if (!log)
             args = args.concat(['--log', 'NONE']);
-        let db_file = temp_file_path('.sqlite3');
+        let db_file = temp_file_path('sqlite3');
         if (!get_param(args, '--database'))
             args = args.concat(['--database', db_file.path]);
         if (!get_param(args, '--proxy'))
@@ -890,9 +933,10 @@ describe('manager', ()=>{
             _this.timeout(30000);
             let args = [
                 '--socks', '25000:24000',
+                '--socks', '26000:24000',
             ];
             app = yield app_with_args(args);
-            let res = yield etask.nfn_apply(request, [{
+            let res1 = yield etask.nfn_apply(request, [{
                 agent: new socks.HttpAgent({
                     proxyHost: '127.0.0.1',
                     proxyPort: 25000,
@@ -900,8 +944,18 @@ describe('manager', ()=>{
                 }),
                 url: _url,
             }]);
-            let body = JSON.parse(res.body);
-            assert.equal(body.url, _url);
+            let body1 = JSON.parse(res1.body);
+            assert.equal(body1.url, _url);
+            let res2 = yield etask.nfn_apply(request, [{
+                agent: new socks.HttpAgent({
+                    proxyHost: '127.0.0.1',
+                    proxyPort: 26000,
+                    auths: [socks.auth.None()],
+                }),
+                url: _url,
+            }]);
+            let body2 = JSON.parse(res2.body);
+            assert.equal(body2.url, _url);
         }));
         t('http', 'http://lumtest.com/echo.json');
     });

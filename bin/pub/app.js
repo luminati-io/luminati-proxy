@@ -841,7 +841,15 @@ function proxies($scope, $http, $proxies, $window, $q){
             key: 'port',
             title: 'Port',
             type: 'number',
-            check: function(v){ return check_number(v) && v>=24000; },
+            check: function(v, config){
+                if (check_number(v) && v>=24000)
+                {
+                    var conflicts = $proxies.proxies.filter(function(proxy){
+                        return proxy.port==v&&proxy.port!=config.port; });
+                    return !conflicts.length;
+                }
+                return false;
+            },
         },
         {
             key: '_status',
@@ -1151,7 +1159,7 @@ function proxies($scope, $http, $proxies, $window, $q){
             return $scope.inline_edit_blur(proxy);
         var v = event.currentTarget.value;
         var p = $window.$(event.currentTarget).closest('.proxies-table-input');
-        if (col.check(v))
+        if (col.check(v, proxy.config))
             p.removeClass('has-error');
         else
         {
@@ -1169,8 +1177,16 @@ function proxies($scope, $http, $proxies, $window, $q){
         var config = _.cloneDeep(proxy.config);
         config[col.key] = v;
         config.persist = true;
-        $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
-            function(){ $proxies.update(); });
+        $http.post('/api/proxy_check/'+proxy.port, config)
+        .then(function(res){
+            var errors = res.data.filter(function(i){ return i.lvl=='err'; });
+            if (!errors.length)
+                return $http.put('/api/proxies/'+proxy.port, {proxy: config});
+        })
+        .then(function(res){
+            if (res)
+                $proxies.update();
+        });
     };
     $scope.inline_edit_select = function(proxy, col, event){
         if (event.which==27)

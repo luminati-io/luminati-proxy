@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.38",
+        "version": "0.9.39",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -295,6 +295,11 @@
         "manager": {
             "type": "object",
             "properties": {
+                "socks": {
+                    "type": "string",
+                    "pattern": "^\\d+(:\\d+)$",
+                    "description": "SOCKS5 port"
+                },
                 "www": {
                     "type": "integer",
                     "description": "UI/API port"
@@ -315,6 +320,10 @@
                     "type": "string",
                     "pattern": "^root|normal|guest$",
                     "description": "Defines a set of permissible operations within the UI/API"
+                },
+                "dropin": {
+                    "type": "boolean",
+                    "description": "Create dropin mode proxy on port 22225"
                 }
             }
         },
@@ -357,6 +366,10 @@
                 "password": {
                     "type": "string",
                     "description": "Zone password"
+                },
+                "proxy": {
+                    "type": "string",
+                    "description": "Hostname or IP of super proxy"
                 },
                 "proxy_port": {
                     "type": "integer",

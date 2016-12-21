@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.39:
+  - :star: sticky_ip sessions now support keep_alive, max_requests and
+  session_duration
+  - :sparkles: proxy inline form will prevent port conflicts when saving proxy
 - 0.9.38:
   - :star: FAQ now contain REST api documentation
 - 0.9.37:
