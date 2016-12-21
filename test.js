@@ -680,6 +680,9 @@ describe('proxy', ()=>{
             t('raw', {raw: true});
             t('direct_include', {direct_include: '.*'}, {direct: true});
             t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
+            t('session explicit', {session: 'test_session'});
+            t('session using seed', {session: true, seed: 'seed'},
+                {session: 'seed'});
         });
         describe('socks', ()=>{
             const t = (name, _url)=>it(name, etask._fn(function*(_this){

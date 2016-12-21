@@ -103,6 +103,7 @@ Options:
                                                                         [number]
   --allow_proxy_auth      Allow Luminati authentication per request
                                                       [boolean] [default: false]
+  --session               Luminati session for all proxy requests       [string]
   --sticky_ip             Use session per requesting host to maintain IP per
                           host                        [boolean] [default: false]
   --pool_size             Session pool size                [number] [default: 3]

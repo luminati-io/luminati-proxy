@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.39",
+        "version": "0.9.40",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -430,6 +430,11 @@
                     "type": "boolean",
                     "description": "Allow Luminati authentication per request"
                 },
+                "session": {
+                    "type": "string",
+                    "pattern": "^[^\\.\\-]*$",
+                    "description": "Luminati session for all proxy requests"
+                },
                 "sticky_ip": {
                     "type": "boolean",
                     "description": "Use session per requesting host to maintain IP per host"
@@ -453,6 +458,7 @@
                 },
                 "seed": {
                     "type": "string",
+                    "pattern": "^[^\\.\\-]*$",
                     "description": "Session ID seed used for identifing sessions from this proxy"
                 },
                 "max_requests": {

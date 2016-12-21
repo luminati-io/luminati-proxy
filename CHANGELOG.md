@@ -1,5 +1,7 @@
 # Luminati Proxy manager - Change Log
 
+- 0.9.40:
+  - :sparkles: make --session visible in UI and CLI
 - 0.9.39:
   - :star: sticky_ip sessions now support keep_alive, max_requests and
   session_duration
