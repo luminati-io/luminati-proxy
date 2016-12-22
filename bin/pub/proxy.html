@@ -46,7 +46,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-sticky-ip>
-                      {{consts.history.desc}}
+                      {{consts.history.desc.description}}
                     </label>
                     <select id=proxy-field-history class=form-control
                       ng-model=_history ng-init="_history =
@@ -68,7 +68,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-sticky-ip>
-                      {{consts.ssl.desc}}
+                      {{consts.ssl.desc.description}}
                     </label>
                     <select id=proxy-field-ssl class=form-control
                       ng-model=_ssl ng-init="_ssl =
@@ -126,7 +126,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-secure-proxy>
-                      {{consts.secure_proxy.desc}}
+                      {{consts.secure_proxy.desc.description}}
                     </label>
                     <select id=proxy-field-secure-proxy class=form-control
                       ng-model=_secure_proxy ng-init="_secure_proxy =
@@ -195,7 +195,7 @@
                   </div>
                   <div class=form-group  ng-show="is_valid_field('asn')">
                     <label class=control-label for=proxy-field-asn>
-                      {{consts.asn.desc}}
+                      {{consts.asn.desc.description}}
                       (<a href=http://bgp.potaroo.net/cidr/autnums.html
                         target=_blank>ASN list</a>)
                     </label>
@@ -348,7 +348,7 @@
                 <div class=panel-body>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-sinit-timeout>
-                      {{consts.session_init_timeout.desc}}
+                      {{consts.session_init_timeout.desc.description}}
                     </label>
                     <input id=proxy-field-sinit-timeout type=number
                       ng-model=form.session_init_timeout class=form-control
@@ -383,7 +383,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-proxy-switch>
-                      {{consts.proxy_switch.desc}}
+                      {{consts.proxy_switch.desc.description}}
                     </label>
                     <input id=proxy-field-proxy-switch type=number
                       ng-model=form.proxy_switch class=form-control
@@ -391,7 +391,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-throttle>
-                      {{consts.throttle.desc}}
+                      {{consts.throttle.desc.description}}
                     </label>
                     <input id=proxy-field-throttle type=number
                       ng-model=form.throttle class=form-control
@@ -399,7 +399,7 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-req-timeout>
-                      {{consts.request_timeout.desc}}
+                      {{consts.request_timeout.desc.description}}
                     </label>
                     <input id=proxy-field-req-timeout type=number
                       ng-model=form.request_timeout class=form-control
@@ -408,7 +408,7 @@
                   <div class=form-group
                     ng-class="{'has-error': form_errors.debug}">
                     <label class=control-label for=proxy-field-debug>
-                      {{consts.debug.desc}}
+                      {{consts.debug.desc.description}}
                     </label>
                     <input id=proxy-field-debug ng-model=form.debug
                       class=form-control>
@@ -435,28 +435,28 @@
                   </p>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-null-response>
-                      {{consts.null_response.desc}}
+                      {{consts.null_response.desc.description}}
                     </label>
                     <input id=proxy-field-null-response
                       ng-model=form.null_response class=form-control>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-bypass-proxy>
-                      {{consts.bypass_proxy.desc}}
+                      {{consts.bypass_proxy.desc.description}}
                     </label>
                     <input id=proxy-field-bypass-proxy
                       ng-model=form.bypass_proxy class=form-control>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-direct-include>
-                      {{consts.direct_include.desc}}
+                      {{consts.direct_include.desc.description}}
                     </label>
                     <input id=proxy-field-direct-include
                       ng-model=form.direct_include class=form-control>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-direct-exclude>
-                      {{consts.direct_exclude.desc}}
+                      {{consts.direct_exclude.desc.description}}
                     </label>
                     <input id=proxy-field-direct-exclude
                       ng-model=form.direct_exclude class=form-control>

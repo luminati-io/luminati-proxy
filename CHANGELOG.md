@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.44:
+- :bug: Proxy field descriptions displayed wrong
+
 ## 0.9.43:
 - :bug: Upgrade notification will display correctly
 
