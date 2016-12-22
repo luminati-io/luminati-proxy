@@ -224,7 +224,7 @@ function root($rootScope, $scope, $http, $window){
         $scope.ver_cur = version.data.version;
     });
     $http.get('/api/last_version').then(function(version){
-        $scope.ver_last = version.data.version;
+        $scope.ver_last = version.data;
     });
     $http.get('/api/consts').then(function(consts){
         $scope.consts = consts.data;

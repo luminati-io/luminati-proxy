@@ -1,7 +1,10 @@
-<div ng-if="$root.mode=='root'&&$parent.ver_cur&&$parent.ver_last&&$parent.ver_cur!=$parent.ver_last"
+<div ng-if="$root.mode=='root'&&$parent.ver_last&&$parent.ver_last.newer"
   class="alert alert-warning settings-alert">
   <div>
-    A new version <strong>{{$parent.ver_last}}</strong> is available.
+    A new version <strong>{{$parent.ver_last.version}}</strong> is available, see
+    <a href=https://github.com/luminati-io/luminati-proxy/blob/master/CHANGELOG.md#luminati-proxy-manager---change-log>change
+      log</a>
+    for specifics.
   </div>
   <button type=button class="btn btn-primary" ng-click=upgrade()
     ng-disabled=upgrading||upgrade_error||!ver_node.satisfied>

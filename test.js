@@ -1038,7 +1038,7 @@ describe('manager', ()=>{
                 assert.equal(before.length, 1);
                 const _proxy = {port: 24001};
                 const res = yield json('api/proxies', 'POST', {proxy: _proxy});
-                assert_has(res, _proxy, 'proxies');
+                assert_has(res.data, _proxy, 'proxies');
                 const after = yield json('api/proxies_running');
                 assert.equal(after.length, 2);
                 assert_has(after[1], _proxy, 'proxies_running');

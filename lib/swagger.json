@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.40",
+        "version": "0.9.42",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -43,7 +43,12 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/package_version"
+                            "type": "object",
+                            "properties": {
+                                "version": {
+                                    "type": "string"
+                                }
+                            }
                         }
                     }
                 }
@@ -59,7 +64,15 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/package_version"
+                            "type": "object",
+                            "properties": {
+                                "version": {
+                                    "type": "string"
+                                },
+                                "newer": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 }
@@ -149,6 +162,40 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/proxy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error responce"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete multiple existing proxies",
+                "tags": [
+                    "Proxy"
+                ],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "body",
+                        "description": "Comma separated list of proxy ports to delete",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^\\d+(.\\d+)*$"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
                         "description": "Successful response"
                     }
                 }
@@ -180,7 +227,18 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful response"
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "$ref": "#/definitions/proxy"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error response"
                     }
                 }
             },
@@ -196,31 +254,6 @@
                         "description": "Existing proxy port",
                         "required": true,
                         "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response"
-                    }
-                }
-            }
-        },
-        "/delete": {
-            "post": {
-                "description": "Delete multiple existing proxies",
-                "tags": [
-                    "Proxy"
-                ],
-                "parameters": [
-                    {
-                        "name": "port",
-                        "in": "body",
-                        "description": "Comma seperated list of proxy ports to delete",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "pattern": "^\\d+(.\\d+)*$"
-                        }
                     }
                 ],
                 "responses": {
@@ -284,14 +317,6 @@
         }
     },
     "definitions": {
-        "package_version": {
-            "type": "object",
-            "properties": {
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
         "manager": {
             "type": "object",
             "properties": {
@@ -495,4 +520,3 @@
         }
     }
 }
-
