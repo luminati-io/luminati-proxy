@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.43:
+- :bug: Upgrade notification will display correctly
+
 ## 0.9.42:
 - :sparkles: proxy API prevent port conflicts when saving proxy
 - :boom: API changes move POST /delete to DELETE /proxies
