@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.45:
+- :bug: Obtain session info using protocole defined by --secure_proxy
+
 ## 0.9.44:
 - :bug: Proxy field descriptions displayed wrong
 
