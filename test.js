@@ -974,12 +974,12 @@ describe('manager', ()=>{
 
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
-            [assign({}, simple_proxy, {persist: true})]);
+            [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('main config only', {config: simple_proxy},
-            [assign({}, simple_proxy, {persist: true})]);
+            [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('config file', {files: [simple_proxy]}, [simple_proxy]);
         t('config override cli', {cli: simple_proxy, config: {port: 24042}},
-            [assign({}, simple_proxy, {persist: true, port: 24042})]);
+            [assign({}, simple_proxy, {proxy_type: 'persist', port: 24042})]);
         const multiple_proxies = [
             assign({}, simple_proxy, {port: 25025}),
             assign({}, simple_proxy, {port: 26026}),
@@ -989,7 +989,7 @@ describe('manager', ()=>{
             multiple_proxies);
         t('main + config files', {config: simple_proxy,
             files: multiple_proxies}, [].concat([assign({}, simple_proxy,
-            {persist: true})], multiple_proxies));
+            {proxy_type: 'persist'})], multiple_proxies));
     });
     describe('dropin', ()=>{
         const t = (name, args, expected)=>it(name, etask._fn(

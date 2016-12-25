@@ -31,12 +31,6 @@
         <img src=/img/ic_dup.svg>
       </button>
       <button type=button class="btn btn-ico"
-        ng-if="$root.mode!='guest'" ng-click="refresh_sessions()"
-        ng-disabled="!get_selected_proxies().length"
-        uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default>
-        <img src=/img/ic_refresh.svg>
-      </button>
-      <button type=button class="btn btn-ico"
         ng-if="$root.mode!='guest'" ng-click=delete_proxies()
         ng-disabled="!get_selected_proxies().length"
         uib-tooltip=Delete tooltip-class=tooltip-default>
@@ -71,7 +65,8 @@
             |limitTo:pagination.per_page"
             ng-class="{opened: showed_status_proxies[proxy.port]}">
             <td>
-                <input ng-model="selected_proxies[proxy.port]" type=checkbox>
+              <input ng-if="proxy.proxy_type!='duplicate'"
+                ng-model="selected_proxies[proxy.port]" type=checkbox>
             </td>
             <td ng-repeat="col in columns" ng-init="val=proxy[col.key]">
               <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
@@ -126,7 +121,7 @@
                 uib-tooltip-html="get_column_tooltip(proxy, col)"
                 tooltip-class=tooltip-default
                 ng-class="{'proxies-default': val&&val!==proxy.config[col.key],
-                'proxies-editable': proxy.persist&&is_valid_field(proxy, col)}">
+                'proxies-editable': proxy.proxy_type=='persist'&&is_valid_field(proxy, col)}">
                 <span ng-if="col.key=='country'">
                   <span ng-if="val!='*'" class="flag-icon flag-icon-{{val}}">
                     </span>
@@ -177,6 +172,13 @@
               </span>
             </td>
             <td class=proxies-actions>
+              <img ng-if=proxy.pool_size||proxy.sticky_ip
+              ng-click=refresh_sessions(proxy) uib-tooltip="Refresh Sessions"
+              tooltip-class=tooltip-default src=/img/ic_refresh.svg
+              class=proxies-action>
+              <img ng-if=!proxy.pool_size&&!proxy.sticky_ip
+              uib-tooltip="No session pool" tooltip-class=tooltip-default
+              src=/img/ic_refresh_disabled.svg class=proxies-action-disabled>
               <img ng-if=proxy._history
                 ng-click=show_history(proxy)
                 uib-tooltip=History tooltip-class=tooltip-default

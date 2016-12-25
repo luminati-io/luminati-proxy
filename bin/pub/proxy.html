@@ -45,6 +45,14 @@
                     </select>
                   </div>
                   <div class=form-group>
+                    <label class=control-label for=proxy-field-multiply>
+                      Multiply
+                    </label>
+                    <input id=proxy-field-multiply class=form-control type=number
+                      ng-model=form.multiply
+                      placeholder={{consts.multiply.def}}>
+                  </div>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-sticky-ip>
                       {{consts.history.desc.description}}
                     </label>

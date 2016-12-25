@@ -582,16 +582,16 @@ faq.$inject = ['$scope'];
 function faq($scope){
     $scope.questions = [
         {
+            name: 'links',
+            title: 'More info on the Luminati proxy manager',
+        },
+        {
             name: 'upgrade',
             title: 'How can I upgrade Luminati proxy manager tool?',
         },
         {
             name: 'ssl',
             title: 'How do I enable HTTPS sniffing?',
-        },
-        {
-            name: 'api',
-            title: 'REST API to contorl Luminati proxy manager',
         },
     ];
 }
@@ -863,6 +863,11 @@ function proxies($scope, $http, $proxies, $window, $q){
             options: function(){ return iface_opts; },
         },
         {
+            key: 'multiply',
+            title: 'Multiple',
+            type: 'number',
+        },
+        {
             key: 'ssl',
             title: 'SSL sniffing',
             type: 'boolean',
@@ -1104,8 +1109,9 @@ function proxies($scope, $http, $proxies, $window, $q){
                 var selected = $scope.get_selected_proxies();
                 var promises = $scope.proxies
                     .filter(function(p){
-                        return p.persist&&selected.includes(p.port); })
-                    .map(function(p){
+                        return p.proxy_type=='persist'
+                            && selected.includes(p.port);
+                    }).map(function(p){
                         return $http.delete('/api/proxies/'+p.port); });
                 $scope.selected_proxies = {};
                 $q.all(promises).then(function(){ return $proxies.update(); });
@@ -1113,11 +1119,9 @@ function proxies($scope, $http, $proxies, $window, $q){
         };
         $window.$('#confirmation').modal();
     };
-    $scope.refresh_sessions = function(){
-        var promises = $scope.get_selected_proxies().map(function(p){
-                return $http.post('/api/refresh_sessions/'+p); });
-        $scope.selected_proxies = {};
-        $q.all(promises).then(function(){ return $proxies.update(); });
+    $scope.refresh_sessions = function(proxy){
+        $http.post('/api/refresh_sessions/'+proxy.port)
+        .then(function(){ return $proxies.update(); });
     };
     $scope.show_history = function(proxy){
         $scope.history_dialog = [{port: proxy.port}];
@@ -1143,8 +1147,11 @@ function proxies($scope, $http, $proxies, $window, $q){
         }];
     };
     $scope.inline_edit_click = function(proxy, col){
-        if (!proxy.persist || !$scope.is_valid_field(proxy, col.key))
+        if (proxy.proxy_type!='persist'
+            || !$scope.is_valid_field(proxy, col.key))
+        {
             return;
+        }
         switch (col.type)
         {
         case 'number':
@@ -1154,7 +1161,7 @@ function proxies($scope, $http, $proxies, $window, $q){
         case 'boolean':
             var config = _.cloneDeep(proxy.config);
             config[col.key] = !proxy[col.key];
-            config.persist = true;
+            config.proxy_type = 'persist';
             $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
                 function(){ $proxies.update(); });
             break;
@@ -1182,7 +1189,7 @@ function proxies($scope, $http, $proxies, $window, $q){
             return $scope.inline_edit_blur(proxy);
         var config = _.cloneDeep(proxy.config);
         config[col.key] = v;
-        config.persist = true;
+        config.proxy_type = 'persist';
         $http.post('/api/proxy_check/'+proxy.port, config)
         .then(function(res){
             var errors = res.data.filter(function(i){ return i.lvl=='err'; });
@@ -1203,7 +1210,7 @@ function proxies($scope, $http, $proxies, $window, $q){
             return $scope.inline_edit_blur(proxy);
         var config = _.cloneDeep(proxy.config);
         config[col.key] = v;
-        config.persist = true;
+        config.proxy_type = 'persist';
         if (col.key=='state')
             config.city = '';
         $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
@@ -1237,7 +1244,7 @@ function proxies($scope, $http, $proxies, $window, $q){
         return [0, 0];
     };
     $scope.get_column_tooltip = function(proxy, col){
-        if (!proxy.persist)
+        if (proxy.proxy_type != 'persist')
             return 'This proxy\'s settings cannot be changed';
         if (!$scope.is_valid_field(proxy, col.key))
         {
@@ -1945,7 +1952,7 @@ function proxy($scope, $http, $proxies, $window, $q){
             proxy.session_duration = effective('session_duration');
             proxy.keep_alive = effective('keep_alive');
             proxy.pool_size = effective('pool_size');
-            proxy.persist = true;
+            proxy.proxy_type = 'persist';
             var edit = $scope.port&&!locals.duplicate;
             var save_inner = function(){
                 var promise = $q.when();

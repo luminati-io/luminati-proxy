@@ -11,11 +11,11 @@
    height="18px"
    viewBox="0 0 18 18"
    version="1.1"
-   id="svg3137"
+   id="svg3098"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="ic_refresh.svg">
+   sodipodi:docname="ic_refresh_disabled.svg">
   <metadata
-     id="metadata3152">
+     id="metadata3113">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -34,48 +34,48 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1858"
-     inkscape:window-height="988"
-     id="namedview3150"
+     inkscape:window-width="773"
+     inkscape:window-height="480"
+     id="namedview3111"
      showgrid="false"
-     inkscape:zoom="13.111111"
-     inkscape:cx="-3.8516949"
+     inkscape:zoom="13.333333"
+     inkscape:cx="9"
      inkscape:cy="9"
      inkscape:window-x="0"
      inkscape:window-y="25"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg3137" />
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3098" />
   <!-- Generator: sketchtool 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
   <title
-     id="title3139">B395AA2A-B05A-45B1-BFB2-B59B7019700E</title>
+     id="title3100">B395AA2A-B05A-45B1-BFB2-B59B7019700E</title>
   <desc
-     id="desc3141">Created with sketchtool.</desc>
+     id="desc3102">Created with sketchtool.</desc>
   <defs
-     id="defs3143" />
+     id="defs3104" />
   <g
      id="Page-1"
      stroke="none"
      stroke-width="1"
      fill="none"
      fill-rule="evenodd"
-     style="fill:#5289b5;fill-opacity:1">
+     style="fill:#d1d8de;fill-opacity:1">
     <g
        id="Luminati-PM"
        transform="translate(-56.000000, -132.000000)"
        fill="#1A1918"
-       style="fill:#5289b5;fill-opacity:1">
+       style="fill:#d1d8de;fill-opacity:1">
       <g
          id="Group-2"
          transform="translate(47.000000, 124.000000)"
-         style="fill:#5289b5;fill-opacity:1">
+         style="fill:#d1d8de;fill-opacity:1">
         <g
            id="Refresh"
            transform="translate(9.000000, 8.000000)"
-           style="fill:#5289b5;fill-opacity:1">
+           style="fill:#d1d8de;fill-opacity:1">
           <path
              d="M16.94,1.01 L11.09,1.01 L11.09,6.86 L13.24,4.71 C14.31,5.69 14.99,7.15 14.99,8.81 C14.99,11.35 13.33,13.49 11.09,14.37 L11.09,16.42 C14.4,15.54 16.94,12.52 16.94,8.91 C16.94,6.76 16.06,4.81 14.6,3.45 L16.94,1.01 Z M1.338,8.81 C1.338,10.96 2.214,12.91 3.681,14.27 L1.338,16.61 L7.189,16.61 L7.189,10.76 L5.042,12.91 C3.971,11.93 3.291,10.47 3.291,8.81 C3.291,6.28 4.947,4.13 7.189,3.25 L7.189,1.3 C3.871,2.18 1.338,5.2 1.338,8.81 L1.338,8.81 Z"
              id="Fill-19"
-             style="fill:#5289b5;fill-opacity:1" />
+             style="fill:#d1d8de;fill-opacity:1" />
         </g>
       </g>
     </g>

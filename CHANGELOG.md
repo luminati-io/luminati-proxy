@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.46:
+- :star: Allow defining multiple identical ports using the multiply property
+- :sparkles: Link to FAX from inside the app
+
 ## 0.9.45:
 - :bug: Obtain session info using protocole defined by --secure_proxy
 
