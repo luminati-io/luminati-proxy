@@ -269,6 +269,9 @@
     <div id=config class="panel-collapse collapse" ng-controller=config>
       <div class=panel-body>
         <textarea id=config-textarea>{{config}}</textarea>
+        <ul ng-if=errors class=help-block>
+          <li ng-repeat="err in errors">{{err}}</li>
+        </ul>
         <div class=text-center>
           <button type=button class="btn btn-success" ng-click=save()>
             Save and restart

@@ -1,11 +1,15 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.47:
+- :star: Detect config errors when saving config from UI
+- :sparkles: UI improvements
+
 ## 0.9.46:
 - :star: Allow defining multiple identical ports using the multiply property
 - :sparkles: Link to FAX from inside the app
 
 ## 0.9.45:
-- :bug: Obtain session info using protocole defined by --secure_proxy
+- :bug: Obtain session info using protocol defined by --secure_proxy
 
 ## 0.9.44:
 - :bug: Proxy field descriptions displayed wrong
@@ -16,7 +20,7 @@
 ## 0.9.42:
 - :sparkles: proxy API prevent port conflicts when saving proxy
 - :boom: API changes move POST /delete to DELETE /proxies
-- :bug: Upgrade message when no newer version is avaliable
+- :bug: Upgrade message when no newer version is available
 - :sparkles: Link to changelog in upgrade message
 
 ## 0.9.41:
@@ -143,9 +147,9 @@ manager, but will be added to the response and history
 - :bug: fix upgrade for Windows
 
 ## 0.9.6:
-- :boom: remove experimantal React version
+- :boom: remove experimental React version
 - :bug: close HTTPS connection after "Refresh session" clicked to allow
-software to connect to new residental IP
+software to connect to new residential IP
 
 ## 0.9.5:
 - :bug: Maintain the letter casing of the header names
@@ -414,7 +418,7 @@ change
 - :star: Configuration can be edited from within the UI
 
 ## 0.7.4
-- :star: UI Preselect avaliable port for new proxy
+- :star: UI Preselect available port for new proxy
 - :star: nodejs API now does not have to be bound to a specific port
 
 ## 0.7.3

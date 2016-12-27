@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.46",
+        "version": "0.9.47",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -298,6 +298,18 @@
                         "description": "Proxy port",
                         "required": true,
                         "type": "integer"
+                    },
+                    {
+                        "name": "with_details",
+                        "in": "query",
+                        "description": "Include status detail messages",
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "force",
+                        "in": "query",
+                        "description": "Force an updated check of the status",
+                        "type": "boolean"
                     }
                 ],
                 "responses": {
@@ -358,6 +370,10 @@
                 "port": {
                     "type": "integer",
                     "description": "Port for the HTTP proxy"
+                },
+                "multiply": {
+                    "type": "integer",
+                    "description": "Multiply the port definition given number of times"
                 },
                 "history": {
                     "type": "boolean",

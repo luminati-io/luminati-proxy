@@ -76,7 +76,6 @@ let msg_handler = function(msg){
             }
             if (stderr)
                 console.log('NPM stderr: '+stderr);
-            check_compat = null;
             delete require.cache[require.resolve('./check_compat.js')];
             check_compat = require('./check_compat.js');
             if (!check_compat.is_env_compat())

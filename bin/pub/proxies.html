@@ -78,6 +78,7 @@
                 </span>
               </span>
               <span ng-if="col.key=='_status'"
+                ng-init="proxy.get_status()"
                 ng-click="toggle_proxy_status_details(proxy)"
                 ng-class="{pointer: proxy._status_details.length}"
                 uib-tooltip-template="'/tooltip_proxy_status.html'"
@@ -123,7 +124,7 @@
                 ng-class="{'proxies-default': val&&val!==proxy.config[col.key],
                 'proxies-editable': proxy.proxy_type=='persist'&&is_valid_field(proxy, col)}">
                 <span ng-if="col.key=='country'">
-                  <span ng-if="val!='*'" class="flag-icon flag-icon-{{val}}">
+                  <span ng-if="val&&val!='*'" class="flag-icon flag-icon-{{val}}">
                     </span>
                   <img ng-if="!val||val=='*'" src=/img/flag_any_country.svg>
                 </span>

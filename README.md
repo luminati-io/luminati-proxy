@@ -72,6 +72,8 @@ Usage: luminati [options] config1 config2 ...
 
 Options:
   --port, -p              Port for the HTTP proxy      [number] [default: 24000]
+  --multiply              Multiply the port definition given number of times
+                                                                        [number]
   --history               Log request history         [boolean] [default: false]
   --ssl                   Enable SSL sniffing         [boolean] [default: false]
   --socks                 SOCKS5 port                                   [number]

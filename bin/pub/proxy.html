@@ -41,7 +41,7 @@
                     </label>
                     <select id=proxy-field-interface ng-model=form.iface
                       class=form-control ng-init="form.iface=form.iface||''"
-                      ng-options="i as i||'All' for i in consts.iface.values">
+                      ng-options="i.value as i.key for i in consts.iface.values">
                     </select>
                   </div>
                   <div class=form-group>
@@ -113,11 +113,11 @@
                       Zone
                     </label>
                     <select id=proxy-field-zone class=form-control
-                      ng-if="get_zones_names().length>0" ng-model=form.zone
-                      ng-options="k as k for (k, v) in zones">
+                      ng-if="consts.zone.values.length>0" ng-model=form.zone
+                      ng-options="z.value as z.key for z in consts.zone.values">
                     </select>
                     <input type="text" class=form-control
-                      ng-if="get_zones_names().length==0" ng-model=form.zone>
+                      ng-if="consts.zone.values.length==0" ng-model=form.zone>
                     <span ng-show=form_errors.zone class="help-block">
                       {{form_errors.zone}}</span>
                   </div>
@@ -269,7 +269,7 @@
                       Pool type
                     </label>
                     <select id=proxy-field-pool-type ng-model=form.pool_type
-                      ng-options="v for v in consts.pool_type.values"
+                      ng-options="pt.value as pt.key for pt in consts.pool_type.values"
                       ng-init="form.pool_type=form.pool_type||''"
                       class=form-control>
                     </select>
@@ -375,18 +375,17 @@
                       DNS resolve
                     </label>
                     <select id=proxy-field-dns-resolve ng-model=form.dns
-                      class=form-control ng-init="form.dns=form.dns||''"
+                      class=form-control
                       ng-options="v for v in consts.dns.values">
                     </select>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-log-level>
                       Log level
-                      {{form.log ? '' : '('+consts.log.def+' by default)'}}
                     </label>
                     <select id=proxy-field-log-level ng-model=form.log
-                      class=form-control ng-init="form.log=form.log||''"
-                      ng-options="v for v in consts.log.values">
+                      class=form-control
+                      ng-options="ll.value as ll.key for ll in consts.log.values">
                     </select>
                   </div>
                   <div class=form-group>
@@ -418,8 +417,10 @@
                     <label class=control-label for=proxy-field-debug>
                       {{consts.debug.desc.description}}
                     </label>
-                    <input id=proxy-field-debug ng-model=form.debug
-                      class=form-control>
+                    <select id=proxy-field-debug ng-model=form.debug
+                      class=form-control
+                      ng-options="d.value as d.key for d in consts.debug.values">
+                    </select>
                     <span ng-show=form_errors.debug class="help-block">
                       {{form_errors.debug}}</span>
                   </div>
