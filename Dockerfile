@@ -7,7 +7,7 @@
 # Pull base image.
 FROM node:6
 
-# Install Bower & Gulp
+# Install Luminati Proxy Manager
 RUN npm install -g luminati-io/luminati-proxy
 
 # Define default command.

@@ -6,7 +6,7 @@ const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;
 let manager, args = process.argv.slice(2), shutdowning = false;
-let shutdown = (reason)=>{
+let shutdown = reason=>{
     if (!manager || shutdowning)
         return;
     console.log('Shtudown, reason is '+reason);
@@ -43,7 +43,7 @@ let on_upgrade_finished;
     manager.start();
 })();
 
-process.on('message', (msg)=>{
+process.on('message', msg=>{
     switch (msg.command)
     {
     case 'upgrade_finished':

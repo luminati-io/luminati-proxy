@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.47",
+        "version": "0.9.48",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -174,29 +174,6 @@
                     },
                     "400": {
                         "description": "Error responce"
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete multiple existing proxies",
-                "tags": [
-                    "Proxy"
-                ],
-                "parameters": [
-                    {
-                        "name": "port",
-                        "in": "body",
-                        "description": "Comma separated list of proxy ports to delete",
-                        "required": false,
-                        "schema": {
-                            "type": "string",
-                            "pattern": "^\\d+(.\\d+)*$"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response"
                     }
                 }
             }

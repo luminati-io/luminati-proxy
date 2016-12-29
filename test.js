@@ -915,6 +915,10 @@ describe('manager', ()=>{
         };
         return yield etask.nfn_apply(request, [opt]);
     });
+    const api_json = (path, options)=>etask(function*api_json(){
+        let opt = options||{};
+        return yield api(path, opt.method, opt.body, true);
+    });
     const json = (path, method, data)=>etask(function*json(){
         const res = yield api(path, method, data, true);
         assert.equal(res.statusCode, 200);
@@ -1032,17 +1036,80 @@ describe('manager', ()=>{
             }));
         });
         describe('proxies', ()=>{
-            it('new', ()=>etask(function*(){
-                app = yield app_with_args(['--mode', 'root']);
-                const before = yield json('api/proxies_running');
-                assert.equal(before.length, 1);
-                const _proxy = {port: 24001};
-                const res = yield json('api/proxies', 'POST', {proxy: _proxy});
-                assert_has(res.data, _proxy, 'proxies');
-                const after = yield json('api/proxies_running');
-                assert.equal(after.length, 2);
-                assert_has(after[1], _proxy, 'proxies_running');
-            }));
+            describe('get', ()=>{
+                it('normal', ()=>etask(function*(){
+                    let proxies = [{port: 24023}, {port: 24024}];
+                    app = yield app_with_proxies(proxies);
+                    let res = yield json('api/proxies');
+                    assert_has(res, proxies, 'proxies');
+                    res = yield json('api/proxies_running');
+                    assert_has(res, proxies, 'proxies_running');
+                }));
+            });
+            describe('post', ()=>{
+                it('normal non-persist', ()=>etask(function*(){
+                    let proxy = {port: 24001};
+                    let proxies = [{port: 24000}];
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield json('api/proxies', 'post',
+                        {proxy: proxy});
+                    assert_has(res, {data: proxy}, 'proxies');
+                    res = yield json('api/proxies_running');
+                    assert_has(res, [{}, proxy], 'proxies');
+                    res = yield json('api/proxies');
+                    assert.equal(res.length, 1);
+                }));
+                it('normal persist', ()=>etask(function*(){
+                    let proxy = {port: 24001, proxy_type: 'persist'};
+                    let proxies = [{port: 24000}];
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield json('api/proxies', 'post',
+                        {proxy: proxy});
+                    assert_has(res, {data: proxy}, 'proxies');
+                    res = yield json('api/proxies_running');
+                    assert_has(res, [{}, proxy], 'proxies');
+                    res = yield json('api/proxies');
+                    assert_has(res, [{}, proxy], 'proxies');
+                }));
+                it('conflict', ()=>etask(function*(){
+                    let proxy = {port: 24000};
+                    let proxies = [proxy];
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield api_json('api/proxies',
+                        {method: 'post', body: {proxy: proxy}});
+                    assert.equal(res.statusCode, 400);
+                    assert_has(res.body, {errors: []}, 'proxies');
+                }));
+            });
+            describe('put', ()=>{
+                it('normal', ()=>etask(function*(){
+                    let proxy = {port: 24001};
+                    let proxies = [{port: 24000}];
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield json('api/proxies/24000', 'put',
+                        {proxy: proxy});
+                    assert_has(res, {data: proxy});
+                    res = yield json('api/proxies_running');
+                    assert_has(res, [proxy], 'proxies');
+                }));
+                it('conflict', ()=>etask(function*(){
+                    let proxy = {port: 24000};
+                    let proxies = [{port: 24000}, {port: 24001}];
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield api_json('api/proxies/24001',
+                        {method: 'put', body: {proxy}});
+                    assert.equal(res.statusCode, 400);
+                    assert_has(res.body, {errors: []}, 'proxies');
+                }));
+            });
+            describe('delete', ()=>{
+                it('normal', ()=>etask(function*(){
+                    app = yield app_with_args(['--mode', 'root']);
+                    let res = yield api_json('api/proxies/24000',
+                        {method: 'delete'});
+                    assert.equal(res.statusCode, 204);
+                }));
+            });
         });
     });
     describe('crash on load error', ()=>{

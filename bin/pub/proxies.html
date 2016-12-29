@@ -108,7 +108,13 @@
                   </span>
                   <img ng-if="!val||val=='*'" src=/img/flag_any_country.svg>
                 </span>
-                <span ng-if="col.key!='_status'&&col.key!='country'">
+                <span ng-if="col.key=='session'"
+                  title="{{options_key(col, val||'')}}">
+                  <i class="fa fa-random" aria-hidden=true ng-if=val===true></i>
+                  <span ng-if=val&&val!==true>{{val}}</span>
+                  <span ng-if=!val>&mdash</span>
+                </span>
+                <span ng-if="col.key!='_status'&&col.key!='country'&&col.key!='session'">
                   <img src=/img/ic_checkmark.svg ng-if=val===true title="On">
                   <img src=/img/ic_off.svg ng-if=val===false title="Off">
                   <span ng-if=val!==true&&val!==false>
@@ -128,7 +134,12 @@
                     </span>
                   <img ng-if="!val||val=='*'" src=/img/flag_any_country.svg>
                 </span>
-                <span ng-if="col.key!='country'">
+                <span ng-if="col.key=='session'">
+                  <i class="fa fa-random" aria-hidden=true ng-if=val===true></i>
+                  <span ng-if=val&&val!==true>{{val}}</span>
+                  <span ng-if=!val>&mdash;</span>
+                </span>
+                <span ng-if="col.key!='country'&&col.key!='session'">
                   <img src=/img/ic_checkmark.svg ng-if=val===true title="On">
                   <img src=/img/ic_off.svg ng-if=val===false title="Off">
                   <span ng-if=val!==true&&val!==false>
@@ -136,23 +147,31 @@
                     <span ng-if=!val&&val!==0>&mdash;</span>
                   </span>
                 </span>
-                <span ng-if="(col.type=='number'||col.type=='text')
-                  &&proxy.edited_field==col.key"
-                  class=proxies-table-input>
+                <span ng-if="(col.type=='number'||col.type=='text')&&proxy.edited_field==col.key"
+                  class=proxies-table-input
+                  ng-class="{'session-edit':col.key=='session'}">
                   <input type={{col.type}} class=form-control
                     init-input-select ng-value=proxy.config[col.key]
-                    ng-blur=inline_edit_blur(proxy)
+                    ng-focus="inline_edit_start(proxy, col)"
+                    ng-blur="inline_edit_blur(proxy, col)"
                     ng-keyup="inline_edit_input(proxy, col, $event)"
                     ng-mouseup="inline_edit_input(proxy, col, $event)">
+                  <button ng-if="col.key=='session'"
+                    class="btn btn-ico" uib-tooltip="Set to random"
+                    tooltip-class=tooltip-default
+                    ng-click="inline_edit_set(proxy, col, true)">
+                    <i class="fa fa-random" aria-hidden=true></i>
+                  </button>
                 </span>
                 <span ng-if="col.type=='options'&&proxy.edited_field==col.key"
                   class=proxies-table-input>
                   <select class=form-control init-select-open
-                    ng-blur=inline_edit_blur(proxy)
+                    ng-focus="inline_edit_start(proxy, col)"
+                    ng-blur="inline_edit_blur(proxy, col)"
                     ng-model=proxy.dummy_model
                     ng-init="proxy.dummy_model=proxy.config[col.key]||''"
                     ng-change="
-                    inline_edit_select_change(proxy, col, proxy.dummy_model)"
+                    inline_edit_set(proxy, col, proxy.dummy_model)"
                     ng-keyup="inline_edit_select(proxy, col, $event)"
                     ng-options="v.value as v.key for v in col.options(proxy)">
                   </select>
@@ -174,12 +193,12 @@
             </td>
             <td class=proxies-actions>
               <img ng-if=proxy.pool_size||proxy.sticky_ip
-              ng-click=refresh_sessions(proxy) uib-tooltip="Refresh Sessions"
-              tooltip-class=tooltip-default src=/img/ic_refresh.svg
-              class=proxies-action>
+                ng-click=refresh_sessions(proxy)
+                uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default
+                src=/img/ic_refresh.svg class=proxies-action>
               <img ng-if=!proxy.pool_size&&!proxy.sticky_ip
-              uib-tooltip="No session pool" tooltip-class=tooltip-default
-              src=/img/ic_refresh_disabled.svg class=proxies-action-disabled>
+                uib-tooltip="No session pool" tooltip-class=tooltip-default
+                src=/img/ic_refresh_disabled.svg class=proxies-action-disabled>
               <img ng-if=proxy._history
                 ng-click=show_history(proxy)
                 uib-tooltip=History tooltip-class=tooltip-default
@@ -187,11 +206,11 @@
               <img ng-if=!proxy._history
                 uib-tooltip="No history" tooltip-class=tooltip-default
                 src=/img/ic_history_disabled.svg class=proxies-action-disabled>
-              <img ng-if=proxy.pool_size
+              <img ng-if=proxy.pool_size||proxy.sticky_ip
                 ng-click=show_pool(proxy)
                 uib-tooltip="Current pool" tooltip-class=tooltip-default
                 src=/img/ic_table.svg class=proxies-action>
-              <img ng-if=!proxy.pool_size
+              <img ng-if=!proxy.pool_size&&!proxy.sticky_ip
                 uib-tooltip="Pool empty; size is set to zero"
                 tooltip-class=tooltip-default
                 src=/img/ic_table_disabled.svg class=proxies-action-disabled>

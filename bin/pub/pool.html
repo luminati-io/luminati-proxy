@@ -34,6 +34,7 @@
                 <th>IP</th>
                 <th>Country</th>
                 <th>City</th>
+                <th ng-if=!pool_size&&sticky_ip>Host</th>
                 <th>Requests</th>
                 <th>Estimated Bandwidth</th>
                 <th>Created</th>
@@ -46,6 +47,7 @@
                 <td>{{p.info.ip}}</td>
                 <td>{{p.info.country}}</td>
                 <td>{{p.info.geo.city}}</td>
+                <td ng-if=!pool_size&&sticky_ip>{{p.host}}</td>
                 <td>{{p.count}}</td>
                 <td>
                   <span ng-if=p.bandwidth>{{p.bandwidth | bytes}}/s</span>
@@ -59,7 +61,7 @@
             uib-pagination
             ng-model=pagination.page
             items-per-page=pagination.per_page
-            total-items=proxies.length
+            total-items=pool.length
             boundary-link-numbers=true max-size=3 force-ellipses=true
             previous-text="&lsaquo;" next-text="&rsaquo;">
           </div>

@@ -806,14 +806,115 @@ function check_reg_exp(v){
     catch(e){ return false; }
 }
 
+var presets = {
+    session: {
+        title: 'Single session (IP)',
+        description: 'All requests share the same session (IP)',
+        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
+            && opt.session; },
+        set: function(opt){
+            opt.pool_size = 0;
+            opt.sticky_ip = false;
+            opt.session = opt.session || true;
+            opt.session_duration = undefined;
+            opt.max_requests = undefined;
+            if (opt.session===true)
+                opt.seed = false;
+        },
+        support: {
+            session: true,
+            keep_alive: true,
+            multiply: true,
+        },
+    },
+    sticky_ip: {
+        title: 'Session (IP) per machine',
+        description: 'Each requesting machine will have its own session (IP)',
+        check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
+        set: function(opt){
+            opt.pool_size = 0;
+            opt.sticky_ip = true;
+            opt.session = undefined;
+            opt.multiply = undefined;
+        },
+        support: {
+            keep_alive: true,
+            max_requests: true,
+            session_duration: true,
+            seed: true,
+        },
+    },
+    sequential: {
+        title: 'Sequential session (IP) pool',
+        description: 'Pool of pre-established sessions (IPs), used one by one',
+        check: function(opt){ return opt.pool_size &&
+            (!opt.pool_type || opt.pool_type=='sequential'); },
+        set: function(opt){
+            opt.pool_size = opt.pool_size || 1;
+            opt.pool_type = 'sequential';
+            opt.sticky_ip = undefined;
+            opt.session = undefined;
+        },
+        support: {
+            pool_size: true,
+            keep_alive: true,
+            max_requests: true,
+            session_duration: true,
+            multiply: true,
+            seed: true,
+        },
+    },
+    'round-robin': {
+        title: 'Round-robin (IP) pool',
+        description: 'Pool of pre-established sessions (IPs), used in '
+            +'round-robin',
+        check: function(opt){ return opt.pool_size
+            && opt.pool_type=='round-robin' && !opt.multiply; },
+        set: function(opt){
+            opt.pool_size = opt.pool_size || 1;
+            opt.pool_type = 'round-robin';
+            opt.sticky_ip = undefined;
+            opt.session = undefined;
+            opt.multiply = undefined;
+        },
+        support: {
+            pool_size: true,
+            keep_alive: true,
+            max_requests: true,
+            session_duration: true,
+            seed: true,
+        },
+    },
+    custom: {
+        title: 'Custom',
+        description: 'Manually adjust all settings to your needs',
+        check: function(opt){ return true; },
+        set: function(opt){},
+        support: {
+            session: true,
+            sticky_ip: true,
+            pool_size: true,
+            pool_type: true,
+            keep_alive: true,
+            max_requests: true,
+            session_duration: true,
+            multiply: true,
+            seed: true,
+        },
+    },
+};
+for (var key in presets)
+    presets[key].key = key;
+
 module.controller('proxies', proxies);
-proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
-function proxies($scope, $http, $proxies, $window, $q){
+proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout'];
+function proxies($scope, $http, $proxies, $window, $q, $timeout){
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     var iface_opts = [], zone_opts = [];
     var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [], debug_opts = [];
+    $scope.presets = presets;
     var opt_columns = [
         {
             key: 'port',
@@ -1108,7 +1209,11 @@ function proxies($scope, $http, $proxies, $window, $q){
         $scope.history_dialog = [{port: proxy.port}];
     };
     $scope.show_pool = function(proxy){
-        $scope.pool_dialog = [{port: proxy.port}];
+        $scope.pool_dialog = [{
+            port: proxy.port,
+            sticky_ip: proxy.sticky_ip,
+            pool_size: proxy.pool_size,
+        }];
     };
     $scope.add_proxy = function(){
         $scope.proxy_dialog = [{proxy: {}}];
@@ -1150,7 +1255,7 @@ function proxies($scope, $http, $proxies, $window, $q){
     };
     $scope.inline_edit_input = function(proxy, col, event){
         if (event.which==27)
-            return $scope.inline_edit_blur(proxy);
+            return $scope.inline_edit_blur(proxy, col);
         var v = event.currentTarget.value;
         var p = $window.$(event.currentTarget).closest('.proxies-table-input');
         if (col.check(v, proxy.config))
@@ -1160,10 +1265,10 @@ function proxies($scope, $http, $proxies, $window, $q){
         if (event.which!=13)
             return;
         v = v.trim();
-        if (proxy.config[col.key]!==undefined &&
-            proxy.config[col.key].toString()==v)
+        if (proxy.original[col.key]!==undefined &&
+            proxy.original[col.key].toString()==v)
         {
-            return $scope.inline_edit_blur(proxy);
+            return $scope.inline_edit_blur(proxy, col);
         }
         if (col.type=='number'&&v)
             v = +v;
@@ -1183,21 +1288,33 @@ function proxies($scope, $http, $proxies, $window, $q){
     };
     $scope.inline_edit_select = function(proxy, col, event){
         if (event.which==27)
-            return $scope.inline_edit_blur(proxy);
+            return $scope.inline_edit_blur(proxy, col);
     };
-    $scope.inline_edit_select_change = function(proxy, col, v){
-        if (proxy.config[col.key]==v)
-            return $scope.inline_edit_blur(proxy);
+    $scope.inline_edit_set = function(proxy, col, v){
+        if (proxy.original[col.key]===v||proxy.original[col.key]==v&&v!==true)
+            return $scope.inline_edit_blur(proxy, col);
         var config = _.cloneDeep(proxy.config);
         config[col.key] = v;
         config.proxy_type = 'persist';
+        if (col.key=='country')
+            config.state = config.city = '';
         if (col.key=='state')
             config.city = '';
         $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
             function(){ $proxies.update(); });
     };
-    $scope.inline_edit_blur = function(proxy){
-        proxy.edited_field = '';
+    $scope.inline_edit_blur = function(proxy, col){
+        $timeout(function(){
+            proxy.config[col.key] = proxy.original[col.key];
+            if (proxy.edited_field == col.key)
+                proxy.edited_field = '';
+        }, 100);
+    };
+    $scope.inline_edit_start = function(proxy, col){
+        if (!proxy.original)
+            proxy.original = _.cloneDeep(proxy.config);
+        if (col.key=='session'&&proxy.config.session===true)
+            proxy.config.session='';
     };
     $scope.get_selected_proxies = function(){
         return Object.keys($scope.selected_proxies)
@@ -1233,6 +1350,8 @@ function proxies($scope, $http, $proxies, $window, $q){
         }
         if (col.key=='country')
             return $scope.option_key(col, proxy[col.key]);
+        if (col.key == 'session' && proxy.session === true)
+                return 'Random';
         if (['state', 'city'].includes(col.key) &&
             [undefined, '', '*'].includes(proxy.country))
         {
@@ -1754,13 +1873,15 @@ pool.$inject = ['$scope', '$http', '$window'];
 function pool($scope, $http, $window){
     $scope.init = function(locals){
         $scope.port = locals.port;
+        $scope.pool_size = locals.pool_size;
+        $scope.sticky_ip = locals.sticky_ip;
         $scope.pagination = {page: 1, per_page: 10};
         $scope.show_modal = function(){ $window.$('#pool').modal(); };
         $scope.update = function(refresh){
             $scope.pool = null;
             $http.get('/api/sessions/'+$scope.port+(refresh ? '?refresh' : ''))
-            .then(function(pool){
-                $scope.pool = pool.data;
+            .then(function(res){
+                $scope.pool = res.data.data;
             });
         };
         $scope.update();
@@ -1774,43 +1895,56 @@ function proxy($scope, $http, $proxies, $window, $q){
         var regions = {};
         var cities = {};
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
-        $scope.form = _.cloneDeep(locals.proxy);
-        $scope.form.port = $scope.port;
-        $scope.form.zone = $scope.form.zone||'';
-        $scope.form.debug = $scope.form.debug||'';
-        $scope.form.country = $scope.form.country||'';
-        $scope.form.state = $scope.form.state||'';
-        $scope.form.city = $scope.form.city||'';
-        $scope.form.dns = $scope.form.dns||'';
-        $scope.form.log = $scope.form.log||'';
+        var form = $scope.form = _.cloneDeep(locals.proxy);
+        form.port = $scope.port;
+        form.zone = form.zone||'';
+        form.debug = form.debug||'';
+        form.country = form.country||'';
+        form.state = form.state||'';
+        form.city = form.city||'';
+        form.dns = form.dns||'';
+        form.log = form.log||'';
         $scope.status = {};
-        if (!$scope.form.port||$scope.form.port=='')
+        if (!form.port||form.port=='')
         {
             var port = 24000;
-            var socks = $scope.form.socks;
+            var socks = form.socks;
             $scope.proxies.forEach(function(p){
                 if (p.port >= port)
                     port = p.port+1;
                 if (socks && p.socks==socks)
                     socks++;
             });
-            $scope.form.port = port;
-            $scope.form.socks = socks;
+            form.port = port;
+            form.socks = socks;
         }
-        if ($scope.form.max_requests)
+        for (var p in presets)
         {
-            var max_requests = (''+$scope.form.max_requests).split(':');
-            $scope.form.max_requests_start = +max_requests[0];
-            $scope.form.max_requests_end = +max_requests[1];
+            if (presets[p].check(form))
+            {
+                form.preset = presets[p];
+                break;
+            }
         }
-        if (!$scope.form.max_requests)
-            $scope.form.max_requests_start = 0;
-        if ($scope.form.session_duration)
+        if (form.session===true)
         {
-            var session_duration = (''+$scope.form.session_duration)
+            form.session_random = true;
+            form.session = '';
+        }
+        if (form.max_requests)
+        {
+            var max_requests = (''+form.max_requests).split(':');
+            form.max_requests_start = +max_requests[0];
+            form.max_requests_end = +max_requests[1];
+        }
+        if (!form.max_requests)
+            form.max_requests_start = 0;
+        if (form.session_duration)
+        {
+            var session_duration = (''+form.session_duration)
                 .split(':');
-            $scope.form.duration_start = +session_duration[0];
-            $scope.form.duration_end = +session_duration[1];
+            form.duration_start = +session_duration[0];
+            form.duration_end = +session_duration[1];
         }
         $scope.form_errors = {};
         $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
@@ -1904,6 +2038,7 @@ function proxy($scope, $http, $proxies, $window, $q){
         };
         $scope.save = function(model){
             var proxy = angular.copy(model);
+            delete proxy.preset;
             for (var field in proxy)
             {
                 if (!$scope.is_valid_field(field) || proxy[field]===null)
@@ -1918,6 +2053,8 @@ function proxy($scope, $http, $proxies, $window, $q){
                 return proxy[prop]===undefined ?
                     $scope.defaults[prop] : proxy[prop];
             };
+            if (proxy.session_random)
+                proxy.session = true;
             proxy.max_requests = make_int_range(proxy.max_requests_start,
                 proxy.max_requests_end);
             delete proxy.max_requests_start;
@@ -1933,6 +2070,7 @@ function proxy($scope, $http, $proxies, $window, $q){
             proxy.keep_alive = effective('keep_alive');
             proxy.pool_size = effective('pool_size');
             proxy.proxy_type = 'persist';
+            model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             var save_inner = function(){
                 var promise = $q.when();

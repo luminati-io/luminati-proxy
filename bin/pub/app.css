@@ -612,4 +612,22 @@ div.proxies .btn-wrapper {
 .pagination>.disabled>a:hover {
     box-shadow: none;
 }
-
+.control-label.preset {
+    width: 100%;
+}
+.control-label.preset .form-control {
+    width: auto;
+    display: inline-block;
+}
+input.form-control[type=checkbox] {
+    width: auto;
+    height: auto;
+    display: inline;
+}
+.proxies-table-input.session-edit input {
+    width: calc(100% - 2em);
+    display: inline-block;
+}
+.proxies-table-input.session-edit .btn {
+    padding: 4px;
+}
