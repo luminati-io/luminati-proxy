@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.49:
+- :sparkles: Improve db handling
+- :sparkles: Remove unnecesary warnings
+
 ## 0.9.48:
 - :star: Improve proxy settings UI by presets
 - :sparkles: show sticky sessions in the pool dialog
