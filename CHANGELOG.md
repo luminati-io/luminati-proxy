@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.50:
+- :sparkles: Support short_username for shorter credentials headers
+
 ## 0.9.49:
 - :sparkles: Improve db handling
 - :sparkles: Remove unnecesary warnings

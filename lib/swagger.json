@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.49",
+        "version": "0.9.50",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -400,6 +400,10 @@
                 "secure_proxy": {
                     "type": "boolean",
                     "description": "Use SSL when accessing super proxy"
+                },
+                "short_username": {
+                    "type": "boolean",
+                    "description": "Use Shorthand username for super proxy credentials"
                 },
                 "proxy_switch": {
                     "type": "integer",

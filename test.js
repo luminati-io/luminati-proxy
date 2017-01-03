@@ -395,6 +395,61 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.zone, 'zzz');
             }));
         });
+        describe('short_username', ()=>{
+            const t = (name, user, short, expected)=>it(name, ()=>etask(
+            function*(){
+                l = yield lum({
+                    allow_proxy_auth: true,
+                    short_username: short,
+                });
+                const res = yield l.test({headers: {
+                    'proxy-authorization': 'Basic '+
+                        (new Buffer(user+':pass'))
+                        .toString('base64'),
+                }});
+                let m = res.body.headers['proxy-authorization']
+                    .match(/^Basic (.*)/);
+                let h = new Buffer(m[1], 'base64').toString('ascii');
+                let parts = h.split(':');
+                assert_has(res.body.auth, expected);
+                if (short)
+                    assert.ok(parts[0].length <= user.length);
+                else
+                    assert.ok(parts[0].length >= user.length);
+            }));
+            t(
+                'short notation',
+                'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
+                true,
+                {
+                    customer: 'ttt',
+                    zone: 'zzz',
+                    direct: true,
+                    session: 'sss',
+                    timeout: '5',
+                    debug: 'full',
+                    country: 'us',
+                    state: 'fl',
+                    city: 'miami',
+                }
+            );
+            t(
+                'long notation',
+                'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
+                false,
+                {
+                    customer: 'ttt',
+                    zone: 'zzz',
+                    direct: true,
+                    session: 'sss',
+                    timeout: '5',
+                    debug: 'full',
+                    country: 'us',
+                    state: 'fl',
+                    city: 'miami',
+                }
+            );
+        });
         describe('pool', ()=>{
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){

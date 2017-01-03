@@ -90,6 +90,8 @@ Options:
                                                            [number] [default: 1]
   --secure_proxy          Use SSL when accessing super proxy
                                                       [boolean] [default: false]
+  --short_username        Use Shorthand username for super proxy credentials
+                                                      [boolean] [default: false]
   --proxy_switch          Automatically switch super proxy on failure
                                                            [number] [default: 5]
   --insecure              Enable SSL connection/sniffing to insecure hosts
