@@ -1,5 +1,13 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.51:
+- :sparkles: simplify handling of cities options in the UI
+- :bug: Handle city names with spaces properly
+- :bug: Treat zones with no plans proprly
+- :sparkles: presets now show the values they set as disabled
+- :boom: Clean up unused endpoint (/api/block)
+- :bug: Treat resolve false as no resolve file and not as auto resolve
+
 ## 0.9.50:
 - :sparkles: Support short_username for shorter credentials headers
 

@@ -739,6 +739,13 @@ describe('proxy', ()=>{
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
                 {session: 'seed'});
+            describe('lower case and spaces', ()=>{
+                t('long', {state: 'NY', city: 'New York'},
+                    {state: 'ny', city: 'new_york'});
+                t('short',
+                    {state: 'NY', city: 'New York', short_username: true},
+                    {state: 'ny', city: 'newyork'});
+            });
         });
         describe('socks', ()=>{
             const t = (name, _url)=>it(name, etask._fn(function*(_this){

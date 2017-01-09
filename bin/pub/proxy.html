@@ -21,7 +21,7 @@
                   <a data-toggle=collapse data-parent=#proxy-tabs
                     href=#proxy-preset>Preset:</a>
                   <select id=proxy-field-preset ng-model=form.preset
-                    class=form-control
+                    class=form-control ng-change=apply_preset()
                     ng-options="v.title for (p, v) in presets">
                   </select>
                 </label>
@@ -61,12 +61,13 @@
                       ng-options="i.value as i.key for i in consts.iface.values">
                     </select>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.multiply>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-multiply>
                       Multiply
                     </label>
                     <input id=proxy-field-multiply class=form-control type=number
                       ng-model=form.multiply
+                      ng-disabled=!form.preset.support.multiply
                       placeholder={{consts.multiply.def}}>
                   </div>
                   <div class=form-group>
@@ -246,40 +247,43 @@
               </div>
               <div id=proxy-ip-policy class="panel-collapse collapse">
                 <div class=panel-body>
-                  <div class=form-group ng-show=form.preset.support.session>
+                  <div class=form-group>
                     <input id=proxy-field-session-random type=checkbox
+                      ng-disabled=!form.preset.support.session
                       ng-model=form.session_random class=form-control>
                     <label class=control-label for=proxy-field-session-random>
                       Random Session
                     </label>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.session>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-session>
                       Explicit Session
                     </label>
                     <input id=proxy-field-session ng-model=form.session
-                      ng-disabled=form.session_random class=form-control
-                      placeholder={{consts.session.def}}>
+                      ng-disabled="form.session_random&&!form.preset.support.session"
+                      class=form-control placeholder={{consts.session.def}}>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.pool_size>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-pool-size>
                       Pool size
                     </label>
                     <input id=proxy-field-pool-size type=number
                       ng-model=form.pool_size class=form-control
+                      ng-disabled=!form.preset.support.pool_size
                       placeholder={{consts.pool_size.def}}>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.pool_type>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-pool-type>
                       Pool type
                     </label>
                     <select id=proxy-field-pool-type ng-model=form.pool_type
                       ng-options="pt.value as pt.key for pt in consts.pool_type.values"
                       ng-init="form.pool_type=form.pool_type||''"
+                      ng-disabled=!form.preset.support.pool_type
                       class=form-control>
                     </select>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.sticky_ip>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-sticky-ip
                       title="Keep same IP address for as long as possible">
                       Sticky IP
@@ -288,6 +292,7 @@
                       ng-model=_sticky_ip ng-init="_sticky_ip =
                       form.sticky_ip ? 'yes' : (form.sticky_ip===undefined
                       ||form.sticky_ip==='' ? 'default' : 'no')"
+                      ng-disabled=!form.preset.support.sticky_ip
                       ng-change="binary_changed(form, 'sticky_ip', _sticky_ip)">
                       <option value=no
                         ng-selected=!form.sticky_ip&&form.sticky_ip!==undefined>
@@ -302,8 +307,7 @@
                       </option>
                     </select>
                   </div>
-                  <div class=form-group
-                    ng-show=form.preset.support.max_requests>
+                  <div class=form-group>
                     <label class=control-label
                       for=proxy-field-max-requests-start>
                       Max requests
@@ -311,39 +315,44 @@
                     <div class=form-range>
                       <input id=proxy-field-max-requests-start type=number
                         ng-model=form.max_requests_start class=form-control
+                        ng-disabled=!form.preset.support.max_request
                         placeholder={{consts.max_requests.def}}>
                       <span class=range-seperator>:</span>
                       <input type=number ng-model=form.max_requests_end
+                        ng-disabled=!form.preset.support.max_request
                         class=form-control>
                     </div>
                   </div>
-                  <div class=form-group
-                    ng-show=form.preset.support.session_duration>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-duration-start>
                       Session duration (seconds)
                     </label>
                     <div class=form-range>
                       <input id=proxy-field-duration-start type=number
                         ng-model=form.duration_start class=form-control
+                        ng-disabled=!form.preset.support.session_duration
                         placeholder={{consts.session_duration.def}}>
                       <span class=range-seperator>:</span>
                       <input type=number ng-model=form.duration_end
+                        ng-disabled=!form.preset.support.session_duration
                         class=form-control>
                     </div>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.keep_alive>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-keep-alive>
                       Keep-alive
                     </label>
                     <input id=proxy-field-keep-alive type=number
                       ng-model=form.keep_alive class=form-control
+                        ng-disabled=!form.preset.support.keep_alive
                       placeholder={{consts.keep_alive.def}}>
                   </div>
-                  <div class=form-group ng-show=form.preset.support.seed>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-seed>
                       Session ID Seed
                     </label>
                     <input id=proxy-field-seed ng-model=form.seed
+                        ng-disabled=!form.preset.support.seed
                       class=form-control placeholder={{consts.seed.def}}>
                   </div>
                   <div class=form-group>

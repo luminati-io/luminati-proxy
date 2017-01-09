@@ -814,6 +814,7 @@ var presets = {
             && opt.session; },
         set: function(opt){
             opt.pool_size = 0;
+            opt.pool_type = undefined;
             opt.sticky_ip = false;
             opt.session = opt.session || true;
             opt.session_duration = undefined;
@@ -833,6 +834,7 @@ var presets = {
         check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
         set: function(opt){
             opt.pool_size = 0;
+            opt.pool_type = undefined;
             opt.sticky_ip = true;
             opt.session = undefined;
             opt.multiply = undefined;
@@ -1894,6 +1896,7 @@ function proxy($scope, $http, $proxies, $window, $q){
     $scope.init = function(locals){
         var regions = {};
         var cities = {};
+        $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         var form = $scope.form = _.cloneDeep(locals.proxy);
         form.port = $scope.port;
@@ -1905,7 +1908,8 @@ function proxy($scope, $http, $proxies, $window, $q){
         form.dns = form.dns||'';
         form.log = form.log||'';
         $scope.status = {};
-        if (!form.port||form.port=='')
+        var new_proxy = !form.port||form.port=='';
+        if (new_proxy)
         {
             var port = 24000;
             var socks = form.socks;
@@ -1918,36 +1922,50 @@ function proxy($scope, $http, $proxies, $window, $q){
             form.port = port;
             form.socks = socks;
         }
+        var def_proxy = form;
+        if (new_proxy)
+        {
+            def_proxy = {};
+            for (var key in $scope.consts)
+            {
+                if ($scope.consts[key].def!==undefined)
+                    def_proxy[key] = $scope.consts[key].def;
+            }
+        }
         for (var p in presets)
         {
-            if (presets[p].check(form))
+            console.log('preset',p,'check',def_proxy); // XXX leee
+            if (presets[p].check(def_proxy))
             {
                 form.preset = presets[p];
                 break;
             }
         }
-        if (form.session===true)
-        {
-            form.session_random = true;
-            form.session = '';
-        }
-        if (form.max_requests)
-        {
-            var max_requests = (''+form.max_requests).split(':');
-            form.max_requests_start = +max_requests[0];
-            form.max_requests_end = +max_requests[1];
-        }
-        if (!form.max_requests)
-            form.max_requests_start = 0;
-        if (form.session_duration)
-        {
-            var session_duration = (''+form.session_duration)
-                .split(':');
-            form.duration_start = +session_duration[0];
-            form.duration_end = +session_duration[1];
-        }
+        $scope.apply_preset = function(){
+            form.preset.set(form);
+            if (form.session===true)
+            {
+                form.session_random = true;
+                form.session = '';
+            }
+            if (form.max_requests)
+            {
+                var max_requests = (''+form.max_requests).split(':');
+                form.max_requests_start = +max_requests[0];
+                form.max_requests_end = +max_requests[1];
+            }
+            if (!form.max_requests)
+                form.max_requests_start = 0;
+            if (form.session_duration)
+            {
+                var session_duration = (''+form.session_duration)
+                    .split(':');
+                form.duration_start = +session_duration[0];
+                form.duration_end = +session_duration[1];
+            }
+        };
+        $scope.apply_preset();
         $scope.form_errors = {};
-        $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
         $scope.defaults = {};
         $http.get('/api/defaults').then(function(defaults){
             $scope.defaults = defaults.data;

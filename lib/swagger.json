@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.50",
+        "version": "0.9.51",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -366,7 +366,7 @@
                 },
                 "log": {
                     "type": "string",
-                    "pattern": "^none|error|warn|info|verbose|debug|silly$",
+                    "pattern": "^(none|error|warn|info|verbose|debug|silly)?$",
                     "description": "Log level"
                 },
                 "iface": {
@@ -431,17 +431,17 @@
                 },
                 "ip": {
                     "type": "string",
-                    "pattern": "^\\d+\\.\\d+\\.\\d+\\.\\d+$",
+                    "pattern": "^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$",
                     "description": "Datacenter IP"
                 },
                 "dns": {
                     "type": "string",
-                    "pattern": "^local|remote$",
+                    "pattern": "^(local|remote)?$",
                     "description": "DNS resolving"
                 },
                 "debug": {
                     "type": "string",
-                    "pattern": "^none|full$",
+                    "pattern": "^(none|full)?$",
                     "description": "Luminati request debug info"
                 },
                 "request_timeout": {
@@ -467,7 +467,7 @@
                 },
                 "pool_type": {
                     "type": "string",
-                    "pattern": "^sequential|round-robin$",
+                    "pattern": "^(sequential|round-robin)?$",
                     "description": "Pool session iteration order"
                 },
                 "session_init_timeout": {
@@ -485,12 +485,12 @@
                 },
                 "max_requests": {
                     "type": "string",
-                    "pattern": "^\\d+(:\\d+)?$",
+                    "pattern": "^(\\d+(:\\d+)?)?$",
                     "description": "Maximum requests per session"
                 },
                 "session_duration": {
                     "type": "string",
-                    "pattern": "^\\d+(:\\d+)?$",
+                    "pattern": "^(\\d+(:\\d+)?)?$",
                     "description": "Maximum duration of session (seconds)"
                 },
                 "throttle": {

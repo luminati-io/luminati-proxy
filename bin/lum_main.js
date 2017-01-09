@@ -7,11 +7,15 @@ const hutil = require('hutil');
 const etask = hutil.etask;
 let manager, args = process.argv.slice(2), shutdowning = false;
 let shutdown = reason=>{
-    if (!manager || shutdowning)
+    if (shutdowning)
         return;
-    console.log('Shtudown, reason is '+reason);
+    console.log('Shutdown, reason is '+reason);
     shutdowning = true;
-    manager.stop(reason, true);
+    if (manager)
+    {
+        manager.stop(reason, true);
+        manager = null;
+    }
 };
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>
     shutdown(sig+(err ? ', error = '+err : ''))));
