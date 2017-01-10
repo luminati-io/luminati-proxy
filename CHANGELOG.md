@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.52:
+- :bug: Fix bug in loading of countries to UI
+
 ## 0.9.51:
 - :sparkles: simplify handling of cities options in the UI
 - :bug: Handle city names with spaces properly
