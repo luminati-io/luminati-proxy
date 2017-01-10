@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.54:
+- :bug: Allow setting max requests from the UI
+
 ## 0.9.53:
 - :bug: Allow windows and other OS to handle the large CSV file properly
 
