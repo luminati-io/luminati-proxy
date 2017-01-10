@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.53:
+- :bug: Allow windows and other OS to handle the large CSV file properly
+
 ## 0.9.52:
 - :bug: Fix bug in loading of countries to UI
 
