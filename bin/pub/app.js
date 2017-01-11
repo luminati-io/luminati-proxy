@@ -1577,12 +1577,6 @@ function history($scope, $http, $window){
                     var alerts = [];
                     var disabled_alerts = [];
                     var add_alert = function(alert){
-                        if (r.method=='CONNECT'
-                            ||request_headers.host=='lumtest.com'
-                            ||r.url.match(/^https?:\/\/lumtest.com[$\/\?]/))
-                        {
-                            return;
-                        }
                         if (localStorage.getItem(
                             'request-alert-disabled-'+alert.type))
                         {
@@ -1595,6 +1589,28 @@ function history($scope, $http, $window){
                     var request_headers = {};
                     for (var h in raw_headers)
                         request_headers[h.toLowerCase()] = raw_headers[h];
+                    r.request_headers = request_headers;
+                    r.response_headers = JSON.parse(r.response_headers);
+                    r.alerts = alerts;
+                    r.disabled_alerts = disabled_alerts;
+                    if (r.url
+                        .match(/^(https?:\/\/)?\d+\.\d+\.\d+\.\d+[$\/\?:]/))
+                    {
+                        add_alert({
+                            type: 'ip_url',
+                            title: 'IP URL',
+                            description: 'The url uses IP and not '
+                                +'hostname, it will not be served from the'
+                                +' proxy peer. It could mean a resolve '
+                                +'configuration issue when using SOCKS.',
+                        });
+                    }
+                    if (r.method=='CONNECT'
+                        ||request_headers.host=='lumtest.com'
+                        ||r.url.match(/^https?:\/\/lumtest.com[$\/\?]/))
+                    {
+                        return r;
+                    }
                     if (!request_headers['user-agent'])
                     {
                         add_alert({
@@ -1664,18 +1680,6 @@ function history($scope, $http, $window){
                                 +'the home page of the site.',
                         });
                     }
-                    if (r.url
-                        .match(/^https?:\/\/\d+\.\d+\.\d+\.\d+[$\/\?]/))
-                    {
-                        add_alert({
-                            type: 'ip_url',
-                            title: 'IP URL',
-                            description: 'The url uses IP and not '
-                                +'hostname, it will not be served from the'
-                                +' proxy peer. It could mean a resolve '
-                                +'configuration issue when using SOCKS.',
-                        });
-                    }
                     var sensitive_headers = [];
                     for (var i in $scope.hola_headers)
                     {
@@ -1694,10 +1698,6 @@ function history($scope, $http, $window){
                                 +sensitive_headers.join(', '),
                         });
                     }
-                    r.request_headers = request_headers;
-                    r.response_headers = JSON.parse(r.response_headers);
-                    r.alerts = alerts;
-                    r.disabled_alerts = disabled_alerts;
                     return r;
                 });
             });

@@ -38,6 +38,7 @@ const assert_has = (value, has, prefix)=>{
     }
     if (has instanceof Object && value instanceof Object)
     {
+        const value_keys = Object.keys(value);
         Object.keys(has).forEach(k=>
             assert_has(value[k], has[k], `${prefix}.${k}`));
         return;
@@ -746,6 +747,14 @@ describe('proxy', ()=>{
                     {state: 'NY', city: 'New York', short_username: true},
                     {state: 'ny', city: 'newyork'});
             });
+            it('explicit any', ()=>etask(function*(){
+                const any_auth = {country: '*', state: '*', city: '*'};
+                l = yield lum(any_auth);
+                const res = yield l.test();
+                const auth_keys = Object.keys(res.body.auth);
+                Object.keys(any_auth).forEach(k=>
+                    assert.ok(!auth_keys.includes(k)));
+            }));
         });
         describe('socks', ()=>{
             const t = (name, _url)=>it(name, etask._fn(function*(_this){

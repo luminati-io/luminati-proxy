@@ -1,5 +1,12 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.55:
+- :bug: Explicit any country was not working properly
+- :bug: Add countries that have no cities/states into UI
+- :sparkles: Warn when keep_alive value is outside effective range 0-60
+- :sparkles: Added alert for SSL connection to IP URLs
+- :sparkles: Handle 404 URLs
+
 ## 0.9.54:
 - :bug: Allow setting max requests from the UI
 
