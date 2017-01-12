@@ -1,4 +1,4 @@
-<div ng-if="$root.mode=='root'&&$parent.ver_last&&$parent.ver_last.newer"
+<div ng-if="$root.mode=='root'&&is_upgradable()"
   class="alert alert-warning settings-alert">
   <div>
     A new version <strong>{{$parent.ver_last.version}}</strong> is available, see
@@ -6,10 +6,16 @@
       log</a>
     for specifics.
   </div>
-  <button type=button class="btn btn-primary" ng-click=upgrade()
-    ng-disabled=upgrading||upgrade_error||!ver_node.satisfied>
-    {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
-  </button>
+  <div class="buttons">
+    <button ng-click=dismiss_upgrade() ng-disabled=upgrading||upgrade_error
+      type="button" class="btn btn-default" >
+      Dismiss
+    </button>
+    <button type=button class="btn btn-primary" ng-click=upgrade()
+      ng-disabled=upgrading||upgrade_error||!ver_node.satisfied>
+      {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
+    </button>
+  </div>
   <div ng-if=ver_node&&!ver_node.satisfied>
     To upgrade Luminati Proxy Manager, you need to update Node.js to version
     {{ver_node.recommended}}.

@@ -356,19 +356,10 @@ div.proxies .btn-wrapper {
 .settings-alert {
     position: relative;
 }
-.settings-alert > div:not(.settings-inner-alert), .settings-alert pre {
-    margin-right: 120px;
-}
-.settings-alert button {
+.settings-alert .buttons {
     position: absolute;
     right: 10px;
     top: 9px;
-}
-.settings-alert .settings-inner-alert {
-    position: absolute;
-    right: 10px;
-    top: 47px;
-    padding: 4px 8px;
 }
 .quickstart li {
     display: block;

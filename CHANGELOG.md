@@ -1,5 +1,12 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.56:
+- :sparkles: Improve app stability
+- :bug: Remove empty country from the UI
+- :bug: Allow editing of proxies with socks and multiply properly using dialog
+- :sparkles: Add ability to dismiss upgrade (you can do upgrade from dropdown
+menu)
+
 ## 0.9.55:
 - :bug: Explicit any country was not working properly
 - :bug: Add countries that have no cities/states into UI

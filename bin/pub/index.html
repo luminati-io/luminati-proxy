@@ -28,6 +28,9 @@
               {{settings.customer}}<span class=caret></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
+              <li ng-if="$root.mode=='root'&&$parent.ver_last&&$parent.ver_last.newer">
+                <a href=# ng-click=upgrade()>Upgrade</a>
+              </li>
               <li><a href=# ng-click=logout()>Log out</a></li>
               <li><a href=# ng-click=shutdown()>Shut down</a></li>
             </ul>

@@ -215,6 +215,18 @@ function root($rootScope, $scope, $http, $window){
             function(){ setTimeout(check_reload, 500); })
         .then(function(){ $window.location.reload(); });
     };
+    $scope.is_upgradable = function(){
+        if ($scope.ver_last&&$scope.ver_last.newer)
+        {
+            var version = $window.localStorage.getItem('dismiss_upgrade');
+            return version ? $scope.ver_last.version>version : true;
+        }
+        return false;
+    };
+    $scope.dismiss_upgrade = function(){
+        $window.localStorage.setItem('dismiss_upgrade',
+            $scope.ver_last.version);
+    };
     $scope.upgrade = function(){
         $scope.confirmation = {
             text: 'The application will be upgraded and restarted.',
@@ -1934,7 +1946,6 @@ function proxy($scope, $http, $proxies, $window, $q){
         }
         for (var p in presets)
         {
-            console.log('preset',p,'check',def_proxy); // XXX leee
             if (presets[p].check(def_proxy))
             {
                 form.preset = presets[p];
@@ -2091,44 +2102,27 @@ function proxy($scope, $http, $proxies, $window, $q){
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             var save_inner = function(){
-                var promise = $q.when();
-                if (edit)
-                {
-                    promise = $http.get('/api/free_port').then(function(res){
-                        proxy.port = parseInt(res.data, 10); });
-                }
+                $scope.status.type = 'warning';
+                $scope.status.message = 'Saving the proxy...';
+                var promise = edit
+                    ? $http.put('/api/proxies/'+$scope.port, {proxy: proxy})
+                    : $http.post('/api/proxies/', {proxy: proxy});
                 var is_ok_cb = function(){
-                    var promise = $q.when();
-                    if (edit)
-                    {
-                        promise = $http.delete('/api/proxies/'+$scope.port)
-                            .then(function(){
-                                var url = '/api/proxies/'+proxy.port;
-                                return $http.put(url,
-                                    {proxy: {port: model.port}});
-                            });
-                    }
-                    return promise
-                        .then(function(){
-                            $window.$('#proxy').modal('hide');
-                            $proxies.update();
-                            $window.localStorage.setItem('quickstart-'+
-                                (edit ? 'edit' : 'create')+'-proxy', true);
-                            return $http.post('/api/recheck');
-                        })
-                        .then(function(r){
-                            if (r.data.login_failure)
-                                $window.location = '/';
-                        });
+                    $window.$('#proxy').modal('hide');
+                    $proxies.update();
+                    $window.localStorage.setItem('quickstart-'+
+                        (edit ? 'edit' : 'create')+'-proxy', true);
+                    return $http.post('/api/recheck')
+                    .then(function(r){
+                        if (r.data.login_failure)
+                            $window.location = '/';
+                    });
                 };
                 var is_not_ok_cb = function(res){
                     $scope.status.type = 'danger';
                     $scope.status.message = 'Error: '+res.data.status;
-                    return $http.delete('/api/proxies/'+proxy.port);
                 };
                 promise
-                    .then(function(){
-                        return $http.post('/api/proxies', {proxy: proxy}); })
                     .then(function(){
                         $scope.status.type = 'warning';
                         $scope.status.message = 'Checking the proxy...';
