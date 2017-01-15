@@ -67,9 +67,9 @@ module.run(function($rootScope, $http, $window){
     });
 });
 
-module.factory('$proxies', $proxies);
-$proxies.$inject = ['$http', '$q'];
-function $proxies($http, $q){
+module.factory('$proxies', proxies_factory);
+proxies_factory.$inject = ['$http', '$q'];
+function proxies_factory($http, $q){
     var service = {
         subscribe: subscribe,
         proxies: null,
@@ -130,9 +130,9 @@ function $proxies($http, $q){
     }
 }
 
-module.controller('root', root);
-root.$inject = ['$rootScope', '$scope', '$http', '$window'];
-function root($rootScope, $scope, $http, $window){
+module.controller('root', Root);
+Root.$inject = ['$rootScope', '$scope', '$http', '$window'];
+function Root($rootScope, $scope, $http, $window){
     $scope.quickstart = function(){
         return $window.localStorage.getItem('quickstart')=='show';
     };
@@ -149,15 +149,15 @@ function root($rootScope, $scope, $http, $window){
             $scope.$apply();
         }});
     };
-    $scope.quickstart_mousedown = function(e){
+    $scope.quickstart_mousedown = function(mouse_dn){
         var qs = $window.$('#quickstart');
         var container = $window.$('.main-container-qs');
         var width = qs.outerWidth();
         var body_width = $window.$('body').width();
-        var cx = e.pageX;
-        var mousemove = function(e){
+        var cx = mouse_dn.pageX;
+        var mousemove = function(mouse_mv){
             var new_width = Math.min(
-                Math.max(width+e.pageX-cx, 150), body_width-250);
+                Math.max(width+mouse_mv.pageX-cx, 150), body_width-250);
             qs.css('width', new_width+'px');
             container.css('margin-left', new_width+'px');
         };
@@ -296,9 +296,9 @@ function root($rootScope, $scope, $http, $window){
     };
 }
 
-module.controller('config', config);
-config.$inject = ['$scope', '$http', '$window'];
-function config($scope, $http, $window){
+module.controller('config', Config);
+Config.$inject = ['$scope', '$http', '$window'];
+function Config($scope, $http, $window){
     $http.get('/api/config').then(function(config){
         $scope.config = config.data.config;
         setTimeout(function(){
@@ -357,9 +357,9 @@ function config($scope, $http, $window){
     };
 }
 
-module.controller('resolve', resolve);
-resolve.$inject = ['$scope', '$http', '$window'];
-function resolve($scope, $http, $window){
+module.controller('resolve', Resolve);
+Resolve.$inject = ['$scope', '$http', '$window'];
+function Resolve($scope, $http, $window){
     $scope.resolve = {text: ''};
     $scope.update = function(){
         $http.get('/api/resolve').then(function(resolve){
@@ -423,9 +423,9 @@ function resolve($scope, $http, $window){
     };
 }
 
-module.controller('settings', settings);
-settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope'];
-function settings($scope, $http, $window, $sce, $rootScope){
+module.controller('settings', Settings);
+Settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope'];
+function Settings($scope, $http, $window, $sce, $rootScope){
     var update_error = function(){
         if ($rootScope.relogin_required)
             return $scope.user_error = {message: 'Please log in again.'};
@@ -519,9 +519,9 @@ function settings($scope, $http, $window, $sce, $rootScope){
     }
 }
 
-module.controller('zones', zones);
-zones.$inject = ['$scope', '$http', '$filter', '$window'];
-function zones($scope, $http, $filter, $window){
+module.controller('zones', Zones);
+Zones.$inject = ['$scope', '$http', '$filter', '$window'];
+function Zones($scope, $http, $filter, $window){
     $window.localStorage.setItem('quickstart-zones-tools', true);
     var today = new Date();
     var one_day_ago = (new Date()).setDate(today.getDate()-1);
@@ -567,9 +567,9 @@ function zones($scope, $http, $filter, $window){
     };
 }
 
-module.controller('faq', faq);
-faq.$inject = ['$scope'];
-function faq($scope){
+module.controller('faq', Faq);
+Faq.$inject = ['$scope'];
+function Faq($scope){
     $scope.questions = [
         {
             name: 'links',
@@ -586,9 +586,9 @@ function faq($scope){
     ];
 }
 
-module.controller('test', test);
-test.$inject = ['$scope', '$http', '$filter', '$window'];
-function test($scope, $http, $filter, $window){
+module.controller('test', Test);
+Test.$inject = ['$scope', '$http', '$filter', '$window'];
+function Test($scope, $http, $filter, $window){
     $window.localStorage.setItem('quickstart-zones-tools', true);
     var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
         /[?&]test=([^&]+)/)||['', 'null'])[1]));
@@ -659,9 +659,9 @@ function test($scope, $http, $filter, $window){
     };
 }
 
-module.controller('countries', countries);
-countries.$inject = ['$scope', '$http', '$window'];
-function countries($scope, $http, $window){
+module.controller('countries', Countries);
+Countries.$inject = ['$scope', '$http', '$window'];
+function Countries($scope, $http, $window){
     $scope.url = '';
     $scope.ua = '';
     $scope.path = '';
@@ -727,7 +727,7 @@ function countries($scope, $http, $window){
                     img: new Image(),
                     index: $scope.countries.length,
                 };
-                data.img.onerror = (function(data, started){
+                data.img.onerror = (function(started){
                     return function(){
                         if ($scope.started!=started)
                             return;
@@ -735,8 +735,8 @@ function countries($scope, $http, $window){
                         $scope.num_loading--;
                         progress(true);
                     };
-                })(data, $scope.started);
-                data.img.onload = (function(data, started){
+                })($scope.started);
+                data.img.onload = (function(started){
                     return function(){
                         if ($scope.started!=started)
                             return;
@@ -744,7 +744,7 @@ function countries($scope, $http, $window){
                         $scope.num_loading--;
                         progress(true);
                     };
-                })(data, $scope.started);
+                })($scope.started);
                 $scope.countries.push(data);
             }
             progress(false);
@@ -819,30 +819,47 @@ function check_reg_exp(v){
 }
 
 var presets = {
-    session: {
-        title: 'Single session (IP)',
-        description: 'All requests share the same session (IP)',
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
-            && opt.session; },
+    session_long: {
+        title: 'Long single session (IP)',
+        check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
+            && opt.session===true && opt.keep_alive; },
         set: function(opt){
             opt.pool_size = 0;
+            opt.keep_alive = opt.keep_alive || 50;
             opt.pool_type = undefined;
             opt.sticky_ip = false;
-            opt.session = opt.session || true;
+            opt.session = true;
             opt.session_duration = undefined;
             opt.max_requests = undefined;
             if (opt.session===true)
                 opt.seed = false;
         },
         support: {
-            session: true,
             keep_alive: true,
+            multiply: true,
+        },
+    },
+    session: {
+        title: 'Single session (IP)',
+        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
+            && opt.session===true && !opt.keep_alive; },
+        set: function(opt){
+            opt.pool_size = 0;
+            opt.keep_alive = 0;
+            opt.pool_type = undefined;
+            opt.sticky_ip = false;
+            opt.session = true;
+            opt.session_duration = undefined;
+            opt.max_requests = undefined;
+            if (opt.session===true)
+                opt.seed = false;
+        },
+        support: {
             multiply: true,
         },
     },
     sticky_ip: {
         title: 'Session (IP) per machine',
-        description: 'Each requesting machine will have its own session (IP)',
         check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
         set: function(opt){
             opt.pool_size = 0;
@@ -860,7 +877,6 @@ var presets = {
     },
     sequential: {
         title: 'Sequential session (IP) pool',
-        description: 'Pool of pre-established sessions (IPs), used one by one',
         check: function(opt){ return opt.pool_size &&
             (!opt.pool_type || opt.pool_type=='sequential'); },
         set: function(opt){
@@ -878,10 +894,8 @@ var presets = {
             seed: true,
         },
     },
-    'round-robin': {
+    round_robin: {
         title: 'Round-robin (IP) pool',
-        description: 'Pool of pre-established sessions (IPs), used in '
-            +'round-robin',
         check: function(opt){ return opt.pool_size
             && opt.pool_type=='round-robin' && !opt.multiply; },
         set: function(opt){
@@ -901,7 +915,6 @@ var presets = {
     },
     custom: {
         title: 'Custom',
-        description: 'Manually adjust all settings to your needs',
         check: function(opt){ return true; },
         set: function(opt){},
         support: {
@@ -917,12 +930,12 @@ var presets = {
         },
     },
 };
-for (var key in presets)
-    presets[key].key = key;
+for (var k in presets)
+    presets[k].key = k;
 
-module.controller('proxies', proxies);
-proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout'];
-function proxies($scope, $http, $proxies, $window, $q, $timeout){
+module.controller('proxies', Proxies);
+Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout'];
+function Proxies($scope, $http, $proxies, $window, $q, $timeout){
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     var iface_opts = [], zone_opts = [];
@@ -959,6 +972,11 @@ function proxies($scope, $http, $proxies, $window, $q, $timeout){
             key: 'multiply',
             title: 'Multiple',
             type: 'number',
+        },
+        {
+            key: 'history',
+            title: 'History',
+            type: 'boolean',
         },
         {
             key: 'ssl',
@@ -1336,7 +1354,7 @@ function proxies($scope, $http, $proxies, $window, $q, $timeout){
             .map(function(p){ return +p; });
     };
     $scope.option_key = function(col, val){
-        var opt = col.options().find(function(opt){ return opt.value==val; });
+        var opt = col.options().find(function(o){ return o.value==val; });
         return opt&&opt.key;
     };
     $scope.toggle_proxy_status_details = function(proxy){
@@ -1427,9 +1445,9 @@ function proxies($scope, $http, $proxies, $window, $q, $timeout){
     };
 }
 
-module.controller('history', history);
-history.$inject = ['$scope', '$http', '$window'];
-function history($scope, $http, $window){
+module.controller('history', History);
+History.$inject = ['$scope', '$http', '$window'];
+function History($scope, $http, $window){
     $scope.hola_headers = [];
     $http.get('/api/hola_headers').then(function(h){
         $scope.hola_headers = h.data;
@@ -1828,9 +1846,9 @@ function history($scope, $http, $window){
     };
 }
 
-module.controller('history_filter', history_filter);
-history_filter.$inject = ['$scope', '$window'];
-function history_filter($scope, $window){
+module.controller('history_filter', History_filter);
+History_filter.$inject = ['$scope', '$window'];
+function History_filter($scope, $window){
     $scope.init = function(locals){
         $scope.field = locals.field;
         var field = locals.field.field;
@@ -1882,9 +1900,9 @@ function history_filter($scope, $window){
     };
 }
 
-module.controller('pool', pool);
-pool.$inject = ['$scope', '$http', '$window'];
-function pool($scope, $http, $window){
+module.controller('pool', Pool);
+Pool.$inject = ['$scope', '$http', '$window'];
+function Pool($scope, $http, $window){
     $scope.init = function(locals){
         $scope.port = locals.port;
         $scope.pool_size = locals.pool_size;
@@ -1902,9 +1920,9 @@ function pool($scope, $http, $window){
     };
 }
 
-module.controller('proxy', proxy);
-proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
-function proxy($scope, $http, $proxies, $window, $q){
+module.controller('proxy', Proxy);
+Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
+function Proxy($scope, $http, $proxies, $window, $q){
     $scope.init = function(locals){
         var regions = {};
         var cities = {};
@@ -2168,9 +2186,9 @@ function proxy($scope, $http, $proxies, $window, $q){
     };
 }
 
-module.controller('columns', columns);
-columns.$inject = ['$scope', '$window'];
-function columns($scope, $window){
+module.controller('columns', Columns);
+Columns.$inject = ['$scope', '$window'];
+function Columns($scope, $window){
     $scope.init = function(locals){
         $scope.columns = locals.columns;
         $scope.form = _.cloneDeep(locals.cols_conf);
@@ -2202,7 +2220,6 @@ function columns($scope, $window){
 }
 
 module.filter('timestamp', timestamp_filter);
-timestamp_filter.$inject = [];
 function timestamp_filter(){
     return function(timestamp){
         return moment(timestamp).format('YYYY/MM/DD HH:mm');

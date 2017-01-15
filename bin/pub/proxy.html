@@ -26,9 +26,49 @@
                   </select>
                 </label>
               </div>
-              <div id=proxy-preset class="panel-collapse collapse">
+              <div id=proxy-preset class="panel-collapse collapse in">
                 <div class=panel-body>
-                  {{form.preset.description}}
+                  <div ng-if="form.preset.key=='session_long'">
+                    All requests share the same long session (IP)
+                    <br>
+                    For connecting a browser to Luminati, maintaining the same
+                    IP for as long as possible
+                  </div>
+                  <div ng-if="form.preset.key=='session'">
+                    All requests share the same active session (IP)
+                    <br>
+                    For connecting a single app/browser that does not need to
+                    maintain IP on idle times
+                  </div>
+                  <div ng-if="form.preset.key=='sticky_ip'">
+                    Each requesting machine will have its own session (IP)
+                    <br>
+                    For connecting several computers to a single Luminati
+                    Proxy Manager, each of them having its own single session
+                    (IP)
+                  </div>
+                  <div ng-if="form.preset.key=='sequential'">
+                    Sequential pool of pre-established of sessions (IPs)
+                    <br>
+                    For running groups of requests sharing the same IP to
+                    a target site
+                    <br>
+                    Use refresh_sessions max_requests & session_duration to
+                    control session (IP) switching
+                  </div>
+                  <div ng-if="form.preset.key=='round_robin'">
+                    Round-robin pool of pre-established sessions (IPs)
+                    <br>
+                    For spreading requests across large number of IPs
+                    <br>
+                    Tweak pool_size, max_requests & proxy_count to optimize
+                    performance
+                  </div>
+                  <div ng-if="form.preset.key=='custom'">
+                    Manually adjust all settings to your needs
+                    <br>
+                    For advanced use cases
+                  </div>
                 </div>
               </div>
             </div>
@@ -39,7 +79,7 @@
                   General
                 </a>
               </div>
-              <div id=proxy-general class="panel-collapse collapse in">
+              <div id=proxy-general class="panel-collapse collapse">
                 <div class=panel-body>
                   <div class=form-group
                     ng-class="{'has-error': form_errors.port}">
@@ -71,7 +111,7 @@
                       placeholder={{consts.multiply.def}}>
                   </div>
                   <div class=form-group>
-                    <label class=control-label for=proxy-field-sticky-ip>
+                    <label class=control-label for=proxy-field-history>
                       {{consts.history.desc.description}}
                     </label>
                     <select id=proxy-field-history class=form-control
@@ -93,7 +133,7 @@
                     </select>
                   </div>
                   <div class=form-group>
-                    <label class=control-label for=proxy-field-sticky-ip>
+                    <label class=control-label for=proxy-field-ssl>
                       {{consts.ssl.desc.description}}
                     </label>
                     <select id=proxy-field-ssl class=form-control

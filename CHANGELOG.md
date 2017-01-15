@@ -1,5 +1,11 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.57:
+- :sparkles: More correct usage message for docker users
+- :sparkles: Add warning for proxy with history and no debug info
+- :bug: History now show all pages
+- :sparkles: Improve presets description, and make it more clear
+
 ## 0.9.56:
 - :sparkles: Improve app stability
 - :bug: Remove empty country from the UI

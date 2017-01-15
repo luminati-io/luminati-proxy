@@ -68,13 +68,14 @@ and configure your proxies.
 ### Complete list of command line options
 ```sh
 luminati --help
-Usage: luminati [options] config1 config2 ...
+Usage:
+  luminati [options] config1 config2 ...
 
 Options:
   --port, -p              Port for the HTTP proxy      [number] [default: 24000]
   --multiply              Multiply the port definition given number of times
                                                                         [number]
-  --history               Log request history         [boolean] [default: false]
+  --history               Log request history                          [boolean]
   --ssl                   Enable SSL sniffing         [boolean] [default: false]
   --socks                 SOCKS5 port                                   [number]
   --log                   Log level                  [string] [default: "error"]
@@ -129,9 +130,9 @@ Options:
   --exclude_include       Exclude URL pattern for direct requests       [string]
   --www                   UI/API port                           [default: 22999]
   --config                Config file containing proxy definitions
-                                  [string] [default: "/home/lee/.luminati.json"]
+                                          [string] [default: "~/.luminati.json"]
   --database              Database file containing history and cached values
-                               [string] [default: "/home/lee/.luminati.sqlite3"]
+                                       [string] [default: "~/.luminati.sqlite3"]
   --resolve               Reverse DNS lookup file                       [string]
   --mode                  Defines a set of permissible operations within the
                           UI/API                      [string] [default: "root"]

@@ -206,11 +206,11 @@
               <img ng-if=!proxy._history
                 uib-tooltip="No history" tooltip-class=tooltip-default
                 src=/img/ic_history_disabled.svg class=proxies-action-disabled>
-              <img ng-if=proxy.pool_size||proxy.sticky_ip
+              <img ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session
                 ng-click=show_pool(proxy)
                 uib-tooltip="Current pool" tooltip-class=tooltip-default
                 src=/img/ic_table.svg class=proxies-action>
-              <img ng-if=!proxy.pool_size&&!proxy.sticky_ip
+              <img ng-if=!proxy.pool_size&&!proxy.sticky_ip&&!proxy.session
                 uib-tooltip="Pool empty; size is set to zero"
                 tooltip-class=tooltip-default
                 src=/img/ic_table_disabled.svg class=proxies-action-disabled>
