@@ -38,7 +38,6 @@ const assert_has = (value, has, prefix)=>{
     }
     if (has instanceof Object && value instanceof Object)
     {
-        const value_keys = Object.keys(value);
         Object.keys(has).forEach(k=>
             assert_has(value[k], has[k], `${prefix}.${k}`));
         return;
@@ -169,7 +168,7 @@ const http_proxy = port=>etask(function*(){
     });
     return proxy;
 });
-const http_ping = ()=>etask(function*http_ping(){
+const http_ping = ()=>etask(function*(){
     let ping = {history: []};
     const handler = (req, res)=>{
         let body = to_body(req);
@@ -576,27 +575,33 @@ describe('proxy', ()=>{
                 t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
                 t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
                 t('10, sticky_ip', {max_requests: 10, sticky_ip: true});
+                t('1, session using seed', {max_requests: 1, session: true});
+                t('2, session using seed', {max_requests: 2, session: true});
+                t('5, session using seed', {max_requests: 5, session: true});
+                t('10, session using seed', {max_requests: 10, session: true});
             });
             describe('keep_alive', ()=>{
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
                     _this.timeout(6000);
                     l = yield lum(assign({keep_alive: 1}, opt)); // actual 1sec
                     yield l.test();
-                    proxy.full_history = [];
+                    const s_f = proxy.full_history.length;
+                    const s_h = proxy.history.length;
                     yield etask.sleep(500);
-                    assert.equal(proxy.full_history.length, 0);
-                    assert.equal(proxy.history.length, 1);
+                    assert.equal(proxy.full_history.length, 0 + s_f);
+                    assert.equal(proxy.history.length, 0 + s_h);
                     yield l.test();
-                    assert.equal(proxy.full_history.length, 1);
-                    assert.equal(proxy.history.length, 2);
+                    assert.equal(proxy.full_history.length, 1 + s_f);
+                    assert.equal(proxy.history.length, 1 + s_h);
                     yield etask.sleep(1500);
-                    assert.equal(proxy.full_history.length, 2);
-                    assert.equal(proxy.history.length, 2);
+                    assert.equal(proxy.full_history.length, 2 + s_f);
+                    assert.equal(proxy.history.length, 1 + s_h);
                 }));
 
                 t('pool', {pool_size: 1});
                 t('sticky_ip', {sticky_ip: true});
-                t('session', {session: 'test'});
+                t('session explicit', {session: 'test'});
+                t('session using seed', {session: true, seed: 'seed'});
             });
             describe('session_duration', ()=>{
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
@@ -631,6 +636,7 @@ describe('proxy', ()=>{
 
                 t('pool', {pool_size: 1});
                 t('sticky_ip', {sticky_ip: true});
+                t('session using seed', {session: true, seed: 'seed'});
             });
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
@@ -739,7 +745,7 @@ describe('proxy', ()=>{
             t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
-                {session: 'seed'});
+                {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'new_york'});
@@ -810,11 +816,12 @@ describe('proxy', ()=>{
                 yield test_session(after);
             }));
 
-            t1('pool', {pool_size: 1, max_requests: 10}, /24000_[0-9a-f]+_1/,
+            t1('pool', {pool_size: 1}, /24000_[0-9a-f]+_1/,
                 /24000_[0-9a-f]+_2/);
-            t1('sticky_ip', {sticky_ip: true, pool_size: 0},
-                /24000_127_0_0_1_[0-9a-f]+_1/,
+            t1('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_[0-9a-f]+_1/,
                 /24000_127_0_0_1_[0-9a-f]+_2/);
+            t1('session using seed', {session: true, seed: 'seed'},
+                /seed_1/, /seed_2/);
 
             const t2 = (name, opt, test)=>it(name, ()=>etask(function*(){
                 l = yield lum(opt);
@@ -913,7 +920,7 @@ describe('manager', ()=>{
         return i?args[i]:null;
     };
 
-    const app_with_args = args=>etask(function*app_with_args(){
+    const app_with_args = args=>etask(function*(){
         let manager;
         this.finally(()=>{
             if (this.error && manager)
@@ -945,7 +952,7 @@ describe('manager', ()=>{
         let admin = 'http://127.0.0.1:'+www;
         return {manager, admin, db_file};
     });
-    const app_with_config = opt=>etask(function*app_with_config(){
+    const app_with_config = opt=>etask(function*(){
         let args = [];
         const cli = opt.cli||{};
         Object.keys(cli).forEach(k=>{
@@ -974,10 +981,10 @@ describe('manager', ()=>{
         });
         return yield app_with_args(args);
     });
-    const app_with_proxies = (proxies, cli)=>etask(function*app_with_proxies(){
+    const app_with_proxies = (proxies, cli)=>etask(function*(){
         return yield app_with_config({config: {proxies}, cli: cli});
     });
-    const api = (_path, method, data, json)=>etask(function*api(){
+    const api = (_path, method, data, json)=>etask(function*(){
         const opt = {
             url: app.admin+'/'+_path,
             method: method||'GET',
@@ -986,12 +993,12 @@ describe('manager', ()=>{
         };
         return yield etask.nfn_apply(request, [opt]);
     });
-    const api_json = (path, options)=>etask(function*api_json(){
+    const api_json = (_path, options)=>etask(function*(){
         let opt = options||{};
-        return yield api(path, opt.method, opt.body, true);
+        return yield api(_path, opt.method, opt.body, true);
     });
-    const json = (path, method, data)=>etask(function*json(){
-        const res = yield api(path, method, data, true);
+    const json = (_path, method, data)=>etask(function*(){
+        const res = yield api(_path, method, data, true);
         assert.equal(res.statusCode, 200);
         return res.body;
     });
@@ -1119,35 +1126,35 @@ describe('manager', ()=>{
             });
             describe('post', ()=>{
                 it('normal non-persist', ()=>etask(function*(){
-                    let proxy = {port: 24001};
+                    let sample_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies', 'post',
-                        {proxy: proxy});
-                    assert_has(res, {data: proxy}, 'proxies');
+                        {proxy: sample_proxy});
+                    assert_has(res, {data: sample_proxy}, 'proxies');
                     res = yield json('api/proxies_running');
-                    assert_has(res, [{}, proxy], 'proxies');
+                    assert_has(res, [{}, sample_proxy], 'proxies');
                     res = yield json('api/proxies');
                     assert.equal(res.length, 1);
                 }));
                 it('normal persist', ()=>etask(function*(){
-                    let proxy = {port: 24001, proxy_type: 'persist'};
+                    let sample_proxy = {port: 24001, proxy_type: 'persist'};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies', 'post',
-                        {proxy: proxy});
-                    assert_has(res, {data: proxy}, 'proxies');
+                        {proxy: sample_proxy});
+                    assert_has(res, {data: sample_proxy}, 'proxies');
                     res = yield json('api/proxies_running');
-                    assert_has(res, [{}, proxy], 'proxies');
+                    assert_has(res, [{}, sample_proxy], 'proxies');
                     res = yield json('api/proxies');
-                    assert_has(res, [{}, proxy], 'proxies');
+                    assert_has(res, [{}, sample_proxy], 'proxies');
                 }));
                 it('conflict', ()=>etask(function*(){
-                    let proxy = {port: 24000};
-                    let proxies = [proxy];
+                    let sample_proxy = {port: 24000};
+                    let proxies = [sample_proxy];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield api_json('api/proxies',
-                        {method: 'post', body: {proxy: proxy}});
+                        {method: 'post', body: {proxy: sample_proxy}});
                     assert.equal(res.statusCode, 400);
                     assert_has(res.body, {errors: []}, 'proxies');
                 }));

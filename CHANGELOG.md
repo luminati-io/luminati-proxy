@@ -1,10 +1,16 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.58:
+- :sparkles: use indexOf instead of include to support old browsers
+
 ## 0.9.57:
 - :sparkles: More correct usage message for docker users
 - :sparkles: Add warning for proxy with history and no debug info
 - :bug: History now show all pages
 - :sparkles: Improve presets description, and make it more clear
+- :star: Show session info for single session proxies
+- :star: Random single session now support refresh_sessions, max_requests &
+  session_duration
 
 ## 0.9.56:
 - :sparkles: Improve app stability

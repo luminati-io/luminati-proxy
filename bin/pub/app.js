@@ -12,8 +12,8 @@ var is_valid_field = function(proxy, name, zone_definition){
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
     var permissions = details.perm.split(' ');
-    if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
-        return permissions.includes(name);
+    if (['country', 'state', 'city', 'asn', 'ip'].indexOf(name)>-1)
+        return permissions.indexOf(name)>-1;
     return true;
 };
 
@@ -829,14 +829,14 @@ var presets = {
             opt.pool_type = undefined;
             opt.sticky_ip = false;
             opt.session = true;
-            opt.session_duration = undefined;
-            opt.max_requests = undefined;
             if (opt.session===true)
                 opt.seed = false;
         },
         support: {
             keep_alive: true,
             multiply: true,
+            session_ducation: true,
+            max_requests: true,
         },
     },
     session: {
@@ -849,13 +849,13 @@ var presets = {
             opt.pool_type = undefined;
             opt.sticky_ip = false;
             opt.session = true;
-            opt.session_duration = undefined;
-            opt.max_requests = undefined;
             if (opt.session===true)
                 opt.seed = false;
         },
         support: {
             multiply: true,
+            session_duration: true,
+            max_requests: true,
         },
     },
     sticky_ip: {
@@ -1224,7 +1224,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
                 var promises = $scope.proxies
                     .filter(function(p){
                         return p.proxy_type=='persist'
-                            && selected.includes(p.port);
+                            && selected.indexOf(p.port) > -1;
                     }).map(function(p){
                         return $http.delete('/api/proxies/'+p.port); });
                 $scope.selected_proxies = {};
@@ -1384,8 +1384,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
             return $scope.option_key(col, proxy[col.key]);
         if (col.key == 'session' && proxy.session === true)
                 return 'Random';
-        if (['state', 'city'].includes(col.key) &&
-            [undefined, '', '*'].includes(proxy.country))
+        if (['state', 'city'].indexOf(col.key)>-1 &&
+            [undefined, '', '*'].indexOf(proxy.country)>-1)
         {
             return 'Set the country first';
         }

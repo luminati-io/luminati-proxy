@@ -192,11 +192,12 @@
               </span>
             </td>
             <td class=proxies-actions>
-              <img ng-if=proxy.pool_size||proxy.sticky_ip
+              <img ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session===true
                 ng-click=refresh_sessions(proxy)
                 uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default
                 src=/img/ic_refresh.svg class=proxies-action>
-              <img ng-if=!proxy.pool_size&&!proxy.sticky_ip
+              <img
+                ng-if=!proxy.pool_size&&!proxy.sticky_ip&&proxy.session!==true
                 uib-tooltip="No session pool" tooltip-class=tooltip-default
                 src=/img/ic_refresh_disabled.svg class=proxies-action-disabled>
               <img ng-if=proxy._history
