@@ -15,6 +15,7 @@ var config = {
         lodash: '/req/lodash/lodash.min',
         codemirror: '/req/codemirror',
         'angular-ui-bootstrap': '/req/angular-ui-bootstrap/dist/ui-bootstrap',
+        'es6-shim': '/req/es6-shim/es6-shim'
     },
     shim: {
         angular: {exports: 'angular'},

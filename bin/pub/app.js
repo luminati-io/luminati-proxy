@@ -2,7 +2,8 @@
 'use strict'; /*jslint browser:true*/
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
-    'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap'],
+    'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap',
+    'es6-shim'],
 function(angular, _, moment, codemirror){
 
 var is_valid_field = function(proxy, name, zone_definition){
@@ -12,8 +13,8 @@ var is_valid_field = function(proxy, name, zone_definition){
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
     var permissions = details.perm.split(' ');
-    if (['country', 'state', 'city', 'asn', 'ip'].indexOf(name)>-1)
-        return permissions.indexOf(name)>-1;
+    if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
+        return permissions.includes(name);
     return true;
 };
 
@@ -282,7 +283,7 @@ function Root($rootScope, $scope, $http, $window){
         for (var i=0; i<$rootScope.run_config.warnings.length; i++)
         {
             var w = $rootScope.run_config.warnings[i];
-            if (suppressed.indexOf(w)==-1)
+            if (!suppressed.includes(w))
                 warnings.push(w);
         }
         return warnings;
@@ -1224,7 +1225,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
                 var promises = $scope.proxies
                     .filter(function(p){
                         return p.proxy_type=='persist'
-                            && selected.indexOf(p.port) > -1;
+                            && selected.includes(p.port);
                     }).map(function(p){
                         return $http.delete('/api/proxies/'+p.port); });
                 $scope.selected_proxies = {};
@@ -1384,8 +1385,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
             return $scope.option_key(col, proxy[col.key]);
         if (col.key == 'session' && proxy.session === true)
                 return 'Random';
-        if (['state', 'city'].indexOf(col.key)>-1 &&
-            [undefined, '', '*'].indexOf(proxy.country)>-1)
+        if (['state', 'city'].includes(col.key) &&
+            [undefined, '', '*'].includes(proxy.country))
         {
             return 'Set the country first';
         }

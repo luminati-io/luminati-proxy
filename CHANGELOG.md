@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.59:
+- :sparkles: use es6-shim
+
 ## 0.9.58:
 - :sparkles: use indexOf instead of include to support old browsers
 
