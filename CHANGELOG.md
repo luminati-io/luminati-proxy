@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.60:
+- :bug: SOCKS now works with sticky_ip
+
 ## 0.9.59:
 - :sparkles: use es6-shim
 
