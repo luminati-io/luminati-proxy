@@ -1,5 +1,9 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.61:
+- :sparkles: update REST api docs
+- :sparkles: improve app stability
+
 ## 0.9.60:
 - :bug: SOCKS now works with sticky_ip
 

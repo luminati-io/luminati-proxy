@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.60",
+        "version": "0.9.61",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -155,7 +155,12 @@
                         "in": "body",
                         "description": "The proxy explicit configuration",
                         "schema": {
-                            "$ref": "#/definitions/proxy"
+                            "type": "object",
+                            "properties": {
+                                "proxy": {
+                                    "$ref": "#/definitions/proxy"
+                                }
+                            }
                         },
                         "required": true
                     }
@@ -197,7 +202,12 @@
                         "in": "body",
                         "description": "The proxy explicit configuration",
                         "schema": {
-                            "$ref": "#/definitions/proxy"
+                            "type": "object",
+                            "properties": {
+                                "proxy": {
+                                    "$ref": "#/definitions/proxy"
+                                }
+                            }
                         },
                         "required": true
                     }
