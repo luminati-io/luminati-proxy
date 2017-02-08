@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.61",
+        "version": "0.9.62",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -336,10 +336,6 @@
                     "type": "string",
                     "description": "Database file containing history and cached values"
                 },
-                "resolve": {
-                    "type": "string",
-                    "description": "Reverse DNS lookup file"
-                },
                 "mode": {
                     "type": "string",
                     "pattern": "^root|normal|guest$",
@@ -448,6 +444,18 @@
                     "type": "string",
                     "pattern": "^(local|remote)?$",
                     "description": "DNS resolving"
+                },
+                "reverse_lookup_dns": {
+                    "type": "boolean",
+                    "description": "Process reverse lookup via DNS"
+                },
+                "reverse_lookup_file": {
+                    "type": "string",
+                    "description": "Process reverse lookup via file"
+                },
+                "reverse_lookup_values": {
+                    "type": "array",
+                    "description": "Process reverse lookup via value"
                 },
                 "debug": {
                     "type": "string",

@@ -130,6 +130,26 @@
         </div>
       </div>
     </div>
+    <div id=allocated_ips class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>
+              <button type=button class=close data-dismiss=modal>
+                &times;</button>
+              Allocated IPs:
+              <span class=blue>{{allocated_ips.zone}}</span>
+            </h4>
+          </div>
+          <div class=modal-body>
+            <p ng-show="allocated_ips.loading" class=text-warning>
+              Loading...
+            </p>
+            <p ng-repeat="ip in allocated_ips.ips">{{ip}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
     <script data-main=/config.js src=/req/requirejs/require.js></script>
   </body>
 </html>

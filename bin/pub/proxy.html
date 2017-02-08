@@ -456,6 +456,25 @@
                     </select>
                   </div>
                   <div class=form-group>
+                    <label class=control-label for=proxy-field-dns-resolve>
+                      Reverse resolve
+                    </label>
+                    <select id=proxy-field-dns-reverse
+                      ng-model="extra.reverse_lookup" class=form-control>
+                      <option value="">No</option>
+                      <option value="dns">DNS</option>
+                      <option value="file">File</option>
+                      <option value="values">Values</option>
+                    </select>
+                    <input ng-if="extra.reverse_lookup=='file'"
+                      ng-model="extra.reverse_lookup_file"
+                      placeholder=/path/to/file type=text class=form-control>
+                    <textarea ng-if="extra.reverse_lookup=='values'"
+                      ng-model="extra.reverse_lookup_values"
+                      placeholder="1.1.1.1 example.com" class=form-control>
+                    </textarea>
+                  </div>
+                  <div class=form-group>
                     <label class=control-label for=proxy-field-log-level>
                       Log level
                     </label>

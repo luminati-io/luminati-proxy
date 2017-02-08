@@ -1,5 +1,10 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.62
+- :boom: move --resolve (manager level) to --reverse_lookup_file (proxy level)
+- :sparkles: added --reverse_lookup_dns and --reverse_lookup_values options
+- :sparkles: show allocated IPs for static plans
+
 ## 0.9.61:
 - :sparkles: update REST api docs
 - :sparkles: improve app stability

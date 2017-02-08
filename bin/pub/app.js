@@ -602,7 +602,10 @@ function Test($scope, $http, $filter, $window){
         $scope.body = preset.body;
     }
     else
+    {
         $scope.method = 'GET';
+        $scope.url = 'http://lumtest.com/myip.json';
+    }
     $http.get('/api/proxies').then(function(proxies){
         $scope.proxies = [['0', 'No proxy']];
         proxies.data.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
@@ -1938,6 +1941,19 @@ function Proxy($scope, $http, $proxies, $window, $q){
         form.city = form.city||'';
         form.dns = form.dns||'';
         form.log = form.log||'';
+        $scope.extra = {
+            reverse_lookup: '',
+            reverse_lookup_dns: form.reverse_lookup_dns,
+            reverse_lookup_file: form.reverse_lookup_file,
+            reverse_lookup_values:
+                (form.reverse_lookup_values||[]).join('\n'),
+        };
+        if ($scope.extra.reverse_lookup_dns)
+            $scope.extra.reverse_lookup = 'dns';
+        else if ($scope.extra.reverse_lookup_file)
+            $scope.extra.reverse_lookup = 'file';
+        else if ($scope.extra.reverse_lookup_values)
+            $scope.extra.reverse_lookup = 'values';
         $scope.status = {};
         var new_proxy = !form.port||form.port=='';
         if (new_proxy)
@@ -2026,6 +2042,25 @@ function Proxy($scope, $http, $proxies, $window, $q){
                     container.animate({'scrollTop': top}, 250);
                 });
             }).modal();
+        };
+        $scope.is_show_allocated_ips = function(){
+            var zone = $scope.consts.zone.values.filter(function(z){
+                return z.value==form.zone; })[0];
+            var plan = (zone.plans||[]).slice(-1)[0];
+            return (plan&&plan.type||zone.type)=='static';
+        };
+        $scope.show_allocated_ips = function(){
+            var zone = form.zone;
+            var key = form.password||'';
+            var modals = $scope.$parent.$parent.$parent.$parent;
+            modals.allocated_ips = {loading: true, zone: zone};
+            $window.$('#allocated_ips').modal();
+            $http.get('/api/allocated_ips?zone='+zone+'&key='+key)
+            .then(function(res){
+                modals.allocated_ips.ips = res.data.ips.map(function(ip){
+                    return ip.split(':')[0]; });
+                modals.allocated_ips.loading = false;
+            });
         };
         $scope.binary_changed = function(proxy, field, value){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
@@ -2118,6 +2153,18 @@ function Proxy($scope, $http, $proxies, $window, $q){
             proxy.keep_alive = effective('keep_alive');
             proxy.pool_size = effective('pool_size');
             proxy.proxy_type = 'persist';
+            proxy.reverse_lookup_dns = '';
+            proxy.reverse_lookup_file = '';
+            proxy.reverse_lookup_values = '';
+            if ($scope.extra.reverse_lookup=='dns')
+                proxy.reverse_lookup_dns = true;
+            if ($scope.extra.reverse_lookup=='file')
+                proxy.reverse_lookup_file = $scope.extra.reverse_lookup_file;
+            if ($scope.extra.reverse_lookup=='values')
+            {
+                proxy.reverse_lookup_values =
+                    $scope.extra.reverse_lookup_values.split('\n');
+            }
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             var save_inner = function(){
