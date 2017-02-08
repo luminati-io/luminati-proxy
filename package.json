@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.9.62",
+  "version": "0.9.63",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",

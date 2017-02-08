@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.63
+- :bug: tests failed with Node 5
+
 ## 0.9.62
 - :boom: move --resolve (manager level) to --reverse_lookup_file (proxy level)
 - :sparkles: added --reverse_lookup_dns and --reverse_lookup_values options
