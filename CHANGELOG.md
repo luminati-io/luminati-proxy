@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.65
+- :bug: fix startup on win
+
 ## 0.9.64
 - :star: added feature to set pool from allocated IPs
 - :star: added feature to save history in external DB

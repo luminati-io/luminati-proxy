@@ -133,6 +133,7 @@ Options:
                                           [string] [default: "~/.luminati.json"]
   --database              Database file containing history and cached values
                                        [string] [default: "~/.luminati.sqlite3"]
+  --database_history      Database URI to save history instead of default DB
   --resolve               Reverse DNS lookup file                       [string]
   --mode                  Defines a set of permissible operations within the
                           UI/API                      [string] [default: "root"]
