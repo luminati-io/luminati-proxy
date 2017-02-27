@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.66
+- :bug: fix API usage
+
 ## 0.9.65
 - :bug: fix startup on win
 
