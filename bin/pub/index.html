@@ -137,7 +137,7 @@
             <h4 class=modal-title>
               <button type=button class=close data-dismiss=modal>
                 &times;</button>
-              Allocated IPs:
+              Select IPs:
               <span class=blue>{{allocated_ips.zone}}</span>
             </h4>
           </div>
@@ -145,7 +145,19 @@
             <p ng-show="allocated_ips.loading" class=text-warning>
               Loading...
             </p>
-            <p ng-repeat="ip in allocated_ips.ips">{{ip}}</p>
+            <div ng-show="!allocated_ips.loading">
+              <button ng-click="allocated_ips.random_ip()"
+                type="button" class="btn btn-default">
+                Random IPs
+              </button>
+              <div ng-repeat="item in allocated_ips.ips" class="checkbox">
+                <label>
+                  <input ng-model="item.checked"
+                    ng-change="allocated_ips.toggle_ip(item)"
+                    type=checkbox> {{item.ip}}
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>

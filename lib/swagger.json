@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.63",
+        "version": "0.9.64",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -336,6 +336,10 @@
                     "type": "string",
                     "description": "Database file containing history and cached values"
                 },
+                "database_history": {
+                    "type": "string",
+                    "description": "Database containing history"
+                },
                 "mode": {
                     "type": "string",
                     "pattern": "^root|normal|guest$",
@@ -344,6 +348,10 @@
                 "dropin": {
                     "type": "boolean",
                     "description": "Create dropin mode proxy on port 22225"
+                },
+                "usage_stats": {
+                    "type": "boolean",
+                    "description": "Enable collection of anonymous usage statistics"
                 }
             }
         },
@@ -499,7 +507,7 @@
                 "seed": {
                     "type": "string",
                     "pattern": "^[^\\.\\-]*$",
-                    "description": "Session ID seed used for identifing sessions from this proxy"
+                    "description": "Session ID seed used for identifying sessions from this proxy"
                 },
                 "max_requests": {
                     "type": "string",

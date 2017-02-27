@@ -118,8 +118,8 @@ Options:
                                                            [number] [default: 5]
   --keep_alive            Generate request to keep session alive after given
                           idle time (seconds)                           [number]
-  --seed                  Session ID seed used for identifing sessions from this
-                          proxy                                         [string]
+  --seed                  Session ID seed used for identifying sessions from
+                          this proxy                                    [string]
   --max_requests          Maximum requests per session    [string] [default: 50]
   --session_duration      Maximum duration of session (seconds)         [string]
   --throttle              Throttle requests above given number          [number]
@@ -142,6 +142,8 @@ Options:
   --no-config             Working without a config file
   --daemon, -d            Start as a daemon
   --stop-daemon           Stop running daemon
+  --usage_stats           Enable collection of anonymous usage statistics
+                                                      [boolean] [default: true]
   --version, -v           Show version number                          [boolean]
   --help, -h, -?          Show help                                    [boolean]
 ```

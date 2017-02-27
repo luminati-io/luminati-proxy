@@ -1,10 +1,25 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true*/
+'use strict'; /*jslint browser:true*//*global module*/
+
+// XXX marka: hack for electron/jquery combination
+if (typeof module=='object')
+{
+    /*jshint -W020*/
+    window.module = module;
+    module = undefined;
+}
+
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
     'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap',
     'es6-shim'],
 function(angular, _, moment, codemirror){
+
+var is_electron = window.process && window.process.versions.electron;
+
+// XXX marka: hack for electron/jquery combination
+if (window.module)
+    module = window.module;
 
 var is_valid_field = function(proxy, name, zone_definition){
     var value = proxy.zone||zone_definition.def;
@@ -217,7 +232,7 @@ function Root($rootScope, $scope, $http, $window){
         .then(function(){ $window.location.reload(); });
     };
     $scope.is_upgradable = function(){
-        if ($scope.ver_last&&$scope.ver_last.newer)
+        if (!is_electron && $scope.ver_last && $scope.ver_last.newer)
         {
             var version = $window.localStorage.getItem('dismiss_upgrade');
             return version ? $scope.ver_last.version>version : true;
@@ -829,6 +844,7 @@ var presets = {
             && opt.session===true && opt.keep_alive; },
         set: function(opt){
             opt.pool_size = 0;
+            opt.ips = [];
             opt.keep_alive = opt.keep_alive || 50;
             opt.pool_type = undefined;
             opt.sticky_ip = false;
@@ -849,6 +865,7 @@ var presets = {
             && opt.session===true && !opt.keep_alive; },
         set: function(opt){
             opt.pool_size = 0;
+            opt.ips = [];
             opt.keep_alive = 0;
             opt.pool_type = undefined;
             opt.sticky_ip = false;
@@ -867,6 +884,7 @@ var presets = {
         check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
         set: function(opt){
             opt.pool_size = 0;
+            opt.ips = [];
             opt.pool_type = undefined;
             opt.sticky_ip = true;
             opt.session = undefined;
@@ -1941,6 +1959,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         form.city = form.city||'';
         form.dns = form.dns||'';
         form.log = form.log||'';
+        form.ips = form.ips||[];
         $scope.extra = {
             reverse_lookup: '',
             reverse_lookup_dns: form.reverse_lookup_dns,
@@ -2053,12 +2072,32 @@ function Proxy($scope, $http, $proxies, $window, $q){
             var zone = form.zone;
             var key = form.password||'';
             var modals = $scope.$parent.$parent.$parent.$parent;
-            modals.allocated_ips = {loading: true, zone: zone};
+            modals.allocated_ips = {
+                ips: [],
+                loading: true,
+                random_ip: function(){
+                    modals.allocated_ips.ips.forEach(function(item){
+                        item.checked = false; });
+                    form.ips = [];
+                    form.pool_size = 0;
+                },
+                toggle_ip: function(item){
+                    var index = form.ips.indexOf(item.ip);
+                    if (item.checked && index<0)
+                        form.ips.push(item.ip);
+                    else if (!item.checked && index>-1)
+                        form.ips.splice(index, 1);
+                    form.pool_size = form.ips.length;
+                },
+                zone: zone,
+            };
             $window.$('#allocated_ips').modal();
             $http.get('/api/allocated_ips?zone='+zone+'&key='+key)
             .then(function(res){
-                modals.allocated_ips.ips = res.data.ips.map(function(ip){
-                    return ip.split(':')[0]; });
+                modals.allocated_ips.ips = res.data.ips.map(function(ip_port){
+                    var ip = ip_port.split(':')[0];
+                    return {ip: ip, checked: form.ips.includes(ip)};
+                });
                 modals.allocated_ips.loading = false;
             });
         };
