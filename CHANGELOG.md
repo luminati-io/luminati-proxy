@@ -1,5 +1,8 @@
 # Luminati Proxy manager - Change Log
 
+## 0.9.67:
+- :sparkles: update API doc
+
 ## 0.9.66
 - :bug: fix API usage
 

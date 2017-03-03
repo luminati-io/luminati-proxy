@@ -143,8 +143,8 @@ Options:
   --no-config             Working without a config file
   --daemon, -d            Start as a daemon
   --stop-daemon           Stop running daemon
-  --usage_stats           Enable collection of anonymous usage statistics
-                                                      [boolean] [default: true]
+  --no_usage_stats        Disable collection of anonymous usage statistics
+                                                      [boolean] [default: false]
   --version, -v           Show version number                          [boolean]
   --help, -h, -?          Show help                                    [boolean]
 ```

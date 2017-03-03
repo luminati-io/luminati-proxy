@@ -39,26 +39,26 @@ autoUpdater.checkForUpdates();
 let run = run_config=>{
     manager = new Manager(args, run_config);
     manager.on('www_ready', url=>{
-        if (manager.argv.usage_stats)
+        if (!manager.argv.no_usage_stats)
             ua.event('ready', url).send();
         wnd = wnd || new BrowserWindow({width: 1024, height: 768});
         wnd.loadURL(url);
     })
     .on('stop', ()=>{
-        if (manager.argv.usage_stats)
-            ua.event('stop', ()=>process.exit());
-        else
+        if (manager.argv.no_usage_stats)
             process.exit();
+        else
+            ua.event('stop', ()=>process.exit());
     })
     .on('error', e=> {
         console.log(e.raw ? e.message : 'Unhandled error: '+e);
-        if (manager.argv.usage_stats)
-            ua.exception('Stack: '+e.stack, true, ()=>process.exit());
-        else
+        if (manager.argv.no_usage_stats)
             process.exit();
+        else
+            ua.exception('Stack: '+e.stack, true, ()=>process.exit());
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
-        if (manager.argv.usage_stats)
+        if (!manager.argv.no_usage_stats)
             ua.event('config_changed');
         args = manager.argv.config ? args : manager.get_params();
         yield manager.stop('config change', true, true);
@@ -71,10 +71,10 @@ let run = run_config=>{
 };
 
 let quit = ()=>{
-    if (manager.argv.usage_stats)
-        ua.event('quit', ()=>app.quit());
-    else
+    if (manager.argv.no_usage_stats)
         app.quit();
+    else
+        ua.event('quit', ()=>app.quit());
 };
 
 app.on('ready', run);

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.9.66",
+        "version": "0.9.67",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -349,9 +349,9 @@
                     "type": "boolean",
                     "description": "Create dropin mode proxy on port 22225"
                 },
-                "usage_stats": {
+                "no_usage_stats": {
                     "type": "boolean",
-                    "description": "Enable collection of anonymous usage statistics"
+                    "description": "Disable collection of anonymous usage statistics"
                 }
             }
         },
@@ -463,6 +463,9 @@
                 },
                 "reverse_lookup_values": {
                     "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
                     "description": "Process reverse lookup via value"
                 },
                 "debug": {
