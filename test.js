@@ -735,7 +735,6 @@ describe('proxy', ()=>{
             t('zone', {zone: 'abc'});
             t('country', {country: 'il'});
             t('city', {country: 'us', state: 'ny', city: 'newyork'});
-            if (0) // XXX dmitryk
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
             t('DNS', {dns: 'local'});

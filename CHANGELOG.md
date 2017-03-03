@@ -1,4 +1,4 @@
-# Luminati Proxy manager - Change Log
+ Luminati Proxy manager - Change Log
 
 ## 0.9.67:
 - :sparkles: update API doc
