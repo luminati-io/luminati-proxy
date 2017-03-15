@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 0.9.70
+## 0.9.72
 - :bug: fixed event listener leak
 - :bug: fixed usage of stringify in error reports
 - :star: added additional analytics events
