@@ -1,9 +1,5 @@
  Luminati Proxy manager - Change Log
 
-## 0.9.73
-- :bug: fixed --dropin to work correctly when credentials given on command line
-- :star: made handling of command-line arguments work reliably
-
 ## 0.9.72
 - :bug: fixed event listener leak
 - :bug: fixed usage of stringify in error reports
