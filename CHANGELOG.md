@@ -1,14 +1,5 @@
  Luminati Proxy manager - Change Log
 
-## 0.9.70
-- :bug: fixed event listener leak
-- :bug: fixed usage of stringify in error reports
-- :star: added additional analytics events
-- :star: report location of config file during startup
-
-## 0.9.69
-- :sparkles: added analytics events for understanding crashes
-
 ## 0.9.67:
 - :sparkles: update API doc
 
