@@ -141,7 +141,7 @@ const http_proxy = port=>etask(function*(){
         res.pipe(socket).pipe(res);
         req.on('end', ()=>socket.end());
     }));
-    yield etask.nfn_apply(proxy.http, '.listen', [port||22225]);
+    yield etask.nfn_apply(proxy.http, '.listen', [port||20001]);
     proxy.port = proxy.http.address().port;
     const onconnection = proxy.http._handle.onconnection;
     proxy.http._handle.onconnection = function(){
@@ -1014,12 +1014,25 @@ describe('manager', ()=>{
     }));
     beforeEach(()=>temp_files = []);
     afterEach(()=>temp_files.forEach(f=>f.done()));
+    describe('get_params', ()=>{
+        const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
+            var mgr = new Manager(_args);
+            assert.deepEqual(expected, mgr.get_params());
+        }));
+        t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
+        t('credentials',
+            qw`--foo 1 --bar 2 --customer test_user --password abcdefgh`,
+            ['--foo', 1, '--bar', 2]);
+        t('credentials with no-config',
+            qw`--no-config --customer test_user --password abcd --zone tst`,
+            qw`--no-config --customer test_user --password abcd --zone tst`);
+    });
     describe('socks', ()=>{
         const t = (name, _url)=>it(name, etask._fn(function*(_this){
             _this.timeout(30000);
             let args = [
-                '--socks', '25000:24000',
-                '--socks', '26000:24000',
+                '--socks', `25000:${Manager.default.port}`,
+                '--socks', `26000:${Manager.default.port}`,
             ];
             app = yield app_with_args(args);
             let res1 = yield etask.nfn_apply(request, [{
@@ -1061,7 +1074,7 @@ describe('manager', ()=>{
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('config file', {files: [simple_proxy]}, [simple_proxy]);
         t('config override cli', {cli: simple_proxy, config: {port: 24042}},
-            [assign({}, simple_proxy, {proxy_type: 'persist', port: 24042})]);
+            [simple_proxy, {proxy_type: 'persist', port: 24042}]);
         const multiple_proxies = [
             assign({}, simple_proxy, {port: 25025}),
             assign({}, simple_proxy, {port: 26026}),
@@ -1082,13 +1095,13 @@ describe('manager', ()=>{
             assert_has(proxies, expected, 'proxies');
         }));
 
-        t('default', [], [{port: 24000}]);
+        t('default', [], [{port: Manager.default.port}]);
         t('off', ['--no-dropin'], [{port: 24000}]);
         it('on', ()=>etask(function*(){
             try {
                 app = yield app_with_args(['--dropin']);
                 let proxies = yield json('api/proxies_running');
-                assert_has(proxies, [{port: 22225}, {port: 24000}], 'proxies');
+                assert_has(proxies, [{port: 22225}], 'proxies');
             } catch(e){
                 if (e instanceof assert.AssertionError)
                     throw e;
@@ -1149,6 +1162,20 @@ describe('manager', ()=>{
                     res = yield json('api/proxies');
                     assert_has(res, [{}, sample_proxy], 'proxies');
                 }));
+                it('inherit defaults', ()=>etask(function*(){
+                    let sample_proxy = {port: 24001};
+                    let proxies = [{port: 24000}];
+                    let res_proxy = assign({}, {customer, password},
+                        sample_proxy);
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield json('api/proxies', 'post',
+                        {proxy: sample_proxy});
+                    assert_has(res, {data: res_proxy}, 'proxies');
+                    res = yield json('api/proxies_running');
+                    assert_has(res, [{}, res_proxy], 'proxies');
+                    res = yield json('api/proxies');
+                    assert.equal(res.length, 1);
+                }));
                 it('conflict', ()=>etask(function*(){
                     let sample_proxy = {port: 24000};
                     let proxies = [sample_proxy];
@@ -1161,14 +1188,26 @@ describe('manager', ()=>{
             });
             describe('put', ()=>{
                 it('normal', ()=>etask(function*(){
-                    let proxy = {port: 24001};
+                    let put_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies/24000', 'put',
-                        {proxy: proxy});
-                    assert_has(res, {data: proxy});
+                        {proxy: put_proxy});
+                    assert_has(res, {data: put_proxy});
                     res = yield json('api/proxies_running');
-                    assert_has(res, [proxy], 'proxies');
+                    assert_has(res, [put_proxy], 'proxies');
+                }));
+                it('inherit defaults', ()=>etask(function*(){
+                    let put_proxy = {port: 24001};
+                    let proxies = [{port: 24000}];
+                    let res_proxy = assign({}, {customer, password},
+                        put_proxy);
+                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    let res = yield json('api/proxies/24000', 'put',
+                        {proxy: put_proxy});
+                    assert_has(res, {data: res_proxy});
+                    res = yield json('api/proxies_running');
+                    assert_has(res, [res_proxy], 'proxies');
                 }));
                 it('conflict', ()=>etask(function*(){
                     let proxy = {port: 24000};

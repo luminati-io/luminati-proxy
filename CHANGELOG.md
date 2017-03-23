@@ -1,5 +1,30 @@
  Luminati Proxy manager - Change Log
 
+## 0.9.75
+- :bug: avoid login error when customer=undefined
+- :bug: enable login to work correctly when using --no-config
+- :bug: ensure that proxies are correctly initialized in put/post
+- :boom: remove inaccurate/confusing parameter reporting in UI
+- :sparkles: slow down rate of requests to lumtest.com to reduce load
+
+## 0.9.74
+- :bug: fixed issue with automating upgrading
+- :star: made automatically saved config files shorter
+- :bug: removed login issues when using --password on the command line
+
+## 0.9.73
+- :bug: fixed --dropin to work correctly when credentials given on command line
+- :star: made handling of command-line arguments work reliably
+
+## 0.9.72
+- :bug: fixed event listener leak
+- :bug: fixed usage of stringify in error reports
+- :star: added additional analytics events
+- :star: report location of config file during startup
+
+## 0.9.69
+- :sparkles: added analytics events for understanding crashes
+
 ## 0.9.67:
 - :sparkles: update API doc
 

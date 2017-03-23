@@ -29,6 +29,8 @@ if (require('electron-squirrel-startup'))
 let manager, args = process.argv.slice(2), wnd;
 
 autoUpdater.on('update-downloaded', e=>{
+    if (manager && manager.argv && !manager.argv.no_usage_stats)
+        ua.event('app', 'update-downloaded');
     dialog.showMessageBox(wnd, {type: 'info', message: 'Upgrading...'});
     autoUpdater.quitAndInstall();
 });
@@ -38,9 +40,11 @@ autoUpdater.checkForUpdates();
 
 let run = run_config=>{
     manager = new Manager(args, run_config);
+    if (!manager.argv.no_usage_stats)
+        ua.event('app', 'run');
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
-            ua.event('ready', url).send();
+            ua.event('manager', 'www_ready', url).send();
         wnd = wnd || new BrowserWindow({width: 1024, height: 768});
         wnd.loadURL(url);
     })
@@ -48,18 +52,24 @@ let run = run_config=>{
         if (manager.argv.no_usage_stats)
             process.exit();
         else
-            ua.event('stop', ()=>process.exit());
+            ua.event('manager', 'stop', ()=>process.exit());
     })
-    .on('error', e=> {
-        console.log(e.raw ? e.message : 'Unhandled error: '+e);
+    .on('error', (e, fatal)=> {
+        let handle_fatal = ()=>{
+            if (fatal)
+            {
+                console.log(e.raw ? e.message : 'Unhandled error: '+e);
+                process.exit();
+            }
+        };
         if (manager.argv.no_usage_stats)
-            process.exit();
+            handle_fatal();
         else
-            ua.exception('Stack: '+e.stack, true, ()=>process.exit());
+            ua.event('manager', 'error', JSON.stringify(e), handle_fatal);
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         if (!manager.argv.no_usage_stats)
-            ua.event('config_changed');
+            ua.event('manager', 'config_changed', JSON.stringify(zone_autoupdate));
         args = manager.argv.config ? args : manager.get_params();
         yield manager.stop('config change', true, true);
         setTimeout(()=>run(zone_autoupdate && zone_autoupdate.prev ? {
@@ -74,7 +84,7 @@ let quit = ()=>{
     if (manager.argv.no_usage_stats)
         app.quit();
     else
-        ua.event('quit', ()=>app.quit());
+        ua.event('app', 'quit', ()=>app.quit());
 };
 
 app.on('ready', run);
