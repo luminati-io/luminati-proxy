@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.0
+- :star: made --dropin flag on by default
+- :sparkles: apply proxy defaults late to avoid polluting configs with defaults
+- :boom: report exception message when prereq check fails
+
 ## 0.9.75
 - :bug: avoid login error when customer=undefined
 - :bug: enable login to work correctly when using --no-config

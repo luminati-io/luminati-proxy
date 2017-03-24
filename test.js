@@ -946,6 +946,8 @@ describe('manager', ()=>{
           args = args.concat(['--password', password]);
         if (!get_param(args, '--mode'))
           args = args.concat(['--mode', 'guest']);
+        if (!get_param(args, '--dropin'))
+          args = args.concat(['--no-dropin']);
         manager = new Manager(args, {bypass_credentials_check: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
@@ -1069,7 +1071,7 @@ describe('manager', ()=>{
 
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
-            [assign({}, simple_proxy, {proxy_type: 'persist'})]);
+            [assign({}, simple_proxy, {proxy_type: 'config'})]);
         t('main config only', {config: simple_proxy},
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('config file', {files: [simple_proxy]}, [simple_proxy]);
@@ -1095,18 +1097,9 @@ describe('manager', ()=>{
             assert_has(proxies, expected, 'proxies');
         }));
 
-        t('default', [], [{port: Manager.default.port}]);
-        t('off', ['--no-dropin'], [{port: 24000}]);
-        it('on', ()=>etask(function*(){
-            try {
-                app = yield app_with_args(['--dropin']);
-                let proxies = yield json('api/proxies_running');
-                assert_has(proxies, [{port: 22225}], 'proxies');
-            } catch(e){
-                if (e instanceof assert.AssertionError)
-                    throw e;
-            }
-        }));
+        t('off', ['--no-dropin'], [{port: Manager.default.port}]);
+        t('on', ['--dropin'], [{port: Luminati.dropin.port, 
+            allow_proxy_auth: true}]);
     });
     describe('api', ()=>{
         it('ssl', ()=>etask(function*(){

@@ -25,7 +25,8 @@ E.is_env_compat = ()=>{
         if (excluded.includes(dep))
             continue;
         try { require(dep); } catch(e){
-            console.log(`Installation problem was detected (${dep} package).\n`
+            console.log(`Installation problem was detected `
+                +`(${dep} package, reason: ${e.message}).\n`
                 +'Please run the following command to recover:');
             const d = path.resolve(__dirname, '../node_modules');
             console.log(

@@ -65,6 +65,31 @@ Point your browser to the app admin UI
 [http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
 and configure your proxies.
 
+After logging in, you will see that the default configuration for the Luminati
+proxy includes a "dropin" proxy running on port 22225. This mode is explained
+in detail below.
+
+### Dropin replacement for existing super-proxies
+
+Luminati Proxy comes with a "dropin mode" which behaves exactly like the
+existing super-proxies. When running a proxy in dropin mode, you do not need to
+log in via the administrative UI in order to make requests through your
+proxies. Rather, the proxy username and password are provided with each request
+to the proxy server. This mode is enabled by default, and you can use this mode
+as an easy replacement when migrating from the regular super-proxy to the
+Luminati Proxy Manager.
+
+Dropin mode is enabled by default. To disable the dropin proxy, use the flag
+`--no-dropin`:
+
+```sh
+luminati --no-dropin
+```
+
+For full documentation on the API for making requests through the dropin proxy,
+see <a href="https://luminati.io/cp/api_example?manager=all&group=active">the
+API Example page in your Luminati.io account</a>.
+
 ### Complete list of command line options
 ```sh
 luminati --help
