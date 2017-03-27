@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.1
+- :bug: removed spurious SOCKS error when using dropin proxy
+- :bug: fixed errors encountered when giving password on the command line
+- :bug: fixed compile errors on Node versions < 6
+
 ## 0.10.0
 - :star: made --dropin flag on by default
 - :sparkles: apply proxy defaults late to avoid polluting configs with defaults
