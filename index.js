@@ -39,7 +39,7 @@ autoUpdater.setFeedURL('http://localhost:9000/dist/win/');
 autoUpdater.checkForUpdates();
 
 let run = run_config=>{
-    manager = new Manager(args, run_config);
+    manager = new Manager(args, Object.assign({ua}, run_config));
     if (!manager.argv.no_usage_stats)
         ua.event('app', 'run');
     manager.on('www_ready', url=>{

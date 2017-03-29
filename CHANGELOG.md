@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.2
+- :star: zone information is now always up-to-date with luminati.io
+- :bug: whitelist, recent_ips, and stats no longer show empty lists
+- :bug: zone password changes no longer old passwords in config files
+
 ## 0.10.1
 - :bug: removed spurious SOCKS error when using dropin proxy
 - :bug: fixed errors encountered when giving password on the command line

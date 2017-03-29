@@ -74,6 +74,12 @@ const to_body = req=>({
     headers: restore_case(req.headers, req.rawHeaders),
 });
 
+const mock_json = status=>{
+    return opt=>{
+        return {status, body: {opt, mock: true}};
+    };
+};
+
 const http_proxy = port=>etask(function*(){
     const proxy = {history: [], full_history: []};
     const handler = (req, res, head)=>{
@@ -920,7 +926,7 @@ describe('manager', ()=>{
         return i?args[i]:null;
     };
 
-    const app_with_args = args=>etask(function*(){
+    const app_with_args = (args, only_explicit)=>etask(function*(){
         let manager;
         this.finally(()=>{
             if (this.error && manager)
@@ -928,26 +934,29 @@ describe('manager', ()=>{
         });
         args = args||[];
         let www = get_param(args, '--www')||Manager.default.www;
-        let log = get_param(args, '--log');
-        if (!log)
-            args = args.concat(['--log', 'NONE']);
         let db_file = temp_file_path('sqlite3');
-        if (!get_param(args, '--database'))
-            args = args.concat(['--database', db_file.path]);
-        if (!get_param(args, '--proxy'))
-            args = args.concat(['--proxy', '127.0.0.1']);
-        if (!get_param(args, '--proxy_port'))
-            args = args.concat(['--proxy_port', proxy.port]);
-        if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
-            args.push('--no-config');
-        if (!get_param(args, '--customer'))
-          args = args.concat(['--customer', customer]);
-        if (!get_param(args, '--password'))
-          args = args.concat(['--password', password]);
-        if (!get_param(args, '--mode'))
-          args = args.concat(['--mode', 'guest']);
-        if (!get_param(args, '--dropin'))
-          args = args.concat(['--no-dropin']);
+        if (!only_explicit)
+        {
+            let log = get_param(args, '--log');
+            if (!log)
+                args = args.concat(['--log', 'NONE']);
+            if (!get_param(args, '--database'))
+                args = args.concat(['--database', db_file.path]);
+            if (!get_param(args, '--proxy'))
+                args = args.concat(['--proxy', '127.0.0.1']);
+            if (!get_param(args, '--proxy_port'))
+                args = args.concat(['--proxy_port', proxy.port]);
+            if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
+                args.push('--no-config');
+            if (!get_param(args, '--customer'))
+              args = args.concat(['--customer', customer]);
+            if (!get_param(args, '--password'))
+              args = args.concat(['--password', password]);
+            if (!get_param(args, '--mode'))
+              args = args.concat(['--mode', 'guest']);
+            if (!get_param(args, '--dropin'))
+              args = args.concat(['--no-dropin']);
+        }
         manager = new Manager(args, {bypass_credentials_check: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
@@ -981,7 +990,7 @@ describe('manager', ()=>{
             args.push(file.path);
             temp_files.push(file);
         });
-        return yield app_with_args(args);
+        return yield app_with_args(args, opt.only_explicit);
     });
     const app_with_proxies = (proxies, cli)=>etask(function*(){
         return yield app_with_config({config: {proxies}, cli: cli});
@@ -1098,7 +1107,7 @@ describe('manager', ()=>{
         }));
 
         t('off', ['--no-dropin'], [{port: Manager.default.port}]);
-        t('on', ['--dropin'], [{port: Luminati.dropin.port, 
+        t('on', ['--dropin'], [{port: Luminati.dropin.port,
             allow_proxy_auth: true}]);
     });
     describe('api', ()=>{
@@ -1117,6 +1126,66 @@ describe('manager', ()=>{
                 app = yield app_with_args();
                 const body = yield json('api/version');
                 assert.equal(body.version, pkg.version);
+            }));
+        });
+        describe('stats', ()=>{
+            Manager.prototype.json = mock_json(200);
+            const expect_opt = {
+                url: 'https://luminati.io/api/get_customer_bw?details=1',
+                headers: {'x-hola-auth': 'lum-customer-opt'
+                    +`-zone-gen-key-${password}`},
+            };
+            it('get', ()=>etask(function*(){
+                app = yield app_with_args(
+                    qw`--customer opt --password ${password}`);
+                const body = yield json('api/stats');
+                assert_has(body, expect_opt);
+            }));
+            it('get with config', ()=>etask(function*(){
+                app = yield app_with_config({config: {_defaults:
+                    {customer: 'opt', password}}, only_explicit: true});
+                const body = yield json('api/stats');
+                assert_has(body, expect_opt);
+            }));
+        });
+        describe('whitelist', ()=>{
+            Manager.prototype.json = mock_json(200);
+            const expect_opt = {
+                url: 'https://luminati.io/api/get_whitelist?zones=*',
+                headers: {'x-hola-auth': `lum-customer-${customer}`
+                    +`-zone-gen-key-${password}`},
+            };
+            it('get', ()=>etask(function*(){
+                app = yield app_with_args(
+                    qw`--customer ${customer} --password ${password}`);
+                const body = yield json('api/whitelist');
+                assert_has(body, {opt: expect_opt});
+            }));
+            it('get with config', ()=>etask(function*(){
+                app = yield app_with_config({config: {_defaults:
+                    {customer, password}}, only_explicit: true});
+                const body = yield json('api/whitelist');
+                assert_has(body, {opt: expect_opt});
+            }));
+        });
+        describe('recent_ips', ()=>{
+            Manager.prototype.json = mock_json(200);
+            const expect_opt = {
+                url: 'https://luminati.io/api/get_recent_ips?zones=*',
+                headers: {'x-hola-auth': `lum-customer-${customer}`
+                    +`-zone-gen-key-${password}`},
+            };
+            it('get', ()=>etask(function*(){
+                app = yield app_with_args(
+                    qw`--customer ${customer} --password ${password}`);
+                const body = yield json('api/recent_ips');
+                assert_has(body, {opt: expect_opt});
+            }));
+            it('get with config', ()=>etask(function*(){
+                app = yield app_with_config({config: {_defaults:
+                    {customer, password}}, only_explicit: true});
+                const body = yield json('api/recent_ips');
+                assert_has(body, {opt: expect_opt});
             }));
         });
         describe('proxies', ()=>{

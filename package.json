@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -78,6 +78,7 @@
     "sqlite3": "3.1.8",
     "sudo-prompt": "^6.2.1",
     "swagger-ui": "^2.2.8",
+    "tough-cookie-filestore": "0.0.1",
     "universal-analytics": "^0.4.9",
     "winston": "^2.3.0",
     "yargs": "^6.5.0"

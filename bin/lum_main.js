@@ -26,11 +26,19 @@ let shutdown = reason=>{
             ua.event('manager', 'stop', reason, stop_manager);
     }
 };
-['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>
-    shutdown(sig+(err ? ', error = '+err : ''))));
+['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
+    const errstr = sig+(err ? ', error = '+err : '');
+    if (err&&manager&&!manager.argv.no_usage_stats)
+    {
+        ua.event('manager', 'error', `${err.message}, stack: ${err.stack}`,
+            ()=>shutdown(errstr));
+    }
+    else
+        shutdown(errstr);
+}));
 let on_upgrade_finished;
 (function run(run_config){
-    manager = new Manager(args, run_config);
+    manager = new Manager(args, Object.assign({ua}, run_config));
     manager.on('stop', ()=>process.exit())
     .on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
