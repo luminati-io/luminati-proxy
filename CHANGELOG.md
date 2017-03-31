@@ -1,10 +1,5 @@
  Luminati Proxy manager - Change Log
 
-## 0.10.3
-- :star: update default zone passwords from luminati.io
-- :sparkles: gather better stack traces during crashes
-- :boom: force login when luminati.io credentials are out of date
-
 ## 0.10.2
 - :star: zone information is now always up-to-date with luminati.io
 - :bug: whitelist, recent_ips, and stats no longer show empty lists

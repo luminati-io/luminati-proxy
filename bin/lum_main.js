@@ -5,7 +5,6 @@
 const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;
-const version = require('../package.json').version;
 const analytics = require('universal-analytics');
 const ua = analytics('UA-60520689-2');
 
@@ -31,7 +30,7 @@ let shutdown = reason=>{
     const errstr = sig+(err ? ', error = '+err : '');
     if (err&&manager&&!manager.argv.no_usage_stats)
     {
-        ua.event('manager', 'crash', `v${version} ${err.stack}`,
+        ua.event('manager', 'error', `${err.message}, stack: ${err.stack}`,
             ()=>shutdown(errstr));
     }
     else
