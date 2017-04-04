@@ -149,10 +149,12 @@ Options:
   --session_duration      Maximum duration of session (seconds)         [string]
   --throttle              Throttle requests above given number          [number]
   --null_response         URL pattern for null response                 [string]
-  --bypass_proxy          URL pattern for bypassing the proxy and connect
-                          directly                                      [string]
-  --direct_include        Include URL pattern for direct requests       [string]
-  --exclude_include       Exclude URL pattern for direct requests       [string]
+  --bypass_proxy          URL regex for bypassing the proxy manager and
+			  send directly to host                         [string]
+  --direct_include        URL regex for requests to be sent directly
+			  from super proxy      			[string]
+  --exclude_include       URL regex for requests to not be sent
+			  directly from super proxy 		        [string]
   --www                   UI/API port                           [default: 22999]
   --config                Config file containing proxy definitions
                                           [string] [default: "~/.luminati.json"]

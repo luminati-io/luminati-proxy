@@ -1,9 +1,10 @@
 {
   "name": "luminati-proxy",
-  "version": "0.10.2",
+  "version": "0.10.4",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
+  "md5": "214b25908d265227577b522d9f4a179e",
   "engines": {
     "node": ">=4.9&&<7"
   },
@@ -57,6 +58,7 @@
     "express": "^4.14.0",
     "flag-icon-css": "^2.8.0",
     "font-awesome": "^4.7.0",
+    "glob-fs": "^0.1.6",
     "http-shutdown": "^1.1.0",
     "hutil": "^0.1.9",
     "jquery": "^3.1.1",
@@ -85,11 +87,12 @@
   },
   "devDependencies": {
     "electron": "^1.4.1",
-    "electron-rebuild": "^1.5.7",
     "electron-builder": "^13.9.0",
     "electron-builder-squirrel-windows": "^13.6.0",
+    "electron-rebuild": "^1.5.7",
     "electron-squirrel-startup": "^1.0.0",
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "nock": "^9.0.11"
   },
   "optionalDependencies": {
     "phantomjs-prebuilt": "^2.1.14",

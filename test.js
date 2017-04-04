@@ -13,6 +13,7 @@ const socks = require('socksv5');
 const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
+const nock = require('nock');
 const etask = hutil.etask;
 const restore_case = hutil.http_hdr.restore_case;
 const qw = hutil.string.qw;
@@ -1041,6 +1042,7 @@ describe('manager', ()=>{
     describe('socks', ()=>{
         const t = (name, _url)=>it(name, etask._fn(function*(_this){
             _this.timeout(30000);
+            const url_path = url.parse(_url).path;
             let args = [
                 '--socks', `25000:${Manager.default.port}`,
                 '--socks', `26000:${Manager.default.port}`,
@@ -1055,7 +1057,8 @@ describe('manager', ()=>{
                 url: _url,
             }]);
             let body1 = JSON.parse(res1.body);
-            assert.equal(body1.url, _url);
+            assert.ok(body1.url.includes(url_path),
+                'body url matches expected url');
             let res2 = yield etask.nfn_apply(request, [{
                 agent: new socks.HttpAgent({
                     proxyHost: '127.0.0.1',
@@ -1065,7 +1068,8 @@ describe('manager', ()=>{
                 url: _url,
             }]);
             let body2 = JSON.parse(res2.body);
-            assert.equal(body2.url, _url);
+            assert.ok(body2.url.includes(url_path),
+                'body url matches expected url');
         }));
         t('http', 'http://lumtest.com/echo.json');
     });
@@ -1080,7 +1084,7 @@ describe('manager', ()=>{
 
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
-            [assign({}, simple_proxy, {proxy_type: 'config'})]);
+            [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('main config only', {config: simple_proxy},
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('config file', {files: [simple_proxy]}, [simple_proxy]);
@@ -1289,6 +1293,37 @@ describe('manager', ()=>{
                     assert.equal(res.statusCode, 204);
                 }));
             });
+        });
+        describe('user credentials', ()=>{
+            it('success', ()=>etask(function*(){
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: 'mock_user'}).twice()
+                    .reply(200, {mock_result: true});
+                app = yield app_with_args(['--customer', 'mock_user']);
+                var result = yield app.manager.get_lum_local_conf();
+                assert_has(result, {mock_result: true});
+            }));
+            it('login required', ()=>etask(function*(){
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: 'mock_user'}).twice()
+                    .reply(403, 'login_required');
+                app = yield app_with_args(['--customer', 'mock_user']);
+                try {
+                    yield app.manager.get_lum_local_conf();
+                    assert.fail('should have thrown exception');
+                } catch(e){
+                    assert_has(e, {status: 403, message: 'login_required'});
+                }
+            }));
+            it('update defaults', ()=>etask(function*(){
+                let updated = {_defaults: {customer: 'updated'}};
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: 'mock_user'}).reply(200, updated);
+                app = yield app_with_args(['--customer', 'mock_user']);
+                let res = yield app.manager.get_lum_local_conf();
+                assert_has(res, updated, 'result');
+                assert_has(app.manager._defaults, res._defaults, '_defaults');
+            }));
         });
     });
     describe('crash on load error', ()=>{

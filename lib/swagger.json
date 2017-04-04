@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.10.2",
+        "version": "0.10.4",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -528,19 +528,19 @@
                 },
                 "null_response": {
                     "type": "string",
-                    "description": "URL pattern for null response"
+                    "description": "URL regex pattern for null response"
                 },
                 "bypass_proxy": {
                     "type": "string",
-                    "description": "URL pattern for bypassing the proxy and connect directly"
+                    "description": "URL regex for bypassing the proxy manager and send directly to host"
                 },
                 "direct_include": {
                     "type": "string",
-                    "description": "Include URL pattern for direct requests"
+                    "description": "URL regex for requests to be sent directly from super proxy"
                 },
                 "exclude_include": {
                     "type": "string",
-                    "description": "Exclude URL pattern for direct requests"
+                    "description": "URL regex for requests to not be sent directly from super proxy"
                 }
             }
         }
