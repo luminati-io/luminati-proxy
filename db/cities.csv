@@ -70,7 +70,9 @@ Abha,14,"'Asir",SA,Saudi Arabia
 Zanjan,11,Zanjan,IR,Iran
 ,25,Yazd,IR,Iran
 Yazd,25,Yazd,IR,Iran
+Tonekabon,21,Māzandarān,IR,Iran
 Tehran,07,Ostan-e Tehran,IR,Iran
+Takestan,28,Ostan-e Qazvin,IR,Iran
 Tabriz,01,East Azerbaijan,IR,Iran
 Shirvan,31,Ostan-e Khorasan-e Shomali,IR,Iran
 Shiraz,14,Fars,IR,Iran
@@ -84,7 +86,6 @@ Rafsanjan,15,Kerman,IR,Iran
 Qazvin,28,Ostan-e Qazvin,IR,Iran
 Urmia,02,Ostan-e Azarbayjan-e Gharbi,IR,Iran
 Miandoab,02,Ostan-e Azarbayjan-e Gharbi,IR,Iran
-Meybod,25,Yazd,IR,Iran
 ,21,Māzandarān,IR,Iran
 Mashhad,30,Razavi Khorasan,IR,Iran
 ,22,Markazi,IR,Iran
@@ -208,7 +209,6 @@ Naivasha,31,Nakuru District,KE,Kenya
 Nairobi,30,Nairobi Province,KE,Kenya
 Mombasa,28,Mombasa District,KE,Kenya
 Mbita,08,Homa Bay District,KE,Kenya
-Maseno,17,Kisumu,KE,Kenya
 Mandera,24,Mandera District,KE,Kenya
 Machakos,22,Machakos District,KE,Kenya
 Kisumu,17,Kisumu,KE,Kenya
@@ -322,7 +322,6 @@ Oropos,I,Attica,GR,Greece
 Papagou,I,Attica,GR,Greece
 Oia,L,South Aegean,GR,Greece
 Nikaia,I,Attica,GR,Greece
-Nemea,J,Peloponnese,GR,Greece
 Nea Smyrni,I,Attica,GR,Greece
 Neapoli,M,Crete,GR,Greece
 Nea Peramos,I,Attica,GR,Greece
@@ -786,7 +785,6 @@ Ashqelon,D,Southern District,IL,Israel
 Ashdod,D,Southern District,IL,Israel
 `Aseret,M,Central District,IL,Israel
 `Arugot,D,Southern District,IL,Israel
-`Amir,Z,Northern District,IL,Israel
 Acre,Z,Northern District,IL,Israel
 Ahituv,M,Central District,IL,Israel
 Ahihud,Z,Northern District,IL,Israel
@@ -812,6 +810,7 @@ Calardi,48,Muğla,TR,Turkey
 Viranşehir,63,Şanlıurfa,TR,Turkey
 ,65,Van,TR,Turkey
 Van,65,Van,TR,Turkey
+,64,Uşak,TR,Turkey
 Uşak,64,Uşak,TR,Turkey
 UErguep,50,Nevsehir,TR,Turkey
 ,63,Şanlıurfa,TR,Turkey
@@ -828,6 +827,7 @@ Sulumenli,03,Afyonkarahisar,TR,Turkey
 Sultandere,26,Eskişehir,TR,Turkey
 Soeke,09,Aydın,TR,Turkey
 Siverek,63,Şanlıurfa,TR,Turkey
+,58,Sivas,TR,Turkey
 Sivas,58,Sivas,TR,Turkey
 Sirnak,73,Şırnak,TR,Turkey
 Sincan,06,Ankara,TR,Turkey
@@ -860,7 +860,6 @@ Nazilli,09,Aydın,TR,Turkey
 Narlidere,35,Izmir,TR,Turkey
 Naldoken,35,Izmir,TR,Turkey
 ,49,Muş,TR,Turkey
-,48,Muğla,TR,Turkey
 Mugla,48,Muğla,TR,Turkey
 Mucur,40,Kırşehir,TR,Turkey
 Milas,48,Muğla,TR,Turkey
@@ -949,7 +948,9 @@ Etimesgut,06,Ankara,TR,Turkey
 Eskişehir,26,Eskişehir,TR,Turkey
 Eskisaray,64,Uşak,TR,Turkey
 Niyazlar,15,Burdur,TR,Turkey
+,25,Erzurum,TR,Turkey
 Erzurum,25,Erzurum,TR,Turkey
+,24,Erzincan,TR,Turkey
 Erzincan,24,Erzincan,TR,Turkey
 Heraclea,42,Konya,TR,Turkey
 Erdemli,33,Mersin,TR,Turkey
@@ -1076,6 +1077,7 @@ Akarca,48,Muğla,TR,Turkey
 Ahmetbeyli,35,Izmir,TR,Turkey
 Ahmetbeyler,35,Izmir,TR,Turkey
 Ahiboz,06,Ankara,TR,Turkey
+,04,Ağrı,TR,Turkey
 Akcakale,58,Sivas,TR,Turkey
 Agalar,33,Mersin,TR,Turkey
 Agacsever,21,Diyarbakir,TR,Turkey
@@ -1133,7 +1135,6 @@ Shubra,C,Cairo Governorate,EG,Egypt
 Shirbin,DK,Dakahlia,EG,Egypt
 Shibīn al Qanāţir,KB,Qalyubia,EG,Egypt
 Shibin al Kawm,MNF,Monufia,EG,Egypt
-Ramsis,BH,Beheira,EG,Egypt
 Rafah,SIN,North Sinai,EG,Egypt
 Quwaysina,MNF,Monufia,EG,Egypt
 Kousa,KN,Qena,EG,Egypt
@@ -1199,6 +1200,7 @@ Alexandria,ALX,Alexandria,EG,Egypt
 Al Haram,GZ,Giza,EG,Egypt
 Hurghada,BA,Red Sea,EG,Egypt
 Al Fayyum,FYM,Faiyum,EG,Egypt
+,BH,Beheira,EG,Egypt
 Aga,DK,Dakahlia,EG,Egypt
 Ad Dilinjat,BH,Beheira,EG,Egypt
 Abu Hammad,SHR,Sharqia,EG,Egypt
@@ -1243,6 +1245,7 @@ Batikent,06,Ankara,TR,Turkey
 ,28,Ostan-e Qazvin,IR,Iran
 ,AA,Addis Ababa,ET,Ethiopia
 Limnos,K,North Aegean,GR,Greece
+Stavros,D,Epirus,GR,Greece
 Perifereiaki Enotita Androu,L,South Aegean,GR,Greece
 Dalaman,48,Muğla,TR,Turkey
 Hittin,01,Ar Riyāḑ,SA,Saudi Arabia
@@ -1250,6 +1253,7 @@ An Nakhil,01,Ar Riyāḑ,SA,Saudi Arabia
 Al Faruq,01,Ar Riyāḑ,SA,Saudi Arabia
 Udomlya,TVE,"Tverskaya Oblast'",RU,Russia
 ,,,EE,Estonia
+,17,Oblast Razgrad,BG,Bulgaria
 Valmiera,VMR,Valmiera District,LV,Latvia
 Zilupe,110,Zilupes Novads,LV,Latvia
 Zentene,099,Tukuma Rajons,LV,Latvia
@@ -1625,7 +1629,6 @@ Rzhavka,PNZ,"Penzenskaya Oblast'",RU,Russia
 Rybnoye,RYA,"Ryazanskaya Oblast'",RU,Russia
 Rybinsk,YAR,"Yaroslavskaya Oblast'",RU,Russia
 Ryazhsk,RYA,"Ryazanskaya Oblast'",RU,Russia
-,RYA,"Ryazanskaya Oblast'",RU,Russia
 Ryazan,RYA,"Ryazanskaya Oblast'",RU,Russia
 Ryabovo,LEN,"Leningradskaya Oblast'",RU,Russia
 Ryabovo,UD,Udmurtskaya Respublika,RU,Russia
@@ -1653,6 +1656,7 @@ Rasskazovo,TAM,"Tambovskaya Oblast'",RU,Russia
 Rameshki,TVE,"Tverskaya Oblast'",RU,Russia
 Ramenskoye,MOS,Moscow Oblast,RU,Russia
 Pyskor,PER,Perm Krai,RU,Russia
+Pyatigorskiy,STA,"Stavropol'skiy Kray",RU,Russia
 Pyatigorsk,STA,"Stavropol'skiy Kray",RU,Russia
 Putilkovo,MOS,Moscow Oblast,RU,Russia
 Pushkino,MOS,Moscow Oblast,RU,Russia
@@ -1776,6 +1780,7 @@ Novocherkassk,ROS,Rostov,RU,Russia
 Novocheboksarsk,CU,Chuvashia,RU,Russia
 Novoaleksandrovsk,STA,"Stavropol'skiy Kray",RU,Russia
 ,NGR,"Novgorodskaya Oblast'",RU,Russia
+Novgorodskaya,VLG,"Vologodskaya Oblast'",RU,Russia
 Veliky Novgorod,NGR,"Novgorodskaya Oblast'",RU,Russia
 "Novaya Usman'",VOR,"Voronezhskaya Oblast'",RU,Russia
 Novaya Tavolzhanka,BEL,"Belgorodskaya Oblast'",RU,Russia
@@ -2668,6 +2673,7 @@ Bacioi,CU,Chișinău Municipality,MD,Republic of Moldova
 Zhodzina,MI,Minsk,BY,Belarus
 Zhlobin,HO,Gomel,BY,Belarus
 Vitebsk,VI,Vitebsk,BY,Belarus
+,VI,Vitebsk,BY,Belarus
 Ushachy,VI,Vitebsk,BY,Belarus
 Svyetlahorsk,HO,Gomel,BY,Belarus
 "Staraya Lepel'",VI,Vitebsk,BY,Belarus
@@ -2701,6 +2707,7 @@ Dzyarzhynsk,MI,Minsk,BY,Belarus
 Dovsk,HO,Gomel,BY,Belarus
 Chavusi,MA,Mogilev,BY,Belarus
 Bykhaw,MA,Mogilev,BY,Belarus
+,BR,Brest,BY,Belarus
 Brest,BR,Brest,BY,Belarus
 Byeshankovichy,VI,Vitebsk,BY,Belarus
 Bereza,BR,Brest,BY,Belarus
@@ -2717,7 +2724,6 @@ Yli-Ii,14,Northern Ostrobothnia,FI,Finland
 Ylihaermae,IS,Eastern Finland,FI,Finland
 Ylaene,19,Southwest Finland,FI,Finland
 Ylaemylly,13,North Karelia,FI,Finland
-Vuokatti,05,Kainuu,FI,Finland
 Vuohijärvi,09,Kymenlaakso,FI,Finland
 Visuvesi,LL,Lapponia,FI,Finland
 Virrat,LL,Lapponia,FI,Finland
@@ -2992,7 +2998,6 @@ Lammi,06,Haeme,FI,Finland
 Laitila,19,Southwest Finland,FI,Finland
 Laihia,12,Ostrobothnia,FI,Finland
 Lahti,16,Päijänne Tavastia,FI,Finland
-Kyyjärvi,08,Central Finland,FI,Finland
 Kyroeskoski,LL,Lapponia,FI,Finland
 Kirkkonummi,18,Uusimaa,FI,Finland
 Kvevlax,12,Ostrobothnia,FI,Finland
@@ -3055,6 +3060,7 @@ Katinala,06,Haeme,FI,Finland
 Kaskinen,12,Ostrobothnia,FI,Finland
 Karvoskylä,14,Northern Ostrobothnia,FI,Finland
 Karvia,17,Satakunta,FI,Finland
+Karstula,08,Central Finland,FI,Finland
 Kärsämäki,14,Northern Ostrobothnia,FI,Finland
 Karkkila,18,Uusimaa,FI,Finland
 Karjalohja,18,Uusimaa,FI,Finland
@@ -3097,6 +3103,7 @@ Jaemijaervi,17,Satakunta,FI,Finland
 Jalasjaervi,IS,Eastern Finland,FI,Finland
 Jakobstad,12,Ostrobothnia,FI,Finland
 Jääli,14,Northern Ostrobothnia,FI,Finland
+Ivalo,10,Lapland,FI,Finland
 Isojoki,IS,Eastern Finland,FI,Finland
 Iso Evo,06,Haeme,FI,Finland
 Inkeroinen,09,Kymenlaakso,FI,Finland
@@ -3177,6 +3184,7 @@ Aijala,19,Southwest Finland,FI,Finland
 Ahmovaara,13,North Karelia,FI,Finland
 Äänekoski,08,Central Finland,FI,Finland
 Zlatna,AB,Judetul Alba,RO,Romania
+Zimnicea,TR,Teleorman,RO,Romania
 Zarnesti,BV,Judetul Brasov,RO,Romania
 Zarnesti,BZ,Judetul Buzau,RO,Romania
 Zarand,AR,Arad,RO,Romania
@@ -3358,7 +3366,6 @@ Simeria,HD,Hunedoara,RO,Romania
 Silistea Crucii,DJ,Dolj,RO,Romania
 Silistea,AG,Judetul Arges,RO,Romania
 Sighetu Marmaţiei,MM,Maramureş,RO,Romania
-Siculeni,HR,Harghita,RO,Romania
 Sibiu,SB,Judetul Sibiu,RO,Romania
 Sfantu-Gheorghe,CV,Covasna,RO,Romania
 Sfantu Gheorghe,TL,Tulcea,RO,Romania
@@ -3939,6 +3946,7 @@ Beresti,GL,Judetul Galati,RO,Romania
 Beregsau Mare,TM,Judetul Timis,RO,Romania
 Berechiu,AR,Arad,RO,Romania
 Berchisesti,SV,Suceava,RO,Romania
+Berceni,PH,Prahova,RO,Romania
 Berceni,GR,Giurgiu,RO,Romania
 Berbesti,VL,Judetul Valcea,RO,Romania
 Bengesti,GJ,Gorj,RO,Romania
@@ -4167,6 +4175,7 @@ Kvasyliv,56,"Rivnens'ka Oblast'",UA,Ukraine
 Kurakhovo,14,"Donets'ka Oblast'",UA,Ukraine
 Kryzhanivka,51,Odessa,UA,Ukraine
 Kryvyi Rih,12,"Dnipropetrovska Oblast'",UA,Ukraine
+,43,Republic of Crimea,UA,Ukraine
 Krolevets,59,"Sums'ka Oblast'",UA,Ukraine
 Kryvyy Rih,65,"Khersons'ka Oblast'",UA,Ukraine
 Kreminna,09,"Luhans'ka Oblast'",UA,Ukraine
@@ -4569,7 +4578,6 @@ Hajdunanas,HB,Hajdú-Bihar,HU,Hungary
 Hajduhadhaz,HB,Hajdú-Bihar,HU,Hungary
 Hajdudorog,HB,Hajdú-Bihar,HU,Hungary
 Hajduboszormeny,HB,Hajdú-Bihar,HU,Hungary
-,HB,Hajdú-Bihar,HU,Hungary
 Gyulahaza,SZ,Szabolcs-Szatmár-Bereg,HU,Hungary
 Gyula,BE,Bekes,HU,Hungary
 Gyomaendrod,BE,Bekes,HU,Hungary
@@ -4840,7 +4848,6 @@ Sestrino,01,Blagoevgrad,BG,Bulgaria
 Selanovtsi,06,Oblast Vratsa,BG,Bulgaria
 Sandanski,01,Blagoevgrad,BG,Bulgaria
 Samuilovo,20,Oblast Sliven,BG,Bulgaria
-Samovodene,04,Oblast Veliko Tarnovo,BG,Bulgaria
 Samokov,23,Sofia,BG,Bulgaria
 Rousse,18,Oblast Ruse,BG,Bulgaria
 ,18,Oblast Ruse,BG,Bulgaria
@@ -4868,6 +4875,7 @@ Pomorie,02,Burgas,BG,Bulgaria
 Polski Trambesh,04,Oblast Veliko Tarnovo,BG,Bulgaria
 Podvis,02,Burgas,BG,Bulgaria
 Plovdiv,16,Plovdiv,BG,Bulgaria
+,16,Plovdiv,BG,Bulgaria
 Pleven,15,Oblast Pleven,BG,Bulgaria
 Pirdop,23,Sofia,BG,Bulgaria
 Petarch,23,Sofia,BG,Bulgaria
@@ -4877,6 +4885,7 @@ Perushtitsa,16,Plovdiv,BG,Bulgaria
 Pernik,14,Pernik,BG,Bulgaria
 Pazardzhik,13,Pazardzhik,BG,Bulgaria
 Pavlikeni,04,Oblast Veliko Tarnovo,BG,Bulgaria
+Pavel Banya,24,Oblast Stara Zagora,BG,Bulgaria
 Panicheri,16,Plovdiv,BG,Bulgaria
 Panagyurishte,13,Pazardzhik,BG,Bulgaria
 Orizovo,24,Oblast Stara Zagora,BG,Bulgaria
@@ -4903,6 +4912,7 @@ Lazhnitsa,01,Blagoevgrad,BG,Bulgaria
 Lukovit,11,Lovech,BG,Bulgaria
 Lozenets,02,Burgas,BG,Bulgaria
 Lovech,11,Lovech,BG,Bulgaria
+,11,Lovech,BG,Bulgaria
 Lom,12,Oblast Montana,BG,Bulgaria
 Levski,15,Oblast Pleven,BG,Bulgaria
 Lakarevo,11,Lovech,BG,Bulgaria
@@ -5087,6 +5097,7 @@ Tuzla,34,Istanbul,TR,Turkey
 Turkoba,34,Istanbul,TR,Turkey
 ,61,Trabzon,TR,Turkey
 Trabzon,61,Trabzon,TR,Turkey
+,60,Tokat,TR,Turkey
 Tokat Province,60,Tokat,TR,Turkey
 Tepebasi,14,Bolu,TR,Turkey
 ,59,Tekirdağ,TR,Turkey
@@ -5098,6 +5109,7 @@ Suluova,05,Amasya,TR,Turkey
 Suadiye,34,Istanbul,TR,Turkey
 Sogukpinar,16,Bursa,TR,Turkey
 Sisli,34,Istanbul,TR,Turkey
+,57,Sinop,TR,Turkey
 Sinop,57,Sinop,TR,Turkey
 Atayurt,61,Trabzon,TR,Turkey
 Siliviri,34,Istanbul,TR,Turkey
@@ -5113,7 +5125,6 @@ Armagan,53,Rize,TR,Turkey
 Salacak,34,Istanbul,TR,Turkey
 ,53,Rize,TR,Turkey
 Rize,53,Rize,TR,Turkey
-Piri,37,Kastamonu,TR,Turkey
 Pendik,34,Istanbul,TR,Turkey
 Ovecler,37,Kastamonu,TR,Turkey
 Orhangazi,16,Bursa,TR,Turkey
@@ -5607,7 +5618,6 @@ Nowiniki,PD,Podlasie,PL,Poland
 Nowe Miasto nad Pilica,MZ,Mazovia,PL,Poland
 Nowa Slupia,SK,Świętokrzyskie,PL,Poland
 Nowa Sarzyna,PK,Subcarpathian Voivodeship,PL,Poland
-Nowa Huta,MA,Lesser Poland Voivodeship,PL,Poland
 Nowa Deba,PK,Subcarpathian Voivodeship,PL,Poland
 Nisko,PK,Subcarpathian Voivodeship,PL,Poland
 Niewodnica Korycka,PD,Podlasie,PL,Poland
@@ -5981,6 +5991,7 @@ Borki Wielbarskie,WN,Warmia-Masuria,PL,Poland
 Bolimów,LD,Łódź Voivodeship,PL,Poland
 Bolescice,SK,Świętokrzyskie,PL,Poland
 Bokiny,PD,Podlasie,PL,Poland
+Bohdan,PD,Podlasie,PL,Poland
 Bogumily,WN,Warmia-Masuria,PL,Poland
 Bogumilowice,MA,Lesser Poland Voivodeship,PL,Poland
 Bogucin,LU,Lublin,PL,Poland
@@ -6366,6 +6377,7 @@ Celmraugciems,041,Jelgavas Rajons,LV,Latvia
 Teplodar,51,Odessa,UA,Ukraine
 Triandría,B,Central Macedonia,GR,Greece
 ,IF,Ilfov,RO,Romania
+,81,Duezce,TR,Turkey
 ,05,Qarku i Gjirokastres,AL,Albania
 Savski Venac,00,Belgrade,RS,Serbia
 "Gmbet'",AV,Armavir,AM,Armenia
@@ -6440,11 +6452,11 @@ Grande Riviere Noire,BL,Black River District,MU,Mauritius
 Quatre Bornes,PW,Plaines Wilhems District,MU,Mauritius
 Port Louis,PL,Port Louis District,MU,Mauritius
 Pamplemousses,PA,Pamplemousses District,MU,Mauritius
+,MO,Moka District,MU,Mauritius
 Moka,MO,Moka District,MU,Mauritius
 ,,,MU,Mauritius
 Mare Tabac,GP,Grand Port District,MU,Mauritius
 Mahebourg,GP,Grand Port District,MU,Mauritius
-Le Reduit,MO,Moka District,MU,Mauritius
 Grande Rosalie,PA,Pamplemousses District,MU,Mauritius
 Grand Baie,RR,Riviere du Rempart District,MU,Mauritius
 Goodlands,RR,Riviere du Rempart District,MU,Mauritius
@@ -6552,6 +6564,7 @@ Soweto,GT,Gauteng,ZA,South Africa
 ,,,ZA,South Africa
 Soshanguve,GT,Gauteng,ZA,South Africa
 Somerset East,EC,Eastern Cape,ZA,South Africa
+Silverton,GT,Gauteng,ZA,South Africa
 Shelly Beach,NL,KwaZulu-Natal,ZA,South Africa
 Sheffield Beach,NL,KwaZulu-Natal,ZA,South Africa
 Senekal,FS,Orange Free State,ZA,South Africa
@@ -6622,7 +6635,6 @@ Mtunzini,NL,KwaZulu-Natal,ZA,South Africa
 Mount Edgecombe,NL,KwaZulu-Natal,ZA,South Africa
 Mossel Bay,WC,Western Cape,ZA,South Africa
 Mooi River,NL,KwaZulu-Natal,ZA,South Africa
-Monument Park,GT,Gauteng,ZA,South Africa
 Monteseel,NL,KwaZulu-Natal,ZA,South Africa
 Modderfontein,GT,Gauteng,ZA,South Africa
 Mmabatho,NW,Province of North West,ZA,South Africa
@@ -6698,7 +6710,6 @@ Howick,NL,KwaZulu-Natal,ZA,South Africa
 Houghton Estate,GT,Gauteng,ZA,South Africa
 Hopetown,NC,Northern Cape,ZA,South Africa
 Honeydew,GT,Gauteng,ZA,South Africa
-Hogsback,EC,Eastern Cape,ZA,South Africa
 Hoedspruit,LP,Limpopo,ZA,South Africa
 Himeville,NL,KwaZulu-Natal,ZA,South Africa
 Hilton,NL,KwaZulu-Natal,ZA,South Africa
@@ -6742,7 +6753,6 @@ Ermelo,MP,Mpumalanga,ZA,South Africa
 Erasmia,GT,Gauteng,ZA,South Africa
 Empangeni,NL,KwaZulu-Natal,ZA,South Africa
 Emmarentia,GT,Gauteng,ZA,South Africa
-Emerald Hill,EC,Eastern Cape,ZA,South Africa
 eMbalenhle,MP,Mpumalanga,ZA,South Africa
 Eldoraigne,GT,Gauteng,ZA,South Africa
 Eldoradopark,GT,Gauteng,ZA,South Africa
@@ -6922,6 +6932,7 @@ Kamphaeng Phet,62,Changwat Kamphaeng Phet,TH,Thailand
 Hua Hin,77,Changwat Prachuap Khiri Khan,TH,Thailand
 Hang Dong,50,Chiang Mai Province,TH,Thailand
 Damnoen Saduak,70,Changwat Ratchaburi,TH,Thailand
+,86,Changwat Chumphon,TH,Thailand
 Chumphon,86,Changwat Chumphon,TH,Thailand
 ,57,Changwat Chiang Rai,TH,Thailand
 Chiang Rai,57,Changwat Chiang Rai,TH,Thailand
@@ -7030,7 +7041,7 @@ Jhelum,PB,Punjab,PK,Pakistan
 Jauharabad,PB,Punjab,PK,Pakistan
 Jāmshoro,SD,Sindh,PK,Pakistan
 Jallozai,KP,Khyber Pakhtunkhwa,PK,Pakistan
-Jalalpur,PB,Punjab,PK,Pakistan
+Jalalpur Jattan,PB,Punjab,PK,Pakistan
 Jalalia,PB,Punjab,PK,Pakistan
 Jahangira,KP,Khyber Pakhtunkhwa,PK,Pakistan
 Islamabad,IS,Islamabad Capital Territory,PK,Pakistan
@@ -7060,7 +7071,7 @@ Dinga,PB,Punjab,PK,Pakistan
 Dina,JK,Azad Kashmir,PK,Pakistan
 Digri,SD,Sindh,PK,Pakistan
 Dera Ghazi Khan,PB,Punjab,PK,Pakistan
-Daska,PB,Punjab,PK,Pakistan
+Daska Kalan,PB,Punjab,PK,Pakistan
 Dadu,SD,Sindh,PK,Pakistan
 Clifton,SD,Sindh,PK,Pakistan
 Chichawatni,PB,Punjab,PK,Pakistan
@@ -7122,6 +7133,7 @@ Kabanjahe,SU,North Sumatra,ID,Indonesia
 Gunungsitoli,SU,North Sumatra,ID,Indonesia
 Galang,SU,North Sumatra,ID,Indonesia
 Bali,SU,North Sumatra,ID,Indonesia
+Bandar,SU,North Sumatra,ID,Indonesia
 Banda Aceh,AC,Aceh,ID,Indonesia
 Adiantorop,SU,North Sumatra,ID,Indonesia
 ,AC,Aceh,ID,Indonesia
@@ -7214,10 +7226,8 @@ Vidisha,MP,Madhya Pradesh,IN,India
 Vesava,MH,Maharashtra,IN,India
 Vellore,TN,Tamil Nadu,IN,India
 Vayalar,KL,Kerala,IN,India
-Vashi,MH,Maharashtra,IN,India
 Vasco,GA,Goa,IN,India
 Vasai,MH,Maharashtra,IN,India
-Varkala,KL,Kerala,IN,India
 Varangaon,MH,Maharashtra,IN,India
 Varanasi,UP,Uttar Pradesh,IN,India
 Vaniyambadi,TN,Tamil Nadu,IN,India
@@ -7292,8 +7302,9 @@ Suratgarh,RJ,Rajasthan,IN,India
 Surandai,TN,Tamil Nadu,IN,India
 Supaul,BR,Bihar,IN,India
 Suntikoppa,KA,Karnataka,IN,India
+Sundargarh,OR,Odisha,IN,India
 Sunam,PB,Punjab,IN,India
-Sultans Battery,KL,Kerala,IN,India
+Ganapathivattam,KL,Kerala,IN,India
 Sultanpur,UP,Uttar Pradesh,IN,India
 Srivilliputhur,TN,Tamil Nadu,IN,India
 Sriperumbudur,TN,Tamil Nadu,IN,India
@@ -7404,6 +7415,7 @@ Raurkela,OR,Odisha,IN,India
 Ratnagiri,MH,Maharashtra,IN,India
 Ratlam,MP,Madhya Pradesh,IN,India
 Raniganj,WB,West Bengal,IN,India
+Rani,RJ,Rajasthan,IN,India
 Rangli,SK,Sikkim,IN,India
 Ranchi,JH,Jharkhand,IN,India
 Ranaghat,WB,West Bengal,IN,India
@@ -7435,6 +7447,7 @@ Raebareli,UP,Uttar Pradesh,IN,India
 Kollam,KL,Kerala,IN,India
 Kasba,BR,Bihar,IN,India
 Puttur,KA,Karnataka,IN,India
+Pushkar,RJ,Rajasthan,IN,India
 Pusa,BR,Bihar,IN,India
 Puruliya,WB,West Bengal,IN,India
 Puri,OR,Odisha,IN,India
@@ -7463,6 +7476,7 @@ Peelamedu,TN,Tamil Nadu,IN,India
 Phursungi,MH,Maharashtra,IN,India
 Phaltan,MH,Maharashtra,IN,India
 Phagwara,PB,Punjab,IN,India
+Perundurai,TN,Tamil Nadu,IN,India
 Pernem,GA,Goa,IN,India
 Perambur,TN,Tamil Nadu,IN,India
 Perambalur,TN,Tamil Nadu,IN,India
@@ -7503,7 +7517,6 @@ Palitana,GJ,Gujarat,IN,India
 Palakkad,KL,Kerala,IN,India
 Palghar,MH,Maharashtra,IN,India
 Palayankottai,TN,Tamil Nadu,IN,India
-Palayam,KL,Kerala,IN,India
 Palasa,AP,Andhra Pradesh,IN,India
 Palanpur,GJ,Gujarat,IN,India
 Palampur,HP,Himachal Pradesh,IN,India
@@ -7548,7 +7561,6 @@ Nandura Buzurg,MH,Maharashtra,IN,India
 Nandigama,AP,Andhra Pradesh,IN,India
 Nanded,MH,Maharashtra,IN,India
 Nandalur,AP,Andhra Pradesh,IN,India
-Namchi,SK,Sikkim,IN,India
 Namakkal,TN,Tamil Nadu,IN,India
 Nalgonda,TG,Telangana,IN,India
 Nalagarh,HP,Himachal Pradesh,IN,India
@@ -7616,7 +7628,6 @@ Majalgaon,MH,Maharashtra,IN,India
 Manjeri,KL,Kerala,IN,India
 Manipala,KA,Karnataka,IN,India
 Manimala,KL,Kerala,IN,India
-Mangaon,MH,Maharashtra,IN,India
 Mangalore,KA,Karnataka,IN,India
 Mangalam,TN,Tamil Nadu,IN,India
 Mangalagiri,AP,Andhra Pradesh,IN,India
@@ -7628,7 +7639,7 @@ Mandi,HP,Himachal Pradesh,IN,India
 Mandal,GJ,Gujarat,IN,India
 Mancherial,TG,Telangana,IN,India
 Manchar,MH,Maharashtra,IN,India
-Mananthavady,KL,Kerala,IN,India
+Manantoddy,KL,Kerala,IN,India
 Manali,HP,Himachal Pradesh,IN,India
 West Mambalam,TN,Tamil Nadu,IN,India
 Mahabalipuram,TN,Tamil Nadu,IN,India
@@ -7674,10 +7685,12 @@ Loni,UP,Uttar Pradesh,IN,India
 Lonavla,MH,Maharashtra,IN,India
 Lohogaon,MH,Maharashtra,IN,India
 Latur,MH,Maharashtra,IN,India
+Lamba Harisingh,RJ,Rajasthan,IN,India
 Lalitpur,UP,Uttar Pradesh,IN,India
 Lalgola,WB,West Bengal,IN,India
 Lalaguda,TG,Telangana,IN,India
-Lakkidi,KL,Kerala,IN,India
+Lala,AS,Assam,IN,India
+Lakkiti,KL,Kerala,IN,India
 Lakhimpur,UP,Uttar Pradesh,IN,India
 Ladwa,HR,Haryana,IN,India
 Ladnun,RJ,Rajasthan,IN,India
@@ -7687,7 +7700,6 @@ Kutiatodu,KL,Kerala,IN,India
 Kushalnagar,KA,Karnataka,IN,India
 Kurnool,AP,Andhra Pradesh,IN,India
 Kurla,MH,Maharashtra,IN,India
-Kuppam,AP,Andhra Pradesh,IN,India
 Kunnamkulam,KL,Kerala,IN,India
 Kunigal,KA,Karnataka,IN,India
 Kumta,KA,Karnataka,IN,India
@@ -7778,6 +7790,7 @@ Karimpur,WB,West Bengal,IN,India
 Karimnagar,TG,Telangana,IN,India
 Karimganj,AS,Assam,IN,India
 Karamsad,GJ,Gujarat,IN,India
+Karamadai,TN,Tamil Nadu,IN,India
 Karaikudi,TN,Tamil Nadu,IN,India
 Karaikal,PY,Union Territory of Puducherry,IN,India
 Karad,MH,Maharashtra,IN,India
@@ -7789,6 +7802,7 @@ Kanhangad,KL,Kerala,IN,India
 Kankroli,RJ,Rajasthan,IN,India
 Kankon,GA,Goa,IN,India
 Kankinara,WB,West Bengal,IN,India
+Kanigiri,AP,Andhra Pradesh,IN,India
 Kangar,HP,Himachal Pradesh,IN,India
 Kangayam,TN,Tamil Nadu,IN,India
 Kandi,WB,West Bengal,IN,India
@@ -7802,7 +7816,7 @@ Kalyan,MH,Maharashtra,IN,India
 Kalwara,RJ,Rajasthan,IN,India
 Kalva,MH,Maharashtra,IN,India
 Kalundri,MH,Maharashtra,IN,India
-Kalpetta,KL,Kerala,IN,India
+Kalpatta,KL,Kerala,IN,India
 Kalpakkam,TN,Tamil Nadu,IN,India
 Kalol,GJ,Gujarat,IN,India
 Kali,MH,Maharashtra,IN,India
@@ -7925,6 +7939,7 @@ Gulbarga,KA,Karnataka,IN,India
 Guindy,TN,Tamil Nadu,IN,India
 Gudiyatham,TN,Tamil Nadu,IN,India
 Gudivada,AP,Andhra Pradesh,IN,India
+Goregaon,MH,Maharashtra,IN,India
 Gorakhpur,UP,Uttar Pradesh,IN,India
 Gobichettipalayam,TN,Tamil Nadu,IN,India
 Gopalpur,OR,Odisha,IN,India
@@ -7933,6 +7948,7 @@ Gondia,MH,Maharashtra,IN,India
 Gondal,GJ,Gujarat,IN,India
 Gonda City,UP,Uttar Pradesh,IN,India
 Gollapudi,AP,Andhra Pradesh,IN,India
+Gokak,KA,Karnataka,IN,India
 Gohana,HR,Haryana,IN,India
 Godhra,GJ,Gujarat,IN,India
 ,GA,Goa,IN,India
@@ -7961,6 +7977,7 @@ Gadarwara,MP,Madhya Pradesh,IN,India
 Gadag,KA,Karnataka,IN,India
 Fort,TN,Tamil Nadu,IN,India
 Ferozepore,PB,Punjab,IN,India
+Firozabad,UP,Uttar Pradesh,IN,India
 Fatehgarh,PB,Punjab,IN,India
 Faridkot,PB,Punjab,IN,India
 Faridabad,HR,Haryana,IN,India
@@ -7975,7 +7992,7 @@ Elur,KL,Kerala,IN,India
 Egra,WB,West Bengal,IN,India
 Egmore,TN,Tamil Nadu,IN,India
 Edappal,KL,Kerala,IN,India
-Edapalli,KL,Kerala,IN,India
+Edappalli,KL,Kerala,IN,India
 Dwarka,GJ,Gujarat,IN,India
 Durgapur,WB,West Bengal,IN,India
 Durg,CT,Chhattisgarh,IN,India
@@ -8016,7 +8033,6 @@ Dhampur,UP,Uttar Pradesh,IN,India
 Dewas,MP,Madhya Pradesh,IN,India
 Devapur,TG,Telangana,IN,India
 Deulgaon Raja,MH,Maharashtra,IN,India
-Dergaon,AS,Assam,IN,India
 Deoband,UP,Uttar Pradesh,IN,India
 ,DL,National Capital Territory of Delhi,IN,India
 Delhi,DL,National Capital Territory of Delhi,IN,India
@@ -8057,7 +8073,6 @@ Coimbatore,TN,Tamil Nadu,IN,India
 Kochi,KL,Kerala,IN,India
 Churu,RJ,Rajasthan,IN,India
 Chunchura,WB,West Bengal,IN,India
-Sholavandan,TN,Tamil Nadu,IN,India
 Chittoor,AP,Andhra Pradesh,IN,India
 Chittaurgarh,RJ,Rajasthan,IN,India
 Chittaranjan,WB,West Bengal,IN,India
@@ -8067,6 +8082,7 @@ Chiplun,MH,Maharashtra,IN,India
 Chintamani,KA,Karnataka,IN,India
 Chinnamanur,TN,Tamil Nadu,IN,India
 Chinchinim,GA,Goa,IN,India
+Chikodi,KA,Karnataka,IN,India
 Chikmagalūr,KA,Karnataka,IN,India
 Chikhli,GJ,Gujarat,IN,India
 Chikhli,MH,Maharashtra,IN,India
@@ -8077,8 +8093,8 @@ Chhindwara,MP,Madhya Pradesh,IN,India
 Chhaprauli,UP,Uttar Pradesh,IN,India
 Chettipalaiyam,TN,Tamil Nadu,IN,India
 Chengannur,KL,Kerala,IN,India
-Chengalpattu,TN,Tamil Nadu,IN,India
-Chavakkad,KL,Kerala,IN,India
+Chingleput,TN,Tamil Nadu,IN,India
+Chetwayi,KL,Kerala,IN,India
 Chaukhandi,UP,Uttar Pradesh,IN,India
 Chatrapur,OR,Odisha,IN,India
 Charthawal,UP,Uttar Pradesh,IN,India
@@ -8086,7 +8102,6 @@ Charkhi Dadri,HR,Haryana,IN,India
 Charkhi,HR,Haryana,IN,India
 Chhapar,HR,Haryana,IN,India
 Chapar,AS,Assam,IN,India
-Chani,RJ,Rajasthan,IN,India
 Changanacheri,KL,Kerala,IN,India
 Chanda,MH,Maharashtra,IN,India
 Chandpur,UP,Uttar Pradesh,IN,India
@@ -8164,6 +8179,7 @@ Bhadla,GJ,Gujarat,IN,India
 Betul,MP,Madhya Pradesh,IN,India
 Bettiah,BR,Bihar,IN,India
 Betim,GA,Goa,IN,India
+Berasia,MP,Madhya Pradesh,IN,India
 Beraja,GJ,Gujarat,IN,India
 Benaulim,GA,Goa,IN,India
 Bemetara,CT,Chhattisgarh,IN,India
@@ -8280,8 +8296,8 @@ Arunachal,AS,Assam,IN,India
 Arnauli,HR,Haryana,IN,India
 Arjuni,MH,Maharashtra,IN,India
 Ariyalur,TN,Tamil Nadu,IN,India
-Aravankadu,TN,Tamil Nadu,IN,India
-Arani,TN,Tamil Nadu,IN,India
+Aruvankad,TN,Tamil Nadu,IN,India
+Arni,TN,Tamil Nadu,IN,India
 Arambagh,WB,West Bengal,IN,India
 Arakkonam,TN,Tamil Nadu,IN,India
 Arrah,BR,Bihar,IN,India
@@ -8293,7 +8309,7 @@ Ankalgi,KA,Karnataka,IN,India
 Anjar,GJ,Gujarat,IN,India
 Angul,OR,Odisha,IN,India
 Angamali,KL,Kerala,IN,India
-Angadipuram,KL,Kerala,IN,India
+Angadipram,KL,Kerala,IN,India
 Anekal,KA,Karnataka,IN,India
 Andori,MH,Maharashtra,IN,India
 Anthiyur,TN,Tamil Nadu,IN,India
@@ -8375,11 +8391,9 @@ Abohar,PB,Punjab,IN,India
 ,54,Tibet,CN,China
 Shengping,53,Yunnan,CN,China
 ,63,Qinghai,CN,China
-Nangxian,54,Tibet,CN,China
 Lung,54,Tibet,CN,China
 Lhasa,54,Tibet,CN,China
 Kashgar,65,Xinjiang,CN,China
-Deqen,54,Tibet,CN,China
 Malé,26,Kaafu Atoll,MV,Maldives
 ,,,MV,Maldives
 ,,,IO,British Indian Ocean Territory
@@ -8442,7 +8456,6 @@ Narayanpur,WB,West Bengal,IN,India
 Dhamrai,C,Dhaka Division,BD,Bangladesh
 Ula,WB,West Bengal,IN,India
 Kumarpara,WB,West Bengal,IN,India
-Manipur,WB,West Bengal,IN,India
 Savar Upazila,C,Dhaka Division,BD,Bangladesh
 Cantt,BA,Balochistan,PK,Pakistan
 Rashang,KP,Khyber Pakhtunkhwa,PK,Pakistan
@@ -8801,6 +8814,8 @@ Dzhezkazgan,KAR,Qaraghandy Oblysy,KZ,Kazakhstan
 Taraz,ZHA,Zhambyl Oblysy,KZ,Kazakhstan
 ,VOS,East Kazakhstan,KZ,Kazakhstan
 Turkestan,YUZ,South Kazakhstan,KZ,Kazakhstan
+Turgen,ALM,Almaty Oblysy,KZ,Kazakhstan
+,AKM,Aqmola Oblysy,KZ,Kazakhstan
 Tobol,KUS,Qostanay Oblysy,KZ,Kazakhstan
 Temirtau,KAR,Qaraghandy Oblysy,KZ,Kazakhstan
 Tekeli,ALM,Almaty Oblysy,KZ,Kazakhstan
@@ -8815,6 +8830,7 @@ Semey,VOS,East Kazakhstan,KZ,Kazakhstan
 Rudnyy,KUS,Qostanay Oblysy,KZ,Kazakhstan
 Kyzylorda,KZY,Qyzylorda Oblysy,KZ,Kazakhstan
 Kostanay,KUS,Qostanay Oblysy,KZ,Kazakhstan
+Qaskeleng,ALM,Almaty Oblysy,KZ,Kazakhstan
 Petropavl,SEV,North Kazakhstan,KZ,Kazakhstan
 ,PAV,Pavlodar Oblysy,KZ,Kazakhstan
 Pavlodar,PAV,Pavlodar Oblysy,KZ,Kazakhstan
@@ -8870,6 +8886,7 @@ Snezhinsk,CHE,Chelyabinsk,RU,Russia
 Larichikha,ALT,Altai Krai,RU,Russia
 Koshurnikovo,KYA,Krasnoyarskiy Kray,RU,Russia
 Berezovskiy,KYA,Krasnoyarskiy Kray,RU,Russia
+,ALM,Almaty Oblysy,KZ,Kazakhstan
 Stepnogorsk,AKM,Aqmola Oblysy,KZ,Kazakhstan
 ,AST,Astana Qalasy,KZ,Kazakhstan
 Zheleznogorsk,KYA,Krasnoyarskiy Kray,RU,Russia
@@ -8888,15 +8905,18 @@ Port-aux-Francais,,,TF,French Southern Territories
 ,,,TF,French Southern Territories
 ,,,CC,Cocos [Keeling] Islands
 ,RO,Rodrigues,MU,Mauritius
+Zhoushan,32,Jiangsu,CN,China
 Qinghai,52,Guizhou,CN,China
 Suzuo,52,Guizhou,CN,China
 ,,,PW,Palau
 ,22,Tinh Nghe An,VN,Vietnam
+,52,Tinh Soc Trang,VN,Vietnam
 ,51,Tinh Tra Vinh,VN,Vietnam
 ,07,Tinh Tuyen Quang,VN,Vietnam
 Yen Bai,06,Tinh Yen Bai,VN,Vietnam
 Yen Bai,HN,Thanh Pho Ha Noi,VN,Vietnam
 Xuan Loc,23,Tinh Ha Tinh,VN,Vietnam
+Xom Truong Dinh,51,Tinh Tra Vinh,VN,Vietnam
 Trang Bom,39,Tinh GJong Nai,VN,Vietnam
 ,02,Tinh Lao Cai,VN,Vietnam
 Vũng Tàu,43,Tinh Ba Ria-Vung Tau,VN,Vietnam
@@ -8927,7 +8947,6 @@ Thot Not,CT,Thanh Pho Can Tho,VN,Vietnam
 Thon Bao An,36,Tinh Ninh Thuan,VN,Vietnam
 Thanh Xuan,73,Hau Giang,VN,Vietnam
 Ho Chi Minh City,SG,Ho Chi Minh City,VN,Vietnam
-Thanh Khe,66,Tinh Hung Yen,VN,Vietnam
 ,21,Tinh Thanh Hoa,VN,Vietnam
 Thanh Hóa,21,Tinh Thanh Hoa,VN,Vietnam
 Thang Binh,27,Tinh Quang Nam,VN,Vietnam
@@ -9111,6 +9130,7 @@ Sa Kaeo,27,Changwat Sa Kaeo,TH,Thailand
 Sadao,90,Changwat Songkhla,TH,Thailand
 Rueso,96,Changwat Narathiwat,TH,Thailand
 Roi Et,45,Changwat Roi Et,TH,Thailand
+,21,Changwat Rayong,TH,Thailand
 Rayong,21,Changwat Rayong,TH,Thailand
 Rattaphum,90,Changwat Songkhla,TH,Thailand
 Rat Burana,10,Bangkok,TH,Thailand
@@ -9129,6 +9149,7 @@ Phon,40,Changwat Khon Kaen,TH,Thailand
 ,65,Changwat Phitsanulok,TH,Thailand
 Phitsanulok,65,Changwat Phitsanulok,TH,Thailand
 Phimai,30,Changwat Nakhon Ratchasima,TH,Thailand
+,66,Changwat Phichit,TH,Thailand
 Phichit,66,Changwat Phichit,TH,Thailand
 Phetchabun,67,Changwat Phetchabun,TH,Thailand
 ,56,Changwat Phayao,TH,Thailand
@@ -9177,7 +9198,6 @@ Krok Phra,60,Changwat Nakhon Sawan,TH,Thailand
 Krathum Baen,74,Changwat Samut Sakhon,TH,Thailand
 Kranuan,40,Changwat Khon Kaen,TH,Thailand
 Ban Klang,54,Changwat Phrae,TH,Thailand
-Klaeng,21,Changwat Rayong,TH,Thailand
 Khuan Khanun,93,Changwat Phatthalung,TH,Thailand
 Khon Kaen,40,Changwat Khon Kaen,TH,Thailand
 Khlung,22,Changwat Chanthaburi,TH,Thailand
@@ -9411,9 +9431,9 @@ Padang,SB,West Sumatra,ID,Indonesia
 Ngawi,JB,West Java,ID,Indonesia
 Nganjuk,JI,East Java,ID,Indonesia
 Nanggewer,JB,West Java,ID,Indonesia
+Muntilan,JT,Central Java,ID,Indonesia
 Mojokerto,JI,East Java,ID,Indonesia
 Mojo,JI,East Java,ID,Indonesia
-Metro,LA,Lampung,ID,Indonesia
 Meruga,JB,West Java,ID,Indonesia
 Mempawah,KB,West Kalimantan,ID,Indonesia
 Mataram,NB,West Nusa Tenggara,ID,Indonesia
@@ -9436,6 +9456,7 @@ Labuan Lombok,NB,West Nusa Tenggara,ID,Indonesia
 Limbung,KB,West Kalimantan,ID,Indonesia
 Lembang,JB,West Java,ID,Indonesia
 Lawang,JI,East Java,ID,Indonesia
+,LA,Lampung,ID,Indonesia
 Lampeong,KT,Central Kalimantan,ID,Indonesia
 Lamongan,JI,East Java,ID,Indonesia
 Lagoa,JK,Jakarta,ID,Indonesia
@@ -9746,6 +9767,7 @@ Tagbilaran City,07,Central Visayas,PH,Philippines
 Tagaytay,40,Calabarzon,PH,Philippines
 Taft,08,Eastern Visayas,PH,Philippines
 Tacloban City,08,Eastern Visayas,PH,Philippines
+Tabaco,05,Bicol,PH,Philippines
 Taal,40,Calabarzon,PH,Philippines
 Surigao City,13,Caraga,PH,Philippines
 ,12,Soccsksargen,PH,Philippines
@@ -9753,7 +9775,6 @@ Sucat,40,Calabarzon,PH,Philippines
 Subic,03,Central Luzon,PH,Philippines
 Subic,40,Calabarzon,PH,Philippines
 ,12,Soccsksargen,PH,Philippines
-Sorsogon,05,Bicol,PH,Philippines
 Solano,02,Cagayan Valley,PH,Philippines
 Siniloan,40,Calabarzon,PH,Philippines
 Silang,40,Calabarzon,PH,Philippines
@@ -9787,6 +9808,7 @@ Clark,03,Central Luzon,PH,Philippines
 San Fernando,01,Ilocos,PH,Philippines
 San Fernando,03,Central Luzon,PH,Philippines
 "Poblacion, San Felipe",03,Central Luzon,PH,Philippines
+San Fabian,03,Central Luzon,PH,Philippines
 San Carlos City,01,Ilocos,PH,Philippines
 San Antonio,03,Central Luzon,PH,Philippines
 San Andres,40,Calabarzon,PH,Philippines
@@ -9799,7 +9821,6 @@ Sabang,03,Central Luzon,PH,Philippines
 Roxas City,06,Western Visayas,PH,Philippines
 Rosario,40,Calabarzon,PH,Philippines
 ,40,Calabarzon,PH,Philippines
-Rizal,03,Central Luzon,PH,Philippines
 Quiapo District,00,National Capital Region,PH,Philippines
 Quezon City,00,National Capital Region,PH,Philippines
 ,40,Calabarzon,PH,Philippines
@@ -9813,7 +9834,6 @@ Pinagbuhatan,40,Calabarzon,PH,Philippines
 Pili,05,Bicol,PH,Philippines
 Pilar,03,Central Luzon,PH,Philippines
 ,,,PH,Philippines
-Pateros,40,Calabarzon,PH,Philippines
 Pasong Tamo,00,National Capital Region,PH,Philippines
 Pasig,03,Central Luzon,PH,Philippines
 Pasay,00,National Capital Region,PH,Philippines
@@ -9831,7 +9851,6 @@ Pagasinan,14,ARMM,PH,Philippines
 Pagadian,09,Zamboanga Peninsula,PH,Philippines
 Paete,40,Calabarzon,PH,Philippines
 Paco,05,Bicol,PH,Philippines
-Ozamiz City,10,Northern Mindanao,PH,Philippines
 Orion,03,Central Luzon,PH,Philippines
 Olongapo City,03,Central Luzon,PH,Philippines
 Obando,03,Central Luzon,PH,Philippines
@@ -9839,7 +9858,6 @@ Obando,03,Central Luzon,PH,Philippines
 ,03,Central Luzon,PH,Philippines
 Noveleta,40,Calabarzon,PH,Philippines
 Novaliches Proper,00,National Capital Region,PH,Philippines
-Norzagaray,03,Central Luzon,PH,Philippines
 ,08,Eastern Visayas,PH,Philippines
 ,12,Soccsksargen,PH,Philippines
 ,NER,Province of Negros Oriental,PH,Philippines
@@ -9863,6 +9881,7 @@ Maybunga,00,National Capital Region,PH,Philippines
 Mataas Na Kahoy,40,Calabarzon,PH,Philippines
 ,05,Bicol,PH,Philippines
 Masbate,05,Bicol,PH,Philippines
+Masantol,03,Central Luzon,PH,Philippines
 Mariveles,03,Central Luzon,PH,Philippines
 ,41,Mimaropa,PH,Philippines
 Marilao,03,Central Luzon,PH,Philippines
@@ -9893,7 +9912,6 @@ Limay,03,Central Luzon,PH,Philippines
 Liloan,07,Central Visayas,PH,Philippines
 Lilio,40,Calabarzon,PH,Philippines
 ,08,Eastern Visayas,PH,Philippines
-Leyte,08,Eastern Visayas,PH,Philippines
 Legazpi,05,Bicol,PH,Philippines
 ,01,Ilocos,PH,Philippines
 La Union,11,Davao,PH,Philippines
@@ -9901,6 +9919,7 @@ Las Pinas,00,National Capital Region,PH,Philippines
 Lapu-Lapu City,07,Central Visayas,PH,Philippines
 Laoag,01,Ilocos,PH,Philippines
 La Luna,01,Ilocos,PH,Philippines
+Lahug,07,Central Visayas,PH,Philippines
 ,40,Calabarzon,PH,Philippines
 Labangon,07,Central Visayas,PH,Philippines
 Koronadal,12,Soccsksargen,PH,Philippines
@@ -9912,7 +9931,6 @@ Kamuning,00,National Capital Region,PH,Philippines
 Kalibo Town,06,Western Visayas,PH,Philippines
 Jesus de la Pena,00,National Capital Region,PH,Philippines
 ,02,Cagayan Valley,PH,Philippines
-Isabel,08,Eastern Visayas,PH,Philippines
 Iriga City,05,Bicol,PH,Philippines
 Intramuros,00,National Capital Region,PH,Philippines
 Initao,10,Northern Mindanao,PH,Philippines
@@ -9924,6 +9942,7 @@ Iloilo City,06,Western Visayas,PH,Philippines
 Iligan City,12,Soccsksargen,PH,Philippines
 Iligan,10,Northern Mindanao,PH,Philippines
 Hermosa,03,Central Luzon,PH,Philippines
+Hamtic,06,Western Visayas,PH,Philippines
 Hagonoy,03,Central Luzon,PH,Philippines
 Guimba,03,Central Luzon,PH,Philippines
 Guiguinto,03,Central Luzon,PH,Philippines
@@ -9940,7 +9959,6 @@ Dipolog City,09,Zamboanga Peninsula,PH,Philippines
 Dingras,01,Ilocos,PH,Philippines
 Dinalupihan,03,Central Luzon,PH,Philippines
 Diliman Primero,03,Central Luzon,PH,Philippines
-Bonifacio,10,Northern Mindanao,PH,Philippines
 Digos,11,Davao,PH,Philippines
 Del Rosario,03,Central Luzon,PH,Philippines
 ,11,Davao,PH,Philippines
@@ -9979,7 +9997,6 @@ Cagaya,14,ARMM,PH,Philippines
 Cadiz,NEC,Province of Negros Occidental,PH,Philippines
 Cabuyao,40,Calabarzon,PH,Philippines
 Cabuyao,40,Calabarzon,PH,Philippines
-Cabugao,01,Ilocos,PH,Philippines
 Cabiao,03,Central Luzon,PH,Philippines
 Cabangahan,07,Central Visayas,PH,Philippines
 Cabanatuan City,03,Central Luzon,PH,Philippines
@@ -10008,7 +10025,7 @@ Binan,40,Calabarzon,PH,Philippines
 Binakod,03,Central Luzon,PH,Philippines
 Upper Bicutan,00,National Capital Region,PH,Philippines
 Biasong,07,Central Visayas,PH,Philippines
-Bel-Air Three,40,Calabarzon,PH,Philippines
+Bel-Air One,40,Calabarzon,PH,Philippines
 Bayombong,02,Cagayan Valley,PH,Philippines
 Bayombong,41,Mimaropa,PH,Philippines
 Bayawan,NER,Province of Negros Oriental,PH,Philippines
@@ -10034,6 +10051,7 @@ Balian,40,Calabarzon,PH,Philippines
 Baler,03,Central Luzon,PH,Philippines
 Balayhangin,40,Calabarzon,PH,Philippines
 Balaybay,03,Central Luzon,PH,Philippines
+Balayan,40,Calabarzon,PH,Philippines
 Balayan,40,Calabarzon,PH,Philippines
 Balatong A,03,Central Luzon,PH,Philippines
 Balanoy,03,Central Luzon,PH,Philippines
@@ -10115,6 +10133,7 @@ Alabang,40,Calabarzon,PH,Philippines
 Aguso,03,Central Luzon,PH,Philippines
 Agusan,10,Northern Mindanao,PH,Philippines
 Agus,08,Eastern Visayas,PH,Philippines
+Aguinaldo,08,Eastern Visayas,PH,Philippines
 Aguilar,01,Ilocos,PH,Philippines
 Agtipal,01,Ilocos,PH,Philippines
 Actangao,15,Cordillera,PH,Philippines
@@ -10291,7 +10310,6 @@ Batu Caves,10,Selangor,MY,Malaysia
 Sungai Besi,,,MY,Malaysia
 Hulu Langat,10,Selangor,MY,Malaysia
 Bagan Pasir Laut,08,Perak,MY,Malaysia
-Sabak Bernam,10,Selangor,MY,Malaysia
 Sungai Besar,10,Selangor,MY,Malaysia
 Kuantan,06,Pahang,MY,Malaysia
 Kampung Batu Hitam,06,Pahang,MY,Malaysia
@@ -10454,7 +10472,6 @@ Qianjiang,42,Hubei,CN,China
 Heyuan,44,Guangdong,CN,China
 Youxian Chengguanzhen,43,Hunan,CN,China
 Yongzhou,43,Hunan,CN,China
-Yongkang,14,Shanxi,CN,China
 Yongchuan,50,Chongqing,CN,China
 "Yong'an",35,Fujian,CN,China
 Yisa,53,Yunnan,CN,China
@@ -10499,13 +10516,13 @@ Xintai,37,Shandong,CN,China
 Xinpu,32,Jiangsu,CN,China
 Xining,63,Qinghai,CN,China
 Xinhuang,43,Hunan,CN,China
+Xinhua,44,Guangdong,CN,China
 Suohe,41,Henan,CN,China
 Xingtai,13,Hebei,CN,China
 Ankang,61,Shaanxi,CN,China
 Xindi,42,Hubei,CN,China
 Chengdong,35,Fujian,CN,China
 Xinan,35,Fujian,CN,China
-Xiazhuang,37,Shandong,CN,China
 Xiashi,33,Zhejiang,CN,China
 Zijinglu,41,Henan,CN,China
 Xiaoxita,42,Hubei,CN,China
@@ -10517,6 +10534,7 @@ Xiantao,42,Hubei,CN,China
 Xianren,33,Zhejiang,CN,China
 Zhuhai,44,Guangdong,CN,China
 Xiangfan,42,Hubei,CN,China
+Xiangcheng,13,Hebei,CN,China
 "Xi'an",61,Shaanxi,CN,China
 Xiamen,35,Fujian,CN,China
 Wuzhou,45,Guangxi,CN,China
@@ -10564,9 +10582,10 @@ Suixi Xian,44,Guangdong,CN,China
 Suicheng,32,Jiangsu,CN,China
 Songyuan,33,Zhejiang,CN,China
 ,51,Sichuan,CN,China
-Shuyi,14,Shanxi,CN,China
+Shuyicun,14,Shanxi,CN,China
 Shuozhou,14,Shanxi,CN,China
 Laixi,37,Shandong,CN,China
+Shuangxi,35,Fujian,CN,China
 Shuangshipu,61,Shaanxi,CN,China
 Shouchun,34,Anhui,CN,China
 Shouguang,37,Shandong,CN,China
@@ -10590,12 +10609,13 @@ Shaoguan,44,Guangdong,CN,China
 ,14,Shanxi,CN,China
 Shancheng,37,Shandong,CN,China
 Shangzhou,61,Shaanxi,CN,China
+Linjiang,35,Fujian,CN,China
 ,31,Shanghai,CN,China
 Shanghai,31,Shanghai,CN,China
 ,37,Shandong,CN,China
-Shancheng,35,Fujian,CN,China
 Shahecheng,13,Hebei,CN,China
 ,61,Shaanxi,CN,China
+Sanyuan Chengguanzhen,61,Shaanxi,CN,China
 Sanming,35,Fujian,CN,China
 Sanmenxia,41,Henan,CN,China
 Sanhe,13,Hebei,CN,China
@@ -10616,7 +10636,6 @@ Qinzhou,45,Guangxi,CN,China
 Qinhuangdao,13,Hebei,CN,China
 Jinjiang,35,Fujian,CN,China
 "Huai'an",32,Jiangsu,CN,China
-Qingfeng Chengguanzhen,41,Henan,CN,China
 Qingdao,37,Shandong,CN,China
 Qingyuan,44,Guangdong,CN,China
 Hongqiao,43,Hunan,CN,China
@@ -10642,6 +10661,7 @@ Nanyang,41,Henan,CN,China
 Nantong,32,Jiangsu,CN,China
 Nanqiao,46,Hainan,CN,China
 Nanning,45,Guangxi,CN,China
+Nanma,37,Shandong,CN,China
 Nanjing,32,Jiangsu,CN,China
 Nanjie,44,Guangdong,CN,China
 Nanchong,51,Sichuan,CN,China
@@ -10651,7 +10671,6 @@ Minhang,31,Shanghai,CN,China
 Mingzhou,61,Shaanxi,CN,China
 Miaogao,33,Zhejiang,CN,China
 Mianyang,51,Sichuan,CN,China
-Huichang,41,Henan,CN,China
 Wuchuan,44,Guangdong,CN,China
 Meicheng,33,Zhejiang,CN,China
 Maoming,44,Guangdong,CN,China
@@ -10695,6 +10714,7 @@ Laibin,45,Guangxi,CN,China
 Kunyang,33,Zhejiang,CN,China
 Kunming,53,Yunnan,CN,China
 Keqiao,33,Zhejiang,CN,China
+Kang Xian,62,Gansu,CN,China
 Kaiyuan,53,Yunnan,CN,China
 Kaili,52,Guizhou,CN,China
 Kaihua Chengguanzhen,33,Zhejiang,CN,China
@@ -10740,7 +10760,6 @@ Huazhou,44,Guangdong,CN,China
 Yuhuan,33,Zhejiang,CN,China
 Huangzhou,42,Hubei,CN,China
 Huanghua,13,Hebei,CN,China
-Daxing,11,Beijing,CN,China
 Xingyi,52,Guizhou,CN,China
 Huainan,34,Anhui,CN,China
 Yanshi Chengguanzhen,41,Henan,CN,China
@@ -10795,6 +10814,7 @@ Ganzhou,36,Jiangxi,CN,China
 ,62,Gansu,CN,China
 Yaluhu,63,Qinghai,CN,China
 Fuzhou,35,Fujian,CN,China
+"Wen'ao",35,Fujian,CN,China
 Fuyang,34,Anhui,CN,China
 ,35,Fujian,CN,China
 Foshan,44,Guangdong,CN,China
@@ -10811,14 +10831,12 @@ Duyun,52,Guizhou,CN,China
 Xinyi,44,Guangdong,CN,China
 Dongying,37,Shandong,CN,China
 Dongtai,32,Jiangsu,CN,China
-Dongsheng,15,Inner Mongolia Autonomous Region,CN,China
 Dongshan,36,Jiangxi,CN,China
 Dongguan,44,Guangdong,CN,China
 "Dong'e",37,Shandong,CN,China
-Dongcun,14,Shanxi,CN,China
+Xinle,13,Hebei,CN,China
 Dingzhou,13,Hebei,CN,China
 Dingxi,62,Gansu,CN,China
-Dingcheng,46,Hainan,CN,China
 Dezhou,37,Shandong,CN,China
 Deyang,51,Sichuan,CN,China
 Deqing,33,Zhejiang,CN,China
@@ -10854,12 +10872,14 @@ Chaozhou,44,Guangdong,CN,China
 Chaohu,34,Anhui,CN,China
 Changzhou,32,Jiangsu,CN,China
 Kuiju,37,Shandong,CN,China
+Changxing Xian,33,Zhejiang,CN,China
 Changsha,43,Hunan,CN,China
 Changle,37,Shandong,CN,China
 Changle,35,Fujian,CN,China
 Cangzhou,13,Hebei,CN,China
 Bozhou,34,Anhui,CN,China
 Boxing,37,Shandong,CN,China
+Boshan,37,Shandong,CN,China
 Baise City,45,Guangxi,CN,China
 Bobai,45,Guangxi,CN,China
 Biyang,34,Anhui,CN,China
@@ -10875,7 +10895,6 @@ Beibei,50,Chongqing,CN,China
 Bazhou,51,Sichuan,CN,China
 Langzhong,51,Sichuan,CN,China
 Baoding,13,Hebei,CN,China
-Baodi,12,Tianjin,CN,China
 Baiyin,62,Gansu,CN,China
 Anshun,52,Guizhou,CN,China
 Anqiu,37,Shandong,CN,China
@@ -10900,7 +10919,6 @@ Tin Shui Wai,NYL,Yuen Long District,HK,Hong Kong
 Tai Wai,,,HK,Hong Kong
 Tai Tong,,,HK,Hong Kong
 Tai Tam,HSO,Southern,HK,Hong Kong
-Tai Lin Pai,,,HK,Hong Kong
 Tai Kok Tsui,,,HK,Hong Kong
 Tai Hang,,,HK,Hong Kong
 So Kwun Wat,,,HK,Hong Kong
@@ -10950,11 +10968,11 @@ Aberdeen,HSO,Southern,HK,Hong Kong
 Happy Valley,HWC,Wanchai,HK,Hong Kong
 Ham Tin,,,HK,Hong Kong
 Fo Tan,NST,Sha Tin,HK,Hong Kong
+Fa Yuen,,,HK,Hong Kong
 Fanling,NNO,North,HK,Hong Kong
 Discovery Bay,,,HK,Hong Kong
 Central District,,,HK,Hong Kong
 Cheung Sha Wan,,,HK,Hong Kong
-Cheung Sha,,,HK,Hong Kong
 Cheung Chau,NIS,Islands District,HK,Hong Kong
 Chek Chue,HSO,Southern,HK,Hong Kong
 Chai Wan,HEA,Eastern,HK,Hong Kong
@@ -10972,7 +10990,7 @@ Macao,,,MO,Macao
 ,,,MO,Macao
 Luhuan,,,MO,Macao
 Phnom Penh,12,Phnom Penh,KH,Cambodia
-Phumi Siem Reab,8,Kandal,KH,Cambodia
+Siem Reab,8,Kandal,KH,Cambodia
 Phumi Kandal,8,Kandal,KH,Cambodia
 Poipet,1,Banteay Meanchey,KH,Cambodia
 ,8,Kandal,KH,Cambodia
@@ -11019,7 +11037,6 @@ Yongsan,11,Seoul,KR,Republic of Korea
 Sangju,47,Gyeongsangbuk-do,KR,Republic of Korea
 Sammun,48,Gyeongsangnam-do,KR,Republic of Korea
 Samcheok,42,Gangwon-do,KR,Republic of Korea
-Gwangmyeong,28,Incheon,KR,Republic of Korea
 Pyeongtaek-si,41,Gyeonggi-do,KR,Republic of Korea
 Pyeong,41,Gyeonggi-do,KR,Republic of Korea
 Pyeongchang County,42,Gangwon-do,KR,Republic of Korea
@@ -11165,6 +11182,7 @@ Wakasa,31,Tottori,JP,Japan
 Wakamatsucho,13,Tokyo,JP,Japan
 Wajima,17,Ishikawa,JP,Japan
 Wadayama,28,Hyōgo,JP,Japan
+Uwayama,15,Niigata,JP,Japan
 Utsunomiya,09,Tochigi,JP,Japan
 Uto,43,Kumamoto,JP,Japan
 Utazu,37,Kagawa,JP,Japan
@@ -11468,6 +11486,7 @@ Nakamura,26,Kyoto,JP,Japan
 Nakamura,28,Hyōgo,JP,Japan
 Nakamachi,20,Nagano,JP,Japan
 Nakama,40,Fukuoka,JP,Japan
+Nakahara,20,Nagano,JP,Japan
 Nakagawa,23,Aichi,JP,Japan
 Naka-ekimae,21,Gifu,JP,Japan
 Naha,47,Okinawa,JP,Japan
@@ -11522,6 +11541,7 @@ Minato,13,Tokyo,JP,Japan
 Minato,12,Chiba,JP,Japan
 Minato,22,Shizuoka,JP,Japan
 Tsunashimanishi,14,Kanagawa,JP,Japan
+Minamiaoyama,13,Tokyo,JP,Japan
 Minami,32,Shimane,JP,Japan
 Minamata,43,Kumamoto,JP,Japan
 Minakuchicho-matoba,25,Shiga,JP,Japan
@@ -11555,8 +11575,8 @@ Maebashi,10,Gunma,JP,Japan
 Maebaru-chuo,40,Fukuoka,JP,Japan
 Machida,13,Tokyo,JP,Japan
 Machi,20,Nagano,JP,Japan
+Machi,34,Hiroshima,JP,Japan
 Kyoto,26,Kyoto,JP,Japan
-Kuwana,24,Mie,JP,Japan
 Kushimoto,30,Wakayama,JP,Japan
 Kusatsu,10,Gunma,JP,Japan
 Kusatsu,25,Shiga,JP,Japan
@@ -11849,6 +11869,7 @@ Fuji,22,Shizuoka,JP,Japan
 Fuchucho,34,Hiroshima,JP,Japan
 Fuchinobe,14,Kanagawa,JP,Japan
 Enzan,19,Yamanashi,JP,Japan
+,38,Ehime,JP,Japan
 Echigawa,25,Shiga,JP,Japan
 Ryotsu-ebisu,15,Niigata,JP,Japan
 Ebi,23,Aichi,JP,Japan
@@ -11926,6 +11947,7 @@ Ayer Raja New Town,,,SG,Singapore
 Bukit Batok New Town,,,SG,Singapore
 Jurong East New Town,,,SG,Singapore
 Jurong West New Town,,,SG,Singapore
+Simei New Town,,,SG,Singapore
 Tampines New Town,,,SG,Singapore
 Yishun New Town,03,North West Community Development Council,SG,Singapore
 Woodlands New Town,03,North West Community Development Council,SG,Singapore
@@ -11968,6 +11990,7 @@ Langat,10,Selangor,MY,Malaysia
 ,57,Tinh Binh Duong,VN,Vietnam
 ,27,Tinh Quang Nam,VN,Vietnam
 ,68,Tinh Phu Tho,VN,Vietnam
+,66,Tinh Hung Yen,VN,Vietnam
 Balongsari,JI,East Java,ID,Indonesia
 Lontar,JI,East Java,ID,Indonesia
 Putat-gede,JI,East Java,ID,Indonesia
@@ -12027,7 +12050,6 @@ Shanweicun,44,Guangdong,CN,China
 Zhongshan,44,Guangdong,CN,China
 Wenchang,46,Hainan,CN,China
 Hainan,46,Hainan,CN,China
-Nanshan,44,Guangdong,CN,China
 Zhongwei,44,Guangdong,CN,China
 Nanping,35,Fujian,CN,China
 Jinzhong,33,Zhejiang,CN,China
@@ -12036,7 +12058,6 @@ Dongyang,33,Zhejiang,CN,China
 Lianping,44,Guangdong,CN,China
 Jingmen,44,Guangdong,CN,China
 Tianshui,44,Guangdong,CN,China
-Baogai,35,Fujian,CN,China
 Wuzhong,35,Fujian,CN,China
 ,BT,Banten,ID,Indonesia
 ,GO,Gorontalo,ID,Indonesia
@@ -12060,6 +12081,7 @@ Komatsu,38,Ehime,JP,Japan
 Inokuchi,38,Ehime,JP,Japan
 Imabari-shi,38,Ehime,JP,Japan
 Horinouchi,38,Ehime,JP,Japan
+Boji,43,Hunan,CN,China
 Xiangtan,43,Hunan,CN,China
 Hengyan,43,Hunan,CN,China
 Hebei,43,Hunan,CN,China
@@ -12068,8 +12090,7 @@ Taoyuan,43,Hunan,CN,China
 Niaojiang,43,Hunan,CN,China
 Malangjiwan,JT,Central Java,ID,Indonesia
 Manahan,JT,Central Java,ID,Indonesia
-Bumi,JT,Central Java,ID,Indonesia
-Huong Tinh,52,Tinh Soc Trang,VN,Vietnam
+Kota,NT,East Nusa Tenggara,ID,Indonesia
 Chau Thanh,51,Tinh Tra Vinh,VN,Vietnam
 An Thanh,52,Tinh Soc Trang,VN,Vietnam
 Thanh Nguyen,51,Tinh Tra Vinh,VN,Vietnam
@@ -12127,7 +12148,6 @@ Curug,JB,West Java,ID,Indonesia
 Antapani,JB,West Java,ID,Indonesia
 Babakanjati,JB,West Java,ID,Indonesia
 Aren,,,ID,Indonesia
-Pancoran,JT,Central Java,ID,Indonesia
 Girirejo,JT,Central Java,ID,Indonesia
 Sawangan,JB,West Java,ID,Indonesia
 Banyuroto,JT,Central Java,ID,Indonesia
@@ -12136,7 +12156,6 @@ Kadipiro,JT,Central Java,ID,Indonesia
 Manjahlega,JB,West Java,ID,Indonesia
 Bongkok Hilir,JB,West Java,ID,Indonesia
 Bulupitu,JI,East Java,ID,Indonesia
-Nueva,40,Calabarzon,PH,Philippines
 Bagumbayan,40,Calabarzon,PH,Philippines
 Kaligayahan,00,National Capital Region,PH,Philippines
 ,,,TL,East Timor
@@ -12168,10 +12187,10 @@ Shantou,43,Hunan,CN,China
 Xinjiang,43,Hunan,CN,China
 Meizhou,43,Hunan,CN,China
 Zhengjiang,43,Hunan,CN,China
-Hetian,43,Hunan,CN,China
 Guyuan,35,Fujian,CN,China
 Zhoushan,33,Zhejiang,CN,China
 Citayam,JB,West Java,ID,Indonesia
+Xinhua,43,Hunan,CN,China
 Depok Jaya,JB,West Java,ID,Indonesia
 Kertajaya,JI,East Java,ID,Indonesia
 Kendangsari,JI,East Java,ID,Indonesia
@@ -12202,7 +12221,6 @@ Sukabumi Selatan,JK,Jakarta,ID,Indonesia
 Karetsemanggi,JK,Jakarta,ID,Indonesia
 Setiabudi,JK,Jakarta,ID,Indonesia
 Guntur,JK,Jakarta,ID,Indonesia
-Senen,JK,Jakarta,ID,Indonesia
 Bungur,JK,Jakarta,ID,Indonesia
 Cempaka Baru,JK,Jakarta,ID,Indonesia
 Kartini,JK,Jakarta,ID,Indonesia
@@ -12211,7 +12229,6 @@ Linxiang,44,Guangdong,CN,China
 Shantou,44,Guangdong,CN,China
 Meizhou,44,Guangdong,CN,China
 Jiyang,61,Shaanxi,CN,China
-Dongcheng,61,Shaanxi,CN,China
 Tirto,YO,Yogyakarta,ID,Indonesia
 Terban,YO,Yogyakarta,ID,Indonesia
 Baciro,YO,Yogyakarta,ID,Indonesia
@@ -12583,7 +12600,6 @@ Mandurah,WA,Western Australia,AU,Australia
 Mallala,SA,South Australia,AU,Australia
 Maitland,SA,South Australia,AU,Australia
 Mahogany Creek,WA,Western Australia,AU,Australia
-Magill,SA,South Australia,AU,Australia
 Maddington,WA,Western Australia,AU,Australia
 Macclesfield,SA,South Australia,AU,Australia
 Lyndoch,SA,South Australia,AU,Australia
@@ -13139,6 +13155,7 @@ Williamstown,VIC,Victoria,AU,Australia
 Willawarrin,NSW,New South Wales,AU,Australia
 Wilcannia,NSW,New South Wales,AU,Australia
 Wilberforce,NSW,New South Wales,AU,Australia
+Wickham,NSW,New South Wales,AU,Australia
 Whittlesea,VIC,Victoria,AU,Australia
 White Rock,QLD,Queensland,AU,Australia
 Whitemark,TAS,Tasmania,AU,Australia
@@ -13364,6 +13381,7 @@ Stapylton,QLD,Queensland,AU,Australia
 Stanwell Park,NSW,New South Wales,AU,Australia
 Stanthorpe,QLD,Queensland,AU,Australia
 Stanmore,NSW,New South Wales,AU,Australia
+Stanmore,QLD,Queensland,AU,Australia
 Stanley,TAS,Tasmania,AU,Australia
 Stanley,VIC,Victoria,AU,Australia
 Stanhope,VIC,Victoria,AU,Australia
@@ -13445,7 +13463,6 @@ Rutherford,NSW,New South Wales,AU,Australia
 Royalla,NSW,New South Wales,AU,Australia
 Rowville,VIC,Victoria,AU,Australia
 Rowsley,VIC,Victoria,AU,Australia
-Rous Mill,NSW,New South Wales,AU,Australia
 Ross Creek,VIC,Victoria,AU,Australia
 Rosewood,QLD,Queensland,AU,Australia
 Roseville,NSW,New South Wales,AU,Australia
@@ -13813,7 +13830,6 @@ Mandurama,NSW,New South Wales,AU,Australia
 Mandagery,NSW,New South Wales,AU,Australia
 Manangatang,VIC,Victoria,AU,Australia
 Malvern,VIC,Victoria,AU,Australia
-Malmsbury,VIC,Victoria,AU,Australia
 Maleny,QLD,Queensland,AU,Australia
 Maldon,VIC,Victoria,AU,Australia
 Malanda,QLD,Queensland,AU,Australia
@@ -13851,7 +13867,6 @@ Loganlea,QLD,Queensland,AU,Australia
 Loganholme,QLD,Queensland,AU,Australia
 Logan,VIC,Victoria,AU,Australia
 Liverpool,NSW,New South Wales,AU,Australia
-Little Burleigh,QLD,Queensland,AU,Australia
 Lithgow,NSW,New South Wales,AU,Australia
 Lismore,NSW,New South Wales,AU,Australia
 Lisarow,NSW,New South Wales,AU,Australia
@@ -13945,7 +13960,6 @@ Kendall,NSW,New South Wales,AU,Australia
 Kempsey,NSW,New South Wales,AU,Australia
 Kembla,NSW,New South Wales,AU,Australia
 Kelso,NSW,New South Wales,AU,Australia
-Keith,SA,South Australia,AU,Australia
 Keiraville,NSW,New South Wales,AU,Australia
 Keilor,VIC,Victoria,AU,Australia
 Katoomba,NSW,New South Wales,AU,Australia
@@ -13988,6 +14002,7 @@ Huskisson,NSW,New South Wales,AU,Australia
 Hurstville Grove,NSW,New South Wales,AU,Australia
 Hurstbridge,VIC,Victoria,AU,Australia
 Huonville,TAS,Tasmania,AU,Australia
+Hunter,VIC,Victoria,AU,Australia
 Hughesdale,VIC,Victoria,AU,Australia
 Hughenden,QLD,Queensland,AU,Australia
 Hoskinstown,NSW,New South Wales,AU,Australia
@@ -14059,6 +14074,7 @@ Greenvale,VIC,Victoria,AU,Australia
 Greens Creek,VIC,Victoria,AU,Australia
 Greensborough,VIC,Victoria,AU,Australia
 Greenhills,NSW,New South Wales,AU,Australia
+Green Hill,NSW,New South Wales,AU,Australia
 Greenbank,QLD,Queensland,AU,Australia
 Gray,TAS,Tasmania,AU,Australia
 Gravelly Beach,TAS,Tasmania,AU,Australia
@@ -14067,6 +14083,7 @@ Grantville,VIC,Victoria,AU,Australia
 Granton,TAS,Tasmania,AU,Australia
 Grantham,QLD,Queensland,AU,Australia
 Grafton,NSW,New South Wales,AU,Australia
+Gracemere,QLD,Queensland,AU,Australia
 Gowrie Junction,QLD,Queensland,AU,Australia
 Gowrie,NSW,New South Wales,AU,Australia
 Goulburn,NSW,New South Wales,AU,Australia
@@ -14090,7 +14107,6 @@ Glenvale,VIC,Victoria,AU,Australia
 Glenroy,VIC,Victoria,AU,Australia
 Glenorie,NSW,New South Wales,AU,Australia
 Glenorchy,TAS,Tasmania,AU,Australia
-Glenorchy,VIC,Victoria,AU,Australia
 Glenlee,VIC,Victoria,AU,Australia
 Glen Innes,NSW,New South Wales,AU,Australia
 Glen Huntly,VIC,Victoria,AU,Australia
@@ -14822,7 +14838,6 @@ Mokau,WKO,Waikato,NZ,New Zealand
 Moerewa,NTL,Northland,NZ,New Zealand
 Meremere,TKI,Taranaki,NZ,New Zealand
 Marshland,CAN,Canterbury,NZ,New Zealand
-,MBH,Marlborough,NZ,New Zealand
 Maraetai,AUK,Auckland,NZ,New Zealand
 Manukau,AUK,Auckland,NZ,New Zealand
 Manukau,NTL,Northland,NZ,New Zealand
@@ -14980,7 +14995,6 @@ Masterton,WGN,Wellington,NZ,New Zealand
 Hokitika,WTC,West Coast,NZ,New Zealand
 Greymouth,WTC,West Coast,NZ,New Zealand
 Westport,WTC,West Coast,NZ,New Zealand
-Bluff,STL,Southland,NZ,New Zealand
 Riverton,STL,Southland,NZ,New Zealand
 Winton,STL,Southland,NZ,New Zealand
 Norlane,VIC,Victoria,AU,Australia
@@ -15164,6 +15178,7 @@ Silves,08,Faro,PT,Portugal
 Silveira,11,Lisbon,PT,Portugal
 Sesimbra,15,Setúbal,PT,Portugal
 Setúbal,15,Setúbal,PT,Portugal
+Sete Rios,11,Lisbon,PT,Portugal
 Sesmarias,14,Santarém,PT,Portugal
 Serta,05,Castelo Branco,PT,Portugal
 Serro Ventoso,10,Leiria,PT,Portugal
@@ -15198,6 +15213,7 @@ Santo Andre,12,Portalegre,PT,Portugal
 Santo Andre,15,Setúbal,PT,Portugal
 Santiago do Cacem,15,Setúbal,PT,Portugal
 Santiago da Guarda,10,Leiria,PT,Portugal
+,14,Santarém,PT,Portugal
 Santarem,10,Leiria,PT,Portugal
 Santarém,14,Santarém,PT,Portugal
 Santana do Mato,14,Santarém,PT,Portugal
@@ -15515,6 +15531,7 @@ Bobadela,11,Lisbon,PT,Portugal
 Boavista,11,Lisbon,PT,Portugal
 Birre,11,Lisbon,PT,Portugal
 Bicesse,11,Lisbon,PT,Portugal
+Benfica,11,Lisbon,PT,Portugal
 Benedita,10,Leiria,PT,Portugal
 Benavente,14,Santarém,PT,Portugal
 Belver,12,Portalegre,PT,Portugal
@@ -15626,7 +15643,6 @@ Daloa,SM,Sassandra-Marahoue,CI,Ivory Coast
 Anyama,AB,Abidjan,CI,Ivory Coast
 Abidjan,AB,Abidjan,CI,Ivory Coast
 Abengourou,CM,Comoe,CI,Ivory Coast
-Winneba,CP,Central Region,GH,Ghana
 Wa,UW,Upper West Region,GH,Ghana
 ,TV,Volta Region,GH,Ghana
 Tema,AA,Greater Accra Region,GH,Ghana
@@ -15639,6 +15655,7 @@ Legon,AA,Greater Accra Region,GH,Ghana
 Kwabeng,EP,Eastern Region,GH,Ghana
 Kumasi,AH,Ashanti Region,GH,Ghana
 ,,,GH,Ghana
+,CP,Central Region,GH,Ghana
 Cape Coast,CP,Central Region,GH,Ghana
 Bolgatanga,UE,Upper East Region,GH,Ghana
 Berekum,BA,Brong-Ahafo,GH,Ghana
@@ -15674,7 +15691,6 @@ Ondo,ON,Ondo State,NG,Nigeria
 ,OG,Ogun State,NG,Nigeria
 Ogbomoso,OY,Oyo State,NG,Nigeria
 Obudu,CR,Cross River State,NG,Nigeria
-Obafemi,OG,Ogun State,NG,Nigeria
 Nsukka,EN,Enugu State,NG,Nigeria
 ,NI,Niger State,NG,Nigeria
 ,,,NG,Nigeria
@@ -15711,6 +15727,7 @@ Gwagwalada,FC,FCT,NG,Nigeria
 Funtua,KT,Katsina State,NG,Nigeria
 Enugu,EN,Enugu State,NG,Nigeria
 Ejigbo,LA,Lagos,NG,Nigeria
+Egbeda,RI,Rivers State,NG,Nigeria
 Damaturu,YO,Yobe State,NG,Nigeria
 Damare,AD,Adamawa,NG,Nigeria
 ,CR,Cross River State,NG,Nigeria
@@ -15723,6 +15740,7 @@ Bauchi,BA,Bauchi,NG,Nigeria
 Apapa,LA,Lagos,NG,Nigeria
 ,AN,Anambra,NG,Nigeria
 Anambra,KO,Kogi State,NG,Nigeria
+Amuwo,LA,Lagos,NG,Nigeria
 Alaiye,OG,Ogun State,NG,Nigeria
 ,AK,Akwa Ibom State,NG,Nigeria
 Akure,ON,Ondo State,NG,Nigeria
@@ -15771,6 +15789,7 @@ Neves,S,São Tomé Island,ST,São Tomé and Príncipe
 Gibraltar,,,GI,Gibraltar
 ,,,GI,Gibraltar
 Catalan Bay,,,GI,Gibraltar
+,W,West Coast,GM,Gambia
 Kanifing,B,Banjul,GM,Gambia
 Serekunda,B,Banjul,GM,Gambia
 ,,,GM,Gambia
@@ -16059,7 +16078,6 @@ Vianos,CM,Castille-La Mancha,ES,Spain
 Vergel,VC,Valencia,ES,Spain
 Vera,AN,Andalusia,ES,Spain
 Vélez-Málaga,AN,Andalusia,ES,Spain
-Velez de Benaudalla,AN,Andalusia,ES,Spain
 Velada,CM,Castille-La Mancha,ES,Spain
 Vejer de la Frontera,AN,Andalusia,ES,Spain
 Valverde del Camino,AN,Andalusia,ES,Spain
@@ -16691,6 +16709,7 @@ Estepona,AN,Andalusia,ES,Spain
 Estepa,AN,Andalusia,ES,Spain
 Esporles,IB,Balearic Islands,ES,Spain
 Espinardo,MC,Murcia,ES,Spain
+Esperanza,VC,Valencia,ES,Spain
 Espartinas,AN,Andalusia,ES,Spain
 Esparragosa de Lares,EX,Extremadura,ES,Spain
 Escuzar,AN,Andalusia,ES,Spain
@@ -17430,6 +17449,7 @@ Milena,82,Sicily,IT,Italy
 Milazzo,82,Sicily,IT,Italy
 Milanesi,78,Calabria,IT,Italy
 Miggiano,75,Apulia,IT,Italy
+,82,Sicily,IT,Italy
 Messina,82,Sicily,IT,Italy
 Mesoraca,78,Calabria,IT,Italy
 Merì,82,Sicily,IT,Italy
@@ -17513,7 +17533,6 @@ Grammichele,82,Sicily,IT,Italy
 Gonnosfanadiga,88,Sardinia,IT,Italy
 Gonnesa,88,Sardinia,IT,Italy
 Gizzeria,78,Calabria,IT,Italy
-Giuliana,82,Sicily,IT,Italy
 Girifalco,78,Calabria,IT,Italy
 Gioiosa Marea,82,Sicily,IT,Italy
 Gioiosa Ionica,78,Calabria,IT,Italy
@@ -17675,7 +17694,7 @@ Bova Marina,78,Calabria,IT,Italy
 Bovalino,78,Calabria,IT,Italy
 Botricello,78,Calabria,IT,Italy
 Borgo Partenope,78,Calabria,IT,Italy
-Borgo,78,Calabria,IT,Italy
+Borgo San Marco,78,Calabria,IT,Italy
 Borgia,78,Calabria,IT,Italy
 Borgetto,82,Sicily,IT,Italy
 Bonifati,78,Calabria,IT,Italy
@@ -17857,7 +17876,7 @@ Al Hoceima,01,Tanger-Tetouan-Al Hoceima,MA,Morocco
 Ayt Mloul,07,Marrakesh-Safi,MA,Morocco
 Ain Harrouda,,,MA,Morocco
 Ain El Aouda,,,MA,Morocco
-Agourai,,,MA,Morocco
+Agourai,05,Beni Mellal-Khenifra,MA,Morocco
 Agdal,,,MA,Morocco
 Agadir,09,Souss-Massa,MA,Morocco
 Afourer,05,Beni Mellal-Khenifra,MA,Morocco
@@ -18630,6 +18649,7 @@ Woodstock,ENG,England,GB,United Kingdom
 Woodley,ENG,England,GB,United Kingdom
 Woodley,ENG,England,GB,United Kingdom
 Woodlesford,ENG,England,GB,United Kingdom
+Woodhouse,ENG,England,GB,United Kingdom
 Woodham Ferrers,ENG,England,GB,United Kingdom
 Woodhall Spa,ENG,England,GB,United Kingdom
 Wood Green,ENG,England,GB,United Kingdom
@@ -18657,7 +18677,6 @@ Wittering,ENG,England,GB,United Kingdom
 Witney,ENG,England,GB,United Kingdom
 Witley,ENG,England,GB,United Kingdom
 Withyham,ENG,England,GB,United Kingdom
-Withington,ENG,England,GB,United Kingdom
 Withernsea,ENG,England,GB,United Kingdom
 Witheridge,ENG,England,GB,United Kingdom
 Witham,ENG,England,GB,United Kingdom
@@ -18690,7 +18709,6 @@ Wimborne Minster,ENG,England,GB,United Kingdom
 Wimbledon,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 Wilton,ENG,England,GB,United Kingdom
-Wilnecote,ENG,England,GB,United Kingdom
 Wilmslow,ENG,England,GB,United Kingdom
 Wilmington,ENG,England,GB,United Kingdom
 Willoughby on the Wolds,ENG,England,GB,United Kingdom
@@ -18723,7 +18741,6 @@ Whitwell,ENG,England,GB,United Kingdom
 Whitton,ENG,England,GB,United Kingdom
 Whittlesford,ENG,England,GB,United Kingdom
 Whittlesey,ENG,England,GB,United Kingdom
-Whittlebury,ENG,England,GB,United Kingdom
 Whitstable,ENG,England,GB,United Kingdom
 Whitsbury,ENG,England,GB,United Kingdom
 Whitnash,ENG,England,GB,United Kingdom
@@ -18870,7 +18887,6 @@ Walton-on-the-Naze,ENG,England,GB,United Kingdom
 Walton,ENG,England,GB,United Kingdom
 Walton on the Hill,ENG,England,GB,United Kingdom
 Walton,ENG,England,GB,United Kingdom
-Walton,ENG,England,GB,United Kingdom
 Walthamstow,ENG,England,GB,United Kingdom
 Waltham Cross,ENG,England,GB,United Kingdom
 Waltham Abbey,ENG,England,GB,United Kingdom
@@ -18891,6 +18907,7 @@ Wainscott,ENG,England,GB,United Kingdom
 Wainfleet All Saints,ENG,England,GB,United Kingdom
 Wadhurst,ENG,England,GB,United Kingdom
 Wadebridge,ENG,England,GB,United Kingdom
+Victoria,WLS,Wales,GB,United Kingdom
 Verwood,ENG,England,GB,United Kingdom
 Ventnor,ENG,England,GB,United Kingdom
 Valley,WLS,Wales,GB,United Kingdom
@@ -19039,6 +19056,7 @@ Templepatrick,NIR,Northern Ireland,GB,United Kingdom
 Templecombe,ENG,England,GB,United Kingdom
 Teignmouth,ENG,England,GB,United Kingdom
 Teddington,ENG,England,GB,United Kingdom
+Teddington,ENG,England,GB,United Kingdom
 Tayport,SCT,Scotland,GB,United Kingdom
 Taynuilt,SCT,Scotland,GB,United Kingdom
 Tavistock,ENG,England,GB,United Kingdom
@@ -19116,7 +19134,6 @@ Stretford,ENG,England,GB,United Kingdom
 Strensham,ENG,England,GB,United Kingdom
 Strensall,ENG,England,GB,United Kingdom
 Streetly,ENG,England,GB,United Kingdom
-Streatley,ENG,England,GB,United Kingdom
 Streatham,ENG,England,GB,United Kingdom
 Stratton Audley,ENG,England,GB,United Kingdom
 Strathmiglo,SCT,Scotland,GB,United Kingdom
@@ -19143,6 +19160,7 @@ Stoney Middleton,ENG,England,GB,United Kingdom
 Stonehouse,SCT,Scotland,GB,United Kingdom
 Stonehouse,ENG,England,GB,United Kingdom
 Stonehaven,SCT,Scotland,GB,United Kingdom
+Stone,ENG,England,GB,United Kingdom
 Stone,ENG,England,GB,United Kingdom
 Stone,ENG,England,GB,United Kingdom
 Stolford,ENG,England,GB,United Kingdom
@@ -19178,6 +19196,7 @@ Starcross,ENG,England,GB,United Kingdom
 Staplehurst,ENG,England,GB,United Kingdom
 Staplefield,ENG,England,GB,United Kingdom
 Staple,ENG,England,GB,United Kingdom
+Stanwick,ENG,England,GB,United Kingdom
 Stanwell,ENG,England,GB,United Kingdom
 Stanton,ENG,England,GB,United Kingdom
 Stansted,ENG,England,GB,United Kingdom
@@ -19324,7 +19343,6 @@ Shenstone,ENG,England,GB,United Kingdom
 Shenley Church End,ENG,England,GB,United Kingdom
 Shenley AV,ENG,England,GB,United Kingdom
 Shenfield,ENG,England,GB,United Kingdom
-Shelley,ENG,England,GB,United Kingdom
 Shelford,ENG,England,GB,United Kingdom
 Sheldon,ENG,England,GB,United Kingdom
 Shefford,ENG,England,GB,United Kingdom
@@ -19358,10 +19376,10 @@ Seaton Delaval,ENG,England,GB,United Kingdom
 Seaton,ENG,England,GB,United Kingdom
 Seaton,ENG,England,GB,United Kingdom
 Seascale,ENG,England,GB,United Kingdom
+Seale,ENG,England,GB,United Kingdom
 Seahouses,ENG,England,GB,United Kingdom
 Seaham,ENG,England,GB,United Kingdom
 Seaford,ENG,England,GB,United Kingdom
-Seacroft,ENG,England,GB,United Kingdom
 Seacombe,ENG,England,GB,United Kingdom
 Scunthorpe,ENG,England,GB,United Kingdom
 Scopwick,ENG,England,GB,United Kingdom
@@ -19383,6 +19401,7 @@ Sanquhar,SCT,Scotland,GB,United Kingdom
 Sandycroft,WLS,Wales,GB,United Kingdom
 Sandy,ENG,England,GB,United Kingdom
 Sandwich,ENG,England,GB,United Kingdom
+Sandwell,ENG,England,GB,United Kingdom
 Sandown,ENG,England,GB,United Kingdom
 Sandleheath,ENG,England,GB,United Kingdom
 Sandiacre,ENG,England,GB,United Kingdom
@@ -19510,8 +19529,10 @@ Redwick,WLS,Wales,GB,United Kingdom
 Redruth,ENG,England,GB,United Kingdom
 Redmile,ENG,England,GB,United Kingdom
 Redhill,ENG,England,GB,United Kingdom
+Redhill,ENG,England,GB,United Kingdom
 Redditch,ENG,England,GB,United Kingdom
 Redcar,ENG,England,GB,United Kingdom
+Redbridge,ENG,England,GB,United Kingdom
 Redbourn,ENG,England,GB,United Kingdom
 Reculver,ENG,England,GB,United Kingdom
 Reading,ENG,England,GB,United Kingdom
@@ -19528,7 +19549,6 @@ Raunds,ENG,England,GB,United Kingdom
 Rattery,ENG,England,GB,United Kingdom
 Ratho,SCT,Scotland,GB,United Kingdom
 Rathfriland,NIR,Northern Ireland,GB,United Kingdom
-Ratcliffe on Soar,ENG,England,GB,United Kingdom
 Rangeworthy,ENG,England,GB,United Kingdom
 Randwick,ENG,England,GB,United Kingdom
 Randalstown,NIR,Northern Ireland,GB,United Kingdom
@@ -19536,6 +19556,7 @@ Ramsgate,ENG,England,GB,United Kingdom
 Ramsey,ENG,England,GB,United Kingdom
 Ramsden,ENG,England,GB,United Kingdom
 Ramsbottom,ENG,England,GB,United Kingdom
+Rake,ENG,England,GB,United Kingdom
 Rainworth,ENG,England,GB,United Kingdom
 Rainow,ENG,England,GB,United Kingdom
 Rainhill,ENG,England,GB,United Kingdom
@@ -19545,7 +19566,6 @@ Rainford,ENG,England,GB,United Kingdom
 Raglan,WLS,Wales,GB,United Kingdom
 Radstock,ENG,England,GB,United Kingdom
 Radnage,ENG,England,GB,United Kingdom
-Radley,ENG,England,GB,United Kingdom
 Radlett,ENG,England,GB,United Kingdom
 Radcliffe on Trent,ENG,England,GB,United Kingdom
 Quinton,ENG,England,GB,United Kingdom
@@ -19585,6 +19605,7 @@ Prescot,ENG,England,GB,United Kingdom
 Preesall,ENG,England,GB,United Kingdom
 Prees,ENG,England,GB,United Kingdom
 Poynton,ENG,England,GB,United Kingdom
+,WLS,Wales,GB,United Kingdom
 Powick,ENG,England,GB,United Kingdom
 Poulton le Fylde,ENG,England,GB,United Kingdom
 Potton,ENG,England,GB,United Kingdom
@@ -19666,6 +19687,7 @@ Pencoed,WLS,Wales,GB,United Kingdom
 Pencader,WLS,Wales,GB,United Kingdom
 Penarth,WLS,Wales,GB,United Kingdom
 Pembury,ENG,England,GB,United Kingdom
+,WLS,Wales,GB,United Kingdom
 Pembroke Dock,WLS,Wales,GB,United Kingdom
 Pembroke,WLS,Wales,GB,United Kingdom
 Pelsall,ENG,England,GB,United Kingdom
@@ -19701,11 +19723,13 @@ Oxenhope,ENG,England,GB,United Kingdom
 Oving,ENG,England,GB,United Kingdom
 Overtown,SCT,Scotland,GB,United Kingdom
 Overseal,ENG,England,GB,United Kingdom
+Over Compton,ENG,England,GB,United Kingdom
 Oundle,ENG,England,GB,United Kingdom
 Ottringham,ENG,England,GB,United Kingdom
 Ottery St Mary,ENG,England,GB,United Kingdom
 Otterton,ENG,England,GB,United Kingdom
 Ottershaw,ENG,England,GB,United Kingdom
+Otley,ENG,England,GB,United Kingdom
 Otley,ENG,England,GB,United Kingdom
 Otford,ENG,England,GB,United Kingdom
 Oswestry,ENG,England,GB,United Kingdom
@@ -19766,6 +19790,7 @@ North Scarle,ENG,England,GB,United Kingdom
 Northrepps,ENG,England,GB,United Kingdom
 North Queensferry,SCT,Scotland,GB,United Kingdom
 North Petherwin,ENG,England,GB,United Kingdom
+Northop,WLS,Wales,GB,United Kingdom
 Northolt,ENG,England,GB,United Kingdom
 North Newton,ENG,England,GB,United Kingdom
 North Moreton,ENG,England,GB,United Kingdom
@@ -20005,6 +20030,7 @@ Martin,ENG,England,GB,United Kingdom
 Martin,ENG,England,GB,United Kingdom
 Martham,ENG,England,GB,United Kingdom
 Marston Moretaine,ENG,England,GB,United Kingdom
+Marston,ENG,England,GB,United Kingdom
 Marske,ENG,England,GB,United Kingdom
 Marsh Gibbon,ENG,England,GB,United Kingdom
 Marple,ENG,England,GB,United Kingdom
@@ -20169,6 +20195,7 @@ Llanddeusant,WLS,Wales,GB,United Kingdom
 Llanbradach,WLS,Wales,GB,United Kingdom
 Llanberis,WLS,Wales,GB,United Kingdom
 Llanarth,WLS,Wales,GB,United Kingdom
+Lizard,ENG,England,GB,United Kingdom
 Livingston,SCT,Scotland,GB,United Kingdom
 Liverton,ENG,England,GB,United Kingdom
 Liversedge,ENG,England,GB,United Kingdom
@@ -20187,7 +20214,6 @@ Little Haseley,ENG,England,GB,United Kingdom
 Littlehampton,ENG,England,GB,United Kingdom
 Little Clacton,ENG,England,GB,United Kingdom
 Little Chart,ENG,England,GB,United Kingdom
-Littlebury,ENG,England,GB,United Kingdom
 Little Brickhill,ENG,England,GB,United Kingdom
 Littleborough,ENG,England,GB,United Kingdom
 Little Bedwyn,ENG,England,GB,United Kingdom
@@ -20212,6 +20238,7 @@ Lincoln,ENG,England,GB,United Kingdom
 Limpsfield,ENG,England,GB,United Kingdom
 Limehouse,ENG,England,GB,United Kingdom
 Limavady,NIR,Northern Ireland,GB,United Kingdom
+,NIR,Northern Ireland,GB,United Kingdom
 Lilleshall,ENG,England,GB,United Kingdom
 Lidlington,ENG,England,GB,United Kingdom
 Lichfield,ENG,England,GB,United Kingdom
@@ -20332,6 +20359,7 @@ Kingston near Lewes,ENG,England,GB,United Kingdom
 Kingston,ENG,England,GB,United Kingdom
 Kingston,ENG,England,GB,United Kingdom
 Kingsteignton,ENG,England,GB,United Kingdom
+Kings Norton,ENG,England,GB,United Kingdom
 Kings Lynn,ENG,England,GB,United Kingdom
 Kings Langley,ENG,England,GB,United Kingdom
 Kingskerswell,ENG,England,GB,United Kingdom
@@ -20491,7 +20519,6 @@ Hougham,ENG,England,GB,United Kingdom
 Horwich,ENG,England,GB,United Kingdom
 Horton Kirby,ENG,England,GB,United Kingdom
 Horton,ENG,England,GB,United Kingdom
-Horsted Keynes,ENG,England,GB,United Kingdom
 Horstead,ENG,England,GB,United Kingdom
 Horsley,ENG,England,GB,United Kingdom
 Horsington,ENG,England,GB,United Kingdom
@@ -20511,7 +20538,6 @@ Hopwood,ENG,England,GB,United Kingdom
 Hopton,ENG,England,GB,United Kingdom
 Hope,ENG,England,GB,United Kingdom
 Hook Norton,ENG,England,GB,United Kingdom
-Hooke,ENG,England,GB,United Kingdom
 Hook,ENG,England,GB,United Kingdom
 Hook,ENG,England,GB,United Kingdom
 Hook,ENG,England,GB,United Kingdom
@@ -20539,6 +20565,7 @@ Hollingwood,ENG,England,GB,United Kingdom
 Hollesley,ENG,England,GB,United Kingdom
 Holcombe Rogus,ENG,England,GB,United Kingdom
 Holborn,ENG,England,GB,United Kingdom
+Holbeck,ENG,England,GB,United Kingdom
 Holbeach,ENG,England,GB,United Kingdom
 Hoghton,ENG,England,GB,United Kingdom
 Hoddesdon,ENG,England,GB,United Kingdom
@@ -20916,11 +20943,11 @@ Folkestone,ENG,England,GB,United Kingdom
 Fochabers,SCT,Scotland,GB,United Kingdom
 Flitwick,ENG,England,GB,United Kingdom
 Flitton,ENG,England,GB,United Kingdom
-,WLS,Wales,GB,United Kingdom
 Flint,WLS,Wales,GB,United Kingdom
 Fleetwood,ENG,England,GB,United Kingdom
 Fleet,ENG,England,GB,United Kingdom
 Fivemiletown,NIR,Northern Ireland,GB,United Kingdom
+Fitzwilliam,ENG,England,GB,United Kingdom
 Fishguard,WLS,Wales,GB,United Kingdom
 Fishburn,ENG,England,GB,United Kingdom
 Fishbourne,ENG,England,GB,United Kingdom
@@ -21144,6 +21171,7 @@ Draperstown,NIR,Northern Ireland,GB,United Kingdom
 Downpatrick,NIR,Northern Ireland,GB,United Kingdom
 Downham Market,ENG,England,GB,United Kingdom
 Downham,ENG,England,GB,United Kingdom
+Downend,ENG,England,GB,United Kingdom
 Dover,ENG,England,GB,United Kingdom
 Doune,SCT,Scotland,GB,United Kingdom
 Douglas,SCT,Scotland,GB,United Kingdom
@@ -21210,6 +21238,7 @@ Darley,ENG,England,GB,United Kingdom
 Darlaston,ENG,England,GB,United Kingdom
 Daresbury,ENG,England,GB,United Kingdom
 Dalton in Furness,ENG,England,GB,United Kingdom
+Dalston,ENG,England,GB,United Kingdom
 Dalrymple,SCT,Scotland,GB,United Kingdom
 Dalry,SCT,Scotland,GB,United Kingdom
 Dalry,SCT,Scotland,GB,United Kingdom
@@ -21285,7 +21314,6 @@ Cowley,ENG,England,GB,United Kingdom
 Cowfold,ENG,England,GB,United Kingdom
 West Cowes,ENG,England,GB,United Kingdom
 Cowdenbeath,SCT,Scotland,GB,United Kingdom
-Cowden,ENG,England,GB,United Kingdom
 Cowbridge,WLS,Wales,GB,United Kingdom
 Coverham,ENG,England,GB,United Kingdom
 Coventry,ENG,England,GB,United Kingdom
@@ -21398,6 +21426,7 @@ Claudy,NIR,Northern Ireland,GB,United Kingdom
 Clare,ENG,England,GB,United Kingdom
 Clapham,ENG,England,GB,United Kingdom
 Clapham,ENG,England,GB,United Kingdom
+Clapham,ENG,England,GB,United Kingdom
 Clacton-on-Sea,ENG,England,GB,United Kingdom
 ,SCT,Scotland,GB,United Kingdom
 Clackmannan,SCT,Scotland,GB,United Kingdom
@@ -21448,7 +21477,6 @@ Chetwynd Aston,ENG,England,GB,United Kingdom
 Chetwode,ENG,England,GB,United Kingdom
 Chetnole,ENG,England,GB,United Kingdom
 Cheswardine,ENG,England,GB,United Kingdom
-Chesterton,ENG,England,GB,United Kingdom
 Chester-le-Street,ENG,England,GB,United Kingdom
 Chesterfield,ENG,England,GB,United Kingdom
 Chester,ENG,England,GB,United Kingdom
@@ -21483,7 +21511,6 @@ Charlwood,ENG,England,GB,United Kingdom
 Charlton on Otmoor,ENG,England,GB,United Kingdom
 Charlton Kings,ENG,England,GB,United Kingdom
 Charlbury,ENG,England,GB,United Kingdom
-Charing Cross,ENG,England,GB,United Kingdom
 Charing,ENG,England,GB,United Kingdom
 Chard,ENG,England,GB,United Kingdom
 Chapeltown,ENG,England,GB,United Kingdom
@@ -21645,7 +21672,7 @@ Brough,ENG,England,GB,United Kingdom
 Brough,ENG,England,GB,United Kingdom
 Broseley,ENG,England,GB,United Kingdom
 Brora,SCT,Scotland,GB,United Kingdom
-Brook,ENG,England,GB,United Kingdom
+Brookland,ENG,England,GB,United Kingdom
 Bromyard,ENG,England,GB,United Kingdom
 Bromsgrove,ENG,England,GB,United Kingdom
 Brompton,ENG,England,GB,United Kingdom
@@ -21659,6 +21686,7 @@ Brockenhurst,ENG,England,GB,United Kingdom
 Broadway,ENG,England,GB,United Kingdom
 Broadstone,ENG,England,GB,United Kingdom
 Broadstairs,ENG,England,GB,United Kingdom
+Broad Oak,ENG,England,GB,United Kingdom
 Broadhempston,ENG,England,GB,United Kingdom
 Broadheath,ENG,England,GB,United Kingdom
 Brize Norton,ENG,England,GB,United Kingdom
@@ -21825,6 +21853,7 @@ Bideford,ENG,England,GB,United Kingdom
 Biddulph,ENG,England,GB,United Kingdom
 Biddenden,ENG,England,GB,United Kingdom
 Bidborough,ENG,England,GB,United Kingdom
+Bicton,ENG,England,GB,United Kingdom
 Bickley Moss,ENG,England,GB,United Kingdom
 Bickerstaffe,ENG,England,GB,United Kingdom
 Bicester,ENG,England,GB,United Kingdom
@@ -21949,6 +21978,7 @@ Ballynure,NIR,Northern Ireland,GB,United Kingdom
 Ballynahinch,NIR,Northern Ireland,GB,United Kingdom
 Ballymoney,NIR,Northern Ireland,GB,United Kingdom
 Ballymena,NIR,Northern Ireland,GB,United Kingdom
+,NIR,Northern Ireland,GB,United Kingdom
 Ballykelly,NIR,Northern Ireland,GB,United Kingdom
 Ballyhornan,NIR,Northern Ireland,GB,United Kingdom
 Ballygrant,SCT,Scotland,GB,United Kingdom
@@ -22111,6 +22141,7 @@ Addlestone,ENG,England,GB,United Kingdom
 Addington,ENG,England,GB,United Kingdom
 Addingham,ENG,England,GB,United Kingdom
 Acton Turville,ENG,England,GB,United Kingdom
+Acton,NIR,Northern Ireland,GB,United Kingdom
 Acton Bridge,ENG,England,GB,United Kingdom
 Acton,ENG,England,GB,United Kingdom
 Acrefair,WLS,Wales,GB,United Kingdom
@@ -22514,7 +22545,7 @@ Root,LU,Lucerne,CH,Switzerland
 Rongellen,GR,Grisons,CH,Switzerland
 Romont,FR,Fribourg,CH,Switzerland
 Romanshorn,TG,Thurgau,CH,Switzerland
-Romanel,VD,Vaud,CH,Switzerland
+Romanel-sur-Lausanne,VD,Vaud,CH,Switzerland
 Romainmotier,VD,Vaud,CH,Switzerland
 Rolle,VD,Vaud,CH,Switzerland
 Rohrbach,BE,Bern,CH,Switzerland
@@ -22596,7 +22627,7 @@ Osogna,TI,Ticino,CH,Switzerland
 Orvin,BE,Bern,CH,Switzerland
 Orsieres,VS,Valais,CH,Switzerland
 Orpund,BE,Bern,CH,Switzerland
-Oron-la-ville,VD,Vaud,CH,Switzerland
+Oron-la-Ville,VD,Vaud,CH,Switzerland
 Ormalingen,BL,Basel-Landschaft,CH,Switzerland
 Orbe,VD,Vaud,CH,Switzerland
 Oppens,VD,Vaud,CH,Switzerland
@@ -22801,6 +22832,7 @@ Leysin,VD,Vaud,CH,Switzerland
 Le Vaud,VD,Vaud,CH,Switzerland
 Leuzigen,BE,Bern,CH,Switzerland
 Leutwil,AG,Aargau,CH,Switzerland
+Leukerbad,VS,Valais,CH,Switzerland
 Les Valettes,VS,Valais,CH,Switzerland
 Les Ponts-de-Martel,NE,Neuchâtel,CH,Switzerland
 Les Moulins,VD,Vaud,CH,Switzerland
@@ -23256,7 +23288,6 @@ Chalais,VS,Valais,CH,Switzerland
 Chabrey,VD,Vaud,CH,Switzerland
 Cernier,NE,Neuchâtel,CH,Switzerland
 Celigny,GE,Geneva,CH,Switzerland
-Celerina,GR,Grisons,CH,Switzerland
 Castione,TI,Ticino,CH,Switzerland
 Caslano,TI,Ticino,CH,Switzerland
 Cartigny,GE,Geneva,CH,Switzerland
@@ -23883,7 +23914,7 @@ Oxelosund,D,Södermanland,SE,Sweden
 Oviken,Z,Jämtland,SE,Sweden
 Overum,H,Kalmar,SE,Sweden
 Overlida,O,Västra Götaland,SE,Sweden
-Overkovland,Y,Västernorrland,SE,Sweden
+OEverkovland,Y,Västernorrland,SE,Sweden
 Overhornas,Y,Västernorrland,SE,Sweden
 Otterbacken,O,Västra Götaland,SE,Sweden
 Ostra Ljungby,M,Skåne,SE,Sweden
@@ -24127,6 +24158,7 @@ Kramfors,Y,Västernorrland,SE,Sweden
 Kosta,G,Kronoberg,SE,Sweden
 Korsberga,O,Västra Götaland,SE,Sweden
 Koppom,S,Värmland,SE,Sweden
+,W,Dalarna,SE,Sweden
 Kopparberg,T,Örebro,SE,Sweden
 Kopmannebro,O,Västra Götaland,SE,Sweden
 Kopmanholmen,Y,Västernorrland,SE,Sweden
@@ -24317,6 +24349,7 @@ Hallekis,O,Västra Götaland,SE,Sweden
 Halleforsnas,D,Södermanland,SE,Sweden
 Haellefors,T,Örebro,SE,Sweden
 Hallaryd,F,Jönköping,SE,Sweden
+,N,Halland,SE,Sweden
 Haeljarp,M,Skåne,SE,Sweden
 Haknas,AC,Västerbotten,SE,Sweden
 Hajom,O,Västra Götaland,SE,Sweden
@@ -24809,6 +24842,7 @@ Santa Leocadia,13,Porto,PT,Portugal
 Santa Cruz do Douro,13,Porto,PT,Portugal
 Santa Cruz do Bispo,13,Porto,PT,Portugal
 Santa Comba Dao,18,Viseu,PT,Portugal
+Santa,03,Braga,PT,Portugal
 Sanguedo,01,Aveiro,PT,Portugal
 Sangalhos,01,Aveiro,PT,Portugal
 Sandomil,09,Guarda,PT,Portugal
@@ -25151,6 +25185,7 @@ Bustos,01,Aveiro,PT,Portugal
 Busteliberne,03,Braga,PT,Portugal
 Briteiros,03,Braga,PT,Portugal
 Branca,01,Aveiro,PT,Portugal
+,04,Bragança,PT,Portugal
 Braganca,04,Bragança,PT,Portugal
 ,03,Braga,PT,Portugal
 Braga,03,Braga,PT,Portugal
@@ -25548,6 +25583,7 @@ Ter Apel,GR,Groningen,NL,Netherlands
 Ter Aar,ZH,South Holland,NL,Netherlands
 Ten Boer,GR,Groningen,NL,Netherlands
 Tegelen,LI,Limburg,NL,Netherlands
+Taarlo,DR,Provincie Drenthe,NL,Netherlands
 Swolgen,LI,Limburg,NL,Netherlands
 Swifterbant,FL,Provincie Flevoland,NL,Netherlands
 Swalmen,LI,Limburg,NL,Netherlands
@@ -25817,7 +25853,6 @@ Oterleek,NH,North Holland,NL,Netherlands
 Ossendrecht,NB,North Brabant,NL,Netherlands
 Oss,NB,North Brabant,NL,Netherlands
 Ospel,LI,Limburg,NL,Netherlands
-Oranje,DR,Provincie Drenthe,NL,Netherlands
 Opperdoes,NH,North Holland,NL,Netherlands
 Opmeer,NH,North Holland,NL,Netherlands
 Oploo,NB,North Brabant,NL,Netherlands
@@ -25900,6 +25935,7 @@ Noordeloos,ZH,South Holland,NL,Netherlands
 ,NB,North Brabant,NL,Netherlands
 Noardburgum,FR,Friesland,NL,Netherlands
 Noordbeemster,NH,North Holland,NL,Netherlands
+Noorbeek,LI,Limburg,NL,Netherlands
 Nistelrode,NB,North Brabant,NL,Netherlands
 Nisse,ZE,Provincie Zeeland,NL,Netherlands
 Nispen,NB,North Brabant,NL,Netherlands
@@ -26445,7 +26481,6 @@ Gaanderen,GE,Provincie Gelderland,NL,Netherlands
 ,FR,Friesland,NL,Netherlands
 Frederiksoord,DR,Provincie Drenthe,NL,Netherlands
 Franeker,FR,Friesland,NL,Netherlands
-Foxhol,GR,Groningen,NL,Netherlands
 Fluitenberg,DR,Provincie Drenthe,NL,Netherlands
 Firdgum,FR,Friesland,NL,Netherlands
 Finsterwolde,GR,Groningen,NL,Netherlands
@@ -26510,6 +26545,7 @@ Eersel,NB,North Brabant,NL,Netherlands
 Eerbeek,GE,Provincie Gelderland,NL,Netherlands
 Een,DR,Provincie Drenthe,NL,Netherlands
 Eemnes,UT,Provincie Utrecht,NL,Netherlands
+Eelderwolde,DR,Provincie Drenthe,NL,Netherlands
 Eelde-Paterswolde,DR,Provincie Drenthe,NL,Netherlands
 Eefde,GE,Provincie Gelderland,NL,Netherlands
 Eede,ZE,Provincie Zeeland,NL,Netherlands
@@ -26521,6 +26557,7 @@ Eck en Wiel,GE,Provincie Gelderland,NL,Netherlands
 Eckelrade,LI,Limburg,NL,Netherlands
 Echtenerbrug,FR,Friesland,NL,Netherlands
 Echten,DR,Provincie Drenthe,NL,Netherlands
+Echteld,GE,Provincie Gelderland,NL,Netherlands
 Echt,LI,Limburg,NL,Netherlands
 Dwingeloo,DR,Provincie Drenthe,NL,Netherlands
 Duizel,NB,North Brabant,NL,Netherlands
@@ -26747,6 +26784,7 @@ Bennekom,GE,Provincie Gelderland,NL,Netherlands
 Bennebroek,NH,North Holland,NL,Netherlands
 Beneden-Leeuwen,GE,Provincie Gelderland,NL,Netherlands
 Bemmel,GE,Provincie Gelderland,NL,Netherlands
+Bemelen,LI,Limburg,NL,Netherlands
 Beltrum,GE,Provincie Gelderland,NL,Netherlands
 Bellingwolde,GR,Groningen,NL,Netherlands
 Belfeld,LI,Limburg,NL,Netherlands
@@ -26932,7 +26970,6 @@ Weitra,3,Lower Austria,AT,Austria
 Weitersfeld,3,Lower Austria,AT,Austria
 Weiten,3,Lower Austria,AT,Austria
 Weisskirchen an der Traun,4,Upper Austria,AT,Austria
-Weissenkirchen in der Wachau,3,Lower Austria,AT,Austria
 Weinzierl,3,Lower Austria,AT,Austria
 Weinburg am Sassbach,6,Styria,AT,Austria
 Weinburg,3,Lower Austria,AT,Austria
@@ -26989,7 +27026,6 @@ Villach,2,Carinthia,AT,Austria
 Viktring,2,Carinthia,AT,Austria
 Viktorsberg,8,Vorarlberg,AT,Austria
 Vigaun,5,Salzburg,AT,Austria
-Viehofen,3,Lower Austria,AT,Austria
 Viehhofen,5,Salzburg,AT,Austria
 Vichtenstein,4,Upper Austria,AT,Austria
 Velden am Woerthersee,2,Carinthia,AT,Austria
@@ -27049,6 +27085,7 @@ Thomasberg,3,Lower Austria,AT,Austria
 Thiersee,7,Tyrol,AT,Austria
 Theyern,3,Lower Austria,AT,Austria
 Theresienfeld,3,Lower Austria,AT,Austria
+Thaur,7,Tyrol,AT,Austria
 Thallern,3,Lower Austria,AT,Austria
 Thalheim bei Wels,4,Upper Austria,AT,Austria
 Thalgau,5,Salzburg,AT,Austria
@@ -27059,6 +27096,7 @@ Terfens,7,Tyrol,AT,Austria
 Telfs,7,Tyrol,AT,Austria
 Telfes im Stubai,7,Tyrol,AT,Austria
 Teesdorf,3,Lower Austria,AT,Austria
+Tauplitz,6,Styria,AT,Austria
 Taufkirchen an der Pram,4,Upper Austria,AT,Austria
 Tarrenz,7,Tyrol,AT,Austria
 Tannheim,7,Tyrol,AT,Austria
@@ -27203,6 +27241,7 @@ Sankt Veit im Pongau,5,Salzburg,AT,Austria
 Sankt Veit an der Golsen,3,Lower Austria,AT,Austria
 Sankt Veit an der Glan,2,Carinthia,AT,Austria
 Sankt Valentin,3,Lower Austria,AT,Austria
+Sankt Urban,2,Carinthia,AT,Austria
 Sankt Ulrich bei Steyr,4,Upper Austria,AT,Austria
 Sankt Roman,4,Upper Austria,AT,Austria
 Sankt Pölten,3,Lower Austria,AT,Austria
@@ -27327,6 +27366,7 @@ Pottenbrunn,3,Lower Austria,AT,Austria
 Poertschach am Woerthersee,2,Carinthia,AT,Austria
 Poelten,6,Styria,AT,Austria
 Polsenz,4,Upper Austria,AT,Austria
+Pols an der Wieserbahn,6,Styria,AT,Austria
 Polling im Innkreis,4,Upper Austria,AT,Austria
 Pollham,4,Upper Austria,AT,Austria
 Polfing,6,Styria,AT,Austria
@@ -27417,6 +27457,7 @@ Obereichen,3,Lower Austria,AT,Austria
 Oberbergern,3,Lower Austria,AT,Austria
 Oberau,7,Tyrol,AT,Austria
 Oberalm,5,Salzburg,AT,Austria
+Oberaichwald,2,Carinthia,AT,Austria
 Obdach,6,Styria,AT,Austria
 Nuziders,8,Vorarlberg,AT,Austria
 Nussbach,4,Upper Austria,AT,Austria
@@ -27557,6 +27598,7 @@ Linz,4,Upper Austria,AT,Austria
 Lindgraben,1,Burgenland,AT,Austria
 Lilienfeld,3,Lower Austria,AT,Austria
 Ligist,6,Styria,AT,Austria
+Liezen,6,Styria,AT,Austria
 Lieserbruecke,2,Carinthia,AT,Austria
 Lienz,7,Tyrol,AT,Austria
 Lieboch,6,Styria,AT,Austria
@@ -27662,6 +27704,7 @@ Kittsee,1,Burgenland,AT,Austria
 Kirnberg an der Mank,3,Lower Austria,AT,Austria
 Kirchstetten,3,Lower Austria,AT,Austria
 Kirchschlag bei Linz,4,Upper Austria,AT,Austria
+Kirchschlag,3,Lower Austria,AT,Austria
 Kirchheim im Innkreis,4,Upper Austria,AT,Austria
 Kirchham,4,Upper Austria,AT,Austria
 Kirchdorf in Tirol,7,Tyrol,AT,Austria
@@ -27678,6 +27721,7 @@ Kierling,3,Lower Austria,AT,Austria
 Kettlasbrunn,3,Lower Austria,AT,Austria
 Kennelbach,8,Vorarlberg,AT,Austria
 Kemeten,1,Burgenland,AT,Austria
+Kematen in Tirol,7,Tyrol,AT,Austria
 Kematen an der Krems,4,Upper Austria,AT,Austria
 Kefermarkt,4,Upper Austria,AT,Austria
 Kautzen,3,Lower Austria,AT,Austria
@@ -27719,6 +27763,7 @@ Innerbraz,8,Vorarlberg,AT,Austria
 Imsterberg,7,Tyrol,AT,Austria
 Imst,7,Tyrol,AT,Austria
 Ilz,6,Styria,AT,Austria
+Illmitz,1,Burgenland,AT,Austria
 Huttschlag,5,Salzburg,AT,Austria
 Hurm,3,Lower Austria,AT,Austria
 Hoetzlarn,4,Upper Austria,AT,Austria
@@ -27746,6 +27791,7 @@ Hochburg,4,Upper Austria,AT,Austria
 Hobersdorf,3,Lower Austria,AT,Austria
 Hitzendorf,6,Styria,AT,Austria
 Hirtenberg,3,Lower Austria,AT,Austria
+Hirschegg,8,Vorarlberg,AT,Austria
 Hirschbach im Muhlkreis,4,Upper Austria,AT,Austria
 Hippersdorf,3,Lower Austria,AT,Austria
 Hippach,7,Tyrol,AT,Austria
@@ -27782,6 +27828,7 @@ Handenberg,4,Upper Austria,AT,Austria
 Hallwang,5,Salzburg,AT,Austria
 Hallstatt,4,Upper Austria,AT,Austria
 Hallein,5,Salzburg,AT,Austria
+Haldensee,7,Tyrol,AT,Austria
 Halbturn,1,Burgenland,AT,Austria
 Haitzendorf,3,Lower Austria,AT,Austria
 Hainfeld,3,Lower Austria,AT,Austria
@@ -27805,6 +27852,7 @@ Guntramsdorf,3,Lower Austria,AT,Austria
 Gunskirchen,4,Upper Austria,AT,Austria
 Gunselsdorf,3,Lower Austria,AT,Austria
 Gumpoldskirchen,3,Lower Austria,AT,Austria
+Gugging,3,Lower Austria,AT,Austria
 Gschwandt,4,Upper Austria,AT,Austria
 Grund,3,Lower Austria,AT,Austria
 Grunbach am Schneeberg,3,Lower Austria,AT,Austria
@@ -27822,6 +27870,7 @@ Mala Gora,2,Carinthia,AT,Austria
 Grosskadolz,3,Lower Austria,AT,Austria
 Grosshoeflein,1,Burgenland,AT,Austria
 Gross-Enzersdorf,3,Lower Austria,AT,Austria
+Grossarl,5,Salzburg,AT,Austria
 Gross,3,Lower Austria,AT,Austria
 Grodig,5,Salzburg,AT,Austria
 Grobming,6,Styria,AT,Austria
@@ -27908,7 +27957,6 @@ Forst,3,Lower Austria,AT,Austria
 Fornach,4,Upper Austria,AT,Austria
 Fohnsdorf,6,Styria,AT,Austria
 Flaurling,7,Tyrol,AT,Austria
-Flattach,2,Carinthia,AT,Austria
 Fladnitz im Raabtal,6,Styria,AT,Austria
 Fiss,7,Tyrol,AT,Austria
 Fischhorn,5,Salzburg,AT,Austria
@@ -27916,7 +27964,6 @@ Finkenberg,7,Tyrol,AT,Austria
 Filzmoos,5,Salzburg,AT,Austria
 Fieberbrunn,7,Tyrol,AT,Austria
 Feuersbrunn,3,Lower Austria,AT,Austria
-Feuchten,7,Tyrol,AT,Austria
 Fernitz,6,Styria,AT,Austria
 Ferlach,2,Carinthia,AT,Austria
 Fels am Wagram,3,Lower Austria,AT,Austria
@@ -27955,7 +28002,6 @@ Engabrunn,3,Lower Austria,AT,Austria
 Empersdorf,6,Styria,AT,Austria
 Eltendorf,1,Burgenland,AT,Austria
 Elsbethen,5,Salzburg,AT,Austria
-Elixhausen,5,Salzburg,AT,Austria
 Elbigenalp,7,Tyrol,AT,Austria
 Eisenstadt,1,Burgenland,AT,Austria
 Bad Eisenkappel,2,Carinthia,AT,Austria
@@ -28140,6 +28186,7 @@ Adriach,6,Styria,AT,Austria
 Adnet,5,Salzburg,AT,Austria
 Admont,6,Styria,AT,Austria
 Aching,4,Upper Austria,AT,Austria
+Achensee,7,Tyrol,AT,Austria
 Achalm,2,Carinthia,AT,Austria
 Abtenau,5,Salzburg,AT,Austria
 Absdorf,3,Lower Austria,AT,Austria
@@ -29416,7 +29463,6 @@ Aubel,WAL,Wallonia,BE,Belgium
 Aubange,WAL,Wallonia,BE,Belgium
 Attre,WAL,Wallonia,BE,Belgium
 Attenrode,VLG,Flanders,BE,Belgium
-Athus,WAL,Wallonia,BE,Belgium
 Ath,WAL,Wallonia,BE,Belgium
 Astene,VLG,Flanders,BE,Belgium
 Assent,VLG,Flanders,BE,Belgium
@@ -29439,6 +29485,7 @@ Antwerp,VLG,Flanders,BE,Belgium
 Antoing,WAL,Wallonia,BE,Belgium
 Anthisnes,WAL,Wallonia,BE,Belgium
 Antheit,WAL,Wallonia,BE,Belgium
+Anseremme,WAL,Wallonia,BE,Belgium
 Ans,WAL,Wallonia,BE,Belgium
 Anloy,WAL,Wallonia,BE,Belgium
 Anhée,WAL,Wallonia,BE,Belgium
@@ -29891,6 +29938,7 @@ Wellheim,BY,Bavaria,DE,Germany
 Wellendingen,BW,Baden-Württemberg Region,DE,Germany
 Wellen,ST,Saxony-Anhalt,DE,Germany
 Wellen,RP,Rheinland-Pfalz,DE,Germany
+Welle,NI,Lower Saxony,DE,Germany
 Wellaune,SN,Saxony,DE,Germany
 Welden,BY,Bavaria,DE,Germany
 Weitramsdorf,BY,Bavaria,DE,Germany
@@ -30329,7 +30377,6 @@ Umkirch,BW,Baden-Württemberg Region,DE,Germany
 Ulsnis,SH,Schleswig-Holstein,DE,Germany
 Ulsby,SH,Schleswig-Holstein,DE,Germany
 Ulrichstein,HE,Hesse,DE,Germany
-Ulmet,RP,Rheinland-Pfalz,DE,Germany
 Ulm,BW,Baden-Württemberg Region,DE,Germany
 Ulbering,BY,Bavaria,DE,Germany
 Uehrde,NI,Lower Saxony,DE,Germany
@@ -33382,6 +33429,7 @@ Korschenbroich,NW,North Rhine-Westphalia,DE,Germany
 Kornwestheim,BW,Baden-Württemberg Region,DE,Germany
 Korntal,BW,Baden-Württemberg Region,DE,Germany
 Korner,TH,Thuringia,DE,Germany
+Korlingen,RP,Rheinland-Pfalz,DE,Germany
 Korle,HE,Hesse,DE,Germany
 Kordorf,RP,Rheinland-Pfalz,DE,Germany
 Kordel,RP,Rheinland-Pfalz,DE,Germany
@@ -33654,7 +33702,7 @@ Karlskron,BY,Bavaria,DE,Germany
 Karlshuld,BY,Bavaria,DE,Germany
 Karlshausen,RP,Rheinland-Pfalz,DE,Germany
 Karlshagen,MV,Mecklenburg-Vorpommern,DE,Germany
-Bad Karlshafen,NI,Lower Saxony,DE,Germany
+Bad Karlshafen,HE,Hesse,DE,Germany
 Karlsfeld,BY,Bavaria,DE,Germany
 Karben,HE,Hesse,DE,Germany
 Karbach,BY,Bavaria,DE,Germany
@@ -33709,7 +33757,6 @@ Joessnitz,SN,Saxony,DE,Germany
 Josephenburg,BY,Bavaria,DE,Germany
 Joerl,SH,Schleswig-Holstein,DE,Germany
 Jork,NI,Lower Saxony,DE,Germany
-Jordan,SH,Schleswig-Holstein,DE,Germany
 Joehstadt,SN,Saxony,DE,Germany
 Johanniskirchen,BY,Bavaria,DE,Germany
 Johannesberg,BY,Bavaria,DE,Germany
@@ -33971,6 +34018,7 @@ Hohenstein-Ernstthal,SN,Saxony,DE,Germany
 Hohenstein,BW,Baden-Württemberg Region,DE,Germany
 Hohenselchow,BB,Brandenburg,DE,Germany
 Hohenroth,BY,Bavaria,DE,Germany
+Hohenroda,SN,Saxony,DE,Germany
 Hohen Pritz,MV,Mecklenburg-Vorpommern,DE,Germany
 Hohenpolding,BY,Bavaria,DE,Germany
 Hohenpeissenberg,BY,Bavaria,DE,Germany
@@ -34443,7 +34491,6 @@ Guetzkow,MV,Mecklenburg-Vorpommern,DE,Germany
 Gutweiler,RP,Rheinland-Pfalz,DE,Germany
 Gütersloh,NW,North Rhine-Westphalia,DE,Germany
 Gutenberg,RP,Rheinland-Pfalz,DE,Germany
-Gutenberg,BW,Baden-Württemberg Region,DE,Germany
 Gutach im Breisgau,BW,Baden-Württemberg Region,DE,Germany
 Gutach (Schwarzwaldbahn),BW,Baden-Württemberg Region,DE,Germany
 Guestrow,MV,Mecklenburg-Vorpommern,DE,Germany
@@ -34493,6 +34540,7 @@ Gruena,SN,Saxony,DE,Germany
 Grumbach,RP,Rheinland-Pfalz,DE,Germany
 Gruibingen,BW,Baden-Württemberg Region,DE,Germany
 Grubweidach,BY,Bavaria,DE,Germany
+Grove,SH,Schleswig-Holstein,DE,Germany
 Gross-Zimmern,HE,Hesse,DE,Germany
 Gross Wittensee,SH,Schleswig-Holstein,DE,Germany
 Grosswelzheim,BY,Bavaria,DE,Germany
@@ -35173,6 +35221,7 @@ Erwitte,NW,North Rhine-Westphalia,DE,Germany
 Ertingen,BW,Baden-Württemberg Region,DE,Germany
 Erpel,RP,Rheinland-Pfalz,DE,Germany
 Erolzheim,BW,Baden-Württemberg Region,DE,Germany
+Ernst,RP,Rheinland-Pfalz,DE,Germany
 Ernsgaden,BY,Bavaria,DE,Germany
 Erndtebruck,NW,North Rhine-Westphalia,DE,Germany
 Ermsleben,ST,Saxony-Anhalt,DE,Germany
@@ -35516,6 +35565,7 @@ Dossenheim,BW,Baden-Württemberg Region,DE,Germany
 Dorzbach,BW,Baden-Württemberg Region,DE,Germany
 Dorverden,NI,Lower Saxony,DE,Germany
 Dortmund,NW,North Rhine-Westphalia,DE,Germany
+Dorth,RP,Rheinland-Pfalz,DE,Germany
 Dorsten,NW,North Rhine-Westphalia,DE,Germany
 Dorstadt,NI,Lower Saxony,DE,Germany
 Dorsheim,RP,Rheinland-Pfalz,DE,Germany
@@ -37104,7 +37154,7 @@ Brouch,ME,Mersch,LU,Luxembourg
 Bridel,CA,Capellen,LU,Luxembourg
 Boxhorn,CL,Clervaux,LU,Luxembourg
 Bous,RM,Remich,LU,Luxembourg
-Born,,,LU,Luxembourg
+Born,EC,Echternach,LU,Luxembourg
 Bofferdange,ME,Mersch,LU,Luxembourg
 Boevange,CL,Clervaux,LU,Luxembourg
 Blumenthal,GR,Grevenmacher,LU,Luxembourg
@@ -37377,6 +37427,7 @@ Clonakilty,M,Munster,IE,Ireland
 Claremorris,C,Connaught,IE,Ireland
 Claregalway,C,Connaught,IE,Ireland
 Clarecastle,M,Munster,IE,Ireland
+,M,Munster,IE,Ireland
 Clane,L,Leinster,IE,Ireland
 Rath Luirc,M,Munster,IE,Ireland
 Charlestown,C,Connaught,IE,Ireland
@@ -37500,7 +37551,6 @@ Yviers,NAQ,Nouvelle-Aquitaine,FR,France
 Yvias,BRE,Brittany,FR,France
 Yvette,IDF,Île-de-France,FR,France
 Yvetot,NOR,Normandy,FR,France
-Yves,NAQ,Nouvelle-Aquitaine,FR,France
 Ytres,HDF,Hauts-de-France,FR,France
 Ytrac,ARA,Auvergne-Rhone-Alpes,FR,France
 Yssingeaux,ARA,Auvergne-Rhone-Alpes,FR,France
@@ -38035,6 +38085,7 @@ Villard-sur-Doron,ARA,Auvergne-Rhone-Alpes,FR,France
 Villard-de-Lans,ARA,Auvergne-Rhone-Alpes,FR,France
 Villard-Bonnot,ARA,Auvergne-Rhone-Alpes,FR,France
 "Villar-d'Arene",PAC,"Provence-Alpes-Côte d'Azur",FR,France
+Villard,ARA,Auvergne-Rhone-Alpes,FR,France
 Villandry,CVL,Centre,FR,France
 Villandraut,NAQ,Nouvelle-Aquitaine,FR,France
 Villamblard,NAQ,Nouvelle-Aquitaine,FR,France
@@ -39561,6 +39612,7 @@ Sauzon,BRE,Brittany,FR,France
 Sauze-Vaussais,NAQ,Nouvelle-Aquitaine,FR,France
 Sauzet,ARA,Auvergne-Rhone-Alpes,FR,France
 Sauzet,OCC,Occitanie,FR,France
+Sauze,PAC,"Provence-Alpes-Côte d'Azur",FR,France
 Sauxillanges,ARA,Auvergne-Rhone-Alpes,FR,France
 Saux-et-Pomarede,OCC,Occitanie,FR,France
 Saux,OCC,Occitanie,FR,France
@@ -43535,6 +43587,7 @@ Moulinet,NAQ,Nouvelle-Aquitaine,FR,France
 Moulinet,PAC,"Provence-Alpes-Côte d'Azur",FR,France
 Moulines,NOR,Normandy,FR,France
 Moulineaux,NOR,Normandy,FR,France
+Moulin,NAQ,Nouvelle-Aquitaine,FR,France
 Mouliherne,PDL,Pays de la Loire,FR,France
 Mouliets-et-Villemartin,NAQ,Nouvelle-Aquitaine,FR,France
 Moulidars,NAQ,Nouvelle-Aquitaine,FR,France
@@ -43647,6 +43700,7 @@ Monts-en-Bessin,NOR,Normandy,FR,France
 Montsegur-sur-Lauzon,ARA,Auvergne-Rhone-Alpes,FR,France
 Mont-Saxonnex,ARA,Auvergne-Rhone-Alpes,FR,France
 Montsaunes,OCC,Occitanie,FR,France
+Montsauche-les-Settons,BFC,Bourgogne-Franche-Comte,FR,France
 Mont-Saint-Vincent,BFC,Bourgogne-Franche-Comte,FR,France
 Mont-Saint-Martin,GES,Grand-Est,FR,France
 Mont-Saint-Martin,ARA,Auvergne-Rhone-Alpes,FR,France
@@ -46058,6 +46112,7 @@ La Taillee,PDL,Pays de la Loire,FR,France
 La Taille,CVL,Centre,FR,France
 La Table,ARA,Auvergne-Rhone-Alpes,FR,France
 La Suze-sur-Sarthe,PDL,Pays de la Loire,FR,France
+Lastic,ARA,Auvergne-Rhone-Alpes,FR,France
 Lassy,BRE,Brittany,FR,France
 Lasseube,NAQ,Nouvelle-Aquitaine,FR,France
 Lasserre,NAQ,Nouvelle-Aquitaine,FR,France
@@ -46295,7 +46350,6 @@ Landrevarzec,BRE,Brittany,FR,France
 Landrethun-les-Ardres,HDF,Hauts-de-France,FR,France
 Landres,GES,Grand-Est,FR,France
 Landrecies,HDF,Hauts-de-France,FR,France
-Landos,ARA,Auvergne-Rhone-Alpes,FR,France
 Landivisiau,BRE,Brittany,FR,France
 Landiras,NAQ,Nouvelle-Aquitaine,FR,France
 Landigou,NOR,Normandy,FR,France
@@ -46617,6 +46671,7 @@ Chaux-Neuve,BFC,Bourgogne-Franche-Comte,FR,France
 La Chaussee-sur-Marne,GES,Grand-Est,FR,France
 "Lachaussee-du-Bois-d'Ecu",HDF,Hauts-de-France,FR,France
 La Chaussee,NOR,Normandy,FR,France
+La Chatre-Langlin,CVL,Centre,FR,France
 La Châtre,CVL,Centre,FR,France
 La Chataigneraie,PDL,Pays de la Loire,FR,France
 La Chartre-sur-le-Loir,PDL,Pays de la Loire,FR,France
@@ -46833,7 +46888,6 @@ Jumelles,PDL,Pays de la Loire,FR,France
 Jumel,HDF,Hauts-de-France,FR,France
 Jumeauville,IDF,Île-de-France,FR,France
 Julos,OCC,Occitanie,FR,France
-Jullouville,NOR,Normandy,FR,France
 Julienas,ARA,Auvergne-Rhone-Alpes,FR,France
 Jujurieux,ARA,Auvergne-Rhone-Alpes,FR,France
 Juilly,IDF,Île-de-France,FR,France
@@ -47150,7 +47204,6 @@ Heugas,NAQ,Nouvelle-Aquitaine,FR,France
 Heudreville-sur-Eure,NOR,Normandy,FR,France
 Heudicourt,HDF,Hauts-de-France,FR,France
 Heudicourt,NOR,Normandy,FR,France
-Heuchin,HDF,Hauts-de-France,FR,France
 Hettenschlag,GES,Grand-Est,FR,France
 Hettange-Grande,GES,Grand-Est,FR,France
 Hestroff,GES,Grand-Est,FR,France
@@ -47431,7 +47484,6 @@ Guerstling,GES,Grand-Est,FR,France
 Guernes,IDF,Île-de-France,FR,France
 Guermantes,IDF,Île-de-France,FR,France
 Guerlesquin,BRE,Brittany,FR,France
-Guerigny,CVL,Centre,FR,France
 Guerfand,BFC,Bourgogne-Franche-Comte,FR,France
 Gueret,NAQ,Nouvelle-Aquitaine,FR,France
 Guereins,ARA,Auvergne-Rhone-Alpes,FR,France
@@ -48099,7 +48151,6 @@ Fontienne,PAC,"Provence-Alpes-Côte d'Azur",FR,France
 Fontgombault,CVL,Centre,FR,France
 "Fontevraud-l'Abbaye",PDL,Pays de la Loire,FR,France
 Fontet,NAQ,Nouvelle-Aquitaine,FR,France
-Fontes,OCC,Occitanie,FR,France
 Fonteny,GES,Grand-Est,FR,France
 Fontenois-les-Montbozon,BFC,Bourgogne-Franche-Comte,FR,France
 Fontenilles,OCC,Occitanie,FR,France
@@ -49966,6 +50017,7 @@ Chenas,ARA,Auvergne-Rhone-Alpes,FR,France
 Chemy,HDF,Hauts-de-France,FR,France
 Chemire-sur-Sarthe,PDL,Pays de la Loire,FR,France
 Cheminot,GES,Grand-Est,FR,France
+"Chemin-d'Aisey",BFC,Bourgogne-Franche-Comte,FR,France
 Cheminas,ARA,Auvergne-Rhone-Alpes,FR,France
 Chemilly,ARA,Auvergne-Rhone-Alpes,FR,France
 Chemille-sur-Indrois,CVL,Centre,FR,France
@@ -50743,6 +50795,7 @@ Cantenac,NAQ,Nouvelle-Aquitaine,FR,France
 Canteleu,NOR,Normandy,FR,France
 Cantaron,PAC,"Provence-Alpes-Côte d'Azur",FR,France
 Cantaing-sur-Escaut,HDF,Hauts-de-France,FR,France
+Canon,NOR,Normandy,FR,France
 Canohes,OCC,Occitanie,FR,France
 Cannes-Ecluse,IDF,Île-de-France,FR,France
 Cannes,PAC,"Provence-Alpes-Côte d'Azur",FR,France
@@ -51129,6 +51182,7 @@ Breteuil,HDF,Hauts-de-France,FR,France
 Breteniere,BFC,Bourgogne-Franche-Comte,FR,France
 Breteil,BRE,Brittany,FR,France
 Bretagne-de-Marsan,NAQ,Nouvelle-Aquitaine,FR,France
+,BRE,Brittany,FR,France
 Brest,BRE,Brittany,FR,France
 Bressuire,NAQ,Nouvelle-Aquitaine,FR,France
 Bressols,OCC,Occitanie,FR,France
@@ -51427,6 +51481,7 @@ Bordeaux-Saint-Clair,NOR,Normandy,FR,France
 Bordeaux-en-Gatinais,CVL,Centre,FR,France
 Bordeaux,NAQ,Nouvelle-Aquitaine,FR,France
 Bordeau,BFC,Bourgogne-Franche-Comte,FR,France
+Bord,ARA,Auvergne-Rhone-Alpes,FR,France
 Boran-sur-Oise,HDF,Hauts-de-France,FR,France
 Boqueho,BRE,Brittany,FR,France
 Bootzheim,GES,Grand-Est,FR,France
@@ -52641,6 +52696,7 @@ Aubin,OCC,Occitanie,FR,France
 Aubin,NAQ,Nouvelle-Aquitaine,FR,France
 Aubigny-sur-Nère,CVL,Centre,FR,France
 Aubigny-en-Plaine,BFC,Bourgogne-Franche-Comte,FR,France
+Aubigny-en-Laonnois,HDF,Hauts-de-France,FR,France
 Aubigny-aux-Kaisnes,HDF,Hauts-de-France,FR,France
 Aubigny-au-Bac,HDF,Hauts-de-France,FR,France
 Aubigny-en-Artois,HDF,Hauts-de-France,FR,France
@@ -54057,6 +54113,7 @@ Felsopakony,PE,Pest megye,HU,Hungary
 Felsoors,VE,Veszprem megye,HU,Hungary
 Felcsut,FE,Fejér,HU,Hungary
 Feketeerdo,GS,Győr-Moson-Sopron,HU,Hungary
+,FE,Fejér,HU,Hungary
 Farad,GS,Győr-Moson-Sopron,HU,Hungary
 Fajsz,BK,Bács-Kiskun,HU,Hungary
 Fadd,TO,Tolna megye,HU,Hungary
@@ -54427,7 +54484,6 @@ Myjava,TC,Trencin,SK,Slovak Republic
 Mošovce,ZI,Zilina,SK,Slovak Republic
 Moravany nad Vahom,TA,Trnava,SK,Slovak Republic
 Mojs,ZI,Zilina,SK,Slovak Republic
-Mojmirovce,NI,Nitra,SK,Slovak Republic
 Modra,BL,Bratislava,SK,Slovak Republic
 Melcice,NI,Nitra,SK,Slovak Republic
 Matuskovo,TA,Trnava,SK,Slovak Republic
@@ -54633,19 +54689,19 @@ Vysokov,52,Kralovehradecky kraj,CZ,Czechia
 Vysoke Myto,53,Pardubicky kraj,CZ,Czechia
 Vysoka Pec,42,Ustecky kraj,CZ,Czechia
 Vysoka nad Labem,52,Kralovehradecky kraj,CZ,Czechia
-Vysni Lhoty,,,CZ,Czechia
+Vysni Lhoty,80,Moravskoslezsky kraj,CZ,Czechia
 Vyskytna nad Jihlavou,63,Kraj Vysocina,CZ,Czechia
 Vyškov,64,South Moravian,CZ,Czechia
 Vsetin,72,Zlín,CZ,Czechia
 Vsenory,20,Central Bohemia,CZ,Czechia
 Vsemina,72,Zlín,CZ,Czechia
 Vsechovice,71,Olomoucky kraj,CZ,Czechia
-Vresina,,,CZ,Czechia
+Vresina,80,Moravskoslezsky kraj,CZ,Czechia
 Vrdy,20,Central Bohemia,CZ,Czechia
 Vrchotovy Janovice,20,Central Bohemia,CZ,Czechia
 Vrchlabi,52,Kralovehradecky kraj,CZ,Czechia
-Vrbno pod Pradedem,,,CZ,Czechia
-Vratimov,,,CZ,Czechia
+Vrbno pod Pradedem,80,Moravskoslezsky kraj,CZ,Czechia
+Vratimov,80,Moravskoslezsky kraj,CZ,Czechia
 Vranovice,64,South Moravian,CZ,Czechia
 Vrane nad Vltavou,20,Central Bohemia,CZ,Czechia
 Vranany,20,Central Bohemia,CZ,Czechia
@@ -54653,7 +54709,7 @@ Vracov,64,South Moravian,CZ,Czechia
 Vrabce,31,Jihocesky kraj,CZ,Czechia
 Votice,20,Central Bohemia,CZ,Czechia
 Vonoklasy,20,Central Bohemia,CZ,Czechia
-Volyne,,,CZ,Czechia
+Volyne,42,Ustecky kraj,CZ,Czechia
 Volary,31,Jihocesky kraj,CZ,Czechia
 Vojtanov,41,Karlovarsky kraj,CZ,Czechia
 Vojnuv Mestec,63,Kraj Vysocina,CZ,Czechia
@@ -54667,7 +54723,7 @@ Vlasatice,64,South Moravian,CZ,Czechia
 Vladislav,63,Kraj Vysocina,CZ,Czechia
 Vlachovo Brezi,31,Jihocesky kraj,CZ,Czechia
 Vizovice,72,Zlín,CZ,Czechia
-Vitkov,,,CZ,Czechia
+Vitkov,80,Moravskoslezsky kraj,CZ,Czechia
 Vintirov,41,Karlovarsky kraj,CZ,Czechia
 Vinicne Sumice,64,South Moravian,CZ,Czechia
 Vimperk,31,Jihocesky kraj,CZ,Czechia
@@ -54679,7 +54735,7 @@ Vetrkovice,80,Moravskoslezsky kraj,CZ,Czechia
 Vestec,20,Central Bohemia,CZ,Czechia
 Veseli nad Moravou,64,South Moravian,CZ,Czechia
 Veseli nad Luznici,31,Jihocesky kraj,CZ,Czechia
-Verovice,,,CZ,Czechia
+Verovice,80,Moravskoslezsky kraj,CZ,Czechia
 Vernerice,42,Ustecky kraj,CZ,Czechia
 Vendryne,80,Moravskoslezsky kraj,CZ,Czechia
 Vendoli,53,Pardubicky kraj,CZ,Czechia
@@ -54788,7 +54844,7 @@ Tanvald,51,Liberecky kraj,CZ,Czechia
 Tachov,32,Plzensky kraj,CZ,Czechia
 Tachlovice,20,Central Bohemia,CZ,Czechia
 Tábor,31,Jihocesky kraj,CZ,Czechia
-Syrovice,,,CZ,Czechia
+Syrovice,42,Ustecky kraj,CZ,Czechia
 Sykorice,20,Central Bohemia,CZ,Czechia
 Svratka,63,Kraj Vysocina,CZ,Czechia
 Svor,51,Liberecky kraj,CZ,Czechia
@@ -54796,7 +54852,7 @@ Svoboda nad Upou,52,Kralovehradecky kraj,CZ,Czechia
 Svitavy,53,Pardubicky kraj,CZ,Czechia
 Sviny,63,Kraj Vysocina,CZ,Czechia
 Svidnice,53,Pardubicky kraj,CZ,Czechia
-Sviadnov,,,CZ,Czechia
+Sviadnov,80,Moravskoslezsky kraj,CZ,Czechia
 Svetla nad Sazavou,63,Kraj Vysocina,CZ,Czechia
 Svetla,20,Central Bohemia,CZ,Czechia
 Svetice,20,Central Bohemia,CZ,Czechia
@@ -54807,10 +54863,10 @@ Sumperk,71,Olomoucky kraj,CZ,Czechia
 Sulejovice,42,Ustecky kraj,CZ,Czechia
 Sudslava,53,Pardubicky kraj,CZ,Czechia
 Sudkov,71,Olomoucky kraj,CZ,Czechia
-Sudice,,,CZ,Czechia
+Sudice,80,Moravskoslezsky kraj,CZ,Czechia
 Suchdol nad Luznici,31,Jihocesky kraj,CZ,Czechia
 Suchdol,80,Moravskoslezsky kraj,CZ,Czechia
-Studenka,,,CZ,Czechia
+Studenka,80,Moravskoslezsky kraj,CZ,Czechia
 Strmilov,31,Jihocesky kraj,CZ,Czechia
 Strilky,72,Zlín,CZ,Czechia
 Stribro,32,Plzensky kraj,CZ,Czechia
@@ -54819,22 +54875,23 @@ Strelice,64,South Moravian,CZ,Czechia
 Straz pod Ralskem,51,Liberecky kraj,CZ,Czechia
 Strazovice,32,Plzensky kraj,CZ,Czechia
 Straznice,64,South Moravian,CZ,Czechia
-Straz nad Nisou,,,CZ,Czechia
+Straz nad Nisou,51,Liberecky kraj,CZ,Czechia
 Straz nad Nezarkou,31,Jihocesky kraj,CZ,Czechia
-Straskov,,,CZ,Czechia
+Straskov,42,Ustecky kraj,CZ,Czechia
 Strasice,32,Plzensky kraj,CZ,Czechia
 Strani,72,Zlín,CZ,Czechia
-Stramberk,,,CZ,Czechia
+Stramberk,80,Moravskoslezsky kraj,CZ,Czechia
 Strakonice,31,Jihocesky kraj,CZ,Czechia
-Strahovice,,,CZ,Czechia
+Strahovice,80,Moravskoslezsky kraj,CZ,Czechia
+Stradonice,20,Central Bohemia,CZ,Czechia
 Stod,32,Plzensky kraj,CZ,Czechia
 Stochov,20,Central Bohemia,CZ,Czechia
 Stitna nad Vlari,72,Zlín,CZ,Czechia
-Stitina,,,CZ,Czechia
+Stitina,80,Moravskoslezsky kraj,CZ,Czechia
 Stezery,52,Kralovehradecky kraj,CZ,Czechia
 Steti,42,Ustecky kraj,CZ,Czechia
 Sternberk,71,Olomoucky kraj,CZ,Czechia
-Stepankovice,,,CZ,Czechia
+Stepankovice,80,Moravskoslezsky kraj,CZ,Czechia
 Stenovice,32,Plzensky kraj,CZ,Czechia
 Stehelceves,20,Central Bohemia,CZ,Czechia
 Stechovice,20,Central Bohemia,CZ,Czechia
@@ -54848,7 +54905,7 @@ Stare Splavy,51,Liberecky kraj,CZ,Czechia
 Stare Mesto,72,Zlín,CZ,Czechia
 Stare Hradiste,53,Pardubicky kraj,CZ,Czechia
 Stara Voda,41,Karlovarsky kraj,CZ,Czechia
-Stara Ves nad Ondrejnici,,,CZ,Czechia
+Stara Ves nad Ondrejnici,80,Moravskoslezsky kraj,CZ,Czechia
 Stara Role,41,Karlovarsky kraj,CZ,Czechia
 Stara,41,Karlovarsky kraj,CZ,Czechia
 Stachy,31,Jihocesky kraj,CZ,Czechia
@@ -54869,14 +54926,14 @@ Slusovice,72,Zlín,CZ,Czechia
 Sluknov,42,Ustecky kraj,CZ,Czechia
 Sloup,20,Central Bohemia,CZ,Czechia
 Slavkov u Brna,64,South Moravian,CZ,Czechia
-Slavkov,,,CZ,Czechia
+Slavkov,80,Moravskoslezsky kraj,CZ,Czechia
 Slavicin,72,Zlín,CZ,Czechia
 Slatinice,71,Olomoucky kraj,CZ,Czechia
 Slatinany,53,Pardubicky kraj,CZ,Czechia
 Slapy,20,Central Bohemia,CZ,Czechia
 Šlapanice,64,South Moravian,CZ,Czechia
 Slany,20,Central Bohemia,CZ,Czechia
-Slana,,,CZ,Czechia
+Slana,51,Liberecky kraj,CZ,Czechia
 Slabce,20,Central Bohemia,CZ,Czechia
 Skvorec,20,Central Bohemia,CZ,Czechia
 Skutec,53,Pardubicky kraj,CZ,Czechia
@@ -54886,7 +54943,7 @@ Skalice,20,Central Bohemia,CZ,Czechia
 Sivice,64,South Moravian,CZ,Czechia
 Sitborice,64,South Moravian,CZ,Czechia
 Siluvky,64,South Moravian,CZ,Czechia
-Silherovice,,,CZ,Czechia
+Silherovice,80,Moravskoslezsky kraj,CZ,Czechia
 Sezemice,53,Pardubicky kraj,CZ,Czechia
 Sestajovice,20,Central Bohemia,CZ,Czechia
 Sepekov,31,Jihocesky kraj,CZ,Czechia
@@ -54906,8 +54963,8 @@ Saratice,64,South Moravian,CZ,Czechia
 Samotisky,71,Olomoucky kraj,CZ,Czechia
 Sakvice,64,South Moravian,CZ,Czechia
 Sadska,20,Central Bohemia,CZ,Czechia
-Rymarov,,,CZ,Czechia
-Rychvald,,,CZ,Czechia
+Rymarov,80,Moravskoslezsky kraj,CZ,Czechia
+Rychvald,80,Moravskoslezsky kraj,CZ,Czechia
 Rychnov nad Kneznou,52,Kralovehradecky kraj,CZ,Czechia
 Rychnov,51,Liberecky kraj,CZ,Czechia
 Rybniste,42,Ustecky kraj,CZ,Czechia
@@ -54926,7 +54983,7 @@ Rozmital pod Tremsinem,20,Central Bohemia,CZ,Czechia
 Rousinov,20,Central Bohemia,CZ,Czechia
 Roudnice nad Labem,42,Ustecky kraj,CZ,Czechia
 Rostoklaty,20,Central Bohemia,CZ,Czechia
-Ropice,,,CZ,Czechia
+Ropice,80,Moravskoslezsky kraj,CZ,Czechia
 Rokytnice v Orlickych Horach,52,Kralovehradecky kraj,CZ,Czechia
 Rokytnice,71,Olomoucky kraj,CZ,Czechia
 Rokycany,32,Plzensky kraj,CZ,Czechia
@@ -54937,7 +54994,7 @@ Ricany,20,Central Bohemia,CZ,Czechia
 Revnice,20,Central Bohemia,CZ,Czechia
 Retova,53,Pardubicky kraj,CZ,Czechia
 Reporyje,10,Hlavni mesto Praha,CZ,Czechia
-Repiste,,,CZ,Czechia
+Repiste,80,Moravskoslezsky kraj,CZ,Czechia
 Rebesovice,64,South Moravian,CZ,Czechia
 Ratiskovice,64,South Moravian,CZ,Czechia
 Ratbor,20,Central Bohemia,CZ,Czechia
@@ -54956,7 +55013,7 @@ Rabstejnska Lhota,53,Pardubicky kraj,CZ,Czechia
 Pysely,20,Central Bohemia,CZ,Czechia
 Pustkovec,80,Moravskoslezsky kraj,CZ,Czechia
 Pustimer,64,South Moravian,CZ,Czechia
-Pusta Polom,,,CZ,Czechia
+Pusta Polom,80,Moravskoslezsky kraj,CZ,Czechia
 Ptice,20,Central Bohemia,CZ,Czechia
 Psary,20,Central Bohemia,CZ,Czechia
 Przno,72,Zlín,CZ,Czechia
@@ -55025,7 +55082,7 @@ Pchery,20,Central Bohemia,CZ,Czechia
 Paskov,80,Moravskoslezsky kraj,CZ,Czechia
 Pardubice,53,Pardubicky kraj,CZ,Czechia
 Pacov,63,Kraj Vysocina,CZ,Czechia
-Pacerice,,,CZ,Czechia
+Pacerice,51,Liberecky kraj,CZ,Czechia
 Pacejov,32,Plzensky kraj,CZ,Czechia
 Otrokovice,72,Zlín,CZ,Czechia
 Otnice,64,South Moravian,CZ,Czechia
@@ -55070,7 +55127,6 @@ Novy Bydzov,52,Kralovehradecky kraj,CZ,Czechia
 Novy Bor,51,Liberecky kraj,CZ,Czechia
 Novosedlice,42,Ustecky kraj,CZ,Czechia
 Nove Veseli,63,Kraj Vysocina,CZ,Czechia
-Nove Strasnice,20,Central Bohemia,CZ,Czechia
 Nove Straseci,20,Central Bohemia,CZ,Czechia
 Nove Mesto na Morave,63,Kraj Vysocina,CZ,Czechia
 Nove Mesto nad Metuji,52,Kralovehradecky kraj,CZ,Czechia
@@ -55099,7 +55155,7 @@ Nehvizdy,20,Central Bohemia,CZ,Czechia
 Nedasova Lhota,72,Zlín,CZ,Czechia
 Nedakonice,72,Zlín,CZ,Czechia
 Nechanice,52,Kralovehradecky kraj,CZ,Czechia
-Navsi u Jablunkova,,,CZ,Czechia
+Navsi u Jablunkova,80,Moravskoslezsky kraj,CZ,Czechia
 Nasavrky,20,Central Bohemia,CZ,Czechia
 Napajedla,72,Zlín,CZ,Czechia
 Nadejkov,31,Jihocesky kraj,CZ,Czechia
@@ -55110,11 +55166,11 @@ Mutenice,64,South Moravian,CZ,Czechia
 Mutejovice,20,Central Bohemia,CZ,Czechia
 Mukarov,20,Central Bohemia,CZ,Czechia
 Mseno,20,Central Bohemia,CZ,Czechia
-Msene,,,CZ,Czechia
+Msene,42,Ustecky kraj,CZ,Czechia
 Mosty u Jablunkova,80,Moravskoslezsky kraj,CZ,Czechia
 Mostkovice,71,Olomoucky kraj,CZ,Czechia
 Most,42,Ustecky kraj,CZ,Czechia
-Mosnov,,,CZ,Czechia
+Mosnov,80,Moravskoslezsky kraj,CZ,Czechia
 Morkovice,72,Zlín,CZ,Czechia
 Moravsky Zizkov,64,South Moravian,CZ,Czechia
 Moravsky Pisek,64,South Moravian,CZ,Czechia
@@ -55163,6 +55219,7 @@ Marianske Radcice,42,Ustecky kraj,CZ,Czechia
 Mariánské Lázně,41,Karlovarsky kraj,CZ,Czechia
 Malotice,20,Central Bohemia,CZ,Czechia
 Malhostovice,64,South Moravian,CZ,Czechia
+Malá Strana,10,Hlavni mesto Praha,CZ,Czechia
 Lysa nad Labem,20,Central Bohemia,CZ,Czechia
 Luzec nad Vltavou,20,Central Bohemia,CZ,Czechia
 Luze,53,Pardubicky kraj,CZ,Czechia
@@ -55219,7 +55276,7 @@ Lety,31,Jihocesky kraj,CZ,Czechia
 Letovice,64,South Moravian,CZ,Czechia
 Letohrad,53,Pardubicky kraj,CZ,Czechia
 Lesna,72,Zlín,CZ,Czechia
-Leskovec nad Moravici,,,CZ,Czechia
+Leskovec nad Moravici,80,Moravskoslezsky kraj,CZ,Czechia
 Lelekovice,64,South Moravian,CZ,Czechia
 Lednice,64,South Moravian,CZ,Czechia
 Ledenice,31,Jihocesky kraj,CZ,Czechia
@@ -55244,8 +55301,8 @@ Kunratice,51,Liberecky kraj,CZ,Czechia
 Kunovice,72,Zlín,CZ,Czechia
 Kunice,20,Central Bohemia,CZ,Czechia
 Kuncina,53,Pardubicky kraj,CZ,Czechia
-Kuncice pod Ondrejnikem,,,CZ,Czechia
-Kujavy,,,CZ,Czechia
+Kuncice pod Ondrejnikem,80,Moravskoslezsky kraj,CZ,Czechia
+Kujavy,80,Moravskoslezsky kraj,CZ,Czechia
 Kublov,20,Central Bohemia,CZ,Czechia
 Ktis,31,Jihocesky kraj,CZ,Czechia
 Krupka,42,Ustecky kraj,CZ,Czechia
@@ -55282,7 +55339,7 @@ Kralovice,32,Plzensky kraj,CZ,Czechia
 Kraliky,53,Pardubicky kraj,CZ,Czechia
 Kralice na Hane,71,Olomoucky kraj,CZ,Czechia
 Kozolupy,32,Plzensky kraj,CZ,Czechia
-Kozlovice,,,CZ,Czechia
+Kozlovice,80,Moravskoslezsky kraj,CZ,Czechia
 Kovarska,42,Ustecky kraj,CZ,Czechia
 Kout na Sumave,32,Plzensky kraj,CZ,Czechia
 Kourim,20,Central Bohemia,CZ,Czechia
@@ -55318,7 +55375,7 @@ Knezmost,20,Central Bohemia,CZ,Czechia
 Knezeves,20,Central Bohemia,CZ,Czechia
 Klopotovice,71,Olomoucky kraj,CZ,Czechia
 Klobouky,64,South Moravian,CZ,Czechia
-Klise,,,CZ,Czechia
+Klise,42,Ustecky kraj,CZ,Czechia
 Klimkovice,80,Moravskoslezsky kraj,CZ,Czechia
 Klecany,20,Central Bohemia,CZ,Czechia
 Klatovy,32,Plzensky kraj,CZ,Czechia
@@ -55351,7 +55408,7 @@ Jirkov,42,Ustecky kraj,CZ,Czechia
 Jinonice,10,Hlavni mesto Praha,CZ,Czechia
 Jinocany,20,Central Bohemia,CZ,Czechia
 Jindrichuv Hradec,31,Jihocesky kraj,CZ,Czechia
-Jindrichov,,,CZ,Czechia
+Jindrichov,80,Moravskoslezsky kraj,CZ,Czechia
 Jindrichov,71,Olomoucky kraj,CZ,Czechia
 Jince,20,Central Bohemia,CZ,Czechia
 Jimramov,63,Kraj Vysocina,CZ,Czechia
@@ -55364,11 +55421,11 @@ Jihlava,63,Kraj Vysocina,CZ,Czechia
 Jičín,52,Kralovehradecky kraj,CZ,Czechia
 Jevisovice,64,South Moravian,CZ,Czechia
 Jevicko,53,Pardubicky kraj,CZ,Czechia
-Jesenik nad Odrou,,,CZ,Czechia
+Jesenik nad Odrou,80,Moravskoslezsky kraj,CZ,Czechia
 Jesenik,71,Olomoucky kraj,CZ,Czechia
 Jesenice,20,Central Bohemia,CZ,Czechia
 Jenstejn,20,Central Bohemia,CZ,Czechia
-Jenisovice,,,CZ,Czechia
+Jenisovice,51,Liberecky kraj,CZ,Czechia
 Jenisov,41,Karlovarsky kraj,CZ,Czechia
 Jenikovice,32,Plzensky kraj,CZ,Czechia
 Jenec,20,Central Bohemia,CZ,Czechia
@@ -55423,6 +55480,7 @@ Hostinne,52,Kralovehradecky kraj,CZ,Czechia
 Horsovsky Tyn,32,Plzensky kraj,CZ,Czechia
 Horovice,20,Central Bohemia,CZ,Czechia
 Horomerice,20,Central Bohemia,CZ,Czechia
+Horni Terlicko,80,Moravskoslezsky kraj,CZ,Czechia
 Horni Slavkov,41,Karlovarsky kraj,CZ,Czechia
 Horni Redice,53,Pardubicky kraj,CZ,Czechia
 Horni Podluzi,42,Ustecky kraj,CZ,Czechia
@@ -55438,6 +55496,7 @@ Horni Cerekev,63,Kraj Vysocina,CZ,Czechia
 Horni Brusnice,52,Kralovehradecky kraj,CZ,Czechia
 Horni Briza,32,Plzensky kraj,CZ,Czechia
 Horni Bojanovice,64,South Moravian,CZ,Czechia
+Horni Bludovice,80,Moravskoslezsky kraj,CZ,Czechia
 Horni Becva,72,Zlín,CZ,Czechia
 Horineves,52,Kralovehradecky kraj,CZ,Czechia
 Horice,52,Kralovehradecky kraj,CZ,Czechia
@@ -55462,7 +55521,7 @@ Hluboka nad Vltavou,31,Jihocesky kraj,CZ,Czechia
 Hlubocky,71,Olomoucky kraj,CZ,Czechia
 Hlinsko,53,Pardubicky kraj,CZ,Czechia
 Hlasna Treban,20,Central Bohemia,CZ,Czechia
-Hladke Zivotice,,,CZ,Czechia
+Hladke Zivotice,80,Moravskoslezsky kraj,CZ,Czechia
 Hermanuv Mestec,53,Pardubicky kraj,CZ,Czechia
 Hejnice,51,Liberecky kraj,CZ,Czechia
 Hazlov,41,Karlovarsky kraj,CZ,Czechia
@@ -55492,7 +55551,7 @@ Frenstat pod Radhostem,80,Moravskoslezsky kraj,CZ,Czechia
 Frantiskovy Lazne,41,Karlovarsky kraj,CZ,Czechia
 Frantiskov nad Ploucnici,42,Ustecky kraj,CZ,Czechia
 Dzbel,71,Olomoucky kraj,CZ,Czechia
-Dvorce,,,CZ,Czechia
+Dvorce,80,Moravskoslezsky kraj,CZ,Czechia
 Dusejov,63,Kraj Vysocina,CZ,Czechia
 Dukovany,63,Kraj Vysocina,CZ,Czechia
 Duchcov,42,Ustecky kraj,CZ,Czechia
@@ -55517,17 +55576,15 @@ Dolni Zalezly,42,Ustecky kraj,CZ,Czechia
 Dolni Ujezd,53,Pardubicky kraj,CZ,Czechia
 Dolni Ujezd,71,Olomoucky kraj,CZ,Czechia
 Dolni Trebonin,31,Jihocesky kraj,CZ,Czechia
-Dolni Terlicko,80,Moravskoslezsky kraj,CZ,Czechia
 Dolni Roven,53,Pardubicky kraj,CZ,Czechia
 Dolni Radechova,52,Kralovehradecky kraj,CZ,Czechia
-Dolni Mecholupy,20,Central Bohemia,CZ,Czechia
-Dolni Lutyne,,,CZ,Czechia
+Dolni Mecholupy,10,Hlavni mesto Praha,CZ,Czechia
+Dolni Lutyne,80,Moravskoslezsky kraj,CZ,Czechia
 Dolni Loucky,64,South Moravian,CZ,Czechia
 Dolni Kounice,64,South Moravian,CZ,Czechia
 Dolni Dunajovice,64,South Moravian,CZ,Czechia
-Dolni Domaslavice,,,CZ,Czechia
+Dolni Domaslavice,80,Moravskoslezsky kraj,CZ,Czechia
 Dolni Dobrouc,53,Pardubicky kraj,CZ,Czechia
-Dolni Chrastava,51,Liberecky kraj,CZ,Czechia
 Dolni Brezany,20,Central Bohemia,CZ,Czechia
 Dolni Bousov,20,Central Bohemia,CZ,Czechia
 Dolni Bojanovice,64,South Moravian,CZ,Czechia
@@ -55539,7 +55596,7 @@ Dohalice,52,Kralovehradecky kraj,CZ,Czechia
 Dobsice,64,South Moravian,CZ,Czechia
 Dobruska,52,Kralovehradecky kraj,CZ,Czechia
 Dobrovice,20,Central Bohemia,CZ,Czechia
-Dobroslavice,,,CZ,Czechia
+Dobroslavice,80,Moravskoslezsky kraj,CZ,Czechia
 Dobrocovice,20,Central Bohemia,CZ,Czechia
 Dobrna,42,Ustecky kraj,CZ,Czechia
 Dobrkovice,72,Zlín,CZ,Czechia
@@ -55547,10 +55604,10 @@ Dobriv,32,Plzensky kraj,CZ,Czechia
 Dobris,20,Central Bohemia,CZ,Czechia
 Dobrichovice,20,Central Bohemia,CZ,Czechia
 Dobrejovice,20,Central Bohemia,CZ,Czechia
-Dobratice,,,CZ,Czechia
+Dobratice,80,Moravskoslezsky kraj,CZ,Czechia
 Dobrany,32,Plzensky kraj,CZ,Czechia
 Dobra,80,Moravskoslezsky kraj,CZ,Czechia
-Dlouhy Most,,,CZ,Czechia
+Dlouhy Most,51,Liberecky kraj,CZ,Czechia
 Dlouhomilov,71,Olomoucky kraj,CZ,Czechia
 Dlouha Trebova,53,Pardubicky kraj,CZ,Czechia
 Detmarovice,80,Moravskoslezsky kraj,CZ,Czechia
@@ -55561,7 +55618,7 @@ Děčín,42,Ustecky kraj,CZ,Czechia
 Deblin,64,South Moravian,CZ,Czechia
 Davle,20,Central Bohemia,CZ,Czechia
 Dasice,53,Pardubicky kraj,CZ,Czechia
-Darkovice,,,CZ,Czechia
+Darkovice,80,Moravskoslezsky kraj,CZ,Czechia
 Dacice,31,Jihocesky kraj,CZ,Czechia
 ,,,CZ,Czechia
 Cvikov,51,Liberecky kraj,CZ,Czechia
@@ -55581,6 +55638,7 @@ Chvalec,52,Kralovehradecky kraj,CZ,Czechia
 Chvalcov,72,Zlín,CZ,Czechia
 Chrudim,53,Pardubicky kraj,CZ,Czechia
 Chropyne,72,Zlín,CZ,Czechia
+Chrastava,51,Liberecky kraj,CZ,Czechia
 Chrast,32,Plzensky kraj,CZ,Czechia
 Choustnikovo Hradiste,52,Kralovehradecky kraj,CZ,Czechia
 Chotutice,20,Central Bohemia,CZ,Czechia
@@ -55643,7 +55701,7 @@ Bucovice,64,South Moravian,CZ,Czechia
 Buchlovice,72,Zlín,CZ,Czechia
 Brusperk,80,Moravskoslezsky kraj,CZ,Czechia
 Bruntal,80,Moravskoslezsky kraj,CZ,Czechia
-Brumovice,,,CZ,Czechia
+Brumovice,80,Moravskoslezsky kraj,CZ,Czechia
 Brumov,72,Zlín,CZ,Czechia
 Brtnice,63,Kraj Vysocina,CZ,Czechia
 Brozany,42,Ustecky kraj,CZ,Czechia
@@ -55691,7 +55749,6 @@ Bohdalec,63,Kraj Vysocina,CZ,Czechia
 Bochov,41,Karlovarsky kraj,CZ,Czechia
 Bochor,71,Olomoucky kraj,CZ,Czechia
 Bludovice,80,Moravskoslezsky kraj,CZ,Czechia
-Bludovice,80,Moravskoslezsky kraj,CZ,Czechia
 Bludov,71,Olomoucky kraj,CZ,Czechia
 Blovice,32,Plzensky kraj,CZ,Czechia
 Blizevedly,51,Liberecky kraj,CZ,Czechia
@@ -55700,7 +55757,7 @@ Blansko,64,South Moravian,CZ,Czechia
 Bitovany,53,Pardubicky kraj,CZ,Czechia
 Bily Ujezd,52,Kralovehradecky kraj,CZ,Czechia
 Bilovice nad Svitavou,64,South Moravian,CZ,Czechia
-Bilovec,,,CZ,Czechia
+Bilovec,80,Moravskoslezsky kraj,CZ,Czechia
 Bilina,42,Ustecky kraj,CZ,Czechia
 Bila Tremesna,52,Kralovehradecky kraj,CZ,Czechia
 Bezno,20,Central Bohemia,CZ,Czechia
@@ -55712,7 +55769,7 @@ Benesov nad Ploucnici,42,Ustecky kraj,CZ,Czechia
 Benešov,20,Central Bohemia,CZ,Czechia
 Benatky nad Jizerou,20,Central Bohemia,CZ,Czechia
 Bela pod Bezdezem,20,Central Bohemia,CZ,Czechia
-Bedrichuv Svetec,,,CZ,Czechia
+Bedrichuv Svetec,42,Ustecky kraj,CZ,Czechia
 Bedrichov,71,Olomoucky kraj,CZ,Czechia
 Bavoryne,20,Central Bohemia,CZ,Czechia
 Bavory,64,South Moravian,CZ,Czechia
@@ -55724,7 +55781,7 @@ Banov,72,Zlín,CZ,Czechia
 Bakov nad Jizerou,20,Central Bohemia,CZ,Czechia
 As,41,Karlovarsky kraj,CZ,Czechia
 Arnestovice,63,Kraj Vysocina,CZ,Czechia
-Albrechticky,,,CZ,Czechia
+Albrechticky,80,Moravskoslezsky kraj,CZ,Czechia
 Albrechtice,51,Liberecky kraj,CZ,Czechia
 Adamov,64,South Moravian,CZ,Czechia
 Żywiec,SL,Silesia,PL,Poland
@@ -55999,6 +56056,7 @@ Sopot,PM,Pomerania,PL,Poland
 Sompolno,WP,Greater Poland,PL,Poland
 Somonino,PM,Pomerania,PL,Poland
 Solec Kujawski,KP,Kujawsko-Pomorskie,PL,Poland
+Solec,WP,Greater Poland,PL,Poland
 Sobotka,DS,Lower Silesia,PL,Poland
 Smolnica,SL,Silesia,PL,Poland
 Smolec,DS,Lower Silesia,PL,Poland
@@ -56624,6 +56682,7 @@ Gryfow Slaski,DS,Lower Silesia,PL,Poland
 Gryfino,ZP,West Pomerania,PL,Poland
 Gryfice,ZP,West Pomerania,PL,Poland
 Gruszewnia,SL,Silesia,PL,Poland
+Grupa,KP,Kujawsko-Pomorskie,PL,Poland
 Grudziądz,KP,Kujawsko-Pomorskie,PL,Poland
 Gromadka,DS,Lower Silesia,PL,Poland
 Grodzisk Wielkopolski,WP,Greater Poland,PL,Poland
@@ -57129,6 +57188,7 @@ Valdesandinas,CL,Castille and León,ES,Spain
 Valdeprados,CL,Castille and León,ES,Spain
 Valdeolmos,MD,Madrid,ES,Spain
 Valdemoro,MD,Madrid,ES,Spain
+Valdemorillo,MD,Madrid,ES,Spain
 Valdelafuente,CL,Castille and León,ES,Spain
 Valdecilla,CB,Cantabria,ES,Spain
 Rivas-Vaciamadrid,MD,Madrid,ES,Spain
@@ -57252,7 +57312,6 @@ Serracines,MD,Madrid,ES,Spain
 "La Seu d'Urgell",CT,Catalonia,ES,Spain
 Seoane,AS,Principality of Asturias,ES,Spain
 Sentmenat,CT,Catalonia,ES,Spain
-Segura,PV,Basque Country,ES,Spain
 Segovia,CL,Castille and León,ES,Spain
 Secadura,CB,Cantabria,ES,Spain
 Sauquillo de Cabezas,CL,Castille and León,ES,Spain
@@ -58776,7 +58835,7 @@ Seim,12,Hordaland Fylke,NO,Norway
 Saura,18,Nordland Fylke,NO,Norway
 Saupstad,18,Nordland Fylke,NO,Norway
 Saudasjoen,11,Rogaland Fylke,NO,Norway
-Mirza Rafi Sauda,11,Rogaland Fylke,NO,Norway
+Sauda,11,Rogaland Fylke,NO,Norway
 Sarpsborg,01,Østfold,NO,Norway
 Sannidal,08,Telemark,NO,Norway
 Sandvoll,12,Hordaland Fylke,NO,Norway
@@ -59559,6 +59618,7 @@ Valle Mosso,21,Piedmont,IT,Italy
 Vallemaio,62,Latium,IT,Italy
 Valle Lomellina,25,Lombardy,IT,Italy
 Valle di Maddaloni,72,Campania,IT,Italy
+,23,Aosta Valley,IT,Italy
 Vallecrosia,42,Liguria,IT,Italy
 Vallecorsa,62,Latium,IT,Italy
 Valle,25,Lombardy,IT,Italy
@@ -60172,10 +60232,8 @@ San Marcello,57,The Marches,IT,Italy
 San Mango sul Calore,72,Campania,IT,Italy
 San Mango Piemonte,72,Campania,IT,Italy
 San Lupo,72,Campania,IT,Italy
-San Luca,55,Umbria,IT,Italy
 San Lorenzo in Campo,57,The Marches,IT,Italy
 San Lorenzo al Mare,42,Liguria,IT,Italy
-San Lorenzo,65,Abruzzo,IT,Italy
 San Lorenzello,72,Campania,IT,Italy
 San Leucio del Sannio,72,Campania,IT,Italy
 San Lazzaro di Savena,45,Emilia-Romagna,IT,Italy
@@ -60371,7 +60429,6 @@ Romeno,32,Trentino-Alto Adige,IT,Italy
 "Romans d'Isonzo",36,Friuli Venezia Giulia,IT,Italy
 Romano di Lombardia,25,Lombardy,IT,Italy
 Romano Canavese,21,Piedmont,IT,Italy
-Romana,88,Sardinia,IT,Italy
 Romagnano Sesia,21,Piedmont,IT,Italy
 Rome,62,Latium,IT,Italy
 Rolo,45,Emilia-Romagna,IT,Italy
@@ -60430,6 +60487,7 @@ Rivanazzano,25,Lombardy,IT,Italy
 Rivalta di Torino,21,Piedmont,IT,Italy
 Riva Ligure,42,Liguria,IT,Italy
 Riva del Garda,32,Trentino-Alto Adige,IT,Italy
+Riva,32,Trentino-Alto Adige,IT,Italy
 Ripi,62,Latium,IT,Italy
 Ripe San Ginesio,57,The Marches,IT,Italy
 Ripatransone,57,The Marches,IT,Italy
@@ -60553,6 +60611,7 @@ Potenza Picena,57,The Marches,IT,Italy
 Potenza,77,Basilicate,IT,Italy
 Postua,21,Piedmont,IT,Italy
 Postioma,34,Veneto,IT,Italy
+Postiglione,72,Campania,IT,Italy
 Posticciola,62,Latium,IT,Italy
 Posta Fibreno,62,Latium,IT,Italy
 Possagno,34,Veneto,IT,Italy
@@ -60590,7 +60649,7 @@ Porcia,36,Friuli Venezia Giulia,IT,Italy
 Porcari,52,Tuscany,IT,Italy
 Porano,55,Umbria,IT,Italy
 Poppi,52,Tuscany,IT,Italy
-Ponzone,21,Piedmont,IT,Italy
+Ponza,62,Latium,IT,Italy
 Pont-Saint-Martin,23,Aosta Valley,IT,Italy
 Pontremoli,52,Tuscany,IT,Italy
 Ponton,34,Veneto,IT,Italy
@@ -60650,6 +60709,7 @@ Pollenza,57,The Marches,IT,Italy
 Polinago,45,Emilia-Romagna,IT,Italy
 Polignano a Mare,75,Apulia,IT,Italy
 Policoro,77,Basilicate,IT,Italy
+Poli,62,Latium,IT,Italy
 Polesine,25,Lombardy,IT,Italy
 Polesella,34,Veneto,IT,Italy
 Poirino,21,Piedmont,IT,Italy
@@ -60778,6 +60838,7 @@ Perosa Argentina,21,Piedmont,IT,Italy
 Pero,42,Liguria,IT,Italy
 Pernumia,34,Veneto,IT,Italy
 Perito,72,Campania,IT,Italy
+Pergola,45,Emilia-Romagna,IT,Italy
 Pergine Valsugana,32,Trentino-Alto Adige,IT,Italy
 Perfugas,88,Sardinia,IT,Italy
 Perdifumo,72,Campania,IT,Italy
@@ -60864,6 +60925,7 @@ Ozzero,25,Lombardy,IT,Italy
 Ozzano Monferrato,21,Piedmont,IT,Italy
 Ozieri,88,Sardinia,IT,Italy
 Ovada,21,Piedmont,IT,Italy
+Ottone,45,Emilia-Romagna,IT,Italy
 Ottobiano,25,Lombardy,IT,Italy
 Ottiglio,21,Piedmont,IT,Italy
 Ottaviano,72,Campania,IT,Italy
@@ -61082,7 +61144,6 @@ Montescaglioso,77,Basilicate,IT,Italy
 Montesarchio,72,Campania,IT,Italy
 Monte San Vito,57,The Marches,IT,Italy
 Monte San Vito,55,Umbria,IT,Italy
-"Monte Sant'Angelo",75,Apulia,IT,Italy
 Monte Santa Maria Tiberina,55,Umbria,IT,Italy
 Monte San Savino,52,Tuscany,IT,Italy
 Monte San Pietro,45,Emilia-Romagna,IT,Italy
@@ -61342,7 +61403,6 @@ Mariano Comense,25,Lombardy,IT,Italy
 Margherita di Savoia,75,Apulia,IT,Italy
 Marghera,34,Veneto,IT,Italy
 Margarita,21,Piedmont,IT,Italy
-Maresca,52,Tuscany,IT,Italy
 Marengo,25,Lombardy,IT,Italy
 Marene,21,Piedmont,IT,Italy
 Marcon,34,Veneto,IT,Italy
@@ -61525,6 +61585,7 @@ Lecce,75,Apulia,IT,Italy
 Lazise,34,Veneto,IT,Italy
 ,62,Latium,IT,Italy
 Lavis,32,Trentino-Alto Adige,IT,Italy
+La Villa,62,Latium,IT,Italy
 Lavezzola,45,Emilia-Romagna,IT,Italy
 Laveno-Mombello,25,Lombardy,IT,Italy
 Lavariano,36,Friuli Venezia Giulia,IT,Italy
@@ -61539,7 +61600,6 @@ Laterina,52,Tuscany,IT,Italy
 Lastra a Signa,52,Tuscany,IT,Italy
 La Spezia,42,Liguria,IT,Italy
 Lasino,32,Trentino-Alto Adige,IT,Italy
-La Salle,23,Aosta Valley,IT,Italy
 Larino,67,Molise,IT,Italy
 Lariano,62,Latium,IT,Italy
 Lari,52,Tuscany,IT,Italy
@@ -62147,6 +62207,7 @@ Colli del Tronto,57,The Marches,IT,Italy
 Colliano,72,Campania,IT,Italy
 Colli,62,Latium,IT,Italy
 Collestatte,55,Umbria,IT,Italy
+Colle Secco,55,Umbria,IT,Italy
 Colle San Vito,65,Abruzzo,IT,Italy
 Colle Sannita,72,Campania,IT,Italy
 Collesalvetti,52,Tuscany,IT,Italy
@@ -62216,7 +62277,6 @@ Cinigiano,52,Tuscany,IT,Italy
 Cingoli,57,The Marches,IT,Italy
 "Cingia de' Botti",25,Lombardy,IT,Italy
 Cimitile,72,Campania,IT,Italy
-Cimbergo,25,Lombardy,IT,Italy
 Cimadolmo,34,Veneto,IT,Italy
 Cilavegna,25,Lombardy,IT,Italy
 Cigole,25,Lombardy,IT,Italy
@@ -63105,6 +63165,7 @@ Bagni di Lucca,52,Tuscany,IT,Italy
 Bagnarola,36,Friuli Venezia Giulia,IT,Italy
 Bagnaia,62,Latium,IT,Italy
 Bagnacavallo,45,Emilia-Romagna,IT,Italy
+Baggio,25,Lombardy,IT,Italy
 Badia Polesine,34,Veneto,IT,Italy
 Badia Calavena,34,Veneto,IT,Italy
 Badia,55,Umbria,IT,Italy
@@ -63200,6 +63261,7 @@ Arcole,34,Veneto,IT,Italy
 Arcola,42,Liguria,IT,Italy
 Arco,32,Trentino-Alto Adige,IT,Italy
 Arcidosso,52,Tuscany,IT,Italy
+Archi,65,Abruzzo,IT,Italy
 Arcevia,57,The Marches,IT,Italy
 Arceto,45,Emilia-Romagna,IT,Italy
 Arcene,25,Lombardy,IT,Italy
@@ -63275,6 +63337,7 @@ Alpette,21,Piedmont,IT,Italy
 Almese,21,Piedmont,IT,Italy
 Almenno San Bartolomeo,25,Lombardy,IT,Italy
 Almè,25,Lombardy,IT,Italy
+Alleghe,34,Veneto,IT,Italy
 Alife,72,Campania,IT,Italy
 Alice Castello,21,Piedmont,IT,Italy
 Alghero,88,Sardinia,IT,Italy
@@ -63413,6 +63476,7 @@ Vrbas,VO,Vojvodina,RS,Serbia
 Vransko,189,Vransko,SI,Slovenia
 Vojnik,139,Vojnik,SI,Slovenia
 Vodnjan,18,Istarska Zupanija,HR,Croatia
+Vodice,15,Sibensko-Kninska Zupanija,HR,Croatia
 Vladimirci,08,Macva,RS,Serbia
 Vitez,BIH,Federation of B&H,BA,Bosnia and Herzegovina
 Visoko,117,Obcina Sencur,SI,Slovenia
@@ -63443,7 +63507,6 @@ Trebnje,130,Trebnje,SI,Slovenia
 Trbovlje,129,Trbovlje,SI,Slovenia
 Travnik,BIH,Federation of B&H,BA,Bosnia and Herzegovina
 Tovarnik,16,Vukovar-Sirmium,HR,Croatia
-Tornjos,VO,Vojvodina,RS,Serbia
 Sveti Tomaz,205,Obcina Sveti Tomaz,SI,Slovenia
 Tolmin,128,Obcina Tolmin,SI,Slovenia
 Tojsici,BIH,Federation of B&H,BA,Bosnia and Herzegovina
@@ -63541,6 +63604,7 @@ Radenci,100,Radenci,SI,Slovenia
 Radeče,099,Obcina Radece,SI,Slovenia
 Race,098,Obcina Race-Fram,SI,Slovenia
 Rab,08,Primorsko-Goranska Zupanija,HR,Croatia
+Punat,08,Primorsko-Goranska Zupanija,HR,Croatia
 Pula,18,Istarska Zupanija,HR,Croatia
 Ptuj,096,Ptuj,SI,Slovenia
 Provo,,,RS,Serbia
@@ -63736,6 +63800,7 @@ Berane,03,Berane,ME,Montenegro
 Ivanec Bistranski,01,Zagreb County,HR,Croatia
 Ivanec,05,Varazdinska Zupanija,HR,Croatia
 Ivančna Gorica,039,Obcina Ivancna Gorica,SI,Slovenia
+Irig,VO,Vojvodina,RS,Serbia
 Imotski,17,Splitsko-Dalmatinska Zupanija,HR,Croatia
 Imbrijovec Jalzabetski,05,Varazdinska Zupanija,HR,Croatia
 Ilovik,08,Primorsko-Goranska Zupanija,HR,Croatia
@@ -63840,6 +63905,7 @@ Ceminac,14,Osjecko-Baranjska Zupanija,HR,Croatia
 Cemernica Lonjska,01,Zagreb County,HR,Croatia
 Celje,011,Celje,SI,Slovenia
 Cazin,BIH,Federation of B&H,BA,Bosnia and Herzegovina
+Cavtat,19,Dubrovacko-Neretvanska Zupanija,HR,Croatia
 Cavle,08,Primorsko-Goranska Zupanija,HR,Croatia
 Cankova,152,Cankova,SI,Slovenia
 Čakovec,20,Megimurska Zupanija,HR,Croatia
@@ -64210,7 +64276,6 @@ Blagusa,21,City of Zagreb,HR,Croatia
 Solkan,084,Nova Gorica,SI,Slovenia
 Rijeka,09,Licko-Senjska Zupanija,HR,Croatia
 Nova Cerkev,139,Vojnik,SI,Slovenia
-Podastrana,09,Licko-Senjska Zupanija,HR,Croatia
 Piuma,36,Friuli Venezia Giulia,IT,Italy
 Capriva del Friuli,36,Friuli Venezia Giulia,IT,Italy
 San Lorenzo Isontino,36,Friuli Venezia Giulia,IT,Italy
@@ -64282,7 +64347,6 @@ Drase,02,Krapinsko-Zagorska Zupanija,HR,Croatia
 Moen,19,Troms Fylke,NO,Norway
 Boschetto,42,Liguria,IT,Italy
 San Rocco,42,Liguria,IT,Italy
-Pellegrino,42,Liguria,IT,Italy
 "Sant'Ambrogio",42,Liguria,IT,Italy
 Caperana,42,Liguria,IT,Italy
 San Salvatore,42,Liguria,IT,Italy
@@ -64373,6 +64437,7 @@ Kamen,17,Splitsko-Dalmatinska Zupanija,HR,Croatia
 Kacuni,BIH,Federation of B&H,BA,Bosnia and Herzegovina
 Heuchelheim-Klingen,RP,Rheinland-Pfalz,DE,Germany
 Raheen,M,Munster,IE,Ireland
+Island,M,Munster,IE,Ireland
 Adamstown,M,Munster,IE,Ireland
 Park,L,Leinster,IE,Ireland
 The Rower,L,Leinster,IE,Ireland
@@ -64409,7 +64474,7 @@ Mulhuddart,L,Leinster,IE,Ireland
 Whitestown,L,Leinster,IE,Ireland
 Ballyfermot,L,Leinster,IE,Ireland
 Templeogue,L,Leinster,IE,Ireland
-Hochgurgl,7,Tyrol,AT,Austria
+Hochsoelden,7,Tyrol,AT,Austria
 OEtztal-Bahnhof,7,Tyrol,AT,Austria
 Leutasch,7,Tyrol,AT,Austria
 Maurach,7,Tyrol,AT,Austria
@@ -64420,6 +64485,7 @@ Gnadenwald,7,Tyrol,AT,Austria
 Ehrwald,7,Tyrol,AT,Austria
 Gerlos,7,Tyrol,AT,Austria
 Krimml,5,Salzburg,AT,Austria
+Hinterglemm,5,Salzburg,AT,Austria
 Alpbach,7,Tyrol,AT,Austria
 Scheiblingstein,3,Lower Austria,AT,Austria
 Esternberg,4,Upper Austria,AT,Austria
@@ -64436,10 +64502,10 @@ Camden,ENG,England,GB,United Kingdom
 Greenwich,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
+,ENG,England,GB,United Kingdom
 Lambeth,ENG,England,GB,United Kingdom
+,ENG,England,GB,United Kingdom
 Lewisham,ENG,England,GB,United Kingdom
-,ENG,England,GB,United Kingdom
-,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
@@ -64455,13 +64521,13 @@ Southwark,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 Waltham Forest,ENG,England,GB,United Kingdom
 Wandsworth,ENG,England,GB,United Kingdom
+,ENG,England,GB,United Kingdom
 City of Westminster,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 ,ENG,England,GB,United Kingdom
 ,SCT,Scotland,GB,United Kingdom
 ,SCT,Scotland,GB,United Kingdom
 ,SCT,Scotland,GB,United Kingdom
-,WLS,Wales,GB,United Kingdom
 ,WLS,Wales,GB,United Kingdom
 ,WLS,Wales,GB,United Kingdom
 ,WLS,Wales,GB,United Kingdom
@@ -64489,6 +64555,7 @@ Jettingen-Scheppach,BY,Bavaria,DE,Germany
 ,CL,Castille and León,ES,Spain
 ,CT,Catalonia,ES,Spain
 ,GA,Galicia,ES,Spain
+,PV,Basque Country,ES,Spain
 ,M,Skåne,SE,Sweden
 ,O,Västra Götaland,SE,Sweden
 Lazne Bohdanec,53,Pardubicky kraj,CZ,Czechia
@@ -64496,6 +64563,7 @@ Miszkowice,DS,Lower Silesia,PL,Poland
 Konjic,BIH,Federation of B&H,BA,Bosnia and Herzegovina
 ,DS,Lower Silesia,PL,Poland
 ,LD,Łódź Voivodeship,PL,Poland
+,LB,Lubusz,PL,Poland
 ,OP,Opole Voivodeship,PL,Poland
 ,PM,Pomerania,PL,Poland
 ,SL,Silesia,PL,Poland
@@ -64504,9 +64572,12 @@ Konjic,BIH,Federation of B&H,BA,Bosnia and Herzegovina
 ,KP,Kujawsko-Pomorskie,PL,Poland
 Seeheim-Jugenheim,HE,Hesse,DE,Germany
 ,19,Dubrovacko-Neretvanska Zupanija,HR,Croatia
+,02,Krapinsko-Zagorska Zupanija,HR,Croatia
+,09,Licko-Senjska Zupanija,HR,Croatia
 ,08,Primorsko-Goranska Zupanija,HR,Croatia
 ,03,Sisacko-Moslavacka Zupanija,HR,Croatia
 ,17,Splitsko-Dalmatinska Zupanija,HR,Croatia
+,13,Zadarska Zupanija,HR,Croatia
 ,01,Zagreb County,HR,Croatia
 ,10,Viroviticko-Podravska Zupanija,HR,Croatia
 Tiszaalpar,BK,Bács-Kiskun,HU,Hungary
@@ -64523,12 +64594,15 @@ Malecnik,070,Maribor,SI,Slovenia
 ,80,Moravskoslezsky kraj,CZ,Czechia
 ,32,Plzensky kraj,CZ,Czechia
 ,20,Central Bohemia,CZ,Czechia
+,42,Ustecky kraj,CZ,Czechia
 Lucija,090,Piran,SI,Slovenia
 Pobegi,050,Koper,SI,Slovenia
 Casette,36,Friuli Venezia Giulia,IT,Italy
 Moraro,36,Friuli Venezia Giulia,IT,Italy
 ,BC,Banska Bystrica,SK,Slovak Republic
+,NI,Nitra,SK,Slovak Republic
 Celebici,BIH,Federation of B&H,BA,Bosnia and Herzegovina
+,11,Qarku i Tiranes,AL,Albania
 Looe,ENG,England,GB,United Kingdom
 Star,WLS,Wales,GB,United Kingdom
 Carway,WLS,Wales,GB,United Kingdom
@@ -64566,7 +64640,6 @@ Huambo,HUA,Huambo,AO,Angola
 Benguela,BGU,Benguela,AO,Angola
 ,,,AO,Angola
 Windhoek,KH,Khomas,NA,Namibia
-,KH,Khomas,NA,Namibia
 Tsumeb,OT,Oshikoto,NA,Namibia
 Tsandi,OS,Omusati,NA,Namibia
 Swakopmund,ER,Erongo,NA,Namibia
@@ -64644,6 +64717,7 @@ Eendekuil,WC,Western Cape,ZA,South Africa
 Durbanville,WC,Western Cape,ZA,South Africa
 Doringbaai,WC,Western Cape,ZA,South Africa
 Darling,WC,Western Cape,ZA,South Africa
+Constantia,WC,Western Cape,ZA,South Africa
 Claremont,WC,Western Cape,ZA,South Africa
 Ceres,WC,Western Cape,ZA,South Africa
 Cape Town,WC,Western Cape,ZA,South Africa
@@ -64658,6 +64732,7 @@ Athlone,WC,Western Cape,ZA,South Africa
 ,TA,Tristan da Cunha,SH,Saint Helena
 ,,,SH,Saint Helena
 Outapi,OS,Omusati,NA,Namibia
+Olympia,KH,Khomas,NA,Namibia
 Vila Franca do Campo,20,Azores,PT,Portugal
 Vila do Porto,20,Azores,PT,Portugal
 Velas,20,Azores,PT,Portugal
@@ -64766,7 +64841,6 @@ Uirauna,PB,Paraíba,BR,Brazil
 Ubirata,RN,Rio Grande do Norte,BR,Brazil
 Ubajara,CE,Ceara,BR,Brazil
 Uaua,BA,Bahia,BR,Brazil
-Tupirama,TO,Tocantins,BR,Brazil
 Tuntum,MA,Maranhao,BR,Brazil
 Tucurui,PA,Para,BR,Brazil
 Tucuma,PA,Para,BR,Brazil
@@ -64900,7 +64974,6 @@ Quixeramobim,CE,Ceara,BR,Brazil
 Quixada,CE,Ceara,BR,Brazil
 Queimadas,PB,Paraíba,BR,Brazil
 Primavera,PE,Pernambuco,BR,Brazil
-Primavera,PA,Para,BR,Brazil
 Potengi,CE,Ceara,BR,Brazil
 Porto Franco,MA,Maranhao,BR,Brazil
 Porto da Folha,SE,Sergipe,BR,Brazil
@@ -64909,7 +64982,6 @@ Portel,PA,Para,BR,Brazil
 Ponta de Pedras,PA,Para,BR,Brazil
 Pombal,PB,Paraíba,BR,Brazil
 Poco das Trincheiras,AL,Alagoas,BR,Brazil
-Poco da Pedra,CE,Ceara,BR,Brazil
 Pocinhos,PB,Paraíba,BR,Brazil
 Pocao,PE,Pernambuco,BR,Brazil
 Piripiri,PI,Piaui,BR,Brazil
@@ -65005,6 +65077,7 @@ Marcelino Vieira,RN,Rio Grande do Norte,BR,Brazil
 ,MA,Maranhao,BR,Brazil
 Maranguape,CE,Ceara,BR,Brazil
 Maracanau,CE,Ceara,BR,Brazil
+Maracana,PA,Para,BR,Brazil
 Marabá,PA,Para,BR,Brazil
 Mamanguape,PB,Paraíba,BR,Brazil
 Major Isidoro,AL,Alagoas,BR,Brazil
@@ -65024,7 +65097,6 @@ Lajes,RN,Rio Grande do Norte,BR,Brazil
 Lajedo,PE,Pernambuco,BR,Brazil
 Lajeado,TO,Tocantins,BR,Brazil
 Lago da Pedra,MA,Maranhao,BR,Brazil
-Lagoa Seca,PB,Paraíba,BR,Brazil
 Lagoa Seca,PB,Paraíba,BR,Brazil
 Lagoa Nova,RN,Rio Grande do Norte,BR,Brazil
 Lagoa dos Gatos,PE,Pernambuco,BR,Brazil
@@ -65064,7 +65136,6 @@ Itapage,CE,Ceara,BR,Brazil
 Itamaraca,PE,Pernambuco,BR,Brazil
 Itaituba,PA,Para,BR,Brazil
 Itaitinga,CE,Ceara,BR,Brazil
-Itaguatins,TO,Tocantins,BR,Brazil
 Itacuruba,PE,Pernambuco,BR,Brazil
 Itacaja,TO,Tocantins,BR,Brazil
 Itabaiana,PB,Paraíba,BR,Brazil
@@ -65110,6 +65181,7 @@ Gameleira,PE,Pernambuco,BR,Brazil
 Freitas,BA,Bahia,BR,Brazil
 Frei Miguelinho,PE,Pernambuco,BR,Brazil
 Frecheirinha,CE,Ceara,BR,Brazil
+Fortaleza,CE,Ceara,BR,Brazil
 Floriano,PI,Piaui,BR,Brazil
 Flores,PE,Pernambuco,BR,Brazil
 Florania,RN,Rio Grande do Norte,BR,Brazil
@@ -65183,6 +65255,7 @@ Canhotinho,PE,Pernambuco,BR,Brazil
 Candido,CE,Ceara,BR,Brazil
 Camutanga,PE,Pernambuco,BR,Brazil
 Campo Maior,PI,Piaui,BR,Brazil
+Campo Grande,PE,Pernambuco,BR,Brazil
 Campo Alegre,AL,Alagoas,BR,Brazil
 Campina Grande,PB,Paraíba,BR,Brazil
 Camocim de Sao Felix,PE,Pernambuco,BR,Brazil
@@ -65353,6 +65426,7 @@ Yerbal Nuevo,N,Misiones,AR,Argentina
 Wilde,B,Buenos Aires,AR,Argentina
 Villa Sarmiento,B,Buenos Aires,AR,Argentina
 Villa Rosa,B,Buenos Aires,AR,Argentina
+Villa Paranacito,E,Entre Rios,AR,Argentina
 Villa Ocampo,S,Santa Fe,AR,Argentina
 Villa Maria Grande,E,Entre Rios,AR,Argentina
 Villa Madero,B,Buenos Aires,AR,Argentina
@@ -65400,7 +65474,6 @@ San Javier,S,Santa Fe,AR,Argentina
 San Isidro,B,Buenos Aires,AR,Argentina
 San Francisco Solano,B,Buenos Aires,AR,Argentina
 San Fernando,B,Buenos Aires,AR,Argentina
-San Cristobal,C,Buenos Aires F.D.,AR,Argentina
 San Clemente del Tuyu,B,Buenos Aires,AR,Argentina
 San Antonio de Padua,B,Buenos Aires,AR,Argentina
 San Andres de Giles,B,Buenos Aires,AR,Argentina
@@ -65408,6 +65481,7 @@ San Andres,B,Buenos Aires,AR,Argentina
 Samborombon,B,Buenos Aires,AR,Argentina
 Saladillo,B,Buenos Aires,AR,Argentina
 Saenz Pena,B,Buenos Aires,AR,Argentina
+Villa Ruiz,B,Buenos Aires,AR,Argentina
 Roque Perez,B,Buenos Aires,AR,Argentina
 Romang,S,Santa Fe,AR,Argentina
 Rivas,B,Buenos Aires,AR,Argentina
@@ -65435,8 +65509,6 @@ Plomer,B,Buenos Aires,AR,Argentina
 Pinamar,B,Buenos Aires,AR,Argentina
 Pilar,B,Buenos Aires,AR,Argentina
 Pereyra,B,Buenos Aires,AR,Argentina
-Perdices,E,Entre Rios,AR,Argentina
-Pedernales,B,Buenos Aires,AR,Argentina
 Paso del Rey,B,Buenos Aires,AR,Argentina
 Paso de los Libres,W,Corrientes,AR,Argentina
 Parque Patricios,C,Buenos Aires F.D.,AR,Argentina
@@ -65455,7 +65527,6 @@ Esteban Echeverria,B,Buenos Aires,AR,Argentina
 Monte Chingolo,B,Buenos Aires,AR,Argentina
 Monte Castro,C,Buenos Aires F.D.,AR,Argentina
 Montecarlo,N,Misiones,AR,Argentina
-,N,Misiones,AR,Argentina
 Miramar,B,Buenos Aires,AR,Argentina
 Ministro Rivadavia,B,Buenos Aires,AR,Argentina
 Merlo,B,Buenos Aires,AR,Argentina
@@ -65467,14 +65538,12 @@ Mataderos,C,Buenos Aires F.D.,AR,Argentina
 Martinez,B,Buenos Aires,AR,Argentina
 Haedo,B,Buenos Aires,AR,Argentina
 Mariano Acosta,B,Buenos Aires,AR,Argentina
-Mar del Tuyu,B,Buenos Aires,AR,Argentina
 Mar del Plata,B,Buenos Aires,AR,Argentina
 Mar de Ajo,B,Buenos Aires,AR,Argentina
 Marcos Paz,B,Buenos Aires,AR,Argentina
-Manuel J. Cobo,B,Buenos Aires,AR,Argentina
 Manuel B. Gonnet,B,Buenos Aires,AR,Argentina
-Maipu,B,Buenos Aires,AR,Argentina
 Magdalena,B,Buenos Aires,AR,Argentina
+Macia,E,Entre Rios,AR,Argentina
 Lynch,B,Buenos Aires,AR,Argentina
 Luján,B,Buenos Aires,AR,Argentina
 Luis Guillon,B,Buenos Aires,AR,Argentina
@@ -65482,7 +65551,6 @@ Los Polvorines,B,Buenos Aires,AR,Argentina
 Los Pinos,B,Buenos Aires,AR,Argentina
 Los Cardales,B,Buenos Aires,AR,Argentina
 Longchamps,B,Buenos Aires,AR,Argentina
-Loma Verde,B,Buenos Aires,AR,Argentina
 Lomas de Zamora,B,Buenos Aires,AR,Argentina
 Lomas del Mirador,B,Buenos Aires,AR,Argentina
 Lobos,B,Buenos Aires,AR,Argentina
@@ -65494,7 +65562,6 @@ Las Toninas,B,Buenos Aires,AR,Argentina
 Las Palmas,B,Buenos Aires,AR,Argentina
 Las Flores,B,Buenos Aires,AR,Argentina
 La Plata,B,Buenos Aires,AR,Argentina
-La Paz,B,Buenos Aires,AR,Argentina
 Lanus,B,Buenos Aires,AR,Argentina
 La Luisa,B,Buenos Aires,AR,Argentina
 La Lucila,B,Buenos Aires,AR,Argentina
@@ -65510,7 +65577,6 @@ Isidro Casanova,B,Buenos Aires,AR,Argentina
 Ingeniero Otamendi,B,Buenos Aires,AR,Argentina
 Ingeniero Miguel Sajaroff,E,Entre Rios,AR,Argentina
 Ingeniero Maschwitz,B,Buenos Aires,AR,Argentina
-Ibicuy,E,Entre Rios,AR,Argentina
 Hurlingham,B,Buenos Aires,AR,Argentina
 Gualeguaychú,E,Entre Rios,AR,Argentina
 Gualeguay,E,Entre Rios,AR,Argentina
@@ -65523,13 +65589,11 @@ Villa Urquiza,C,Buenos Aires F.D.,AR,Argentina
 General San Martin,B,Buenos Aires,AR,Argentina
 General Rodriguez,B,Buenos Aires,AR,Argentina
 General Pacheco,B,Buenos Aires,AR,Argentina
-General Mansilla,B,Buenos Aires,AR,Argentina
 General Las Heras,B,Buenos Aires,AR,Argentina
 General Belgrano,B,Buenos Aires,AR,Argentina
 Garupa,N,Misiones,AR,Argentina
 Garin,B,Buenos Aires,AR,Argentina
 Francisco Alvarez,B,Buenos Aires,AR,Argentina
-,P,Formosa,AR,Argentina
 Formosa,P,Formosa,AR,Argentina
 Fontana,H,Chaco,AR,Argentina
 Florida,B,Buenos Aires,AR,Argentina
@@ -65537,7 +65601,6 @@ Floresta,C,Buenos Aires F.D.,AR,Argentina
 Flores,C,Buenos Aires F.D.,AR,Argentina
 Florencio Varela,B,Buenos Aires,AR,Argentina
 Florencia,S,Santa Fe,AR,Argentina
-,C,Buenos Aires F.D.,AR,Argentina
 Federal,E,Entre Rios,AR,Argentina
 Fatima,B,Buenos Aires,AR,Argentina
 Ezpeleta,B,Buenos Aires,AR,Argentina
@@ -65592,7 +65655,6 @@ Bovril,E,Entre Rios,AR,Argentina
 Boulogne,B,Buenos Aires,AR,Argentina
 Bosques,B,Buenos Aires,AR,Argentina
 La Boca,C,Buenos Aires F.D.,AR,Argentina
-Billinghurst,B,Buenos Aires,AR,Argentina
 Bernal,B,Buenos Aires,AR,Argentina
 Berisso,B,Buenos Aires,AR,Argentina
 Berazategui,B,Buenos Aires,AR,Argentina
@@ -65659,7 +65721,6 @@ Victoria,MO,Departamento de Montevideo,UY,Uruguay
 ,,,UY,Uruguay
 Tala,CA,Canelones,UY,Uruguay
 Tacuarembó,TA,Departamento de Tacuarembo,UY,Uruguay
-,SO,Soriano,UY,Uruguay
 Sayago,MO,Departamento de Montevideo,UY,Uruguay
 Sauzal,RV,Departamento de Rivera,UY,Uruguay
 Santa Rosa,CA,Canelones,UY,Uruguay
@@ -65744,7 +65805,6 @@ Varzea da Palma,MG,Minas Gerais,BR,Brazil
 Varzea da Canabrava,BA,Bahia,BR,Brazil
 Varginha,MG,Minas Gerais,BR,Brazil
 Vargem Grande do Sul,SP,Sao Paulo,BR,Brazil
-Vargem Grande,MG,Minas Gerais,BR,Brazil
 Vargem Bonita,PR,Parana,BR,Brazil
 Vargem Alta,ES,Espirito Santo,BR,Brazil
 Vargem,SP,Sao Paulo,BR,Brazil
@@ -65909,6 +65969,7 @@ Serra Preta,BA,Bahia,BR,Brazil
 Serrania,MG,Minas Gerais,BR,Brazil
 Serra Negra,SP,Sao Paulo,BR,Brazil
 Serrana,SP,Sao Paulo,BR,Brazil
+Serra Dourada,GO,Goias,BR,Brazil
 Serra do Salitre,MG,Minas Gerais,BR,Brazil
 Serra dos Aimores,MG,Minas Gerais,BR,Brazil
 Serra Azul,SP,Sao Paulo,BR,Brazil
@@ -66086,6 +66147,9 @@ Santo Antonio de Jesus,BA,Bahia,BR,Brazil
 Santo Antonio da Platina,PR,Parana,BR,Brazil
 Santo Antonio da Alegria,SP,Sao Paulo,BR,Brazil
 Santo Antonio da Patrulha,RS,Rio Grande do Sul,BR,Brazil
+Santo Antonio,RS,Rio Grande do Sul,BR,Brazil
+Santo Antonio,SP,Sao Paulo,BR,Brazil
+Santo Antonio,TO,Tocantins,BR,Brazil
 Santo Ângelo,RS,Rio Grande do Sul,BR,Brazil
 Santo André,SP,Sao Paulo,BR,Brazil
 Santo Anastacio,SP,Sao Paulo,BR,Brazil
@@ -66175,7 +66239,6 @@ Rubineia,SP,Sao Paulo,BR,Brazil
 Roseira,SP,Sao Paulo,BR,Brazil
 Rosario do Sul,RS,Rio Grande do Sul,BR,Brazil
 Rosario da Limeira,MG,Minas Gerais,BR,Brazil
-Rosalia,SP,Sao Paulo,BR,Brazil
 Rondonópolis,MT,Mato Grosso,BR,Brazil
 Rondon,PR,Parana,BR,Brazil
 Rondinha,RS,Rio Grande do Sul,BR,Brazil
@@ -66243,7 +66306,6 @@ Renascenca,PR,Parana,BR,Brazil
 Registro,SP,Sao Paulo,BR,Brazil
 Reginopolis,SP,Sao Paulo,BR,Brazil
 Regente Feijo,SP,Sao Paulo,BR,Brazil
-Recife,BA,Bahia,BR,Brazil
 Realeza,PR,Parana,BR,Brazil
 Real,BA,Bahia,BR,Brazil
 Ravena,MG,Minas Gerais,BR,Brazil
@@ -66336,7 +66398,6 @@ Pocoes,BA,Bahia,BR,Brazil
 Poco Central,BA,Bahia,BR,Brazil
 Poa,SP,Sao Paulo,BR,Brazil
 Planura,MG,Minas Gerais,BR,Brazil
-Planalto,SP,Sao Paulo,BR,Brazil
 Planalto,MG,Minas Gerais,BR,Brazil
 Piuma,ES,Espirito Santo,BR,Brazil
 Pituba,BA,Bahia,BR,Brazil
@@ -66606,7 +66667,6 @@ Morrinhos,GO,Goias,BR,Brazil
 Morretes,PR,Parana,BR,Brazil
 Moreira Sales,PR,Parana,BR,Brazil
 Moreira,BA,Bahia,BR,Brazil
-Montividiu,GO,Goias,BR,Brazil
 Montezuma,MG,Minas Gerais,BR,Brazil
 Monte Siao,MG,Minas Gerais,BR,Brazil
 Montese,MS,Mato Grosso do Sul,BR,Brazil
@@ -66667,7 +66727,7 @@ Matozinhos,MG,Minas Gerais,BR,Brazil
 Mato Verde,MG,Minas Gerais,BR,Brazil
 ,MS,Mato Grosso do Sul,BR,Brazil
 ,MT,Mato Grosso,BR,Brazil
-Mato Grosso,MT,Mato Grosso,BR,Brazil
+Vila Bela da Santissima Trindade,MT,Mato Grosso,BR,Brazil
 Matipo,MG,Minas Gerais,BR,Brazil
 Matinhos,PR,Parana,BR,Brazil
 Matias Barbosa,MG,Minas Gerais,BR,Brazil
@@ -67406,7 +67466,6 @@ Casca,RS,Rio Grande do Sul,BR,Brazil
 Casa Branca,SP,Sao Paulo,BR,Brazil
 Caruara,RS,Rio Grande do Sul,BR,Brazil
 Carrancas,MG,Minas Gerais,BR,Brazil
-Carneirinho,MG,Minas Gerais,BR,Brazil
 Carmopolis,SE,Sergipe,BR,Brazil
 Carmo do Rio Verde,GO,Goias,BR,Brazil
 Carmo do Rio Claro,MG,Minas Gerais,BR,Brazil
@@ -67443,7 +67502,6 @@ Capim Branco,MG,Minas Gerais,BR,Brazil
 Capim Branco,MG,Minas Gerais,BR,Brazil
 Capetinga,MG,Minas Gerais,BR,Brazil
 Capelinha,MG,Minas Gerais,BR,Brazil
-Capelinha,GO,Goias,BR,Brazil
 Capela do Alto,SP,Sao Paulo,BR,Brazil
 Capela,SE,Sergipe,BR,Brazil
 Caparao,MG,Minas Gerais,BR,Brazil
@@ -67708,6 +67766,7 @@ Arroio do Tigre,RS,Rio Grande do Sul,BR,Brazil
 Arroio dos Ratos,RS,Rio Grande do Sul,BR,Brazil
 Arroio do Silva,SC,Santa Catarina,BR,Brazil
 Arroio do Meio,RS,Rio Grande do Sul,BR,Brazil
+Recife,BA,Bahia,BR,Brazil
 Arraias,TO,Tocantins,BR,Brazil
 Arraial do Cabo,RJ,Rio de Janeiro,BR,Brazil
 Aroeira,PR,Parana,BR,Brazil
@@ -67808,7 +67867,6 @@ Alto Parana,PR,Parana,BR,Brazil
 Alto Garcas,MT,Mato Grosso,BR,Brazil
 Alto Bela Vista,SC,Santa Catarina,BR,Brazil
 Alto Araguaia,MT,Mato Grosso,BR,Brazil
-Alto Alegre,SP,Sao Paulo,BR,Brazil
 Altinopolis,SP,Sao Paulo,BR,Brazil
 Alterosa,MG,Minas Gerais,BR,Brazil
 Altaneiras,PR,Parana,BR,Brazil
@@ -67899,6 +67957,7 @@ El Chaparro,B,Anzoátegui,VE,Venezuela
 Anaco,B,Anzoátegui,VE,Venezuela
 Spanish Town,14,Saint Catherine,JM,Jamaica
 Santa Cruz,11,Saint Elizabeth,JM,Jamaica
+,08,Saint James,JM,Jamaica
 ,14,Saint Catherine,JM,Jamaica
 ,02,Saint Andrew,JM,Jamaica
 Runaway Bay,06,Parish of Saint Ann,JM,Jamaica
@@ -67931,7 +67990,6 @@ Tamboril,25,Provincia de Santiago,DO,Dominican Republic
 Simon Bolivar,01,Nacional,DO,Dominican Republic
 Santo Domingo,01,Nacional,DO,Dominican Republic
 Santiago de los Caballeros,25,Provincia de Santiago,DO,Dominican Republic
-,25,Provincia de Santiago,DO,Dominican Republic
 Santa Cruz de Barahona,04,Provincia de Barahona,DO,Dominican Republic
 San Pedro de Macorís,23,Provincia de San Pedro de Macoris,DO,Dominican Republic
 San Pedro,22,Provincia de San Juan,DO,Dominican Republic
@@ -67940,13 +67998,11 @@ San Jose de Ocoa,31,Provincia de San Jose de Ocoa,DO,Dominican Republic
 San Francisco de Macorís,06,Provincia Duarte,DO,Dominican Republic
 San Fernando de Monte Cristi,15,Provincia de Monte Cristi,DO,Dominican Republic
 Puerto Plata,18,Puerto Plata,DO,Dominican Republic
-,21,Provincia de San Cristobal,DO,Dominican Republic
 San Carlos,01,Nacional,DO,Dominican Republic
 Salvaleón de Higüey,11,Provincia de La Altagracia,DO,Dominican Republic
 Salcedo,19,Provincia de Hermanas Mirabal,DO,Dominican Republic
 Sabaneta,26,Provincia de Santiago Rodriguez,DO,Dominican Republic
 Punta Cana,22,Provincia de San Juan,DO,Dominican Republic
-,18,Puerto Plata,DO,Dominican Republic
 Pedro Brand,32,Provincia de Santo Domingo,DO,Dominican Republic
 Pedernales,16,Provincia de Pedernales,DO,Dominican Republic
 Nagua,14,Provincia Maria Trinidad Sanchez,DO,Dominican Republic
@@ -67971,7 +68027,6 @@ Ensanche Luperon,01,Nacional,DO,Dominican Republic
 Ensanche La Fe,01,Nacional,DO,Dominican Republic
 ,,,DO,Dominican Republic
 Dominica,08,Provincia de El Seibo,DO,Dominican Republic
-Cotui,24,Provincia Sanchez Ramirez,DO,Dominican Republic
 Constanza,13,Provincia de La Vega,DO,Dominican Republic
 Concepción de la Vega,13,Provincia de La Vega,DO,Dominican Republic
 Cayetano Germosen,09,Provincia Espaillat,DO,Dominican Republic
@@ -68126,7 +68181,6 @@ Tamazunchale,SLP,San Luis Potosí,MX,Mexico
 ,TAM,Tamaulipas,MX,Mexico
 Tacubaya,CMX,Mexico City,MX,Mexico
 Tacotalpa,TAB,Tabasco,MX,Mexico
-,TAB,Tabasco,MX,Mexico
 Soto la Marina,TAM,Tamaulipas,MX,Mexico
 Soledad de Doblado,VER,Veracruz,MX,Mexico
 Soconusco,VER,Veracruz,MX,Mexico
@@ -68209,7 +68263,6 @@ San Bernardo,HID,Hidalgo,MX,Mexico
 Amaxac de Guerrero,TLA,Tlaxcala,MX,Mexico
 San Bartolo Amayalco,CMX,Mexico City,MX,Mexico
 San Antonio Tula,HID,Hidalgo,MX,Mexico
-San Andres Tuxtla,VER,Veracruz,MX,Mexico
 San Andres Cacaloapan,PUE,Puebla,MX,Mexico
 San Andres Totoltepec,CMX,Mexico City,MX,Mexico
 San Alvaro,CMX,Mexico City,MX,Mexico
@@ -68225,16 +68278,12 @@ Rio Blanco,VER,Veracruz,MX,Mexico
 Reynosa,TAM,Tamaulipas,MX,Mexico
 Renta,OAX,Oaxaca,MX,Mexico
 Grajales,PUE,Puebla,MX,Mexico
-,ROO,Quintana Roo,MX,Mexico
-,QUE,Querétaro,MX,Mexico
 Quecholac,PUE,Puebla,MX,Mexico
 Puerto Escondido,OAX,Oaxaca,MX,Mexico
 Puente de Ixtla,MOR,Morelos,MX,Mexico
 Puebla City,PUE,Puebla,MX,Mexico
-,PUE,Puebla,MX,Mexico
 Pro-Hogar,CMX,Mexico City,MX,Mexico
 Progreso de Alvaro Obregon,HID,Hidalgo,MX,Mexico
-Progreso,YUC,Yucatán,MX,Mexico
 Prado Churubusco,CMX,Mexico City,MX,Mexico
 Poza Rica de Hidalgo,VER,Veracruz,MX,Mexico
 Poza Rica Chacas,VER,Veracruz,MX,Mexico
@@ -68273,7 +68322,6 @@ San Francisco Ocotlan,PUE,Puebla,MX,Mexico
 Ocosingo,CHP,Chiapas,MX,Mexico
 Oaxtepec,MOR,Morelos,MX,Mexico
 Oaxaca City,OAX,Oaxaca,MX,Mexico
-,OAX,Oaxaca,MX,Mexico
 ,NLE,Nuevo León,MX,Mexico
 Nuevo Leon,TAB,Tabasco,MX,Mexico
 Nuevo Laredo,TAM,Tamaulipas,MX,Mexico
@@ -68394,12 +68442,10 @@ Hocaba,YUC,Yucatán,MX,Mexico
 Hidalgo,CHP,Chiapas,MX,Mexico
 Heroes de Churubusco,CMX,Mexico City,MX,Mexico
 Guzman,TAM,Tamaulipas,MX,Mexico
-,GRO,Guerrero,MX,Mexico
 Vicente Guerrero,HID,Hidalgo,MX,Mexico
 Guadalupe Piletas,PUE,Puebla,MX,Mexico
 Guadalupe Insurgentes,CMX,Mexico City,MX,Mexico
 Graciano Sanchez,TAM,Tamaulipas,MX,Mexico
-Magiscatzin,TAM,Tamaulipas,MX,Mexico
 Tancanhuitz de Santos,SLP,San Luis Potosí,MX,Mexico
 Fortin de las Flores,VER,Veracruz,MX,Mexico
 Felipe Carrillo Puerto,ROO,Quintana Roo,MX,Mexico
@@ -68479,7 +68525,6 @@ Chilapa de Alvarez,GRO,Guerrero,MX,Mexico
 Chiconquiaco,VER,Veracruz,MX,Mexico
 Chiconcuac,MEX,Estado de Mexico,MX,Mexico
 Chicoloapan,MEX,Estado de Mexico,MX,Mexico
-,CHP,Chiapas,MX,Mexico
 Chiapas,CHP,Chiapas,MX,Mexico
 Chiapa de Corzo,CHP,Chiapas,MX,Mexico
 Chetumal,ROO,Quintana Roo,MX,Mexico
@@ -68499,7 +68544,6 @@ Cardenas,TAB,Tabasco,MX,Mexico
 Capulhuac,MEX,Estado de Mexico,MX,Mexico
 Cancún,ROO,Quintana Roo,MX,Mexico
 Campestre Churubusco,CMX,Mexico City,MX,Mexico
-,CAM,Campeche,MX,Mexico
 Campeche,CAM,Campeche,MX,Mexico
 Calpulalpan,TLA,Tlaxcala,MX,Mexico
 Calkini,CAM,Campeche,MX,Mexico
@@ -68574,10 +68618,8 @@ Acajete,PUE,Puebla,MX,Mexico
 Acachapan y Colmena Primera Seccion,TAB,Tabasco,MX,Mexico
 Varadero,04,Provincia de Matanzas,CU,Cuba
 Santa Clara,05,Provincia de Villa Clara,CU,Cuba
-Pinar del Río,01,Provincia de Pinar del Rio,CU,Cuba
 Havana,03,La Habana,CU,Cuba
 La Habana,09,Provincia de Camagueey,CU,Cuba
-Holguín,11,Provincia de Holguin,CU,Cuba
 ,,,CU,Cuba
 ,08,Provincia de Ciego de Avila,CU,Cuba
 Vert-Pre,,,MQ,Martinique
@@ -68653,7 +68695,6 @@ New Grant,PRT,Princes Town,TT,Trinidad and Tobago
 Morvant,SJL,San Juan/Laventille,TT,Trinidad and Tobago
 Moriah,WTO,Tobago,TT,Trinidad and Tobago
 Maraval,DMN,Diego Martin,TT,Trinidad and Tobago
-Maracas,TUP,Tunapuna/Piarco,TT,Trinidad and Tobago
 Marabella,SFO,City of San Fernando,TT,Trinidad and Tobago
 La Brea,SIP,Siparia,TT,Trinidad and Tobago
 Gasparillo,CTT,Couva-Tabaquite-Talparo,TT,Trinidad and Tobago
@@ -68801,7 +68842,6 @@ Soyapango,SS,Departamento de San Salvador,SV,El Salvador
 Sonsonate,SO,Departamento de Sonsonate,SV,El Salvador
 Sensuntepeque,CA,Departamento de Cabanas,SV,El Salvador
 San Vicente,SV,Departamento de San Vicente,SV,El Salvador
-,SA,Departamento de Santa Ana,SV,El Salvador
 Santa Ana,SA,Departamento de Santa Ana,SV,El Salvador
 San Salvador,SS,Departamento de San Salvador,SV,El Salvador
 San Pedro Perulapan,CU,Departamento de Cuscatlan,SV,El Salvador
@@ -68856,16 +68896,11 @@ Zaragoza,CM,Departamento de Chimaltenango,GT,Guatemala
 Zacapa,ZA,Departamento de Zacapa,GT,Guatemala
 Villa Nueva,GU,Departamento de Guatemala,GT,Guatemala
 Sumpango,SA,Departamento de Sacatepequez,GT,Guatemala
-,SU,Suchitepeque,GT,Guatemala
 Solola,SO,Departamento de Solola,GT,Guatemala
-Santa Cruz Naranjo,SR,Departamento de Santa Rosa,GT,Guatemala
 Santa Catarina Pinula,GU,Departamento de Guatemala,GT,Guatemala
 San Pedro Sacatepequez,SM,Departamento de San Marcos,GT,Guatemala
 San Jose Pinula,GU,Departamento de Guatemala,GT,Guatemala
-,SA,Departamento de Sacatepequez,GT,Guatemala
-,RE,Departamento de Retalhuleu,GT,Guatemala
 Retalhuleu,RE,Departamento de Retalhuleu,GT,Guatemala
-,QZ,Departamento de Quetzaltenango,GT,Guatemala
 Quetzaltenango,QZ,Departamento de Quetzaltenango,GT,Guatemala
 Petapa,GU,Departamento de Guatemala,GT,Guatemala
 Patzun,CM,Departamento de Chimaltenango,GT,Guatemala
@@ -68884,10 +68919,10 @@ Flores Costa Cuca,QZ,Departamento de Quetzaltenango,GT,Guatemala
 Guastatoya,PR,Departamento de El Progreso,GT,Guatemala
 Guatemala City,GU,Departamento de Guatemala,GT,Guatemala
 Chiquimula,CQ,Departamento de Chiquimula,GT,Guatemala
-,CM,Departamento de Chimaltenango,GT,Guatemala
 Chimaltenango,CM,Departamento de Chimaltenango,GT,Guatemala
 Asuncion Mita,JU,Departamento de Jutiapa,GT,Guatemala
 Antigua Guatemala,SA,Departamento de Sacatepequez,GT,Guatemala
+Amatitlán,GU,Departamento de Guatemala,GT,Guatemala
 ,AV,Departamento de Alta Verapaz,GT,Guatemala
 Puerto Cortez,CR,Departamento de Cortes,HN,Honduras
 Villanueva,CR,Departamento de Cortes,HN,Honduras
@@ -68895,10 +68930,9 @@ Tocoa,CL,Departamento de Colon,HN,Honduras
 Tela,AT,Departamento de Atlantida,HN,Honduras
 Tegucigalpa,FM,Departamento de Francisco Morazan,HN,Honduras
 Sula,SB,Departamento de Santa Barbara,HN,Honduras
-Siguatepeque,CM,Departamento de Comayagua,HN,Honduras
-Santa Rosa de Copán,CP,Departamento de Copan,HN,Honduras
 Santa Barbara,SB,Departamento de Santa Barbara,HN,Honduras
 San Pedro Sula,CR,Departamento de Cortes,HN,Honduras
+Coxen Hole,IB,Bay Islands,HN,Honduras
 Puerto Lempira,GD,Departamento de Gracias a Dios,HN,Honduras
 Piraera,LE,Departamento de Lempira,HN,Honduras
 Pinalejo,SB,Departamento de Santa Barbara,HN,Honduras
@@ -68909,18 +68943,14 @@ La Lima,CR,Departamento de Cortes,HN,Honduras
 La Ceiba,AT,Departamento de Atlantida,HN,Honduras
 ,IB,Bay Islands,HN,Honduras
 ,,,HN,Honduras
-,FM,Departamento de Francisco Morazan,HN,Honduras
 El Progreso,YO,Departamento de Yoro,HN,Honduras
 El Paraiso,EP,Departamento de El Paraiso,HN,Honduras
 Danli,EP,Departamento de El Paraiso,HN,Honduras
 Copán,CP,Departamento de Copan,HN,Honduras
 Comayaguela,FM,Departamento de Francisco Morazan,HN,Honduras
 Comayagua,CM,Departamento de Comayagua,HN,Honduras
-,CL,Departamento de Colon,HN,Honduras
 Ciudad Choluteca,CH,Departamento de Choluteca,HN,Honduras
 Choloma,CR,Departamento de Cortes,HN,Honduras
-Catacamas,OL,Departamento de Olancho,HN,Honduras
-,AT,Departamento de Atlantida,HN,Honduras
 Santo Tomas,CO,Departamento de Chontales,NI,Nicaragua
 San Rafael del Sur,MN,Departamento de Managua,NI,Nicaragua
 San Juan del Sur,RI,Departamento de Rivas,NI,Nicaragua
@@ -68930,7 +68960,6 @@ Ocotal,NS,Departamento de Nueva Segovia,NI,Nicaragua
 Nandaime,GR,Departamento de Granada,NI,Nicaragua
 Matagalpa,MT,Departamento de Matagalpa,NI,Nicaragua
 Masaya,MS,Departamento de Masaya,NI,Nicaragua
-,MN,Departamento de Managua,NI,Nicaragua
 Managua,MN,Departamento de Managua,NI,Nicaragua
 León,LE,Departamento de Leon,NI,Nicaragua
 La Paz de Oriente,CA,Departamento de Carazo,NI,Nicaragua
@@ -68974,6 +69003,7 @@ San José,SJ,Provincia de San Jose,CR,Costa Rica
 San Isidro,SJ,Provincia de San Jose,CR,Costa Rica
 San Francisco,H,Provincia de Heredia,CR,Costa Rica
 San Francisco de Dos Rios,SJ,Provincia de San Jose,CR,Costa Rica
+San Felipe,SJ,Provincia de San Jose,CR,Costa Rica
 Sabanilla,SJ,Provincia de San Jose,CR,Costa Rica
 Rio Jimenez,L,Provincia de Limon,CR,Costa Rica
 Quesada,A,Provincia de Alajuela,CR,Costa Rica
@@ -68994,7 +69024,6 @@ Naranjo,A,Provincia de Alajuela,CR,Costa Rica
 Moravia,C,Provincia de Cartago,CR,Costa Rica
 Miramar,P,Provincia de Puntarenas,CR,Costa Rica
 Yoses,SJ,Provincia de San Jose,CR,Costa Rica
-Anselmo Llorente,SJ,Provincia de San Jose,CR,Costa Rica
 Llano,SJ,Provincia de San Jose,CR,Costa Rica
 Liberia,G,Provincia de Guanacaste,CR,Costa Rica
 La Cruz,G,Provincia de Guanacaste,CR,Costa Rica
@@ -69026,7 +69055,6 @@ Cinco Esquinas,A,Provincia de Alajuela,CR,Costa Rica
 Cartago,C,Provincia de Cartago,CR,Costa Rica
 Carrizal,A,Provincia de Alajuela,CR,Costa Rica
 Canas,G,Provincia de Guanacaste,CR,Costa Rica
-Calle Blancos,SJ,Provincia de San Jose,CR,Costa Rica
 Caballo Blanco,C,Provincia de Cartago,CR,Costa Rica
 Buenos Aires,P,Provincia de Puntarenas,CR,Costa Rica
 Belen,G,Provincia de Guanacaste,CR,Costa Rica
@@ -69035,13 +69063,11 @@ Barro Morado,C,Provincia de Cartago,CR,Costa Rica
 Atenas,A,Provincia de Alajuela,CR,Costa Rica
 Angeles,H,Provincia de Heredia,CR,Costa Rica
 Alfaro,A,Provincia de Alajuela,CR,Costa Rica
-Alajuelita,SJ,Provincia de San Jose,CR,Costa Rica
 ,A,Provincia de Alajuela,CR,Costa Rica
 Alajuela,A,Provincia de Alajuela,CR,Costa Rica
 Aguas Zarcas,A,Provincia de Alajuela,CR,Costa Rica
 ,V,Zulia,VE,Venezuela
 Yaritagua,U,Yaracuy,VE,Venezuela
-,U,Yaracuy,VE,Venezuela
 Villa de Cura,D,Aragua,VE,Venezuela
 Villa Bruzual,P,Portuguesa,VE,Venezuela
 ,,,VE,Venezuela
@@ -69075,9 +69101,8 @@ San Fernando,M,Miranda,VE,Venezuela
 San Felipe,U,Yaracuy,VE,Venezuela
 San Diego,M,Miranda,VE,Venezuela
 San Cristóbal,S,Táchira,VE,Venezuela
-San Casimiro,D,Aragua,VE,Venezuela
 San Carlos,H,Cojedes,VE,Venezuela
-San Antonio del Tachira,S,Táchira,VE,Venezuela
+San Antonio del Táchira,S,Táchira,VE,Venezuela
 San Antonio de Los Altos,M,Miranda,VE,Venezuela
 San Antonio,I,Falcón,VE,Venezuela
 Sabaneta,E,Barinas,VE,Venezuela
@@ -69091,18 +69116,16 @@ Punto Fijo,I,Falcón,VE,Venezuela
 Puerto Ordaz and San Felix,F,Bolívar,VE,Venezuela
 Puerto La Cruz,X,Vargas,VE,Venezuela
 Puerto Cabello,G,Carabobo,VE,Venezuela
-,P,Portuguesa,VE,Venezuela
 Porlamar,O,Nueva Esparta,VE,Venezuela
 Piritu,P,Portuguesa,VE,Venezuela
 Pampatar,O,Nueva Esparta,VE,Venezuela
 Palo Negro,D,Aragua,VE,Venezuela
 Ocumare,M,Miranda,VE,Venezuela
+Nirgua,U,Yaracuy,VE,Venezuela
 Naguanagua,G,Carabobo,VE,Venezuela
 Moron,G,Carabobo,VE,Venezuela
 Montalban,G,Carabobo,VE,Venezuela
-,N,Monagas,VE,Venezuela
-,M,Miranda,VE,Venezuela
-Miranda,G,Carabobo,VE,Venezuela
+,L,Mérida,VE,Venezuela
 Mérida,L,Mérida,VE,Venezuela
 Mariara,G,Carabobo,VE,Venezuela
 Maracay,D,Aragua,VE,Venezuela
@@ -69116,7 +69139,6 @@ La Victoria,D,Aragua,VE,Venezuela
 La Vencindad,O,Nueva Esparta,VE,Venezuela
 La Vela de Coro,I,Falcón,VE,Venezuela
 Las Tejerias,D,Aragua,VE,Venezuela
-,K,Lara,VE,Venezuela
 La Mocha,V,Zulia,VE,Venezuela
 Lagunillas,V,Zulia,VE,Venezuela
 La Guaira,X,Vargas,VE,Venezuela
@@ -69132,7 +69154,6 @@ Guanare,P,Portuguesa,VE,Venezuela
 Guachara,C,Apure,VE,Venezuela
 Guacara,G,Carabobo,VE,Venezuela
 Gamelotal,M,Miranda,VE,Venezuela
-,I,Falcón,VE,Venezuela
 El Vigía,L,Mérida,VE,Venezuela
 El Tocuyo,K,Lara,VE,Venezuela
 El Tigre,B,Anzoátegui,VE,Venezuela
@@ -69142,7 +69163,6 @@ El Morro de Barcelona,B,Anzoátegui,VE,Venezuela
 El Milagro,G,Carabobo,VE,Venezuela
 El Limón,D,Aragua,VE,Venezuela
 El Limon,M,Miranda,VE,Venezuela
-El Hatillo Municipality,M,Miranda,VE,Venezuela
 El Consejo,D,Aragua,VE,Venezuela
 Ejido,L,Mérida,VE,Venezuela
 Duaca,K,Lara,VE,Venezuela
@@ -69179,7 +69199,6 @@ Cagua,D,Aragua,VE,Venezuela
 Cabudare,K,Lara,VE,Venezuela
 Cabimas,V,Zulia,VE,Venezuela
 Buena Vista,V,Zulia,VE,Venezuela
-,F,Bolívar,VE,Venezuela
 Bolivar,O,Nueva Esparta,VE,Venezuela
 Boconó,T,Estado Trujillo,VE,Venezuela
 Blanquillo,I,Falcón,VE,Venezuela
@@ -69193,7 +69212,6 @@ Barranquitas,V,Zulia,VE,Venezuela
 Barquisimeto,K,Lara,VE,Venezuela
 Barlovento,M,Miranda,VE,Venezuela
 Barinitas,E,Barinas,VE,Venezuela
-,E,Barinas,VE,Venezuela
 Barinas,E,Barinas,VE,Venezuela
 Barcelona,B,Anzoátegui,VE,Venezuela
 Barbacoas,D,Aragua,VE,Venezuela
@@ -69204,7 +69222,6 @@ Arichuna,C,Apure,VE,Venezuela
 Arenales,K,Lara,VE,Venezuela
 Araure,P,Portuguesa,VE,Venezuela
 Aponte,D,Aragua,VE,Venezuela
-,B,Anzoátegui,VE,Venezuela
 Anzoategui,K,Lara,VE,Venezuela
 Andres,V,Zulia,VE,Venezuela
 Anare,X,Vargas,VE,Venezuela
@@ -69229,99 +69246,70 @@ Acarigua,P,Portuguesa,VE,Venezuela
 Acapralito,J,Guárico,VE,Venezuela
 Acapral,J,Guárico,VE,Venezuela
 Abejales,S,Táchira,VE,Venezuela
-Zamora,Z,Provincia de Zamora-Chinchipe,EC,Ecuador
 Yantzaza,Z,Provincia de Zamora-Chinchipe,EC,Ecuador
-Vinces,R,Provincia de Los Rios,EC,Ecuador
 Ventanas,R,Provincia de Los Rios,EC,Ecuador
-,T,Provincia del Tungurahua,EC,Ecuador
 Tulcán,C,Provincia del Carchi,EC,Ecuador
 Tena,N,Provincia de Napo,EC,Ecuador
 Sucua,S,Provincia de Morona-Santiago,EC,Ecuador
 Santo Domingo de los Colorados,SD,Provincia de Santo Domingo de los Tsachilas,EC,Ecuador
 Santa Rosa,O,Provincia de El Oro,EC,Ecuador
-Santa Elena,SE,Provincia de Santa Elena,EC,Ecuador
 Sangolqui,P,Provincia de Pichincha,EC,Ecuador
 Samborondon,G,Provincia del Guayas,EC,Ecuador
-Salinas,SE,Provincia de Santa Elena,EC,Ecuador
 Riobamba,H,Provincia del Chimborazo,EC,Ecuador
 Quito,P,Provincia de Pichincha,EC,Ecuador
 Quevedo,R,Provincia de Los Rios,EC,Ecuador
 Puyo,Y,Provincia del Pastaza,EC,Ecuador
 Pujili,X,Provincia de Cotopaxi,EC,Ecuador
-Puerto Lopez,M,Provincia de Manabi,EC,Ecuador
 Puerto Francisco de Orellana,D,Provincia de Francisco de Orellana,EC,Ecuador
 Puerto Ayora,W,Provincia de Galapagos,EC,Ecuador
 Pueblo Nuevo,M,Provincia de Manabi,EC,Ecuador
 Portoviejo,M,Provincia de Manabi,EC,Ecuador
-Playas,G,Provincia del Guayas,EC,Ecuador
 Pinas,O,Provincia de El Oro,EC,Ecuador
-,P,Provincia de Pichincha,EC,Ecuador
 Pichincha,Y,Provincia del Pastaza,EC,Ecuador
 Pelileo,T,Provincia del Tungurahua,EC,Ecuador
-Pedernales,M,Provincia de Manabi,EC,Ecuador
 Paute,A,Provincia del Azuay,EC,Ecuador
 Pascuales,G,Provincia del Guayas,EC,Ecuador
 Palora,S,Provincia de Morona-Santiago,EC,Ecuador
 Pajan,M,Provincia de Manabi,EC,Ecuador
-Otavalo,I,Provincia de Imbabura,EC,Ecuador
-Naranjal,G,Provincia del Guayas,EC,Ecuador
-,N,Provincia de Napo,EC,Ecuador
 Montecristi,M,Provincia de Manabi,EC,Ecuador
 Montalvo,R,Provincia de Los Rios,EC,Ecuador
 Milagro,G,Provincia del Guayas,EC,Ecuador
 Manta,M,Provincia de Manabi,EC,Ecuador
 ,M,Provincia de Manabi,EC,Ecuador
 Machala,O,Provincia de El Oro,EC,Ecuador
-Machachi,P,Provincia de Pichincha,EC,Ecuador
-Macas,S,Provincia de Morona-Santiago,EC,Ecuador
-,R,Provincia de Los Rios,EC,Ecuador
 ,L,Provincia de Loja,EC,Ecuador
 Loja,L,Provincia de Loja,EC,Ecuador
 La Troncal,F,Provincia del Canar,EC,Ecuador
 Latacunga,X,Provincia de Cotopaxi,EC,Ecuador
-La Mana,X,Provincia de Cotopaxi,EC,Ecuador
-La Libertad,G,Provincia del Guayas,EC,Ecuador
 Nueva Loja,U,Provincia de Sucumbios,EC,Ecuador
 Juan Montalvo,P,Provincia de Pichincha,EC,Ecuador
-Jipijapa,M,Provincia de Manabi,EC,Ecuador
 ,I,Provincia de Imbabura,EC,Ecuador
 Ibarra,I,Provincia de Imbabura,EC,Ecuador
-Huaquillas,O,Provincia de El Oro,EC,Ecuador
 Hacienda Vera,G,Provincia del Guayas,EC,Ecuador
 Hacienda Duran,O,Provincia de El Oro,EC,Ecuador
-,G,Provincia del Guayas,EC,Ecuador
 Guayas,G,Provincia del Guayas,EC,Ecuador
 Guayaquil,G,Provincia del Guayas,EC,Ecuador
 Guaranda,B,Provincia de Bolivar,EC,Ecuador
 Gualaceo,A,Provincia del Azuay,EC,Ecuador
 Gonzalez Suarez,I,Provincia de Imbabura,EC,Ecuador
-Giron,A,Provincia del Azuay,EC,Ecuador
 Galapagos,I,Provincia de Imbabura,EC,Ecuador
 Florida,G,Provincia del Guayas,EC,Ecuador
-,E,Provincia de Esmeraldas,EC,Ecuador
 Esmeraldas,E,Provincia de Esmeraldas,EC,Ecuador
 Durán,G,Provincia del Guayas,EC,Ecuador
-,O,Provincia de El Oro,EC,Ecuador
 El Carmen,G,Provincia del Guayas,EC,Ecuador
 ,,,EC,Ecuador
 Daule,G,Provincia del Guayas,EC,Ecuador
 Cumbaya,P,Provincia de Pichincha,EC,Ecuador
 Cuenca,A,Provincia del Azuay,EC,Ecuador
-Chunchi,H,Provincia del Chimborazo,EC,Ecuador
 Chordeleg,A,Provincia del Azuay,EC,Ecuador
 Chone,M,Provincia de Manabi,EC,Ecuador
-,H,Provincia del Chimborazo,EC,Ecuador
 Chillogallo,P,Provincia de Pichincha,EC,Ecuador
-Cayambe,P,Provincia de Pichincha,EC,Ecuador
 Canaribamba,A,Provincia del Azuay,EC,Ecuador
 Canar,F,Provincia del Canar,EC,Ecuador
-San Jacinto de Buena Fe,R,Provincia de Los Rios,EC,Ecuador
 Bellavista,A,Provincia del Azuay,EC,Ecuador
 Baquerizo Moreno,G,Provincia del Guayas,EC,Ecuador
 Banos de Yunga,A,Provincia del Azuay,EC,Ecuador
-Banos,T,Provincia del Tungurahua,EC,Ecuador
 Babahoyo,R,Provincia de Los Rios,EC,Ecuador
-,A,Provincia del Azuay,EC,Ecuador
 Azogues,F,Provincia del Canar,EC,Ecuador
 Ambato,T,Provincia del Tungurahua,EC,Ecuador
 Aloag,P,Provincia de Pichincha,EC,Ecuador
@@ -69346,7 +69334,6 @@ Canutama,AM,Amazonas,BR,Brazil
 Caapiranga,AM,Amazonas,BR,Brazil
 Boca do Acre,AM,Amazonas,BR,Brazil
 Boa Vista,RR,Roraima,BR,Brazil
-Boa Vista,AM,Amazonas,BR,Brazil
 Ariquemes,RO,Rondonia,BR,Brazil
 Anama,AM,Amazonas,BR,Brazil
 ,AM,Amazonas,BR,Brazil
@@ -69358,14 +69345,11 @@ Villeta,CUN,Cundinamarca,CO,Colombia
 Villavicencio,MET,Departamento del Meta,CO,Colombia
 Villamaria,CAL,Departamento de Caldas,CO,Colombia
 Valledupar,CES,Departamento del Cesar,CO,Colombia
-,VAC,Departamento del Valle del Cauca,CO,Colombia
 Usaquen,DC,Bogota D.C.,CO,Colombia
-Turbo,ANT,Antioquia,CO,Colombia
 Turbaco,BOL,Departamento de Bolivar,CO,Colombia
 Tunja,BOY,Departamento de Boyaca,CO,Colombia
 Tuluá,VAC,Departamento del Valle del Cauca,CO,Colombia
 Trujillo,VAC,Departamento del Valle del Cauca,CO,Colombia
-,TOL,Departamento de Tolima,CO,Colombia
 Tenjo,CUN,Cundinamarca,CO,Colombia
 Tarapaca,BOL,Departamento de Bolivar,CO,Colombia
 Tabio,CUN,Cundinamarca,CO,Colombia
@@ -69387,13 +69371,11 @@ Santander,BOL,Departamento de Bolivar,CO,Colombia
 Santa Marta,MAG,Departamento del Magdalena,CO,Colombia
 Santa Barbara,ANT,Antioquia,CO,Colombia
 San Rafael,SUC,Departamento de Sucre,CO,Colombia
-San Martin,MET,Departamento del Meta,CO,Colombia
 San Jose del Salado,NAR,Departamento de Narino,CO,Colombia
 San Gil,SAN,Departamento de Santander,CO,Colombia
 San Cristobal,BOL,Departamento de Bolivar,CO,Colombia
 San Andrés,SAP,San Andres y Providencia,CO,Colombia
 Sabaneta,ANT,Antioquia,CO,Colombia
-,RIS,Departamento de Risaralda,CO,Colombia
 Risaralda,CAL,Departamento de Caldas,CO,Colombia
 Rionegro,ANT,Antioquia,CO,Colombia
 Riohacha,LAG,Departamento de La Guajira,CO,Colombia
@@ -69411,12 +69393,10 @@ Pitalito,HUI,Departamento del Huila,CO,Colombia
 Pereira,RIS,Departamento de Risaralda,CO,Colombia
 Paz de Ariporo,CAS,Departamento de Casanare,CO,Colombia
 Pasto,NAR,Departamento de Narino,CO,Colombia
-Pamplona,NSA,Departamento de Norte de Santander,CO,Colombia
 Palmira,VAC,Departamento del Valle del Cauca,CO,Colombia
 Palmar de Varela,ATL,Atlántico,CO,Colombia
-Ocaña,NSA,Departamento de Norte de Santander,CO,Colombia
+,NSA,Departamento de Norte de Santander,CO,Colombia
 Neiva,HUI,Departamento del Huila,CO,Colombia
-,NAR,Departamento de Narino,CO,Colombia
 Narino,ANT,Antioquia,CO,Colombia
 Naranjo,CAL,Departamento de Caldas,CO,Colombia
 Motavita,BOY,Departamento de Boyaca,CO,Colombia
@@ -69429,7 +69409,6 @@ Marinilla,ANT,Antioquia,CO,Colombia
 Manizales,CAL,Departamento de Caldas,CO,Colombia
 Manaciare,GUA,Departamento del Guainia,CO,Colombia
 Malambo,ATL,Atlántico,CO,Colombia
-,MAG,Departamento del Magdalena,CO,Colombia
 Magdalena,BOL,Departamento de Bolivar,CO,Colombia
 Madrid,CUN,Cundinamarca,CO,Colombia
 Los Andes,VAC,Departamento del Valle del Cauca,CO,Colombia
@@ -69440,7 +69419,6 @@ La Paz,VAC,Departamento del Valle del Cauca,CO,Colombia
 La Mesa,CUN,Cundinamarca,CO,Colombia
 La Magdalena,CUN,Cundinamarca,CO,Colombia
 La Leonera,VAC,Departamento del Valle del Cauca,CO,Colombia
-,LAG,Departamento de La Guajira,CO,Colombia
 La Estrella,ANT,Antioquia,CO,Colombia
 La Ceja,ANT,Antioquia,CO,Colombia
 La Ceiba,CAS,Departamento de Casanare,CO,Colombia
@@ -69480,14 +69458,11 @@ Coronado,VAC,Departamento del Valle del Cauca,CO,Colombia
 Municipio de Copacabana,ANT,Antioquia,CO,Colombia
 ,,,CO,Colombia
 Colombia,CUN,Cundinamarca,CO,Colombia
+Cienaga,MAG,Departamento del Magdalena,CO,Colombia
 Chiquinquira,BOY,Departamento de Boyaca,CO,Colombia
 Chinchina,CAL,Departamento de Caldas,CO,Colombia
 Chia,CUN,Cundinamarca,CO,Colombia
-,CES,Departamento del Cesar,CO,Colombia
 Caucasia,ANT,Antioquia,CO,Colombia
-,CAU,Departamento del Cauca,CO,Colombia
-,CAS,Departamento de Casanare,CO,Colombia
-Casanare,DC,Bogota D.C.,CO,Colombia
 Cartago,VAC,Departamento del Valle del Cauca,CO,Colombia
 Cartagena,BOL,Departamento de Bolivar,CO,Colombia
 El Carmen de Viboral,ANT,Antioquia,CO,Colombia
@@ -69501,7 +69476,6 @@ Buenos Aires,SUC,Departamento de Sucre,CO,Colombia
 Buenaventura,VAC,Departamento del Valle del Cauca,CO,Colombia
 Buchitolo,VAC,Departamento del Valle del Cauca,CO,Colombia
 Bucaramanga,SAN,Departamento de Santander,CO,Colombia
-,BOY,Departamento de Boyaca,CO,Colombia
 Boyaca,BOY,Departamento de Boyaca,CO,Colombia
 El Bosque,SAN,Departamento de Santander,CO,Colombia
 Bosa,DC,Bogota D.C.,CO,Colombia
@@ -69513,7 +69487,6 @@ Bello,ANT,Antioquia,CO,Colombia
 Barranquilla,ATL,Atlántico,CO,Colombia
 Barrancabermeja,SAN,Departamento de Santander,CO,Colombia
 Aures,VAC,Departamento del Valle del Cauca,CO,Colombia
-,ATL,Atlántico,CO,Colombia
 Atlantico,MAG,Departamento del Magdalena,CO,Colombia
 Armenia,QUI,Quindio Department,CO,Colombia
 Arabia,RIS,Departamento de Risaralda,CO,Colombia
@@ -69530,9 +69503,7 @@ Acevedo,HUI,Departamento del Huila,CO,Colombia
 Acacias,MET,Departamento del Meta,CO,Colombia
 Tres de Octubre,ANC,Ancash,PE,Peru
 Ventanilla,SAM,Region de San Martin,PE,Peru
-Tumbes,TUM,Tumbes,PE,Peru
 Trujillo,LAL,La Libertad,PE,Peru
-Tingo Maria,HUC,Region de Huanuco,PE,Peru
 Tarapoto,SAM,Region de San Martin,PE,Peru
 Tambo Grande,PIU,Piura,PE,Peru
 Sullana,PIU,Piura,PE,Peru
@@ -69540,7 +69511,6 @@ Santa,ANC,Ancash,PE,Peru
 San Lorenzo,LOR,Loreto,PE,Peru
 Salaverry,LAL,La Libertad,PE,Peru
 Pucallpa,UCA,Ucayali,PE,Peru
-,PIU,Piura,PE,Peru
 Piura,PIU,Piura,PE,Peru
 Paita,PIU,Piura,PE,Peru
 Moyobamba,SAM,Region de San Martin,PE,Peru
@@ -69550,7 +69520,6 @@ La Libertad,LAL,La Libertad,PE,Peru
 La Esperanza,LAL,La Libertad,PE,Peru
 Iquitos,LOR,Loreto,PE,Peru
 Huaraz,ANC,Ancash,PE,Peru
-,HUC,Region de Huanuco,PE,Peru
 Huánuco,HUC,Region de Huanuco,PE,Peru
 Ferrenafe,LAM,Lambayeque,PE,Peru
 El Conde,CAJ,Cajamarca,PE,Peru
@@ -69562,7 +69531,6 @@ Chiclayo,LAM,Lambayeque,PE,Peru
 Chepen,LAL,La Libertad,PE,Peru
 Chapaira,PIU,Piura,PE,Peru
 Chancay Banos,CAJ,Cajamarca,PE,Peru
-Chachapoyas,AMA,Amazonas,PE,Peru
 Hacienda Cayalti,LAM,Lambayeque,PE,Peru
 Castilla,PIU,Piura,PE,Peru
 Casma,ANC,Ancash,PE,Peru
@@ -69581,7 +69549,6 @@ Sabalo,8,Provincia de Panama,PA,Panama
 Playón Chico,KY,Guna Yala,PA,Panama
 Playa Blanca,3,Provincia de Colon,PA,Panama
 Penonomé,2,Provincia de Cocle,PA,Panama
-Parque Lefevre,8,Provincia de Panama,PA,Panama
 ,,,PA,Panama
 ,8,Provincia de Panama,PA,Panama
 Panama City,8,Provincia de Panama,PA,Panama
@@ -69591,33 +69558,23 @@ Nueva Gorgona,10,Panama Oeste,PA,Panama
 Mulatupo,KY,Guna Yala,PA,Panama
 ,7,Provincia de Los Santos,PA,Panama
 Buabidi,NB,Ngoebe-Bugle,PA,Panama
-Las Tablas,7,Provincia de Los Santos,PA,Panama
 La Chorrera,10,Panama Oeste,PA,Panama
 Juan Franco,8,Provincia de Panama,PA,Panama
-,6,Provincia de Herrera,PA,Panama
 El Naranjal,10,Panama Oeste,PA,Panama
 El Dorado,8,Provincia de Panama,PA,Panama
-El Carmen,8,Provincia de Panama,PA,Panama
 Dolega District,4,Provincia de Chiriqui,PA,Panama
 David,4,Provincia de Chiriqui,PA,Panama
 ,5,Provincia del Darien,PA,Panama
-,3,Provincia de Colon,PA,Panama
 Colón,3,Provincia de Colon,PA,Panama
 ,2,Provincia de Cocle,PA,Panama
+Cocle,2,Provincia de Cocle,PA,Panama
 Chitré,6,Provincia de Herrera,PA,Panama
 ,4,Provincia de Chiriqui,PA,Panama
 Chiriqui,4,Provincia de Chiriqui,PA,Panama
-Chepo,8,Provincia de Panama,PA,Panama
 Chame,10,Panama Oeste,PA,Panama
 Boquete,4,Provincia de Chiriqui,PA,Panama
 ,1,Provincia de Bocas del Toro,PA,Panama
-Bocas del Toro,1,Provincia de Bocas del Toro,PA,Panama
-Bella Vista,7,Provincia de Los Santos,PA,Panama
-Balboa,8,Provincia de Panama,PA,Panama
 Arraijan,10,Panama Oeste,PA,Panama
-Aguadulce,2,Provincia de Cocle,PA,Panama
-Turgeau,OU,"Departement de l'Ouest",HT,Haiti
-Tabarre,OU,"Departement de l'Ouest",HT,Haiti
 ,SE,Sud-Est,HT,Haiti
 Saint-Marc,AR,"Departement de l'Artibonite",HT,Haiti
 Port-au-Prince,OU,"Departement de l'Ouest",HT,Haiti
@@ -69704,7 +69661,6 @@ Quintana Roo,CHP,Chiapas,MX,Mexico
 Reforma,CHP,Chiapas,MX,Mexico
 Altamira,M,Miranda,VE,Venezuela
 Aricagua,M,Miranda,VE,Venezuela
-Margarita,M,Miranda,VE,Venezuela
 San Jose de Los Altos,M,Miranda,VE,Venezuela
 San Fernando de Apure,C,Apure,VE,Venezuela
 Hernandez,D,Aragua,VE,Venezuela
@@ -69756,7 +69712,6 @@ La Victoria,LAM,Lambayeque,PE,Peru
 Estado de Mexico,CAM,Campeche,MX,Mexico
 Lomas de Chapultepec,GRO,Guerrero,MX,Mexico
 Benito Juarez,YUC,Yucatán,MX,Mexico
-Insurgentes,ROO,Quintana Roo,MX,Mexico
 Isla Holbox,ROO,Quintana Roo,MX,Mexico
 Cabo Verde,VER,Veracruz,MX,Mexico
 Villa Union,VER,Veracruz,MX,Mexico
@@ -69797,7 +69752,6 @@ Santa Maria Tonatitla,MEX,Estado de Mexico,MX,Mexico
 Adolfo Ruiz Cortines,MEX,Estado de Mexico,MX,Mexico
 Puerto de Belen,LOR,Loreto,PE,Peru
 San José del Guaviare,GUV,Departamento del Guaviare,CO,Colombia
-,U,Provincia de Sucumbios,EC,Ecuador
 Narsaq,QA,Qaasuitsup,GL,Greenland
 Zapala,Q,Neuquen,AR,Argentina
 Yerba Buena,T,Tucuman,AR,Argentina
@@ -69814,9 +69768,7 @@ Villa La Angostura,Q,Neuquen,AR,Argentina
 Villa Hipodromo,M,Mendoza,AR,Argentina
 Villa Giardino,X,Cordoba,AR,Argentina
 Villa General Belgrano,X,Cordoba,AR,Argentina
-Villa Eloisa,S,Santa Fe,AR,Argentina
 Villa Dolores,X,Cordoba,AR,Argentina
-Villa de Maria,X,Cordoba,AR,Argentina
 Villa del Rosario,X,Cordoba,AR,Argentina
 Villa Cura Brochero,X,Cordoba,AR,Argentina
 Villa Constitucion,S,Santa Fe,AR,Argentina
@@ -69824,12 +69776,9 @@ Villa Carlos Paz,X,Cordoba,AR,Argentina
 Villa Canas,S,Santa Fe,AR,Argentina
 Villa Ascasubi,X,Cordoba,AR,Argentina
 Villa Angelica,E,Entre Rios,AR,Argentina
-Villa Angela,H,Chaco,AR,Argentina
-Villa Amelia,S,Santa Fe,AR,Argentina
 Villa Allende,X,Cordoba,AR,Argentina
 Viedma,R,Rio Negro,AR,Argentina
 Victoria,E,Entre Rios,AR,Argentina
-Viamonte,X,Cordoba,AR,Argentina
 Viale,E,Entre Rios,AR,Argentina
 Venado Tuerto,S,Santa Fe,AR,Argentina
 Veinticinco de Mayo,B,Buenos Aires,AR,Argentina
@@ -69844,7 +69793,6 @@ Trenque Lauquen,B,Buenos Aires,AR,Argentina
 Trelew,U,Chubut,AR,Argentina
 Totoras,S,Santa Fe,AR,Argentina
 Tostado,S,Santa Fe,AR,Argentina
-Toay,L,La Pampa,AR,Argentina
 Ticino,X,Cordoba,AR,Argentina
 Termas de Rio Hondo,G,Santiago del Estero,AR,Argentina
 Tartagal,A,Salta,AR,Argentina
@@ -69870,7 +69818,6 @@ Santa Magdalena,X,Cordoba,AR,Argentina
 Santa Lucia,J,San Juan,AR,Argentina
 ,S,Santa Fe,AR,Argentina
 Santa Fe,S,Santa Fe,AR,Argentina
-,Z,Santa Cruz,AR,Argentina
 Santa Clara de Saguier,S,Santa Fe,AR,Argentina
 San Salvador de Jujuy,Y,Jujuy,AR,Argentina
 Orán,A,Salta,AR,Argentina
@@ -69879,11 +69826,9 @@ San Pedro,Y,Jujuy,AR,Argentina
 San Patricio,B,Buenos Aires,AR,Argentina
 San Nicolás de los Arroyos,B,Buenos Aires,AR,Argentina
 San Miguel de Tucumán,T,Tucuman,AR,Argentina
-San Miguel,L,La Pampa,AR,Argentina
 San Martín de los Andes,Q,Neuquen,AR,Argentina
 San Martin,M,Mendoza,AR,Argentina
 San Marcos Sierra,X,Cordoba,AR,Argentina
-,D,San Luis,AR,Argentina
 San Luis,D,San Luis,AR,Argentina
 San Justo,S,Santa Fe,AR,Argentina
 ,J,San Juan,AR,Argentina
@@ -69892,7 +69837,6 @@ San Jose de la Esquina,S,Santa Fe,AR,Argentina
 San Jose,K,Catamarca,AR,Argentina
 San Jorge,S,Santa Fe,AR,Argentina
 San Jeronimo Norte,S,Santa Fe,AR,Argentina
-San Genaro,S,Santa Fe,AR,Argentina
 San Francisco,X,Cordoba,AR,Argentina
 San Fernando del Valle de Catamarca,K,Catamarca,AR,Argentina
 San Carlos de Bolivar,B,Buenos Aires,AR,Argentina
@@ -69900,13 +69844,11 @@ San Carlos Centro,S,Santa Fe,AR,Argentina
 San Bernardo,B,Buenos Aires,AR,Argentina
 San Antonio Oeste,R,Rio Negro,AR,Argentina
 Sampacho,X,Cordoba,AR,Argentina
-Salto Grande,S,Santa Fe,AR,Argentina
 Salto,B,Buenos Aires,AR,Argentina
 ,A,Salta,AR,Argentina
 Salta,A,Salta,AR,Argentina
 Salsipuedes,X,Cordoba,AR,Argentina
 Salliquelo,B,Buenos Aires,AR,Argentina
-Saladillo,S,Santa Fe,AR,Argentina
 Sacanta,X,Cordoba,AR,Argentina
 Saavedra,B,Buenos Aires,AR,Argentina
 Rufino,S,Santa Fe,AR,Argentina
@@ -69914,7 +69856,6 @@ Rosario de Lerma,A,Salta,AR,Argentina
 Rosario,S,Santa Fe,AR,Argentina
 Roldan,S,Santa Fe,AR,Argentina
 Rojas,B,Buenos Aires,AR,Argentina
-Rodriguez Pena,M,Mendoza,AR,Argentina
 Rodeo del Medio,M,Mendoza,AR,Argentina
 Rivadavia,M,Mendoza,AR,Argentina
 Rivadavia,J,San Juan,AR,Argentina
@@ -69933,9 +69874,7 @@ Ramallo,B,Buenos Aires,AR,Argentina
 Rafaela,S,Santa Fe,AR,Argentina
 Rada Tilly,U,Chubut,AR,Argentina
 Quetrequen,L,La Pampa,AR,Argentina
-Quemu Quemu,L,La Pampa,AR,Argentina
 Punta Alta,B,Buenos Aires,AR,Argentina
-Pujato,S,Santa Fe,AR,Argentina
 Puerto San Martin,S,Santa Fe,AR,Argentina
 Puerto Madryn,U,Chubut,AR,Argentina
 Pueblo Nuevo,S,Santa Fe,AR,Argentina
@@ -69953,7 +69892,6 @@ Pico Truncado,Z,Santa Cruz,AR,Argentina
 Perico,Y,Jujuy,AR,Argentina
 Pergamino,B,Buenos Aires,AR,Argentina
 Perez,S,Santa Fe,AR,Argentina
-Pellegrini,B,Buenos Aires,AR,Argentina
 Pehuajó,B,Buenos Aires,AR,Argentina
 Pedro Luro,B,Buenos Aires,AR,Argentina
 Pasaje,Y,Jujuy,AR,Argentina
@@ -69962,7 +69900,6 @@ Palpala,Y,Jujuy,AR,Argentina
 Pacara,T,Tucuman,AR,Argentina
 Ordonez,X,Cordoba,AR,Argentina
 Oncativo,X,Cordoba,AR,Argentina
-Oliveros,S,Santa Fe,AR,Argentina
 Oliva,X,Cordoba,AR,Argentina
 Olavarría,B,Buenos Aires,AR,Argentina
 Nueve de Julio,B,Buenos Aires,AR,Argentina
@@ -69970,27 +69907,23 @@ Neuquén,Q,Neuquen,AR,Argentina
 Nelson,S,Santa Fe,AR,Argentina
 Morteros,X,Cordoba,AR,Argentina
 Morrison,X,Cordoba,AR,Argentina
-Monte Quemado Airport,G,Santiago del Estero,AR,Argentina
 Monte Maiz,X,Cordoba,AR,Argentina
 Monte Coman,M,Mendoza,AR,Argentina
 Monte Buey,X,Cordoba,AR,Argentina
 Metan,A,Salta,AR,Argentina
 Merlo,D,San Luis,AR,Argentina
-,M,Mendoza,AR,Argentina
 Mendoza,M,Mendoza,AR,Argentina
 Mendiolaza,X,Cordoba,AR,Argentina
 Mechita,B,Buenos Aires,AR,Argentina
 Maximo Paz,S,Santa Fe,AR,Argentina
 Maria Susana,S,Santa Fe,AR,Argentina
 Maria Juana,S,Santa Fe,AR,Argentina
-Margarita,S,Santa Fe,AR,Argentina
 Marcos Juarez,X,Cordoba,AR,Argentina
 Manantial,T,Tucuman,AR,Argentina
 Malvinas Argentinas,X,Cordoba,AR,Argentina
 Malargüe,M,Mendoza,AR,Argentina
 Malagueno,X,Cordoba,AR,Argentina
 Maipu,M,Mendoza,AR,Argentina
-Maggiolo,S,Santa Fe,AR,Argentina
 Luzuriaga,M,Mendoza,AR,Argentina
 Luque,X,Cordoba,AR,Argentina
 Lujan de Cuyo,M,Mendoza,AR,Argentina
@@ -70008,7 +69941,6 @@ Las Perdices,X,Cordoba,AR,Argentina
 Las Parejas,S,Santa Fe,AR,Argentina
 Las Lajitas,A,Salta,AR,Argentina
 Las Heras,M,Mendoza,AR,Argentina
-,F,La Rioja,AR,Argentina
 La Rioja,F,La Rioja,AR,Argentina
 La Rinconada,T,Tucuman,AR,Argentina
 La Punta,G,Santiago del Estero,AR,Argentina
@@ -70031,8 +69963,6 @@ La Banda,G,Santiago del Estero,AR,Argentina
 Justiniano Posse,X,Cordoba,AR,Argentina
 Junín,B,Buenos Aires,AR,Argentina
 Junin,M,Mendoza,AR,Argentina
-,Y,Jujuy,AR,Argentina
-Juan Pujol,B,Buenos Aires,AR,Argentina
 Juan Jose Paso,B,Buenos Aires,AR,Argentina
 Jesus Maria,S,Santa Fe,AR,Argentina
 James Craik,X,Cordoba,AR,Argentina
@@ -70044,7 +69974,6 @@ Ingeniero Beaugey,B,Buenos Aires,AR,Argentina
 Hughes,S,Santa Fe,AR,Argentina
 Huerta Grande,X,Cordoba,AR,Argentina
 Hipolito Yrigoyen,D,San Luis,AR,Argentina
-Hersilia,S,Santa Fe,AR,Argentina
 Hernando,X,Cordoba,AR,Argentina
 Henderson,B,Buenos Aires,AR,Argentina
 Gueer Aike,Z,Santa Cruz,AR,Argentina
@@ -70079,7 +70008,6 @@ Franck,S,Santa Fe,AR,Argentina
 Florentino Ameghino,U,Chubut,AR,Argentina
 Firmat,S,Santa Fe,AR,Argentina
 Fernandez,G,Santiago del Estero,AR,Argentina
-Famailla,T,Tucuman,AR,Argentina
 Esther,S,Santa Fe,AR,Argentina
 Estacion Arenales,B,Buenos Aires,AR,Argentina
 Esquel,U,Chubut,AR,Argentina
@@ -70093,7 +70021,6 @@ El Pueblito,X,Cordoba,AR,Argentina
 El Pluma,Z,Santa Cruz,AR,Argentina
 El Pampero,X,Cordoba,AR,Argentina
 El Palomar,G,Santiago del Estero,AR,Argentina
-El Carmen,A,Salta,AR,Argentina
 El Calafate,Z,Santa Cruz,AR,Argentina
 El Brete,Y,Jujuy,AR,Argentina
 El Bolsón,R,Rio Negro,AR,Argentina
@@ -70104,7 +70031,6 @@ Dique Florentino Ameghino,U,Chubut,AR,Argentina
 Despenaderos,X,Cordoba,AR,Argentina
 Del Campillo,X,Cordoba,AR,Argentina
 Dean Funes,X,Cordoba,AR,Argentina
-Darwin,R,Rio Negro,AR,Argentina
 Darregueira,B,Buenos Aires,AR,Argentina
 Cutral-Co,Q,Neuquen,AR,Argentina
 Cruz del Eje,X,Cordoba,AR,Argentina
@@ -70124,7 +70050,6 @@ Coronda,S,Santa Fe,AR,Argentina
 ,X,Cordoba,AR,Argentina
 Córdoba,X,Cordoba,AR,Argentina
 Copacabana,X,Cordoba,AR,Argentina
-Concepcion,G,Santiago del Estero,AR,Argentina
 Concepcion,T,Tucuman,AR,Argentina
 Comodoro Rivadavia,U,Chubut,AR,Argentina
 Comedero,K,Catamarca,AR,Argentina
@@ -70140,7 +70065,6 @@ Clucellas,S,Santa Fe,AR,Argentina
 Cipolletti,R,Rio Negro,AR,Argentina
 Cinco Saltos,R,Rio Negro,AR,Argentina
 Chos Malal,Q,Neuquen,AR,Argentina
-Choele Choel,R,Rio Negro,AR,Argentina
 Chivilcoy,B,Buenos Aires,AR,Argentina
 Chilecito,F,La Rioja,AR,Argentina
 Chateaubriand,S,Santa Fe,AR,Argentina
@@ -70153,7 +70077,6 @@ Centenario,B,Buenos Aires,AR,Argentina
 Cavanagh,X,Cordoba,AR,Argentina
 Caucete,J,San Juan,AR,Argentina
 Catriel,R,Rio Negro,AR,Argentina
-Castillo,V,Tierra del Fuego,AR,Argentina
 Casilda,S,Santa Fe,AR,Argentina
 Casbas,B,Buenos Aires,AR,Argentina
 Carmen de Patagones,B,Buenos Aires,AR,Argentina
@@ -70167,13 +70090,12 @@ Canadon de las Vacas,Z,Santa Cruz,AR,Argentina
 Canada Seca,B,Buenos Aires,AR,Argentina
 Canada Rosquin,S,Santa Fe,AR,Argentina
 Canada Rica,S,Santa Fe,AR,Argentina
-Canada del Ucle,S,Santa Fe,AR,Argentina
 Canada de Gomez,S,Santa Fe,AR,Argentina
 Calmayo,X,Cordoba,AR,Argentina
 Caleta Olivia,Z,Santa Cruz,AR,Argentina
 Calera,X,Cordoba,AR,Argentina
 Calchaqui,S,Santa Fe,AR,Argentina
-Cabildo,B,Buenos Aires,AR,Argentina
+Cafayate,A,Salta,AR,Argentina
 Brinkmann,X,Cordoba,AR,Argentina
 Brea,K,Catamarca,AR,Argentina
 Bragado,B,Buenos Aires,AR,Argentina
@@ -70219,7 +70141,6 @@ Alta Gracia,X,Cordoba,AR,Argentina
 Alta Cordoba,X,Cordoba,AR,Argentina
 Almafuerte,X,Cordoba,AR,Argentina
 Allen,R,Rio Negro,AR,Argentina
-Alicia,X,Cordoba,AR,Argentina
 Alejandro Roca,X,Cordoba,AR,Argentina
 Alderetes,T,Tucuman,AR,Argentina
 Aldea,U,Chubut,AR,Argentina
@@ -70256,7 +70177,6 @@ San Vicente,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 Santiago,RM,Santiago Metropolitan,CL,Chile
 Santa Cruz,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 San Pedro,BI,Region del Biobio,CL,Chile
-San Pedro,CO,Coquimbo,CL,Chile
 San Jose de Maipo,RM,Santiago Metropolitan,CL,Chile
 San Joaquin,RM,Santiago Metropolitan,CL,Chile
 San Javier,ML,Maule,CL,Chile
@@ -70267,13 +70187,11 @@ San Clemente,ML,Maule,CL,Chile
 San Carlos,BI,Region del Biobio,CL,Chile
 San Bernardo,RM,Santiago Metropolitan,CL,Chile
 San Antonio,VS,Region de Valparaiso,CL,Chile
-Rio Negro,LL,Los Lagos,CL,Chile
 Rio Bueno,LR,Region de Los Rios,CL,Chile
 Rengo,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 Renca,RM,Santiago Metropolitan,CL,Chile
 Renaca,VS,Region de Valparaiso,CL,Chile
 ,RM,Santiago Metropolitan,CL,Chile
-Recoleta,CO,Coquimbo,CL,Chile
 Rancagua,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 Quirihue,BI,Region del Biobio,CL,Chile
 Quinta Normal,RM,Santiago Metropolitan,CL,Chile
@@ -70282,7 +70200,6 @@ Quillota,VS,Region de Valparaiso,CL,Chile
 Quilleco,BI,Region del Biobio,CL,Chile
 Quilicura,RM,Santiago Metropolitan,CL,Chile
 Putaendo,VS,Region de Valparaiso,CL,Chile
-Purranque,LL,Los Lagos,CL,Chile
 Punta Arenas,MA,Region de Magallanes y de la Antartica Chilena,CL,Chile
 Puerto Varas,LL,Los Lagos,CL,Chile
 Quellon,LL,Los Lagos,CL,Chile
@@ -70300,14 +70217,11 @@ Penaflor,RM,Santiago Metropolitan,CL,Chile
 Panquehue,VS,Region de Valparaiso,CL,Chile
 Panguipulli,AR,Region de la Araucania,CL,Chile
 Paine,RM,Santiago Metropolitan,CL,Chile
-Paillaco,LL,Los Lagos,CL,Chile
-Padre Las Casas,AR,Region de la Araucania,CL,Chile
 Padre Hurtado,RM,Santiago Metropolitan,CL,Chile
 Ovalle,CO,Coquimbo,CL,Chile
 Osorno,LL,Los Lagos,CL,Chile
 Nunoa,RM,Santiago Metropolitan,CL,Chile
 Nogales,VS,Region de Valparaiso,CL,Chile
-Mulchen,BI,Region del Biobio,CL,Chile
 Molina,ML,Maule,CL,Chile
 Melipilla,RM,Santiago Metropolitan,CL,Chile
 Mejillones,AN,Antofagasta,CL,Chile
@@ -70318,7 +70232,6 @@ Maipo,RM,Santiago Metropolitan,CL,Chile
 Macul,RM,Santiago Metropolitan,CL,Chile
 Machali,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 Lota,BI,Region del Biobio,CL,Chile
-Los Vilos,CO,Coquimbo,CL,Chile
 ,LL,Los Lagos,CL,Chile
 Los Lagos,LR,Region de Los Rios,CL,Chile
 Los Ángeles,BI,Region del Biobio,CL,Chile
@@ -70332,7 +70245,6 @@ Llaillay,VS,Region de Valparaiso,CL,Chile
 Linares,ML,Maule,CL,Chile
 Limari,CO,Coquimbo,CL,Chile
 Limache,VS,Region de Valparaiso,CL,Chile
-,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 Lautaro,AR,Region de la Araucania,CL,Chile
 La Union,LR,Region de Los Rios,CL,Chile
 La Serena,CO,Coquimbo,CL,Chile
@@ -70362,7 +70274,6 @@ El Bosque,CO,Coquimbo,CL,Chile
 Dalcahue,LL,Los Lagos,CL,Chile
 Curicó,ML,Maule,CL,Chile
 Curacavi,RM,Santiago Metropolitan,CL,Chile
-Cunco,AR,Region de la Araucania,CL,Chile
 Coronel,BI,Region del Biobio,CL,Chile
 ,CO,Coquimbo,CL,Chile
 Coquimbo,CO,Coquimbo,CL,Chile
@@ -70396,7 +70307,6 @@ Bulnes,BI,Region del Biobio,CL,Chile
 Buin,RM,Santiago Metropolitan,CL,Chile
 Arica,AP,Region de Arica y Parinacota,CL,Chile
 Arauco,BI,Region del Biobio,CL,Chile
-,AR,Region de la Araucania,CL,Chile
 ,AN,Antofagasta,CL,Chile
 Antofagasta,AN,Antofagasta,CL,Chile
 Angol,AR,Region de la Araucania,CL,Chile
@@ -70405,11 +70315,9 @@ Ancud,LL,Los Lagos,CL,Chile
 Alto Hospicio,TA,Tarapacá,CL,Chile
 Algarrobo,VS,Region de Valparaiso,CL,Chile
 Trinidad,B,El Beni,BO,Bolivia
-,T,Departamento de Tarija,BO,Bolivia
 Tarija,T,Departamento de Tarija,BO,Bolivia
 Sucre,H,Departamento de Chuquisaca,BO,Bolivia
 Santa Cruz,S,Departamento de Santa Cruz,BO,Bolivia
-,S,Departamento de Santa Cruz,BO,Bolivia
 Santa Cruz,B,El Beni,BO,Bolivia
 Riberalta,B,El Beni,BO,Bolivia
 Quillacollo,C,Departamento de Cochabamba,BO,Bolivia
@@ -70417,11 +70325,11 @@ Quillacollo,C,Departamento de Cochabamba,BO,Bolivia
 Potosí,P,Departamento de Potosi,BO,Bolivia
 Oruro,O,Oruro,BO,Bolivia
 La Paz,L,Departamento de La Paz,BO,Bolivia
-Guayaramerin,B,El Beni,BO,Bolivia
 Cochabamba,C,Departamento de Cochabamba,BO,Bolivia
 Cobija,N,Departamento de Pando,BO,Bolivia
 Camiri,S,Departamento de Santa Cruz,BO,Bolivia
 ,,,BO,Bolivia
+,B,El Beni,BO,Bolivia
 Vilhena,RO,Rondonia,BR,Brazil
 Senador Guiomard,AC,Acre,BR,Brazil
 ,RO,Rondonia,BR,Brazil
@@ -70452,19 +70360,16 @@ San Isidro,LIM,Lima region,PE,Peru
 San Francisco,LIM,Lima region,PE,Peru
 San Borja,LIM,Lima region,PE,Peru
 Rimac,LIM,Lima region,PE,Peru
-,PUN,Puno,PE,Peru
 Puno,PUN,Puno,PE,Peru
 Puerto Bermudez,PAS,Pasco,PE,Peru
 Puente de Piedra,LIM,Lima region,PE,Peru
 ,,,PE,Peru
 Paucarpata,ARE,Arequipa,PE,Peru
-,MOQ,Departamento de Moquegua,PE,Peru
 Matarani,ARE,Arequipa,PE,Peru
 Magdalena del Mar,LIM,Lima region,PE,Peru
 Lurin,LIM,Lima region,PE,Peru
 San Juan de Lurigancho,LIM,Lima region,PE,Peru
 Lince,LIM,Lima region,PE,Peru
-,LIM,Lima region,PE,Peru
 Lima,LMA,Lima,PE,Peru
 La Virgen,LIM,Lima region,PE,Peru
 La Victoria,LIM,Lima region,PE,Peru
@@ -70472,7 +70377,6 @@ La Punta,CAL,Callao,PE,Peru
 La Perla,CAL,Callao,PE,Peru
 La Merced,JUN,Junin,PE,Peru
 La Libertad,LIM,Lima region,PE,Peru
-,JUN,Junin,PE,Peru
 Juliaca,PUN,Puno,PE,Peru
 Jesus Maria,APU,Apurimac,PE,Peru
 Jauja,JUN,Junin,PE,Peru
@@ -70515,7 +70419,6 @@ Barranco,LIM,Lima region,PE,Peru
 Ayacucho,AYA,Ayacucho,PE,Peru
 Ayabacas,PUN,Puno,PE,Peru
 Ate,LIM,Lima region,PE,Peru
-,ARE,Arequipa,PE,Peru
 Arequipa,ARE,Arequipa,PE,Peru
 Andahuaylas,APU,Apurimac,PE,Peru
 Ancon,LIM,Lima region,PE,Peru
@@ -70565,7 +70468,6 @@ Zapotiltic,JAL,Jalisco,MX,Mexico
 Zapopan,JAL,Jalisco,MX,Mexico
 Zamora,MIC,Michoacán,MX,Mexico
 Zacoalco de Torres,JAL,Jalisco,MX,Mexico
-,ZAC,Zacatecas,MX,Mexico
 Zacatecas City,ZAC,Zacatecas,MX,Mexico
 Zacapu,MIC,Michoacán,MX,Mexico
 Yuriria,GUA,Guanajuato,MX,Mexico
@@ -70599,7 +70501,6 @@ Tuxpan,JAL,Jalisco,MX,Mexico
 Tuxcacuesco,JAL,Jalisco,MX,Mexico
 Tototlan,JAL,Jalisco,MX,Mexico
 Torreón,COA,Coahuila,MX,Mexico
-Topolobampo,SIN,Sinaloa,MX,Mexico
 Tonala,JAL,Jalisco,MX,Mexico
 Tlazazalca,MEX,Estado de Mexico,MX,Mexico
 Tlaquepaque,JAL,Jalisco,MX,Mexico
@@ -70634,7 +70535,6 @@ Sonoyta,SON,Sonora,MX,Mexico
 Sombrerete,ZAC,Zacatecas,MX,Mexico
 Soledad,SLP,San Luis Potosí,MX,Mexico
 Sinaloa de Leyva,SIN,Sinaloa,MX,Mexico
-,SIN,Sinaloa,MX,Mexico
 Silao,GUA,Guanajuato,MX,Mexico
 Sayulita,NAY,Nayarit,MX,Mexico
 Sayula,JAL,Jalisco,MX,Mexico
@@ -70753,7 +70653,6 @@ Morelia,MIC,Michoacán,MX,Mexico
 Monterrey,SIN,Sinaloa,MX,Mexico
 Monterrey,NLE,Nuevo León,MX,Mexico
 Monclova,COA,Coahuila,MX,Mexico
-Moctezuma,SON,Sonora,MX,Mexico
 Mocorito,SIN,Sinaloa,MX,Mexico
 Miraflores,JAL,Jalisco,MX,Mexico
 ,MIC,Michoacán,MX,Mexico
@@ -70870,7 +70769,7 @@ Vizcaino,SIN,Sinaloa,MX,Mexico
 El Seri,SON,Sonora,MX,Mexico
 Pueblo Nuevo,DUR,Durango,MX,Mexico
 El Salto,JAL,Jalisco,MX,Mexico
-El Rio,SIN,Sinaloa,MX,Mexico
+Del Rio,SIN,Sinaloa,MX,Mexico
 El Refugio,AGU,Aguascalientes,MX,Mexico
 El Quince,JAL,Jalisco,MX,Mexico
 El Pueblito,QUE,Querétaro,MX,Mexico
@@ -70984,7 +70883,6 @@ Amealco,QUE,Querétaro,MX,Mexico
 Alvaro Obregon,MIC,Michoacán,MX,Mexico
 Allende,NLE,Nuevo León,MX,Mexico
 Aldama,CHH,Chihuahua,MX,Mexico
-Alamos,SON,Sonora,MX,Mexico
 Ajijic,JAL,Jalisco,MX,Mexico
 Ahualulco de Mercado,JAL,Jalisco,MX,Mexico
 Ahome,SIN,Sinaloa,MX,Mexico
@@ -71004,11 +70902,9 @@ San Jose de Gracia,AGU,Aguascalientes,MX,Mexico
 Guerrero Negro,BCN,Estado de Baja California,MX,Mexico
 Valle Alto,NLE,Nuevo León,MX,Mexico
 Hidalgo,NLE,Nuevo León,MX,Mexico
-Anahuac,NLE,Nuevo León,MX,Mexico
 Victoria,GUA,Guanajuato,MX,Mexico
 Dolores Hidalgo Cuna de la Independencia Nacional,GUA,Guanajuato,MX,Mexico
 Arperos,GUA,Guanajuato,MX,Mexico
-Granjas,GUA,Guanajuato,MX,Mexico
 Maravatio del Encinal,GUA,Guanajuato,MX,Mexico
 Cuitzillo,GUA,Guanajuato,MX,Mexico
 El Cerrito,GUA,Guanajuato,MX,Mexico
@@ -76343,7 +76239,6 @@ Crooksville,OH,Ohio,US,United States
 Crown City,OH,Ohio,US,United States
 Cumberland,OH,Ohio,US,United States
 Dayton,OH,Ohio,US,United States
-Delhi,OH,Ohio,US,United States
 Derwent,OH,Ohio,US,United States
 Donnelsville,OH,Ohio,US,United States
 Duncan Falls,OH,Ohio,US,United States
@@ -79154,6 +79049,7 @@ Waverly,VA,Virginia,US,United States
 Waynesboro,VA,Virginia,US,United States
 Weber City,VA,Virginia,US,United States
 Weems,VA,Virginia,US,United States
+West Briar,VA,Virginia,US,United States
 West McLean,VA,Virginia,US,United States
 West Point,VA,Virginia,US,United States
 Weyers Cave,VA,Virginia,US,United States
@@ -84540,6 +84436,7 @@ Succasunna,NJ,New Jersey,US,United States
 Summit,NJ,New Jersey,US,United States
 Sussex,NJ,New Jersey,US,United States
 Swartswood,NJ,New Jersey,US,United States
+Tabor,NJ,New Jersey,US,United States
 Teaneck,NJ,New Jersey,US,United States
 Tenafly,NJ,New Jersey,US,United States
 Teterboro,NJ,New Jersey,US,United States
@@ -85986,7 +85883,6 @@ Montpelier,OH,Ohio,US,United States
 Montville,OH,Ohio,US,United States
 Morral,OH,Ohio,US,United States
 Mount Gilead,OH,Ohio,US,United States
-Mount Tabor,OH,Ohio,US,United States
 Mount Vernon,OH,Ohio,US,United States
 Mount Victory,OH,Ohio,US,United States
 Munroe Falls,OH,Ohio,US,United States
@@ -88056,7 +87952,6 @@ Nekoosa,WI,Wisconsin,US,United States
 Nelson,WI,Wisconsin,US,United States
 Neopit,WI,Wisconsin,US,United States
 Neosho,WI,Wisconsin,US,United States
-Neptune,WI,Wisconsin,US,United States
 Neshkoro,WI,Wisconsin,US,United States
 New Auburn,WI,Wisconsin,US,United States
 New Berlin,WI,Wisconsin,US,United States
@@ -88438,7 +88333,6 @@ Mesa,AZ,Arizona,US,United States
 Mohave Valley,AZ,Arizona,US,United States
 Morenci,AZ,Arizona,US,United States
 Munds Park,AZ,Arizona,US,United States
-Naco,AZ,Arizona,US,United States
 Navajo Mountain Mission,AZ,Arizona,US,United States
 New River,AZ,Arizona,US,United States
 Nogales,AZ,Arizona,US,United States
@@ -90031,7 +89925,7 @@ Beaver,UT,Utah,US,United States
 Beryl,UT,Utah,US,United States
 Bicknell,UT,Utah,US,United States
 Blanding,UT,Utah,US,United States
-Bryce Canyon,UT,Utah,US,United States
+Bryce Canyon City,UT,Utah,US,United States
 Castle Dale,UT,Utah,US,United States
 Cedar City,UT,Utah,US,United States
 Central,UT,Utah,US,United States
@@ -90730,7 +90624,6 @@ Stanton,ND,North Dakota,US,United States
 Sterling,ND,North Dakota,US,United States
 Strasburg,ND,North Dakota,US,United States
 Surrey,ND,North Dakota,US,United States
-Sweet Briar,ND,North Dakota,US,United States
 Tioga,ND,North Dakota,US,United States
 Towner,ND,North Dakota,US,United States
 Trenton,ND,North Dakota,US,United States
@@ -92205,6 +92098,7 @@ Chalk River,ON,Ontario,CA,Canada
 Chambly,QC,Quebec,CA,Canada
 Chambord,QC,Quebec,CA,Canada
 Chamcook,NB,New Brunswick,CA,Canada
+Champ de manoeuvre Kakabeka Falls,ON,Ontario,CA,Canada
 Champion,AB,Alberta,CA,Canada
 Champlain,QC,Quebec,CA,Canada
 Channel-Port aux Basques,NL,Newfoundland and Labrador,CA,Canada
@@ -92798,7 +92692,6 @@ Jenner,AB,Alberta,CA,Canada
 Joliette,QC,Quebec,CA,Canada
 Jordan,ON,Ontario,CA,Canada
 Jordan Falls,NS,Nova Scotia,CA,Canada
-Kakabeka Falls Training Area,ON,Ontario,CA,Canada
 Kamaskawak,MB,Manitoba,CA,Canada
 Kaministiquia,ON,Ontario,CA,Canada
 Kamloops,BC,British Columbia,CA,Canada
@@ -93788,7 +93681,6 @@ Shawville,QC,Quebec,CA,Canada
 Shedden,ON,Ontario,CA,Canada
 Shediac,NB,New Brunswick,CA,Canada
 Sheet Harbour,NS,Nova Scotia,CA,Canada
-Shefford-Ouest,QC,Quebec,CA,Canada
 Shelburne,NS,Nova Scotia,CA,Canada
 Shelburne,ON,Ontario,CA,Canada
 Shellbrook,SK,Saskatchewan,CA,Canada
@@ -94297,6 +94189,7 @@ Wilton,WGN,Wellington,NZ,New Zealand
 Te Puke,BOP,Bay of Plenty,NZ,New Zealand
 Gate Pa,BOP,Bay of Plenty,NZ,New Zealand
 Dannevirke,MWT,Manawatu-Wanganui,NZ,New Zealand
+Taradale,HKB,"Hawke's Bay",NZ,New Zealand
 Raureka,HKB,"Hawke's Bay",NZ,New Zealand
 Flaxmere,HKB,"Hawke's Bay",NZ,New Zealand
 Waipukurau,HKB,"Hawke's Bay",NZ,New Zealand
@@ -94424,12 +94317,12 @@ Cabixi,RO,Rondonia,BR,Brazil
 Campinacu,GO,Goias,BR,Brazil
 Canaa dos Carajas,PA,Para,BR,Brazil
 Capivari do Sul,RS,Rio Grande do Sul,BR,Brazil
+Carneirinho,MG,Minas Gerais,BR,Brazil
 Chupinguaia,RO,Rondonia,BR,Brazil
 Chuvisca,RS,Rio Grande do Sul,BR,Brazil
 Colider,MT,Mato Grosso,BR,Brazil
 Condado,PB,Paraíba,BR,Brazil
 Corumbatai do Sul,PR,Parana,BR,Brazil
-Delta,MG,Minas Gerais,BR,Brazil
 Deodapolis,MS,Mato Grosso do Sul,BR,Brazil
 Deputado Irapuan Pinheiro,CE,Ceara,BR,Brazil
 Divinesia,MG,Minas Gerais,BR,Brazil
@@ -94473,6 +94366,7 @@ Paranaita,MT,Mato Grosso,BR,Brazil
 Penaforte,CE,Ceara,BR,Brazil
 Picada Cafe,RS,Rio Grande do Sul,BR,Brazil
 Pinhais,PR,Parana,BR,Brazil
+Planalto,BA,Bahia,BR,Brazil
 Potim,SP,Sao Paulo,BR,Brazil
 Quarto Centenario,PR,Parana,BR,Brazil
 Quitandinha,PR,Parana,BR,Brazil
@@ -94499,8 +94393,8 @@ Tapurah,MT,Mato Grosso,BR,Brazil
 Teixeira de Freitas,BA,Bahia,BR,Brazil
 Teofilandia,BA,Bahia,BR,Brazil
 Trizidela do Vale,MA,Maranhao,BR,Brazil
-Uruara,PA,Para,BR,Brazil
 Vanini,RS,Rio Grande do Sul,BR,Brazil
+Vargem Grande do Rio Pardo,MG,Minas Gerais,BR,Brazil
 Vargem Grande Paulista,SP,Sao Paulo,BR,Brazil
 Venda Nova do Imigrante,ES,Espirito Santo,BR,Brazil
 Vicentina,MS,Mato Grosso do Sul,BR,Brazil
@@ -94577,7 +94471,6 @@ Viladecans,CT,Catalonia,ES,Spain
 Fisterra,GA,Galicia,ES,Spain
 Val do Dubra,GA,Galicia,ES,Spain
 Isla Cristina,AN,Andalusia,ES,Spain
-Valdemoro,MD,Madrid,ES,Spain
 "Cuervo de Sevilla, El",AN,Andalusia,ES,Spain
 el Lloar,CT,Catalonia,ES,Spain
 Roda de Bara,CT,Catalonia,ES,Spain
@@ -94637,7 +94530,6 @@ Baria,B,Chittagong,BD,Bangladesh
 Mohammadpur,B,Chittagong,BD,Bangladesh
 Sezaki,26,Kyoto,JP,Japan
 Hirata,26,Kyoto,JP,Japan
-Ebisu,,,JP,Japan
 Tokiwa,38,Ehime,JP,Japan
 Kitagawa,,,JP,Japan
 Novodrozhzhino,MOS,Moscow Oblast,RU,Russia
@@ -95230,6 +95122,7 @@ Roquefort-les-Pins,PAC,"Provence-Alpes-Côte d'Azur",FR,France
 Deltebre,CT,Catalonia,ES,Spain
 Komsomolsk,53,"Poltavs'ka Oblast'",UA,Ukraine
 Chum,54,Tibet,CN,China
+Rohrmoos,6,Styria,AT,Austria
 Cademario,TI,Ticino,CH,Switzerland
 Agarone,TI,Ticino,CH,Switzerland
 Breganzona,TI,Ticino,CH,Switzerland
@@ -95624,14 +95517,12 @@ Pasaia,PV,Basque Country,ES,Spain
 San Nicolas,C,Buenos Aires F.D.,AR,Argentina
 Lehavim,D,Southern District,IL,Israel
 Lytham St Annes,ENG,England,GB,United Kingdom
-,AP,Region de Arica y Parinacota,CL,Chile
 Modiin,M,Central District,IL,Israel
 maale adumim,JM,Jerusalem,IL,Israel
 Attwood,VIC,Victoria,AU,Australia
 Alexandra Headland,QLD,Queensland,AU,Australia
 Carleton-sur-Mer,QC,Quebec,CA,Canada
 Sholinganallur,TN,Tamil Nadu,IN,India
-Seminyak,BA,Bali,ID,Indonesia
 Vigonzone,25,Lombardy,IT,Italy
 Focene,62,Latium,IT,Italy
 Passoscuro,62,Latium,IT,Italy
@@ -95691,6 +95582,7 @@ Obermumpf,AG,Aargau,CH,Switzerland
 Rumoongbawah,SA,North Sulawesi,ID,Indonesia
 Bukit,SU,North Sumatra,ID,Indonesia
 Suka Maju,SU,North Sumatra,ID,Indonesia
+Darussalam,AC,Aceh,ID,Indonesia
 Negeri,SU,North Sumatra,ID,Indonesia
 Pahlawan,SU,North Sumatra,ID,Indonesia
 Pekan Binjai,SU,North Sumatra,ID,Indonesia
@@ -95811,7 +95703,6 @@ Banjarejo,JI,East Java,ID,Indonesia
 Balongdowo,JI,East Java,ID,Indonesia
 Kelutan,JI,East Java,ID,Indonesia
 Kalijaga,JB,West Java,ID,Indonesia
-Sanur,JI,East Java,ID,Indonesia
 Tanah,JI,East Java,ID,Indonesia
 Bligo,JT,Central Java,ID,Indonesia
 Kejiwan,JT,Central Java,ID,Indonesia
@@ -96221,7 +96112,6 @@ Khanpur,HR,Haryana,IN,India
 Belal,MP,Madhya Pradesh,IN,India
 Agar,UP,Uttar Pradesh,IN,India
 Amarpur,UP,Uttar Pradesh,IN,India
-Nadia,MP,Madhya Pradesh,IN,India
 Mohali,PB,Punjab,IN,India
 Alapur,UP,Uttar Pradesh,IN,India
 Ahmadganj,UP,Uttar Pradesh,IN,India
@@ -96454,6 +96344,7 @@ Kelvin,GT,Gauteng,ZA,South Africa
 Pointe-Verte,NB,New Brunswick,CA,Canada
 Juniper,NB,New Brunswick,CA,Canada
 Smiths Lake,NSW,New South Wales,AU,Australia
+Nusa Dua,BA,Bali,ID,Indonesia
 Plaster Rock,NB,New Brunswick,CA,Canada
 Garibaldi Highlands,BC,British Columbia,CA,Canada
 Madeira Park,BC,British Columbia,CA,Canada
@@ -96476,12 +96367,14 @@ Douglasdale,GT,Gauteng,ZA,South Africa
 Campanillas,AN,Andalusia,ES,Spain
 Gorraiz,NC,Navarre,ES,Spain
 Barra da Tijuca,RJ,Rio de Janeiro,BR,Brazil
+Cowden,ENG,England,GB,United Kingdom
 Mogale City,GT,Gauteng,ZA,South Africa
 Cherngtalay,83,Phuket,TH,Thailand
 Kaleden,BC,British Columbia,CA,Canada
 Burnham-on-Crouch,ENG,England,GB,United Kingdom
 Farnham,ENG,England,GB,United Kingdom
 Newnham,ENG,England,GB,United Kingdom
+Horsted Keynes,ENG,England,GB,United Kingdom
 Wells-Next-the-Sea,ENG,England,GB,United Kingdom
 Baldegg,LU,Lucerne,CH,Switzerland
 City of Parramatta,NSW,New South Wales,AU,Australia
@@ -96511,7 +96404,6 @@ Ponnur,AP,Andhra Pradesh,IN,India
 Pubnico,NS,Nova Scotia,CA,Canada
 Cornwallis,NS,Nova Scotia,CA,Canada
 Yawatahama,38,Ehime,JP,Japan
-Wittenberg,ST,Saxony-Anhalt,DE,Germany
 ,MAJ,Majuro Atoll,MH,Marshall Islands
 Golden Beach,QLD,Queensland,AU,Australia
 Jelcz Laskowice,DS,Lower Silesia,PL,Poland
@@ -96636,6 +96528,7 @@ Granja Guarani,RJ,Rio de Janeiro,BR,Brazil
 Eleuthera,,,BS,Bahamas
 Budziechow,LB,Lubusz,PL,Poland
 Berzyna,WP,Greater Poland,PL,Poland
+San Fernando,LI,"Region del Libertador General Bernardo O'Higgins",CL,Chile
 Chroscina,OP,Opole Voivodeship,PL,Poland
 Helensvale,QLD,Queensland,AU,Australia
 Rabenau,HE,Hesse,DE,Germany
@@ -96647,7 +96540,6 @@ Ketanon,JI,East Java,ID,Indonesia
 Hurriyet,52,Ordu,TR,Turkey
 Akguney,52,Ordu,TR,Turkey
 Sao Cristovao,RS,Rio Grande do Sul,BR,Brazil
-Santo Antonio,RS,Rio Grande do Sul,BR,Brazil
 Sudnikovo,YAR,"Yaroslavskaya Oblast'",RU,Russia
 Shchelkovo,YAR,"Yaroslavskaya Oblast'",RU,Russia
 Rodrigues,SP,Sao Paulo,BR,Brazil
@@ -97115,7 +97007,6 @@ Garung,JT,Central Java,ID,Indonesia
 Cibodas,JT,Central Java,ID,Indonesia
 Merkaz Shapira,D,Southern District,IL,Israel
 Akdamlar,07,Antalya,TR,Turkey
-Deniz,07,Antalya,TR,Turkey
 Balbey,07,Antalya,TR,Turkey
 Barbaros,07,Antalya,TR,Turkey
 Doguyaka,07,Antalya,TR,Turkey
@@ -97200,7 +97091,6 @@ Nirit,,,IL,Israel
 Vallioor,TN,Tamil Nadu,IN,India
 Singampunari,TN,Tamil Nadu,IN,India
 Tran Phu,68,Tinh Phu Tho,VN,Vietnam
-Minh Khai,68,Tinh Phu Tho,VN,Vietnam
 Beijing,44,Guangdong,CN,China
 Bahatyrskaya,VI,Vitebsk,BY,Belarus
 Caravonica,QLD,Queensland,AU,Australia
@@ -97554,6 +97444,7 @@ Macquarie Hills,NSW,New South Wales,AU,Australia
 Waterways,VIC,Victoria,AU,Australia
 Gwelup,WA,Western Australia,AU,Australia
 Jolimont,WA,Western Australia,AU,Australia
+Magill,SA,South Australia,AU,Australia
 Ballajura,WA,Western Australia,AU,Australia
 Yellingbo,VIC,Victoria,AU,Australia
 Maryville,NSW,New South Wales,AU,Australia
@@ -97572,7 +97463,6 @@ Youngtown,TAS,Tasmania,AU,Australia
 Cashmere,QLD,Queensland,AU,Australia
 Winnellie,NT,Northern Territory,AU,Australia
 Fadden,ACT,Australian Capital Territory,AU,Australia
-Wickham,NSW,New South Wales,AU,Australia
 Page,ACT,Australian Capital Territory,AU,Australia
 Teneriffe,QLD,Queensland,AU,Australia
 Bray Park,NSW,New South Wales,AU,Australia
@@ -98298,10 +98188,14 @@ Notre Dame,IN,Indiana,US,United States
 Randolph Township,NJ,New Jersey,US,United States
 Al Nahda,,,AE,United Arab Emirates
 International City,DU,Dubai,AE,United Arab Emirates
+Montividiu,GO,Goias,BR,Brazil
+Capelinha,GO,Goias,BR,Brazil
 Santana do Araguaia,PA,Para,BR,Brazil
 Al Majaz 3,SH,Ash Shariqah,AE,United Arab Emirates
 Kinda,02,Aomori,JP,Japan
 Vavdi,GJ,Gujarat,IN,India
+Alto Alegre,SP,Sao Paulo,BR,Brazil
+Primavera,SP,Sao Paulo,BR,Brazil
 Victoria Park,WA,Western Australia,AU,Australia
 Merion,PA,Pennsylvania,US,United States
 Fort Peck,MT,Montana,US,United States
@@ -98328,6 +98222,7 @@ Widnau,SG,Saint Gallen,CH,Switzerland
 Hinterforst,SG,Saint Gallen,CH,Switzerland
 Solta,17,Splitsko-Dalmatinska Zupanija,HR,Croatia
 Shimoishikawa,02,Aomori,JP,Japan
+Boa Vista,AM,Amazonas,BR,Brazil
 Muzychi,32,Kyiv Oblast,UA,Ukraine
 Pattonville,BW,Baden-Württemberg Region,DE,Germany
 Dzerzhinsky,MOS,Moscow Oblast,RU,Russia
@@ -98454,6 +98349,7 @@ Wyee Point,NSW,New South Wales,AU,Australia
 Binh Minh,49,Tinh Vinh Long,VN,Vietnam
 Moras De La Paz,03,Central Luzon,PH,Philippines
 Dakhla,,,MA,Morocco
+Primavera,PA,Para,BR,Brazil
 Bennetts Green,NSW,New South Wales,AU,Australia
 Punta Ballena,MA,Maldonado,UY,Uruguay
 Snowshoe,WV,West Virginia,US,United States
@@ -98549,11 +98445,12 @@ Tara,ON,Ontario,CA,Canada
 Orono,ON,Ontario,CA,Canada
 Dalbeg,QLD,Queensland,AU,Australia
 Bizaron,TA,Tel Aviv,IL,Israel
-Laleham,QLD,Queensland,AU,Australia
 Mulambin,QLD,Queensland,AU,Australia
 Bluewater,QLD,Queensland,AU,Australia
 Barratta,QLD,Queensland,AU,Australia
 Bagong Silang,40,Calabarzon,PH,Philippines
+Uruara,PA,Para,BR,Brazil
+Delta,MG,Minas Gerais,BR,Brazil
 Virginia,MG,Minas Gerais,BR,Brazil
 Galileia,MG,Minas Gerais,BR,Brazil
 Vienna,ON,Ontario,CA,Canada
@@ -98700,6 +98597,7 @@ Pianacce,65,Abruzzo,IT,Italy
 Ilsan-dong,31,Ulsan,KR,Republic of Korea
 Ichon-dong,11,Seoul,KR,Republic of Korea
 Akkerhaugen,08,Telemark,NO,Norway
+Wittenberg,ST,Saxony-Anhalt,DE,Germany
 Nickol,WA,Western Australia,AU,Australia
 Tenniken,BL,Basel-Landschaft,CH,Switzerland
 Calentadores Dos,VER,Veracruz,MX,Mexico
@@ -98930,12 +98828,12 @@ Canova,25,Lombardy,IT,Italy
 Bozzano,52,Tuscany,IT,Italy
 Dolcecanto,75,Apulia,IT,Italy
 Castello di Serravalle,45,Emilia-Romagna,IT,Italy
-Collesecco,55,Umbria,IT,Italy
 Mozzo,34,Veneto,IT,Italy
 Martinetto,42,Liguria,IT,Italy
 San Zeno,34,Veneto,IT,Italy
 Guardia,82,Sicily,IT,Italy
 Moncestino,21,Piedmont,IT,Italy
+Monte,67,Molise,IT,Italy
 Contesse,25,Lombardy,IT,Italy
 San Bartolomeo,42,Liguria,IT,Italy
 Argine,45,Emilia-Romagna,IT,Italy
@@ -99089,6 +98987,7 @@ Rollag,08,Telemark,NO,Norway
 Homborsund,09,Aust-Agder,NO,Norway
 Bersteland,BB,Brandenburg,DE,Germany
 Aspra,82,Sicily,IT,Italy
+Hall bei Admont,6,Styria,AT,Austria
 Morihigashi,25,Shiga,JP,Japan
 Laban,01,Ar Riyāḑ,SA,Saudi Arabia
 Akhfennir,11,Laayoune-Sakia El Hamra,MA,Morocco
@@ -99862,6 +99761,7 @@ Andipalayam,TN,Tamil Nadu,IN,India
 Anklav,GJ,Gujarat,IN,India
 Bakrol,GJ,Gujarat,IN,India
 Uliyakovil,KL,Kerala,IN,India
+Savarkundla,GJ,Gujarat,IN,India
 Ranip,GJ,Gujarat,IN,India
 Penumantra,AP,Andhra Pradesh,IN,India
 Palliyadi,TN,Tamil Nadu,IN,India
@@ -99936,3 +99836,7 @@ Meerstad,GR,Groningen,NL,Netherlands
 Mont Colah,NSW,New South Wales,AU,Australia
 Guadalupe,NLE,Nuevo León,MX,Mexico
 Luis Eduardo Magalhaes,BA,Bahia,BR,Brazil
+Seminyak town,BA,Bali,ID,Indonesia
+Iga,24,Mie,JP,Japan
+Kuwana,24,Mie,JP,Japan
+Matsusaka,24,Mie,JP,Japan

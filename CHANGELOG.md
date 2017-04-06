@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.5
+- :bug: fixed fatal exception when zone has no passwords
+- :bug: fixed inability to make POST requests with ssl sniffing
+- :bug: resolved build failures on node v4
+
 ## 0.10.4
 - :star: update default zone passwords from luminati.io
 - :sparkles: gather better stack traces during crashes

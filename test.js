@@ -181,8 +181,13 @@ const http_ping = ()=>etask(function*(){
         let body = to_body(req);
         ping.history.push(body);
         res.writeHead(200, 'PONG', {'content-type': 'application/json'});
-        res.write(JSON.stringify(body));
-        res.end();
+        if (req.headers['content-length'])
+            req.pipe(res);
+        else
+        {
+            res.write(JSON.stringify(body));
+            res.end();
+        }
     };
     const _http = http.createServer(handler);
     yield etask.nfn_apply(_http, '.listen', [0]);
@@ -278,20 +283,29 @@ describe('proxy', ()=>{
         l = null;
     }));
     describe('sanity', ()=>{
-        const t = (name, _url, opt)=>it(name, ()=>etask(function*(){
+        const t = (name, req, opt)=>it(name, ()=>etask(function*(){
             proxy.fake = false;
-            _url = _url();
+            req = req();
             l = yield lum(opt);
-            let res = yield l.test(_url);
+            let res = yield l.test(req);
             assert.equal(ping.history.length, 1);
-            assert_has(res, {
-                statusCode: 200,
-                statusMessage: 'PONG',
-            });
+            let expected = { statusCode: 200, statusMessage: 'PONG' };
+            if (req.body)
+                assign(expected, { body: req.body });
+            assert_has(res, expected, 'res');
         }));
         t('http', ()=>ping.http.url);
+        t('http post', ()=>{
+            return { url: ping.http.url, method: 'POST', body: 'test body' };
+        });
         t('https', ()=>ping.https.url);
+        t('https post', ()=>{
+            return {url: ping.https.url, method: 'POST', body: 'test body' };
+        });
         t('https sniffing', ()=>ping.https.url, {ssl: true, insecure: true});
+        t('https sniffing post', ()=>{
+            return { url: ping.https.url, method: 'POST', body: 'test body' };
+        }, {ssl: true, insecure: true});
     });
     describe('headers', ()=>{
         describe('X-Hola-Agent', ()=>{
@@ -1190,6 +1204,48 @@ describe('manager', ()=>{
                     {customer, password}}, only_explicit: true});
                 const body = yield json('api/recent_ips');
                 assert_has(body, {opt: expect_opt});
+            }));
+        });
+        describe('zones', ()=>{
+            let zone_resp = {_defaults: { zones: {
+                a: { perm: 'abc', plan: 'plan', password: ['pwd1'] },
+                b: { perm: 'xyz', plan: 'plan9', password: ['pwd2'] }
+            }}};
+            let zone_expected = [
+                { zone: 'a', perm: 'abc', plans: 'plan', password: 'pwd1' },
+                { zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2' },
+            ];
+            it('get', ()=>etask(function*(){
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: customer}).reply(200, zone_resp);
+                app = yield app_with_args(
+                    qw`--customer ${customer} --password ${password}`);
+                const body = yield json('api/zones');
+                assert_has(body, zone_expected, 'zones');
+            }));
+            it('get with config', ()=>etask(function*(){
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: customer}).reply(200, zone_resp);
+                app = yield app_with_config({config: {_defaults:
+                    {customer, password}}, only_explicit: true});
+                const body = yield json('api/zones');
+                assert_has(body, zone_expected, 'zones');
+            }));
+            it('get zone without passwords', ()=>etask(function*(){
+                let no_pwd_resp = {_defaults: { zones: {
+                    a: { perm: 'abc', plan: 'plan' },
+                }}};
+                let no_pwd_expected = [
+                    { zone: 'a', perm: 'abc', plans: 'plan',
+                        password: undefined }
+                ];
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: customer})
+                    .reply(200, no_pwd_resp);
+                app = yield app_with_args(
+                    qw`--customer ${customer} --password ${password}`);
+                const body = yield json('api/zones');
+                assert_has(body, no_pwd_expected, 'zones');
             }));
         });
         describe('proxies', ()=>{
