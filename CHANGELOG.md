@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.6
+- :star: added smart rules scripting for zero-fail-rate (alpha)
+- :bug: fixed Google account login
+
 ## 0.10.5
 - :bug: fixed fatal exception when zone has no passwords
 - :bug: fixed inability to make POST requests with ssl sniffing

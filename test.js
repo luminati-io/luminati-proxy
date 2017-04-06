@@ -1050,8 +1050,8 @@ describe('manager', ()=>{
             qw`--foo 1 --bar 2 --customer test_user --password abcdefgh`,
             ['--foo', 1, '--bar', 2]);
         t('credentials with no-config',
-            qw`--no-config --customer test_user --password abcd --zone tst`,
-            qw`--no-config --customer test_user --password abcd --zone tst`);
+            qw`--no-config --customer usr --password abc --token t --zone z`,
+            qw`--no-config --customer usr --password abc --token t --zone z`);
     });
     describe('socks', ()=>{
         const t = (name, _url)=>it(name, etask._fn(function*(_this){

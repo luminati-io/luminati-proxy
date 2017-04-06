@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.10.5",
+        "version": "0.10.6",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -352,6 +352,14 @@
                 "no_usage_stats": {
                     "type": "boolean",
                     "description": "Disable collection of anonymous usage statistics"
+                },
+                "rules": {
+                    "type": "boolean",
+                    "description": "Enable routing rules for requests"
+                },
+                "token": {
+                    "type": "string",
+                    "description": "A Google authorization token for accessing luminati.io"
                 }
             }
         },
@@ -541,6 +549,10 @@
                 "exclude_include": {
                     "type": "string",
                     "description": "URL regex for requests to not be sent directly from super proxy"
+                },
+                "rules": {
+                    "type": "boolean",
+                    "description": "Enable routing rules for requests"
                 }
             }
         }
