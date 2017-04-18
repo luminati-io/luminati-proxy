@@ -971,6 +971,8 @@ describe('manager', ()=>{
               args = args.concat(['--mode', 'guest']);
             if (!get_param(args, '--dropin'))
               args = args.concat(['--no-dropin']);
+            if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
+                args.push('--no-cookie');
         }
         manager = new Manager(args, {bypass_credentials_check: true});
         manager.on('error', this.throw_fn());
@@ -1208,8 +1210,8 @@ describe('manager', ()=>{
         });
         describe('zones', ()=>{
             let zone_resp = {_defaults: { zones: {
-                a: { perm: 'abc', plan: 'plan', password: ['pwd1'] },
-                b: { perm: 'xyz', plan: 'plan9', password: ['pwd2'] }
+                a: { perm: 'abc', plans: 'plan', password: ['pwd1'] },
+                b: { perm: 'xyz', plans: 'plan9', password: ['pwd2'] }
             }}};
             let zone_expected = [
                 { zone: 'a', perm: 'abc', plans: 'plan', password: 'pwd1' },
@@ -1233,7 +1235,7 @@ describe('manager', ()=>{
             }));
             it('get zone without passwords', ()=>etask(function*(){
                 let no_pwd_resp = {_defaults: { zones: {
-                    a: { perm: 'abc', plan: 'plan' },
+                    a: { perm: 'abc', plans: 'plan' },
                 }}};
                 let no_pwd_expected = [
                     { zone: 'a', perm: 'abc', plans: 'plan',

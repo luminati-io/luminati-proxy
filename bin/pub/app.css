@@ -80,14 +80,8 @@ pre.top-margin {
     margin-right: 15px;
     margin-bottom: -5px;
 }
-.header {
-    height: 60px;
-    background: #0c334d;
-}
-.header img {
-    width: 170px;
-    margin-top: 9px;
-}
+.header { height: 60px; }
+.header img { margin-top: 10px; }
 .navigation {
     background: #f5f5f5;
     padding: 8px 15px;

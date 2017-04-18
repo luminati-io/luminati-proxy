@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.7
+- :star: added --cookie, --no-cookie options
+- :bug: fix option to set Pool size from allocated IPs
+
 ## 0.10.6
 - :star: added smart rules scripting for zero-fail-rate (alpha)
 - :bug: fixed Google account login
