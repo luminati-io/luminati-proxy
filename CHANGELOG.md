@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.8
+- :bug: fix infinite requests when luminati.io credentials are invalid
+
 ## 0.10.7
 - :star: added --cookie, --no-cookie options
 - :bug: fix option to set Pool size from allocated IPs

@@ -1367,7 +1367,7 @@ describe('manager', ()=>{
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
                 try {
-                    yield app.manager.get_lum_local_conf();
+                    yield app.manager.get_lum_local_conf(null, null, true);
                     assert.fail('should have thrown exception');
                 } catch(e){
                     assert_has(e, {status: 403, message: 'login_required'});

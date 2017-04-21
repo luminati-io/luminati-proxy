@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.10.7",
+  "version": "0.10.8",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -67,7 +67,7 @@
     "lodash": "^4.17.2",
     "moment": "^2.17.1",
     "mysql": "^2.13.0",
-    "node-forge": "^0.7.1",
+    "node-forge": "^0.6.46",
     "notosans-fontface": "^1.0.1",
     "pm2": "^2.2.2",
     "request": "^2.79.0",
@@ -78,21 +78,19 @@
     "sequelize": "^3.30.2",
     "socksv5": "0.0.6",
     "sqlite3": "3.1.8",
-    "sudo-prompt": "^7.0.0",
-    "swagger-ui": "^3.0.5",
-    "webpack": "^2.3.3",
+    "sudo-prompt": "^6.2.1",
+    "swagger-ui": "^2.2.8",
     "tough-cookie-filestore": "0.0.1",
     "universal-analytics": "^0.4.9",
     "winston": "^2.3.0",
-    "yargs": "^7.1.0"
+    "yargs": "^6.5.0"
   },
   "devDependencies": {
     "electron": "^1.4.1",
-    "electron-builder": "^16.8.3",
-    "electron-builder-squirrel-windows": "^16.8.3",
+    "electron-builder": "^13.9.0",
+    "electron-builder-squirrel-windows": "^13.6.0",
     "electron-rebuild": "^1.5.7",
     "electron-squirrel-startup": "^1.0.0",
-    "ajv": "^5.0.4-beta",
     "mocha": "^3.2.0",
     "nock": "^9.0.11"
   },
