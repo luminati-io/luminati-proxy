@@ -3,10 +3,9 @@ node_js:
 #  - node
   - '6'
   - '5'
-  - '4'
 os:
   - linux
   - osx
 notifications:
   email:
-    - jesse@hola.org
+    - ovidiu@hola.org

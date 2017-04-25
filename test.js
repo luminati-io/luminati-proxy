@@ -974,7 +974,8 @@ describe('manager', ()=>{
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
                 args.push('--no-cookie');
         }
-        manager = new Manager(args, {bypass_credentials_check: true});
+        manager = new Manager(args, {bypass_credentials_check: true,
+            skip_ga: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
@@ -1044,7 +1045,7 @@ describe('manager', ()=>{
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('get_params', ()=>{
         const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
-            var mgr = new Manager(_args);
+            var mgr = new Manager(_args, {skip_ga: true});
             assert.deepEqual(expected, mgr.get_params());
         }));
         t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
@@ -1219,7 +1220,8 @@ describe('manager', ()=>{
             ];
             it('get', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: customer}).reply(200, zone_resp);
+                    .query({customer, proxy: pkg.version})
+                    .reply(200, zone_resp);
                 app = yield app_with_args(
                     qw`--customer ${customer} --password ${password}`);
                 const body = yield json('api/zones');
@@ -1227,7 +1229,8 @@ describe('manager', ()=>{
             }));
             it('get with config', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: customer}).reply(200, zone_resp);
+                    .query({customer, proxy: pkg.version})
+                    .reply(200, zone_resp);
                 app = yield app_with_config({config: {_defaults:
                     {customer, password}}, only_explicit: true});
                 const body = yield json('api/zones');
@@ -1242,7 +1245,7 @@ describe('manager', ()=>{
                         password: undefined }
                 ];
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: customer})
+                    .query({customer, proxy: pkg.version})
                     .reply(200, no_pwd_resp);
                 app = yield app_with_args(
                     qw`--customer ${customer} --password ${password}`);
@@ -1355,7 +1358,7 @@ describe('manager', ()=>{
         describe('user credentials', ()=>{
             it('success', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user'}).twice()
+                    .query({customer: 'mock_user', proxy: pkg.version}).twice()
                     .reply(200, {mock_result: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
                 var result = yield app.manager.get_lum_local_conf();
@@ -1363,7 +1366,7 @@ describe('manager', ()=>{
             }));
             it('login required', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user'}).twice()
+                    .query({customer: 'mock_user', proxy: pkg.version}).twice()
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
                 try {
@@ -1376,7 +1379,8 @@ describe('manager', ()=>{
             it('update defaults', ()=>etask(function*(){
                 let updated = {_defaults: {customer: 'updated'}};
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user'}).reply(200, updated);
+                    .query({customer: 'mock_user', proxy: pkg.version})
+                    .reply(200, updated);
                 app = yield app_with_args(['--customer', 'mock_user']);
                 let res = yield app.manager.get_lum_local_conf();
                 assert_has(res, updated, 'result');

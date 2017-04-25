@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.9
+- :sparkles: reduce rate of proxy check_credentials requests
+
 ## 0.10.8
 - :bug: fix infinite requests when luminati.io credentials are invalid
 

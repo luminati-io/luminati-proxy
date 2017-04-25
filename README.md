@@ -24,7 +24,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
 ## Installation
 
-### Requirements
+###Requirements
 Software requirements for Luminati proxy manager are:
 
 - Git from version 1.7+

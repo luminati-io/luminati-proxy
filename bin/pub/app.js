@@ -1418,6 +1418,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         return 'Change value';
     };
     $scope.is_valid_field = function(proxy, name){
+        if (!$scope.$parent.consts)
+            return true;
         return is_valid_field(proxy, name, $scope.$parent.consts.proxy.zone);
     };
     $scope.starts_with = function(actual, expected){
@@ -2070,7 +2072,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         };
         $scope.show_allocated_ips = function(){
             var zone = form.zone;
-            var key = form.password||'';
+            var keypass = form.password||'';
             var modals = $scope.$parent.$parent.$parent.$parent;
             modals.allocated_ips = {
                 ips: [],
@@ -2092,7 +2094,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 zone: zone,
             };
             $window.$('#allocated_ips').modal();
-            $http.get('/api/allocated_ips?zone='+zone+'&key='+key)
+            $http.get('/api/allocated_ips?zone='+zone+'&key='+keypass)
             .then(function(res){
                 modals.allocated_ips.ips = res.data.ips.map(function(ip_port){
                     var ip = ip_port.split(':')[0];
