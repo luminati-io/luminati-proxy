@@ -134,7 +134,9 @@ const http_proxy = port=>etask(function*(){
             _url = '127.0.0.1:'+proxy.https.address().port;
         }
         let req_port;
-        res.write('HTTP/1.1 200 OK\r\n\r\n');
+        res.write(`HTTP/1.1 200 OK\r\nx-hola-ip: ${to_body(req).ip}\r\n\r\n`);
+        if (req.method=='CONNECT')
+            proxy.full_history.push(to_body(req));
         const socket = net.connect({
             host: _url.split(':')[0],
             port: _url.split(':')[1]||443,
@@ -482,7 +484,7 @@ describe('proxy', ()=>{
                     for (let i=0; i<pool_size; i++)
                     {
                         assert.equal(proxy.full_history[i].url,
-                            'http://lumtest.com/myip.json');
+                            'lumtest.com:443');
                     }
                     assert.equal(proxy.full_history[pool_size].url, test_url);
                     assert.equal(l.sessions.length, pool_size);

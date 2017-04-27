@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.10
+- :sparkles: reduce rate of lumtest requests
+
 ## 0.10.9
 - :sparkles: reduce rate of proxy check_credentials requests
 
