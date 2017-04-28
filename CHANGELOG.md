@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.11
+- :sparkles: further reduce load on lumtest
+- :sparkles: reduce rate of /cp/lum_local_conf requests
+
 ## 0.10.10
 - :sparkles: reduce rate of lumtest requests
 

@@ -90,7 +90,9 @@ const http_proxy = port=>etask(function*(){
             const auth = username.parse(body.headers['proxy-authorization']);
             if (auth)
                 body.auth = auth;
-            res.writeHead(200, {'content-type': 'application/json'});
+            res.writeHead(req.method=='HEAD'&&
+                req.headers['x-hola-direct-first'] ? 302 : 200,
+                {'content-type': 'application/json', 'x-hola-response': 1});
             res.write(JSON.stringify(body));
             proxy.full_history.push(body);
             if (body.url!='http://lumtest.com/myip.json')
@@ -484,7 +486,7 @@ describe('proxy', ()=>{
                     for (let i=0; i<pool_size; i++)
                     {
                         assert.equal(proxy.full_history[i].url,
-                            'lumtest.com:443');
+                            'http://lumtest.com/myip.json');
                     }
                     assert.equal(proxy.full_history[pool_size].url, test_url);
                     assert.equal(l.sessions.length, pool_size);
