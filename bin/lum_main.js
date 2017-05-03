@@ -29,6 +29,11 @@ let shutdown = reason=>{
 };
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
     const errstr = sig+(err ? ', error = '+err : '');
+    if (err&&manager)
+    {
+        manager._log.error(errstr);
+        manager._log.silly(err, err.stack);
+    }
     if (err&&manager&&!manager.argv.no_usage_stats)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,

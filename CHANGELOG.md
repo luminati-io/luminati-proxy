@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.12
+- :sparkles: fix manager crash on socks ECONNREFUSED ECONNRESET errors
+
 ## 0.10.11
 - :sparkles: further reduce load on lumtest
 - :sparkles: reduce rate of /cp/lum_local_conf requests
