@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.13
+- :bug: fix high cpu usage after multple UI reloads
+- :star: added "port": "auto" option support to POST /api/proxies - auto
+  selects next available port
+
 ## 0.10.12
 - :sparkles: fix manager crash on socks ECONNREFUSED ECONNRESET errors
 
