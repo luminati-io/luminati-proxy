@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.14
+- :bug: fix "port": "auto" when no proxies are running
+- :bug: fix permission "asn" check
+- :sparkles: stability improvements
+
 ## 0.10.13
 - :bug: fix high cpu usage after multple UI reloads
 - :star: added "port": "auto" option support to POST /api/proxies - auto

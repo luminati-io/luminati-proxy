@@ -10,10 +10,10 @@ if (typeof module=='object')
 }
 
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
-    'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
-    'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap',
-    'es6-shim'],
-function(angular, _, moment, codemirror){
+    'hutil/util/date', 'codemirror/mode/javascript/javascript', 'jquery',
+    'angular-sanitize', 'bootstrap', 'bootstrap-datepicker', '_css!app',
+    'angular-ui-bootstrap', 'es6-shim'],
+function(angular, _, moment, codemirror, date){
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -21,15 +21,34 @@ var is_electron = window.process && window.process.versions.electron;
 if (window.module)
     module = window.module;
 
+// XXX ovidiu: move to common file for node and browser
+var get_zone_plan = function(plans){
+    var d = date();
+    plans = plans||[];
+    for (var i=plans.length-1; i>=0; i--)
+    {
+        if (date(plans[i].start)<=d)
+        {
+            if (plans[i].end && d>=date(plans[i].end))
+                return;
+            return plans[i];
+        }
+    }
+};
+
 var is_valid_field = function(proxy, name, zone_definition){
     var value = proxy.zone||zone_definition.def;
     if (name=='password')
         return value!='gen';
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
-    var permissions = details.perm.split(' ');
+    var permissions = details.perm.split(' '), zone_plan;
     if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
-        return permissions.includes(name);
+    {
+        return permissions.includes(name) ||
+            (zone_plan = get_zone_plan(details.plans)) && !zone_plan.disable &&
+            zone_plan[name]===1;
+    }
     return true;
 };
 
