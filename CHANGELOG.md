@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.15
+- :bug: fix saving configuration from UI
+- :bug: fix port conflicts crash
+- :sparkles: stability improvements
+
 ## 0.10.14
 - :bug: fix "port": "auto" when no proxies are running
 - :bug: fix permission "asn" check

@@ -404,7 +404,7 @@ describe('proxy', ()=>{
                 assert.equal(proxy.full_history.length, 4);
                 assert.equal(res.body.auth.customer, customer);
                 assert.equal(res.body.auth.password, password);
-                assert.equal(res.body.auth.zone, 'gen');
+                assert.equal(res.body.auth.zone, 'static');
             }));
             it('enabled', ()=>etask(function*(){
                 l = yield lum({pool_size: 3, allow_proxy_auth: true});
@@ -1158,7 +1158,7 @@ describe('manager', ()=>{
             const expect_opt = {
                 url: 'https://luminati.io/api/get_customer_bw?details=1',
                 headers: {'x-hola-auth': 'lum-customer-opt'
-                    +`-zone-gen-key-${password}`},
+                    +`-zone-static-key-${password}`},
             };
             it('get', ()=>etask(function*(){
                 app = yield app_with_args(
@@ -1178,7 +1178,7 @@ describe('manager', ()=>{
             const expect_opt = {
                 url: 'https://luminati.io/api/get_whitelist?zones=*',
                 headers: {'x-hola-auth': `lum-customer-${customer}`
-                    +`-zone-gen-key-${password}`},
+                    +`-zone-static-key-${password}`},
             };
             it('get', ()=>etask(function*(){
                 app = yield app_with_args(
@@ -1198,7 +1198,7 @@ describe('manager', ()=>{
             const expect_opt = {
                 url: 'https://luminati.io/api/get_recent_ips?zones=*',
                 headers: {'x-hola-auth': `lum-customer-${customer}`
-                    +`-zone-gen-key-${password}`},
+                    +`-zone-static-key-${password}`},
             };
             it('get', ()=>etask(function*(){
                 app = yield app_with_args(

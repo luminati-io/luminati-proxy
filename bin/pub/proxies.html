@@ -17,14 +17,14 @@
   <div ng-if=proxies class="panel panel-default proxies">
     <div class=panel-heading>
       <button ng-if="$root.mode!='guest'"
-        ng-disabled="get_selected_proxies().length!=1"
+        ng-disabled="!is_action_available('edit')"
         ng-click="edit_proxy()"
         uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
         type=button class="btn btn-ico">
         <img src=/img/ic_edit.svg>
       </button>
       <button ng-if="$root.mode!='guest'"
-        ng-disabled="get_selected_proxies().length!=1"
+        ng-disabled="!is_action_available('duplicate')"
         uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
         ng-click="edit_proxy(true)"
         type=button class="btn btn-ico">
@@ -32,7 +32,7 @@
       </button>
       <button type=button class="btn btn-ico"
         ng-if="$root.mode!='guest'" ng-click=delete_proxies()
-        ng-disabled="!get_selected_proxies().length"
+        ng-disabled="!is_action_available('delete')"
         uib-tooltip=Delete tooltip-class=tooltip-default>
         <img src=/img/ic_delete.svg>
       </button>

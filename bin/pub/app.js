@@ -21,34 +21,15 @@ var is_electron = window.process && window.process.versions.electron;
 if (window.module)
     module = window.module;
 
-// XXX ovidiu: move to common file for node and browser
-var get_zone_plan = function(plans){
-    var d = date();
-    plans = plans||[];
-    for (var i=plans.length-1; i>=0; i--)
-    {
-        if (date(plans[i].start)<=d)
-        {
-            if (plans[i].end && d>=date(plans[i].end))
-                return;
-            return plans[i];
-        }
-    }
-};
-
 var is_valid_field = function(proxy, name, zone_definition){
     var value = proxy.zone||zone_definition.def;
     if (name=='password')
         return value!='gen';
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
-    var permissions = details.perm.split(' '), zone_plan;
+    var permissions = details.perm.split(' ');
     if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
-    {
-        return permissions.includes(name) ||
-            (zone_plan = get_zone_plan(details.plans)) && !zone_plan.disable &&
-            zone_plan[name]===1;
-    }
+        return permissions.includes(name);
     return true;
 };
 
@@ -1393,6 +1374,17 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         return Object.keys($scope.selected_proxies)
             .filter(function(p){ return $scope.selected_proxies[p]; })
             .map(function(p){ return +p; });
+    };
+    $scope.is_action_available = function(action){
+        var proxies = $scope.get_selected_proxies()||[];
+        if (!proxies.length)
+            return false;
+        if (action=='duplicate')
+            return proxies.length==1;
+        return !$scope.proxies.some(function(sp){
+            return $scope.selected_proxies[sp.port] &&
+                sp.proxy_type!='persist';
+        });
     };
     $scope.option_key = function(col, val){
         var opt = col.options().find(function(o){ return o.value==val; });
