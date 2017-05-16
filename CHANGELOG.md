@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.16
+- :bug: fix memory leak
+- :bug: fix dropin proxy select available zone, static by default
+
 ## 0.10.15
 - :bug: fix saving configuration from UI
 - :bug: fix port conflicts crash
