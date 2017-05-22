@@ -2,18 +2,17 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 
+const Manager = require('./lib/manager.js');
+const version = require('./package.json').version;
 let is_electron = process.versions && !!process.versions.electron;
 
 if (!is_electron)
 {
     const Luminati = require('./lib/luminati.js');
-    const Manager = require('./lib/manager.js');
-    const version = require('./package.json').version;
     module.exports = {Luminati, Manager, version};
     return;
 }
 
-const Manager = require('./lib/manager.js');
 const electron = require('electron');
 const app = electron.app, dialog = electron.dialog;
 const autoUpdater = electron.autoUpdater;
@@ -22,6 +21,9 @@ const hutil = require('hutil');
 const etask = hutil.etask;
 const analytics = require('universal-analytics');
 const ua = analytics('UA-60520689-2');
+
+ua.set('an', 'LPM-electron');
+ua.set('av', `v${version}`);
 
 if (require('electron-squirrel-startup'))
     return;
@@ -35,7 +37,7 @@ autoUpdater.on('update-downloaded', e=>{
     autoUpdater.quitAndInstall();
 });
 autoUpdater.on('error', ()=>{});
-autoUpdater.setFeedURL('http://localhost:9000/dist/win/');
+autoUpdater.setFeedURL('http://cdn.luminati.io/static/lpm');
 autoUpdater.checkForUpdates();
 
 let run = run_config=>{

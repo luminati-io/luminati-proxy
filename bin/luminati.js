@@ -28,6 +28,8 @@ if (args.some(arg=>arg=='-d' || arg=='--daemon'))
     return pm2_cmd('start', {
         name: 'luminati',
         script: process.argv[1],
+        killTimeout: 5000,
+        restartDelay: 5000,
         args: args.filter(arg=>arg!='-d' && arg!='--daemon'
             && arg!='--stop-daemon'),
     });
@@ -47,6 +49,10 @@ let child;
 }));
 
 let shutdown_on_child_exit = ()=>process.exit();
+let start_on_child_exit = ()=>{
+    child.removeListener('exit', start_on_child_exit);
+    setTimeout(()=>create_child(), 5000);
+};
 
 let create_child = ()=>{
     child = child_process.fork(path.resolve(__dirname, 'lum_main.js'), args,
@@ -61,7 +67,7 @@ let msg_handler = function(msg){
     case 'shutdown_master': return process.exit();
     case 'restart':
         child.removeListener('exit', shutdown_on_child_exit);
-        child.on('exit', ()=>create_child());
+        child.on('exit', start_on_child_exit);
         child.kill();
         break;
     case 'upgrade':

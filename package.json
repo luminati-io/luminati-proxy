@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.10.16",
+  "version": "0.10.17",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -37,6 +37,7 @@
   "build": {
     "npmRebuild": false,
     "appId": "luminati.proxy_manager",
+    "directories": {"output": "d"},
     "squirrelWindows": {
       "remoteReleases": "http://cdn.luminati.io/static/lpm"
     },

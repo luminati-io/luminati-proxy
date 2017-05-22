@@ -7,21 +7,90 @@ const hutil = require('hutil');
 const etask = hutil.etask;
 const version = require('../package.json').version;
 const analytics = require('universal-analytics');
+const _ = require('lodash');
+const file = require('hutil').file;
+const qw = require('hutil').string.qw;
+const os = require('os');
+const path = require('path');
+const crypto = require('crypto');
 const ua = analytics('UA-60520689-2');
 
+ua.set('an', 'LPM');
+ua.set('av', `v${version}`);
+
+const ua_filename = path.resolve(os.homedir(),
+    '.luminati_ua_ev.json'.substr(process.platform=='win32' ? 1 : 0));
+let last_ev;
+const ua_event = ua.event.bind(ua);
+ua.event = (...args)=>{
+    let send = true, hash;
+    if (!last_ev)
+    {
+        try { last_ev = JSON.parse(file.read_e(ua_filename)); }
+        catch(e){ last_ev = {}; }
+    }
+    const cb = _.isFunction(_.last(args)) ? args.pop() : null;
+    let params;
+    if (_.isObject(_.last(args)))
+        params = args.pop();
+    params = Object.assign({}, params,
+        _.zipObject(_.take(qw`ec ea el ev`, args.length), args));
+    if (params.ec&&params.ea)
+    {
+        hash = crypto.createHash('md5').update(_.values(params).join(''))
+            .digest('hex');
+        send = !last_ev[hash] || last_ev[hash].ts<Date.now()-10*60*1000;
+    }
+    const last_day = Date.now()-24*3600*1000;
+    if (!last_ev.clean || last_ev.clean.ts<last_day)
+    {
+        for (let k in last_ev)
+        {
+            if (last_ev[k].ts<last_day)
+                delete last_ev[k];
+        }
+        last_ev.clean = {ts: Date.now()};
+    }
+    let ev;
+    if (hash)
+    {
+        ev = (last_ev[hash]&&last_ev[hash].c||0)+1;
+        last_ev[hash] = {ts: Date.now(), c: send ? 0 : ev};
+    }
+    if (send)
+    {
+        if (params.ev===undefined && ev>1)
+            params.ev = ev;
+        ua_event(params, (..._args)=>{
+            if (_.isFunction(cb))
+                cb.apply(null, _args);
+        });
+    }
+    else if (_.isFunction(cb))
+        cb();
+};
+let write_ua_file = ()=>{
+    if (!last_ev)
+        return;
+    try {
+        file.write_e(ua_filename, JSON.stringify(last_ev));
+        last_ev = null;
+    } catch(e){ }
+};
 let manager, args = process.argv.slice(2), shutdowning = false;
-let shutdown = reason=>{
+let shutdown = (reason, send_ev = true)=>{
     if (shutdowning)
         return;
     console.log('Shutdown, reason is '+reason);
     shutdowning = true;
+    write_ua_file();
     if (manager)
     {
-        let stop_manager = ()=> {
+        let stop_manager = ()=>{
             manager.stop(reason, true);
             manager = null;
         };
-        if (manager.argv.no_usage_stats)
+        if (manager.argv.no_usage_stats||!send_ev)
             stop_manager();
         else
             ua.event('manager', 'stop', reason, stop_manager);
@@ -37,7 +106,7 @@ let shutdown = reason=>{
     if (err&&manager&&!manager.argv.no_usage_stats)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
-            ()=>shutdown(errstr));
+            ()=>shutdown(errstr, false));
     }
     else
         shutdown(errstr);
@@ -45,10 +114,9 @@ let shutdown = reason=>{
 let on_upgrade_finished;
 (function run(run_config){
     manager = new Manager(args, Object.assign({ua}, run_config));
-    manager.on('stop', ()=>process.exit())
-    .on('www_ready', url=>{
-        if (!manager.argv.no_usage_stats)
-            ua.event('manager', 'www_ready', url).send();
+    manager.on('stop', ()=>{
+        write_ua_file();
+        process.exit();
     })
     .on('error', (e, fatal)=>{
         console.log(e.raw ? e.message : 'Unhandled error: '+e);
@@ -56,10 +124,13 @@ let on_upgrade_finished;
             if (fatal)
                 manager.stop();
         };
-        if (manager.argv.no_usage_stats)
+        if (manager.argv.no_usage_stats||e.raw)
             handle_fatal();
         else
-            ua.event('manager', 'error', JSON.stringify(e), handle_fatal);
+        {
+            ua.event('manager', 'error', `v${version} ${JSON.stringify(e)}`,
+                handle_fatal);
+        }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         if (!manager.argv.no_usage_stats)

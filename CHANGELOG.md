@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.17
+- :bug: fix keep default zone if enabled/available
+- :sparkles: fix correct config proxy zones
+
 ## 0.10.16
 - :bug: fix memory leak
 - :bug: fix dropin proxy select available zone, static by default

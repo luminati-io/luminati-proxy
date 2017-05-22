@@ -1362,8 +1362,8 @@ describe('manager', ()=>{
         describe('user credentials', ()=>{
             it('success', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version}).twice()
-                    .reply(200, {mock_result: true});
+                    .query({customer: 'mock_user', proxy: pkg.version})
+                    .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
                 var result = yield app.manager.get_lum_local_conf();
                 assert_has(result, {mock_result: true});

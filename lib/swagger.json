@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.10.16",
+        "version": "0.10.17",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -351,7 +351,11 @@
                 },
                 "dropin": {
                     "type": "boolean",
-                    "description": "Create dropin mode proxy on port 22225"
+                    "description": "Create dropin mode proxy port (default: 22225)"
+                },
+                "dropin_port": {
+                    "type": "integer",
+                    "description": "Port for dropin mode"
                 },
                 "no_usage_stats": {
                     "type": "boolean",

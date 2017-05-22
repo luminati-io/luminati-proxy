@@ -77,7 +77,7 @@ module.run(function($rootScope, $http, $window){
                 });
                 setTimeout(recheck, p);
             };
-            var t = +new Date();
+            var t = +date();
             setTimeout(recheck, p-t%p);
         }
     });
@@ -815,7 +815,7 @@ function Countries($scope, $http, $window){
         {
             country.status = 1;
             country.url = country.url.replace(/&\d+$/, '')
-            +'&'+new Date().getTime();
+            +'&'+(+date());
             $scope.num_loading++;
             country.img.src = country.url;
         }
@@ -1631,7 +1631,7 @@ function History($scope, $http, $window){
             url += '/'+locals.port+'?'+params_arr.join('&');
             if (export_type)
                 return $window.location = url;
-            $scope.loading = new Date().getTime();
+            $scope.loading = +date();
             setTimeout(function(){ $scope.$apply(); }, loader_delay);
             $http.get(url).then(function(res){
                 $scope.pagination.total_items = res.data.total;
@@ -1768,9 +1768,7 @@ function History($scope, $http, $window){
             });
         };
         $scope.show_loader = function(){
-            return $scope.loading
-            &&new Date().getTime()-$scope.loading>=loader_delay;
-        };
+            return $scope.loading && date()-$scope.loading>=loader_delay; };
         $scope.sort = function(field){
             if ($scope.sort_field==field.field)
                 $scope.sort_asc = !$scope.sort_asc;
