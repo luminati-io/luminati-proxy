@@ -217,7 +217,7 @@ The API supports both [Promises](https://www.promisejs.org/) and [Generators](ht
 ### Promises
 ```js
 'use strict';
-const Luminati = require('luminati-proxy').Luminati;
+const Luminati = require('luminati-proxy');
 
 const proxy = new Luminati({
     customer: 'CUSTOMER', // your customer name
