@@ -17,6 +17,8 @@ var config = {
         'angular-ui-bootstrap': '/req/angular-ui-bootstrap/dist/ui-bootstrap',
         'es6-shim': '/req/es6-shim/es6-shim',
         hutil: '/req/hutil',
+        'angular-google-analytics': '/req/angular-google-analytics/dist/'
+            +'angular-google-analytics.min',
     },
     shim: {
         angular: {exports: 'angular'},

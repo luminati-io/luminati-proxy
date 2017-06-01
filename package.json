@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.10.17",
+  "version": "0.10.18",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -37,7 +37,9 @@
   "build": {
     "npmRebuild": false,
     "appId": "luminati.proxy_manager",
-    "directories": {"output": "d"},
+    "directories": {
+      "output": "d"
+    },
     "squirrelWindows": {
       "remoteReleases": "http://cdn.luminati.io/static/lpm"
     },
@@ -47,6 +49,7 @@
   },
   "dependencies": {
     "angular": "^1.6.0",
+    "angular-google-analytics": "^1.1.8",
     "angular-sanitize": "^1.6.0",
     "angular-ui-bootstrap": "^2.3.1",
     "body-parser": "^1.15.2",

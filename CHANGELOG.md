@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.18
+- :star: added "--timeout" parameter
+- :bug: fix login problem with some users
+- :sparkles: speed and stability improvements
+- :star: sessions are initialized on first request
+
 ## 0.10.17
 - :bug: fix keep default zone if enabled/available
 - :sparkles: fix correct config proxy zones

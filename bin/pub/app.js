@@ -12,7 +12,7 @@ if (typeof module=='object')
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'hutil/util/date', 'codemirror/mode/javascript/javascript', 'jquery',
     'angular-sanitize', 'bootstrap', 'bootstrap-datepicker', '_css!app',
-    'angular-ui-bootstrap', 'es6-shim'],
+    'angular-ui-bootstrap', 'es6-shim', 'angular-google-analytics'],
 function(angular, _, moment, codemirror, date){
 
 var is_electron = window.process && window.process.versions.electron;
@@ -33,13 +33,19 @@ var is_valid_field = function(proxy, name, zone_definition){
     return true;
 };
 
-var module = angular.module('app', ['ngSanitize', 'ui.bootstrap']);
+var module = angular.module('app', ['ngSanitize', 'ui.bootstrap',
+    'angular-google-analytics']);
 
-module.config(function($uibTooltipProvider){
+var analytics_provider;
+
+module.config(['$uibTooltipProvider', 'AnalyticsProvider',
+function($uibTooltipProvider, AP){
     $uibTooltipProvider.options({placement: 'bottom'});
-});
+    AP.delayScriptTag(true);
+    analytics_provider = AP;
+}]);
 
-module.run(function($rootScope, $http, $window){
+module.run(function($rootScope, $http, $window, Analytics){
     var l = $window.location.pathname;
     if (l.match(/zones\/[^\/]+/))
     {
@@ -58,6 +64,19 @@ module.run(function($rootScope, $http, $window){
             $window.location = '/proxies';
         $rootScope.mode = data.data.mode;
         $rootScope.run_config = data.data.run_config;
+        var ua;
+        if (ua = data.data.run_config.ua)
+        {
+            if (data.data.no_usage_stats)
+                analytics_provider.disableAnalytics(true);
+            analytics_provider.setAccount(ua.tid);
+            _.each(ua._persistentParams, function(v, k){
+                Analytics.set('&'+k, v); });
+            Analytics.set('&an', 'LPM - UI');
+            Analytics.registerScriptTags();
+            Analytics.registerTrackers();
+        }
+        analytics_provider = null;
         if ($window.localStorage.getItem('last_run_id')!=
             $rootScope.run_config.id)
         {
@@ -1354,6 +1373,15 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
             config.state = config.city = '';
         if (col.key=='state')
             config.city = '';
+        if (col.key=='zone' && $scope.consts)
+        {
+            var zone;
+            if (zone = $scope.consts.proxy.zone.values.find(
+                _.matches({zone: v})))
+            {
+                config.password = zone.password;
+            }
+        }
         $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
             function(){ $proxies.update(); });
     };
@@ -2169,6 +2197,13 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 $scope.form.state = city.region;
             $scope.update_cities();
         };
+        $scope.$watch('form.zone', function(val, old){
+            if (!$scope.consts || val==old)
+                return;
+            var zone;
+            if (zone = $scope.consts.zone.values.find(_.matches({zone: val})))
+                form.password = zone.password;
+        });
         $scope.save = function(model){
             var proxy = angular.copy(model);
             delete proxy.preset;

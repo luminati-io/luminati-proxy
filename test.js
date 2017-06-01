@@ -401,7 +401,7 @@ describe('proxy', ()=>{
                 }});
                 assert.ok(l.sessions);
                 assert.equal(proxy.history.length, 1);
-                assert.equal(proxy.full_history.length, 4);
+                assert.equal(proxy.full_history.length, 1);
                 assert.equal(res.body.auth.customer, customer);
                 assert.equal(res.body.auth.password, password);
                 assert.equal(res.body.auth.zone, 'static');
@@ -478,22 +478,16 @@ describe('proxy', ()=>{
         describe('pool', ()=>{
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
-                    l = yield lum({pool_size});
+                    l = yield lum({pool_size, pool_type: 'round-robin'});
                     yield l.test();
                     assert.equal(proxy.history.length, 1);
                     assert.equal(proxy.history[0].url, test_url);
-                    assert.equal(proxy.full_history.length, pool_size+1);
-                    for (let i=0; i<pool_size; i++)
-                    {
-                        assert.equal(proxy.full_history[i].url,
-                            'http://lumtest.com/myip.json');
-                    }
-                    assert.equal(proxy.full_history[pool_size].url, test_url);
-                    assert.equal(l.sessions.length, pool_size);
+                    assert.equal(proxy.full_history.length, 1);
+                    assert.equal(l.sessions.sessions.length, pool_size);
                     let sessions = {};
                     for (let i=0; i<pool_size; i++)
                     {
-                        let s = l.sessions[i];
+                        let s = l.sessions.sessions[i];
                         assert.equal(s.host, '127.0.0.1');
                         assert.ok(!sessions[s.session]);
                         sessions[s.session] = true;
@@ -510,7 +504,8 @@ describe('proxy', ()=>{
                         l = yield lum({max_requests: start+':'+end,
                             pool_size: pool});
                         yield l.refresh_sessions();
-                        let max_requests = l.sessions.map(s=>s.max_requests);
+                        let max_requests = l.sessions.sessions
+                            .map(s=>s.max_requests);
                         let count = {};
                         max_requests.forEach(m=>{
                             if (!start || !end)
@@ -852,9 +847,9 @@ describe('proxy', ()=>{
                 l = yield lum(opt);
                 assert.ok(!l.sessions);
                 yield l.refresh_sessions();
-                let pre = l.sessions.map(s=>s.session);
+                let pre = l.sessions.sessions.map(s=>s.session);
                 yield l.refresh_sessions();
-                let after = l.sessions.map(s=>s.session);
+                let after = l.sessions.sessions.map(s=>s.session);
                 test(pre, after);
             }));
 
@@ -923,13 +918,13 @@ describe('proxy', ()=>{
                 _this.timeout(4000);
                 l = yield lum({pool_size: 1, keep_alive: 1, history: true,
                     history_aggregator: aggregator});
-                l.refresh_sessions();
+                yield l.test();
                 yield etask.sleep(1200);
                 l.update_all_sessions();
                 yield etask.sleep(10);
                 assert.equal(history.length, 3);
                 assert_has(history, [
-                    {context: 'SESSION INIT'},
+                    {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
                     {context: 'SESSION INFO'},
                 ]);
@@ -1121,6 +1116,30 @@ describe('manager', ()=>{
         t('main + config files', {config: simple_proxy,
             files: multiple_proxies}, [].concat([assign({}, simple_proxy,
             {proxy_type: 'persist'})], multiple_proxies));
+
+        describe('default zone', ()=>{
+            const zone_static = {password: ['pass1']};
+            const zone_gen = {password: ['pass2']};
+            const zones = {static: assign({}, zone_static),
+                gen: assign({}, zone_gen)};
+            const t2 = (name, config, expected, _defaults = {zone: 'static'})=>
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                .query({customer: 'testc1', proxy: pkg.version, uid: /.*/})
+                .reply(200, {_defaults}) && t(name, _.set(config,
+                    'cli.customer', 'testc1'), expected);
+            t2('no defaults', {config: {proxies: [simple_proxy]}}, [assign({},
+                simple_proxy, {zone: 'static'})]);
+            t2('invalid', {config: {_defaults: {zone: 'foo'},
+                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
+                {zone: 'static'})], {zone: 'static', zones});
+            t2('keep default', {config: {_defaults: {zone: 'gen'},
+                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
+                {zone: 'gen'})]);
+            t2('default disabled', {config: {_defaults: {zone: 'gen'},
+                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
+                {zone: 'static'})], {zone: 'static', zones: assign({}, zones,
+                    {gen: {plans: [{disable: 1}]}})});
+        });
     });
     describe('dropin', ()=>{
         const t = (name, args, expected)=>it(name, etask._fn(
@@ -1224,7 +1243,7 @@ describe('manager', ()=>{
             ];
             it('get', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
+                    .query({customer, proxy: pkg.version, uid: /.*/})
                     .reply(200, zone_resp);
                 app = yield app_with_args(
                     qw`--customer ${customer} --password ${password}`);
@@ -1233,7 +1252,7 @@ describe('manager', ()=>{
             }));
             it('get with config', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
+                    .query({customer, proxy: pkg.version, uid: /.*/})
                     .reply(200, zone_resp);
                 app = yield app_with_config({config: {_defaults:
                     {customer, password}}, only_explicit: true});
@@ -1249,7 +1268,7 @@ describe('manager', ()=>{
                         password: undefined }
                 ];
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
+                    .query({customer, proxy: pkg.version, uid: /.*/})
                     .reply(200, no_pwd_resp);
                 app = yield app_with_args(
                     qw`--customer ${customer} --password ${password}`);
@@ -1362,7 +1381,8 @@ describe('manager', ()=>{
         describe('user credentials', ()=>{
             it('success', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version})
+                    .query({customer: 'mock_user', proxy: pkg.version,
+                        uid: /.*/})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
                 var result = yield app.manager.get_lum_local_conf();
@@ -1370,7 +1390,8 @@ describe('manager', ()=>{
             }));
             it('login required', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version}).twice()
+                    .query({customer: 'mock_user', proxy: pkg.version,
+                        uid: /.*/}).twice()
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
                 try {
@@ -1383,7 +1404,8 @@ describe('manager', ()=>{
             it('update defaults', ()=>etask(function*(){
                 let updated = {_defaults: {customer: 'updated'}};
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version})
+                    .query({customer: 'mock_user', proxy: pkg.version,
+                        uid: /.*/})
                     .reply(200, updated);
                 app = yield app_with_args(['--customer', 'mock_user']);
                 let res = yield app.manager.get_lum_local_conf();
