@@ -61,6 +61,26 @@ let create_child = ()=>{
     child.on('exit', shutdown_on_child_exit);
 };
 
+let upgrade = cb=>{
+    const cmd = 'npm install -g luminati-io/luminati-proxy';
+    const opt = {name: 'Luminati Proxy Manager'};
+    sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
+        if (cb)
+            cb(e);
+        if (e)
+        {
+            console.log('Error during upgrade: '+e);
+            return;
+        }
+        if (stderr)
+            console.log('NPM stderr: '+stderr);
+        delete require.cache[require.resolve('./check_compat.js')];
+        check_compat = require('./check_compat.js');
+        if (!check_compat.is_env_compat())
+            process.exit();
+    });
+};
+
 let msg_handler = function(msg){
     switch (msg.command)
     {
@@ -71,24 +91,22 @@ let msg_handler = function(msg){
         child.kill();
         break;
     case 'upgrade':
-        const cmd = 'npm install -g luminati-io/luminati-proxy';
-        const opt = {name: 'Luminati Proxy Manager'};
-        sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
-            child.send({command: 'upgrade_finished', error: e});
-            if (e)
-            {
-                console.log('Error during upgrade: '+e);
-                return;
-            }
-            if (stderr)
-                console.log('NPM stderr: '+stderr);
-            delete require.cache[require.resolve('./check_compat.js')];
-            check_compat = require('./check_compat.js');
-            if (!check_compat.is_env_compat())
-                process.exit();
-        });
+        upgrade(e=>child.send({command: 'upgrade_finished', error: e}));
         break;
     }
 };
 
-create_child();
+if (args.some(arg=>arg=='--upgrade'))
+{
+    upgrade(e=>{
+        if (e)
+        {
+            console.log(`Error during upgrade: ${e}`);
+            process.exit();
+        }
+        console.log('Upgrade completed successfully.');
+        create_child();
+    });
+}
+else
+    create_child();

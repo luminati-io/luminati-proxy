@@ -1,6 +1,6 @@
 {
   "name": "luminati-proxy",
-  "version": "0.10.18",
+  "version": "0.10.19",
   "description": "A configurable local proxy for luminati.io",
   "homepage": "https://luminati.io/",
   "main": "index.js",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/hola/luminati-proxy.git"
+    "url": "git://github.com/luminati-io/luminati-proxy.git"
   },
   "bugs": {
     "email": "gilad@hola.org"
@@ -37,14 +37,27 @@
   "build": {
     "npmRebuild": false,
     "appId": "luminati.proxy_manager",
+    "productName": "Luminati Proxy Manager",
+    "artifactName": "${name}-${version}.${ext}",
+    "files": [
+      "!publish*.js*",
+      "!**/.jakecache${/*}"
+    ],
     "directories": {
       "output": "d"
     },
-    "squirrelWindows": {
-      "remoteReleases": "http://cdn.luminati.io/static/lpm"
-    },
     "win": {
-      "iconUrl": "http://luminati.io/favicon.ico"
+      "target": {
+        "target": "nsis",
+        "arch": "x64"
+      }
+    },
+    "nsis": {
+      "artifactName": "${name}-setup-${version}.${ext}"
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "http://luminati.io/static/lpm"
     }
   },
   "dependencies": {
@@ -58,6 +71,7 @@
     "check-node-version": "^2.0.1",
     "codemirror": "^5.21.0",
     "country-language": "^0.1.7",
+    "electron-updater": "^2.2.1",
     "es6-shim": "^0.35.3",
     "express": "^4.14.0",
     "flag-icon-css": "^2.8.0",
@@ -85,6 +99,7 @@
     "sudo-prompt": "^6.2.1",
     "swagger-ui": "^2.2.8",
     "tough-cookie-filestore": "0.0.1",
+    "ui-select": "^0.19.8",
     "universal-analytics": "^0.4.9",
     "winston": "^2.3.0",
     "yargs": "^6.5.0"
@@ -92,9 +107,7 @@
   "devDependencies": {
     "electron": "^1.4.1",
     "electron-builder": "^13.9.0",
-    "electron-builder-squirrel-windows": "^13.6.0",
     "electron-rebuild": "^1.5.7",
-    "electron-squirrel-startup": "^1.0.0",
     "mocha": "^3.2.0",
     "nock": "^9.0.11"
   },

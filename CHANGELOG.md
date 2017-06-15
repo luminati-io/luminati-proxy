@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.19
+- :star: added firewall ports tester in tools
+- :bug: fix login problem for root users
+- :bug: fix --iface parameter to accept ip addresses as well as interface names
+- :bug: fix login for renamed customers
+
 ## 0.10.18
 - :star: added "--timeout" parameter
 - :bug: fix login problem with some users

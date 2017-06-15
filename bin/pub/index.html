@@ -2,10 +2,11 @@
 <html>
   <head>
     <meta charset=utf-8>
-    <title>Luminati Proxy</title>
+    <title>Luminati Proxy Manager</title>
     <meta name=viewport
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="shortcut icon" href=/favicon.ico>
+    <link rel=stylesheet href=/req/ui-select/dist/select.min.css>
     <link rel=stylesheet href=/req/bootstrap/dist/css/bootstrap.min.css>
     <link rel=stylesheet href=/req/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css>
     <link rel=stylesheet href=/req/notosans-fontface/css/notosans-fontface.min.css>
@@ -56,7 +57,10 @@
           <div class=items>
             <span ng-repeat="s in sections" ng-if=$index&gt;0>
               <span ng-if="$index&gt;1" class=separator>&nbsp;|&nbsp;</span>
-              <a ng-if=s!=section||subsection href=/{{s.name}}>{{s.title}}</a>
+              <a ng-if=s!=section||subsection href=/{{s.name}}
+                ng-click=zone_click(s.name)>
+                {{s.title}}
+              </a>
               <span ng-if=s==section&&!subsection>{{s.title}}</span>
             </span>
           </div>

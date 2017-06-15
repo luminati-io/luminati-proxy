@@ -125,6 +125,53 @@
   </div>
   <div class="panel panel-default">
     <div class=panel-heading>
+      <a data-toggle=collapse data-parent=#tools href=#test-ports>
+        Firewall ports tester</a>
+    </div>
+    <div id=test-ports class="panel-collapse collapse" ng-controller=test-ports
+      ng-class="{in: expand}">
+      <div class=panel-body>
+        <form name=test ng-submit="go(proxy)" class=form-inline>
+          <div>
+            <div class=form-group ng-class="{'has-error':
+              test.port.$touched&&test.port.$invalid}">
+              <label class=control-label for=tester-ports>Proxy</label>
+              <select id=tester-ports name=port ng-model=proxy
+                class=form-control required
+                ng-options="p[0] as p[1] for p in proxies">
+              </select>
+            </div>
+            <button ng-disabled=loading||test.$invalid type=submit
+              class="btn btn-success">Go</button>
+            <button type=reset class="btn btn-warning" ng-click=reset()>
+              Reset</button>
+          </div>
+          <div ng-if=loading class="alert alert-info tester-alert">
+            Loading...
+          </div>
+          <div class=tester-results ng-if=request.responses>
+            <table class=table>
+              <thead>
+                <th>Proxy</th><th>Pass</th><th>Date tested</th>
+              </thead>
+              <tbody>
+                <tr ng-repeat="r in request.responses">
+                  <td>{{r.proxy}}</td>
+                  <td>{{r.body.pass ? 'Pass' : 'Fail'}}</td>
+                  <td>{{r.ts|date:'dd-MMM-yy HH:mm:ss'}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div ng-if=request.error class="alert alert-danger tester-alert">
+            {{request.error}}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class=panel-heading>
       <a data-toggle=collapse data-parent=#tools href=#countries>
         Countries
       </a>

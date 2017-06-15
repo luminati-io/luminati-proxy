@@ -188,7 +188,10 @@
                     <input type=password id=proxy-field-zone-password autocomplete=off
                       ng-model=form.password class=form-control>
                     <span ng-show=form_errors.password class="help-block">
-                      {{form_errors.password}}</span>
+                      {{form_errors.password}}
+                      <a ng-href="https://luminati.io/cp/zones/{{form.zone}}?cust={{form.customer}}">
+                        Find password here</a>
+                    </span>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-secure-proxy>
@@ -229,7 +232,7 @@
                       Country
                     </label>
                     <select id=proxy-field-country ng-model=form.country
-                      ng-options="c.value as c.key for c in consts.country.values"
+                      ng-options="c.value as c.key for c in allowed_countries"
                       ng-change="update_regions_and_cities()"
                       class=form-control>
                     </select>

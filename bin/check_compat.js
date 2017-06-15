@@ -18,7 +18,7 @@ E.is_env_compat = ()=>{
     const excluded = ['angular', 'angular-sanitize', 'bootstrap',
         'bootstrap-datepicker', 'codemirror', 'notosans-fontface',
         'require-css', 'flag-icon-css', 'angular-ui-bootstrap',
-        'swagger-ui', 'font-awesome', 'angular-google-analytics']
+        'swagger-ui', 'font-awesome', 'angular-google-analytics', 'ui-select']
         .concat(Object.keys(pkg.optionalDependencies));
     for (let dep in pkg.dependencies)
     {

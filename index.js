@@ -15,7 +15,7 @@ if (!is_electron)
 
 const electron = require('electron');
 const app = electron.app, dialog = electron.dialog;
-const autoUpdater = electron.autoUpdater;
+const autoUpdater = require('electron-updater').autoUpdater;
 const BrowserWindow = electron.BrowserWindow;
 const hutil = require('hutil');
 const etask = hutil.etask;
@@ -24,9 +24,6 @@ const ua = analytics('UA-60520689-2');
 
 ua.set('an', 'LPM-electron');
 ua.set('av', `v${version}`);
-
-if (require('electron-squirrel-startup'))
-    return;
 
 let manager, args = process.argv.slice(2), wnd;
 
@@ -37,13 +34,13 @@ autoUpdater.on('update-downloaded', e=>{
     autoUpdater.quitAndInstall();
 });
 autoUpdater.on('error', ()=>{});
-autoUpdater.setFeedURL('http://cdn.luminati.io/static/lpm');
-autoUpdater.checkForUpdates();
 
 let run = run_config=>{
     manager = new Manager(args, Object.assign({ua}, run_config));
     if (!manager.argv.no_usage_stats)
         ua.event('app', 'run');
+    autoUpdater.logger = manager._log;
+    autoUpdater.checkForUpdates();
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
             ua.event('manager', 'www_ready', url).send();

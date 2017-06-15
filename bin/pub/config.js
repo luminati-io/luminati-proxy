@@ -15,6 +15,7 @@ var config = {
         lodash: '/req/lodash/lodash.min',
         codemirror: '/req/codemirror',
         'angular-ui-bootstrap': '/req/angular-ui-bootstrap/dist/ui-bootstrap',
+        'ui-select': '/req/ui-select/dist/select.min',
         'es6-shim': '/req/es6-shim/es6-shim',
         hutil: '/req/hutil',
         'angular-google-analytics': '/req/angular-google-analytics/dist/'
@@ -25,6 +26,7 @@ var config = {
         bootstrap: {deps: ['jquery']},
         'angular-sanitize': {deps: ['angular']},
         'angular-ui-bootstrap': {deps: ['angular']},
+        'ui-select': {deps: ['angular']},
     },
     map: {
         '*': {

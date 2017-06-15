@@ -13,9 +13,8 @@
       </span>
     </strong>
   </div>
-  <div
-    ng-if="$root.mode=='root'&&$parent.ver_node&&!$parent.ver_node.satisfied" class="alert
-    alert-warning settings-alert">
+  <div ng-if="$root.mode=='root'&&$parent.ver_node&&!$parent.ver_node.is_electron&&!$parent.ver_node.satisfied"
+    class="alert alert-warning settings-alert">
     <div>
       The recommended version of node.js is
       <strong>{{$parent.ver_node.recommended}}</strong>. You are using version
@@ -66,10 +65,14 @@
         </div>
         <div class=form-group ng-if=user_customers>
           <label for=user_customer>Customer</label>
-          <select id=user_customer ng-model=user_data.customer
-            class=form-control>
-            <option ng-repeat="c in user_customers" ng-value=c>{{c}}</option>
-          </select>
+          <ui-select id=user_customer ng-model=user_data.customer>
+            <ui-select-match placeholder="select customer">
+              {{$select.selected}}</ui-select-match>
+            <ui-select-choices ui-disable-choice="$index==50"
+              repeat="c in user_customers|filter:$select.search|limitTo:51">
+              <span>{{$index==50 ? 'start typing to see more...' : c}}</span>
+            </ui-select-choices>
+          </ui-select>
         </div>
         <button type=submit class="btn btn-flat-blue btn-block"
           ng-disabled=saving_user>

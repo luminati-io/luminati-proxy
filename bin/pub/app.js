@@ -1,10 +1,10 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true*//*global module*/
+'use strict'; /*jslint browser:true*//*global module:true*/
 
 // XXX marka: hack for electron/jquery combination
 if (typeof module=='object')
 {
-    /*jshint -W020*/
+    // jshint -W020
     window.module = module;
     module = undefined;
 }
@@ -12,7 +12,8 @@ if (typeof module=='object')
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'hutil/util/date', 'codemirror/mode/javascript/javascript', 'jquery',
     'angular-sanitize', 'bootstrap', 'bootstrap-datepicker', '_css!app',
-    'angular-ui-bootstrap', 'es6-shim', 'angular-google-analytics'],
+    'angular-ui-bootstrap', 'es6-shim', 'angular-google-analytics',
+    'ui-select'],
 function(angular, _, moment, codemirror, date){
 
 var is_electron = window.process && window.process.versions.electron;
@@ -33,16 +34,16 @@ var is_valid_field = function(proxy, name, zone_definition){
     return true;
 };
 
-var module = angular.module('app', ['ngSanitize', 'ui.bootstrap',
+var module = angular.module('app', ['ngSanitize', 'ui.bootstrap', 'ui.select',
     'angular-google-analytics']);
 
-var analytics_provider;
+var analytics_provider, ga_event;
 
 module.config(['$uibTooltipProvider', 'AnalyticsProvider',
-function($uibTooltipProvider, AP){
+function($uibTooltipProvider, _analytics_provider){
     $uibTooltipProvider.options({placement: 'bottom'});
-    AP.delayScriptTag(true);
-    analytics_provider = AP;
+    _analytics_provider.delayScriptTag(true);
+    analytics_provider = _analytics_provider;
 }]);
 
 module.run(function($rootScope, $http, $window, Analytics){
@@ -77,6 +78,10 @@ module.run(function($rootScope, $http, $window, Analytics){
             Analytics.registerTrackers();
         }
         analytics_provider = null;
+        ga_event = function(category, action, label){
+            Analytics.trackEvent(category, action, label, undefined, undefined,
+                {transport: 'beacon'});
+        };
         if ($window.localStorage.getItem('last_run_id')!=
             $rootScope.run_config.id)
         {
@@ -328,6 +333,9 @@ function Root($rootScope, $scope, $http, $window){
         warnings.push(warning);
         $window.localStorage.setItem('suppressed_warnings',
             warnings.join('|||'));
+    };
+    $scope.zone_click = function(name){
+        ga_event('navbar', 'click', name);
     };
 }
 
@@ -697,6 +705,62 @@ function Test($scope, $http, $filter, $window){
     };
 }
 
+module.controller('test-ports', ['$scope', '$http', '$filter', '$window',
+function($scope, $http, $filter, $window){
+    $window.localStorage.setItem('quickstart-zones-tools', true);
+    var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
+        /[?&]test-ports=([^&]+)/)||['', 'null'])[1]));
+    if (preset)
+        $scope.proxy = ''+preset.port;
+    $http.get('/api/proxies').then(function(proxies){
+        $scope.proxies = [['0', 'All proxies']];
+        proxies.data.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
+        for (var i=0; i<proxies.data.length; i++)
+        {
+            $scope.proxies.push(
+                [''+proxies.data[i].port, ''+proxies.data[i].port]);
+        }
+        if (!$scope.proxy)
+            $scope.proxy = $scope.proxies[1][0];
+    });
+    $scope.request = {};
+    $scope.go = function(proxy){
+        $scope.reset();
+        var req = {
+            method: 'GET',
+            url: '/api/test-ports?ports='+(+proxy==0 ? $scope.proxies.map(
+                function(p){ return +p[0]; }).filter(Boolean).join(',') :
+                proxy),
+        };
+        $scope.loading = true;
+        $http(req).then(function(r){
+            $scope.loading = false;
+            r = r.data;
+            if (!r.error)
+            {
+                for (var port in r)
+                    $scope.request[port] = r[port];
+            }
+            $scope.request.responses = [];
+            for (var p in $scope.request)
+            {
+                if (!+p)
+                    continue;
+                var response = $scope.request[p].response ||
+                    $scope.request[p].error;
+                $scope.request.responses.push({
+                    proxy: p,
+                    body: response.body||{pass: false},
+                    ts: response.ts||+new Date(),
+                });
+            }
+        });
+    };
+    $scope.reset = function(){
+        $scope.request = {};
+    };
+}]);
+
 module.controller('countries', Countries);
 Countries.$inject = ['$scope', '$http', '$window'];
 function Countries($scope, $http, $window){
@@ -833,8 +897,8 @@ function Countries($scope, $http, $window){
         if ($scope.cur_index>country.index)
         {
             country.status = 1;
-            country.url = country.url.replace(/&\d+$/, '')
-            +'&'+(+date());
+            // XXX colin/ovidiu: why not use urlencoding?
+            country.url = country.url.replace(/&\d+$/, '')+'&'+(+date());
             $scope.num_loading++;
             country.img.src = country.url;
         }
@@ -1045,7 +1109,16 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
             key: 'country',
             title: 'Country',
             type: 'options',
-            options: function(){ return country_opts; },
+            options: function(proxy){
+                if (proxy&&proxy.zone=='static')
+                {
+                    return country_opts.filter(function(c){
+                        return ['', 'br', 'de', 'gb', 'au', 'us']
+                            .includes(c.value);
+                    });
+                }
+                return country_opts;
+            },
         },
         {
             key: 'state',
@@ -2142,6 +2215,17 @@ function Proxy($scope, $http, $proxies, $window, $q){
         };
         $scope.binary_changed = function(proxy, field, value){
             proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
+        var update_allowed_countries = function(){
+            var countries = $scope.consts.country.values;
+            $scope.allowed_countries = [];
+            if (!countries)
+                return;
+            if (form.zone!='static')
+                return $scope.allowed_countries = countries;
+            $scope.allowed_countries = countries.filter(function(c){
+                return ['', 'au', 'br', 'de', 'gb', 'us'].includes(c.value);
+            });
+        };
         $scope.update_regions_and_cities = function(is_init){
             if (!is_init)
                 $scope.form.region = $scope.form.city = '';
@@ -2200,6 +2284,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         $scope.$watch('form.zone', function(val, old){
             if (!$scope.consts || val==old)
                 return;
+            update_allowed_countries();
             var zone;
             if (zone = $scope.consts.zone.values.find(_.matches({zone: val})))
                 form.password = zone.password;
@@ -2291,7 +2376,15 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 var warnings = [];
                 angular.forEach(res.data, function(item){
                     if (item.lvl=='err')
-                        $scope.form_errors[item.field] = item.msg;
+                    {
+                        var msg = item.msg;
+                        if (item.field=='password' && msg==
+                            'the provided password is not valid')
+                        {
+                            msg = 'Wrong password';
+                        }
+                        $scope.form_errors[item.field] = msg;
+                    }
                     if (item.lvl=='warn')
                         warnings.push(item.msg);
                 });
@@ -2316,6 +2409,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
             return actual.toLowerCase().startsWith(expected.toLowerCase());
         };
         $scope.update_regions_and_cities(true);
+        update_allowed_countries();
     };
 }
 
