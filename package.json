@@ -1,63 +1,36 @@
 {
-  "name": "luminati-proxy",
-  "version": "0.10.19",
-  "description": "A configurable local proxy for luminati.io",
-  "homepage": "https://luminati.io/",
-  "main": "index.js",
-  "md5": "214b25908d265227577b522d9f4a179e",
-  "engines": {
-    "node": ">=4.9&&<7"
-  },
-  "recomendedNode": ">=6",
-  "scripts": {
-    "start": "bin/luminati.js",
-    "electron": "electron .",
-    "test": "./node_modules/mocha/bin/mocha",
-    "test-win": "node node_modules/mocha/bin/mocha"
-  },
-  "keywords": [
-    "luminati",
-    "proxy",
-    "hola"
-  ],
   "author": "Gilad Novik <gilad@hola.org>",
-  "license": "ISC",
-  "preferGlobal": "true",
   "bin": {
-    "luminati-proxy": "bin/luminati.js",
-    "luminati": "bin/luminati.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/luminati-io/luminati-proxy.git"
+    "luminati": "bin/luminati.js",
+    "luminati-proxy": "bin/luminati.js"
   },
   "bugs": {
     "email": "gilad@hola.org"
   },
   "build": {
-    "npmRebuild": false,
     "appId": "luminati.proxy_manager",
-    "productName": "Luminati Proxy Manager",
     "artifactName": "${name}-${version}.${ext}",
+    "directories": {
+      "output": "d"
+    },
     "files": [
       "!publish*.js*",
       "!**/.jakecache${/*}"
     ],
-    "directories": {
-      "output": "d"
-    },
-    "win": {
-      "target": {
-        "target": "nsis",
-        "arch": "x64"
-      }
-    },
+    "npmRebuild": false,
     "nsis": {
       "artifactName": "${name}-setup-${version}.${ext}"
     },
+    "productName": "Luminati Proxy Manager",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
+    },
+    "win": {
+      "target": {
+        "arch": "x64",
+        "target": "nsis"
+      }
     }
   },
   "dependencies": {
@@ -76,7 +49,6 @@
     "express": "^4.14.0",
     "flag-icon-css": "^2.8.0",
     "font-awesome": "^4.7.0",
-    "glob-fs": "^0.1.6",
     "http-shutdown": "^1.1.0",
     "hutil": "^0.1.9",
     "jquery": "^3.1.1",
@@ -104,6 +76,7 @@
     "winston": "^2.3.0",
     "yargs": "^6.5.0"
   },
+  "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
     "electron": "^1.4.1",
     "electron-builder": "^13.9.0",
@@ -111,8 +84,107 @@
     "mocha": "^3.2.0",
     "nock": "^9.0.11"
   },
+  "engines": {
+    "node": ">=4.9&&<7"
+  },
+  "homepage": "https://luminati.io/",
+  "keywords": [
+    "luminati",
+    "proxy",
+    "hola"
+  ],
+  "license": "ISC",
+  "lpm": {
+    "files": [
+      ".travis.yml",
+      "CHANGELOG.md",
+      "Dockerfile",
+      "README.md",
+      "appveyor.yml",
+      "bin/ca.crt",
+      "bin/ca.key",
+      "bin/check_compat.js",
+      "bin/lum_main.js",
+      "bin/luminati.js",
+      "bin/pub/app.css",
+      "bin/pub/app.js",
+      "bin/pub/config.js",
+      "bin/pub/faq/links.html",
+      "bin/pub/faq/ssl.html",
+      "bin/pub/faq/upgrade.html",
+      "bin/pub/faq.html",
+      "bin/pub/favicon.ico",
+      "bin/pub/history.html",
+      "bin/pub/img/flag_any_country.svg",
+      "bin/pub/img/ic_checkmark.svg",
+      "bin/pub/img/ic_columns.svg",
+      "bin/pub/img/ic_delete.svg",
+      "bin/pub/img/ic_download_mini.svg",
+      "bin/pub/img/ic_dup.svg",
+      "bin/pub/img/ic_edit.svg",
+      "bin/pub/img/ic_edit_disabled.svg",
+      "bin/pub/img/ic_history.svg",
+      "bin/pub/img/ic_history_disabled.svg",
+      "bin/pub/img/ic_off.svg",
+      "bin/pub/img/ic_plus.svg",
+      "bin/pub/img/ic_refresh.svg",
+      "bin/pub/img/ic_refresh_disabled.svg",
+      "bin/pub/img/ic_refresh_mini.svg",
+      "bin/pub/img/ic_status_details_error.svg",
+      "bin/pub/img/ic_status_details_warning.svg",
+      "bin/pub/img/ic_status_ok.svg",
+      "bin/pub/img/ic_status_ok_with_warning.svg",
+      "bin/pub/img/ic_status_red.svg",
+      "bin/pub/img/ic_status_undefined.svg",
+      "bin/pub/img/ic_table.svg",
+      "bin/pub/img/ic_table_disabled.svg",
+      "bin/pub/img/logo.png",
+      "bin/pub/img/social_btns.svg",
+      "bin/pub/index.html",
+      "bin/pub/pool.html",
+      "bin/pub/proxies.html",
+      "bin/pub/proxy.html",
+      "bin/pub/proxy_cols.html",
+      "bin/pub/quickstart.html",
+      "bin/pub/settings.html",
+      "bin/pub/tools.html",
+      "bin/pub/tooltip_proxy_status.html",
+      "bin/pub/upgrade.html",
+      "bin/pub/zones.html",
+      "db/cities.csv",
+      "index.js",
+      "lib/cities.js",
+      "lib/db_history.json",
+      "lib/find_iface.js",
+      "lib/log.js",
+      "lib/luminati.js",
+      "lib/manager.js",
+      "lib/socks.js",
+      "lib/ssl.js",
+      "lib/swagger.json",
+      "lib/username.js",
+      "lib/util.js",
+      "test.js"
+    ],
+    "md5": "a2d5c310e9ed9748eefa2e4fa4b9c337"
+  },
+  "main": "index.js",
+  "name": "luminati-proxy",
   "optionalDependencies": {
     "phantomjs-prebuilt": "^2.1.14",
     "webshot": "^0.18.0"
-  }
+  },
+  "preferGlobal": "true",
+  "recomendedNode": ">=6",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/luminati-io/luminati-proxy.git"
+  },
+  "scripts": {
+    "electron": "electron .",
+    "start": "bin/luminati.js",
+    "test": "./node_modules/mocha/bin/mocha",
+    "test-win": "node node_modules/mocha/bin/mocha"
+  },
+  "version": "0.10.20"
 }

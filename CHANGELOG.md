@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 0.10.20
+- :star: added support for ip whitelist on each port
+- :star: added analytics events on buttons and proxies
+- :bug: fix reverse lookup for http
+
 ## 0.10.19
 - :star: added firewall ports tester in tools
 - :bug: fix login problem for root users

@@ -73,7 +73,7 @@ module.run(function($rootScope, $http, $window, Analytics){
             analytics_provider.setAccount(ua.tid);
             _.each(ua._persistentParams, function(v, k){
                 Analytics.set('&'+k, v); });
-            Analytics.set('&an', 'LPM - UI');
+            Analytics.set('&an', (ua._persistentParams.an||'LPM')+' - UI');
             Analytics.registerScriptTags();
             Analytics.registerTrackers();
         }
@@ -2085,6 +2085,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
             $scope.extra.reverse_lookup = 'file';
         else if ($scope.extra.reverse_lookup_values)
             $scope.extra.reverse_lookup = 'values';
+        $scope.extra.whitelist_ips = (form.whitelist_ips||[]).join(',');
         $scope.status = {};
         var new_proxy = !form.port||form.port=='';
         if (new_proxy)
@@ -2335,6 +2336,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 proxy.reverse_lookup_values =
                     $scope.extra.reverse_lookup_values.split('\n');
             }
+            proxy.whitelist_ips =
+                $scope.extra.whitelist_ips.split(',').filter(i=>i);
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             var save_inner = function(){

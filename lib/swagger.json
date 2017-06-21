@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.10.19",
+        "version": "0.10.20",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -569,6 +569,13 @@
                 "rules": {
                     "type": "boolean",
                     "description": "Enable routing rules for requests"
+                },
+                "whitelist_ips": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Whitelist ip list for granting access to proxy"
                 }
             }
         }

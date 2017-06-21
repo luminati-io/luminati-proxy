@@ -215,6 +215,13 @@
                       </option>
                     </select>
                   </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-whitelist-ips>
+                      {{consts.whitelist_ips.desc.description}}
+                    </label>
+                    <input id=proxy-field-whitelist-ips placeholder="127.0.0.1,1.1.1.1"
+                      ng-model=extra.whitelist_ips class=form-control>
+                  </div>
                 </div>
               </div>
             </div>

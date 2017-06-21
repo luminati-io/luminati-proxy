@@ -807,7 +807,7 @@ describe('proxy', ()=>{
                 proxy.connection = hold_request;
                 l = yield lum({throttle});
                 repeat(2*throttle, ()=>requests.push(l.test()));
-                yield etask.sleep(100);
+                yield etask.sleep(300);
                 assert.equal(waiting.length, throttle);
                 for (let i=0; i < throttle; ++i)
                 {
