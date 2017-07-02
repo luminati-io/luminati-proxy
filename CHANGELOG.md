@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.52.1
+- :bug: fix login for renamed users
+- :star: limit minimum values to numeric input fields
+
 ## 0.10.20
 - :star: added support for ip whitelist on each port
 - :star: added analytics events on buttons and proxies

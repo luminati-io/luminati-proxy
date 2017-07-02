@@ -25,13 +25,25 @@ const ua = analytics('UA-60520689-2');
 ua.set('an', 'LPM-electron');
 ua.set('av', `v${version}`);
 
-let manager, args = process.argv.slice(2), wnd;
+let manager, args = process.argv.slice(2), wnd, upgrade_available, can_upgrade;
+
+const upgrade = ()=>{
+    dialog.showMessageBox(wnd, {
+        type: 'info',
+        title:'Update Required',
+        message: 'A new Luminati Proxy Manager version is available',
+        buttons: ['Update now'],
+    });
+    autoUpdater.quitAndInstall();
+};
 
 autoUpdater.on('update-downloaded', e=>{
     if (manager && manager.argv && !manager.argv.no_usage_stats)
         ua.event('app', 'update-downloaded');
-    dialog.showMessageBox(wnd, {type: 'info', message: 'Upgrading...'});
-    autoUpdater.quitAndInstall();
+    if (can_upgrade)
+        upgrade();
+    else
+        upgrade_available = true;
 });
 autoUpdater.on('error', ()=>{});
 
@@ -46,6 +58,13 @@ let run = run_config=>{
             ua.event('manager', 'www_ready', url).send();
         wnd = wnd || new BrowserWindow({width: 1024, height: 768});
         wnd.loadURL(url);
+    })
+    .on('upgrade', cb=>{
+        can_upgrade = true;
+        if (upgrade_available)
+            upgrade();
+        else
+            cb();
     })
     .on('stop', ()=>{
         if (manager.argv.no_usage_stats)
@@ -68,7 +87,10 @@ let run = run_config=>{
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         if (!manager.argv.no_usage_stats)
-            ua.event('manager', 'config_changed', JSON.stringify(zone_autoupdate));
+        {
+            ua.event('manager', 'config_changed',
+                JSON.stringify(zone_autoupdate));
+        }
         args = manager.argv.config ? args : manager.get_params();
         yield manager.stop('config change', true, true);
         setTimeout(()=>run(zone_autoupdate && zone_autoupdate.prev ? {

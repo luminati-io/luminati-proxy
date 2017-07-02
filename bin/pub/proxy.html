@@ -105,8 +105,8 @@
                     <label class=control-label for=proxy-field-multiply>
                       Multiply
                     </label>
-                    <input id=proxy-field-multiply class=form-control type=number
-                      ng-model=form.multiply
+                    <input id=proxy-field-multiply class=form-control
+                      type=number ng-model=form.multiply min=1
                       ng-disabled=!form.preset.support.multiply
                       placeholder={{consts.multiply.def}}>
                   </div>
@@ -161,7 +161,7 @@
                     </label>
                     <input id=proxy-field-socks-port type=number
                       ng-model=form.socks placeholder={{consts.socks.def}}
-                      class=form-control>
+                      class=form-control min=0>
                     <span ng-show=form_errors.socks class="help-block">
                       {{form_errors.socks}}</span>
                   </div>
@@ -323,7 +323,7 @@
                         set from allocated IPs
                       </button>
                     </label>
-                    <input id=proxy-field-pool-size type=number
+                    <input id=proxy-field-pool-size type=number min=0
                       ng-model=form.pool_size class=form-control
                       ng-disabled="!form.preset.support.pool_size||form.ips.length"
                       placeholder={{consts.pool_size.def}}>
@@ -372,11 +372,11 @@
                       <input id=proxy-field-max-requests-start type=number
                         ng-model=form.max_requests_start class=form-control
                         ng-disabled=!form.preset.support.max_requests
-                        placeholder={{consts.max_requests.def}}>
+                        placeholder={{consts.max_requests.def}} min=0>
                       <span class=range-seperator>:</span>
                       <input type=number ng-model=form.max_requests_end
                         ng-disabled=!form.preset.support.max_requests
-                        class=form-control>
+                        class=form-control min=0>
                     </div>
                   </div>
                   <div class=form-group>
@@ -387,11 +387,11 @@
                       <input id=proxy-field-duration-start type=number
                         ng-model=form.duration_start class=form-control
                         ng-disabled=!form.preset.support.session_duration
-                        placeholder={{consts.session_duration.def}}>
+                        placeholder={{consts.session_duration.def}} min=0>
                       <span class=range-seperator>:</span>
                       <input type=number ng-model=form.duration_end
                         ng-disabled=!form.preset.support.session_duration
-                        class=form-control>
+                        class=form-control min=0>
                     </div>
                   </div>
                   <div class=form-group>
@@ -401,7 +401,7 @@
                     <input id=proxy-field-keep-alive type=number
                       ng-model=form.keep_alive class=form-control
                       ng-disabled=!form.preset.support.keep_alive
-                      placeholder={{consts.keep_alive.def}}>
+                      placeholder={{consts.keep_alive.def}} min=0>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-seed>
@@ -450,7 +450,7 @@
                     <label class=control-label for=proxy-field-sinit-timeout>
                       {{consts.session_init_timeout.desc.description}}
                     </label>
-                    <input id=proxy-field-sinit-timeout type=number
+                    <input id=proxy-field-sinit-timeout type=number min=0
                       ng-model=form.session_init_timeout class=form-control
                       placeholder={{consts.session_init_timeout.def}}>
                   </div>
@@ -458,7 +458,7 @@
                     <label class=control-label for=proxy-field-min-super>
                       Minimum number of super proxies to use
                     </label>
-                    <input id=proxy-field-min-super type=number
+                    <input id=proxy-field-min-super type=number min=1
                       ng-model=form.proxy_count class=form-control
                       placeholder={{consts.proxy_count.def}}>
                   </div>
@@ -503,7 +503,7 @@
                     <label class=control-label for=proxy-field-proxy-switch>
                       {{consts.proxy_switch.desc.description}}
                     </label>
-                    <input id=proxy-field-proxy-switch type=number
+                    <input id=proxy-field-proxy-switch type=number min=0
                       ng-model=form.proxy_switch class=form-control
                       placeholder={{consts.proxy_switch.def}}>
                   </div>
@@ -511,7 +511,7 @@
                     <label class=control-label for=proxy-field-throttle>
                       {{consts.throttle.desc.description}}
                     </label>
-                    <input id=proxy-field-throttle type=number
+                    <input id=proxy-field-throttle type=number min=0
                       ng-model=form.throttle class=form-control
                       placeholder={{consts.throttle.def}}>
                   </div>
@@ -519,7 +519,7 @@
                     <label class=control-label for=proxy-field-req-timeout>
                       {{consts.request_timeout.desc.description}}
                     </label>
-                    <input id=proxy-field-req-timeout type=number
+                    <input id=proxy-field-req-timeout type=number min=0
                       ng-model=form.request_timeout class=form-control
                       placeholder={{consts.request_timeout.def}}>
                   </div>

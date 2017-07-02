@@ -13,7 +13,7 @@ define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'hutil/util/date', 'codemirror/mode/javascript/javascript', 'jquery',
     'angular-sanitize', 'bootstrap', 'bootstrap-datepicker', '_css!app',
     'angular-ui-bootstrap', 'es6-shim', 'angular-google-analytics',
-    'ui-select'],
+    'ui-select', 'ui-router'],
 function(angular, _, moment, codemirror, date){
 
 var is_electron = window.process && window.process.versions.electron;
@@ -28,41 +28,102 @@ var is_valid_field = function(proxy, name, zone_definition){
         return value!='gen';
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
-    var permissions = details.perm.split(' ');
+    var permissions = details&&details.perm.split(' ')||[];
     if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
         return permissions.includes(name);
     return true;
 };
 
 var module = angular.module('app', ['ngSanitize', 'ui.bootstrap', 'ui.select',
-    'angular-google-analytics']);
+    'angular-google-analytics', 'ui.router']);
 
 var analytics_provider, ga_event;
 
-module.config(['$uibTooltipProvider', 'AnalyticsProvider',
-function($uibTooltipProvider, _analytics_provider){
+module.config(['$uibTooltipProvider', '$uiRouterProvider', '$locationProvider',
+    'AnalyticsProvider',
+function($uibTooltipProvider, $uiRouter, $location_provider,
+    _analytics_provider)
+{
+    $location_provider.html5Mode(true);
     $uibTooltipProvider.options({placement: 'bottom'});
     _analytics_provider.delayScriptTag(true);
     analytics_provider = _analytics_provider;
+
+    $uiRouter.urlService.rules.otherwise({state: 'settings'});
+
+    var state_registry = $uiRouter.stateRegistry;
+    state_registry.register({
+        name: 'app',
+        redirectTo: 'settings',
+        controller: 'root'
+    });
+    state_registry.register({
+        name: 'settings',
+        parent: 'app',
+        url: '/',
+        templateUrl: 'settings.html'
+    });
+    state_registry.register({
+        name: 'proxies',
+        parent: 'app',
+        url: '/proxies',
+        templateUrl: 'proxies.html'
+    });
+    state_registry.register({
+        name: 'zones',
+        parent: 'app',
+        url: '/zones/{zone:string}',
+        templateUrl: 'zones.html',
+        params: {zone: {squash: true, value: null}}
+    });
+    state_registry.register({
+        name: 'tools',
+        parent: 'app',
+        url: '/tools',
+        templateUrl: 'tools.html'
+    });
+    state_registry.register({
+        name: 'faq',
+        parent: 'app',
+        url: '/faq',
+        templateUrl: 'faq.html'
+    });
+    state_registry.register({
+        name: 'status_codes',
+        parent: 'app',
+        url: '/status_codes',
+        templateUrl: 'status_codes.html'
+    });
 }]);
 
-module.run(function($rootScope, $http, $window, Analytics){
-    var l = $window.location.pathname;
-    if (l.match(/zones\/[^\/]+/))
-    {
-        $rootScope.section = 'zones';
-        $rootScope.subsection = l.split('/').pop();
-    }
-    else
-        $rootScope.section = l.split('/').pop()||'settings';
+module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
+    var logged_in_resolver = $q.defer();
+    $rootScope.logged_in = logged_in_resolver.promise;
+    $transitions.onBefore({to: function(state){
+        return ['settings', 'proxies', 'zones', 'tools'].
+        includes(state.name);
+    }}, function(transition){
+        return $q(function(resolve, reject){
+            $q.resolve($rootScope.logged_in).then(function(logged_in){
+                if (logged_in)
+                {
+                    if (transition.to().name!='settings')
+                        return resolve(true);
+                    return resolve(transition.router.stateService.target(
+                            'proxies', undefined, {location: true}));
+                }
+                if (transition.to().name=='settings')
+                    return resolve(true);
+                return resolve(transition.router.stateService.target(
+                    'settings', undefined, {location: false}));
+            });
+        });
+    });
     $http.get('/api/mode').then(function(data){
         var logged_in = data.data.logged_in;
+        logged_in_resolver.resolve(logged_in);
         if (logged_in)
             $window.localStorage.setItem('quickstart-creds', true);
-        if (!logged_in && $rootScope.section!='settings')
-            $window.location = '/';
-        if (logged_in&&$rootScope.section=='settings')
-            $window.location = '/proxies';
         $rootScope.mode = data.data.mode;
         $rootScope.run_config = data.data.run_config;
         var ua;
@@ -170,9 +231,9 @@ function proxies_factory($http, $q){
     }
 }
 
-module.controller('root', Root);
-Root.$inject = ['$rootScope', '$scope', '$http', '$window'];
-function Root($rootScope, $scope, $http, $window){
+module.controller('root', ['$rootScope', '$scope', '$http', '$window',
+    '$state', '$transitions',
+function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.quickstart = function(){
         return $window.localStorage.getItem('quickstart')=='show';
     };
@@ -212,14 +273,17 @@ function Root($rootScope, $scope, $http, $window){
         {name: 'tools', title: 'Tools'},
         {name: 'faq', title: 'FAQ'},
     ];
-    for (var s in $scope.sections)
-    {
-        if ($scope.sections[s].name==$rootScope.section)
+    $transitions.onSuccess({}, function(transition){
+        var state = transition.to(), section;
+        if (section = $scope.sections.find(function(s){
+            return s.name==state.name; }))
         {
-            $scope.section = $scope.sections[s];
-            break;
+            $scope.section = section;
         }
-    }
+        $scope.subsection = section.name=='zones'&&transition.params().zone;
+    });
+    $scope.section = $scope.sections.find(function(s){
+        return s.name==$state.$current.name||'settings'; });
     $http.get('/api/settings').then(function(settings){
         $scope.settings = settings.data;
         if (!$scope.settings.request_disallowed&&!$scope.settings.customer)
@@ -337,7 +401,7 @@ function Root($rootScope, $scope, $http, $window){
     $scope.zone_click = function(name){
         ga_event('navbar', 'click', name);
     };
-}
+}]);
 
 module.controller('config', Config);
 Config.$inject = ['$scope', '$http', '$window'];
@@ -367,7 +431,7 @@ function Config($scope, $http, $window){
             $scope.errors = res.data;
             if ($scope.errors.length)
                 return;
-            $scope.$parent.$parent.$parent.confirmation = {
+            $scope.$root.confirmation = {
                 text: 'Editing the configuration manually may result in your '
                     +'proxies working incorrectly. Do you still want to modify'
                     +' the configuration file?',
@@ -467,8 +531,9 @@ function Resolve($scope, $http, $window){
 }
 
 module.controller('settings', Settings);
-Settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope'];
-function Settings($scope, $http, $window, $sce, $rootScope){
+Settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope',
+    '$state'];
+function Settings($scope, $http, $window, $sce, $rootScope, $state){
     var update_error = function(){
         if ($rootScope.relogin_required)
             return $scope.user_error = {message: 'Please log in again.'};
@@ -503,7 +568,7 @@ function Settings($scope, $http, $window, $sce, $rootScope){
     var check_reload = function(){
         $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
-        .then(function(){ $window.location = '/proxies'; });
+        .then(function(){ $window.location.reload(); });
     };
     $scope.user_data = {username: '', password: ''};
     var token;
@@ -853,7 +918,7 @@ function Countries($scope, $http, $window){
         };
         if ($scope.started)
         {
-            $scope.$parent.$parent.confirmation = {
+            $scope.$root.confirmation = {
                 text: 'The currently made screenshots will be lost. '
                     +'Do you want to continue?',
                 confirmed: process,
@@ -880,7 +945,7 @@ function Countries($scope, $http, $window){
             country.img.src = '';
     };
     $scope.cancel_all = function(){
-        $scope.$parent.$parent.confirmation = {
+        $scope.$root.confirmation = {
             text: 'Do you want to stop all the remaining countries?',
             confirmed: function(){
                     for (var c_i=$scope.countries.length-1; c_i>=0; c_i--)
@@ -1331,7 +1396,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         });
     });
     $scope.delete_proxies = function(){
-        $scope.$parent.$parent.confirmation = {
+        $scope.$root.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
             confirmed: function(){
                 var selected = $scope.get_selected_proxies();
@@ -1346,6 +1411,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
             },
         };
         $window.$('#confirmation').modal();
+        ga_event('page: proxies', 'click', 'delete proxy');
     };
     $scope.refresh_sessions = function(proxy){
         $http.post('/api/refresh_sessions/'+proxy.port)
@@ -1363,11 +1429,13 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
     };
     $scope.add_proxy = function(){
         $scope.proxy_dialog = [{proxy: {}}];
+        ga_event('page: proxies', 'click', 'add proxy');
     };
     $scope.edit_proxy = function(duplicate){
         var port = $scope.get_selected_proxies()[0];
         var proxy = $scope.proxies.filter(function(p){ return p.port==port; });
         $scope.proxy_dialog = [{proxy: proxy[0].config, duplicate: duplicate}];
+        ga_event('page: proxies', 'click', 'edit proxy');
     };
     $scope.edit_cols = function(){
         $scope.columns_dialog = [{
@@ -1377,6 +1445,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
             cols_conf: $scope.cols_conf,
             default_cols: default_cols,
         }];
+        ga_event('page: proxies', 'click', 'edit columns');
     };
     $scope.inline_edit_click = function(proxy, col){
         if (proxy.proxy_type!='persist'
@@ -2178,8 +2247,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
         $scope.is_show_allocated_ips = function(){
             var zone = $scope.consts.zone.values.filter(function(z){
                 return z.value==form.zone; })[0];
-            var plan = (zone.plans||[]).slice(-1)[0];
-            return (plan&&plan.type||zone.type)=='static';
+            var plan = (zone&&zone.plans||[]).slice(-1)[0];
+            return (plan&&plan.type||zone&&zone.type)=='static';
         };
         $scope.show_allocated_ips = function(){
             var zone = form.zone;
@@ -2337,7 +2406,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
                     $scope.extra.reverse_lookup_values.split('\n');
             }
             proxy.whitelist_ips =
-                $scope.extra.whitelist_ips.split(',').filter(i=>i);
+                $scope.extra.whitelist_ips.split(',').filter(Boolean);
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             var save_inner = function(){
@@ -2395,7 +2464,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
                     return;
                 else if (warnings.length)
                 {
-                    $scope.$parent.$parent.$parent.$parent.confirmation = {
+                    $scope.$root.confirmation = {
                         text: 'Warning'+(warnings.length>1?'s':'')+':',
                         items: warnings,
                         confirmed: save_inner,

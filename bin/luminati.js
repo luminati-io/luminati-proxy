@@ -68,10 +68,7 @@ let upgrade = cb=>{
         if (cb)
             cb(e);
         if (e)
-        {
-            console.log('Error during upgrade: '+e);
-            return;
-        }
+            return console.log('Error during upgrade: '+e);
         if (stderr)
             console.log('NPM stderr: '+stderr);
         delete require.cache[require.resolve('./check_compat.js')];

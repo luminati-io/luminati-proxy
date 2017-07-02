@@ -221,9 +221,6 @@ table.proxies {
     overflow: auto;
     max-height: calc(100vh - 190px);
 }
-.columns-settings {
-    padding-left: 100px;
-}
 .proxies-panel {
     overflow: auto;
 }
@@ -615,4 +612,32 @@ input.form-control[type=checkbox] {
 }
 .proxies-table-input.session-edit .btn {
     padding: 4px;
+}
+.tabs_default:hover {
+    color: #555 !important;
+    box-shadow: none !important;
+}
+.chrome_icon {
+    width: 32px;
+    height: 32px;
+    background-image: url('img/icon_chrome.jpg');
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    margin: auto;
+}
+.firefox_icon {
+    width: 32px;
+    height: 32px;
+    background-image: url(img/icon_firefox.jpg);
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    margin: auto;
+}
+.safari_icon {
+    width: 32px;
+    height: 32px;
+    background-image: url(img/icon_safari.jpg);
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    margin: auto;
 }

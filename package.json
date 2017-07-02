@@ -34,6 +34,7 @@
     }
   },
   "dependencies": {
+    "@uirouter/angularjs": "^1.0.4",
     "angular": "^1.6.0",
     "angular-google-analytics": "^1.1.8",
     "angular-sanitize": "^1.6.0",
@@ -85,7 +86,7 @@
     "nock": "^9.0.11"
   },
   "engines": {
-    "node": ">=4.9&&<7"
+    "node": ">=6&&<7"
   },
   "homepage": "https://luminati.io/",
   "keywords": [
@@ -94,18 +95,32 @@
     "hola"
   ],
   "license": "ISC",
+  "main": "index.js",
+  "name": "luminati-proxy",
+  "optionalDependencies": {
+    "phantomjs-prebuilt": "^2.1.14",
+    "webshot": "^0.18.0"
+  },
+  "preferGlobal": "true",
+  "recomendedNode": ">=6",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/luminati-io/luminati-proxy.git"
+  },
+  "scripts": {
+    "electron": "electron .",
+    "start": "bin/luminati.js",
+    "test": "./node_modules/mocha/bin/mocha",
+    "test-win": "node node_modules/mocha/bin/mocha"
+  },
+  "version": "1.52.1",
   "lpm": {
     "files": [
-      ".travis.yml",
-      "CHANGELOG.md",
-      "Dockerfile",
-      "README.md",
-      "appveyor.yml",
       "bin/ca.crt",
       "bin/ca.key",
       "bin/check_compat.js",
-      "bin/lum_main.js",
       "bin/luminati.js",
+      "bin/lum_main.js",
       "bin/pub/app.css",
       "bin/pub/app.js",
       "bin/pub/config.js",
@@ -116,6 +131,10 @@
       "bin/pub/favicon.ico",
       "bin/pub/history.html",
       "bin/pub/img/flag_any_country.svg",
+      "bin/pub/img/icon_chrome.jpg",
+      "bin/pub/img/icon_explorer.png",
+      "bin/pub/img/icon_firefox.jpg",
+      "bin/pub/img/icon_safari.jpg",
       "bin/pub/img/ic_checkmark.svg",
       "bin/pub/img/ic_columns.svg",
       "bin/pub/img/ic_delete.svg",
@@ -147,11 +166,12 @@
       "bin/pub/proxy_cols.html",
       "bin/pub/quickstart.html",
       "bin/pub/settings.html",
+      "bin/pub/stats.html",
+      "bin/pub/status_codes.html",
       "bin/pub/tools.html",
       "bin/pub/tooltip_proxy_status.html",
       "bin/pub/upgrade.html",
       "bin/pub/zones.html",
-      "db/cities.csv",
       "index.js",
       "lib/cities.js",
       "lib/db_history.json",
@@ -159,32 +179,12 @@
       "lib/log.js",
       "lib/luminati.js",
       "lib/manager.js",
+      "lib/md5_util.js",
       "lib/socks.js",
       "lib/ssl.js",
-      "lib/swagger.json",
       "lib/username.js",
-      "lib/util.js",
       "test.js"
     ],
-    "md5": "a2d5c310e9ed9748eefa2e4fa4b9c337"
-  },
-  "main": "index.js",
-  "name": "luminati-proxy",
-  "optionalDependencies": {
-    "phantomjs-prebuilt": "^2.1.14",
-    "webshot": "^0.18.0"
-  },
-  "preferGlobal": "true",
-  "recomendedNode": ">=6",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/luminati-io/luminati-proxy.git"
-  },
-  "scripts": {
-    "electron": "electron .",
-    "start": "bin/luminati.js",
-    "test": "./node_modules/mocha/bin/mocha",
-    "test-win": "node node_modules/mocha/bin/mocha"
-  },
-  "version": "0.10.20"
+    "md5": "c3e0cf6981c7bfa0e986a92cc370cbad"
+  }
 }

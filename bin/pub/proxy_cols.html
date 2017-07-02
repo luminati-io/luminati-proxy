@@ -21,8 +21,8 @@
             Overview Column List
           </h4>
         </div>
-        <div class="modal-body columns-settings">
-          <div class=form-group ng-repeat="col in columns">
+        <div class="modal-body columns-settings col-md-12">
+          <div class="form-group col-md-6" ng-repeat="col in columns">
             <label class=control-label
               title={{col.title}}>
               <input type=checkbox ng-model=form[col.key]> {{col.title}}

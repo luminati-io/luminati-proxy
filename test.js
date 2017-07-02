@@ -920,7 +920,7 @@ describe('proxy', ()=>{
                 l = yield lum({pool_size: 1, keep_alive: 1, history: true,
                     history_aggregator: aggregator});
                 yield l.test();
-                yield etask.sleep(1200);
+                yield etask.sleep(1300);
                 l.update_all_sessions();
                 yield etask.sleep(10);
                 assert(history.length>=2);
@@ -1412,6 +1412,39 @@ describe('manager', ()=>{
                 assert_has(res, updated, 'result');
                 assert_has(app.manager._defaults, res._defaults, '_defaults');
             }));
+        });
+        describe('request_stats', ()=>{
+            const t = (name, path, expected, opt = {})=>
+            it(name, etask._fn(function*(_this){
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: 'mock_user', proxy: pkg.version,
+                        uid: /.*/})
+                    .reply(200, {mock_result: true, _defaults: true});
+                app = yield app_with_args(qw`--customer mock_user
+                    --request_stats`.concat(opt.args));
+                yield etask.nfn_apply(request, [{
+                    proxy: 'http://127.0.0.1:24000',
+                    url: `${opt.proto||'http'}://lumtest.com/myip`,
+                    strictSSL: false,
+                }]);
+                const res = yield api_json(`api/request_stats${path}`);
+                assert_has(res.body, expected);
+            }));
+            t('path empty', '', {top: {200: 1, http: {count: 1},
+                'lumtest.com': 1}});
+            t('top', '/top', {top: {200: 1, http: {count: 1},
+                'lumtest.com': 1}});
+            t('all', '/all', {all: [{status_code: 200, protocol: 'http',
+                url: 'http://lumtest.com/myip', hostname: 'lumtest.com'}]});
+            t('status_code', '/200', {200: [{status_code: 200}]});
+            t('http', '/http', {http: [{status_code: 200, protocol: 'http'}]});
+            const https_exp = {https: [{status_code: 200, protocol: 'https',
+                hostname: 'lumtest.com'}]};
+            t('https', '/https', https_exp, {proto: 'https'});
+            t('https sniff', '/https', https_exp, {proto: 'https',
+                args: qw`--ssl --insecure`});
+            t('domain', '/lumtest.com', {'lumtest.com': [{status_code: 200,
+                hostname: 'lumtest.com'}]});
         });
     });
     describe('crash on load error', ()=>{

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "0.10.20",
+        "version": "1.52.1",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -372,6 +372,10 @@
                 "proxy_creds_check": {
                     "type": "boolean",
                     "description": "Validate proxy credentials"
+                },
+                "request_stats": {
+                    "type": "boolean",
+                    "description": "Enable requests statistics"
                 }
             }
         },

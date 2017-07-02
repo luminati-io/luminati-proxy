@@ -9,7 +9,7 @@
   <div ng-if=stats&&!error>
     Note that a kilobyte is counted as <strong>1000</strong> bytes.
   </div><br>
-  <div ng-if=!$root.subsection>
+  <div ng-if=!$resolve.$stateParams.zone>
     <table class="table table-hover zones-table" ng-if=stats&&!error>
       <thead>
         <tr>
@@ -21,7 +21,8 @@
       </thead>
       <tbody>
         <tr ng-repeat="(zone, properties) in stats">
-          <td class=zones-zone><a href=zones/{{zone}}>{{zone}}</a></td>
+          <td class=zones-zone>
+            <a ui-sref='zones({zone: zone})'>{{zone}}</a></td>
           <td ng-repeat="time in times">
             <span ng-repeat="field in fields" ng-if="field.key=='bw_sum'">
               {{field.filter(properties[time.key][field.key])||'&mdash;'}}
@@ -31,9 +32,9 @@
       </tbody>
     </table>
   </div>
-  <div ng-if=$root.subsection>
-    <div ng-repeat="(zone, properties) in stats" ng-if=zone==$root.subsection
-      class="panel panel-default" id=zone>
+  <div ng-if=$resolve.$stateParams.zone>
+    <div ng-repeat="(zone, properties) in stats" id=zone
+      ng-if=zone==$resolve.$stateParams.zone class="panel panel-default">
       <div class=panel-heading>
         {{zone}}
         <button type=submit class="btn btn-default" ng-click=edit_zone(zone)>
