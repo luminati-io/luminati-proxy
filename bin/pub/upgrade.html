@@ -7,10 +7,6 @@
     for specifics.
   </div>
   <div class="buttons">
-    <button ng-click=dismiss_upgrade() ng-disabled=upgrading||upgrade_error
-      type="button" class="btn btn-default" >
-      Dismiss
-    </button>
     <button type=button class="btn btn-primary" ng-click=upgrade()
       ng-disabled=upgrading||upgrade_error||!ver_node.satisfied>
       {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}

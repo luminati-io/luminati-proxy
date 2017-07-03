@@ -113,7 +113,7 @@
     "test": "./node_modules/mocha/bin/mocha",
     "test-win": "node node_modules/mocha/bin/mocha"
   },
-  "version": "1.52.1",
+  "version": "1.52.241",
   "lpm": {
     "files": [
       "bin/ca.crt",
@@ -185,6 +185,6 @@
       "lib/username.js",
       "test.js"
     ],
-    "md5": "c3e0cf6981c7bfa0e986a92cc370cbad"
+    "md5": "6e504f1cd18bc4514a06155a65b991f8"
   }
 }

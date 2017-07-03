@@ -2253,7 +2253,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         $scope.show_allocated_ips = function(){
             var zone = form.zone;
             var keypass = form.password||'';
-            var modals = $scope.$parent.$parent.$parent.$parent;
+            var modals = $scope.$root;
             modals.allocated_ips = {
                 ips: [],
                 loading: true,

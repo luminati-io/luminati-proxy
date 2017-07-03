@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 1.52.1
+## 1.52.241
 - :bug: fix login for renamed users
 - :star: limit minimum values to numeric input fields
 
