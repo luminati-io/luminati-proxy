@@ -532,8 +532,8 @@ function Resolve($scope, $http, $window){
 
 module.controller('settings', Settings);
 Settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope',
-    '$state'];
-function Settings($scope, $http, $window, $sce, $rootScope, $state){
+    '$state', '$location'];
+function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
     var update_error = function(){
         if ($rootScope.relogin_required)
             return $scope.user_error = {message: 'Please log in again.'};
@@ -618,8 +618,8 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state){
         google.attr('href', google.attr('href')+'&state='+encodeURIComponent(
             l.protocol+'//'+l.hostname+':'+(l.port||80)+'?api_version=3'));
     };
-    var m, qs_regex = /\&t=([a-zA-Z0-9\+\/=]+)$/;
-    if (m = $window.location.search.match(qs_regex))
+    var m, qs_regex = /^([a-zA-Z0-9\+\/=]+)$/;
+    if (m = ($location.search().t||'').replace(/\s+/g, '+').match(qs_regex))
     {
         $scope.google_login = true;
         token = m[1];

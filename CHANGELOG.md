@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.52.425
+- :bug: fix google login
+
 ## 1.52.369
 - :bug: fix upgrade modal
 
