@@ -3,7 +3,7 @@
 ## 1.52.369
 - :bug: fix upgrade modal
 
-##1.52.241
+## 1.52.241
 - :bug: fix allocated ips selection
 
 ## 1.52.1
