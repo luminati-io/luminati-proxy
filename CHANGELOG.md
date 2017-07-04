@@ -1,6 +1,12 @@
  Luminati Proxy manager - Change Log
 
-## 1.52.241
+## 1.52.369
+- :bug: fix upgrade modal
+
+##1.52.241
+- :bug: fix allocated ips selection
+
+## 1.52.1
 - :bug: fix login for renamed users
 - :star: limit minimum values to numeric input fields
 

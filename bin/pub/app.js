@@ -332,7 +332,7 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
             $scope.ver_last.version);
     };
     $scope.upgrade = function(){
-        $scope.confirmation = {
+        $scope.$root.confirmation = {
             text: 'The application will be upgraded and restarted.',
             confirmed: function(){
                 $window.$('#upgrading').modal({backdrop: 'static',
@@ -357,7 +357,7 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         $window.$('#confirmation').modal();
     };
     $scope.shutdown = function(){
-        $scope.confirmation = {
+        $scope.$root.confirmation = {
             text: 'Are you sure you want to shut down the local proxies?',
             confirmed: function(){
                 $http.post('/api/shutdown');
