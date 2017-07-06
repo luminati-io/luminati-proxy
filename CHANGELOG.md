@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.52.848
+- :sparkles: add stats feature
+
 ## 1.52.425
 - :bug: fix google login
 

@@ -14,7 +14,7 @@
   <div ng-hide=proxies class="alert alert-info">
     Loading...
   </div>
-  <div class=col-md-12>
+  <div class=col-md-7>
     <div ng-if=proxies class="panel panel-default proxies">
       <div class=panel-heading>
         <button ng-if="$root.mode!='guest'"
@@ -248,8 +248,8 @@
       </div>
     </div>
   </div>
-  <div class="col-md-5 hidden">
-    <ng-include src="'stats.html'"></ng-include>
+  <div class=col-md-5>
+    <div id=stats></div>
   </div>
   <div ng-repeat="h in history_dialog" ng-controller=history
     ng-include="'history.html'" ng-init=init(h)>

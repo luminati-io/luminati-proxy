@@ -10,11 +10,11 @@ if (typeof module=='object')
 }
 
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
-    'hutil/util/date', 'codemirror/mode/javascript/javascript', 'jquery',
-    'angular-sanitize', 'bootstrap', 'bootstrap-datepicker', '_css!app',
-    'angular-ui-bootstrap', 'es6-shim', 'angular-google-analytics',
-    'ui-select', 'ui-router'],
-function(angular, _, moment, codemirror, date){
+    'hutil/date', '/stats/stats.js', '/util.js',
+    'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
+    'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap',
+    'es6-shim', 'angular-google-analytics', 'ui-select', 'ui-router'],
+function(angular, _, moment, codemirror, date, req_stats, util){
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -100,8 +100,7 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
     var logged_in_resolver = $q.defer();
     $rootScope.logged_in = logged_in_resolver.promise;
     $transitions.onBefore({to: function(state){
-        return ['settings', 'proxies', 'zones', 'tools'].
-        includes(state.name);
+        return ['settings', 'proxies', 'zones', 'tools'].includes(state.name);
     }}, function(transition){
         return $q(function(resolve, reject){
             $q.resolve($rootScope.logged_in).then(function(logged_in){
@@ -131,7 +130,10 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
         {
             if (data.data.no_usage_stats)
                 analytics_provider.disableAnalytics(true);
-            analytics_provider.setAccount(ua.tid);
+            analytics_provider.setAccount({
+                tracker: ua.tid,
+                set: {forceSSL: true},
+            });
             _.each(ua._persistentParams, function(v, k){
                 Analytics.set('&'+k, v); });
             Analytics.set('&an', (ua._persistentParams.an||'LPM')+' - UI');
@@ -143,6 +145,7 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
             Analytics.trackEvent(category, action, label, undefined, undefined,
                 {transport: 'beacon'});
         };
+        req_stats.init_ga(ga_event);
         if ($window.localStorage.getItem('last_run_id')!=
             $rootScope.run_config.id)
         {
@@ -273,6 +276,10 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         {name: 'tools', title: 'Tools'},
         {name: 'faq', title: 'FAQ'},
     ];
+    $transitions.onBefore({}, function(transition){
+        if (transition.to().name!='proxies')
+            req_stats.uninstall();
+    });
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
         if (section = $scope.sections.find(function(s){
@@ -1648,6 +1655,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         return options;
 
     };
+    req_stats.install($window.$('#stats')[0]);
 }
 
 module.controller('history', History);
@@ -2541,20 +2549,9 @@ function requests_filter($filter){
     };
 }
 
-module.filter('bytes', bytes_filter);
-bytes_filter.$inject = ['$filter'];
-function bytes_filter($filter){
-    var number_filter = $filter('number');
-    return function(bytes, precision){
-        if (!bytes || isNaN(parseFloat(bytes)) || !isFinite(bytes))
-            return '';
-        var number = Math.floor(Math.log(bytes) / Math.log(1000));
-        if (typeof precision==='undefined')
-            precision = number ? 2 : 0;
-        return number_filter(bytes / Math.pow(1000, Math.floor(number)),
-            precision)+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
-    };
-}
+module.filter('bytes', function(){
+    return util.bytes_format;
+});
 
 module.filter('request', request_filter);
 function request_filter(){

@@ -641,3 +641,6 @@ input.form-control[type=checkbox] {
     background-size: 32px 32px;
     margin: auto;
 }
+.stats_row_change {
+    animation: pulse 1s;
+}

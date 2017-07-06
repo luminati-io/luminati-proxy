@@ -39,6 +39,8 @@
     "angular-google-analytics": "^1.1.8",
     "angular-sanitize": "^1.6.0",
     "angular-ui-bootstrap": "^2.3.1",
+    "animate.css": "^3.5.2",
+    "axios": "^0.16.2",
     "body-parser": "^1.15.2",
     "bootstrap": "^3.3.7",
     "bootstrap-datepicker": "^1.6.4",
@@ -61,6 +63,9 @@
     "node-forge": "^0.6.46",
     "notosans-fontface": "^1.0.1",
     "pm2": "^2.2.2",
+    "react": "^15.6.1",
+    "react-bootstrap": "^0.31.0",
+    "react-dom": "^15.6.1",
     "request": "^2.79.0",
     "request-stats": "^2.0.1",
     "require-css": "^0.1.8",
@@ -79,6 +84,11 @@
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
     "electron": "^1.4.1",
     "electron-builder": "^13.9.0",
     "electron-rebuild": "^1.5.7",
@@ -101,7 +111,7 @@
     "phantomjs-prebuilt": "^2.1.14",
     "webshot": "^0.18.0"
   },
-  "preferGlobal": "true",
+  "preferGlobal": true,
   "recomendedNode": ">=6",
   "repository": {
     "type": "git",
@@ -111,9 +121,10 @@
     "electron": "electron .",
     "start": "bin/luminati.js",
     "test": "./node_modules/mocha/bin/mocha",
-    "test-win": "node node_modules/mocha/bin/mocha"
+    "test-win": "node node_modules/mocha/bin/mocha",
+    "build": "./node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js"
   },
-  "version": "1.52.425",
+  "version": "1.52.848",
   "lpm": {
     "files": [
       "bin/ca.crt",
@@ -171,6 +182,7 @@
       "bin/pub/tools.html",
       "bin/pub/tooltip_proxy_status.html",
       "bin/pub/upgrade.html",
+      "bin/pub/util.js",
       "bin/pub/zones.html",
       "index.js",
       "lib/cities.js",
@@ -183,8 +195,9 @@
       "lib/socks.js",
       "lib/ssl.js",
       "lib/username.js",
+      "src/pub/stats/stats.js",
       "test.js"
     ],
-    "md5": "a902207bd10f140ee37b8af23b90b3cb"
+    "md5": "99d2ea4ada2b077568ba02c06940eed2"
   }
 }

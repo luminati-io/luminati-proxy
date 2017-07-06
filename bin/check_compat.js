@@ -19,7 +19,7 @@ E.is_env_compat = ()=>{
         'bootstrap-datepicker', 'codemirror', 'notosans-fontface',
         'require-css', 'flag-icon-css', 'angular-ui-bootstrap',
         'swagger-ui', 'font-awesome', 'angular-google-analytics', 'ui-select',
-        '@uirouter/angularjs']
+        '@uirouter/angularjs', 'animate.css']
         .concat(Object.keys(pkg.optionalDependencies));
     for (let dep in pkg.dependencies)
     {
