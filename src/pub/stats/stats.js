@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true, jsx:true*//*global module:true*/
+'use strict'; /*jslint react:true*/
 define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
     'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date',
     '_css!animate'],
@@ -40,8 +40,10 @@ class StatRow extends React.Component {
 
 class StatusCodeRow extends StatRow {
     render(){
+        // XXX ranl/ovidiu: add tooltip in first td of each row.
         return <tr>
               <td>{this.props.stat.code}</td>
+              <td className="hidden"></td>
               <td className={this.state.class_value}>
                 {this.props.stat.value}</td>
             </tr>;
@@ -52,6 +54,7 @@ class DomainRow extends StatRow {
     render(){
         return <tr>
               <td>{this.props.stat.hostname}</td>
+              <td className="hidden"></td>
               <td className={this.state.class_value}>
                 {this.props.stat.value}</td>
             </tr>;
@@ -73,19 +76,23 @@ class ProtoRow extends StatRow {
 class StatTable extends React.Component {
     enter = ()=>{
         let dt = this.props.dataType;
-        E.sp.spawn(this.sp=etask({cancel: true}, [function(){
-            return etask.sleep(2*date.ms.SEC);
-        }, function(){
+        E.sp.spawn(this.sp = etask(function*(){
+            yield etask.sleep(2*date.ms.SEC);
             ga_event('stats panel', 'hover', dt);
-        }]));
+        }));
     }
     leave = ()=>{
         this.sp.return();
     }
     render(){
         let Row = this.props.row;
+        // XXX ranl/ovidiu: unhide small tag when rows are > 5
+        // XXX ranl/ovidiu: link to main inner page by section
         return <div onMouseEnter={this.enter} onMouseLeave={this.leave}>
-              <h4>{this.props.title}</h4>
+              <h4>
+                {this.props.title} <small className="hidden">
+                <a href="#">show all</a></small>
+              </h4>
               <table className="table table-condensed table-bordered">
                 <thead>{this.props.children}</thead>
                 <tbody>
@@ -104,32 +111,49 @@ class Stats extends React.Component {
         this.state = {statuses: [], domains: [], protocols: []};
     }
     get_stats = etask._fn(function*(_this){
-        if (E.sp.tm_completed)
-            return;
-        let res = yield etask(()=>axios.get('/api/request_stats/top'));
-        let state = _.reduce(res.data.top, (s, v, k)=>{
-            if (_.isInteger(+k))
-                return s.statuses.push({code: k, value: v}) && s;
-            if (['http', 'https'].includes(k))
-            {
-                return s.protocols.push({proto: k, bw: v.bw,
-                    value: v.count}) && s;
-            }
-            return s.domains.push({hostname: k, value: v}) && s;
-        }, {statuses: [], domains: [], protocols: []});
-        ['statuses', 'domains', 'protocols'].forEach(k=>
-            state[k] = _(state[k]).sortBy('value').take(5).reverse().value());
-        _this.setState(state);
-        E.sp.spawn(etask({cancel: true}, [()=>etask.sleep(1000),
-            ()=>_this.get_stats()]));
+        while (true)
+        {
+            let res = yield etask(()=>axios.get('/api/request_stats/top'));
+            let state = _.reduce(res.data.top, (s, v, k)=>{
+                if (_.isInteger(+k))
+                    return s.statuses.push({code: k, value: v}) && s;
+                if (['http', 'https'].includes(k))
+                {
+                    return s.protocols.push({proto: k, bw: v.bw,
+                        value: v.count}) && s;
+                }
+                return s.domains.push({hostname: k, value: v}) && s;
+            }, {statuses: [], domains: [], protocols: []});
+            if (!state.protocols.some(_.matches({proto: 'https'})))
+                state.protocols.push({proto: 'https', bw: 0, value: 0});
+            ['statuses', 'domains', 'protocols'].forEach(k=>
+                state[k] = _(state[k]).sortBy('value').take(5).reverse()
+                    .value());
+            _this.setState(state);
+            yield etask.sleep(date.ms.SEC);
+        }
     })
     componentDidMount(){
         E.sp.spawn(this.get_stats());
     }
+    confirm() {
+        window.confirm("Are you sure?");
+    }
     render(){
         const Button = RB.Button;
         return <div className="panel panel-default">
-              <div className="panel-heading">Recent statistics</div>
+              <div className="panel-heading">
+                <div className="row">
+                  <div className="col-md-6">Recent statistics</div>
+                  <div className="col-md-6 text-right">
+                    <button type="button"
+                      className="btn btn-default btn-xs hidden"
+                      onClick={this.confirm}>
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
               <div className="panel-body">
                 <StatTable row={StatusCodeRow} path="/status_codes"
                   row_key="code" title={`Top ${_.min([5,
@@ -137,6 +161,7 @@ class Stats extends React.Component {
                   stats={this.state.statuses} dataType="status_codes">
                   <tr>
                     <th className="col-md-4">Status Code</th>
+                    <th className="hidden">Bandwidth</th>
                     <th>Number of requests</th>
                   </tr>
                 </StatTable>
@@ -146,11 +171,12 @@ class Stats extends React.Component {
                   dataType="domains">
                   <tr>
                     <th className="col-md-4">Domain Host</th>
+                    <th className="hidden">Bandwidth</th>
                     <th>Number of requests</th>
                   </tr>
                 </StatTable>
                 <StatTable row={ProtoRow} path="/protocols" row_key="proto"
-                  stats={this.state.protocols} title="Bandwidth"
+                  stats={this.state.protocols} title="Protocols"
                   dataType="protocols">
                   <tr>
                     <th className="col-md-2">Type</th>

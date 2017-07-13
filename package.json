@@ -19,7 +19,7 @@
     ],
     "npmRebuild": false,
     "nsis": {
-      "artifactName": "${name}-setup-${version}.${ext}"
+      "artifactName": "${name}-${version}-setup.${ext}"
     },
     "productName": "Luminati Proxy Manager",
     "publish": {
@@ -105,26 +105,6 @@
     "hola"
   ],
   "license": "ISC",
-  "main": "index.js",
-  "name": "luminati-proxy",
-  "optionalDependencies": {
-    "phantomjs-prebuilt": "^2.1.14",
-    "webshot": "^0.18.0"
-  },
-  "preferGlobal": true,
-  "recomendedNode": ">=6",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/luminati-io/luminati-proxy.git"
-  },
-  "scripts": {
-    "electron": "electron .",
-    "start": "bin/luminati.js",
-    "test": "./node_modules/mocha/bin/mocha",
-    "test-win": "node node_modules/mocha/bin/mocha",
-    "build": "./node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js"
-  },
-  "version": "1.52.848",
   "lpm": {
     "files": [
       "bin/ca.crt",
@@ -135,6 +115,7 @@
       "bin/pub/app.css",
       "bin/pub/app.js",
       "bin/pub/config.js",
+      "bin/pub/domains.html",
       "bin/pub/faq/links.html",
       "bin/pub/faq/ssl.html",
       "bin/pub/faq/upgrade.html",
@@ -172,6 +153,7 @@
       "bin/pub/img/social_btns.svg",
       "bin/pub/index.html",
       "bin/pub/pool.html",
+      "bin/pub/protocols.html",
       "bin/pub/proxies.html",
       "bin/pub/proxy.html",
       "bin/pub/proxy_cols.html",
@@ -198,6 +180,26 @@
       "src/pub/stats/stats.js",
       "test.js"
     ],
-    "md5": "99d2ea4ada2b077568ba02c06940eed2"
-  }
+    "md5": "967f6941921c08713b75c256bf928dd6"
+  },
+  "main": "index.js",
+  "name": "luminati-proxy",
+  "optionalDependencies": {
+    "phantomjs-prebuilt": "^2.1.14",
+    "webshot": "^0.18.0"
+  },
+  "preferGlobal": true,
+  "recomendedNode": ">=6",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/luminati-io/luminati-proxy.git"
+  },
+  "scripts": {
+    "electron": "electron .",
+    "start": "bin/luminati.js",
+    "test": "./node_modules/mocha/bin/mocha",
+    "test-win": "node node_modules/mocha/bin/mocha",
+    "build": "./node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js"
+  },
+  "version": "1.53.605"
 }

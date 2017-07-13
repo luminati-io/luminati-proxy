@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.53.605
+- :bug: fix UI css
+
 ## 1.52.848
 - :sparkles: add stats feature
 

@@ -644,3 +644,6 @@ input.form-control[type=checkbox] {
 .stats_row_change {
     animation: pulse 1s;
 }
+.code_max_height {
+    max-height: 500px;
+}

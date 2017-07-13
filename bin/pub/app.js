@@ -94,6 +94,19 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         url: '/status_codes',
         templateUrl: 'status_codes.html'
     });
+    state_registry.register({
+        name: 'domains',
+        parent: 'app',
+        url: '/domains',
+        templateUrl: 'domains.html'
+    });
+    state_registry.register({
+        name: 'protocols',
+        parent: 'app',
+        url: '/protocols',
+        templateUrl: 'protocols.html'
+    });
+
 }]);
 
 module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
@@ -287,7 +300,8 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         {
             $scope.section = section;
         }
-        $scope.subsection = section.name=='zones'&&transition.params().zone;
+        $scope.subsection = section && section.name=='zones' &&
+            transition.params().zone;
     });
     $scope.section = $scope.sections.find(function(s){
         return s.name==$state.$current.name||'settings'; });

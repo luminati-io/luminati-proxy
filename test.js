@@ -1427,6 +1427,7 @@ describe('manager', ()=>{
                     url: `${opt.proto||'http'}://lumtest.com/myip`,
                     strictSSL: false,
                 }]);
+                yield etask.sleep(100);
                 const res = yield api_json(`api/request_stats${path}`);
                 assert_has(res.body, expected);
             }));

@@ -80,7 +80,10 @@
             Loading...
           </div>
           <div class=tester-results ng-if=request.response.headers>
-            <pre>{{request.response.body}}</pre>
+            <div class=text-center>
+              <strong>Body</strong>
+            </div>
+            <pre class=code_max_height>{{request.response.body}}</pre>
             <table class="table table-hover tools-table">
               <thead>
                 <tr>
