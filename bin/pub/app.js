@@ -10,11 +10,13 @@ if (typeof module=='object')
 }
 
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
-    'hutil/date', '/stats/stats.js', '/util.js',
+    'hutil/date', '/stats/stats.js', '/stats/status_codes.js',
+    '/stats/domains.js', '/stats/protocols.js', '/util.js',
     'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
     'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap',
     'es6-shim', 'angular-google-analytics', 'ui-select', 'ui-router'],
-function(angular, _, moment, codemirror, date, req_stats, util){
+function(angular, _, moment, codemirror, date, req_stats, status_codes,
+    domains, protocols, util){
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -55,56 +57,60 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     state_registry.register({
         name: 'app',
         redirectTo: 'settings',
-        controller: 'root'
+        controller: 'root',
     });
     state_registry.register({
         name: 'settings',
         parent: 'app',
         url: '/',
-        templateUrl: 'settings.html'
+        templateUrl: 'settings.html',
     });
     state_registry.register({
         name: 'proxies',
         parent: 'app',
         url: '/proxies',
-        templateUrl: 'proxies.html'
+        templateUrl: 'proxies.html',
     });
     state_registry.register({
         name: 'zones',
         parent: 'app',
         url: '/zones/{zone:string}',
         templateUrl: 'zones.html',
-        params: {zone: {squash: true, value: null}}
+        params: {zone: {squash: true, value: null}},
     });
     state_registry.register({
         name: 'tools',
         parent: 'app',
         url: '/tools',
-        templateUrl: 'tools.html'
+        templateUrl: 'tools.html',
     });
     state_registry.register({
         name: 'faq',
         parent: 'app',
         url: '/faq',
-        templateUrl: 'faq.html'
+        templateUrl: 'faq.html',
     });
     state_registry.register({
         name: 'status_codes',
         parent: 'app',
-        url: '/status_codes',
-        templateUrl: 'status_codes.html'
+        url: '/status_codes/{code:int}',
+        params: {code: {squash: true, value: null}},
+        template: '<div react-view component=react_component></div>',
+        controller: function($scope){ $scope.react_component = status_codes; },
     });
     state_registry.register({
         name: 'domains',
         parent: 'app',
         url: '/domains',
-        templateUrl: 'domains.html'
+        template: '<div react-view component=react_component></div>',
+        controller: function($scope){ $scope.react_component = domains; },
     });
     state_registry.register({
         name: 'protocols',
         parent: 'app',
         url: '/protocols',
-        templateUrl: 'protocols.html'
+        template: '<div react-view component=react_component></div>',
+        controller: function($scope){ $scope.react_component = protocols; },
     });
 
 }]);
@@ -290,8 +296,6 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         {name: 'faq', title: 'FAQ'},
     ];
     $transitions.onBefore({}, function(transition){
-        if (transition.to().name!='proxies')
-            req_stats.uninstall();
     });
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
@@ -1667,9 +1671,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         if (state&&state!='*')
             options = options.filter(function(i){ return i.region==state; });
         return options;
-
     };
-    req_stats.install($window.$('#stats')[0]);
+    $scope.react_component = req_stats;
 }
 
 module.controller('history', History);
@@ -2598,6 +2601,16 @@ module.directive('initSelectOpen', ['$window', function($window){
             setTimeout(function(){
                 element.focus();
             }, 100);
+        },
+    };
+}]);
+
+module.directive('reactView', ['$state', function($state){
+    return {
+        scope: {component: '='},
+        link: function(scope, element, attrs){
+            scope.component.install(element[0], $state.params);
+            element.on('$destroy', function(){ scope.component.uninstall(); });
         },
     };
 }]);

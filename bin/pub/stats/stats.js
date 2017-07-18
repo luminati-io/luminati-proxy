@@ -1,6 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -11,7 +13,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date', '_css!animate'], function (rr, _, React, ReactDOM, RB, axios, util, etask, date) {
+define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date', '/stats/common.js', '/stats/status_codes.js', '/stats/domains.js', '/stats/protocols.js', '_css!animate'], function (rr, _, React, ReactDOM, RB, axios, util, etask, date, Common, StatusCode, Domain, Protocol) {
 
     var mount = void 0,
         ga_event = void 0;
@@ -20,7 +22,7 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
             return ga_event = ga;
         },
         install: function install(mnt) {
-            E.sp = etask('lpm_stats', [function () {
+            E.sp = etask('stats', [function () {
                 return this.wait();
             }]);
             ReactDOM.render(React.createElement(Stats, null), mount = mnt);
@@ -75,22 +77,8 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         _createClass(StatusCodeRow, [{
             key: 'render',
             value: function render() {
-                // XXX ranl/ovidiu: add tooltip in first td of each row.
-                return React.createElement(
-                    'tr',
-                    null,
-                    React.createElement(
-                        'td',
-                        null,
-                        this.props.stat.code
-                    ),
-                    React.createElement('td', { className: 'hidden' }),
-                    React.createElement(
-                        'td',
-                        { className: this.state.class_value },
-                        this.props.stat.value
-                    )
-                );
+                return React.createElement(StatusCode.Row, _extends({ class_value: this.state.class_value,
+                    class_bw: this.state.class_bw }, this.props));
             }
         }]);
 
@@ -109,21 +97,8 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         _createClass(DomainRow, [{
             key: 'render',
             value: function render() {
-                return React.createElement(
-                    'tr',
-                    null,
-                    React.createElement(
-                        'td',
-                        null,
-                        this.props.stat.hostname
-                    ),
-                    React.createElement('td', { className: 'hidden' }),
-                    React.createElement(
-                        'td',
-                        { className: this.state.class_value },
-                        this.props.stat.value
-                    )
-                );
+                return React.createElement(Domain.Row, _extends({ class_value: this.state.class_value,
+                    class_bw: this.state.class_bw }, this.props));
             }
         }]);
 
@@ -142,25 +117,8 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         _createClass(ProtoRow, [{
             key: 'render',
             value: function render() {
-                return React.createElement(
-                    'tr',
-                    null,
-                    React.createElement(
-                        'td',
-                        null,
-                        this.props.stat.proto.toUpperCase()
-                    ),
-                    React.createElement(
-                        'td',
-                        { className: this.state.class_bw },
-                        util.bytes_format(this.props.stat.bw)
-                    ),
-                    React.createElement(
-                        'td',
-                        { className: this.state.class_value },
-                        this.props.stat.value
-                    )
-                );
+                return React.createElement(Protocol.Row, _extends({ class_value: this.state.class_value,
+                    class_bw: this.state.class_bw }, this.props));
             }
         }]);
 
@@ -209,46 +167,11 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         _createClass(StatTable, [{
             key: 'render',
             value: function render() {
-                var _this8 = this;
-
-                var Row = this.props.row;
-                // XXX ranl/ovidiu: unhide small tag when rows are > 5
-                // XXX ranl/ovidiu: link to main inner page by section
+                var Table = this.props.table || Common.StatTable;
                 return React.createElement(
                     'div',
                     { onMouseEnter: this.enter, onMouseLeave: this.leave },
-                    React.createElement(
-                        'h4',
-                        null,
-                        this.props.title,
-                        ' ',
-                        React.createElement(
-                            'small',
-                            { className: 'hidden' },
-                            React.createElement(
-                                'a',
-                                { href: '#' },
-                                'show all'
-                            )
-                        )
-                    ),
-                    React.createElement(
-                        'table',
-                        { className: 'table table-condensed table-bordered' },
-                        React.createElement(
-                            'thead',
-                            null,
-                            this.props.children
-                        ),
-                        React.createElement(
-                            'tbody',
-                            null,
-                            this.props.stats.map(function (s) {
-                                return React.createElement(Row, { stat: s, key: s[_this8.props.row_key || 'key'],
-                                    path: _this8.props.path });
-                            })
-                        )
-                    )
+                    React.createElement(Table, this.props)
                 );
             }
         }]);
@@ -256,8 +179,35 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         return StatTable;
     }(React.Component);
 
-    var Stats = function (_React$Component3) {
-        _inherits(Stats, _React$Component3);
+    var CertificateButton = function (_React$Component3) {
+        _inherits(CertificateButton, _React$Component3);
+
+        function CertificateButton() {
+            _classCallCheck(this, CertificateButton);
+
+            return _possibleConstructorReturn(this, (CertificateButton.__proto__ || Object.getPrototypeOf(CertificateButton)).apply(this, arguments));
+        }
+
+        _createClass(CertificateButton, [{
+            key: 'render',
+            value: function render() {
+                return React.createElement(
+                    'div',
+                    { className: 'col-md-6 col-md-offset-3 text-center' },
+                    React.createElement(
+                        Button,
+                        { className: 'btn btn-success' },
+                        'Enable HTTPS statistics'
+                    )
+                );
+            }
+        }]);
+
+        return CertificateButton;
+    }(React.Component);
+
+    var Stats = function (_React$Component4) {
+        _inherits(Stats, _React$Component4);
 
         function Stats(props) {
             _classCallCheck(this, Stats);
@@ -265,73 +215,102 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
             var _this9 = _possibleConstructorReturn(this, (Stats.__proto__ || Object.getPrototypeOf(Stats)).call(this, props));
 
             _this9.get_stats = etask._fn(regeneratorRuntime.mark(function _callee2(_this) {
-                var _this10 = this;
+                var res, state, _arr, _i, k;
 
-                var _loop;
-
-                return regeneratorRuntime.wrap(function _callee2$(_context3) {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context2.prev = _context2.next) {
                             case 0:
-                                _loop = regeneratorRuntime.mark(function _loop() {
-                                    var res, state;
-                                    return regeneratorRuntime.wrap(function _loop$(_context2) {
-                                        while (1) {
-                                            switch (_context2.prev = _context2.next) {
-                                                case 0:
-                                                    _context2.next = 2;
-                                                    return etask(function () {
-                                                        return axios.get('/api/request_stats/top');
-                                                    });
-
-                                                case 2:
-                                                    res = _context2.sent;
-                                                    state = _.reduce(res.data.top, function (s, v, k) {
-                                                        if (_.isInteger(+k)) return s.statuses.push({ code: k, value: v }) && s;
-                                                        if (['http', 'https'].includes(k)) {
-                                                            return s.protocols.push({ proto: k, bw: v.bw,
-                                                                value: v.count }) && s;
-                                                        }
-                                                        return s.domains.push({ hostname: k, value: v }) && s;
-                                                    }, { statuses: [], domains: [], protocols: [] });
-
-                                                    if (!state.protocols.some(_.matches({ proto: 'https' }))) state.protocols.push({ proto: 'https', bw: 0, value: 0 });
-                                                    ['statuses', 'domains', 'protocols'].forEach(function (k) {
-                                                        return state[k] = _(state[k]).sortBy('value').take(5).reverse().value();
-                                                    });
-                                                    _this.setState(state);
-                                                    _context2.next = 9;
-                                                    return etask.sleep(date.ms.SEC);
-
-                                                case 9:
-                                                case 'end':
-                                                    return _context2.stop();
-                                            }
-                                        }
-                                    }, _loop, _this10);
-                                });
-
-                            case 1:
                                 if (!true) {
-                                    _context3.next = 5;
+                                    _context2.next = 13;
                                     break;
                                 }
 
-                                return _context3.delegateYield(_loop(), 't0', 3);
+                                _context2.next = 3;
+                                return etask(function () {
+                                    return axios.get('/api/request_stats/top');
+                                });
 
                             case 3:
-                                _context3.next = 1;
+                                res = _context2.sent;
+                                state = _.reduce(res.data.top, function (s, v, k) {
+                                    if (_.isInteger(+k)) return s.statuses.stats.push({ code: k, value: v.count,
+                                        bw: v.bw }) && s;
+                                    if (['http', 'https'].includes(k)) {
+                                        return s.protocols.stats.push({ proto: k, bw: v.bw,
+                                            value: v.count }) && s;
+                                    }
+                                    return s.domains.stats.push({ hostname: k, value: v.count,
+                                        bw: v.bw }) && s;
+                                }, { statuses: { stats: [] }, domains: { stats: [] },
+                                    protocols: { stats: [] } });
+
+                                if (!state.protocols.stats.some(_.matches({ proto: 'https' }))) state.protocols.stats.push({ proto: 'https', bw: 0, value: 0 });
+                                _arr = ['statuses', 'domains', 'protocols'];
+                                for (_i = 0; _i < _arr.length; _i++) {
+                                    k = _arr[_i];
+
+                                    state[k] = {
+                                        show_more: state[k].stats.length > 5,
+                                        stats: _(state[k].stats).sortBy('value').take(5).reverse().value()
+                                    };
+                                }
+                                _this.setState(state);
+                                _context2.next = 11;
+                                return etask.sleep(date.ms.SEC);
+
+                            case 11:
+                                _context2.next = 0;
                                 break;
 
-                            case 5:
+                            case 13:
                             case 'end':
-                                return _context3.stop();
+                                return _context2.stop();
                         }
                     }
                 }, _callee2, this);
             }));
 
-            _this9.state = { statuses: [], domains: [], protocols: [] };
+            _this9.close = function () {
+                return _this9.setState({ show_reset: false });
+            };
+
+            _this9.confirm = function () {
+                return _this9.setState({ show_reset: true });
+            };
+
+            _this9.reset_stats = function () {
+                if (_this9.state.resetting) return;
+                _this9.setState({ resetting: true });
+                var _this = _this9;
+                E.sp.spawn(etask(regeneratorRuntime.mark(function _callee3() {
+                    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                        while (1) {
+                            switch (_context3.prev = _context3.next) {
+                                case 0:
+                                    _context3.next = 2;
+                                    return etask(function () {
+                                        return axios.get('/api/request_stats/reset');
+                                    });
+
+                                case 2:
+                                    _this.setState({ resetting: undefined });
+                                    _this.close();
+
+                                case 4:
+                                case 'end':
+                                    return _context3.stop();
+                            }
+                        }
+                    }, _callee3, this);
+                })));
+            };
+
+            _this9.state = {
+                statuses: { stats: [] },
+                domains: { stats: [] },
+                protocols: { stats: [] }
+            };
             return _this9;
         }
 
@@ -341,116 +320,83 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                 E.sp.spawn(this.get_stats());
             }
         }, {
-            key: 'confirm',
-            value: function confirm() {
-                window.confirm("Are you sure?");
-            }
-        }, {
             key: 'render',
             value: function render() {
-                var Button = RB.Button;
+                var Button = RB.Button,
+                    ButtonToolbar = RB.ButtonToolbar,
+                    Row = RB.Row,
+                    Col = RB.Col,
+                    Panel = RB.Panel,
+                    Modal = RB.Modal;
+
                 return React.createElement(
-                    'div',
-                    { className: 'panel panel-default' },
-                    React.createElement(
-                        'div',
-                        { className: 'panel-heading' },
-                        React.createElement(
-                            'div',
-                            { className: 'row' },
+                    Panel,
+                    { header: React.createElement(
+                            Row,
+                            null,
                             React.createElement(
-                                'div',
-                                { className: 'col-md-6' },
+                                Col,
+                                { md: 6 },
                                 'Recent statistics'
                             ),
                             React.createElement(
-                                'div',
-                                { className: 'col-md-6 text-right' },
+                                Col,
+                                { md: 6, className: 'text-right' },
                                 React.createElement(
-                                    'button',
-                                    { type: 'button',
-                                        className: 'btn btn-default btn-xs hidden',
-                                        onClick: this.confirm },
+                                    Button,
+                                    { bsSize: 'xsmall', onClick: this.confirm },
                                     'Reset'
                                 )
                             )
-                        )
-                    ),
+                        ) },
+                    React.createElement(StatTable, { table: StatusCode.Table, row: StatusCodeRow,
+                        title: 'Top ' + (_.min([5, this.state.statuses.stats.length]) || '') + '\n                    status codes', dataType: 'status_codes',
+                        stats: this.state.statuses.stats,
+                        show_more: this.state.statuses.show_more }),
+                    React.createElement(StatTable, { table: Domain.Table, row: DomainRow,
+                        dataType: 'domains', stats: this.state.domains.stats,
+                        show_more: this.state.domains.show_more,
+                        title: 'Top ' + (_.min([5, this.state.domains.stats.length]) || '') + '\n                    domains' }),
+                    React.createElement(StatTable, { table: Protocol.Table, row: ProtoRow,
+                        dataType: 'protocols', stats: this.state.protocols.stats,
+                        show_more: this.state.protocols.show_more }),
                     React.createElement(
-                        'div',
-                        { className: 'panel-body' },
+                        Modal,
+                        { show: this.state.show_reset, onHide: this.close },
                         React.createElement(
-                            StatTable,
-                            { row: StatusCodeRow, path: '/status_codes',
-                                row_key: 'code', title: 'Top ' + (_.min([5, this.state.statuses.length]) || '') + ' status codes',
-                                stats: this.state.statuses, dataType: 'status_codes' },
+                            Modal.Header,
+                            { closeButton: true },
                             React.createElement(
-                                'tr',
+                                Modal.Title,
                                 null,
-                                React.createElement(
-                                    'th',
-                                    { className: 'col-md-4' },
-                                    'Status Code'
-                                ),
-                                React.createElement(
-                                    'th',
-                                    { className: 'hidden' },
-                                    'Bandwidth'
-                                ),
-                                React.createElement(
-                                    'th',
-                                    null,
-                                    'Number of requests'
-                                )
+                                'Reset stats'
                             )
                         ),
                         React.createElement(
-                            StatTable,
-                            { row: DomainRow, path: '/domains', row_key: 'hostname',
-                                stats: this.state.domains, title: 'Top ' + (_.min([5, this.state.domains.length]) || '') + ' domains',
-                                dataType: 'domains' },
+                            Modal.Body,
+                            null,
                             React.createElement(
-                                'tr',
+                                'h4',
                                 null,
-                                React.createElement(
-                                    'th',
-                                    { className: 'col-md-4' },
-                                    'Domain Host'
-                                ),
-                                React.createElement(
-                                    'th',
-                                    { className: 'hidden' },
-                                    'Bandwidth'
-                                ),
-                                React.createElement(
-                                    'th',
-                                    null,
-                                    'Number of requests'
-                                )
+                                'Are you sure you want to reset stats?'
                             )
                         ),
                         React.createElement(
-                            StatTable,
-                            { row: ProtoRow, path: '/protocols', row_key: 'proto',
-                                stats: this.state.protocols, title: 'Protocols',
-                                dataType: 'protocols' },
+                            Modal.Footer,
+                            null,
                             React.createElement(
-                                'tr',
+                                ButtonToolbar,
                                 null,
                                 React.createElement(
-                                    'th',
-                                    { className: 'col-md-2' },
-                                    'Type'
+                                    Button,
+                                    { bsStyle: 'primary', onClick: this.reset_stats,
+                                        disabled: this.state.resetting },
+                                    this.state.resetting ? 'Resetting...' : 'OK'
                                 ),
                                 React.createElement(
-                                    'th',
-                                    { className: 'col-md-2' },
-                                    'Bandwidth'
-                                ),
-                                React.createElement(
-                                    'th',
-                                    null,
-                                    'Number of Requests'
+                                    Button,
+                                    { onClick: this.close },
+                                    'Cancel'
                                 )
                             )
                         )

@@ -2,14 +2,16 @@
 'use strict'; /*jslint react:true*/
 define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
     'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date',
-    '_css!animate'],
-(rr, _, React, ReactDOM, RB, axios, util, etask, date)=>{
+    '/stats/common.js', '/stats/status_codes.js', '/stats/domains.js',
+    '/stats/protocols.js', '_css!animate'],
+(rr, _, React, ReactDOM, RB, axios, util, etask, date, Common, StatusCode,
+    Domain, Protocol)=>{
 
 let mount, ga_event;
 const E = {
     init_ga: ga=>ga_event = ga,
     install: mnt=>{
-        E.sp = etask('lpm_stats', [function(){ return this.wait(); }]);
+        E.sp = etask('stats', [function(){ return this.wait(); }]);
         ReactDOM.render(<Stats />, mount = mnt);
     },
     uninstall: ()=>{
@@ -40,36 +42,22 @@ class StatRow extends React.Component {
 
 class StatusCodeRow extends StatRow {
     render(){
-        // XXX ranl/ovidiu: add tooltip in first td of each row.
-        return <tr>
-              <td>{this.props.stat.code}</td>
-              <td className="hidden"></td>
-              <td className={this.state.class_value}>
-                {this.props.stat.value}</td>
-            </tr>;
+        return <StatusCode.Row class_value={this.state.class_value}
+              class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
 class DomainRow extends StatRow {
     render(){
-        return <tr>
-              <td>{this.props.stat.hostname}</td>
-              <td className="hidden"></td>
-              <td className={this.state.class_value}>
-                {this.props.stat.value}</td>
-            </tr>;
+        return <Domain.Row class_value={this.state.class_value}
+              class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
 class ProtoRow extends StatRow {
     render(){
-        return <tr>
-              <td>{this.props.stat.proto.toUpperCase()}</td>
-              <td className={this.state.class_bw}>
-                {util.bytes_format(this.props.stat.bw)}</td>
-              <td className={this.state.class_value}>
-                {this.props.stat.value}</td>
-            </tr>;
+        return <Protocol.Row class_value={this.state.class_value}
+              class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
@@ -85,22 +73,18 @@ class StatTable extends React.Component {
         this.sp.return();
     }
     render(){
-        let Row = this.props.row;
-        // XXX ranl/ovidiu: unhide small tag when rows are > 5
-        // XXX ranl/ovidiu: link to main inner page by section
+        const Table = this.props.table || Common.StatTable;
         return <div onMouseEnter={this.enter} onMouseLeave={this.leave}>
-              <h4>
-                {this.props.title} <small className="hidden">
-                <a href="#">show all</a></small>
-              </h4>
-              <table className="table table-condensed table-bordered">
-                <thead>{this.props.children}</thead>
-                <tbody>
-                  {this.props.stats.map(s=>
-                    <Row stat={s} key={s[this.props.row_key||'key']}
-                      path={this.props.path} />)}
-                </tbody>
-              </table>
+              <Table {...this.props} />
+            </div>;
+    }
+}
+
+class CertificateButton extends React.Component {
+    render() {
+        return <div className="col-md-6 col-md-offset-3 text-center">
+              <Button className="btn btn-success">
+                Enable HTTPS statistics</Button>
             </div>;
     }
 }
@@ -108,7 +92,11 @@ class StatTable extends React.Component {
 class Stats extends React.Component {
     constructor(props){
         super(props);
-        this.state = {statuses: [], domains: [], protocols: []};
+        this.state = {
+            statuses: {stats: []},
+            domains: {stats: []},
+            protocols: {stats: []},
+        };
     }
     get_stats = etask._fn(function*(_this){
         while (true)
@@ -116,19 +104,27 @@ class Stats extends React.Component {
             let res = yield etask(()=>axios.get('/api/request_stats/top'));
             let state = _.reduce(res.data.top, (s, v, k)=>{
                 if (_.isInteger(+k))
-                    return s.statuses.push({code: k, value: v}) && s;
+                    return s.statuses.stats.push({code: k, value: v.count,
+                        bw: v.bw}) && s;
                 if (['http', 'https'].includes(k))
                 {
-                    return s.protocols.push({proto: k, bw: v.bw,
+                    return s.protocols.stats.push({proto: k, bw: v.bw,
                         value: v.count}) && s;
                 }
-                return s.domains.push({hostname: k, value: v}) && s;
-            }, {statuses: [], domains: [], protocols: []});
-            if (!state.protocols.some(_.matches({proto: 'https'})))
-                state.protocols.push({proto: 'https', bw: 0, value: 0});
-            ['statuses', 'domains', 'protocols'].forEach(k=>
-                state[k] = _(state[k]).sortBy('value').take(5).reverse()
-                    .value());
+                return s.domains.stats.push({hostname: k, value: v.count,
+                    bw: v.bw}) && s;
+            }, {statuses: {stats: []}, domains: {stats: []},
+                protocols: {stats: []}});
+            if (!state.protocols.stats.some(_.matches({proto: 'https'})))
+                state.protocols.stats.push({proto: 'https', bw: 0, value: 0});
+            for (let k of ['statuses', 'domains', 'protocols'])
+            {
+                state[k] = {
+                    show_more: state[k].stats.length>5,
+                    stats: _(state[k].stats).sortBy('value').take(5).reverse()
+                    .value(),
+                };
+            }
             _this.setState(state);
             yield etask.sleep(date.ms.SEC);
         }
@@ -136,56 +132,61 @@ class Stats extends React.Component {
     componentDidMount(){
         E.sp.spawn(this.get_stats());
     }
-    confirm() {
-        window.confirm("Are you sure?");
+    close = ()=>this.setState({show_reset: false})
+    confirm = ()=>this.setState({show_reset: true})
+    reset_stats = ()=>{
+        if (this.state.resetting)
+            return;
+        this.setState({resetting: true});
+        const _this = this;
+        E.sp.spawn(etask(function*(){
+            yield etask(()=>axios.get('/api/request_stats/reset'));
+            _this.setState({resetting: undefined});
+            _this.close();
+        }));
     }
     render(){
-        const Button = RB.Button;
-        return <div className="panel panel-default">
-              <div className="panel-heading">
-                <div className="row">
-                  <div className="col-md-6">Recent statistics</div>
-                  <div className="col-md-6 text-right">
-                    <button type="button"
-                      className="btn btn-default btn-xs hidden"
-                      onClick={this.confirm}>
-                      Reset
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="panel-body">
-                <StatTable row={StatusCodeRow} path="/status_codes"
-                  row_key="code" title={`Top ${_.min([5,
-                      this.state.statuses.length])||''} status codes`}
-                  stats={this.state.statuses} dataType="status_codes">
-                  <tr>
-                    <th className="col-md-4">Status Code</th>
-                    <th className="hidden">Bandwidth</th>
-                    <th>Number of requests</th>
-                  </tr>
-                </StatTable>
-                <StatTable row={DomainRow} path="/domains" row_key="hostname"
-                  stats={this.state.domains} title={`Top ${_.min([5,
-                      this.state.domains.length])||''} domains`}
-                  dataType="domains">
-                  <tr>
-                    <th className="col-md-4">Domain Host</th>
-                    <th className="hidden">Bandwidth</th>
-                    <th>Number of requests</th>
-                  </tr>
-                </StatTable>
-                <StatTable row={ProtoRow} path="/protocols" row_key="proto"
-                  stats={this.state.protocols} title="Protocols"
-                  dataType="protocols">
-                  <tr>
-                    <th className="col-md-2">Type</th>
-                    <th className="col-md-2">Bandwidth</th>
-                    <th>Number of Requests</th>
-                  </tr>
-                </StatTable>
-              </div>
-            </div>;
+        const {Button, ButtonToolbar, Row, Col, Panel, Modal} = RB;
+        return <Panel header={
+                <Row>
+                  <Col md={6}>Recent statistics</Col>
+                  <Col md={6} className="text-right">
+                    <Button bsSize="xsmall" onClick={this.confirm}>
+                      Reset</Button>
+                  </Col>
+                </Row>
+              }>
+              <StatTable table={StatusCode.Table} row={StatusCodeRow}
+                title={`Top ${_.min([5, this.state.statuses.stats.length])||''}
+                    status codes`} dataType="status_codes"
+                stats={this.state.statuses.stats}
+                show_more={this.state.statuses.show_more} />
+              <StatTable table={Domain.Table} row={DomainRow}
+                dataType="domains" stats={this.state.domains.stats}
+                show_more={this.state.domains.show_more}
+                title={`Top ${_.min([5, this.state.domains.stats.length])||''}
+                    domains`} />
+              <StatTable table={Protocol.Table} row={ProtoRow}
+                dataType="protocols" stats={this.state.protocols.stats}
+                show_more={this.state.protocols.show_more} />
+              <Modal show={this.state.show_reset} onHide={this.close}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Reset stats</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <h4>Are you sure you want to reset stats?</h4>
+                </Modal.Body>
+                <Modal.Footer>
+                  <ButtonToolbar>
+                    <Button bsStyle="primary" onClick={this.reset_stats}
+                      disabled={this.state.resetting}>
+                      {this.state.resetting ? 'Resetting...' : 'OK'}
+                    </Button>
+                    <Button onClick={this.close}>Cancel</Button>
+                  </ButtonToolbar>
+                </Modal.Footer>
+              </Modal>
+            </Panel>;
     }
 }
 

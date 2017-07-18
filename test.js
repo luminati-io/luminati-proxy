@@ -1431,10 +1431,10 @@ describe('manager', ()=>{
                 const res = yield api_json(`api/request_stats${path}`);
                 assert_has(res.body, expected);
             }));
-            t('path empty', '', {top: {200: 1, http: {count: 1},
-                'lumtest.com': 1}});
-            t('top', '/top', {top: {200: 1, http: {count: 1},
-                'lumtest.com': 1}});
+            t('path empty', '', {top: {200: {count: 1}, http: {count: 1},
+                'lumtest.com': {count: 1}}});
+            t('top', '/top', {top: {200: {count: 1}, http: {count: 1},
+                'lumtest.com': {count: 1}}});
             t('all', '/all', {all: [{status_code: 200, protocol: 'http',
                 url: 'http://lumtest.com/myip', hostname: 'lumtest.com'}]});
             t('status_code', '/200', {200: [{status_code: 200}]});

@@ -92,6 +92,7 @@
     "electron": "^1.4.1",
     "electron-builder": "^13.9.0",
     "electron-rebuild": "^1.5.7",
+    "less": "^2.7.2",
     "mocha": "^3.2.0",
     "nock": "^9.0.11"
   },
@@ -112,7 +113,6 @@
       "bin/check_compat.js",
       "bin/luminati.js",
       "bin/lum_main.js",
-      "bin/pub/app.css",
       "bin/pub/app.js",
       "bin/pub/config.js",
       "bin/pub/domains.html",
@@ -177,10 +177,15 @@
       "lib/socks.js",
       "lib/ssl.js",
       "lib/username.js",
+      "src/pub/app.less",
+      "src/pub/stats/common.js",
+      "src/pub/stats/domains.js",
+      "src/pub/stats/protocols.js",
       "src/pub/stats/stats.js",
+      "src/pub/stats/status_codes.js",
       "test.js"
     ],
-    "md5": "967f6941921c08713b75c256bf928dd6"
+    "md5": "74a36266ac8758f04cd78b1af801200c"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -199,7 +204,8 @@
     "start": "bin/luminati.js",
     "test": "./node_modules/mocha/bin/mocha",
     "test-win": "node node_modules/mocha/bin/mocha",
-    "build": "./node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js"
+    "build": "node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js",
+    "build-less": "node_modules/less/bin/lessc src/pub/app.less bin/pub/app.css"
   },
-  "version": "1.53.605"
+  "version": "1.54.526"
 }

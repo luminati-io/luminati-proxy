@@ -12,6 +12,8 @@ With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IP
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
+<em>Read this in [Chinese](README-zh-CN.md).</em>
+
 ## Features
 - Highly scalable
 - Connection pool for faster response time
@@ -31,7 +33,7 @@ Software requirements for Luminati proxy manager are:
 - <a href="https://nodejs.org/en/download/">Node.js</a> from version 6+
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.53.605/luminati-proxy-setup-1.53.605.exe">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/tag/v0.10.19">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOS
 - Install Node.js 6 or above (preferably using
