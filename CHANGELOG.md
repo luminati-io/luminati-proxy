@@ -1,6 +1,7 @@
  Luminati Proxy manager - Change Log
 
 ## 1.55.53
+- :bug: fixed high memory usage on high number of concurrent requests
 
 ## 1.54.526
 - :star: added reset stats button
