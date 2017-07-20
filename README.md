@@ -33,7 +33,7 @@ Software requirements for Luminati proxy manager are:
 - <a href="https://nodejs.org/en/download/">Node.js</a> from version 6+
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/tag/v0.10.19">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.54.526/luminati-proxy-setup-1.54.526.exe">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOS
 - Install Node.js 6 or above (preferably using
