@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.55.53
+
 ## 1.54.526
 - :star: added reset stats button
 - :bug: fixed memory leak in stats

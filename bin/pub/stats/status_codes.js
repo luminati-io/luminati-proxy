@@ -1,4 +1,3 @@
-
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 
@@ -12,18 +11,15 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date', '/stats/common.js', '_css!animate'], function (rr, _, React, ReactDOM, RB, axios, util, etask, date, Common) {
+define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', '/util.js', 'hutil/etask', '/stats/common.js'], function (rr, _, React, ReactDOM, RB, util, etask, Common) {
 
     var mount = void 0;
     var E = {
         install: function install(mnt) {
-            var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null,
-                code = _ref.code;
-
             E.sp = etask('status_codes', [function () {
                 return this.wait();
             }]);
-            ReactDOM.render(React.createElement(Stats, { code: code }), mount = mnt);
+            ReactDOM.render(React.createElement(Stats, null), mount = mnt);
         },
         uninstall: function uninstall() {
             if (E.sp) E.sp.return();
@@ -66,8 +62,9 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
 
                 var tooltip = React.createElement(
                     Tooltip,
-                    { id: 'status_code_' + this.props.stat.code },
-                    status_codes[this.props.stat.code] || this.props.stat.code
+                    {
+                        id: 'status_code_' + this.props.stat.status_code },
+                    status_codes[this.props.stat.status_code] || this.props.stat.status_code
                 );
                 return React.createElement(
                     'tr',
@@ -78,7 +75,11 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                         React.createElement(
                             'td',
                             null,
-                            this.props.stat.code
+                            React.createElement(
+                                'a',
+                                { href: this.props.path + '/' + this.props.stat.status_code },
+                                this.props.stat.status_code
+                            )
                         )
                     ),
                     React.createElement(
@@ -113,7 +114,7 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                 return React.createElement(
                     Common.StatTable,
                     _extends({ row: StatusCodeRow, path: '/status_codes',
-                        row_key: 'code', title: 'All status codes' }, this.props),
+                        row_key: 'status_code', title: 'All status codes' }, this.props),
                     React.createElement(
                         'tr',
                         null,
@@ -157,29 +158,21 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
             value: function componentDidMount() {
                 var _this = this;
                 E.sp.spawn(etask(regeneratorRuntime.mark(function _callee() {
-                    var res, state;
+                    var res;
                     return regeneratorRuntime.wrap(function _callee$(_context) {
                         while (1) {
                             switch (_context.prev = _context.next) {
                                 case 0:
                                     _context.next = 2;
-                                    return etask(function () {
-                                        return axios.get('/api/request_stats/all');
-                                    });
+                                    return Common.StatsService.get_all({ sort: 1,
+                                        by: 'status_code' });
 
                                 case 2:
                                     res = _context.sent;
-                                    state = res.data.all.reduce(function (s, v, k) {
-                                        var c = v.status_code;
-                                        s[c] = s[c] || { code: c, value: 0, bw: 0 };
-                                        s[c].value += 1;
-                                        s[c].bw += v.bw;
-                                        return s;
-                                    }, {});
 
-                                    _this.setState({ stats: _(Object.values(state)).sortBy('value').reverse().value() });
+                                    _this.setState({ stats: res });
 
-                                case 5:
+                                case 4:
                                 case 'end':
                                     return _context.stop();
                             }
@@ -199,7 +192,7 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                         React.createElement(
                             'h3',
                             null,
-                            'Status codes ' + this.props.code
+                            'Status codes'
                         )
                     ),
                     React.createElement(
@@ -214,6 +207,7 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         return Stats;
     }(React.Component);
 
+    E.status_codes = status_codes;
     E.Row = StatusCodeRow;
     E.Table = StatusCodeTable;
     return E;

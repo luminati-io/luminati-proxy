@@ -1,11 +1,8 @@
-
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
-    'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date',
-    '/stats/common.js',
-    '_css!animate'],
-(rr, _, React, ReactDOM, RB, axios, util, etask, date, Common)=>{
+    'react-bootstrap', '/util.js', 'hutil/etask', '/stats/common.js'],
+(rr, _, React, ReactDOM, RB, util, etask, Common)=>{
 
 let mount;
 const E = {
@@ -25,7 +22,10 @@ const E = {
 class DomainRow extends React.Component {
     render(){
         return <tr>
-              <td>{this.props.stat.hostname}</td>
+              <td>
+                <a href={`${this.props.path}/${this.props.stat.hostname}`}>
+                  {this.props.stat.hostname}</a>
+              </td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
@@ -55,16 +55,9 @@ class Stats extends React.Component {
     componentDidMount(){
         const _this = this;
         E.sp.spawn(etask(function*(){
-            const res = yield etask(()=>axios.get('/api/request_stats/all'));
-            const state = res.data.all.reduce((s, v, k)=>{
-                let h = v.hostname;
-                s[h] = s[h]||{hostname: h, value: 0, bw: 0};
-                s[h].value += 1;
-                s[h].bw += v.bw;
-                return s;
-            }, {});
-            _this.setState({stats: _(Object.values(state)).sortBy('value')
-                .reverse().value()});
+            const res = yield Common.StatsService.get_all({sort: 1,
+                by: 'hostname'});
+            _this.setState({stats: res});
         }));
     }
     render(){

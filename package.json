@@ -1,11 +1,11 @@
 {
-  "author": "Gilad Novik <gilad@hola.org>",
+  "author": "Colin Shribman <colin@luminati.io>",
   "bin": {
     "luminati": "bin/luminati.js",
     "luminati-proxy": "bin/luminati.js"
   },
   "bugs": {
-    "email": "gilad@hola.org"
+    "email": "colin@luminati.io"
   },
   "build": {
     "appId": "luminati.proxy_manager",
@@ -180,12 +180,15 @@
       "src/pub/app.less",
       "src/pub/stats/common.js",
       "src/pub/stats/domains.js",
+      "src/pub/stats/domains_detail.js",
       "src/pub/stats/protocols.js",
+      "src/pub/stats/protocols_detail.js",
       "src/pub/stats/stats.js",
       "src/pub/stats/status_codes.js",
+      "src/pub/stats/status_codes_detail.js",
       "test.js"
     ],
-    "md5": "74a36266ac8758f04cd78b1af801200c"
+    "md5": "a8ac7d66a0afdfb289129a78adf1884a"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -207,5 +210,5 @@
     "build": "node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js",
     "build-less": "node_modules/less/bin/lessc src/pub/app.less bin/pub/app.css"
   },
-  "version": "1.54.526"
+  "version": "1.55.53"
 }

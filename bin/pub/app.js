@@ -11,12 +11,15 @@ if (typeof module=='object')
 
 define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'hutil/date', '/stats/stats.js', '/stats/status_codes.js',
-    '/stats/domains.js', '/stats/protocols.js', '/util.js',
+    '/stats/status_codes_detail.js', '/stats/domains.js',
+    '/stats/domains_detail.js', '/stats/protocols.js',
+    '/stats/protocols_detail.js', '/util.js',
     'codemirror/mode/javascript/javascript', 'jquery', 'angular-sanitize',
     'bootstrap', 'bootstrap-datepicker', '_css!app', 'angular-ui-bootstrap',
     'es6-shim', 'angular-google-analytics', 'ui-select', 'ui-router'],
 function(angular, _, moment, codemirror, date, req_stats, status_codes,
-    domains, protocols, util){
+    status_codes_detail, domains, domains_detail, protocols, protocols_detail,
+    util){
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -93,10 +96,17 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     state_registry.register({
         name: 'status_codes',
         parent: 'app',
-        url: '/status_codes/{code:int}',
-        params: {code: {squash: true, value: null}},
+        url: '/status_codes',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){ $scope.react_component = status_codes; },
+    });
+    state_registry.register({
+        name: 'status_codes_detail',
+        parent: 'app',
+        url: '/status_codes/{code:int}',
+        template: '<div react-view component=react_component></div>',
+        controller: function($scope){
+            $scope.react_component = status_codes_detail; },
     });
     state_registry.register({
         name: 'domains',
@@ -106,11 +116,27 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         controller: function($scope){ $scope.react_component = domains; },
     });
     state_registry.register({
+        name: 'domains_detail',
+        parent: 'app',
+        url: '/domains/{domain:string}',
+        template: '<div react-view component=react_component></div>',
+        controller: function($scope){
+            $scope.react_component = domains_detail; },
+    });
+    state_registry.register({
         name: 'protocols',
         parent: 'app',
         url: '/protocols',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){ $scope.react_component = protocols; },
+    });
+    state_registry.register({
+        name: 'protocols_detail',
+        parent: 'app',
+        url: '/protocols/{protocol:string}',
+        template: '<div react-view component=react_component></div>',
+        controller: function($scope){
+            $scope.react_component = protocols_detail; },
     });
 
 }]);

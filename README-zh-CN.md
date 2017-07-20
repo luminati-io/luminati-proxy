@@ -6,88 +6,73 @@
 [![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
 [![optionalDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/optional-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=optional)
 
-A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribute/manage/monitor/report/log/debug traffic to your proxies around the world.
+一个HTTP/HTTPS 代理服务器在你身边，为你世界各地的代理流量加速/压缩/轮流/分发/管理/监控/汇报/日志/调试
 
-With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IPs or Luminati static IPs.
+用 Luminati HTTP/HTTPS 代理管理器你可以使用Luminati 住宅 IPs 或 Luminati 数据心 IPs.
 
-This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
+这个工具需要一个 [Luminati](https://luminati.io/?cam=github-proxy) 账户.
 
-<em>Read this in [Chinese](README-zh-CN.md).</em>
+## 特征
+- 可扩展
+- 连接池（更快的反应）
+- 省心的建立组态
+- 统计数据
+- 每N请求自动轮流IP
+- 负载均衡
+- SSL 嗅探
+- SOCKSv5 代理
 
-## Features
-- Highly scalable
-- Connection pool for faster response time
-- Easy setup for multiple configurations using a simple web interface
-- Statistics
-- Automatically rotate IP every X requests
-- Load balancing using multiple Super Proxies
-- SSL sniffing (using a self-signed certificate)
-- SOCKSv5 proxy
+## 安装
 
-## Installation
+### 要求
+软件要求:
 
-### Requirements
-Software requirements for Luminati proxy manager are:
-
-- <a href="https://git-scm.com/downloads/">Git</a> from version 1.7+
-- <a href="https://nodejs.org/en/download/">Node.js</a> from version 6+
+- <a href="https://git-scm.com/downloads/">Git</a> 1.7+版
+- <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/tag/v0.10.19">Luminati Proxy Manager installer</a>.
+下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/tag/v0.10.19">代理管理安装器</a>.
 
 ### Linux/MacOS
-- Install Node.js 6 or above (preferably using
+- 安装 Node.js 6+版 (最好用x
   [nave](https://github.com/isaacs/nave))
-- Install Luminati Proxy from the terminal prompt:
+- 从终端安装 Luminati 代理:
 ```sh
 sudo npm install -g luminati-io/luminati-proxy
 ```
-### Upgrade
-- Use npm to upgrade
+### 升级
+- 用npm升级
 ```sh
 sudo npm install -g luminati-io/luminati-proxy
 ```
-### Release Notes
+### 发布说明
 
-You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every version
+你可以在 [CHANGELOG.md](CHANGELOG.md) 里找到每个版本的修改.
 
-## Usage
+## 运用
 
-### First run
-After running the app for the first time:
+### 第一次运行
+第一次运行之后:
 ```sh
 luminati
 ```
-Point your browser to the app admin UI
-[http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
-and configure your proxies.
+把你的浏览器设到 [http://127.0.0.1:22999](http://127.0.0.1:22999) 为了设置凭证和代理服务器.
 
-After logging in, you will see that the default configuration for the Luminati
-proxy includes a "dropin" proxy running on port 22225. This mode is explained
-in detail below.
+登录之后，你会看到Luminati的默认设置所含一个”drop in”代理服务器在接口22225运行。细节提供在下面.
 
-### Dropin replacement for existing super-proxies
+### 超级代理服务器的‘Dropin’替代
 
-Luminati Proxy comes with a "dropin mode" which behaves exactly like the
-existing super-proxies. When running a proxy in dropin mode, you do not need to
-log in via the administrative UI in order to make requests through your
-proxies. Rather, the proxy username and password are provided with each request
-to the proxy server. This mode is enabled by default, and you can use this mode
-as an easy replacement when migrating from the regular super-proxy to the
-Luminati Proxy Manager.
+Luminati 代理服务器所含的”Dropin 模式” 和现有的超级代理服务器的功能相同。在 ‘dropin’ 模式运行代理时，你不需要登录行政UI就能发出请求。代理账户和密码会自动被提供。’dropin’ 模式是默认模式，和可以让你容易的从一般的超级代理服务器转到Luminati 代理管理器.
 
-Dropin mode is enabled by default. To disable the dropin proxy, use the flag
-`--no-dropin`:
+’dropin’ 模式是默认模式。如果你想禁用’dropin’,请用命令：--no-dropin:
 
 ```sh
 luminati --no-dropin
 ```
 
-For full documentation on the API for making requests through the dropin proxy,
-see <a href="https://luminati.io/cp/api_example?manager=all&group=active">the
-API Example page in your Luminati.io account</a>.
+为了完整的API解说文件 （为了'dropin'代理请求），请从你的Luminati.io账户关注 <a href="https://luminati.io/cp/api_example?manager=all&group=active">API例网页</a>.
 
-### Complete list of command line options
+### 完整的API命令名单:
 ```sh
 luminati --help
 Usage:
@@ -175,7 +160,7 @@ Options:
 
 ### Docker
 
-A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy/](https://hub.docker.com/r/luminati/luminati-proxy/)
+'Docker' 图片能在这里找着 [https://hub.docker.com/r/luminati/luminati-proxy/](https://hub.docker.com/r/luminati/luminati-proxy/)
 
 ```sh
 docker pull luminati/luminati-proxy
@@ -185,31 +170,29 @@ docker run luminati/luminati-proxy
 docker run luminati/luminati-proxy luminati --version
 ```
 
-### SSL Requests
+### SSL 请求
 
-The --ssl parameter is for SSL sniffing, HTTPS requests can be made without it.
+-ssl 参数是为了 SSL sniffing, HTTPS请求不需要它就能运行
 
-## Help
+## 帮助
 
-The FAQ can be found on the luminati
-[FAQ](https://luminati.io/faq#proxy)
+常见问题 [FAQ](https://luminati.io/faq#proxy)
 
-If you do not find the answer there, feel free to open an
-[issue on github](issues).
+如果你在Luminati 常见问题找不着解决方式，可以在 [github 上提问](issues).
 
-Or contact [support@luminati.io](mailto:support@luminati.io).
+或联系 [support@luminati.io](mailto:support@luminati.io).
 
 ## REST API
 
-Working documentation of the API can be found inside the app.
+API的解说文件能在APP里找着
 
-A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json)
+详细解释能在 [这里](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json) 找到
 
 ## Node.js API
 
-The proxy manager can be used as a required module for node.js applications - eliminating the need to run it as a standalone process.
+代理管理器可以当作一个需要的软件为了node.js软件 - 消除独立运行node.js的必要.
 
-The API supports both [Promises](https://www.promisejs.org/) and [Generators](https://www.promisejs.org/generators/). Internally, it uses the [request](https://github.com/request/request) module and supports all of its features.
+API支持 [Promises](https://www.promisejs.org/) 和 [Generators](https://www.promisejs.org/generators/). 它内部会用 [request module](https://github.com/request/request) 莫和支持所有它的特征
 
 ### Promises
 ```js

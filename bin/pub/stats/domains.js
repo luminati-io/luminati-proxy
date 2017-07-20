@@ -1,4 +1,3 @@
-
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 
@@ -12,7 +11,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date', '/stats/common.js', '_css!animate'], function (rr, _, React, ReactDOM, RB, axios, util, etask, date, Common) {
+define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', '/util.js', 'hutil/etask', '/stats/common.js'], function (rr, _, React, ReactDOM, RB, util, etask, Common) {
 
     var mount = void 0;
     var E = {
@@ -47,7 +46,11 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                     React.createElement(
                         'td',
                         null,
-                        this.props.stat.hostname
+                        React.createElement(
+                            'a',
+                            { href: this.props.path + '/' + this.props.stat.hostname },
+                            this.props.stat.hostname
+                        )
                     ),
                     React.createElement(
                         'td',
@@ -125,29 +128,21 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
             value: function componentDidMount() {
                 var _this = this;
                 E.sp.spawn(etask(regeneratorRuntime.mark(function _callee() {
-                    var res, state;
+                    var res;
                     return regeneratorRuntime.wrap(function _callee$(_context) {
                         while (1) {
                             switch (_context.prev = _context.next) {
                                 case 0:
                                     _context.next = 2;
-                                    return etask(function () {
-                                        return axios.get('/api/request_stats/all');
-                                    });
+                                    return Common.StatsService.get_all({ sort: 1,
+                                        by: 'hostname' });
 
                                 case 2:
                                     res = _context.sent;
-                                    state = res.data.all.reduce(function (s, v, k) {
-                                        var h = v.hostname;
-                                        s[h] = s[h] || { hostname: h, value: 0, bw: 0 };
-                                        s[h].value += 1;
-                                        s[h].bw += v.bw;
-                                        return s;
-                                    }, {});
 
-                                    _this.setState({ stats: _(Object.values(state)).sortBy('value').reverse().value() });
+                                    _this.setState({ stats: res });
 
-                                case 5:
+                                case 4:
                                 case 'end':
                                     return _context.stop();
                             }

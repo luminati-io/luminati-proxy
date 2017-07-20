@@ -1,17 +1,14 @@
-
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
 define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
-    'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date',
-    '/stats/common.js',
-    '_css!animate'],
-(rr, _, React, ReactDOM, RB, axios, util, etask, date, Common)=>{
+    'react-bootstrap', '/util.js', 'hutil/etask', '/stats/common.js'],
+(rr, _, React, ReactDOM, RB, util, etask, Common)=>{
 
 let mount;
 const E = {
-    install: (mnt, {code} = null)=>{
+    install: mnt=>{
         E.sp = etask('status_codes', [function(){ return this.wait(); }]);
-        ReactDOM.render(<Stats code={code} />, mount = mnt);
+        ReactDOM.render(<Stats />, mount = mnt);
     },
     uninstall: ()=>{
         if (E.sp)
@@ -42,12 +39,17 @@ const status_codes = {
 class StatusCodeRow extends React.Component {
     render(){
         const {OverlayTrigger, Tooltip} = RB;
-        const tooltip = <Tooltip id={`status_code_${this.props.stat.code}`}>
-              {status_codes[this.props.stat.code]||this.props.stat.code}
+        const tooltip = <Tooltip
+              id={`status_code_${this.props.stat.status_code}`}>
+              {status_codes[this.props.stat.status_code]||
+                this.props.stat.status_code}
             </Tooltip>;
         return <tr>
               <OverlayTrigger overlay={tooltip} placement="top">
-                <td>{this.props.stat.code}</td>
+                <td>
+                  <a href={`${this.props.path}/`+this.props.stat.status_code}>
+                    {this.props.stat.status_code}</a>
+                </td>
               </OverlayTrigger>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
@@ -60,7 +62,7 @@ class StatusCodeRow extends React.Component {
 class StatusCodeTable extends React.Component {
     render(){
         return <Common.StatTable row={StatusCodeRow} path="/status_codes"
-              row_key="code" title="All status codes" {...this.props}>
+              row_key="status_code" title="All status codes" {...this.props}>
               <tr>
                 <th>Status Code</th>
                 <th className="col-md-2">Bandwidth</th>
@@ -78,22 +80,15 @@ class Stats extends React.Component {
     componentDidMount(){
         const _this = this;
         E.sp.spawn(etask(function*(){
-            const res = yield etask(()=>axios.get('/api/request_stats/all'));
-            const state = res.data.all.reduce((s, v, k)=>{
-                let c = v.status_code;
-                s[c] = s[c]||{code: c, value: 0, bw: 0};
-                s[c].value += 1;
-                s[c].bw += v.bw;
-                return s;
-            }, {});
-            _this.setState({stats: _(Object.values(state)).sortBy('value')
-                .reverse().value()});
+            const res = yield Common.StatsService.get_all({sort: 1,
+                by: 'status_code'});
+            _this.setState({stats: res});
         }));
     }
     render(){
         return <div>
               <div className="page-header">
-                <h3>{`Status codes ${this.props.code}`}</h3>
+                <h3>Status codes</h3>
               </div>
               <div className="page-body">
                 <StatusCodeTable stats={this.state.stats} />
@@ -102,6 +97,7 @@ class Stats extends React.Component {
     }
 }
 
+E.status_codes = status_codes;
 E.Row = StatusCodeRow;
 E.Table = StatusCodeTable;
 return E; });

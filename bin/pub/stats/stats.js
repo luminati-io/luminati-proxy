@@ -13,7 +13,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', 'axios', '/util.js', 'hutil/etask', 'hutil/date', '/stats/common.js', '/stats/status_codes.js', '/stats/domains.js', '/stats/protocols.js', '_css!animate'], function (rr, _, React, ReactDOM, RB, axios, util, etask, date, Common, StatusCode, Domain, Protocol) {
+define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap', '/util.js', 'hutil/etask', 'hutil/date', '/stats/common.js', '/stats/status_codes.js', '/stats/domains.js', '/stats/protocols.js', '_css!animate'], function (rr, _, React, ReactDOM, RB, util, etask, date, Common, StatusCode, Domain, Protocol) {
 
     var mount = void 0,
         ga_event = void 0;
@@ -191,12 +191,15 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
         _createClass(CertificateButton, [{
             key: 'render',
             value: function render() {
+                var Button = RB.Button,
+                    Col = RB.Col;
+
                 return React.createElement(
-                    'div',
-                    { className: 'col-md-6 col-md-offset-3 text-center' },
+                    Col,
+                    { md: 6, mdOffset: 3, className: 'text-center' },
                     React.createElement(
                         Button,
-                        { className: 'btn btn-success' },
+                        { bsStyle: 'success' },
                         'Enable HTTPS statistics'
                     )
                 );
@@ -215,55 +218,33 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
             var _this9 = _possibleConstructorReturn(this, (Stats.__proto__ || Object.getPrototypeOf(Stats)).call(this, props));
 
             _this9.get_stats = etask._fn(regeneratorRuntime.mark(function _callee2(_this) {
-                var res, state, _arr, _i, k;
-
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 if (!true) {
-                                    _context2.next = 13;
+                                    _context2.next = 10;
                                     break;
                                 }
 
-                                _context2.next = 3;
-                                return etask(function () {
-                                    return axios.get('/api/request_stats/top');
-                                });
+                                _context2.t0 = _this;
+                                _context2.next = 4;
+                                return Common.StatsService.get_top({ sort: 'value',
+                                    limit: 5 });
 
-                            case 3:
-                                res = _context2.sent;
-                                state = _.reduce(res.data.top, function (s, v, k) {
-                                    if (_.isInteger(+k)) return s.statuses.stats.push({ code: k, value: v.count,
-                                        bw: v.bw }) && s;
-                                    if (['http', 'https'].includes(k)) {
-                                        return s.protocols.stats.push({ proto: k, bw: v.bw,
-                                            value: v.count }) && s;
-                                    }
-                                    return s.domains.stats.push({ hostname: k, value: v.count,
-                                        bw: v.bw }) && s;
-                                }, { statuses: { stats: [] }, domains: { stats: [] },
-                                    protocols: { stats: [] } });
+                            case 4:
+                                _context2.t1 = _context2.sent;
 
-                                if (!state.protocols.stats.some(_.matches({ proto: 'https' }))) state.protocols.stats.push({ proto: 'https', bw: 0, value: 0 });
-                                _arr = ['statuses', 'domains', 'protocols'];
-                                for (_i = 0; _i < _arr.length; _i++) {
-                                    k = _arr[_i];
+                                _context2.t0.setState.call(_context2.t0, _context2.t1);
 
-                                    state[k] = {
-                                        show_more: state[k].stats.length > 5,
-                                        stats: _(state[k].stats).sortBy('value').take(5).reverse().value()
-                                    };
-                                }
-                                _this.setState(state);
-                                _context2.next = 11;
+                                _context2.next = 8;
                                 return etask.sleep(date.ms.SEC);
 
-                            case 11:
+                            case 8:
                                 _context2.next = 0;
                                 break;
 
-                            case 13:
+                            case 10:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -289,9 +270,7 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                             switch (_context3.prev = _context3.next) {
                                 case 0:
                                     _context3.next = 2;
-                                    return etask(function () {
-                                        return axios.get('/api/request_stats/reset');
-                                    });
+                                    return Common.StatsService.reset();
 
                                 case 2:
                                     _this.setState({ resetting: undefined });
@@ -350,16 +329,16 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                             )
                         ) },
                     React.createElement(StatTable, { table: StatusCode.Table, row: StatusCodeRow,
-                        title: 'Top ' + (_.min([5, this.state.statuses.stats.length]) || '') + '\n                    status codes', dataType: 'status_codes',
+                        title: 'Top ' + (_.min([5, this.state.statuses.stats.length]) || '') + '\n                  status codes', dataType: 'status_codes',
                         stats: this.state.statuses.stats,
-                        show_more: this.state.statuses.show_more }),
+                        show_more: this.state.statuses.has_more }),
                     React.createElement(StatTable, { table: Domain.Table, row: DomainRow,
                         dataType: 'domains', stats: this.state.domains.stats,
-                        show_more: this.state.domains.show_more,
-                        title: 'Top ' + (_.min([5, this.state.domains.stats.length]) || '') + '\n                    domains' }),
+                        show_more: this.state.domains.has_more,
+                        title: 'Top ' + (_.min([5, this.state.domains.stats.length]) || '') + '\n                  domains' }),
                     React.createElement(StatTable, { table: Protocol.Table, row: ProtoRow,
                         dataType: 'protocols', stats: this.state.protocols.stats,
-                        show_more: this.state.protocols.show_more }),
+                        show_more: this.state.protocols.has_more }),
                     React.createElement(
                         Modal,
                         { show: this.state.show_reset, onHide: this.close },
