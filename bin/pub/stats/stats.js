@@ -160,7 +160,7 @@ define(['regenerator-runtime', 'lodash', 'react', 'react-dom', 'react-bootstrap'
                     }, _callee, this);
                 })));
             }, _this7.leave = function () {
-                _this7.sp.return();
+                if (_this7.sp) _this7.sp.return();
             }, _temp), _possibleConstructorReturn(_this7, _ret);
         }
 

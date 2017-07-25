@@ -15,7 +15,14 @@
     },
     "files": [
       "!publish*.js*",
-      "!**/.jakecache${/*}"
+      "!**/.jakecache${/*}",
+      "!**/test_ln",
+      "!**/xvfs_ln",
+      "!**/builddir_ln",
+      "!build.lock",
+      "!luminati-proxy-*",
+      "!latest.yml",
+      "!deploy${/*}"
     ],
     "npmRebuild": false,
     "nsis": {
@@ -28,7 +35,6 @@
     },
     "win": {
       "target": {
-        "arch": "x64",
         "target": "nsis"
       }
     }
@@ -76,6 +82,8 @@
     "sqlite3": "3.1.8",
     "sudo-prompt": "^6.2.1",
     "swagger-ui": "^2.2.8",
+    "taskkill": "^2.0.0",
+    "tasklist": "^3.1.0",
     "tough-cookie-filestore": "0.0.1",
     "ui-select": "^0.19.8",
     "universal-analytics": "^0.4.9",
@@ -188,7 +196,7 @@
       "src/pub/stats/status_codes_detail.js",
       "test.js"
     ],
-    "md5": "a8ac7d66a0afdfb289129a78adf1884a"
+    "md5": "0d2b479d735c0fcbe64c48c9e987dc16"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -210,5 +218,5 @@
     "build": "node_modules/babel-cli/bin/babel.js src/pub/stats -d bin/pub/stats --ignore Jakefile.js",
     "build-less": "node_modules/less/bin/lessc src/pub/app.less bin/pub/app.css"
   },
-  "version": "1.55.53"
+  "version": "1.55.635"
 }

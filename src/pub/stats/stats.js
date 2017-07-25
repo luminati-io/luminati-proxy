@@ -70,7 +70,8 @@ class StatTable extends React.Component {
         }));
     };
     leave = ()=>{
-        this.sp.return();
+        if (this.sp)
+            this.sp.return();
     };
     render(){
         const Table = this.props.table || Common.StatTable;

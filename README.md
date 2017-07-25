@@ -12,7 +12,7 @@ With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IP
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
-<em>Read this in [Chinese](README-zh-CN.md).</em>
+<em>Read this in [中文](README-zh-CN.md).</em>
 
 ## Features
 - Highly scalable
@@ -26,18 +26,13 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
 ## Installation
 
-### Requirements
-Software requirements for Luminati proxy manager are:
-
-- <a href="https://git-scm.com/downloads/">Git</a> from version 1.7+
-- <a href="https://nodejs.org/en/download/">Node.js</a> from version 6+
-
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/tag/v0.10.19">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.55.635/luminati-proxy-manager-v1.55.635-setup.exe">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOS
 - Install Node.js 6 or above (preferably using
   [nave](https://github.com/isaacs/nave))
+- Install [Git](https://git-scm.com/downloads/) 1.7 or above
 - Install Luminati Proxy from the terminal prompt:
 ```sh
 sudo npm install -g luminati-io/luminati-proxy

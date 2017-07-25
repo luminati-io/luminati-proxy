@@ -19,6 +19,8 @@ const autoUpdater = require('electron-updater').autoUpdater;
 const BrowserWindow = electron.BrowserWindow;
 const hutil = require('hutil');
 const etask = hutil.etask;
+const tasklist = require('tasklist');
+const taskkill = require('taskkill');
 const analytics = require('universal-analytics');
 const ua = analytics('UA-60520689-2');
 
@@ -47,6 +49,55 @@ autoUpdater.on('update-downloaded', e=>{
 });
 autoUpdater.on('error', ()=>{});
 
+let dialog_shown;
+const show_port_conflict = (addr, port)=>{
+    if (dialog_shown)
+        return;
+    dialog_shown = true;
+    const restart = ()=>{
+        app.relaunch({args: process.argv.slice(1)});
+        app.exit();
+    };
+    const show = tasks=>{
+        let res = dialog.showMessageBox({
+            type: 'warning',
+            title: 'Address in use',
+            message: `There is already an application running on ${addr}:`
+                +`${port}\n`
+                +(tasks.length ? 'Click OK button to try stopping the '
+                +'offending processes or Cancel to close Luminati Proxy '
+                +'Manager and stop other instances manually.\n\n'
+                +'Suspected processes:\nPID\t Image Name\t Session Name\t '
+                +'Mem Usage\n'
+                +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
+                    +`${t.memUsage}`).join('\n') :
+                'Stop other running instances manually then click OK button '
+                +'to restart Luminati Proxy Manager.'),
+            buttons: ['Ok', 'Cancel'],
+        });
+        if (res==1)
+            return app.exit();
+        if (!tasks.length)
+            return restart();
+        taskkill(tasks.map(t=>t.pid), {tree: true, force: true})
+        .then(restart, e=>{
+            dialog.showMessageBox({
+                type: 'warning',
+                title: 'Failed stopping processes',
+                message: 'Failed stopping processes. Restart Luminati Proxy '
+                    +'Manager as administrator or stop the processes manually '
+                    +'and then restart.\n\n'+e,
+                buttons: ['Ok'],
+            });
+            process.exit();
+        });
+    };
+    tasklist({filter: ['imagename eq node.exe']}).then(tasks=>{
+        tasks = tasks.filter(t=>t.pid!=process.pid);
+        show(tasks);
+    }, e=>process.exit());
+};
+
 let run = run_config=>{
     manager = new Manager(args, Object.assign({ua}, run_config));
     if (!manager.argv.no_usage_stats)
@@ -72,8 +123,11 @@ let run = run_config=>{
         else
             ua.event('manager', 'stop', ()=>process.exit());
     })
-    .on('error', (e, fatal)=> {
+    .on('error', (e, fatal)=>{
         let handle_fatal = ()=>{
+            let err;
+            if (err = (e.message||'').match(/((?:\d{1,3}\.?){4}):(\d+)$/))
+                return show_port_conflict(err[1], err[2]);
             if (fatal)
             {
                 console.log(e.raw ? e.message : 'Unhandled error: '+e);

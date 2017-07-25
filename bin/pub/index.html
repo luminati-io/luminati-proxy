@@ -44,15 +44,16 @@
           <div class=active>
             <span ng-if=settings.customer>
               {{settings.customer}}
-              <span class=separator>&nbsp;/&nbsp;</span>
             </span>
-            <span ng-if=!subsection>
+            <span ng-if="section&&!subsection">
+              <span class=separator>/</span>
               {{section.title}}
             </span>
             <span ng-if=subsection>
+              <span class=separator>/</span>
               <a ui-state=section.name ui-state-params="{zone: ''}">
                 {{section.title}}</a>
-              <span class=separator>&nbsp;/&nbsp;</span>
+              <span class=separator>/</span>
               {{subsection}}
             </span>
           </div>

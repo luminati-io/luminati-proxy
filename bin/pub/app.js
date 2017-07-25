@@ -19,7 +19,8 @@ define(['angular', 'lodash', 'moment', 'codemirror/lib/codemirror',
     'es6-shim', 'angular-google-analytics', 'ui-select', 'ui-router'],
 function(angular, _, moment, codemirror, date, req_stats, status_codes,
     status_codes_detail, domains, domains_detail, protocols, protocols_detail,
-    util){
+    util)
+{
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -94,15 +95,25 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         templateUrl: 'faq.html',
     });
     state_registry.register({
+        name: 'stats',
+        template: '<div><button ng-if=has_back ng-click=go_back() '
+            +'class="btn btn-default">Back</button><ui-view></ui-view></div>',
+        controller: function($scope, $transition$, $window){
+            if ($transition$.from().name=='proxies')
+                $scope.has_back = true;
+            $scope.go_back = function(){ $window.history.back(); };
+        },
+    });
+    state_registry.register({
         name: 'status_codes',
-        parent: 'app',
+        parent: 'stats',
         url: '/status_codes',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){ $scope.react_component = status_codes; },
     });
     state_registry.register({
         name: 'status_codes_detail',
-        parent: 'app',
+        parent: 'stats',
         url: '/status_codes/{code:int}',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){
@@ -110,14 +121,14 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     });
     state_registry.register({
         name: 'domains',
-        parent: 'app',
+        parent: 'stats',
         url: '/domains',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){ $scope.react_component = domains; },
     });
     state_registry.register({
         name: 'domains_detail',
-        parent: 'app',
+        parent: 'stats',
         url: '/domains/{domain:string}',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){
@@ -125,14 +136,14 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     });
     state_registry.register({
         name: 'protocols',
-        parent: 'app',
+        parent: 'stats',
         url: '/protocols',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){ $scope.react_component = protocols; },
     });
     state_registry.register({
         name: 'protocols_detail',
-        parent: 'app',
+        parent: 'stats',
         url: '/protocols/{protocol:string}',
         template: '<div react-view component=react_component></div>',
         controller: function($scope){
@@ -145,7 +156,7 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
     var logged_in_resolver = $q.defer();
     $rootScope.logged_in = logged_in_resolver.promise;
     $transitions.onBefore({to: function(state){
-        return ['settings', 'proxies', 'zones', 'tools'].includes(state.name);
+        return !['app', 'faq'].includes(state.name);
     }}, function(transition){
         return $q(function(resolve, reject){
             $q.resolve($rootScope.logged_in).then(function(logged_in){
@@ -321,20 +332,15 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         {name: 'tools', title: 'Tools'},
         {name: 'faq', title: 'FAQ'},
     ];
-    $transitions.onBefore({}, function(transition){
-    });
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
-        if (section = $scope.sections.find(function(s){
-            return s.name==state.name; }))
-        {
-            $scope.section = section;
-        }
+        $scope.section = section = $scope.sections.find(function(s){
+            return s.name==state.name; });
         $scope.subsection = section && section.name=='zones' &&
             transition.params().zone;
     });
     $scope.section = $scope.sections.find(function(s){
-        return s.name==$state.$current.name||'settings'; });
+        return s.name==$state.$current.name; });
     $http.get('/api/settings').then(function(settings){
         $scope.settings = settings.data;
         if (!$scope.settings.request_disallowed&&!$scope.settings.customer)
@@ -1014,7 +1020,7 @@ function Countries($scope, $http, $window){
         {
             country.status = 1;
             // XXX colin/ovidiu: why not use urlencoding?
-            country.url = country.url.replace(/&\d+$/, '')+'&'+(+date());
+            country.url = country.url.replace(/&\d+$/, '')+'&'+ +date();
             $scope.num_loading++;
             country.img.src = country.url;
         }
