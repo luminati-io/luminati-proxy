@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.55.635/luminati-proxy-manager-v1.55.635-setup.exe">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.55.669/luminati-proxy-manager-1.55.669-setup.exe">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOS
 - Install Node.js 6 or above (preferably using
