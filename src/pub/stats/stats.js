@@ -1,11 +1,18 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
-    'react-bootstrap', '/util.js', 'hutil/etask', 'hutil/date',
-    '/stats/common.js', '/stats/status_codes.js', '/stats/domains.js',
-    '/stats/protocols.js', '_css!animate'],
-(rr, _, React, ReactDOM, RB, util, etask, date, Common, StatusCode,
-    Domain, Protocol)=>{
+import regeneratorRuntime from 'regenerator-runtime';
+import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Button, ButtonToolbar, Row, Col, Panel, Modal} from 'react-bootstrap';
+import util from 'app/util.js';
+import etask from 'hutil/util/etask';
+import date from 'hutil/util/date';
+import Common from './common.js';
+import StatusCode from './status_codes.js';
+import Domain from './domains.js';
+import Protocol from './protocols.js';
+import 'animate.css';
 
 let mount, ga_event;
 const E = {
@@ -83,7 +90,6 @@ class StatTable extends React.Component {
 
 class CertificateButton extends React.Component {
     render(){
-        const {Button, Col} = RB;
         return <Col md={6} mdOffset={3} className="text-center">
               <Button bsStyle="success">Enable HTTPS statistics</Button>
             </Col>;
@@ -100,6 +106,7 @@ class Stats extends React.Component {
         };
     }
     get_stats = etask._fn(function*(_this){
+        this.catch(e=>console.log(e));
         while (true)
         {
             _this.setState(yield Common.StatsService.get_top({sort: 'value',
@@ -124,7 +131,6 @@ class Stats extends React.Component {
         }));
     };
     render(){
-        const {Button, ButtonToolbar, Row, Col, Panel, Modal} = RB;
         return <Panel header={
                 <Row>
                   <Col md={6}>Recent statistics</Col>
@@ -168,4 +174,4 @@ class Stats extends React.Component {
     }
 }
 
-return E; });
+export default E;

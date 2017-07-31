@@ -14,6 +14,7 @@ const ssl = require('./lib/ssl.js');
 const hutil = require('hutil');
 const request = require('request');
 const nock = require('nock');
+const lolex = require('lolex');
 const etask = hutil.etask;
 const restore_case = hutil.http_hdr.restore_case;
 const qw = hutil.string.qw;
@@ -691,7 +692,7 @@ describe('proxy', ()=>{
             const t =
                 (name, null_response, no_match_url, match_url, _ssl, code)=>it(
                     name, etask._fn(function*(_this){
-                        _this.timeout(5000);
+                        _this.timeout(8000);
                         l = yield lum({
                             null_response: null_response,
                             ssl: _ssl,
@@ -864,6 +865,11 @@ describe('proxy', ()=>{
             });
         });
         describe('history aggregation', ()=>{
+            let clock;
+            before(()=>clock = lolex.install({shouldAdvanceTime: true,
+                advanceTimeDelta: 1, toFake: qw`setTimeout clearTimeout
+                setInterval clearInterval setImmediate clearImmediate`}));
+            after(()=>clock.uninstall());
             let history;
             const aggregator = data=>history.push(data);
             beforeEach(()=>history = []);
@@ -875,8 +881,8 @@ describe('proxy', ()=>{
                     history_aggregator: aggregator}, opt));
                 assert.equal(history.length, 0);
                 let res = yield l.test(_url());
-                res.socket.destroy();
                 yield etask.sleep(10);
+                res.socket.destroy();
                 assert.equal(history.length, 1);
                 assert_has(history[0], expected());
             }));
@@ -920,13 +926,14 @@ describe('proxy', ()=>{
                 l = yield lum({pool_size: 1, keep_alive: 1, history: true,
                     history_aggregator: aggregator});
                 yield l.test();
-                yield etask.sleep(1300);
-                l.update_all_sessions();
+                yield etask.sleep(1100);
+                yield l.update_all_sessions();
                 yield etask.sleep(10);
-                assert(history.length>=2);
+                assert(history.length==3);
                 assert_has(history, [
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
+                    {context: 'SESSION INFO'},
                 ]);
             }));
         });

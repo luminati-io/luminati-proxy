@@ -1,14 +1,16 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-define(['regenerator-runtime', 'lodash', 'react', 'react-bootstrap', 'axios',
-    'hutil/etask', '/util.js'],
-(rr, _, React, RB, axios, etask, util)=>{
-
-const E = {};
+import regeneratorRuntime from 'regenerator-runtime';
+import _ from 'lodash';
+import React from 'react';
+import {Col, Table, Pagination} from 'react-bootstrap';
+import axios from 'axios';
+import etask from 'hutil/util/etask';
+import util from 'app/util.js';
 
 class StatTable extends React.Component {
     render(){
-        const Row = this.props.row, {Table} = RB;
+        const Row = this.props.row;
         return <div>
               <h4>
                 {this.props.title}
@@ -140,7 +142,6 @@ class StatsDetails extends React.Component {
         this.paginate(page-1);
     };
     render(){
-        const {Col, Table, Pagination} = RB;
         return <div>
               <div className="page-header">
                 <h3>{this.props.header}</h3>
@@ -180,8 +181,4 @@ class StatsDetails extends React.Component {
     }
 }
 
-E.StatsDetails = StatsDetails;
-E.StatTable = StatTable;
-E.StatsService = StatsService;
-
-return E; });
+export default {StatsDetails, StatTable, StatsService};

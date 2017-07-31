@@ -334,8 +334,8 @@
     </div>
   </div>
   <div class="panel panel-default" id=resolve-panel
-    ng-if="$root.mode=='root' && $parent.settings.resolve &&
-    $parent.settings.resolve!==true">
+    ng-if="$root.mode=='root' && $root.settings.resolve &&
+    $root.settings.resolve!==true">
     <div class=panel-heading>
       <a data-toggle=collapse data-parent=#tools href=#resolve>
         IP resolution file

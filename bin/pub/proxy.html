@@ -584,6 +584,45 @@
                 </div>
               </div>
             </div>
+            <div class="panel panel-default" ng-if=beta_features>
+              <div class=panel-heading>
+                <a data-toggle=collapse data-parent=#proxy-tabs
+                  href=#proxy-rules>
+                  Rules
+                </a>
+              </div>
+              <div id=proxy-rules class="panel-collapse collapse">
+                <div class=panel-body>
+                  <h3>Trigger</h3>
+                  <div class=form-group>
+                    <label for=proxy-field-rules-status_code>
+                      Select status code:
+                    </label>
+                    <select class=form-control id=proxy-field-rules-status_code
+                      ng-model=form.rules.post.res.status.arg
+                      ng-options="c for c in [200, 403, 404, 500, 501, 502, 503]">
+                    </select>
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-rules-domain>
+                      Apply rule for this domain name:
+                    </label>
+                    <input id=proxy-field-rules-domain
+                      ng-model=form.rules.post.url class=form-control>
+                  </div>
+                  <h3>Action</h3>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-rules-action>
+                      Select action to be taken when the rule is met:
+                    </label>
+                    <select class=form-control id=proxy-field-rules-action
+                      ng-model=form.rules.post.res.action
+                      ng-options="a as a.label for a in [{label: 'Retry request', value: 'retry'}]">
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class=modal-footer>

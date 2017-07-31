@@ -1,8 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
-    'react-bootstrap', '/util.js', 'hutil/etask', '/stats/common.js'],
-(rr, _, React, ReactDOM, RB, util, etask, Common)=>{
+import regeneratorRuntime from 'regenerator-runtime';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import etask from 'hutil/util/etask';
+import util from 'app/util.js';
+import Common from './common.js';
 
 let mount;
 const E = {
@@ -74,4 +77,4 @@ class Stats extends React.Component {
 
 E.Row = DomainRow;
 E.Table = DomainTable;
-return E; });
+export default E;

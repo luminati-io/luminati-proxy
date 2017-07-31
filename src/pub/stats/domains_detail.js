@@ -1,9 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
-    'react-bootstrap', 'hutil/etask', '/stats/common.js',
-    '/stats/status_codes.js', '/stats/protocols.js'],
-(rr, _, React, ReactDOM, RB, etask, Common, StatusCode, Protocol)=>{
+import regeneratorRuntime from 'regenerator-runtime';
+import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Col} from 'react-bootstrap';
+import etask from 'hutil/util/etask';
+import Common from './common.js';
+import StatusCode from './status_codes.js';
+import Protocol from './protocols.js';
 
 let mount;
 const E = {
@@ -38,7 +43,6 @@ class StatsDetails extends React.Component {
         }));
     }
     render(){
-        const {Col} = RB;
         return <Common.StatsDetails stats={this.state.stats}
               header={`Domain name: ${this.props.domain}`}>
               <Col md={6}>
@@ -53,4 +57,4 @@ class StatsDetails extends React.Component {
     }
 }
 
-return E; });
+export default E;

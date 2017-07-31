@@ -1,9 +1,9 @@
 <div ng-controller=settings id=settings-page>
   <div class="alert alert-danger settings-alert" ng-if=user_error ng-bind-html=user_error.message></div>
-  <div ng-if="$root.mode=='root'&&$parent.$parent.settings.argv" class="alert alert-info">
+  <div ng-if="$root.mode=='root'&&$root.settings.argv" class="alert alert-info">
     The application is running with the following arguments:
     <strong>
-      <span ng-repeat="p in parse_arguments($parent.$parent.settings.argv)">
+      <span ng-repeat="p in parse_arguments($root.settings.argv)">
         <span ng-if=!($index%2)||args_password>
           {{p}}
         </span>

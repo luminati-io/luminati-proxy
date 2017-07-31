@@ -1,8 +1,13 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-define(['regenerator-runtime', 'lodash', 'react', 'react-dom',
-    'react-bootstrap', '/util.js', 'hutil/etask', '/stats/common.js'],
-(rr, _, React, ReactDOM, RB, util, etask, Common)=>{
+import regeneratorRuntime from 'regenerator-runtime';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Col, Table, Pagination, OverlayTrigger, Tooltip}
+    from 'react-bootstrap';
+import etask from 'hutil/util/etask';
+import util from 'app/util.js';
+import Common from './common.js';
 
 let mount;
 const E = {
@@ -38,7 +43,6 @@ const status_codes = {
 
 class StatusCodeRow extends React.Component {
     render(){
-        const {OverlayTrigger, Tooltip} = RB;
         const tooltip = <Tooltip
               id={`status_code_${this.props.stat.status_code}`}>
               {status_codes[this.props.stat.status_code]||
@@ -100,4 +104,6 @@ class Stats extends React.Component {
 E.status_codes = status_codes;
 E.Row = StatusCodeRow;
 E.Table = StatusCodeTable;
-return E; });
+
+export {status_codes};
+export default E;

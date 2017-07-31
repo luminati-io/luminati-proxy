@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.56.453
+- :bug: fix typeerror when using rules
+
 ## 1.55.635
 - :star: added back button in stats
 - :star: windows binary file show dialog on port conflicts
