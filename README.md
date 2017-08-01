@@ -12,7 +12,7 @@ With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IP
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
-<em>Read this in [中文](README-zh-CN.md).</em>
+<em>Read this in [中文](README-zh-CN.md).</em> 
 
 ## Features
 - Highly scalable
