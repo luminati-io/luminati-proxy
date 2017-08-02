@@ -3,6 +3,7 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Row, Col, Button} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import util from 'app/util.js';
 import Common from './common.js';
@@ -22,6 +23,15 @@ const E = {
     },
 };
 
+class CertificateButton extends React.Component {
+    render(){
+        return <Button bsStyle="success" bsSize="xsmall"
+              onClick={this.props.onClick}>
+              Enable HTTPS statistics
+            </Button>;
+    }
+}
+
 class ProtocolRow extends React.Component {
     render(){
         return <tr>
@@ -32,7 +42,8 @@ class ProtocolRow extends React.Component {
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
-                {this.props.stat.value}</td>
+                {this.props.stat.value}
+              </td>
             </tr>;
     }
 }
@@ -40,7 +51,17 @@ class ProtocolRow extends React.Component {
 class ProtocolTable extends React.Component {
     render(){
         return <Common.StatTable row={ProtocolRow} path="/protocols"
-              row_key="protocol" title="All protocols" {...this.props}>
+              row_key="protocol" title={
+                  <Row>
+                    <Col md={6}>All protocols</Col>
+                    {this.props.show_enable_https_button &&
+                      <Col md={6} className="text-right">
+                        <CertificateButton
+                          onClick={this.props.enable_https_button_click} />
+                      </Col>}
+                  </Row>
+                }
+                {...this.props}>
               <tr>
                 <th>Protocol</th>
                 <th className="col-md-2">Bandwidth</th>

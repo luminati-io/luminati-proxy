@@ -27,7 +27,7 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -244,7 +244,9 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _etask = __webpack_require__(49);
+var _reactBootstrap = __webpack_require__(45);
+
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -279,8 +281,32 @@ var E = {
     }
 };
 
-var ProtocolRow = function (_React$Component) {
-    _inherits(ProtocolRow, _React$Component);
+var CertificateButton = function (_React$Component) {
+    _inherits(CertificateButton, _React$Component);
+
+    function CertificateButton() {
+        _classCallCheck(this, CertificateButton);
+
+        return _possibleConstructorReturn(this, (CertificateButton.__proto__ || Object.getPrototypeOf(CertificateButton)).apply(this, arguments));
+    }
+
+    _createClass(CertificateButton, [{
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                _reactBootstrap.Button,
+                { bsStyle: 'success', bsSize: 'xsmall',
+                    onClick: this.props.onClick },
+                'Enable HTTPS statistics'
+            );
+        }
+    }]);
+
+    return CertificateButton;
+}(_react2.default.Component);
+
+var ProtocolRow = function (_React$Component2) {
+    _inherits(ProtocolRow, _React$Component2);
 
     function ProtocolRow() {
         _classCallCheck(this, ProtocolRow);
@@ -320,8 +346,8 @@ var ProtocolRow = function (_React$Component) {
     return ProtocolRow;
 }(_react2.default.Component);
 
-var ProtocolTable = function (_React$Component2) {
-    _inherits(ProtocolTable, _React$Component2);
+var ProtocolTable = function (_React$Component3) {
+    _inherits(ProtocolTable, _React$Component3);
 
     function ProtocolTable() {
         _classCallCheck(this, ProtocolTable);
@@ -335,7 +361,22 @@ var ProtocolTable = function (_React$Component2) {
             return _react2.default.createElement(
                 _common2.default.StatTable,
                 _extends({ row: ProtocolRow, path: '/protocols',
-                    row_key: 'protocol', title: 'All protocols' }, this.props),
+                    row_key: 'protocol', title: _react2.default.createElement(
+                        _reactBootstrap.Row,
+                        null,
+                        _react2.default.createElement(
+                            _reactBootstrap.Col,
+                            { md: 6 },
+                            'All protocols'
+                        ),
+                        this.props.show_enable_https_button && _react2.default.createElement(
+                            _reactBootstrap.Col,
+                            { md: 6, className: 'text-right' },
+                            _react2.default.createElement(CertificateButton, {
+                                onClick: this.props.enable_https_button_click })
+                        )
+                    )
+                }, this.props),
                 _react2.default.createElement(
                     'tr',
                     null,
@@ -362,16 +403,16 @@ var ProtocolTable = function (_React$Component2) {
     return ProtocolTable;
 }(_react2.default.Component);
 
-var Stats = function (_React$Component3) {
-    _inherits(Stats, _React$Component3);
+var Stats = function (_React$Component4) {
+    _inherits(Stats, _React$Component4);
 
     function Stats(props) {
         _classCallCheck(this, Stats);
 
-        var _this4 = _possibleConstructorReturn(this, (Stats.__proto__ || Object.getPrototypeOf(Stats)).call(this, props));
+        var _this5 = _possibleConstructorReturn(this, (Stats.__proto__ || Object.getPrototypeOf(Stats)).call(this, props));
 
-        _this4.state = { stats: [] };
-        return _this4;
+        _this5.state = { stats: [] };
+        return _this5;
     }
 
     _createClass(Stats, [{
@@ -1284,7 +1325,7 @@ var _angular = __webpack_require__(66);
 
 var _angular2 = _interopRequireDefault(_angular);
 
-var _lodash = __webpack_require__(54);
+var _lodash = __webpack_require__(55);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -1666,7 +1707,7 @@ _module.controller('root', ['$rootScope', '$scope', '$http', '$window', '$state'
         $scope.ver_last = version.data;
     });
     $http.get('/api/consts').then(function (consts) {
-        $scope.consts = consts.data;
+        $rootScope.consts = consts.data;
         $scope.$broadcast('consts', consts.data);
     });
     $http.get('/api/node_version').then(function (node) {
@@ -2167,8 +2208,8 @@ function Countries($scope, $http, $window) {
                 if (apply) $scope.$apply();
             };
             var nheaders = JSON.stringify(normalize_headers($scope.headers));
-            for (var c_index in $scope.$parent.consts.proxy.country.values) {
-                var c = $scope.$parent.consts.proxy.country.values[c_index];
+            for (var c_index in $scope.$root.consts.proxy.country.values) {
+                var c = $scope.$root.consts.proxy.country.values[c_index];
                 if (!c.value) continue;
                 var params = {
                     country: c.value,
@@ -2672,7 +2713,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout) {
     $scope.$on('consts', function (e, data) {
         apply_consts(data.proxy);
     });
-    if ($scope.$parent.consts) apply_consts($scope.$parent.consts.proxy);
+    if ($scope.$root.consts) apply_consts($scope.$root.consts.proxy);
     $scope.zones = {};
     $scope.selected_proxies = {};
     $scope.showed_status_proxies = {};
@@ -2868,8 +2909,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout) {
         return 'Change value';
     };
     $scope.is_valid_field = function (proxy, name) {
-        if (!$scope.$parent.consts) return true;
-        return is_valid_field(proxy, name, $scope.$parent.consts.proxy.zone);
+        if (!$scope.$root.consts) return true;
+        return is_valid_field(proxy, name, $scope.$root.consts.proxy.zone);
     };
     $scope.starts_with = function (actual, expected) {
         return expected.length > 1 && actual.toLowerCase().startsWith(expected.toLowerCase());
@@ -3144,7 +3185,7 @@ function History($scope, $http, $window) {
                 options = ['', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD', 'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND', 'VIEW', 'TRACE', 'CONNECT'].map(function (e) {
                     return { key: e, value: e };
                 });
-            } else if (field.field == 'country') options = $scope.$parent.$parent.consts.proxy.country.values;else if (field.field == 'context') options = $scope.history_context;
+            } else if (field.field == 'country') options = $scope.$root.consts.proxy.country.values;else if (field.field == 'context') options = $scope.history_context;
             $scope.filter_dialog = [{
                 field: field,
                 filters: $scope.filters,
@@ -3285,7 +3326,7 @@ function Proxy($scope, $http, $proxies, $window, $q) {
     $scope.init = function (locals) {
         var regions = {};
         var cities = {};
-        $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
+        $scope.consts = $scope.$root.consts.proxy;
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         var form = $scope.form = _lodash2.default.cloneDeep(locals.proxy);
         form.port = $scope.port;
@@ -3515,7 +3556,7 @@ function Proxy($scope, $http, $proxies, $window, $q) {
             }
             proxy.whitelist_ips = $scope.extra.whitelist_ips.split(',').filter(Boolean);
             var reload;
-            if (Object.keys(proxy.rules).length) {
+            if (Object.keys(proxy.rules || {}).length) {
                 proxy.rules = {
                     pre: { browser: 'firefox' },
                     post: {
@@ -3744,7 +3785,7 @@ var _regeneratorRuntime = __webpack_require__(42);
 
 var _regeneratorRuntime2 = _interopRequireDefault(_regeneratorRuntime);
 
-var _lodash = __webpack_require__(54);
+var _lodash = __webpack_require__(55);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -3756,13 +3797,13 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactBootstrap = __webpack_require__(57);
+var _reactBootstrap = __webpack_require__(45);
 
 var _util = __webpack_require__(78);
 
 var _util2 = _interopRequireDefault(_util);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -3962,42 +4003,15 @@ var StatTable = function (_React$Component2) {
     return StatTable;
 }(_react2.default.Component);
 
-var CertificateButton = function (_React$Component3) {
-    _inherits(CertificateButton, _React$Component3);
-
-    function CertificateButton() {
-        _classCallCheck(this, CertificateButton);
-
-        return _possibleConstructorReturn(this, (CertificateButton.__proto__ || Object.getPrototypeOf(CertificateButton)).apply(this, arguments));
-    }
-
-    _createClass(CertificateButton, [{
-        key: 'render',
-        value: function render() {
-            return _react2.default.createElement(
-                _reactBootstrap.Col,
-                { md: 6, mdOffset: 3, className: 'text-center' },
-                _react2.default.createElement(
-                    _reactBootstrap.Button,
-                    { bsStyle: 'success' },
-                    'Enable HTTPS statistics'
-                )
-            );
-        }
-    }]);
-
-    return CertificateButton;
-}(_react2.default.Component);
-
-var Stats = function (_React$Component4) {
-    _inherits(Stats, _React$Component4);
+var Stats = function (_React$Component3) {
+    _inherits(Stats, _React$Component3);
 
     function Stats(props) {
         _classCallCheck(this, Stats);
 
-        var _this9 = _possibleConstructorReturn(this, (Stats.__proto__ || Object.getPrototypeOf(Stats)).call(this, props));
+        var _this8 = _possibleConstructorReturn(this, (Stats.__proto__ || Object.getPrototypeOf(Stats)).call(this, props));
 
-        _this9.get_stats = _etask2.default._fn(_regeneratorRuntime2.default.mark(function _callee2(_this) {
+        _this8.get_stats = _etask2.default._fn(_regeneratorRuntime2.default.mark(function _callee2(_this) {
             return _regeneratorRuntime2.default.wrap(function _callee2$(_context2) {
                 while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -4037,18 +4051,18 @@ var Stats = function (_React$Component4) {
             }, _callee2, this);
         }));
 
-        _this9.close = function () {
-            return _this9.setState({ show_reset: false });
+        _this8.close = function () {
+            return _this8.setState({ show_reset: false });
         };
 
-        _this9.confirm = function () {
-            return _this9.setState({ show_reset: true });
+        _this8.confirm = function () {
+            return _this8.setState({ show_reset: true });
         };
 
-        _this9.reset_stats = function () {
-            if (_this9.state.resetting) return;
-            _this9.setState({ resetting: true });
-            var _this = _this9;
+        _this8.reset_stats = function () {
+            if (_this8.state.resetting) return;
+            _this8.setState({ resetting: true });
+            var _this = _this8;
             E.sp.spawn((0, _etask2.default)(_regeneratorRuntime2.default.mark(function _callee3() {
                 return _regeneratorRuntime2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -4068,14 +4082,23 @@ var Stats = function (_React$Component4) {
                     }
                 }, _callee3, this);
             })));
+            ga_event('stats panel', 'click', 'reset btn');
         };
 
-        _this9.state = {
+        _this8.enable_https_statistics = function () {
+            _this8.setState({ show_certificate: true });
+        };
+
+        _this8.close_certificate = function () {
+            _this8.setState({ show_certificate: false });
+        };
+
+        _this8.state = {
             statuses: { stats: [] },
             domains: { stats: [] },
             protocols: { stats: [] }
         };
-        return _this9;
+        return _this8;
     }
 
     _createClass(Stats, [{
@@ -4116,32 +4139,13 @@ var Stats = function (_React$Component4) {
                     title: 'Top ' + (_lodash2.default.min([5, this.state.domains.stats.length]) || '') + '\n                  domains' }),
                 _react2.default.createElement(StatTable, { table: _protocols2.default.Table, row: ProtoRow,
                     dataType: 'protocols', stats: this.state.protocols.stats,
-                    show_more: this.state.protocols.has_more }),
+                    show_more: this.state.protocols.has_more,
+                    show_enable_https_button: true,
+                    enable_https_button_click: this.enable_https_statistics }),
                 _react2.default.createElement(
-                    _reactBootstrap.Modal,
-                    { show: this.state.show_reset, onHide: this.close },
-                    _react2.default.createElement(
-                        _reactBootstrap.Modal.Header,
-                        { closeButton: true },
-                        _react2.default.createElement(
-                            _reactBootstrap.Modal.Title,
-                            null,
-                            'Reset stats'
-                        )
-                    ),
-                    _react2.default.createElement(
-                        _reactBootstrap.Modal.Body,
-                        null,
-                        _react2.default.createElement(
-                            'h4',
-                            null,
-                            'Are you sure you want to reset stats?'
-                        )
-                    ),
-                    _react2.default.createElement(
-                        _reactBootstrap.Modal.Footer,
-                        null,
-                        _react2.default.createElement(
+                    _common2.default.Dialog,
+                    { show: this.state.show_reset, onHide: this.close,
+                        title: 'Reset stats', footer: _react2.default.createElement(
                             _reactBootstrap.ButtonToolbar,
                             null,
                             _react2.default.createElement(
@@ -4155,6 +4159,46 @@ var Stats = function (_React$Component4) {
                                 { onClick: this.close },
                                 'Cancel'
                             )
+                        ) },
+                    _react2.default.createElement(
+                        'h4',
+                        null,
+                        'Are you sure you want to reset stats?'
+                    )
+                ),
+                _react2.default.createElement(
+                    _common2.default.Dialog,
+                    { show: this.state.show_certificate,
+                        onHide: this.close_certificate,
+                        title: 'Add certificate file to browsers',
+                        footer: _react2.default.createElement(
+                            _reactBootstrap.Button,
+                            { onClick: this.close_certificate },
+                            'Close'
+                        ) },
+                    'Gathering stats for HTTPS requests requires setting a certificate key.',
+                    _react2.default.createElement(
+                        'ol',
+                        null,
+                        _react2.default.createElement(
+                            'li',
+                            null,
+                            'Download our free certificate key',
+                            _react2.default.createElement(
+                                'a',
+                                { href: '/ssl', target: '_blank', download: true },
+                                ' here'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'li',
+                            null,
+                            'Add the certificate to your browser'
+                        ),
+                        _react2.default.createElement(
+                            'li',
+                            null,
+                            'Refresh the page'
                         )
                     )
                 )
@@ -4169,7 +4213,7 @@ exports.default = E;
 
 /***/ }),
 
-/***/ 49:
+/***/ 50:
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -5699,7 +5743,7 @@ var _regeneratorRuntime = __webpack_require__(42);
 
 var _regeneratorRuntime2 = _interopRequireDefault(_regeneratorRuntime);
 
-var _lodash = __webpack_require__(54);
+var _lodash = __webpack_require__(55);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -5707,13 +5751,13 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactBootstrap = __webpack_require__(57);
+var _reactBootstrap = __webpack_require__(45);
 
 var _axios = __webpack_require__(292);
 
 var _axios2 = _interopRequireDefault(_axios);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -6080,7 +6124,48 @@ var StatsDetails = function (_React$Component2) {
     return StatsDetails;
 }(_react2.default.Component);
 
-exports.default = { StatsDetails: StatsDetails, StatTable: StatTable, StatsService: StatsService };
+var Dialog = function (_React$Component3) {
+    _inherits(Dialog, _React$Component3);
+
+    function Dialog() {
+        _classCallCheck(this, Dialog);
+
+        return _possibleConstructorReturn(this, (Dialog.__proto__ || Object.getPrototypeOf(Dialog)).apply(this, arguments));
+    }
+
+    _createClass(Dialog, [{
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                _reactBootstrap.Modal,
+                _lodash2.default.omit(this.props, ['title', 'footer', 'children']),
+                _react2.default.createElement(
+                    _reactBootstrap.Modal.Header,
+                    { closeButton: true },
+                    _react2.default.createElement(
+                        _reactBootstrap.Modal.Title,
+                        null,
+                        this.props.title
+                    )
+                ),
+                _react2.default.createElement(
+                    _reactBootstrap.Modal.Body,
+                    null,
+                    this.props.children
+                ),
+                _react2.default.createElement(
+                    _reactBootstrap.Modal.Footer,
+                    null,
+                    this.props.footer
+                )
+            );
+        }
+    }]);
+
+    return Dialog;
+}(_react2.default.Component);
+
+exports.default = { StatsDetails: StatsDetails, StatTable: StatTable, StatsService: StatsService, Dialog: Dialog };
 
 /***/ }),
 
@@ -6663,7 +6748,7 @@ var _regeneratorRuntime = __webpack_require__(42);
 
 var _regeneratorRuntime2 = _interopRequireDefault(_regeneratorRuntime);
 
-var _lodash = __webpack_require__(54);
+var _lodash = __webpack_require__(55);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -6675,9 +6760,9 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactBootstrap = __webpack_require__(57);
+var _reactBootstrap = __webpack_require__(45);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -6844,7 +6929,7 @@ var _regeneratorRuntime = __webpack_require__(42);
 
 var _regeneratorRuntime2 = _interopRequireDefault(_regeneratorRuntime);
 
-var _lodash = __webpack_require__(54);
+var _lodash = __webpack_require__(55);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -6856,9 +6941,9 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactBootstrap = __webpack_require__(57);
+var _reactBootstrap = __webpack_require__(45);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -7007,7 +7092,7 @@ var _regeneratorRuntime = __webpack_require__(42);
 
 var _regeneratorRuntime2 = _interopRequireDefault(_regeneratorRuntime);
 
-var _lodash = __webpack_require__(54);
+var _lodash = __webpack_require__(55);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -7019,9 +7104,9 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactBootstrap = __webpack_require__(57);
+var _reactBootstrap = __webpack_require__(45);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 
@@ -7252,9 +7337,9 @@ var _reactDom = __webpack_require__(20);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactBootstrap = __webpack_require__(57);
+var _reactBootstrap = __webpack_require__(45);
 
-var _etask = __webpack_require__(49);
+var _etask = __webpack_require__(50);
 
 var _etask2 = _interopRequireDefault(_etask);
 

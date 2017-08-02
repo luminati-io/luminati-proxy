@@ -867,7 +867,7 @@ describe('proxy', ()=>{
         describe('history aggregation', ()=>{
             let clock;
             before(()=>clock = lolex.install({shouldAdvanceTime: true,
-                advanceTimeDelta: 1, toFake: qw`setTimeout clearTimeout
+                advanceTimeDelta: 10, toFake: qw`setTimeout clearTimeout
                 setInterval clearInterval setImmediate clearImmediate`}));
             after(()=>clock.uninstall());
             let history;
@@ -881,7 +881,7 @@ describe('proxy', ()=>{
                     history_aggregator: aggregator}, opt));
                 assert.equal(history.length, 0);
                 let res = yield l.test(_url());
-                yield etask.sleep(10);
+                yield etask.sleep(40);
                 res.socket.destroy();
                 assert.equal(history.length, 1);
                 assert_has(history[0], expected());
@@ -922,14 +922,17 @@ describe('proxy', ()=>{
                 content_size: 0,
             }), {null_response: '.*'});
             it('pool', etask._fn(function*(_this){
-                _this.timeout(4000);
-                l = yield lum({pool_size: 1, keep_alive: 1, history: true,
-                    history_aggregator: aggregator});
+                const one_each_aggregator = data=>{
+                    if (!history.some(_.matches({context: data.context})))
+                        history.push(data);
+                };
+                l = yield lum({pool_size: 1, keep_alive: 0.01, history: true,
+                    history_aggregator: one_each_aggregator});
                 yield l.test();
-                yield etask.sleep(1100);
+                yield etask.sleep(20);
                 yield l.update_all_sessions();
-                yield etask.sleep(10);
-                assert(history.length==3);
+                yield etask.sleep(20);
+                assert.equal(history.length, 3);
                 assert_has(history, [
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},

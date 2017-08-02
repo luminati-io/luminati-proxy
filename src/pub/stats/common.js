@@ -3,7 +3,7 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
-import {Col, Table, Pagination} from 'react-bootstrap';
+import {Col, Table, Pagination, Modal} from 'react-bootstrap';
 import axios from 'axios';
 import etask from 'hutil/util/etask';
 import util from 'app/util.js';
@@ -181,4 +181,20 @@ class StatsDetails extends React.Component {
     }
 }
 
-export default {StatsDetails, StatTable, StatsService};
+class Dialog extends React.Component {
+    render(){
+        return <Modal {..._.omit(this.props, ['title', 'footer', 'children'])}>
+              <Modal.Header closeButton>
+                <Modal.Title>{this.props.title}</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {this.props.children}
+              </Modal.Body>
+              <Modal.Footer>
+                {this.props.footer}
+              </Modal.Footer>
+            </Modal>;
+    }
+}
+
+export default {StatsDetails, StatTable, StatsService, Dialog};

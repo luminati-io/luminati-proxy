@@ -1,6 +1,10 @@
  Luminati Proxy manager - Change Log
 
-## 1.56.453
+## 1.56.648
+- :bug: fix UI create proxy
+- :star: Added certificate setup instructions
+
+## 1.56.452
 - :bug: fix typeerror when using rules
 
 ## 1.55.635

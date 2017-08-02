@@ -364,7 +364,7 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         $scope.ver_last = version.data;
     });
     $http.get('/api/consts').then(function(consts){
-        $scope.consts = consts.data;
+        $rootScope.consts = consts.data;
         $scope.$broadcast('consts', consts.data);
     });
     $http.get('/api/node_version').then(function(node){
@@ -933,9 +933,9 @@ function Countries($scope, $http, $window){
                     $scope.$apply();
             };
             var nheaders = JSON.stringify(normalize_headers($scope.headers));
-            for (var c_index in $scope.$parent.consts.proxy.country.values)
+            for (var c_index in $scope.$root.consts.proxy.country.values)
             {
-                var c = $scope.$parent.consts.proxy.country.values[c_index];
+                var c = $scope.$root.consts.proxy.country.values[c_index];
                 if (!c.value)
                     continue;
                 var params = {
@@ -1434,8 +1434,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         debug_opts = data.debug.values;
     };
     $scope.$on('consts', function(e, data){ apply_consts(data.proxy); });
-    if ($scope.$parent.consts)
-        apply_consts($scope.$parent.consts.proxy);
+    if ($scope.$root.consts)
+        apply_consts($scope.$root.consts.proxy);
     $scope.zones = {};
     $scope.selected_proxies = {};
     $scope.showed_status_proxies = {};
@@ -1661,9 +1661,9 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         return 'Change value';
     };
     $scope.is_valid_field = function(proxy, name){
-        if (!$scope.$parent.consts)
+        if (!$scope.$root.consts)
             return true;
-        return is_valid_field(proxy, name, $scope.$parent.consts.proxy.zone);
+        return is_valid_field(proxy, name, $scope.$root.consts.proxy.zone);
     };
     $scope.starts_with = function(actual, expected){
         return expected.length>1 &&
@@ -2022,7 +2022,7 @@ function History($scope, $http, $window){
                 );
             }
             else if (field.field=='country')
-                options = $scope.$parent.$parent.consts.proxy.country.values;
+                options = $scope.$root.consts.proxy.country.values;
             else if (field.field=='context')
                 options = $scope.history_context;
             $scope.filter_dialog = [{
@@ -2191,7 +2191,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
     $scope.init = function(locals){
         var regions = {};
         var cities = {};
-        $scope.consts = $scope.$parent.$parent.$parent.$parent.consts.proxy;
+        $scope.consts = $scope.$root.consts.proxy;
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
         var form = $scope.form = _.cloneDeep(locals.proxy);
         form.port = $scope.port;
@@ -2474,7 +2474,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
             proxy.whitelist_ips =
                 $scope.extra.whitelist_ips.split(',').filter(Boolean);
             var reload;
-            if (Object.keys(proxy.rules).length)
+            if (Object.keys(proxy.rules||{}).length)
             {
                 proxy.rules = {
                     pre: {browser: 'firefox'},

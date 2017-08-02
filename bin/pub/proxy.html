@@ -600,7 +600,10 @@
                     </label>
                     <select class=form-control id=proxy-field-rules-status_code
                       ng-model=form.rules.post.res.status.arg
-                      ng-options="c for c in [200, 403, 404, 500, 501, 502, 503]">
+                      ng-options="c for c in ['200 - Succeeded requests',
+                      '403 - Forbidden', '404 - Not found', '500 - Internal
+                      server error', '502 - Bad gateway', '503 - Service
+                      unavailable', '504 - Gateway timeout']">
                     </select>
                   </div>
                   <div class=form-group>
@@ -608,7 +611,8 @@
                       Apply rule for this domain name:
                     </label>
                     <input id=proxy-field-rules-domain
-                      ng-model=form.rules.post.url class=form-control>
+                      ng-model=form.rules.post.url class=form-control
+                      placeholder="example.com">
                   </div>
                   <h3>Action</h3>
                   <div class=form-group>
@@ -617,7 +621,8 @@
                     </label>
                     <select class=form-control id=proxy-field-rules-action
                       ng-model=form.rules.post.res.action
-                      ng-options="a as a.label for a in [{label: 'Retry request', value: 'retry'}]">
+                      ng-options="a as a.label for a in [{label: 'Retry request
+                      (up to 20 times)', value: 'retry'}]">
                     </select>
                   </div>
                 </div>
