@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.56.937
+- :bug: fix session handling with proxy-authorization header
+
 ## 1.56.648
 - :bug: fix UI create proxy
 - :star: Added certificate setup instructions
