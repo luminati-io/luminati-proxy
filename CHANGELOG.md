@@ -2,6 +2,7 @@
 
 ## 1.56.937
 - :bug: fix session handling with proxy-authorization header
+- :star: add x-lpm-session header support
 
 ## 1.56.648
 - :bug: fix UI create proxy
