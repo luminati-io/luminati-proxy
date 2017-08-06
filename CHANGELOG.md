@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.57.189
+- :bug: fix allocated ips
+
 ## 1.56.937
 - :bug: fix session handling with proxy-authorization header
 - :star: add x-lpm-session header support

@@ -2342,6 +2342,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
             $window.$('#allocated_ips').modal();
             $http.get('/api/allocated_ips?zone='+zone+'&key='+keypass)
             .then(function(res){
+                form.ips = form.ips.filter(ip=>res.data.ips.includes(ip));
                 modals.allocated_ips.ips = res.data.ips.map(function(ip_port){
                     var ip = ip_port.split(':')[0];
                     return {ip: ip, checked: form.ips.includes(ip)};
