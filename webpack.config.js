@@ -62,7 +62,6 @@ module.exports = {
     },
     resolve: {
         alias: {
-            app: `${__dirname}/src/pub`,
             '/util': 'hutil/util/',
             jquery: 'jquery/src/jquery.js',
         },

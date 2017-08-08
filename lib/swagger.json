@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.57.189",
+        "version": "1.57.488",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -380,6 +380,10 @@
                 "beta_features": {
                     "type": "boolean",
                     "description": "Enable beta features"
+                },
+                "test_url": {
+                    "type": "string",
+                    "description": "A url for testing proxy (default: http://lumtest.com/myip.json)"
                 }
             }
         },

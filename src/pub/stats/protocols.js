@@ -5,7 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Row, Col, Button} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
-import util from 'app/util.js';
+import util from '../util.js';
 import Common from './common.js';
 
 let mount;

@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.57.488
+- :star: support custom urls for proxy status check
+
 ## 1.57.189
 - :bug: fix allocated ips
 

@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import {Col, Table, Pagination, OverlayTrigger, Tooltip}
     from 'react-bootstrap';
 import etask from 'hutil/util/etask';
-import util from 'app/util.js';
+import util from '../util.js';
 import Common from './common.js';
 
 let mount;

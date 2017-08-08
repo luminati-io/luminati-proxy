@@ -5,13 +5,14 @@ import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Button, ButtonToolbar, Row, Col, Panel, Modal} from 'react-bootstrap';
-import util from 'app/util.js';
+import util from '../util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import Common from './common.js';
 import StatusCode from './status_codes.js';
 import Domain from './domains.js';
 import Protocol from './protocols.js';
+import {Dialog} from '../common.js';
 import 'animate.css';
 
 let mount, ga_event;
@@ -154,7 +155,7 @@ class Stats extends React.Component {
                 show_more={this.state.protocols.has_more}
                 show_enable_https_button
                 enable_https_button_click={this.enable_https_statistics} />
-              <Common.Dialog show={this.state.show_reset} onHide={this.close}
+              <Dialog show={this.state.show_reset} onHide={this.close}
                 title="Reset stats" footer={
                   <ButtonToolbar>
                     <Button bsStyle="primary" onClick={this.reset_stats}
@@ -165,8 +166,8 @@ class Stats extends React.Component {
                   </ButtonToolbar>
                 }>
                 <h4>Are you sure you want to reset stats?</h4>
-              </Common.Dialog>
-              <Common.Dialog show={this.state.show_certificate}
+              </Dialog>
+              <Dialog show={this.state.show_certificate}
                 onHide={this.close_certificate}
                 title="Add certificate file to browsers"
                 footer={
@@ -181,7 +182,7 @@ class Stats extends React.Component {
                   <li>Add the certificate to your browser</li>
                   <li>Refresh the page</li>
                 </ol>
-              </Common.Dialog>
+              </Dialog>
             </Panel>;
     }
 }

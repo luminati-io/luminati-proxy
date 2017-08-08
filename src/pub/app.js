@@ -17,6 +17,7 @@ import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
 import protocols_detail from './stats/protocols_detail.js';
+import messages from './messages.js';
 import util from './util.js';
 import 'codemirror/mode/javascript/javascript';
 import 'jquery';
@@ -206,6 +207,7 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
                 {transport: 'beacon'});
         };
         req_stats.init_ga(ga_event);
+        messages.init_ga(ga_event);
         if ($window.localStorage.getItem('last_run_id')!=
             $rootScope.run_config.id)
         {
@@ -297,6 +299,7 @@ function proxies_factory($http, $q){
 module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     '$state', '$transitions',
 function($rootScope, $scope, $http, $window, $state, $transitions){
+    $scope.messages = messages;
     $scope.quickstart = function(){
         return $window.localStorage.getItem('quickstart')=='show';
     };
@@ -347,6 +350,8 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         return s.name==$state.$current.name; });
     $http.get('/api/settings').then(function(settings){
         $rootScope.settings = settings.data;
+        $rootScope.beta_features = settings.data.argv
+            .includes('beta_features');
         if (!$rootScope.settings.request_disallowed&&
             !$rootScope.settings.customer)
         {
@@ -773,7 +778,7 @@ function Test($scope, $http, $filter, $window){
     else
     {
         $scope.method = 'GET';
-        $scope.url = 'http://lumtest.com/myip.json';
+        $scope.url = $scope.$root.settings.test_url;
     }
     $http.get('/api/proxies').then(function(proxies){
         $scope.proxies = [['0', 'No proxy']];
@@ -2283,8 +2288,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         });
         $scope.regions = [];
         $scope.cities = [];
-        $scope.beta_features = $scope.$root.settings.argv
-            .includes('beta_features');
+        $scope.beta_features = $scope.$root.beta_features;
         $scope.get_zones_names = function(){
             return Object.keys($scope.zones); };
         $scope.show_modal = function(){
