@@ -14,6 +14,7 @@
   <div ng-hide=proxies class="alert alert-info">
     Loading...
   </div>
+  <div ng-if="section.name!='settings'" react-view=messages></div>
   <div class=col-md-7>
     <div ng-if=proxies class="panel panel-default proxies">
       <div class=panel-heading>
@@ -249,7 +250,7 @@
     </div>
   </div>
   <div class=col-md-5>
-    <div react-view component=react_component></div>
+    <div react-view=react_component></div>
   </div>
   <div ng-repeat="h in history_dialog" ng-controller=history
     ng-include="'history.html'" ng-init=init(h)>

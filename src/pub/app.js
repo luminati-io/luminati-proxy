@@ -19,6 +19,8 @@ import protocols from './stats/protocols.js';
 import protocols_detail from './stats/protocols_detail.js';
 import messages from './messages.js';
 import util from './util.js';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import 'codemirror/mode/javascript/javascript';
 import 'jquery';
 import 'angular-sanitize';
@@ -48,7 +50,8 @@ var is_valid_field = function(proxy, name, zone_definition){
 var module = angular.module('app', ['ngSanitize', 'ui.bootstrap', 'ui.select',
     'angular-google-analytics', 'ui.router']);
 
-var analytics_provider, ga_event;
+let analytics_provider;
+const ga_event = util.ga_event;
 
 module.config(['$uibTooltipProvider', '$uiRouterProvider', '$locationProvider',
     'AnalyticsProvider',
@@ -101,8 +104,11 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     });
     state_registry.register({
         name: 'stats',
-        template: '<div><button ng-if=has_back ng-click=go_back() '
-            +'class="btn btn-default">Back</button><ui-view></ui-view></div>',
+        template: `<div class=col-md-12>
+              <button ng-if=has_back ng-click=go_back()
+                class="btn btn-default">Back</button>
+              <ui-view></ui-view>
+            </div>`,
         controller: function($scope, $transition$, $window){
             if ($transition$.from().name=='proxies')
                 $scope.has_back = true;
@@ -113,14 +119,14 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'status_codes',
         parent: 'stats',
         url: '/status_codes',
-        template: '<div react-view component=react_component></div>',
+        template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = status_codes; },
     });
     state_registry.register({
         name: 'status_codes_detail',
         parent: 'stats',
         url: '/status_codes/{code:int}',
-        template: '<div react-view component=react_component></div>',
+        template: '<div react-view=react_component state-props=code></div>',
         controller: function($scope){
             $scope.react_component = status_codes_detail; },
     });
@@ -128,14 +134,14 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'domains',
         parent: 'stats',
         url: '/domains',
-        template: '<div react-view component=react_component></div>',
+        template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = domains; },
     });
     state_registry.register({
         name: 'domains_detail',
         parent: 'stats',
         url: '/domains/{domain:string}',
-        template: '<div react-view component=react_component></div>',
+        template: '<div react-view=react_component state-props=domain></div>',
         controller: function($scope){
             $scope.react_component = domains_detail; },
     });
@@ -143,14 +149,15 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'protocols',
         parent: 'stats',
         url: '/protocols',
-        template: '<div react-view component=react_component></div>',
+        template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = protocols; },
     });
     state_registry.register({
         name: 'protocols_detail',
         parent: 'stats',
         url: '/protocols/{protocol:string}',
-        template: '<div react-view component=react_component></div>',
+        template: `<div react-view=react_component state-props=protocol>
+            </div>`,
         controller: function($scope){
             $scope.react_component = protocols_detail; },
     });
@@ -194,20 +201,15 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
             analytics_provider.setAccount({
                 tracker: ua.tid,
                 set: {forceSSL: true},
+                trackEvent: true,
             });
-            _.each(ua._persistentParams, function(v, k){
-                Analytics.set('&'+k, v); });
-            Analytics.set('&an', (ua._persistentParams.an||'LPM')+' - UI');
             Analytics.registerScriptTags();
             Analytics.registerTrackers();
+            _.each(ua._persistentParams, (v, k)=>Analytics.set(`&${k}`, v));
+            Analytics.set('&an', `${ua._persistentParams.an||'LPM'} - UI`);
         }
         analytics_provider = null;
-        ga_event = function(category, action, label){
-            Analytics.trackEvent(category, action, label, undefined, undefined,
-                {transport: 'beacon'});
-        };
-        req_stats.init_ga(ga_event);
-        messages.init_ga(ga_event);
+        util.init_ga(Analytics);
         if ($window.localStorage.getItem('last_run_id')!=
             $rootScope.run_config.id)
         {
@@ -2692,10 +2694,13 @@ module.directive('initSelectOpen', ['$window', function($window){
 
 module.directive('reactView', ['$state', function($state){
     return {
-        scope: {component: '='},
+        scope: {view: '=reactView', props: '@stateProps'},
         link: function(scope, element, attrs){
-            scope.component.install(element[0], $state.params);
-            element.on('$destroy', function(){ scope.component.uninstall(); });
+            ReactDOM.render(React.createElement(scope.view,
+                _.pick($state.params, (scope.props||'').split(' '))),
+                element[0]);
+            element.on('$destroy', ()=>{
+                ReactDOM.unmountComponentAtNode(element[0]); });
         },
     };
 }]);

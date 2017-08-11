@@ -3,31 +3,22 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {Button, ButtonToolbar, Row, Col, Panel, Modal} from 'react-bootstrap';
 import util from '../util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import Common from './common.js';
-import StatusCode from './status_codes.js';
-import Domain from './domains.js';
-import Protocol from './protocols.js';
+import {StatusCodeRow, StatusCodeTable} from './status_codes.js';
+import {DomainRow, DomainTable} from './domains.js';
+import {ProtocolRow, ProtocolTable} from './protocols.js';
 import {Dialog} from '../common.js';
 import 'animate.css';
 
-let mount, ga_event;
 const E = {
-    init_ga: ga=>ga_event = ga,
-    install: mnt=>{
-        E.sp = etask('stats', [function(){ return this.wait(); }]);
-        ReactDOM.render(<Stats />, mount = mnt);
-    },
+    install: ()=>E.sp = etask('stats', [function(){ return this.wait(); }]),
     uninstall: ()=>{
         if (E.sp)
             E.sp.return();
-        if (mount)
-            ReactDOM.unmountComponentAtNode(mount);
-        mount = null;
     },
 };
 
@@ -48,23 +39,23 @@ class StatRow extends React.Component {
     }
 }
 
-class StatusCodeRow extends StatRow {
+class SRow extends StatRow {
     render(){
-        return <StatusCode.Row class_value={this.state.class_value}
+        return <StatusCodeRow class_value={this.state.class_value}
               class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
-class DomainRow extends StatRow {
+class DRow extends StatRow {
     render(){
-        return <Domain.Row class_value={this.state.class_value}
+        return <DomainRow class_value={this.state.class_value}
               class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
-class ProtoRow extends StatRow {
+class PRow extends StatRow {
     render(){
-        return <Protocol.Row class_value={this.state.class_value}
+        return <ProtocolRow class_value={this.state.class_value}
               class_bw={this.state.class_bw} {...this.props} />;
     }
 }
@@ -74,7 +65,7 @@ class StatTable extends React.Component {
         let dt = this.props.dataType;
         E.sp.spawn(this.sp = etask(function*(){
             yield etask.sleep(2*date.ms.SEC);
-            ga_event('stats panel', 'hover', dt);
+            util.ga_event('stats panel', 'hover', dt);
         }));
     };
     leave = ()=>{
@@ -108,8 +99,10 @@ class Stats extends React.Component {
         }
     });
     componentDidMount(){
+        E.install();
         E.sp.spawn(this.get_stats());
     }
+    componentWillUnmount(){ E.uninstall(); }
     close = ()=>this.setState({show_reset: false});
     confirm = ()=>this.setState({show_reset: true});
     reset_stats = ()=>{
@@ -122,10 +115,11 @@ class Stats extends React.Component {
             _this.setState({resetting: undefined});
             _this.close();
         }));
-        ga_event('stats panel', 'click', 'reset btn');
+        util.ga_event('stats panel', 'click', 'reset btn');
     };
     enable_https_statistics = ()=>{
         this.setState({show_certificate: true});
+        util.ga_event('stats panel', 'click', 'enable https stats');
     };
     close_certificate = ()=>{
         this.setState({show_certificate: false});
@@ -140,17 +134,17 @@ class Stats extends React.Component {
                   </Col>
                 </Row>
               }>
-              <StatTable table={StatusCode.Table} row={StatusCodeRow}
+              <StatTable table={StatusCodeTable} row={SRow}
                 title={`Top ${_.min([5, this.state.statuses.stats.length])||''}
                   status codes`} dataType="status_codes"
                 stats={this.state.statuses.stats}
                 show_more={this.state.statuses.has_more} />
-              <StatTable table={Domain.Table} row={DomainRow}
+              <StatTable table={DomainTable} row={DRow}
                 dataType="domains" stats={this.state.domains.stats}
                 show_more={this.state.domains.has_more}
                 title={`Top ${_.min([5, this.state.domains.stats.length])||''}
                   domains`} />
-              <StatTable table={Protocol.Table} row={ProtoRow}
+              <StatTable table={ProtocolTable} row={PRow}
                 dataType="protocols" stats={this.state.protocols.stats}
                 show_more={this.state.protocols.has_more}
                 show_enable_https_button
@@ -187,4 +181,4 @@ class Stats extends React.Component {
     }
 }
 
-export default E;
+export default Stats;

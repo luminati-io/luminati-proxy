@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>Luminati Proxy Manager</title>
+    <meta name=viewport
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <base href=/>
+    <link rel="shortcut icon" href=/favicon.ico>
+    <link rel=stylesheet href=req/notosans-fontface/css/notosans-fontface.css>
+    <link rel=stylesheet href=req/font-awesome/css/font-awesome.css>
+    <link rel=stylesheet href=req/flag-icon-css/css/flag-icon.css>
+    <style>[ng-cloak] { display: none; }</style>
+  </head>
+  <body ng-cloak ng-controller=root>
+    <div ng-class="{'main-container-qs': quickstart()}">
+      <div class=qs-move-control ng-if=quickstart()
+        ng-mousedown=quickstart_mousedown($event)>
+      </div>
+      <div class=header>
+        <div class=container>
+          <img src=/img/logo.png>
+          <span id=version ng-if=ver_cur>V{{ver_cur}}</span>
+          <div class=dropdown ng-if="section.name!='settings'">
+            <a href=# class=dropdown-toggle data-toggle=dropdown>
+              {{settings.customer}}<span class=caret></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li ng-if="$root.mode=='root'&&$parent.ver_last&&$parent.ver_last.newer">
+                <a href=# ng-click=upgrade()>Upgrade</a>
+              </li>
+              <li><a href=# ng-click=logout()>Log out</a></li>
+              <li><a href=# ng-click=shutdown()>Shut down</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container page-body">
+        <div class=navigation ng-if="section.name!='settings'">
+          <div class=active>
+            <span ng-if=settings.customer>
+              {{settings.customer}}
+            </span>
+            <span ng-if="section&&!subsection">
+              <span class=separator>/</span>
+              {{section.title}}
+            </span>
+            <span ng-if=subsection>
+              <span class=separator>/</span>
+              <a ui-state=section.name ui-state-params="{zone: ''}">
+                {{section.title}}</a>
+              <span class=separator>/</span>
+              {{subsection}}
+            </span>
+          </div>
+          <div class=items>
+            <span ng-repeat="s in sections" ng-if=$index&gt;0>
+              <span ng-if="$index&gt;1" class=separator>&nbsp;|&nbsp;</span>
+              <a ng-if=s!=section ui-state=s.name ng-click=zone_click(s.name)>
+                {{s.title}}
+              </a>
+              <span ng-if=s==section>{{s.title}}</span>
+            </span>
+          </div>
+        </div>
+        <ui-view></ui-view>
+      </div>
+    </div>
+    <div ng-if=quickstart() class=quickstart id=quickstart>
+      <ng-include src="'/quickstart.html'"></ng-include>
+    </div>
+    <div id=confirmation class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <button type=button class=close data-dismiss=modal>
+              &times;
+            </button>
+            <h4 class=modal-title>{{confirmation.text}}</h4>
+            <ul ng-if=confirmation.items class=confirmation-items>
+              <li ng-repeat="i in confirmation.items">{{i}}</li>
+            </ul>
+          </div>
+          <div class=modal-footer>
+            <button type=button class="btn btn-default"
+              data-dismiss=modal>
+              Cancel
+            </button>
+            <button type=button class="btn btn-success"
+              data-dismiss=modal ng-click=confirmation.confirmed()>
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id=restarting class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>Restarting...</h4>
+          </div>
+          <div class=modal-body>
+            Please wait. The page will be reloaded automatically
+            once the application has restarted.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id=upgrading class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>Luminati Proxy Manager is upgrading</h4>
+          </div>
+          <div class=modal-body>
+            Please wait...
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id=shutdown class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>Shutdown</h4>
+          </div>
+          <div class=modal-body>
+            The application has been shut down. To restart,
+            please run it manually and reload this page.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id=allocated_ips class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>
+              <button type=button class=close data-dismiss=modal>
+                &times;</button>
+              Select IPs:
+              <span class=blue>{{allocated_ips.zone}}</span>
+            </h4>
+          </div>
+          <div class=modal-body>
+            <p ng-show="allocated_ips.loading" class=text-warning>
+              Loading...
+            </p>
+            <div ng-show="!allocated_ips.loading">
+              <button ng-click="allocated_ips.random_ip()"
+                type="button" class="btn btn-default">
+                Random IPs
+              </button>
+              <div ng-repeat="item in allocated_ips.ips" class="checkbox">
+                <label>
+                  <input ng-model="item.checked"
+                    ng-change="allocated_ips.toggle_ip(item)"
+                    type=checkbox> {{item.ip}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+

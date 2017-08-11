@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.57.488",
+        "version": "1.57.967",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -359,7 +359,7 @@
                 },
                 "no_usage_stats": {
                     "type": "boolean",
-                    "description": "Disable collection of anonymous usage statistics"
+                    "description": "Disable collection of usage statistics"
                 },
                 "rules": {
                     "type": "boolean",
@@ -412,7 +412,7 @@
                 },
                 "log": {
                     "type": "string",
-                    "pattern": "^(none|error|warn|info|verbose|debug|silly)?$",
+                    "pattern": "^(none|error|warn|info|verbose|debug)?$",
                     "description": "Log level"
                 },
                 "iface": {

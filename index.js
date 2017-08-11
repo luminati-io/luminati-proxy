@@ -130,7 +130,13 @@ let run = run_config=>{
                 return show_port_conflict(err[1], err[2]);
             if (fatal)
             {
-                console.log(e.raw ? e.message : 'Unhandled error: '+e);
+                if (manager&&manager._log)
+                {
+                    manager._log.error(e.raw ? e.message :
+                        'Unhandled error: '+e, e);
+                }
+                else
+                    console.log(e.raw ? e.message : 'Unhandled error: '+e);
                 process.exit();
             }
         };

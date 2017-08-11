@@ -2,23 +2,15 @@
 'use strict'; /*jslint react:true*/
 import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
 
-let mount;
 const E = {
-    install: mnt=>{
-        E.sp = etask('domains', [function(){ return this.wait(); }]);
-        ReactDOM.render(<Stats />, mount = mnt);
-    },
+    install: ()=>E.sp = etask('domains', [function(){ return this.wait(); }]),
     uninstall: ()=>{
         if (E.sp)
             E.sp.return();
-        if (mount)
-            ReactDOM.unmountComponentAtNode(mount);
-        mount = null;
     },
 };
 
@@ -56,6 +48,7 @@ class Stats extends React.Component {
         this.state = {stats: []};
     }
     componentDidMount(){
+        E.install();
         const _this = this;
         E.sp.spawn(etask(function*(){
             const res = yield Common.StatsService.get_all({sort: 1,
@@ -63,6 +56,7 @@ class Stats extends React.Component {
             _this.setState({stats: res});
         }));
     }
+    componentWillUnmount(){ E.uninstall(); }
     render(){
         return <div>
               <div className="page-header">
@@ -75,6 +69,5 @@ class Stats extends React.Component {
     }
 }
 
-E.Row = DomainRow;
-E.Table = DomainTable;
-export default E;
+export {DomainRow, DomainTable};
+export default Stats;

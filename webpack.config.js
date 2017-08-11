@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
 const webpack = require('webpack');
+const html_webpack_plugin = require('html-webpack-plugin');
 module.exports = {
     context: `${__dirname}/src/pub`,
     entry: {
@@ -20,18 +21,19 @@ module.exports = {
     output: {
         path: `${__dirname}/bin/pub`,
         publicPath: '/',
-        filename: '[name].bundle.js',
+        filename: '[chunkhash].[name].js',
     },
     plugins: [
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.optimize.CommonsChunkPlugin({
-            name: 'vendor',
+            names: ['vendor', 'runtime'],
             minChunks: Infinity,
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
         }),
+        new html_webpack_plugin({inject: true, template: 'index.html'}),
     ],
     module: {
         rules: [

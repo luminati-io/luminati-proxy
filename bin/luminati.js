@@ -44,7 +44,8 @@ if (is_win)
 }
 let child;
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
-    child.send({command: 'shutdown', reason: sig+(err ? 'error = '+err : '')});
+    child.send({command: 'shutdown', reason: sig+(err ? 'error = '+err : ''),
+        error: err});
     setTimeout(()=>process.exit(), 5000);
 }));
 

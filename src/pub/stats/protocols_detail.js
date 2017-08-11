@@ -3,25 +3,18 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {Col} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import Common from './common.js';
-import Domain from './domains.js';
-import StatusCode from './status_codes.js';
+import {DomainTable} from './domains.js';
+import {StatusCodeTable} from './status_codes.js';
 
-let mount;
 const E = {
-    install: (mnt, {protocol})=>{
-        E.sp = etask('protocol_detail', [function(){ return this.wait(); }]);
-        ReactDOM.render(<StatsDetails protocol={protocol} />, mount = mnt);
-    },
+    install: ()=>
+        E.sp = etask('protocol_detail', [function(){ return this.wait(); }]),
     uninstall: ()=>{
         if (E.sp)
             E.sp.return();
-        if (mount)
-            ReactDOM.unmountComponentAtNode(mount);
-        mount = null;
     },
 };
 
@@ -34,6 +27,7 @@ class StatsDetails extends React.Component {
         };
     }
     componentDidMount(){
+        E.install();
         const _this = this;
         E.sp.spawn(etask(function*(){
             _this.setState(
@@ -42,19 +36,20 @@ class StatsDetails extends React.Component {
             _this.setState(_.pick(res, ['statuses', 'domains']));
         }));
     }
+    componentWillUnmount(){ E.uninstall(); }
     render(){
         return <Common.StatsDetails stats={this.state.stats}
               header={`Protocol: ${this.props.protocol.toUpperCase()}`}>
               <Col md={6}>
                 <h3>Domains</h3>
-                <Domain.Table stats={this.state.domains.stats} />
+                <DomainTable stats={this.state.domains.stats} />
               </Col>
               <Col md={6}>
                 <h3>Status codes</h3>
-                <StatusCode.Table stats={this.state.statuses.stats} />
+                <StatusCodeTable stats={this.state.statuses.stats} />
               </Col>
             </Common.StatsDetails>;
     }
 }
 
-export default E;
+export default StatsDetails;

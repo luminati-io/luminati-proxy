@@ -78,14 +78,16 @@ let write_ua_file = ()=>{
     } catch(e){ }
 };
 let manager, args = process.argv.slice(2), shutdowning = false;
-let shutdown = (reason, send_ev = true)=>{
+let shutdown = (reason, send_ev = true, error = null)=>{
     if (shutdowning)
         return;
-    console.log('Shutdown, reason is '+reason);
     shutdowning = true;
     write_ua_file();
     if (manager)
     {
+        manager._log.info(`Shutdown, reason is ${reason}`);
+        if (error)
+            manager._log.error(reason, error);
         let stop_manager = ()=>{
             manager.stop(reason, true);
             manager = null;
@@ -95,21 +97,20 @@ let shutdown = (reason, send_ev = true)=>{
         else
             ua.event('manager', 'stop', reason, stop_manager);
     }
+    else
+        console.log(`Shutdown, reason is ${reason}`, error.stack);
 };
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
     const errstr = sig+(err ? ', error = '+err : '');
     if (err&&manager)
-    {
         manager._log.error(errstr);
-        manager._log.silly(err, err.stack);
-    }
     if (err&&manager&&!manager.argv.no_usage_stats)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
-            ()=>shutdown(errstr, false));
+            ()=>shutdown(errstr, false, err));
     }
     else
-        shutdown(errstr);
+        shutdown(errstr, true, err);
 }));
 let on_upgrade_finished;
 (function run(run_config){
@@ -164,6 +165,6 @@ process.on('message', msg=>{
             on_upgrade_finished(msg.error);
         on_upgrade_finished = undefined;
         break;
-    case 'shutdown': shutdown(msg.reason); break;
+    case 'shutdown': shutdown(msg.reason, true, msg.error); break;
     }
 });

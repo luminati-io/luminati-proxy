@@ -3,27 +3,21 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {Col, Well} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import Common from './common.js';
 import {status_codes} from './status_codes.js';
-import Domain from './domains.js';
-import Protocol from './protocols.js';
+import {DomainTable} from './domains.js';
+import {ProtocolTable} from './protocols.js';
 
-let mount;
 const E = {
-    install: (mnt, {code})=>{
+    install: ()=>{
         E.sp = etask('status_codes_detail', [function(){
             return this.wait(); }]);
-        ReactDOM.render(<StatsDetails code={code} />, mount = mnt);
     },
     uninstall: ()=>{
         if (E.sp)
             E.sp.return();
-        if (mount)
-            ReactDOM.unmountComponentAtNode(mount);
-        mount = null;
     },
 };
 
@@ -36,6 +30,7 @@ class StatsDetails extends React.Component {
         };
     }
     componentDidMount(){
+        E.install();
         const _this = this;
         E.sp.spawn(etask(function*(){
             _this.setState(
@@ -44,6 +39,7 @@ class StatsDetails extends React.Component {
             _this.setState(_.pick(res, ['domains', 'protocols']));
         }));
     }
+    componentWillUnmount(){ E.uninstall(); }
     render(){
         return <Common.StatsDetails stats={this.state.stats}
               header={`Status code: ${this.props.code}`} title={
@@ -60,14 +56,14 @@ class StatsDetails extends React.Component {
               }>
               <Col md={6}>
                 <h3>Domains</h3>
-                <Domain.Table stats={this.state.domains.stats} />
+                <DomainTable stats={this.state.domains.stats} />
               </Col>
               <Col md={6}>
                 <h3>Protocols</h3>
-                <Protocol.Table stats={this.state.protocols.stats} />
+                <ProtocolTable stats={this.state.protocols.stats} />
               </Col>
             </Common.StatsDetails>;
     }
 }
 
-export default E;
+export default StatsDetails;
