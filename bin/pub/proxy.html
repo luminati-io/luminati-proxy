@@ -464,11 +464,13 @@
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-dns-resolve>
-                      DNS resolve
+                      DNS lookup
                     </label>
                     <select id=proxy-field-dns-resolve ng-model=form.dns
-                      class=form-control
-                      ng-options="v for v in consts.dns.values">
+                      class=form-control>
+                      <option value="local">Local (default) - resolved by
+                        the super proxy</option>
+                      <option value="remote">Remote - resolved by peer</option>
                     </select>
                   </div>
                   <div class=form-group>

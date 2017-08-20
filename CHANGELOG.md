@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.58.632
+- :star: modify UI
+
 ## 1.57.967
 - :star: add file logging
 
