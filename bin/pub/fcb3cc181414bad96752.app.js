@@ -2135,7 +2135,7 @@ function Faq($scope) {
         title: 'How can I upgrade Luminati proxy manager tool?'
     }, {
         name: 'ssl',
-        title: 'How do I enable HTTPS sniffing?'
+        title: 'How do I enable HTTPS analyzing?'
     }];
 }
 
@@ -2573,7 +2573,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout) {
         type: 'boolean'
     }, {
         key: 'ssl',
-        title: 'SSL sniffing',
+        title: 'SSL analyzing',
         type: 'boolean'
     }, {
         key: 'socks',

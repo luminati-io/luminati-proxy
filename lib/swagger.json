@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.58.632",
+        "version": "1.58.884",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -404,7 +404,7 @@
                 },
                 "ssl": {
                     "type": "boolean",
-                    "description": "Enable SSL sniffing"
+                    "description": "Enable SSL analyzing"
                 },
                 "socks": {
                     "type": "integer",
@@ -457,7 +457,7 @@
                 },
                 "insecure": {
                     "type": "boolean",
-                    "description": "Enable SSL connection/sniffing to insecure hosts"
+                    "description": "Enable SSL connection/analyzing to insecure hosts"
                 },
                 "country": {
                     "type": "string",

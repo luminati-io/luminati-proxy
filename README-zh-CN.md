@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.58.632/luminati-proxy-manager-v1.58.632-setup.exe">代理管理安装器</a>.
+下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.58.884/luminati-proxy-manager-v1.58.884-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -83,7 +83,7 @@ Options:
   --multiply              Multiply the port definition given number of times
                                                                         [number]
   --history               Log request history                          [boolean]
-  --ssl                   Enable SSL sniffing         [boolean] [default: false]
+  --ssl                   Enable SSL analyzing        [boolean] [default: false]
   --socks                 SOCKS5 port                                   [number]
   --log                   Log level                  [string] [default: "error"]
   --iface                 Interface or IP to listen on
@@ -102,7 +102,7 @@ Options:
                                                       [boolean] [default: false]
   --proxy_switch          Automatically switch super proxy on failure
                                                            [number] [default: 5]
-  --insecure              Enable SSL connection/sniffing to insecure hosts
+  --insecure              Enable SSL connection/analyzing to insecure hosts
                                                       [boolean] [default: false]
   --country               Country                                       [string]
   --state                 State                                         [string]
@@ -172,7 +172,7 @@ docker run luminati/luminati-proxy luminati --version
 
 ### SSL 请求
 
--ssl 参数是为了 SSL sniffing, HTTPS请求不需要它就能运行
+-ssl 参数是为了 SSL analyzing, HTTPS请求不需要它就能运行
 
 ## 帮助
 

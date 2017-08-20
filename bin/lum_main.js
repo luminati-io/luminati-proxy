@@ -115,9 +115,7 @@ let shutdown = (reason, send_ev = true, error = null)=>{
 let on_upgrade_finished;
 (function run(run_config){
     manager = new Manager(args, Object.assign({ua}, run_config));
-    manager.on('www_ready', ()=>
-        ua.event('admin_ready', 'sniffing', ''+manager.argv.ssl))
-    .on('stop', ()=>{
+    manager.on('stop', ()=>{
         write_ua_file();
         process.exit();
     })

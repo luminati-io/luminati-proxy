@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.58.884
+- :star: modify UI
+- :bug: fix logging bug
+
 ## 1.58.632
 - :star: modify UI
 
@@ -18,7 +22,7 @@
 
 ## 1.56.648
 - :bug: fix UI create proxy
-- :star: Added certificate setup instructions
+- :star: added certificate setup instructions
 
 ## 1.56.452
 - :bug: fix typeerror when using rules
@@ -119,7 +123,7 @@
 
 ## 0.10.5
 - :bug: fixed fatal exception when zone has no passwords
-- :bug: fixed inability to make POST requests with ssl sniffing
+- :bug: fixed inability to make POST requests with ssl analyzing
 - :bug: resolved build failures on node v4
 
 ## 0.10.4
@@ -558,7 +562,7 @@ root mode (default)
 - :star: Column list in proxies overview is now configurable
 
 ## 0.7.34
-- :star: Added warning when enabling history with not SSL sniffing
+- :star: Added warning when enabling history with not SSL analyzing
 - :sparkles: Added history alert for IP urls
 - :sparkles: Add uninstall/install instructions to node upgrade notice
 
@@ -575,7 +579,7 @@ when using SOCKs (#18)
 ## 0.7.31
 - :boom: secure_proxy can not be configured per proxy (like all other
 parameters) with command line giving advantage only over defaults settings
-- :star: ssl sniffing can now be turned on/off individually for each proxy
+- :star: ssl analyzing can now be turned on/off individually for each proxy
 
 ## 0.7.30
 - :bug: Proxies with unavailable network interfaces no longer cause errors
@@ -680,7 +684,7 @@ change
 - :star: Resettable statistics on local proxies
 
 ## 0.7.2
-- :star: Allow SSL connections/sniffing to insecure domains
+- :star: Allow SSL connections/analyzing to insecure domains
 - :bug: do not parse password as numbers even if format fit
 
 ## 0.7.1

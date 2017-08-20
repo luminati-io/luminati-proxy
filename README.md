@@ -21,13 +21,13 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 - Statistics
 - Automatically rotate IP every X requests
 - Load balancing using multiple Super Proxies
-- SSL sniffing (using a self-signed certificate)
+- SSL analyzing (using a self-signed certificate)
 - SOCKSv5 proxy
 
 ## Installation
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.58.632/luminati-proxy-manager-v1.58.632-setup.exe">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.58.884/luminati-proxy-manager-v1.58.884-setup.exe">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOS
 - Install Node.js 6 or above (preferably using
@@ -93,7 +93,7 @@ Options:
   --multiply              Multiply the port definition given number of times
                                                                         [number]
   --history               Log request history                          [boolean]
-  --ssl                   Enable SSL sniffing         [boolean] [default: false]
+  --ssl                   Enable SSL analyzing        [boolean] [default: false]
   --socks                 SOCKS5 port                                   [number]
   --log                   Log level                  [string] [default: "error"]
   --iface                 Interface or IP to listen on
@@ -112,7 +112,7 @@ Options:
                                                       [boolean] [default: false]
   --proxy_switch          Automatically switch super proxy on failure
                                                            [number] [default: 5]
-  --insecure              Enable SSL connection/sniffing to insecure hosts
+  --insecure              Enable SSL connection/analyzing to insecure hosts
                                                       [boolean] [default: false]
   --country               Country                                       [string]
   --state                 State                                         [string]
@@ -182,7 +182,7 @@ docker run luminati/luminati-proxy luminati --version
 
 ### SSL Requests
 
-The --ssl parameter is for SSL sniffing, HTTPS requests can be made without it.
+The --ssl parameter is for SSL analyzing, HTTPS requests can be made without it.
 
 ## Help
 

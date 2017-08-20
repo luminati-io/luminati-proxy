@@ -758,7 +758,7 @@ function Faq($scope){
         },
         {
             name: 'ssl',
-            title: 'How do I enable HTTPS sniffing?',
+            title: 'How do I enable HTTPS analyzing?',
         },
     ];
 }
@@ -1219,7 +1219,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         },
         {
             key: 'ssl',
-            title: 'SSL sniffing',
+            title: 'SSL analyzing',
             type: 'boolean',
         },
         {
