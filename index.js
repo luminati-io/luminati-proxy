@@ -3,18 +3,21 @@
 'use strict'; /*jslint node:true, esnext:true*/
 
 const Manager = require('./lib/manager.js');
+const Luminati = require('./lib/luminati.js');
 const version = require('./package.json').version;
 let is_electron = process.versions && !!process.versions.electron;
 
 if (!is_electron)
 {
-    const Luminati = require('./lib/luminati.js');
     module.exports = {Luminati, Manager, version};
     return;
 }
 
+Manager.default.disable_color = Luminati.default.disable_color = true;
+
 const electron = require('electron');
 const app = electron.app, dialog = electron.dialog;
+const opn = require('opn');
 const autoUpdater = require('electron-updater').autoUpdater;
 const BrowserWindow = electron.BrowserWindow;
 const hutil = require('hutil');
@@ -107,8 +110,12 @@ let run = run_config=>{
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
             ua.event('manager', 'www_ready', url).send();
+        if (0)
+        {
         wnd = wnd || new BrowserWindow({width: 1024, height: 768});
         wnd.loadURL(url);
+        }
+        opn(url);
     })
     .on('upgrade', cb=>{
         can_upgrade = true;
@@ -169,4 +176,6 @@ let quit = ()=>{
 };
 
 app.on('ready', run);
-app.on('window-all-closed', quit);
+process.on('SIGINT', quit);
+process.on('SIGTERM', quit);
+process.on('uncaughtException', quit);

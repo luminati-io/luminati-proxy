@@ -132,15 +132,12 @@ class StatsDetails extends React.Component {
         let cur_page = _.min(
             [Math.ceil(stats.length/this.state.items_per_page), page]);
         this.setState({
-            all_stats: stats,
             stats: stats.slice(cur_page*this.state.items_per_page,
                 (cur_page+1)*this.state.items_per_page),
             cur_page,
         });
     }
-    page_change = page=>{
-        this.paginate(page-1);
-    };
+    page_change = page=>this.paginate(page-1);
     render(){
         return <div>
               <div className="page-header">
@@ -152,25 +149,30 @@ class StatsDetails extends React.Component {
                 <Table bordered className="table-fixed">
                   <thead>
                     <tr>
-                      <th className="col-sm-8">URL</th>
+                      <th className="col-sm-7">URL</th>
                       <th>Bandwidth</th>
                       <th>Response time</th>
+                      <th>Date</th>
                       <th>IP used</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {this.state.stats.map((s, i)=>
-                      <tr key={i}>
-                        <td className="nowrap overflow-ellipsis">{s.url}</td>
+                    {this.state.stats.map((s, i)=>{
+                      let rh = JSON.parse(s.response_headers);
+                      let local = new Date(rh.date).toLocaleString();
+                      return <tr key={i}>
+                        <td className="overflow-ellipsis">{s.url}</td>
                         <td>{util.bytes_format(s.bw)}</td>
                         <td>{s.response_time} ms</td>
+                        <td>{local}</td>
                         <td>{s.proxy_peer}</td>
-                      </tr>
-                    )}
+                      </tr>;
+                    })}
                   </tbody>
                 </Table>
                 <Col md={12} className="text-center">
-                  <Pagination prev next activePage={this.state.cur_page+1}
+                  <Pagination prev next boundaryLinks
+                    activePage={this.state.cur_page+1}
                     bsSize="small" onSelect={this.page_change}
                     items={Math.ceil(this.state.all_stats.length/
                       this.state.items_per_page)} maxButtons={5} />

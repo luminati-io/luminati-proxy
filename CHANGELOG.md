@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.59.952
+- :star: remove internal browser and show terminal with log in exe
+- :star: add disable_color flag to disable colors in terminal
+
 ## 1.58.884
 - :star: modify UI
 - :bug: fix logging bug

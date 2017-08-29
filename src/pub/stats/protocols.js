@@ -18,10 +18,8 @@ const E = {
 
 class CertificateButton extends React.Component {
     render(){
-        return <Button bsStyle="success" bsSize="xsmall"
-              onClick={this.props.onClick}>
-              Enable HTTPS statistics
-            </Button>;
+        return <Button bsStyle={this.props.bs_style} bsSize="xsmall"
+              onClick={this.props.onClick}>{this.props.text}</Button>;
     }
 }
 
@@ -49,7 +47,8 @@ class ProtocolTable extends React.Component {
                     <Col md={6}>All protocols</Col>
                     {this.props.show_enable_https_button &&
                       <Col md={6} className="text-right">
-                        <CertificateButton
+                        <CertificateButton bs_style="success"
+                          text="Enable HTTPS Statistics"
                           onClick={this.props.enable_https_button_click} />
                       </Col>}
                   </Row>

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.58.884",
+        "version": "1.59.952",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -384,6 +384,10 @@
                 "test_url": {
                     "type": "string",
                     "description": "A url for testing proxy (default: http://lumtest.com/myip.json)"
+                },
+                "disable_color": {
+                    "type": "boolean",
+                    "description": "Disable colors in log"
                 }
             }
         },
@@ -588,6 +592,10 @@
                         "type": "string"
                     },
                     "description": "Whitelist ip list for granting access to proxy"
+                },
+                "disable_color": {
+                    "type": "boolean",
+                    "description": "Disable colors in log"
                 }
             }
         }

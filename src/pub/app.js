@@ -103,28 +103,15 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         templateUrl: 'faq.html',
     });
     state_registry.register({
-        name: 'stats',
-        template: `<div class=col-md-12>
-              <button ng-if=has_back ng-click=go_back()
-                class="btn btn-default">Back</button>
-              <ui-view></ui-view>
-            </div>`,
-        controller: function($scope, $transition$, $window){
-            if ($transition$.from().name=='proxies')
-                $scope.has_back = true;
-            $scope.go_back = function(){ $window.history.back(); };
-        },
-    });
-    state_registry.register({
         name: 'status_codes',
-        parent: 'stats',
+        parent: 'app',
         url: '/status_codes',
         template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = status_codes; },
     });
     state_registry.register({
         name: 'status_codes_detail',
-        parent: 'stats',
+        parent: 'app',
         url: '/status_codes/{code:int}',
         template: '<div react-view=react_component state-props=code></div>',
         controller: function($scope){
@@ -132,14 +119,14 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     });
     state_registry.register({
         name: 'domains',
-        parent: 'stats',
+        parent: 'app',
         url: '/domains',
         template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = domains; },
     });
     state_registry.register({
         name: 'domains_detail',
-        parent: 'stats',
+        parent: 'app',
         url: '/domains/{domain:string}',
         template: '<div react-view=react_component state-props=domain></div>',
         controller: function($scope){
@@ -147,14 +134,14 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     });
     state_registry.register({
         name: 'protocols',
-        parent: 'stats',
+        parent: 'app',
         url: '/protocols',
         template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = protocols; },
     });
     state_registry.register({
         name: 'protocols_detail',
-        parent: 'stats',
+        parent: 'app',
         url: '/protocols/{protocol:string}',
         template: `<div react-view=react_component state-props=protocol>
             </div>`,

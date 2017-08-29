@@ -69,7 +69,8 @@
     "tough-cookie-filestore": "0.0.1",
     "universal-analytics": "^0.4.9",
     "winston": "^2.3.0",
-    "yargs": "^6.5.0"
+    "yargs": "^6.5.0",
+    "opn": "^5.1.0"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -210,7 +211,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "919739141206feac84cf32bdefb40b26"
+    "md5": "3719ac78986f74a6fd0e6bb958cf1b9b"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -231,5 +232,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.58.884"
+  "version": "1.59.973"
 }
