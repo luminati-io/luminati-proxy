@@ -1,6 +1,13 @@
  Luminati Proxy manager - Change Log
 
-## 1.59.952
+## 1.61.96
+- :bug: fix 1mb limit on proxy configuration size
+- :bug: fix broken save button in proxy form when rules present
+- :star: add google analytics events on proxy edit modal
+- :star: upgrade to new hutil version (fixes port handling in url globs)
+- :star: allow setting rules per port
+
+## 1.59.973
 - :star: remove internal browser and show terminal with log in exe
 - :star: add disable_color flag to disable colors in terminal
 

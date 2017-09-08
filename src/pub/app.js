@@ -2419,6 +2419,19 @@ function Proxy($scope, $http, $proxies, $window, $q){
             if (zone = $scope.consts.zone.values.find(_.matches({zone: val})))
                 form.password = zone.password;
         });
+        $scope.$watchCollection('form', function(newv, oldv){
+            var old, val;
+            for (var f in oldv)
+            {
+                old = oldv[f]||'';
+                val = newv[f]||'';
+                if (old!==val)
+                {
+                    ga_event('proxy_form', f+'_change', f=='password'
+                        ? 'redacted' : val);
+                }
+            }
+        });
         $scope.save = function(model){
             var proxy = angular.copy(model);
             delete proxy.preset;
@@ -2468,39 +2481,10 @@ function Proxy($scope, $http, $proxies, $window, $q){
             proxy.whitelist_ips =
                 $scope.extra.whitelist_ips.split(',').filter(Boolean);
             var reload;
-            if (Object.keys(proxy.rules||{}).length)
-            {
-                proxy.rules = {
-                    pre: {browser: 'firefox'},
-                    post: {
-                        res: {
-                            head: true,
-                            status: Object.assign({type: 'in'},
-                                proxy.rules.post.res.status),
-                            action: proxy.rules.post.res.action,
-                        },
-                        url: proxy.rules.post.url,
-                    },
-                };
-                if (!proxy.rules.post.res.action ||
-                    proxy.rules.post.res.action.value=='retry')
-                {
-                    proxy.rules.post.res.action = {ban_ip: '60min',
-                        retry: true};
-                }
-                if (proxy.rules.post.url)
-                    proxy.rules.pre.url = proxy.rules.post.url += '/**';
-                else
-                    delete proxy.rules.post.url;
-                proxy.rules.post.res = [proxy.rules.post.res];
-                proxy.rules.pre = [proxy.rules.pre];
-                proxy.rules.post = [proxy.rules.post];
-                reload = true;
-            }
-            else
-                delete proxy.rules;
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
+            ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create'),
+                'start');
             var save_inner = function(){
                 $scope.status.type = 'warning';
                 $scope.status.message = 'Saving the proxy...';
@@ -2512,6 +2496,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
                     $proxies.update();
                     $window.localStorage.setItem('quickstart-'+
                         (edit ? 'edit' : 'create')+'-proxy', true);
+                    ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
+                        , 'ok');
                     return $http.post('/api/recheck')
                     .then(function(r){
                         if (r.data.login_failure)
@@ -2521,6 +2507,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 var is_not_ok_cb = function(res){
                     $scope.status.type = 'danger';
                     $scope.status.message = 'Error: '+res.data.status;
+                    ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
+                        , 'err');
                 };
                 promise
                     .then(function(){

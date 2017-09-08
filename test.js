@@ -294,22 +294,22 @@ describe('proxy', ()=>{
             l = yield lum(opt);
             let res = yield l.test(req);
             assert.equal(ping.history.length, 1);
-            let expected = { statusCode: 200, statusMessage: 'PONG' };
+            let expected = {statusCode: 200, statusMessage: 'PONG'};
             if (req.body)
-                assign(expected, { body: req.body });
+                assign(expected, {body: req.body});
             assert_has(res, expected, 'res');
         }));
         t('http', ()=>ping.http.url);
         t('http post', ()=>{
-            return { url: ping.http.url, method: 'POST', body: 'test body' };
+            return {url: ping.http.url, method: 'POST', body: 'test body'};
         });
         t('https', ()=>ping.https.url);
         t('https post', ()=>{
-            return {url: ping.https.url, method: 'POST', body: 'test body' };
+            return {url: ping.https.url, method: 'POST', body: 'test body'};
         });
         t('https sniffing', ()=>ping.https.url, {ssl: true, insecure: true});
         t('https sniffing post', ()=>{
-            return { url: ping.https.url, method: 'POST', body: 'test body' };
+            return {url: ping.https.url, method: 'POST', body: 'test body'};
         }, {ssl: true, insecure: true});
     });
     describe('headers', ()=>{
@@ -941,13 +941,39 @@ describe('proxy', ()=>{
             }));
         });
     });
+    describe('rules', ()=>{
+        it('should set rules', ()=>etask(function*(){
+            l = yield lum({rules: true, _rules: {res: {}}});
+            assert.ok(l.rules);
+        }));
+        const t = (name, arg, c)=>it(name, etask._fn(function*(_this){
+            let _rules = {post: [{res: [{action: {ban_ip: '60min',
+            retry: true}, head: true, status: {arg, type: 'in'}}],
+            url: 'lumtest.com/**'}], pre: [{browser: 'firefox',
+            url: 'lumtest.com/**'}]};
+            l = yield lum({rules: true, _rules});
+            let req = l._request;
+            let count = 0;
+            l._request = function(){
+                count++;
+                return req.apply(l, arguments);
+            };
+            yield l.test();
+            yield etask.sleep(20);
+            assert.equal(count, c);
+        }));
+        t('should retry when status match', '200 - Succeeded requests',
+            21);
+        t('should ignore rule when status does not match',
+            '404 - Succeeded requests', 1);
+    });
 });
 describe('manager', ()=>{
     let app, temp_files;
 
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
-        return i?args[i]:null;
+        return i ? args[i] : null;
     };
 
     const app_with_args = (args, only_explicit)=>etask(function*(){
@@ -1243,13 +1269,13 @@ describe('manager', ()=>{
             }));
         });
         describe('zones', ()=>{
-            let zone_resp = {_defaults: { zones: {
-                a: { perm: 'abc', plans: 'plan', password: ['pwd1'] },
-                b: { perm: 'xyz', plans: 'plan9', password: ['pwd2'] }
+            let zone_resp = {_defaults: {zones: {
+                a: {perm: 'abc', plans: 'plan', password: ['pwd1']},
+                b: {perm: 'xyz', plans: 'plan9', password: ['pwd2']}
             }}};
             let zone_expected = [
-                { zone: 'a', perm: 'abc', plans: 'plan', password: 'pwd1' },
-                { zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2' },
+                {zone: 'a', perm: 'abc', plans: 'plan', password: 'pwd1'},
+                {zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2'},
             ];
             it('get', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
@@ -1270,12 +1296,12 @@ describe('manager', ()=>{
                 assert_has(body, zone_expected, 'zones');
             }));
             it('get zone without passwords', ()=>etask(function*(){
-                let no_pwd_resp = {_defaults: { zones: {
-                    a: { perm: 'abc', plans: 'plan' },
+                let no_pwd_resp = {_defaults: {zones: {
+                    a: {perm: 'abc', plans: 'plan'},
                 }}};
                 let no_pwd_expected = [
-                    { zone: 'a', perm: 'abc', plans: 'plan',
-                        password: undefined }
+                    {zone: 'a', perm: 'abc', plans: 'plan',
+                        password: undefined}
                 ];
                 nock('https://luminati.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
