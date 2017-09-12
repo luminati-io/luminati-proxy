@@ -80,6 +80,15 @@ class StatTable extends React.Component {
     }
 }
 
+class SuccessRatio extends React.Component {
+    render (){
+        return <Row className="hidden">
+              <Col md={6} className="success_title">Success Ratio</Col>
+              <Col md={6} className="success_value">94.5%</Col>
+            </Row>;
+    }
+}
+
 class Stats extends React.Component {
     constructor(props){
         super(props);
@@ -134,6 +143,7 @@ class Stats extends React.Component {
                   </Col>
                 </Row>
               }>
+              <SuccessRatio/>
               <StatTable table={StatusCodeTable} row={SRow}
                 title={`Top ${_.min([5, this.state.statuses.stats.length])||''}
                   status codes`} dataType="status_codes"

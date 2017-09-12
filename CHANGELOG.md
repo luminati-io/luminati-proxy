@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.61.493
+
 ## 1.61.96
 - :bug: fix 1mb limit on proxy configuration size
 - :bug: fix broken save button in proxy form when rules present

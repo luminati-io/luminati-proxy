@@ -586,7 +586,7 @@
                 </div>
               </div>
             </div>
-            <div class="panel panel-default" ng-if=beta_features>
+            <div class="panel panel-default">
               <div class=panel-heading>
                 <a data-toggle=collapse data-parent=#proxy-tabs
                   href=#proxy-rules>
@@ -626,6 +626,7 @@
                       ng-options="a as a.label for a in [{label: 'Retry request
                       (up to 20 times)', value: 'retry'}]">
                     </select>
+                    <div> note: IP will change when system retry</div>
                   </div>
                 </div>
               </div>

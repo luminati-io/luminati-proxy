@@ -2481,6 +2481,35 @@ function Proxy($scope, $http, $proxies, $window, $q){
             proxy.whitelist_ips =
                 $scope.extra.whitelist_ips.split(',').filter(Boolean);
             var reload;
+            if (Object.keys(proxy.rules||{}).length)
+            {
+                var proxy_post = ((proxy.rules||{}).post||{});
+                proxy_post.res = (proxy_post.res||{});
+                proxy.rules = {
+                    post: {
+                        res: {
+                            head: true,
+                            status: Object.assign({type: 'in'},
+                                proxy_post.res.status),
+                            action: proxy_post.res.action,
+                        },
+                        url: proxy_post.url,
+                    },
+                };
+                if (!proxy.rules.post.res.action ||
+                    proxy.rules.post.res.action.value=='retry')
+                {
+                    proxy.rules.post.res.action = {ban_ip: '60min',
+                        retry: true};
+                }
+                if (!proxy.rules.post.url)
+                    delete proxy.rules.post.url;
+                proxy.rules.post.res = [proxy.rules.post.res];
+                proxy.rules.post = [proxy.rules.post];
+                reload = true;
+            }
+            else
+                delete proxy.rules;
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create'),
