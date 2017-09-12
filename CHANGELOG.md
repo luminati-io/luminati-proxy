@@ -1,6 +1,7 @@
  Luminati Proxy manager - Change Log
 
-## 1.61.493
+## 1.61.507
+- :star: release status code rule
 
 ## 1.61.96
 - :bug: fix 1mb limit on proxy configuration size
