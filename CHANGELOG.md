@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.61.888
+- :bug: fix rule editing in proxy form when rules are undefined
+
 ## 1.61.772
 - :bug: fix proxy form when rules are set
 - :bug: fix rule options not remembered in form

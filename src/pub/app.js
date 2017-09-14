@@ -2440,8 +2440,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
         });
         $scope.$watchCollection('form', function(newv, oldv){
             function has_changed(f){
-                var old = oldv[f]||'';
-                var val= newv[f]||'';
+                var old = oldv&&oldv[f]||'';
+                var val= newv&&newv[f]||'';
                 return old!==val;
             }
             if (has_changed('preset'))
@@ -2451,7 +2451,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
             }
             if (newv.applying_preset)
                 return;
-            for (var f in oldv)
+            for (var f in _.extend({}, newv, oldv))
             {
                 if (has_changed(f)&&f!='applying_preset'&&f!='rule')
                 {
@@ -2462,8 +2462,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
         });
         $scope.$watchCollection('form.rule', function(newv, oldv){
             function has_changed(f){
-                var old = oldv[f]||'';
-                var val= newv[f]||'';
+                var old = oldv&&oldv[f]||'';
+                var val= newv&&newv[f]||'';
                 old = typeof old == 'object' ? old.value : old;
                 val = typeof val == 'object' ? val.value : val;
                 return old!==val;
@@ -2530,7 +2530,6 @@ function Proxy($scope, $http, $proxies, $window, $q){
             var reload;
             if (Object.keys(proxy.rule||{}).length)
             {
-                delete proxy.delete_rules;
                 if (!proxy.rule.url)
                     delete proxy.rule.url;
                 proxy.rule = _.extend({
@@ -2558,6 +2557,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 delete proxy.rules;
             if (proxy.delete_rules)
                 proxy.rules = {};
+            delete proxy.delete_rules;
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create'),

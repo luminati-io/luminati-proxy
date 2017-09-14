@@ -3618,15 +3618,15 @@ function Proxy($scope, $http, $proxies, $window, $q) {
         });
         $scope.$watchCollection('form', function (newv, oldv) {
             function has_changed(f) {
-                var old = oldv[f] || '';
-                var val = newv[f] || '';
+                var old = oldv && oldv[f] || '';
+                var val = newv && newv[f] || '';
                 return old !== val;
             }
             if (has_changed('preset')) {
                 return ga_event('proxy_form', 'preset_change', newv.preset.title);
             }
             if (newv.applying_preset) return;
-            for (var f in oldv) {
+            for (var f in _lodash2.default.extend({}, newv, oldv)) {
                 if (has_changed(f) && f != 'applying_preset' && f != 'rule') {
                     ga_event('proxy_form', f + '_change', f == 'password' ? 'redacted' : newv[f]);
                 }
@@ -3634,8 +3634,8 @@ function Proxy($scope, $http, $proxies, $window, $q) {
         });
         $scope.$watchCollection('form.rule', function (newv, oldv) {
             function has_changed(f) {
-                var old = oldv[f] || '';
-                var val = newv[f] || '';
+                var old = oldv && oldv[f] || '';
+                var val = newv && newv[f] || '';
                 old = (typeof old === 'undefined' ? 'undefined' : _typeof(old)) == 'object' ? old.value : old;
                 val = (typeof val === 'undefined' ? 'undefined' : _typeof(val)) == 'object' ? val.value : val;
                 return old !== val;
@@ -3687,7 +3687,6 @@ function Proxy($scope, $http, $proxies, $window, $q) {
             proxy.whitelist_ips = $scope.extra.whitelist_ips.split(',').filter(Boolean);
             var reload;
             if (Object.keys(proxy.rule || {}).length) {
-                delete proxy.delete_rules;
                 if (!proxy.rule.url) delete proxy.rule.url;
                 proxy.rule = _lodash2.default.extend({
                     url: '**',
@@ -3710,6 +3709,7 @@ function Proxy($scope, $http, $proxies, $window, $q) {
                 reload = true;
             } else delete proxy.rules;
             if (proxy.delete_rules) proxy.rules = {};
+            delete proxy.delete_rules;
             model.preset.set(proxy);
             var edit = $scope.port && !locals.duplicate;
             ga_event('proxy_form', 'proxy_' + (edit ? 'edit' : 'create'), 'start');
