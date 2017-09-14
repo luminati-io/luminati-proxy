@@ -1,5 +1,13 @@
  Luminati Proxy manager - Change Log
 
+## 1.61.772
+- :bug: fix proxy form when rules are set
+- :bug: fix rule options not remembered in form
+- :star: add reset rules button in proxy form
+- :star: add rules form analytics
+- :bug: fix analytics for input fields
+- :bug: fix upgrade popup not firing in electron app
+
 ## 1.61.507
 - :star: release status code rule
 

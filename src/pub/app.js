@@ -2187,7 +2187,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         var cities = {};
         $scope.consts = $scope.$root.consts.proxy;
         $scope.port = locals.duplicate ? '' : locals.proxy.port;
-        var form = $scope.form = _.cloneDeep(locals.proxy);
+        var form = $scope.form = _.omit(_.cloneDeep(locals.proxy), 'rules');
         form.port = $scope.port;
         form.zone = form.zone||'';
         form.debug = form.debug||'';
@@ -2197,8 +2197,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
         form.dns = form.dns||'';
         form.log = form.log||'';
         form.ips = form.ips||[];
-        if (_.isBoolean(form.rules))
-            form.rules = {};
+        if (_.isBoolean(form.rule))
+            form.rule = {};
         $scope.extra = {
             reverse_lookup: '',
             reverse_lookup_dns: form.reverse_lookup_dns,
@@ -2206,6 +2206,17 @@ function Proxy($scope, $http, $proxies, $window, $q){
             reverse_lookup_values:
                 (form.reverse_lookup_values||[]).join('\n'),
         };
+        $scope.rule_actions = [{label: 'Retry request(up to 20 times)',
+            value: 'retry', raw: {ban_ip: '60min', retry: true}}];
+        $scope.rule_statuses = ['200 - Succeeded requests',
+            '403 - Forbidden', '404 - Not found',
+            '500 - Internal server error', '502 - Bad gateway',
+            '503 - Service unavailable', '504 - Gateway timeout', 'Custom'];
+        if (form.rule && form.rule.action)
+        {
+            form.rule.action = _.find($scope.rule_actions,
+                {value: form.rule.action.value});
+        }
         if ($scope.extra.reverse_lookup_dns)
             $scope.extra.reverse_lookup = 'dns';
         else if ($scope.extra.reverse_lookup_file)
@@ -2247,6 +2258,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
             }
         }
         $scope.apply_preset = function(){
+            form.applying_preset = true;
             form.preset.set(form);
             if (form.session===true)
             {
@@ -2268,6 +2280,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 form.duration_start = +session_duration[0];
                 form.duration_end = +session_duration[1];
             }
+            delete form.applying_preset;
         };
         $scope.apply_preset();
         $scope.form_errors = {};
@@ -2411,6 +2424,12 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 $scope.form.state = city.region;
             $scope.update_cities();
         };
+        $scope.reset_rules = function(){
+            $scope.form.rule = {};
+            $scope.form.rules = {};
+            $scope.form.delete_rules = true;
+            ga_event('proxy_form', 'reset_rules');
+        };
         $scope.$watch('form.zone', function(val, old){
             if (!$scope.consts || val==old)
                 return;
@@ -2420,16 +2439,44 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 form.password = zone.password;
         });
         $scope.$watchCollection('form', function(newv, oldv){
-            var old, val;
+            function has_changed(f){
+                var old = oldv[f]||'';
+                var val= newv[f]||'';
+                return old!==val;
+            }
+            if (has_changed('preset'))
+            {
+                return ga_event('proxy_form', 'preset_change',
+                    newv.preset.title);
+            }
+            if (newv.applying_preset)
+                return;
             for (var f in oldv)
             {
-                old = oldv[f]||'';
-                val = newv[f]||'';
-                if (old!==val)
+                if (has_changed(f)&&f!='applying_preset'&&f!='rule')
                 {
                     ga_event('proxy_form', f+'_change', f=='password'
-                        ? 'redacted' : val);
+                        ? 'redacted' : newv[f]);
                 }
+            }
+        });
+        $scope.$watchCollection('form.rule', function(newv, oldv){
+            function has_changed(f){
+                var old = oldv[f]||'';
+                var val= newv[f]||'';
+                old = typeof old == 'object' ? old.value : old;
+                val = typeof val == 'object' ? val.value : val;
+                return old!==val;
+            }
+            if (_.isEmpty($scope.form.rule))
+                return;
+            var val;
+            for (var f in _.extend({}, newv, oldv))
+            {
+                if (!has_changed(f))
+                    continue;
+                val = typeof newv[f] == 'object' ? newv[f].value: newv[f];
+                ga_event('proxy_form', 'rule_'+f+'_change', val);
             }
         });
         $scope.save = function(model){
@@ -2481,35 +2528,36 @@ function Proxy($scope, $http, $proxies, $window, $q){
             proxy.whitelist_ips =
                 $scope.extra.whitelist_ips.split(',').filter(Boolean);
             var reload;
-            if (Object.keys(proxy.rules||{}).length)
+            if (Object.keys(proxy.rule||{}).length)
             {
-                var proxy_post = ((proxy.rules||{}).post||{});
-                proxy_post.res = (proxy_post.res||{});
+                delete proxy.delete_rules;
+                if (!proxy.rule.url)
+                    delete proxy.rule.url;
+                proxy.rule = _.extend({
+                    url: '**',
+                    action: {}
+                }, proxy.rule);
+                var rule_status = proxy.rule.status == 'Custom' ? proxy.rule.custom
+                    : proxy.rule.status;
                 proxy.rules = {
-                    post: {
-                        res: {
+                    post: [{
+                        res: [{
                             head: true,
-                            status: Object.assign({type: 'in'},
-                                proxy_post.res.status),
-                            action: proxy_post.res.action,
-                        },
-                        url: proxy_post.url,
-                    },
+                            status: {
+                                type: 'in',
+                                arg: rule_status||''
+                            },
+                            action: proxy.rule.action.raw||{},
+                        }],
+                        url: proxy.rule.url+'/**'
+                    }]
                 };
-                if (!proxy.rules.post.res.action ||
-                    proxy.rules.post.res.action.value=='retry')
-                {
-                    proxy.rules.post.res.action = {ban_ip: '60min',
-                        retry: true};
-                }
-                if (!proxy.rules.post.url)
-                    delete proxy.rules.post.url;
-                proxy.rules.post.res = [proxy.rules.post.res];
-                proxy.rules.post = [proxy.rules.post];
                 reload = true;
             }
             else
                 delete proxy.rules;
+            if (proxy.delete_rules)
+                proxy.rules = {};
             model.preset.set(proxy);
             var edit = $scope.port&&!locals.duplicate;
             ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create'),

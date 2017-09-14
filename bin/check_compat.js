@@ -30,10 +30,12 @@ E.is_env_compat = ()=>{
                 +`(${dep} package, reason: ${e.message}).\n`
                 +'Please run the following command to recover:');
             const d = path.resolve(__dirname, '../node_modules');
+            let sudo = process.platform=='win32' ? '' : 'sudo ';
             console.log(
                 (process.platform=='win32'
-                ? `rmdir /s /q ${d} && ` : `sudo rm -rf ${d} && sudo `)
-                +'npm install -g luminati-io/luminati-proxy');
+                ? `rmdir /s /q ${d} && ` : `sudo rm -rf ${d} && `)
+                +`${sudo}npm uninstall ${dep} && `
+                +`${sudo}npm install -g luminati-io/luminati-proxy`);
             return false;
         }
     }

@@ -88,7 +88,8 @@
                     </label>
                     <input id=proxy-field-port class=form-control type=number
                       ng-model=form.port
-                      placeholder={{consts.port.def}} min=24000>
+                      placeholder={{consts.port.def}} min=24000
+                      ng-model-options="{updateOn: 'blur'}">
                     <span ng-show=form_errors.port class="help-block">
                       {{form_errors.port}}</span>
                   </div>
@@ -108,7 +109,8 @@
                     <input id=proxy-field-multiply class=form-control
                       type=number ng-model=form.multiply min=1
                       ng-disabled=!form.preset.support.multiply
-                      placeholder={{consts.multiply.def}}>
+                      placeholder={{consts.multiply.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-history>
@@ -161,7 +163,8 @@
                     </label>
                     <input id=proxy-field-socks-port type=number
                       ng-model=form.socks placeholder={{consts.socks.def}}
-                      class=form-control min=0>
+                      class=form-control min=0
+                      ng-model-options="{updateOn: 'blur'}">
                     <span ng-show=form_errors.socks class="help-block">
                       {{form_errors.socks}}</span>
                   </div>
@@ -175,7 +178,8 @@
                       ng-options="z.value as z.key for z in consts.zone.values">
                     </select>
                     <input type="text" class=form-control
-                      ng-if="consts.zone.values.length==0" ng-model=form.zone>
+                      ng-if="consts.zone.values.length==0" ng-model=form.zone
+                      ng-model-options="{updateOn: 'blur'}">
                     <span ng-show=form_errors.zone class="help-block">
                       {{form_errors.zone}}</span>
                   </div>
@@ -186,7 +190,8 @@
                       Zone password (if different from zone)
                     </label>
                     <input type=password id=proxy-field-zone-password autocomplete=off
-                      ng-model=form.password class=form-control>
+                      ng-model=form.password class=form-control
+                      ng-model-options="{updateOn: 'blur'}">
                     <span ng-show=form_errors.password class="help-block">
                       {{form_errors.password}}
                       <a ng-href="https://luminati.io/cp/zones/{{form.zone}}?cust={{form.customer}}">
@@ -267,7 +272,8 @@
                       typeahead-on-select="update_region_by_city($item)"
                       autocomplete=off
                       placeholder="Start typing or leave it empty for all cities"
-                      type="text" class=form-control>
+                      type="text" class=form-control
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group  ng-show="is_valid_field('asn')">
                     <label class=control-label for=proxy-field-asn>
@@ -276,7 +282,7 @@
                         target=_blank>ASN list</a>)
                     </label>
                     <input id=proxy-field-asn type=number ng-model=form.asn
-                      class=form-control>
+                      class=form-control ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group  ng-show="is_valid_field('ip')">
                     <label class=control-label for=proxy-field-datacenter-ip>
@@ -326,7 +332,8 @@
                     <input id=proxy-field-pool-size type=number min=0
                       ng-model=form.pool_size class=form-control
                       ng-disabled="!form.preset.support.pool_size||form.ips.length"
-                      placeholder={{consts.pool_size.def}}>
+                      placeholder={{consts.pool_size.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-pool-type>
@@ -376,7 +383,8 @@
                       <span class=range-seperator>:</span>
                       <input type=number ng-model=form.max_requests_end
                         ng-disabled=!form.preset.support.max_requests
-                        class=form-control min=0>
+                        class=form-control min=0
+                        ng-model-options="{updateOn: 'blur'}">
                     </div>
                   </div>
                   <div class=form-group>
@@ -387,11 +395,13 @@
                       <input id=proxy-field-duration-start type=number
                         ng-model=form.duration_start class=form-control
                         ng-disabled=!form.preset.support.session_duration
-                        placeholder={{consts.session_duration.def}} min=0>
+                        placeholder={{consts.session_duration.def}} min=0
+                        ng-model-options="{updateOn: 'blur'}">
                       <span class=range-seperator>:</span>
                       <input type=number ng-model=form.duration_end
                         ng-disabled=!form.preset.support.session_duration
-                        class=form-control min=0>
+                        class=form-control min=0
+                        ng-model-options="{updateOn: 'blur'}">
                     </div>
                   </div>
                   <div class=form-group>
@@ -401,7 +411,8 @@
                     <input id=proxy-field-keep-alive type=number
                       ng-model=form.keep_alive class=form-control
                       ng-disabled=!form.preset.support.keep_alive
-                      placeholder={{consts.keep_alive.def}} min=0>
+                      placeholder={{consts.keep_alive.def}} min=0
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-seed>
@@ -452,7 +463,8 @@
                     </label>
                     <input id=proxy-field-sinit-timeout type=number min=0
                       ng-model=form.session_init_timeout class=form-control
-                      placeholder={{consts.session_init_timeout.def}}>
+                      placeholder={{consts.session_init_timeout.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-min-super>
@@ -460,7 +472,8 @@
                     </label>
                     <input id=proxy-field-min-super type=number min=1
                       ng-model=form.proxy_count class=form-control
-                      placeholder={{consts.proxy_count.def}}>
+                      placeholder={{consts.proxy_count.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-dns-resolve>
@@ -507,7 +520,8 @@
                     </label>
                     <input id=proxy-field-proxy-switch type=number min=0
                       ng-model=form.proxy_switch class=form-control
-                      placeholder={{consts.proxy_switch.def}}>
+                      placeholder={{consts.proxy_switch.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-throttle>
@@ -515,7 +529,8 @@
                     </label>
                     <input id=proxy-field-throttle type=number min=0
                       ng-model=form.throttle class=form-control
-                      placeholder={{consts.throttle.def}}>
+                      placeholder={{consts.throttle.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-req-timeout>
@@ -523,7 +538,8 @@
                     </label>
                     <input id=proxy-field-req-timeout type=number min=0
                       ng-model=form.request_timeout class=form-control
-                      placeholder={{consts.request_timeout.def}}>
+                      placeholder={{consts.request_timeout.def}}
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <div class=form-group
                     ng-class="{'has-error': form_errors.debug}">
@@ -595,26 +611,35 @@
               </div>
               <div id=proxy-rules class="panel-collapse collapse">
                 <div class=panel-body>
+                  <div>
+                    <h4>Define custom action for specific request
+                      response</h4>
+                    Note: Rules will apply when 'SSL analyzing'
+                    enabled (See 'general' section)
+                  </div>
                   <h3>Trigger</h3>
                   <div class=form-group>
                     <label for=proxy-field-rules-status_code>
-                      Select status code:
+                      Select status code to activate action:
                     </label>
                     <select class=form-control id=proxy-field-rules-status_code
-                      ng-model=form.rules.post.res.status.arg
-                      ng-options="c for c in ['200 - Succeeded requests',
-                      '403 - Forbidden', '404 - Not found', '500 - Internal
-                      server error', '502 - Bad gateway', '503 - Service
-                      unavailable', '504 - Gateway timeout']">
+                      ng-model=form.rule.status
+                      ng-options="c for c in rule_statuses">
                     </select>
+                    <input class=form-control type="text"
+                      ng-model=form.rule.custom
+                      ng-if="form.rule.status=='Custom'"
+                      ng-model-options="{updateOn: 'blur'}"
+                      />
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-rules-domain>
-                      Apply rule for this domain name:
+                      Apply for specific domain(Regex):
                     </label>
                     <input id=proxy-field-rules-domain
-                      ng-model=form.rules.post.url class=form-control
-                      placeholder="example.com">
+                      ng-model=form.rule.url class=form-control
+                      placeholder="'example.com' or 'www.example.com'"
+                      ng-model-options="{updateOn: 'blur'}">
                   </div>
                   <h3>Action</h3>
                   <div class=form-group>
@@ -622,11 +647,15 @@
                       Select action to be taken when the rule is met:
                     </label>
                     <select class=form-control id=proxy-field-rules-action
-                      ng-model=form.rules.post.res.action
-                      ng-options="a as a.label for a in [{label: 'Retry request
-                      (up to 20 times)', value: 'retry'}]">
+                      ng-model=form.rule.action
+                      ng-options="a as a.label for a in rule_actions">
                     </select>
-                    <div> note: IP will change when system retry</div>
+                    <div> Note: IP will change for every retry</div>
+                  </div>
+                  <div ng-if="form.rule.url" class=form-group>
+                    <button class="btn btn-warn btn-secondary"
+                      ng-click="reset_rules()">
+                      Reset rules</button>
                   </div>
                 </div>
               </div>

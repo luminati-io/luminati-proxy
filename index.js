@@ -33,7 +33,7 @@ ua.set('av', `v${version}`);
 let manager, args = process.argv.slice(2), wnd, upgrade_available, can_upgrade;
 
 const upgrade = ()=>{
-    dialog.showMessageBox(wnd, {
+    dialog.showMessageBox({
         type: 'info',
         title:'Update Required',
         message: 'A new Luminati Proxy Manager version is available',
