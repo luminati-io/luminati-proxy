@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.63.154
+- :star: improve stats ui
+- :star: improve quick-start wizard ui
+
 ## 1.61.888
 - :bug: fix rule editing in proxy form when rules are undefined
 

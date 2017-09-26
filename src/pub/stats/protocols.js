@@ -24,8 +24,35 @@ class CertificateButton extends React.Component {
 }
 
 class ProtocolRow extends React.Component {
+    handle_https_btn_click = (evt)=>{
+        evt.stopPropagation();
+        this.props.enable_https_button_click(evt);
+    };
+    render_https_button(){
+        if (this.props.stat.protocol!='https')
+          return null;
+        if (!this.props.show_enable_https_button)
+          return null;
+        return (
+            <CertificateButton bs_style="success"
+              text="Enable HTTPS Statistics"
+              onClick={this.handle_https_btn_click} />
+        );
+    }
     render(){
-        return <tr>
+        let class_name = '';
+        let click = ()=>{};
+        let https_button = this.render_https_button();
+        let value = !https_button||this.props.stat.value!='0' ?
+            this.props.stat.value : '';
+        if (this.props.go)
+        {
+            click = ()=>(window.location =
+                `${this.props.path}/${this.props.stat.protocol}`);
+            class_name = 'row_clickable';
+        }
+        return (
+            <tr className={class_name} onClick={click}>
               <td>
                 <a href={`${this.props.path}/${this.props.stat.protocol}`}>
                   {this.props.stat.protocol}</a>
@@ -33,9 +60,10 @@ class ProtocolRow extends React.Component {
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
-                {this.props.stat.value}
+                {value} {https_button}
               </td>
-            </tr>;
+            </tr>
+        );
     }
 }
 
@@ -44,7 +72,7 @@ class ProtocolTable extends React.Component {
         return <Common.StatTable row={ProtocolRow} path="/protocols"
               row_key="protocol" title={
                   <Row>
-                    <Col md={6}>All protocols</Col>
+                    <Col md={6}>{this.props.title}</Col>
                     {this.props.show_enable_https_button &&
                       <Col md={6} className="text-right">
                         <CertificateButton bs_style="success"
@@ -53,6 +81,10 @@ class ProtocolTable extends React.Component {
                       </Col>}
                   </Row>
                 }
+                go
+                row_opts={{show_enable_https_button:
+                  this.props.show_enable_https_button, enable_https_button_click:
+                  this.props.enable_https_button_click}}
                 {...this.props}>
               <tr>
                 <th>Protocol</th>

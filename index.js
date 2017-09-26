@@ -18,7 +18,10 @@ Manager.default.disable_color = Luminati.default.disable_color = true;
 const electron = require('electron');
 const app = electron.app, dialog = electron.dialog;
 const opn = require('opn');
+let _info_bkp = console.info;
+console.info = function(){};
 const autoUpdater = require('electron-updater').autoUpdater;
+console.info = _info_bkp;
 const BrowserWindow = electron.BrowserWindow;
 const hutil = require('hutil');
 const etask = hutil.etask;
@@ -33,13 +36,14 @@ ua.set('av', `v${version}`);
 let manager, args = process.argv.slice(2), wnd, upgrade_available, can_upgrade;
 
 const upgrade = ()=>{
-    dialog.showMessageBox({
+    let res = dialog.showMessageBox({
         type: 'info',
         title:'Update Required',
         message: 'A new Luminati Proxy Manager version is available',
         buttons: ['Update now'],
     });
-    autoUpdater.quitAndInstall();
+    if (res==1)
+        autoUpdater.quitAndInstall();
 };
 
 autoUpdater.on('update-downloaded', e=>{

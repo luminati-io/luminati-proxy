@@ -42,11 +42,11 @@ class StatsDetails extends React.Component {
               header={`Protocol: ${this.props.protocol.toUpperCase()}`}>
               <Col md={6}>
                 <h3>Domains</h3>
-                <DomainTable stats={this.state.domains.stats} />
+                <DomainTable stats={this.state.domains.stats} go/>
               </Col>
               <Col md={6}>
                 <h3>Status codes</h3>
-                <StatusCodeTable stats={this.state.statuses.stats} />
+                <StatusCodeTable stats={this.state.statuses.stats} go/>
               </Col>
             </Common.StatsDetails>;
     }

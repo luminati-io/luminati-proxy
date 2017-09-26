@@ -16,23 +16,33 @@ const E = {
 
 class DomainRow extends React.Component {
     render(){
-        return <tr>
+        let class_name = '';
+        let click = ()=>{};
+        if (this.props.go)
+        {
+            click = ()=>(window.location =
+                `${this.props.path}/${this.props.stat.hostname}`);
+            class_name = 'row_clickable';
+        }
+        return (
+            <tr className={class_name} onClick={click}>
               <td>
-                <a href={`${this.props.path}/${this.props.stat.hostname}`}>
+                <a href={`${this.props.path}/`+this.props.stat.hostname}>
                   {this.props.stat.hostname}</a>
               </td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
                 {this.props.stat.value}</td>
-            </tr>;
+            </tr>
+        );
     }
 }
 
 class DomainTable extends React.Component {
     render(){
         return <Common.StatTable row={DomainRow} path="/domains"
-              row_key="hostname" title="All domains" {...this.props}>
+              row_key="hostname" go {...this.props}>
               <tr>
                 <th>Domain Host</th>
                 <th className="col-md-2">Bandwidth</th>
@@ -50,6 +60,8 @@ class Stats extends React.Component {
     componentDidMount(){
         E.install();
         const _this = this;
+        if (window.localStorage.getItem('quickstart-test-proxy'))
+            window.localStorage.setItem('quickstart-stats', true);
         E.sp.spawn(etask(function*(){
             const res = yield Common.StatsService.get_all({sort: 1,
                 by: 'hostname'});

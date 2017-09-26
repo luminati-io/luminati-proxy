@@ -81,6 +81,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'proxies',
         parent: 'app',
         url: '/proxies',
+        params: {'add_proxy': false},
         templateUrl: 'proxies.html',
     });
     state_registry.register({
@@ -151,10 +152,15 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
 
 }]);
 
-module.run(function($rootScope, $http, $window, $transitions, $q, Analytics){
+module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
+    $timeout)
+{
     var logged_in_resolver = $q.defer();
     $rootScope.logged_in = logged_in_resolver.promise;
     $transitions.onBefore({to: function(state){
+        $timeout(function(){
+            $rootScope.hide_quickstart = !!(state.data||{}).hide_quickstart;
+        });
         return !['app', 'faq'].includes(state.name);
     }}, function(transition){
         return $q(function(resolve, reject){
@@ -290,7 +296,10 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
 function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.messages = messages;
     $scope.quickstart = function(){
-        return $window.localStorage.getItem('quickstart')=='show';
+        var hq = $rootScope.hide_quickstart;
+        if (typeof hq=='undefined')
+            return false;
+        return !hq&&$window.localStorage.getItem('quickstart')=='show';
     };
     $scope.quickstart_completed = function(s){
         return $window.localStorage.getItem('quickstart-'+s);
@@ -320,6 +329,23 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         $window.$('body').on('mousemove', mousemove).one('mouseup', function(){
             $window.$('body').off('mousemove', mousemove).css('cursor', '');
         }).css('cursor', 'col-resize');
+    };
+    $scope.quickstart_navigate = function(to){
+        switch (to)
+        {
+        case 'create_proxy':
+            if (!$window.localStorage.getItem('quickstart-creds'))
+                return '';
+            return $state.go('proxies', {add_proxy: true});
+        case 'test_proxy':
+            if (!$window.localStorage.getItem('quickstart-create-proxy'))
+                return;
+            return $state.go('tools');
+        case 'stats':
+            if (!$window.localStorage.getItem('quickstart-test-proxy'))
+                return;
+            return $state.go('domains');
+        }
     };
     $scope.sections = [
         {name: 'settings', title: 'Settings'},
@@ -376,7 +402,8 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         .then(function(){ $window.location.reload(); });
     };
     $scope.is_upgradable = function(){
-        if (!is_electron && $scope.ver_last && $scope.ver_last.newer)
+        if (!($scope.ver_node&&$scope.ver_node.is_electron)&&!is_electron
+            &&$scope.ver_last&& $scope.ver_last.newer)
         {
             var version = $window.localStorage.getItem('dismiss_upgrade');
             return version ? $scope.ver_last.version>version : true;
@@ -686,7 +713,6 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
 module.controller('zones', Zones);
 Zones.$inject = ['$scope', '$http', '$filter', '$window'];
 function Zones($scope, $http, $filter, $window){
-    $window.localStorage.setItem('quickstart-zones-tools', true);
     var today = new Date();
     var one_day_ago = (new Date()).setDate(today.getDate()-1);
     var two_days_ago = (new Date()).setDate(today.getDate()-2);
@@ -753,7 +779,8 @@ function Faq($scope){
 module.controller('test', Test);
 Test.$inject = ['$scope', '$http', '$filter', '$window'];
 function Test($scope, $http, $filter, $window){
-    $window.localStorage.setItem('quickstart-zones-tools', true);
+    if ($window.localStorage.getItem('quickstart-create-proxy'))
+        $window.localStorage.setItem('quickstart-test-proxy', true);
     var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
         /[?&]test=([^&]+)/)||['', 'null'])[1]));
     if (preset)
@@ -828,7 +855,6 @@ function Test($scope, $http, $filter, $window){
 
 module.controller('test-ports', ['$scope', '$http', '$filter', '$window',
 function($scope, $http, $filter, $window){
-    $window.localStorage.setItem('quickstart-zones-tools', true);
     var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
         /[?&]test-ports=([^&]+)/)||['', 'null'])[1]));
     if (preset)
@@ -1160,8 +1186,9 @@ for (var k in presets)
     presets[k].key = k;
 
 module.controller('proxies', Proxies);
-Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout'];
-function Proxies($scope, $http, $proxies, $window, $q, $timeout){
+Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout',
+    '$stateParams'];
+function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     var iface_opts = [], zone_opts = [];
@@ -1704,6 +1731,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout){
         return options;
     };
     $scope.react_component = req_stats;
+    if ($stateParams.add_proxy)
+        $scope.add_proxy();
 }
 
 module.controller('history', History);
@@ -2536,8 +2565,8 @@ function Proxy($scope, $http, $proxies, $window, $q){
                     url: '**',
                     action: {}
                 }, proxy.rule);
-                var rule_status = proxy.rule.status == 'Custom' ? proxy.rule.custom
-                    : proxy.rule.status;
+                var rule_status = proxy.rule.status == 'Custom'
+                    ? proxy.rule.custom : proxy.rule.status;
                 proxy.rules = {
                     post: [{
                         res: [{
@@ -2571,8 +2600,11 @@ function Proxy($scope, $http, $proxies, $window, $q){
                 var is_ok_cb = function(){
                     $window.$('#proxy').modal('hide');
                     $proxies.update();
-                    $window.localStorage.setItem('quickstart-'+
-                        (edit ? 'edit' : 'create')+'-proxy', true);
+                    if ($window.localStorage.getItem('quickstart-creds'))
+                    {
+                        $window.localStorage.setItem('quickstart-'+
+                            (edit ? 'edit' : 'create')+'-proxy', true);
+                    }
                     ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
                         , 'ok');
                     return $http.post('/api/recheck')

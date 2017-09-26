@@ -18,20 +18,44 @@ const E = {
 };
 
 const status_codes = {
-    200: 'Succeeded requests',
-    301: 'Permanently moved to a new location',
-    302: 'Temporary moved to a new location',
-    303: 'See other',
-    400: 'Bad request',
+    200: 'OK',
+    201: 'Created',
+    202: 'Accepted',
+    203: 'Non-Authoritative Information',
+    204: 'No Content',
+    205: 'Reset Content',
+    206: 'Partial Content',
+    300: 'Multiple Choices',
+    301: 'Moved Permanently',
+    302: 'Found',
+    303: 'See Other',
+    304: 'Not Modified',
+    305: 'Use Proxy',
+    307: 'Temporary Redirect',
+    400: 'Bad Request',
     401: 'Unauthorized',
+    402: 'Payment Required',
     403: 'Forbidden',
-    404: 'Not found',
-    407: 'Proxy authentication required',
-    414: 'Request-URI too long',
-    500: 'Internal server error',
-    502: 'Bad gateway',
-    503: 'Service unavailable',
-    504: 'Gateway timeout',
+    404: 'Not Found',
+    405: 'Method Not Allowed',
+    406: 'Not Acceptable',
+    407: 'Proxy Authentication Required',
+    408: 'Request Timeout',
+    409: 'Conflict',
+    410: 'Gone',
+    411: 'Length Required',
+    412: 'Precondition Failed',
+    413: 'Request Entity Too Large',
+    414: 'Request-URI Too Long',
+    415: 'Unsupported Media Type',
+    416: 'Requested Range Not Satisfiable',
+    417: 'Expectation Failed',
+    500: 'Internal Server Error',
+    501: 'Not Implemented',
+    502: 'Bad Gateway',
+    503: 'Service Unavailable',
+    504: 'Gateway Timeout',
+    505: 'HTTP Version Not Supported',
 };
 
 class StatusCodeRow extends React.Component {
@@ -41,7 +65,16 @@ class StatusCodeRow extends React.Component {
               {status_codes[this.props.stat.status_code]||
                 this.props.stat.status_code}
             </Tooltip>;
-        return <tr>
+        let class_name = '';
+        let click = ()=>{};
+        if (this.props.go)
+        {
+            click = ()=>(window.location =
+                `${this.props.path}/${this.props.stat.status_code}`);
+            class_name = 'row_clickable';
+        }
+        return (
+            <tr className={class_name} onClick={click}>
               <OverlayTrigger overlay={tooltip} placement="top">
                 <td>
                   <a href={`${this.props.path}/`+this.props.stat.status_code}>
@@ -52,14 +85,15 @@ class StatusCodeRow extends React.Component {
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
                 {this.props.stat.value}</td>
-            </tr>;
+            </tr>
+        );
     }
 }
 
 class StatusCodeTable extends React.Component {
     render(){
         return <Common.StatTable row={StatusCodeRow} path="/status_codes"
-              row_key="status_code" title="All status codes" {...this.props}>
+              row_key="status_code" go {...this.props}>
               <tr>
                 <th>Status Code</th>
                 <th className="col-md-2">Bandwidth</th>

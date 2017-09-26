@@ -41,26 +41,18 @@ class StatsDetails extends React.Component {
     }
     componentWillUnmount(){ E.uninstall(); }
     render(){
+        let definition = status_codes[this.props.code] ?
+            `(${status_codes[this.props.code]})` : '';
+        let header_text = `Status code: ${this.props.code} ${definition}`;
         return <Common.StatsDetails stats={this.state.stats}
-              header={`Status code: ${this.props.code}`} title={
-                <Col md={12}>
-                  <Col md={6} mdOffset={3}>
-                    <Well bsSize="small" className="text-center">
-                      <span>
-                        {`Definition of status code ${this.props.code}:
-                        ${status_codes[this.props.code]|| this.props.code}`}
-                      </span>
-                    </Well>
-                  </Col>
-                </Col>
-              }>
+              header={header_text}>
               <Col md={6}>
                 <h3>Domains</h3>
-                <DomainTable stats={this.state.domains.stats} />
+                <DomainTable stats={this.state.domains.stats} go/>
               </Col>
               <Col md={6}>
                 <h3>Protocols</h3>
-                <ProtocolTable stats={this.state.protocols.stats} />
+                <ProtocolTable stats={this.state.protocols.stats} go/>
               </Col>
             </Common.StatsDetails>;
     }

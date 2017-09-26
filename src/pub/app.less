@@ -362,22 +362,43 @@ div.proxies .btn-wrapper {
 .quickstart li {
     display: block;
     margin-bottom: 10px;
+    color: gray;
 }
-.quickstart li:before {
-    font-family: 'Glyphicons Halflings';
+.quickstart li .quickstart_num {
     float: left;
     margin-left: -22px;
 }
-.quickstart li:before {
-    content: '\e092';
+.quickstart li.quickstart-completed {
+    color: black;
+    .quickstart_num {
+        &:before {
+            content: 'Done';
+            color: green;
+            font-size: 15px;
+            font-weight: bold;
+            position: absolute;
+            left: 5px;
+        }
+        font-size: 0;
+    }
 }
-.quickstart li.quickstart-completed:before {
-    content: '\e013';
-    color: green;
-}
-.quickstart li.quickstart-completed + li:not(.quickstart-completed):before,
-.quickstart li:not(.quickstart-completed):first-child:before {
-    color: red;
+.quickstart li.quickstart-completed + li:not(.quickstart-completed),
+.quickstart li:not(.quickstart-completed):first-child {
+    &[ng-click] {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+    color: black;
+    .quickstart_num {
+        &:before {
+            content: 'Next';
+            font-size: 15px;
+            font-weight: bold;
+            position: absolute;
+            left: 5px;
+        }
+        font-size: 0;
+    }
 }
 #version {
     background: #f04844;
@@ -529,10 +550,12 @@ div.proxies .btn-wrapper {
 .panel .panel-heading button.btn.btn-ico[disabled] img {
     opacity: 0.25;
 }
-.tooltip-default .tooltip-inner {
+.tooltip.in {
+    opacity: 1;
+}
+.tooltip-default .tooltip-inner, .tooltip .tooltip-inner {
     max-width: 250px;
-    border: solid 1px #d8d8d8;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
+    border: solid 1px black;
     background: #fff;
     color: #3f505b;
     white-space: nowrap;
@@ -651,6 +674,7 @@ input.form-control[type=checkbox] {
 .stats_row_change {
     animation: pulse 1s;
 }
+.row_clickable { cursor: pointer; }
 .code_max_height {
     max-height: 500px;
 }
@@ -665,4 +689,31 @@ input.form-control[type=checkbox] {
     background: none;
     border: none;
     box-shadow: none;
+}
+.pagination {
+    margin: 0;
+    .active>a, .active>a:focus, .active>span {
+        background: none;
+        color: black;
+        font-weight: bold;
+        &:hover {
+            background: none;
+            color: black;
+            font-weight: bold;
+        }
+    }
+    li>a, li>span, li>a:focus {
+        &:hover {
+            border: none;
+            background: none;
+            color: white;
+            background: #428bca;
+        }
+        font-size: 14px;
+        padding: 0 5px;
+        color: #428bca;
+        line-height: 1.4;
+        background: none;
+        border: none;
+    }
 }

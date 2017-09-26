@@ -75,7 +75,7 @@ class StatTable extends React.Component {
     render(){
         const Table = this.props.table || Common.StatTable;
         return <div onMouseEnter={this.enter} onMouseLeave={this.leave}>
-              <Table {...this.props} />
+              <Table go {...this.props} />
             </div>;
     }
 }
@@ -145,18 +145,17 @@ class Stats extends React.Component {
               }>
               <SuccessRatio/>
               <StatTable table={StatusCodeTable} row={SRow}
-                title={`Top ${_.min([5, this.state.statuses.stats.length])||''}
-                  status codes`} dataType="status_codes"
+                title={`Top status codes`} dataType="status_codes"
                 stats={this.state.statuses.stats}
                 show_more={this.state.statuses.has_more} />
               <StatTable table={DomainTable} row={DRow}
                 dataType="domains" stats={this.state.domains.stats}
                 show_more={this.state.domains.has_more}
-                title={`Top ${_.min([5, this.state.domains.stats.length])||''}
-                  domains`} />
+                title={`Top domains`} />
               <StatTable table={ProtocolTable} row={PRow}
                 dataType="protocols" stats={this.state.protocols.stats}
                 show_more={this.state.protocols.has_more}
+                title={`All protocols`}
                 show_enable_https_button
                 enable_https_button_click={this.enable_https_statistics} />
               <Dialog show={this.state.show_reset} onHide={this.close}

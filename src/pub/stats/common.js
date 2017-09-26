@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true*/
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
+import moment from 'moment';
 import React from 'react';
 import {Col, Table, Pagination} from 'react-bootstrap';
 import axios from 'axios';
@@ -17,12 +18,13 @@ class StatTable extends React.Component {
                 {this.props.show_more &&
                   <small>&nbsp;<a href={this.props.path}>show all</a></small>}
               </h4>
-              <Table bordered condensed>
+              <Table hover condensed>
                 <thead>{this.props.children}</thead>
                 <tbody>
                   {this.props.stats.map(s=>
                     <Row stat={s} key={s[this.props.row_key||'key']}
-                      path={this.props.path} />)}
+                      path={this.props.path} go={this.props.go}
+                      {...(this.props.row_opts||{})}/>)}
                 </tbody>
               </Table>
             </div>;
@@ -138,7 +140,30 @@ class StatsDetails extends React.Component {
         });
     }
     page_change = page=>this.paginate(page-1);
+    render_headers(headers = {}){
+        const hds = Object.keys(headers).map(h=>(
+            <div className='request_headers_header' key={h}>
+              {h}: {headers[h]}
+            </div>
+        ));
+        return <div className='request_headers'>{hds}</div>;
+    }
     render(){
+        let pagination = null;
+        if (this.state.all_stats.length>this.state.items_per_page)
+        {
+            let next = false;
+            let pages = Math.ceil(this.state.all_stats.length/
+                this.state.items_per_page);
+            if (this.state.cur_page+1<pages)
+                next = 'Next';
+            pagination = (
+                <Pagination next={next} boundaryLinks
+                  activePage={this.state.cur_page+1}
+                  bsSize="small" onSelect={this.page_change}
+                  items={pages} maxButtons={5} />
+            );
+        }
         return <div>
               <div className="page-header">
                 <h3>{this.props.header}</h3>
@@ -146,10 +171,10 @@ class StatsDetails extends React.Component {
               <div className="page-body">
                 {this.props.title}
                 <h3>Requests</h3>
-                <Table bordered className="table-fixed">
+                <Table hover className="table-consolidate">
                   <thead>
                     <tr>
-                      <th className="col-sm-7">URL</th>
+                      <th className="col-sm-6">URL</th>
                       <th>Bandwidth</th>
                       <th>Response time</th>
                       <th>Date</th>
@@ -159,9 +184,12 @@ class StatsDetails extends React.Component {
                   <tbody>
                     {this.state.stats.map((s, i)=>{
                       let rh = JSON.parse(s.response_headers);
-                      let local = new Date(rh.date).toLocaleString();
+                      let local = moment(rh.date).format('YYYY-MM-DD HH:mm:ss');
                       return <tr key={i}>
-                        <td className="overflow-ellipsis">{s.url}</td>
+                        <td>
+                            {s.url}
+                            {this.render_headers(JSON.parse(s.request_headers))}
+                        </td>
                         <td>{util.bytes_format(s.bw)}</td>
                         <td>{s.response_time} ms</td>
                         <td>{local}</td>
@@ -169,14 +197,10 @@ class StatsDetails extends React.Component {
                       </tr>;
                     })}
                   </tbody>
+                  <tfoot>
+                    <tr><td colSpan={5}>{pagination}</td></tr>
+                  </tfoot>
                 </Table>
-                <Col md={12} className="text-center">
-                  <Pagination prev next boundaryLinks
-                    activePage={this.state.cur_page+1}
-                    bsSize="small" onSelect={this.page_change}
-                    items={Math.ceil(this.state.all_stats.length/
-                      this.state.items_per_page)} maxButtons={5} />
-                </Col>
                 {this.props.children}
               </div>
             </div>;
