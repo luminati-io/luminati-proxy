@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.64.145
+
 ## 1.63.154
 - :star: improve stats ui
 - :star: improve quick-start wizard ui

@@ -18,26 +18,6 @@
   <div class=col-md-7>
     <div ng-if=proxies class="panel panel-default proxies">
       <div class=panel-heading>
-        <button ng-if="$root.mode!='guest'"
-          ng-disabled="!is_action_available('edit')"
-          ng-click="edit_proxy()"
-          uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
-          type=button class="btn btn-ico">
-          <img src=/img/ic_edit.svg>
-        </button>
-        <button ng-if="$root.mode!='guest'"
-          ng-disabled="!is_action_available('duplicate')"
-          uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
-          ng-click="edit_proxy(true)"
-          type=button class="btn btn-ico">
-          <img src=/img/ic_dup.svg>
-        </button>
-        <button type=button class="btn btn-ico"
-          ng-if="$root.mode!='guest'" ng-click=delete_proxies()
-          ng-disabled="!is_action_available('delete')"
-          uib-tooltip=Delete tooltip-class=tooltip-default>
-          <img src=/img/ic_delete.svg>
-        </button>
         <div class=btn-wrapper>
           <button type=button class="btn btn-ico" ng-click=edit_cols()
             uib-tooltip="Edit Columns" tooltip-class=tooltip-default>
@@ -59,6 +39,10 @@
                 {{col.title}}
               </th>
               <th class=proxies-actions>Actions</th>
+              <th class="hidden proxies-success-rate"
+                uib-tooltip="Precentage of successful requests per port"
+                tooltip-class=tooltip-default>Success rate
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -67,8 +51,11 @@
               |limitTo:pagination.per_page"
               ng-class="{opened: showed_status_proxies[proxy.port]}">
               <td>
-                <input ng-if="proxy.proxy_type!='duplicate'"
-                  ng-model="selected_proxies[proxy.port]" type=checkbox>
+                <img ng-if="$root.mode!='guest'&&is_action_available('edit',
+                  proxy)"
+                  ng-click="edit_proxy(false, proxy)"
+                  uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
+                  src=/img/ic_edit.svg class=proxies-action-edit>
               </td>
               <td ng-repeat="col in columns" ng-init="val=proxy[col.key]">
                 <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
@@ -117,8 +104,8 @@
                     <span ng-if=!val>&mdash</span>
                   </span>
                   <span ng-if="col.key!='_status'&&col.key!='country'&&col.key!='session'">
-                    <img src=/img/ic_checkmark.svg ng-if=val===true title="On">
-                    <img src=/img/ic_off.svg ng-if=val===false title="Off">
+                    <img src=/img/ic_checkmark.svg ng-if=val===true>
+                    <img src=/img/ic_off.svg ng-if=val===false>
                     <span ng-if=val!==true&&val!==false>
                       <span ng-if=val||val===0>{{val}}</span>
                       <span ng-if=!val&&val!==0>&mdash;</span>
@@ -131,23 +118,34 @@
                   tooltip-class=tooltip-default
                   ng-class="{'proxies-default': val&&val!==proxy.config[col.key],
                   'proxies-editable': proxy.proxy_type=='persist'&&
-                  is_valid_field(proxy, col.key)}">
-                  <span ng-if="col.key=='country'">
+                  is_valid_field(proxy, col.key)&&(col.key!='country'
+                  ||!get_static_country(proxy))}">
+                  <span ng-if="col.key=='country'&&!get_static_country(proxy)">
                     <span ng-if="val&&val!='*'" class="flag-icon flag-icon-{{val}}">
                       </span>
                     <img ng-if="!val||val=='*'" src=/img/flag_any_country.svg>
+                    <span ng-if="!val||val=='*'">Any</span>
+                    <span ng-if="val&&val!='*'">{{option_key(col, val)}}</span>
+                  </span>
+                  <span ng-if="col.key=='country'&&get_static_country(proxy)"
+                    ng-init="val=get_static_country(proxy)">
+                    <span ng-if="val&&val!='any'" class="flag-icon flag-icon-{{val}}">
+                      </span>
+                    <img ng-if="!val||val=='any'"
+                      src=/img/flag_any_country.svg>
+                    <span ng-if="!val||val=='any'">Any</span>
+                    <span ng-if="val&&val!='any'">
+                      {{option_key(col, val)}}</span>
                   </span>
                   <span ng-if="col.key=='session'">
                     <i class="fa fa-random" aria-hidden=true ng-if=val===true></i>
                     <span ng-if=val&&val!==true>{{val}}</span>
-                    <span ng-if=!val>&mdash;</span>
                   </span>
                   <span ng-if="col.key!='country'&&col.key!='session'">
-                    <img src=/img/ic_checkmark.svg ng-if=val===true title="On">
-                    <img src=/img/ic_off.svg ng-if=val===false title="Off">
+                    <img src=/img/ic_checkmark.svg ng-if=val===true>
+                    <img src=/img/ic_off.svg ng-if=val===false>
                     <span ng-if=val!==true&&val!==false>
                       <span ng-if=val||val===0>{{val}}</span>
-                      <span ng-if=!val&&val!==0>&mdash;</span>
                     </span>
                   </span>
                   <span ng-if="(col.type=='number'||col.type=='text')&&proxy.edited_field==col.key"
@@ -218,6 +216,26 @@
                   uib-tooltip="Pool empty; size is set to zero"
                   tooltip-class=tooltip-default
                   src=/img/ic_table_disabled.svg class=proxies-action-disabled>
+                <img ng-if="$root.mode!='guest'
+                  &&is_action_available('duplicate', proxy)"
+                  uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
+                  ng-click="edit_proxy(true, proxy.port)"
+                  class=proxies-action-duplicate
+                  src=/img/ic_dup.svg>
+                <img ng-if="$root.mode!='guest'&&is_action_available('delete',
+                  proxy)" ng-click=delete_proxies(proxy.port)
+                  uib-tooltip=Delete tooltip-class=tooltip-default
+                  class=proxies-action-delete
+                  src=/img/ic_delete.svg>
+              </td>
+              <td class="hidden proxies-success-rate" ng-if="success-enabled">
+                <p class=proxies-success-rate-value>95%</p>
+              </td>
+              <td class="hidden proxies-success-rate" ng-if="!success-enabled">
+                <a href class=proxies-success-rate-value
+                  tooltip-class=tooltip-default uib-tooltip="Measure how many
+                  of your requests are successfule">Enable
+                </a>
               </td>
             </tr>
             <tr ng-repeat-end ng-if="showed_status_proxies[proxy.port]"
@@ -238,13 +256,11 @@
         </table>
       </div>
       <div class=panel-footer>
-        <div uib-pagination
-          ng-model=pagination.page
-          ng-change=on_page_change()
-          items-per-page=pagination.per_page
-          total-items=proxies.length
-          boundary-link-numbers=true max-size=3 force-ellipses=true
-          previous-text="&lsaquo;" next-text="&rsaquo;">
+        <div uib-pagination ng-if="pagination.per_page<proxies.length"
+          ng-model=pagination.page ng-change=on_page_change()
+          items-per-page=pagination.per_page total-items=proxies.length
+          rotate=true boundary-link-numbers=true max-size=3
+          force-ellipses=true previous-text=" " next-text="Next">
         </div>
       </div>
     </div>

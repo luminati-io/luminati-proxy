@@ -52,7 +52,6 @@ pre.top-margin {
 }
 .container {
     width: auto;
-    max-width: 1170px;
 }
 .main-container-qs {
     margin-left: 25%;
@@ -86,8 +85,8 @@ pre.top-margin {
     background: #f5f5f5;
     padding: 8px 15px;
     border-radius: 4px;
-    margin-bottom: 20px;
     color: #777;
+    margin: 0px 14px 20px 14px;
 }
 .navigation:after {
     content: '';
@@ -109,12 +108,18 @@ pre.top-margin {
 nav a:hover {
     box-shadow: none;
 }
+.overall-success-ratio {
+    margin-bottom: 20px;
+}
 .success_title {
     font-size: 22px;
+    cursor: pointer;
 }
 .success_value {
     text-align: right;
     font-size: 22px;
+    cursor: pointer;
+    color: #428bca;
 }
 .block {
     background: #eeeeee;
@@ -266,6 +271,16 @@ div.proxies .btn-wrapper {
 .proxies-check {
     width: 32px;
 }
+.proxies-succes-rate {
+    white-space: nowrap;
+    width: 80px;
+}
+.proxies-success-rate-value {
+    color: #428bca;
+    width: 80px;
+    font-size:16px;
+    cursor: pointer;
+}
 .proxies-actions {
     white-space: nowrap;
     width: 80px;
@@ -282,6 +297,16 @@ div.proxies .btn-wrapper {
     border: 1px solid transparent;
     line-height: 20px;
     margin: 0 4px;
+}
+.proxies-action-edit {
+    visibility: hidden;
+}
+.proxies tr:hover .proxies-action-edit {
+    visibility: visible;
+    cursor: pointer;
+}
+.proxies-action-delete, .proxies-action-duplicate {
+    cursor: pointer;
 }
 .proxies-warning {
     color: red;
@@ -553,20 +578,13 @@ div.proxies .btn-wrapper {
 .tooltip.in {
     opacity: 1;
 }
-.tooltip-default .tooltip-inner, .tooltip .tooltip-inner {
+.tooltip-proxy-status .tooltip-inner, .tooltip-default .tooltip-inner,
+.tooltip .tooltip-inner {
     max-width: 250px;
     border: solid 1px black;
     background: #fff;
-    color: #3f505b;
+    color: black;
     white-space: nowrap;
-}
-.tooltip-proxy-status .tooltip-inner {
-    border: solid 1px #d8d8d8;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.16);
-    background: #fff;
-}
-.tooltip-proxy-status.in {
-    opacity: 1;
 }
 .status-details-wrapper {
     background: #f7f7f7;
@@ -601,6 +619,9 @@ div.proxies .btn-wrapper {
 .opened,
 .table-hover>tbody>tr.opened:hover {
     background-color: #d7f6ff;
+}
+.table-hover>tbody>tr>td {
+    border: none;
 }
 .table-hover .no-hover:hover {
     background: none;

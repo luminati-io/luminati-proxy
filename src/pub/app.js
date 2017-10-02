@@ -1437,7 +1437,6 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         country: true,
         city: true,
         state: true,
-        sticky_ip: true,
     };
     $scope.cols_conf = JSON.parse(
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
@@ -1478,11 +1477,11 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
                 $scope.showed_status_proxies[p.port]&&p._status_details.length;
         });
     });
-    $scope.delete_proxies = function(){
+    $scope.delete_proxies = function(proxy){
         $scope.$root.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
             confirmed: function(){
-                var selected = $scope.get_selected_proxies();
+                var selected = proxy ? [proxy] : $scope.get_selected_proxies();
                 var promises = $scope.proxies
                     .filter(function(p){
                         return p.proxy_type=='persist'
@@ -1514,9 +1513,17 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         $scope.proxy_dialog = [{proxy: {}}];
         ga_event('page: proxies', 'click', 'add proxy');
     };
-    $scope.edit_proxy = function(duplicate){
-        var port = $scope.get_selected_proxies()[0];
-        var proxy = $scope.proxies.filter(function(p){ return p.port==port; });
+    $scope.get_static_country = function(proxy){
+        var zone = proxy.zones[proxy.zone];
+        var plan = zone.plans[zone.plans.length-1];
+        if (plan.type=='static')
+            return plan.country||'any';
+        return false;
+    };
+    $scope.edit_proxy = function(duplicate, proxy){
+        var port = proxy.port||$scope.get_selected_proxies()[0];
+        proxy = proxy ? [proxy] : $scope.proxies.filter(function(p){
+            return p.port==port; });
         $scope.proxy_dialog = [{proxy: proxy[0].config, duplicate: duplicate}];
         ga_event('page: proxies', 'click', 'edit proxy');
     };
@@ -1532,7 +1539,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
     };
     $scope.inline_edit_click = function(proxy, col){
         if (proxy.proxy_type!='persist'
-            || !$scope.is_valid_field(proxy, col.key))
+            || !$scope.is_valid_field(proxy, col.key)
+            || $scope.get_static_country(proxy)&&col.key=='country')
         {
             return;
         }
@@ -1628,12 +1636,14 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
             .filter(function(p){ return $scope.selected_proxies[p]; })
             .map(function(p){ return +p; });
     };
-    $scope.is_action_available = function(action){
-        var proxies = $scope.get_selected_proxies()||[];
+    $scope.is_action_available = function(action, port){
+        var proxies = $scope.get_selected_proxies()|| port ? [port] : [];
         if (!proxies.length)
             return false;
         if (action=='duplicate')
             return proxies.length==1;
+        if (port)
+            return port.proxy_type=='persist';
         return !$scope.proxies.some(function(sp){
             return $scope.selected_proxies[sp.port] &&
                 sp.proxy_type!='persist';
@@ -1665,6 +1675,11 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         {
             return 'You don\'t have \''+ col.key+'\' permission.<br>'
             +'Please contact your success manager.';
+        }
+        if (col.key=='country'&&$scope.get_static_country(proxy))
+        {
+            return $scope.option_key(col, $scope.get_static_country(proxy))
+                ||'Any country';
         }
         if (col.key=='country')
             return $scope.option_key(col, proxy[col.key]);

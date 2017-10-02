@@ -3,7 +3,8 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
-import {Button, ButtonToolbar, Row, Col, Panel, Modal} from 'react-bootstrap';
+import {Button, ButtonToolbar, Row, Col, Panel, Modal, OverlayTrigger, Tooltip}
+    from 'react-bootstrap';
 import util from '../util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
@@ -82,10 +83,16 @@ class StatTable extends React.Component {
 
 class SuccessRatio extends React.Component {
     render (){
-        return <Row className="hidden">
-              <Col md={6} className="success_title">Success Ratio</Col>
-              <Col md={6} className="success_value">94.5%</Col>
-            </Row>;
+        const overallSuccessTooltip = <Tooltip
+                id="succes-tooltip">Successful requests out of total requests
+              </Tooltip>;
+        return <Row className="hidden overall-success-ratio ">
+                 <OverlayTrigger overlay={overallSuccessTooltip}
+                  placement="top">
+                   <Col md={6} className="success_title">Overall success</Col>
+                 </OverlayTrigger>
+                 <Col md={6} className="success_value">94.5%</Col>
+               </Row>;
     }
 }
 
