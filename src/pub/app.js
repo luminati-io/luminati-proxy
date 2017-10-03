@@ -114,7 +114,8 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'status_codes_detail',
         parent: 'app',
         url: '/status_codes/{code:int}',
-        template: '<div react-view=react_component state-props=code></div>',
+        template: `<div react-view=react_component state-props=code
+        class=container></div>`,
         controller: function($scope){
             $scope.react_component = status_codes_detail; },
     });
@@ -129,7 +130,8 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'domains_detail',
         parent: 'app',
         url: '/domains/{domain:string}',
-        template: '<div react-view=react_component state-props=domain></div>',
+        template: `<div react-view=react_component state-props=domain
+        class=container></div>`,
         controller: function($scope){
             $scope.react_component = domains_detail; },
     });
@@ -144,8 +146,8 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'protocols_detail',
         parent: 'app',
         url: '/protocols/{protocol:string}',
-        template: `<div react-view=react_component state-props=protocol>
-            </div>`,
+        template: `<div react-view=react_component state-props=protocol
+        class=container></div>`,
         controller: function($scope){
             $scope.react_component = protocols_detail; },
     });
@@ -1518,6 +1520,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         var plan = zone.plans[zone.plans.length-1];
         if (plan.type=='static')
             return plan.country||'any';
+        if (plan.vip==1)
+            return plan.vip_country||'any';
         return false;
     };
     $scope.edit_proxy = function(duplicate, proxy){
@@ -1571,7 +1575,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         if (event.which!=13)
             return;
         v = v.trim();
-        if (proxy.original[col.key]!==undefined &&
+        if (!proxy.original||proxy.original[col.key]!==undefined &&
             proxy.original[col.key].toString()==v)
         {
             return $scope.inline_edit_blur(proxy, col);
@@ -1620,7 +1624,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
     };
     $scope.inline_edit_blur = function(proxy, col){
         $timeout(function(){
-            proxy.config[col.key] = proxy.original[col.key];
+            if (proxy.original)
+                proxy.config[col.key] = proxy.original[col.key];
             if (proxy.edited_field == col.key)
                 proxy.edited_field = '';
         }, 100);
