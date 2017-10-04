@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.64.509
+
 ## 1.64.275
 - :start: improve proxy list ui
 

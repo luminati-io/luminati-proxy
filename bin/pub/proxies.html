@@ -133,8 +133,8 @@
                       </span>
                     <img ng-if="!val||val=='any'"
                       src=/img/flag_any_country.svg>
-                    <span ng-if="!val||val=='any'">Any</span>
-                    <span ng-if="val&&val!='any'">
+                    <span ng-if="!val||val=='*'">Any</span>
+                    <span ng-if="val&&val!='*'">
                       {{option_key(col, val)}}</span>
                   </span>
                   <span ng-if="col.key=='session'">
@@ -147,6 +147,8 @@
                     <span ng-if=val!==true&&val!==false>
                       <span ng-if=val||val===0>{{val}}</span>
                     </span>
+                    <span ng-if="(!val||val=='*')&&is_valid_field(proxy,
+                      col.key)&&proxy.proxy_type=='persist'">&mdash;</span>
                   </span>
                   <span ng-if="(col.type=='number'||col.type=='text')&&proxy.edited_field==col.key"
                     class=proxies-table-input
@@ -183,7 +185,7 @@
                       ng-model=proxy.dummy_model
                       ng-init="proxy.dummy_model=proxy.config[col.key]||''"
                       ng-keyup="inline_edit_input(proxy, col, $event)"
-                      uib-typeahead="c.key as c.value for c in col.options(proxy) | filter:{value:$viewValue}:starts_with"
+                      uib-typeahead="c.key as c.value for c in col.options(proxy, $viewValue)|limitTo:15"
                       typeahead-append-to-body=true
                       typeahead-editable=false
                       typeahead-min-length=0

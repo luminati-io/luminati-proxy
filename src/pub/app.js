@@ -4,7 +4,6 @@ import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
 import 'codemirror/lib/codemirror.css';
-
 import angular from 'angular';
 import _ from 'lodash';
 import moment from 'moment';
@@ -39,6 +38,8 @@ var is_valid_field = function(proxy, name, zone_definition){
     var value = proxy.zone||zone_definition.def;
     if (name=='password')
         return value!='gen';
+    if ({city: 1, state: 1}[name]&&(!proxy.country||proxy.country=='*'))
+        return false;
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
     var permissions = details&&details.perm.split(' ')||[];
@@ -1281,7 +1282,15 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
             title: 'City',
             type: 'autocomplete',
             check: function(){ return true; },
-            options: function(proxy){ return load_cities(proxy); },
+            options: function(proxy, view_val){
+                var cities = load_cities(proxy);
+                if (!view_val)
+                    return cities;
+                return cities.filter(function(c){
+                    return c.value.toLowerCase().startsWith(
+                        view_val.toLowerCase());
+                });
+            },
         },
         {
             key: 'asn',
@@ -1517,6 +1526,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
     };
     $scope.get_static_country = function(proxy){
         var zone = proxy.zones[proxy.zone];
+        if (!zone)
+            return false;
         var plan = zone.plans[zone.plans.length-1];
         if (plan.type=='static')
             return plan.country||'any';
@@ -1575,7 +1586,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         if (event.which!=13)
             return;
         v = v.trim();
-        if (!proxy.original||proxy.original[col.key]!==undefined &&
+        if (proxy.original&&proxy.original[col.key]!==undefined &&
             proxy.original[col.key].toString()==v)
         {
             return $scope.inline_edit_blur(proxy, col);
@@ -1617,6 +1628,9 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
                 _.matches({zone: v})))
             {
                 config.password = zone.password;
+                var plan = zone.plans[zone.plans.length-1];
+                if (!plan.city)
+                    config.state = config.city = '';
             }
         }
         $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
@@ -1714,7 +1728,10 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         if (col.key=='city')
         {
             var config = _.cloneDeep(proxy.config);
-            config.city = item.key;
+            if (item.value==''||item.value=='*')
+                config.city = '';
+            else
+                config.city = item.key;
             config.state = item.region||'';
             $http.put('/api/proxies/'+proxy.port, {proxy: config}).then(
                 function(){ $proxies.update(); });
@@ -1730,7 +1747,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
                 return region_opts[country] = r.data; }));
     };
     var load_cities = function(proxy){
-        var country = proxy.country.toUpperCase();
+        var country = proxy.country||''.toUpperCase();
         var state = proxy.state;
         if (!country||country=='*')
             return [];
@@ -1738,16 +1755,21 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         {
             cities_opts[country] = [];
             $http.get('/api/cities/'+country).then(function(res){
-                return cities_opts[country] = res.data.map(function(city){
+                cities_opts[country] = res.data.map(function(city){
                     if (city.region)
                         city.value = city.value+' ('+city.region+')';
                     return city;
                 });
+                return cities_opts[country];
             });
         }
         var options = cities_opts[country];
-        if (state&&state!='*')
-            options = options.filter(function(i){ return i.region==state; });
+        // XXX maximk: temporary disable filter by state
+        if (0&&state&&state!='*')
+        {
+            options = options.filter(function(i){
+                return i.region==state; });
+        }
         return options;
     };
     $scope.react_component = req_stats;
