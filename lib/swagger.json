@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.64.509",
+        "version": "1.65.923",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -362,8 +362,8 @@
                     "description": "Disable collection of usage statistics"
                 },
                 "rules": {
-                    "type": "boolean",
-                    "description": "Enable routing rules for requests"
+                    "type": "object",
+                    "description": "Proxy request rules"
                 },
                 "token": {
                     "type": "string",
@@ -583,8 +583,8 @@
                     "description": "URL regex for requests to not be sent directly from super proxy"
                 },
                 "rules": {
-                    "type": "boolean",
-                    "description": "Enable routing rules for requests"
+                    "type": "object",
+                    "description": "Proxy request rules"
                 },
                 "whitelist_ips": {
                     "type": "array",

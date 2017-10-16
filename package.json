@@ -191,6 +191,7 @@
       "lib/luminati.js",
       "lib/manager.js",
       "lib/md5_util.js",
+      "lib/perr.js",
       "lib/socks.js",
       "lib/ssl.js",
       "lib/username.js",
@@ -211,7 +212,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "f6354ff9f264df5c39a433a68046c5d2"
+    "md5": "4fa070545a41f414d60b4f561879db9f"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -232,5 +233,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.64.509"
+  "version": "1.65.923"
 }

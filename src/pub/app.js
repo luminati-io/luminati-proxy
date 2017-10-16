@@ -237,6 +237,7 @@ function proxies_factory($http, $q){
     var service = {
         subscribe: subscribe,
         proxies: null,
+        trigger: trigger,
         update: update_proxies
     };
     var listeners = [];
@@ -290,6 +291,56 @@ function proxies_factory($http, $q){
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
             return proxies;
+        });
+    }
+    function trigger(){
+        listeners.forEach(function(cb){ cb(service.proxies); });
+    }
+}
+
+module.factory('$success_rate', success_rate_factory);
+success_rate_factory.$inject = ['$http', '$proxies', '$timeout'];
+
+function success_rate_factory($http, $proxies, $timeout){
+    let is_listening = false;
+    let get_timeout = false;
+    const poll_interval = 3000;
+    return {listen, stop_listening};
+
+    function listen(){
+        if (is_listening)
+            return;
+        is_listening = true;
+        poll();
+        function poll(){
+            get_request_rate().then(function(){
+                if (!is_listening)
+                    return;
+                get_timeout = $timeout(poll, poll_interval);
+            });
+        }
+    }
+
+    function stop_listening(){
+        is_listening = false;
+        get_timeout.cancel();
+    }
+
+    function get_request_rate(){
+        return $http.get('/api/req_status').then(function(res){
+            let rates = res.data;
+            if (!$proxies.proxies)
+                return;
+            $proxies.proxies = $proxies.proxies.map((p)=>{
+                let rstat = {total: 0, success: 0};
+                if (''+p.port in rates)
+                    rstat = rates[p.port];
+                p.success_rate = (rstat.total==0 ? 0
+                    : rstat.success/rstat.total*100);
+                p.success_rate = p.success_rate.toFixed(0);
+                return p;
+            });
+            $proxies.trigger();
         });
     }
 }
@@ -1190,10 +1241,14 @@ for (var k in presets)
 
 module.controller('proxies', Proxies);
 Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout',
-    '$stateParams'];
-function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
+    '$stateParams', '$success_rate'];
+function Proxies($scope, $http, $proxies, $window, $q, $timeout,
+    $stateParams, $success_rate)
+{
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
+    $success_rate.listen();
+    $scope.$on('$destroy', function(){ $success_rate.stop_listening(); });
     var iface_opts = [], zone_opts = [];
     var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [], debug_opts = [];
@@ -1440,6 +1495,11 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
             type: 'text',
             check: check_reg_exp,
         },
+        {
+            key: 'success_rate',
+            title: 'Success rate',
+            type: 'success_rate',
+        }
     ];
     var default_cols = {
         port: true,
@@ -1448,6 +1508,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
         country: true,
         city: true,
         state: true,
+        success_rate: true,
     };
     $scope.cols_conf = JSON.parse(
         $window.localStorage.getItem('columns'))||_.cloneDeep(default_cols);
@@ -1551,6 +1612,9 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams){
             default_cols: default_cols,
         }];
         ga_event('page: proxies', 'click', 'edit columns');
+    };
+    $scope.success_rate_hover = function(rate){
+        ga_event('page: proxies', 'hover', 'success_rate', rate);
     };
     $scope.inline_edit_click = function(proxy, col){
         if (proxy.proxy_type!='persist'

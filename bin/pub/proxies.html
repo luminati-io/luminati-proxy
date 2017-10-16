@@ -15,7 +15,7 @@
     Loading...
   </div>
   <div ng-if="section.name!='settings'" react-view=messages></div>
-  <div class=col-md-7>
+  <div class=col-md-8>
     <div ng-if=proxies class="panel panel-default proxies">
       <div class=panel-heading>
         <div class=btn-wrapper>
@@ -35,14 +35,10 @@
           <thead>
             <tr>
               <th class=proxies-check></th>
-              <th ng-repeat="col in columns">
+              <th ng-repeat="col in columns" ng-class="'col_'+col.key">
                 {{col.title}}
               </th>
               <th class=proxies-actions>Actions</th>
-              <th class="hidden proxies-success-rate"
-                uib-tooltip="Precentage of successful requests per port"
-                tooltip-class=tooltip-default>Success rate
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -58,6 +54,15 @@
                   src=/img/ic_edit.svg class=proxies-action-edit>
               </td>
               <td ng-repeat="col in columns" ng-init="val=proxy[col.key]">
+                <span uib-tooltip="Ratio of successful requests out of total
+                  requests, where successful requests are calculated as 2xx,
+                  3xx or 404 HTTP status codes"
+                  tooltip-class=tooltip-default
+                  ng-if="col.key=='success_rate'&&proxy.success_rate"
+                  ng-mouseenter="success_rate_hover(proxy.success_rate)"
+                  class="proxies-success-rate-value">
+                  {{proxy.success_rate}}%
+                </span>
                 <span ng-if="col.key=='port'&&proxy.iface=='0.0.0.0'
                   &&proxy.config.iface&&proxy.config.iface!=='0.0.0.0'">
                   <span title="{{'This proxy has been bound to all network '
@@ -103,7 +108,8 @@
                     <span ng-if=val&&val!==true>{{val}}</span>
                     <span ng-if=!val>&mdash</span>
                   </span>
-                  <span ng-if="col.key!='_status'&&col.key!='country'&&col.key!='session'">
+                  <span ng-if="col.key!='_status'&&col.key!='country'
+                    &&col.key!='session'&&col.key!='success_rate'">
                     <img src=/img/ic_checkmark.svg ng-if=val===true>
                     <img src=/img/ic_off.svg ng-if=val===false>
                     <span ng-if=val!==true&&val!==false>
@@ -112,7 +118,8 @@
                     </span>
                   </span>
                 </span>
-                <span ng-if="col.key!='_status'&&$root.mode!='guest'"
+                <span ng-if="col.key!='_status'&&col.key!='success_rate'
+                  &&$root.mode!='guest'"
                   ng-click="inline_edit_click(proxy, col)"
                   uib-tooltip-html="get_column_tooltip(proxy, col)"
                   tooltip-class=tooltip-default
@@ -141,7 +148,8 @@
                     <i class="fa fa-random" aria-hidden=true ng-if=val===true></i>
                     <span ng-if=val&&val!==true>{{val}}</span>
                   </span>
-                  <span ng-if="col.key!='country'&&col.key!='session'">
+                  <span ng-if="col.key!='country'&&col.key!='session'
+                    &&col.key!='success_rate'">
                     <img src=/img/ic_checkmark.svg ng-if=val===true>
                     <img src=/img/ic_off.svg ng-if=val===false>
                     <span ng-if=val!==true&&val!==false>
@@ -230,9 +238,6 @@
                   class=proxies-action-delete
                   src=/img/ic_delete.svg>
               </td>
-              <td class="hidden proxies-success-rate" ng-if="success-enabled">
-                <p class=proxies-success-rate-value>95%</p>
-              </td>
               <td class="hidden proxies-success-rate" ng-if="!success-enabled">
                 <a href class=proxies-success-rate-value
                   tooltip-class=tooltip-default uib-tooltip="Measure how many
@@ -267,7 +272,7 @@
       </div>
     </div>
   </div>
-  <div class=col-md-5>
+  <div class=col-md-4>
     <div react-view=react_component></div>
   </div>
   <div ng-repeat="h in history_dialog" ng-controller=history

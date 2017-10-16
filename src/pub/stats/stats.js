@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint react:true, es6:true*/
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
@@ -8,6 +8,7 @@ import {Button, ButtonToolbar, Row, Col, Panel, Modal, OverlayTrigger, Tooltip}
 import util from '../util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
+import axios from 'axios';
 import Common from './common.js';
 import {StatusCodeRow, StatusCodeTable} from './status_codes.js';
 import {DomainRow, DomainTable} from './domains.js';
@@ -82,17 +83,47 @@ class StatTable extends React.Component {
 }
 
 class SuccessRatio extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {total: 0, success: 0};
+        this.get_req_status_stats = etask._fn(function*(_this){
+            let res = yield etask(()=>axios.get('/api/req_status'));
+            return res.data;
+        });
+    }
+    componentDidMount(){
+        E.install();
+        const _this = this;
+        E.sp.spawn(etask(function*(){
+            while (true)
+            {
+                _this.setState(yield _this.get_req_status_stats());
+                yield etask.sleep(3000);
+            }
+        }));
+    }
     render (){
+        const {total, success} = this.state;
+        const ratio = total==0 ? 0 : success/total*100;
         const overallSuccessTooltip = <Tooltip
-                id="succes-tooltip">Successful requests out of total requests
-              </Tooltip>;
-        return <Row className="hidden overall-success-ratio ">
-                 <OverlayTrigger overlay={overallSuccessTooltip}
-                  placement="top">
-                   <Col md={6} className="success_title">Overall success</Col>
-                 </OverlayTrigger>
-                 <Col md={6} className="success_value">94.5%</Col>
-               </Row>;
+              id="succes-tooltip">
+              Ratio of successful requests out of total
+              requests, where successful requests are calculated as 2xx,
+              3xx or 404 HTTP status codes
+            </Tooltip>;
+        return (
+            <OverlayTrigger overlay={overallSuccessTooltip}
+              placement="top">
+              <Row className="overall-success-ratio" onMouseEnter={()=>{
+                util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
+              }}>
+                <Col md={6} className="success_title">Overall success</Col>
+                <Col md={6} className="success_value">
+                  {ratio.toFixed(2)}%
+                </Col>
+              </Row>
+            </OverlayTrigger>
+        );
     }
 }
 

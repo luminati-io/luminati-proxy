@@ -1,7 +1,12 @@
  Luminati Proxy manager - Change Log
 
+## 1.65.923
+- :star: added success rate counting
+- :bug: multiple ui and bug fixing
+
 ## 1.64.509
-- :bug: fix city selector
+- :bug: fixed city selector
+
 ## 1.64.275
 - :star: improve proxy list ui
 
