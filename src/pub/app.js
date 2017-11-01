@@ -298,6 +298,54 @@ function proxies_factory($http, $q){
     }
 }
 
+module.factory('$www_lum', www_lum_factory);
+www_lum_factory.$inject = ['$http', '$timeout'];
+
+function www_lum_factory($http, $timeout){
+    let conf = {};
+    let is_listening = false;
+    let get_timeout;
+    const www_lum_poll_interval = 500000;
+    poll();
+    return {conf, listen, stop_listening, combine_presets};
+
+    function listen(){
+        if (is_listening)
+            return;
+        is_listening = true;
+        poll();
+    }
+
+    function stop_listening(){
+        is_listening = false;
+        if (get_timeout)
+            $timeout.cancel(get_timeout);
+    }
+
+    function combine_presets(_presets){
+        let www_presets = (conf.presets||[])
+        .reduce((prs, p)=>{
+            let np = _.cloneDeep(p);
+            np.set = opt=>_.extend(opt, p.set);
+            np.check = ()=>true;
+            prs[np.key] = np;
+            return prs;
+        }, _.cloneDeep(_presets));
+        return www_presets;
+    }
+
+    function poll(){
+        get_www_lum().then(res=>{
+            _.extend(conf, res);
+            get_timeout = $timeout(poll, www_lum_poll_interval);
+        });
+    }
+    function get_www_lum(){
+        return $http.get('/api/www_lpm')
+        .then(res=>res.data);
+    }
+}
+
 module.factory('$success_rate', success_rate_factory);
 success_rate_factory.$inject = ['$http', '$proxies', '$timeout'];
 
@@ -323,7 +371,8 @@ function success_rate_factory($http, $proxies, $timeout){
 
     function stop_listening(){
         is_listening = false;
-        get_timeout.cancel();
+        if (get_timeout)
+            $timeout.cancel(get_timeout);
     }
 
     function get_request_rate(){
@@ -331,7 +380,7 @@ function success_rate_factory($http, $proxies, $timeout){
             let rates = res.data;
             if (!$proxies.proxies)
                 return;
-            $proxies.proxies = $proxies.proxies.map((p)=>{
+            $proxies.proxies = $proxies.proxies.map(p=>{
                 let rstat = {total: 0, success: 0};
                 if (''+p.port in rates)
                     rstat = rates[p.port];
@@ -1241,14 +1290,18 @@ for (var k in presets)
 
 module.controller('proxies', Proxies);
 Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout',
-    '$stateParams', '$success_rate'];
+    '$stateParams', '$success_rate', '$www_lum'];
 function Proxies($scope, $http, $proxies, $window, $q, $timeout,
-    $stateParams, $success_rate)
+    $stateParams, $success_rate, $www_lum)
 {
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     $success_rate.listen();
-    $scope.$on('$destroy', function(){ $success_rate.stop_listening(); });
+    $www_lum.listen();
+    $scope.$on('$destroy', function(){
+        $success_rate.stop_listening();
+        $www_lum.stop_listening();
+    });
     var iface_opts = [], zone_opts = [];
     var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [], debug_opts = [];
@@ -2315,9 +2368,10 @@ function Pool($scope, $http, $window){
 }
 
 module.controller('proxy', Proxy);
-Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q'];
-function Proxy($scope, $http, $proxies, $window, $q){
+Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$www_lum'];
+function Proxy($scope, $http, $proxies, $window, $q, $www_lum){
     $scope.init = function(locals){
+        var _presets = $www_lum.combine_presets(presets);
         var regions = {};
         var cities = {};
         $scope.consts = $scope.$root.consts.proxy;
@@ -2332,6 +2386,7 @@ function Proxy($scope, $http, $proxies, $window, $q){
         form.dns = form.dns||'';
         form.log = form.log||'';
         form.ips = form.ips||[];
+        $scope.presets = _presets;
         if (_.isBoolean(form.rule))
             form.rule = {};
         $scope.extra = {
@@ -2384,11 +2439,11 @@ function Proxy($scope, $http, $proxies, $window, $q){
                     def_proxy[key] = $scope.consts[key].def;
             }
         }
-        for (var p in presets)
+        for (var p in _presets)
         {
-            if (presets[p].check(def_proxy))
+            if (_presets[p].check(def_proxy))
             {
-                form.preset = presets[p];
+                form.preset = _presets[p];
                 break;
             }
         }

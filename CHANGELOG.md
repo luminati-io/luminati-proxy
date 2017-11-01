@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 1.68.476
+- :star: added dynamic presets
+- :star: added timeout option to improve request performance
+- :bug: ui and bug fixing
+
 ## 1.65.923
 - :star: added success rate counting
 - :bug: multiple ui and bug fixing
