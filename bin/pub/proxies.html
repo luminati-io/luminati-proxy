@@ -19,6 +19,11 @@
     <div ng-if=proxies class="panel panel-default proxies">
       <div class=panel-heading>
         <div class=btn-wrapper>
+          <button type=button class="btn btn-ico btn-csv"
+            ng-click=download_csv() uib-tooltip="Download CSV"
+            tooltip-class=tooltip-default>
+            CSV
+          </button>
           <button type=button class="btn btn-ico" ng-click=edit_cols()
             uib-tooltip="Edit Columns" tooltip-class=tooltip-default>
             <img src=/img/ic_columns.svg >

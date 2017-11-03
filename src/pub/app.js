@@ -9,6 +9,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import codemirror from 'codemirror/lib/codemirror';
 import date from 'hutil/util/date';
+import csv from 'hutil/util/csv';
 import req_stats from './stats/stats.js';
 import status_codes from './stats/status_codes.js';
 import status_codes_detail from './stats/status_codes_detail.js';
@@ -31,6 +32,7 @@ import 'es6-shim';
 import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
+import filesaver from 'file-saver';
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -1665,6 +1667,11 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
             default_cols: default_cols,
         }];
         ga_event('page: proxies', 'click', 'edit columns');
+    };
+    $scope.download_csv = ()=>{
+        const data = $scope.proxies.map(p=>['127.0.0.1:'+p.port]);
+        ga_event('page: proxies', 'click', 'export_csv');
+        filesaver.saveAs(csv.to_blob(data), 'proxies.csv');
     };
     $scope.success_rate_hover = function(rate){
         ga_event('page: proxies', 'hover', 'success_rate', rate);
