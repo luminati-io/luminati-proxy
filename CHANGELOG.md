@@ -1,6 +1,8 @@
  Luminati Proxy manager - Change Log
 
 ## 1.68.880
+- :star: added export proxies list as CSV file
+- :bug: fixed x-lpm-session header
 
 ## 1.68.476
 - :star: added dynamic presets
