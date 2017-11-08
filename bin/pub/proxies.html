@@ -286,8 +286,10 @@
   <div ng-repeat="p in pool_dialog" ng-controller=pool
     ng-include="'pool.html'" ng-init=init(p)>
   </div>
-  <div ng-repeat="p in proxy_dialog" ng-controller=proxy
-    ng-include="'proxy.html'" ng-init=init(p)>
+  <div ng-if="proxies && $root.consts">
+    <div ng-repeat="p in proxy_dialog" ng-controller=proxy
+      ng-include="'proxy.html'" ng-init=init(p)>
+    </div>
   </div>
   <div ng-repeat="c in columns_dialog" ng-controller=columns
     ng-include="'proxy_cols.html'" ng-init=init(c)>

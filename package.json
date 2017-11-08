@@ -138,6 +138,11 @@
       "bin/pub/faq.html",
       "bin/pub/favicon.ico",
       "bin/pub/history.html",
+      "bin/pub/img/1_active.svg",
+      "bin/pub/img/2.svg",
+      "bin/pub/img/2_active.svg",
+      "bin/pub/img/3.svg",
+      "bin/pub/img/3_active.svg",
       "bin/pub/img/flag_any_country.svg",
       "bin/pub/img/icon_chrome.jpg",
       "bin/pub/img/icon_explorer.png",
@@ -168,6 +173,7 @@
       "bin/pub/img/ic_thumbs_down.svg",
       "bin/pub/img/ic_thumbs_up.svg",
       "bin/pub/img/logo.png",
+      "bin/pub/img/lpm_infographics.png",
       "bin/pub/img/social_btns.svg",
       "bin/pub/messages.html",
       "bin/pub/pool.html",
@@ -175,7 +181,6 @@
       "bin/pub/proxies.html",
       "bin/pub/proxy.html",
       "bin/pub/proxy_cols.html",
-      "bin/pub/quickstart.html",
       "bin/pub/settings.html",
       "bin/pub/stats.html",
       "bin/pub/status_codes.html",
@@ -200,6 +205,8 @@
       "src/pub/app.less",
       "src/pub/common.js",
       "src/pub/index.html",
+      "src/pub/intro/index.js",
+      "src/pub/intro/welcome.js",
       "src/pub/messages.js",
       "src/pub/stats/common.js",
       "src/pub/stats/domains.js",
@@ -213,7 +220,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "7d508415c7281090aaddf37448090a7f"
+    "md5": "38d49e63c8738e44113b6d51fffd54b8"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -234,5 +241,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.68.880"
+  "version": "1.69.565"
 }

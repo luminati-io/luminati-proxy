@@ -63,13 +63,21 @@ let create_child = ()=>{
 };
 
 let upgrade = cb=>{
-    const cmd = 'npm install -g luminati-io/luminati-proxy';
+    const log_file = path.join(process.cwd(), '.luminati_upgrade.log');
+    const is_win = /^win/.test(process.platform);
+    const npm_cmd = 'npm install --unsafe-perm -g luminati-io/luminati-proxy';
+    const cmd = is_win ? npm_cmd : `bash -c "${npm_cmd} > ${log_file} 2>&1"`;
     const opt = {name: 'Luminati Proxy Manager'};
     sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
         if (cb)
             cb(e);
         if (e)
-            return console.log('Error during upgrade: '+e);
+        {
+            console.log('Error during upgrade: '+e);
+            if (!is_win)
+                console.log(`Look at ${log_file} for more details`);
+            return;
+        }
         if (stderr)
             console.log('NPM stderr: '+stderr);
         delete require.cache[require.resolve('./check_compat.js')];

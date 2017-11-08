@@ -13,10 +13,7 @@
     <style>[ng-cloak] { display: none; }</style>
   </head>
   <body ng-cloak ng-controller=root>
-    <div ng-class="{'main-container-qs': quickstart()}">
-      <div class=qs-move-control ng-if=quickstart()
-        ng-mousedown=quickstart_mousedown($event)>
-      </div>
+    <div>
       <div class="header container">
         <div class=container>
           <img src=/img/logo.png>
@@ -36,7 +33,8 @@
         </div>
       </div>
       <div class="container page-body">
-        <div class=navigation ng-if="section.name!='settings'">
+        <div class=navigation
+          ng-if="section.name!='settings' && section.name!='intro'">
           <div class=active>
             <span ng-if=settings.customer>
               {{settings.customer}}
@@ -65,9 +63,6 @@
         </div>
         <ui-view></ui-view>
       </div>
-    </div>
-    <div ng-if=quickstart() class=quickstart id=quickstart>
-      <ng-include src="'/quickstart.html'"></ng-include>
     </div>
     <div id=confirmation class="modal fade" role=dialog>
       <div class=modal-dialog>
@@ -164,6 +159,6 @@
         </div>
       </div>
     </div>
-  <script type="text/javascript" src="/5145bec61a3bfd061373.runtime.js"></script><script type="text/javascript" src="/9cbc9490f8b016dd78c4.vendor.js"></script><script type="text/javascript" src="/6f86401c208ec23875f6.app.js"></script></body>
+  <script type="text/javascript" src="/3aa3a88fe9422bb0d9fd.runtime.js"></script><script type="text/javascript" src="/3963ba67072360784ca3.vendor.js"></script><script type="text/javascript" src="/3fd1a84549cc78222eb0.app.js"></script></body>
 </html>
 

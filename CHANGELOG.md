@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 1.69.565
+- :star: added new onboarding flow
+- :star: added rotating User agent and cookies
+- :bug: fixed multiple bugs and UI issues
+
 ## 1.68.880
 - :star: added export proxies list as CSV file
 - :bug: fixed x-lpm-session header

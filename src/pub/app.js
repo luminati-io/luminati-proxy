@@ -10,12 +10,14 @@ import moment from 'moment';
 import codemirror from 'codemirror/lib/codemirror';
 import date from 'hutil/util/date';
 import csv from 'hutil/util/csv';
+import zurl from 'hutil/util/url';
 import req_stats from './stats/stats.js';
 import status_codes from './stats/status_codes.js';
 import status_codes_detail from './stats/status_codes_detail.js';
 import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
+import intro from './intro/index.js';
 import protocols_detail from './stats/protocols_detail.js';
 import messages from './messages.js';
 import util from './util.js';
@@ -33,6 +35,9 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
+
+const url_o = zurl.parse(document.location.href);
+const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -154,7 +159,13 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         controller: function($scope){
             $scope.react_component = protocols_detail; },
     });
-
+    state_registry.register({
+        name: 'intro',
+        parent: 'app',
+        url: '/intro',
+        template: '<div react-view=react_component></div>',
+        controller: function($scope){ $scope.react_component = intro; },
+    });
 }]);
 
 module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
@@ -172,6 +183,14 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
             $q.resolve($rootScope.logged_in).then(function(logged_in){
                 if (logged_in)
                 {
+                    if (!$window.localStorage.getItem('quickstart-intro')
+                        && $window.localStorage.getItem('quickstart')
+                            !='dismissed')
+                    {
+                        $window.localStorage.setItem('quickstart-intro', true);
+                        return resolve(transition.router.stateService.target(
+                                'intro'));
+                    }
                     if (transition.to().name!='settings')
                         return resolve(true);
                     return resolve(transition.router.stateService.target(
@@ -400,64 +419,13 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     '$state', '$transitions',
 function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.messages = messages;
-    $scope.quickstart = function(){
-        var hq = $rootScope.hide_quickstart;
-        if (typeof hq=='undefined')
-            return false;
-        return !hq&&$window.localStorage.getItem('quickstart')=='show';
-    };
-    $scope.quickstart_completed = function(s){
-        return $window.localStorage.getItem('quickstart-'+s);
-    };
-    $scope.quickstart_dismiss = function(){
-        var mc = $window.$('body > .main-container-qs');
-        var qs = $window.$('body > .quickstart');
-        var w = qs.outerWidth();
-        mc.animate({marginLeft: 0, width: '100%'});
-        qs.animate({left: -w}, {done: function(){
-            $window.localStorage.setItem('quickstart', 'dismissed');
-            $scope.$apply();
-        }});
-    };
-    $scope.quickstart_mousedown = function(mouse_dn){
-        var qs = $window.$('#quickstart');
-        var container = $window.$('.main-container-qs');
-        var width = qs.outerWidth();
-        var body_width = $window.$('body').width();
-        var cx = mouse_dn.pageX;
-        var mousemove = function(mouse_mv){
-            var new_width = Math.min(
-                Math.max(width+mouse_mv.pageX-cx, 150), body_width-250);
-            qs.css('width', new_width+'px');
-            container.css('margin-left', new_width+'px');
-        };
-        $window.$('body').on('mousemove', mousemove).one('mouseup', function(){
-            $window.$('body').off('mousemove', mousemove).css('cursor', '');
-        }).css('cursor', 'col-resize');
-    };
-    $scope.quickstart_navigate = function(to){
-        switch (to)
-        {
-        case 'create_proxy':
-            if (!$window.localStorage.getItem('quickstart-creds'))
-                return '';
-            return $state.go('proxies', {add_proxy: true});
-        case 'test_proxy':
-            if (!$window.localStorage.getItem('quickstart-create-proxy'))
-                return;
-            return $state.go('tools');
-        case 'stats':
-            if (!$window.localStorage.getItem('quickstart-test-proxy'))
-                return;
-            return $state.go('domains');
-        }
-    };
     $scope.sections = [
         {name: 'settings', title: 'Settings'},
         {name: 'proxies', title: 'Proxies'},
         {name: 'zones', title: 'Zones'},
         {name: 'tools', title: 'Tools'},
         {name: 'faq', title: 'FAQ'},
+        {name: 'intro', Title: 'Intro'},
     ];
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
@@ -501,6 +469,7 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
             keyboard: false,
         });
     };
+    // XXX krzysztof/ovidiu: incorrect usage of promises
     var check_reload = function(){
         $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
@@ -559,6 +528,7 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         };
         $window.$('#confirmation').modal();
     };
+    // XXX krzysztof/ovidiu: check if this is correct usage of promises
     $scope.logout = function(){
         $http.post('/api/logout').then(function cb(){
             $http.get('/api/config').catch(function(){ setTimeout(cb, 500); })
@@ -608,9 +578,12 @@ function Config($scope, $http, $window){
         });
     };
     var check_reload = function(){
-        $http.get('/api/config').catch(
-            function(){ setTimeout(check_reload, 500); })
-        .then(function(){ $window.location.reload(); });
+        const retry = ()=>{ setTimeout(check_reload, 500); };
+        $http.get('/tools').then(function(res){
+            $window.location.reload();
+        }, function(){
+            retry();
+        });
     };
     $scope.save = function(){
         $scope.errors = null;
@@ -627,7 +600,7 @@ function Config($scope, $http, $window){
                     $scope.config = $scope.codemirror.getValue();
                     show_reload();
                     $http.post('/api/config', {config: $scope.config})
-                    .then(check_reload);
+                    .then(setTimeout(check_reload, 3000));
                 },
             };
             $window.$('#confirmation').modal();
@@ -668,6 +641,7 @@ function Resolve($scope, $http, $window){
             keyboard: false,
         });
     };
+    // XXX krzysztof/ovidiu: incorrect usage of promises
     var check_reload = function(){
         $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
@@ -753,6 +727,7 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
         .split('|||');
     };
     $scope.show_password = function(){ $scope.args_password = true; };
+    // XXX krzysztof/ovidiu: incorrect usage of promises
     var check_reload = function(){
         $http.get('/api/config').catch(
             function(){ setTimeout(check_reload, 500); })
@@ -886,6 +861,8 @@ Test.$inject = ['$scope', '$http', '$filter', '$window'];
 function Test($scope, $http, $filter, $window){
     if ($window.localStorage.getItem('quickstart-create-proxy'))
         $window.localStorage.setItem('quickstart-test-proxy', true);
+    if (qs_o.action && qs_o.action=='test_proxy')
+        $scope.expand = true;
     var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
         /[?&]test=([^&]+)/)||['', 'null'])[1]));
     if (preset)
@@ -1897,8 +1874,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
         return options;
     };
     $scope.react_component = req_stats;
-    if ($stateParams.add_proxy)
-        $scope.add_proxy();
+    if ($stateParams.add_proxy || qs_o.action && qs_o.action=='add_proxy')
+        setTimeout($scope.add_proxy);
 }
 
 module.controller('history', History);
@@ -2768,7 +2745,7 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum){
                 var is_ok_cb = function(){
                     $window.$('#proxy').modal('hide');
                     $proxies.update();
-                    if ($window.localStorage.getItem('quickstart-creds'))
+                    if ($window.localStorage.getItem('quickstart-welcome'))
                     {
                         $window.localStorage.setItem('quickstart-'+
                             (edit ? 'edit' : 'create')+'-proxy', true);

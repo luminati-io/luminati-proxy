@@ -13,10 +13,7 @@
     <style>[ng-cloak] { display: none; }</style>
   </head>
   <body ng-cloak ng-controller=root>
-    <div ng-class="{'main-container-qs': quickstart()}">
-      <div class=qs-move-control ng-if=quickstart()
-        ng-mousedown=quickstart_mousedown($event)>
-      </div>
+    <div>
       <div class="header container">
         <div class=container>
           <img src=/img/logo.png>
@@ -36,7 +33,8 @@
         </div>
       </div>
       <div class="container page-body">
-        <div class=navigation ng-if="section.name!='settings'">
+        <div class=navigation
+          ng-if="section.name!='settings' && section.name!='intro'">
           <div class=active>
             <span ng-if=settings.customer>
               {{settings.customer}}
@@ -65,9 +63,6 @@
         </div>
         <ui-view></ui-view>
       </div>
-    </div>
-    <div ng-if=quickstart() class=quickstart id=quickstart>
-      <ng-include src="'/quickstart.html'"></ng-include>
     </div>
     <div id=confirmation class="modal fade" role=dialog>
       <div class=modal-dialog>
