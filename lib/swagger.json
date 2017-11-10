@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.69.565",
+        "version": "1.69.931",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -483,6 +483,10 @@
                     "type": "string",
                     "pattern": "^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$",
                     "description": "Datacenter IP"
+                },
+                "vip": {
+                    "type": "integer",
+                    "description": "VIP"
                 },
                 "dns": {
                     "type": "string",

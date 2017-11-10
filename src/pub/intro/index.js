@@ -3,6 +3,9 @@
 import React from 'react';
 import WelcomePage from './welcome.js';
 
+const ga_event = (cat, action, label)=>
+    window.ga && window.ga('send', 'event', cat, action, label);
+
 class Page extends React.Component {
     constructor(props){
         super(props);
@@ -10,8 +13,9 @@ class Page extends React.Component {
             !!window.localStorage.getItem('quickstart-welcome')};
     }
     btn_go_click(){
-        this.setState({btn_clicked: true});
+        window.ga('lpm-onboarding', '03 intro page next');
         window.localStorage.setItem('quickstart-welcome', true);
+        this.setState({btn_clicked: true});
     }
     render(){
         const CurrentPage = this.state.btn_clicked ? WelcomePage : Index;

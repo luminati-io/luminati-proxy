@@ -12,7 +12,8 @@ class Welcome extends React.Component {
         this.state = {create, test};
     }
     click_add_proxy(){
-        window.location.href = localhost+'/proxies?action=add_proxy'; }
+        window.location.href = localhost+'/proxies?action=tutorial_add_proxy';
+    }
     render(){
         return (
             <div>

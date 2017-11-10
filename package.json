@@ -66,7 +66,7 @@
     "sudo-prompt": "^6.2.1",
     "taskkill": "^2.0.0",
     "tasklist": "^3.1.0",
-    "tough-cookie-filestore": "0.0.1",
+    "tough-cookie-file-store": "1.2.0",
     "universal-analytics": "^0.4.9",
     "winston": "^2.3.0",
     "yargs": "^6.5.0",
@@ -220,7 +220,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "38d49e63c8738e44113b6d51fffd54b8"
+    "md5": "62d1a0072589411cf28f9078200e2847"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -241,5 +241,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.69.565"
+  "version": "1.69.931"
 }

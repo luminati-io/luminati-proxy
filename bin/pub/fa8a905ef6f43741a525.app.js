@@ -1563,6 +1563,10 @@ var is_valid_field = function is_valid_field(proxy, name, zone_definition) {
         return z.value == value;
     })[0];
     var permissions = details && details.perm.split(' ') || [];
+    if (name == 'vip') {
+        var plan = details && details.plans[details.plans.length - 1] || {};
+        return !!plan.vip;
+    }
     if (['country', 'state', 'city', 'asn', 'ip'].includes(name)) return permissions.includes(name);
     return true;
 };
@@ -1976,11 +1980,13 @@ _module.controller('root', ['$rootScope', '$scope', '$http', '$window', '$state'
                 $window.$('#upgrading').modal({ backdrop: 'static',
                     keyboard: false });
                 $scope.upgrading = true;
+                // XXX krzysztof: wrong usage of promises
                 $http.post('/api/upgrade').catch(function () {
                     $scope.upgrading = false;
                     $scope.upgrade_error = true;
                 }).then(function (data) {
                     $scope.upgrading = false;
+                    // XXX krzysztof: wrong usage of promises
                     $http.post('/api/restart').catch(function () {
                         // $scope.upgrade_error = true;
                         show_reload();
@@ -2009,14 +2015,17 @@ _module.controller('root', ['$rootScope', '$scope', '$http', '$window', '$state'
         };
         $window.$('#confirmation').modal();
     };
-    // XXX krzysztof/ovidiu: check if this is correct usage of promises
     $scope.logout = function () {
-        $http.post('/api/logout').then(function cb() {
-            $http.get('/api/config').catch(function () {
-                setTimeout(cb, 500);
-            }).then(function () {
-                $window.location = '/';
-            });
+        $http.post('/api/logout').then(function () {
+            show_reload();
+            setTimeout(function check_reload() {
+                var retry = function retry() {
+                    setTimeout(check_reload, 500);
+                };
+                $http.get('/proxies').then(function (res) {
+                    $window.location = '/';
+                }, retry);
+            }, 3000);
         });
     };
     $scope.warnings = function () {
@@ -2060,9 +2069,7 @@ function Config($scope, $http, $window) {
         };
         $http.get('/tools').then(function (res) {
             $window.location.reload();
-        }, function () {
-            retry();
-        });
+        }, retry);
     };
     $scope.save = function () {
         $scope.errors = null;
@@ -2185,13 +2192,23 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location) {
     $scope.show_password = function () {
         $scope.args_password = true;
     };
-    // XXX krzysztof/ovidiu: incorrect usage of promises
     var check_reload = function check_reload() {
-        $http.get('/api/config').catch(function () {
-            setTimeout(check_reload, 500);
-        }).then(function () {
+        $http.get('/proxies').then(function () {
             $window.location.reload();
+        }, function () {
+            setTimeout(check_reload, 500);
         });
+    };
+    var show_reload = function show_reload() {
+        $window.$('#restarting').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+    };
+    var send_event_user_logged = function send_event_user_logged() {
+        if ($window.localStorage.getItem('quickstart-intro') || $window.localStorage.getItem('quickstart') == 'dismissed') {
+            ga_event('lpm-onboarding', '02 login successful', 'old user');
+        } else ga_event('lpm-onboarding', '02 login successful', 'new user');
     };
     $scope.user_data = { username: '', password: '' };
     var token;
@@ -2221,7 +2238,11 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location) {
                 $scope.saving_user = false;
                 $scope.user_customers = d.data.customers;
                 $scope.user_data.customer = $scope.user_customers[0];
-            } else check_reload();
+            } else {
+                send_event_user_logged();
+                show_reload();
+                setTimeout(check_reload, 3000);
+            }
         }).catch(function (error) {
             $scope.saving_user = false;
             $scope.user_error = error.data.error;
@@ -2801,6 +2822,13 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams, $
             return true;
         }
     }, {
+        key: 'vip',
+        title: 'VIP',
+        type: 'number',
+        check: function check(v) {
+            return true;
+        }
+    }, {
         key: 'max_requests',
         title: 'Max requests',
         type: 'text',
@@ -3234,7 +3262,9 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout, $stateParams, $
         return options;
     };
     $scope.react_component = _stats2.default;
-    if ($stateParams.add_proxy || qs_o.action && qs_o.action == 'add_proxy') setTimeout($scope.add_proxy);
+    if ($stateParams.add_proxy || qs_o.action && qs_o.action == 'tutorial_add_proxy') {
+        setTimeout($scope.add_proxy);
+    }
 }
 
 _module.controller('history', History);
@@ -3602,8 +3632,8 @@ function Pool($scope, $http, $window) {
 }
 
 _module.controller('proxy', Proxy);
-Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$www_lum'];
-function Proxy($scope, $http, $proxies, $window, $q, $www_lum) {
+Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$www_lum', '$location'];
+function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location) {
     $scope.init = function (locals) {
         var _presets = $www_lum.combine_presets(presets);
         var regions = {};
@@ -3620,6 +3650,7 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum) {
         form.dns = form.dns || '';
         form.log = form.log || '';
         form.ips = form.ips || [];
+        form.vips = form.vips || [];
         $scope.presets = _presets;
         if (_lodash2.default.isBoolean(form.rule)) form.rule = {};
         $scope.extra = {
@@ -3748,6 +3779,45 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum) {
                     return { ip: ip, checked: form.ips.includes(ip) };
                 });
                 modals.allocated_ips.loading = false;
+            });
+        };
+        $scope.is_show_allocated_vips = function () {
+            var zone = $scope.consts.zone.values.filter(function (z) {
+                return z.value == form.zone;
+            })[0];
+            var plan = (zone && zone.plans || []).slice(-1)[0];
+            return plan && !!plan.vip;
+        };
+        $scope.show_allocated_vips = function () {
+            var zone = form.zone;
+            var keypass = form.password || '';
+            var modals = $scope.$root;
+            modals.allocated_vips = {
+                vips: [],
+                loading: true,
+                random_vip: function random_vip() {
+                    modals.allocated_vips.vips.forEach(function (item) {
+                        item.checked = false;
+                    });
+                    form.vips = [];
+                    form.pool_size = 0;
+                },
+                toggle_vip: function toggle_vip(item) {
+                    var index = form.vips.indexOf(item.vip);
+                    if (item.checked && index < 0) form.vips.push(item.vip);else if (!item.checked && index > -1) form.vips.splice(index, 1);
+                    form.pool_size = form.vips.length;
+                },
+                zone: zone
+            };
+            $window.$('#allocated_vips').modal();
+            $http.get('/api/allocated_vips?zone=' + zone + '&key=' + keypass).then(function (res) {
+                form.vips = form.vips.filter(function (vip) {
+                    return res.data.includes(vip);
+                });
+                modals.allocated_vips.vips = res.data.map(function (vip) {
+                    return { vip: vip, checked: form.vips.includes(vip) };
+                });
+                modals.allocated_vips.loading = false;
             });
         };
         $scope.binary_changed = function (proxy, field, value) {
@@ -3927,6 +3997,10 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum) {
                     }
                     ga_event('proxy_form', 'proxy_' + (edit ? 'edit' : 'create'), 'ok');
                     return $http.post('/api/recheck').then(function (r) {
+                        if (qs_o.action && qs_o.action == 'tutorial_add_proxy') {
+                            $location.search({});
+                            ga_event('lpm-onboarding', '04 tutorial create port completed', '');
+                        }
                         if (r.data.login_failure) $window.location = '/';
                     });
                 };
@@ -8131,6 +8205,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var ga_event = function ga_event(cat, action, label) {
+    return window.ga && window.ga('send', 'event', cat, action, label);
+};
+
 var Page = function (_React$Component) {
     _inherits(Page, _React$Component);
 
@@ -8146,8 +8224,9 @@ var Page = function (_React$Component) {
     _createClass(Page, [{
         key: 'btn_go_click',
         value: function btn_go_click() {
-            this.setState({ btn_clicked: true });
+            window.ga('lpm-onboarding', '03 intro page next');
             window.localStorage.setItem('quickstart-welcome', true);
+            this.setState({ btn_clicked: true });
         }
     }, {
         key: 'render',
@@ -8245,7 +8324,7 @@ var Welcome = function (_React$Component) {
     _createClass(Welcome, [{
         key: 'click_add_proxy',
         value: function click_add_proxy() {
-            window.location.href = localhost + '/proxies?action=add_proxy';
+            window.location.href = localhost + '/proxies?action=tutorial_add_proxy';
         }
     }, {
         key: 'render',

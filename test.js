@@ -761,6 +761,7 @@ describe('proxy', ()=>{
             t('city', {country: 'us', state: 'ny', city: 'newyork'});
             t('static', {zone: 'static', ip: '127.0.0.1'});
             t('ASN', {zone: 'asn', asn: 28133});
+            t('mobile', {zone: 'mobile', mobile: 'true'});
             t('DNS', {dns: 'local'});
             t('debug', {debug: 'none'});
             t('request_timeout', {request_timeout: 10}, {timeout: 10});

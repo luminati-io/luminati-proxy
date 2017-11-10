@@ -159,6 +159,38 @@
         </div>
       </div>
     </div>
+    <div id=allocated_vips class="modal fade" role=dialog>
+      <div class=modal-dialog>
+        <div class=modal-content>
+          <div class=modal-header>
+            <h4 class=modal-title>
+              <button type=button class=close data-dismiss=modal>
+                &times;</button>
+              Select VIPs:
+              <span class=blue>{{allocated_vips.zone}}</span>
+            </h4>
+          </div>
+          <div class=modal-body>
+            <p ng-show="allocated_vips.loading" class=text-warning>
+              Loading...
+            </p>
+            <div ng-show="!allocated_vips.loading">
+              <button ng-click="allocated_vips.random_vip()"
+                type="button" class="btn btn-default">
+                Random VIPs
+              </button>
+              <div ng-repeat="item in allocated_vips.vips" class="checkbox">
+                <label>
+                  <input ng-model="item.checked"
+                    ng-change="allocated_vips.toggle_vip(item)"
+                    type=checkbox> {{item.vip}}
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
 

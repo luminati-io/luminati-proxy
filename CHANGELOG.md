@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.69.931
+- :bug: fixed login bug
+- :bug: fixed debug log info 
+
 ## 1.69.565
 - :star: added new onboarding flow
 - :star: added rotating User agent and cookies

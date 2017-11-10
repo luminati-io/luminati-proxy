@@ -50,6 +50,10 @@ var is_valid_field = function(proxy, name, zone_definition){
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
     var permissions = details&&details.perm.split(' ')||[];
+    if (name=='vip'){
+        var plan = details&&details.plans[details.plans.length-1]||{};
+        return !!plan.vip;
+    }
     if (['country', 'state', 'city', 'asn', 'ip'].includes(name))
         return permissions.includes(name);
     return true;
@@ -495,11 +499,13 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
                 $window.$('#upgrading').modal({backdrop: 'static',
                     keyboard: false});
                 $scope.upgrading = true;
+                // XXX krzysztof: wrong usage of promises
                 $http.post('/api/upgrade').catch(function(){
                     $scope.upgrading = false;
                     $scope.upgrade_error = true;
                 }).then(function(data){
                     $scope.upgrading = false;
+                    // XXX krzysztof: wrong usage of promises
                     $http.post('/api/restart').catch(function(){
                         // $scope.upgrade_error = true;
                         show_reload();
@@ -528,11 +534,14 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         };
         $window.$('#confirmation').modal();
     };
-    // XXX krzysztof/ovidiu: check if this is correct usage of promises
     $scope.logout = function(){
-        $http.post('/api/logout').then(function cb(){
-            $http.get('/api/config').catch(function(){ setTimeout(cb, 500); })
-                .then(function(){ $window.location = '/'; });
+        $http.post('/api/logout').then(function(){
+            show_reload();
+            setTimeout(function check_reload(){
+                const retry = ()=>{ setTimeout(check_reload, 500); };
+                $http.get('/proxies').then(function(res){
+                    $window.location = '/'; }, retry);
+            }, 3000);
         });
     };
     $scope.warnings = function(){
@@ -580,10 +589,7 @@ function Config($scope, $http, $window){
     var check_reload = function(){
         const retry = ()=>{ setTimeout(check_reload, 500); };
         $http.get('/tools').then(function(res){
-            $window.location.reload();
-        }, function(){
-            retry();
-        });
+            $window.location.reload(); }, retry);
     };
     $scope.save = function(){
         $scope.errors = null;
@@ -727,11 +733,25 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
         .split('|||');
     };
     $scope.show_password = function(){ $scope.args_password = true; };
-    // XXX krzysztof/ovidiu: incorrect usage of promises
     var check_reload = function(){
-        $http.get('/api/config').catch(
-            function(){ setTimeout(check_reload, 500); })
-        .then(function(){ $window.location.reload(); });
+        $http.get('/proxies').then(function(){
+            $window.location.reload(); }, function(){
+                setTimeout(check_reload, 500); });
+    };
+    var show_reload = function(){
+        $window.$('#restarting').modal({
+            backdrop: 'static',
+            keyboard: false,
+        });
+    };
+    const send_event_user_logged = ()=>{
+        if ($window.localStorage.getItem('quickstart-intro') ||
+            $window.localStorage.getItem('quickstart')=='dismissed')
+        {
+            ga_event('lpm-onboarding', '02 login successful', 'old user');
+        }
+        else
+            ga_event('lpm-onboarding', '02 login successful', 'new user');
     };
     $scope.user_data = {username: '', password: ''};
     var token;
@@ -770,7 +790,11 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
                 $scope.user_data.customer = $scope.user_customers[0];
             }
             else
-                check_reload();
+            {
+                send_event_user_logged();
+                show_reload();
+                setTimeout(check_reload, 3000);
+            }
         }).catch(function(error){
             $scope.saving_user = false;
             $scope.user_error = error.data.error;
@@ -1404,6 +1428,12 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
             },
         },
         {
+            key: 'vip',
+            title: 'VIP',
+            type: 'number',
+            check: function(v){ return true; },
+        },
+        {
             key: 'max_requests',
             title: 'Max requests',
             type: 'text',
@@ -1874,8 +1904,11 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
         return options;
     };
     $scope.react_component = req_stats;
-    if ($stateParams.add_proxy || qs_o.action && qs_o.action=='add_proxy')
+    if ($stateParams.add_proxy ||
+        qs_o.action && qs_o.action=='tutorial_add_proxy')
+    {
         setTimeout($scope.add_proxy);
+    }
 }
 
 module.controller('history', History);
@@ -2352,8 +2385,9 @@ function Pool($scope, $http, $window){
 }
 
 module.controller('proxy', Proxy);
-Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$www_lum'];
-function Proxy($scope, $http, $proxies, $window, $q, $www_lum){
+Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$www_lum',
+    '$location'];
+function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
     $scope.init = function(locals){
         var _presets = $www_lum.combine_presets(presets);
         var regions = {};
@@ -2370,6 +2404,7 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum){
         form.dns = form.dns||'';
         form.log = form.log||'';
         form.ips = form.ips||[];
+        form.vips = form.vips||[];
         $scope.presets = _presets;
         if (_.isBoolean(form.rule))
             form.rule = {};
@@ -2528,6 +2563,45 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum){
                     return {ip: ip, checked: form.ips.includes(ip)};
                 });
                 modals.allocated_ips.loading = false;
+            });
+        };
+        $scope.is_show_allocated_vips = function(){
+            var zone = $scope.consts.zone.values.filter(function(z){
+                return z.value==form.zone; })[0];
+            var plan = (zone&&zone.plans||[]).slice(-1)[0];
+            return plan&&!!plan.vip;
+        };
+        $scope.show_allocated_vips = function(){
+            var zone = form.zone;
+            var keypass = form.password||'';
+            var modals = $scope.$root;
+            modals.allocated_vips = {
+                vips: [],
+                loading: true,
+                random_vip: function(){
+                    modals.allocated_vips.vips.forEach(function(item){
+                        item.checked = false; });
+                    form.vips = [];
+                    form.pool_size = 0;
+                },
+                toggle_vip: function(item){
+                    var index = form.vips.indexOf(item.vip);
+                    if (item.checked && index<0)
+                        form.vips.push(item.vip);
+                    else if (!item.checked && index>-1)
+                        form.vips.splice(index, 1);
+                    form.pool_size = form.vips.length;
+                },
+                zone: zone,
+            };
+            $window.$('#allocated_vips').modal();
+            $http.get('/api/allocated_vips?zone='+zone+'&key='+keypass)
+            .then(function(res){
+                form.vips = form.vips.filter(vip=>res.data.includes(vip));
+                modals.allocated_vips.vips = res.data.map(function(vip){
+                    return {vip: vip, checked: form.vips.includes(vip)};
+                });
+                modals.allocated_vips.loading = false;
             });
         };
         $scope.binary_changed = function(proxy, field, value){
@@ -2754,6 +2828,12 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum){
                         , 'ok');
                     return $http.post('/api/recheck')
                     .then(function(r){
+                        if (qs_o.action && qs_o.action=='tutorial_add_proxy')
+                        {
+                            $location.search({});
+                            ga_event('lpm-onboarding',
+                                '04 tutorial create port completed', '');
+                        }
                         if (r.data.login_failure)
                             $window.location = '/';
                     });

@@ -290,6 +290,13 @@
                     <input id=proxy-field-datacenter-ip ng-model=form.ip
                       class=form-control>
                   </div>
+                  <div class=form-group  ng-show="is_valid_field('vip')">
+                    <label class=control-label for=proxy-field-vip>
+                      VIP
+                    </label>
+                    <input id=proxy-field-vip ng-model=form.vip
+                      class=form-control>
+                  </div>
                 </div>
               </div>
             </div>
@@ -326,6 +333,12 @@
                         ng-click="show_allocated_ips()"
                         type=button class="btn btn-link">
                         set from allocated IPs
+                      </button>
+                      <button ng-if="is_show_allocated_vips()"
+                        ng-disabled="!form.preset.support.pool_size"
+                        ng-click="show_allocated_vips()"
+                        type=button class="btn btn-link">
+                        set from allocated VIPs
                       </button>
                     </label>
                     <input id=proxy-field-pool-size type=number min=0
