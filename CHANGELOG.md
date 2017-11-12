@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 1.69.931
+## 1.70.145
 - :bug: fixed login bug
 - :bug: fixed debug log info 
 

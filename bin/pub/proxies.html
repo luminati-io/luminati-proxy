@@ -33,6 +33,11 @@
             uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
             <img src=/img/ic_plus.svg>
           </button>
+          <button type=button class="btn btn-ico add_proxy_btn"
+            ng-if="show_add_proxy()" ng-click=add_proxy_new()
+            uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
+            <img src=/img/ic_plus.svg>
+          </button>
         </div>
       </div>
       <div class="panel-body proxies-panel" ng-show="columns">
@@ -280,6 +285,7 @@
   <div class=col-md-4>
     <div react-view=react_component></div>
   </div>
+  <div react-view=add_proxy_modal></div>
   <div ng-repeat="h in history_dialog" ng-controller=history
     ng-include="'history.html'" ng-init=init(h)>
   </div>

@@ -143,6 +143,7 @@
       "bin/pub/img/2_active.svg",
       "bin/pub/img/3.svg",
       "bin/pub/img/3_active.svg",
+      "bin/pub/img/delete.svg",
       "bin/pub/img/flag_any_country.svg",
       "bin/pub/img/icon_chrome.jpg",
       "bin/pub/img/icon_explorer.png",
@@ -174,7 +175,9 @@
       "bin/pub/img/ic_thumbs_up.svg",
       "bin/pub/img/logo.png",
       "bin/pub/img/lpm_infographics.png",
+      "bin/pub/img/preset_icon.png",
       "bin/pub/img/social_btns.svg",
+      "bin/pub/img/zone_icon.png",
       "bin/pub/messages.html",
       "bin/pub/pool.html",
       "bin/pub/protocols.html",
@@ -201,6 +204,7 @@
       "lib/socks.js",
       "lib/ssl.js",
       "lib/username.js",
+      "src/pub/add_proxy.js",
       "src/pub/app.js",
       "src/pub/app.less",
       "src/pub/common.js",
@@ -220,7 +224,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "62d1a0072589411cf28f9078200e2847"
+    "md5": "7f55d3283086794fbf7510d596faacba"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -241,5 +245,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.69.931"
+  "version": "1.70.145"
 }

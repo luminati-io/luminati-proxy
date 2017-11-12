@@ -20,7 +20,7 @@ class Page extends React.Component {
     render(){
         const CurrentPage = this.state.btn_clicked ? WelcomePage : Index;
         return (
-            <div className="intro">
+            <div className="intro lpm">
               <h1 className="header">Welcome to Luminati Proxy Manager</h1>
               <CurrentPage btn_go_click={this.btn_go_click.bind(this)}/>
             </div>

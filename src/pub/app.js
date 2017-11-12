@@ -18,11 +18,13 @@ import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
 import intro from './intro/index.js';
+import zadd_proxy from './add_proxy.js';
 import protocols_detail from './stats/protocols_detail.js';
 import messages from './messages.js';
 import util from './util.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import $ from 'jquery';
 import 'codemirror/mode/javascript/javascript';
 import 'jquery';
 import 'angular-sanitize';
@@ -39,6 +41,9 @@ import filesaver from 'file-saver';
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
 
+window.feature_flag = (flag, enable=true)=>{
+    window.localStorage.setItem(flag, JSON.stringify(enable)); };
+
 var is_electron = window.process && window.process.versions.electron;
 
 var is_valid_field = function(proxy, name, zone_definition){
@@ -50,7 +55,8 @@ var is_valid_field = function(proxy, name, zone_definition){
     var details = zone_definition.values
     .filter(function(z){ return z.value==value; })[0];
     var permissions = details&&details.perm.split(' ')||[];
-    if (name=='vip'){
+    if (name=='vip')
+    {
         var plan = details&&details.plans[details.plans.length-1]||{};
         return !!plan.vip;
     }
@@ -409,8 +415,8 @@ function success_rate_factory($http, $proxies, $timeout){
                 let rstat = {total: 0, success: 0};
                 if (''+p.port in rates)
                     rstat = rates[p.port];
-                p.success_rate = (rstat.total==0 ? 0
-                    : rstat.success/rstat.total*100);
+                p.success_rate = rstat.total==0 ?
+                    0 : rstat.success/rstat.total*100;
                 p.success_rate = p.success_rate.toFixed(0);
                 return p;
             });
@@ -537,8 +543,8 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.logout = function(){
         $http.post('/api/logout').then(function(){
             show_reload();
-            setTimeout(function check_reload(){
-                const retry = ()=>{ setTimeout(check_reload, 500); };
+            setTimeout(function _check_reload(){
+                const retry = ()=>{ setTimeout(_check_reload, 500); };
                 $http.get('/proxies').then(function(res){
                     $window.location = '/'; }, retry);
             }, 3000);
@@ -1647,6 +1653,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
         $scope.proxy_dialog = [{proxy: {}}];
         ga_event('page: proxies', 'click', 'add proxy');
     };
+    $scope.add_proxy_new = function(){
+        $('#add_proxy_modal').modal('show'); };
     $scope.get_static_country = function(proxy){
         var zone = proxy.zones[proxy.zone];
         if (!zone)
@@ -1870,6 +1878,8 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
     };
     $scope.on_page_change = function(){
         $scope.selected_proxies = {}; };
+    $scope.show_add_proxy = function(){
+        return JSON.parse($window.localStorage.getItem('add_proxy')); };
     var load_regions = function(country){
         if (!country||country=='*')
             return [];
@@ -1904,6 +1914,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
         return options;
     };
     $scope.react_component = req_stats;
+    $scope.add_proxy_modal = zadd_proxy;
     if ($stateParams.add_proxy ||
         qs_o.action && qs_o.action=='tutorial_add_proxy')
     {
