@@ -17,7 +17,7 @@ import status_codes_detail from './stats/status_codes_detail.js';
 import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
-import intro from './intro/index.js';
+import intro from './intro.js';
 import zadd_proxy from './add_proxy.js';
 import protocols_detail from './stats/protocols_detail.js';
 import messages from './messages.js';

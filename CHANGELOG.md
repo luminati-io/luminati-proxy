@@ -1,10 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 1.70.323
+
 ## 1.70.145
 - :bug: fixed login bug
-- :bug: fixed debug log info
-- :star: added option to set specific vip IP in port
-- :star: see allocated vip IPs
+- :bug: fixed debug log info 
 
 ## 1.69.565
 - :star: added new onboarding flow

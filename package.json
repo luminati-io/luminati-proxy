@@ -209,8 +209,7 @@
       "src/pub/app.less",
       "src/pub/common.js",
       "src/pub/index.html",
-      "src/pub/intro/index.js",
-      "src/pub/intro/welcome.js",
+      "src/pub/intro.js",
       "src/pub/messages.js",
       "src/pub/stats/common.js",
       "src/pub/stats/domains.js",
@@ -224,7 +223,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "7f55d3283086794fbf7510d596faacba"
+    "md5": "716388f454964349b042913fce422a74"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -245,5 +244,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.70.145"
+  "version": "1.70.323"
 }
