@@ -137,6 +137,8 @@
       "bin/pub/faq/upgrade.html",
       "bin/pub/faq.html",
       "bin/pub/favicon.ico",
+      "bin/pub/font/lato_bold.woff2",
+      "bin/pub/font/lato_regular.woff2",
       "bin/pub/history.html",
       "bin/pub/img/1_active.svg",
       "bin/pub/img/2.svg",
@@ -144,7 +146,9 @@
       "bin/pub/img/3.svg",
       "bin/pub/img/3_active.svg",
       "bin/pub/img/delete.svg",
+      "bin/pub/img/faq.svg",
       "bin/pub/img/flag_any_country.svg",
+      "bin/pub/img/howto.svg",
       "bin/pub/img/icon_chrome.jpg",
       "bin/pub/img/icon_explorer.png",
       "bin/pub/img/icon_firefox.jpg",
@@ -175,8 +179,14 @@
       "bin/pub/img/ic_thumbs_up.svg",
       "bin/pub/img/logo.png",
       "bin/pub/img/lpm_infographics.png",
+      "bin/pub/img/luminati_logo_2.svg",
       "bin/pub/img/preset_icon.png",
+      "bin/pub/img/proxies.svg",
       "bin/pub/img/social_btns.svg",
+      "bin/pub/img/stats.svg",
+      "bin/pub/img/tester.svg",
+      "bin/pub/img/tools.svg",
+      "bin/pub/img/zones.svg",
       "bin/pub/img/zone_icon.png",
       "bin/pub/messages.html",
       "bin/pub/pool.html",
@@ -223,7 +233,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "716388f454964349b042913fce422a74"
+    "md5": "94aa5634b5b17e1dc945888fa7349c6f"
   },
   "main": "index.js",
   "name": "luminati-proxy",
@@ -244,5 +254,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.70.323"
+  "version": "1.70.725"
 }

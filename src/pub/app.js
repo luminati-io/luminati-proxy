@@ -430,12 +430,12 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
 function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.messages = messages;
     $scope.sections = [
-        {name: 'settings', title: 'Settings'},
-        {name: 'proxies', title: 'Proxies'},
-        {name: 'zones', title: 'Zones'},
-        {name: 'tools', title: 'Tools'},
-        {name: 'faq', title: 'FAQ'},
-        {name: 'intro', Title: 'Intro'},
+        {name: 'settings', title: 'Settings', navbar: false},
+        {name: 'proxies', title: 'Proxies', navbar: true},
+        {name: 'zones', title: 'Zones', navbar: true},
+        {name: 'tools', title: 'Tools', navbar: true},
+        {name: 'faq', title: 'FAQ', navbar: true},
+        {name: 'intro', navbar: false},
     ];
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
