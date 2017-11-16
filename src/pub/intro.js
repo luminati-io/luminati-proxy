@@ -1,33 +1,16 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import ajax from 'hutil/util/ajax';
-import etask from 'hutil/util/etask';
 
 const localhost = 'http://127.0.0.1:22999';
 const ga_event = (cat, action, label)=>
-    window.ga('send', 'event', cat, action, label);
+    window.ga && window.ga('send', 'event', cat, action, label);
 
 class Page extends React.Component {
     constructor(props){
         super(props);
         this.state = {btn_clicked:
             !!window.localStorage.getItem('quickstart-welcome')};
-    }
-    componentWillMount(){ this.load_data(); }
-    // XXX krzysztof: move setting ga to the upper component
-    load_data(){
-        return etask([function(){
-            return ajax.json({url: '/api/mode'});
-        }, function(res){
-            let ua;
-            if (ua = res.run_config.ua)
-            {
-                window.ga('create', ua.tid, 'auto');
-                for (let i in ua._persistentParams)
-                    window.ga('set', i, ua._persistentParams[i]);
-            }
-        }]);
     }
     btn_go_click(){
         ga_event('lpm-onboarding', '03 intro page next');

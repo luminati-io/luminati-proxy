@@ -40,23 +40,19 @@ const upgrade = ()=>{
         type: 'info',
         title:'Update Required',
         message: 'A new Luminati Proxy Manager version is available',
-        buttons: ['Update on exit', 'Update now'],
+        buttons: ['Update now'],
     });
     if (res==1)
-    {
-        console.log('starting upgrade');
-        return autoUpdater.quitAndInstall();
-    }
-    console.log('upgrade postponed until exit');
+        autoUpdater.quitAndInstall();
 };
 
 autoUpdater.on('update-downloaded', e=>{
-    console.log('upgrade downloaded');
     if (manager && manager.argv && !manager.argv.no_usage_stats)
         ua.event('app', 'update-downloaded');
     if (can_upgrade)
         upgrade();
-    upgrade_available = true;
+    else
+        upgrade_available = true;
 });
 autoUpdater.on('error', ()=>{});
 
@@ -114,7 +110,7 @@ let run = run_config=>{
     if (!manager.argv.no_usage_stats)
         ua.event('app', 'run');
     autoUpdater.logger = manager._log;
-    autoUpdater.checkForUpdatesAndNotify();
+    autoUpdater.checkForUpdates();
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
             ua.event('manager', 'www_ready', url).send();
