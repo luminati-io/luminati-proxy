@@ -1,14 +1,42 @@
 @first_color: #004d74;
 @second_color: #05bed1;
 @grey: #ccdbe3;
-@import url('https://fonts.googleapis.com/css?family=Lato');
-
+@grey_border: #edf0f5;
+@light_grey: #f5f5f5;
+@light: #B4E6EE;
+@x_light: #E6F6F9;
+@xx_light: #F3FBFC;
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'),
+      url(/font/lato_regular.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
+      U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Lato Bold'), local('Lato-Bold'),
+      url(/font/lato_bold.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
+      U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
 body {
     font-family: "Noto Sans", sans-serif;
     font-size: 15px;
     line-height: 23px;
     overflow-y: scroll;
 }
+.no_nav {
+    .page-body {
+        margin-left: 0;
+    }
+    .nav_top { background-color: white; }
+}
+.page-body { margin-left: 224px; }
 .page-body a {
     color: #428bca;
     outline: 3px solid transparent;
@@ -33,28 +61,6 @@ code {
 pre.top-margin {
     margin-top: 4px;
 }
-.header .dropdown {
-    float: right;
-    margin: 18px 5px 0 0;
-    font-size: 14px;
-}
-.header .dropdown-toggle {
-    background: white;
-    color: #2d404c;
-    border-radius: 5px;
-    padding: 3px 17px 3px 5px;
-    position: relative;
-    text-decoration: none;
-}
-.header .dropdown-toggle:hover {
-    background-color: #e6e6e6;
-}
-.header .dropdown-toggle .caret {
-    position: absolute;
-    right: 6px;
-    top: 12px;
-    margin: 0;
-}
 .container {
     width: auto;
 }
@@ -76,30 +82,6 @@ pre.top-margin {
 }
 .header { height: 60px; }
 .header img { margin-top: 10px; }
-.navigation {
-    background: #f5f5f5;
-    padding: 8px 15px;
-    border-radius: 4px;
-    color: #777;
-    margin: 0px 14px 20px 14px;
-}
-.navigation:after {
-    content: '';
-    display: block;
-    clear: both;
-}
-.navigation .active {
-    float: left;
-}
-.navigation .active .separator {
-    color: #ccc;
-}
-.navigation .items {
-    float: right;
-}
-.navigation .items .separator {
-    color: #0c334d;
-}
 nav a:hover {
     box-shadow: none;
 }
@@ -291,12 +273,12 @@ div.proxies .btn-wrapper {
     outline: 3px solid transparent;
     border: 1px solid transparent;
     line-height: 20px;
-    margin: 0 4px;
+    margin: 0;
 }
 .proxies-action-disabled {
     border: 1px solid transparent;
     line-height: 20px;
-    margin: 0 4px;
+    margin: 0;
 }
 .proxies-action-edit {
     visibility: hidden;
@@ -383,17 +365,6 @@ div.proxies .btn-wrapper {
     position: absolute;
     right: 10px;
     top: 9px;
-}
-#version {
-    background: #f04844;
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    padding: 0 4px;
-    border-radius: 2px;
-    position: relative;
-    top: 12px;
-    left: 4px;
 }
 .github {
     margin-top: 12px;
@@ -739,6 +710,7 @@ input.form-control[type=checkbox] {
         border: solid 1px @grey;
         border-radius: 3px;
         padding-left: 13px;
+        font-weight: 300;
         &:focus {
             outline: none;
             border: solid 1px @second_color;
@@ -780,6 +752,11 @@ input.form-control[type=checkbox] {
         font-weight: 700;
         width: 280px;
         height: 60px;
+    }
+    .btn_lpm_small {
+        font-size: 11px;
+        height: 27px;
+        width: auto;
     }
     .modal {
         .modal-content {
@@ -881,7 +858,7 @@ input.form-control[type=checkbox] {
     }
     .section.disabled {
         cursor: initial;
-        border: solid 1px #edf0f5;
+        border: solid 1px @grey_border;
         color: #9cb5be;
         .subtitle { color: #9cb5be; }
         .right_arrow { border-color: #9cb5be; }
@@ -909,6 +886,138 @@ input.form-control[type=checkbox] {
     .img_2_active { background: url(/img/2_active.svg); }
     .img_3 { background: url(/img/3.svg); }
     .img_3_active { background: url(/img/3_active.svg); }
+    .howto {
+        h1.sub_header {
+            line-height: 0;
+            margin: 0 0 25px 0;
+            color: @second_color;
+        }
+        .choices { height: 140px; }
+        .choice {
+            cursor: pointer;
+            display: inline-block;
+            width: 205px;
+            height: 83px;
+            border-radius: 4px;
+            box-shadow: 0 2px 2px 0 @grey;
+            border: solid 1px @grey_border;
+            margin: 30px 20px;
+            .content {
+                position: relative;
+                top: 14px;
+            }
+            .text_smaller { font-size: 14px; }
+            .text_bigger {
+                font-size: 20px;
+                font-weight: bold;
+            }
+            &.active, &:hover {
+                border: solid 2px #00aac3;
+                margin-top: 29px;
+            }
+        }
+        .text_middle {
+            display: inline-block;
+            font-size: 17px;
+            font-weight: bold;
+        }
+        .well {
+            text-align: left;
+            box-shadow: none;
+            border-radius: 3px;
+            width: 537px;
+            margin: auto;
+            background-color: @light_grey;
+        }
+        .browser_instructions .header_well {
+            font-size: 14px;
+            font-weight: bold;
+            p { margin: 10px; display: inline-block; }
+            select { width: 270px; float: right; }
+        }
+        .code_instructions .header_well {
+            text-align: center;
+        }
+        .instructions_well {
+            margin-top: 25px;
+        }
+        .btn_lang {
+            margin: 0 2px;
+        }
+        // XXX krzysztof: move it to .lpm to make it common
+        .instructions {
+            margin-left: 30px;
+            border-left: 1px solid @second_color;
+            .single_instruction {
+                display: inline-block;
+                font-size: 14px;
+                padding-left: 3px;
+                position: relative;
+                top: -1px;
+            }
+            ul { margin: 0; }
+            ol {
+                counter-reset: section;
+                list-style-type: none;
+                padding-left: 0;
+            }
+            li { padding-bottom: 12px; }
+            ol li .circle_wrapper {
+                position: relative;
+                left: -13px;
+                background-color: @light_grey;
+                height: 28px;
+                display: inline-block;
+            }
+            ol li .circle {
+                border: 1px solid #00bcd2;
+                border-radius: 50%;
+                width: 22px;
+                height: 22px;
+                position: relative;
+                top: 3px;
+                left: 1px;
+            }
+            ol li:last-child { padding-bottom: 0; }
+            ol li .circle:before {
+                counter-increment: section;
+                content: counters(section, ".");
+                display: inline-block;
+                font-size: 11px;
+                color: #00bcd2;
+                margin-top: 3px;
+                text-align: center;
+                font-weight: 600;
+                position: relative;
+                left: 7px;
+                top: -5px;
+            }
+            code {
+                font-family: Lato;
+                font-size: 13px;
+                font-weight: bold;
+                letter-spacing: -0.1px;
+                border-radius: 3px;
+                background-color: #e7f9fa;
+                color: #005271;
+                padding: 3px 10px;
+                margin: 0 5px;
+            }
+            .btn_copy {
+                color: @second_color;
+                border-color: @second_color;
+                font-size: 9px;
+                padding: 0;
+                width: 35px;
+                height: 20px;
+                font-weight: 900;
+                margin-left: 10px;
+                position: relative;
+                top: -1px;
+                &:hover { color: white; }
+            }
+        }
+    }
 }
 .add_proxy_modal.modal .modal-content {
     .icon {
@@ -964,5 +1073,102 @@ input.form-control[type=checkbox] {
         padding-right: 6px;
         position: relative;
         top: 2px;
+    }
+}
+.nav_left {
+    margin-top: -30px;
+    position: absolute;
+    width: 224px;
+    height: 100%;
+    .menu {
+        background-color: @x_light;
+        padding-top: 11px;
+        .menu_item {
+            background-color: @x_light;
+            height: 40px;
+            position: relative;
+            cursor: pointer;
+            .text {
+                color: @second_color;
+                height: 22px;
+                position: absolute;
+                top: 50%;
+                margin-top: -11px;
+                left: 60px;
+                font-size: 14px;
+            }
+            &.active {
+                background-color: @light;
+                cursor: default;
+                .text { color: @first_color; }
+            }
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 10px;
+            left: 20px;
+        }
+        .howto { background-image: url('img/howto.svg'); }
+        .proxies { background-image: url('img/proxies.svg'); }
+        .stats { background-image: url('img/stats.svg'); }
+        .zones { background-image: url('img/zones.svg'); }
+        .tester { background-image: url('img/tester.svg'); }
+        .tools { background-image: url('img/tools.svg'); }
+        .faq { background-image: url('img/faq.svg'); }
+    }
+    .menu_filler {
+        background-color: @xx_light;
+        height: 100%;
+    }
+}
+.nav_top {
+    margin-bottom: 30px;
+    background-color: @light_grey;
+    height: 60px;
+    .logo_wrapper {
+        height: 60px;
+        width: 224px;
+        background: white;
+        display: inline-block;
+    }
+    .logo {
+        background-image: url('img/luminati_logo_2.svg');
+        width: 166px;
+        height: 35px;
+        position: relative;
+        top: 8px;
+        left: 24px;
+    }
+    .version {
+        font-size: 9px;
+        font-weight: bold;
+        float: right;
+        position: relative;
+        top: 4px;
+        right: 3px;
+        opacity: 0.5;
+    }
+    .dropdown {
+        float: right;
+        margin: 18px 36px 0 0;
+        font-size: 14px;
+    }
+    .dropdown-toggle {
+        color: @first_color;
+        padding: 3px 17px 3px 5px;
+        position: relative;
+        text-decoration: none;
+    }
+    .dropdown-toggle .caret {
+        position: absolute;
+        right: 6px;
+        top: 12px;
+        margin: 0;
+    }
+    .dropdown-menu li a {
+        color: @first_color;
+        text-decoration: none;
     }
 }

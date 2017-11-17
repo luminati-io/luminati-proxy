@@ -27,7 +27,7 @@
                 </label>
               </div>
               <div id=proxy-preset class="panel-collapse collapse in">
-                <div class=panel-body>
+                <div class=panel-body ng-if="!form.preset.subtitle">
                   <div ng-if="form.preset.key=='session_long'">
                     All requests share the same long session (IP)
                     <br>
@@ -70,6 +70,9 @@
                     For advanced use cases
                   </div>
                 </div>
+              </div>
+              <div class=panel-body ng-if="form.preset.subtitle">
+                {{form.preset.subtitle}}
               </div>
             </div>
             <div class="panel panel-default">

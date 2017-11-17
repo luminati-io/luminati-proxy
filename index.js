@@ -40,19 +40,33 @@ const upgrade = ()=>{
         type: 'info',
         title:'Update Required',
         message: 'A new Luminati Proxy Manager version is available',
-        buttons: ['Update now'],
+        buttons: ['Update on exit', 'Update now'],
     });
     if (res==1)
-        autoUpdater.quitAndInstall();
+    {
+        console.log('starting upgrade');
+        return autoUpdater.quitAndInstall();
+    }
+    console.log('upgrade postponed until exit');
 };
 
 autoUpdater.on('update-downloaded', e=>{
+    console.log('upgrade downloaded');
     if (manager && manager.argv && !manager.argv.no_usage_stats)
         ua.event('app', 'update-downloaded');
     if (can_upgrade)
         upgrade();
     else
-        upgrade_available = true;
+    {
+        let ntf = new Notification({
+            title: 'Luminati update',
+            body: 'Luminati version '+e.version+' will be installed on exit',
+        });
+        ntf.on('click', ()=>upgrade());
+        ntf.on('exit', ()=>console.log('upgrade postponed until exit'));
+        ntf.show();
+    }
+    upgrade_available = true;
 });
 autoUpdater.on('error', ()=>{});
 
@@ -183,3 +197,4 @@ app.on('ready', run);
 process.on('SIGINT', quit);
 process.on('SIGTERM', quit);
 process.on('uncaughtException', quit);
+

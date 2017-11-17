@@ -13,54 +13,39 @@
     <style>[ng-cloak] { display: none; }</style>
   </head>
   <body ng-cloak ng-controller=root>
-    <div>
-      <div class="header container">
-        <div class=container>
-          <img src=/img/logo.png>
-          <span id=version ng-if=ver_cur>V{{ver_cur}}</span>
-          <div class=dropdown ng-if="section.name!='settings'">
-            <a href=# class=dropdown-toggle data-toggle=dropdown>
-              {{settings.customer}}<span class=caret></span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-right">
-              <li ng-if="$root.mode=='root'&&$parent.ver_last&&$parent.ver_last.newer">
-                <a href=# ng-click=upgrade()>Upgrade</a>
-              </li>
-              <li><a href=# ng-click=logout()>Log out</a></li>
-              <li><a href=# ng-click=shutdown()>Shut down</a></li>
-            </ul>
-          </div>
+    <div
+      ng-class="{'no_nav': section.name=='settings' || section.name=='intro'}">
+      <div class="lpm nav_top">
+        <div class=logo_wrapper>
+          <div class=logo></div>
+          <span class=version ng-if=ver_cur>V{{ver_cur}}</span>
+        </div>
+        <div class=dropdown ng-if="section.name!='settings'">
+          <a href=# class=dropdown-toggle data-toggle=dropdown>
+            {{settings.customer}}<span class=caret></span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li ng-if="is_upgradable()">
+              <a href=# ng-click=upgrade()>Upgrade</a>
+            </li>
+            <li><a href=# ng-click=logout()>Log out</a></li>
+            <li><a href=# ng-click=shutdown()>Shut down</a></li>
+          </ul>
         </div>
       </div>
-      <div class="container page-body">
-        <div class=navigation
-          ng-if="section.name!='settings' && section.name!='intro'">
-          <div class=active>
-            <span ng-if=settings.customer>
-              {{settings.customer}}
-            </span>
-            <span ng-if="section&&!subsection">
-              <span class=separator>/</span>
-              {{section.title}}
-            </span>
-            <span ng-if=subsection>
-              <span class=separator>/</span>
-              <a ui-state=section.name ui-state-params="{zone: ''}">
-                {{section.title}}</a>
-              <span class=separator>/</span>
-              {{subsection}}
-            </span>
-          </div>
-          <div class=items>
-            <span ng-repeat="s in sections" ng-if=$index&gt;0>
-              <span ng-if="$index&gt;1" class=separator>&nbsp;|&nbsp;</span>
-              <a ng-if=s!=section ui-state=s.name ng-click=zone_click(s.name)>
-                {{s.title}}
-              </a>
-              <span ng-if=s==section>{{s.title}}</span>
-            </span>
+      <div ng-if="section.name!='settings' && section.name!='intro'"
+        class="lpm nav_left">
+        <div class=menu>
+          <div ng-repeat="s in sections" ng-if="s.navbar" class="menu_item"
+            ng-class="{'active': s==section}" ui-state=s.name
+            ng-click=zone_click(s.name)>
+            <div class="icon {{s.name}}"></div>
+            <div class=text>{{s.title}}</div>
           </div>
         </div>
+        <div class=menu_filler></div>
+      </div>
+      <div class="container page-body">
         <ui-view></ui-view>
       </div>
     </div>
@@ -191,6 +176,6 @@
         </div>
       </div>
     </div>
-  <script type="text/javascript" src="/94e4dda8ad032c95c567.runtime.js"></script><script type="text/javascript" src="/e28cd49df33aba7e3777.vendor.js"></script><script type="text/javascript" src="/54b5b9a2c830cc9879f5.app.js"></script></body>
+  <script type="text/javascript" src="/8fcbf3f8dc9b26683ca8.runtime.js"></script><script type="text/javascript" src="/b9728078e4effe208ed9.vendor.js"></script><script type="text/javascript" src="/1951777343c49abedcd5.app.js"></script></body>
 </html>
 

@@ -19,6 +19,7 @@ import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
 import intro from './intro.js';
 import zadd_proxy from './add_proxy.js';
+import howto from './howto.js';
 import protocols_detail from './stats/protocols_detail.js';
 import messages from './messages.js';
 import util from './util.js';
@@ -175,6 +176,13 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         url: '/intro',
         template: '<div react-view=react_component></div>',
         controller: function($scope){ $scope.react_component = intro; },
+    });
+    state_registry.register({
+        name: 'howto',
+        parent: 'app',
+        url: '/howto',
+        template: '<div react-view=react_component></div>',
+        controller: function($scope){ $scope.react_component = howto; },
     });
 }]);
 
@@ -358,6 +366,7 @@ function www_lum_factory($http, $timeout){
         .reduce((prs, p)=>{
             let np = _.cloneDeep(p);
             np.set = opt=>_.extend(opt, p.set);
+            np.clean = opt=>_.extend(opt, p.clean||{});
             np.check = ()=>true;
             prs[np.key] = np;
             return prs;
@@ -430,12 +439,12 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
 function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.messages = messages;
     $scope.sections = [
-        {name: 'settings', title: 'Settings'},
-        {name: 'proxies', title: 'Proxies'},
-        {name: 'zones', title: 'Zones'},
-        {name: 'tools', title: 'Tools'},
-        {name: 'faq', title: 'FAQ'},
-        {name: 'intro', Title: 'Intro'},
+        {name: 'settings', title: 'Settings', navbar: false},
+        {name: 'proxies', title: 'Proxies', navbar: true},
+        {name: 'zones', title: 'Zones', navbar: true},
+        {name: 'tools', title: 'Tools', navbar: true},
+        {name: 'faq', title: 'FAQ', navbar: true},
+        {name: 'intro', navbar: false},
     ];
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
@@ -1295,7 +1304,11 @@ var presets = {
     },
 };
 for (var k in presets)
+{
+    if (!presets[k].clean)
+        presets[k].clean = (opt)=>opt;
     presets[k].key = k;
+}
 
 module.controller('proxies', Proxies);
 Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout',
@@ -2477,9 +2490,16 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                 break;
             }
         }
+        if (form.last_preset_applied && _presets[form.last_preset_applied])
+            form.preset = _presets[form.last_preset_applied];
         $scope.apply_preset = function(){
+            let last_preset = form.last_preset_applied ?
+                _presets[form.last_preset_applied] : null;
             form.applying_preset = true;
+            if (last_preset&&last_preset.clean)
+                last_preset.clean(form);
             form.preset.set(form);
+            form.last_preset_applied = form.preset.key;
             if (form.session===true)
             {
                 form.session_random = true;

@@ -1,10 +1,21 @@
  Luminati Proxy manager - Change Log
 
+## 1.70.851
+- :bug: fixed upagrade issue from previous version
+
+## 1.70.725
+- :star: new navbar layout
+- :star: upgradable .exe version
+- :star: improved ssl sniffing performance
+
 ## 1.70.323
+- :bug: bug fixes and ui improvments
 
 ## 1.70.145
+- :star: added option to view vip IP pool
+- :star: added option to select specific vip per port
 - :bug: fixed login bug
-- :bug: fixed debug log info 
+- :bug: fixed debug log info
 
 ## 1.69.565
 - :star: added new onboarding flow
