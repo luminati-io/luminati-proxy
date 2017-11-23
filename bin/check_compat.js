@@ -10,7 +10,8 @@ E.is_env_compat = ()=>{
             +'Please upgrade your Node using nvm or nave, or visit nodejs.org '
             +'and download a newer version.\nAfter that run the following '
             +'command to reinstall Luminati Proxy Manager:\nnpm uninstall -g '
-            +'luminati-proxy && npm install -g luminati-io/luminati-proxy');
+            +'@luminati-io/luminati-proxy && npm install -g '
+            +'@luminati-io/luminati-proxy');
         return false;
     }
     const path = require('path');
@@ -35,7 +36,7 @@ E.is_env_compat = ()=>{
                 (process.platform=='win32'
                 ? `rmdir /s /q ${d} && ` : `sudo rm -rf ${d} && `)
                 +`${sudo}npm uninstall ${dep} && `
-                +`${sudo}npm install -g luminati-io/luminati-proxy`);
+                +`${sudo}npm install -g @luminati-io/luminati-proxy`);
             return false;
         }
     }

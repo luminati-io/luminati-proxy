@@ -61,7 +61,7 @@
     "request-stats": "^2.0.1",
     "semver": "^5.3.0",
     "sequelize": "^3.30.2",
-    "socksv5": "lee-elenbaas/socksv5#7039cb6",
+    "@luminati-io/socksv5": "0.0.7",
     "sqlite3": "3.1.8",
     "sudo-prompt": "^6.2.1",
     "taskkill": "^2.0.0",
@@ -70,7 +70,9 @@
     "universal-analytics": "^0.4.9",
     "winston": "^2.3.0",
     "yargs": "^6.5.0",
-    "opn": "^5.1.0"
+    "opn": "^5.1.0",
+    "prismjs": "^1.8.4",
+    "classnames": "^2.2.5"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -115,7 +117,7 @@
     "webpack": "^3.4.0"
   },
   "engines": {
-    "node": ">=6&&<7"
+    "node": ">=6&&<9"
   },
   "homepage": "https://luminati.io/",
   "keywords": [
@@ -145,9 +147,14 @@
       "bin/pub/img/2_active.svg",
       "bin/pub/img/3.svg",
       "bin/pub/img/3_active.svg",
+      "bin/pub/img/check.svg",
+      "bin/pub/img/debug.svg",
       "bin/pub/img/delete.svg",
+      "bin/pub/img/down.svg",
+      "bin/pub/img/error.svg",
       "bin/pub/img/faq.svg",
       "bin/pub/img/flag_any_country.svg",
+      "bin/pub/img/general.svg",
       "bin/pub/img/howto.svg",
       "bin/pub/img/icon_chrome.jpg",
       "bin/pub/img/icon_explorer.png",
@@ -177,15 +184,21 @@
       "bin/pub/img/ic_table_disabled.svg",
       "bin/pub/img/ic_thumbs_down.svg",
       "bin/pub/img/ic_thumbs_up.svg",
+      "bin/pub/img/info.svg",
       "bin/pub/img/logo.png",
       "bin/pub/img/lpm_infographics.png",
       "bin/pub/img/luminati_logo_2.svg",
       "bin/pub/img/preset_icon.png",
       "bin/pub/img/proxies.svg",
+      "bin/pub/img/rotation.svg",
       "bin/pub/img/social_btns.svg",
+      "bin/pub/img/speed.svg",
       "bin/pub/img/stats.svg",
+      "bin/pub/img/target.svg",
       "bin/pub/img/tester.svg",
       "bin/pub/img/tools.svg",
+      "bin/pub/img/up.svg",
+      "bin/pub/img/zero.svg",
       "bin/pub/img/zones.svg",
       "bin/pub/img/zone_icon.png",
       "bin/pub/messages.html",
@@ -218,8 +231,10 @@
       "src/pub/app.js",
       "src/pub/app.less",
       "src/pub/common.js",
+      "src/pub/edit_proxy.js",
       "src/pub/howto.js",
       "src/pub/index.html",
+      "src/pub/instructions.js",
       "src/pub/intro.js",
       "src/pub/messages.js",
       "src/pub/stats/common.js",
@@ -234,16 +249,17 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "638090aa354d41e1e291953e87e4026f"
+    "md5": "6d2721380e36c2b3b5191574472214ff"
   },
   "main": "index.js",
-  "name": "luminati-proxy",
+  "name": "@luminati-io/luminati-proxy",
   "optionalDependencies": {
     "phantomjs-prebuilt": "^2.1.14",
     "webshot": "^0.18.0"
   },
   "preferGlobal": true,
   "recomendedNode": ">=6",
+  "unsafe-perm": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -255,5 +271,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.70.851"
+  "version": "1.71.813"
 }

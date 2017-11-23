@@ -65,7 +65,7 @@ let create_child = ()=>{
 let upgrade = cb=>{
     const log_file = path.join(process.cwd(), '.luminati_upgrade.log');
     const is_win = /^win/.test(process.platform);
-    const npm_cmd = 'npm install --unsafe-perm -g luminati-io/luminati-proxy';
+    const npm_cmd = 'npm install --unsafe-perm -g @luminati-io/luminati-proxy';
     const cmd = is_win ? npm_cmd : `bash -c "${npm_cmd} > ${log_file} 2>&1"`;
     const opt = {name: 'Luminati Proxy Manager'};
     sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{

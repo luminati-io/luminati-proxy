@@ -1,17 +1,41 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
+import 'prismjs/themes/prism.css';
 import React from 'react';
+import prism from 'prismjs';
+import instructions from './instructions.js';
+import {Code} from './common.js';
+import util from './util.js';
+
+const ga_event = util.ga_event;
 
 class Howto extends React.Component {
     constructor(props){
         super(props);
         this.state = {};
     }
-    choose_click(option){ this.setState({option}); }
+    render_children(){
+        return React.Children.map(this.props.children, child=>{
+            return React.cloneElement(child, {
+                on_click: child.props.on_click(this.state.option)});
+        });
+    }
+    choose_click(option){
+        if (this.props.ga_category=='onboarding')
+            ga_event('lpm-onboarding', '06 select code/browser', option);
+        else if (this.props.ga_category=='how-to-use')
+            ga_event('How-to-tab', 'select code/browser', option);
+        this.setState({option});
+    }
     render(){
         let subheader;
         if (this.state.option)
             subheader = 'using '+this.state.option;
+        let Instructions = ()=>null;
+        if (this.state.option=='browser')
+            Instructions = Browser_instructions;
+        else if (this.state.option=='code')
+            Instructions = Code_instructions;
         return (
             <div className="intro lpm">
               <div className="howto">
@@ -26,10 +50,9 @@ class Howto extends React.Component {
                     selected={this.state.option=='code'}
                     on_click={()=>this.choose_click('code')}/>
                 </div>
-                {this.state.option=='browser' ?
-                  <Browser_instructions/> : null}
-                {this.state.option=='code' ?
-                  <Code_instructions/> : null}
+                <Instructions ga_cat={this.props.ga_category}>
+                  {this.props.children}</Instructions>
+                {this.state.option ? this.render_children() : null}
               </div>
             </div>
         );
@@ -40,90 +63,96 @@ const Subheader = props=>(
     props.value ? <h1 className="sub_header">{props.value}</h1> : null
 );
 
-const Lang_btn = props=>(
-    <button className="btn btn_lpm btn_lpm_default btn_lpm_small btn_lang">
-      {props.lang}</button>
-);
-
-const Code_instructions = ()=>(
-    <div className="code_instructions">
-      <div className="well header_well">
-        <Lang_btn lang="Shell"/>
-        <Lang_btn lang="Node.js"/>
-        <Lang_btn lang="Java"/>
-        <Lang_btn lang="C#"/>
-        <Lang_btn lang="VB"/>
-        <Lang_btn lang="PHP"/>
-        <Lang_btn lang="Python"/>
-        <Lang_btn lang="Ruby"/>
-        <Lang_btn lang="Perl"/>
-      </div>
-      <div className="well instructions_well">
-        todo
-      </div>
-    </div>
-);
-
-const Browser_instructions = ()=>(
-    <div className="browser_instructions">
-      <div className="well header_well">
-        <p>Choose browser</p>
-        <select>
-          <option>Chrome Windows</option>
-          <option>Chrome Mac</option>
-          <option>Internet Explorer</option>
-          <option>Firefox</option>
-          <option>Safari</option>
-        </select>
-      </div>
-      <div className="well instructions_well">
-        <div className="instructions">
-          <ol>
-            <Instruction>
-              Click the Tools button, and then click Internet
-              options.
-            </Instruction>
-            <Instruction>
-              Click the Connections tab.
-            </Instruction>
-            <Instruction>
-              Enter "Address":
-              <Code id="address">127.0.0.1</Code>
-            </Instruction>
-          </ol>
-        </div>
-      </div>
-    </div>
-);
-
-const Instruction = props=>(
-    <li>
-      <div className="circle_wrapper">
-        <div className="circle"></div>
-      </div>
-      <div className="single_instruction">{props.children}</div>
-    </li>
-);
-
-// XXX krzysztof: consider making it a common component and share with lum
-const Code = props=>{
-    const copy = ()=>{
-        const area = document.querySelector('#copy_'+props.id+'>textarea');
-        area.select();
-        try { document.execCommand('copy'); }
-        catch(e){ console.log('Oops, unable to copy'); }
-    };
-    return (
-        <code id={'copy_'+props.id}>
-          {props.children}
-          <textarea defaultValue={props.children}
-            style={{position: 'fixed', top: '-1000px'}}/>
-          <button onClick={copy}
-            className="btn btn_lpm btn_lpm_default btn_copy">
-            Copy</button>
-        </code>
-    );
+const Lang_btn = props=>{
+    const class_names = 'btn btn_lpm btn_lpm_default btn_lpm_small btn_lang'
+    +(props.active ? ' active' : '');
+    return <button className={class_names}>{props.text}</button>;
 };
+
+class Code_instructions extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {lang: 'shell'};
+        this.category = 'lpm-code-examples'+'-'+this.props.ga_cat;
+    }
+    click_lang(lang){
+        this.setState({lang});
+        ga_event(this.category, 'selected option', lang);
+    }
+    click_copy(lang){ ga_event(this.category, 'click copy', lang); }
+    render(){
+        const Lang_btn_clickable = props=>(
+            <span onClick={()=>this.click_lang(props.lang)}>
+              <Lang_btn active={this.state.lang==props.lang} {...props}/>
+            </span>
+        );
+        const tutorial_port = window.localStorage.getItem(
+            'quickstart-first-proxy')||24000;
+        const code = prism.highlight(
+            instructions.code(tutorial_port)[this.state.lang],
+            prism.languages.clike);
+        return (
+            <div className="code_instructions">
+              <div className="well header_well">
+                <Lang_btn_clickable lang="shell" text="Shell"/>
+                <Lang_btn_clickable lang="node" text="Node.js"/>
+                <Lang_btn_clickable lang="java" text="Java"/>
+                <Lang_btn_clickable lang="csharp" text="C#"/>
+                <Lang_btn_clickable lang="vb" text="VB"/>
+                <Lang_btn_clickable lang="php" text="PHP"/>
+                <Lang_btn_clickable lang="python" text="Python"/>
+                <Lang_btn_clickable lang="ruby" text="Ruby"/>
+                <Lang_btn_clickable lang="perl" text="Perl"/>
+              </div>
+              <div className="well instructions_well">
+                <pre>
+                  <code>
+                    <Code id={this.state.lang}
+                      on_click={()=>this.click_copy(this.state.lang)}>
+                      <div dangerouslySetInnerHTML={{__html:  code}}/></Code>
+                  </code>
+                </pre>
+              </div>
+            </div>
+        );
+    }
+}
+
+class Browser_instructions extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {browser: 'chrome_win'};
+        this.category = 'lpm-browser-examples'+'-'+this.props.ga_cat;
+        this.port = window.localStorage.getItem(
+            'quickstart-first-proxy')||24000;
+    }
+    browser_changed(e){
+        const browser = e.target.value;
+        this.setState({browser});
+        ga_event(this.category, 'select option', browser);
+    }
+    render(){
+        return (
+            <div className="browser_instructions">
+              <div className="well header_well">
+                <p>Choose browser</p>
+                <select onChange={this.browser_changed.bind(this)}>
+                  <option value="chrome_win">Chrome Windows</option>
+                  <option value="chrome_mac">Chrome Mac</option>
+                  <option value="ie">Internet Explorer</option>
+                  <option value="firefox">Firefox</option>
+                  <option value="safari">Safari</option>
+                </select>
+              </div>
+              <div className="well instructions_well">
+                <div className="instructions">
+                  {instructions.browser(this.port)[this.state.browser]}
+                </div>
+              </div>
+            </div>
+        );
+    }
+}
 
 const Choice = props=>{
     const c = 'choice'+(props.selected ? ' active' : '');

@@ -74,9 +74,7 @@ class Stats extends React.Component {
               <div className="page-header">
                 <h3>Domains</h3>
               </div>
-              <div className="page-body">
-                <DomainTable stats={this.state.stats} />
-              </div>
+              <DomainTable stats={this.state.stats} />
             </div>;
     }
 }

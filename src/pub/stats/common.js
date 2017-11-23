@@ -168,7 +168,7 @@ class StatsDetails extends React.Component {
               <div className="page-header">
                 <h3>{this.props.header}</h3>
               </div>
-              <div className="page-body">
+              <div>
                 {this.props.title}
                 <h3>Requests</h3>
                 <Table hover className="table-consolidate">

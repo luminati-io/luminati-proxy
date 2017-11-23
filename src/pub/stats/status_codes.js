@@ -123,9 +123,7 @@ class Stats extends React.Component {
               <div className="page-header">
                 <h3>Status codes</h3>
               </div>
-              <div className="page-body">
-                <StatusCodeTable stats={this.state.stats} />
-              </div>
+              <StatusCodeTable stats={this.state.stats} />
             </div>;
     }
 }

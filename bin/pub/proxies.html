@@ -57,6 +57,9 @@
               |limitTo:pagination.per_page"
               ng-class="{opened: showed_status_proxies[proxy.port]}">
               <td>
+                <a ng-if="show_add_proxy()" ng-click="edit_proxy_new(proxy)"
+                  ng-href="proxy/{{proxy.port}}" class=proxies-action-edit>
+                  E</a>
                 <img ng-if="$root.mode!='guest'&&is_action_available('edit',
                   proxy)"
                   ng-click="edit_proxy(false, proxy)"

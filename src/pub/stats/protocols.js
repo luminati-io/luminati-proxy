@@ -115,9 +115,7 @@ class Stats extends React.Component {
               <div className="page-header">
                 <h3>Protocols</h3>
               </div>
-              <div className="page-body">
-                <ProtocolTable stats={this.state.stats} />
-              </div>
+              <ProtocolTable stats={this.state.stats} />
             </div>;
     }
 }

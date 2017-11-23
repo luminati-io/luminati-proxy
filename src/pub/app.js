@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true, es6:true*/
+'use strict'; /*jslint browser:true, react:true, es6:true*/
 import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
@@ -19,7 +19,8 @@ import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
 import intro from './intro.js';
 import zadd_proxy from './add_proxy.js';
-import howto from './howto.js';
+import zedit_proxy from './edit_proxy.js';
+import Howto from './howto.js';
 import protocols_detail from './stats/protocols_detail.js';
 import messages from './messages.js';
 import util from './util.js';
@@ -38,6 +39,7 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
+import {onboarding_steps} from './common.js';
 
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -182,7 +184,22 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         parent: 'app',
         url: '/howto',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = howto; },
+        controller: function($scope){
+            const howto_wrapper = props=>
+                <Howto ga_category="how-to-use"/>;
+            $scope.react_component = howto_wrapper;
+        },
+    });
+    state_registry.register({
+        name: 'edit_proxy',
+        parent: 'app',
+        url: '/proxy/{port:string}',
+        template: `<div react-view=react_component state-props=port
+        extra-props=proxy></div>`,
+        controller: function($scope, $rootScope){
+            $scope.react_component = zedit_proxy;
+            $scope.proxy = $rootScope.edit_proxy;
+        },
     });
 }]);
 
@@ -224,8 +241,6 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
     $http.get('/api/mode').then(function(data){
         var logged_in = data.data.logged_in;
         logged_in_resolver.resolve(logged_in);
-        if (logged_in)
-            $window.localStorage.setItem('quickstart-creds', true);
         $rootScope.mode = data.data.mode;
         $rootScope.run_config = data.data.run_config;
         var ua;
@@ -440,6 +455,7 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
     $scope.messages = messages;
     $scope.sections = [
         {name: 'settings', title: 'Settings', navbar: false},
+        {name: 'howto', title: 'How to use', navbar: true},
         {name: 'proxies', title: 'Proxies', navbar: true},
         {name: 'zones', title: 'Zones', navbar: true},
         {name: 'tools', title: 'Tools', navbar: true},
@@ -898,8 +914,6 @@ function Faq($scope){
 module.controller('test', Test);
 Test.$inject = ['$scope', '$http', '$filter', '$window'];
 function Test($scope, $http, $filter, $window){
-    if ($window.localStorage.getItem('quickstart-create-proxy'))
-        $window.localStorage.setItem('quickstart-test-proxy', true);
     if (qs_o.action && qs_o.action=='test_proxy')
         $scope.expand = true;
     var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
@@ -1306,14 +1320,14 @@ var presets = {
 for (var k in presets)
 {
     if (!presets[k].clean)
-        presets[k].clean = (opt)=>opt;
+        presets[k].clean = opt=>opt;
     presets[k].key = k;
 }
 
 module.controller('proxies', Proxies);
-Proxies.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$timeout',
-    '$stateParams', '$success_rate', '$www_lum'];
-function Proxies($scope, $http, $proxies, $window, $q, $timeout,
+Proxies.$inject = ['$scope', '$rootScope', '$http', '$proxies', '$window',
+    '$q', '$timeout', '$stateParams', '$success_rate', '$www_lum'];
+function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     $stateParams, $success_rate, $www_lum)
 {
     var prepare_opts = function(opt){
@@ -1668,6 +1682,7 @@ function Proxies($scope, $http, $proxies, $window, $q, $timeout,
     };
     $scope.add_proxy_new = function(){
         $('#add_proxy_modal').modal('show'); };
+    $scope.edit_proxy_new = function(proxy){ $root.edit_proxy = proxy; };
     $scope.get_static_country = function(proxy){
         var zone = proxy.zones[proxy.zone];
         if (!zone)
@@ -2850,10 +2865,14 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                 var is_ok_cb = function(){
                     $window.$('#proxy').modal('hide');
                     $proxies.update();
-                    if ($window.localStorage.getItem('quickstart-welcome'))
+                    const curr_step = JSON.parse($window.localStorage.getItem(
+                        'quickstart-step'));
+                    if (curr_step==onboarding_steps.ADD_PROXY)
                     {
-                        $window.localStorage.setItem('quickstart-'+
-                            (edit ? 'edit' : 'create')+'-proxy', true);
+                        $window.localStorage.setItem('quickstart-step',
+                            onboarding_steps.ADD_PROXY_DONE);
+                        $window.localStorage.setItem('quickstart-first-proxy',
+                            proxy.port);
                     }
                     ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
                         , 'ok');
@@ -2864,6 +2883,7 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                             $location.search({});
                             ga_event('lpm-onboarding',
                                 '04 tutorial create port completed', '');
+                            $window.location = '/intro';
                         }
                         if (r.data.login_failure)
                             $window.location = '/';
@@ -3034,10 +3054,12 @@ module.directive('initSelectOpen', ['$window', function($window){
 
 module.directive('reactView', ['$state', function($state){
     return {
-        scope: {view: '=reactView', props: '@stateProps'},
+        scope: {view: '=reactView', props: '@stateProps',
+            extra_props: '=extraProps'},
         link: function(scope, element, attrs){
-            ReactDOM.render(React.createElement(scope.view,
-                _.pick($state.params, (scope.props||'').split(' '))),
+            const props = _.pick($state.params, (scope.props||'').split(' '));
+            Object.assign(props, {extra: scope.extra_props});
+            ReactDOM.render(React.createElement(scope.view, props),
                 element[0]);
             element.on('$destroy', ()=>{
                 ReactDOM.unmountComponentAtNode(element[0]); });

@@ -3,51 +3,76 @@
 import React from 'react';
 import ajax from 'hutil/util/ajax';
 import etask from 'hutil/util/etask';
+import Howto from './howto.js';
+import {onboarding_steps} from './common.js';
+import util from './util.js';
 
-const localhost = 'http://127.0.0.1:22999';
-const ga_event = (cat, action, label)=>
-    window.ga('send', 'event', cat, action, label);
+const ga_event = util.ga_event;
+const steps = onboarding_steps;
+const localhost = window.location.origin;
 
 class Page extends React.Component {
     constructor(props){
         super(props);
-        this.state = {btn_clicked:
-            !!window.localStorage.getItem('quickstart-welcome')};
+        let step = JSON.parse(window.localStorage.getItem('quickstart-step'));
+        if (!Object.values(steps).includes(Number(step)))
+            step = steps.WELCOME;
+        this.state = {step};
     }
-    componentWillMount(){ this.load_data(); }
-    // XXX krzysztof: move setting ga to the upper component
-    load_data(){
-        return etask([function(){
-            return ajax.json({url: '/api/mode'});
-        }, function(res){
-            let ua;
-            if (ua = res.run_config.ua)
-            {
-                window.ga('create', ua.tid, 'auto');
-                for (let i in ua._persistentParams)
-                    window.ga('set', i, ua._persistentParams[i]);
-            }
-        }]);
-    }
-    btn_go_click(){
-        ga_event('lpm-onboarding', '03 intro page next');
-        window.localStorage.setItem('quickstart-welcome', true);
-        this.setState({btn_clicked: true});
+    set_step(step){
+        if (step==steps.ADD_PROXY)
+            ga_event('lpm-onboarding', '03 intro page next');
+        if (step==steps.HOWTO)
+        {
+            ga_event('lpm-onboarding',
+                '05 first request button clicked');
+        }
+        if (step==steps.HOWTO_DONE)
+            window.location = '/proxies';
+        window.localStorage.setItem('quickstart-step', step);
+        this.setState({step});
     }
     render(){
-        const CurrentPage = this.state.btn_clicked ? Welcome : Index;
+        let Current_page;
+        switch(this.state.step)
+        {
+        case steps.WELCOME: Current_page = Welcome; break;
+        case steps.ADD_PROXY:
+        case steps.HOWTO_DONE:
+        case steps.ADD_PROXY_DONE: Current_page = List; break;
+        case steps.HOWTO: Current_page = Howto_wrapper; break;
+        default: Current_page = Welcome;
+        }
         return (
             <div className="intro lpm">
-              <h1 className="header">Welcome to Luminati Proxy Manager</h1>
-              <CurrentPage btn_go_click={this.btn_go_click.bind(this)}/>
+              <Current_page set_step={this.set_step.bind(this)}
+                curr_step={this.state.step}/>
             </div>
         );
     }
 }
 
-const Index = props=>(
+const Done_btn = props=>(
+    <button onClick={props.on_click} className="btn btn_lpm btn_done">
+        Done</button>
+);
+
+const Howto_wrapper = props=>{
+    const click_done = option=>()=>{
+        props.set_step(steps.HOWTO_DONE);
+        ga_event('lpm-onboarding', '07 click done', option);
+    };
+    return (
+        <Howto ga_category="onboarding">
+            <Done_btn on_click={click_done}/>
+        </Howto>
+    );
+};
+
+const Welcome = props=>(
     <div className="header">
-      <h2>How it works</h2>
+      <h1>Welcome to Luminati Proxy Manager</h1>
+      <h2 className="sub_header">How it works</h2>
       <div className="sub_header">
         <h4>
           Create multiple proxy ports, each with its own unique configuration,
@@ -56,11 +81,11 @@ const Index = props=>(
       </div>
       <div className="img_intro"></div>
       <button className="btn btn-primary btn_lpm btn_lpm_big"
-        onClick={props.btn_go_click}>{"Let's go"}</button>
+        onClick={()=>props.set_step(steps.ADD_PROXY)}>{"Let's go"}</button>
     </div>
 );
 
-class Welcome extends React.Component {
+class List extends React.Component {
     constructor(props){
         super(props);
         const create = window.localStorage.getItem('quickstart-create-proxy');
@@ -72,11 +97,12 @@ class Welcome extends React.Component {
     }
     skip_to_dashboard(){
         ga_event('lpm-onboarding', '04 tutorial skipped');
-        window.location.href = 'http://127.0.0.1:22999/proxies';
+        window.location.href = localhost+'/proxies';
     }
     render(){
         return (
             <div>
+              <h1 className="header">Welcome to Luminati Proxy Manager</h1>
               <div className="sub_header">
                 <h4>
                   Configure a new port with specific proxy settings and use it
@@ -87,6 +113,10 @@ class Welcome extends React.Component {
                 <Section header="Configure new proxy port" img="1"
                   text="Specific proxy settings to be applied on this port"
                   on_click={this.click_add_proxy}/>
+                <Section header="Make your first request" img="2"
+                  text=""
+                  on_click={()=>this.props.set_step(steps.HOWTO)}
+                  disabled={this.props.curr_step<steps.ADD_PROXY_DONE}/>
                 <a onClick={this.skip_to_dashboard.bind(this)}>
                   Skip to dashboard</a>
               </div>

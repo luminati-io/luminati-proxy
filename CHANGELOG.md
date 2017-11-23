@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 1.71.813
+- :star: published to npm
+- :star: added 'how to use' page
+- :star: improved onboarding flow
+
 ## 1.70.851
 - :bug: fixed upagrade issue from previous version
 
