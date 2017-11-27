@@ -332,17 +332,25 @@
                     <label class=control-label for=proxy-field-pool-size>
                       Pool size
                       <button ng-if="is_show_allocated_ips()"
-                        ng-disabled="!form.preset.support.pool_size"
+                        ng-disabled="!form.preset.support.pool_size&&!form.multiply_ips"
                         ng-click="show_allocated_ips()"
                         type=button class="btn btn-link">
                         set from allocated IPs
                       </button>
                       <button ng-if="is_show_allocated_vips()"
-                        ng-disabled="!form.preset.support.pool_size"
+                        ng-disabled="!form.preset.support.pool_size!form.multiply_vips"
                         ng-click="show_allocated_vips()"
                         type=button class="btn btn-link">
                         set from allocated VIPs
                       </button>
+                      <span ng-if="is_show_allocated_ips()">
+                        <input type='checkbox'
+                          ng-model="form.multiply_ips"> multiply ips
+                      </span>
+                      <span ng-if="is_show_allocated_vips()">
+                        <input type='checkbox'
+                          ng-model="form.multiply_vips"> multiply vips
+                      </span>
                     </label>
                     <input id=proxy-field-pool-size type=number min=0
                       ng-model=form.pool_size class=form-control

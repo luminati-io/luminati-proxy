@@ -715,7 +715,7 @@ input.form-control[type=checkbox] {
             box-shadow: none;
         }
     }
-    select, input {
+    select, input[type=number], input[type=text] {
         width: 100%;
         height: 32px;
         background-color: white;
@@ -735,12 +735,26 @@ input.form-control[type=checkbox] {
         background: url(/img/down.svg) no-repeat;
         background-position: right 10px center;
     }
-
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
         -webkit-appearance: none;
     }
     input[type=number] { -moz-appearance: textfield; }
+    input[type=radio] {
+        display:none;
+    }
+    input[type=radio] + label {
+        display:inline-block;
+        width:19px;
+        height:19px;
+        margin:-2px 10px 0 0;
+        vertical-align:middle;
+        background: url(/img/check_radio.svg) left top no-repeat;
+        cursor:pointer;
+    }
+    input[type=radio]:checked + label {
+        background: url(/img/check_radio.svg) -19px top no-repeat;
+    }
     .btn_lpm {
         width: 160px;
         height: 32px;
@@ -858,7 +872,7 @@ input.form-control[type=checkbox] {
         .field {
             flex-grow: 1;
             .title { display: inline-block; }
-            select, input {
+            select, input[type=number], input[type=text] {
                 color: @second_color;
                 font-weight: bold;
                 margin-left: 10px;
@@ -983,7 +997,7 @@ input.form-control[type=checkbox] {
                 line-height: 1.07;
                 padding-right: 35px;
             }
-            select, input { width: 60%; }
+            select, input[type=number], input[type=text] { width: 60%; }
             .icon {
                 position: absolute;
                 right: 20px;
@@ -1002,7 +1016,9 @@ input.form-control[type=checkbox] {
                     right: -7px;
                 }
                 border-color: @error_light;
-                input, select { border-color: @error; }
+                select, input[type=number], input[type=text] {
+                    border-color: @error;
+                }
             }
             &.correct {
                 .desc { color: @second_color; }

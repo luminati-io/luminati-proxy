@@ -148,6 +148,7 @@
       "bin/pub/img/3.svg",
       "bin/pub/img/3_active.svg",
       "bin/pub/img/check.svg",
+      "bin/pub/img/check_radio.svg",
       "bin/pub/img/debug.svg",
       "bin/pub/img/delete.svg",
       "bin/pub/img/down.svg",
@@ -249,7 +250,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "6d2721380e36c2b3b5191574472214ff"
+    "md5": "eca6c7cd5c5b3b020817f01ea8f9e8e7"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -271,5 +272,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.71.813"
+  "version": "1.72.187"
 }

@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.72.187
+- :star: added install script for Linux/MacOs installs
+- :star: added option to create many ports from allocated ips
+
 ## 1.71.813
 - :star: published to npm
 - :star: added 'how to use' page

@@ -8,7 +8,10 @@ install_curl=0;
 install_git=0;
 desired_node_ver='8.9.1';
 desired_npm_ver='4.6.1';
-downgrade_npm=0;
+downgrade_node=0;
+update_node=0;
+update_npm=0;
+
 
 is_cmd_defined()
 {
@@ -60,12 +63,17 @@ check_node()
         if ! [[ "$node_ver" =~ ^(v[6-9]\.|v[1-9][0-9]+\.) ]]
             then
             echo "minimum required node version is 6";
-            exit 1;
+            update_node=1;
+        fi
+        if [[ "$node_ver" =~ ^(v[9]\.|v[1-9][0-9]+\.) ]]
+            then
+            echo "maximum required node version is 8";
+            update_node=1;
         fi
     else
         echo 'node is not installed';
         install_node=1;
-        downgrade_npm=1;
+        update_npm=1;
     fi
     if [ "$install_node" == "0" ] && ! is_cmd_defined 'npm'
         then
@@ -76,7 +84,7 @@ check_node()
         local npm_ver=$(npm -v);
         if [[ "$npm_ver" =~ ^([5-9]\.|[1-9][0-9]+\.) ]]
             then
-            downgrade_npm=1;
+            update_npm=1;
         fi
     fi
 
@@ -135,7 +143,7 @@ install_npm_fn()
 {
     echo "installing npm";
     curl https://www.npmjs.com/install.sh | sh;
-    downgrade_npm=1;
+    update_npm=1;
 }
 
 install_curl_fn()
@@ -150,9 +158,9 @@ install_git_fn()
     sys_install "git";
 }
 
-downgrade_npm_fn()
+update_npm_fn()
 {
- echo "downgrading npm to $desired_npm_ver";
+ echo "updating npm to $desired_npm_ver";
  sudo_cmd "npm install -g npm@$desired_npm_ver";
 }
 
@@ -175,7 +183,7 @@ deps_install()
         then
         install_git_fn;
     fi
-    if [ "$install_node" == "1" ]
+    if [ "$install_node" == "1" ] || [ "$update_node" == "1" ]
         then
         install_node_fn;
     fi
@@ -183,9 +191,9 @@ deps_install()
         then
         install_npm_fn;
     fi
-    if [ "$downgrade_npm" == "1" ]
+    if [ "$update_npm" == "1" ]
         then
-        downgrade_npm_fn;
+        update_npm_fn;
     fi;
 }
 

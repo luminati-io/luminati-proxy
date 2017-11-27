@@ -1,11 +1,12 @@
 # Test against this version of Node.js
 environment:
-  nodejs_version: "6"
+  nodejs_version: "8"
 
 # Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
+  - npm -g install npm@4.6.1
   # install modules
   - npm install
 
@@ -23,4 +24,4 @@ build: off
 notifications:
   - provider: Email
     to:
-      - ovidiu@hola.org
+      - maximk@hola.org

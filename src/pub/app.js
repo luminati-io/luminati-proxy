@@ -2442,8 +2442,10 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
         form.city = form.city||'';
         form.dns = form.dns||'';
         form.log = form.log||'';
-        form.ips = form.ips||[];
-        form.vips = form.vips||[];
+        form.ips = form._ips||form.ips||[];
+        delete form._ips;
+        form.vips = form._vips||form.vips||[];
+        delete form._vips;
         $scope.presets = _presets;
         if (_.isBoolean(form.rule))
             form.rule = {};
@@ -2596,7 +2598,10 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                         form.ips.push(item.ip);
                     else if (!item.checked && index>-1)
                         form.ips.splice(index, 1);
-                    form.pool_size = form.ips.length;
+                    if (!form.multiply_ips)
+                        form.pool_size = form.ips.length;
+                    else
+                        form.multiply = form.ips.length;
                 },
                 zone: zone,
             };
@@ -2636,7 +2641,10 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                         form.vips.push(item.vip);
                     else if (!item.checked && index>-1)
                         form.vips.splice(index, 1);
-                    form.pool_size = form.vips.length;
+                    if (!form.multiply_vips)
+                        form.pool_size = form.vips.length;
+                    else
+                        form.multiply = form.vips.length;
                 },
                 zone: zone,
             };
@@ -2732,6 +2740,17 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
             if (zone = $scope.consts.zone.values.find(_.matches({zone: val})))
                 form.password = zone.password;
         });
+        $scope.$watch('form.multiply_ips', multiply_val_changed);
+        $scope.$watch('form.multiply_vips', multiply_val_changed);
+        function multiply_val_changed(val, old){
+            if (val==old)
+                return;
+            if (val)
+                return;
+            form.multiply=0;
+            form.ips=[];
+            form.vips=[];
+        }
         $scope.$watchCollection('form', function(newv, oldv){
             function has_changed(f){
                 var old = oldv&&oldv[f]||'';
