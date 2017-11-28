@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.72.444
+- :star: improve log performance
+- :star: fix exe link on windows
+
 ## 1.72.187
 - :star: added install script for Linux/MacOs installs
 - :star: added option to create many ports from allocated ips

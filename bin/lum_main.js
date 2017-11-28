@@ -5,6 +5,7 @@
 const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;
+const zerr = hutil.zerr;
 const version = require('../package.json').version;
 const analytics = require('universal-analytics');
 const _ = require('lodash');
@@ -117,6 +118,7 @@ let on_upgrade_finished;
     manager = new Manager(args, Object.assign({ua}, run_config));
     manager.on('stop', ()=>{
         write_ua_file();
+        zerr.flush();
         process.exit();
     })
     .on('error', (e, fatal)=>{

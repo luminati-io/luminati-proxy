@@ -23,6 +23,7 @@ console.info = function(){};
 const autoUpdater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
 const BrowserWindow = electron.BrowserWindow;
+const Notification = electron.Notification;
 const hutil = require('hutil');
 const etask = hutil.etask;
 const tasklist = require('tasklist');
