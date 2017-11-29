@@ -11200,27 +11200,27 @@ var tabs = {
         label: 'Request Speed',
         tooltip: 'Control the speed of your request to improve performance',
         fields: {
-            dns_lookup: {
+            dns: {
                 label: 'DNS Lookup',
                 tooltip: 'Location of DNS resolve'
             },
-            timeout_super_proxy: {
+            request_timeout: {
                 label: 'Timeout for requests on the super proxy',
                 tooltip: 'Kill requests to super proxy and try new one if\n                    timeout is exceeded'
             },
-            session_timeout: {
+            session_init_timeout: {
                 label: 'Session establish timeout',
                 tooltip: 'session establish == search + connect to peer'
             },
-            min_number_super_proxy: {
+            proxy_count: {
                 label: 'Minimum number of super proxies to use',
                 tooltip: 'min number of failed attempts before switching\n                    proxy'
             },
-            auto_switch_super_proxy: {
+            proxy_switch: {
                 label: 'Automatically switch super proxy on failure',
                 tooltip: 'if request failed (status 4XX) use a differen zagent\n                    next time'
             },
-            throttle_req: {
+            throttle: {
                 label: 'Throttle requests above given number',
                 tooltip: 'allow maximum number of requests per unit of time'
             }
@@ -11311,7 +11311,7 @@ var tabs = {
         label: 'General',
         tooltip: '',
         fields: {
-            interface: {
+            iface: {
                 label: 'Interface',
                 tooltip: 'network interface on the machine to use'
             },
@@ -11327,19 +11327,19 @@ var tabs = {
                 label: 'SSL to super proxy',
                 tooltip: 'encrypt requests sent to super proxy to avoid\n                    detection on DNS'
             },
-            url_regex_null_resp: {
+            null_response: {
                 label: 'URL regex pattern for null response',
                 tooltip: 'on this url pattern, lpm will return a "null\n                    response" without proxying (usefull when users don\'t want\n                    to make a request, but a browser expects 200 response)'
             },
-            url_regex_bypassing: {
+            bypass_proxy: {
                 label: 'URL regex for bypassing the proxy manager and send\n                    directly to host',
                 tooltip: 'requests with this pattern will be passed directly,\n                    without any proxy (super proxy or peer)'
             },
-            url_regex_sent_directly: {
+            direct_include: {
                 label: 'URL regex for requests to be sent directly from super\n                    proxy',
                 tooltip: 'urls with this pattern will not be sent trough peers\n                    but throug super proxy directly'
             },
-            url_regex_not_sent_directly: {
+            direct_exclude: {
                 label: 'URL regex for requests to not be sent directly from\n                    super proxy',
                 tooltip: 'negation of the abow (to exlude from a set)'
             }
@@ -11360,6 +11360,7 @@ var Index = function (_React$Component) {
             window.location.href = '/';
             _this2.proxy = { zones: {} };
         } else _this2.proxy = props.extra;
+        console.log(_this2.proxy);
         return _this2;
     }
 
@@ -11368,7 +11369,7 @@ var Index = function (_React$Component) {
         value: function componentWillMount() {
             var _this = this;
             (0, _etask2.default)( /*#__PURE__*/_regeneratorRuntime2.default.mark(function _callee() {
-                var consts;
+                var consts, defaults;
                 return _regeneratorRuntime2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
@@ -11378,10 +11379,15 @@ var Index = function (_React$Component) {
 
                             case 2:
                                 consts = _context.sent;
+                                _context.next = 5;
+                                return _ajax2.default.json({ url: '/api/defaults' });
 
-                                _this.setState({ consts: consts });
+                            case 5:
+                                defaults = _context.sent;
 
-                            case 4:
+                                _this.setState({ consts: consts, defaults: defaults });
+
+                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -11417,6 +11423,12 @@ var Index = function (_React$Component) {
             });
         }
     }, {
+        key: 'default_opt',
+        value: function default_opt(option) {
+            var default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
+            return [{ key: 'No', value: 'no' }, { key: 'default (' + default_label + ')', value: 'default' }, { key: 'Yes', value: 'yes' }];
+        }
+    }, {
         key: 'render',
         value: function render() {
             var Main_window = void 0;
@@ -11443,14 +11455,15 @@ var Index = function (_React$Component) {
                     'Edit port ',
                     this.props.port
                 ),
-                _react2.default.createElement(Nav, { zones: Object.keys(this.proxy.zones) }),
+                _react2.default.createElement(Nav, { model: this.proxy, zones: Object.keys(this.proxy.zones) }),
                 _react2.default.createElement(Nav_tabs, { curr_tab: this.state.tab, fields: this.state.fields,
                     on_tab_click: this.click_tab.bind(this) }),
                 _react2.default.createElement(Main_window, _extends({}, this.state.consts, { cities: this.state.cities,
-                    states: this.state.states,
+                    states: this.state.states, defaults: this.state.defaults,
                     update_states_and_cities: this.update_states_and_cities.bind(this),
                     on_change_field: this.field_changed.bind(this),
-                    fields: this.state.fields }))
+                    fields: this.state.fields, model: this.proxy,
+                    default_opt: this.default_opt.bind(this) }))
             );
         }
     }]);
@@ -11462,10 +11475,12 @@ var Nav = function Nav(props) {
     return _react2.default.createElement(
         'div',
         { className: 'nav' },
-        _react2.default.createElement(Field, { options: props.zones, label: 'Zone' }),
-        _react2.default.createElement(Field, { options: _common.presets.map(function (p) {
+        _react2.default.createElement(Field, { on_change: props.on_field_change, options: props.zones,
+            label: 'Zone', value: props.model.zone }),
+        _react2.default.createElement(Field, { on_change: props.on_field_change,
+            label: 'Preset', options: _common.presets.map(function (p) {
                 return p.title;
-            }), label: 'Preset' }),
+            }) }),
         _react2.default.createElement(Action_buttons, null)
     );
 };
@@ -11482,11 +11497,11 @@ var Field = function Field(props) {
         ),
         _react2.default.createElement(
             'select',
-            null,
+            { value: props.value, onChange: props.on_change },
             options.map(function (o) {
                 return _react2.default.createElement(
                     'option',
-                    { key: o, value: '' },
+                    { key: o, value: o },
                     o
                 );
             })
@@ -11632,7 +11647,7 @@ var Section = function (_React$Component2) {
 var Select = function Select(props) {
     return _react2.default.createElement(
         'select',
-        { value: props.fields[props.id], onChange: props.on_change_wrapper },
+        { value: props.val, onChange: props.on_change_wrapper },
         (props.data || []).map(function (c, i) {
             return _react2.default.createElement(
                 'option',
@@ -11644,29 +11659,56 @@ var Select = function Select(props) {
 };
 
 var Input = function Input(props) {
-    return _react2.default.createElement('input', { type: props.type, value: props.fields[props.id] || '',
-        onChange: props.on_change_wrapper });
+    return _react2.default.createElement('input', { type: props.type, value: props.val,
+        onChange: function onChange(e) {
+            return props.on_change_wrapper(e, props.id);
+        },
+        className: props.className });
+};
+
+var Double_number = function Double_number(props) {
+    return _react2.default.createElement(
+        'span',
+        { className: 'double_field' },
+        _react2.default.createElement(Input, _extends({}, props, { id: props.id + '_min', type: 'number' })),
+        _react2.default.createElement(
+            'span',
+            { className: 'divider' },
+            '\xF7'
+        ),
+        _react2.default.createElement(Input, _extends({}, props, { id: props.id + '_max', type: 'number' }))
+    );
 };
 
 var Input_boolean = function Input_boolean(props) {
     return _react2.default.createElement(
         'div',
-        null,
-        _react2.default.createElement('input', { type: 'radio', checked: props.fields[props.id] == '1',
-            onChange: props.on_change_wrapper, id: 'enable',
-            name: props.id, value: '1' }),
+        { className: 'radio_buttons' },
         _react2.default.createElement(
-            'label',
-            { htmlFor: 'enable' },
-            'Enabled'
+            'div',
+            { className: 'option' },
+            _react2.default.createElement('input', { type: 'radio', checked: props.fields[props.id] == '1',
+                onChange: props.on_change_wrapper, id: 'enable',
+                name: props.id, value: '1' }),
+            _react2.default.createElement('div', { className: 'checked_icon' }),
+            _react2.default.createElement(
+                'label',
+                { htmlFor: 'enable' },
+                'Enabled'
+            )
         ),
-        _react2.default.createElement('input', { type: 'radio', checked: props.fields[props.id] == '0',
-            onChange: props.on_change_wrapper, id: 'disable',
-            name: props.id, value: '0' }),
         _react2.default.createElement(
-            'label',
-            { htmlFor: 'disable' },
-            'Disabled'
+            'div',
+            { className: 'option' },
+            _react2.default.createElement('input', { type: 'radio', checked: props.fields[props.id] == '0',
+                onChange: props.on_change_wrapper, id: 'disable',
+                name: props.id, value: '0' }),
+            _react2.default.createElement('div', { className: 'checked_icon' }),
+            _react2.default.createElement(
+                'label',
+                { htmlFor: 'disable' },
+                'Disabled'
+            )
         )
     );
 };
@@ -11678,11 +11720,14 @@ var Section_field = function Section_field(props) {
         on_change_field = props.on_change_field,
         data = props.data,
         type = props.type,
-        tab_id = props.tab_id;
+        tab_id = props.tab_id,
+        sufix = props.sufix,
+        model = props.model;
 
-    var on_change_wrapper = function on_change_wrapper(e) {
+    var on_change_wrapper = function on_change_wrapper(e, _id) {
+        var curr_id = _id || id;
         if (on_change) on_change(e);
-        on_change_field(id, e.target.value);
+        on_change_field(curr_id, e.target.value);
     };
     var Comp = void 0;
     switch (type) {
@@ -11693,9 +11738,10 @@ var Section_field = function Section_field(props) {
             Comp = Input;break;
         case 'boolean':
             Comp = Input_boolean;break;
-        case 'double_select':
-            Comp = To_implement;break;
+        case 'double_number':
+            Comp = Double_number;break;
     }
+    var val = fields[id] || model[id] || '';
     return _react2.default.createElement(
         Section,
         { correct: fields[id] && fields[id] != '*', id: id,
@@ -11705,8 +11751,17 @@ var Section_field = function Section_field(props) {
             { className: 'desc' },
             tabs[tab_id].fields[id].label
         ),
-        _react2.default.createElement(Comp, { fields: fields, id: id, data: data, type: type,
-            on_change_wrapper: on_change_wrapper })
+        _react2.default.createElement(
+            'div',
+            { className: 'field' },
+            _react2.default.createElement(Comp, { fields: fields, id: id, data: data, type: type,
+                on_change_wrapper: on_change_wrapper, val: val }),
+            sufix ? _react2.default.createElement(
+                'span',
+                { className: 'sufix' },
+                sufix
+            ) : null
+        )
     );
 };
 
@@ -11745,10 +11800,18 @@ var With_data = function (_React$Component3) {
 var Target = function (_React$Component4) {
     _inherits(Target, _React$Component4);
 
-    function Target() {
+    function Target(props) {
         _classCallCheck(this, Target);
 
-        return _possibleConstructorReturn(this, (Target.__proto__ || Object.getPrototypeOf(Target)).apply(this, arguments));
+        var _this6 = _possibleConstructorReturn(this, (Target.__proto__ || Object.getPrototypeOf(Target)).call(this, props));
+
+        var _this6$props = _this6.props,
+            fields = _this6$props.fields,
+            model = _this6$props.model;
+
+        var country = fields.country || model.country;
+        if (country) _this6.load_names(country);
+        return _this6;
     }
 
     _createClass(Target, [{
@@ -11763,10 +11826,8 @@ var Target = function (_React$Component4) {
             return countries;
         }
     }, {
-        key: 'country_changed',
-        value: function country_changed(e) {
-            var country = e.target.value;
-            if (this.props.cities[country]) return;
+        key: 'load_names',
+        value: function load_names(country) {
             var _this = this;
             (0, _etask2.default)( /*#__PURE__*/_regeneratorRuntime2.default.mark(function _callee2() {
                 var cities, states;
@@ -11794,14 +11855,26 @@ var Target = function (_React$Component4) {
                     }
                 }, _callee2, this);
             }));
+        }
+    }, {
+        key: 'country_changed',
+        value: function country_changed(e) {
+            var country = e.target.value;
+            if (this.props.cities[country]) return;
+            this.load_names(country);
             this.props.on_change_field('city', '');
             this.props.on_change_field('state', '');
         }
     }, {
         key: 'states',
         value: function states() {
-            var country = this.props.fields.country;
-            return country && this.props.states && this.props.states[country] || [];
+            var _props = this.props,
+                fields = _props.fields,
+                model = _props.model,
+                states = _props.states;
+
+            var country = fields.country || model.country;
+            return country && states && states[country] || [];
         }
     }, {
         key: 'state_changed',
@@ -11811,8 +11884,10 @@ var Target = function (_React$Component4) {
     }, {
         key: 'cities',
         value: function cities() {
-            var country = this.props.fields.country;
-            var state = this.props.fields.state;
+            var _Object$assign4 = Object.assign({}, this.props.model, this.props.fields),
+                country = _Object$assign4.country,
+                state = _Object$assign4.state;
+
             var cities = country && this.props.cities[country] || [];
             if (state) return cities.filter(function (c) {
                 return c.region == state || !c.region || c.region == '*';
@@ -11824,7 +11899,8 @@ var Target = function (_React$Component4) {
             return _react2.default.createElement(
                 With_data,
                 { fields: this.props.fields, tab_id: 'target',
-                    on_change_field: this.props.on_change_field },
+                    on_change_field: this.props.on_change_field,
+                    model: this.props.model },
                 _react2.default.createElement(Section_field, { type: 'select', id: 'country',
                     data: this.allowed_countries(),
                     on_change: this.country_changed.bind(this) }),
@@ -11842,10 +11918,14 @@ var Target = function (_React$Component4) {
 var Speed = function (_React$Component5) {
     _inherits(Speed, _React$Component5);
 
-    function Speed() {
+    function Speed(props) {
         _classCallCheck(this, Speed);
 
-        return _possibleConstructorReturn(this, (Speed.__proto__ || Object.getPrototypeOf(Speed)).apply(this, arguments));
+        var _this7 = _possibleConstructorReturn(this, (Speed.__proto__ || Object.getPrototypeOf(Speed)).call(this, props));
+
+        _this7.dns_options = [{ key: 'Local (default) - resolved by the super proxy',
+            value: 'local' }, { key: 'Remote - resolved by peer', value: 'remote' }];
+        return _this7;
     }
 
     _createClass(Speed, [{
@@ -11854,13 +11934,17 @@ var Speed = function (_React$Component5) {
             return _react2.default.createElement(
                 With_data,
                 { fields: this.props.fields, tab_id: 'speed',
-                    on_change_field: this.props.on_change_field },
-                _react2.default.createElement(Section_field, { type: 'select', id: 'dns_lookup' }),
-                _react2.default.createElement(Section_field, { type: 'number', id: 'timeout_super_proxy' }),
-                _react2.default.createElement(Section_field, { type: 'number', id: 'session_timeout' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'min_number_super_proxy' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'auto_switch_super_proxy' }),
-                _react2.default.createElement(Section_field, { type: 'number', id: 'throttle_req' })
+                    on_change_field: this.props.on_change_field,
+                    model: this.props.model },
+                _react2.default.createElement(Section_field, { type: 'select', id: 'dns',
+                    data: this.dns_options }),
+                _react2.default.createElement(Section_field, { type: 'number', id: 'request_timeout',
+                    sufix: 'seconds' }),
+                _react2.default.createElement(Section_field, { type: 'number', id: 'session_init_timeout',
+                    sufix: 'seconds' }),
+                _react2.default.createElement(Section_field, { type: 'number', id: 'proxy_count' }),
+                _react2.default.createElement(Section_field, { type: 'number', id: 'proxy_switch' }),
+                _react2.default.createElement(Section_field, { type: 'number', id: 'throttle' })
             );
         }
     }]);
@@ -11883,19 +11967,23 @@ var Rotation = function (_React$Component6) {
             return _react2.default.createElement(
                 With_data,
                 { fields: this.props.fields, tab_id: 'rotation',
-                    on_change_field: this.props.on_change_field },
+                    on_change_field: this.props.on_change_field,
+                    model: this.props.model },
                 _react2.default.createElement(Section_field, { type: 'text', id: 'datacenter_ip' }),
                 _react2.default.createElement(Section_field, { type: 'number', id: 'pool_size' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'pool_type' }),
+                _react2.default.createElement(Section_field, { type: 'select', id: 'pool_type',
+                    data: this.props.proxy.pool_type.values }),
                 _react2.default.createElement(Section_field, { type: 'number', id: 'keep_alive' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'whitelist_ip_access' }),
+                _react2.default.createElement(Section_field, { type: 'text', id: 'whitelist_ip_access' }),
                 _react2.default.createElement(Section_field, { type: 'boolean', id: 'random_session' }),
                 _react2.default.createElement(Section_field, { type: 'text', id: 'explicit_session' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'sticky_ip' }),
-                _react2.default.createElement(Section_field, { type: 'double_select', id: 'max_requests' }),
-                _react2.default.createElement(Section_field, { type: 'double_select', id: 'session_duration' }),
+                _react2.default.createElement(Section_field, { type: 'select', id: 'sticky_ip',
+                    data: this.props.default_opt('sticky_ip') }),
+                _react2.default.createElement(Section_field, { type: 'double_number', id: 'max_requests' }),
+                _react2.default.createElement(Section_field, { type: 'double_number', id: 'session_duration' }),
                 _react2.default.createElement(Section_field, { type: 'text', id: 'session_id_seed' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'allow_req_auth' })
+                _react2.default.createElement(Section_field, { type: 'select', id: 'allow_req_auth',
+                    data: this.props.default_opt('allow_proxy_auth') })
             );
         }
     }]);
@@ -11918,11 +12006,16 @@ var Debug = function (_React$Component7) {
             return _react2.default.createElement(
                 With_data,
                 { fields: this.props.fields, tab_id: 'debug',
-                    on_change_field: this.props.on_change_field },
-                _react2.default.createElement(Section_field, { type: 'select', id: 'log_req_history' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'ssl_analyzing' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'log_level' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'lum_req_debug_info' })
+                    on_change_field: this.props.on_change_field,
+                    model: this.props.model },
+                _react2.default.createElement(Section_field, { type: 'select', id: 'log_req_history',
+                    data: this.props.default_opt('history') }),
+                _react2.default.createElement(Section_field, { type: 'select', id: 'ssl_analyzing',
+                    data: this.props.default_opt('ssl') }),
+                _react2.default.createElement(Section_field, { type: 'select', id: 'log_level',
+                    data: this.props.proxy.log.values }),
+                _react2.default.createElement(Section_field, { type: 'select', id: 'lum_req_debug_info',
+                    data: this.props.proxy.debug.values })
             );
         }
     }]);
@@ -11945,15 +12038,18 @@ var General = function (_React$Component8) {
             return _react2.default.createElement(
                 With_data,
                 { fields: this.props.fields, tab_id: 'general',
-                    on_change_field: this.props.on_change_field },
-                _react2.default.createElement(Section_field, { type: 'select', id: 'interface' }),
+                    on_change_field: this.props.on_change_field,
+                    model: this.props.model },
+                _react2.default.createElement(Section_field, { type: 'select', id: 'iface',
+                    data: this.props.proxy.iface.values }),
                 _react2.default.createElement(Section_field, { type: 'number', id: 'multiply' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'socks_5_port' }),
-                _react2.default.createElement(Section_field, { type: 'select', id: 'ssl_to_super_proxy' }),
-                _react2.default.createElement(Section_field, { type: 'text', id: 'url_regex_null_resp' }),
-                _react2.default.createElement(Section_field, { type: 'text', id: 'url_regex_bypassing' }),
-                _react2.default.createElement(Section_field, { type: 'text', id: 'url_regex_sent_directly' }),
-                _react2.default.createElement(Section_field, { type: 'text', id: 'url_regex_not_sent_directly' })
+                _react2.default.createElement(Section_field, { type: 'number', id: 'socks_5_port' }),
+                _react2.default.createElement(Section_field, { type: 'select', id: 'ssl_to_super_proxy',
+                    data: this.props.default_opt('secure_proxy') }),
+                _react2.default.createElement(Section_field, { type: 'text', id: 'null_response' }),
+                _react2.default.createElement(Section_field, { type: 'text', id: 'bypass_proxy' }),
+                _react2.default.createElement(Section_field, { type: 'text', id: 'direct_include' }),
+                _react2.default.createElement(Section_field, { type: 'text', id: 'direct_exclude' })
             );
         }
     }]);
@@ -12362,7 +12458,7 @@ exports = module.exports = __webpack_require__(49)(undefined);
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nbody {\n  font-family: \"Noto Sans\", sans-serif;\n  font-size: 15px;\n  line-height: 23px;\n  overflow-y: scroll;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.page-body {\n  margin-left: 224px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\ncode {\n  background: lightgrey;\n  color: black;\n  white-space: nowrap;\n}\n.nowrap {\n  white-space: nowrap;\n}\npre.top-margin {\n  margin-top: 4px;\n}\n.container {\n  width: auto;\n}\n.main-container-qs {\n  margin-left: 25%;\n}\n.qs-move-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 2px;\n  cursor: col-resize;\n}\n.btn-title {\n  float: right;\n  margin-top: -4px;\n  margin-right: 15px;\n  margin-bottom: -5px;\n}\n.header {\n  height: 60px;\n}\n.header img {\n  margin-top: 10px;\n}\nnav a:hover {\n  box-shadow: none;\n}\n.overall-success-ratio {\n  margin-bottom: 20px;\n}\n.success_title {\n  font-size: 22px;\n  cursor: pointer;\n}\n.success_value {\n  text-align: right;\n  font-size: 22px;\n  cursor: pointer;\n  color: #428bca;\n}\n.block {\n  background: #eeeeee;\n  padding: 1em;\n  margin-bottom: 20px;\n}\n.form-group {\n  margin-bottom: 12px;\n}\n.alert-inline {\n  display: inline;\n  padding: 6px 12px;\n  position: relative;\n  top: 2px;\n  margin: 0 8px;\n}\n.tester-body {\n  margin-bottom: 18px;\n}\n.tester-body textarea {\n  height: 100px;\n}\n.tools-header {\n  margin-bottom: 12px;\n}\n.tester-body:after,\n.tools-header:after {\n  content: '';\n  display: block;\n  clear: both;\n}\n.tools-add-header {\n  margin-bottom: 18px;\n}\n.tester-alert {\n  margin-top: 20px;\n  padding: 7.5px 11.5px;\n}\n.tester-results {\n  margin-top: 20px;\n}\n.tools-table {\n  width: auto;\n  float: none;\n  margin: 20px auto;\n}\n.tools-table th {\n  text-align: center;\n}\n.countries-list {\n  text-align: center;\n  margin-top: 20px;\n}\n.countries-list > div {\n  padding: 10px;\n  display: inline-block;\n  width: 200px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-align: left;\n  position: relative;\n  border: 1px solid black;\n  margin: 5px 10px;\n}\n.countries-list .glyphicon {\n  color: grey;\n}\n.countries-list .glyphicon-ok {\n  color: green !important;\n}\n.countries-list .glyphicon-download-alt {\n  color: blue !important;\n}\n.countries-failed {\n  color: red !important;\n}\n.countries-canceled {\n  color: orange !important;\n}\n.countries-op {\n  display: inline-block;\n  position: absolute;\n  right: 0;\n  width: 40px;\n  padding-left: 10px;\n  background: white;\n  background: linear-gradient(to right, rgba(255, 255, 255, 0), white 25%);\n}\n.countries-op span:hover {\n  color: orange;\n  cursor: pointer;\n}\n.countries-view {\n  border-bottom: 1px dashed;\n  cursor: pointer;\n}\n#countries-screenshot .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#countries-screenshot .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\ntable.proxies {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies-settings,\n.columns-settings {\n  overflow: auto;\n  max-height: calc(100vh - 190px);\n}\n.proxies-panel {\n  overflow: auto;\n}\ndiv.proxies .panel-footer,\ndiv.proxies .panel-heading {\n  position: relative;\n}\ndiv.proxies .panel-heading {\n  height: 65px;\n}\ndiv.proxies .btn-wrapper {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.proxies .btn-csv {\n  font-size: 12px;\n}\n.proxies-default {\n  color: gray;\n}\n.proxies-editable {\n  cursor: pointer;\n  position: relative;\n  display: inline-block;\n  min-height: 20px;\n  min-width: 100%;\n}\n.proxies-editable:hover {\n  color: orange;\n}\n.proxies-table-input {\n  position: absolute;\n  z-index: 2;\n  left: -25px;\n  right: -25px;\n  top: -7px;\n}\n.proxies-table-input input,\n.proxies-table-input select {\n  width: 100%;\n}\n.proxies-check {\n  width: 32px;\n}\n.col_success_rate {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-success-rate-value {\n  color: #428bca;\n  width: 80px;\n  font-size: 16px;\n  cursor: pointer;\n}\n.proxies-actions {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-action {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-disabled {\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-edit {\n  visibility: hidden;\n}\n.proxies tr:hover .proxies-action-edit {\n  visibility: visible;\n  cursor: pointer;\n}\n.proxies-action-delete,\n.proxies-action-duplicate {\n  cursor: pointer;\n}\n.proxies-warning {\n  color: red;\n}\n#history .modal-dialog,\n#history_details .modal-dialog,\n#pool .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#history .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\n#history label {\n  font-weight: normal;\n}\n.proxies-history-navigation {\n  margin-bottom: 25px;\n}\n.proxies-history-filter {\n  font-size: 11px;\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n}\n.proxies-history th {\n  line-height: 15px !important;\n}\n.clickable {\n  cursor: pointer;\n}\n.proxies-history-loading {\n  padding: 4px;\n  width: 200px;\n  text-align: center;\n  position: fixed;\n  left: 50%;\n  top: 50%;\n  margin-left: -100px;\n  z-index: 2;\n}\n.proxies-history-archive {\n  float: right;\n  font-size: 11px;\n  line-height: 14px;\n  margin-top: -1px;\n  margin-bottom: -2px;\n  margin-right: 32px;\n  text-align: right;\n}\n.proxies-history-archive > span {\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n  cursor: pointer;\n  text-transform: lowercase;\n}\n.zones-table td,\n.zones-table thead th {\n  text-align: right;\n}\n.zones-table td.zones-zone,\n.zones-table thead th.zones-zone {\n  text-align: left;\n}\n#zone .panel-heading {\n  position: relative;\n}\n#zone .panel-heading button {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.settings-alert {\n  position: relative;\n}\n.settings-alert .buttons {\n  position: absolute;\n  right: 10px;\n  top: 9px;\n}\n.github {\n  margin-top: 12px;\n}\n#config-textarea,\n#config-textarea + .CodeMirror,\n#resolve-textarea {\n  width: 100%;\n  height: 400px;\n  margin-bottom: 18px;\n}\n.resolve-add-host {\n  margin-top: -6px;\n  margin-bottom: 18px;\n}\n#settings-page {\n  padding-top: 20px;\n}\n.confirmation-items {\n  margin-top: 11px;\n}\n.form-range {\n  width: 100%;\n}\n.form-range .form-control {\n  display: inline-block;\n  width: 48%;\n}\n.form-range .range-seperator {\n  display: inline-block;\n  width: 2%;\n  text-align: center;\n}\n.luminati-login h3 {\n  font-weight: bold;\n  margin-top: 20px;\n  margin-bottom: 20px;\n}\n.luminati-login .alert-danger {\n  color: #d00;\n}\n.luminati-login label {\n  color: #818c93;\n  font-weight: normal;\n}\n.luminati-login button {\n  margin-top: 15px;\n  font-weight: bold;\n  padding: 10px 12px;\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n  border: 1px solid #1c74b3;\n  border-bottom-color: #0d5b97;\n  border-top-color: #2c8ed1;\n  box-shadow: 0 1px 0 #ddd, inset 0 1px 0 rgba(255, 255, 255, 0.2);\n  color: #fff !important;\n  text-shadow: rgba(0, 0, 0, 0.2) 0 1px 0;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  -webkit-tap-highlight-color: transparent;\n}\n.luminati-login button:hover:enabled {\n  background-color: #3baaf4;\n  background-image: -o-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#3baaf4), to(#2389dc));\n  background-image: -webkit-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -moz-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: linear-gradient(top, #3baaf4, #2389dc);\n}\n.luminati-login button:active {\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n}\n.luminati-login .signup {\n  color: #818c93;\n  font-size: 16.5px;\n  margin-top: 12px;\n}\n#google {\n  min-width: 300px;\n}\n#google a.google {\n  color: white;\n  display: block;\n  padding: 0;\n  margin: auto;\n  margin-top: 50px;\n  margin-bottom: 40px;\n  height: 35px;\n  font-size: 16px;\n  padding-top: 6px;\n  padding-left: 95px;\n  cursor: pointer;\n  max-width: 300px;\n  text-align: left;\n  text-decoration: none;\n  border: none;\n  position: relative;\n  white-space: nowrap;\n}\n#google a.google,\n#google a.google:hover {\n  background: url(/img/social_btns.svg) no-repeat 50% 100%;\n}\n#google a.google:focus {\n  outline: 0;\n  top: 1px;\n}\n#google a.google:hover {\n  border: none;\n  box-shadow: none;\n  border-radius: 0;\n}\n#google a.google:active {\n  top: 1px;\n}\n.panel .panel-heading button.btn.btn-ico {\n  padding: 7px;\n  border: solid 1px #c8c2bf;\n  background-color: #fcfcfc;\n  width: 35px;\n  height: 34px;\n  margin: 0 1px;\n}\n.panel .panel-heading button.btn.btn-ico.add_proxy_btn {\n  color: #004d74;\n  background-color: #05bed1;\n  border-color: #05bed1;\n}\n.panel .panel-heading button.btn.btn-ico img {\n  width: 100%;\n  height: 100%;\n  vertical-align: baseline;\n}\n.panel .panel-heading button.btn.btn-ico[disabled] img {\n  opacity: 0.25;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  max-width: 250px;\n  border: solid 1px black;\n  background: #fff;\n  color: black;\n}\n.status-details-wrapper {\n  background: #f7f7f7;\n  font-size: 12px;\n}\n.status-details-line {\n  margin: 0 0 5px 25px;\n}\n.status-details-icon-warn {\n  vertical-align: bottom;\n  padding-bottom: 1px;\n}\n.status-details-text {\n  padding: 0 0 0 5px;\n}\n.ic-status-triangle {\n  font-size: 12px;\n  color: #979797;\n}\n.text-err {\n  color: #d8393c;\n}\n.text-ok {\n  color: #4ca16a;\n}\n.text-warn {\n  color: #f5a623;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #d7f6ff;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.pull-none {\n  float: none !important;\n}\n.history__header {\n  margin-top: 10px;\n}\n.history-details__column-first {\n  width: 300px;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.blue {\n  color: #4a90e2;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.control-label.preset {\n  width: 100%;\n}\n.control-label.preset .form-control {\n  width: auto;\n  display: inline-block;\n}\ninput.form-control[type=checkbox] {\n  width: auto;\n  height: auto;\n  display: inline;\n}\n.proxies-table-input.session-edit input {\n  width: calc(100% - 2em);\n  display: inline-block;\n}\n.proxies-table-input.session-edit .btn {\n  padding: 4px;\n}\n.tabs_default:hover {\n  color: #555 !important;\n  box-shadow: none !important;\n}\n.chrome_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url('img/icon_chrome.jpg');\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.firefox_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_firefox.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.safari_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_safari.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.stats_row_change {\n  animation: pulse 1s;\n}\n.row_clickable {\n  cursor: pointer;\n}\n.code_max_height {\n  max-height: 500px;\n}\n.table-fixed {\n  table-layout: fixed;\n}\n.overflow-ellipsis {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n}\n.lpm {\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.lpm h1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\n.lpm h2 {\n  color: #05bed1;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\n.lpm h3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\n.lpm h4 {\n  margin: 0;\n}\n.lpm a {\n  color: #05bed1;\n  cursor: pointer;\n  border: none;\n  text-decoration: underline;\n}\n.lpm a:hover {\n  color: #05bed1;\n  cursor: pointer;\n  background: rgba(0, 0, 0, 0);\n  border: none;\n  box-shadow: none;\n}\n.lpm select,\n.lpm input[type=number],\n.lpm input[type=text] {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n.lpm select:focus,\n.lpm input[type=number]:focus,\n.lpm input[type=text]:focus {\n  outline: none;\n  border: solid 1px #05bed1;\n}\n.lpm select {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\n.lpm input[type=number]::-webkit-inner-spin-button,\n.lpm input[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\n.lpm input[type=number] {\n  -moz-appearance: textfield;\n}\n.lpm input[type=radio] {\n  display: none;\n}\n.lpm input[type=radio] + label {\n  display: inline-block;\n  width: 19px;\n  height: 19px;\n  margin: -2px 10px 0 0;\n  vertical-align: middle;\n  background: url(/img/check_radio.svg) left top no-repeat;\n  cursor: pointer;\n}\n.lpm input[type=radio]:checked + label {\n  background: url(/img/check_radio.svg) -19px top no-repeat;\n}\n.lpm .btn_lpm {\n  width: 160px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: #05bed1;\n  border: solid 1px #05bed1;\n  color: white;\n  font-size: 16px;\n  font-weight: bold;\n  padding-top: 3px;\n  margin: 0 5px;\n  box-shadow: none;\n}\n.lpm .btn_lpm:hover {\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.lpm .btn_lpm:active,\n.lpm .btn_lpm.active {\n  background-color: #003d5b;\n  border-color: #003d5b;\n  color: #05bed1;\n}\n.lpm .btn_lpm:focus {\n  outline: none;\n}\n.lpm .btn_lpm_default {\n  color: #05bed1;\n  background-color: white;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:hover {\n  background-color: #B4E6EE;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:active,\n.lpm .btn_lpm_default.active {\n  background-color: #05bed1;\n  border-color: #05bed1;\n  color: white;\n}\n.lpm .btn_lpm_normal {\n  color: #004d74;\n  border-color: #ccdbe3;\n  background-color: white;\n}\n.lpm .btn_lpm_normal:hover {\n  background-color: #f5f5f5;\n  border-color: #ccdbe3;\n}\n.lpm .btn_lpm_normal:active,\n.lpm .btn_lpm_normal.active {\n  background-color: #d7d7d7;\n  border-color: #d7d7d7;\n  color: #004d74;\n}\n.lpm .btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.lpm .btn_lpm_small {\n  font-size: 11px;\n  height: 27px;\n  width: auto;\n}\n.lpm .btn_copy {\n  color: #05bed1;\n  border-color: #05bed1;\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.lpm .btn_copy:hover {\n  color: white;\n}\n.lpm .modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.lpm .modal .modal-header {\n  border: 0;\n}\n.lpm .modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 30px;\n  line-height: 0;\n}\n.lpm .modal .modal-header .close_icon {\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 19px;\n  right: 19px;\n}\n.lpm .modal .modal-body {\n  padding: 15px 50px 0;\n}\n.lpm .modal .modal-footer {\n  border: 0;\n  text-align: center;\n}\n.edit_proxy h3 {\n  margin-bottom: 20px;\n}\n.edit_proxy .nav {\n  display: flex;\n  margin-bottom: 20px;\n}\n.edit_proxy .nav .field {\n  flex-grow: 1;\n}\n.edit_proxy .nav .field .title {\n  display: inline-block;\n}\n.edit_proxy .nav .field select,\n.edit_proxy .nav .field input[type=number],\n.edit_proxy .nav .field input[type=text] {\n  color: #05bed1;\n  font-weight: bold;\n  margin-left: 10px;\n  width: 200px;\n}\n.edit_proxy .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.edit_proxy .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.edit_proxy .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.edit_proxy .nav_tabs {\n  display: flex;\n  margin-bottom: 20px;\n  padding-bottom: 20px;\n  border-bottom: solid 1px #E0E9EE;\n}\n.edit_proxy .nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 100px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 2px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.edit_proxy .nav_tabs .btn_tab .icon {\n  width: 30px;\n  height: 30px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 16px;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #05bed1;\n  position: relative;\n  left: 29px;\n  top: -5px;\n  border-radius: 50%;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 55px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n}\n.edit_proxy .nav_tabs .btn_tab .info {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.edit_proxy .nav_tabs .btn_tab .icon.target {\n  background: url(/img/target.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.speed {\n  background: url(/img/speed.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.zero {\n  background: url(/img/zero.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.rotation {\n  background: url(/img/rotation.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.debug {\n  background: url(/img/debug.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.general {\n  background: url(/img/general.svg);\n}\n.edit_proxy .nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.edit_proxy .nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.edit_proxy .nav_tabs .btn_tab.active,\n.edit_proxy .nav_tabs .btn_tab:hover {\n  border-color: #05bed1;\n  background-color: white;\n}\n.edit_proxy .nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.edit_proxy .nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.edit_proxy .nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #05bed1;\n  position: absolute;\n  bottom: -8px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.edit_proxy .section_wrapper {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper:focus {\n  outline: 0;\n}\n.edit_proxy .section_wrapper .section {\n  position: relative;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n  flex: 2 0;\n  padding: 14px 30px;\n  padding-right: 20%;\n  font-size: 14px;\n  margin: 5px 0;\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .section .desc {\n  width: 40%;\n  line-height: 1.07;\n  padding-right: 35px;\n}\n.edit_proxy .section_wrapper .section select,\n.edit_proxy .section_wrapper .section input[type=number],\n.edit_proxy .section_wrapper .section input[type=text] {\n  width: 60%;\n}\n.edit_proxy .section_wrapper .section .icon {\n  position: absolute;\n  right: 20px;\n}\n.edit_proxy .section_wrapper .section.error {\n  border-color: #F9BFB9;\n}\n.edit_proxy .section_wrapper .section.error .icon {\n  background: url(/img/error.svg);\n  width: 10px;\n  height: 10px;\n}\n.edit_proxy .section_wrapper .section.error .arrow {\n  border-left: solid 6px #ef6153;\n  border-top: solid 7px transparent;\n  border-bottom: solid 7px transparent;\n  position: absolute;\n  right: -7px;\n}\n.edit_proxy .section_wrapper .section.error select,\n.edit_proxy .section_wrapper .section.error input[type=number],\n.edit_proxy .section_wrapper .section.error input[type=text] {\n  border-color: #ef6153;\n}\n.edit_proxy .section_wrapper .section.correct {\n  border-color: #B4E6EE;\n}\n.edit_proxy .section_wrapper .section.correct .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .section.correct .icon {\n  background: url(/img/check.svg);\n  width: 11px;\n  height: 8px;\n}\n.edit_proxy .section_wrapper .section.active {\n  border-color: #05bed1;\n}\n.edit_proxy .section_wrapper .section.active .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .section.active .arrow {\n  border-left: solid 6px #05bed1;\n  border-top: solid 7px transparent;\n  border-bottom: solid 7px transparent;\n  position: absolute;\n  right: -7px;\n}\n.edit_proxy .section_wrapper .message_wrapper {\n  margin-left: 25px;\n  flex: 1 0;\n  display: inline-block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message {\n  display: none;\n  font-size: 12px;\n  line-height: 1.17;\n  border-radius: 4px;\n  padding: 14px 19px;\n  background-color: #E6F6F9;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.active {\n  display: block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.error {\n  display: block;\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.intro {\n  text-align: center;\n  margin-top: 40px;\n}\n.intro .header {\n  margin: auto;\n  width: 600px;\n}\n.intro .sub_header {\n  margin: auto;\n  margin-top: 10px;\n}\n.intro .img_intro {\n  background: url(/img/lpm_infographics.png);\n  width: 592px;\n  height: 326px;\n  margin: 15px 0;\n}\n.intro .section {\n  cursor: pointer;\n  text-align: initial;\n  width: 470px;\n  height: 83px;\n  margin: auto;\n  border: 2px solid #05bed1;\n  box-shadow: 0 2px 2px 0 rgba(156, 181, 190, 0.57);\n  border-radius: 4px;\n  margin-top: 20px;\n  margin-bottom: 20px;\n  padding-top: 17px;\n}\n.intro .section .img_block {\n  position: absolute;\n}\n.intro .section .img_block .circle_wrapper {\n  border: 1px solid #05bed1;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  border-radius: 50%;\n  left: 19px;\n  z-index: 1;\n  background-color: white;\n}\n.intro .section .text_block {\n  display: inline-block;\n  position: relative;\n  left: 110px;\n}\n.intro .section .title {\n  font-size: 22px;\n  font-weight: 700;\n}\n.intro .section .subtitle {\n  font-size: 14px;\n  color: #05bed1;\n}\n.intro .section .right_arrow {\n  width: 14px;\n  height: 14px;\n  position: relative;\n  top: -32px;\n  left: 425px;\n  transform: rotate(45deg);\n  border-top: 2px solid #05bed1;\n  border-right: 2px solid #05bed1;\n}\n.intro .section.disabled {\n  cursor: initial;\n  border: solid 1px #E0E9EE;\n  color: #9cb5be;\n}\n.intro .section.disabled .subtitle {\n  color: #9cb5be;\n}\n.intro .section.disabled .right_arrow {\n  border-color: #9cb5be;\n}\n.intro .section_list {\n  counter-reset: section;\n}\n.intro .img {\n  width: 40px;\n  height: 40px;\n  position: relative;\n  left: 30px;\n  top: -18px;\n}\n.intro .img:before {\n  color: #05bed1;\n  counter-increment: section;\n  content: counters(section, \".\");\n  font-size: 12px;\n  position: absolute;\n  left: -4px;\n  top: -4px;\n  z-index: 2;\n}\n.intro .img_1_active {\n  background: url(/img/1_active.svg);\n}\n.intro .img_2 {\n  background: url(/img/2.svg);\n}\n.intro .img_2_active {\n  background: url(/img/2_active.svg);\n}\n.intro .img_3 {\n  background: url(/img/3.svg);\n}\n.intro .img_3_active {\n  background: url(/img/3_active.svg);\n}\n.intro .howto {\n  width: 537px;\n  margin: auto;\n  margin-bottom: 100px;\n}\n.intro .howto h1.sub_header {\n  line-height: 0;\n  margin: 0 0 25px 0;\n  color: #05bed1;\n}\n.intro .howto .choices {\n  height: 140px;\n}\n.intro .howto .choice {\n  cursor: pointer;\n  display: inline-block;\n  width: 205px;\n  height: 83px;\n  border-radius: 4px;\n  box-shadow: 0 2px 2px 0 #ccdbe3;\n  border: solid 1px #E0E9EE;\n  margin: 30px 20px;\n}\n.intro .howto .choice .content {\n  position: relative;\n  top: 14px;\n}\n.intro .howto .choice .text_smaller {\n  font-size: 14px;\n}\n.intro .howto .choice .text_bigger {\n  font-size: 20px;\n  font-weight: bold;\n}\n.intro .howto .choice.active,\n.intro .howto .choice:hover {\n  border: solid 2px #00aac3;\n  margin-top: 29px;\n}\n.intro .howto .text_middle {\n  display: inline-block;\n  font-size: 17px;\n  font-weight: bold;\n}\n.intro .howto .well {\n  text-align: left;\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: #f5f5f5;\n}\n.intro .howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n}\n.intro .howto .browser_instructions .header_well p {\n  margin: 10px;\n  display: inline-block;\n}\n.intro .howto .browser_instructions .header_well select {\n  width: 270px;\n  float: right;\n}\n.intro .howto .code_instructions .header_well {\n  text-align: center;\n}\n.intro .howto .instructions_well {\n  margin-top: 25px;\n  margin-bottom: 25px;\n  position: relative;\n}\n.intro .howto .instructions_well pre {\n  border: none;\n  font-size: 12px;\n  background-color: #E6F6F9;\n}\n.intro .howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 28px;\n  right: 28px;\n}\n.intro .howto .btn_lang {\n  margin: 0 2px;\n}\n.intro .howto .btn_done {\n  float: right;\n}\n.intro .howto .instructions {\n  margin-left: 30px;\n  border-left: 1px solid #05bed1;\n}\n.intro .howto .instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 23px;\n  position: relative;\n  top: 2px;\n}\n.intro .howto .instructions ul {\n  margin: 0;\n}\n.intro .howto .instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.intro .howto .instructions li {\n  padding-bottom: 12px;\n}\n.intro .howto .instructions ol li .circle_wrapper {\n  position: absolute;\n  left: 37px;\n  background-color: #f5f5f5;\n  height: 28px;\n  display: inline-block;\n}\n.intro .howto .instructions ol li .circle {\n  border: 1px solid #00bcd2;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.intro .howto .instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.intro .howto .instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #00bcd2;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  left: 7px;\n  top: -5px;\n}\n.intro .howto .instructions code {\n  font-family: Lato;\n  font-size: 13px;\n  font-weight: bold;\n  letter-spacing: -0.1px;\n  border-radius: 3px;\n  background-color: #e7f9fa;\n  color: #005271;\n  padding: 3px 10px;\n  margin: 0 5px;\n}\n.add_proxy_modal.modal .modal-content .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .modal-footer button {\n  margin: 10px 16px;\n}\n.add_proxy_modal.modal .modal-content .modal-footer button.options {\n  width: 190px;\n}\n.add_proxy_modal.modal .modal-content .section {\n  margin-bottom: 37px;\n}\n.add_proxy_modal.modal .modal-content .section:last-child {\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .section h4 {\n  color: #05bed1;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 50px;\n  top: 3px;\n}\n.add_proxy_modal.modal .modal-content .section select {\n  margin-top: 25px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 20px 30px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #05bed1;\n  content: \"\\2022\";\n  font-size: 26px;\n  padding-right: 6px;\n  position: relative;\n  top: 2px;\n}\n.nav_left {\n  margin-top: -30px;\n  position: absolute;\n  width: 224px;\n  height: 100%;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  padding-top: 11px;\n}\n.nav_left .menu .menu_item {\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item .text {\n  color: #05bed1;\n  height: 22px;\n  position: absolute;\n  top: 50%;\n  margin-top: -11px;\n  left: 60px;\n  font-size: 14px;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .icon {\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 20px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .stats {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .zones {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu_filler {\n  background-color: #F3FBFC;\n  height: 100%;\n}\n.nav_top {\n  margin-bottom: 30px;\n  background-color: #f5f5f5;\n  height: 60px;\n}\n.nav_top .logo_wrapper {\n  height: 60px;\n  width: 224px;\n  background: white;\n  display: inline-block;\n}\n.nav_top .logo {\n  background-image: url('img/luminati_logo_2.svg');\n  width: 166px;\n  height: 35px;\n  position: relative;\n  top: 8px;\n  left: 24px;\n}\n.nav_top .version {\n  font-size: 9px;\n  font-weight: bold;\n  float: right;\n  position: relative;\n  top: 4px;\n  right: 3px;\n  opacity: 0.5;\n}\n.nav_top .dropdown {\n  float: right;\n  margin: 18px 36px 0 0;\n  font-size: 14px;\n}\n.nav_top .dropdown-toggle {\n  color: #004d74;\n  padding: 3px 17px 3px 5px;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 6px;\n  top: 12px;\n  margin: 0;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nbody {\n  font-family: \"Noto Sans\", sans-serif;\n  font-size: 15px;\n  line-height: 23px;\n  overflow-y: scroll;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.page-body {\n  margin-left: 224px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\ncode {\n  background: lightgrey;\n  color: black;\n  white-space: nowrap;\n}\n.nowrap {\n  white-space: nowrap;\n}\npre.top-margin {\n  margin-top: 4px;\n}\n.container {\n  width: auto;\n}\n.main-container-qs {\n  margin-left: 25%;\n}\n.qs-move-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 2px;\n  cursor: col-resize;\n}\n.btn-title {\n  float: right;\n  margin-top: -4px;\n  margin-right: 15px;\n  margin-bottom: -5px;\n}\n.header {\n  height: 60px;\n}\n.header img {\n  margin-top: 10px;\n}\nnav a:hover {\n  box-shadow: none;\n}\n.overall-success-ratio {\n  margin-bottom: 20px;\n}\n.success_title {\n  font-size: 22px;\n  cursor: pointer;\n}\n.success_value {\n  text-align: right;\n  font-size: 22px;\n  cursor: pointer;\n  color: #428bca;\n}\n.block {\n  background: #eeeeee;\n  padding: 1em;\n  margin-bottom: 20px;\n}\n.form-group {\n  margin-bottom: 12px;\n}\n.alert-inline {\n  display: inline;\n  padding: 6px 12px;\n  position: relative;\n  top: 2px;\n  margin: 0 8px;\n}\n.tester-body {\n  margin-bottom: 18px;\n}\n.tester-body textarea {\n  height: 100px;\n}\n.tools-header {\n  margin-bottom: 12px;\n}\n.tester-body:after,\n.tools-header:after {\n  content: '';\n  display: block;\n  clear: both;\n}\n.tools-add-header {\n  margin-bottom: 18px;\n}\n.tester-alert {\n  margin-top: 20px;\n  padding: 7.5px 11.5px;\n}\n.tester-results {\n  margin-top: 20px;\n}\n.tools-table {\n  width: auto;\n  float: none;\n  margin: 20px auto;\n}\n.tools-table th {\n  text-align: center;\n}\n.countries-list {\n  text-align: center;\n  margin-top: 20px;\n}\n.countries-list > div {\n  padding: 10px;\n  display: inline-block;\n  width: 200px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-align: left;\n  position: relative;\n  border: 1px solid black;\n  margin: 5px 10px;\n}\n.countries-list .glyphicon {\n  color: grey;\n}\n.countries-list .glyphicon-ok {\n  color: green !important;\n}\n.countries-list .glyphicon-download-alt {\n  color: blue !important;\n}\n.countries-failed {\n  color: red !important;\n}\n.countries-canceled {\n  color: orange !important;\n}\n.countries-op {\n  display: inline-block;\n  position: absolute;\n  right: 0;\n  width: 40px;\n  padding-left: 10px;\n  background: white;\n  background: linear-gradient(to right, rgba(255, 255, 255, 0), white 25%);\n}\n.countries-op span:hover {\n  color: orange;\n  cursor: pointer;\n}\n.countries-view {\n  border-bottom: 1px dashed;\n  cursor: pointer;\n}\n#countries-screenshot .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#countries-screenshot .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\ntable.proxies {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies-settings,\n.columns-settings {\n  overflow: auto;\n  max-height: calc(100vh - 190px);\n}\n.proxies-panel {\n  overflow: auto;\n}\ndiv.proxies .panel-footer,\ndiv.proxies .panel-heading {\n  position: relative;\n}\ndiv.proxies .panel-heading {\n  height: 65px;\n}\ndiv.proxies .btn-wrapper {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.proxies .btn-csv {\n  font-size: 12px;\n}\n.proxies-default {\n  color: gray;\n}\n.proxies-editable {\n  cursor: pointer;\n  position: relative;\n  display: inline-block;\n  min-height: 20px;\n  min-width: 100%;\n}\n.proxies-editable:hover {\n  color: orange;\n}\n.proxies-table-input {\n  position: absolute;\n  z-index: 2;\n  left: -25px;\n  right: -25px;\n  top: -7px;\n}\n.proxies-table-input input,\n.proxies-table-input select {\n  width: 100%;\n}\n.proxies-check {\n  width: 32px;\n}\n.col_success_rate {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-success-rate-value {\n  color: #428bca;\n  width: 80px;\n  font-size: 16px;\n  cursor: pointer;\n}\n.proxies-actions {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-action {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-disabled {\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-edit {\n  visibility: hidden;\n}\n.proxies tr:hover .proxies-action-edit {\n  visibility: visible;\n  cursor: pointer;\n}\n.proxies-action-delete,\n.proxies-action-duplicate {\n  cursor: pointer;\n}\n.proxies-warning {\n  color: red;\n}\n#history .modal-dialog,\n#history_details .modal-dialog,\n#pool .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#history .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\n#history label {\n  font-weight: normal;\n}\n.proxies-history-navigation {\n  margin-bottom: 25px;\n}\n.proxies-history-filter {\n  font-size: 11px;\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n}\n.proxies-history th {\n  line-height: 15px !important;\n}\n.clickable {\n  cursor: pointer;\n}\n.proxies-history-loading {\n  padding: 4px;\n  width: 200px;\n  text-align: center;\n  position: fixed;\n  left: 50%;\n  top: 50%;\n  margin-left: -100px;\n  z-index: 2;\n}\n.proxies-history-archive {\n  float: right;\n  font-size: 11px;\n  line-height: 14px;\n  margin-top: -1px;\n  margin-bottom: -2px;\n  margin-right: 32px;\n  text-align: right;\n}\n.proxies-history-archive > span {\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n  cursor: pointer;\n  text-transform: lowercase;\n}\n.zones-table td,\n.zones-table thead th {\n  text-align: right;\n}\n.zones-table td.zones-zone,\n.zones-table thead th.zones-zone {\n  text-align: left;\n}\n#zone .panel-heading {\n  position: relative;\n}\n#zone .panel-heading button {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.settings-alert {\n  position: relative;\n}\n.settings-alert .buttons {\n  position: absolute;\n  right: 10px;\n  top: 9px;\n}\n.github {\n  margin-top: 12px;\n}\n#config-textarea,\n#config-textarea + .CodeMirror,\n#resolve-textarea {\n  width: 100%;\n  height: 400px;\n  margin-bottom: 18px;\n}\n.resolve-add-host {\n  margin-top: -6px;\n  margin-bottom: 18px;\n}\n#settings-page {\n  padding-top: 20px;\n}\n.confirmation-items {\n  margin-top: 11px;\n}\n.form-range {\n  width: 100%;\n}\n.form-range .form-control {\n  display: inline-block;\n  width: 48%;\n}\n.form-range .range-seperator {\n  display: inline-block;\n  width: 2%;\n  text-align: center;\n}\n.luminati-login h3 {\n  font-weight: bold;\n  margin-top: 20px;\n  margin-bottom: 20px;\n}\n.luminati-login .alert-danger {\n  color: #d00;\n}\n.luminati-login label {\n  color: #818c93;\n  font-weight: normal;\n}\n.luminati-login button {\n  margin-top: 15px;\n  font-weight: bold;\n  padding: 10px 12px;\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n  border: 1px solid #1c74b3;\n  border-bottom-color: #0d5b97;\n  border-top-color: #2c8ed1;\n  box-shadow: 0 1px 0 #ddd, inset 0 1px 0 rgba(255, 255, 255, 0.2);\n  color: #fff !important;\n  text-shadow: rgba(0, 0, 0, 0.2) 0 1px 0;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  -webkit-tap-highlight-color: transparent;\n}\n.luminati-login button:hover:enabled {\n  background-color: #3baaf4;\n  background-image: -o-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#3baaf4), to(#2389dc));\n  background-image: -webkit-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -moz-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: linear-gradient(top, #3baaf4, #2389dc);\n}\n.luminati-login button:active {\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n}\n.luminati-login .signup {\n  color: #818c93;\n  font-size: 16.5px;\n  margin-top: 12px;\n}\n#google {\n  min-width: 300px;\n}\n#google a.google {\n  color: white;\n  display: block;\n  padding: 0;\n  margin: auto;\n  margin-top: 50px;\n  margin-bottom: 40px;\n  height: 35px;\n  font-size: 16px;\n  padding-top: 6px;\n  padding-left: 95px;\n  cursor: pointer;\n  max-width: 300px;\n  text-align: left;\n  text-decoration: none;\n  border: none;\n  position: relative;\n  white-space: nowrap;\n}\n#google a.google,\n#google a.google:hover {\n  background: url(/img/social_btns.svg) no-repeat 50% 100%;\n}\n#google a.google:focus {\n  outline: 0;\n  top: 1px;\n}\n#google a.google:hover {\n  border: none;\n  box-shadow: none;\n  border-radius: 0;\n}\n#google a.google:active {\n  top: 1px;\n}\n.panel .panel-heading button.btn.btn-ico {\n  padding: 7px;\n  border: solid 1px #c8c2bf;\n  background-color: #fcfcfc;\n  width: 35px;\n  height: 34px;\n  margin: 0 1px;\n}\n.panel .panel-heading button.btn.btn-ico.add_proxy_btn {\n  color: #004d74;\n  background-color: #05bed1;\n  border-color: #05bed1;\n}\n.panel .panel-heading button.btn.btn-ico img {\n  width: 100%;\n  height: 100%;\n  vertical-align: baseline;\n}\n.panel .panel-heading button.btn.btn-ico[disabled] img {\n  opacity: 0.25;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  max-width: 250px;\n  border: solid 1px black;\n  background: #fff;\n  color: black;\n}\n.status-details-wrapper {\n  background: #f7f7f7;\n  font-size: 12px;\n}\n.status-details-line {\n  margin: 0 0 5px 25px;\n}\n.status-details-icon-warn {\n  vertical-align: bottom;\n  padding-bottom: 1px;\n}\n.status-details-text {\n  padding: 0 0 0 5px;\n}\n.ic-status-triangle {\n  font-size: 12px;\n  color: #979797;\n}\n.text-err {\n  color: #d8393c;\n}\n.text-ok {\n  color: #4ca16a;\n}\n.text-warn {\n  color: #f5a623;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #d7f6ff;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.pull-none {\n  float: none !important;\n}\n.history__header {\n  margin-top: 10px;\n}\n.history-details__column-first {\n  width: 300px;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.blue {\n  color: #4a90e2;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.control-label.preset {\n  width: 100%;\n}\n.control-label.preset .form-control {\n  width: auto;\n  display: inline-block;\n}\ninput.form-control[type=checkbox] {\n  width: auto;\n  height: auto;\n  display: inline;\n}\n.proxies-table-input.session-edit input {\n  width: calc(100% - 2em);\n  display: inline-block;\n}\n.proxies-table-input.session-edit .btn {\n  padding: 4px;\n}\n.tabs_default:hover {\n  color: #555 !important;\n  box-shadow: none !important;\n}\n.chrome_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url('img/icon_chrome.jpg');\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.firefox_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_firefox.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.safari_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_safari.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.stats_row_change {\n  animation: pulse 1s;\n}\n.row_clickable {\n  cursor: pointer;\n}\n.code_max_height {\n  max-height: 500px;\n}\n.table-fixed {\n  table-layout: fixed;\n}\n.overflow-ellipsis {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n}\n.lpm {\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.lpm h1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\n.lpm h2 {\n  color: #05bed1;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\n.lpm h3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\n.lpm h4 {\n  margin: 0;\n}\n.lpm a {\n  color: #05bed1;\n  cursor: pointer;\n  border: none;\n  text-decoration: underline;\n}\n.lpm a:hover {\n  color: #05bed1;\n  cursor: pointer;\n  background: rgba(0, 0, 0, 0);\n  border: none;\n  box-shadow: none;\n}\n.lpm select,\n.lpm input[type=number],\n.lpm input[type=text] {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n.lpm select:focus,\n.lpm input[type=number]:focus,\n.lpm input[type=text]:focus {\n  outline: none;\n  border: solid 1px #05bed1;\n}\n.lpm select {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\n.lpm input[type=number]::-webkit-inner-spin-button,\n.lpm input[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\n.lpm input[type=number] {\n  -moz-appearance: textfield;\n}\n.lpm .radio_buttons {\n  width: 100%;\n  display: flex;\n}\n.lpm .radio_buttons .option {\n  flex: 1;\n}\n.lpm .radio_buttons input[type=radio] {\n  display: none;\n}\n.lpm .radio_buttons label {\n  cursor: pointer;\n  font-size: 12px;\n  font-weight: 300;\n}\n.lpm .radio_buttons input[type=radio] + .checked_icon {\n  display: inline-block;\n  width: 16px;\n  height: 16px;\n  margin: -2px 6px 0 0;\n  vertical-align: middle;\n  background: none;\n}\n.lpm .radio_buttons input[type=radio]:checked + .checked_icon {\n  background: url(/img/check_radio.svg) left top no-repeat;\n}\n.lpm .btn_lpm {\n  width: 160px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: #05bed1;\n  border: solid 1px #05bed1;\n  color: white;\n  font-size: 16px;\n  font-weight: bold;\n  padding-top: 3px;\n  margin: 0 5px;\n  box-shadow: none;\n}\n.lpm .btn_lpm:hover {\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.lpm .btn_lpm:active,\n.lpm .btn_lpm.active {\n  background-color: #003d5b;\n  border-color: #003d5b;\n  color: #05bed1;\n}\n.lpm .btn_lpm:focus {\n  outline: none;\n}\n.lpm .btn_lpm_default {\n  color: #05bed1;\n  background-color: white;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:hover {\n  background-color: #B4E6EE;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:active,\n.lpm .btn_lpm_default.active {\n  background-color: #05bed1;\n  border-color: #05bed1;\n  color: white;\n}\n.lpm .btn_lpm_normal {\n  color: #004d74;\n  border-color: #ccdbe3;\n  background-color: white;\n}\n.lpm .btn_lpm_normal:hover {\n  background-color: #f5f5f5;\n  border-color: #ccdbe3;\n}\n.lpm .btn_lpm_normal:active,\n.lpm .btn_lpm_normal.active {\n  background-color: #d7d7d7;\n  border-color: #d7d7d7;\n  color: #004d74;\n}\n.lpm .btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.lpm .btn_lpm_small {\n  font-size: 11px;\n  height: 27px;\n  width: auto;\n}\n.lpm .btn_copy {\n  color: #05bed1;\n  border-color: #05bed1;\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.lpm .btn_copy:hover {\n  color: white;\n}\n.lpm .modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.lpm .modal .modal-header {\n  border: 0;\n}\n.lpm .modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 30px;\n  line-height: 0;\n}\n.lpm .modal .modal-header .close_icon {\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 19px;\n  right: 19px;\n}\n.lpm .modal .modal-body {\n  padding: 15px 50px 0;\n}\n.lpm .modal .modal-footer {\n  border: 0;\n  text-align: center;\n}\n.edit_proxy h3 {\n  margin-bottom: 20px;\n}\n.edit_proxy .nav {\n  display: flex;\n  margin-bottom: 20px;\n}\n.edit_proxy .nav .field {\n  flex-grow: 1;\n}\n.edit_proxy .nav .field .title {\n  display: inline-block;\n}\n.edit_proxy .nav .field select,\n.edit_proxy .nav .field input[type=number],\n.edit_proxy .nav .field input[type=text] {\n  color: #05bed1;\n  font-weight: bold;\n  margin-left: 10px;\n  width: 200px;\n}\n.edit_proxy .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.edit_proxy .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.edit_proxy .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.edit_proxy .nav_tabs {\n  display: flex;\n  margin-bottom: 20px;\n  padding-bottom: 20px;\n  border-bottom: solid 1px #E0E9EE;\n}\n.edit_proxy .nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 100px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 2px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.edit_proxy .nav_tabs .btn_tab .icon {\n  width: 30px;\n  height: 30px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 16px;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #05bed1;\n  position: relative;\n  left: 29px;\n  top: -5px;\n  border-radius: 50%;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 55px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n}\n.edit_proxy .nav_tabs .btn_tab .info {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.edit_proxy .nav_tabs .btn_tab .icon.target {\n  background: url(/img/target.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.speed {\n  background: url(/img/speed.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.zero {\n  background: url(/img/zero.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.rotation {\n  background: url(/img/rotation.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.debug {\n  background: url(/img/debug.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.general {\n  background: url(/img/general.svg);\n}\n.edit_proxy .nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.edit_proxy .nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.edit_proxy .nav_tabs .btn_tab.active,\n.edit_proxy .nav_tabs .btn_tab:hover {\n  border-color: #05bed1;\n  background-color: white;\n}\n.edit_proxy .nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.edit_proxy .nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.edit_proxy .nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #05bed1;\n  position: absolute;\n  bottom: -8px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.edit_proxy .section_wrapper {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper:focus {\n  outline: 0;\n}\n.edit_proxy .section_wrapper .section {\n  position: relative;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n  flex: 2 0;\n  padding: 14px 30px;\n  padding-right: 20%;\n  font-size: 14px;\n  margin: 5px 0;\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .section .desc {\n  flex: 3 3;\n  line-height: 1.07;\n  padding-right: 35px;\n}\n.edit_proxy .section_wrapper .section .field {\n  flex: 5 5;\n  display: flex;\n}\n.edit_proxy .section_wrapper .section .field .sufix {\n  margin-left: 20px;\n}\n.edit_proxy .section_wrapper .section .field .double_field {\n  display: flex;\n}\n.edit_proxy .section_wrapper .section .field .double_field input {\n  flex: 2 2;\n}\n.edit_proxy .section_wrapper .section .field .double_field .divider {\n  flex: 1 1;\n  text-align: center;\n}\n.edit_proxy .section_wrapper .section .icon {\n  position: absolute;\n  right: 20px;\n}\n.edit_proxy .section_wrapper .section.error {\n  border-color: #F9BFB9;\n}\n.edit_proxy .section_wrapper .section.error .icon {\n  background: url(/img/error.svg);\n  width: 10px;\n  height: 10px;\n}\n.edit_proxy .section_wrapper .section.error .arrow {\n  border-left: solid 6px #ef6153;\n  border-top: solid 7px transparent;\n  border-bottom: solid 7px transparent;\n  position: absolute;\n  right: -7px;\n}\n.edit_proxy .section_wrapper .section.error select,\n.edit_proxy .section_wrapper .section.error input[type=number],\n.edit_proxy .section_wrapper .section.error input[type=text] {\n  border-color: #ef6153;\n}\n.edit_proxy .section_wrapper .section.correct {\n  border-color: #B4E6EE;\n}\n.edit_proxy .section_wrapper .section.correct .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .section.correct .icon {\n  background: url(/img/check.svg);\n  width: 11px;\n  height: 8px;\n}\n.edit_proxy .section_wrapper .section.active {\n  border-color: #05bed1;\n}\n.edit_proxy .section_wrapper .section.active .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .section.active .arrow {\n  border-left: solid 6px #05bed1;\n  border-top: solid 7px transparent;\n  border-bottom: solid 7px transparent;\n  position: absolute;\n  right: -7px;\n}\n.edit_proxy .section_wrapper .message_wrapper {\n  margin-left: 25px;\n  flex: 1 0;\n  display: inline-block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message {\n  display: none;\n  font-size: 12px;\n  line-height: 1.17;\n  border-radius: 4px;\n  padding: 14px 19px;\n  background-color: #E6F6F9;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.active {\n  display: block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.error {\n  display: block;\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.intro {\n  text-align: center;\n  margin-top: 40px;\n}\n.intro .header {\n  margin: auto;\n  width: 600px;\n}\n.intro .sub_header {\n  margin: auto;\n  margin-top: 10px;\n}\n.intro .img_intro {\n  background: url(/img/lpm_infographics.png);\n  width: 592px;\n  height: 326px;\n  margin: 15px 0;\n}\n.intro .section {\n  cursor: pointer;\n  text-align: initial;\n  width: 470px;\n  height: 83px;\n  margin: auto;\n  border: 2px solid #05bed1;\n  box-shadow: 0 2px 2px 0 rgba(156, 181, 190, 0.57);\n  border-radius: 4px;\n  margin-top: 20px;\n  margin-bottom: 20px;\n  padding-top: 17px;\n}\n.intro .section .img_block {\n  position: absolute;\n}\n.intro .section .img_block .circle_wrapper {\n  border: 1px solid #05bed1;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  border-radius: 50%;\n  left: 19px;\n  z-index: 1;\n  background-color: white;\n}\n.intro .section .text_block {\n  display: inline-block;\n  position: relative;\n  left: 110px;\n}\n.intro .section .title {\n  font-size: 22px;\n  font-weight: 700;\n}\n.intro .section .subtitle {\n  font-size: 14px;\n  color: #05bed1;\n}\n.intro .section .right_arrow {\n  width: 14px;\n  height: 14px;\n  position: relative;\n  top: -32px;\n  left: 425px;\n  transform: rotate(45deg);\n  border-top: 2px solid #05bed1;\n  border-right: 2px solid #05bed1;\n}\n.intro .section.disabled {\n  cursor: initial;\n  border: solid 1px #E0E9EE;\n  color: #9cb5be;\n}\n.intro .section.disabled .subtitle {\n  color: #9cb5be;\n}\n.intro .section.disabled .right_arrow {\n  border-color: #9cb5be;\n}\n.intro .section_list {\n  counter-reset: section;\n}\n.intro .img {\n  width: 40px;\n  height: 40px;\n  position: relative;\n  left: 30px;\n  top: -18px;\n}\n.intro .img:before {\n  color: #05bed1;\n  counter-increment: section;\n  content: counters(section, \".\");\n  font-size: 12px;\n  position: absolute;\n  left: -4px;\n  top: -4px;\n  z-index: 2;\n}\n.intro .img_1_active {\n  background: url(/img/1_active.svg);\n}\n.intro .img_2 {\n  background: url(/img/2.svg);\n}\n.intro .img_2_active {\n  background: url(/img/2_active.svg);\n}\n.intro .img_3 {\n  background: url(/img/3.svg);\n}\n.intro .img_3_active {\n  background: url(/img/3_active.svg);\n}\n.intro .howto {\n  width: 537px;\n  margin: auto;\n  margin-bottom: 100px;\n}\n.intro .howto h1.sub_header {\n  line-height: 0;\n  margin: 0 0 25px 0;\n  color: #05bed1;\n}\n.intro .howto .choices {\n  height: 140px;\n}\n.intro .howto .choice {\n  cursor: pointer;\n  display: inline-block;\n  width: 205px;\n  height: 83px;\n  border-radius: 4px;\n  box-shadow: 0 2px 2px 0 #ccdbe3;\n  border: solid 1px #E0E9EE;\n  margin: 30px 20px;\n}\n.intro .howto .choice .content {\n  position: relative;\n  top: 14px;\n}\n.intro .howto .choice .text_smaller {\n  font-size: 14px;\n}\n.intro .howto .choice .text_bigger {\n  font-size: 20px;\n  font-weight: bold;\n}\n.intro .howto .choice.active,\n.intro .howto .choice:hover {\n  border: solid 2px #00aac3;\n  margin-top: 29px;\n}\n.intro .howto .text_middle {\n  display: inline-block;\n  font-size: 17px;\n  font-weight: bold;\n}\n.intro .howto .well {\n  text-align: left;\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: #f5f5f5;\n}\n.intro .howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n}\n.intro .howto .browser_instructions .header_well p {\n  margin: 10px;\n  display: inline-block;\n}\n.intro .howto .browser_instructions .header_well select {\n  width: 270px;\n  float: right;\n}\n.intro .howto .code_instructions .header_well {\n  text-align: center;\n}\n.intro .howto .instructions_well {\n  margin-top: 25px;\n  margin-bottom: 25px;\n  position: relative;\n}\n.intro .howto .instructions_well pre {\n  border: none;\n  font-size: 12px;\n  background-color: #E6F6F9;\n}\n.intro .howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 28px;\n  right: 28px;\n}\n.intro .howto .btn_lang {\n  margin: 0 2px;\n}\n.intro .howto .btn_done {\n  float: right;\n}\n.intro .howto .instructions {\n  margin-left: 30px;\n  border-left: 1px solid #05bed1;\n}\n.intro .howto .instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 23px;\n  position: relative;\n  top: 2px;\n}\n.intro .howto .instructions ul {\n  margin: 0;\n}\n.intro .howto .instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.intro .howto .instructions li {\n  padding-bottom: 12px;\n}\n.intro .howto .instructions ol li .circle_wrapper {\n  position: absolute;\n  left: 37px;\n  background-color: #f5f5f5;\n  height: 28px;\n  display: inline-block;\n}\n.intro .howto .instructions ol li .circle {\n  border: 1px solid #00bcd2;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.intro .howto .instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.intro .howto .instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #00bcd2;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  left: 7px;\n  top: -5px;\n}\n.intro .howto .instructions code {\n  font-family: Lato;\n  font-size: 13px;\n  font-weight: bold;\n  letter-spacing: -0.1px;\n  border-radius: 3px;\n  background-color: #e7f9fa;\n  color: #005271;\n  padding: 3px 10px;\n  margin: 0 5px;\n}\n.add_proxy_modal.modal .modal-content .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .modal-footer button {\n  margin: 10px 16px;\n}\n.add_proxy_modal.modal .modal-content .modal-footer button.options {\n  width: 190px;\n}\n.add_proxy_modal.modal .modal-content .section {\n  margin-bottom: 37px;\n}\n.add_proxy_modal.modal .modal-content .section:last-child {\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .section h4 {\n  color: #05bed1;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 50px;\n  top: 3px;\n}\n.add_proxy_modal.modal .modal-content .section select {\n  margin-top: 25px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 20px 30px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #05bed1;\n  content: \"\\2022\";\n  font-size: 26px;\n  padding-right: 6px;\n  position: relative;\n  top: 2px;\n}\n.nav_left {\n  margin-top: -30px;\n  position: absolute;\n  width: 224px;\n  height: 100%;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  padding-top: 11px;\n}\n.nav_left .menu .menu_item {\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item .text {\n  color: #05bed1;\n  height: 22px;\n  position: absolute;\n  top: 50%;\n  margin-top: -11px;\n  left: 60px;\n  font-size: 14px;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .icon {\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 20px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .stats {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .zones {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu_filler {\n  background-color: #F3FBFC;\n  height: 100%;\n}\n.nav_top {\n  margin-bottom: 30px;\n  background-color: #f5f5f5;\n  height: 60px;\n}\n.nav_top .logo_wrapper {\n  height: 60px;\n  width: 224px;\n  background: white;\n  display: inline-block;\n}\n.nav_top .logo {\n  background-image: url('img/luminati_logo_2.svg');\n  width: 166px;\n  height: 35px;\n  position: relative;\n  top: 8px;\n  left: 24px;\n}\n.nav_top .version {\n  font-size: 9px;\n  font-weight: bold;\n  float: right;\n  position: relative;\n  top: 4px;\n  right: 3px;\n  opacity: 0.5;\n}\n.nav_top .dropdown {\n  float: right;\n  margin: 18px 36px 0 0;\n  font-size: 14px;\n}\n.nav_top .dropdown-toggle {\n  color: #004d74;\n  padding: 3px 17px 3px 5px;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 6px;\n  top: 12px;\n  margin: 0;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n}\n", ""]);
 
 // exports
 

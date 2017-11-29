@@ -35,30 +35,30 @@ const tabs = {
         label: 'Request Speed',
         tooltip: 'Control the speed of your request to improve performance',
         fields: {
-            dns_lookup: {
+            dns: {
                 label: 'DNS Lookup',
                 tooltip: 'Location of DNS resolve',
             },
-            timeout_super_proxy: {
+            request_timeout: {
                 label: 'Timeout for requests on the super proxy',
                 tooltip: `Kill requests to super proxy and try new one if
                     timeout is exceeded`,
             },
-            session_timeout: {
+            session_init_timeout: {
                 label: 'Session establish timeout',
                 tooltip: 'session establish == search + connect to peer',
             },
-            min_number_super_proxy: {
+            proxy_count: {
                 label: 'Minimum number of super proxies to use',
                 tooltip: `min number of failed attempts before switching
                     proxy`,
             },
-            auto_switch_super_proxy: {
+            proxy_switch: {
                 label: 'Automatically switch super proxy on failure',
                 tooltip: `if request failed (status 4XX) use a differen zagent
                     next time`,
             },
-            throttle_req: {
+            throttle: {
                 label: 'Throttle requests above given number',
                 tooltip: 'allow maximum number of requests per unit of time',
             },
@@ -159,7 +159,7 @@ const tabs = {
         label: 'General',
         tooltip: '',
         fields: {
-            interface: {
+            iface: {
                 label: 'Interface',
                 tooltip: `network interface on the machine to use`,
             },
@@ -177,25 +177,25 @@ const tabs = {
                 tooltip: `encrypt requests sent to super proxy to avoid
                     detection on DNS`,
             },
-            url_regex_null_resp: {
+            null_response: {
                 label: 'URL regex pattern for null response',
                 tooltip: `on this url pattern, lpm will return a "null
                     response" without proxying (usefull when users don't want
                     to make a request, but a browser expects 200 response)`,
             },
-            url_regex_bypassing: {
+            bypass_proxy: {
                 label: `URL regex for bypassing the proxy manager and send
                     directly to host`,
                 tooltip: `requests with this pattern will be passed directly,
                     without any proxy (super proxy or peer)`,
             },
-            url_regex_sent_directly: {
+            direct_include: {
                 label: `URL regex for requests to be sent directly from super
                     proxy`,
                 tooltip: `urls with this pattern will not be sent trough peers
                     but throug super proxy directly`,
             },
-            url_regex_not_sent_directly: {
+            direct_exclude: {
                 label: `URL regex for requests to not be sent directly from
                     super proxy`,
                 tooltip: `negation of the abow (to exlude from a set)`,
@@ -215,12 +215,14 @@ class Index extends React.Component {
         }
         else
             this.proxy = props.extra;
+        console.log(this.proxy);
     }
     componentWillMount(){
         const _this = this;
         etask(function*(){
             const consts = yield ajax.json({url: '/api/consts'});
-            _this.setState({consts});
+            const defaults = yield ajax.json({url: '/api/defaults'});
+            _this.setState({consts, defaults});
         });
     }
     componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
@@ -234,6 +236,14 @@ class Index extends React.Component {
     field_changed(field_name, value){
         this.setState(prev_state=>({fields:
             Object.assign({}, prev_state.fields, {[field_name]: value})}));
+    }
+    default_opt(option){
+        const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
+        return [
+            {key: 'No', value: 'no'},
+            {key: 'default ('+default_label+')', value: 'default'},
+            {key: 'Yes', value: 'yes'},
+        ];
     }
     render(){
         let Main_window;
@@ -249,14 +259,15 @@ class Index extends React.Component {
         return (
             <div className="lpm edit_proxy">
               <h3>Edit port {this.props.port}</h3>
-              <Nav zones={Object.keys(this.proxy.zones)}/>
+              <Nav model={this.proxy} zones={Object.keys(this.proxy.zones)}/>
               <Nav_tabs curr_tab={this.state.tab} fields={this.state.fields}
                 on_tab_click={this.click_tab.bind(this)}/>
               <Main_window {...this.state.consts} cities={this.state.cities}
-                states={this.state.states}
+                states={this.state.states} defaults={this.state.defaults}
                 update_states_and_cities={this.update_states_and_cities.bind(this)}
                 on_change_field={this.field_changed.bind(this)}
-                fields={this.state.fields}/>
+                fields={this.state.fields} model={this.proxy}
+                default_opt={this.default_opt.bind(this)}/>
             </div>
         );
     }
@@ -265,8 +276,10 @@ class Index extends React.Component {
 const Nav = props=>{
     return (
         <div className="nav">
-          <Field options={props.zones} label="Zone"/>
-          <Field options={presets.map(p=>p.title)} label="Preset"/>
+          <Field on_change={props.on_field_change} options={props.zones}
+            label="Zone" value={props.model.zone}/>
+          <Field on_change={props.on_field_change}
+            label="Preset" options={presets.map(p=>p.title)}/>
           <Action_buttons/>
         </div>
     );
@@ -277,9 +290,9 @@ const Field = props=>{
     return (
         <div className="field">
           <div className="title">{props.label}</div>
-          <select>
+          <select value={props.value} onChange={props.on_change}>
             {options.map(o=>(
-              <option key={o} value="">{o}</option>
+              <option key={o} value={o}>{o}</option>
             ))}
           </select>
         </div>
@@ -374,7 +387,7 @@ class Section extends React.Component {
 }
 
 const Select = props=>(
-    <select value={props.fields[props.id]} onChange={props.on_change_wrapper}>
+    <select value={props.val} onChange={props.on_change_wrapper}>
       {(props.data||[]).map((c, i)=>(
         <option key={i} value={c.value}>{c.key}</option>
       ))}
@@ -382,29 +395,46 @@ const Select = props=>(
 );
 
 const Input = props=>(
-    <input type={props.type} value={props.fields[props.id]||''}
-      onChange={props.on_change_wrapper}/>
+    <input type={props.type} value={props.val}
+      onChange={e=>props.on_change_wrapper(e, props.id)}
+      className={props.className}/>
+);
+
+const Double_number = props=>(
+    <span className="double_field">
+      <Input {...props} id={props.id+'_min'} type="number"/>
+      <span className="divider">÷</span>
+      <Input {...props} id={props.id+'_max'} type="number"/>
+    </span>
 );
 
 const Input_boolean = props=>(
-    <div>
-      <input type="radio" checked={props.fields[props.id]=='1'}
-        onChange={props.on_change_wrapper} id="enable"
-        name={props.id} value="1"/>
-      <label htmlFor="enable">Enabled</label>
-      <input type="radio" checked={props.fields[props.id]=='0'}
-        onChange={props.on_change_wrapper} id="disable"
-        name={props.id} value="0"/>
-      <label htmlFor="disable">Disabled</label>
+    <div className="radio_buttons">
+      <div className="option">
+        <input type="radio" checked={props.fields[props.id]=='1'}
+          onChange={props.on_change_wrapper} id="enable"
+          name={props.id} value="1"/>
+        <div className="checked_icon"/>
+        <label htmlFor="enable">Enabled</label>
+      </div>
+      <div className="option">
+        <input type="radio" checked={props.fields[props.id]=='0'}
+          onChange={props.on_change_wrapper} id="disable"
+          name={props.id} value="0"/>
+        <div className="checked_icon"/>
+        <label htmlFor="disable">Disabled</label>
+      </div>
     </div>
 );
 
 const Section_field = props=>{
-    const {id, fields, on_change, on_change_field, data, type, tab_id} = props;
-    const on_change_wrapper = e=>{
+    const {id, fields, on_change, on_change_field, data, type, tab_id,
+        sufix, model} = props;
+    const on_change_wrapper = (e, _id)=>{
+        const curr_id = _id||id;
         if (on_change)
             on_change(e);
-        on_change_field(id, e.target.value);
+        on_change_field(curr_id, e.target.value);
     };
     let Comp;
     switch (type)
@@ -413,14 +443,18 @@ const Section_field = props=>{
     case 'text':
     case 'number': Comp = Input; break;
     case 'boolean': Comp = Input_boolean; break;
-    case 'double_select': Comp = To_implement; break;
+    case 'double_number': Comp = Double_number; break;
     }
+    const val = fields[id]||model[id]||'';
     return (
         <Section correct={fields[id] && fields[id]!='*'} id={id}
           tab_id={tab_id}>
           <div className="desc">{tabs[tab_id].fields[id].label}</div>
-          <Comp fields={fields} id={id} data={data} type={type}
-            on_change_wrapper={on_change_wrapper}/>
+          <div className="field">
+            <Comp fields={fields} id={id} data={data} type={type}
+              on_change_wrapper={on_change_wrapper} val={val}/>
+            {sufix ? <span className="sufix">{sufix}</span> : null}
+          </div>
         </Section>
     );
 };
@@ -434,6 +468,13 @@ class With_data extends React.Component {
 }
 
 class Target extends React.Component {
+    constructor(props){
+        super(props);
+        const {fields, model} = this.props;
+        const country = fields.country||model.country;
+        if (country)
+            this.load_names(country);
+    }
     allowed_countries(){
         let countries = this.props.proxy && this.props.proxy.country.values
             || [];
@@ -444,27 +485,31 @@ class Target extends React.Component {
         }
         return countries;
     }
-    country_changed(e){
-        const country = e.target.value;
-        if (this.props.cities[country])
-            return;
+    load_names(country){
         const _this = this;
         etask(function*(){
             const cities = yield ajax.json({url: '/api/cities/'+country});
             const states = yield ajax.json({url: '/api/regions/'+country});
             _this.props.update_states_and_cities(country, states, cities);
         });
+    }
+    country_changed(e){
+        const country = e.target.value;
+        if (this.props.cities[country])
+            return;
+        this.load_names(country);
         this.props.on_change_field('city', '');
         this.props.on_change_field('state', '');
     }
     states(){
-        const country = this.props.fields.country;
-        return country&&this.props.states&&this.props.states[country]||[];
+        const {fields, model, states} = this.props;
+        const country = fields.country||model.country;
+        return country&&states&&states[country]||[];
     }
     state_changed(e){ this.props.on_change_field('city', ''); }
     cities(){
-        const country = this.props.fields.country;
-        const state = this.props.fields.state;
+        const {country, state} = Object.assign({}, this.props.model,
+            this.props.fields);
         const cities = country&&this.props.cities[country]||[];
         if (state)
             return cities.filter(c=>c.region==state||!c.region||c.region=='*');
@@ -474,7 +519,8 @@ class Target extends React.Component {
     render(){
         return (
             <With_data fields={this.props.fields} tab_id="target"
-              on_change_field={this.props.on_change_field}>
+              on_change_field={this.props.on_change_field}
+              model={this.props.model}>
               <Section_field type="select" id="country"
                 data={this.allowed_countries()}
                 on_change={this.country_changed.bind(this)}/>
@@ -489,16 +535,28 @@ class Target extends React.Component {
 
 
 class Speed extends React.Component {
+    constructor(props){
+        super(props);
+        this.dns_options = [
+            {key: 'Local (default) - resolved by the super proxy',
+                value: 'local'},
+            {key: 'Remote - resolved by peer', value: 'remote'},
+        ];
+    }
     render(){
         return (
             <With_data fields={this.props.fields} tab_id="speed"
-              on_change_field={this.props.on_change_field}>
-              <Section_field type="select" id="dns_lookup"/>
-              <Section_field type="number" id="timeout_super_proxy"/>
-              <Section_field type="number" id="session_timeout"/>
-              <Section_field type="select" id="min_number_super_proxy"/>
-              <Section_field type="select" id="auto_switch_super_proxy"/>
-              <Section_field type="number" id="throttle_req"/>
+              on_change_field={this.props.on_change_field}
+              model={this.props.model}>
+              <Section_field type="select" id="dns"
+                data={this.dns_options}/>
+              <Section_field type="number" id="request_timeout"
+                sufix="seconds"/>
+              <Section_field type="number" id="session_init_timeout"
+                sufix="seconds"/>
+              <Section_field type="number" id="proxy_count"/>
+              <Section_field type="number" id="proxy_switch"/>
+              <Section_field type="number" id="throttle"/>
             </With_data>
         );
     }
@@ -508,19 +566,23 @@ class Rotation extends React.Component {
     render() {
         return (
             <With_data fields={this.props.fields} tab_id="rotation"
-              on_change_field={this.props.on_change_field}>
+              on_change_field={this.props.on_change_field}
+              model={this.props.model}>
               <Section_field type="text" id="datacenter_ip"/>
               <Section_field type="number" id="pool_size"/>
-              <Section_field type="select" id="pool_type"/>
+              <Section_field type="select" id="pool_type"
+                data={this.props.proxy.pool_type.values}/>
               <Section_field type="number" id="keep_alive"/>
-              <Section_field type="select" id="whitelist_ip_access"/>
+              <Section_field type="text" id="whitelist_ip_access"/>
               <Section_field type="boolean" id="random_session"/>
               <Section_field type="text" id="explicit_session"/>
-              <Section_field type="select" id="sticky_ip"/>
-              <Section_field type="double_select" id="max_requests"/>
-              <Section_field type="double_select" id="session_duration"/>
+              <Section_field type="select" id="sticky_ip"
+                data={this.props.default_opt('sticky_ip')}/>
+              <Section_field type="double_number" id="max_requests"/>
+              <Section_field type="double_number" id="session_duration"/>
               <Section_field type="text" id="session_id_seed"/>
-              <Section_field type="select" id="allow_req_auth"/>
+              <Section_field type="select" id="allow_req_auth"
+                data={this.props.default_opt('allow_proxy_auth')}/>
             </With_data>
         );
     }
@@ -530,11 +592,16 @@ class Debug extends React.Component {
     render(){
         return (
             <With_data fields={this.props.fields} tab_id="debug"
-              on_change_field={this.props.on_change_field}>
-              <Section_field type="select" id="log_req_history"/>
-              <Section_field type="select" id="ssl_analyzing"/>
-              <Section_field type="select" id="log_level"/>
-              <Section_field type="select" id="lum_req_debug_info"/>
+              on_change_field={this.props.on_change_field}
+              model={this.props.model}>
+              <Section_field type="select" id="log_req_history"
+                data={this.props.default_opt('history')}/>
+              <Section_field type="select" id="ssl_analyzing"
+                data={this.props.default_opt('ssl')}/>
+              <Section_field type="select" id="log_level"
+                data={this.props.proxy.log.values}/>
+              <Section_field type="select" id="lum_req_debug_info"
+                data={this.props.proxy.debug.values}/>
             </With_data>
         );
     }
@@ -544,15 +611,18 @@ class General extends React.Component {
     render(){
         return (
             <With_data fields={this.props.fields} tab_id="general"
-              on_change_field={this.props.on_change_field}>
-              <Section_field type="select" id="interface"/>
+              on_change_field={this.props.on_change_field}
+              model={this.props.model}>
+              <Section_field type="select" id="iface"
+                data={this.props.proxy.iface.values}/>
               <Section_field type="number" id="multiply"/>
-              <Section_field type="select" id="socks_5_port"/>
-              <Section_field type="select" id="ssl_to_super_proxy"/>
-              <Section_field type="text" id="url_regex_null_resp"/>
-              <Section_field type="text" id="url_regex_bypassing"/>
-              <Section_field type="text" id="url_regex_sent_directly"/>
-              <Section_field type="text" id="url_regex_not_sent_directly"/>
+              <Section_field type="number" id="socks_5_port"/>
+              <Section_field type="select" id="ssl_to_super_proxy"
+                data={this.props.default_opt('secure_proxy')}/>
+              <Section_field type="text" id="null_response"/>
+              <Section_field type="text" id="bypass_proxy"/>
+              <Section_field type="text" id="direct_include"/>
+              <Section_field type="text" id="direct_exclude"/>
             </With_data>
         );
     }

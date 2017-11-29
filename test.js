@@ -402,7 +402,7 @@ describe('proxy', ()=>{
                         (new Buffer('lum-customer-user-zone-zzz:pass'))
                         .toString('base64'),
                 }});
-                assert.ok(l.sessions);
+                assert.ok(l.session_mgr.sessions);
                 assert.equal(proxy.history.length, 1);
                 assert.equal(proxy.full_history.length, 1);
                 assert.equal(res.body.auth.customer, customer);
@@ -486,11 +486,12 @@ describe('proxy', ()=>{
                     assert.equal(proxy.history.length, 1);
                     assert.equal(proxy.history[0].url, test_url);
                     assert.equal(proxy.full_history.length, 1);
-                    assert.equal(l.sessions.sessions.length, pool_size);
+                    assert.equal(l.session_mgr.sessions.sessions.length,
+                        pool_size);
                     let sessions = {};
                     for (let i=0; i<pool_size; i++)
                     {
-                        let s = l.sessions.sessions[i];
+                        let s = l.session_mgr.sessions.sessions[i];
                         assert.equal(s.host, '127.0.0.1');
                         assert.ok(!sessions[s.session]);
                         sessions[s.session] = true;
@@ -506,8 +507,8 @@ describe('proxy', ()=>{
                     const t=(name, start, end)=>it(name, ()=>etask(function*(){
                         l = yield lum({max_requests: start+':'+end,
                             pool_size: pool});
-                        yield l.refresh_sessions();
-                        let max_requests = l.sessions.sessions
+                        yield l.session_mgr.refresh_sessions();
+                        let max_requests = l.session_mgr.sessions.sessions
                             .map(s=>s.max_requests);
                         let count = {};
                         max_requests.forEach(m=>{
@@ -530,7 +531,7 @@ describe('proxy', ()=>{
                 });
                 it('disabled', ()=>etask(function*(){
                     l = yield lum({max_requests: '0'});
-                    assert.equal(l.max_requests, 0);
+                    assert.equal(l.session_mgr.max_requests, 0);
                 }));
 
                 const test_call = ()=>etask(function*(){
@@ -830,6 +831,7 @@ describe('proxy', ()=>{
             const test_session = session=>etask(function*(){
                 let res = yield l.test();
                 let auth = res.body.auth;
+                console.log(session, auth.session);
                 assert.ok(session.test(auth.session));
             });
 
@@ -837,7 +839,7 @@ describe('proxy', ()=>{
             function*(){
                 l = yield lum(opt);
                 yield test_session(before);
-                yield l.refresh_sessions();
+                yield l.session_mgr.refresh_sessions();
                 yield test_session(after);
             }));
 
@@ -851,10 +853,10 @@ describe('proxy', ()=>{
             const t2 = (name, opt, test)=>it(name, ()=>etask(function*(){
                 l = yield lum(opt);
                 assert.ok(!l.sessions);
-                yield l.refresh_sessions();
-                let pre = l.sessions.sessions.map(s=>s.session);
-                yield l.refresh_sessions();
-                let after = l.sessions.sessions.map(s=>s.session);
+                yield l.session_mgr.refresh_sessions();
+                let pre =l.session_mgr.sessions.sessions.map(s=>s.session);
+                yield l.session_mgr.refresh_sessions();
+                let after =l.session_mgr.sessions.sessions.map(s=>s.session);
                 test(pre, after);
             }));
 
@@ -933,7 +935,7 @@ describe('proxy', ()=>{
                     history_aggregator: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(20);
-                yield l.update_all_sessions();
+                yield l.session_mgr.update_all_sessions();
                 yield etask.sleep(20);
                 assert.equal(history.length, 3);
                 assert_has(history, [

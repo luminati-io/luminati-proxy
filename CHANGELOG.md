@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 1.72.444
+## 1.72.569
 - :star: improve log performance
 - :star: fix exe link on windows
 

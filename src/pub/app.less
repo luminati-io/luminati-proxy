@@ -722,6 +722,7 @@ input.form-control[type=checkbox] {
         border: solid 1px @grey;
         border-radius: 3px;
         padding-left: 10px;
+        padding-right: 25px;
         font-weight: 300;
         -webkit-appearance: none;
         -moz-appearance: none;
@@ -740,20 +741,27 @@ input.form-control[type=checkbox] {
         -webkit-appearance: none;
     }
     input[type=number] { -moz-appearance: textfield; }
-    input[type=radio] {
-        display:none;
-    }
-    input[type=radio] + label {
-        display:inline-block;
-        width:19px;
-        height:19px;
-        margin:-2px 10px 0 0;
-        vertical-align:middle;
-        background: url(/img/check_radio.svg) left top no-repeat;
-        cursor:pointer;
-    }
-    input[type=radio]:checked + label {
-        background: url(/img/check_radio.svg) -19px top no-repeat;
+    .radio_buttons {
+        width: 100%;
+        display: flex;
+        .option { flex: 1; }
+        input[type=radio] { display:none; }
+        label {
+            cursor:pointer;
+            font-size: 12px;
+            font-weight: 300;
+        }
+        input[type=radio] + .checked_icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin: -2px 6px 0 0;
+            vertical-align:middle;
+            background: none;
+        }
+        input[type=radio]:checked + .checked_icon {
+            background: url(/img/check_radio.svg) left top no-repeat;
+        }
     }
     .btn_lpm {
         width: 160px;
@@ -993,11 +1001,20 @@ input.form-control[type=checkbox] {
             display: flex;
             align-items: center;
             .desc {
-                width: 40%;
+                flex: 3 3;
                 line-height: 1.07;
                 padding-right: 35px;
             }
-            select, input[type=number], input[type=text] { width: 60%; }
+            .field {
+                flex: 5 5;
+                display: flex;
+                .sufix { margin-left: 20px; }
+                .double_field {
+                    display: flex;
+                    input { flex: 2 2; }
+                    .divider { flex: 1 1; text-align: center; }
+                }
+            }
             .icon {
                 position: absolute;
                 right: 20px;
