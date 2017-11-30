@@ -85,6 +85,7 @@ class StatTable extends React.Component {
 class SuccessRatio extends React.Component {
     constructor(props){
         super(props);
+        this.sp = etask('SuccessRatio', function*(){ yield this.wait(); });
         this.state = {total: 0, success: 0};
         this.get_req_status_stats = etask._fn(function*(_this){
             let res = yield etask(()=>axios.get('/api/req_status'));
@@ -92,9 +93,8 @@ class SuccessRatio extends React.Component {
         });
     }
     componentDidMount(){
-        E.install();
         const _this = this;
-        E.sp.spawn(etask(function*(){
+        this.sp.spawn(etask(function*(){
             while (true)
             {
                 _this.setState(yield _this.get_req_status_stats());
@@ -102,6 +102,7 @@ class SuccessRatio extends React.Component {
             }
         }));
     }
+    componentWillUnmount(){ this.sp.return(); }
     render (){
         const {total, success} = this.state;
         const ratio = total==0 ? 0 : success/total*100;

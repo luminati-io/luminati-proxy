@@ -73,7 +73,7 @@ const tabs = {
         label: 'IP Control',
         tooltip: 'Set the conditions for which your IPs will change',
         fields: {
-            datacenter_ip: {
+            ip: {
                 label: 'Data center IP',
                 tooltip: `choose specific data center IP (when datacenter
                     zone`,
@@ -92,16 +92,16 @@ const tabs = {
                 tooltip: `chosen number of sec to ping ip and keep it
                     connected`,
             },
-            whitelist_ip_access: {
+            whitelist_ips: {
                 label: 'Whitelist IP access',
                 tooltip: `Grant proxy access to specific IPs. only those
                     IPs will be able to send requests to Port`,
             },
-            random_session: {
+            session_random: {
                 label: 'Random Session',
                 tooltip: `switch session ID on each request`,
             },
-            explicit_session: {
+            session: {
                 label: 'Explicit Session',
                 tooltip: `insert session ID to maintain the same session`,
             },
@@ -116,10 +116,10 @@ const tabs = {
                     range or a fixed number`,
             },
             session_duration: {
-                label: 'Session Duration',
+                label: 'Session Duration (seconds)',
                 tooltip: `change session after fixed number of seconds`,
             },
-            session_id_seed: {
+            seed: {
                 label: 'Session ID Seed',
                 tooltip: `seed used for random number generator in random
                     sessions`,
@@ -135,21 +135,21 @@ const tabs = {
         label: 'Debugging',
         tooltip: 'Improve the info you receive from the Proxy Manager',
         fields: {
-            log_req_history: {
+            history: {
                 label: 'Log request history',
                 tooltip: `keep track of requests made through LPM, view
                     through UI or download from UI. This feature is
                     disabled by default.`,
             },
-            ssl_analyzing: {
+            ssl: {
                 label: 'Enable SSL analyzing',
                 tooltip: `allow the proxy manager to read HTTPS requests`,
             },
-            log_level: {
+            log: {
                 label: 'Log level',
                 tooltip: `which data to show in logs`,
             },
-            lum_req_debug_info: {
+            debug: {
                 label: 'Luminati request debug info',
                 tooltip: `send debug info on every request`,
             },
@@ -167,12 +167,12 @@ const tabs = {
                 label: 'Multiply',
                 tooltip: `create multiple identical ports`,
             },
-            socks_5_port: {
+            socks: {
                 label: 'SOCKS 5 port',
                 tooltip: `in addition to current port, creates a separate port
                     with a socks5 server (here provide the port)`,
             },
-            ssl_to_super_proxy: {
+            secure_proxy: {
                 label: 'SSL to super proxy',
                 tooltip: `encrypt requests sent to super proxy to avoid
                     detection on DNS`,
@@ -214,8 +214,7 @@ class Index extends React.Component {
             this.proxy = {zones: {}};
         }
         else
-            this.proxy = props.extra;
-        console.log(this.proxy);
+            this.set_model(props.extra);
     }
     componentWillMount(){
         const _this = this;
@@ -226,6 +225,10 @@ class Index extends React.Component {
         });
     }
     componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
+    set_model(model){
+        console.log(model);
+        this.model = model;
+    }
     click_tab(tab){ this.setState({tab}); }
     update_states_and_cities(country, states, cities){
         this.setState(prev_state=>({
@@ -240,10 +243,13 @@ class Index extends React.Component {
     default_opt(option){
         const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
         return [
-            {key: 'No', value: 'no'},
-            {key: 'default ('+default_label+')', value: 'default'},
-            {key: 'Yes', value: 'yes'},
+            {key: 'No', value: false},
+            {key: 'Default ('+default_label+')', value: ''},
+            {key: 'Yes', value: true},
         ];
+    }
+    nav_field_changed(e){
+        console.log('TO IMPLEMENT', e.target.value);
     }
     render(){
         let Main_window;
@@ -259,14 +265,15 @@ class Index extends React.Component {
         return (
             <div className="lpm edit_proxy">
               <h3>Edit port {this.props.port}</h3>
-              <Nav model={this.proxy} zones={Object.keys(this.proxy.zones)}/>
+              <Nav model={this.model} zones={Object.keys(this.model.zones)}
+                on_field_change={this.nav_field_changed.bind(this)}/>
               <Nav_tabs curr_tab={this.state.tab} fields={this.state.fields}
                 on_tab_click={this.click_tab.bind(this)}/>
               <Main_window {...this.state.consts} cities={this.state.cities}
                 states={this.state.states} defaults={this.state.defaults}
                 update_states_and_cities={this.update_states_and_cities.bind(this)}
                 on_change_field={this.field_changed.bind(this)}
-                fields={this.state.fields} model={this.proxy}
+                fields={this.state.fields} model={this.model}
                 default_opt={this.default_opt.bind(this)}/>
             </div>
         );
@@ -400,25 +407,33 @@ const Input = props=>(
       className={props.className}/>
 );
 
-const Double_number = props=>(
-    <span className="double_field">
-      <Input {...props} id={props.id+'_min'} type="number"/>
-      <span className="divider">÷</span>
-      <Input {...props} id={props.id+'_max'} type="number"/>
-    </span>
-);
+const Double_number = props=>{
+    const vals = (''+props.val).split(':');
+    const update = (start, end)=>{
+        props.on_change_wrapper({target: {value: [start, end].join(':')}}); };
+    return (
+        <span className="double_field">
+          <Input {...props} val={vals[0]} id={props.id+'_start'}
+            type="number"
+            on_change_wrapper={e=>update(e.target.value, vals[1])}/>
+          <span className="divider">÷</span>
+          <Input {...props} val={vals[1]} id={props.id+'_end'} type="number"
+            on_change_wrapper={e=>update(vals[0], e.target.value)}/>
+        </span>
+    );
+};
 
 const Input_boolean = props=>(
     <div className="radio_buttons">
       <div className="option">
-        <input type="radio" checked={props.fields[props.id]=='1'}
+        <input type="radio" checked={props.val=='1'}
           onChange={props.on_change_wrapper} id="enable"
           name={props.id} value="1"/>
         <div className="checked_icon"/>
         <label htmlFor="enable">Enabled</label>
       </div>
       <div className="option">
-        <input type="radio" checked={props.fields[props.id]=='0'}
+        <input type="radio" checked={props.val=='0'}
           onChange={props.on_change_wrapper} id="disable"
           name={props.id} value="0"/>
         <div className="checked_icon"/>
@@ -568,19 +583,19 @@ class Rotation extends React.Component {
             <With_data fields={this.props.fields} tab_id="rotation"
               on_change_field={this.props.on_change_field}
               model={this.props.model}>
-              <Section_field type="text" id="datacenter_ip"/>
+              <Section_field type="text" id="ip"/>
               <Section_field type="number" id="pool_size"/>
               <Section_field type="select" id="pool_type"
                 data={this.props.proxy.pool_type.values}/>
               <Section_field type="number" id="keep_alive"/>
-              <Section_field type="text" id="whitelist_ip_access"/>
-              <Section_field type="boolean" id="random_session"/>
-              <Section_field type="text" id="explicit_session"/>
+              <Section_field type="text" id="whitelist_ips"/>
+              <Section_field type="boolean" id="session_random"/>
+              <Section_field type="text" id="session"/>
               <Section_field type="select" id="sticky_ip"
                 data={this.props.default_opt('sticky_ip')}/>
               <Section_field type="double_number" id="max_requests"/>
               <Section_field type="double_number" id="session_duration"/>
-              <Section_field type="text" id="session_id_seed"/>
+              <Section_field type="text" id="seed"/>
               <Section_field type="select" id="allow_req_auth"
                 data={this.props.default_opt('allow_proxy_auth')}/>
             </With_data>
@@ -594,13 +609,13 @@ class Debug extends React.Component {
             <With_data fields={this.props.fields} tab_id="debug"
               on_change_field={this.props.on_change_field}
               model={this.props.model}>
-              <Section_field type="select" id="log_req_history"
+              <Section_field type="select" id="history"
                 data={this.props.default_opt('history')}/>
-              <Section_field type="select" id="ssl_analyzing"
+              <Section_field type="select" id="ssl"
                 data={this.props.default_opt('ssl')}/>
-              <Section_field type="select" id="log_level"
+              <Section_field type="select" id="log"
                 data={this.props.proxy.log.values}/>
-              <Section_field type="select" id="lum_req_debug_info"
+              <Section_field type="select" id="debug"
                 data={this.props.proxy.debug.values}/>
             </With_data>
         );
@@ -616,8 +631,8 @@ class General extends React.Component {
               <Section_field type="select" id="iface"
                 data={this.props.proxy.iface.values}/>
               <Section_field type="number" id="multiply"/>
-              <Section_field type="number" id="socks_5_port"/>
-              <Section_field type="select" id="ssl_to_super_proxy"
+              <Section_field type="number" id="socks"/>
+              <Section_field type="select" id="secure_proxy"
                 data={this.props.default_opt('secure_proxy')}/>
               <Section_field type="text" id="null_response"/>
               <Section_field type="text" id="bypass_proxy"/>
