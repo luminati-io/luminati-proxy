@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 1.74.604
+- :star: add experimental cluster mode under '--cluster' flag in cmd
+- :star: add race request option
+- :star: add new rule action 'retry port'
+- :bug: fix selection of mobile peers
+
 ## 1.72.729
 
 ## 1.72.569

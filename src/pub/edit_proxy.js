@@ -46,28 +46,41 @@ const tabs = {
             },
             session_init_timeout: {
                 label: 'Session establish timeout',
-                tooltip: 'session establish == search + connect to peer',
+                tooltip: `Time in seconds for the request to complete before
+                    estblishing connection to new peer`,
             },
             proxy_count: {
                 label: 'Minimum number of super proxies to use',
-                tooltip: `min number of failed attempts before switching
-                    proxy`,
+                tooltip: `Number of super proxies to use in parallel`,
             },
             proxy_switch: {
                 label: 'Automatically switch super proxy on failure',
-                tooltip: `if request failed (status 4XX) use a differen zagent
-                    next time`,
+                tooltip: `Number of failed requests(status 403, 429, 502, 503)
+                    to switch to different super proxy`,
             },
             throttle: {
                 label: 'Throttle requests above given number',
-                tooltip: 'allow maximum number of requests per unit of time',
+                tooltip: 'Allow maximum number of requests per unit of time',
             },
         },
     },
     zero: {
         label: 'Zero fail',
         tooltip: 'Configure rules to handle failed requests',
-        fields: {},
+        fields: {
+            trigger_type: {
+                label: 'Create a rule including',
+                tooltip: `What is the type of condition to trigger the rule
+                    action`,
+            },
+            trigger_regex: {label: 'Apply for specific domains (regex)'},
+            status_code: {label: 'Status Code'},
+            status_custom: {label: 'Custom Status Code'},
+            action: {
+                label: 'Select action to be taken when the rule is met',
+                tooltip: `The action to be exected when trigger pulled`,
+            },
+        },
     },
     rotation: {
         label: 'IP Control',
@@ -75,12 +88,12 @@ const tabs = {
         fields: {
             ip: {
                 label: 'Data center IP',
-                tooltip: `choose specific data center IP (when datacenter
+                tooltip: `Choose specific data center IP (when datacenter
                     zone`,
             },
             pool_size: {
                 label: 'Pool size',
-                tooltip: `maintain number of IPs that will be pinged constantly
+                tooltip: `Maintain number of IPs that will be pinged constantly
                     - must have keep_allive to work properly`,
             },
             pool_type: {
@@ -89,44 +102,46 @@ const tabs = {
             },
             keep_alive: {
                 label: 'Keep-alive',
-                tooltip: `chosen number of sec to ping ip and keep it
-                    connected`,
+                tooltip: `Chosen number of sec to ping ip and keep it
+                    connected. depending on peer availability.`,
             },
             whitelist_ips: {
                 label: 'Whitelist IP access',
                 tooltip: `Grant proxy access to specific IPs. only those
-                    IPs will be able to send requests to Port`,
+                    IPs will be able to send requests to this proxy Port`,
             },
             session_random: {
                 label: 'Random Session',
-                tooltip: `switch session ID on each request`,
+                tooltip: `Switch session ID on each request`,
             },
             session: {
                 label: 'Explicit Session',
-                tooltip: `insert session ID to maintain the same session`,
+                tooltip: `Insert session ID to maintain the same session`,
             },
             sticky_ip: {
                 label: 'Sticky IP',
-                tooltip: `when connecting to lpm server from different servers
-                    stick sessions to client ips`,
+                tooltip: `When connecting to lpm server from different servers
+                    stick sessions to client ips. in that case every connected
+                    server will recieve unique session to avoid overriding
+                    sessions between machines`,
             },
             max_requests: {
                 label: 'Max Requests',
-                tooltip: `change session based on number of requests can be a
+                tooltip: `Change session based on number of requests can be a
                     range or a fixed number`,
             },
             session_duration: {
                 label: 'Session Duration (seconds)',
-                tooltip: `change session after fixed number of seconds`,
+                tooltip: `Change session after fixed number of seconds`,
             },
             seed: {
                 label: 'Session ID Seed',
-                tooltip: `seed used for random number generator in random
+                tooltip: `Seed used for random number generator in random
                     sessions`,
             },
             allow_req_auth: {
                 label: 'Allow request authentication',
-                tooltip: `allow passing auth data per request (use lpm like
+                tooltip: `Pass auth data per request (use lpm like
                     api)`,
             },
         },
@@ -137,21 +152,20 @@ const tabs = {
         fields: {
             history: {
                 label: 'Log request history',
-                tooltip: `keep track of requests made through LPM, view
-                    through UI or download from UI. This feature is
-                    disabled by default.`,
+                tooltip: `Keep track of requests made through LPM, view
+                    through UI or download from UI`,
             },
             ssl: {
                 label: 'Enable SSL analyzing',
-                tooltip: `allow the proxy manager to read HTTPS requests`,
+                tooltip: `Allow the proxy manager to read HTTPS requests`,
             },
             log: {
                 label: 'Log level',
-                tooltip: `which data to show in logs`,
+                tooltip: `Decide which data to show in logs`,
             },
             debug: {
                 label: 'Luminati request debug info',
-                tooltip: `send debug info on every request`,
+                tooltip: `Send debug info on every request`,
             },
         },
     },
@@ -161,20 +175,21 @@ const tabs = {
         fields: {
             iface: {
                 label: 'Interface',
-                tooltip: `network interface on the machine to use`,
+                tooltip: `Specify a network interface for the machine to use`,
             },
             multiply: {
                 label: 'Multiply',
-                tooltip: `create multiple identical ports`,
+                tooltip: `Create multiple identical ports`,
             },
             socks: {
                 label: 'SOCKS 5 port',
-                tooltip: `in addition to current port, creates a separate port
-                    with a socks5 server (here provide the port)`,
+                tooltip: `In addition to current port, creates a separate port
+                    with a socks5 server (input should be the SOCKS port
+                    number)`,
             },
             secure_proxy: {
                 label: 'SSL to super proxy',
-                tooltip: `encrypt requests sent to super proxy to avoid
+                tooltip: `Encrypt requests sent to super proxy to avoid
                     detection on DNS`,
             },
             null_response: {
@@ -186,19 +201,21 @@ const tabs = {
             bypass_proxy: {
                 label: `URL regex for bypassing the proxy manager and send
                     directly to host`,
-                tooltip: `requests with this pattern will be passed directly,
-                    without any proxy (super proxy or peer)`,
+                tooltip: `Insert URL pattern for which requests will be passed
+                    directly to target site without any proxy
+                    (super proxy or peer)`,
             },
             direct_include: {
                 label: `URL regex for requests to be sent directly from super
                     proxy`,
-                tooltip: `urls with this pattern will not be sent trough peers
-                    but throug super proxy directly`,
+                tooltip: `Insert URL pattern for which requests will be passed
+                    through super proxy directly (not through peers)`,
             },
             direct_exclude: {
                 label: `URL regex for requests to not be sent directly from
                     super proxy`,
-                tooltip: `negation of the abow (to exlude from a set)`,
+                tooltip: `Insert URL pattern for which requests will NOT be
+                    passed through super proxy`,
             },
         },
     },
@@ -622,26 +639,70 @@ class Debug extends React.Component {
     }
 }
 
-class General extends React.Component {
-    render(){
+const Ips_alloc_modal = props=>(
+    <Modal id="allocated_ips" title="Select IPs: static">
+      <p>{props.ips}</p>
+    </Modal>
+);
+
+class Rotation extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {ips: []};
+    }
+    open_modal(){
+        $('#allocated_ips').modal('show'); }
+    render() {
+        const {proxy, support, form, default_opt} = this.props;
+        const pool_size_disabled = !support.pool_size ||
+            (form.ips && form.ips.length);
+        const pool_size_note = <a onClick={this.open_modal.bind(this)}>
+            set from allocated IPs</a>;
         return (
-            <With_data fields={this.props.fields} tab_id="general"
-              on_change_field={this.props.on_change_field}
-              model={this.props.model}>
-              <Section_field type="select" id="iface"
-                data={this.props.proxy.iface.values}/>
-              <Section_field type="number" id="multiply"/>
-              <Section_field type="number" id="socks"/>
-              <Section_field type="select" id="secure_proxy"
-                data={this.props.default_opt('secure_proxy')}/>
-              <Section_field type="text" id="null_response"/>
-              <Section_field type="text" id="bypass_proxy"/>
-              <Section_field type="text" id="direct_include"/>
-              <Section_field type="text" id="direct_exclude"/>
+            <With_data {...this.props} tab_id="rotation">
+              <Ips_alloc_modal ips={this.state.ips}/>
+              <Section_with_fields type="text" id="ip"/>
+              <Section_with_fields type="number" id="pool_size" min="0"
+                disabled={pool_size_disabled} note={pool_size_note}/>
+              <Section_with_fields type="select" id="pool_type"
+                data={proxy.pool_type.values}
+                disabled={!support.pool_type}/>
+              <Section_with_fields type="number" id="keep_alive" min="0"
+                disabled={!support.keep_alive}/>
+              <Section_with_fields type="text" id="whitelist_ips"/>
+              <Section_with_fields type="boolean" id="session_random"
+                disabled={!support.session}/>
+              <Section_with_fields type="text" id="session"
+                disabled={form.session_random &&
+                !support.session}/>
+              <Section_with_fields type="select" id="sticky_ip"
+                data={default_opt('sticky_ip')}
+                disabled={!support.sticky_ip}/>
+              <Section_with_fields type="double_number" id="max_requests"
+                disabled={!support.max_requests}/>
+              <Section_with_fields type="double_number" id="session_duration"
+                disabled={!support.session_duration}/>
+              <Section_with_fields type="text" id="seed"
+                disabled={!support.seed}/>
+              <Section_with_fields type="select" id="allow_req_auth"
+                data={default_opt('allow_proxy_auth')}/>
             </With_data>
         );
     }
 }
+
+const Debug = props=>(
+    <With_data {...props} tab_id="debug">
+      <Section_with_fields type="select" id="history"
+        data={props.default_opt('history')}/>
+      <Section_with_fields type="select" id="ssl"
+        data={props.default_opt('ssl')}/>
+      <Section_with_fields type="select" id="log"
+        data={props.proxy.log.values}/>
+      <Section_with_fields type="select" id="debug"
+        data={props.proxy.debug.values}/>
+    </With_data>
+);
 
 const To_implement = ()=>(
     <div>To implement</div>

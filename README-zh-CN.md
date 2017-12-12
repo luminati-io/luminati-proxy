@@ -31,7 +31,8 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.72.729/luminati-proxy-manager-v1.72.729-setup.exe">代理管理安装器</a>.
+
+下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.74.604/luminati-proxy-manager-v1.74.604-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
