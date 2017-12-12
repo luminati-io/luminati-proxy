@@ -1,7 +1,7 @@
 <div id=proxy class="modal fade" role=dialog ng-init=show_modal()>
   <div class=modal-dialog>
     <div class=modal-content>
-      <form ng-submit=save(form)>
+      <form ng-submit=save(form) name="proxy-form">
         <input style="display:none;" type="text" name="dummy1">
         <input style="display:none;" type="password" name="dummy2">
         <div class=modal-header>
@@ -488,6 +488,15 @@
                       ng-model=form.session_init_timeout class=form-control
                       placeholder={{consts.session_init_timeout.def}}
                       ng-model-options="{updateOn: 'blur'}">
+                  </div>
+                  <div class=form-group>
+                    <label class=control-label for=proxy-field-min-super>
+                      Race requests
+                    </label>
+                    <input id=proxy-field-race-reqs type=number min=1
+                      ng-model=form.race_reqs class=form-control
+                      placeholder={{consts.proxy_count.def}}
+                      ng-model-options="{updateOn: 'blur'}" max=3>
                   </div>
                   <div class=form-group>
                     <label class=control-label for=proxy-field-min-super>

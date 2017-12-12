@@ -15,6 +15,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const ua = analytics('UA-60520689-2');
+const cluster = require('cluster');
 
 ua.set('an', 'LPM');
 ua.set('av', `v${version}`);
@@ -79,6 +80,7 @@ let write_ua_file = ()=>{
     } catch(e){ }
 };
 let manager, args = process.argv.slice(2), shutdowning = false;
+const enable_cluster = process.argv.includes('--cluster');
 let shutdown = (reason, send_ev = true, error = null)=>{
     if (shutdowning)
         return;
@@ -98,11 +100,13 @@ let shutdown = (reason, send_ev = true, error = null)=>{
         else
             ua.event('manager', 'stop', reason, stop_manager);
     }
+    else if (enable_cluster&&cluster.isMaster)
+        cluster.workers.forEach(w=>{ w.send('shutdown'); });
     else
         console.log(`Shutdown, reason is ${reason}`, error.stack);
 };
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
-    const errstr = sig+(err ? ', error = '+err : '');
+    const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
     if (err&&manager)
         manager._log.error(errstr);
     if (err&&manager&&!manager.argv.no_usage_stats)
@@ -115,6 +119,19 @@ let shutdown = (reason, send_ev = true, error = null)=>{
 }));
 let on_upgrade_finished;
 (function run(run_config){
+    if (enable_cluster&&cluster.isMaster)
+    {
+        console.log('WARNING: cluster mode is experimental');
+        const cpus = os.cpus().length;
+        for (let i=0; i<cpus; i++)
+            cluster.fork();
+        cluster.on('exit', worker=>{
+            console.log('worker %d died', worker.id);
+            if (!shutdowning)
+                cluster.fork();
+        });
+        return;
+    }
     manager = new Manager(args, Object.assign({ua}, run_config));
     manager.on('stop', ()=>{
         write_ua_file();

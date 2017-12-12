@@ -39,7 +39,7 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
-import {onboarding_steps} from './common.js';
+import {onboarding_steps, combine_presets} from './common.js';
 
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -195,10 +195,15 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         parent: 'app',
         url: '/proxy/{port:string}',
         template: `<div react-view=react_component state-props=port
-        extra-props=proxy></div>`,
+        extra-props=extra_props></div>`,
         controller: function($scope, $rootScope){
             $scope.react_component = zedit_proxy;
-            $scope.proxy = $rootScope.edit_proxy;
+            $scope.extra_props = {
+                proxy: $rootScope.edit_proxy,
+                consts: $rootScope.consts,
+                defaults: $rootScope.defaults,
+                presets: $rootScope.presets,
+            };
         },
     });
 }]);
@@ -352,55 +357,6 @@ function proxies_factory($http, $q){
     }
 }
 
-module.factory('$www_lum', www_lum_factory);
-www_lum_factory.$inject = ['$http', '$timeout'];
-
-function www_lum_factory($http, $timeout){
-    let conf = {};
-    let is_listening = false;
-    let get_timeout;
-    const www_lum_poll_interval = 500000;
-    poll();
-    return {conf, listen, stop_listening, combine_presets};
-
-    function listen(){
-        if (is_listening)
-            return;
-        is_listening = true;
-        poll();
-    }
-
-    function stop_listening(){
-        is_listening = false;
-        if (get_timeout)
-            $timeout.cancel(get_timeout);
-    }
-
-    function combine_presets(_presets){
-        let www_presets = (conf.presets||[])
-        .reduce((prs, p)=>{
-            let np = _.cloneDeep(p);
-            np.set = opt=>_.extend(opt, p.set);
-            np.clean = opt=>_.extend(opt, p.clean||{});
-            np.check = ()=>true;
-            prs[np.key] = np;
-            return prs;
-        }, _.cloneDeep(_presets));
-        return www_presets;
-    }
-
-    function poll(){
-        get_www_lum().then(res=>{
-            _.extend(conf, res);
-            get_timeout = $timeout(poll, www_lum_poll_interval);
-        });
-    }
-    function get_www_lum(){
-        return $http.get('/api/www_lpm')
-        .then(res=>res.data);
-    }
-}
-
 module.factory('$success_rate', success_rate_factory);
 success_rate_factory.$inject = ['$http', '$proxies', '$timeout'];
 
@@ -483,20 +439,28 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         }
     });
     $http.get('/api/ip').then(function(ip){
-        $scope.ip = ip.data.ip;
-    });
+        $scope.ip = ip.data.ip; });
     $http.get('/api/version').then(function(version){
-        $scope.ver_cur = version.data.version;
-    });
+        $scope.ver_cur = version.data.version; });
     $http.get('/api/last_version').then(function(version){
-        $scope.ver_last = version.data;
-    });
+        $scope.ver_last = version.data; });
     $http.get('/api/consts').then(function(consts){
         $rootScope.consts = consts.data;
         $scope.$broadcast('consts', consts.data);
     });
+    $http.get('/api/defaults').then(function(defaults){
+        $scope.$root.defaults = defaults.data; });
     $http.get('/api/node_version').then(function(node){
-        $scope.ver_node = node.data;
+        $scope.ver_node = node.data; });
+    $http.get('/api/www_lpm').then(function(res){
+        $scope.$root.presets = combine_presets(res.data); });
+    // krzysztof: hack to pass data to react
+    $scope.$root.$watchGroup(['consts', 'presets'], function(){
+        if ($scope.consts && $scope.presets)
+        {
+            $scope.$root.add_proxy_constants = {consts: $scope.consts,
+                presets: $scope.presets};
+        }
     });
     var show_reload = function(){
         $window.$('#restarting').modal({
@@ -1202,146 +1166,20 @@ function check_reg_exp(v){
     catch(e){ return false; }
 }
 
-var presets = {
-    session_long: {
-        title: 'Long single session (IP)',
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
-            && opt.session===true && opt.keep_alive; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.ips = [];
-            opt.keep_alive = opt.keep_alive || 50;
-            opt.pool_type = undefined;
-            opt.sticky_ip = false;
-            opt.session = true;
-            if (opt.session===true)
-                opt.seed = false;
-        },
-        support: {
-            keep_alive: true,
-            multiply: true,
-            session_ducation: true,
-            max_requests: true,
-        },
-    },
-    session: {
-        title: 'Single session (IP)',
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
-            && opt.session===true && !opt.keep_alive; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.ips = [];
-            opt.keep_alive = 0;
-            opt.pool_type = undefined;
-            opt.sticky_ip = false;
-            opt.session = true;
-            if (opt.session===true)
-                opt.seed = false;
-        },
-        support: {
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
-        },
-    },
-    sticky_ip: {
-        title: 'Session (IP) per machine',
-        check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.ips = [];
-            opt.pool_type = undefined;
-            opt.sticky_ip = true;
-            opt.session = undefined;
-            opt.multiply = undefined;
-        },
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            seed: true,
-        },
-    },
-    sequential: {
-        title: 'Sequential session (IP) pool',
-        check: function(opt){ return opt.pool_size &&
-            (!opt.pool_type || opt.pool_type=='sequential'); },
-        set: function(opt){
-            opt.pool_size = opt.pool_size || 1;
-            opt.pool_type = 'sequential';
-            opt.sticky_ip = undefined;
-            opt.session = undefined;
-        },
-        support: {
-            pool_size: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
-        },
-    },
-    round_robin: {
-        title: 'Round-robin (IP) pool',
-        check: function(opt){ return opt.pool_size
-            && opt.pool_type=='round-robin' && !opt.multiply; },
-        set: function(opt){
-            opt.pool_size = opt.pool_size || 1;
-            opt.pool_type = 'round-robin';
-            opt.sticky_ip = undefined;
-            opt.session = undefined;
-            opt.multiply = undefined;
-        },
-        support: {
-            pool_size: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            seed: true,
-        },
-    },
-    custom: {
-        title: 'Custom',
-        check: function(opt){ return true; },
-        set: function(opt){},
-        support: {
-            session: true,
-            sticky_ip: true,
-            pool_size: true,
-            pool_type: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
-        },
-    },
-};
-for (var k in presets)
-{
-    if (!presets[k].clean)
-        presets[k].clean = opt=>opt;
-    presets[k].key = k;
-}
-
 module.controller('proxies', Proxies);
 Proxies.$inject = ['$scope', '$rootScope', '$http', '$proxies', '$window',
-    '$q', '$timeout', '$stateParams', '$success_rate', '$www_lum'];
+    '$q', '$timeout', '$stateParams', '$success_rate'];
 function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
-    $stateParams, $success_rate, $www_lum)
+    $stateParams, $success_rate)
 {
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     $success_rate.listen();
-    $www_lum.listen();
     $scope.$on('$destroy', function(){
-        $success_rate.stop_listening();
-        $www_lum.stop_listening();
-    });
+        $success_rate.stop_listening(); });
     var iface_opts = [], zone_opts = [];
     var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [], debug_opts = [];
-    $scope.presets = presets;
     var opt_columns = [
         {
             key: 'port',
@@ -1531,6 +1369,13 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             check: function(v){ return !v ||check_number(v); },
         },
         {
+            key: 'race_reqs',
+            title: 'Race request via different super proxies and take the'
+            +' fastest',
+            type: 'number',
+            check: function(v){ return !v ||check_number(v); },
+        },
+        {
             key: 'dns',
             title: 'DNS',
             type: 'options',
@@ -1644,6 +1489,10 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
                 $scope.showed_status_proxies[p.port]&&p._status_details.length;
         });
     });
+    $scope.proxies_loading = function(){
+        return !$scope.proxies || !$scope.consts || !$scope.defaults ||
+            !$scope.presets;
+    };
     $scope.delete_proxies = function(proxy){
         $scope.$root.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
@@ -1682,7 +1531,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     };
     $scope.add_proxy_new = function(){
         $('#add_proxy_modal').modal('show'); };
-    $scope.edit_proxy_new = function(proxy){ $root.edit_proxy = proxy; };
+    $scope.edit_proxy_new = function(proxy){
+        $root.edit_proxy = proxy.config; };
     $scope.get_static_country = function(proxy){
         var zone = proxy.zones[proxy.zone];
         if (!zone)
@@ -2424,11 +2274,10 @@ function Pool($scope, $http, $window){
 }
 
 module.controller('proxy', Proxy);
-Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$www_lum',
-    '$location'];
-function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
+Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$location'];
+function Proxy($scope, $http, $proxies, $window, $q, $location){
     $scope.init = function(locals){
-        var _presets = $www_lum.combine_presets(presets);
+        var _presets = $scope.presets;
         var regions = {};
         var cities = {};
         $scope.consts = $scope.$root.consts.proxy;
@@ -2446,7 +2295,6 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
         delete form._ips;
         form.vips = form._vips||form.vips||[];
         delete form._vips;
-        $scope.presets = _presets;
         if (_.isBoolean(form.rule))
             form.rule = {};
         $scope.extra = {
@@ -2542,9 +2390,6 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
         $scope.apply_preset();
         $scope.form_errors = {};
         $scope.defaults = {};
-        $http.get('/api/defaults').then(function(defaults){
-            $scope.defaults = defaults.data;
-        });
         $scope.regions = [];
         $scope.cities = [];
         $scope.beta_features = $scope.$root.beta_features;
@@ -2745,11 +2590,15 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
         function multiply_val_changed(val, old){
             if (val==old)
                 return;
+            const size = Math.max(form.ips.length, form.vips.length);
             if (val)
+            {
+                form.pool_size = 0;
+                form.multiply = size;
                 return;
-            form.multiply=0;
-            form.ips=[];
-            form.vips=[];
+            }
+            form.multiply = 1;
+            form.pool_size = size;
         }
         $scope.$watchCollection('form', function(newv, oldv){
             function has_changed(f){
@@ -2857,12 +2706,12 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                             head: true,
                             status: {
                                 type: 'in',
-                                arg: rule_status||''
+                                arg: rule_status||'',
                             },
                             action: proxy.rule.action.raw||{},
                         }],
-                        url: proxy.rule.url+'/**'
-                    }]
+                        url: proxy.rule.url+'/**',
+                    }],
                 };
                 reload = true;
             }
@@ -2914,24 +2763,23 @@ function Proxy($scope, $http, $proxies, $window, $q, $www_lum, $location){
                     ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
                         , 'err');
                 };
-                promise
-                    .then(function(){
-                        if (reload)
-                        {
-                            $scope.status.type = 'warning';
-                            $scope.status.message = 'Loading...';
-                            return setTimeout(function(){
-                                $window.location.reload(); }, 800);
-                        }
+                promise.then(function(){
+                    if (reload)
+                    {
                         $scope.status.type = 'warning';
-                        $scope.status.message = 'Checking the proxy...';
-                        return $http.get('/api/proxy_status/'+proxy.port);
-                    })
-                    .then(function(res){
-                        if (res.data.status == 'ok')
-                            return is_ok_cb(res);
+                        $scope.status.message = 'Loading...';
+                        return setTimeout(function(){
+                            $window.location.reload(); }, 800);
+                    }
+                    $scope.status.type = 'warning';
+                    $scope.status.message = 'Checking the proxy...';
+                    return $http.get('/api/proxy_status/'+proxy.port);
+                }).then(function(res){
+                    if (res.data&&res.data.status=='ok')
+                        return is_ok_cb(res);
+                    else if (res.data)
                         return is_not_ok_cb(res);
-                    });
+                });
             };
             var url = '/api/proxy_check'+(edit ? '/'+$scope.port : '');
             $http.post(url, proxy).then(function(res){

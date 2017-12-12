@@ -14,6 +14,7 @@ const child_process = require('child_process');
 const path = require('path');
 const sudo_prompt = require('sudo-prompt');
 const etask = hutil.etask;
+const zerr = hutil.zerr;
 
 const pm2_cmd = (command, opt)=>etask(function*pm2_cmd(){
     this.on('uncaught', err=>console.log('Uncaught exception:', err,
@@ -44,8 +45,8 @@ if (is_win)
 }
 let child;
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
-    child.send({command: 'shutdown', reason: sig+(err ? 'error = '+err : ''),
-        error: err});
+    child.send({command: 'shutdown', reason: sig+(err ? 'error = '
+        +zerr.e2s(err) : ''), error: err});
     setTimeout(()=>process.exit(), 5000);
 }));
 

@@ -24,7 +24,8 @@
             "super_proxy": "TEXT",
             "username": "TEXT",
             "content_size": {"type": "INTEGER", "index": true},
-            "context": {"type": "TEXT", "index": true}
+            "context": {"type": "TEXT", "index": true},
+            "success": "INTEGER"
         },
         "proxy_hosts": {
             "proxy": {"type": "TEXT", "index": true},

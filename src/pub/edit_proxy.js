@@ -6,8 +6,20 @@ import classnames from 'classnames';
 import $ from 'jquery';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import {presets} from './common.js';
+import {If, Modal, Loader, combine_presets} from './common.js';
+import util from './util.js';
+import zurl from 'hutil/util/url';
+import {Typeahead} from 'react-bootstrap-typeahead';
 
+const event_tracker = {};
+const ga_event = (category, action, label, opt={})=>{
+    const id = category+action+label;
+    if (!event_tracker[id] || !opt.single)
+    {
+        event_tracker[id] = true;
+        util.ga_event(category, action, label);
+    }
+};
 const tabs = {
     target: {
         label: 'Targeting',
@@ -19,15 +31,21 @@ const tabs = {
             },
             state: {
                 label: 'State',
-                tooltip: 'The city from which IP will be allocated',
+                tooltip: 'Specific state in a given country',
             },
             city: {
                 label: 'City',
-                tooltip: 'Specifc ASN provider',
+                tooltip: 'The city from which IP will be allocated',
             },
             asn: {
-                label: 'ASN',
-                tooltip: 'Specific state in a given country',
+                label: <span>
+                    ASN (
+                    <a href="http://bgp.potaroo.net/cidr/autnums.html"
+                      target="_blank" rel="noopener noreferrer">
+                      ASN list
+                    </a>)
+                    </span>,
+                tooltip: 'Specifc ASN provider',
             },
         },
     },
@@ -49,6 +67,11 @@ const tabs = {
                 tooltip: `Time in seconds for the request to complete before
                     estblishing connection to new peer`,
             },
+            race_reqs: {
+                label: 'Race requests',
+                tooltip: `Race request via different super proxies and take the
+                    fastest`,
+            },
             proxy_count: {
                 label: 'Minimum number of super proxies to use',
                 tooltip: `Number of super proxies to use in parallel`,
@@ -62,9 +85,21 @@ const tabs = {
                 label: 'Throttle requests above given number',
                 tooltip: 'Allow maximum number of requests per unit of time',
             },
+            reverse_lookup: {
+                label: 'Reverse resolve',
+                tooltip: 'resolve DNS from IP to url',
+            },
+            reverse_lookup_file: {
+                label: 'Path to file',
+                placeholder: '/path/to/file',
+            },
+            reverse_lookup_values: {
+                label: 'Values',
+                placeholder: '1.1.1.1 example.com',
+            },
         },
     },
-    zero: {
+    rules: {
         label: 'Zero fail',
         tooltip: 'Configure rules to handle failed requests',
         fields: {
@@ -201,14 +236,14 @@ const tabs = {
             bypass_proxy: {
                 label: `URL regex for bypassing the proxy manager and send
                     directly to host`,
-                tooltip: `Insert URL pattern for which requests will be passed
+                tooltip: `Insert URL pattern for which requests will be passed 
                     directly to target site without any proxy
                     (super proxy or peer)`,
             },
             direct_include: {
                 label: `URL regex for requests to be sent directly from super
                     proxy`,
-                tooltip: `Insert URL pattern for which requests will be passed
+                tooltip: `Insert URL pattern for which requests will be passed 
                     through super proxy directly (not through peers)`,
             },
             direct_exclude: {
@@ -224,38 +259,166 @@ const tabs = {
 class Index extends React.Component {
     constructor(props){
         super(props);
-        this.state = {tab: 'target', cities: {}, fields: {}};
-        if (!props.extra)
-        {
-            window.location.href='/';
-            this.proxy = {zones: {}};
-        }
-        else
-            this.set_model(props.extra);
+        this.sp = etask('Index', function*(){ yield this.wait(); });
+        this.state = {tab: 'target', cities: {}, form: {zones: {}},
+            warnings: [], errors: {}, show_loader: false, consts: {}};
     }
     componentWillMount(){
+        const url_o = zurl.parse(document.location.href);
+        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+        if (qs_o.field)
+            this.set_init_focus(qs_o.field);
         const _this = this;
-        etask(function*(){
-            const consts = yield ajax.json({url: '/api/consts'});
-            const defaults = yield ajax.json({url: '/api/defaults'});
-            _this.setState({consts, defaults});
-        });
-    }
-    componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
-    set_model(model){
-        console.log(model);
-        this.model = model;
-    }
-    click_tab(tab){ this.setState({tab}); }
-    update_states_and_cities(country, states, cities){
-        this.setState(prev_state=>({
-            states: Object.assign({}, prev_state.states, {[country]: states}),
-            cities: Object.assign({}, prev_state.cities, {[country]: cities}),
+        this.sp.spawn(etask(function*(){
+            _this.setState({show_loader: true});
+            const locations = yield ajax.json({url: '/api/all_locations'});
+            let form, presets, consts, defaults;
+            if (!_this.props.extra.proxy)
+            {
+                consts = yield ajax.json({url: '/api/consts'});
+                defaults = yield ajax.json({url: '/api/defaults'});
+                const proxies = yield ajax.json({url: '/api/proxies'});
+                const www_presets = yield ajax.json({url: '/api/www_lpm'});
+                presets = combine_presets(www_presets);
+                const port = window.location.pathname.split('/').slice(-1)[0];
+                form = proxies.filter(p=>p.port==port)[0];
+            }
+            else
+            {
+                let proxy = _this.props.extra.proxy;
+                consts = _this.props.extra.consts;
+                defaults = _this.props.extra.defaults;
+                presets = _this.props.extra.presets;
+                form = Object.assign({}, proxy);
+            }
+            const preset = _this.guess_preset(form, presets);
+            _this.apply_preset(form, preset, presets);
+            _this.setState({consts, defaults, show_loader: false,
+                presets, locations});
         }));
     }
+    componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
+    componentWillUnmount(){ this.sp.return(); }
+    set_init_focus(field){
+        this.init_focus = field;
+        let tab;
+        for (let [tab_id, tab_o] of Object.entries(tabs))
+        {
+            if (Object.keys(tab_o.fields).includes(field))
+            {
+                tab = tab_id;
+                break;
+            }
+        }
+        if (tab)
+            this.setState({tab});
+    }
+    guess_preset(form, presets){
+        let res;
+        for (let p in presets)
+        {
+            const preset = presets[p];
+            if (preset.check(form))
+            {
+                res = p;
+                break;
+            }
+        }
+        if (form.last_preset_applied && presets[form.last_preset_applied])
+            res = form.last_preset_applied;
+        return res;
+    }
+    click_tab(tab){
+        this.setState({tab});
+        ga_event('categories', 'click', tab);
+    }
     field_changed(field_name, value){
-        this.setState(prev_state=>({fields:
-            Object.assign({}, prev_state.fields, {[field_name]: value})}));
+        this.setState(prev_state=>
+            ({form: {...prev_state.form, [field_name]: value}}));
+        this.send_ga(field_name);
+    }
+    send_ga(id){
+        if (id=='zone')
+        {
+            ga_event('top bar', 'edit field', id);
+            return;
+        }
+        let tab_label;
+        for (let t in tabs)
+        {
+            if (Object.keys(tabs[t].fields).includes(id))
+            {
+                tab_label = tabs[t].label;
+                break;
+            }
+        }
+        ga_event(tab_label, 'edit field', id, {single: true});
+    }
+    is_valid_field(field_name){
+        const proxy = this.state.consts.proxy;
+        const form = this.state.form;
+        if (!proxy)
+            return false;
+        const zone = form.zone||proxy.zone.def;
+        if (['city', 'state'].includes(field_name) &&
+            (!form.country||form.country=='*'))
+        {
+            return false;
+        }
+        const details = proxy.zone.values.filter(z=>z.value==zone)[0];
+        const permissions = details&&details.perm.split(' ')||[];
+        if (field_name=='vip')
+        {
+            const plan = details&&details.plans[details.plans.length-1]||{};
+            return !!plan.vip;
+        }
+        if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
+            return permissions.includes(field_name);
+        return true;
+    }
+    apply_preset(_form, preset, presets){
+        const form = Object.assign({}, _form);
+        const last_preset = form.last_preset_applied ?
+            presets[form.last_preset_applied] : null;
+        if (last_preset&&last_preset.clean)
+            last_preset.clean(form);
+        form.preset = preset;
+        form.last_preset_applied = preset;
+        presets[preset].set(form);
+        if (form.session===true)
+        {
+            form.session_random = true;
+            form.session = '';
+        }
+        else
+            form.session_random = false;
+        if (form.rule)
+        {
+            form.status_code = form.rule.status;
+            form.status_custom = form.rule.custom;
+            form.trigger_regex = form.rule.url;
+            if (form.rule.action)
+            {
+                form.action = form.rule.action.value;
+                form.trigger_type = 'status';
+            }
+        }
+        if (form.reverse_lookup_dns)
+            form.reverse_lookup = 'dns';
+        else if (form.reverse_lookup_file)
+            form.reverse_lookup = 'file';
+        else if (form.reverse_lookup_values)
+        {
+            form.reverse_lookup = 'values';
+            form.reverse_lookup_values = form.reverse_lookup_values.join('\n');
+        }
+        form.whitelist_ips = (form.whitelist_ips||[]).join(',');
+        if (form.city && !Array.isArray(form.city) && form.state)
+            form.city = [{id: form.city,
+                label: form.city+' ('+form.state+')'}];
+        else if (!Array.isArray(form.city))
+            form.city = [];
+        this.setState({form});
     }
     default_opt(option){
         const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
@@ -265,46 +428,235 @@ class Index extends React.Component {
             {key: 'Yes', value: true},
         ];
     }
-    nav_field_changed(e){
-        console.log('TO IMPLEMENT', e.target.value);
+    set_errors(_errors){
+        const errors = _errors.reduce((acc, e)=>
+            Object.assign(acc, {[e.field]: e.msg}), {});
+        this.setState({errors, error_list: _errors});
+    }
+    save_from_modal(){
+        const _this = this;
+        return etask(function*(){
+            const data = _this.prepare_to_save();
+            yield _this.persist(data);
+        });
+    }
+    persist(data){
+        this.setState({show_loader: true});
+        const update_url = '/api/proxies/'+this.props.port;
+        const _this = this;
+        return etask(function*(){
+            // XXX krzysztof: update hutil on github and replace fetch with
+            // ajax.json
+            const raw_update = yield window.fetch(update_url, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({proxy: data}),
+            });
+            _this.setState({show_loader: false});
+            ga_event('top bar', 'click save', 'successful');
+            window.location = '/';
+        });
+    }
+    save(){
+        const data = this.prepare_to_save();
+        const check_url = '/api/proxy_check/'+this.props.port;
+        this.setState({show_loader: true});
+        const _this = this;
+        this.sp.spawn(etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                _this.setState({show_loader: false});
+            });
+            const raw_check = yield window.fetch(check_url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+            });
+            const json_check = yield raw_check.json();
+            const errors = json_check.filter(e=>e.lvl=='err');
+            _this.set_errors(errors);
+            _this.setState({show_loader: false});
+            if (errors.length)
+            {
+                ga_event('top bar', 'click save', 'failed');
+                $('#save_proxy_errors').modal('show');
+                return;
+            }
+            const warnings = json_check.filter(w=>w.lvl=='warn');
+            if (warnings.length)
+            {
+                _this.setState({warnings});
+                $('#save_proxy_warnings').modal('show');
+            }
+            else
+                yield _this.persist(data);
+        }));
+    }
+    prepare_to_save(){
+        const save_form = Object.assign({}, this.state.form);
+        for (let field in save_form)
+        {
+            if (!this.is_valid_field(field) || save_form[field]===null)
+                save_form[field] = '';
+        }
+        const effective = attr=>{
+            return save_form[attr]===undefined ?
+                this.state.defaults[attr] : save_form[attr];
+        };
+        if (save_form.session_random)
+            save_form.session = true;
+        save_form.history = effective('history');
+        save_form.ssl = effective('ssl');
+        save_form.max_requests = effective('max_requests');
+        save_form.session_duration = effective('session_duration');
+        save_form.keep_alive = effective('keep_alive');
+        save_form.pool_size = effective('pool_size');
+        save_form.proxy_type = 'persist';
+        const action_raw = save_form.action=='retry' ?
+            {ban_ip: "60min", retry: true} : {};
+        save_form.action = {
+            label: "Retry request(up to 20 times)",
+            raw: action_raw,
+            value: save_form.action,
+        };
+        const rule_status = save_form.status_code=='Custom'
+            ? save_form.status_custom : save_form.status_code;
+        save_form.rules = {};
+        save_form.rule = {};
+        if (save_form.trigger_type)
+        {
+            save_form.rule = {
+                url: save_form.trigger_regex||'**',
+                action: save_form.action||{},
+                status: save_form.status_code,
+            };
+            if (save_form.rule.status=='Custom')
+                save_form.rule.custom = save_form.status_custom;
+            save_form.rules = {
+                post: [{
+                    res: [{
+                        head: true,
+                        status: {
+                            type: 'in',
+                            arg: rule_status||'',
+                        },
+                        action: action_raw,
+                    }],
+                    url: save_form.trigger_regex+'/**',
+                }],
+            };
+        }
+        delete save_form.trigger_type;
+        delete save_form.status_code;
+        delete save_form.status_custom;
+        delete save_form.trigger_regex;
+        delete save_form.action;
+        if (save_form.reverse_lookup=='dns')
+            save_form.reverse_lookup_dns = true;
+        else
+            save_form.reverse_lookup_dns = '';
+        if (save_form.reverse_lookup!='file')
+            save_form.reverse_lookup_file = '';
+        if (save_form.reverse_lookup=='values')
+        {
+            save_form.reverse_lookup_values =
+                save_form.reverse_lookup_values.split('\n');
+        }
+        else
+            save_form.reverse_lookup_values = '';
+        delete save_form.reverse_lookup;
+        save_form.whitelist_ips = save_form.whitelist_ips.split(',')
+        .filter(Boolean);
+        if (save_form.delete_rules)
+            save_form.rules = {};
+        delete save_form.delete_rules;
+        this.state.presets[save_form.preset].set(save_form);
+        delete save_form.preset;
+        if (save_form.city.length)
+            save_form.city = save_form.city[0].id;
+        else
+            save_form.city = '';
+        return save_form;
     }
     render(){
         let Main_window;
         switch (this.state.tab)
         {
-        case 'target': Main_window = Target; break;
+        case 'target': Main_window = Targeting; break;
         case 'speed': Main_window = Speed; break;
-        case 'zero': Main_window = To_implement; break;
+        case 'rules': Main_window = Rules; break;
         case 'rotation': Main_window = Rotation; break;
         case 'debug': Main_window = Debug; break;
         case 'general': Main_window = General; break;
         }
+        if (!this.state.consts.proxy)
+            Main_window = ()=>null;
+        const support = this.state.presets && this.state.form.preset &&
+            this.state.presets[this.state.form.preset].support||{};
+        const zones = this.state.consts.proxy&&
+            this.state.consts.proxy.zone.values||[];
         return (
             <div className="lpm edit_proxy">
+              <Loader show={this.state.show_loader}/>
               <h3>Edit port {this.props.port}</h3>
-              <Nav model={this.model} zones={Object.keys(this.model.zones)}
-                on_field_change={this.nav_field_changed.bind(this)}/>
-              <Nav_tabs curr_tab={this.state.tab} fields={this.state.fields}
-                on_tab_click={this.click_tab.bind(this)}/>
-              <Main_window {...this.state.consts} cities={this.state.cities}
-                states={this.state.states} defaults={this.state.defaults}
-                update_states_and_cities={this.update_states_and_cities.bind(this)}
+              <Nav zones={zones}
+                form={this.state.form} presets={this.state.presets}
                 on_change_field={this.field_changed.bind(this)}
-                fields={this.state.fields} model={this.model}
+                on_change_preset={this.apply_preset.bind(this)}
+                save={this.save.bind(this)}/>
+              <Nav_tabs curr_tab={this.state.tab} form={this.state.form}
+                on_tab_click={this.click_tab.bind(this)}
+                errors={this.state.errors}/>
+              <Main_window proxy={this.state.consts.proxy}
+                locations={this.state.locations}
+                cities={this.state.cities} states={this.state.states}
+                defaults={this.state.defaults} form={this.state.form}
+                init_focus={this.init_focus}
+                is_valid_field={this.is_valid_field.bind(this)}
+                on_change_field={this.field_changed.bind(this)}
+                support={support} errors={this.state.errors}
                 default_opt={this.default_opt.bind(this)}/>
+              <Modal className="warnings_modal" id="save_proxy_warnings"
+                title="Warnings:" click_ok={this.save_from_modal.bind(this)}>
+                <Warnings warnings={this.state.warnings}/>
+              </Modal>
+              <Modal className="warnings_modal" id="save_proxy_errors"
+                title="Errors:" no_cancel_btn>
+                <Warnings warnings={this.state.error_list}/>
+              </Modal>
             </div>
         );
     }
 }
 
+const Warnings = props=>(
+    <div>
+      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
+    </div>
+);
+
+const Warning = props=>(
+    <div className="warning">
+      <div className="warning_icon"/>
+      <div className="text">{props.text}</div>
+    </div>
+);
+
 const Nav = props=>{
+    const update_preset = val=>{
+        props.on_change_preset(props.form, val, props.presets);
+        ga_event('top bar', 'edit field', 'preset');
+    };
+    const update_zone = val=>props.on_change_field('zone', val);
+    const presets_opt = Object.keys(props.presets||{}).map(p=>
+        ({key: props.presets[p].title, value: p}));
     return (
         <div className="nav">
-          <Field on_change={props.on_field_change} options={props.zones}
-            label="Zone" value={props.model.zone}/>
-          <Field on_change={props.on_field_change}
-            label="Preset" options={presets.map(p=>p.title)}/>
-          <Action_buttons/>
+          <Field on_change={update_zone} options={props.zones} label="Zone"
+            value={props.form.zone}/>
+          <Field on_change={update_preset} label="Preset" options={presets_opt}
+            value={props.form.preset}/>
+          <Action_buttons save={props.save}/>
         </div>
     );
 };
@@ -314,28 +666,39 @@ const Field = props=>{
     return (
         <div className="field">
           <div className="title">{props.label}</div>
-          <select value={props.value} onChange={props.on_change}>
+          <select value={props.value}
+            onChange={e=>props.on_change(e.target.value)}>
             {options.map(o=>(
-              <option key={o} value={o}>{o}</option>
+              <option key={o.key} value={o.value}>{o.key}</option>
             ))}
           </select>
         </div>
     );
 };
 
-const Action_buttons = ()=>(
-    <div className="action_buttons">
-      <button className="btn btn_lpm btn_lpm_normal btn_cancel">Cancel</button>
-      <button className="btn btn_lpm btn_save">Save</button>
-    </div>
-);
+class Action_buttons extends React.Component {
+    cancel_clicked(){ ga_event('top bar', 'cancel'); }
+    save_clicked(){ this.props.save(); }
+    render(){
+        return (
+            <div className="action_buttons">
+              <a href="/proxies" onClick={this.cancel_clicked.bind(this)}
+                className="btn btn_lpm btn_lpm_normal btn_cancel">
+                Cancel
+              </a>
+              <button className="btn btn_lpm btn_save"
+                onClick={this.save_clicked.bind(this)}>Save</button>
+            </div>
+        );
+    }
+}
 
 const Nav_tabs = props=>{
     return (
         <div className="nav_tabs">
           <Tab_btn {...props} id="target"/>
           <Tab_btn {...props} id="speed"/>
-          <Tab_btn {...props} id="zero"/>
+          <Tab_btn {...props} id="rules"/>
           <Tab_btn {...props} id="rotation"/>
           <Tab_btn {...props} id="debug"/>
           <Tab_btn {...props} id="general"/>
@@ -346,15 +709,18 @@ const Nav_tabs = props=>{
 const Tab_btn = props=>{
     const btn_class = classnames('btn_tab',
         {active: props.curr_tab==props.id});
-    const changes = Object.keys(props.fields).filter(f=>{
-        const val = props.fields[f];
-        const tab_fields = Object.keys(tabs[props.id].fields);
-        return tab_fields.includes(f) && val && val!='*';
+    const tab_fields = Object.keys(tabs[props.id].fields);
+    const changes = Object.keys(props.form).filter(f=>{
+        const val = props.form[f];
+        const is_empty_arr = Array.isArray(val) && !val[0];
+        return tab_fields.includes(f) && val && !is_empty_arr;
     }).length;
+    const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
     return (
         <div onClick={()=>props.on_tab_click(props.id)}
           className={btn_class}>
-          <Tab_icon id={props.id} error={props.error} changes={changes}/>
+          <Tab_icon id={props.id} changes={changes}
+            error={errors.length}/>
           <div className="title">{tabs[props.id].label}</div>
           <div className="arrow"/>
           <Tooltip_icon title={tabs[props.id].tooltip}/>
@@ -379,30 +745,45 @@ const Tooltip_icon = props=>props.title ? (
     <div className="info" data-toggle="tooltip"
       data-placement="bottom" title={props.title}/>) : null;
 
+const Section_header = props=>{
+    return props.text ? <div className="header">{props.text}</div> : null;
+};
+
 class Section extends React.Component {
     constructor(props){
         super(props);
         this.state = {focused: false};
     }
-    on_focus(){ this.setState({focused: true}); }
+    on_focus(){
+        if (!this.props.disabled)
+            this.setState({focused: true});
+    }
     on_blur(){ this.setState({focused: false}); }
     render(){
+        const error = !!this.props.error_msg;
         const dynamic_class = {
-            error: this.props.error,
-            correct: this.props.correct,
-            active: this.props.active||this.state.focused,
+            error,
+            correct: this.props.correct && !error,
+            active: this.state.focused && !error,
+            disabled: this.props.disabled,
         };
+        const message = this.props.error_msg
+            ? this.props.error_msg
+            : tabs[this.props.tab_id].fields[this.props.id].tooltip;
         return (
-            <div tabIndex="0" onFocus={this.on_focus.bind(this)}
+            <div tabIndex="0" onFocus={this.on_focus.bind(this)} autoFocus
               onBlur={this.on_blur.bind(this)} className="section_wrapper">
-              <div className={classnames('section', dynamic_class)}>
-                {this.props.children}
+              <div className={classnames('outlined', dynamic_class)}>
+                <Section_header text={this.props.header}/>
+                <div className="section_body">
+                  {this.props.children}
+                </div>
                 <div className="icon"/>
                 <div className="arrow"/>
               </div>
               <div className="message_wrapper">
                 <div className={classnames('message', dynamic_class)}>
-                  {tabs[this.props.tab_id].fields[this.props.id].tooltip}
+                  {message}
                 </div>
               </div>
             </div>
@@ -411,31 +792,48 @@ class Section extends React.Component {
 }
 
 const Select = props=>(
-    <select value={props.val} onChange={props.on_change_wrapper}>
+    <select value={props.val}
+      onChange={e=>props.on_change_wrapper(e.target.value)}
+      disabled={props.disabled}>
       {(props.data||[]).map((c, i)=>(
         <option key={i} value={c.value}>{c.key}</option>
       ))}
     </select>
 );
 
-const Input = props=>(
-    <input type={props.type} value={props.val}
-      onChange={e=>props.on_change_wrapper(e, props.id)}
-      className={props.className}/>
-);
+const Textarea = props=>{
+    return (
+        <textarea value={props.val} rows="3" placeholder={props.placeholder}
+          onChange={e=>props.on_change_wrapper(e.target.value)}/>
+    );
+};
+
+const Input = props=>{
+    const update = val=>{
+        if (props.type=='number' && val)
+            val = Number(val);
+        props.on_change_wrapper(val, props.id);
+    };
+    return (
+        <input type={props.type} value={props.val} disabled={props.disabled}
+          onChange={e=>update(e.target.value)} className={props.className}
+          min={props.min} max={props.max} placeholder={props.placeholder}/>
+    );
+};
 
 const Double_number = props=>{
     const vals = (''+props.val).split(':');
     const update = (start, end)=>{
-        props.on_change_wrapper({target: {value: [start, end].join(':')}}); };
+        props.on_change_wrapper([start, end].join(':')); };
     return (
         <span className="double_field">
-          <Input {...props} val={vals[0]} id={props.id+'_start'}
-            type="number"
-            on_change_wrapper={e=>update(e.target.value, vals[1])}/>
+          <Input {...props} val={vals[0]||''} id={props.id+'_start'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(val, vals[1])}/>
           <span className="divider">÷</span>
-          <Input {...props} val={vals[1]} id={props.id+'_end'} type="number"
-            on_change_wrapper={e=>update(vals[0], e.target.value)}/>
+          <Input {...props} val={vals[1]||''} id={props.id+'_end'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(vals[0], val)}/>
         </span>
     );
 };
@@ -444,127 +842,165 @@ const Input_boolean = props=>(
     <div className="radio_buttons">
       <div className="option">
         <input type="radio" checked={props.val=='1'}
-          onChange={props.on_change_wrapper} id="enable"
-          name={props.id} value="1"/>
+          onChange={e=>props.on_change_wrapper(e.target.value)} id="enable"
+          name={props.id} value="1" disabled={props.disabled}/>
         <div className="checked_icon"/>
         <label htmlFor="enable">Enabled</label>
       </div>
       <div className="option">
         <input type="radio" checked={props.val=='0'}
-          onChange={props.on_change_wrapper} id="disable"
-          name={props.id} value="0"/>
+          onChange={e=>props.on_change_wrapper(e.target.value)} id="disable"
+          name={props.id} value="0" disabled={props.disabled}/>
         <div className="checked_icon"/>
         <label htmlFor="disable">Disabled</label>
       </div>
     </div>
 );
 
+const Typeahead_wrapper = props=>(
+    <Typeahead options={props.data} maxResults={10}
+      minLength={1} disabled={props.disabled} selectHintOnEnter
+      onChange={props.on_change_wrapper} selected={props.val}/>
+);
+
+const Section_with_fields = props=>{
+    const {id, form, tab_id, header, errors, init_focus} = props;
+    const disabled = props.disabled || !props.is_valid_field(id);
+    const is_empty_arr = Array.isArray(form[id]) && !form[id][0];
+    const correct = form[id] && form[id]!='*' && !is_empty_arr;
+    const error_msg = errors[id];
+    return (
+        <Section correct={correct} disabled={disabled} id={id} tab_id={tab_id}
+          header={header} error_msg={error_msg} init_focus={init_focus}>
+          <Section_field {...props} disabled={disabled} correct={correct}/>
+        </Section>
+    );
+};
+
 const Section_field = props=>{
-    const {id, fields, on_change, on_change_field, data, type, tab_id,
-        sufix, model} = props;
-    const on_change_wrapper = (e, _id)=>{
+    const {tab_id, id, form, sufix, note, type, disabled, data, on_change,
+        on_change_field, min, max} = props;
+    const on_change_wrapper = (value, _id)=>{
         const curr_id = _id||id;
         if (on_change)
-            on_change(e);
-        on_change_field(curr_id, e.target.value);
+            on_change(value);
+        on_change_field(curr_id, value);
     };
     let Comp;
     switch (type)
     {
     case 'select': Comp = Select; break;
-    case 'text':
-    case 'number': Comp = Input; break;
     case 'boolean': Comp = Input_boolean; break;
     case 'double_number': Comp = Double_number; break;
+    case 'typeahead': Comp = Typeahead_wrapper; break;
+    case 'textarea': Comp = Textarea; break;
+    default: Comp = Input;
     }
-    const val = fields[id]||model[id]||'';
+    const val = form[id]||'';
+    const placeholder = tabs[tab_id].fields[id].placeholder||'';
     return (
-        <Section correct={fields[id] && fields[id]!='*'} id={id}
-          tab_id={tab_id}>
+        <div className="field_row">
           <div className="desc">{tabs[tab_id].fields[id].label}</div>
           <div className="field">
-            <Comp fields={fields} id={id} data={data} type={type}
-              on_change_wrapper={on_change_wrapper} val={val}/>
-            {sufix ? <span className="sufix">{sufix}</span> : null}
+            <div className="inline_field">
+              <Comp form={form} id={id} data={data} type={type}
+                on_change_wrapper={on_change_wrapper} val={val}
+                disabled={disabled} min={min} max={max}
+                placeholder={placeholder}/>
+              {sufix ? <span className="sufix">{sufix}</span> : null}
+            </div>
+            {note ? <Note>{note}</Note> : null}
           </div>
-        </Section>
+        </div>
     );
 };
 
 class With_data extends React.Component {
     wrapped_children(){
+        const props = Object.assign({}, this.props);
+        delete props.children;
         return React.Children.map(this.props.children, child=>{
-            return React.cloneElement(child, this.props); });
+            return React.cloneElement(child, props); });
     }
     render(){ return <div>{this.wrapped_children()}</div>; }
 }
 
-class Target extends React.Component {
+class Targeting extends React.Component {
     constructor(props){
         super(props);
-        const {fields, model} = this.props;
-        const country = fields.country||model.country;
-        if (country)
-            this.load_names(country);
+        this.def_value = {key: 'Any (default)', value: ''};
     }
     allowed_countries(){
-        let countries = this.props.proxy && this.props.proxy.country.values
-            || [];
-        if (this.props.zone=='static')
-        {
-            countries = this.props.proxy.countries.filter(c=>
-                ['', 'au', 'br', 'de', 'gb', 'us'].includes(c.value));
-        }
-        return countries;
+        const res = this.props.locations.countries.map(c=>
+            ({key: c.country_name, value: c.country_id}));
+        return [this.def_value, ...res];
     }
-    load_names(country){
-        const _this = this;
-        etask(function*(){
-            const cities = yield ajax.json({url: '/api/cities/'+country});
-            const states = yield ajax.json({url: '/api/regions/'+country});
-            _this.props.update_states_and_cities(country, states, cities);
-        });
-    }
-    country_changed(e){
-        const country = e.target.value;
-        if (this.props.cities[country])
-            return;
-        this.load_names(country);
-        this.props.on_change_field('city', '');
+    country_changed(){
+        this.props.on_change_field('city', []);
         this.props.on_change_field('state', '');
     }
     states(){
-        const {fields, model, states} = this.props;
-        const country = fields.country||model.country;
-        return country&&states&&states[country]||[];
+        const country = this.props.form.country;
+        if (!country)
+            return [];
+        const res = this.props.locations.regions[country].map(r=>
+            ({key: r.region_name, value: r.region_id}));
+        return [this.def_value, ...res];
     }
-    state_changed(e){ this.props.on_change_field('city', ''); }
+    state_changed(){ this.props.on_change_field('city', []); }
     cities(){
-        const {country, state} = Object.assign({}, this.props.model,
-            this.props.fields);
-        const cities = country&&this.props.cities[country]||[];
+        const {country, state} = this.props.form;
+        let res;
+        if (!country)
+            return [];
+        res = this.props.locations.cities.filter(c=>c.country_id==country);
         if (state)
-            return cities.filter(c=>c.region==state||!c.region||c.region=='*');
-        else
-            return cities;
+            res = res.filter(c=>c.region_id==state);
+        const regions = this.states();
+        res = res.map(c=>{
+            const region = regions.filter(r=>r.value==c.region_id)[0];
+            return {label: c.city_name+' ('+region.value+')', id: c.city_name,
+                region: region.value};
+        });
+        return res;
+    }
+    city_changed(e){
+        if (e&&e.length)
+            this.props.on_change_field('state', e[0].region);
+    }
+    country_disabled(){
+        const zone_name = this.props.form.zone||'static';
+        const zones = this.props.proxy.zone.values;
+        const curr_zone = zones.filter(p=>p.key==zone_name);
+        let curr_plan;
+        if (curr_zone.length)
+            curr_plan = curr_zone[0].plans.slice(-1)[0];
+        return curr_plan&&curr_plan.type=='static';
     }
     render(){
         return (
-            <With_data fields={this.props.fields} tab_id="target"
-              on_change_field={this.props.on_change_field}
-              model={this.props.model}>
-              <Section_field type="select" id="country"
+            <With_data {...this.props} tab_id="target">
+              <Note>
+                <span>To change Data Center country visit your </span>
+                <a target="_blank" rel="noopener noreferrer"
+                  href="https://luminati.io/cp/zones">zone page</a>
+                <span> and change your zone plan.</span>
+              </Note>
+              <Section_with_fields type="select" id="country"
                 data={this.allowed_countries()}
-                on_change={this.country_changed.bind(this)}/>
-              <Section_field type="select" id="state" data={this.states()}
-                on_change={this.state_changed.bind(this)} />
-              <Section_field type="select" id="city" data={this.cities()}/>
-              <Section_field type="number" id="asn"/>
+                on_change={this.country_changed.bind(this)}
+                disabled={this.country_disabled()}/>
+              <Section_with_fields type="select" id="state"
+                data={this.states()}
+                on_change={this.state_changed.bind(this)}/>
+              <Section_with_fields type="typeahead" id="city"
+                data={this.cities()}
+                on_change={this.city_changed.bind(this)}/>
+              <Section_with_fields type="number" id="asn"/>
             </With_data>
         );
     }
 }
-
 
 class Speed extends React.Component {
     constructor(props){
@@ -574,67 +1010,122 @@ class Speed extends React.Component {
                 value: 'local'},
             {key: 'Remote - resolved by peer', value: 'remote'},
         ];
+        this.reverse_lookup_options = [{key: 'No', value: ''},
+            {key: 'DNS', value: 'dns'}, {key: 'File', value: 'file'},
+            {key: 'Values', value: 'values'}];
     }
     render(){
         return (
-            <With_data fields={this.props.fields} tab_id="speed"
-              on_change_field={this.props.on_change_field}
-              model={this.props.model}>
-              <Section_field type="select" id="dns"
+            <With_data {...this.props} tab_id="speed">
+              <Section_with_fields type="select" id="dns"
                 data={this.dns_options}/>
-              <Section_field type="number" id="request_timeout"
-                sufix="seconds"/>
-              <Section_field type="number" id="session_init_timeout"
-                sufix="seconds"/>
-              <Section_field type="number" id="proxy_count"/>
-              <Section_field type="number" id="proxy_switch"/>
-              <Section_field type="number" id="throttle"/>
+              <Section_with_fields type="number" id="request_timeout"
+                sufix="seconds" min="0"/>
+              <Section_with_fields type="number" id="session_init_timeout"
+                sufix="seconds" min="0"/>
+              <Section_with_fields type="number" id="race_reqs" min="1"
+                max="3"/>
+              <Section_with_fields type="number" id="proxy_count" min="1"/>
+              <Section_with_fields type="number" id="proxy_switch" min="0"/>
+              <Section_with_fields type="number" id="throttle" min="0"/>
+              <Section id="reverse_lookup">
+                <Section_field type="select" id="reverse_lookup" tab_id="speed"
+                  {...this.props} data={this.reverse_lookup_options}/>
+                <If when={this.props.form.reverse_lookup=='file'}>
+                  <Section_field type="text" id="reverse_lookup_file"
+                    tab_id="speed" {...this.props}/>
+                </If>
+                <If when={this.props.form.reverse_lookup=='values'}>
+                  <Section_field type="textarea" id="reverse_lookup_values"
+                    tab_id="speed" {...this.props}/>
+                </If>
+              </Section>
             </With_data>
         );
     }
 }
 
-class Rotation extends React.Component {
-    render() {
-        return (
-            <With_data fields={this.props.fields} tab_id="rotation"
-              on_change_field={this.props.on_change_field}
-              model={this.props.model}>
-              <Section_field type="text" id="ip"/>
-              <Section_field type="number" id="pool_size"/>
-              <Section_field type="select" id="pool_type"
-                data={this.props.proxy.pool_type.values}/>
-              <Section_field type="number" id="keep_alive"/>
-              <Section_field type="text" id="whitelist_ips"/>
-              <Section_field type="boolean" id="session_random"/>
-              <Section_field type="text" id="session"/>
-              <Section_field type="select" id="sticky_ip"
-                data={this.props.default_opt('sticky_ip')}/>
-              <Section_field type="double_number" id="max_requests"/>
-              <Section_field type="double_number" id="session_duration"/>
-              <Section_field type="text" id="seed"/>
-              <Section_field type="select" id="allow_req_auth"
-                data={this.props.default_opt('allow_proxy_auth')}/>
-            </With_data>
-        );
-    }
-}
+const Note = props=>(
+    <div className="note">
+      <span className="highlight">Note:</span>
+      <span>{props.children}</span>
+    </div>
+);
 
-class Debug extends React.Component {
+class Rules extends React.Component {
+    constructor(props){
+        super(props);
+        this.state={show_statuses: this.props.form.trigger_type=='status',
+            show_custom: this.props.form.status_code=='Custom'};
+    }
+    type_changed(val){
+        if (val=='status')
+            this.setState({show_statuses: true});
+        else
+        {
+            this.setState({show_statuses: false, show_custom: false});
+            this.props.on_change_field('status_code', '');
+            this.props.on_change_field('status_custom', '');
+        }
+        if (!val)
+            this.props.on_change_field('trigger_regex', '');
+    }
+    status_changed(val){
+        this.setState({show_custom: val=='Custom'});
+        if (val!='Custom')
+            this.props.on_change_field('status_custom', '');
+    }
     render(){
+        const trigger_types = [
+            {key:'', value: ''},
+            {key: 'Status-code', value: 'status'},
+        ];
+        const action_types = [
+            {key: '', value: ''},
+            {key: 'Retry request (up to 20 times)', value: 'retry'},
+        ];
+        const status_types = ['', '200 - Succeeded requests',
+            '403 - Forbidden', '404 - Not found',
+            '500 - Internal server error', '502 - Bad gateway',
+            '503 - Service unavailable', '504 - Gateway timeout', 'Custom']
+            .map(s=>({key: s, value: s}));
+        const {form, on_change_field} = this.props;
+        const trigger_correct = form.trigger_type||form.trigger_regex;
         return (
-            <With_data fields={this.props.fields} tab_id="debug"
-              on_change_field={this.props.on_change_field}
-              model={this.props.model}>
-              <Section_field type="select" id="history"
-                data={this.props.default_opt('history')}/>
-              <Section_field type="select" id="ssl"
-                data={this.props.default_opt('ssl')}/>
-              <Section_field type="select" id="log"
-                data={this.props.proxy.log.values}/>
-              <Section_field type="select" id="debug"
-                data={this.props.proxy.debug.values}/>
-            </With_data>
+            <div>
+              <div className="tab_header">
+                Define custom action for specific request response</div>
+              <Note>
+                Rules will apply when 'SSL analyzing' enabled (See 'Debugging'
+                section)
+              </Note>
+              <With_data {...this.props} tab_id="rules">
+                <Section id="trigger_type" header="Trigger Type"
+                  correct={trigger_correct}>
+                  <Section_field tab_id="rules" id="trigger_type"
+                    form={form} type="select" data={trigger_types}
+                    on_change_field={on_change_field}
+                    on_change={this.type_changed.bind(this)}/>
+                  <If when={this.state.show_statuses}>
+                    <Section_field tab_id="rules" id="status_code"
+                      form={form} type="select" data={status_types}
+                      on_change_field={on_change_field}
+                      on_change={this.status_changed.bind(this)}/>
+                  </If>
+                  <If when={this.state.show_custom}>
+                    <Section_field tab_id="rules" id="status_custom"
+                      form={form} type="text" data={status_types}
+                      on_change_field={on_change_field}/>
+                  </If>
+                  <Section_field tab_id="rules" id="trigger_regex"
+                    form={form} type="text"
+                    on_change_field={on_change_field}/>
+                </Section>
+                <Section_with_fields type="select" id="action" header="Action"
+                  note="IP will change for every entry" data={action_types}
+                  on_change_field={on_change_field}/>
+              </With_data>
+            </div>
         );
     }
 }
@@ -704,8 +1195,20 @@ const Debug = props=>(
     </With_data>
 );
 
-const To_implement = ()=>(
-    <div>To implement</div>
+const General = props=>(
+    <With_data {...props} tab_id="general">
+      <Section_with_fields type="select" id="iface"
+        data={props.proxy.iface.values}/>
+      <Section_with_fields type="number" id="multiply" min="1"
+        disabled={!props.support.multiply}/>
+      <Section_with_fields type="number" id="socks" min="0"/>
+      <Section_with_fields type="select" id="secure_proxy"
+        data={props.default_opt('secure_proxy')}/>
+      <Section_with_fields type="text" id="null_response"/>
+      <Section_with_fields type="text" id="bypass_proxy"/>
+      <Section_with_fields type="text" id="direct_include"/>
+      <Section_with_fields type="text" id="direct_exclude"/>
+    </With_data>
 );
 
 export default Index;

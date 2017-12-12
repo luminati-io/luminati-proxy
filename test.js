@@ -831,7 +831,6 @@ describe('proxy', ()=>{
             const test_session = session=>etask(function*(){
                 let res = yield l.test();
                 let auth = res.body.auth;
-                console.log(session, auth.session);
                 assert.ok(session.test(auth.session));
             });
 
@@ -981,38 +980,6 @@ describe('proxy', ()=>{
             url: 'lumtest.com/test'}, {res: [{action:
             {ban_ip: '60min', retry: true}, head: true, status: {arg: '200',
             type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 20);
-        describe('req_status', ()=>{
-            it('rule should have high priority', ()=>etask(function*(){
-                l = yield lum({rules: {post: [{res: [], tag:
-                    'req_status'}]}});
-                assert.equal(l.rules._post[0].tag, 'req_status');
-                assert.equal(l.rules._post[0].priority, 1);
-            }));
-            it('should count success', ()=>etask(function*(){
-                l = yield lum({rules: {post: [{res: [{action: {
-                    req_status_cnt: true, req_status_success: true,
-                    retry: false},
-                    head: true, status: {arg: '200', type: 'in'}}],
-                    url: 'lumtest.com/test'}]}});
-                l.test();
-                l.test();
-                l.test();
-                yield etask.sleep(100);
-                assert.deepEqual(l.req_status_cnt, {total: 3, success: 3});
-            }));
-            it('should count failure', ()=>etask(function*(){
-                l = yield lum({rules: {post: [{res: [{action: {
-                    req_status_cnt: true, req_status_success: false,
-                    retry: false},
-                    head: true, status: {arg: '200', type: 'in'}}],
-                    url: 'lumtest.com/test'}]}});
-                l.test();
-                l.test();
-                l.test();
-                yield etask.sleep(100);
-                assert.deepEqual(l.req_status_cnt, {total: 3, success: 0});
-            }));
-        });
     });
 });
 describe('manager', ()=>{
@@ -1546,18 +1513,5 @@ describe('manager', ()=>{
             {port: 24001, socks: 25000},
         ]);
         t('conflict with www', [{port: Manager.default.www}]);
-    });
-    describe('request status', ()=>{
-        it('get_req_status_cnt', ()=>etask(function*(){
-            app = yield app_with_proxies([{port: 24001}, {port: 24002}]);
-            let mngr = app.manager;
-            let proxy_24001 = {total: 5, success: 2};
-            let proxy_24002 = {total: 100, success: 42};
-            mngr.proxies_running[24001].req_status_cnt = proxy_24001;
-            mngr.proxies_running[24002].req_status_cnt = proxy_24002;
-            let req_status = mngr.get_req_status_cnt();
-            assert.deepEqual(req_status, {total: 105, success: 44,
-                24001: proxy_24001, 24002: proxy_24002});
-        }));
     });
 });

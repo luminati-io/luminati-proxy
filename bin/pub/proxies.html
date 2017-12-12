@@ -11,12 +11,12 @@
   IP resolution is done automatically.
 </div>
 <div ng-controller=proxies>
-  <div ng-hide=proxies class="alert alert-info">
+  <div ng-hide=!proxies_loading() class="alert alert-info">
     Loading...
   </div>
   <div ng-if="section.name!='settings'" react-view=messages></div>
   <div class=col-md-8>
-    <div ng-if=proxies class="panel panel-default proxies">
+    <div ng-if=!proxies_loading() class="panel panel-default proxies">
       <div class=panel-heading>
         <div class=btn-wrapper>
           <button type=button class="btn btn-ico btn-csv"
@@ -59,7 +59,8 @@
               <td>
                 <a ng-if="show_add_proxy()" ng-click="edit_proxy_new(proxy)"
                   ng-href="proxy/{{proxy.port}}" class=proxies-action-edit>
-                  E</a>
+                  E
+                </a>
                 <img ng-if="$root.mode!='guest'&&is_action_available('edit',
                   proxy)"
                   ng-click="edit_proxy(false, proxy)"
@@ -288,7 +289,8 @@
   <div class=col-md-4>
     <div react-view=react_component></div>
   </div>
-  <div react-view=add_proxy_modal></div>
+  <div ng-if=add_proxy_constants react-view=add_proxy_modal
+    extra-props=add_proxy_constants></div>
   <div ng-repeat="h in history_dialog" ng-controller=history
     ng-include="'history.html'" ng-init=init(h)>
   </div>
