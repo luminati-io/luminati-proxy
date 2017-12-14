@@ -6,7 +6,7 @@ import ajax from 'hutil/util/ajax';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {If, Modal, Loader} from './common.js';
+import {If, Modal, Loader, onboarding_steps} from './common.js';
 
 class Add_proxy extends React.Component {
     constructor(props){
@@ -20,13 +20,21 @@ class Add_proxy extends React.Component {
     }
     persist(){
         const preset = this.state.preset;
-        const form = {last_preset_applied: preset, zone: this.state.zone};
-        form.proxy_type = 'persist';
+        const form = {
+            last_preset_applied: preset,
+            zone: this.state.zone,
+            proxy_type:'persist',
+            max_requests:0,
+            session_duration: 0,
+            ips: [],
+            vips: [],
+            whitelist_ips: [],
+        };
         this.presets[preset].set(form);
         this.setState({show_loader: true});
         const _this = this;
         return etask(function*(){
-            const proxies = yield ajax.json({url: '/api/proxies'});
+            const proxies = yield ajax.json({url: '/api/proxies_running'});
             let port = 24000;
             proxies.forEach(p=>{
                 if (p.port>=port)
@@ -53,6 +61,16 @@ class Add_proxy extends React.Component {
                 if (opt.field)
                     url+='?field='+opt.field;
                 window.location.href=url;
+            }
+            else if (window.location.pathname=='/intro')
+            {
+                const curr_step = JSON.parse(window.localStorage.getItem(
+                    'quickstart-step'));
+                window.localStorage.setItem('quickstart-first-proxy', port);
+                // XXX krzysztof: temporary hack; remove when zstore
+                if (curr_step==onboarding_steps.ADD_PROXY);
+                    window.set_step(onboarding_steps.ADD_PROXY_DONE);
+                return;
             }
             else
                 window.location.href='/proxies';

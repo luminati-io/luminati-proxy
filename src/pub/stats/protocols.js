@@ -89,7 +89,7 @@ class ProtocolTable extends React.Component {
               <tr>
                 <th>Protocol</th>
                 <th className="col-md-2">Bandwidth</th>
-                <th className="col-md-5">Number of requests</th>
+                <th className="col-md-5">Requests</th>
               </tr>
             </Common.StatTable>;
     }

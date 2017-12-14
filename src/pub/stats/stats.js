@@ -118,8 +118,8 @@ class SuccessRatio extends React.Component {
               <Row className="overall-success-ratio" onMouseEnter={()=>{
                 util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
               }}>
-                <Col md={6} className="success_title">Overall success</Col>
-                <Col md={6} className="success_value">
+                <Col md={8} className="success_title">Overall success</Col>
+                <Col md={4} className="success_value">
                   {ratio.toFixed(2)}%
                 </Col>
               </Row>

@@ -1891,7 +1891,6 @@ var presets = {
             opt.session = true;
             if (opt.session === true) opt.seed = false;
         },
-        // XXX krzysztof: find a better, more generic way for rules messages
         rules: [{ field: 'pool_size', label: 'sets \'Pool size\' to 0' }, { field: 'keep_alive', label: 'sets \'Keep-alive\' to 50 seconds' }, { field: 'pool_type', label: 'sequential pool type' }, { field: 'sticky_ip', label: 'disables \'Sticky Ip\'' }, { field: 'session', label: 'enables \'Random Session\'' }, { field: 'seed', label: 'disables \'Session ID Seed\'' }],
         support: {
             keep_alive: true,
@@ -2966,7 +2965,7 @@ var StatusCodeTable = function (_React$Component2) {
                     _react2.default.createElement(
                         'th',
                         null,
-                        'Status Code'
+                        'Code'
                     ),
                     _react2.default.createElement(
                         'th',
@@ -2976,7 +2975,7 @@ var StatusCodeTable = function (_React$Component2) {
                     _react2.default.createElement(
                         'th',
                         { className: 'col-md-5' },
-                        'Number of requests'
+                        'Requests'
                     )
                 )
             );
@@ -3853,7 +3852,7 @@ var DomainTable = function (_React$Component2) {
                     _react2.default.createElement(
                         'th',
                         null,
-                        'Domain Host'
+                        'Domain'
                     ),
                     _react2.default.createElement(
                         'th',
@@ -3863,7 +3862,7 @@ var DomainTable = function (_React$Component2) {
                     _react2.default.createElement(
                         'th',
                         { className: 'col-md-5' },
-                        'Number of requests'
+                        'Requests'
                     )
                 )
             );
@@ -4153,7 +4152,7 @@ var ProtocolTable = function (_React$Component3) {
                     _react2.default.createElement(
                         'th',
                         { className: 'col-md-5' },
-                        'Number of requests'
+                        'Requests'
                     )
                 )
             );
@@ -9507,9 +9506,11 @@ _module.controller('root', ['$rootScope', '$scope', '$http', '$window', '$state'
     $http.get('/api/www_lpm').then(function (res) {
         $scope.$root.presets = (0, _common.combine_presets)(res.data);
     });
+    $scope.$root.add_proxy_modal = _add_proxy2.default;
     // krzysztof: hack to pass data to react
     $scope.$root.$watchGroup(['consts', 'presets'], function () {
         if ($scope.consts && $scope.presets) {
+            if (window.constants_loaded) window.constants_loaded();
             $scope.$root.add_proxy_constants = { consts: $scope.consts,
                 presets: $scope.presets };
         }
@@ -10686,8 +10687,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout, $statePa
     $scope.on_page_change = function () {
         $scope.selected_proxies = {};
     };
-    $scope.show_add_proxy = function () {
-        return JSON.parse($window.localStorage.getItem('add_proxy'));
+    $scope.show_old_ui = function () {
+        return JSON.parse($window.localStorage.getItem('old_ui'));
     };
     var load_regions = function load_regions(country) {
         if (!country || country == '*') return [];
@@ -10719,7 +10720,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout, $statePa
         return options;
     };
     $scope.react_component = _stats2.default;
-    $scope.add_proxy_modal = _add_proxy2.default;
     if ($stateParams.add_proxy || qs_o.action && qs_o.action == 'tutorial_add_proxy') {
         setTimeout($scope.add_proxy);
     }
@@ -12169,12 +12169,12 @@ var SuccessRatio = function (_React$Component3) {
                         } },
                     _react2.default.createElement(
                         _reactBootstrap.Col,
-                        { md: 6, className: 'success_title' },
+                        { md: 8, className: 'success_title' },
                         'Overall success'
                     ),
                     _react2.default.createElement(
                         _reactBootstrap.Col,
-                        { md: 6, className: 'success_value' },
+                        { md: 4, className: 'success_value' },
                         ratio.toFixed(2),
                         '%'
                     )
@@ -14212,6 +14212,10 @@ var _util = __webpack_require__(29);
 
 var _util2 = _interopRequireDefault(_util);
 
+var _jquery = __webpack_require__(13);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -14234,7 +14238,14 @@ var Page = function (_React$Component) {
 
         var step = JSON.parse(window.localStorage.getItem('quickstart-step'));
         if (!Object.values(steps).includes(Number(step))) step = steps.WELCOME;
-        _this.state = { step: step };
+        var loading = false;
+        if (!(0, _jquery2.default)('#add_proxy_modal').length) loading = true;
+        _this.state = { step: step, loading: loading };
+        // XXX krzysztof: temporary hack; remove when zstore
+        window.set_step = _this.set_step.bind(_this);
+        window.constants_loaded = function () {
+            _this.setState({ loading: false });
+        };
         return _this;
     }
 
@@ -14268,6 +14279,7 @@ var Page = function (_React$Component) {
             return _react2.default.createElement(
                 'div',
                 { className: 'intro lpm' },
+                _react2.default.createElement(_common.Loader, { show: this.state.loading }),
                 _react2.default.createElement(Current_page, { set_step: this.set_step.bind(this),
                     curr_step: this.state.step })
             );
@@ -14351,7 +14363,7 @@ var List = function (_React$Component2) {
     _createClass(List, [{
         key: 'click_add_proxy',
         value: function click_add_proxy() {
-            window.location.href = localhost + '/proxies?action=tutorial_add_proxy';
+            (0, _jquery2.default)('#add_proxy_modal').modal('show');
         }
     }, {
         key: 'skip_to_dashboard',
@@ -15753,8 +15765,16 @@ var Add_proxy = function (_React$Component) {
         key: 'persist',
         value: function persist() {
             var preset = this.state.preset;
-            var form = { last_preset_applied: preset, zone: this.state.zone };
-            form.proxy_type = 'persist';
+            var form = {
+                last_preset_applied: preset,
+                zone: this.state.zone,
+                proxy_type: 'persist',
+                max_requests: 0,
+                session_duration: 0,
+                ips: [],
+                vips: [],
+                whitelist_ips: []
+            };
             this.presets[preset].set(form);
             this.setState({ show_loader: true });
             var _this = this;
@@ -15765,7 +15785,7 @@ var Add_proxy = function (_React$Component) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 _context2.next = 2;
-                                return _ajax2.default.json({ url: '/api/proxies' });
+                                return _ajax2.default.json({ url: '/api/proxies_running' });
 
                             case 2:
                                 proxies = _context2.sent;
@@ -15803,7 +15823,7 @@ var Add_proxy = function (_React$Component) {
 
             var _this = this;
             this.sp.spawn((0, _etask2.default)( /*#__PURE__*/_regeneratorRuntime2.default.mark(function _callee3() {
-                var port, url;
+                var port, url, curr_step;
                 return _regeneratorRuntime2.default.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
@@ -15815,14 +15835,37 @@ var Add_proxy = function (_React$Component) {
                                 port = _context3.sent;
 
                                 (0, _jquery2.default)('#add_proxy_modal').modal('hide');
-                                if (opt.redirect) {
-                                    url = '/proxy/' + port;
 
-                                    if (opt.field) url += '?field=' + opt.field;
-                                    window.location.href = url;
-                                } else window.location.href = '/proxies';
+                                if (!opt.redirect) {
+                                    _context3.next = 10;
+                                    break;
+                                }
 
-                            case 5:
+                                url = '/proxy/' + port;
+
+                                if (opt.field) url += '?field=' + opt.field;
+                                window.location.href = url;
+                                _context3.next = 19;
+                                break;
+
+                            case 10:
+                                if (!(window.location.pathname == '/intro')) {
+                                    _context3.next = 18;
+                                    break;
+                                }
+
+                                curr_step = JSON.parse(window.localStorage.getItem('quickstart-step'));
+
+                                window.localStorage.setItem('quickstart-first-proxy', port);
+                                // XXX krzysztof: temporary hack; remove when zstore
+                                if (curr_step == _common.onboarding_steps.ADD_PROXY) ;
+                                window.set_step(_common.onboarding_steps.ADD_PROXY_DONE);
+                                return _context3.abrupt('return');
+
+                            case 18:
+                                window.location.href = '/proxies';
+
+                            case 19:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -16130,12 +16173,18 @@ var tabs = {
         fields: {
             ip: {
                 label: 'Data center IP',
-                tooltip: 'Choose specific data center IP (when datacenter\n                    zone'
+                tooltip: 'Choose specific data center IP. to ensure\n                    all requests are executed using specific Data Center IP.\n                    to view the pool of your IPs take a look at \'pool size\'\n                    option'
+            },
+            vip: {
+                label: 'vIP',
+                tooltip: 'Choose specific vIP to ensure all requests are\n                    executed using specific vIP. to view the pool of your vIPs\n                    take a look at \'pool size\' option'
             },
             pool_size: {
                 label: 'Pool size',
                 tooltip: 'Maintain number of IPs that will be pinged constantly\n                    - must have keep_allive to work properly'
             },
+            multiply_ips: { label: 'Multiply IPs' },
+            multiply_vips: { label: 'Multiply vIPs' },
             pool_type: {
                 label: 'Pool type',
                 tooltip: 'How to pull the IPs - roundrobin / sequential'
@@ -16226,11 +16275,11 @@ var tabs = {
             },
             bypass_proxy: {
                 label: 'URL regex for bypassing the proxy manager and send\n                    directly to host',
-                tooltip: 'Insert URL pattern for which requests will be passed \n                    directly to target site without any proxy\n                    (super proxy or peer)'
+                tooltip: 'Insert URL pattern for which requests will be passed\n                    directly to target site without any proxy\n                    (super proxy or peer)'
             },
             direct_include: {
                 label: 'URL regex for requests to be sent directly from super\n                    proxy',
-                tooltip: 'Insert URL pattern for which requests will be passed \n                    through super proxy directly (not through peers)'
+                tooltip: 'Insert URL pattern for which requests will be passed\n                    through super proxy directly (not through peers)'
             },
             direct_exclude: {
                 label: 'URL regex for requests to not be sent directly from\n                    super proxy',
@@ -16263,8 +16312,8 @@ var Index = function (_React$Component) {
                 }
             }, _callee, this);
         }));
-        _this2.state = { tab: 'target', cities: {}, form: { zones: {} },
-            warnings: [], errors: {}, show_loader: false, consts: {} };
+        _this2.state = { tab: 'target', form: { zones: {} }, warnings: [],
+            errors: {}, show_loader: false, consts: {} };
         return _this2;
     }
 
@@ -16480,11 +16529,16 @@ var Index = function (_React$Component) {
                     form.action = form.rule.action.value;
                     form.trigger_type = 'status';
                 }
+                delete form.rule;
             }
-            if (form.reverse_lookup_dns) form.reverse_lookup = 'dns';else if (form.reverse_lookup_file) form.reverse_lookup = 'file';else if (form.reverse_lookup_values) {
-                form.reverse_lookup = 'values';
-                form.reverse_lookup_values = form.reverse_lookup_values.join('\n');
+            if (form.reverse_lookup === undefined) {
+                if (form.reverse_lookup_dns) form.reverse_lookup = 'dns';else if (form.reverse_lookup_file) form.reverse_lookup = 'file';else if (form.reverse_lookup_values) {
+                    form.reverse_lookup = 'values';
+                    form.reverse_lookup_values = form.reverse_lookup_values.join('\n');
+                }
             }
+            if (!form.ips) form.ips = [];
+            if (!form.vips) form.vips = [];
             form.whitelist_ips = (form.whitelist_ips || []).join(',');
             if (form.city && !Array.isArray(form.city) && form.state) form.city = [{ id: form.city,
                 label: form.city + ' (' + form.state + ')' }];else if (!Array.isArray(form.city)) form.city = [];
@@ -16533,7 +16587,7 @@ var Index = function (_React$Component) {
             var update_url = '/api/proxies/' + this.props.port;
             var _this = this;
             return (0, _etask2.default)( /*#__PURE__*/_regeneratorRuntime2.default.mark(function _callee4() {
-                var raw_update;
+                var raw_update, status, curr_step;
                 return _regeneratorRuntime2.default.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -16547,12 +16601,30 @@ var Index = function (_React$Component) {
 
                             case 2:
                                 raw_update = _context4.sent;
+                                _context4.next = 5;
+                                return _ajax2.default.json({
+                                    url: '/api/proxy_status/' + data.port });
+
+                            case 5:
+                                status = _context4.sent;
 
                                 _this.setState({ show_loader: false });
-                                ga_event('top bar', 'click save', 'successful');
-                                window.location = '/';
+                                if (status.status == 'ok') {
+                                    ga_event('top bar', 'click save', 'successful');
+                                    curr_step = JSON.parse(window.localStorage.getItem('quickstart-step'));
 
-                            case 6:
+                                    if (curr_step == _common.onboarding_steps.ADD_PROXY) {
+                                        window.localStorage.setItem('quickstart-step', _common.onboarding_steps.ADD_PROXY_DONE);
+                                        window.localStorage.setItem('quickstart-first-proxy', data.port);
+                                        window.location = '/intro';
+                                    } else window.location = '/';
+                                } else {
+                                    ga_event('top bar', 'click save', 'failed');
+                                    _this.setState({ error_list: [{ msg: status.status }] });
+                                    (0, _jquery2.default)('#save_proxy_errors').modal('show');
+                                }
+
+                            case 8:
                             case 'end':
                                 return _context4.stop();
                         }
@@ -16661,8 +16733,6 @@ var Index = function (_React$Component) {
                 value: save_form.action
             };
             var rule_status = save_form.status_code == 'Custom' ? save_form.status_custom : save_form.status_code;
-            save_form.rules = {};
-            save_form.rule = {};
             if (save_form.trigger_type) {
                 save_form.rule = {
                     url: save_form.trigger_regex || '**',
@@ -16683,6 +16753,9 @@ var Index = function (_React$Component) {
                         url: save_form.trigger_regex + '/**'
                     }]
                 };
+            } else {
+                delete save_form.rules;
+                delete save_form.rule;
             }
             delete save_form.trigger_type;
             delete save_form.status_code;
@@ -16696,12 +16769,23 @@ var Index = function (_React$Component) {
             } else save_form.reverse_lookup_values = '';
             delete save_form.reverse_lookup;
             save_form.whitelist_ips = save_form.whitelist_ips.split(',').filter(Boolean);
-            if (save_form.delete_rules) save_form.rules = {};
-            delete save_form.delete_rules;
+            if (save_form.city.length) save_form.city = save_form.city[0].id;else save_form.city = '';
+            if (!save_form.max_requests) save_form.max_requests = 0;
             this.state.presets[save_form.preset].set(save_form);
             delete save_form.preset;
-            if (save_form.city.length) save_form.city = save_form.city[0].id;else save_form.city = '';
             return save_form;
+        }
+    }, {
+        key: 'get_curr_plan',
+        value: function get_curr_plan() {
+            var zone_name = this.state.form.zone || 'static';
+            var zones = this.state.consts.proxy.zone.values;
+            var curr_zone = zones.filter(function (p) {
+                return p.key == zone_name;
+            });
+            var curr_plan = void 0;
+            if (curr_zone.length) curr_plan = curr_zone[0].plans.slice(-1)[0];
+            return curr_plan;
         }
     }, {
         key: 'render',
@@ -16746,13 +16830,13 @@ var Index = function (_React$Component) {
                     errors: this.state.errors }),
                 _react2.default.createElement(Main_window, { proxy: this.state.consts.proxy,
                     locations: this.state.locations,
-                    cities: this.state.cities, states: this.state.states,
                     defaults: this.state.defaults, form: this.state.form,
                     init_focus: this.init_focus,
                     is_valid_field: this.is_valid_field.bind(this),
                     on_change_field: this.field_changed.bind(this),
                     support: support, errors: this.state.errors,
-                    default_opt: this.default_opt.bind(this) }),
+                    default_opt: this.default_opt.bind(this),
+                    get_curr_plan: this.get_curr_plan.bind(this) }),
                 _react2.default.createElement(
                     _common.Modal,
                     { className: 'warnings_modal', id: 'save_proxy_warnings',
@@ -16801,7 +16885,13 @@ var Nav = function Nav(props) {
         ga_event('top bar', 'edit field', 'preset');
     };
     var update_zone = function update_zone(val) {
-        return props.on_change_field('zone', val);
+        props.on_change_field('zone', val);
+        if (props.form.ips.length || props.form.vips.length) props.on_change_field('pool_size', 0);
+        props.on_change_field('ips', []);
+        props.on_change_field('vips', []);
+        props.on_change_field('multiply_ips', false);
+        props.on_change_field('multiply_vips', false);
+        props.on_change_field('multiply', 1);
     };
     var presets_opt = Object.keys(props.presets || {}).map(function (p) {
         return { key: props.presets[p].title, value: p };
@@ -17067,7 +17157,7 @@ var Input = function Input(props) {
 var Double_number = function Double_number(props) {
     var vals = ('' + props.val).split(':');
     var update = function update(start, end) {
-        props.on_change_wrapper([start, end].join(':'));
+        props.on_change_wrapper([start || 0, end].join(':'));
     };
     return _react2.default.createElement(
         'span',
@@ -17091,36 +17181,40 @@ var Double_number = function Double_number(props) {
 };
 
 var Input_boolean = function Input_boolean(props) {
+    var update = function update(val) {
+        val = val == 'true';
+        props.on_change_wrapper(val);
+    };
     return _react2.default.createElement(
         'div',
         { className: 'radio_buttons' },
         _react2.default.createElement(
             'div',
             { className: 'option' },
-            _react2.default.createElement('input', { type: 'radio', checked: props.val == '1',
+            _react2.default.createElement('input', { type: 'radio', checked: props.val == true,
                 onChange: function onChange(e) {
-                    return props.on_change_wrapper(e.target.value);
-                }, id: 'enable',
-                name: props.id, value: '1', disabled: props.disabled }),
+                    return update(e.target.value);
+                }, id: props.id + '_enable',
+                name: props.id, value: 'true', disabled: props.disabled }),
             _react2.default.createElement('div', { className: 'checked_icon' }),
             _react2.default.createElement(
                 'label',
-                { htmlFor: 'enable' },
+                { htmlFor: props.id + '_enable' },
                 'Enabled'
             )
         ),
         _react2.default.createElement(
             'div',
             { className: 'option' },
-            _react2.default.createElement('input', { type: 'radio', checked: props.val == '0',
+            _react2.default.createElement('input', { type: 'radio', checked: props.val == false,
                 onChange: function onChange(e) {
-                    return props.on_change_wrapper(e.target.value);
-                }, id: 'disable',
-                name: props.id, value: '0', disabled: props.disabled }),
+                    return update(e.target.value);
+                }, id: props.id + '_disable',
+                name: props.id, value: 'false', disabled: props.disabled }),
             _react2.default.createElement('div', { className: 'checked_icon' }),
             _react2.default.createElement(
                 'label',
-                { htmlFor: 'disable' },
+                { htmlFor: props.id + '_disable' },
                 'Disabled'
             )
         )
@@ -17191,7 +17285,7 @@ var Section_field = function Section_field(props) {
     var placeholder = tabs[tab_id].fields[id].placeholder || '';
     return _react2.default.createElement(
         'div',
-        { className: 'field_row' },
+        { className: (0, _classnames2.default)('field_row', { disabled: disabled }) },
         _react2.default.createElement(
             'div',
             { className: 'desc' },
@@ -17328,13 +17422,7 @@ var Targeting = function (_React$Component5) {
     }, {
         key: 'country_disabled',
         value: function country_disabled() {
-            var zone_name = this.props.form.zone || 'static';
-            var zones = this.props.proxy.zone.values;
-            var curr_zone = zones.filter(function (p) {
-                return p.key == zone_name;
-            });
-            var curr_plan = void 0;
-            if (curr_zone.length) curr_plan = curr_zone[0].plans.slice(-1)[0];
+            var curr_plan = this.props.get_curr_plan();
             return curr_plan && curr_plan.type == 'static';
         }
     }, {
@@ -17550,15 +17638,48 @@ var Rules = function (_React$Component7) {
     return Rules;
 }(_react2.default.Component);
 
-var Ips_alloc_modal = function Ips_alloc_modal(props) {
+var Checkbox = function Checkbox(props) {
+    return _react2.default.createElement(
+        'div',
+        { className: 'form-check' },
+        _react2.default.createElement(
+            'label',
+            { className: 'form-check-label' },
+            _react2.default.createElement('input', { className: 'form-check-input', type: 'checkbox', value: props.value,
+                onChange: function onChange(e) {
+                    return props.on_change(e);
+                }, checked: props.checked }),
+            props.text
+        )
+    );
+};
+
+var Alloc_modal = function Alloc_modal(props) {
+    if (!props.type) return null;
+    var type_label = props.type == 'ips' ? 'IPs' : 'vIPs';
+    var title = 'Select ' + type_label + ': ' + props.zone_name;
+    var checked = function checked(row) {
+        return props.form[props.type].includes(row);
+    };
+    var reset = function reset() {
+        props.on_change_field(props.type, []);
+        props.on_change_field('pool_size', '');
+    };
     return _react2.default.createElement(
         _common.Modal,
-        { id: 'allocated_ips', title: 'Select IPs: static' },
+        { id: 'allocated_ips', className: 'allocated_ips_modal',
+            title: title, no_cancel_btn: true },
         _react2.default.createElement(
-            'p',
-            null,
-            props.ips
-        )
+            'button',
+            { onClick: reset,
+                className: 'btn btn_lpm btn_lpm_normal random_ips_btn' },
+            'Random ',
+            type_label
+        ),
+        props.list.map(function (row) {
+            return _react2.default.createElement(Checkbox, { on_change: props.toggle(props.type), key: row,
+                text: row, value: row, checked: checked(row) });
+        })
     );
 };
 
@@ -17570,37 +17691,168 @@ var Rotation = function (_React$Component8) {
 
         var _this10 = _possibleConstructorReturn(this, (Rotation.__proto__ || Object.getPrototypeOf(Rotation)).call(this, props));
 
-        _this10.state = { ips: [] };
+        _this10.state = { list: [], loading: false };
+        _this10.sp = (0, _etask2.default)('Rotation', /*#__PURE__*/_regeneratorRuntime2.default.mark(function _callee6() {
+            return _regeneratorRuntime2.default.wrap(function _callee6$(_context6) {
+                while (1) {
+                    switch (_context6.prev = _context6.next) {
+                        case 0:
+                            _context6.next = 2;
+                            return this.wait();
+
+                        case 2:
+                        case 'end':
+                            return _context6.stop();
+                    }
+                }
+            }, _callee6, this);
+        }));
         return _this10;
     }
 
     _createClass(Rotation, [{
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+            this.sp.return();
+        }
+    }, {
+        key: 'toggle',
+        value: function toggle(type) {
+            var _this11 = this;
+
+            return function (e) {
+                var _e$target = e.target,
+                    value = _e$target.value,
+                    checked = _e$target.checked;
+
+                if (type == 'vips') value = Number(value);
+                var _props2 = _this11.props,
+                    form = _props2.form,
+                    on_change_field = _props2.on_change_field;
+
+                var new_alloc = void 0;
+                if (checked) new_alloc = [].concat(_toConsumableArray(form[type]), [value]);else new_alloc = form[type].filter(function (r) {
+                    return r != value;
+                });
+                on_change_field(type, new_alloc);
+                if (!form.multiply_ips && !form.multiply_vips) on_change_field('pool_size', new_alloc.length);else on_change_field('multiply', new_alloc.length);
+            };
+        }
+    }, {
         key: 'open_modal',
-        value: function open_modal() {
-            (0, _jquery2.default)('#allocated_ips').modal('show');
+        value: function open_modal(type) {
+            if (!this.props.support.pool_size) return;
+            var form = this.props.form;
+
+            this.setState({ loading: true });
+            var zone = form.zone || 'static';
+            var keypass = form.password || '';
+            var base_url = void 0;
+            if (type == 'ips') base_url = '/api/allocated_ips';else base_url = '/api/allocated_vips';
+            var url = base_url + '?zone=' + zone + '&key=' + keypass;
+            var _this = this;
+            this.sp.spawn((0, _etask2.default)( /*#__PURE__*/_regeneratorRuntime2.default.mark(function _callee7() {
+                var res, list;
+                return _regeneratorRuntime2.default.wrap(function _callee7$(_context7) {
+                    while (1) {
+                        switch (_context7.prev = _context7.next) {
+                            case 0:
+                                this.on('uncaught', function (e) {
+                                    console.log(e);
+                                    _this.setState({ loading: false });
+                                });
+                                _context7.next = 3;
+                                return _ajax2.default.json({ url: url });
+
+                            case 3:
+                                res = _context7.sent;
+                                list = void 0;
+
+                                if (type == 'ips') list = res.ips;else list = res.slice(0, 100);
+                                _this.setState({ list: list, loading: false });
+                                (0, _jquery2.default)('#allocated_ips').modal('show');
+
+                            case 8:
+                            case 'end':
+                                return _context7.stop();
+                        }
+                    }
+                }, _callee7, this);
+            })));
+        }
+    }, {
+        key: 'multiply_changed',
+        value: function multiply_changed(val) {
+            var _props3 = this.props,
+                on_change_field = _props3.on_change_field,
+                form = _props3.form;
+
+            var size = Math.max(form.ips.length, form.vips.length);
+            if (val) {
+                on_change_field('pool_size', 0);
+                on_change_field('multiply', size);
+                return;
+            }
+            on_change_field('pool_size', size);
+            on_change_field('multiply', 1);
         }
     }, {
         key: 'render',
         value: function render() {
-            var _props2 = this.props,
-                proxy = _props2.proxy,
-                support = _props2.support,
-                form = _props2.form,
-                default_opt = _props2.default_opt;
+            var _this12 = this;
 
-            var pool_size_disabled = !support.pool_size || form.ips && form.ips.length;
-            var pool_size_note = _react2.default.createElement(
-                'a',
-                { onClick: this.open_modal.bind(this) },
-                'set from allocated IPs'
-            );
+            var _props4 = this.props,
+                proxy = _props4.proxy,
+                support = _props4.support,
+                form = _props4.form,
+                default_opt = _props4.default_opt;
+
+            var pool_size_disabled = !support.pool_size || form.ips.length || form.vips.length;
+            var curr_plan = this.props.get_curr_plan();
+            var type = void 0;
+            if (curr_plan && curr_plan.type == 'static') type = 'ips';else if (curr_plan && !!curr_plan.vip) type = 'vips';
+            var render_modal = ['ips', 'vips'].includes(type);
+            var pool_size_note = void 0;
+            if (this.props.support.pool_size && render_modal) {
+                pool_size_note = _react2.default.createElement(
+                    'a',
+                    { onClick: function onClick() {
+                            return _this12.open_modal(type);
+                        } },
+                    'set from allocated ' + (type == 'ips' ? 'IPs' : 'vIPs')
+                );
+            }
             return _react2.default.createElement(
                 With_data,
                 _extends({}, this.props, { tab_id: 'rotation' }),
-                _react2.default.createElement(Ips_alloc_modal, { ips: this.state.ips }),
+                _react2.default.createElement(_common.Loader, { show: this.state.loading }),
+                _react2.default.createElement(Alloc_modal, { list: this.state.list, type: type,
+                    zone_name: form.zone || 'static', loading: this.state.loading,
+                    toggle: this.toggle.bind(this) }),
                 _react2.default.createElement(Section_with_fields, { type: 'text', id: 'ip' }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'pool_size', min: '0',
-                    disabled: pool_size_disabled, note: pool_size_note }),
+                _react2.default.createElement(Section_with_fields, { type: 'text', id: 'vip' }),
+                _react2.default.createElement(
+                    Section,
+                    { id: 'pool_size', correct: this.props.form.pool_size,
+                        disabled: pool_size_disabled },
+                    _react2.default.createElement(Section_field, _extends({}, this.props, { type: 'number', id: 'pool_size',
+                        tab_id: 'rotation', note: pool_size_note, min: '0',
+                        disabled: pool_size_disabled })),
+                    _react2.default.createElement(
+                        _common.If,
+                        { when: type == 'ips' },
+                        _react2.default.createElement(Section_field, _extends({}, this.props, { type: 'boolean',
+                            id: 'multiply_ips', tab_id: 'rotation',
+                            on_change: this.multiply_changed.bind(this) }))
+                    ),
+                    _react2.default.createElement(
+                        _common.If,
+                        { when: type == 'vips' },
+                        _react2.default.createElement(Section_field, _extends({}, this.props, { type: 'boolean',
+                            id: 'multiply_vips', tab_id: 'rotation',
+                            on_change: this.multiply_changed.bind(this) }))
+                    )
+                ),
                 _react2.default.createElement(Section_with_fields, { type: 'select', id: 'pool_type',
                     data: proxy.pool_type.values,
                     disabled: !support.pool_type }),
@@ -24658,7 +24910,7 @@ exports = module.exports = __webpack_require__(40)(undefined);
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nbody {\n  font-family: \"Noto Sans\", sans-serif;\n  font-size: 15px;\n  line-height: 23px;\n  overflow-y: scroll;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.page-body {\n  margin-left: 224px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\ncode {\n  background: lightgrey;\n  color: black;\n  white-space: nowrap;\n}\n.nowrap {\n  white-space: nowrap;\n}\npre.top-margin {\n  margin-top: 4px;\n}\n.container {\n  width: auto;\n}\n.main-container-qs {\n  margin-left: 25%;\n}\n.qs-move-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 2px;\n  cursor: col-resize;\n}\n.btn-title {\n  float: right;\n  margin-top: -4px;\n  margin-right: 15px;\n  margin-bottom: -5px;\n}\n.header {\n  height: 60px;\n}\n.header img {\n  margin-top: 10px;\n}\nnav a:hover {\n  box-shadow: none;\n}\n.overall-success-ratio {\n  margin-bottom: 20px;\n}\n.success_title {\n  font-size: 22px;\n  cursor: pointer;\n}\n.success_value {\n  text-align: right;\n  font-size: 22px;\n  cursor: pointer;\n  color: #428bca;\n}\n.block {\n  background: #eeeeee;\n  padding: 1em;\n  margin-bottom: 20px;\n}\n.form-group {\n  margin-bottom: 12px;\n}\n.alert-inline {\n  display: inline;\n  padding: 6px 12px;\n  position: relative;\n  top: 2px;\n  margin: 0 8px;\n}\n.tester-body {\n  margin-bottom: 18px;\n}\n.tester-body textarea {\n  height: 100px;\n}\n.tools-header {\n  margin-bottom: 12px;\n}\n.tester-body:after,\n.tools-header:after {\n  content: '';\n  display: block;\n  clear: both;\n}\n.tools-add-header {\n  margin-bottom: 18px;\n}\n.tester-alert {\n  margin-top: 20px;\n  padding: 7.5px 11.5px;\n}\n.tester-results {\n  margin-top: 20px;\n}\n.tools-table {\n  width: auto;\n  float: none;\n  margin: 20px auto;\n}\n.tools-table th {\n  text-align: center;\n}\n.countries-list {\n  text-align: center;\n  margin-top: 20px;\n}\n.countries-list > div {\n  padding: 10px;\n  display: inline-block;\n  width: 200px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-align: left;\n  position: relative;\n  border: 1px solid black;\n  margin: 5px 10px;\n}\n.countries-list .glyphicon {\n  color: grey;\n}\n.countries-list .glyphicon-ok {\n  color: green !important;\n}\n.countries-list .glyphicon-download-alt {\n  color: blue !important;\n}\n.countries-failed {\n  color: red !important;\n}\n.countries-canceled {\n  color: orange !important;\n}\n.countries-op {\n  display: inline-block;\n  position: absolute;\n  right: 0;\n  width: 40px;\n  padding-left: 10px;\n  background: white;\n  background: linear-gradient(to right, rgba(255, 255, 255, 0), white 25%);\n}\n.countries-op span:hover {\n  color: orange;\n  cursor: pointer;\n}\n.countries-view {\n  border-bottom: 1px dashed;\n  cursor: pointer;\n}\n#countries-screenshot .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#countries-screenshot .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\ntable.proxies {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies-settings,\n.columns-settings {\n  overflow: auto;\n  max-height: calc(100vh - 190px);\n}\n.proxies-panel {\n  overflow: auto;\n}\ndiv.proxies .panel-footer,\ndiv.proxies .panel-heading {\n  position: relative;\n}\ndiv.proxies .panel-heading {\n  height: 65px;\n}\ndiv.proxies .btn-wrapper {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.proxies .btn-csv {\n  font-size: 12px;\n}\n.proxies-default {\n  color: gray;\n}\n.proxies-editable {\n  cursor: pointer;\n  position: relative;\n  display: inline-block;\n  min-height: 20px;\n  min-width: 100%;\n}\n.proxies-editable:hover {\n  color: orange;\n}\n.proxies-table-input {\n  position: absolute;\n  z-index: 2;\n  left: -25px;\n  right: -25px;\n  top: -7px;\n}\n.proxies-table-input input,\n.proxies-table-input select {\n  width: 100%;\n}\n.proxies-check {\n  width: 32px;\n}\n.col_success_rate {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-success-rate-value {\n  color: #428bca;\n  width: 80px;\n  font-size: 16px;\n  cursor: pointer;\n}\n.proxies-actions {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-action {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-disabled {\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-edit {\n  visibility: hidden;\n}\n.proxies tr:hover .proxies-action-edit {\n  visibility: visible;\n  cursor: pointer;\n}\n.proxies-action-delete,\n.proxies-action-duplicate {\n  cursor: pointer;\n}\n.proxies-warning {\n  color: red;\n}\n#history .modal-dialog,\n#history_details .modal-dialog,\n#pool .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#history .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\n#history label {\n  font-weight: normal;\n}\n.proxies-history-navigation {\n  margin-bottom: 25px;\n}\n.proxies-history-filter {\n  font-size: 11px;\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n}\n.proxies-history th {\n  line-height: 15px !important;\n}\n.clickable {\n  cursor: pointer;\n}\n.proxies-history-loading {\n  padding: 4px;\n  width: 200px;\n  text-align: center;\n  position: fixed;\n  left: 50%;\n  top: 50%;\n  margin-left: -100px;\n  z-index: 2;\n}\n.proxies-history-archive {\n  float: right;\n  font-size: 11px;\n  line-height: 14px;\n  margin-top: -1px;\n  margin-bottom: -2px;\n  margin-right: 32px;\n  text-align: right;\n}\n.proxies-history-archive > span {\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n  cursor: pointer;\n  text-transform: lowercase;\n}\n.zones-table td,\n.zones-table thead th {\n  text-align: right;\n}\n.zones-table td.zones-zone,\n.zones-table thead th.zones-zone {\n  text-align: left;\n}\n#zone .panel-heading {\n  position: relative;\n}\n#zone .panel-heading button {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.settings-alert {\n  position: relative;\n}\n.settings-alert .buttons {\n  position: absolute;\n  right: 10px;\n  top: 9px;\n}\n.github {\n  margin-top: 12px;\n}\n#config-textarea,\n#config-textarea + .CodeMirror,\n#resolve-textarea {\n  width: 100%;\n  height: 400px;\n  margin-bottom: 18px;\n}\n.resolve-add-host {\n  margin-top: -6px;\n  margin-bottom: 18px;\n}\n#settings-page {\n  padding-top: 20px;\n}\n.confirmation-items {\n  margin-top: 11px;\n}\n.form-range {\n  width: 100%;\n}\n.form-range .form-control {\n  display: inline-block;\n  width: 48%;\n}\n.form-range .range-seperator {\n  display: inline-block;\n  width: 2%;\n  text-align: center;\n}\n.luminati-login h3 {\n  font-weight: bold;\n  margin-top: 20px;\n  margin-bottom: 20px;\n}\n.luminati-login .alert-danger {\n  color: #d00;\n}\n.luminati-login label {\n  color: #818c93;\n  font-weight: normal;\n}\n.luminati-login button {\n  margin-top: 15px;\n  font-weight: bold;\n  padding: 10px 12px;\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n  border: 1px solid #1c74b3;\n  border-bottom-color: #0d5b97;\n  border-top-color: #2c8ed1;\n  box-shadow: 0 1px 0 #ddd, inset 0 1px 0 rgba(255, 255, 255, 0.2);\n  color: #fff !important;\n  text-shadow: rgba(0, 0, 0, 0.2) 0 1px 0;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  -webkit-tap-highlight-color: transparent;\n}\n.luminati-login button:hover:enabled {\n  background-color: #3baaf4;\n  background-image: -o-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#3baaf4), to(#2389dc));\n  background-image: -webkit-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -moz-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: linear-gradient(top, #3baaf4, #2389dc);\n}\n.luminati-login button:active {\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n}\n.luminati-login .signup {\n  color: #818c93;\n  font-size: 16.5px;\n  margin-top: 12px;\n}\n#google {\n  min-width: 300px;\n}\n#google a.google {\n  color: white;\n  display: block;\n  padding: 0;\n  margin: auto;\n  margin-top: 50px;\n  margin-bottom: 40px;\n  height: 35px;\n  font-size: 16px;\n  padding-top: 6px;\n  padding-left: 95px;\n  cursor: pointer;\n  max-width: 300px;\n  text-align: left;\n  text-decoration: none;\n  border: none;\n  position: relative;\n  white-space: nowrap;\n}\n#google a.google,\n#google a.google:hover {\n  background: url(/img/social_btns.svg) no-repeat 50% 100%;\n}\n#google a.google:focus {\n  outline: 0;\n  top: 1px;\n}\n#google a.google:hover {\n  border: none;\n  box-shadow: none;\n  border-radius: 0;\n}\n#google a.google:active {\n  top: 1px;\n}\n.panel .panel-heading button.btn.btn-ico {\n  padding: 7px;\n  border: solid 1px #c8c2bf;\n  background-color: #fcfcfc;\n  width: 35px;\n  height: 34px;\n  margin: 0 1px;\n}\n.panel .panel-heading button.btn.btn-ico.add_proxy_btn {\n  color: #004d74;\n  background-color: #05bed1;\n  border-color: #05bed1;\n}\n.panel .panel-heading button.btn.btn-ico img {\n  width: 100%;\n  height: 100%;\n  vertical-align: baseline;\n}\n.panel .panel-heading button.btn.btn-ico[disabled] img {\n  opacity: 0.25;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  max-width: 250px;\n  border: solid 1px black;\n  background: #fff;\n  color: black;\n}\n.status-details-wrapper {\n  background: #f7f7f7;\n  font-size: 12px;\n}\n.status-details-line {\n  margin: 0 0 5px 25px;\n}\n.status-details-icon-warn {\n  vertical-align: bottom;\n  padding-bottom: 1px;\n}\n.status-details-text {\n  padding: 0 0 0 5px;\n}\n.ic-status-triangle {\n  font-size: 12px;\n  color: #979797;\n}\n.text-err {\n  color: #d8393c;\n}\n.text-ok {\n  color: #4ca16a;\n}\n.text-warn {\n  color: #f5a623;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #d7f6ff;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.pull-none {\n  float: none !important;\n}\n.history__header {\n  margin-top: 10px;\n}\n.history-details__column-first {\n  width: 300px;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.blue {\n  color: #4a90e2;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.control-label.preset {\n  width: 100%;\n}\n.control-label.preset .form-control {\n  width: auto;\n  display: inline-block;\n}\ninput.form-control[type=checkbox] {\n  width: auto;\n  height: auto;\n  display: inline;\n}\n.proxies-table-input.session-edit input {\n  width: calc(100% - 2em);\n  display: inline-block;\n}\n.proxies-table-input.session-edit .btn {\n  padding: 4px;\n}\n.tabs_default:hover {\n  color: #555 !important;\n  box-shadow: none !important;\n}\n.chrome_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url('img/icon_chrome.jpg');\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.firefox_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_firefox.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.safari_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_safari.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.stats_row_change {\n  animation: pulse 1s;\n}\n.row_clickable {\n  cursor: pointer;\n}\n.code_max_height {\n  max-height: 500px;\n}\n.table-fixed {\n  table-layout: fixed;\n}\n.overflow-ellipsis {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n}\n.lpm {\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.lpm h1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\n.lpm h2 {\n  color: #05bed1;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\n.lpm h3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\n.lpm h4 {\n  margin: 0;\n}\n.lpm a {\n  color: #05bed1;\n  cursor: pointer;\n  border: none;\n  text-decoration: underline;\n}\n.lpm a:hover {\n  color: #05bed1;\n  cursor: pointer;\n  background: rgba(0, 0, 0, 0);\n  border: none;\n  box-shadow: none;\n  text-decoration: underline;\n}\n.lpm select,\n.lpm input[type=number],\n.lpm input[type=text],\n.lpm input[type=password],\n.lpm textarea {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n.lpm select:focus,\n.lpm input[type=number]:focus,\n.lpm input[type=text]:focus,\n.lpm input[type=password]:focus,\n.lpm textarea:focus {\n  outline: none;\n  border: solid 1px #05bed1;\n}\n.lpm textarea {\n  height: auto;\n  resize: vertical;\n}\n.lpm select {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\n.lpm input[type=number]::-webkit-inner-spin-button,\n.lpm input[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\n.lpm input[type=number] {\n  -moz-appearance: textfield;\n}\n.lpm .radio_buttons {\n  width: 100%;\n  display: flex;\n}\n.lpm .radio_buttons .option {\n  flex: 1;\n}\n.lpm .radio_buttons input[type=radio] {\n  display: none;\n}\n.lpm .radio_buttons label {\n  cursor: pointer;\n  font-size: 12px;\n  font-weight: 300;\n}\n.lpm .radio_buttons input[type=radio] + .checked_icon {\n  display: inline-block;\n  width: 16px;\n  height: 16px;\n  margin: -2px 6px 0 0;\n  vertical-align: middle;\n  background: none;\n}\n.lpm .radio_buttons input[type=radio]:checked + .checked_icon {\n  background: url(/img/check_radio.svg) left top no-repeat;\n}\n.lpm .highlight {\n  color: #05bed1;\n  margin-right: 5px;\n  font-weight: bold;\n}\n.lpm a.btn_lpm {\n  text-decoration: none;\n  color: #004d74;\n}\n.lpm a.btn_lpm:hover {\n  border-width: 1px;\n  border-style: solid;\n}\n.lpm .btn_lpm {\n  width: 160px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: #05bed1;\n  border: solid 1px #05bed1;\n  color: white;\n  font-size: 16px;\n  font-weight: bold;\n  padding-top: 3px;\n  margin: 0 5px;\n  box-shadow: none;\n}\n.lpm .btn_lpm:hover {\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.lpm .btn_lpm:active,\n.lpm .btn_lpm.active {\n  background-color: #003d5b;\n  border-color: #003d5b;\n  color: #05bed1;\n}\n.lpm .btn_lpm:focus {\n  outline: none;\n}\n.lpm .btn_lpm_default {\n  color: #05bed1;\n  background-color: white;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:hover {\n  background-color: #B4E6EE;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:active,\n.lpm .btn_lpm_default.active {\n  background-color: #05bed1;\n  border-color: #05bed1;\n  color: white;\n}\n.lpm .btn_lpm_normal {\n  color: #004d74;\n  border-color: #ccdbe3;\n  background-color: white;\n}\n.lpm .btn_lpm_normal:hover {\n  background-color: #f5f5f5;\n  border-color: #ccdbe3;\n}\n.lpm .btn_lpm_normal:active,\n.lpm .btn_lpm_normal.active {\n  background-color: #d7d7d7;\n  border-color: #d7d7d7;\n  color: #004d74;\n}\n.lpm .btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.lpm .btn_lpm_small {\n  font-size: 11px;\n  height: 27px;\n  width: auto;\n}\n.lpm .btn_copy {\n  color: #05bed1;\n  border-color: #05bed1;\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.lpm .btn_copy:hover {\n  color: white;\n}\n.lpm .loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.lpm .loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.lpm .loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.lpm .loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.lpm .modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.lpm .modal .modal-header {\n  border: 0;\n}\n.lpm .modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 30px;\n  line-height: 0;\n}\n.lpm .modal .modal-header .close_icon {\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 19px;\n  right: 19px;\n}\n.lpm .modal .modal-body {\n  padding: 15px 50px 0;\n}\n.lpm .modal .modal-footer {\n  border: 0;\n  text-align: center;\n}\n.lpm .modal .modal-footer .default_footer {\n  text-align: right;\n}\n.lpm .modal .modal-footer .default_footer .cancel {\n  width: 72px;\n}\n.lpm .modal .modal-footer .default_footer .ok {\n  width: 88px;\n}\n.lpm .rbt.open {\n  width: 100%;\n}\n.lpm .rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.lpm .rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.lpm .rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.lpm .rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.lpm .rbt .dropdown-menu {\n  width: 100%;\n}\n.lpm .rbt .dropdown-menu .dropdown-item {\n  color: #05bed1;\n}\n.lpm .rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.edit_proxy h3 {\n  margin-bottom: 20px;\n}\n.edit_proxy .nav {\n  display: flex;\n  margin-bottom: 20px;\n}\n.edit_proxy .nav .field {\n  flex-grow: 1;\n}\n.edit_proxy .nav .field .title {\n  display: inline-block;\n}\n.edit_proxy .nav .field select,\n.edit_proxy .nav .field input[type=number],\n.edit_proxy .nav .field input[type=text] {\n  color: #05bed1;\n  font-weight: bold;\n  margin-left: 10px;\n  width: 200px;\n}\n.edit_proxy .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.edit_proxy .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.edit_proxy .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.edit_proxy .warnings_modal .modal-header h4 {\n  font-size: 20px;\n}\n.edit_proxy .warnings_modal .modal-body {\n  padding: 20px;\n}\n.edit_proxy .warnings_modal .warning {\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  background-color: #fff5d7;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.edit_proxy .warnings_modal .warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.edit_proxy .nav_tabs {\n  display: flex;\n  margin-bottom: 20px;\n  padding-bottom: 20px;\n  border-bottom: solid 1px #E0E9EE;\n}\n.edit_proxy .nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 100px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 2px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.edit_proxy .nav_tabs .btn_tab .icon {\n  width: 30px;\n  height: 30px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 16px;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #05bed1;\n  position: relative;\n  left: 29px;\n  top: -5px;\n  border-radius: 50%;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 55px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n}\n.edit_proxy .nav_tabs .btn_tab .info {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.edit_proxy .nav_tabs .btn_tab .icon.target {\n  background: url(/img/target.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.speed {\n  background: url(/img/speed.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.rules {\n  background: url(/img/rules.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.rotation {\n  background: url(/img/rotation.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.debug {\n  background: url(/img/debug.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.general {\n  background: url(/img/general.svg);\n}\n.edit_proxy .nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.edit_proxy .nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.edit_proxy .nav_tabs .btn_tab.active,\n.edit_proxy .nav_tabs .btn_tab:hover {\n  border-color: #05bed1;\n  background-color: white;\n}\n.edit_proxy .nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.edit_proxy .nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.edit_proxy .nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #05bed1;\n  position: absolute;\n  bottom: -8px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.edit_proxy .tab_header {\n  font-size: 16px;\n  font-weight: bold;\n}\n.edit_proxy .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.edit_proxy .section_wrapper {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper:focus {\n  outline: 0;\n}\n.edit_proxy .section_wrapper .outlined {\n  position: relative;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n  flex: 2 0;\n  margin: 5px 0;\n  padding: 14px 30px;\n}\n.edit_proxy .section_wrapper .outlined .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined .section_body {\n  position: relative;\n  font-size: 14px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .note {\n  margin-bottom: 0;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row:not(:first-child) {\n  margin-top: 15px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .desc {\n  flex: 3 3;\n  line-height: 1.07;\n  padding-right: 35px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field {\n  padding-right: 20px;\n  flex: 5 5;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .inline_field {\n  display: flex;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .sufix {\n  margin-left: 20px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .double_field {\n  display: flex;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .double_field input {\n  flex: 2 2;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .double_field .divider {\n  flex: 1 1;\n  text-align: center;\n}\n.edit_proxy .section_wrapper .outlined .icon {\n  position: absolute;\n  right: 20px;\n  top: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.edit_proxy .section_wrapper .outlined .arrow {\n  border-top: solid 7px transparent;\n  border-bottom: solid 7px transparent;\n  position: absolute;\n  margin-top: auto;\n  margin-bottom: auto;\n  top: 0;\n  height: 14px;\n  bottom: 0;\n  right: -7px;\n}\n.edit_proxy .section_wrapper .outlined.error {\n  border-color: #F9BFB9;\n}\n.edit_proxy .section_wrapper .outlined.error .icon {\n  background: url(/img/error.svg);\n  width: 10px;\n  height: 10px;\n}\n.edit_proxy .section_wrapper .outlined.error .arrow {\n  border-left: solid 6px #ef6153;\n}\n.edit_proxy .section_wrapper .outlined.error select,\n.edit_proxy .section_wrapper .outlined.error input[type=number],\n.edit_proxy .section_wrapper .outlined.error input[type=text] {\n  border-color: #ef6153;\n}\n.edit_proxy .section_wrapper .outlined.correct {\n  border-color: #B4E6EE;\n}\n.edit_proxy .section_wrapper .outlined.correct .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.correct .icon {\n  background: url(/img/check.svg);\n  width: 11px;\n  height: 8px;\n}\n.edit_proxy .section_wrapper .outlined.active {\n  border-color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.active .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.active .arrow {\n  border-left: solid 6px #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.disabled {\n  color: #ccdbe3;\n}\n.edit_proxy .section_wrapper .outlined.disabled a {\n  color: #ccdbe3;\n}\n.edit_proxy .section_wrapper .outlined.disabled input,\n.edit_proxy .section_wrapper .outlined.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.edit_proxy .section_wrapper .outlined.disabled label {\n  cursor: default;\n}\n.edit_proxy .section_wrapper .message_wrapper {\n  margin-left: 25px;\n  flex: 1 0;\n  display: inline-block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message {\n  display: none;\n  font-size: 14px;\n  line-height: 1.17;\n  border-radius: 4px;\n  padding: 14px 19px;\n  background-color: #E6F6F9;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.active {\n  display: block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.error {\n  display: block;\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.intro {\n  text-align: center;\n  margin-top: 40px;\n}\n.intro .header {\n  margin: auto;\n}\n.intro .sub_header {\n  margin: auto;\n  margin-top: 10px;\n}\n.intro .img_intro {\n  background: url(/img/lpm_infographics.png);\n  width: 592px;\n  height: 326px;\n  margin: 15px 0;\n}\n.intro .section {\n  cursor: pointer;\n  text-align: initial;\n  width: 470px;\n  height: 83px;\n  margin: auto;\n  border: 2px solid #05bed1;\n  box-shadow: 0 2px 2px 0 rgba(156, 181, 190, 0.57);\n  border-radius: 4px;\n  margin-top: 20px;\n  margin-bottom: 20px;\n  padding-top: 17px;\n}\n.intro .section .img_block {\n  position: absolute;\n}\n.intro .section .img_block .circle_wrapper {\n  border: 1px solid #05bed1;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  border-radius: 50%;\n  left: 19px;\n  z-index: 1;\n  background-color: white;\n}\n.intro .section .text_block {\n  display: inline-block;\n  position: relative;\n  left: 110px;\n}\n.intro .section .title {\n  font-size: 22px;\n  font-weight: 700;\n}\n.intro .section .subtitle {\n  font-size: 14px;\n  color: #05bed1;\n}\n.intro .section .right_arrow {\n  width: 14px;\n  height: 14px;\n  position: relative;\n  top: -32px;\n  left: 425px;\n  transform: rotate(45deg);\n  border-top: 2px solid #05bed1;\n  border-right: 2px solid #05bed1;\n}\n.intro .section.disabled {\n  cursor: initial;\n  border: solid 1px #E0E9EE;\n  color: #9cb5be;\n}\n.intro .section.disabled .subtitle {\n  color: #9cb5be;\n}\n.intro .section.disabled .right_arrow {\n  border-color: #9cb5be;\n}\n.intro .section_list {\n  counter-reset: section;\n}\n.intro .img {\n  width: 40px;\n  height: 40px;\n  position: relative;\n  left: 30px;\n  top: -18px;\n}\n.intro .img:before {\n  color: #05bed1;\n  counter-increment: section;\n  content: counters(section, \".\");\n  font-size: 12px;\n  position: absolute;\n  left: -4px;\n  top: -4px;\n  z-index: 2;\n}\n.intro .img_1_active {\n  background: url(/img/1_active.svg);\n}\n.intro .img_2 {\n  background: url(/img/2.svg);\n}\n.intro .img_2_active {\n  background: url(/img/2_active.svg);\n}\n.intro .img_3 {\n  background: url(/img/3.svg);\n}\n.intro .img_3_active {\n  background: url(/img/3_active.svg);\n}\n.intro .howto {\n  width: 537px;\n  margin: auto;\n  margin-bottom: 100px;\n}\n.intro .howto h1.sub_header {\n  line-height: 0;\n  margin: 0 0 25px 0;\n  color: #05bed1;\n}\n.intro .howto .choices {\n  height: 140px;\n}\n.intro .howto .choice {\n  cursor: pointer;\n  display: inline-block;\n  width: 205px;\n  height: 83px;\n  border-radius: 4px;\n  box-shadow: 0 2px 2px 0 #ccdbe3;\n  border: solid 1px #E0E9EE;\n  margin: 30px 20px;\n}\n.intro .howto .choice .content {\n  position: relative;\n  top: 14px;\n}\n.intro .howto .choice .text_smaller {\n  font-size: 14px;\n}\n.intro .howto .choice .text_bigger {\n  font-size: 20px;\n  font-weight: bold;\n}\n.intro .howto .choice.active,\n.intro .howto .choice:hover {\n  border: solid 2px #00aac3;\n  margin-top: 29px;\n}\n.intro .howto .text_middle {\n  display: inline-block;\n  font-size: 17px;\n  font-weight: bold;\n}\n.intro .howto .well {\n  text-align: left;\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: #f5f5f5;\n}\n.intro .howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n}\n.intro .howto .browser_instructions .header_well p {\n  margin: 10px;\n  display: inline-block;\n}\n.intro .howto .browser_instructions .header_well select {\n  width: 270px;\n  float: right;\n}\n.intro .howto .code_instructions .header_well {\n  text-align: center;\n}\n.intro .howto .instructions_well {\n  margin-top: 25px;\n  margin-bottom: 25px;\n  position: relative;\n}\n.intro .howto .instructions_well pre {\n  border: none;\n  font-size: 12px;\n  background-color: #E6F6F9;\n}\n.intro .howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 28px;\n  right: 28px;\n}\n.intro .howto .btn_lang {\n  margin: 0 2px;\n}\n.intro .howto .btn_done {\n  float: right;\n}\n.intro .howto .instructions {\n  margin-left: 30px;\n  border-left: 1px solid #05bed1;\n}\n.intro .howto .instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 23px;\n  position: relative;\n  top: 2px;\n}\n.intro .howto .instructions ul {\n  margin: 0;\n}\n.intro .howto .instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.intro .howto .instructions li {\n  padding-bottom: 12px;\n}\n.intro .howto .instructions ol li .circle_wrapper {\n  position: absolute;\n  left: 37px;\n  background-color: #f5f5f5;\n  height: 28px;\n  display: inline-block;\n}\n.intro .howto .instructions ol li .circle {\n  border: 1px solid #00bcd2;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.intro .howto .instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.intro .howto .instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #00bcd2;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  left: 7px;\n  top: -5px;\n}\n.intro .howto .instructions code {\n  font-family: Lato;\n  font-size: 13px;\n  font-weight: bold;\n  letter-spacing: -0.1px;\n  border-radius: 3px;\n  background-color: #e7f9fa;\n  color: #005271;\n  padding: 3px 10px;\n  margin: 0 5px;\n}\n.add_proxy_modal.modal .modal-content .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .modal-footer button {\n  margin: 10px 16px;\n}\n.add_proxy_modal.modal .modal-content .modal-footer button.options {\n  width: 190px;\n}\n.add_proxy_modal.modal .modal-content .section {\n  margin-bottom: 37px;\n}\n.add_proxy_modal.modal .modal-content .section:last-child {\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .section h4 {\n  color: #05bed1;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 50px;\n  top: 3px;\n}\n.add_proxy_modal.modal .modal-content .section select {\n  margin-top: 25px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 20px 30px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #05bed1;\n  content: \"\\2022\";\n  font-size: 26px;\n  padding-right: 6px;\n  position: relative;\n  top: 2px;\n}\n.nav_left {\n  margin-top: -30px;\n  position: absolute;\n  width: 224px;\n  height: 100%;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  padding-top: 11px;\n}\n.nav_left .menu .menu_item {\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item .text {\n  color: #05bed1;\n  height: 22px;\n  position: absolute;\n  top: 50%;\n  margin-top: -11px;\n  left: 60px;\n  font-size: 14px;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .icon {\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 20px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .stats {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .zones {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu_filler {\n  background-color: #F3FBFC;\n  height: 100%;\n}\n.nav_top {\n  margin-bottom: 30px;\n  background-color: #f5f5f5;\n  height: 60px;\n}\n.nav_top .logo_wrapper {\n  height: 60px;\n  width: 224px;\n  background: white;\n  display: inline-block;\n}\n.nav_top .logo {\n  background-image: url('img/luminati_logo_2.svg');\n  width: 166px;\n  height: 35px;\n  position: relative;\n  top: 8px;\n  left: 24px;\n}\n.nav_top .version {\n  font-size: 9px;\n  font-weight: bold;\n  float: right;\n  position: relative;\n  top: 4px;\n  right: 3px;\n  opacity: 0.5;\n}\n.nav_top .dropdown {\n  float: right;\n  margin: 18px 36px 0 0;\n  font-size: 14px;\n}\n.nav_top .dropdown-toggle {\n  color: #004d74;\n  padding: 3px 17px 3px 5px;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 6px;\n  top: 12px;\n  margin: 0;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nbody {\n  font-family: \"Noto Sans\", sans-serif;\n  font-size: 15px;\n  line-height: 23px;\n  overflow-y: scroll;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.page-body {\n  margin-left: 224px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\ncode {\n  background: lightgrey;\n  color: black;\n  white-space: nowrap;\n}\n.nowrap {\n  white-space: nowrap;\n}\npre.top-margin {\n  margin-top: 4px;\n}\n.container {\n  width: auto;\n}\n.main-container-qs {\n  margin-left: 25%;\n}\n.qs-move-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 2px;\n  cursor: col-resize;\n}\n.btn-title {\n  float: right;\n  margin-top: -4px;\n  margin-right: 15px;\n  margin-bottom: -5px;\n}\n.header {\n  height: 60px;\n}\n.header img {\n  margin-top: 10px;\n}\nnav a:hover {\n  box-shadow: none;\n}\n.overall-success-ratio {\n  margin-bottom: 20px;\n}\n.success_title {\n  font-size: 22px;\n  cursor: pointer;\n}\n.success_value {\n  text-align: right;\n  font-size: 22px;\n  cursor: pointer;\n  color: #428bca;\n}\n.block {\n  background: #eeeeee;\n  padding: 1em;\n  margin-bottom: 20px;\n}\n.form-group {\n  margin-bottom: 12px;\n}\n.alert-inline {\n  display: inline;\n  padding: 6px 12px;\n  position: relative;\n  top: 2px;\n  margin: 0 8px;\n}\n.tester-body {\n  margin-bottom: 18px;\n}\n.tester-body textarea {\n  height: 100px;\n}\n.tools-header {\n  margin-bottom: 12px;\n}\n.tester-body:after,\n.tools-header:after {\n  content: '';\n  display: block;\n  clear: both;\n}\n.tools-add-header {\n  margin-bottom: 18px;\n}\n.tester-alert {\n  margin-top: 20px;\n  padding: 7.5px 11.5px;\n}\n.tester-results {\n  margin-top: 20px;\n}\n.tools-table {\n  width: auto;\n  float: none;\n  margin: 20px auto;\n}\n.tools-table th {\n  text-align: center;\n}\n.countries-list {\n  text-align: center;\n  margin-top: 20px;\n}\n.countries-list > div {\n  padding: 10px;\n  display: inline-block;\n  width: 200px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-align: left;\n  position: relative;\n  border: 1px solid black;\n  margin: 5px 10px;\n}\n.countries-list .glyphicon {\n  color: grey;\n}\n.countries-list .glyphicon-ok {\n  color: green !important;\n}\n.countries-list .glyphicon-download-alt {\n  color: blue !important;\n}\n.countries-failed {\n  color: red !important;\n}\n.countries-canceled {\n  color: orange !important;\n}\n.countries-op {\n  display: inline-block;\n  position: absolute;\n  right: 0;\n  width: 40px;\n  padding-left: 10px;\n  background: white;\n  background: linear-gradient(to right, rgba(255, 255, 255, 0), white 25%);\n}\n.countries-op span:hover {\n  color: orange;\n  cursor: pointer;\n}\n.countries-view {\n  border-bottom: 1px dashed;\n  cursor: pointer;\n}\n#countries-screenshot .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#countries-screenshot .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\ntable.proxies {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies-settings,\n.columns-settings {\n  overflow: auto;\n  max-height: calc(100vh - 190px);\n}\n.proxies-panel {\n  overflow: auto;\n}\ndiv.proxies .panel-footer,\ndiv.proxies .panel-heading {\n  position: relative;\n}\ndiv.proxies .panel-heading {\n  height: 65px;\n}\ndiv.proxies .btn-wrapper {\n  position: absolute;\n  right: 10px;\n  top: 10px;\n}\n.proxies .btn-csv {\n  font-size: 12px;\n}\n.proxies-default {\n  color: gray;\n}\n.proxies-editable {\n  cursor: pointer;\n  position: relative;\n  display: inline-block;\n  min-height: 20px;\n  min-width: 100%;\n}\n.proxies-editable:hover {\n  color: orange;\n}\n.proxies-table-input {\n  position: absolute;\n  z-index: 2;\n  left: -25px;\n  right: -25px;\n  top: -7px;\n}\n.proxies-table-input input,\n.proxies-table-input select {\n  width: 100%;\n}\n.proxies-check {\n  width: 32px;\n}\n.col_success_rate {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-success-rate-value {\n  color: #428bca;\n  width: 80px;\n  font-size: 16px;\n  cursor: pointer;\n}\n.proxies-actions {\n  white-space: nowrap;\n  width: 80px;\n}\n.proxies-action {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\n.proxies-action-disabled {\n  border: 1px solid transparent;\n  line-height: 20px;\n  margin: 0;\n}\na.proxies-action-edit {\n  visibility: hidden;\n}\na.proxies-action-edit:hover {\n  background: none;\n  border-color: transparent;\n  box-shadow: none;\n}\n.proxies tr:hover .proxies-action-edit {\n  visibility: visible;\n  cursor: pointer;\n}\n.proxies-action-delete,\n.proxies-action-duplicate {\n  cursor: pointer;\n}\n.proxies-warning {\n  color: red;\n}\n#history .modal-dialog,\n#history_details .modal-dialog,\n#pool .modal-dialog {\n  width: auto;\n  margin-left: 20px;\n  margin-right: 20px;\n}\n#history .modal-body > div {\n  overflow: auto;\n  max-height: calc(100vh - 164px);\n}\n#history label {\n  font-weight: normal;\n}\n.proxies-history-navigation {\n  margin-bottom: 25px;\n}\n.proxies-history-filter {\n  font-size: 11px;\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n}\n.proxies-history th {\n  line-height: 15px !important;\n}\n.clickable {\n  cursor: pointer;\n}\n.proxies-history-loading {\n  padding: 4px;\n  width: 200px;\n  text-align: center;\n  position: fixed;\n  left: 50%;\n  top: 50%;\n  margin-left: -100px;\n  z-index: 2;\n}\n.proxies-history-archive {\n  float: right;\n  font-size: 11px;\n  line-height: 14px;\n  margin-top: -1px;\n  margin-bottom: -2px;\n  margin-right: 32px;\n  text-align: right;\n}\n.proxies-history-archive > span {\n  border-bottom: 1px dashed;\n  border-color: #428bca;\n  cursor: pointer;\n  text-transform: lowercase;\n}\n.zones-table td,\n.zones-table thead th {\n  text-align: right;\n}\n.zones-table td.zones-zone,\n.zones-table thead th.zones-zone {\n  text-align: left;\n}\n#zone .panel-heading {\n  position: relative;\n}\n#zone .panel-heading button {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.settings-alert {\n  position: relative;\n}\n.settings-alert .buttons {\n  position: absolute;\n  right: 10px;\n  top: 9px;\n}\n.github {\n  margin-top: 12px;\n}\n#config-textarea,\n#config-textarea + .CodeMirror,\n#resolve-textarea {\n  width: 100%;\n  height: 400px;\n  margin-bottom: 18px;\n}\n.resolve-add-host {\n  margin-top: -6px;\n  margin-bottom: 18px;\n}\n#settings-page {\n  padding-top: 20px;\n}\n.confirmation-items {\n  margin-top: 11px;\n}\n.form-range {\n  width: 100%;\n}\n.form-range .form-control {\n  display: inline-block;\n  width: 48%;\n}\n.form-range .range-seperator {\n  display: inline-block;\n  width: 2%;\n  text-align: center;\n}\n.luminati-login h3 {\n  font-weight: bold;\n  margin-top: 20px;\n  margin-bottom: 20px;\n}\n.luminati-login .alert-danger {\n  color: #d00;\n}\n.luminati-login label {\n  color: #818c93;\n  font-weight: normal;\n}\n.luminati-login button {\n  margin-top: 15px;\n  font-weight: bold;\n  padding: 10px 12px;\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n  border: 1px solid #1c74b3;\n  border-bottom-color: #0d5b97;\n  border-top-color: #2c8ed1;\n  box-shadow: 0 1px 0 #ddd, inset 0 1px 0 rgba(255, 255, 255, 0.2);\n  color: #fff !important;\n  text-shadow: rgba(0, 0, 0, 0.2) 0 1px 0;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  -webkit-tap-highlight-color: transparent;\n}\n.luminati-login button:hover:enabled {\n  background-color: #3baaf4;\n  background-image: -o-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#3baaf4), to(#2389dc));\n  background-image: -webkit-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: -moz-linear-gradient(top, #3baaf4, #2389dc);\n  background-image: linear-gradient(top, #3baaf4, #2389dc);\n}\n.luminati-login button:active {\n  background-image: -o-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -webkit-gradient(linear, left top, left bottom, from(#37a3eb), to(#2181cf));\n  background-image: -webkit-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: -moz-linear-gradient(top, #37a3eb, #2181cf);\n  background-image: linear-gradient(top, #37a3eb, #2181cf);\n}\n.luminati-login .signup {\n  color: #818c93;\n  font-size: 16.5px;\n  margin-top: 12px;\n}\n#google {\n  min-width: 300px;\n}\n#google a.google {\n  color: white;\n  display: block;\n  padding: 0;\n  margin: auto;\n  margin-top: 50px;\n  margin-bottom: 40px;\n  height: 35px;\n  font-size: 16px;\n  padding-top: 6px;\n  padding-left: 95px;\n  cursor: pointer;\n  max-width: 300px;\n  text-align: left;\n  text-decoration: none;\n  border: none;\n  position: relative;\n  white-space: nowrap;\n}\n#google a.google,\n#google a.google:hover {\n  background: url(/img/social_btns.svg) no-repeat 50% 100%;\n}\n#google a.google:focus {\n  outline: 0;\n  top: 1px;\n}\n#google a.google:hover {\n  border: none;\n  box-shadow: none;\n  border-radius: 0;\n}\n#google a.google:active {\n  top: 1px;\n}\n.panel .panel-heading button.btn.btn-ico {\n  padding: 7px;\n  border: solid 1px #c8c2bf;\n  background-color: #fcfcfc;\n  width: 35px;\n  height: 34px;\n  margin: 0 1px;\n}\n.panel .panel-heading button.btn.btn-ico.old_ui_btn {\n  color: #004d74;\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n}\n.panel .panel-heading button.btn.btn-ico img {\n  width: 100%;\n  height: 100%;\n  vertical-align: baseline;\n}\n.panel .panel-heading button.btn.btn-ico[disabled] img {\n  opacity: 0.25;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  max-width: 250px;\n  border: solid 1px black;\n  background: #fff;\n  color: black;\n}\n.status-details-wrapper {\n  background: #f7f7f7;\n  font-size: 12px;\n}\n.status-details-line {\n  margin: 0 0 5px 25px;\n}\n.status-details-icon-warn {\n  vertical-align: bottom;\n  padding-bottom: 1px;\n}\n.status-details-text {\n  padding: 0 0 0 5px;\n}\n.ic-status-triangle {\n  font-size: 12px;\n  color: #979797;\n}\n.text-err {\n  color: #d8393c;\n}\n.text-ok {\n  color: #4ca16a;\n}\n.text-warn {\n  color: #f5a623;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #d7f6ff;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.pull-none {\n  float: none !important;\n}\n.history__header {\n  margin-top: 10px;\n}\n.history-details__column-first {\n  width: 300px;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.blue {\n  color: #4a90e2;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.control-label.preset {\n  width: 100%;\n}\n.control-label.preset .form-control {\n  width: auto;\n  display: inline-block;\n}\ninput.form-control[type=checkbox] {\n  width: auto;\n  height: auto;\n  display: inline;\n}\n.proxies-table-input.session-edit input {\n  width: calc(100% - 2em);\n  display: inline-block;\n}\n.proxies-table-input.session-edit .btn {\n  padding: 4px;\n}\n.tabs_default:hover {\n  color: #555 !important;\n  box-shadow: none !important;\n}\n.chrome_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url('img/icon_chrome.jpg');\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.firefox_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_firefox.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.safari_icon {\n  width: 32px;\n  height: 32px;\n  background-image: url(img/icon_safari.jpg);\n  background-repeat: no-repeat;\n  background-size: 32px 32px;\n  margin: auto;\n}\n.stats_row_change {\n  animation: pulse 1s;\n}\n.row_clickable {\n  cursor: pointer;\n}\n.code_max_height {\n  max-height: 500px;\n}\n.table-fixed {\n  table-layout: fixed;\n}\n.overflow-ellipsis {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: black;\n  font-weight: bold;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n}\n.lpm {\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.lpm h1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\n.lpm h2 {\n  color: #05bed1;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\n.lpm h3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\n.lpm h4 {\n  margin: 0;\n}\n.lpm a {\n  color: #05bed1;\n  cursor: pointer;\n  border: none;\n  text-decoration: underline;\n}\n.lpm a:hover {\n  color: #05bed1;\n  cursor: pointer;\n  background: rgba(0, 0, 0, 0);\n  border: none;\n  box-shadow: none;\n  text-decoration: underline;\n}\n.lpm select,\n.lpm input[type=number],\n.lpm input[type=text],\n.lpm input[type=password],\n.lpm textarea {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n.lpm select:focus,\n.lpm input[type=number]:focus,\n.lpm input[type=text]:focus,\n.lpm input[type=password]:focus,\n.lpm textarea:focus {\n  outline: none;\n  border: solid 1px #05bed1;\n}\n.lpm textarea {\n  height: auto;\n  resize: vertical;\n}\n.lpm select {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\n.lpm input[type=number]::-webkit-inner-spin-button,\n.lpm input[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\n.lpm input[type=number] {\n  -moz-appearance: textfield;\n}\n.lpm .radio_buttons {\n  width: 100%;\n  display: flex;\n}\n.lpm .radio_buttons .option {\n  flex: 1;\n}\n.lpm .radio_buttons input[type=radio] {\n  display: none;\n}\n.lpm .radio_buttons label {\n  cursor: pointer;\n  font-size: 12px;\n  font-weight: 300;\n}\n.lpm .radio_buttons input[type=radio] + .checked_icon {\n  display: inline-block;\n  width: 16px;\n  height: 16px;\n  margin: -2px 6px 0 0;\n  vertical-align: middle;\n  background: none;\n}\n.lpm .radio_buttons input[type=radio]:checked + .checked_icon {\n  background: url(/img/check_radio.svg) left top no-repeat;\n}\n.lpm label.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\n.lpm input[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\n.lpm .highlight {\n  color: #05bed1;\n  margin-right: 5px;\n  font-weight: bold;\n}\n.lpm a.btn_lpm {\n  text-decoration: none;\n  color: #004d74;\n}\n.lpm a.btn_lpm:hover {\n  border-width: 1px;\n  border-style: solid;\n}\n.lpm .btn_lpm {\n  width: 160px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: #05bed1;\n  border: solid 1px #05bed1;\n  color: white;\n  font-size: 16px;\n  font-weight: bold;\n  padding-top: 3px;\n  margin: 0 5px;\n  box-shadow: none;\n}\n.lpm .btn_lpm:hover {\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.lpm .btn_lpm:active,\n.lpm .btn_lpm.active {\n  background-color: #003d5b;\n  border-color: #003d5b;\n  color: #05bed1;\n}\n.lpm .btn_lpm:focus {\n  outline: none;\n}\n.lpm .btn_lpm_default {\n  color: #05bed1;\n  background-color: white;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:hover {\n  background-color: #B4E6EE;\n  border-color: #05bed1;\n}\n.lpm .btn_lpm_default:active,\n.lpm .btn_lpm_default.active {\n  background-color: #05bed1;\n  border-color: #05bed1;\n  color: white;\n}\n.lpm .btn_lpm_normal {\n  color: #004d74;\n  border-color: #ccdbe3;\n  background-color: white;\n}\n.lpm .btn_lpm_normal:hover {\n  background-color: #f5f5f5;\n  border-color: #ccdbe3;\n}\n.lpm .btn_lpm_normal:active,\n.lpm .btn_lpm_normal.active {\n  background-color: #d7d7d7;\n  border-color: #d7d7d7;\n  color: #004d74;\n}\n.lpm .btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.lpm .btn_lpm_small {\n  font-size: 11px;\n  height: 27px;\n  width: auto;\n}\n.lpm .btn_copy {\n  color: #05bed1;\n  border-color: #05bed1;\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.lpm .btn_copy:hover {\n  color: white;\n}\n.lpm .loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.lpm .loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.lpm .loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.lpm .loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.lpm .modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.lpm .modal .modal-header {\n  border: 0;\n}\n.lpm .modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 30px;\n  line-height: 0;\n}\n.lpm .modal .modal-header .close_icon {\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 19px;\n  right: 19px;\n}\n.lpm .modal .modal-body {\n  padding: 15px 50px 0;\n}\n.lpm .modal .modal-footer {\n  border: 0;\n  text-align: center;\n}\n.lpm .modal .modal-footer .default_footer {\n  text-align: right;\n}\n.lpm .modal .modal-footer .default_footer .cancel {\n  width: 72px;\n}\n.lpm .modal .modal-footer .default_footer .ok {\n  width: 88px;\n}\n.lpm .rbt.open {\n  width: 100%;\n}\n.lpm .rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.lpm .rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.lpm .rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.lpm .rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.lpm .rbt .dropdown-menu {\n  width: 100%;\n}\n.lpm .rbt .dropdown-menu .dropdown-item {\n  color: #05bed1;\n}\n.lpm .rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.edit_proxy h3 {\n  margin-bottom: 20px;\n}\n.edit_proxy .nav {\n  display: flex;\n  margin-bottom: 20px;\n}\n.edit_proxy .nav .field {\n  flex-grow: 1;\n}\n.edit_proxy .nav .field .title {\n  display: inline-block;\n}\n.edit_proxy .nav .field select,\n.edit_proxy .nav .field input[type=number],\n.edit_proxy .nav .field input[type=text] {\n  color: #05bed1;\n  font-weight: bold;\n  margin-left: 10px;\n  width: 200px;\n}\n.edit_proxy .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.edit_proxy .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.edit_proxy .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.edit_proxy .warnings_modal .modal-header h4 {\n  font-size: 20px;\n}\n.edit_proxy .warnings_modal .modal-body {\n  padding: 20px;\n}\n.edit_proxy .warnings_modal .warning {\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  background-color: #fff5d7;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.edit_proxy .warnings_modal .warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.edit_proxy .nav_tabs {\n  display: flex;\n  margin-bottom: 20px;\n  padding-bottom: 20px;\n  border-bottom: solid 1px #E0E9EE;\n}\n.edit_proxy .nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 100px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 2px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.edit_proxy .nav_tabs .btn_tab .icon {\n  width: 30px;\n  height: 30px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 16px;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #05bed1;\n  position: relative;\n  left: 29px;\n  top: -5px;\n  border-radius: 50%;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.edit_proxy .nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 55px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n}\n.edit_proxy .nav_tabs .btn_tab .info {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.edit_proxy .nav_tabs .btn_tab .icon.target {\n  background: url(/img/target.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.speed {\n  background: url(/img/speed.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.rules {\n  background: url(/img/rules.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.rotation {\n  background: url(/img/rotation.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.debug {\n  background: url(/img/debug.svg);\n}\n.edit_proxy .nav_tabs .btn_tab .icon.general {\n  background: url(/img/general.svg);\n}\n.edit_proxy .nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.edit_proxy .nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.edit_proxy .nav_tabs .btn_tab.active,\n.edit_proxy .nav_tabs .btn_tab:hover {\n  border-color: #05bed1;\n  background-color: white;\n}\n.edit_proxy .nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.edit_proxy .nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.edit_proxy .nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.edit_proxy .nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #05bed1;\n  position: absolute;\n  bottom: -8px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.edit_proxy .tab_header {\n  font-size: 16px;\n  font-weight: bold;\n}\n.edit_proxy .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.edit_proxy .section_wrapper {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper:focus {\n  outline: 0;\n}\n.edit_proxy .section_wrapper .outlined {\n  position: relative;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n  flex: 2 0;\n  margin: 5px 0;\n  padding: 14px 30px;\n}\n.edit_proxy .section_wrapper .outlined .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined .section_body {\n  position: relative;\n  font-size: 14px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .note {\n  margin-bottom: 0;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row:not(:first-child) {\n  margin-top: 15px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row.disabled {\n  color: #ccdbe3;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row.disabled input,\n.edit_proxy .section_wrapper .outlined .section_body .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field_row.disabled label {\n  cursor: default;\n}\n.edit_proxy .section_wrapper .outlined .section_body .desc {\n  flex: 3 3;\n  line-height: 1.07;\n  padding-right: 35px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field {\n  padding-right: 20px;\n  flex: 5 5;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .inline_field {\n  display: flex;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .sufix {\n  margin-left: 20px;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .double_field {\n  display: flex;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .double_field input {\n  flex: 2 2;\n}\n.edit_proxy .section_wrapper .outlined .section_body .field .double_field .divider {\n  flex: 1 1;\n  text-align: center;\n}\n.edit_proxy .section_wrapper .outlined .icon {\n  position: absolute;\n  right: 20px;\n  top: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.edit_proxy .section_wrapper .outlined .arrow {\n  border-top: solid 7px transparent;\n  border-bottom: solid 7px transparent;\n  position: absolute;\n  margin-top: auto;\n  margin-bottom: auto;\n  top: 0;\n  height: 14px;\n  bottom: 0;\n  right: -7px;\n}\n.edit_proxy .section_wrapper .outlined.error {\n  border-color: #F9BFB9;\n}\n.edit_proxy .section_wrapper .outlined.error .icon {\n  background: url(/img/error.svg);\n  width: 10px;\n  height: 10px;\n}\n.edit_proxy .section_wrapper .outlined.error .arrow {\n  border-left: solid 6px #ef6153;\n}\n.edit_proxy .section_wrapper .outlined.error select,\n.edit_proxy .section_wrapper .outlined.error input[type=number],\n.edit_proxy .section_wrapper .outlined.error input[type=text] {\n  border-color: #ef6153;\n}\n.edit_proxy .section_wrapper .outlined.correct {\n  border-color: #B4E6EE;\n}\n.edit_proxy .section_wrapper .outlined.correct .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.correct .icon {\n  background: url(/img/check.svg);\n  width: 11px;\n  height: 8px;\n}\n.edit_proxy .section_wrapper .outlined.active {\n  border-color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.active .desc {\n  color: #05bed1;\n}\n.edit_proxy .section_wrapper .outlined.active .arrow {\n  border-left: solid 6px #05bed1;\n}\n.edit_proxy .section_wrapper .message_wrapper {\n  margin-left: 25px;\n  flex: 1 0;\n  display: inline-block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message {\n  display: none;\n  font-size: 14px;\n  line-height: 1.17;\n  border-radius: 4px;\n  padding: 14px 19px;\n  background-color: #E6F6F9;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.active {\n  display: block;\n}\n.edit_proxy .section_wrapper .message_wrapper .message.error {\n  display: block;\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.edit_proxy .allocated_ips_modal .random_ips_btn {\n  margin-bottom: 20px;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.intro {\n  text-align: center;\n  margin-top: 40px;\n}\n.intro .header {\n  margin: auto;\n  width: 600px;\n}\n.intro .sub_header {\n  margin: auto;\n  margin-top: 10px;\n}\n.intro .img_intro {\n  background: url(/img/lpm_infographics.png);\n  width: 592px;\n  height: 326px;\n  margin: 15px 0;\n}\n.intro .section {\n  cursor: pointer;\n  text-align: initial;\n  width: 470px;\n  height: 83px;\n  margin: auto;\n  border: 2px solid #05bed1;\n  box-shadow: 0 2px 2px 0 rgba(156, 181, 190, 0.57);\n  border-radius: 4px;\n  margin-top: 20px;\n  margin-bottom: 20px;\n  padding-top: 17px;\n}\n.intro .section .img_block {\n  position: absolute;\n}\n.intro .section .img_block .circle_wrapper {\n  border: 1px solid #05bed1;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  border-radius: 50%;\n  left: 19px;\n  z-index: 1;\n  background-color: white;\n}\n.intro .section .text_block {\n  display: inline-block;\n  position: relative;\n  left: 110px;\n  height: 46px;\n}\n.intro .section .title {\n  font-size: 22px;\n  font-weight: 700;\n}\n.intro .section .subtitle {\n  font-size: 14px;\n  color: #05bed1;\n}\n.intro .section .right_arrow {\n  width: 14px;\n  height: 14px;\n  position: relative;\n  top: -32px;\n  left: 425px;\n  transform: rotate(45deg);\n  border-top: 2px solid #05bed1;\n  border-right: 2px solid #05bed1;\n}\n.intro .section.disabled {\n  cursor: initial;\n  border: solid 1px #E0E9EE;\n  color: #9cb5be;\n}\n.intro .section.disabled .subtitle {\n  color: #9cb5be;\n}\n.intro .section.disabled .right_arrow {\n  border-color: #9cb5be;\n}\n.intro .section_list {\n  counter-reset: section;\n}\n.intro .img {\n  width: 40px;\n  height: 40px;\n  position: relative;\n  left: 30px;\n  top: -18px;\n}\n.intro .img:before {\n  color: #05bed1;\n  counter-increment: section;\n  content: counters(section, \".\");\n  font-size: 12px;\n  position: absolute;\n  left: -4px;\n  top: -4px;\n  z-index: 2;\n}\n.intro .img_1_active {\n  background: url(/img/1_active.svg);\n}\n.intro .img_2 {\n  background: url(/img/2.svg);\n}\n.intro .img_2_active {\n  background: url(/img/2_active.svg);\n}\n.intro .img_3 {\n  background: url(/img/3.svg);\n}\n.intro .img_3_active {\n  background: url(/img/3_active.svg);\n}\n.intro .howto {\n  width: 537px;\n  margin: auto;\n  margin-bottom: 100px;\n}\n.intro .howto h1.header {\n  width: auto;\n}\n.intro .howto h1.sub_header {\n  line-height: 0;\n  margin: 0 0 25px 0;\n  color: #05bed1;\n}\n.intro .howto .choices {\n  height: 140px;\n}\n.intro .howto .choice {\n  cursor: pointer;\n  display: inline-block;\n  width: 205px;\n  height: 83px;\n  border-radius: 4px;\n  box-shadow: 0 2px 2px 0 #ccdbe3;\n  border: solid 1px #E0E9EE;\n  margin: 30px 20px;\n}\n.intro .howto .choice .content {\n  position: relative;\n  top: 14px;\n}\n.intro .howto .choice .text_smaller {\n  font-size: 14px;\n}\n.intro .howto .choice .text_bigger {\n  font-size: 20px;\n  font-weight: bold;\n}\n.intro .howto .choice.active,\n.intro .howto .choice:hover {\n  border: solid 2px #00aac3;\n  margin-top: 29px;\n}\n.intro .howto .text_middle {\n  display: inline-block;\n  font-size: 17px;\n  font-weight: bold;\n}\n.intro .howto .well {\n  text-align: left;\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: #f5f5f5;\n}\n.intro .howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n}\n.intro .howto .browser_instructions .header_well p {\n  margin: 10px;\n  display: inline-block;\n}\n.intro .howto .browser_instructions .header_well select {\n  width: 270px;\n  float: right;\n}\n.intro .howto .code_instructions .header_well {\n  text-align: center;\n}\n.intro .howto .instructions_well {\n  margin-top: 25px;\n  margin-bottom: 25px;\n  position: relative;\n}\n.intro .howto .instructions_well pre {\n  border: none;\n  font-size: 12px;\n  background-color: #E6F6F9;\n}\n.intro .howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 28px;\n  right: 28px;\n}\n.intro .howto .btn_lang {\n  margin: 0 2px;\n}\n.intro .howto .btn_done {\n  float: right;\n}\n.intro .howto .instructions {\n  margin-left: 30px;\n  border-left: 1px solid #05bed1;\n}\n.intro .howto .instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 23px;\n  position: relative;\n  top: 2px;\n}\n.intro .howto .instructions ul {\n  margin: 0;\n}\n.intro .howto .instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.intro .howto .instructions li {\n  padding-bottom: 12px;\n}\n.intro .howto .instructions ol li .circle_wrapper {\n  position: absolute;\n  left: 37px;\n  background-color: #f5f5f5;\n  height: 28px;\n  display: inline-block;\n}\n.intro .howto .instructions ol li .circle {\n  border: 1px solid #00bcd2;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.intro .howto .instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.intro .howto .instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #00bcd2;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  left: 7px;\n  top: -5px;\n}\n.intro .howto .instructions code {\n  font-family: Lato;\n  font-size: 13px;\n  font-weight: bold;\n  letter-spacing: -0.1px;\n  border-radius: 3px;\n  background-color: #e7f9fa;\n  color: #005271;\n  padding: 3px 10px;\n  margin: 0 5px;\n}\n.add_proxy_modal.modal .modal-content .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .modal-footer button {\n  margin: 10px 16px;\n}\n.add_proxy_modal.modal .modal-content .modal-footer button.options {\n  width: 190px;\n}\n.add_proxy_modal.modal .modal-content .section {\n  margin-bottom: 37px;\n}\n.add_proxy_modal.modal .modal-content .section:last-child {\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .section h4 {\n  color: #05bed1;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 50px;\n  top: 3px;\n}\n.add_proxy_modal.modal .modal-content .section select {\n  margin-top: 25px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 20px 30px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #05bed1;\n  content: \"\\2022\";\n  font-size: 26px;\n  padding-right: 6px;\n  position: relative;\n  top: 2px;\n}\n.nav_left {\n  margin-top: -30px;\n  position: absolute;\n  width: 224px;\n  height: 100%;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  padding-top: 11px;\n}\n.nav_left .menu .menu_item {\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item .text {\n  color: #05bed1;\n  height: 22px;\n  position: absolute;\n  top: 50%;\n  margin-top: -11px;\n  left: 60px;\n  font-size: 14px;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .icon {\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 20px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .stats {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .zones {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu_filler {\n  background-color: #F3FBFC;\n  height: 100%;\n}\n.nav_top {\n  margin-bottom: 30px;\n  background-color: #f5f5f5;\n  height: 60px;\n}\n.nav_top .logo_wrapper {\n  height: 60px;\n  width: 224px;\n  background: white;\n  display: inline-block;\n}\n.nav_top .logo {\n  background-image: url('img/luminati_logo_2.svg');\n  width: 166px;\n  height: 35px;\n  position: relative;\n  top: 8px;\n  left: 24px;\n}\n.nav_top .version {\n  font-size: 9px;\n  font-weight: bold;\n  float: right;\n  position: relative;\n  top: 4px;\n  right: 3px;\n  opacity: 0.5;\n}\n.nav_top .dropdown {\n  float: right;\n  margin: 18px 36px 0 0;\n  font-size: 14px;\n}\n.nav_top .dropdown-toggle {\n  color: #004d74;\n  padding: 3px 17px 3px 5px;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 6px;\n  top: 12px;\n  margin: 0;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n}\n", ""]);
 
 // exports
 

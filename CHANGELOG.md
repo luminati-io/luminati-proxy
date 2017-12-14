@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 1.74.978
+- :star: remove git dependency
+- :star: reserved session
+- :star: new edit page design structure
+- :star: new add proxy modal design
+
 ## 1.74.626
 - :star: add experimental cluster mode under '--cluster' flag in cmd
 - :star: add race request option

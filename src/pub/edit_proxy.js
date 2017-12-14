@@ -6,7 +6,8 @@ import classnames from 'classnames';
 import $ from 'jquery';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import {If, Modal, Loader, combine_presets} from './common.js';
+import {If, Modal, Loader, combine_presets,
+    onboarding_steps} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -123,14 +124,24 @@ const tabs = {
         fields: {
             ip: {
                 label: 'Data center IP',
-                tooltip: `Choose specific data center IP (when datacenter
-                    zone`,
+                tooltip: `Choose specific data center IP. to ensure
+                    all requests are executed using specific Data Center IP.
+                    to view the pool of your IPs take a look at 'pool size'
+                    option`,
+            },
+            vip: {
+                label: 'vIP',
+                tooltip: `Choose specific vIP to ensure all requests are
+                    executed using specific vIP. to view the pool of your vIPs
+                    take a look at 'pool size' option`,
             },
             pool_size: {
                 label: 'Pool size',
                 tooltip: `Maintain number of IPs that will be pinged constantly
                     - must have keep_allive to work properly`,
             },
+            multiply_ips: {label: 'Multiply IPs'},
+            multiply_vips: {label: 'Multiply vIPs'},
             pool_type: {
                 label: 'Pool type',
                 tooltip: `How to pull the IPs - roundrobin / sequential`,
@@ -236,14 +247,14 @@ const tabs = {
             bypass_proxy: {
                 label: `URL regex for bypassing the proxy manager and send
                     directly to host`,
-                tooltip: `Insert URL pattern for which requests will be passed 
+                tooltip: `Insert URL pattern for which requests will be passed
                     directly to target site without any proxy
                     (super proxy or peer)`,
             },
             direct_include: {
                 label: `URL regex for requests to be sent directly from super
                     proxy`,
-                tooltip: `Insert URL pattern for which requests will be passed 
+                tooltip: `Insert URL pattern for which requests will be passed
                     through super proxy directly (not through peers)`,
             },
             direct_exclude: {
@@ -260,8 +271,8 @@ class Index extends React.Component {
     constructor(props){
         super(props);
         this.sp = etask('Index', function*(){ yield this.wait(); });
-        this.state = {tab: 'target', cities: {}, form: {zones: {}},
-            warnings: [], errors: {}, show_loader: false, consts: {}};
+        this.state = {tab: 'target', form: {zones: {}}, warnings: [],
+            errors: {}, show_loader: false, consts: {}};
     }
     componentWillMount(){
         const url_o = zurl.parse(document.location.href);
@@ -402,16 +413,25 @@ class Index extends React.Component {
                 form.action = form.rule.action.value;
                 form.trigger_type = 'status';
             }
+            delete form.rule;
         }
-        if (form.reverse_lookup_dns)
-            form.reverse_lookup = 'dns';
-        else if (form.reverse_lookup_file)
-            form.reverse_lookup = 'file';
-        else if (form.reverse_lookup_values)
+        if (form.reverse_lookup===undefined)
         {
-            form.reverse_lookup = 'values';
-            form.reverse_lookup_values = form.reverse_lookup_values.join('\n');
+            if (form.reverse_lookup_dns)
+                form.reverse_lookup = 'dns';
+            else if (form.reverse_lookup_file)
+                form.reverse_lookup = 'file';
+            else if (form.reverse_lookup_values)
+            {
+                form.reverse_lookup = 'values';
+                form.reverse_lookup_values = form.reverse_lookup_values
+                .join('\n');
+            }
         }
+        if (!form.ips)
+            form.ips = [];
+        if (!form.vips)
+            form.vips = [];
         form.whitelist_ips = (form.whitelist_ips||[]).join(',');
         if (form.city && !Array.isArray(form.city) && form.state)
             form.city = [{id: form.city,
@@ -452,9 +472,31 @@ class Index extends React.Component {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: data}),
             });
+            const status = yield ajax.json({
+                url: '/api/proxy_status/'+data.port});
             _this.setState({show_loader: false});
-            ga_event('top bar', 'click save', 'successful');
-            window.location = '/';
+            if (status.status=='ok')
+            {
+                ga_event('top bar', 'click save', 'successful');
+                const curr_step = JSON.parse(window.localStorage.getItem(
+                    'quickstart-step'));
+                if (curr_step==onboarding_steps.ADD_PROXY)
+                {
+                    window.localStorage.setItem('quickstart-step',
+                        onboarding_steps.ADD_PROXY_DONE);
+                    window.localStorage.setItem('quickstart-first-proxy',
+                       data.port);
+                    window.location = '/intro';
+                }
+                else
+                    window.location = '/';
+            }
+            else
+            {
+                ga_event('top bar', 'click save', 'failed');
+                _this.setState({error_list: [{msg: status.status}]});
+                $('#save_proxy_errors').modal('show');
+            }
         });
     }
     save(){
@@ -521,8 +563,6 @@ class Index extends React.Component {
         };
         const rule_status = save_form.status_code=='Custom'
             ? save_form.status_custom : save_form.status_code;
-        save_form.rules = {};
-        save_form.rule = {};
         if (save_form.trigger_type)
         {
             save_form.rule = {
@@ -546,6 +586,10 @@ class Index extends React.Component {
                 }],
             };
         }
+        else {
+            delete save_form.rules;
+            delete save_form.rule;
+        }
         delete save_form.trigger_type;
         delete save_form.status_code;
         delete save_form.status_custom;
@@ -567,16 +611,24 @@ class Index extends React.Component {
         delete save_form.reverse_lookup;
         save_form.whitelist_ips = save_form.whitelist_ips.split(',')
         .filter(Boolean);
-        if (save_form.delete_rules)
-            save_form.rules = {};
-        delete save_form.delete_rules;
-        this.state.presets[save_form.preset].set(save_form);
-        delete save_form.preset;
         if (save_form.city.length)
             save_form.city = save_form.city[0].id;
         else
             save_form.city = '';
+        if (!save_form.max_requests)
+            save_form.max_requests = 0;
+        this.state.presets[save_form.preset].set(save_form);
+        delete save_form.preset;
         return save_form;
+    }
+    get_curr_plan(){
+        const zone_name = this.state.form.zone||'static';
+        const zones = this.state.consts.proxy.zone.values;
+        const curr_zone = zones.filter(p=>p.key==zone_name);
+        let curr_plan;
+        if (curr_zone.length)
+            curr_plan = curr_zone[0].plans.slice(-1)[0];
+        return curr_plan;
     }
     render(){
         let Main_window;
@@ -609,13 +661,13 @@ class Index extends React.Component {
                 errors={this.state.errors}/>
               <Main_window proxy={this.state.consts.proxy}
                 locations={this.state.locations}
-                cities={this.state.cities} states={this.state.states}
                 defaults={this.state.defaults} form={this.state.form}
                 init_focus={this.init_focus}
                 is_valid_field={this.is_valid_field.bind(this)}
                 on_change_field={this.field_changed.bind(this)}
                 support={support} errors={this.state.errors}
-                default_opt={this.default_opt.bind(this)}/>
+                default_opt={this.default_opt.bind(this)}
+                get_curr_plan={this.get_curr_plan.bind(this)}/>
               <Modal className="warnings_modal" id="save_proxy_warnings"
                 title="Warnings:" click_ok={this.save_from_modal.bind(this)}>
                 <Warnings warnings={this.state.warnings}/>
@@ -647,7 +699,16 @@ const Nav = props=>{
         props.on_change_preset(props.form, val, props.presets);
         ga_event('top bar', 'edit field', 'preset');
     };
-    const update_zone = val=>props.on_change_field('zone', val);
+    const update_zone = val=>{
+        props.on_change_field('zone', val);
+        if (props.form.ips.length || props.form.vips.length)
+            props.on_change_field('pool_size', 0);
+        props.on_change_field('ips', []);
+        props.on_change_field('vips', []);
+        props.on_change_field('multiply_ips', false);
+        props.on_change_field('multiply_vips', false);
+        props.on_change_field('multiply', 1);
+    };
     const presets_opt = Object.keys(props.presets||{}).map(p=>
         ({key: props.presets[p].title, value: p}));
     return (
@@ -824,7 +885,7 @@ const Input = props=>{
 const Double_number = props=>{
     const vals = (''+props.val).split(':');
     const update = (start, end)=>{
-        props.on_change_wrapper([start, end].join(':')); };
+        props.on_change_wrapper([start||0, end].join(':')); };
     return (
         <span className="double_field">
           <Input {...props} val={vals[0]||''} id={props.id+'_start'}
@@ -838,24 +899,30 @@ const Double_number = props=>{
     );
 };
 
-const Input_boolean = props=>(
-    <div className="radio_buttons">
-      <div className="option">
-        <input type="radio" checked={props.val=='1'}
-          onChange={e=>props.on_change_wrapper(e.target.value)} id="enable"
-          name={props.id} value="1" disabled={props.disabled}/>
-        <div className="checked_icon"/>
-        <label htmlFor="enable">Enabled</label>
-      </div>
-      <div className="option">
-        <input type="radio" checked={props.val=='0'}
-          onChange={e=>props.on_change_wrapper(e.target.value)} id="disable"
-          name={props.id} value="0" disabled={props.disabled}/>
-        <div className="checked_icon"/>
-        <label htmlFor="disable">Disabled</label>
-      </div>
-    </div>
-);
+const Input_boolean = props=>{
+    const update = val=>{
+        val = val=='true';
+        props.on_change_wrapper(val);
+    };
+    return (
+        <div className="radio_buttons">
+          <div className="option">
+            <input type="radio" checked={props.val==true}
+              onChange={e=>update(e.target.value)} id={props.id+'_enable'}
+              name={props.id} value="true" disabled={props.disabled}/>
+            <div className="checked_icon"/>
+            <label htmlFor={props.id+'_enable'}>Enabled</label>
+          </div>
+          <div className="option">
+            <input type="radio" checked={props.val==false}
+              onChange={e=>update(e.target.value)} id={props.id+'_disable'}
+              name={props.id} value="false" disabled={props.disabled}/>
+            <div className="checked_icon"/>
+            <label htmlFor={props.id+'_disable'}>Disabled</label>
+          </div>
+        </div>
+    );
+};
 
 const Typeahead_wrapper = props=>(
     <Typeahead options={props.data} maxResults={10}
@@ -899,7 +966,7 @@ const Section_field = props=>{
     const val = form[id]||'';
     const placeholder = tabs[tab_id].fields[id].placeholder||'';
     return (
-        <div className="field_row">
+        <div className={classnames('field_row', {disabled})}>
           <div className="desc">{tabs[tab_id].fields[id].label}</div>
           <div className="field">
             <div className="inline_field">
@@ -969,12 +1036,7 @@ class Targeting extends React.Component {
             this.props.on_change_field('state', e[0].region);
     }
     country_disabled(){
-        const zone_name = this.props.form.zone||'static';
-        const zones = this.props.proxy.zone.values;
-        const curr_zone = zones.filter(p=>p.key==zone_name);
-        let curr_plan;
-        if (curr_zone.length)
-            curr_plan = curr_zone[0].plans.slice(-1)[0];
+        const curr_plan = this.props.get_curr_plan();
         return curr_plan&&curr_plan.type=='static';
     }
     render(){
@@ -1130,31 +1192,149 @@ class Rules extends React.Component {
     }
 }
 
-const Ips_alloc_modal = props=>(
-    <Modal id="allocated_ips" title="Select IPs: static">
-      <p>{props.ips}</p>
-    </Modal>
+const Checkbox = props=>(
+  <div className="form-check">
+    <label className="form-check-label">
+      <input className="form-check-input" type="checkbox" value={props.value}
+        onChange={e=>props.on_change(e)} checked={props.checked}/>
+        {props.text}
+    </label>
+  </div>
 );
+
+const Alloc_modal = props=>{
+    if (!props.type)
+        return null;
+    const type_label = props.type=='ips' ? 'IPs' : 'vIPs';
+    const title = 'Select '+type_label+': '+props.zone_name;
+    const checked = row=>props.form[props.type].includes(row);
+    const reset = ()=>{
+        props.on_change_field(props.type, []);
+        props.on_change_field('pool_size', '');
+    };
+    return (
+        <Modal id="allocated_ips" className="allocated_ips_modal"
+          title={title} no_cancel_btn>
+          <button onClick={reset}
+            className="btn btn_lpm btn_lpm_normal random_ips_btn">
+            Random {type_label}
+          </button>
+          {props.list.map(row=>
+            <Checkbox on_change={props.toggle(props.type)} key={row}
+              text={row} value={row} checked={checked(row)}/>
+          )}
+        </Modal>
+    );
+};
 
 class Rotation extends React.Component {
     constructor(props){
         super(props);
-        this.state = {ips: []};
+        this.state = {list: [], loading: false};
+        this.sp = etask('Rotation', function*(){ yield this.wait(); });
     }
-    open_modal(){
-        $('#allocated_ips').modal('show'); }
+    componentWillUnmount(){ this.sp.return(); }
+    toggle(type){
+        return e=>{
+            let {value, checked} = e.target;
+            if (type=='vips')
+                value = Number(value);
+            const {form, on_change_field} = this.props;
+            let new_alloc;
+            if (checked)
+                new_alloc = [...form[type], value];
+            else
+                new_alloc = form[type].filter(r=>r!=value);
+            on_change_field(type, new_alloc);
+            if (!form.multiply_ips && !form.multiply_vips)
+                on_change_field('pool_size', new_alloc.length);
+            else
+                on_change_field('multiply', new_alloc.length);
+        };
+    }
+    open_modal(type){
+        if (!this.props.support.pool_size)
+            return;
+        const {form} = this.props;
+        this.setState({loading: true});
+        const zone = form.zone||'static';
+        const keypass = form.password||'';
+        let base_url;
+        if (type=='ips')
+            base_url = '/api/allocated_ips';
+        else
+            base_url = '/api/allocated_vips';
+        const url = base_url+'?zone='+zone+'&key='+keypass;
+        const _this = this;
+        this.sp.spawn(etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                _this.setState({loading: false});
+            });
+            const res = yield ajax.json({url});
+            let list;
+            if (type=='ips')
+                list = res.ips;
+            else
+                list = res.slice(0, 100);
+            _this.setState({list, loading: false});
+            $('#allocated_ips').modal('show');
+        }));
+    }
+    multiply_changed(val){
+        const {on_change_field, form} = this.props;
+        const size = Math.max(form.ips.length, form.vips.length);
+        if (val)
+        {
+            on_change_field('pool_size', 0);
+            on_change_field('multiply', size);
+            return;
+        }
+        on_change_field('pool_size', size);
+        on_change_field('multiply', 1);
+    }
     render() {
         const {proxy, support, form, default_opt} = this.props;
         const pool_size_disabled = !support.pool_size ||
-            (form.ips && form.ips.length);
-        const pool_size_note = <a onClick={this.open_modal.bind(this)}>
-            set from allocated IPs</a>;
+            form.ips.length || form.vips.length;
+        const curr_plan = this.props.get_curr_plan();
+        let type;
+        if (curr_plan&&curr_plan.type=='static')
+            type = 'ips';
+        else if (curr_plan&&!!curr_plan.vip)
+            type = 'vips';
+        const render_modal = ['ips', 'vips'].includes(type);
+        let pool_size_note;
+        if (this.props.support.pool_size&&render_modal)
+        {
+            pool_size_note = <a onClick={()=>this.open_modal(type)}>
+              {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
+            </a>;
+        }
         return (
             <With_data {...this.props} tab_id="rotation">
-              <Ips_alloc_modal ips={this.state.ips}/>
+              <Loader show={this.state.loading}/>
+              <Alloc_modal list={this.state.list} type={type}
+                zone_name={form.zone||'static'} loading={this.state.loading}
+                toggle={this.toggle.bind(this)}/>
               <Section_with_fields type="text" id="ip"/>
-              <Section_with_fields type="number" id="pool_size" min="0"
-                disabled={pool_size_disabled} note={pool_size_note}/>
+              <Section_with_fields type="text" id="vip"/>
+              <Section id="pool_size" correct={this.props.form.pool_size}
+                disabled={pool_size_disabled}>
+                <Section_field {...this.props} type="number" id="pool_size"
+                  tab_id="rotation" note={pool_size_note} min="0"
+                  disabled={pool_size_disabled}/>
+                <If when={type=='ips'}>
+                  <Section_field {...this.props} type="boolean"
+                    id="multiply_ips" tab_id="rotation"
+                    on_change={this.multiply_changed.bind(this)}/>
+                </If>
+                <If when={type=='vips'}>
+                  <Section_field {...this.props} type="boolean"
+                    id="multiply_vips" tab_id="rotation"
+                    on_change={this.multiply_changed.bind(this)}/>
+                </If>
+              </Section>
               <Section_with_fields type="select" id="pool_type"
                 data={proxy.pool_type.values}
                 disabled={!support.pool_type}/>

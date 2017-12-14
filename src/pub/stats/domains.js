@@ -44,9 +44,9 @@ class DomainTable extends React.Component {
         return <Common.StatTable row={DomainRow} path="/domains"
               row_key="hostname" go {...this.props}>
               <tr>
-                <th>Domain Host</th>
+                <th>Domain</th>
                 <th className="col-md-2">Bandwidth</th>
-                <th className="col-md-5">Number of requests</th>
+                <th className="col-md-5">Requests</th>
               </tr>
             </Common.StatTable>;
     }

@@ -28,13 +28,13 @@
             uib-tooltip="Edit Columns" tooltip-class=tooltip-default>
             <img src=/img/ic_columns.svg >
           </button>
-          <button type=button class="btn btn-ico" ng-click=add_proxy()
-            ng-if="$root.mode!='guest'"
+          <button type=button class="btn btn-ico old_ui_btn" ng-click=add_proxy()
+            ng-if="$root.mode!='guest' && show_old_ui()"
             uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
             <img src=/img/ic_plus.svg>
           </button>
-          <button type=button class="btn btn-ico add_proxy_btn"
-            ng-if="show_add_proxy()" ng-click=add_proxy_new()
+          <button type=button class="btn btn-ico"
+            ng-if="$root.mode!='guest'" ng-click=add_proxy_new()
             uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
             <img src=/img/ic_plus.svg>
           </button>
@@ -57,15 +57,20 @@
               |limitTo:pagination.per_page"
               ng-class="{opened: showed_status_proxies[proxy.port]}">
               <td>
-                <a ng-if="show_add_proxy()" ng-click="edit_proxy_new(proxy)"
-                  ng-href="proxy/{{proxy.port}}" class=proxies-action-edit>
+                <a ng-if="show_old_ui() &&
+                  $root.mode!='guest'&&is_action_available('edit', proxy)"
+                  ng-click="edit_proxy(false, proxy)"
+                  class=proxies-action-edit>
                   E
                 </a>
-                <img ng-if="$root.mode!='guest'&&is_action_available('edit',
+                <a ng-if="$root.mode!='guest'&&is_action_available('edit',
                   proxy)"
-                  ng-click="edit_proxy(false, proxy)"
+                  href="proxy/{{proxy.port}}"
+                  ng-click="edit_proxy_new(proxy)"
                   uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
                   src=/img/ic_edit.svg class=proxies-action-edit>
+                  <img src=/img/ic_edit.svg>
+                </a>
               </td>
               <td ng-repeat="col in columns" ng-init="val=proxy[col.key]">
                 <span uib-tooltip="Ratio of successful requests out of total

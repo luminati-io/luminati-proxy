@@ -4,8 +4,9 @@ import React from 'react';
 import ajax from 'hutil/util/ajax';
 import etask from 'hutil/util/etask';
 import Howto from './howto.js';
-import {onboarding_steps} from './common.js';
+import {onboarding_steps, Loader} from './common.js';
 import util from './util.js';
+import $ from 'jquery';
 
 const ga_event = util.ga_event;
 const steps = onboarding_steps;
@@ -17,7 +18,13 @@ class Page extends React.Component {
         let step = JSON.parse(window.localStorage.getItem('quickstart-step'));
         if (!Object.values(steps).includes(Number(step)))
             step = steps.WELCOME;
-        this.state = {step};
+        let loading = false;
+        if (!$('#add_proxy_modal').length)
+            loading = true;
+        this.state = {step, loading};
+        // XXX krzysztof: temporary hack; remove when zstore
+        window.set_step = this.set_step.bind(this);
+        window.constants_loaded = ()=>{ this.setState({loading: false}); };
     }
     set_step(step){
         if (step==steps.ADD_PROXY)
@@ -45,6 +52,7 @@ class Page extends React.Component {
         }
         return (
             <div className="intro lpm">
+              <Loader show={this.state.loading}/>
               <Current_page set_step={this.set_step.bind(this)}
                 curr_step={this.state.step}/>
             </div>
@@ -92,9 +100,7 @@ class List extends React.Component {
         const test = window.localStorage.getItem('quickstart-test-proxy');
         this.state = {create, test};
     }
-    click_add_proxy(){
-        window.location.href = localhost+'/proxies?action=tutorial_add_proxy';
-    }
+    click_add_proxy(){ $('#add_proxy_modal').modal('show'); }
     skip_to_dashboard(){
         ga_event('lpm-onboarding', '04 tutorial skipped');
         window.location.href = localhost+'/proxies';

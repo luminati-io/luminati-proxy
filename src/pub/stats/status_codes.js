@@ -95,9 +95,9 @@ class StatusCodeTable extends React.Component {
         return <Common.StatTable row={StatusCodeRow} path="/status_codes"
               row_key="status_code" go {...this.props}>
               <tr>
-                <th>Status Code</th>
+                <th>Code</th>
                 <th className="col-md-2">Bandwidth</th>
-                <th className="col-md-5">Number of requests</th>
+                <th className="col-md-5">Requests</th>
               </tr>
             </Common.StatTable>;
     }

@@ -288,8 +288,13 @@ div.proxies .btn-wrapper {
     line-height: 20px;
     margin: 0;
 }
-.proxies-action-edit {
+a.proxies-action-edit {
     visibility: hidden;
+    &:hover {
+        background: none;
+        border-color: transparent;
+        box-shadow: none;
+    }
 }
 .proxies tr:hover .proxies-action-edit {
     visibility: visible;
@@ -504,10 +509,10 @@ div.proxies .btn-wrapper {
     width: 35px;
     height: 34px;
     margin: 0 1px;
-    &.add_proxy_btn {
+    &.old_ui_btn {
         color: @first_color;
-        background-color: @second_color;
-        border-color: @second_color;
+        background-color: @grey;
+        border-color: @grey;
     }
 }
 .panel .panel-heading button.btn.btn-ico img {
@@ -769,6 +774,15 @@ input.form-control[type=checkbox] {
         input[type=radio]:checked + .checked_icon {
             background: url(/img/check_radio.svg) left top no-repeat;
         }
+    }
+    label.form-check-label {
+        font-weight: 300;
+        cursor: pointer;
+    }
+    input[type=checkbox] {
+        margin-right: 5px;
+        position: relative;
+        top: 1px;
     }
     .highlight { color: @second_color; margin-right: 5px; font-weight: bold; }
     a.btn_lpm {
@@ -1119,6 +1133,14 @@ input.form-control[type=checkbox] {
                     display: flex;
                     align-items: center;
                     &:not(:first-child) { margin-top: 15px; }
+                    &.disabled {
+                        color: @grey;
+                        input, select {
+                            background-color: @light_grey;
+                            border-color: @grey_border;
+                        }
+                        label { cursor: default; }
+                    }
                 }
                 .desc {
                     flex: 3 3;
@@ -1184,13 +1206,6 @@ input.form-control[type=checkbox] {
                 border-color: @second_color;
             }
             &.disabled {
-                a { color: @grey; }
-                color: @grey;
-                input, select {
-                    background-color: @light_grey;
-                    border-color: @grey_border;
-                }
-                label { cursor: default; }
             }
         }
         .message_wrapper {
@@ -1213,6 +1228,9 @@ input.form-control[type=checkbox] {
             }
         }
     }
+    .allocated_ips_modal {
+        .random_ips_btn { margin-bottom: 20px; }
+    }
 }
 .modal-backdrop.fade.in { opacity: 0.15; }
 .intro {
@@ -1220,6 +1238,7 @@ input.form-control[type=checkbox] {
     margin-top: 40px;
     .header {
         margin: auto;
+        width: 600px;
     }
     .sub_header {
         margin: auto;
@@ -1260,6 +1279,7 @@ input.form-control[type=checkbox] {
             display: inline-block;
             position: relative;
             left: 110px;
+            height: 46px;
         }
         .title {
             font-size: 22px;
@@ -1314,6 +1334,7 @@ input.form-control[type=checkbox] {
         width: 537px;
         margin: auto;
         margin-bottom: 100px;
+        h1.header { width: auto; }
         h1.sub_header {
             line-height: 0;
             margin: 0 0 25px 0;

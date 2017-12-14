@@ -454,10 +454,13 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         $scope.ver_node = node.data; });
     $http.get('/api/www_lpm').then(function(res){
         $scope.$root.presets = combine_presets(res.data); });
+    $scope.$root.add_proxy_modal = zadd_proxy;
     // krzysztof: hack to pass data to react
     $scope.$root.$watchGroup(['consts', 'presets'], function(){
         if ($scope.consts && $scope.presets)
         {
+            if (window.constants_loaded)
+                window.constants_loaded();
             $scope.$root.add_proxy_constants = {consts: $scope.consts,
                 presets: $scope.presets};
         }
@@ -1756,8 +1759,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     };
     $scope.on_page_change = function(){
         $scope.selected_proxies = {}; };
-    $scope.show_add_proxy = function(){
-        return JSON.parse($window.localStorage.getItem('add_proxy')); };
+    $scope.show_old_ui = function(){
+        return JSON.parse($window.localStorage.getItem('old_ui')); };
     var load_regions = function(country){
         if (!country||country=='*')
             return [];
@@ -1792,7 +1795,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         return options;
     };
     $scope.react_component = req_stats;
-    $scope.add_proxy_modal = zadd_proxy;
     if ($stateParams.add_proxy ||
         qs_o.action && qs_o.action=='tutorial_add_proxy')
     {

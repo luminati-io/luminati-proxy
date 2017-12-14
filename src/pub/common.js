@@ -139,7 +139,6 @@ const presets = {
             if (opt.session===true)
                 opt.seed = false;
         },
-        // XXX krzysztof: find a better, more generic way for rules messages
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'keep_alive', label: `sets 'Keep-alive' to 50 seconds`},

@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.74.626/luminati-proxy-manager-v1.74.626-setup.exe">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.74.978/luminati-proxy-manager-v1.74.978-setup.exe">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -36,7 +36,8 @@ wget -qO- https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 ### Linux/MacOS - Manual install
 - Install Node.js 6 or above ([nodejs.org](https://nodejs.org/en/download/))
-- Install [Git](https://git-scm.com/downloads/) 1.7 or above
+- Make sure npm version is 4.6.1 or higher
+  - if not, run: `sudo npm install -g npm@4.6.1`
 - Install Luminati Proxy from the terminal prompt:
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
@@ -183,6 +184,9 @@ docker run luminati/luminati-proxy
 
 docker run luminati/luminati-proxy luminati --version
 ```
+Make sure to forward appropriate ports. Proxy manager uses by default 22999
+for the web console and the api, 22555 for dropin and 24000 for first
+configurable proxy.
 
 ### SSL Requests
 

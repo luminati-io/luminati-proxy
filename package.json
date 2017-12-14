@@ -1,11 +1,14 @@
 {
-  "author": "Colin Shribman <colin@luminati.io>",
+  "author": "Luminati Networks Ltd <lpm@luminati.io> (https://luminati.io/)",
   "bin": {
     "luminati": "bin/luminati.js",
     "luminati-proxy": "bin/luminati.js"
   },
+  "config": {
+    "unsafe-perm": true
+  },
   "bugs": {
-    "email": "colin@luminati.io"
+    "email": "lpm@luminati.io"
   },
   "build": {
     "appId": "luminati.proxy_manager",
@@ -255,17 +258,34 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "e6f2f48417eb885a71e894dbdf77711e"
+    "md5": "5cf10b3202888d051b96f30d5e841c75"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
+  "contributors": [
+    {
+      "name": "Colin Shribman",
+      "email": "colin@luminati.io"
+    },
+    {
+      "name": "Assaf Zarfaty",
+      "email": "assafz@luminati.io"
+    },
+    {
+      "name": "Krzysztof Fudali",
+      "email": "krzysztof@luminati.io"
+    },
+    {
+      "name": "Maxim Kovalov",
+      "email": "maximk@luminati.io"
+    }
+  ],
   "optionalDependencies": {
     "phantomjs-prebuilt": "^2.1.14",
     "webshot": "^0.18.0"
   },
   "preferGlobal": true,
   "recomendedNode": ">=6",
-  "unsafe-perm": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -277,5 +297,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.74.626"
+  "version": "1.74.978"
 }

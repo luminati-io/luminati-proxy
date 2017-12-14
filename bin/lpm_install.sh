@@ -5,7 +5,6 @@ arg=$1;
 install_node=0;
 install_npm=0;
 install_curl=0;
-install_git=0;
 desired_node_ver='8.9.1';
 desired_npm_ver='4.6.1';
 downgrade_node=0;
@@ -90,16 +89,6 @@ check_node()
 
 }
 
-check_git()
-{
-    echo "checing git...";
-    if ! is_cmd_defined "git"
-        then
-        echo 'git is not installed'
-        install_git=1;
-    fi
-}
-
 check_curl()
 {
     echo "checking curl...";
@@ -152,12 +141,6 @@ install_curl_fn()
     sys_install "curl";
 }
 
-install_git_fn()
-{
-    echo "installing git";
-    sys_install "git";
-}
-
 update_npm_fn()
 {
  echo "updating npm to $desired_npm_ver";
@@ -168,7 +151,6 @@ check_env()
 {
     echo "checking deps...";
     check_curl;
-    check_git;
     check_node;
 }
 
@@ -178,10 +160,6 @@ deps_install()
     if [ "$install_curl" == "1" ]
         then
         install_curl_fn;
-    fi
-    if [ "$install_git" == "1" ]
-        then
-        install_git_fn;
     fi
     if [ "$install_node" == "1" ] || [ "$update_node" == "1" ]
         then
@@ -208,8 +186,6 @@ lpm_clean()
     sudo_cmd "rm -rf $home/.npm /root/.npm";
     mkdir -p $HOME/.npm/_cacache
     mkdir -p $HOME/.npm/_logs
-    git config --global url."git+https://github.com/".insteadOf git@github.com:
-    git config --global url."git+https://".insteadOf git://
 }
 
 lpm_install()
@@ -233,7 +209,7 @@ lpm_install()
 
 clean()
 {
-    sudo_cmd "apt-get remove -y curl nodejs npm git";
+    sudo_cmd "apt-get remove -y curl nodejs npm";
     local lib_path=$(npm list -g | head -1);
     sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules ~/.npm ~/.nave";
     sudo_cmd "rm -rf /usr/local/bin/{luminati,liminati-proxy,npm,nave,node}";
