@@ -34,6 +34,10 @@ Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/dow
 ```sh
 wget -qO- https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
+Or
+```sh
+curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
+```
 ### Linux/MacOS - Manual install
 - Install Node.js 6 or above ([nodejs.org](https://nodejs.org/en/download/))
 - Make sure npm version is 4.6.1 or higher
