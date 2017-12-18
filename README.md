@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.75.355/luminati-proxy-manager-v1.75.355-setup.exe">Luminati Proxy Manager installer</a>.
+Download the <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.75.443/luminati-proxy-manager-v1.75.443-setup.exe">Luminati Proxy Manager installer</a>.
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -51,6 +51,16 @@ sudo npm install -g @luminati-io/luminati-proxy
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
 ```
+
+### Specific Version
+- To install a specific proxy manager version, choose a version from
+ [releases](https://github.com/luminati-io/luminati-proxy/releases)
+
+- Run (VERSION_NUMBER is the version you've chosen (example: 1.75.355)):
+```sh
+sudo npm install -g @luminati-io/luminati-proxy@VERSION_NUMBER
+```
+
 ### Release Notes
 
 You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every version

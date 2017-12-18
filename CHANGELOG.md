@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.75.443
+- :bug: fix session_duration 0 to disable session duration
+
 ## 1.75.355
 - :star: added password and port fields to edit page
 - :star: instant proxy duplication

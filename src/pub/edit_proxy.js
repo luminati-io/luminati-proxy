@@ -116,6 +116,7 @@ const tabs = {
                 label: 'Select action to be taken when the rule is met',
                 tooltip: `The action to be exected when trigger pulled`,
             },
+            retry_port: {label: 'Retry using a different port'},
         },
     },
     rotation: {
@@ -422,6 +423,7 @@ class Index extends React.Component {
             {
                 form.action = form.rule.action.value;
                 form.trigger_type = 'status';
+                form.retry_port = form.rule.action.raw.retry_port;
             }
             delete form.rule;
         }
@@ -544,6 +546,51 @@ class Index extends React.Component {
                 yield _this.persist(data);
         }));
     }
+    prepare_rules(form){
+        const action_raw = ['retry', 'retry_port'].includes(form.action) ?
+            {ban_ip: "60min", retry: true} : {};
+        if (form.action=='retry_port')
+            action_raw.retry_port = form.retry_port;
+        form.action = {
+            raw: action_raw,
+            value: form.action,
+        };
+        const rule_status = form.status_code=='Custom'
+            ? form.status_custom : form.status_code;
+        if (form.trigger_type)
+        {
+            form.rule = {
+                url: form.trigger_regex||'**',
+                action: form.action||{},
+                status: form.status_code,
+            };
+            if (form.rule.status=='Custom')
+                form.rule.custom = form.status_custom;
+            form.rules = {
+                post: [{
+                    res: [{
+                        head: true,
+                        status: {
+                            type: 'in',
+                            arg: rule_status||'',
+                        },
+                        action: action_raw,
+                    }],
+                    url: form.trigger_regex+'/**',
+                }],
+            };
+        }
+        else {
+            delete form.rules;
+            delete form.rule;
+        }
+        delete form.trigger_type;
+        delete form.status_code;
+        delete form.status_custom;
+        delete form.trigger_regex;
+        delete form.action;
+        delete form.retry_port;
+    }
     prepare_to_save(){
         const save_form = Object.assign({}, this.state.form);
         for (let field in save_form)
@@ -565,47 +612,6 @@ class Index extends React.Component {
         save_form.keep_alive = effective('keep_alive');
         save_form.pool_size = effective('pool_size');
         save_form.proxy_type = 'persist';
-        const action_raw = save_form.action=='retry' ?
-            {ban_ip: "60min", retry: true} : {};
-        save_form.action = {
-            label: "Retry request(up to 20 times)",
-            raw: action_raw,
-            value: save_form.action,
-        };
-        const rule_status = save_form.status_code=='Custom'
-            ? save_form.status_custom : save_form.status_code;
-        if (save_form.trigger_type)
-        {
-            save_form.rule = {
-                url: save_form.trigger_regex||'**',
-                action: save_form.action||{},
-                status: save_form.status_code,
-            };
-            if (save_form.rule.status=='Custom')
-                save_form.rule.custom = save_form.status_custom;
-            save_form.rules = {
-                post: [{
-                    res: [{
-                        head: true,
-                        status: {
-                            type: 'in',
-                            arg: rule_status||'',
-                        },
-                        action: action_raw,
-                    }],
-                    url: save_form.trigger_regex+'/**',
-                }],
-            };
-        }
-        else {
-            delete save_form.rules;
-            delete save_form.rule;
-        }
-        delete save_form.trigger_type;
-        delete save_form.status_code;
-        delete save_form.status_custom;
-        delete save_form.trigger_regex;
-        delete save_form.action;
         if (save_form.reverse_lookup=='dns')
             save_form.reverse_lookup_dns = true;
         else
@@ -628,6 +634,7 @@ class Index extends React.Component {
             save_form.city = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
+        this.prepare_rules(save_form);
         this.state.presets[save_form.preset].set(save_form);
         delete save_form.preset;
         return save_form;
@@ -1168,6 +1175,7 @@ class Rules extends React.Component {
         const action_types = [
             {key: '', value: ''},
             {key: 'Retry request (up to 20 times)', value: 'retry'},
+            {key: 'Retry using new port', value: 'retry_port'},
         ];
         const status_types = ['', '200 - Succeeded requests',
             '403 - Forbidden', '404 - Not found',
@@ -1206,9 +1214,16 @@ class Rules extends React.Component {
                     form={form} type="text"
                     on_change_field={on_change_field}/>
                 </Section>
-                <Section_with_fields type="select" id="action" header="Action"
-                  note="IP will change for every entry" data={action_types}
-                  on_change_field={on_change_field}/>
+                <Section id="action" header="Action"
+                  note="IP will change for every entry"
+                  on_change_field={on_change_field}>
+                  <Section_field id="action" tab_id="rules"
+                    type="select" data={action_types} {...this.props}/>
+                  <If when={this.props.form.action=='retry_port'}>
+                    <Section_field id="retry_port" tab_id="rules"
+                      type="number" {...this.props}/>
+                  </If>
+                </Section>
               </With_data>
             </div>
         );

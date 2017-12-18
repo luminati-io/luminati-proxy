@@ -16207,7 +16207,8 @@ var tabs = {
             action: {
                 label: 'Select action to be taken when the rule is met',
                 tooltip: 'The action to be exected when trigger pulled'
-            }
+            },
+            retry_port: { label: 'Retry using a different port' }
         }
     },
     rotation: {
@@ -16579,6 +16580,7 @@ var Index = function (_React$Component) {
                 if (form.rule.action) {
                     form.action = form.rule.action.value;
                     form.trigger_type = 'status';
+                    form.retry_port = form.rule.action.raw.retry_port;
                 }
                 delete form.rule;
             }
@@ -16758,6 +16760,47 @@ var Index = function (_React$Component) {
             })));
         }
     }, {
+        key: 'prepare_rules',
+        value: function prepare_rules(form) {
+            var action_raw = ['retry', 'retry_port'].includes(form.action) ? { ban_ip: "60min", retry: true } : {};
+            if (form.action == 'retry_port') action_raw.retry_port = form.retry_port;
+            form.action = {
+                raw: action_raw,
+                value: form.action
+            };
+            var rule_status = form.status_code == 'Custom' ? form.status_custom : form.status_code;
+            if (form.trigger_type) {
+                form.rule = {
+                    url: form.trigger_regex || '**',
+                    action: form.action || {},
+                    status: form.status_code
+                };
+                if (form.rule.status == 'Custom') form.rule.custom = form.status_custom;
+                form.rules = {
+                    post: [{
+                        res: [{
+                            head: true,
+                            status: {
+                                type: 'in',
+                                arg: rule_status || ''
+                            },
+                            action: action_raw
+                        }],
+                        url: form.trigger_regex + '/**'
+                    }]
+                };
+            } else {
+                delete form.rules;
+                delete form.rule;
+            }
+            delete form.trigger_type;
+            delete form.status_code;
+            delete form.status_custom;
+            delete form.trigger_regex;
+            delete form.action;
+            delete form.retry_port;
+        }
+    }, {
         key: 'prepare_to_save',
         value: function prepare_to_save() {
             var _this3 = this;
@@ -16778,42 +16821,6 @@ var Index = function (_React$Component) {
             save_form.keep_alive = effective('keep_alive');
             save_form.pool_size = effective('pool_size');
             save_form.proxy_type = 'persist';
-            var action_raw = save_form.action == 'retry' ? { ban_ip: "60min", retry: true } : {};
-            save_form.action = {
-                label: "Retry request(up to 20 times)",
-                raw: action_raw,
-                value: save_form.action
-            };
-            var rule_status = save_form.status_code == 'Custom' ? save_form.status_custom : save_form.status_code;
-            if (save_form.trigger_type) {
-                save_form.rule = {
-                    url: save_form.trigger_regex || '**',
-                    action: save_form.action || {},
-                    status: save_form.status_code
-                };
-                if (save_form.rule.status == 'Custom') save_form.rule.custom = save_form.status_custom;
-                save_form.rules = {
-                    post: [{
-                        res: [{
-                            head: true,
-                            status: {
-                                type: 'in',
-                                arg: rule_status || ''
-                            },
-                            action: action_raw
-                        }],
-                        url: save_form.trigger_regex + '/**'
-                    }]
-                };
-            } else {
-                delete save_form.rules;
-                delete save_form.rule;
-            }
-            delete save_form.trigger_type;
-            delete save_form.status_code;
-            delete save_form.status_custom;
-            delete save_form.trigger_regex;
-            delete save_form.action;
             if (save_form.reverse_lookup == 'dns') save_form.reverse_lookup_dns = true;else save_form.reverse_lookup_dns = '';
             if (save_form.reverse_lookup != 'file') save_form.reverse_lookup_file = '';
             if (save_form.reverse_lookup == 'values') {
@@ -16823,6 +16830,7 @@ var Index = function (_React$Component) {
             save_form.whitelist_ips = save_form.whitelist_ips.split(',').filter(Boolean);
             if (save_form.city.length) save_form.city = save_form.city[0].id;else save_form.city = '';
             if (!save_form.max_requests) save_form.max_requests = 0;
+            this.prepare_rules(save_form);
             this.state.presets[save_form.preset].set(save_form);
             delete save_form.preset;
             return save_form;
@@ -17636,7 +17644,7 @@ var Rules = function (_React$Component7) {
         key: 'render',
         value: function render() {
             var trigger_types = [{ key: '', value: '' }, { key: 'Status-code', value: 'status' }];
-            var action_types = [{ key: '', value: '' }, { key: 'Retry request (up to 20 times)', value: 'retry' }];
+            var action_types = [{ key: '', value: '' }, { key: 'Retry request (up to 20 times)', value: 'retry' }, { key: 'Retry using new port', value: 'retry_port' }];
             var status_types = ['', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
                 return { key: s, value: s };
             });
@@ -17688,9 +17696,20 @@ var Rules = function (_React$Component7) {
                             form: form, type: 'text',
                             on_change_field: on_change_field })
                     ),
-                    _react2.default.createElement(Section_with_fields, { type: 'select', id: 'action', header: 'Action',
-                        note: 'IP will change for every entry', data: action_types,
-                        on_change_field: on_change_field })
+                    _react2.default.createElement(
+                        Section,
+                        { id: 'action', header: 'Action',
+                            note: 'IP will change for every entry',
+                            on_change_field: on_change_field },
+                        _react2.default.createElement(Section_field, _extends({ id: 'action', tab_id: 'rules',
+                            type: 'select', data: action_types }, this.props)),
+                        _react2.default.createElement(
+                            _common.If,
+                            { when: this.props.form.action == 'retry_port' },
+                            _react2.default.createElement(Section_field, _extends({ id: 'retry_port', tab_id: 'rules',
+                                type: 'number' }, this.props))
+                        )
+                    )
                 )
             );
         }

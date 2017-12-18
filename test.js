@@ -1010,8 +1010,7 @@ describe('proxy', ()=>{
             _this.timeout(6000);
             yield l.test();
             assert.equal(history.length, 1);
-            yield etask.sleep(1500);
-            console.log(history.length);
+            yield etask.sleep(3000);
             assert.notEqual(history.length, 1);
         }));
     });

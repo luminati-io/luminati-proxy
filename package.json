@@ -52,7 +52,7 @@
     "font-awesome": "^4.7.0",
     "flag-icon-css": "^2.8.0",
     "http-shutdown": "^1.1.0",
-    "hutil": "^0.1.11",
+    "hutil": "^0.2.0",
     "json-stable-stringify": "^1.0.1",
     "json2csv": "^3.7.3",
     "lodash": "^4.17.2",
@@ -258,7 +258,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "c59e60c2ee0c6474ed394274e154179d"
+    "md5": "2bb788cc0f651f17c397ac3559fa7762"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -297,5 +297,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.75.355"
+  "version": "1.75.443"
 }
