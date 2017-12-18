@@ -248,7 +248,7 @@
                 <img ng-if="$root.mode!='guest'
                   &&is_action_available('duplicate', proxy)"
                   uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
-                  ng-click="edit_proxy(true, proxy)"
+                  ng-click="dup_proxies(proxy)"
                   class=proxies-action-duplicate
                   src=/img/ic_dup.svg>
                 <img ng-if="$root.mode!='guest'&&is_action_available('delete',

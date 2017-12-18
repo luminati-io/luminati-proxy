@@ -7,6 +7,9 @@ import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
 import {If, Modal, Loader, onboarding_steps} from './common.js';
+import util from './util.js';
+
+const ga_event = util.ga_event;
 
 class Add_proxy extends React.Component {
     constructor(props){
@@ -22,7 +25,7 @@ class Add_proxy extends React.Component {
         const preset = this.state.preset;
         const form = {
             last_preset_applied: preset,
-            zone: this.state.zone,
+            zone: this.state.zone||this.props.extra.consts.proxy.zone.def,
             proxy_type:'persist',
             max_requests:0,
             session_duration: 0,
@@ -34,6 +37,10 @@ class Add_proxy extends React.Component {
         this.setState({show_loader: true});
         const _this = this;
         return etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                ga_event('add-new-port', 'failed saved');
+            });
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             let port = 24000;
             proxies.forEach(p=>{
@@ -46,6 +53,7 @@ class Add_proxy extends React.Component {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: form}),
             });
+            ga_event('add-new-port', 'successfully saved');
             _this.setState({show_loader: false});
             return port;
         });
@@ -76,8 +84,20 @@ class Add_proxy extends React.Component {
                 window.location.href='/proxies';
         }));
     }
-    rule_clicked(field){ this.save({redirect: true, field}); }
-    field_changed = id=>value=>{ this.setState({[id]: value}); };
+    rule_clicked(field){
+        ga_event('add-new-port', 'rules clicked', field);
+        this.save({redirect: true, field});
+    }
+    field_changed = id=>value=>{
+        this.setState({[id]: value});
+        if (id=='zone')
+            ga_event('add-new-port', 'zone selected', value);
+        else if (id=='preset')
+        {
+            ga_event('add-new-port', 'preset selected',
+                `${this.state.preset}_${value}`);
+        }
+    };
     render(){
         const Footer_wrapper = <Footer save_clicked={this.save.bind(this)}/>;
         return (
@@ -128,14 +148,24 @@ const Field = props=>(
     </div>
 );
 
-const Footer = props=>(
-    <div>
-      <button onClick={()=>props.save_clicked({redirect: true})}
-        className="btn btn_lpm_default btn_lpm options">
-        Advanced options</button>
-      <button onClick={props.save_clicked} className="btn btn_lpm save">
-        Save</button>
-    </div>
-);
+const Footer = props=>{
+    const advanced_clicked = ()=>{
+        ga_event('add-new-port', 'click save');
+        props.save_clicked({redirect: true});
+    };
+    const save_clicked = ()=>{
+        ga_event('add-new-port', 'click advanced');
+        props.save_clicked();
+    };
+    return (
+        <div>
+          <button onClick={advanced_clicked}
+            className="btn btn_lpm_default btn_lpm options">
+            Advanced options</button>
+          <button onClick={save_clicked} className="btn btn_lpm save">
+            Save</button>
+        </div>
+    );
+};
 
 export default Add_proxy;

@@ -981,6 +981,40 @@ describe('proxy', ()=>{
             {ban_ip: '60min', retry: true}, head: true, status: {arg: '200',
             type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 20);
     });
+    describe('reserve session', ()=>{
+        let history;
+        const aggregator = data=>history.push(data);
+        let rules;
+        beforeEach(etask._fn(function*(_this){
+            rules = {post: [{res: [{action: {reserve_session: true, retry:
+                false}, head: true, status: {arg: '200', type: 'in'}}],
+                url: '**'}]};
+            history = [];
+            l = yield lum({history: true, history_aggregator: aggregator,
+                rules, session: true, session_random: true, log: 'info',
+                session_duration: 0, reserved_keep_alive: 1});
+        }));
+        it('should use reserved_sessions', etask._fn(function*(_this){
+            for (var i=0; i<5; i++)
+            {
+                yield l.test();
+                yield etask.sleep(20);
+            }
+            yield l.test({headers: {'x-lpm-reserved': true}});
+            yield etask.sleep(20);
+            let unames = history.map(h=>h.username);
+            assert.notEqual(unames[0], unames[2]);
+            assert.equal(unames[unames.length-1], unames[0]);
+        }));
+        it('should keep reserved session alive',  etask._fn(function*(_this){
+            _this.timeout(6000);
+            yield l.test();
+            assert.equal(history.length, 1);
+            yield etask.sleep(1500);
+            console.log(history.length);
+            assert.notEqual(history.length, 1);
+        }));
+    });
 });
 describe('manager', ()=>{
     let app, temp_files;

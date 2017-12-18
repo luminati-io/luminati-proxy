@@ -219,6 +219,16 @@ const tabs = {
         label: 'General',
         tooltip: '',
         fields: {
+            port: {
+                label: 'Port',
+                tooltip: `The port number that will be used for the current
+                    proxy configuration`,
+            },
+            password: {
+                label: 'Password',
+                tooltip: `Zone password as it appears in your zones page in
+                    your Luminati's control panel http://luminati.io/cp/zones`,
+            },
             iface: {
                 label: 'Interface',
                 tooltip: `Specify a network interface for the machine to use`,
@@ -288,11 +298,11 @@ class Index extends React.Component {
             {
                 consts = yield ajax.json({url: '/api/consts'});
                 defaults = yield ajax.json({url: '/api/defaults'});
-                const proxies = yield ajax.json({url: '/api/proxies'});
+                const proxies = yield ajax.json({url: '/api/proxies_running'});
                 const www_presets = yield ajax.json({url: '/api/www_lpm'});
                 presets = combine_presets(www_presets);
                 const port = window.location.pathname.split('/').slice(-1)[0];
-                form = proxies.filter(p=>p.port==port)[0];
+                form = proxies.filter(p=>p.port==port)[0].config;
             }
             else
             {
@@ -545,6 +555,7 @@ class Index extends React.Component {
             return save_form[attr]===undefined ?
                 this.state.defaults[attr] : save_form[attr];
         };
+        save_form.zone = save_form.zone||this.state.consts.proxy.zone.def;
         if (save_form.session_random)
             save_form.session = true;
         save_form.history = effective('history');
@@ -622,7 +633,8 @@ class Index extends React.Component {
         return save_form;
     }
     get_curr_plan(){
-        const zone_name = this.state.form.zone||'static';
+        const zone_name = this.state.form.zone||
+            this.state.consts.proxy.zone.def;
         const zones = this.state.consts.proxy.zone.values;
         const curr_zone = zones.filter(p=>p.key==zone_name);
         let curr_plan;
@@ -647,11 +659,13 @@ class Index extends React.Component {
             this.state.presets[this.state.form.preset].support||{};
         const zones = this.state.consts.proxy&&
             this.state.consts.proxy.zone.values||[];
+        const default_zone=this.state.consts.proxy&&
+            this.state.consts.proxy.zone.def;
         return (
             <div className="lpm edit_proxy">
               <Loader show={this.state.show_loader}/>
               <h3>Edit port {this.props.port}</h3>
-              <Nav zones={zones}
+              <Nav zones={zones} default_zone={default_zone}
                 form={this.state.form} presets={this.state.presets}
                 on_change_field={this.field_changed.bind(this)}
                 on_change_preset={this.apply_preset.bind(this)}
@@ -700,7 +714,10 @@ const Nav = props=>{
         ga_event('top bar', 'edit field', 'preset');
     };
     const update_zone = val=>{
+        const zone_name = val||props.default_zone;
+        const zone = props.zones.filter(z=>z.key==zone_name)[0]||{};
         props.on_change_field('zone', val);
+        props.on_change_field('password', zone.password);
         if (props.form.ips.length || props.form.vips.length)
             props.on_change_field('pool_size', 0);
         props.on_change_field('ips', []);
@@ -754,18 +771,16 @@ class Action_buttons extends React.Component {
     }
 }
 
-const Nav_tabs = props=>{
-    return (
-        <div className="nav_tabs">
-          <Tab_btn {...props} id="target"/>
-          <Tab_btn {...props} id="speed"/>
-          <Tab_btn {...props} id="rules"/>
-          <Tab_btn {...props} id="rotation"/>
-          <Tab_btn {...props} id="debug"/>
-          <Tab_btn {...props} id="general"/>
-        </div>
-    );
-};
+const Nav_tabs = props=>(
+    <div className="nav_tabs">
+      <Tab_btn {...props} id="target"/>
+      <Tab_btn {...props} id="speed"/>
+      <Tab_btn {...props} id="rules"/>
+      <Tab_btn {...props} id="rotation"/>
+      <Tab_btn {...props} id="debug"/>
+      <Tab_btn {...props} id="general"/>
+    </div>
+);
 
 const Tab_btn = props=>{
     const btn_class = classnames('btn_tab',
@@ -852,15 +867,23 @@ class Section extends React.Component {
     }
 }
 
-const Select = props=>(
-    <select value={props.val}
-      onChange={e=>props.on_change_wrapper(e.target.value)}
-      disabled={props.disabled}>
-      {(props.data||[]).map((c, i)=>(
-        <option key={i} value={c.value}>{c.key}</option>
-      ))}
-    </select>
-);
+const Select = props=>{
+    const update = val=>{
+        if (val=='true')
+            val = true;
+        else if (val=='false')
+            val = false;
+        props.on_change_wrapper(val);
+    };
+    return (
+        <select value={''+props.val}
+          onChange={e=>update(e.target.value)} disabled={props.disabled}>
+          {(props.data||[]).map((c, i)=>(
+            <option key={i} value={c.value}>{c.key}</option>
+          ))}
+        </select>
+    );
+};
 
 const Textarea = props=>{
     return (
@@ -963,7 +986,7 @@ const Section_field = props=>{
     case 'textarea': Comp = Textarea; break;
     default: Comp = Input;
     }
-    const val = form[id]||'';
+    const val = form[id]===undefined ? '' : form[id];
     const placeholder = tabs[tab_id].fields[id].placeholder||'';
     return (
         <div className={classnames('field_row', {disabled})}>
@@ -1257,7 +1280,7 @@ class Rotation extends React.Component {
             return;
         const {form} = this.props;
         this.setState({loading: true});
-        const zone = form.zone||'static';
+        const zone = form.zone||this.props.proxy.zone.def;
         const keypass = form.password||'';
         let base_url;
         if (type=='ips')
@@ -1315,8 +1338,8 @@ class Rotation extends React.Component {
             <With_data {...this.props} tab_id="rotation">
               <Loader show={this.state.loading}/>
               <Alloc_modal list={this.state.list} type={type}
-                zone_name={form.zone||'static'} loading={this.state.loading}
-                toggle={this.toggle.bind(this)}/>
+                zone_name={form.zone||this.props.proxy.zone.def}
+                loading={this.state.loading} toggle={this.toggle.bind(this)}/>
               <Section_with_fields type="text" id="ip"/>
               <Section_with_fields type="text" id="vip"/>
               <Section id="pool_size" correct={this.props.form.pool_size}
@@ -1377,6 +1400,8 @@ const Debug = props=>(
 
 const General = props=>(
     <With_data {...props} tab_id="general">
+      <Section_with_fields type="number" id="port"/>
+      <Section_with_fields type="password" id="password"/>
       <Section_with_fields type="select" id="iface"
         data={props.proxy.iface.values}/>
       <Section_with_fields type="number" id="multiply" min="1"

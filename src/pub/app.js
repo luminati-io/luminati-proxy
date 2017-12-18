@@ -1496,6 +1496,17 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         return !$scope.proxies || !$scope.consts || !$scope.defaults ||
             !$scope.presets;
     };
+    $scope.dup_proxies = proxy=>{
+        $scope.$root.confirmation = {
+            text: 'Are you sure you want to duplicate the proxy?',
+            confirmed: ()=>{
+                $http.post('/api/proxy_dup', {port: proxy.port}).then(()=>{
+                    return $proxies.update();
+                });
+            },
+        };
+        $window.$('#confirmation').modal();
+    };
     $scope.delete_proxies = function(proxy){
         $scope.$root.confirmation = {
             text: 'Are you sure you want to delete the proxy?',
@@ -1679,8 +1690,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         var proxies = $scope.get_selected_proxies()|| port ? [port] : [];
         if (!proxies.length)
             return false;
-        if (action=='duplicate')
-            return proxies.length==1;
         if (port)
             return port.proxy_type=='persist';
         return !$scope.proxies.some(function(sp){
@@ -2586,6 +2595,20 @@ function Proxy($scope, $http, $proxies, $window, $q, $location){
             var zone;
             if (zone = $scope.consts.zone.values.find(_.matches({zone: val})))
                 form.password = zone.password;
+            const plans = zone.plans||[];
+            const plan = plans.length ? plans[plans.length-1] : {};
+            if (!plan.vip)
+            {
+                form.multiply_vips = false;
+                delete form.vip;
+                delete form.vips;
+            }
+            if (!plan.static)
+            {
+                form.multiply_ips = false;
+                delete form.ip;
+                delete form.ips;
+            }
         });
         $scope.$watch('form.multiply_ips', multiply_val_changed);
         $scope.$watch('form.multiply_vips', multiply_val_changed);

@@ -36,38 +36,47 @@ ua.set('av', `v${version}`);
 
 let manager, args = process.argv.slice(2), wnd, upgrade_available, can_upgrade;
 
-const upgrade = ()=>{
-    let res = dialog.showMessageBox({
-        type: 'info',
-        title:'Update Required',
-        message: 'A new Luminati Proxy Manager version is available',
-        buttons: ['Update on exit', 'Update now'],
+const upgrade = (v)=>{
+    dialog.showMessageBox({
+            type: 'info',
+            title: 'Luminati update',
+            message: (v ? `Luminati version ${v}` : 'Luminati update')
+            +' will be installed on exit',
+            buttons: ['Install on exit', 'Install now'],
+    }, (res)=>{
+        if (res==1)
+        {
+            console.log('Starting update');
+            return autoUpdater.quitAndInstall();
+        }
+        console.log('Update postponed until exit');
     });
-    if (res==1)
-    {
-        console.log('starting upgrade');
-        return autoUpdater.quitAndInstall();
-    }
-    console.log('upgrade postponed until exit');
 };
-
+autoUpdater.allowDowngrade = true;
+autoUpdater.autoDownload = false;
+autoUpdater.on('update-available', e=>{
+    console.log(`Update version ${e.version} is available`);
+    dialog.showMessageBox({
+        type: 'info',
+        title: `Luminati update ${e.version} is available`,
+        message: 'Luminati version '+e.version
+        +' is available, would you like to download it?',
+        buttons: ['No', 'Yes'],
+    }, (res)=>{
+        if (res==1)
+        {
+            console.log('Downloading update');
+            return autoUpdater.downloadUpdate();
+        }
+        console.log('Will not download update');
+    });
+});
 autoUpdater.on('update-downloaded', e=>{
-    console.log('upgrade downloaded');
+    console.log('Update downloaded');
     if (manager && manager.argv && !manager.argv.no_usage_stats)
         ua.event('app', 'update-downloaded');
-    if (can_upgrade)
-        upgrade();
-    else
-    {
-        let ntf = new Notification({
-            title: 'Luminati update',
-            body: 'Luminati version '+e.version+' will be installed on exit',
-        });
-        ntf.on('click', ()=>upgrade());
-        ntf.on('exit', ()=>console.log('upgrade postponed until exit'));
-        ntf.show();
-    }
     upgrade_available = true;
+    upgrade(e.version);
 });
 autoUpdater.on('error', ()=>{});
 
@@ -121,11 +130,12 @@ const show_port_conflict = (addr, port)=>{
 };
 
 let run = run_config=>{
+    console.log(`Starting Luminati version ${version}`);
     manager = new Manager(args, Object.assign({ua}, run_config));
     if (!manager.argv.no_usage_stats)
         ua.event('app', 'run');
     autoUpdater.logger = manager._log;
-    autoUpdater.checkForUpdates();
+    setTimeout(()=>autoUpdater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
             ua.event('manager', 'www_ready', url).send();
@@ -188,7 +198,7 @@ let run = run_config=>{
 };
 
 let quit = ()=>{
-    if (manager.argv.no_usage_stats)
+    if (manager&&manager.argv.no_usage_stats)
         app.quit();
     else
         ua.event('app', 'quit', ()=>app.quit());

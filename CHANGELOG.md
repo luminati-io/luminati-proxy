@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 1.75.355
+- :star: added password and port fields to edit page
+- :star: instant proxy duplication
+- :bug: fix selection of boolean values in edit page
+
 ## 1.74.978
 - :star: remove git dependency
 - :star: reserved session
