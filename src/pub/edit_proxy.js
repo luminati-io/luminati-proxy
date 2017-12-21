@@ -4,6 +4,7 @@ import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import classnames from 'classnames';
 import $ from 'jquery';
+import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import {If, Modal, Loader, combine_presets,
@@ -109,14 +110,18 @@ const tabs = {
                 tooltip: `What is the type of condition to trigger the rule
                     action`,
             },
-            trigger_regex: {label: 'Apply for specific domains (regex)'},
+            body_regex: {label: 'Apply for regex'},
+            trigger_url_regex: {label: 'Apply for specific domains (regex)'},
             status_code: {label: 'Status Code'},
             status_custom: {label: 'Custom Status Code'},
             action: {
                 label: 'Select action to be taken when the rule is met',
                 tooltip: `The action to be exected when trigger pulled`,
             },
+            retry_number: {label: 'Number of retries'},
             retry_port: {label: 'Retry using a different port'},
+            ban_ip_duration: {label: 'Ban IP for'},
+            ban_ip_custom: {label: 'Custom duration'},
         },
     },
     rotation: {
@@ -278,6 +283,25 @@ const tabs = {
     },
 };
 
+const validators = {
+    number: (min, max, req=false)=>val=>{
+        val = Number(val);
+        if (isNaN(val))
+        {
+            if (req)
+                return min;
+            else
+                return undefined;
+        }
+        else if (val < min)
+            return min;
+        else if (val > max)
+            return max;
+        else
+            return val;
+    },
+};
+
 class Index extends React.Component {
     constructor(props){
         super(props);
@@ -289,7 +313,7 @@ class Index extends React.Component {
         const url_o = zurl.parse(document.location.href);
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
         if (qs_o.field)
-            this.set_init_focus(qs_o.field);
+            this.goto_field(qs_o.field);
         const _this = this;
         this.sp.spawn(etask(function*(){
             _this.setState({show_loader: true});
@@ -321,7 +345,7 @@ class Index extends React.Component {
     }
     componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
     componentWillUnmount(){ this.sp.return(); }
-    set_init_focus(field){
+    goto_field(field){
         this.init_focus = field;
         let tab;
         for (let [tab_id, tab_o] of Object.entries(tabs))
@@ -354,9 +378,30 @@ class Index extends React.Component {
         this.setState({tab});
         ga_event('categories', 'click', tab);
     }
+    is_dirty(form){
+        for (let key in form)
+        {
+            if (form[key]||this.original_form[key])
+            {
+                if (typeof form[key]=='object' &&
+                    !_.isEqual(form[key], this.original_form[key]))
+                {
+                    return true;
+                }
+                else if (typeof form[key]!='object' &&
+                    form[key]!=this.original_form[key])
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     field_changed(field_name, value){
-        this.setState(prev_state=>
-            ({form: {...prev_state.form, [field_name]: value}}));
+        this.setState(prev_state=>{
+            const new_form = {...prev_state.form, [field_name]: value};
+            return {form: new_form, dirty: this.is_dirty(new_form)};
+        });
         this.send_ga(field_name);
     }
     send_ga(id){
@@ -418,12 +463,20 @@ class Index extends React.Component {
         {
             form.status_code = form.rule.status;
             form.status_custom = form.rule.custom;
-            form.trigger_regex = form.rule.url;
+            form.trigger_url_regex = form.rule.url;
+            form.trigger_type = form.rule.trigger_type;
+            form.body_regex = form.rule.body_regex;
             if (form.rule.action)
             {
                 form.action = form.rule.action.value;
-                form.trigger_type = 'status';
                 form.retry_port = form.rule.action.raw.retry_port;
+                form.retry_number = form.rule.action.raw.retry;
+                if (form.rule.action.raw.ban_ip)
+                {
+                    form.ban_ip_duration = 'custom';
+                    const minutes = form.rule.action.raw.ban_ip.match(/\d+/);
+                    form.ban_ip_custom = Number(minutes&&minutes[0]);
+                }
             }
             delete form.rule;
         }
@@ -451,6 +504,10 @@ class Index extends React.Component {
         else if (!Array.isArray(form.city))
             form.city = [];
         this.setState({form});
+        if (!this.original_form)
+            this.original_form = form;
+        else
+            this.setState({dirty: true});
     }
     default_opt(option){
         const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
@@ -519,7 +576,10 @@ class Index extends React.Component {
         this.sp.spawn(etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
-                _this.setState({show_loader: false});
+                ga_event('top bar', 'click save', 'failed');
+                _this.setState({error_list: [{msg: 'Something went wrong'}],
+                    show_loader: false});
+                $('#save_proxy_errors').modal('show');
             });
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
@@ -547,49 +607,70 @@ class Index extends React.Component {
         }));
     }
     prepare_rules(form){
-        const action_raw = ['retry', 'retry_port'].includes(form.action) ?
-            {ban_ip: "60min", retry: true} : {};
-        if (form.action=='retry_port')
+        const action_raw = {};
+        if (['retry', 'retry_port', 'ban_ip'].includes(form.action))
+            action_raw.retry = true;
+        if (form.action=='retry' && form.retry_number)
+            action_raw.retry = form.retry_number;
+        else if (form.action=='retry_port')
             action_raw.retry_port = form.retry_port;
-        form.action = {
-            raw: action_raw,
-            value: form.action,
-        };
-        const rule_status = form.status_code=='Custom'
-            ? form.status_custom : form.status_code;
+        else if (form.action=='ban_ip')
+        {
+            if (form.ban_ip_duration!='custom')
+                action_raw.ban_ip = form.ban_ip_duration||'10min';
+            else
+                action_raw.ban_ip = form.ban_ip_custom+'min';
+        }
+        else if (form.action=='save_to_pool')
+            action_raw.reserve_session = true;
+        if (!form.rules)
+            form.rules = {};
         if (form.trigger_type)
         {
-            form.rule = {
-                url: form.trigger_regex||'**',
-                action: form.action||{},
-                status: form.status_code,
-            };
-            if (form.rule.status=='Custom')
-                form.rule.custom = form.status_custom;
-            form.rules = {
-                post: [{
-                    res: [{
-                        head: true,
-                        status: {
-                            type: 'in',
-                            arg: rule_status||'',
-                        },
-                        action: action_raw,
-                    }],
-                    url: form.trigger_regex+'/**',
+            form.rules.post = [{
+                res: [{
+                    head: true,
+                    action: action_raw,
                 }],
+                url: (form.trigger_url_regex||'**'),
+            }];
+            form.rule = {
+                url: form.trigger_url_regex||'**',
+                action: {raw: action_raw, value: form.action},
+                trigger_type: form.trigger_type,
             };
         }
-        else {
+        if (form.trigger_type=='status')
+        {
+            let rule_status = form.status_code=='Custom'
+                ? form.status_custom : form.status_code;
+            rule_status = rule_status||'';
+            form.rules.post[0].res[0].status = {type: 'in', arg: rule_status};
+            form.rule.status = form.status_code;
+            if (form.rule.status=='Custom')
+                form.rule.custom = form.status_custom;
+        }
+        else if (form.trigger_type=='body'&&form.body_regex)
+        {
+            form.rules.post[0].res[0].body = {type: '=~',
+                arg: form.body_regex};
+            form.rule.body_regex = form.body_regex;
+        }
+        else if (!form.rules.post && !form.rules.pre)
+        {
             delete form.rules;
             delete form.rule;
         }
         delete form.trigger_type;
         delete form.status_code;
         delete form.status_custom;
-        delete form.trigger_regex;
+        delete form.body_regex;
         delete form.action;
+        delete form.trigger_url_regex;
+        delete form.retry_number;
         delete form.retry_port;
+        delete form.ban_ip_duration;
+        delete form.ban_ip_custom;
     }
     prepare_to_save(){
         const save_form = Object.assign({}, this.state.form);
@@ -634,8 +715,8 @@ class Index extends React.Component {
             save_form.city = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
-        this.prepare_rules(save_form);
         this.state.presets[save_form.preset].set(save_form);
+        this.prepare_rules(save_form);
         delete save_form.preset;
         return save_form;
     }
@@ -668,27 +749,44 @@ class Index extends React.Component {
             this.state.consts.proxy.zone.values||[];
         const default_zone=this.state.consts.proxy&&
             this.state.consts.proxy.zone.def;
+        const warning_dirty = (<span>
+            You have unsaved changes. Сlick
+            <strong> 'Save' </strong>
+            to apply the changes
+        </span>);
         return (
             <div className="lpm edit_proxy">
               <Loader show={this.state.show_loader}/>
-              <h3>Edit port {this.props.port}</h3>
-              <Nav zones={zones} default_zone={default_zone}
-                form={this.state.form} presets={this.state.presets}
-                on_change_field={this.field_changed.bind(this)}
-                on_change_preset={this.apply_preset.bind(this)}
-                save={this.save.bind(this)}/>
-              <Nav_tabs curr_tab={this.state.tab} form={this.state.form}
-                on_tab_click={this.click_tab.bind(this)}
-                errors={this.state.errors}/>
-              <Main_window proxy={this.state.consts.proxy}
-                locations={this.state.locations}
-                defaults={this.state.defaults} form={this.state.form}
-                init_focus={this.init_focus}
-                is_valid_field={this.is_valid_field.bind(this)}
-                on_change_field={this.field_changed.bind(this)}
-                support={support} errors={this.state.errors}
-                default_opt={this.default_opt.bind(this)}
-                get_curr_plan={this.get_curr_plan.bind(this)}/>
+              <div className="nav_wrapper">
+                <div className="nav_header">
+                  <h3>Edit port {this.props.port}</h3>
+                  <div className="warning_wrapper">
+                    <If when={this.state.dirty}>
+                      <Warning text={warning_dirty}/>
+                    </If>
+                  </div>
+                </div>
+                <Nav zones={zones} default_zone={default_zone}
+                  form={this.state.form} presets={this.state.presets}
+                  on_change_field={this.field_changed.bind(this)}
+                  on_change_preset={this.apply_preset.bind(this)}
+                  save={this.save.bind(this)} dirty={this.state.dirty}/>
+                <Nav_tabs curr_tab={this.state.tab} form={this.state.form}
+                  on_tab_click={this.click_tab.bind(this)}
+                  errors={this.state.errors}/>
+              </div>
+              <div className="main_window">
+                <Main_window proxy={this.state.consts.proxy}
+                  locations={this.state.locations}
+                  defaults={this.state.defaults} form={this.state.form}
+                  init_focus={this.init_focus}
+                  is_valid_field={this.is_valid_field.bind(this)}
+                  on_change_field={this.field_changed.bind(this)}
+                  support={support} errors={this.state.errors}
+                  default_opt={this.default_opt.bind(this)}
+                  get_curr_plan={this.get_curr_plan.bind(this)}
+                  goto_field={this.goto_field.bind(this)}/>
+              </div>
               <Modal className="warnings_modal" id="save_proxy_warnings"
                 title="Warnings:" click_ok={this.save_from_modal.bind(this)}>
                 <Warnings warnings={this.state.warnings}/>
@@ -741,7 +839,7 @@ const Nav = props=>{
             value={props.form.zone}/>
           <Field on_change={update_preset} label="Preset" options={presets_opt}
             value={props.form.preset}/>
-          <Action_buttons save={props.save}/>
+          <Action_buttons save={props.save} dirty={props.dirty}/>
         </div>
     );
 };
@@ -763,15 +861,19 @@ const Field = props=>{
 
 class Action_buttons extends React.Component {
     cancel_clicked(){ ga_event('top bar', 'cancel'); }
-    save_clicked(){ this.props.save(); }
+    save_clicked(){
+        if (this.props.dirty)
+            this.props.save();
+    }
     render(){
+        const save_btn_class = classnames('btn btn_lpm btn_save',
+            {disabled: !this.props.dirty});
         return (
             <div className="action_buttons">
               <a href="/proxies" onClick={this.cancel_clicked.bind(this)}
-                className="btn btn_lpm btn_lpm_normal btn_cancel">
-                Cancel
+                className="btn btn_lpm btn_lpm_normal btn_cancel">Cancel
               </a>
-              <button className="btn btn_lpm btn_save"
+              <button className={save_btn_class}
                 onClick={this.save_clicked.bind(this)}>Save</button>
             </div>
         );
@@ -842,20 +944,25 @@ class Section extends React.Component {
             this.setState({focused: true});
     }
     on_blur(){ this.setState({focused: false}); }
+    on_mouse_enter(){ this.setState({hovered: true}); }
+    on_mouse_leave(){ this.setState({hovered: false}); }
     render(){
         const error = !!this.props.error_msg;
         const dynamic_class = {
             error,
             correct: this.props.correct && !error,
             active: this.state.focused && !error,
+            hovered: this.state.hovered,
             disabled: this.props.disabled,
         };
         const message = this.props.error_msg
             ? this.props.error_msg
             : tabs[this.props.tab_id].fields[this.props.id].tooltip;
         return (
-            <div tabIndex="0" onFocus={this.on_focus.bind(this)} autoFocus
-              onBlur={this.on_blur.bind(this)} className="section_wrapper">
+            <div tabIndex="0" onFocus={this.on_focus.bind(this)}
+              onBlur={this.on_blur.bind(this)} className="section_wrapper"
+              onMouseEnter={this.on_mouse_enter.bind(this)}
+              onMouseLeave={this.on_mouse_leave.bind(this)}>
               <div className={classnames('outlined', dynamic_class)}>
                 <Section_header text={this.props.header}/>
                 <div className="section_body">
@@ -908,7 +1015,8 @@ const Input = props=>{
     return (
         <input type={props.type} value={props.val} disabled={props.disabled}
           onChange={e=>update(e.target.value)} className={props.className}
-          min={props.min} max={props.max} placeholder={props.placeholder}/>
+          min={props.min} max={props.max} placeholder={props.placeholder}
+          onBlur={props.on_blur}/>
     );
 };
 
@@ -921,7 +1029,7 @@ const Double_number = props=>{
           <Input {...props} val={vals[0]||''} id={props.id+'_start'}
             type="number" disabled={props.disabled}
             on_change_wrapper={val=>update(val, vals[1])}/>
-          <span className="divider">÷</span>
+          <span className="divider">:</span>
           <Input {...props} val={vals[1]||''} id={props.id+'_end'}
             type="number" disabled={props.disabled}
             on_change_wrapper={val=>update(vals[0], val)}/>
@@ -976,7 +1084,11 @@ const Section_with_fields = props=>{
 
 const Section_field = props=>{
     const {tab_id, id, form, sufix, note, type, disabled, data, on_change,
-        on_change_field, min, max} = props;
+        on_change_field, min, max, validator} = props;
+    const on_blur = e=>{
+        if (validator)
+            on_change_field(id, validator(e.target.value));
+    };
     const on_change_wrapper = (value, _id)=>{
         const curr_id = _id||id;
         if (on_change)
@@ -1003,7 +1115,7 @@ const Section_field = props=>{
               <Comp form={form} id={id} data={data} type={type}
                 on_change_wrapper={on_change_wrapper} val={val}
                 disabled={disabled} min={min} max={max}
-                placeholder={placeholder}/>
+                placeholder={placeholder} on_blur={on_blur}/>
               {sufix ? <span className="sufix">{sufix}</span> : null}
             </div>
             {note ? <Note>{note}</Note> : null}
@@ -1147,23 +1259,33 @@ const Note = props=>(
 class Rules extends React.Component {
     constructor(props){
         super(props);
-        this.state={show_statuses: this.props.form.trigger_type=='status',
-            show_custom: this.props.form.status_code=='Custom'};
+        this.state={
+            show_statuses: this.props.form.trigger_type=='status',
+            show_body_regex: this.props.form.trigger_type=='body',
+            show_custom_status: this.props.form.status_code=='Custom',
+        };
     }
     type_changed(val){
         if (val=='status')
             this.setState({show_statuses: true});
         else
         {
-            this.setState({show_statuses: false, show_custom: false});
+            this.setState({show_statuses: false, show_custom_status: false});
             this.props.on_change_field('status_code', '');
             this.props.on_change_field('status_custom', '');
         }
+        if (val=='body')
+            this.setState({show_body_regex: true});
+        else
+        {
+            this.setState({show_body_regex: false});
+            this.props.on_change_field('body_regex', '');
+        }
         if (!val)
-            this.props.on_change_field('trigger_regex', '');
+            this.props.on_change_field('trigger_url_regex', '');
     }
     status_changed(val){
-        this.setState({show_custom: val=='Custom'});
+        this.setState({show_custom_status: val=='Custom'});
         if (val!='Custom')
             this.props.on_change_field('status_custom', '');
     }
@@ -1171,11 +1293,22 @@ class Rules extends React.Component {
         const trigger_types = [
             {key:'', value: ''},
             {key: 'Status-code', value: 'status'},
+            {key: 'html-Body', value: 'body'},
         ];
         const action_types = [
             {key: '', value: ''},
             {key: 'Retry request (up to 20 times)', value: 'retry'},
             {key: 'Retry using new port', value: 'retry_port'},
+            {key: 'Ban IP', value: 'ban_ip'},
+            {key: 'Save IP to the reserved pool', value: 'save_to_pool'},
+        ];
+        const ban_options = [
+            {key: '10 minutes', value: '10min'},
+            {key: '20 minutes', value: '20min'},
+            {key: '30 minutes', value: '30min'},
+            {key: '40 minutes', value: '40min'},
+            {key: '50 minutes', value: '50min'},
+            {key: 'Custom', value: 'custom'},
         ];
         const status_types = ['', '200 - Succeeded requests',
             '403 - Forbidden', '404 - Not found',
@@ -1183,14 +1316,15 @@ class Rules extends React.Component {
             '503 - Service unavailable', '504 - Gateway timeout', 'Custom']
             .map(s=>({key: s, value: s}));
         const {form, on_change_field} = this.props;
-        const trigger_correct = form.trigger_type||form.trigger_regex;
+        const trigger_correct = form.trigger_type||form.trigger_url_regex;
         return (
             <div>
               <div className="tab_header">
                 Define custom action for specific request response</div>
               <Note>
-                Rules will apply when 'SSL analyzing' enabled (See 'Debugging'
-                section)
+                <span>Rules will apply when 'SSL analyzing' </span>
+                <a onClick={()=>this.props.goto_field('ssl')}>enabled</a>
+                <span> (See 'Debugging' section)</span>
               </Note>
               <With_data {...this.props} tab_id="rules">
                 <Section id="trigger_type" header="Trigger Type"
@@ -1199,18 +1333,22 @@ class Rules extends React.Component {
                     form={form} type="select" data={trigger_types}
                     on_change_field={on_change_field}
                     on_change={this.type_changed.bind(this)}/>
+                  <If when={this.state.show_body_regex}>
+                    <Section_field tab_id="rules" id="body_regex"
+                      type="text" {...this.props}/>
+                  </If>
                   <If when={this.state.show_statuses}>
                     <Section_field tab_id="rules" id="status_code"
                       form={form} type="select" data={status_types}
                       on_change_field={on_change_field}
                       on_change={this.status_changed.bind(this)}/>
                   </If>
-                  <If when={this.state.show_custom}>
+                  <If when={this.state.show_custom_status}>
                     <Section_field tab_id="rules" id="status_custom"
                       form={form} type="text" data={status_types}
                       on_change_field={on_change_field}/>
                   </If>
-                  <Section_field tab_id="rules" id="trigger_regex"
+                  <Section_field tab_id="rules" id="trigger_url_regex"
                     form={form} type="text"
                     on_change_field={on_change_field}/>
                 </Section>
@@ -1219,9 +1357,22 @@ class Rules extends React.Component {
                   on_change_field={on_change_field}>
                   <Section_field id="action" tab_id="rules"
                     type="select" data={action_types} {...this.props}/>
+                  <If when={this.props.form.action=='retry'}>
+                    <Section_field id="retry_number" tab_id="rules"
+                      type="number" {...this.props} min="0" max="20"
+                      validator={validators.number(0, 20)}/>
+                  </If>
                   <If when={this.props.form.action=='retry_port'}>
                     <Section_field id="retry_port" tab_id="rules"
                       type="number" {...this.props}/>
+                  </If>
+                  <If when={this.props.form.action=='ban_ip'}>
+                    <Section_field id="ban_ip_duration" tab_id="rules"
+                      type="select" data={ban_options} {...this.props}/>
+                    <If when={this.props.form.ban_ip_duration=='custom'}>
+                      <Section_field id="ban_ip_custom" tab_id="rules"
+                        type="number" {...this.props} sufix="minutes"/>
+                    </If>
                   </If>
                 </Section>
               </With_data>

@@ -8,11 +8,17 @@
   </div>
   <div class="buttons">
     <button type=button class="btn btn-primary" ng-click=upgrade()
-      ng-disabled=upgrading||upgrade_error||!ver_node.satisfied>
+      ng-disabled=upgrading||upgrade_error||!ver_node.satisfied
+      ng-if="!is_electron()">
       {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
     </button>
+    <a ng-href="https://github.com/luminati-io/luminati-proxy/releases/download/v{{$parent.ver_last.version}}/luminati-proxy-manager-v{{$parent.ver_last.version}}-setup.exe"
+      ng-if="is_electron()">
+      Download upgrade
+    </a>
   </div>
-  <div ng-if=ver_node&&!ver_node.satisfied>
+
+  <div ng-if=ver_node&&!ver_node.satisfied&&!is_electron()>
     To upgrade Luminati Proxy Manager, you need to update Node.js to version
     {{ver_node.recommended}}.
   </div>

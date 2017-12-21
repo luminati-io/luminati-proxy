@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.75.912
+
 ## 1.75.443
 - :bug: fix session_duration 0 to disable session duration
 - :star: 'waterfall' rule action to retry using different port

@@ -991,8 +991,8 @@ describe('proxy', ()=>{
                 url: '**'}]};
             history = [];
             l = yield lum({history: true, history_aggregator: aggregator,
-                rules, session: true, session_random: true, log: 'info',
-                session_duration: 0, reserved_keep_alive: 1});
+                rules, session: true, log: 'info', max_requests: 1,
+                reserved_keep_alive: 1});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             for (var i=0; i<5; i++)

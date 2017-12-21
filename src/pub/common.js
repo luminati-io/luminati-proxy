@@ -129,16 +129,18 @@ const presets = {
             long as possible`,
         check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
             && opt.session===true && opt.keep_alive; },
-        set: function(opt){
+        set: opt=>{
             opt.pool_size = 0;
             opt.ips = [];
-            opt.keep_alive = opt.keep_alive || 50;
+            opt.keep_alive = opt.keep_alive||50;
             opt.pool_type = undefined;
             opt.sticky_ip = false;
             opt.session = true;
             if (opt.session===true)
                 opt.seed = false;
         },
+        to_clean: ['pool_size', 'ips', 'keep_alive', 'sticky_ip', 'session',
+            'seed'],
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'keep_alive', label: `sets 'Keep-alive' to 50 seconds`},
@@ -171,6 +173,8 @@ const presets = {
             if (opt.session===true)
                 opt.seed = false;
         },
+        to_clean: ['pool_size', 'ips', 'keep_alive', 'sticky_ip', 'session',
+            'seed'],
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'keep_alive', label: `sets 'Keep-alive' to 0 seconds`},
@@ -199,6 +203,7 @@ const presets = {
             opt.session = undefined;
             opt.multiply = undefined;
         },
+        to_clean: ['pool_size', 'ips', 'sticky_ip'],
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'pool_type', label: `sequential pool type`},
@@ -227,6 +232,7 @@ const presets = {
             opt.sticky_ip = undefined;
             opt.session = undefined;
         },
+        to_clean: ['pool_size', 'pool_type'],
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `sequential pool type`},
@@ -256,6 +262,7 @@ const presets = {
             opt.session = undefined;
             opt.multiply = undefined;
         },
+        to_clean: ['pool_size', 'pool_type'],
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `round-robin pool type`},
@@ -290,9 +297,14 @@ const presets = {
         },
     },
 };
-for (var k in presets)
+for (let k in presets)
 {
-    if (!presets[k].clean)
+    if (!presets[k].clean && presets[k].to_clean)
+    {
+        presets[k].clean = opt=>{
+            presets[k].to_clean.forEach(f=>delete opt[f]); };
+    }
+    else if (!presets[k].clean)
         presets[k].clean = opt=>opt;
     presets[k].key = k;
 }

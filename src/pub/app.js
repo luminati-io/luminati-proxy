@@ -478,13 +478,15 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         .then(function(){ $window.location.reload(); });
     };
     $scope.is_upgradable = function(){
-        if (!($scope.ver_node&&$scope.ver_node.is_electron)&&!is_electron
-            &&$scope.ver_last&& $scope.ver_last.newer)
+        if ($scope.ver_last&&$scope.ver_last.newer)
         {
             var version = $window.localStorage.getItem('dismiss_upgrade');
             return version ? $scope.ver_last.version>version : true;
         }
         return false;
+    };
+    $scope.is_electron = function(){
+        return $scope.ver_node&&$scope.ver_node.is_electron||is_electron;
     };
     $scope.dismiss_upgrade = function(){
         $window.localStorage.setItem('dismiss_upgrade',
