@@ -39,7 +39,7 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
-import {onboarding_steps, combine_presets} from './common.js';
+import {onboarding_steps, presets} from './common.js';
 
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -202,7 +202,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
                 proxy: $rootScope.edit_proxy,
                 consts: $rootScope.consts,
                 defaults: $rootScope.defaults,
-                presets: $rootScope.presets,
+                all_locations: $rootScope.all_locations,
             };
         },
     });
@@ -450,19 +450,20 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
     });
     $http.get('/api/defaults').then(function(defaults){
         $scope.$root.defaults = defaults.data; });
+    $http.get('/api/all_locations').then(function(locations){
+        $scope.$root.all_locations = locations.data; });
     $http.get('/api/node_version').then(function(node){
         $scope.ver_node = node.data; });
-    $http.get('/api/www_lpm').then(function(res){
-        $scope.$root.presets = combine_presets(res.data); });
+    $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
     // krzysztof: hack to pass data to react
-    $scope.$root.$watchGroup(['consts', 'presets'], function(){
-        if ($scope.consts && $scope.presets)
+    $scope.$root.$watchGroup(['consts', 'all_locations'], function(){
+        if ($scope.consts && $scope.all_locations)
         {
             if (window.constants_loaded)
                 window.constants_loaded();
             $scope.$root.add_proxy_constants = {consts: $scope.consts,
-                presets: $scope.presets};
+                all_locations: $scope.all_locations};
         }
     });
     var show_reload = function(){

@@ -7,8 +7,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import {If, Modal, Loader, combine_presets,
-    onboarding_steps} from './common.js';
+import {If, Modal, Loader, presets, onboarding_steps} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -102,21 +101,31 @@ const tabs = {
         },
     },
     rules: {
-        label: 'Zero fail',
-        tooltip: 'Configure rules to handle failed requests',
+        label: 'Rules',
+        tooltip: 'Define custom action for specific rule',
         fields: {
             trigger_type: {
-                label: 'Create a rule including',
-                tooltip: `What is the type of condition to trigger the rule
-                    action`,
+                label: 'Rule type',
+                tooltip: `Lumianti will scan the HTML response on every
+                    request and if the rule you select is true the Action
+                    will be executed automatically `,
             },
-            body_regex: {label: 'Apply for regex'},
-            trigger_url_regex: {label: 'Apply for specific domains (regex)'},
-            status_code: {label: 'Status Code'},
-            status_custom: {label: 'Custom Status Code'},
+            body_regex: {
+                label: 'String to be scanned in body (Regex)',
+                placeholder:`i.e. (captcha|robot)`
+            },
+            trigger_url_regex: {
+                label: 'Apply only on specific domains (optional)',
+                placeholder:`i.e. example.com`
+            },
+            status_code: {label: 'Status Code string to be scanned'},
+            status_custom: {
+                label: 'Custom Status Code(Regex)',
+                placeholder:`i.e. (2..|3..|404)`
+            },
             action: {
-                label: 'Select action to be taken when the rule is met',
-                tooltip: `The action to be exected when trigger pulled`,
+                label: 'Action type',
+                tooltip: `The action to be executed when rule is met `,
             },
             retry_number: {label: 'Number of retries'},
             retry_port: {label: 'Retry using a different port'},
@@ -144,7 +153,7 @@ const tabs = {
             pool_size: {
                 label: 'Pool size',
                 tooltip: `Maintain number of IPs that will be pinged constantly
-                    - must have keep_allive to work properly`,
+                    - must have keep_alive to work properly`,
             },
             multiply_ips: {label: 'Multiply IPs'},
             multiply_vips: {label: 'Multiply vIPs'},
@@ -317,15 +326,13 @@ class Index extends React.Component {
         const _this = this;
         this.sp.spawn(etask(function*(){
             _this.setState({show_loader: true});
-            const locations = yield ajax.json({url: '/api/all_locations'});
-            let form, presets, consts, defaults;
+            let form, consts, defaults, locations;
             if (!_this.props.extra.proxy)
             {
                 consts = yield ajax.json({url: '/api/consts'});
                 defaults = yield ajax.json({url: '/api/defaults'});
+                locations = yield ajax.json({url: '/api/all_locations'});
                 const proxies = yield ajax.json({url: '/api/proxies_running'});
-                const www_presets = yield ajax.json({url: '/api/www_lpm'});
-                presets = combine_presets(www_presets);
                 const port = window.location.pathname.split('/').slice(-1)[0];
                 form = proxies.filter(p=>p.port==port)[0].config;
             }
@@ -334,13 +341,12 @@ class Index extends React.Component {
                 let proxy = _this.props.extra.proxy;
                 consts = _this.props.extra.consts;
                 defaults = _this.props.extra.defaults;
-                presets = _this.props.extra.presets;
+                locations = _this.props.extra.all_locations;
                 form = Object.assign({}, proxy);
             }
-            const preset = _this.guess_preset(form, presets);
-            _this.apply_preset(form, preset, presets);
-            _this.setState({consts, defaults, show_loader: false,
-                presets, locations});
+            const preset = _this.guess_preset(form);
+            _this.apply_preset(form, preset);
+            _this.setState({consts, defaults, show_loader: false, locations});
         }));
     }
     componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
@@ -359,7 +365,7 @@ class Index extends React.Component {
         if (tab)
             this.setState({tab});
     }
-    guess_preset(form, presets){
+    guess_preset(form){
         let res;
         for (let p in presets)
         {
@@ -443,11 +449,11 @@ class Index extends React.Component {
             return permissions.includes(field_name);
         return true;
     }
-    apply_preset(_form, preset, presets){
+    apply_preset(_form, preset){
         const form = Object.assign({}, _form);
         const last_preset = form.last_preset_applied ?
             presets[form.last_preset_applied] : null;
-        if (last_preset&&last_preset.clean)
+        if (last_preset&&last_preset.key!=preset&&last_preset.clean)
             last_preset.clean(form);
         form.preset = preset;
         form.last_preset_applied = preset;
@@ -497,7 +503,8 @@ class Index extends React.Component {
             form.ips = [];
         if (!form.vips)
             form.vips = [];
-        form.whitelist_ips = (form.whitelist_ips||[]).join(',');
+        if (Array.isArray(form.whitelist_ips))
+            form.whitelist_ips = form.whitelist_ips.join(',');
         if (form.city && !Array.isArray(form.city) && form.state)
             form.city = [{id: form.city,
                 label: form.city+' ('+form.state+')'}];
@@ -640,6 +647,8 @@ class Index extends React.Component {
                 trigger_type: form.trigger_type,
             };
         }
+        else
+            form.rule = null;
         if (form.trigger_type=='status')
         {
             let rule_status = form.status_code=='Custom'
@@ -657,10 +666,7 @@ class Index extends React.Component {
             form.rule.body_regex = form.body_regex;
         }
         else if (!form.rules.post && !form.rules.pre)
-        {
-            delete form.rules;
-            delete form.rule;
-        }
+            form.rules = null;
         delete form.trigger_type;
         delete form.status_code;
         delete form.status_custom;
@@ -684,8 +690,6 @@ class Index extends React.Component {
                 this.state.defaults[attr] : save_form[attr];
         };
         save_form.zone = save_form.zone||this.state.consts.proxy.zone.def;
-        if (save_form.session_random)
-            save_form.session = true;
         save_form.history = effective('history');
         save_form.ssl = effective('ssl');
         save_form.max_requests = effective('max_requests');
@@ -707,7 +711,8 @@ class Index extends React.Component {
         else
             save_form.reverse_lookup_values = '';
         delete save_form.reverse_lookup;
-        save_form.whitelist_ips = save_form.whitelist_ips.split(',')
+        if (save_form.whitelist_ips)
+            save_form.whitelist_ips = save_form.whitelist_ips.split(',')
         .filter(Boolean);
         if (save_form.city.length)
             save_form.city = save_form.city[0].id;
@@ -715,9 +720,14 @@ class Index extends React.Component {
             save_form.city = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
-        this.state.presets[save_form.preset].set(save_form);
+        delete save_form.rules;
+        presets[save_form.preset].set(save_form);
         this.prepare_rules(save_form);
         delete save_form.preset;
+        if (!save_form.session)
+            save_form.session = false;
+        if (save_form.session_random)
+            save_form.session = true;
         return save_form;
     }
     get_curr_plan(){
@@ -743,8 +753,8 @@ class Index extends React.Component {
         }
         if (!this.state.consts.proxy)
             Main_window = ()=>null;
-        const support = this.state.presets && this.state.form.preset &&
-            this.state.presets[this.state.form.preset].support||{};
+        const support = presets && this.state.form.preset &&
+            presets[this.state.form.preset].support||{};
         const zones = this.state.consts.proxy&&
             this.state.consts.proxy.zone.values||[];
         const default_zone=this.state.consts.proxy&&
@@ -767,7 +777,7 @@ class Index extends React.Component {
                   </div>
                 </div>
                 <Nav zones={zones} default_zone={default_zone}
-                  form={this.state.form} presets={this.state.presets}
+                  form={this.state.form}
                   on_change_field={this.field_changed.bind(this)}
                   on_change_preset={this.apply_preset.bind(this)}
                   save={this.save.bind(this)} dirty={this.state.dirty}/>
@@ -815,7 +825,7 @@ const Warning = props=>(
 
 const Nav = props=>{
     const update_preset = val=>{
-        props.on_change_preset(props.form, val, props.presets);
+        props.on_change_preset(props.form, val);
         ga_event('top bar', 'edit field', 'preset');
     };
     const update_zone = val=>{
@@ -831,8 +841,8 @@ const Nav = props=>{
         props.on_change_field('multiply_vips', false);
         props.on_change_field('multiply', 1);
     };
-    const presets_opt = Object.keys(props.presets||{}).map(p=>
-        ({key: props.presets[p].title, value: p}));
+    const presets_opt = Object.keys(presets).map(p=>
+        ({key: presets[p].title, value: p}));
     return (
         <div className="nav">
           <Field on_change={update_zone} options={props.zones} label="Zone"
@@ -1320,14 +1330,15 @@ class Rules extends React.Component {
         return (
             <div>
               <div className="tab_header">
-                Define custom action for specific request response</div>
+                Configure an action to be taken in response to a given Trigger
+              </div>
               <Note>
                 <span>Rules will apply when 'SSL analyzing' </span>
                 <a onClick={()=>this.props.goto_field('ssl')}>enabled</a>
                 <span> (See 'Debugging' section)</span>
               </Note>
               <With_data {...this.props} tab_id="rules">
-                <Section id="trigger_type" header="Trigger Type"
+                <Section id="trigger_type" header="Trigger"
                   correct={trigger_correct}>
                   <Section_field tab_id="rules" id="trigger_type"
                     form={form} type="select" data={trigger_types}

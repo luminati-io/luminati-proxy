@@ -15,32 +15,30 @@
     Loading...
   </div>
   <div ng-if="section.name!='settings'" react-view=messages></div>
-  <div class=col-md-8>
-    <div ng-if=!proxies_loading() class="panel panel-default proxies">
-      <div class=panel-heading>
+  <div class="col-md-8 lpm proxies">
+    <div ng-if=!proxies_loading() class="panel proxies_panel">
+      <div class=panel_heading>
+        <h2>Proxies</h2>
         <div class=btn-wrapper>
-          <button type=button class="btn btn-ico btn-csv"
+          <button class="btn btn_lpm btn_lpm_normal btn_csv"
             ng-click=download_csv() uib-tooltip="Download CSV"
             tooltip-class=tooltip-default>
-            CSV
+            <div class="icon"></div>
+            csv
           </button>
-          <button type=button class="btn btn-ico" ng-click=edit_cols()
-            uib-tooltip="Edit Columns" tooltip-class=tooltip-default>
-            <img src=/img/ic_columns.svg >
+          <button class="btn btn_lpm btn_lpm_normal btn_columns"
+            ng-click=edit_cols() uib-tooltip="Edit Columns"
+            tooltip-class=tooltip-default>
+            <div class="icon"></div>
           </button>
-          <button type=button class="btn btn-ico old_ui_btn" ng-click=add_proxy()
-            ng-if="$root.mode!='guest' && show_old_ui()"
-            uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
-            <img src=/img/ic_plus.svg>
-          </button>
-          <button type=button class="btn btn-ico"
+          <button class="btn btn_lpm btn_lpm_normal btn_add"
             ng-if="$root.mode!='guest'" ng-click=add_proxy_new()
             uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
-            <img src=/img/ic_plus.svg>
+            <div class="icon"></div>
           </button>
         </div>
       </div>
-      <div class="panel-body proxies-panel" ng-show="columns">
+      <div class="panel_body" ng-show="columns">
         <table class="table table-hover proxies">
           <thead>
             <tr>
@@ -68,8 +66,8 @@
                   href="proxy/{{proxy.port}}"
                   ng-click="edit_proxy_new(proxy)"
                   uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
-                  src=/img/ic_edit.svg class=proxies-action-edit>
-                  <img src=/img/ic_edit.svg>
+                  class=proxies-action-edit>
+                  <div class="action_icon edit"></div>
                 </a>
               </td>
               <td ng-repeat="col in columns" ng-init="val=proxy[col.key]">
@@ -91,27 +89,21 @@
                   </span>
                 </span>
                 <span ng-if="col.key=='_status'"
-                  ng-init="proxy.get_status()"
+                  ng-init="proxy.get_status()" class="proxy_status"
                   ng-click="toggle_proxy_status_details(proxy)"
                   ng-class="{pointer: proxy._status_details.length}"
                   uib-tooltip-template="'/tooltip_proxy_status.html'"
                   tooltip-class="tooltip-proxy-status">
-                  <img ng-if="proxy._status=='error'"
-                    src="/img/ic_status_red.svg">
-                  <img ng-if="!proxy._status"
-                    src="/img/ic_status_undefined.svg">
-                  <img ng-if="proxy._status=='ok'&&proxy._status_details.length"
-                    src="/img/ic_status_ok_with_warning.svg">
-                  <img ng-if="proxy._status=='ok'&&!proxy._status_details.length"
-                    src="/img/ic_status_ok.svg">
-                  <i ng-if="proxy._status_details.length"
-                    ng-class="{
-                    'glyphicon-triangle-bottom':
-                     showed_status_proxies[proxy.port],
-                     'glyphicon-triangle-right':
-                     !showed_status_proxies[proxy.port]}"
-                    class="glyphicon ic-status-triangle">
-                  </i>
+                  <div ng-if="proxy._status=='error'"
+                    class="status_icon error"></div>
+                  <div ng-if="!proxy._status" class="status_icon undefined">
+                  </div>
+                  <div ng-if="proxy._status=='ok'&&proxy._status_details.length"
+                    class="status_icon warning"></div>
+                  <div ng-if="proxy._status=='ok'&&!proxy._status_details.length"
+                    class="status_icon success"></div>
+                  <div ng-if="proxy._status_details.length"
+                    class="toggle_info icon"></div>
                 </span>
                 <span ng-if="$root.mode=='guest'">
                   <span ng-if="col.key=='country'"
@@ -222,46 +214,38 @@
                 </span>
               </td>
               <td class=proxies-actions>
-                <img ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session===true
+                <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session===true
                   ng-click=refresh_sessions(proxy)
                   uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default
-                  src=/img/ic_refresh.svg class=proxies-action>
-                <img
+                  class="action_icon refresh"></div>
+                <div
                   ng-if=!proxy.pool_size&&!proxy.sticky_ip&&proxy.session!==true
                   uib-tooltip="No session pool" tooltip-class=tooltip-default
-                  src=/img/ic_refresh_disabled.svg class=proxies-action-disabled>
-                <img ng-if=proxy._history
+                  class="action_icon refresh disabled"></div>
+                <div ng-if=proxy._history
                   ng-click=show_history(proxy)
                   uib-tooltip=History tooltip-class=tooltip-default
-                  src=/img/ic_history.svg class=proxies-action>
-                <img ng-if=!proxy._history
+                  class="action_icon history"></div>
+                <div ng-if=!proxy._history
                   uib-tooltip="No history" tooltip-class=tooltip-default
-                  src=/img/ic_history_disabled.svg class=proxies-action-disabled>
-                <img ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session
+                  class="action_icon history disabled"></div>
+                <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session
                   ng-click=show_pool(proxy)
                   uib-tooltip="Current pool" tooltip-class=tooltip-default
-                  src=/img/ic_table.svg class=proxies-action>
-                <img ng-if=!proxy.pool_size&&!proxy.sticky_ip&&!proxy.session
+                  class="action_icon pool"></div>
+                <div ng-if=!proxy.pool_size&&!proxy.sticky_ip&&!proxy.session
                   uib-tooltip="Pool empty; size is set to zero"
                   tooltip-class=tooltip-default
-                  src=/img/ic_table_disabled.svg class=proxies-action-disabled>
-                <img ng-if="$root.mode!='guest'
+                  class="action_icon pool disabled"></div>
+                <div ng-if="$root.mode!='guest'
                   &&is_action_available('duplicate', proxy)"
                   uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
                   ng-click="dup_proxies(proxy)"
-                  class=proxies-action-duplicate
-                  src=/img/ic_dup.svg>
-                <img ng-if="$root.mode!='guest'&&is_action_available('delete',
+                  class="action_icon duplicate"></div>
+                <div ng-if="$root.mode!='guest'&&is_action_available('delete',
                   proxy)" ng-click=delete_proxies(proxy.port)
                   uib-tooltip=Delete tooltip-class=tooltip-default
-                  class=proxies-action-delete
-                  src=/img/ic_delete.svg>
-              </td>
-              <td class="hidden proxies-success-rate" ng-if="!success-enabled">
-                <a href class=proxies-success-rate-value
-                  tooltip-class=tooltip-default uib-tooltip="Measure how many
-                  of your requests are successfule">Enable
-                </a>
+                  class="action_icon delete"></div>
               </td>
             </tr>
             <tr ng-repeat-end ng-if="showed_status_proxies[proxy.port]"
@@ -281,7 +265,7 @@
           </tbody>
         </table>
       </div>
-      <div class=panel-footer>
+      <div class=panel_footer>
         <div uib-pagination ng-if="pagination.per_page<proxies.length"
           ng-model=pagination.page ng-change=on_page_change()
           items-per-page=pagination.per_page total-items=proxies.length

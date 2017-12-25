@@ -1,8 +1,13 @@
  Luminati Proxy manager - Change Log
 
+## 1.76.363
+- :bug: fix multiply and duplicate port conflict
+- :bug: fix reserved session timeout
+- :sparkles: peformance improvments and UI for proxies page
+
 ## 1.75.912
-- :star: html body as a rule's trigger
-- :star: 'ban ip' as a rule's action
+- :star: html body as a rule trigger
+- :star: 'ban ip' as a rule action
 - :star: 'reserved IP pool' as a rule action
 
 ## 1.75.443

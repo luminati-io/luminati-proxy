@@ -13,6 +13,7 @@
 @error_light: #F9BFB9;
 @error_x_light: #ffebeb;
 @warning: #fff5d7;
+@blue_grey: #6694AC;
 
 @font-face {
   font-family: 'Lato';
@@ -98,14 +99,16 @@ nav a:hover {
     margin-bottom: 20px;
 }
 .success_title {
-    font-size: 22px;
+    font-size: 18px;
+    font-weight: bold;
     cursor: pointer;
 }
 .success_value {
     text-align: right;
-    font-size: 22px;
+    font-size: 18px;
     cursor: pointer;
-    color: #428bca;
+    color: @second_color;
+    font-weight: bold;
 }
 .block {
     background: #eeeeee;
@@ -219,9 +222,6 @@ table.proxies {
     overflow: auto;
     max-height: calc(~"100vh - 190px");
 }
-.proxies-panel {
-    overflow: auto;
-}
 div.proxies .panel-footer, div.proxies .panel-heading {
     position: relative;
 }
@@ -230,11 +230,8 @@ div.proxies .panel-heading {
 }
 div.proxies .btn-wrapper {
     position: absolute;
-    right: 10px;
+    right: 22px;
     top: 10px;
-}
-.proxies .btn-csv {
-    font-size: 12px;
 }
 .proxies-default {
     color: gray;
@@ -252,9 +249,10 @@ div.proxies .btn-wrapper {
 .proxies-table-input {
     position: absolute;
     z-index: 2;
-    left: -25px;
+    left: -15px;
     right: -25px;
-    top: -7px;
+    top: -5px;
+    background-color: white;
 }
 .proxies-table-input input, .proxies-table-input select {
     width: 100%;
@@ -265,12 +263,6 @@ div.proxies .btn-wrapper {
 .col_success_rate {
     white-space: nowrap;
     width: 80px;
-}
-.proxies-success-rate-value {
-    color: #428bca;
-    width: 80px;
-    font-size:16px;
-    cursor: pointer;
 }
 .proxies-actions {
     white-space: nowrap;
@@ -548,10 +540,7 @@ a.proxies-action-edit {
 .status-details-text {
     padding: 0 0 0 5px;
 }
-.ic-status-triangle {
-    font-size: 12px;
-    color: #979797;
-}
+.proxy_status { position: relative; }
 .text-err {
     color: #d8393c;
 }
@@ -914,6 +903,29 @@ input.form-control[type=checkbox] {
             }
         }
     }
+    .panel {
+        box-shadow: none;
+        -webkit-box-shadow: none;
+        border: solid 1px @grey_border;
+        border-radius: 4px;
+        .panel_heading, .panel-heading {
+            h2 {
+                font-size: 18px;
+                margin-top: 20px;
+                margin-left: 30px;
+            }
+        }
+        .panel_body { padding: 20px; }
+        .panel_footer { padding: 20px; }
+        table {
+            thead tr th {
+                font-weight: 300;
+                font-size: 14px;
+                color: @blue_grey;
+                border-bottom: solid 1px @grey_border;
+            }
+        }
+    }
     .modal {
         .modal-content {
             border: 0;
@@ -1268,6 +1280,108 @@ input.form-control[type=checkbox] {
     }
     .allocated_ips_modal {
         .random_ips_btn { margin-bottom: 20px; }
+    }
+}
+.proxies {
+    .proxies_panel {
+        overflow: auto;
+        table { &.col__status { text-align: center; } }
+        .status_icon {
+            width: 18px;
+            height: 18px;
+            position: relative;
+            top: 2px;
+            margin: auto;
+            &.success { background: url(/img/success.svg); }
+            &.error { background: url(/img/errors.svg); }
+            &.warning { background: url(/img/warning.svg); }
+            &.undefined {
+                background-color: #ffaf00;
+                border-radius: 50%;
+            };
+        }
+        .toggle_info.icon {
+            width: 7px;
+            height: 4px;
+            position: absolute;
+            left: 37px;
+            top: -8px;
+            background: url(/img/down.svg);
+        }
+        .action_icon {
+            width: 18px;
+            height: 18px;
+            top: 2px;
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin: 0 1px;
+            &.edit {
+                opacity: 0.4;
+                background: url(/img/edit.svg);
+            }
+            &.refresh { background: url(/img/refresh.svg); }
+            &.history { background: url(/img/history.svg); }
+            &.pool { background: url(/img/pool.svg); }
+            &.duplicate { background: url(/img/duplicate.svg); }
+            &.delete { background: url(/img/trash.svg); }
+            &.disabled { opacity: 0.3; cursor: default; }
+        }
+        .btn {
+            padding: 0 4px;
+            height: 26px;
+            width: 26px;
+            font-weight: 300;
+            font-size: 12px;
+            margin: 0 2px;
+        }
+        .btn_csv {
+            width: 44px;
+            .icon {
+                display: inline-block;
+                position: relative;
+                top: 2px;
+                background: url(/img/arrow_down.svg);
+                height: 10px;
+                width: 8px;
+            }
+        }
+        .btn_columns {
+            .icon {
+                background: url(/img/columns.svg);
+                width: 16px;
+                height: 14px;
+            }
+        }
+        .btn_add {
+            .icon {
+                background: url(/img/add.svg);
+                width: 14px;
+                height: 14px;
+                position: relative;
+                left: 1px;
+            }
+        }
+    }
+    .stats_panel {
+        font-size: 14px;
+        a { text-decoration: none; }
+        h4 { font-size: 16px; }
+        .stats_btn {
+            font-size: 12px;
+            width: 150px;
+            height: 24px;
+            padding: 0;
+        }
+        .btn_reset {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            width: 60px;
+            height: 24px;
+            font-size: 12px;
+            font-weight: 300;
+        }
     }
 }
 .modal-backdrop.fade.in { opacity: 0.15; }

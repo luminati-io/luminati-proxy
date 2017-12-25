@@ -133,14 +133,18 @@ const presets = {
             opt.pool_size = 0;
             opt.ips = [];
             opt.keep_alive = opt.keep_alive||50;
-            opt.pool_type = undefined;
+            opt.pool_type = null;
             opt.sticky_ip = false;
             opt.session = true;
-            if (opt.session===true)
-                opt.seed = false;
+            opt.seed = false;
         },
-        to_clean: ['pool_size', 'ips', 'keep_alive', 'sticky_ip', 'session',
-            'seed'],
+        clean: opt=>{
+            opt.keep_alive = 0;
+            opt.session = '';
+            opt.session_duration = 0;
+            opt.max_requests = 0;
+            opt.seed = '';
+        },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'keep_alive', label: `sets 'Keep-alive' to 50 seconds`},
@@ -152,7 +156,7 @@ const presets = {
         support: {
             keep_alive: true,
             multiply: true,
-            session_ducation: true,
+            session_duration: true,
             max_requests: true,
         },
     },
@@ -167,14 +171,17 @@ const presets = {
             opt.pool_size = 0;
             opt.ips = [];
             opt.keep_alive = 0;
-            opt.pool_type = undefined;
+            opt.pool_type = null;
             opt.sticky_ip = false;
             opt.session = true;
-            if (opt.session===true)
-                opt.seed = false;
+            opt.seed = false;
         },
-        to_clean: ['pool_size', 'ips', 'keep_alive', 'sticky_ip', 'session',
-            'seed'],
+        clean: opt=>{
+            opt.session = '';
+            opt.session_duration = 0;
+            opt.max_requests = 0;
+            opt.seed = '';
+        },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'keep_alive', label: `sets 'Keep-alive' to 0 seconds`},
@@ -198,12 +205,18 @@ const presets = {
         set: function(opt){
             opt.pool_size = 0;
             opt.ips = [];
-            opt.pool_type = undefined;
+            opt.pool_type = null;
             opt.sticky_ip = true;
-            opt.session = undefined;
-            opt.multiply = undefined;
+            opt.session = '';
+            opt.multiply = 1;
         },
-        to_clean: ['pool_size', 'ips', 'sticky_ip'],
+        clean: opt=>{
+            opt.sticky_ip = null;
+            opt.keep_alive = 0;
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.seed = '';
+        },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'pool_type', label: `sequential pool type`},
@@ -227,12 +240,19 @@ const presets = {
         check: function(opt){ return opt.pool_size &&
             (!opt.pool_type || opt.pool_type=='sequential'); },
         set: function(opt){
-            opt.pool_size = opt.pool_size || 1;
+            opt.pool_size = opt.pool_size||1;
             opt.pool_type = 'sequential';
-            opt.sticky_ip = undefined;
-            opt.session = undefined;
+            opt.sticky_ip = null;
+            opt.session = '';
         },
-        to_clean: ['pool_size', 'pool_type'],
+        clean: opt=>{
+            opt.pool_size = 1;
+            opt.keep_alive = 0;
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.multiply = 1;
+            opt.seed = '';
+        },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `sequential pool type`},
@@ -256,13 +276,19 @@ const presets = {
         check: function(opt){ return opt.pool_size
             && opt.pool_type=='round-robin' && !opt.multiply; },
         set: function(opt){
-            opt.pool_size = opt.pool_size || 1;
+            opt.pool_size = opt.pool_size||1;
             opt.pool_type = 'round-robin';
-            opt.sticky_ip = undefined;
-            opt.session = undefined;
-            opt.multiply = undefined;
+            opt.sticky_ip = null;
+            opt.session = '';
+            opt.multiply = 1;
         },
-        to_clean: ['pool_size', 'pool_type'],
+        clean: opt=>{
+            opt.pool_size = 1;
+            opt.keep_alive = 0;
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.seed = '';
+        },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `round-robin pool type`},
@@ -278,12 +304,93 @@ const presets = {
             seed: true,
         },
     },
+    high_performance: {
+        title: 'High performance',
+        subtitle: 'Maximum request speed',
+        check: opt=>true,
+        set: opt=>{
+            opt.pool_size = 50;
+            opt.keep_alive = 40;
+            opt.max_requests = 0;
+            opt.pool_type = 'round-robin';
+            opt.seed = false;
+            opt.session = true;
+            opt.session_duration = 0;
+            opt.session_random = false;
+            opt.sticky_ip = false;
+        },
+        clean: opt=>{ opt.multiply = 1; },
+        rules: [
+            {field: 'pool_size', label: "sets 'Pool size' to 50"},
+            {field: 'keep_alive', label: "sets 'Keep-alive' to 40"},
+            {field: 'pool_type', label: "round-robin pool type"},
+            {field: 'seed', label: "disables 'Session ID Seed'"},
+        ],
+        support: {multiply: true},
+    },
+    rnd_usr_agent_and_cookie_header: {
+        title: 'Random User-Agent and cookie headers',
+        subtitle: 'Rotate User-Agent and cookie on each request',
+        check: opt=>true,
+        set: opt=>{
+            opt.session = '';
+            opt.sticky_ip = false;
+            opt.pool_size = 1;
+            opt.pool_type = 'sequential';
+            opt.keep_alive = 0;
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.seed = false;
+            opt.rules = opt.rules||{};
+            opt.rules.pre = [{
+                alphabet: 'wertyuiop;lkjhgfdQWERTYUJBVCF5467',
+                header: true,
+                name: 'cookie',
+                prefix: 'v=',
+                random: 'string',
+                size: 8,
+                suffix: 'end of cookie',
+                url: '**'
+            },
+            {
+                arg: [
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246',
+                'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36',
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9',
+                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36',
+                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
+                'Mozilla/5.0 (X11; Linux x86_64; rv:2.0b4) Gecko/20100818 Firefox/4.0b4',
+                'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36',
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36',
+                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
+                'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'],
+                header: true,
+                name: 'User-Agent',
+                random: 'list',
+                url: '**'
+            }];
+            opt.rules.post = opt.rules.post||[];
+        },
+        clean: opt=>{ opt.multiply = 1; },
+        support: {multiply: true},
+    },
     custom: {
         title: 'Custom',
         subtitle: `Manually adjust all settings to your needs For advanced
             use cases`,
         check: function(opt){ return true; },
         set: function(opt){},
+        clean: opt=>{
+            opt.session = '';
+            opt.sticky_ip = null;
+            opt.pool_size = 1;
+            opt.pool_type = null;
+            opt.keep_alive = 0;
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.multiply = 1;
+            opt.seed = '';
+        },
         support: {
             session: true,
             sticky_ip: true,
@@ -298,29 +405,6 @@ const presets = {
     },
 };
 for (let k in presets)
-{
-    if (!presets[k].clean && presets[k].to_clean)
-    {
-        presets[k].clean = opt=>{
-            presets[k].to_clean.forEach(f=>delete opt[f]); };
-    }
-    else if (!presets[k].clean)
-        presets[k].clean = opt=>opt;
     presets[k].key = k;
-}
 
-const combine_presets = data=>{
-    let www_presets = (data.presets||[])
-    .reduce((prs, np)=>{
-        const set = _.cloneDeep(np.set);
-        const clean = _.cloneDeep(np.clean);
-        np.set = opt=>Object.assign(opt, set);
-        np.clean = opt=>Object.assign(opt, clean);
-        np.check = ()=>true;
-        prs[np.key] = np;
-        return prs;
-    }, _.cloneDeep(presets));
-    return www_presets;
-};
-
-export {Dialog, Code, If, Modal, Loader, onboarding_steps, combine_presets};
+export {Dialog, Code, If, Modal, Loader, onboarding_steps, presets};

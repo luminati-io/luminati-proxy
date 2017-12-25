@@ -991,7 +991,7 @@ describe('proxy', ()=>{
                 url: '**'}]};
             history = [];
             l = yield lum({history: true, history_aggregator: aggregator,
-                rules, session: true, log: 'info', max_requests: 1,
+                rules, session: true, max_requests: 1,
                 reserved_keep_alive: 1});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
@@ -1006,11 +1006,11 @@ describe('proxy', ()=>{
             assert.notEqual(unames[0], unames[2]);
             assert.equal(unames[unames.length-1], unames[0]);
         }));
-        it('should keep reserved session alive',  etask._fn(function*(_this){
+        it('should keep reserved session alive', etask._fn(function*(_this){
             _this.timeout(6000);
             yield l.test();
             assert.equal(history.length, 1);
-            yield etask.sleep(3000);
+            console.log(history.length);
             assert.notEqual(history.length, 1);
         }));
     });

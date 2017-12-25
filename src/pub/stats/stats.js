@@ -173,59 +173,60 @@ class Stats extends React.Component {
         this.setState({show_certificate: false});
     };
     render(){
-        return <Panel header={
-                <Row>
-                  <Col md={6}>Recent statistics</Col>
-                  <Col md={6} className="text-right">
-                    <Button bsSize="xsmall" onClick={this.confirm}>
-                      Reset</Button>
-                  </Col>
-                </Row>
-              }>
-              <SuccessRatio/>
-              <StatTable table={StatusCodeTable} row={SRow}
-                title={`Top status codes`} dataType="status_codes"
-                stats={this.state.statuses.stats}
-                show_more={this.state.statuses.has_more} />
-              <StatTable table={DomainTable} row={DRow}
-                dataType="domains" stats={this.state.domains.stats}
-                show_more={this.state.domains.has_more}
-                title={`Top domains`} />
-              <StatTable table={ProtocolTable} row={PRow}
-                dataType="protocols" stats={this.state.protocols.stats}
-                show_more={this.state.protocols.has_more}
-                title={`All protocols`}
-                show_enable_https_button
-                enable_https_button_click={this.enable_https_statistics} />
-              <Dialog show={this.state.show_reset} onHide={this.close}
-                title="Reset stats" footer={
-                  <ButtonToolbar>
-                    <Button bsStyle="primary" onClick={this.reset_stats}
-                      disabled={this.state.resetting}>
-                      {this.state.resetting ? 'Resetting...' : 'OK'}
-                    </Button>
-                    <Button onClick={this.close}>Cancel</Button>
-                  </ButtonToolbar>
-                }>
-                <h4>Are you sure you want to reset stats?</h4>
-              </Dialog>
-              <Dialog show={this.state.show_certificate}
-                onHide={this.close_certificate}
-                title="Add certificate file to browsers"
-                footer={
-                  <Button onClick={this.close_certificate}>Close</Button>
-                }>
-                Gathering stats for HTTPS requests requires setting a
-                certificate key.
-                <ol>
-                  <li>Download our free certificate key
-                    <a href="/ssl" target="_blank" download> here</a>
-                  </li>
-                  <li>Add the certificate to your browser</li>
-                  <li>Refresh the page</li>
-                </ol>
-              </Dialog>
-            </Panel>;
+        return <div className="proxies lpm">
+            <div className="panel stats_panel">
+              <div className="panel_heading">
+                <h2>Recent statistics</h2>
+                <button className="btn btn_lpm btn_lpm_normal btn_reset"
+                  onClick={this.confirm}>Reset</button>
+              </div>
+              <div className="panel_body">
+                <SuccessRatio/>
+                <StatTable table={StatusCodeTable} row={SRow}
+                  title={`Top status codes`} dataType="status_codes"
+                  stats={this.state.statuses.stats}
+                  show_more={this.state.statuses.has_more}/>
+                <StatTable table={DomainTable} row={DRow}
+                  dataType="domains" stats={this.state.domains.stats}
+                  show_more={this.state.domains.has_more}
+                  title={`Top domains`} />
+                <StatTable table={ProtocolTable} row={PRow}
+                  dataType="protocols" stats={this.state.protocols.stats}
+                  show_more={this.state.protocols.has_more}
+                  title={`All protocols`}
+                  show_enable_https_button
+                  enable_https_button_click={this.enable_https_statistics}/>
+                <Dialog show={this.state.show_reset} onHide={this.close}
+                  title="Reset stats" footer={
+                    <ButtonToolbar>
+                      <Button bsStyle="primary" onClick={this.reset_stats}
+                        disabled={this.state.resetting}>
+                        {this.state.resetting ? 'Resetting...' : 'OK'}
+                      </Button>
+                      <Button onClick={this.close}>Cancel</Button>
+                    </ButtonToolbar>
+                  }>
+                  <h4>Are you sure you want to reset stats?</h4>
+                </Dialog>
+                <Dialog show={this.state.show_certificate}
+                  onHide={this.close_certificate}
+                  title="Add certificate file to browsers"
+                  footer={
+                    <Button onClick={this.close_certificate}>Close</Button>
+                  }>
+                  Gathering stats for HTTPS requests requires setting a
+                  certificate key.
+                  <ol>
+                    <li>Download our free certificate key
+                      <a href="/ssl" target="_blank" download> here</a>
+                    </li>
+                    <li>Add the certificate to your browser</li>
+                    <li>Refresh the page</li>
+                  </ol>
+                </Dialog>
+              </div>
+            </div>
+          </div>;
     }
 }
 

@@ -18,8 +18,8 @@ const E = {
 
 class CertificateButton extends React.Component {
     render(){
-        return <Button bsStyle={this.props.bs_style} bsSize="xsmall"
-              onClick={this.props.onClick}>{this.props.text}</Button>;
+        return <button className="btn btn_lpm stats_btn"
+            onClick={this.props.onClick}> {this.props.text}</button>;
     }
 }
 
@@ -34,8 +34,7 @@ class ProtocolRow extends React.Component {
         if (!this.props.show_enable_https_button)
           return null;
         return (
-            <CertificateButton bs_style="success"
-              text="Enable HTTPS Statistics"
+            <CertificateButton text="Enable HTTPS Statistics"
               onClick={this.handle_https_btn_click} />
         );
     }

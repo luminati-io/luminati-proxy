@@ -6,7 +6,7 @@ import ajax from 'hutil/util/ajax';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {If, Modal, Loader, onboarding_steps} from './common.js';
+import {If, Modal, Loader, onboarding_steps, presets} from './common.js';
 import util from './util.js';
 
 const ga_event = util.ga_event;
@@ -16,9 +16,8 @@ class Add_proxy extends React.Component {
         super(props);
         this.sp = etask('Add_proxy', function*(){ yield this.wait(); });
         this.zones = props.extra.consts.proxy.zone.values;
-        this.presets = props.extra.presets;
-        this.presets_opt = Object.keys(this.presets).map(p=>
-            ({key: this.presets[p].title, value: p}));
+        this.presets_opt = Object.keys(presets).map(p=>
+            ({key: presets[p].title, value: p}));
         this.state = {zone: '', preset: 'sequential', show_loader: false};
     }
     persist(){
@@ -33,7 +32,7 @@ class Add_proxy extends React.Component {
             vips: [],
             whitelist_ips: [],
         };
-        this.presets[preset].set(form);
+        presets[preset].set(form);
         this.setState({show_loader: true});
         const _this = this;
         return etask(function*(){
@@ -117,11 +116,11 @@ class Add_proxy extends React.Component {
                     on_change={this.field_changed('preset').bind(this)}/>
                   <div className="preview">
                     <div className="header">
-                      {this.presets[this.state.preset].title}</div>
+                      {presets[this.state.preset].title}</div>
                     <div className="desc">
-                      {this.presets[this.state.preset].subtitle}</div>
+                      {presets[this.state.preset].subtitle}</div>
                     <ul>
-                    {(this.presets[this.state.preset].rules||[]).map((r, i)=>(
+                    {(presets[this.state.preset].rules||[]).map((r, i)=>(
                       <li key={i}>
                         <a onClick={()=>this.rule_clicked(r.field)}>
                           {r.label}</a>

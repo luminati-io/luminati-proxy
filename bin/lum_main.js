@@ -6,6 +6,7 @@ const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;
 const zerr = hutil.zerr;
+require('../lib/perr.js').run({});
 const version = require('../package.json').version;
 const analytics = require('universal-analytics');
 const _ = require('lodash');
@@ -22,6 +23,17 @@ ua.set('av', `v${version}`);
 
 const ua_filename = path.resolve(os.homedir(),
     '.luminati_ua_ev.json'.substr(process.platform=='win32' ? 1 : 0));
+const status_filename = path.resolve(os.homedir(),
+    '.luminati_status.json'.substr(process.platform=='win32' ? 1 : 0));
+let lpm_status = {
+    status: 'initializing',
+    config: null,
+    error: null,
+    create_date: hutil.date(),
+    update_date: hutil.date(),
+    customer_name: null,
+    version,
+};
 let last_ev;
 const ua_event = ua.event.bind(ua);
 ua.event = (...args)=>{
@@ -63,6 +75,14 @@ ua.event = (...args)=>{
     {
         if (params.ev===undefined && ev>1)
             params.ev = ev;
+        zerr.perr('event', {
+            action: params.ea,
+            category: params.ec,
+            label: params.el,
+            value: params.ev,
+            customer_name: manager&&manager._defaults
+                &&manager._defaults.customer,
+        });
         ua_event(params, (..._args)=>{
             if (_.isFunction(cb))
                 cb.apply(null, _args);
@@ -79,6 +99,35 @@ let write_ua_file = ()=>{
         last_ev = null;
     } catch(e){ }
 };
+let write_status_file = (status, error = null, config = null, reason = null)=>{
+    if (error)
+        error = zerr.e2s(error);
+    Object.assign(lpm_status, {
+        last_updated: hutil.date(),
+        status,
+        reason,
+        error,
+        config,
+        customer_name: config&&config._defaults&&config._defaults.customer
+    });
+    try {
+        file.write_e(status_filename, JSON.stringify(lpm_status));
+    } catch(e){ }
+};
+let read_status_file = ()=>{
+    let status_file;
+    let invalid_start = {'running': 1, 'initializing': 1, 'shutdowning': 1};
+    try { status_file = JSON.parse(file.read_e(status_filename)); }
+    catch(e){ status_file = {}; }
+    if (status_file)
+        lpm_status = status_file;
+    if (status_file && invalid_start[status_file.status])
+    {
+        ua.event('manager', 'crash_sudden', JSON.stringify(status_file));
+        zerr.perr('crash_sudden', {lpm_status});
+    }
+};
+
 let manager, args = process.argv.slice(2), shutdowning = false;
 const enable_cluster = process.argv.includes('--cluster');
 let shutdown = (reason, send_ev = true, error = null)=>{
@@ -86,6 +135,8 @@ let shutdown = (reason, send_ev = true, error = null)=>{
         return;
     shutdowning = true;
     write_ua_file();
+    write_status_file('shutdowning', error, manager&&manager._total_conf,
+        reason);
     if (manager)
     {
         manager._log.info(`Shutdown, reason is ${reason}`);
@@ -104,6 +155,8 @@ let shutdown = (reason, send_ev = true, error = null)=>{
         cluster.workers.forEach(w=>{ w.send('shutdown'); });
     else
         console.log(`Shutdown, reason is ${reason}`, error.stack);
+    write_status_file('shutdown', error, manager&&manager._total_conf,
+        reason);
 };
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
@@ -113,12 +166,15 @@ let shutdown = (reason, send_ev = true, error = null)=>{
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
             ()=>shutdown(errstr, false, err));
+        zerr.perr('crash', {error: errstr, reason: sig,
+            config: manager&&manager._total_conf});
     }
     else
         shutdown(errstr, true, err);
 }));
 let on_upgrade_finished;
 (function run(run_config){
+    read_status_file();
     if (enable_cluster&&cluster.isMaster)
     {
         console.log('WARNING: cluster mode is experimental');
@@ -132,6 +188,7 @@ let on_upgrade_finished;
         });
         return;
     }
+    write_status_file('initializing', null, manager&&manager._total_conf);
     manager = new Manager(args, Object.assign({ua}, run_config));
     manager.on('stop', ()=>{
         write_ua_file();
@@ -153,6 +210,7 @@ let on_upgrade_finished;
         }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
+        write_status_file('changing_config', null, zone_autoupdate);
         if (!manager.argv.no_usage_stats)
         {
             ua.event('manager', 'config_changed',
@@ -172,6 +230,7 @@ let on_upgrade_finished;
         on_upgrade_finished = cb;
     }).on('restart', ()=>process.send({command: 'restart'}));
     manager.start();
+    write_status_file('running', null, manager&&manager._total_conf);
 })();
 
 process.on('message', msg=>{
