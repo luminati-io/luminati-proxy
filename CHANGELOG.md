@@ -1,6 +1,8 @@
  Luminati Proxy manager - Change Log
 
 ## 1.75.912
+- :star: html body as a rule's trigger
+- :star: 'ban ip' as a rule's action
 
 ## 1.75.443
 - :bug: fix session_duration 0 to disable session duration
