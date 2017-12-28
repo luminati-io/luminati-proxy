@@ -48,7 +48,7 @@ const tabs = {
                       ASN list
                     </a>)
                     </span>,
-                tooltip: 'Specifc ASN provider',
+                tooltip: 'Specific ASN provider',
             },
         },
     },
