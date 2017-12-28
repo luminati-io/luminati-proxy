@@ -113,6 +113,40 @@ const Code = props=>{
 
 const If = ({when, children})=>when ? children : null;
 
+const Select = props=>{
+    const update = val=>{
+        if (val=='true')
+            val = true;
+        else if (val=='false')
+            val = false;
+        if (props.on_change_wrapper)
+            props.on_change_wrapper(val);
+    };
+    return (
+        <select value={''+props.val}
+          onChange={e=>update(e.target.value)} disabled={props.disabled}>
+          {(props.data||[]).map((c, i)=>(
+            <option key={i} value={c.value}>{c.key}</option>
+          ))}
+        </select>
+    );
+};
+
+const Input = props=>{
+    const update = val=>{
+        if (props.type=='number' && val)
+            val = Number(val);
+        if (props.on_change_wrapper)
+            props.on_change_wrapper(val, props.id);
+    };
+    return (
+        <input type={props.type} value={props.val} disabled={props.disabled}
+          onChange={e=>update(e.target.value)} className={props.className}
+          min={props.min} max={props.max} placeholder={props.placeholder}
+          onBlur={props.on_blur}/>
+    );
+};
+
 const onboarding_steps = {
     WELCOME: 0,
     ADD_PROXY: 1,
@@ -124,7 +158,7 @@ const onboarding_steps = {
 const presets = {
     session_long: {
         title: 'Long single session (IP)',
-        subtitle: `All requests share the same long session (IP) For
+        subtitle: `All requests share the same long session (IP). For
             connecting a browser to Luminati, maintaining the same IP for as
             long as possible`,
         check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
@@ -162,7 +196,7 @@ const presets = {
     },
     session: {
         title: 'Single session (IP)',
-        subtitle: `All requests share the same active session (IP) For
+        subtitle: `All requests share the same active session (IP). For
             connecting a single app/browser that does not need to maintain IP
             on idle times`,
         check: function(opt){ return !opt.pool_size && !opt.sticky_ip
@@ -198,7 +232,7 @@ const presets = {
     },
     sticky_ip: {
         title: 'Session (IP) per machine',
-        subtitle: `Each requesting machine will have its own session (IP)
+        subtitle: `Each requesting machine will have its own session (IP).
             For connecting several computers to a single Luminati Proxy
             Manager, each of them having its own single session (IP)`,
         check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
@@ -233,8 +267,8 @@ const presets = {
     },
     sequential: {
         title: 'Sequential session (IP) pool',
-        subtitle: `Sequential pool of pre-established of sessions (IPs) For
-            running groups of requests sharing the same IP to a target site
+        subtitle: `Sequential pool of pre-established of sessions (IPs). For
+            running groups of requests sharing the same IP to a target site.
             Use refresh_sessions max_requests & session_duration to control
             session (IP) switching`,
         check: function(opt){ return opt.pool_size &&
@@ -270,8 +304,8 @@ const presets = {
     },
     round_robin: {
         title: 'Round-robin (IP) pool',
-        subtitle: `Round-robin pool of pre-established sessions (IPs) For
-            spreading requests across large number of IPs Tweak pool_size,
+        subtitle: `Round-robin pool of pre-established sessions (IPs). For
+            spreading requests across large number of IPs. Tweak pool_size,
             max_requests & proxy_count to optimize performance`,
         check: function(opt){ return opt.pool_size
             && opt.pool_type=='round-robin' && !opt.multiply; },
@@ -407,4 +441,5 @@ const presets = {
 for (let k in presets)
     presets[k].key = k;
 
-export {Dialog, Code, If, Modal, Loader, onboarding_steps, presets};
+export {Dialog, Code, If, Modal, Loader, Select, Input, onboarding_steps,
+    presets};

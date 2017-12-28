@@ -14,14 +14,13 @@
   <div ng-hide=!proxies_loading() class="alert alert-info">
     Loading...
   </div>
-  <div ng-if="section.name!='settings'" react-view=messages></div>
   <div class="col-md-8 lpm proxies">
     <div ng-if=!proxies_loading() class="panel proxies_panel">
       <div class=panel_heading>
         <h2>Proxies</h2>
         <div class=btn-wrapper>
           <button class="btn btn_lpm btn_lpm_normal btn_csv"
-            ng-click=download_csv() uib-tooltip="Download CSV"
+            ng-click=download_csv() uib-tooltip="Download all ports as CSV"
             tooltip-class=tooltip-default>
             <div class="icon"></div>
             csv
@@ -31,10 +30,10 @@
             tooltip-class=tooltip-default>
             <div class="icon"></div>
           </button>
-          <button class="btn btn_lpm btn_lpm_normal btn_add"
+          <button class="btn btn_lpm btn_add"
             ng-if="$root.mode!='guest'" ng-click=add_proxy_new()
-            uib-tooltip="Add Proxy" tooltip-class=tooltip-default>
-            <div class="icon"></div>
+            uib-tooltip="Add new Proxy port" tooltip-class=tooltip-default>
+            <b>+ New Proxy</b>
           </button>
         </div>
       </div>
@@ -55,12 +54,6 @@
               |limitTo:pagination.per_page"
               ng-class="{opened: showed_status_proxies[proxy.port]}">
               <td>
-                <a ng-if="show_old_ui() &&
-                  $root.mode!='guest'&&is_action_available('edit', proxy)"
-                  ng-click="edit_proxy(false, proxy)"
-                  class=proxies-action-edit>
-                  E
-                </a>
                 <a ng-if="$root.mode!='guest'&&is_action_available('edit',
                   proxy)"
                   href="proxy/{{proxy.port}}"
@@ -88,7 +81,7 @@
                     class="proxies-warning glyphicon glyphicon-exclamation-sign">
                   </span>
                 </span>
-                <span ng-if="col.key=='_status'"
+                <div ng-if="col.key=='_status'"
                   ng-init="proxy.get_status()" class="proxy_status"
                   ng-click="toggle_proxy_status_details(proxy)"
                   ng-class="{pointer: proxy._status_details.length}"
@@ -96,15 +89,14 @@
                   tooltip-class="tooltip-proxy-status">
                   <div ng-if="proxy._status=='error'"
                     class="status_icon error"></div>
-                  <div ng-if="!proxy._status" class="status_icon undefined">
-                  </div>
+                  <div ng-if="!proxy._status" class="status_icon undefined"></div>
                   <div ng-if="proxy._status=='ok'&&proxy._status_details.length"
-                    class="status_icon warning"></div>
+                    class="status_icon ok_with_warning"></div>
                   <div ng-if="proxy._status=='ok'&&!proxy._status_details.length"
                     class="status_icon success"></div>
                   <div ng-if="proxy._status_details.length"
                     class="toggle_info icon"></div>
-                </span>
+                </div>
                 <span ng-if="$root.mode=='guest'">
                   <span ng-if="col.key=='country'"
                     title="{{option_key(col, val||'')}}">
@@ -217,49 +209,54 @@
                 <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session===true
                   ng-click=refresh_sessions(proxy)
                   uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default
-                  class="action_icon refresh"></div>
+                  class="action_icon refresh">
+                </div>
                 <div
                   ng-if=!proxy.pool_size&&!proxy.sticky_ip&&proxy.session!==true
                   uib-tooltip="No session pool" tooltip-class=tooltip-default
-                  class="action_icon refresh disabled"></div>
+                  class="action_icon refresh disabled">
+                </div>
                 <div ng-if=proxy._history
                   ng-click=show_history(proxy)
                   uib-tooltip=History tooltip-class=tooltip-default
-                  class="action_icon history"></div>
+                  class="action_icon history">
+                </div>
                 <div ng-if=!proxy._history
                   uib-tooltip="No history" tooltip-class=tooltip-default
-                  class="action_icon history disabled"></div>
+                  class="action_icon history disabled">
+                </div>
                 <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session
                   ng-click=show_pool(proxy)
                   uib-tooltip="Current pool" tooltip-class=tooltip-default
-                  class="action_icon pool"></div>
+                  class="action_icon pool">
+                </div>
                 <div ng-if=!proxy.pool_size&&!proxy.sticky_ip&&!proxy.session
                   uib-tooltip="Pool empty; size is set to zero"
                   tooltip-class=tooltip-default
-                  class="action_icon pool disabled"></div>
+                  class="action_icon pool disabled">
+                </div>
                 <div ng-if="$root.mode!='guest'
                   &&is_action_available('duplicate', proxy)"
                   uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
                   ng-click="dup_proxies(proxy)"
-                  class="action_icon duplicate"></div>
+                  class="action_icon duplicate">
+                </div>
                 <div ng-if="$root.mode!='guest'&&is_action_available('delete',
                   proxy)" ng-click=delete_proxies(proxy.port)
                   uib-tooltip=Delete tooltip-class=tooltip-default
-                  class="action_icon delete"></div>
+                  class="action_icon delete">
+                </div>
               </td>
             </tr>
             <tr ng-repeat-end ng-if="showed_status_proxies[proxy.port]"
               class=status-details-wrapper>
               <td colspan="{{get_colspans()[0]}}"></td>
               <td colspan="{{get_colspans()[1]}}">
-                <p ng-repeat="i in proxy._status_details"
-                  class=status-details-line>
-                  <img ng-if="i.lvl=='err'" class=status-details-icon-err
-                    src="/img/ic_status_details_error.svg">
-                  <img ng-if="i.lvl=='warn'" class=status-details-icon-warn
-                    src="/img/ic_status_details_warning.svg">
-                  <span class=status-details-text>{{i.msg}}</span>
-                </p>
+                <span ng-repeat="i in proxy._status_details" class="status_details">
+                  <div ng-if="i.lvl=='err'" class="status_icon error"></div>
+                  <div ng-if="i.lvl=='warn'" class="status_icon warning"></div>
+                  <span class=text>{{i.msg}}</span>
+                </span>
               </td>
             </tr>
           </tbody>
@@ -285,11 +282,6 @@
   </div>
   <div ng-repeat="p in pool_dialog" ng-controller=pool
     ng-include="'pool.html'" ng-init=init(p)>
-  </div>
-  <div ng-if="proxies && $root.consts">
-    <div ng-repeat="p in proxy_dialog" ng-controller=proxy
-      ng-include="'proxy.html'" ng-init=init(p)>
-    </div>
   </div>
   <div ng-repeat="c in columns_dialog" ng-controller=columns
     ng-include="'proxy_cols.html'" ng-init=init(c)>

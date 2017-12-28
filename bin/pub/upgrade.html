@@ -1,25 +1,28 @@
-<div ng-if="$root.mode=='root'&&is_upgradable()"
-  class="alert alert-warning settings-alert">
-  <div>
-    A new version <strong>{{$parent.ver_last.version}}</strong> is available, see
-    <a href=https://github.com/luminati-io/luminati-proxy/blob/master/CHANGELOG.md#luminati-proxy-manager---change-log>change
-      log</a>
-    for specifics.
-  </div>
-  <div class="buttons">
-    <button type=button class="btn btn-primary" ng-click=upgrade()
-      ng-disabled=upgrading||upgrade_error||!ver_node.satisfied
-      ng-if="!is_electron()">
-      {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
-    </button>
-    <a ng-href="https://github.com/luminati-io/luminati-proxy/releases/download/v{{$parent.ver_last.version}}/luminati-proxy-manager-v{{$parent.ver_last.version}}-setup.exe"
-      ng-if="is_electron()">
-      Download upgrade
-    </a>
-  </div>
-
-  <div ng-if=ver_node&&!ver_node.satisfied&&!is_electron()>
-    To upgrade Luminati Proxy Manager, you need to update Node.js to version
-    {{ver_node.recommended}}.
+<div class="lpm">
+  <div ng-if="$root.mode=='root'&&is_upgradable()"
+    class="warning warning_upgrade">
+    <div class="warning_icon"></div>
+    <div>
+      A new version <strong>{{$parent.ver_last.version}}</strong> is available, see
+      <a target="_blank"
+        href=https://github.com/luminati-io/luminati-proxy/blob/master/CHANGELOG.md#luminati-proxy-manager---change-log>change
+        log
+      </a> for specifics.
+    </div>
+    <div class="buttons buttons_upgrade">
+      <button class="btn btn_lpm btn_upgrade" ng-click=upgrade()
+        ng-disabled=upgrading||upgrade_error||!ver_node.satisfied
+        ng-if="!is_electron()">
+        {{upgrading ? 'Upgrading...' : (upgrade_error ? 'Error' : 'Upgrade')}}
+      </button>
+      <a ng-href="https://github.com/luminati-io/luminati-proxy/releases/download/v{{$parent.ver_last.version}}/luminati-proxy-manager-v{{$parent.ver_last.version}}-setup.exe"
+        ng-if="is_electron()">
+        Download upgrade
+      </a>
+    </div>
+    <div ng-if=ver_node&&!ver_node.satisfied&&!is_electron()>
+      To upgrade Luminati Proxy Manager, you need to update Node.js to version
+      {{ver_node.recommended}}.
+    </div>
   </div>
 </div>

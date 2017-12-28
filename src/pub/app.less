@@ -33,6 +33,12 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
       U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+html, body, .top_nav_wrapper, .page-body {
+    height: 100%;
+}
+div[react-view=react_component] {
+    height: 98%;
+}
 body {
     font-family: "Noto Sans", sans-serif;
     font-size: 15px;
@@ -41,11 +47,10 @@ body {
     padding-top: 70px;
 }
 .no_nav {
-    .page-body {
-        margin-left: 0;
-    }
+    .page-body { margin-left: 0; }
     .nav_top { background-color: white; }
 }
+.alert.alert-info { margin: 0 15px 20px; }
 .page-body { margin-left: 224px; }
 .page-body a {
     color: #428bca;
@@ -527,18 +532,11 @@ a.proxies-action-edit {
     color: black;
 }
 .status-details-wrapper {
-    background: #f7f7f7;
+    background-color: @warning;
     font-size: 12px;
 }
-.status-details-line {
-    margin: 0 0 5px 25px;
-}
-.status-details-icon-warn {
-    vertical-align: bottom;
-    padding-bottom: 1px;
-}
-.status-details-text {
-    padding: 0 0 0 5px;
+table.table-hover tbody tr.status-details-wrapper:hover {
+    background-color: @warning;
 }
 .proxy_status { position: relative; }
 .text-err {
@@ -555,7 +553,7 @@ a.proxies-action-edit {
 }
 .opened,
 .table-hover>tbody>tr.opened:hover {
-    background-color: #d7f6ff;
+    background-color: @x_light;
 }
 .table-hover>tbody>tr>td {
     border: none;
@@ -713,6 +711,12 @@ input.form-control[type=checkbox] {
             text-decoration: underline;
         }
     }
+    .nav_header {
+        h3 {
+            height: 57px;
+            line-height: 55px;
+        }
+    }
     select, input[type=number], input[type=text], input[type=password],
     textarea {
         width: 100%;
@@ -841,6 +845,20 @@ input.form-control[type=checkbox] {
             color: @first_color;
         }
     }
+    .btn_lpm_error {
+        color: @error;
+        border-color: @error;
+        background-color: white;
+        &:hover {
+            background-color: @error_x_light;
+            border-color: @error;
+        }
+        &:active, &.active {
+            color: white;
+            background-color: @error;
+            border-color: @error;
+        }
+    }
     .btn_lpm_big {
         line-height: 0;
         font-size: 32px;
@@ -902,6 +920,38 @@ input.form-control[type=checkbox] {
                 margin: auto;
             }
         }
+    }
+    .warning {
+        margin: 10px 0;
+        font-size: 14px;
+        color: @dark;
+        display: flex;
+        align-items: center;
+        background-color: @warning;
+        border-radius: 2px;
+        padding: 17px 20px;
+        .warning_icon {
+            background: url(/img/warning.svg);
+            width: 18px;
+            min-width: 18px;
+            height: 18px;
+            margin-right: 22px;
+         }
+    }
+    .warning_upgrade {
+        position: relative;
+        margin: 0 15px 20px;
+        height: 48px;
+    }
+    .buttons_upgrade {
+        position: absolute;
+        right: 5px;
+    }
+    .btn_upgrade {
+        width: 100px;
+        height: 32px;
+        font-size: 14px;
+        font-weight: 300;
     }
     .panel {
         box-shadow: none;
@@ -993,15 +1043,21 @@ input.form-control[type=checkbox] {
     }
 }
 .edit_proxy {
+    .info_icon {
+        background: url(/img/info.svg);
+        width: 11px;
+        height: 11px;
+        opacity: 0.4;
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        cursor: pointer;
+    }
     .nav_wrapper {
         .nav_header {
+            h3 { margin: 10px 0; }
             display: flex;
             align-items: center;
-            h3 {
-                margin: 10px 0;
-                height: 57px;
-                line-height: 55px;
-            }
             .warning_wrapper {
                 flex: 1;
                 margin-left: 100px;
@@ -1017,6 +1073,14 @@ input.form-control[type=checkbox] {
     .nav {
         display: flex;
         margin-bottom: 20px;
+        .preset_field {
+            position: relative;
+            .info_icon {
+                right: 2px;
+                top: 11px;
+            }
+            .field { min-width: 270px; }
+        }
         .field {
             min-width: 260px;
             flex-grow: 1;
@@ -1039,23 +1103,6 @@ input.form-control[type=checkbox] {
     .warnings_modal {
         .modal-header h4 { font-size: 20px; }
         .modal-body { padding: 20px; }
-    }
-    .warning {
-        margin: 10px 0;
-        font-size: 14px;
-        color: @dark;
-        display: flex;
-        align-items: center;
-        background-color: @warning;
-        border-radius: 2px;
-        padding: 17px 20px;
-        .warning_icon {
-            background: url(/img/warning.svg);
-            width: 18px;
-            min-width: 18px;
-            height: 18px;
-            margin-right: 22px;
-         }
     }
     .nav_tabs {
         display: flex;
@@ -1105,16 +1152,6 @@ input.form-control[type=checkbox] {
                 left: 0;
                 right: 0;
                 opacity: 0.8;
-            }
-            .info {
-                background: url(/img/info.svg);
-                width: 11px;
-                height: 11px;
-                opacity: 0.4;
-                position: absolute;
-                bottom: 6px;
-                right: 6px;
-                cursor: pointer;
             }
             .icon.target { background: url(/img/target.svg); }
             .icon.speed { background: url(/img/speed.svg); }
@@ -1291,21 +1328,34 @@ input.form-control[type=checkbox] {
             height: 18px;
             position: relative;
             top: 2px;
-            margin: auto;
+            display: inline-block;
             &.success { background: url(/img/success.svg); }
             &.error { background: url(/img/errors.svg); }
+            &.ok_with_warning { background: url(/img/ok_warning.svg); }
             &.warning { background: url(/img/warning.svg); }
             &.undefined {
                 background-color: #ffaf00;
                 border-radius: 50%;
             };
         }
+        .status_details {
+            display: flex;
+            align-items: center;
+            padding: 3px 0;
+            .text { margin-left: 15px; }
+            .status_icon {
+                padding: 0;
+                margin: 0;
+                min-width: 18px;
+                min-height: 18px;
+            }
+        }
         .toggle_info.icon {
             width: 7px;
             height: 4px;
             position: absolute;
-            left: 37px;
-            top: -8px;
+            left: 27px;
+            top: 9px;
             background: url(/img/down.svg);
         }
         .action_icon {
@@ -1354,6 +1404,7 @@ input.form-control[type=checkbox] {
             }
         }
         .btn_add {
+            width: 80px;
             .icon {
                 background: url(/img/add.svg);
                 width: 14px;
@@ -1384,23 +1435,116 @@ input.form-control[type=checkbox] {
         }
     }
 }
+.proxy_tester {
+    .title_value_pairs {
+        font-size: 14px;
+        .pair {
+            display: flex;
+            .title { flex: 1; }
+            .value {
+                flex: 1;
+                color: @second_color;
+            }
+        }
+    }
+    .panel {
+        &.request {
+            .request_params {
+                display: flex;
+                border-bottom: solid 1px @grey_border;
+                padding-bottom: 20px;
+                margin-bottom: 20px;
+            }
+            .field {
+                &:first-child { margin-left: 0; }
+                &:last-child { margin-right: 0; }
+                margin: 0 10px;
+                .title {
+                    font-size: 14px;
+                    margin-bottom: 3px;
+                    margin-left: 2px;
+                }
+                &.proxy { flex: 1; }
+                &.url { flex: 3; }
+                &.method { flex: 1; }
+            }
+            .headers {
+                .header_line {
+                    display: flex;
+                    margin: 10px 0;
+                    &:first-child { margin-top: 0; }
+                    &:last-child { margin-bottom: 20px; }
+                    button { min-width: 140px; }
+                    .header_input {
+                        margin-right: 10px;
+                        flex: 1;
+                    }
+                    .value_input {
+                        margin-left: 10px;
+                        margin-right: 20px;
+                        flex: 2;
+                    }
+                }
+            }
+            .add_header_wrapper {
+                text-align: center;
+                .btn_add_header {
+                    font-weight: 300;
+                }
+            }
+        }
+        &.body {
+            .panel.code {
+                font-size: 14px;
+                background-color: #fafafa;
+                margin-bottom: 0;
+                .panel_body { padding: 15px; }
+            }
+        }
+        &.info {
+            .title_value_pairs .pair .value { text-align: right; }
+        }
+        &.response {
+            .title_value_pairs .pair {
+                .key { min-width: 160px; }
+            }
+        }
+    }
+}
 .modal-backdrop.fade.in { opacity: 0.15; }
 .intro {
+    height: 100%;
     text-align: center;
     margin-top: 10px;
+    .intro_panel {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+    }
     .header {
-        margin: auto;
+        margin-left: auto;
+        margin-right: auto;
         width: 600px;
     }
     .sub_header {
-        margin: auto;
         margin-top: 10px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 600px;
     }
     .img_intro {
+        flex: 1;
         background: url(/img/lpm_infographics.png);
-        width: 592px;
-        height: 326px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
         margin: 15px 0;
+        max-height: 330px;
+    }
+    .btn_lets_go {
+        margin-bottom: 10px;
+        margin-left: auto;
+        margin-right: auto;
     }
     .section {
         cursor: pointer;
@@ -1705,7 +1849,7 @@ input.form-control[type=checkbox] {
         .proxies { background-image: url('img/proxies.svg'); }
         .stats { background-image: url('img/stats.svg'); }
         .zones { background-image: url('img/zones.svg'); }
-        .tester { background-image: url('img/tester.svg'); }
+        .proxy_tester { background-image: url('img/tester.svg'); }
         .tools { background-image: url('img/tools.svg'); }
         .faq { background-image: url('img/faq.svg'); }
     }

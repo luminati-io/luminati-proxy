@@ -21,8 +21,8 @@ import intro from './intro.js';
 import zadd_proxy from './add_proxy.js';
 import zedit_proxy from './edit_proxy.js';
 import Howto from './howto.js';
+import proxy_tester from './proxy_tester.js';
 import protocols_detail from './stats/protocols_detail.js';
-import messages from './messages.js';
 import util from './util.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -46,6 +46,9 @@ const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
 
 window.feature_flag = (flag, enable=true)=>{
     window.localStorage.setItem(flag, JSON.stringify(enable)); };
+
+const is_feature_flag_on = flag=>{
+    return JSON.parse(window.localStorage.getItem(flag)); };
 
 var is_electron = window.process && window.process.versions.electron;
 
@@ -189,6 +192,13 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
                 <Howto ga_category="how-to-use"/>;
             $scope.react_component = howto_wrapper;
         },
+    });
+    state_registry.register({
+        name: 'proxy_tester',
+        parent: 'app',
+        url: '/proxy_tester',
+        template: '<div react-view=react_component></div>',
+        controller: function($scope){ $scope.react_component = proxy_tester; },
     });
     state_registry.register({
         name: 'edit_proxy',
@@ -406,14 +416,15 @@ function success_rate_factory($http, $proxies, $timeout){
 }
 
 module.controller('root', ['$rootScope', '$scope', '$http', '$window',
-    '$state', '$transitions',
-function($rootScope, $scope, $http, $window, $state, $transitions){
-    $scope.messages = messages;
+    '$state', '$transitions', '$timeout',
+function($rootScope, $scope, $http, $window, $state, $transitions, $timeout){
     $scope.sections = [
         {name: 'settings', title: 'Settings', navbar: false},
         {name: 'howto', title: 'How to use', navbar: true},
         {name: 'proxies', title: 'Proxies', navbar: true},
         {name: 'zones', title: 'Zones', navbar: true},
+        {name: 'proxy_tester', title: 'Proxy Tester',
+            navbar: is_feature_flag_on('proxy_tester')},
         {name: 'tools', title: 'Tools', navbar: true},
         {name: 'faq', title: 'FAQ', navbar: true},
         {name: 'intro', navbar: false},
@@ -472,12 +483,6 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
             keyboard: false,
         });
     };
-    // XXX krzysztof/ovidiu: incorrect usage of promises
-    var check_reload = function(){
-        $http.get('/api/config').catch(
-            function(){ setTimeout(check_reload, 500); })
-        .then(function(){ $window.location.reload(); });
-    };
     $scope.is_upgradable = function(){
         if ($scope.ver_last&&$scope.ver_last.newer)
         {
@@ -497,24 +502,23 @@ function($rootScope, $scope, $http, $window, $state, $transitions){
         $scope.$root.confirmation = {
             text: 'The application will be upgraded and restarted.',
             confirmed: function(){
-                $window.$('#upgrading').modal({backdrop: 'static',
-                    keyboard: false});
+                $timeout(()=>$('#upgrading').modal(), 500);
                 $scope.upgrading = true;
-                // XXX krzysztof: wrong usage of promises
-                $http.post('/api/upgrade').catch(function(){
-                    $scope.upgrading = false;
-                    $scope.upgrade_error = true;
-                }).then(function(data){
-                    $scope.upgrading = false;
-                    // XXX krzysztof: wrong usage of promises
-                    $http.post('/api/restart').catch(function(){
-                        // $scope.upgrade_error = true;
+                $http.post('/api/upgrade').then(()=>{
+                    $http.post('/api/restart').then(()=>{
+                        $scope.upgrading = false;
+                        $('#upgrading').modal('hide');
                         show_reload();
-                        check_reload();
-                    }).then(function(d){
-                        show_reload();
-                        check_reload();
+                        setTimeout(function _check_reload(){
+                            const retry_cb = ()=>{
+                                setTimeout(_check_reload, 500); };
+                            const ok_cb = ()=>{ $window.location = '/'; };
+                            $http.get('/proxies').then(ok_cb, retry_cb);
+                        }, 3000);
                     });
+                }).catch(()=>{
+                    $scope.upgrading = false;
+                    $('#upgrading').modal('hide');
                 });
             },
         };
@@ -1771,8 +1775,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     };
     $scope.on_page_change = function(){
         $scope.selected_proxies = {}; };
-    $scope.show_old_ui = function(){
-        return JSON.parse($window.localStorage.getItem('old_ui')); };
     var load_regions = function(country){
         if (!country||country=='*')
             return [];
@@ -2284,571 +2286,6 @@ function Pool($scope, $http, $window){
             });
         };
         $scope.update();
-    };
-}
-
-module.controller('proxy', Proxy);
-Proxy.$inject = ['$scope', '$http', '$proxies', '$window', '$q', '$location'];
-function Proxy($scope, $http, $proxies, $window, $q, $location){
-    $scope.init = function(locals){
-        var _presets = $scope.presets;
-        var regions = {};
-        var cities = {};
-        $scope.consts = $scope.$root.consts.proxy;
-        $scope.port = locals.duplicate ? '' : locals.proxy.port;
-        var form = $scope.form = _.omit(_.cloneDeep(locals.proxy), 'rules');
-        form.port = $scope.port;
-        form.zone = form.zone||'';
-        form.debug = form.debug||'';
-        form.country = form.country||'';
-        form.state = form.state||'';
-        form.city = form.city||'';
-        form.dns = form.dns||'';
-        form.log = form.log||'';
-        form.ips = form._ips||form.ips||[];
-        delete form._ips;
-        form.vips = form._vips||form.vips||[];
-        delete form._vips;
-        if (_.isBoolean(form.rule))
-            form.rule = {};
-        $scope.extra = {
-            reverse_lookup: '',
-            reverse_lookup_dns: form.reverse_lookup_dns,
-            reverse_lookup_file: form.reverse_lookup_file,
-            reverse_lookup_values:
-                (form.reverse_lookup_values||[]).join('\n'),
-        };
-        $scope.rule_actions = [{label: 'Retry request(up to 20 times)',
-            value: 'retry', raw: {ban_ip: '60min', retry: true}}];
-        $scope.rule_statuses = ['200 - Succeeded requests',
-            '403 - Forbidden', '404 - Not found',
-            '500 - Internal server error', '502 - Bad gateway',
-            '503 - Service unavailable', '504 - Gateway timeout', 'Custom'];
-        if (form.rule && form.rule.action)
-        {
-            form.rule.action = _.find($scope.rule_actions,
-                {value: form.rule.action.value});
-        }
-        if ($scope.extra.reverse_lookup_dns)
-            $scope.extra.reverse_lookup = 'dns';
-        else if ($scope.extra.reverse_lookup_file)
-            $scope.extra.reverse_lookup = 'file';
-        else if ($scope.extra.reverse_lookup_values)
-            $scope.extra.reverse_lookup = 'values';
-        $scope.extra.whitelist_ips = (form.whitelist_ips||[]).join(',');
-        $scope.status = {};
-        var new_proxy = !form.port||form.port=='';
-        if (new_proxy)
-        {
-            var port = 24000;
-            var socks = form.socks;
-            $scope.proxies.forEach(function(p){
-                if (p.port >= port)
-                    port = p.port+1;
-                if (socks && p.socks==socks)
-                    socks++;
-            });
-            form.port = port;
-            form.socks = socks;
-        }
-        var def_proxy = form;
-        if (new_proxy)
-        {
-            def_proxy = {};
-            for (var key in $scope.consts)
-            {
-                if ($scope.consts[key].def!==undefined)
-                    def_proxy[key] = $scope.consts[key].def;
-            }
-        }
-        for (var p in _presets)
-        {
-            if (_presets[p].check(def_proxy))
-            {
-                form.preset = _presets[p];
-                break;
-            }
-        }
-        if (form.last_preset_applied && _presets[form.last_preset_applied])
-            form.preset = _presets[form.last_preset_applied];
-        $scope.apply_preset = function(){
-            let last_preset = form.last_preset_applied ?
-                _presets[form.last_preset_applied] : null;
-            form.applying_preset = true;
-            if (last_preset&&last_preset.clean)
-                last_preset.clean(form);
-            form.preset.set(form);
-            form.last_preset_applied = form.preset.key;
-            if (form.session===true)
-            {
-                form.session_random = true;
-                form.session = '';
-            }
-            if (form.max_requests)
-            {
-                var max_requests = (''+form.max_requests).split(':');
-                form.max_requests_start = +max_requests[0];
-                form.max_requests_end = +max_requests[1];
-            }
-            if (!form.max_requests)
-                form.max_requests_start = 0;
-            if (form.session_duration)
-            {
-                var session_duration = (''+form.session_duration)
-                    .split(':');
-                form.duration_start = +session_duration[0];
-                form.duration_end = +session_duration[1];
-            }
-            delete form.applying_preset;
-        };
-        $scope.apply_preset();
-        $scope.form_errors = {};
-        $scope.defaults = {};
-        $scope.regions = [];
-        $scope.cities = [];
-        $scope.beta_features = $scope.$root.beta_features;
-        $scope.get_zones_names = function(){
-            return Object.keys($scope.zones); };
-        $scope.show_modal = function(){
-            $window.$('#proxy').one('shown.bs.modal', function(){
-                $window.$('#proxy-field-port').select().focus();
-                $window.$('#proxy .panel-collapse').on('show.bs.collapse',
-                    function(event){
-                    var container = $window.$('#proxy .proxies-settings');
-                    var opening = $window.$(event.currentTarget).closest(
-                        '.panel');
-                    var pre = opening.prevAll('.panel');
-                    var top;
-                    if (pre.length)
-                    {
-                        top = opening.position().top+container.scrollTop();
-                        var closing = pre.find('.panel-collapse.in');
-                        if (closing.length)
-                            top -= closing.height();
-                    }
-                    else
-                        top = 0;
-                    container.animate({'scrollTop': top}, 250);
-                });
-            }).modal();
-        };
-        $scope.is_show_allocated_ips = function(){
-            var zone = $scope.consts.zone.values.filter(function(z){
-                return z.value==form.zone; })[0];
-            var plan = (zone&&zone.plans||[]).slice(-1)[0];
-            return (plan&&plan.type||zone&&zone.type)=='static';
-        };
-        $scope.show_allocated_ips = function(){
-            var zone = form.zone;
-            var keypass = form.password||'';
-            var modals = $scope.$root;
-            modals.allocated_ips = {
-                ips: [],
-                loading: true,
-                random_ip: function(){
-                    modals.allocated_ips.ips.forEach(function(item){
-                        item.checked = false; });
-                    form.ips = [];
-                    form.pool_size = 0;
-                },
-                toggle_ip: function(item){
-                    var index = form.ips.indexOf(item.ip);
-                    if (item.checked && index<0)
-                        form.ips.push(item.ip);
-                    else if (!item.checked && index>-1)
-                        form.ips.splice(index, 1);
-                    if (!form.multiply_ips)
-                        form.pool_size = form.ips.length;
-                    else
-                        form.multiply = form.ips.length;
-                },
-                zone: zone,
-            };
-            $window.$('#allocated_ips').modal();
-            $http.get('/api/allocated_ips?zone='+zone+'&key='+keypass)
-            .then(function(res){
-                form.ips = form.ips.filter(ip=>res.data.ips.includes(ip));
-                modals.allocated_ips.ips = res.data.ips.map(function(ip_port){
-                    var ip = ip_port.split(':')[0];
-                    return {ip: ip, checked: form.ips.includes(ip)};
-                });
-                modals.allocated_ips.loading = false;
-            });
-        };
-        $scope.is_show_allocated_vips = function(){
-            var zone = $scope.consts.zone.values.filter(function(z){
-                return z.value==form.zone; })[0];
-            var plan = (zone&&zone.plans||[]).slice(-1)[0];
-            return plan&&!!plan.vip;
-        };
-        $scope.show_allocated_vips = function(){
-            var zone = form.zone;
-            var keypass = form.password||'';
-            var modals = $scope.$root;
-            modals.allocated_vips = {
-                vips: [],
-                loading: true,
-                random_vip: function(){
-                    modals.allocated_vips.vips.forEach(function(item){
-                        item.checked = false; });
-                    form.vips = [];
-                    form.pool_size = 0;
-                },
-                toggle_vip: function(item){
-                    var index = form.vips.indexOf(item.vip);
-                    if (item.checked && index<0)
-                        form.vips.push(item.vip);
-                    else if (!item.checked && index>-1)
-                        form.vips.splice(index, 1);
-                    if (!form.multiply_vips)
-                        form.pool_size = form.vips.length;
-                    else
-                        form.multiply = form.vips.length;
-                },
-                zone: zone,
-            };
-            $window.$('#allocated_vips').modal();
-            $http.get('/api/allocated_vips?zone='+zone+'&key='+keypass)
-            .then(function(res){
-                form.vips = form.vips.filter(vip=>res.data.includes(vip));
-                modals.allocated_vips.vips = res.data.map(function(vip){
-                    return {vip: vip, checked: form.vips.includes(vip)};
-                });
-                modals.allocated_vips.loading = false;
-            });
-        };
-        $scope.binary_changed = function(proxy, field, value){
-            proxy[field] = {'yes': true, 'no': false, 'default': ''}[value]; };
-        var update_allowed_countries = function(){
-            var countries = $scope.consts.country.values;
-            $scope.allowed_countries = [];
-            if (!countries)
-                return;
-            if (form.zone!='static')
-                return $scope.allowed_countries = countries;
-            $scope.allowed_countries = countries.filter(function(c){
-                return ['', 'au', 'br', 'de', 'gb', 'us'].includes(c.value);
-            });
-        };
-        $scope.update_regions_and_cities = function(is_init){
-            if (!is_init)
-                $scope.form.region = $scope.form.city = '';
-            $scope.regions = [];
-            $scope.cities = [];
-            var country = ($scope.form.country||'').toUpperCase();
-            if (!country||country=='*')
-                return;
-            if (regions[country])
-                $scope.regions = regions[country];
-            else
-            {
-                regions[country] = [];
-                $http.get('/api/regions/'+country).then(function(res){
-                    $scope.regions = regions[country] = res.data; });
-            }
-            if (cities[country])
-                $scope.cities = cities[country];
-            else
-            {
-                cities[country] = [];
-                $http.get('/api/cities/'+country).then(function(res){
-                    cities[country] = res.data.map(function(city){
-                        if (city.region)
-                            city.value = city.value+' ('+city.region+')';
-                        return city;
-                    });
-                    $scope.cities = cities[country];
-                    $scope.update_cities();
-                });
-            }
-        };
-        $scope.update_cities = function(){
-            var country = $scope.form.country.toUpperCase();
-            var state = $scope.form.state;
-            if (state==''||state=='*')
-            {
-                $scope.form.city = '';
-                $scope.cities = cities[country];
-            }
-            else
-            {
-                $scope.cities = cities[country].filter(function(item){
-                    return !item.region || item.region==state; });
-                var exist = $scope.cities.filter(function(item){
-                    return item.key==$scope.form.city; }).length>0;
-                if (!exist)
-                    $scope.form.city = '';
-            }
-        };
-        $scope.update_region_by_city = function(city){
-            if (city.region)
-                $scope.form.state = city.region;
-            $scope.update_cities();
-        };
-        $scope.reset_rules = function(){
-            $scope.form.rule = {};
-            $scope.form.rules = {};
-            $scope.form.delete_rules = true;
-            ga_event('proxy_form', 'reset_rules');
-        };
-        $scope.$watch('form.zone', function(val, old){
-            if (!$scope.consts || val==old)
-                return;
-            update_allowed_countries();
-            var zone;
-            if (zone = $scope.consts.zone.values.find(_.matches({zone: val})))
-                form.password = zone.password;
-            const plans = zone.plans||[];
-            const plan = plans.length ? plans[plans.length-1] : {};
-            if (!plan.vip)
-            {
-                form.multiply_vips = false;
-                delete form.vip;
-                delete form.vips;
-            }
-            if (!plan.static)
-            {
-                form.multiply_ips = false;
-                delete form.ip;
-                delete form.ips;
-            }
-        });
-        $scope.$watch('form.multiply_ips', multiply_val_changed);
-        $scope.$watch('form.multiply_vips', multiply_val_changed);
-        function multiply_val_changed(val, old){
-            if (val==old)
-                return;
-            const size = Math.max(form.ips.length, form.vips.length);
-            if (val)
-            {
-                form.pool_size = 0;
-                form.multiply = size;
-                return;
-            }
-            form.multiply = 1;
-            form.pool_size = size;
-        }
-        $scope.$watchCollection('form', function(newv, oldv){
-            function has_changed(f){
-                var old = oldv&&oldv[f]||'';
-                var val= newv&&newv[f]||'';
-                return old!==val;
-            }
-            if (has_changed('preset'))
-            {
-                return ga_event('proxy_form', 'preset_change',
-                    newv.preset.title);
-            }
-            if (newv.applying_preset)
-                return;
-            for (var f in _.extend({}, newv, oldv))
-            {
-                if (has_changed(f)&&f!='applying_preset'&&f!='rule')
-                {
-                    ga_event('proxy_form', f+'_change', f=='password'
-                        ? 'redacted' : newv[f]);
-                }
-            }
-        });
-        $scope.$watchCollection('form.rule', function(newv, oldv){
-            function has_changed(f){
-                var old = oldv&&oldv[f]||'';
-                var val= newv&&newv[f]||'';
-                old = typeof old == 'object' ? old.value : old;
-                val = typeof val == 'object' ? val.value : val;
-                return old!==val;
-            }
-            if (_.isEmpty($scope.form.rule))
-                return;
-            var val;
-            for (var f in _.extend({}, newv, oldv))
-            {
-                if (!has_changed(f))
-                    continue;
-                val = typeof newv[f] == 'object' ? newv[f].value: newv[f];
-                ga_event('proxy_form', 'rule_'+f+'_change', val);
-            }
-        });
-        $scope.save = function(model){
-            var proxy = angular.copy(model);
-            delete proxy.preset;
-            for (var field in proxy)
-            {
-                if (!$scope.is_valid_field(field) || proxy[field]===null)
-                    proxy[field] = '';
-            }
-            var make_int_range = function(start, end){
-                var s = parseInt(start, 10)||0;
-                var e = parseInt(end, 10)||0;
-                return s&&e ? [s, e].join(':') : s||e;
-            };
-            var effective = function(prop){
-                return proxy[prop]===undefined ?
-                    $scope.defaults[prop] : proxy[prop];
-            };
-            if (proxy.session_random)
-                proxy.session = true;
-            proxy.max_requests = make_int_range(proxy.max_requests_start,
-                proxy.max_requests_end);
-            delete proxy.max_requests_start;
-            delete proxy.max_requests_end;
-            proxy.session_duration = make_int_range(proxy.duration_start,
-                proxy.duration_end);
-            delete proxy.duration_start;
-            delete proxy.duration_end;
-            proxy.history = effective('history');
-            proxy.ssl = effective('ssl');
-            proxy.max_requests = effective('max_requests');
-            proxy.session_duration = effective('session_duration');
-            proxy.keep_alive = effective('keep_alive');
-            proxy.pool_size = effective('pool_size');
-            proxy.proxy_type = 'persist';
-            proxy.reverse_lookup_dns = '';
-            proxy.reverse_lookup_file = '';
-            proxy.reverse_lookup_values = '';
-            if ($scope.extra.reverse_lookup=='dns')
-                proxy.reverse_lookup_dns = true;
-            if ($scope.extra.reverse_lookup=='file')
-                proxy.reverse_lookup_file = $scope.extra.reverse_lookup_file;
-            if ($scope.extra.reverse_lookup=='values')
-            {
-                proxy.reverse_lookup_values =
-                    $scope.extra.reverse_lookup_values.split('\n');
-            }
-            proxy.whitelist_ips =
-                $scope.extra.whitelist_ips.split(',').filter(Boolean);
-            var reload;
-            if (Object.keys(proxy.rule||{}).length)
-            {
-                if (!proxy.rule.url)
-                    delete proxy.rule.url;
-                proxy.rule = _.extend({
-                    url: '**',
-                    action: {}
-                }, proxy.rule);
-                var rule_status = proxy.rule.status == 'Custom'
-                    ? proxy.rule.custom : proxy.rule.status;
-                proxy.rules = {
-                    post: [{
-                        res: [{
-                            head: true,
-                            status: {
-                                type: 'in',
-                                arg: rule_status||'',
-                            },
-                            action: proxy.rule.action.raw||{},
-                        }],
-                        url: proxy.rule.url+'/**',
-                    }],
-                };
-                reload = true;
-            }
-            else
-                delete proxy.rules;
-            if (proxy.delete_rules)
-                proxy.rules = {};
-            delete proxy.delete_rules;
-            model.preset.set(proxy);
-            var edit = $scope.port&&!locals.duplicate;
-            ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create'),
-                'start');
-            var save_inner = function(){
-                $scope.status.type = 'warning';
-                $scope.status.message = 'Saving the proxy...';
-                var promise = edit
-                    ? $http.put('/api/proxies/'+$scope.port, {proxy: proxy})
-                    : $http.post('/api/proxies/', {proxy: proxy});
-                var is_ok_cb = function(){
-                    $window.$('#proxy').modal('hide');
-                    $proxies.update();
-                    const curr_step = JSON.parse($window.localStorage.getItem(
-                        'quickstart-step'));
-                    if (curr_step==onboarding_steps.ADD_PROXY)
-                    {
-                        $window.localStorage.setItem('quickstart-step',
-                            onboarding_steps.ADD_PROXY_DONE);
-                        $window.localStorage.setItem('quickstart-first-proxy',
-                            proxy.port);
-                    }
-                    ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
-                        , 'ok');
-                    return $http.post('/api/recheck')
-                    .then(function(r){
-                        if (qs_o.action && qs_o.action=='tutorial_add_proxy')
-                        {
-                            $location.search({});
-                            ga_event('lpm-onboarding',
-                                '04 tutorial create port completed', '');
-                            $window.location = '/intro';
-                        }
-                        if (r.data.login_failure)
-                            $window.location = '/';
-                    });
-                };
-                var is_not_ok_cb = function(res){
-                    $scope.status.type = 'danger';
-                    $scope.status.message = 'Error: '+res.data.status;
-                    ga_event('proxy_form', 'proxy_'+(edit ? 'edit' : 'create')
-                        , 'err');
-                };
-                promise.then(function(){
-                    if (reload)
-                    {
-                        $scope.status.type = 'warning';
-                        $scope.status.message = 'Loading...';
-                        return setTimeout(function(){
-                            $window.location.reload(); }, 800);
-                    }
-                    $scope.status.type = 'warning';
-                    $scope.status.message = 'Checking the proxy...';
-                    return $http.get('/api/proxy_status/'+proxy.port);
-                }).then(function(res){
-                    if (res.data&&res.data.status=='ok')
-                        return is_ok_cb(res);
-                    else if (res.data)
-                        return is_not_ok_cb(res);
-                });
-            };
-            var url = '/api/proxy_check'+(edit ? '/'+$scope.port : '');
-            $http.post(url, proxy).then(function(res){
-                $scope.form_errors = {};
-                var warnings = [];
-                angular.forEach(res.data, function(item){
-                    if (item.lvl=='err')
-                    {
-                        var msg = item.msg;
-                        if (item.field=='password' && msg==
-                            'the provided password is not valid')
-                        {
-                            msg = 'Wrong password';
-                        }
-                        $scope.form_errors[item.field] = msg;
-                    }
-                    if (item.lvl=='warn')
-                        warnings.push(item.msg);
-                });
-                if (Object.keys($scope.form_errors).length)
-                    return;
-                else if (warnings.length)
-                {
-                    $scope.$root.confirmation = {
-                        text: 'Warning'+(warnings.length>1?'s':'')+':',
-                        items: warnings,
-                        confirmed: save_inner,
-                    };
-                    return $window.$('#confirmation').modal();
-                }
-                save_inner();
-            });
-        };
-        $scope.is_valid_field = function(name){
-            return is_valid_field($scope.form, name, $scope.consts.zone);
-        };
-        $scope.starts_with = function(actual, expected){
-            return actual.toLowerCase().startsWith(expected.toLowerCase());
-        };
-        $scope.update_regions_and_cities(true);
-        update_allowed_countries();
     };
 }
 

@@ -7,10 +7,12 @@ import $ from 'jquery';
 import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import {If, Modal, Loader, presets, onboarding_steps} from './common.js';
+import {If, Modal, Loader, Select, Input, presets,
+    onboarding_steps} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
+import {Netmask} from 'netmask';
 
 const event_tracker = {};
 const ga_event = (category, action, label, opt={})=>{
@@ -69,9 +71,10 @@ const tabs = {
                     estblishing connection to new peer`,
             },
             race_reqs: {
-                label: 'Race requests',
-                tooltip: `Race request via different super proxies and take the
-                    fastest`,
+                label: 'Parallel race requests',
+                tooltip: `Sends multiple requests in parallel via different
+                    super proxies and uses the fastest request`,
+                placeholder: 'Number of parallel requests'
             },
             proxy_count: {
                 label: 'Minimum number of super proxies to use',
@@ -308,6 +311,16 @@ const validators = {
             return max;
         else
             return val;
+    },
+    ips_list: val=>{
+        val = val.replace(/\s/g, '');
+        const ips = val.split(',');
+        const res = [];
+        ips.forEach(ip=>{
+            try { res.push(new Netmask(ip).base); }
+            catch(e){ console.log('incorrect ip format'); }
+        });
+        return res.join(',');
     },
 };
 
@@ -843,12 +856,18 @@ const Nav = props=>{
     };
     const presets_opt = Object.keys(presets).map(p=>
         ({key: presets[p].title, value: p}));
+    let {preset} = props.form;
+    let preset_tooltip = preset&&presets[preset].subtitle||'';
+    preset_tooltip = preset_tooltip.replace(/\s\s+/g, ' ');
     return (
         <div className="nav">
           <Field on_change={update_zone} options={props.zones} label="Zone"
             value={props.form.zone}/>
-          <Field on_change={update_preset} label="Preset" options={presets_opt}
-            value={props.form.preset}/>
+          <div className="preset_field">
+            <Field on_change={update_preset} label="Preset"
+              options={presets_opt} value={preset}/>
+            <Tooltip_icon id={preset} title={preset_tooltip}/>
+          </div>
           <Action_buttons save={props.save} dirty={props.dirty}/>
         </div>
     );
@@ -936,9 +955,17 @@ const Tab_icon = props=>{
     );
 };
 
-const Tooltip_icon = props=>props.title ? (
-    <div className="info" data-toggle="tooltip"
-      data-placement="bottom" title={props.title}/>) : null;
+class Tooltip_icon extends React.Component {
+    componentDidUpdate(){
+        $(this.el).attr('title', this.props.title).tooltip('fixTitle'); }
+    save_ref(e){ this.el = e; }
+    render(){
+        return this.props.title ?
+            <div className="info_icon" data-toggle="tooltip"
+              data-placement="bottom" title={this.props.title}
+              ref={this.save_ref.bind(this)}/> : null;
+    }
+}
 
 const Section_header = props=>{
     return props.text ? <div className="header">{props.text}</div> : null;
@@ -991,42 +1018,10 @@ class Section extends React.Component {
     }
 }
 
-const Select = props=>{
-    const update = val=>{
-        if (val=='true')
-            val = true;
-        else if (val=='false')
-            val = false;
-        props.on_change_wrapper(val);
-    };
-    return (
-        <select value={''+props.val}
-          onChange={e=>update(e.target.value)} disabled={props.disabled}>
-          {(props.data||[]).map((c, i)=>(
-            <option key={i} value={c.value}>{c.key}</option>
-          ))}
-        </select>
-    );
-};
-
 const Textarea = props=>{
     return (
         <textarea value={props.val} rows="3" placeholder={props.placeholder}
           onChange={e=>props.on_change_wrapper(e.target.value)}/>
-    );
-};
-
-const Input = props=>{
-    const update = val=>{
-        if (props.type=='number' && val)
-            val = Number(val);
-        props.on_change_wrapper(val, props.id);
-    };
-    return (
-        <input type={props.type} value={props.val} disabled={props.disabled}
-          onChange={e=>update(e.target.value)} className={props.className}
-          min={props.min} max={props.max} placeholder={props.placeholder}
-          onBlur={props.on_blur}/>
     );
 };
 
@@ -1307,8 +1302,8 @@ class Rules extends React.Component {
         ];
         const action_types = [
             {key: '', value: ''},
-            {key: 'Retry request (up to 20 times)', value: 'retry'},
-            {key: 'Retry using new port', value: 'retry_port'},
+            {key: 'Retry request with new IP', value: 'retry'},
+            {key: 'Retry using new port(Waterfall)', value: 'retry_port'},
             {key: 'Ban IP', value: 'ban_ip'},
             {key: 'Save IP to the reserved pool', value: 'save_to_pool'},
         ];
@@ -1540,7 +1535,8 @@ class Rotation extends React.Component {
                 disabled={!support.pool_type}/>
               <Section_with_fields type="number" id="keep_alive" min="0"
                 disabled={!support.keep_alive}/>
-              <Section_with_fields type="text" id="whitelist_ips"/>
+              <Section_with_fields type="text" id="whitelist_ips"
+                validator={validators.ips_list}/>
               <Section_with_fields type="boolean" id="session_random"
                 disabled={!support.session}/>
               <Section_with_fields type="text" id="session"

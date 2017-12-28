@@ -124,7 +124,7 @@ let read_status_file = ()=>{
     if (status_file && invalid_start[status_file.status])
     {
         ua.event('manager', 'crash_sudden', JSON.stringify(status_file));
-        zerr.perr('crash_sudden', {lpm_status});
+        zerr.perr('crash_sudden', lpm_status);
     }
 };
 

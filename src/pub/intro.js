@@ -78,8 +78,10 @@ const Howto_wrapper = props=>{
 };
 
 const Welcome = props=>(
-    <div className="header">
-      <h1>Welcome to Luminati Proxy Manager</h1>
+    <div className="intro_panel">
+      <div className="header">
+        <h1>Welcome to Luminati Proxy Manager</h1>
+      </div>
       <h2 className="sub_header">How it works</h2>
       <div className="sub_header">
         <h4>
@@ -88,7 +90,7 @@ const Welcome = props=>(
         </h4>
       </div>
       <div className="img_intro"></div>
-      <button className="btn btn-primary btn_lpm btn_lpm_big"
+      <button className="btn btn-primary btn_lpm btn_lpm_big btn_lets_go"
         onClick={()=>props.set_step(steps.ADD_PROXY)}>{"Let's go"}</button>
     </div>
 );

@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 1.76.806
+- :star: add file log transport
+- :bug: fix google bypass on selective dc zones
+- :bug: fix whitelist IP to include localhost
+- :sparkles: improvments in UI on proxies page and rules 
+
 ## 1.76.363
 - :bug: fix multiply and duplicate port conflict
 - :bug: fix reserved session timeout

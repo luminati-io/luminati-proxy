@@ -75,7 +75,8 @@
     "yargs": "^6.5.0",
     "opn": "^5.1.0",
     "prismjs": "^1.8.4",
-    "classnames": "^2.2.5"
+    "classnames": "^2.2.5",
+    "netmask": "^1.0.6"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -119,7 +120,8 @@
     "url-loader": "^0.5.9",
     "file-saver": "^1.3.3",
     "webpack": "^3.4.0",
-    "react-bootstrap-typeahead": "^2.0.2"
+    "react-bootstrap-typeahead": "^2.0.2",
+    "rotating-file-stream": "1.3.4"
   },
   "engines": {
     "node": ">=6&&<9"
@@ -203,6 +205,7 @@
       "bin/pub/img/logo.png",
       "bin/pub/img/lpm_infographics.png",
       "bin/pub/img/luminati_logo_2.svg",
+      "bin/pub/img/ok_warning.svg",
       "bin/pub/img/pool.svg",
       "bin/pub/img/preset_icon.png",
       "bin/pub/img/proxies.svg",
@@ -225,7 +228,6 @@
       "bin/pub/pool.html",
       "bin/pub/protocols.html",
       "bin/pub/proxies.html",
-      "bin/pub/proxy.html",
       "bin/pub/proxy_cols.html",
       "bin/pub/settings.html",
       "bin/pub/stats.html",
@@ -257,7 +259,7 @@
       "src/pub/index.html",
       "src/pub/instructions.js",
       "src/pub/intro.js",
-      "src/pub/messages.js",
+      "src/pub/proxy_tester.js",
       "src/pub/stats/common.js",
       "src/pub/stats/domains.js",
       "src/pub/stats/domains_detail.js",
@@ -270,7 +272,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "edf43ae8eb8be5c734be43bd98d37e65"
+    "md5": "8dae5c3423d8558fc25f886447df66ae"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -309,5 +311,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.76.363"
+  "version": "1.76.806"
 }

@@ -32,6 +32,8 @@ class Add_proxy extends React.Component {
             vips: [],
             whitelist_ips: [],
         };
+        const zone = this.zones.filter(z=>z.key==form.zone)[0]||{};
+        form.password = zone.password;
         presets[preset].set(form);
         this.setState({show_loader: true});
         const _this = this;
