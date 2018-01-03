@@ -1,5 +1,10 @@
  Luminati Proxy manager - Change Log
 
+## 1.77.506
+- :star: added proxy tester tool in main nav bar
+- :sparkles: improved performance of edit and save proxies 
+- :bug: fixed request authorization feature
+
 ## 1.76.851
 - :star: add file log transport
 - :bug: fix google bypass on selective dc zones

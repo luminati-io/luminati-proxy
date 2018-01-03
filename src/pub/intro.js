@@ -3,8 +3,9 @@
 import React from 'react';
 import ajax from 'hutil/util/ajax';
 import etask from 'hutil/util/etask';
+import setdb from 'hutil/util/setdb';
 import Howto from './howto.js';
-import {onboarding_steps, Loader} from './common.js';
+import {onboarding_steps, Loader, emitter} from './common.js';
 import util from './util.js';
 import $ from 'jquery';
 
@@ -22,10 +23,17 @@ class Page extends React.Component {
         if (!$('#add_proxy_modal').length)
             loading = true;
         this.state = {step, loading};
-        // XXX krzysztof: temporary hack; remove when zstore
-        window.set_step = this.set_step.bind(this);
-        window.constants_loaded = ()=>{ this.setState({loading: false}); };
     }
+    componentWillMount(){
+        emitter.on('intro:set_step', this.set_step.bind(this)),
+        this.listeners = [
+            setdb.on('head.consts', consts=>{
+                if (consts)
+                    this.setState({loading: false});
+            }),
+        ];
+    }
+    componentWillUnmount(){ this.listeners.forEach(l=>setdb.off(l)); }
     set_step(step){
         if (step==steps.ADD_PROXY)
             ga_event('lpm-onboarding', '03 intro page next');
@@ -35,7 +43,10 @@ class Page extends React.Component {
                 '05 first request button clicked');
         }
         if (step==steps.HOWTO_DONE)
-            window.location = '/proxies';
+        {
+            const state = setdb.get('head.callbacks.state');
+            return state.go('proxies');
+        }
         window.localStorage.setItem('quickstart-step', step);
         this.setState({step});
     }
@@ -45,6 +56,7 @@ class Page extends React.Component {
         {
         case steps.WELCOME: Current_page = Welcome; break;
         case steps.ADD_PROXY:
+        case steps.ADD_PROXY_STARTED:
         case steps.HOWTO_DONE:
         case steps.ADD_PROXY_DONE: Current_page = List; break;
         case steps.HOWTO: Current_page = Howto_wrapper; break;
@@ -102,10 +114,14 @@ class List extends React.Component {
         const test = window.localStorage.getItem('quickstart-test-proxy');
         this.state = {create, test};
     }
-    click_add_proxy(){ $('#add_proxy_modal').modal('show'); }
+    click_add_proxy(){
+        this.props.set_step(steps.ADD_PROXY_STARTED);
+        $('#add_proxy_modal').modal('show');
+    }
     skip_to_dashboard(){
         ga_event('lpm-onboarding', '04 tutorial skipped');
-        window.location.href = localhost+'/proxies';
+        const state = setdb.get('head.callbacks.state');
+        return state.go('proxies');
     }
     render(){
         return (
@@ -120,7 +136,7 @@ class List extends React.Component {
               <div className="section_list">
                 <Section header="Configure new proxy port" img="1"
                   text="Specific proxy settings to be applied on this port"
-                  on_click={this.click_add_proxy}/>
+                  on_click={this.click_add_proxy.bind(this)}/>
                 <Section header="Make your first request" img="2"
                   text=""
                   on_click={()=>this.props.set_step(steps.HOWTO)}

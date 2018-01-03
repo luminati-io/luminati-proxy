@@ -30,7 +30,8 @@
     ],
     "npmRebuild": false,
     "nsis": {
-      "artifactName": "${name}-${version}-setup.${ext}"
+      "artifactName": "${name}-${version}-setup.${ext}",
+      "warningsAsErrors": false
     },
     "productName": "Luminati-Proxy-Manager",
     "publish": {
@@ -52,7 +53,7 @@
     "font-awesome": "^4.7.0",
     "flag-icon-css": "^2.8.0",
     "http-shutdown": "^1.1.0",
-    "hutil": "^0.2.0",
+    "hutil": "^0.2.1",
     "json-stable-stringify": "^1.0.1",
     "json2csv": "^3.7.3",
     "lodash": "^4.17.2",
@@ -272,7 +273,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "ea01484c505bd383d47af56964595aee"
+    "md5": "b2a558f50e26d17f3c4a8c2d7d51aaca"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -311,5 +312,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.76.851"
+  "version": "1.77.506"
 }

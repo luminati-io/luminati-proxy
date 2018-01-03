@@ -3,14 +3,26 @@
 arg=$1;
 
 install_node=0;
+install_wget=0;
 install_npm=0;
 install_curl=0;
+install_brew=0;
 desired_node_ver='8.9.1';
 desired_npm_ver='4.6.1';
 downgrade_node=0;
 update_node=0;
 update_npm=0;
 
+uname_out="$(uname -s)"
+os_name=""
+
+case "${uname_out}" in
+    Linux*)     os_name=Linux;;
+    Darwin*)    os_name=Mac;;
+    CYGWIN*)    os_name=Cygwin;;
+    MINGW*)     os_name=MinGw;;
+    *)          os_name="UNKNOWN:${unameOut}"
+esac
 
 is_cmd_defined()
 {
@@ -43,13 +55,62 @@ sys_install()
         then
         pkg_mng="yum install -y"
     fi
-    if is_cmd_defined "brew"
+    if [ "$os_name" == "Mac" ]
         then
         pkg_mng="brew install -y"
+        eval "${pkg_mng} ${cmp}";
+        return $?;
     fi
-    echo $pkg_mng;
-    sudo_cmd "${pkg_mng} ${cmp}";
+    if [ $os_name != "Mac" ]
+        then
+        sudo_cmd "${pkg_mng} ${cmp}";
+    fi
     return $?;
+}
+
+sys_rm()
+{
+    local cmp=$1;
+    if [ -z "$cmp" ];
+        then
+        return 1;
+    fi;
+    local pkg_mng="apt-get remove -y"
+    if is_cmd_defined "yum"
+        then
+        pkg_mng="yum remove -y"
+    fi
+    if [ "$os_name" == "Mac" ]
+        then
+        pkg_mng="brew uninstall -y"
+        eval "${pkg_mng} ${cmp}";
+        return $?;
+    fi
+    if [ $os_name != "Mac" ]
+        then
+        sudo_cmd "${pkg_mng} ${cmp}";
+    fi
+    return $?;
+}
+
+check_wget()
+{
+    echo "checking wget...";
+    if ! is_cmd_defined "wget"
+        then
+        echo "will install wget"
+        install_wget=1;
+    fi
+}
+
+check_brew()
+{
+    echo "checking brew...";
+    if [ "$os_name" == "Mac" ] && ! is_cmd_defined "brew"
+        then
+        echo "will install brew"
+        install_brew=1;
+    fi
 }
 
 check_node()
@@ -81,7 +142,7 @@ check_node()
     if [ "$install_npm" == "0" ] && is_cmd_defined 'npm'
         then
         local npm_ver=$(npm -v);
-        if [[ "$npm_ver" =~ ^([5-9]\.|[1-9][0-9]+\.) ]]
+        if [[ "$npm_ver" =~ ^([3,5-9]\.|[1-9][0-9]+\.) ]]
             then
             update_npm=1;
         fi
@@ -135,28 +196,50 @@ install_npm_fn()
     update_npm=1;
 }
 
+install_wget_fn()
+{
+    echo "installing wget";
+    sys_install "wget";
+}
+
 install_curl_fn()
 {
     echo "installing curl";
     sys_install "curl";
 }
 
+install_brew_fn()
+{
+    echo "installing brew"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+}
+
 update_npm_fn()
 {
- echo "updating npm to $desired_npm_ver";
- sudo_cmd "npm install -g npm@$desired_npm_ver";
+    echo "updating npm to $desired_npm_ver";
+    sudo_cmd "npm install -g npm@$desired_npm_ver";
 }
 
 check_env()
 {
     echo "checking deps...";
+    check_brew;
     check_curl;
+    check_wget;
     check_node;
 }
 
 deps_install()
 {
     echo 'installing deps';
+    if [ "$install_brew" == "1" ]
+        then
+        install_brew_fn;
+    fi
+    if [ "$install_wget" == "1" ]
+        then
+        install_wget_fn;
+    fi
     if [ "$install_curl" == "1" ]
         then
         install_curl_fn;
@@ -180,10 +263,9 @@ lpm_clean()
 
     local lib_path=$(npm list -g | head -1);
     local home=$HOME;
-    sudo_cmd "rm -rf $lib_path/node_modules/@luminati-io";
-    sudo_cmd "rm -rf $lib_path/node_modules/sqlite3";
-    sudo_cmd "rm -rf $lib_path/node_modules/luminati-proxy";
+    sudo_cmd "rm -rf $lib_path/node_modules/{@luminati-io,sqlite3,luminati-proxy}";
     sudo_cmd "rm -rf $home/.npm /root/.npm";
+    sudo_cmd "rm -rf /usr/local/bin/{luminati,luminati-proxy}";
     mkdir -p $HOME/.npm/_cacache
     mkdir -p $HOME/.npm/_logs
 }
@@ -194,23 +276,23 @@ lpm_install()
     lpm_clean;
     sudo_cmd "npm install -g --unsafe-perm @luminati-io/luminati-proxy";
     if [[ $? != 0 ]]; then exit $?; fi
-    }
+}
 
-    check_install()
-    {
-     echo 'check install';
-     if ! luminati -v > /dev/null
-         then
-         echo 'there was an error installing Luminait';
-         exit 1;
-     fi
-     echo "Luminati installed successfully";
+check_install()
+{
+    echo 'check install';
+    if ! luminati -v > /dev/null
+    then
+        echo 'there was an error installing Luminait';
+        exit 1;
+    fi
+    echo "Luminati installed successfully";
 }
 
 clean()
 {
-    sudo_cmd "apt-get remove -y curl nodejs npm";
     local lib_path=$(npm list -g | head -1);
+    sys_rm "curl wget nodejs npm";
     sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules ~/.npm ~/.nave";
     sudo_cmd "rm -rf /usr/local/bin/{luminati,liminati-proxy,npm,nave,node}";
 }

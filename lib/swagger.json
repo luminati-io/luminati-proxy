@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.76.851",
+        "version": "1.77.506",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -596,6 +596,10 @@
                         "type": "string"
                     },
                     "description": "Whitelist ip list for granting access to proxy"
+                },
+                "race_reqs": {
+                    "type": "integer",
+                    "description": "Race several requests at once and choose fastest"
                 },
                 "disable_color": {
                     "type": "boolean",

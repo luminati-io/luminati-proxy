@@ -8,6 +8,7 @@ import * as Bootstrap from 'react-bootstrap';
 import regeneratorRuntime from 'regenerator-runtime';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
+import EventEmitter from 'events';
 
 class Dialog extends React.Component {
     render(){
@@ -62,6 +63,20 @@ class Modal extends React.Component {
         );
     }
 }
+
+const Warnings = props=>(
+    <div>
+      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
+    </div>
+);
+
+const Warning = props=>(
+    <div className="warning">
+      <div className="warning_icon"/>
+      <div className="text">{props.text}</div>
+    </div>
+);
+
 
 const Footer_default = props=>(
     <div className="default_footer">
@@ -150,9 +165,10 @@ const Input = props=>{
 const onboarding_steps = {
     WELCOME: 0,
     ADD_PROXY: 1,
-    ADD_PROXY_DONE: 2,
-    HOWTO: 3,
-    HOWTO_DONE: 4,
+    ADD_PROXY_STARTED: 2,
+    ADD_PROXY_DONE: 3,
+    HOWTO: 4,
+    HOWTO_DONE: 5,
 };
 
 const presets = {
@@ -441,5 +457,7 @@ const presets = {
 for (let k in presets)
     presets[k].key = k;
 
-export {Dialog, Code, If, Modal, Loader, Select, Input, onboarding_steps,
-    presets};
+const emitter = new EventEmitter();
+
+export {Dialog, Code, If, Modal, Loader, Select, Input, Warnings,
+    Warning, onboarding_steps, presets, emitter};

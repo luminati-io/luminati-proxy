@@ -11,6 +11,7 @@ import codemirror from 'codemirror/lib/codemirror';
 import date from 'hutil/util/date';
 import csv from 'hutil/util/csv';
 import zurl from 'hutil/util/url';
+import setdb from 'hutil/util/setdb';
 import req_stats from './stats/stats.js';
 import status_codes from './stats/status_codes.js';
 import status_codes_detail from './stats/status_codes_detail.js';
@@ -93,7 +94,6 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     state_registry.register({
         name: 'app',
         redirectTo: 'settings',
-        controller: 'root',
     });
     state_registry.register({
         name: 'settings',
@@ -203,18 +203,11 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     state_registry.register({
         name: 'edit_proxy',
         parent: 'app',
-        url: '/proxy/{port:string}',
+        url: '/proxy/{port:string}?field',
         template: `<div react-view=react_component state-props=port
-        extra-props=extra_props></div>`,
+            extra-props=field></div>`,
         controller: function($scope, $rootScope){
-            $scope.react_component = zedit_proxy;
-            $scope.extra_props = {
-                proxy: $rootScope.edit_proxy,
-                consts: $rootScope.consts,
-                defaults: $rootScope.defaults,
-                all_locations: $rootScope.all_locations,
-            };
-        },
+            $scope.react_component = zedit_proxy; },
     });
 }]);
 
@@ -359,6 +352,7 @@ function proxies_factory($http, $q){
             });
             service.proxies = proxies;
             listeners.forEach(function(cb){ cb(proxies); });
+            setdb.set('head.proxies_running', proxies);
             return proxies;
         });
     }
@@ -416,15 +410,16 @@ function success_rate_factory($http, $proxies, $timeout){
 }
 
 module.controller('root', ['$rootScope', '$scope', '$http', '$window',
-    '$state', '$transitions', '$timeout',
-function($rootScope, $scope, $http, $window, $state, $transitions, $timeout){
+    '$state', '$transitions', '$timeout', '$proxies',
+    ($rootScope, $scope, $http, $window, $state, $transitions, $timeout,
+    $proxies)=>
+{
     $scope.sections = [
         {name: 'settings', title: 'Settings', navbar: false},
         {name: 'howto', title: 'How to use', navbar: true},
         {name: 'proxies', title: 'Proxies', navbar: true},
         {name: 'zones', title: 'Zones', navbar: true},
-        {name: 'proxy_tester', title: 'Proxy Tester',
-            navbar: is_feature_flag_on('proxy_tester')},
+        {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'tools', title: 'Tools', navbar: true},
         {name: 'faq', title: 'FAQ', navbar: true},
         {name: 'intro', navbar: false},
@@ -456,27 +451,25 @@ function($rootScope, $scope, $http, $window, $state, $transitions, $timeout){
     $http.get('/api/last_version').then(function(version){
         $scope.ver_last = version.data; });
     $http.get('/api/consts').then(function(consts){
+        setdb.set('head.consts', consts.data);
         $rootScope.consts = consts.data;
         $scope.$broadcast('consts', consts.data);
     });
     $http.get('/api/defaults').then(function(defaults){
-        $scope.$root.defaults = defaults.data; });
+        setdb.set('head.defaults', defaults.data);
+        $scope.$root.defaults = defaults.data;
+    });
     $http.get('/api/all_locations').then(function(locations){
-        $scope.$root.all_locations = locations.data; });
+        setdb.set('head.locations', locations.data);
+        $scope.$root.all_locations = locations.data;
+    });
     $http.get('/api/node_version').then(function(node){
         $scope.ver_node = node.data; });
+    $proxies.update();
+    setdb.set('head.callbacks.proxies.update', $proxies.update);
+    setdb.set('head.callbacks.state.go', $state.go);
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
-    // krzysztof: hack to pass data to react
-    $scope.$root.$watchGroup(['consts', 'all_locations'], function(){
-        if ($scope.consts && $scope.all_locations)
-        {
-            if (window.constants_loaded)
-                window.constants_loaded();
-            $scope.$root.add_proxy_constants = {consts: $scope.consts,
-                all_locations: $scope.all_locations};
-        }
-    });
     var show_reload = function(){
         $window.$('#restarting').modal({
             backdrop: 'static',
@@ -883,83 +876,6 @@ function Faq($scope){
             title: 'How do I enable HTTPS analyzing?',
         },
     ];
-}
-
-module.controller('test', Test);
-Test.$inject = ['$scope', '$http', '$filter', '$window'];
-function Test($scope, $http, $filter, $window){
-    if (qs_o.action && qs_o.action=='test_proxy')
-        $scope.expand = true;
-    var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
-        /[?&]test=([^&]+)/)||['', 'null'])[1]));
-    if (preset)
-    {
-        $scope.expand = true;
-        $scope.proxy = ''+preset.port;
-        $scope.url = preset.url;
-        $scope.method = preset.method;
-        $scope.body = preset.body;
-    }
-    else
-    {
-        $scope.method = 'GET';
-        $scope.url = $scope.$root.settings.test_url;
-    }
-    $http.get('/api/proxies').then(function(proxies){
-        $scope.proxies = [['0', 'No proxy']];
-        proxies.data.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
-        for (var i=0; i<proxies.data.length; i++)
-        {
-            $scope.proxies.push(
-                [''+proxies.data[i].port, ''+proxies.data[i].port]);
-        }
-        if (!$scope.proxy)
-            $scope.proxy = $scope.proxies[1][0];
-    });
-    $scope.methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'COPY', 'HEAD',
-        'OPTIONS', 'LINK', 'UNLINK', 'PURGE', 'LOCK', 'UNLOCK', 'PROPFIND',
-        'VIEW'];
-    $scope.request = {};
-    $scope.go = function(proxy, url, method, headers, body){
-        var headers_obj = {};
-        headers.forEach(function(h){ headers_obj[h.key] = h.value; });
-        var req = {
-            method: 'POST',
-            url: '/api/test/'+proxy,
-            data: {
-                url: url,
-                method: method,
-                headers: headers_obj,
-                body: body,
-            },
-        };
-        $scope.loading = true;
-        $http(req).then(function(r){
-            $scope.loading = false;
-            r = r.data;
-            if (!r.error)
-            {
-                r.response.headers = Object.keys(r.response.headers).sort()
-                .map(function(key){
-                    return [key, r.response.headers[key]];
-                });
-            }
-            $scope.request = r;
-        });
-    };
-    $scope.headers = preset&&preset.headers ? Object.keys(preset.headers).map(
-        function(h){
-        return {key: h, value: preset.headers[h]};
-    }) : [];
-    $scope.add_header = function(){
-        $scope.headers.push({key: '', value: ''});
-    };
-    $scope.remove_header = function(index){
-        $scope.headers.splice(index, 1);
-    };
-    $scope.reset = function(){
-        $scope.headers = [];
-    };
 }
 
 module.controller('test-ports', ['$scope', '$http', '$filter', '$window',
@@ -1500,9 +1416,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         });
     });
     $scope.proxies_loading = function(){
-        return !$scope.proxies || !$scope.consts || !$scope.defaults ||
-            !$scope.presets;
-    };
+        return !$scope.proxies || !$scope.consts || !$scope.defaults; };
     $scope.dup_proxies = proxy=>{
         $scope.$root.confirmation = {
             text: 'Are you sure you want to duplicate the proxy?',
@@ -1546,14 +1460,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             pool_size: proxy.pool_size,
         }];
     };
-    $scope.add_proxy = function(){
-        $scope.proxy_dialog = [{proxy: {}}];
-        ga_event('page: proxies', 'click', 'add proxy');
-    };
     $scope.add_proxy_new = function(){
         $('#add_proxy_modal').modal('show'); };
-    $scope.edit_proxy_new = function(proxy){
-        $root.edit_proxy = proxy.config; };
     $scope.get_static_country = function(proxy){
         var zone = proxy.zones[proxy.zone];
         if (!zone)
@@ -1564,13 +1472,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         if (plan.vip==1)
             return plan.vip_country||'any';
         return false;
-    };
-    $scope.edit_proxy = function(duplicate, proxy){
-        var port = proxy.port||$scope.get_selected_proxies()[0];
-        proxy = proxy ? [proxy] : $scope.proxies.filter(function(p){
-            return p.port==port; });
-        $scope.proxy_dialog = [{proxy: proxy[0].config, duplicate: duplicate}];
-        ga_event('page: proxies', 'click', 'edit proxy');
     };
     $scope.edit_cols = function(){
         $scope.columns_dialog = [{

@@ -1492,13 +1492,20 @@ input.form-control[type=checkbox] {
                     font-weight: 300;
                 }
             }
+            .footer_buttons {
+                text-align: center;
+                margin-top: 30px;
+            }
         }
         &.body {
             .panel.code {
                 font-size: 14px;
                 background-color: #fafafa;
                 margin-bottom: 0;
-                .panel_body { padding: 15px; }
+                .panel_body {
+                    padding: 15px;
+                    span { word-wrap: break-word; }
+                }
             }
         }
         &.info {
@@ -1507,6 +1514,7 @@ input.form-control[type=checkbox] {
         &.response {
             .title_value_pairs .pair {
                 .key { min-width: 160px; }
+                .value { word-break: break-all; }
             }
         }
     }

@@ -165,7 +165,7 @@ E.browser = (proxy=24000)=>({
     ),
     firefox: (
         <ol>
-          <Li>In main menu, click "Tools" and then click "Options".</Li>
+          <Li>In main menu, click on "Options".</Li>
           <Li>Click the "General" tab and scroll down to "Network Proxy".</Li>
           <Li>Open network settings by clicking "Settings..." button.</Li>
           <Li>Choose "Manual proxy configuration" radio button.</Li>

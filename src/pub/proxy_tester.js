@@ -1,21 +1,35 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
+import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
+import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, If} from './common.js';
+import {Input, Select, If, Loader, Modal, Warnings} from './common.js';
 import classnames from 'classnames';
+import etask from 'hutil/util/etask';
+import setdb from 'hutil/util/setdb';
 
-class Index extends React.Component {
+class Proxy_tester extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {response: {}};
+    }
+    update_response(response){ this.setState({response}); }
     render(){
+        const body = this.state.response&&this.state.response.body;
+        const headers = this.state.response&&this.state.response.headers;
         return (
             <div className="lpm proxy_tester">
               <Nav/>
-              <Request/>
-              <Body/>
-              <Row>
-                <Col md={4}><Info/></Col>
-                <Col md={8}><Response/></Col>
-              </Row>
+              <Request update_response={this.update_response.bind(this)}/>
+              <If when={body}>
+                <Body body={body}/>
+                <Row>
+                  <Col md={4}><Info {...this.state.response}/></Col>
+                  <Col md={8}>
+                    <Response headers={headers}/></Col>
+                </Row>
+              </If>
             </div>
         );
     }
@@ -26,68 +40,188 @@ const Nav = ()=>(
       <h3>Proxy Tester</h3></div>
 );
 
-const Request = ()=>(
-    <div className="panel request">
-      <div className="panel_body">
-        <Request_params/>
-        <Headers headers={[1, 2]}/>
-        <Add_header_btn/>
-      </div>
-    </div>
-);
+class Request extends React.Component {
+    constructor(props){
+        super(props);
+        this.default_state = {headers: [], max_idx: 0, params: {proxy: '22225',
+            url: 'http://lumtest.com/myip.json', method: 'GET'}};
+        this.state = {...this.default_state, show_loader: false};
+    }
+    componentWillMount(){
+        this.sp = etask('Request', function*(){ yield this.wait(); });
+        this.listeners = [setdb.on('head.proxies_running',
+            proxies=>this.setState({proxies}))];
+    }
+    componentWillUnmount(){
+        this.listeners.forEach(l=>setdb.off(l));
+        this.sp.return();
+    }
+    add_header(){
+        this.setState(prev_state=>({
+            headers: [...prev_state.headers, {idx: prev_state.max_idx,
+                header: '', value: ''}],
+            max_idx: prev_state.max_idx+1,
+        }));
+    }
+    remove_header(idx){
+        this.setState(prev_state=>
+            ({headers: prev_state.headers.filter(h=>h.idx!=idx)}));
+    }
+    update_header(idx, field, value){
+        this.setState(prev_state=>({
+            headers: prev_state.headers.map(h=>{
+                if (h.idx!=idx)
+                    return h;
+                else
+                    return {...h, [field]: value};
+            }),
+        }));
+    }
+    update_params(field, value){
+        this.setState(prev_state=>({
+            params: {...prev_state.params, [field]: value}}));
+    }
+    reset(){
+        this.setState({...this.default_state});
+        this.props.update_response({});
+    }
+    go(){
+        const check_url = '/api/test/'+this.state.params.proxy;
+        const body = {
+            headers: this.state.headers.reduce((acc, el)=>{
+                if (!el.header)
+                    return acc;
+                else
+                    return {...acc, [el.header]: el.value};
+            }, {}),
+            method: this.state.params.method,
+            url: this.state.params.url,
+        };
+        this.setState({show_loader: true});
+        const _this = this;
+        this.sp.spawn(etask(function*(){
+            this.on('uncaught', e=>{
+                console.error(e);
+                _this.setState({show_loader: false});
+            });
+            const raw_check = yield window.fetch(check_url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(body),
+            });
+            const json_check = yield raw_check.json();
+            _this.setState({show_loader: false});
+            _this.props.update_response(json_check.response);
+            if (json_check.error)
+            {
+                _this.setState({warnings: [{msg: json_check.error}]});
+                $('#warnings_modal').modal();
+            }
+        }));
+    }
+    render() {
+        return (
+            <div className="panel request">
+              <Loader show={this.state.show_loader}/>
+              <Modal className="warnings_modal" id="warnings_modal"
+                title="Warnings:" no_cancel_btn>
+                <Warnings warnings={this.state.warnings}/>
+              </Modal>
+              <div className="panel_body">
+                <Request_params params={this.state.params}
+                  update={this.update_params.bind(this)}
+                  proxies={this.state.proxies}/>
+                <Headers headers={this.state.headers}
+                  clicked_remove={this.remove_header.bind(this)}
+                  update={this.update_header.bind(this)}/>
+                <Add_header_btn
+                  clicked_add={this.add_header.bind(this)}/>
+                <Footer_buttons reset_clicked={this.reset.bind(this)}
+                  go_clicked={this.go.bind(this)}/>
+              </div>
+            </div>
+        );
+    }
+}
 
-const Add_header_btn = ()=>(
-    <div className="add_header_wrapper">
-      <button className="btn btn_lpm btn_lpm_normal btn_add_header">
-        Add header</button>
-    </div>
-);
-
-const Headers = props=>(
-    <div className="headers">
-      {props.headers.map((h, idx)=><New_header_params key={idx}/>)}</div>
-);
-
-const New_header_params = ()=>(
-    <div className="header_line">
-      <Input type="text" placeholder="Header" className="header_input"/>
-      <Input type="text" placeholder="Value" className="value_input"/>
-      <button className="btn btn_lpm btn_lpm_error">Remove</button>
-    </div>
-);
-
-const Request_params = ()=>{
-    const proxies = [{key: '24000', value: '24000'},
-          {key: '24001', value: '240001'}];
-    const methods = [{key: 'GET', value: 'get'}, {key: 'POST', value: 'post'}];
+const Request_params = ({params, update, proxies})=>{
+    proxies = (proxies||[]).map(p=>({key: p.port, value: p.port}));
+    const methods = [{key: 'GET', value: 'GET'}, {key: 'POST', value: 'POST'}];
     return (
         <div className="request_params">
-          <Field name="proxy" type="select" data={proxies}/>
-          <Field name="url" type="text"/>
-          <Field name="method" type="select" data={methods}/>
+          <Field params={params} update={update} name="proxy" type="select"
+            data={proxies}/>
+          <Field params={params} update={update} name="url" type="text"/>
+          <Field params={params} update={update} name="method" type="select"
+            data={methods}/>
         </div>
     );
 };
 
-const Field = ({type, ...props})=>{
+const Field = ({type, update, name, params, ...props})=>{
     const fields = {proxy: 'Proxy', url: 'URL', method: 'Method'};
+    const on_change_wrapper = val=>{ update(name, val); };
     let Comp;
     if (type=='select')
-        Comp = <Select {...props}/>;
+        Comp = Select;
     else
-        Comp = <Input type={type} {...props}/>;
-    const title = fields[props.name];
+        Comp = Input;
+    const title = fields[name];
     return (
-        <div className={classnames('field', props.name)}>
+        <div className={classnames('field', name)}>
           <If when={title}>
-            <div className="title">{fields[props.name]}</div>
+            <div className="title">{fields[name]}</div>
           </If>
-          {Comp}
+          <Comp on_change_wrapper={on_change_wrapper} type={type}
+            val={params[name]} {...props}/>
         </div>
     );
 };
 
-const Body = ()=>(
+const Add_header_btn = ({clicked_add})=>(
+    <div className="add_header_wrapper">
+      <button onClick={clicked_add}
+        className="btn btn_lpm btn_lpm_normal btn_add_header">
+        Add header
+      </button>
+    </div>
+);
+
+const Headers = ({headers, clicked_remove, update})=>(
+    <div className="headers">
+      {headers.map(h=>
+        <New_header_params clicked_remove={clicked_remove} header={h}
+          key={h.idx} update={update}/>
+      )}
+    </div>
+);
+
+const New_header_params = ({clicked_remove, update, header})=>{
+    const input_changed = field=>value=>{
+        update(header.idx, field, value); };
+    return (
+        <div className="header_line">
+          <Input val={header.header}
+            on_change_wrapper={input_changed('header')}
+            type="text" placeholder="Header" className="header_input"/>
+          <Input val={header.value}
+            on_change_wrapper={input_changed('value')}
+            type="text" placeholder="Value" className="value_input"/>
+          <button onClick={()=>clicked_remove(header.idx)}
+            className="btn btn_lpm btn_lpm_error">Remove</button>
+        </div>
+    );
+};
+
+const Footer_buttons = ({reset_clicked, go_clicked})=>(
+    <div className="footer_buttons">
+      <button onClick={go_clicked} className="btn btn_lpm btn_go">Go</button>
+      <button onClick={reset_clicked}
+        className="btn btn_lpm btn_lpm_error btn_reset">Reset</button>
+    </div>
+);
+
+const Body = ({body})=>(
     <div className="panel body">
       <div className="panel_heading">
         <h2>Body</h2>
@@ -95,12 +229,7 @@ const Body = ()=>(
       <div className="panel_body">
         <div className="panel code">
           <div className="panel_body">
-            <span>
-              {`{"ip":"158.46.203.119","country":"IN","asn":{"asnum":57129,
-              "org_name":"Optibit LLC"},"geo":{"city":"Chennai","region":"TN",
-              "postal_code":"","latitude":13.0833,"longitude":80.2833,"tz":
-              "Asia/Kolkata"}}`}
-            </span>
+            <span>{body}</span>
           </div>
         </div>
       </div>
@@ -121,11 +250,9 @@ const Pair = props=>(
     </div>
 );
 
-const Info = ()=>{
-    const pairs = [{title: 'HTTP Version', value: '1.1'},
-        {title: 'Response status code', value: '200'},
-        {title: 'Response status message', value: 'OK'},
-    ];
+const Info = ({status_code, status_message, version})=>{
+    const pairs = Object.entries({status_code, status_message, version})
+    .map(e=>({title: e[0], value: e[1]}));
     return (
         <div className="panel info">
           <div className="panel_heading">
@@ -138,19 +265,9 @@ const Info = ()=>{
     );
 };
 
-const Response = ()=>{
-    const pairs = [
-        {title: 'cache-control', value: 'no-store'},
-        {title: 'connection', value: 'close'},
-        {title: 'content-length', value: '200'},
-        {title: 'content-type', value: 'application/json; charset=utf-8'},
-        {title: 'date', value: 'Wed, 15 Nov 2017 15:07:47 GMT'},
-        {title: 'x-hola-context', value: 'PROXY TESTER TOOL'},
-        {title: 'x-hola-ip', value: '158.46.203.119'},
-        {title: 'x-hola-timeline-debug', value: 'ztun 943ms z672 158.46.203.119 xx zgc xx.pool_route z672'},
-        {title: 'x-lpm-authorization', value: 'lum-customer-hl_0f86d21e-zone-static-session-22225_127_0_0_1_193ff7b915180b_1'},
-        {title: 'x-luminati-timeline', value: 'init:0,auth:1,dns_resolve:0,ext_conn:0,ext_proxy_connect:565,response:377'},
-    ];
+const Response = ({headers = {}})=>{
+    const pairs = Object.entries(headers)
+    .map(e=>({title: e[0], value: e[1]}));
     return (
         <div className="panel response">
           <div className="panel_heading">
@@ -163,4 +280,4 @@ const Response = ()=>{
     );
 };
 
-export default Index;
+export default Proxy_tester;

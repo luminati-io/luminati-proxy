@@ -57,7 +57,6 @@
                 <a ng-if="$root.mode!='guest'&&is_action_available('edit',
                   proxy)"
                   href="proxy/{{proxy.port}}"
-                  ng-click="edit_proxy_new(proxy)"
                   uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
                   class=proxies-action-edit>
                   <div class="action_icon edit"></div>
@@ -275,8 +274,6 @@
   <div class=col-md-4>
     <div react-view=react_component></div>
   </div>
-  <div ng-if=add_proxy_constants react-view=add_proxy_modal
-    extra-props=add_proxy_constants></div>
   <div ng-repeat="h in history_dialog" ng-controller=history
     ng-include="'history.html'" ng-init=init(h)>
   </div>

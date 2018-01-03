@@ -7,7 +7,8 @@ import $ from 'jquery';
 import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import {If, Modal, Loader, Select, Input, presets,
+import setdb from 'hutil/util/setdb';
+import {If, Modal, Loader, Select, Input, Warning, Warnings, presets,
     onboarding_steps} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
@@ -68,7 +69,7 @@ const tabs = {
             session_init_timeout: {
                 label: 'Session establish timeout',
                 tooltip: `Time in seconds for the request to complete before
-                    estblishing connection to new peer`,
+                    establishing connection to new peer`,
             },
             race_reqs: {
                 label: 'Parallel race requests',
@@ -148,9 +149,9 @@ const tabs = {
                     option`,
             },
             vip: {
-                label: 'vIP',
-                tooltip: `Choose specific vIP to ensure all requests are
-                    executed using specific vIP. to view the pool of your vIPs
+                label: 'gIP',
+                tooltip: `Choose specific gIP to ensure all requests are
+                    executed using specific gIP. to view the pool of your gIPs
                     take a look at 'pool size' option`,
             },
             pool_size: {
@@ -159,7 +160,7 @@ const tabs = {
                     - must have keep_alive to work properly`,
             },
             multiply_ips: {label: 'Multiply IPs'},
-            multiply_vips: {label: 'Multiply vIPs'},
+            multiply_vips: {label: 'Multiply gIPs'},
             pool_type: {
                 label: 'Pool type',
                 tooltip: `How to pull the IPs - roundrobin / sequential`,
@@ -186,7 +187,7 @@ const tabs = {
                 label: 'Sticky IP',
                 tooltip: `When connecting to lpm server from different servers
                     stick sessions to client ips. in that case every connected
-                    server will recieve unique session to avoid overriding
+                    server will receive unique session to avoid overriding
                     sessions between machines`,
             },
             max_requests: {
@@ -202,12 +203,7 @@ const tabs = {
                 label: 'Session ID Seed',
                 tooltip: `Seed used for random number generator in random
                     sessions`,
-            },
-            allow_req_auth: {
-                label: 'Allow request authentication',
-                tooltip: `Pass auth data per request (use lpm like
-                    api)`,
-            },
+            }
         },
     },
     debug: {
@@ -269,7 +265,7 @@ const tabs = {
             null_response: {
                 label: 'URL regex pattern for null response',
                 tooltip: `on this url pattern, lpm will return a "null
-                    response" without proxying (usefull when users don't want
+                    response" without proxying (useful when users don't want
                     to make a request, but a browser expects 200 response)`,
             },
             bypass_proxy: {
@@ -290,6 +286,11 @@ const tabs = {
                     super proxy`,
                 tooltip: `Insert URL pattern for which requests will NOT be
                     passed through super proxy`,
+            },
+             allow_proxy_auth: {
+                label: 'Allow request authentication',
+                tooltip: `Pass auth data per request (use lpm like
+                    api)`,
             },
         },
     },
@@ -329,41 +330,50 @@ class Index extends React.Component {
         super(props);
         this.sp = etask('Index', function*(){ yield this.wait(); });
         this.state = {tab: 'target', form: {zones: {}}, warnings: [],
-            errors: {}, show_loader: false, consts: {}};
+            errors: {}, show_loader: false};
     }
     componentWillMount(){
-        const url_o = zurl.parse(document.location.href);
-        const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-        if (qs_o.field)
-            this.goto_field(qs_o.field);
-        const _this = this;
-        this.sp.spawn(etask(function*(){
-            _this.setState({show_loader: true});
-            let form, consts, defaults, locations;
-            if (!_this.props.extra.proxy)
-            {
-                consts = yield ajax.json({url: '/api/consts'});
-                defaults = yield ajax.json({url: '/api/defaults'});
-                locations = yield ajax.json({url: '/api/all_locations'});
-                const proxies = yield ajax.json({url: '/api/proxies_running'});
-                const port = window.location.pathname.split('/').slice(-1)[0];
-                form = proxies.filter(p=>p.port==port)[0].config;
-            }
-            else
-            {
-                let proxy = _this.props.extra.proxy;
-                consts = _this.props.extra.consts;
-                defaults = _this.props.extra.defaults;
-                locations = _this.props.extra.all_locations;
-                form = Object.assign({}, proxy);
-            }
-            const preset = _this.guess_preset(form);
-            _this.apply_preset(form, preset);
-            _this.setState({consts, defaults, show_loader: false, locations});
-        }));
+        this.listeners = [
+            setdb.on('head.proxies_running', proxies=>{
+                if (!proxies||this.state.proxies)
+                    return;
+                this.port = window.location.pathname.split('/').slice(-1)[0];
+                const proxy = proxies.filter(p=>p.port==this.port)[0].config;
+                const form = Object.assign({}, proxy);
+                const preset = this.guess_preset(form);
+                this.apply_preset(form, preset);
+                this.setState({proxies}, this.delayed_loader());
+            }),
+            setdb.on('head.consts',
+                consts=>this.setState({consts}, this.delayed_loader())),
+            setdb.on('head.defaults',
+                defaults=>this.setState({defaults}, this.delayed_loader())),
+            setdb.on('head.locations',
+                locations=>this.setState({locations}, this.delayed_loader())),
+            setdb.on('head.callbacks', callbacks=>this.setState({callbacks})),
+        ];
     }
-    componentDidMount(){ $('[data-toggle="tooltip"]').tooltip(); }
-    componentWillUnmount(){ this.sp.return(); }
+    componentDidMount(){
+        $('[data-toggle="tooltip"]').tooltip();
+        setTimeout(()=>{
+            const url_o = zurl.parse(document.location.href);
+            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+            if (qs_o.field)
+                this.goto_field(qs_o.field);
+        });
+    }
+    componentWillUnmount(){
+        this.sp.return();
+        this.listeners.forEach(l=>setdb.off(l));
+    }
+    delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
+    update_loader(){
+        this.setState(state=>{
+            const show_loader = !state.consts || !state.locations ||
+                !state.proxies || !state.defaults;
+            return {show_loader};
+        });
+    }
     goto_field(field){
         this.init_focus = field;
         let tab;
@@ -523,11 +533,11 @@ class Index extends React.Component {
                 label: form.city+' ('+form.state+')'}];
         else if (!Array.isArray(form.city))
             form.city = [];
-        this.setState({form});
         if (!this.original_form)
             this.original_form = form;
         else
-            this.setState({dirty: true});
+            this.setState({dirty: this.is_dirty(form)});
+        this.setState({form});
     }
     default_opt(option){
         const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
@@ -551,11 +561,9 @@ class Index extends React.Component {
     }
     persist(data){
         this.setState({show_loader: true});
-        const update_url = '/api/proxies/'+this.props.port;
+        const update_url = '/api/proxies/'+this.port;
         const _this = this;
         return etask(function*(){
-            // XXX krzysztof: update hutil on github and replace fetch with
-            // ajax.json
             const raw_update = yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -563,22 +571,23 @@ class Index extends React.Component {
             });
             const status = yield ajax.json({
                 url: '/api/proxy_status/'+data.port});
+            yield _this.state.callbacks.proxies.update();
             _this.setState({show_loader: false});
             if (status.status=='ok')
             {
                 ga_event('top bar', 'click save', 'successful');
                 const curr_step = JSON.parse(window.localStorage.getItem(
                     'quickstart-step'));
-                if (curr_step==onboarding_steps.ADD_PROXY)
+                if (curr_step==onboarding_steps.ADD_PROXY_STARTED)
                 {
                     window.localStorage.setItem('quickstart-step',
                         onboarding_steps.ADD_PROXY_DONE);
                     window.localStorage.setItem('quickstart-first-proxy',
                        data.port);
-                    window.location = '/intro';
+                    _this.state.callbacks.state.go('intro');
                 }
                 else
-                    window.location = '/';
+                    _this.state.callbacks.state.go('proxies');
             }
             else
             {
@@ -590,7 +599,7 @@ class Index extends React.Component {
     }
     save(){
         const data = this.prepare_to_save();
-        const check_url = '/api/proxy_check/'+this.props.port;
+        const check_url = '/api/proxy_check/'+this.port;
         this.setState({show_loader: true});
         const _this = this;
         this.sp.spawn(etask(function*(){
@@ -764,13 +773,16 @@ class Index extends React.Component {
         case 'debug': Main_window = Debug; break;
         case 'general': Main_window = General; break;
         }
-        if (!this.state.consts.proxy)
+        if (!this.state.consts||!this.state.defaults||!this.state.locations||
+            !this.state.proxies)
+        {
             Main_window = ()=>null;
+        }
         const support = presets && this.state.form.preset &&
             presets[this.state.form.preset].support||{};
-        const zones = this.state.consts.proxy&&
+        const zones = this.state.consts&&
             this.state.consts.proxy.zone.values||[];
-        const default_zone=this.state.consts.proxy&&
+        const default_zone=this.state.consts&&
             this.state.consts.proxy.zone.def;
         const warning_dirty = (<span>
             You have unsaved changes. Сlick
@@ -782,7 +794,7 @@ class Index extends React.Component {
               <Loader show={this.state.show_loader}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
-                  <h3>Edit port {this.props.port}</h3>
+                  <h3>Edit port {this.port}</h3>
                   <div className="warning_wrapper">
                     <If when={this.state.dirty}>
                       <Warning text={warning_dirty}/>
@@ -799,7 +811,7 @@ class Index extends React.Component {
                   errors={this.state.errors}/>
               </div>
               <div className="main_window">
-                <Main_window proxy={this.state.consts.proxy}
+                <Main_window proxy={this.state.consts&&this.state.consts.proxy}
                   locations={this.state.locations}
                   defaults={this.state.defaults} form={this.state.form}
                   init_focus={this.init_focus}
@@ -822,19 +834,6 @@ class Index extends React.Component {
         );
     }
 }
-
-const Warnings = props=>(
-    <div>
-      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
-    </div>
-);
-
-const Warning = props=>(
-    <div className="warning">
-      <div className="warning_icon"/>
-      <div className="text">{props.text}</div>
-    </div>
-);
 
 const Nav = props=>{
     const update_preset = val=>{
@@ -1551,8 +1550,6 @@ class Rotation extends React.Component {
                 disabled={!support.session_duration}/>
               <Section_with_fields type="text" id="seed"
                 disabled={!support.seed}/>
-              <Section_with_fields type="select" id="allow_req_auth"
-                data={default_opt('allow_proxy_auth')}/>
             </With_data>
         );
     }
@@ -1575,8 +1572,6 @@ const General = props=>(
     <With_data {...props} tab_id="general">
       <Section_with_fields type="number" id="port"/>
       <Section_with_fields type="password" id="password"/>
-      <Section_with_fields type="select" id="iface"
-        data={props.proxy.iface.values}/>
       <Section_with_fields type="number" id="multiply" min="1"
         disabled={!props.support.multiply}/>
       <Section_with_fields type="number" id="socks" min="0"/>
@@ -1586,6 +1581,10 @@ const General = props=>(
       <Section_with_fields type="text" id="bypass_proxy"/>
       <Section_with_fields type="text" id="direct_include"/>
       <Section_with_fields type="text" id="direct_exclude"/>
+      <Section_with_fields type="select" id="allow_proxy_auth"
+        data={props.default_opt('allow_proxy_auth')}/>
+      <Section_with_fields type="select" id="iface"
+        data={props.proxy.iface.values}/>
     </With_data>
 );
 

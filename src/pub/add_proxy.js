@@ -3,10 +3,12 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
+import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {If, Modal, Loader, onboarding_steps, presets} from './common.js';
+import {If, Modal, Loader, onboarding_steps, presets,
+    emitter} from './common.js';
 import util from './util.js';
 
 const ga_event = util.ga_event;
@@ -15,16 +17,20 @@ class Add_proxy extends React.Component {
     constructor(props){
         super(props);
         this.sp = etask('Add_proxy', function*(){ yield this.wait(); });
-        this.zones = props.extra.consts.proxy.zone.values;
         this.presets_opt = Object.keys(presets).map(p=>
             ({key: presets[p].title, value: p}));
         this.state = {zone: '', preset: 'sequential', show_loader: false};
     }
+    componentWillMount(){
+        this.listener = setdb.on('head.consts', consts=>
+            this.setState({consts, zones: consts&&consts.proxy.zone.values}));
+    }
+    componentWillUnmount(){ setdb.off(this.listener); }
     persist(){
         const preset = this.state.preset;
         const form = {
             last_preset_applied: preset,
-            zone: this.state.zone||this.props.extra.consts.proxy.zone.def,
+            zone: this.state.zone||this.state.consts.proxy.zone.def,
             proxy_type:'persist',
             max_requests:0,
             session_duration: 0,
@@ -32,7 +38,7 @@ class Add_proxy extends React.Component {
             vips: [],
             whitelist_ips: [],
         };
-        const zone = this.zones.filter(z=>z.key==form.zone)[0]||{};
+        const zone = this.state.zones.filter(z=>z.key==form.zone)[0]||{};
         form.password = zone.password;
         presets[preset].set(form);
         this.setState({show_loader: true});
@@ -66,23 +72,27 @@ class Add_proxy extends React.Component {
             $('#add_proxy_modal').modal('hide');
             if (opt.redirect)
             {
-                let url = '/proxy/'+port;
+                const callbacks = setdb.get('head.callbacks');
+                yield callbacks.proxies.update();
+                const state_opt = {port};
                 if (opt.field)
-                    url+='?field='+opt.field;
-                window.location.href=url;
+                    state_opt.field = opt.field;
+                return yield callbacks.state.go('edit_proxy', state_opt);
             }
             else if (window.location.pathname=='/intro')
             {
                 const curr_step = JSON.parse(window.localStorage.getItem(
                     'quickstart-step'));
                 window.localStorage.setItem('quickstart-first-proxy', port);
-                // XXX krzysztof: temporary hack; remove when zstore
-                if (curr_step==onboarding_steps.ADD_PROXY);
-                    window.set_step(onboarding_steps.ADD_PROXY_DONE);
+                if (curr_step==onboarding_steps.ADD_PROXY_STARTED);
+                {
+                    emitter.emit('intro:set_step',
+                        onboarding_steps.ADD_PROXY_DONE);
+                }
                 return;
             }
             else
-                window.location.href='/proxies';
+                setdb.get('head.callbacks.proxies.update')();
         }));
     }
     rule_clicked(field){
@@ -101,6 +111,8 @@ class Add_proxy extends React.Component {
     };
     render(){
         const Footer_wrapper = <Footer save_clicked={this.save.bind(this)}/>;
+        if (!this.state.zones)
+            return null;
         return (
             <div className="lpm">
               <Loader show={this.state.show_loader}/>
@@ -108,7 +120,7 @@ class Add_proxy extends React.Component {
                 footer={Footer_wrapper} className="add_proxy_modal">
                 <div className="section">
                   <Field icon_class="zone_icon" val={this.state.zone}
-                    options={this.zones} title="Choose Zone"
+                    options={this.state.zones} title="Choose Zone"
                     on_change={this.field_changed('zone').bind(this)}/>
                 </div>
                 <div className="section">
