@@ -2,6 +2,11 @@
 
 arg=$1;
 
+run_id=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+start_time=$(date +"%s");
+
+PERR_URL="https://perr.luminati.io/client_cgi/perr";
+
 install_node=0;
 install_wget=0;
 install_npm=0;
@@ -41,6 +46,23 @@ sudo_cmd()
     fi;
     eval "$sdo $cmd";
     return $?;
+}
+
+perr()
+{
+    local name=$1;
+    local note=$2;
+    local ts=$(date +"%s");
+    local url="${PERR_URL}/?id=lpm_sh_${name}";
+    local data="{\"uuid\": \"$run_id\", \"timestamp\": \"$ts\", \"info\": {\"platform\": \"$os_name\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$start_time\", \"note\": \"$note\"}}";
+    if is_cmd_defined "curl"; then
+        curl -X POST "$url" --data "$data" -H "Content-Type: application/json";
+    elif is_cmd_defined "wget"; then
+        wget -S --header "Content-Type: application/json" \
+             -O /dev/null -o /dev/null --post-data="$data" --quiet $url;
+    else
+        echo "perr $url $data";
+    fi
 }
 
 sys_install()
@@ -99,6 +121,7 @@ check_wget()
     if ! is_cmd_defined "wget"
         then
         echo "will install wget"
+        perr "check_no_wget"
         install_wget=1;
     fi
 }
@@ -110,6 +133,7 @@ check_brew()
         then
         echo "will install brew"
         install_brew=1;
+        perr "check_no_brew"
     fi
 }
 
@@ -123,21 +147,25 @@ check_node()
         if ! [[ "$node_ver" =~ ^(v[6-9]\.|v[1-9][0-9]+\.) ]]
             then
             echo "minimum required node version is 6";
+            perr "check_node_bad_version" "$node_ver";
             update_node=1;
         fi
         if [[ "$node_ver" =~ ^(v[9]\.|v[1-9][0-9]+\.) ]]
             then
             echo "maximum required node version is 8";
+            perr "check_node_bad_version" "$node_ver";
             update_node=1;
         fi
     else
         echo 'node is not installed';
         install_node=1;
         update_npm=1;
+        perr "check_no_node"
     fi
     if [ "$install_node" == "0" ] && ! is_cmd_defined 'npm'
         then
         install_npm=1;
+        perr "check_no_npm"
     fi
     if [ "$install_npm" == "0" ] && is_cmd_defined 'npm'
         then
@@ -145,6 +173,7 @@ check_node()
         if [[ "$npm_ver" =~ ^([3,5-9]\.|[1-9][0-9]+\.) ]]
             then
             update_npm=1;
+            perr "check_npm_bad_version" "$npm_ver"
         fi
     fi
 
@@ -156,15 +185,17 @@ check_curl()
     if ! is_cmd_defined "curl"
         then
         echo 'curl is not installed'
+        perr 'check_no_curl';
         install_curl=1
     fi
 }
 
 install_nave_fn()
 {
-    echo "installing nave";
     if ! is_cmd_defined "nave"
         then
+        echo "installing nave";
+        perr "install_nave";
         mkdir -p ~/.nave
         cd ~/.nave;
         wget http://github.com/isaacs/nave/raw/master/nave.sh
@@ -179,11 +210,13 @@ install_node_fn()
 {
     install_nave_fn;
     echo "installing node $desired_node_ver";
+    perr "install_node";
     sudo_cmd "rm -rf ~/.nave/cache/$desired_node_ver"
     sudo_cmd "rm -rf /root/.nave/cache/v$desired_node_ver";
     sudo_cmd "nave usemain $desired_node_ver";
     if ! is_cmd_defined "node"
         then
+        perr "install_error_node";
         echo 'could not install node';
         exit 1;
     fi
@@ -192,6 +225,7 @@ install_node_fn()
 install_npm_fn()
 {
     echo "installing npm";
+    perr "install_npm";
     curl https://www.npmjs.com/install.sh | sh;
     update_npm=1;
 }
@@ -199,24 +233,28 @@ install_npm_fn()
 install_wget_fn()
 {
     echo "installing wget";
+    perr "install_wget";
     sys_install "wget";
 }
 
 install_curl_fn()
 {
     echo "installing curl";
+    perr "install_curl";
     sys_install "curl";
 }
 
 install_brew_fn()
 {
     echo "installing brew"
+    perr "install_brew";
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
 }
 
 update_npm_fn()
 {
     echo "updating npm to $desired_npm_ver";
+    perr "install_npm" "$desired_npm_ver";
     sudo_cmd "npm install -g npm@$desired_npm_ver";
 }
 
@@ -261,11 +299,12 @@ deps_install()
 lpm_clean()
 {
 
+    sudo_cmd "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy";
     local lib_path=$(npm list -g | head -1);
     local home=$HOME;
     sudo_cmd "rm -rf $lib_path/node_modules/{@luminati-io,sqlite3,luminati-proxy}";
     sudo_cmd "rm -rf $home/.npm /root/.npm";
-    sudo_cmd "rm -rf /usr/local/bin/{luminati,luminati-proxy}";
+    sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}";
     mkdir -p $HOME/.npm/_cacache
     mkdir -p $HOME/.npm/_logs
 }
@@ -273,9 +312,15 @@ lpm_clean()
 lpm_install()
 {
     echo "installing Luminati proxy manager";
+    perr "install" "lpm";
     lpm_clean;
     sudo_cmd "npm install -g --unsafe-perm @luminati-io/luminati-proxy";
-    if [[ $? != 0 ]]; then exit $?; fi
+    if [[ $? != 0 ]]; then
+        perr "install_error_lpm";
+        exit $?;
+    else
+        perr "install_success_lpm";
+    fi
 }
 
 check_install()
@@ -284,9 +329,11 @@ check_install()
     if ! luminati -v > /dev/null
     then
         echo 'there was an error installing Luminait';
+        perr "install_error_lpm_check";
         exit 1;
     fi
     echo "Luminati installed successfully";
+    perr "install_success_lpm_check";
 }
 
 clean()
@@ -299,11 +346,16 @@ clean()
 
 main()
 {
+    perr "start"
+    echo "Luminati install script. Install id: $run_id";
     check_env;
     deps_install;
     lpm_install;
     check_install;
+    perr "complete"
+    echo "Luminati install script complete. Install id: $run_id";
 }
 
 if [ "$arg" == "clean" ]; then clean; exit 0; fi;
+
 main;

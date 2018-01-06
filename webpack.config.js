@@ -47,6 +47,11 @@ module.exports = {
                 parser: {node: false, commonjs: false},
                 use: ['hutil-loader'],
             },
+            {
+                test: /pure_component\.js/,
+                parser: {node: false, commonjs: false},
+                use: ['hutil-loader'],
+            },
             {test: /\.css$/, use: ['style-loader', 'css-loader']},
             {test: /\.less$/, use: ['style-loader', 'css-loader?-url',
                 'less-loader']},

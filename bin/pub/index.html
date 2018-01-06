@@ -14,26 +14,29 @@
   </head>
   <body ng-cloak ng-controller=root>
     <div class="top_nav_wrapper"
-      ng-class="{'no_nav': section.name=='settings' || section.name=='intro'}">
+      ng-class="{'no_nav': section.name=='settings' || section.name=='welcome'}">
       <div class="lpm nav_top">
         <div class=logo_wrapper>
           <div class=logo></div>
           <span class=version ng-if=ver_cur>V{{ver_cur}}</span>
         </div>
-        <div class=dropdown ng-if="section.name!='settings'">
-          <a href=# class=dropdown-toggle data-toggle=dropdown>
-            {{settings.customer}}<span class=caret></span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-right">
-            <li ng-if="is_upgradable()">
-              <a href=# ng-click=upgrade()>Upgrade</a>
-            </li>
-            <li><a href=# ng-click=logout()>Log out</a></li>
-            <li><a href=# ng-click=shutdown()>Shut down</a></li>
-          </ul>
+        <div class=nav_top_right>
+          <div class=notif_icon react-view=notif_center></div>
+          <div class=dropdown ng-if="section.name!='settings'">
+            <a href=# class=dropdown-toggle data-toggle=dropdown>
+              {{settings.customer}}<span class=caret></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li ng-if="is_upgradable()">
+                <a href=# ng-click=upgrade()>Upgrade</a>
+              </li>
+              <li><a href=# ng-click=logout()>Log out</a></li>
+              <li><a href=# ng-click=shutdown()>Shut down</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-      <div ng-if="section.name!='settings' && section.name!='intro'"
+      <div ng-if="section.name!='settings' && section.name!='welcome'"
         class="lpm nav_left">
         <div class=menu>
           <div ng-repeat="s in sections" ng-if="s.navbar" class="menu_item"
@@ -177,6 +180,7 @@
       </div>
     </div>
     <div react-view=add_proxy_modal></div>
-  <script type="text/javascript" src="/d4c0809b54000c14494d.runtime.js"></script><script type="text/javascript" src="/109e81eaaa18d8a741fb.vendor.js"></script><script type="text/javascript" src="/667edd82cb08f6205b30.app.js"></script></body>
+    <div id=notif_react_modal></div>
+  <script type="text/javascript" src="/8562db9786958c307b65.runtime.js"></script><script type="text/javascript" src="/46d3b23b3f0457b875ff.vendor.js"></script><script type="text/javascript" src="/d83c1767d2ab6e8bc2b8.app.js"></script></body>
 </html>
 

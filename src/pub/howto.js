@@ -21,10 +21,7 @@ class Howto extends React.Component {
         });
     }
     choose_click(option){
-        if (this.props.ga_category=='onboarding')
-            ga_event('lpm-onboarding', '06 select code/browser', option);
-        else if (this.props.ga_category=='how-to-use')
-            ga_event('How-to-tab', 'select code/browser', option);
+        ga_event('How-to-tab', 'select code/browser', option);
         this.setState({option});
     }
     render(){
@@ -37,8 +34,8 @@ class Howto extends React.Component {
         else if (this.state.option=='code')
             Instructions = Code_instructions;
         return (
-            <div className="intro lpm">
-              <div className="howto">
+            <div className="howto lpm">
+              <div className="howto_panel">
                 <h1 className="header">Make your first request</h1>
                 <Subheader value={subheader}/>
                 <div className="choices">
@@ -50,8 +47,7 @@ class Howto extends React.Component {
                     selected={this.state.option=='code'}
                     on_click={()=>this.choose_click('code')}/>
                 </div>
-                <Instructions ga_cat={this.props.ga_category}>
-                  {this.props.children}</Instructions>
+                <Instructions>{this.props.children}</Instructions>
                 {this.state.option ? this.render_children() : null}
               </div>
             </div>
@@ -73,13 +69,12 @@ class Code_instructions extends React.Component {
     constructor(props){
         super(props);
         this.state = {lang: 'shell'};
-        this.category = 'lpm-code-examples'+'-'+this.props.ga_cat;
     }
     click_lang(lang){
         this.setState({lang});
-        ga_event(this.category, 'selected option', lang);
+        ga_event('How-to-tab', 'select option', lang);
     }
-    click_copy(lang){ ga_event(this.category, 'click copy', lang); }
+    click_copy(lang){ ga_event('How-to-tab', 'click copy', lang); }
     render(){
         const Lang_btn_clickable = props=>(
             <span onClick={()=>this.click_lang(props.lang)}>
@@ -122,14 +117,13 @@ class Browser_instructions extends React.Component {
     constructor(props){
         super(props);
         this.state = {browser: 'chrome_win'};
-        this.category = 'lpm-browser-examples'+'-'+this.props.ga_cat;
         this.port = window.localStorage.getItem(
             'quickstart-first-proxy')||24000;
     }
     browser_changed(e){
         const browser = e.target.value;
         this.setState({browser});
-        ga_event(this.category, 'select option', browser);
+        ga_event('How-to-tab', 'select option', browser);
     }
     render(){
         return (

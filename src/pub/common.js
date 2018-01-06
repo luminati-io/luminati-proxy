@@ -164,11 +164,10 @@ const Input = props=>{
 
 const onboarding_steps = {
     WELCOME: 0,
-    ADD_PROXY: 1,
-    ADD_PROXY_STARTED: 2,
-    ADD_PROXY_DONE: 3,
-    HOWTO: 4,
-    HOWTO_DONE: 5,
+    ADD_PROXY_STARTED: 1,
+    ADD_PROXY_DONE: 2,
+    TEST_PROXY_CLICKED: 3,
+    HOWTO_CLICKED: 4,
 };
 
 const presets = {
@@ -369,7 +368,11 @@ const presets = {
             opt.session_random = false;
             opt.sticky_ip = false;
         },
-        clean: opt=>{ opt.multiply = 1; },
+        clean: opt=>{
+            opt.pool_size = 1;
+            opt.keep_alive = 0;
+            opt.multiply = 1;
+        },
         rules: [
             {field: 'pool_size', label: "sets 'Pool size' to 50"},
             {field: 'keep_alive', label: "sets 'Keep-alive' to 40"},

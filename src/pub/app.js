@@ -18,10 +18,12 @@ import status_codes_detail from './stats/status_codes_detail.js';
 import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
-import intro from './intro.js';
+import zwelcome from './welcome.js';
+import zsetup_guide from './setup_guide.js';
 import zadd_proxy from './add_proxy.js';
+import znotif_center from './notif_center.js';
 import zedit_proxy from './edit_proxy.js';
-import Howto from './howto.js';
+import zhowto from './howto.js';
 import proxy_tester from './proxy_tester.js';
 import protocols_detail from './stats/protocols_detail.js';
 import util from './util.js';
@@ -40,7 +42,7 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
-import {onboarding_steps, presets} from './common.js';
+import {presets} from './common.js';
 
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -176,22 +178,25 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
             $scope.react_component = protocols_detail; },
     });
     state_registry.register({
-        name: 'intro',
+        name: 'welcome',
         parent: 'app',
-        url: '/intro',
+        url: '/welcome',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = intro; },
+        controller: function($scope){ $scope.react_component = zwelcome; },
+    });
+    state_registry.register({
+        name: 'setup_guide',
+        parent: 'app',
+        url: '/setup_guide',
+        template: '<div react-view=react_component></div>',
+        controller: function($scope){ $scope.react_component = zsetup_guide; },
     });
     state_registry.register({
         name: 'howto',
         parent: 'app',
         url: '/howto',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){
-            const howto_wrapper = props=>
-                <Howto ga_category="how-to-use"/>;
-            $scope.react_component = howto_wrapper;
-        },
+        controller: function($scope){ $scope.react_component = zhowto; },
     });
     state_registry.register({
         name: 'proxy_tester',
@@ -232,7 +237,7 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
                     {
                         $window.localStorage.setItem('quickstart-intro', true);
                         return resolve(transition.router.stateService.target(
-                                'intro'));
+                                'welcome'));
                     }
                     if (transition.to().name!='settings')
                         return resolve(true);
@@ -415,6 +420,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     $proxies)=>
 {
     $scope.sections = [
+        {name: 'setup_guide', title: 'Setup guide', navbar: true},
         {name: 'settings', title: 'Settings', navbar: false},
         {name: 'howto', title: 'How to use', navbar: true},
         {name: 'proxies', title: 'Proxies', navbar: true},
@@ -422,7 +428,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'tools', title: 'Tools', navbar: true},
         {name: 'faq', title: 'FAQ', navbar: true},
-        {name: 'intro', navbar: false},
+        {name: 'welcome', navbar: false},
     ];
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
@@ -470,6 +476,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     setdb.set('head.callbacks.state.go', $state.go);
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
+    $scope.$root.notif_center = znotif_center;
     var show_reload = function(){
         $window.$('#restarting').modal({
             backdrop: 'static',
@@ -743,16 +750,14 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
         });
     };
     const send_event_user_logged = ()=>{
-        if ($window.localStorage.getItem('quickstart-intro') ||
-            $window.localStorage.getItem('quickstart')=='dismissed')
+        if (!$window.localStorage.getItem('quickstart-intro') &&
+            $window.localStorage.getItem('quickstart')!='dismissed')
         {
-            ga_event('lpm-onboarding', '02 login successful', 'old user');
-        }
-        else
             ga_event('lpm-onboarding', '02 login successful', 'new user');
+        }
     };
     $scope.user_data = {username: '', password: ''};
-    var token;
+    let token;
     $scope.save_user = function(){
         var creds = {};
         if (token)

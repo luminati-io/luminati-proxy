@@ -118,6 +118,10 @@ const tabs = {
                 label: 'String to be scanned in body (Regex)',
                 placeholder:`i.e. (captcha|robot)`
             },
+            max_req_time: {
+                label: 'Maximum request time',
+                placeholder: '500',
+            },
             trigger_url_regex: {
                 label: 'Apply only on specific domains (optional)',
                 placeholder:`i.e. example.com`
@@ -495,6 +499,11 @@ class Index extends React.Component {
             form.trigger_url_regex = form.rule.url;
             form.trigger_type = form.rule.trigger_type;
             form.body_regex = form.rule.body_regex;
+            if (form.rule.max_req_time)
+            {
+                const max_req_time = form.rule.max_req_time.match(/\d+/);
+                form.max_req_time = Number(max_req_time&&max_req_time[0]);
+            }
             if (form.rule.action)
             {
                 form.action = form.rule.action.value;
@@ -584,7 +593,7 @@ class Index extends React.Component {
                         onboarding_steps.ADD_PROXY_DONE);
                     window.localStorage.setItem('quickstart-first-proxy',
                        data.port);
-                    _this.state.callbacks.state.go('intro');
+                    _this.state.callbacks.state.go('setup_guide');
                 }
                 else
                     _this.state.callbacks.state.go('proxies');
@@ -687,9 +696,15 @@ class Index extends React.Component {
                 arg: form.body_regex};
             form.rule.body_regex = form.body_regex;
         }
+        else if (form.trigger_type=='max_req_time'&&form.max_req_time)
+        {
+            form.rules.post[0].res[0].max_req_time = form.max_req_time+'ms';
+            form.rule.max_req_time = form.max_req_time+'ms';
+        }
         else if (!form.rules.post && !form.rules.pre)
             form.rules = null;
         delete form.trigger_type;
+        delete form.max_req_time;
         delete form.status_code;
         delete form.status_custom;
         delete form.body_regex;
@@ -1183,7 +1198,7 @@ class Targeting extends React.Component {
     }
     country_disabled(){
         const curr_plan = this.props.get_curr_plan();
-        return curr_plan&&curr_plan.type=='static';
+        return curr_plan&&(curr_plan.type=='static'||curr_plan.vip);
     }
     render(){
         return (
@@ -1266,6 +1281,7 @@ class Rules extends React.Component {
         this.state={
             show_statuses: this.props.form.trigger_type=='status',
             show_body_regex: this.props.form.trigger_type=='body',
+            show_max_time: this.props.form.trigger_type=='max_req_time',
             show_custom_status: this.props.form.status_code=='Custom',
         };
     }
@@ -1285,6 +1301,13 @@ class Rules extends React.Component {
             this.setState({show_body_regex: false});
             this.props.on_change_field('body_regex', '');
         }
+        if (val=='max_req_time')
+            this.setState({show_max_time: true});
+        else
+        {
+            this.setState({show_max_time: false});
+            this.props.on_change_field('max_req_time', '');
+        }
         if (!val)
             this.props.on_change_field('trigger_url_regex', '');
     }
@@ -1298,6 +1321,7 @@ class Rules extends React.Component {
             {key:'', value: ''},
             {key: 'Status-code', value: 'status'},
             {key: 'html-Body', value: 'body'},
+            {key: 'Maximum request time', value: 'max_req_time'},
         ];
         const action_types = [
             {key: '', value: ''},
@@ -1341,6 +1365,10 @@ class Rules extends React.Component {
                   <If when={this.state.show_body_regex}>
                     <Section_field tab_id="rules" id="body_regex"
                       type="text" {...this.props}/>
+                  </If>
+                  <If when={this.state.show_max_time}>
+                    <Section_field tab_id="rules" id="max_req_time"
+                      type="number" {...this.props} sufix="milliseconds"/>
                   </If>
                   <If when={this.state.show_statuses}>
                     <Section_field tab_id="rules" id="status_code"

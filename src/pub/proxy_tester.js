@@ -8,6 +8,9 @@ import {Input, Select, If, Loader, Modal, Warnings} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import setdb from 'hutil/util/setdb';
+import util from './util.js';
+
+const ga_event = util.ga_event;
 
 class Proxy_tester extends React.Component {
     constructor(props){
@@ -57,6 +60,7 @@ class Request extends React.Component {
         this.sp.return();
     }
     add_header(){
+        ga_event('proxy-tester-tab', 'add header');
         this.setState(prev_state=>({
             headers: [...prev_state.headers, {idx: prev_state.max_idx,
                 header: '', value: ''}],
@@ -64,6 +68,7 @@ class Request extends React.Component {
         }));
     }
     remove_header(idx){
+        ga_event('proxy-tester-tab', 'remove header');
         this.setState(prev_state=>
             ({headers: prev_state.headers.filter(h=>h.idx!=idx)}));
     }
@@ -82,10 +87,12 @@ class Request extends React.Component {
             params: {...prev_state.params, [field]: value}}));
     }
     reset(){
+        ga_event('proxy-tester-tab', 'reset clicked');
         this.setState({...this.default_state});
         this.props.update_response({});
     }
     go(){
+        ga_event('proxy-tester-tab', 'run test');
         const check_url = '/api/test/'+this.state.params.proxy;
         const body = {
             headers: this.state.headers.reduce((acc, el)=>{
@@ -103,6 +110,7 @@ class Request extends React.Component {
             this.on('uncaught', e=>{
                 console.error(e);
                 _this.setState({show_loader: false});
+                ga_event('proxy-tester-tab', 'unexpected error');
             });
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
@@ -116,7 +124,10 @@ class Request extends React.Component {
             {
                 _this.setState({warnings: [{msg: json_check.error}]});
                 $('#warnings_modal').modal();
+                ga_event('proxy-tester-tab', 'response has errors');
             }
+            else
+                ga_event('proxy-tester-tab', 'response successful');
         }));
     }
     render() {
@@ -160,7 +171,15 @@ const Request_params = ({params, update, proxies})=>{
 
 const Field = ({type, update, name, params, ...props})=>{
     const fields = {proxy: 'Proxy', url: 'URL', method: 'Method'};
-    const on_change_wrapper = val=>{ update(name, val); };
+    const on_change_wrapper = val=>{
+        if (name!='url')
+            ga_event('proxy-tester-tab', 'edit '+name);
+        update(name, val);
+    };
+    const on_blur = ()=>{
+        if (name=='url')
+            ga_event('proxy-tester-tab', 'edit url');
+    };
     let Comp;
     if (type=='select')
         Comp = Select;
@@ -173,7 +192,7 @@ const Field = ({type, update, name, params, ...props})=>{
             <div className="title">{fields[name]}</div>
           </If>
           <Comp on_change_wrapper={on_change_wrapper} type={type}
-            val={params[name]} {...props}/>
+            val={params[name]} {...props} on_blur={on_blur}/>
         </div>
     );
 };

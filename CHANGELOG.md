@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.77.943
+- :star: notification center
+- :bug: add subjectAltName on certificate generation
+
 ## 1.77.506
 - :star: added proxy tester tool in main nav bar
 - :sparkles: improved performance of edit and save proxies 

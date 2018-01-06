@@ -157,6 +157,7 @@
       "bin/pub/img/3_active.svg",
       "bin/pub/img/add.svg",
       "bin/pub/img/arrow_down.svg",
+      "bin/pub/img/bell.svg",
       "bin/pub/img/check.svg",
       "bin/pub/img/check_radio.svg",
       "bin/pub/img/columns.svg",
@@ -171,6 +172,7 @@
       "bin/pub/img/faq.svg",
       "bin/pub/img/flag_any_country.svg",
       "bin/pub/img/general.svg",
+      "bin/pub/img/google.svg",
       "bin/pub/img/history.svg",
       "bin/pub/img/howto.svg",
       "bin/pub/img/icon_chrome.jpg",
@@ -213,6 +215,7 @@
       "bin/pub/img/refresh.svg",
       "bin/pub/img/rotation.svg",
       "bin/pub/img/rules.svg",
+      "bin/pub/img/setup_guide.svg",
       "bin/pub/img/social_btns.svg",
       "bin/pub/img/speed.svg",
       "bin/pub/img/stats.svg",
@@ -259,8 +262,9 @@
       "src/pub/howto.js",
       "src/pub/index.html",
       "src/pub/instructions.js",
-      "src/pub/intro.js",
+      "src/pub/notif_center.js",
       "src/pub/proxy_tester.js",
+      "src/pub/setup_guide.js",
       "src/pub/stats/common.js",
       "src/pub/stats/domains.js",
       "src/pub/stats/domains_detail.js",
@@ -270,10 +274,11 @@
       "src/pub/stats/status_codes.js",
       "src/pub/stats/status_codes_detail.js",
       "src/pub/util.js",
+      "src/pub/welcome.js",
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "b2a558f50e26d17f3c4a8c2d7d51aaca"
+    "md5": "5effa865e55950f096d96ac8b44b1467"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -312,5 +317,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.77.506"
+  "version": "1.77.943"
 }

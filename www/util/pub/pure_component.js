@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true*/
 define(['react', '/util/etask.js', '/util/setdb.js'], (React, etask, setdb)=>{
 
-const LONG_CB_MS = 50;
+const LONG_CB_MS = 100;
 
 // XXX krzysztof: copied from android/who/app/components, removed local
 // dependency: zerr and event
@@ -11,6 +11,7 @@ class Pure_component extends React.PureComponent {
     constructor(props){
         super(props);
         this.listeners = {};
+        this.comp_name = this.constructor.name;
     }
     componentWillUnmount(){
         let t0 = Date.now();
@@ -24,10 +25,10 @@ class Pure_component extends React.PureComponent {
         if (this.willUnmount)
             this.willUnmount();
         let t1 = Date.now();
-        if (t1-t0 > LONG_CB_MS)
+        if (this.debug && t1-t0 > LONG_CB_MS)
         {
             console.warn('long cb componentWillUnmount %s took %sms',
-                this.displayName, t1-t0);
+                this.comp_name, t1-t0);
         }
     }
     setdb_on(path, cb){ this.listeners[path] = setdb.on(path, cb); }
@@ -36,34 +37,34 @@ class Pure_component extends React.PureComponent {
             this.sp = etask('Component', function*(){ yield this.wait(); });
         this.sp.spawn(task);
     }
-    // XXX arik WIP
     setState(updater, cb){
-        if (0) // XXX arik: debug feature
+        let t0, t1, t2, t3;
+        if (this.debug)
         {
-            console.log('setState %s %s', this.displayName||'Component',
-                Object.keys(updater));
+            console.log('setState %s %s', this.comp_name,
+                Object.keys(updater).join(', '));
+            t0 = Date.now();
         }
-        let t0 = Date.now();
         super.setState(updater, ()=>{
-            let t2 = Date.now();
+            t2 = Date.now();
             if (cb)
                 cb.apply(this, arguments);
-            let t3 = Date.now();
-            if (t3-t2 > LONG_CB_MS)
+            t3 = Date.now();
+            if (this.debug && t3-t2 > LONG_CB_MS)
             {
                 console.warn('long cb setState %s cb %s took %sms',
-                    this.displayName, cb && cb.name, t3-t2);
+                    this.comp_name, cb && cb.name, t3-t2);
             }
-            if (t3-t0 > LONG_CB_MS)
+            if (this.debug && t3-t0 > LONG_CB_MS)
             {
                 console.warn('long cb setState-done %s cb %s took %sms',
-                    this.displayName, cb && cb.name, t3-t0);
+                    this.comp_name, cb && cb.name, t3-t0);
             }
         });
-        let t1 = Date.now();
-        if (t1-t0 > LONG_CB_MS)
+        t1 = Date.now();
+        if (this.debug && t1-t0 > LONG_CB_MS)
         {
-            console.warn('long cb setState %s took %sms', this.displayName,
+            console.warn('long cb setState %s took %sms', this.comp_name,
                 t1-t0);
         }
     }

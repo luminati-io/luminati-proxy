@@ -69,30 +69,27 @@ class Add_proxy extends React.Component {
         const _this = this;
         this.sp.spawn(etask(function*(){
             const port = yield _this.persist();
+            const callbacks = setdb.get('head.callbacks');
+            yield callbacks.proxies.update();
             $('#add_proxy_modal').modal('hide');
             if (opt.redirect)
             {
-                const callbacks = setdb.get('head.callbacks');
-                yield callbacks.proxies.update();
                 const state_opt = {port};
                 if (opt.field)
                     state_opt.field = opt.field;
                 return yield callbacks.state.go('edit_proxy', state_opt);
             }
-            else if (window.location.pathname=='/intro')
+            else if (window.location.pathname=='/setup_guide')
             {
                 const curr_step = JSON.parse(window.localStorage.getItem(
                     'quickstart-step'));
                 window.localStorage.setItem('quickstart-first-proxy', port);
                 if (curr_step==onboarding_steps.ADD_PROXY_STARTED);
                 {
-                    emitter.emit('intro:set_step',
+                    emitter.emit('setup_guide:set_step',
                         onboarding_steps.ADD_PROXY_DONE);
                 }
-                return;
             }
-            else
-                setdb.get('head.callbacks.proxies.update')();
         }));
     }
     rule_clicked(field){
