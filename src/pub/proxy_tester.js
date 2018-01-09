@@ -4,7 +4,8 @@ import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, If, Loader, Modal, Warnings} from './common.js';
+import {Input, Select, If, Loader, Modal, Warnings,
+    onboarding_steps, emitter} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import setdb from 'hutil/util/setdb';
@@ -40,7 +41,11 @@ class Proxy_tester extends React.Component {
 
 const Nav = ()=>(
     <div className="nav_header">
-      <h3>Proxy Tester</h3></div>
+      <h3>Proxy Tester</h3>
+      <div className="subtitle">
+        Emulate requests from your proxies to any target URL
+      </div>
+    </div>
 );
 
 class Request extends React.Component {
@@ -118,6 +123,16 @@ class Request extends React.Component {
                 body: JSON.stringify(body),
             });
             const json_check = yield raw_check.json();
+            const curr_step = JSON.parse(window.localStorage.getItem(
+                'quickstart-step'));
+            if (curr_step==onboarding_steps.TEST_PROXY_CLICKED)
+            {
+                emitter.emit('setup_guide:set_step',
+                    onboarding_steps.TEST_PROXY_WATCHED);
+                emitter.emit('setup_guide:progress_modal',
+                    'Looks good? now lets browse the web',
+                    2000);
+            }
             _this.setState({show_loader: false});
             _this.props.update_response(json_check.response);
             if (json_check.error)

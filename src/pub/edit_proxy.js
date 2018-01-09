@@ -9,7 +9,7 @@ import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import {If, Modal, Loader, Select, Input, Warning, Warnings, presets,
-    onboarding_steps} from './common.js';
+    onboarding_steps, emitter} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -40,6 +40,7 @@ const tabs = {
             city: {
                 label: 'City',
                 tooltip: 'The city from which IP will be allocated',
+                placeholder: 'Type in city name'
             },
             asn: {
                 label: <span>
@@ -50,6 +51,7 @@ const tabs = {
                     </a>)
                     </span>,
                 tooltip: 'Specific ASN provider',
+                placeholder: 'ASN code e.g. 42793'
             },
         },
     },
@@ -61,6 +63,13 @@ const tabs = {
                 label: 'DNS Lookup',
                 tooltip: 'Location of DNS resolve',
             },
+            pool_size: {
+                label: 'Pool size',
+                tooltip: `Maintain number of IPs that will be pinged constantly
+                    - must have keep_alive to work properly`,
+            },
+            multiply_ips: {label: 'Multiply IPs'},
+            multiply_vips: {label: 'Multiply gIPs'},
             request_timeout: {
                 label: 'Timeout for requests on the super proxy',
                 tooltip: `Kill requests to super proxy and try new one if
@@ -110,9 +119,9 @@ const tabs = {
         fields: {
             trigger_type: {
                 label: 'Rule type',
-                tooltip: `Lumianti will scan the HTML response on every
-                    request and if the rule you select is true the Action
-                    will be executed automatically `,
+                tooltip: `In every request the response will be analyzed. 
+                    if the configured Trigger rule is true, the Action
+                    will be executed automatically`,
             },
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
@@ -151,20 +160,15 @@ const tabs = {
                     all requests are executed using specific Data Center IP.
                     to view the pool of your IPs take a look at 'pool size'
                     option`,
+                placeholder: 'insert IP value from your pool'
             },
             vip: {
                 label: 'gIP',
                 tooltip: `Choose specific gIP to ensure all requests are
                     executed using specific gIP. to view the pool of your gIPs
                     take a look at 'pool size' option`,
+                placeholder: 'insert gIP id'
             },
-            pool_size: {
-                label: 'Pool size',
-                tooltip: `Maintain number of IPs that will be pinged constantly
-                    - must have keep_alive to work properly`,
-            },
-            multiply_ips: {label: 'Multiply IPs'},
-            multiply_vips: {label: 'Multiply gIPs'},
             pool_type: {
                 label: 'Pool type',
                 tooltip: `How to pull the IPs - roundrobin / sequential`,
@@ -178,6 +182,7 @@ const tabs = {
                 label: 'Whitelist IP access',
                 tooltip: `Grant proxy access to specific IPs. only those
                     IPs will be able to send requests to this proxy Port`,
+                placeholder: `e.g. 1.1.1.1,23.23.23.23`
             },
             session_random: {
                 label: 'Random Session',
@@ -185,14 +190,14 @@ const tabs = {
             },
             session: {
                 label: 'Explicit Session',
-                tooltip: `Insert session ID to maintain the same session`,
+                tooltip: `Insert session ID to maintain the same ip 
+                    for as long as possible.`,
             },
             sticky_ip: {
                 label: 'Sticky IP',
-                tooltip: `When connecting to lpm server from different servers
-                    stick sessions to client ips. in that case every connected
-                    server will receive unique session to avoid overriding
-                    sessions between machines`,
+                tooltip: `When connecting to remote lpm server stick sessions
+                    to each computer. each connected computer will receive 
+                    unique session`,
             },
             max_requests: {
                 label: 'Max Requests',
@@ -589,14 +594,12 @@ class Index extends React.Component {
                     'quickstart-step'));
                 if (curr_step==onboarding_steps.ADD_PROXY_STARTED)
                 {
-                    window.localStorage.setItem('quickstart-step',
+                    emitter.emit('setup_guide:set_step',
                         onboarding_steps.ADD_PROXY_DONE);
-                    window.localStorage.setItem('quickstart-first-proxy',
-                       data.port);
-                    _this.state.callbacks.state.go('setup_guide');
+                    emitter.emit('setup_guide:progress_modal',`Great! You have`
+                        +` configured proxy on port ${data.port}`, 1500);
                 }
-                else
-                    _this.state.callbacks.state.go('proxies');
+                _this.state.callbacks.state.go('proxies');
             }
             else
             {
@@ -1228,6 +1231,7 @@ class Targeting extends React.Component {
 class Speed extends React.Component {
     constructor(props){
         super(props);
+        this.state = {list: [], loading: false};
         this.dns_options = [
             {key: 'Local (default) - resolved by the super proxy',
                 value: 'local'},
@@ -1237,11 +1241,110 @@ class Speed extends React.Component {
             {key: 'DNS', value: 'dns'}, {key: 'File', value: 'file'},
             {key: 'Values', value: 'values'}];
     }
+    componentWillMount(){
+        this.sp = etask('Rotation', function*(){ yield this.wait(); }); }
+    componentWillUnmount(){ this.sp.return(); }
+    toggle(type){
+        return e=>{
+            let {value, checked} = e.target;
+            if (type=='vips')
+                value = Number(value);
+            const {form, on_change_field} = this.props;
+            let new_alloc;
+            if (checked)
+                new_alloc = [...form[type], value];
+            else
+                new_alloc = form[type].filter(r=>r!=value);
+            on_change_field(type, new_alloc);
+            if (!form.multiply_ips && !form.multiply_vips)
+                on_change_field('pool_size', new_alloc.length);
+            else
+                on_change_field('multiply', new_alloc.length);
+        };
+    }
+    open_modal(type){
+        if (!this.props.support.pool_size)
+            return;
+        const {form} = this.props;
+        this.setState({loading: true});
+        const zone = form.zone||this.props.proxy.zone.def;
+        const keypass = form.password||'';
+        let base_url;
+        if (type=='ips')
+            base_url = '/api/allocated_ips';
+        else
+            base_url = '/api/allocated_vips';
+        const url = base_url+'?zone='+zone+'&key='+keypass;
+        const _this = this;
+        this.sp.spawn(etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                _this.setState({loading: false});
+            });
+            const res = yield ajax.json({url});
+            let list;
+            if (type=='ips')
+                list = res.ips;
+            else
+                list = res.slice(0, 100);
+            _this.setState({list, loading: false});
+            $('#allocated_ips').modal('show');
+        }));
+    }
+    multiply_changed(val){
+        const {on_change_field, form} = this.props;
+        const size = Math.max(form.ips.length, form.vips.length);
+        if (val)
+        {
+            on_change_field('pool_size', 0);
+            on_change_field('multiply', size);
+            return;
+        }
+        on_change_field('pool_size', size);
+        on_change_field('multiply', 1);
+    }
     render(){
+        const {form, support} = this.props;
+        const pool_size_disabled = !support.pool_size ||
+            form.ips.length || form.vips.length;
+        const curr_plan = this.props.get_curr_plan();
+        let type;
+        if (curr_plan&&curr_plan.type=='static')
+            type = 'ips';
+        else if (curr_plan&&!!curr_plan.vip)
+            type = 'vips';
+        const render_modal = ['ips', 'vips'].includes(type);
+        let pool_size_note;
+        if (this.props.support.pool_size&&render_modal)
+        {
+            pool_size_note = <a onClick={()=>this.open_modal(type)}>
+              {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
+            </a>;
+        }
         return (
             <With_data {...this.props} tab_id="speed">
+              <Loader show={this.state.loading}/>
+              <Alloc_modal list={this.state.list} type={type}
+                zone_name={form.zone||this.props.proxy.zone.def}
+                loading={this.state.loading} toggle={this.toggle.bind(this)}/>
               <Section_with_fields type="select" id="dns"
                 data={this.dns_options}/>
+              <Section id="pool_size" correct={this.props.form.pool_size}
+                disabled={pool_size_disabled}>
+                <Section_field {...this.props} type="number" id="pool_size"
+                  tab_id="speed" note={pool_size_note} min="0"
+                  disabled={pool_size_disabled}/>
+                <If when={type=='ips'}>
+                  <Section_field {...this.props} type="boolean"
+                    id="multiply_ips" tab_id="speed"
+                    on_change={this.multiply_changed.bind(this)}/>
+                </If>
+                <If when={type=='vips'}>
+                  <Section_field {...this.props} type="boolean"
+                    id="multiply_vips" tab_id="speed"
+                    on_change={this.multiply_changed.bind(this)}/>
+                </If>
+              </Section>
               <Section_with_fields type="number" id="request_timeout"
                 sufix="seconds" min="0"/>
               <Section_with_fields type="number" id="session_init_timeout"
@@ -1318,17 +1421,18 @@ class Rules extends React.Component {
     }
     render(){
         const trigger_types = [
-            {key:'', value: ''},
-            {key: 'Status-code', value: 'status'},
-            {key: 'html-Body', value: 'body'},
+            {key:'Select condition type for your Trigger rule', value: ''},
+            {key: 'Status code', value: 'status'},
+            {key: 'HTML body element', value: 'body'},
             {key: 'Maximum request time', value: 'max_req_time'},
         ];
         const action_types = [
-            {key: '', value: ''},
-            {key: 'Retry request with new IP', value: 'retry'},
-            {key: 'Retry using new port(Waterfall)', value: 'retry_port'},
+            {key: 'Select the Action to execute when Trigger pulled',
+                value: ''},
+            {key: 'Retry with new IP', value: 'retry'},
+            {key: 'Retry with new port (Waterfall)', value: 'retry_port'},
             {key: 'Ban IP', value: 'ban_ip'},
-            {key: 'Save IP to the reserved pool', value: 'save_to_pool'},
+            {key: 'Save IP to reserved pool', value: 'save_to_pool'},
         ];
         const ban_options = [
             {key: '10 minutes', value: '10min'},
@@ -1449,139 +1553,33 @@ const Alloc_modal = props=>{
     );
 };
 
-class Rotation extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {list: [], loading: false};
-        this.sp = etask('Rotation', function*(){ yield this.wait(); });
-    }
-    componentWillUnmount(){ this.sp.return(); }
-    toggle(type){
-        return e=>{
-            let {value, checked} = e.target;
-            if (type=='vips')
-                value = Number(value);
-            const {form, on_change_field} = this.props;
-            let new_alloc;
-            if (checked)
-                new_alloc = [...form[type], value];
-            else
-                new_alloc = form[type].filter(r=>r!=value);
-            on_change_field(type, new_alloc);
-            if (!form.multiply_ips && !form.multiply_vips)
-                on_change_field('pool_size', new_alloc.length);
-            else
-                on_change_field('multiply', new_alloc.length);
-        };
-    }
-    open_modal(type){
-        if (!this.props.support.pool_size)
-            return;
-        const {form} = this.props;
-        this.setState({loading: true});
-        const zone = form.zone||this.props.proxy.zone.def;
-        const keypass = form.password||'';
-        let base_url;
-        if (type=='ips')
-            base_url = '/api/allocated_ips';
-        else
-            base_url = '/api/allocated_vips';
-        const url = base_url+'?zone='+zone+'&key='+keypass;
-        const _this = this;
-        this.sp.spawn(etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-                _this.setState({loading: false});
-            });
-            const res = yield ajax.json({url});
-            let list;
-            if (type=='ips')
-                list = res.ips;
-            else
-                list = res.slice(0, 100);
-            _this.setState({list, loading: false});
-            $('#allocated_ips').modal('show');
-        }));
-    }
-    multiply_changed(val){
-        const {on_change_field, form} = this.props;
-        const size = Math.max(form.ips.length, form.vips.length);
-        if (val)
-        {
-            on_change_field('pool_size', 0);
-            on_change_field('multiply', size);
-            return;
-        }
-        on_change_field('pool_size', size);
-        on_change_field('multiply', 1);
-    }
-    render() {
-        const {proxy, support, form, default_opt} = this.props;
-        const pool_size_disabled = !support.pool_size ||
-            form.ips.length || form.vips.length;
-        const curr_plan = this.props.get_curr_plan();
-        let type;
-        if (curr_plan&&curr_plan.type=='static')
-            type = 'ips';
-        else if (curr_plan&&!!curr_plan.vip)
-            type = 'vips';
-        const render_modal = ['ips', 'vips'].includes(type);
-        let pool_size_note;
-        if (this.props.support.pool_size&&render_modal)
-        {
-            pool_size_note = <a onClick={()=>this.open_modal(type)}>
-              {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
-            </a>;
-        }
-        return (
-            <With_data {...this.props} tab_id="rotation">
-              <Loader show={this.state.loading}/>
-              <Alloc_modal list={this.state.list} type={type}
-                zone_name={form.zone||this.props.proxy.zone.def}
-                loading={this.state.loading} toggle={this.toggle.bind(this)}/>
-              <Section_with_fields type="text" id="ip"/>
-              <Section_with_fields type="text" id="vip"/>
-              <Section id="pool_size" correct={this.props.form.pool_size}
-                disabled={pool_size_disabled}>
-                <Section_field {...this.props} type="number" id="pool_size"
-                  tab_id="rotation" note={pool_size_note} min="0"
-                  disabled={pool_size_disabled}/>
-                <If when={type=='ips'}>
-                  <Section_field {...this.props} type="boolean"
-                    id="multiply_ips" tab_id="rotation"
-                    on_change={this.multiply_changed.bind(this)}/>
-                </If>
-                <If when={type=='vips'}>
-                  <Section_field {...this.props} type="boolean"
-                    id="multiply_vips" tab_id="rotation"
-                    on_change={this.multiply_changed.bind(this)}/>
-                </If>
-              </Section>
-              <Section_with_fields type="select" id="pool_type"
-                data={proxy.pool_type.values}
-                disabled={!support.pool_type}/>
-              <Section_with_fields type="number" id="keep_alive" min="0"
-                disabled={!support.keep_alive}/>
-              <Section_with_fields type="text" id="whitelist_ips"
-                validator={validators.ips_list}/>
-              <Section_with_fields type="boolean" id="session_random"
-                disabled={!support.session}/>
-              <Section_with_fields type="text" id="session"
-                disabled={form.session_random &&
-                !support.session}/>
-              <Section_with_fields type="select" id="sticky_ip"
-                data={default_opt('sticky_ip')}
-                disabled={!support.sticky_ip}/>
-              <Section_with_fields type="double_number" id="max_requests"
-                disabled={!support.max_requests}/>
-              <Section_with_fields type="double_number" id="session_duration"
-                disabled={!support.session_duration}/>
-              <Section_with_fields type="text" id="seed"
-                disabled={!support.seed}/>
-            </With_data>
-        );
-    }
-}
+const Rotation = props=>{
+    const {support, form, proxy} = props;
+    return (
+        <With_data {...props} tab_id="rotation">
+          <Section_with_fields type="text" id="ip"/>
+          <Section_with_fields type="text" id="vip"/>
+          <Section_with_fields type="select" id="pool_type"
+            data={proxy.pool_type.values} disabled={!support.pool_type}/>
+          <Section_with_fields type="number" id="keep_alive" min="0"
+            disabled={!support.keep_alive}/>
+          <Section_with_fields type="text" id="whitelist_ips"
+            validator={validators.ips_list}/>
+          <Section_with_fields type="boolean" id="session_random"
+            disabled={!support.session}/>
+          <Section_with_fields type="text" id="session"
+            disabled={form.session_random && !support.session}/>
+          <Section_with_fields type="select" id="sticky_ip"
+            data={props.default_opt('sticky_ip')}
+            disabled={!support.sticky_ip}/>
+          <Section_with_fields type="double_number" id="max_requests"
+            disabled={!support.max_requests}/>
+          <Section_with_fields type="double_number" id="session_duration"
+            disabled={!support.session_duration}/>
+          <Section_with_fields type="text" id="seed" disabled={!support.seed}/>
+        </With_data>
+    );
+};
 
 const Debug = props=>(
     <With_data {...props} tab_id="debug">

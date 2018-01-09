@@ -34,12 +34,6 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
       U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
-html, body, .top_nav_wrapper, .page-body {
-    height: 100%;
-}
-div[react-view=react_component] {
-    height: 98%;
-}
 body {
     font-family: "Noto Sans", sans-serif;
     font-size: 15px;
@@ -50,6 +44,7 @@ body {
 .no_nav {
     .page-body { margin-left: 0; }
     .nav_top { background-color: white; }
+    .logo_wrapper { background-color: white !important; }
 }
 .alert.alert-info { margin: 0 15px 20px; }
 .page-body { margin-left: 224px; }
@@ -214,8 +209,8 @@ div.proxies .panel-heading {
 }
 div.proxies .btn-wrapper {
     position: absolute;
-    right: 22px;
-    top: 10px;
+    right: 31px;
+    top: 17px;
 }
 .proxies-default { color: gray; }
 .proxies-editable {
@@ -362,6 +357,7 @@ a.proxies-action-edit {
     .warning {
         position: relative;
         top: -20px;
+        a { margin: 0 6px; }
     }
     h3 {
         font-weight: bold;
@@ -588,8 +584,11 @@ input.form-control[type=checkbox] {
     }
     .nav_header {
         h3 {
-            height: 57px;
-            line-height: 55px;
+            height: 37px;
+            line-height: 37px;
+        }
+        .subtitle {
+            margin-bottom: 15px;
         }
     }
     select, input[type=number], input[type=text], input[type=password],
@@ -797,12 +796,16 @@ input.form-control[type=checkbox] {
         }
     }
     .warning {
+        background-color: @warning;
+        &.error {
+            background-color: @error_x_light;
+            color: @error_dark;
+        }
         margin: 10px 0;
         font-size: 14px;
         color: @dark;
         display: flex;
         align-items: center;
-        background-color: @warning;
         border-radius: 2px;
         padding: 17px 20px;
         .warning_icon {
@@ -837,7 +840,7 @@ input.form-control[type=checkbox] {
             h2 {
                 font-size: 18px;
                 margin-top: 20px;
-                margin-left: 30px;
+                margin-left: 18px;
             }
         }
         .panel_body { padding: 20px; }
@@ -1303,8 +1306,8 @@ input.form-control[type=checkbox] {
         }
         .btn_reset {
             position: absolute;
-            top: 10px;
-            right: 20px;
+            top: 17px;
+            right: 31px;
             width: 60px;
             height: 24px;
             font-size: 12px;
@@ -1401,35 +1404,13 @@ input.form-control[type=checkbox] {
     height: 100%;
     text-align: center;
     margin-top: 10px;
-    .welcome_panel {
-        height: 100%;
-        display: flex;
-        flex-flow: column;
-    }
-    .header {
-        margin-left: auto;
-        margin-right: auto;
-        width: 600px;
-    }
-    .sub_header {
-        margin-top: 10px;
-        margin-left: auto;
-        margin-right: auto;
-        width: 600px;
-    }
+    .sub_header { margin-top: 10px; }
     .img_welcome {
-        flex: 1;
         background: url(/img/lpm_infographics.png);
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
-        margin: 15px 0;
-        max-height: 330px;
-    }
-    .btn_lets_go {
-        margin-bottom: 10px;
-        margin-left: auto;
-        margin-right: auto;
+        height: 330px;
     }
 }
 .setup_guide {
@@ -1442,7 +1423,6 @@ input.form-control[type=checkbox] {
         height: 83px;
         margin: auto;
         border: 2px solid @second_color;
-        box-shadow: 0 2px 2px 0 rgba(156, 181, 190, 0.57);
         border-radius: 4px;
         margin-top: 20px;
         margin-bottom: 20px;
@@ -1509,12 +1489,14 @@ input.form-control[type=checkbox] {
             top: -4px;
             z-index: 2;
         }
+        &.create { background: url(/img/step_create_active.svg); }
+        &.create_disabled { background: url(/img/step_create_disabled.svg); }
+        &.test { background: url(/img/step_test_active.svg); }
+        &.test_disabled { background: url(/img/step_test_disabled.svg); }
+        &.req { background: url(/img/step_req_active.svg); }
+        &.req_disabled { background: url(/img/step_req_disabled.svg); }
+        &.done { background: url(/img/step_done.svg); }
     }
-    .img_1_active { background: url(/img/1_active.svg); }
-    .img_2 { background: url(/img/2.svg); }
-    .img_2_active { background: url(/img/2_active.svg); }
-    .img_3 { background: url(/img/3.svg); }
-    .img_3_active { background: url(/img/3_active.svg); }
 }
 .howto {
     padding-top: 20px;
@@ -1537,7 +1519,6 @@ input.form-control[type=checkbox] {
         width: 205px;
         height: 83px;
         border-radius: 4px;
-        box-shadow: 0 2px 2px 0 @grey;
         border: solid 1px @grey_border;
         margin: 30px 20px;
         .content {
@@ -1568,8 +1549,16 @@ input.form-control[type=checkbox] {
     .browser_instructions .header_well {
         font-size: 14px;
         font-weight: bold;
-        p { margin: 10px; display: inline-block; }
-        select { width: 270px; float: right; }
+        display: flex;
+        align-items: center;
+        p {
+            flex: 1;
+            margin: 10px;
+        }
+        select {
+            background-color: white;
+            width: 270px;
+        }
     }
     .code_instructions .header_well {
         text-align: center;
@@ -1590,7 +1579,7 @@ input.form-control[type=checkbox] {
         }
     }
     .btn_lang { margin: 0 2px; }
-    .btn_done { float: right; }
+    .onboarding_buttons { display: flex; }
     // XXX krzysztof: move it to .lpm to make it common
     .instructions {
         margin-left: 30px;
@@ -1707,8 +1696,7 @@ input.form-control[type=checkbox] {
 .nav_left {
     .menu {
         background-color: @x_light;
-        padding-top: 11px;
-        top: 61px;
+        top: 60px;
         position: fixed;
         width: 224px;
         .menu_item {
@@ -1748,12 +1736,20 @@ input.form-control[type=checkbox] {
         .faq { background-image: url('img/faq.svg'); }
     }
     .menu_filler {
-        background-color: @xx_light;
+        background-color: @x_light;
         height: 100%;
         position: fixed;
         width: 224px;
         z-index: -1;
         top: 10px;
+    }
+    .footer {
+        color: @second_color;
+        a { text-decoration: none; }
+        width: 224px;
+        position: fixed;
+        bottom: 50px;
+        text-align: center;
     }
 }
 .nav_top {
@@ -1767,7 +1763,7 @@ input.form-control[type=checkbox] {
     .logo_wrapper {
         height: 60px;
         width: 224px;
-        background: white;
+        background-color: @x_light;
         display: inline-block;
     }
     .logo {

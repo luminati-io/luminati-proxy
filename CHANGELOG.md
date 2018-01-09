@@ -1,6 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 1.78.485
+- :star: onboarding flow for easier setup
+- :sparkles: multiple ui improvments
+
 ## 1.77.943
+- :star: rule trigger 'max request time'
 - :star: notification center
 - :bug: add subjectAltName on certificate generation
 

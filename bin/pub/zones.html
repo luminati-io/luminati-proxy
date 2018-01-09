@@ -6,8 +6,18 @@
   <div ng-hide=stats||error class="alert alert-info">
     Loading...
   </div>
-  <div ng-if=stats&&!error>
-    Note that a kilobyte is counted as <strong>1000</strong> bytes.
+  <div ng-if=stats&&!error class="lpm row">
+    <div class="col-md-10 nav_header">
+      <h3>My Zones</h3>
+      <div class="subtitle">
+        List of all the zones(network type permission pack) in my account
+      </div>
+    </div>
+    <div class=col-md-2>
+      <button type=submit class="btn btn-default" ng-click=new_zone()>
+        + New zone
+      </button>
+    </div>
   </div><br>
   <div ng-if=!$resolve.$stateParams.zone>
     <table class="table table-hover zones-table" ng-if=stats&&!error>

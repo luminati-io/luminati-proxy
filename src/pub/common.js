@@ -39,11 +39,15 @@ class Modal extends React.Component {
         });
     }
     render(){
-        const footer = this.props.footer || (
-            <Footer_default cancel_clicked={this.click_cancel.bind(this)}
-              ok_clicked={this.click_ok.bind(this)}
-              no_cancel_btn={this.props.no_cancel_btn}/>
-        );
+        let footer = null;
+        if (!this.props.no_footer)
+        {
+            footer = this.props.footer || (
+                <Footer_default cancel_clicked={this.click_cancel.bind(this)}
+                  ok_clicked={this.click_ok.bind(this)}
+                  no_cancel_btn={this.props.no_cancel_btn}/>
+            );
+        }
         return (
             <div id={this.props.id} tabIndex="-1"
               className={classnames('modal', 'fade', this.props.className)}>
@@ -167,7 +171,9 @@ const onboarding_steps = {
     ADD_PROXY_STARTED: 1,
     ADD_PROXY_DONE: 2,
     TEST_PROXY_CLICKED: 3,
-    HOWTO_CLICKED: 4,
+    TEST_PROXY_WATCHED: 4,
+    HOWTO_CLICKED: 5,
+    HOWTO_WATCHED: 6,
 };
 
 const presets = {
@@ -367,11 +373,17 @@ const presets = {
             opt.session_duration = 0;
             opt.session_random = false;
             opt.sticky_ip = false;
+            opt.proxy_count = 5;
+            opt.session_init_timeout = 5;
+            opt.race_reqs = 5;
         },
         clean: opt=>{
             opt.pool_size = 1;
             opt.keep_alive = 0;
             opt.multiply = 1;
+            opt.proxy_count = '';
+            opt.session_init_timeout = '';
+            opt.race_reqs = '';
         },
         rules: [
             {field: 'pool_size', label: "sets 'Pool size' to 50"},

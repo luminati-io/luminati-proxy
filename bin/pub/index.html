@@ -39,14 +39,25 @@
       <div ng-if="section.name!='settings' && section.name!='welcome'"
         class="lpm nav_left">
         <div class=menu>
-          <div ng-repeat="s in sections" ng-if="s.navbar" class="menu_item"
-            ng-class="{'active': s==section}" ui-state=s.name
+          <div ng-repeat="s in sections" ng-if="s.navbar" ui-state=s.name
             ng-click=zone_click(s.name)>
-            <div class="icon {{s.name}}"></div>
-            <div class=text>{{s.title}}</div>
+            <div class=menu_item ng-class="{'active': s==section}">
+              <div class="icon {{s.name}}"></div>
+              <div class=text>{{s.title}}</div>
+            </div>
+            <div class=children ng-if="false && s.children">
+              <div ng-repeat="c in s.children" class=menu_item>
+                <div class="icon {{c.name}}"></div>
+                <div class=text>{{c.title}}</div>
+              </div>
+            </div>
           </div>
         </div>
         <div class=menu_filler></div>
+        <div class=footer>
+          <a href=http://luminati.io/faq#proxy target="_blank">FAQ</a>
+          | <a href=mailto:lpm@luminati.io>Contact us</a>
+        </div>
       </div>
       <div class="container page-body">
         <ui-view></ui-view>
@@ -180,7 +191,9 @@
       </div>
     </div>
     <div react-view=add_proxy_modal></div>
+    <div react-view=welcome_modal></div>
+    <div react-view=progress_modal></div>
     <div id=notif_react_modal></div>
-  <script type="text/javascript" src="/8562db9786958c307b65.runtime.js"></script><script type="text/javascript" src="/46d3b23b3f0457b875ff.vendor.js"></script><script type="text/javascript" src="/d83c1767d2ab6e8bc2b8.app.js"></script></body>
+  <script type="text/javascript" src="/f0fdb2b6e7ac25e70abf.runtime.js"></script><script type="text/javascript" src="/25ea756facffeb874e60.vendor.js"></script><script type="text/javascript" src="/266bfe1afbace730eb84.app.js"></script></body>
 </html>
 

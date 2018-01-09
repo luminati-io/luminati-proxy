@@ -28,22 +28,10 @@ class ProtocolRow extends React.Component {
         evt.stopPropagation();
         this.props.enable_https_button_click(evt);
     };
-    render_https_button(){
-        if (this.props.stat.protocol!='https')
-          return null;
-        if (!this.props.show_enable_https_button)
-          return null;
-        return (
-            <CertificateButton text="Enable HTTPS Statistics"
-              onClick={this.handle_https_btn_click} />
-        );
-    }
     render(){
         let class_name = '';
         let click = ()=>{};
-        let https_button = this.render_https_button();
-        let value = !https_button||this.props.stat.value!='0' ?
-            this.props.stat.value : '';
+        let value = this.props.stat.value||0;
         if (this.props.go)
         {
             click = ()=>(window.location =
@@ -59,7 +47,7 @@ class ProtocolRow extends React.Component {
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
-                {value} {https_button}
+                {value}
               </td>
             </tr>
         );

@@ -72,6 +72,9 @@ class Add_proxy extends React.Component {
             const callbacks = setdb.get('head.callbacks');
             yield callbacks.proxies.update();
             $('#add_proxy_modal').modal('hide');
+            const curr_step = JSON.parse(window.localStorage.getItem(
+                'quickstart-step'));
+            window.localStorage.setItem('quickstart-first-proxy', port);
             if (opt.redirect)
             {
                 const state_opt = {port};
@@ -79,16 +82,12 @@ class Add_proxy extends React.Component {
                     state_opt.field = opt.field;
                 return yield callbacks.state.go('edit_proxy', state_opt);
             }
-            else if (window.location.pathname=='/setup_guide')
+            if (curr_step<=onboarding_steps.ADD_PROXY_STARTED)
             {
-                const curr_step = JSON.parse(window.localStorage.getItem(
-                    'quickstart-step'));
-                window.localStorage.setItem('quickstart-first-proxy', port);
-                if (curr_step==onboarding_steps.ADD_PROXY_STARTED);
-                {
-                    emitter.emit('setup_guide:set_step',
-                        onboarding_steps.ADD_PROXY_DONE);
-                }
+                emitter.emit('setup_guide:set_step',
+                    onboarding_steps.ADD_PROXY_DONE);
+                emitter.emit('setup_guide:progress_modal',`Great! You have`
+                    +` configured proxy on port ${port}`, 500);
             }
         }));
     }

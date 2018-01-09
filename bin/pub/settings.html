@@ -1,5 +1,5 @@
 <div ng-controller=settings id=settings-page class="lpm lum_login">
-  <div class="warning settings-alert" ng-if=user_error ng-bind-html=user_error.message>
+  <div class="warning error settings-alert" ng-if=user_error ng-bind-html=user_error.message>
     <div class=warning_icon></div>
   </div>
   <div ng-if="$root.mode=='root'&&$root.settings.argv" class=warning>

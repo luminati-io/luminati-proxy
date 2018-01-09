@@ -18,8 +18,8 @@ import status_codes_detail from './stats/status_codes_detail.js';
 import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
-import zwelcome from './welcome.js';
-import zsetup_guide from './setup_guide.js';
+import zwelcome_modal from './welcome.js';
+import {Progress_modal, Setup_guide} from './setup_guide.js';
 import zadd_proxy from './add_proxy.js';
 import znotif_center from './notif_center.js';
 import zedit_proxy from './edit_proxy.js';
@@ -178,18 +178,11 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
             $scope.react_component = protocols_detail; },
     });
     state_registry.register({
-        name: 'welcome',
-        parent: 'app',
-        url: '/welcome',
-        template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = zwelcome; },
-    });
-    state_registry.register({
         name: 'setup_guide',
         parent: 'app',
         url: '/setup_guide',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = zsetup_guide; },
+        controller: function($scope){ $scope.react_component = Setup_guide; },
     });
     state_registry.register({
         name: 'howto',
@@ -236,8 +229,9 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
                             !='dismissed')
                     {
                         $window.localStorage.setItem('quickstart-intro', true);
+                        $timeout(()=>$('#welcome_modal').modal(), 1500);
                         return resolve(transition.router.stateService.target(
-                                'welcome'));
+                                'setup_guide'));
                     }
                     if (transition.to().name!='settings')
                         return resolve(true);
@@ -420,14 +414,15 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     $proxies)=>
 {
     $scope.sections = [
-        {name: 'setup_guide', title: 'Setup guide', navbar: true},
+        {name: 'setup_guide', title: 'Start using', navbar: true},
         {name: 'settings', title: 'Settings', navbar: false},
-        {name: 'howto', title: 'How to use', navbar: true},
         {name: 'proxies', title: 'Proxies', navbar: true},
-        {name: 'zones', title: 'Zones', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
-        {name: 'tools', title: 'Tools', navbar: true},
-        {name: 'faq', title: 'FAQ', navbar: true},
+        {name: 'howto', title: 'Examples', navbar: true},
+        {name: 'tools', title: 'Tools', navbar: true, children: [
+            {name: 'howto', title: 'How to use', navbar: true},
+            {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
+        ]},
         {name: 'welcome', navbar: false},
     ];
     $transitions.onSuccess({}, function(transition){
@@ -476,6 +471,8 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     setdb.set('head.callbacks.state.go', $state.go);
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
+    $scope.$root.progress_modal = Progress_modal;
+    $scope.$root.welcome_modal = zwelcome_modal;
     $scope.$root.notif_center = znotif_center;
     var show_reload = function(){
         $window.$('#restarting').modal({
@@ -570,9 +567,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         $window.localStorage.setItem('suppressed_warnings',
             warnings.join('|||'));
     };
-    $scope.zone_click = function(name){
-        ga_event('navbar', 'click', name);
-    };
+    $scope.zone_click = function(name){ ga_event('navbar', 'click', name); };
 }]);
 
 module.controller('config', Config);
@@ -861,6 +856,10 @@ function Zones($scope, $http, $filter, $window){
     });
     $scope.edit_zone = function(zone){
         $window.location = 'https://luminati.io/cp/zones/'+zone;
+    };
+    $scope.new_zone = function(){
+        $window.location = 'https://luminati.io/cp/zones?add_new_zone=1';
+        ga_event('page: zones', 'click', 'new zone');
     };
 }
 
