@@ -113,17 +113,17 @@ class SuccessRatio extends React.Component {
               3xx or 404 HTTP status codes
             </Tooltip>;
         return (
-            <OverlayTrigger overlay={overallSuccessTooltip}
-              placement="top">
-              <Row className="overall-success-ratio" onMouseEnter={()=>{
-                util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
-              }}>
-                <Col sm={8} className="success_title">Overall success</Col>
-                <Col sm={4} className="success_value">
-                  {ratio.toFixed(2)}%
-                </Col>
-              </Row>
-            </OverlayTrigger>
+            <Row className="overall-success-ratio" onMouseEnter={()=>{
+              util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
+            }}>
+              <Col sm={8} className="success_title">
+                <OverlayTrigger overlay={overallSuccessTooltip}
+                  placement="top"><span>Overall success</span></OverlayTrigger>
+              </Col>
+              <Col sm={4} className="success_value">
+                {ratio.toFixed(2)}%
+              </Col>
+            </Row>
         );
     }
 }

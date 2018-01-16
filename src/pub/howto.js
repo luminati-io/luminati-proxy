@@ -5,9 +5,11 @@ import React from 'react';
 import $ from 'jquery';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code, onboarding_steps, emitter, Modal} from './common.js';
+import {Code, onboarding, emitter, Modal} from './common.js';
 import util from './util.js';
 import setdb from 'hutil/util/setdb';
+import etask from 'hutil/util/etask';
+import regeneratorRuntime from 'regenerator-runtime';
 
 const ga_event = util.ga_event;
 
@@ -23,16 +25,20 @@ class Howto extends React.Component {
         });
     }
     choose_click(option){
-        ga_event('How-to-tab', 'select code/browser', option);
         this.setState({option});
-        const curr_step = JSON.parse(window.localStorage.getItem(
-            'quickstart-step'));
-        if (curr_step==onboarding_steps.HOWTO_CLICKED)
-        {
-            emitter.emit('setup_guide:set_step',
-                onboarding_steps.HOWTO_WATCHED);
-            window.setTimeout(()=>$('#finish_onboarding_modal').modal(), 2000);
-        }
+        ga_event('How-to-tab', 'select code/browser', option);
+        etask(function*(){
+            const seen_examples = yield onboarding.has_seen_examples();
+            if (seen_examples)
+                return;
+            onboarding.check_seen_examples();
+            const all_done = yield onboarding.is_all_done();
+            if (all_done)
+            {
+                window.setTimeout(()=>
+                    $('#finish_onboarding_modal').modal(), 2000);
+            }
+        });
     }
     render(){
         let subheader;

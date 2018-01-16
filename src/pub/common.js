@@ -8,6 +8,7 @@ import * as Bootstrap from 'react-bootstrap';
 import regeneratorRuntime from 'regenerator-runtime';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
+import setdb from 'hutil/util/setdb';
 import EventEmitter from 'events';
 
 class Dialog extends React.Component {
@@ -166,14 +167,62 @@ const Input = props=>{
     );
 };
 
-const onboarding_steps = {
-    WELCOME: 0,
-    ADD_PROXY_STARTED: 1,
-    ADD_PROXY_DONE: 2,
-    TEST_PROXY_CLICKED: 3,
-    TEST_PROXY_WATCHED: 4,
-    HOWTO_CLICKED: 5,
-    HOWTO_WATCHED: 6,
+const onboarding = {
+    _is_checked(step){
+        if (!setdb.get('head.onboarding.steps') &&
+            !setdb.get('head.onboarding.loading'))
+        {
+            setdb.set('head.onboarding.loading', true);
+            etask(function*(){
+                const steps = yield ajax.json({url: '/api/get_onboarding'});
+                if (steps.done)
+                {
+                    steps.first_login = true;
+                    steps.welcome_modal = true;
+                    steps.created_proxy = true;
+                    steps.tested_proxy = true;
+                    steps.seen_examples = true;
+                }
+                setdb.set('head.onboarding.steps', steps);
+                setdb.set('head.onboarding.loading', false);
+            });
+        }
+        const et = etask.wait();
+        const listener = setdb.on('head.onboarding.steps', steps=>{
+            if (!steps)
+                return;
+            setdb.off(listener);
+            et.return(!!steps[step]||!!steps.done);
+        });
+        return et;
+    },
+    _check(step){
+        setdb.set('head.onboarding.steps.'+step, true);
+        return window.fetch('/api/update_onboarding', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({lpm_onboarding: {[step]: 1}}),
+        });
+    },
+    has_logged(){ return this._is_checked('first_login'); },
+    has_seen_welcome(){ return this._is_checked('welcome_modal'); },
+    has_created_proxy(){ return this._is_checked('created_proxy'); },
+    has_tested_proxy(){ return this._is_checked('tested_proxy'); },
+    has_seen_examples(){ return this._is_checked('seen_examples'); },
+    check_login(){ this._check('first_login'); },
+    check_welcome(){ this._check('welcome_modal'); },
+    check_created_proxy(){ this._check('created_proxy'); },
+    check_tested_proxy(){ this._check('tested_proxy'); },
+    check_seen_examples(){ this._check('seen_examples'); },
+    is_all_done(){
+        const _this = this;
+        return etask(function*(){
+            const proxy = yield _this.has_created_proxy();
+            const test = yield _this.has_tested_proxy();
+            const examples = yield _this.has_seen_examples();
+            return proxy && test && examples;
+        });
+    },
 };
 
 const presets = {
@@ -475,4 +524,4 @@ for (let k in presets)
 const emitter = new EventEmitter();
 
 export {Dialog, Code, If, Modal, Loader, Select, Input, Warnings,
-    Warning, onboarding_steps, presets, emitter};
+    Warning, onboarding, presets, emitter};

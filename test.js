@@ -1009,9 +1009,10 @@ describe('proxy', ()=>{
         it('should keep reserved session alive', etask._fn(function*(_this){
             _this.timeout(6000);
             yield l.test();
-            assert.equal(history.length, 1);
+            let hst = history.length;
+            assert.ok(hst<=2);
             yield etask.sleep(3000);
-            assert.notEqual(history.length, 1);
+            assert.ok(hst < history.length);
         }));
     });
 });
@@ -1145,6 +1146,7 @@ describe('manager', ()=>{
             let args = [
                 '--socks', `25000:${Manager.default.port}`,
                 '--socks', `26000:${Manager.default.port}`,
+                '--port', 24000,
             ];
             app = yield app_with_args(args);
             let res1 = yield etask.nfn_apply(request, [{
@@ -1233,7 +1235,7 @@ describe('manager', ()=>{
             assert_has(proxies, expected, 'proxies');
         }));
 
-        t('off', ['--no-dropin'], [{port: Manager.default.port}]);
+        t('off', ['--no-dropin'], []);
         t('on', ['--dropin'], [{port: Luminati.dropin.port,
             allow_proxy_auth: true}]);
     });
@@ -1499,7 +1501,7 @@ describe('manager', ()=>{
                 nock('https://luminati.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
-                app = yield app_with_args(qw`--customer mock_user
+                app = yield app_with_args(qw`--customer mock_user --port 24000
                     --request_stats`.concat(opt.args));
                 yield etask.nfn_apply(request, [{
                     proxy: 'http://127.0.0.1:24000',

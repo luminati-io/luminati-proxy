@@ -5,7 +5,7 @@ import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
 import {Input, Select, If, Loader, Modal, Warnings,
-    onboarding_steps, emitter} from './common.js';
+    onboarding, emitter} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import setdb from 'hutil/util/setdb';
@@ -51,14 +51,19 @@ const Nav = ()=>(
 class Request extends React.Component {
     constructor(props){
         super(props);
-        this.default_state = {headers: [], max_idx: 0, params: {proxy: '22225',
+        this.default_state = {headers: [], max_idx: 0, params: {
             url: 'http://lumtest.com/myip.json', method: 'GET'}};
         this.state = {...this.default_state, show_loader: false};
     }
     componentWillMount(){
         this.sp = etask('Request', function*(){ yield this.wait(); });
-        this.listeners = [setdb.on('head.proxies_running',
-            proxies=>this.setState({proxies}))];
+        this.listeners = [setdb.on('head.proxies_running', proxies=>{
+            if (!proxies||!proxies.length)
+                return;
+            this.setState({proxies});
+            this.setState(prev_state=>
+                ({params: {...prev_state.params, proxy: proxies[0].port}}));
+        })];
     }
     componentWillUnmount(){
         this.listeners.forEach(l=>setdb.off(l));
@@ -98,6 +103,14 @@ class Request extends React.Component {
     }
     go(){
         ga_event('proxy-tester-tab', 'run test');
+        if (!this.state.params.proxy)
+        {
+            ga_event('proxy-tester-tab', 'no proxy chosen');
+            this.setState({warnings:
+                [{msg: 'You need to choose a proxy first'}]});
+            $('#warnings_modal').modal();
+            return;
+        }
         const check_url = '/api/test/'+this.state.params.proxy;
         const body = {
             headers: this.state.headers.reduce((acc, el)=>{
@@ -123,15 +136,12 @@ class Request extends React.Component {
                 body: JSON.stringify(body),
             });
             const json_check = yield raw_check.json();
-            const curr_step = JSON.parse(window.localStorage.getItem(
-                'quickstart-step'));
-            if (curr_step==onboarding_steps.TEST_PROXY_CLICKED)
+            onboarding.check_tested_proxy();
+            const seen_examples = yield onboarding.has_seen_examples();
+            if (!seen_examples)
             {
-                emitter.emit('setup_guide:set_step',
-                    onboarding_steps.TEST_PROXY_WATCHED);
                 emitter.emit('setup_guide:progress_modal',
-                    'Looks good? now lets browse the web',
-                    2000);
+                    'Looks good? now lets browse the web', 2000);
             }
             _this.setState({show_loader: false});
             _this.props.update_response(json_check.response);

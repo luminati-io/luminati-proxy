@@ -12,6 +12,8 @@ import date from 'hutil/util/date';
 import csv from 'hutil/util/csv';
 import zurl from 'hutil/util/url';
 import setdb from 'hutil/util/setdb';
+import etask from 'hutil/util/etask';
+import regeneratorRuntime from 'regenerator-runtime';
 import req_stats from './stats/stats.js';
 import status_codes from './stats/status_codes.js';
 import status_codes_detail from './stats/status_codes_detail.js';
@@ -21,6 +23,7 @@ import protocols from './stats/protocols.js';
 import zwelcome_modal from './welcome.js';
 import {Progress_modal, Setup_guide} from './setup_guide.js';
 import zadd_proxy from './add_proxy.js';
+import zno_proxies from './no_proxies.js';
 import znotif_center from './notif_center.js';
 import zedit_proxy from './edit_proxy.js';
 import zhowto from './howto.js';
@@ -42,7 +45,7 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
-import {presets} from './common.js';
+import {presets, onboarding} from './common.js';
 
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -86,7 +89,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     _analytics_provider)
 {
     $location_provider.html5Mode(true);
-    $uibTooltipProvider.options({placement: 'bottom'});
+    $uibTooltipProvider.options({placement: 'top', container: 'body'});
     _analytics_provider.delayScriptTag(true);
     analytics_provider = _analytics_provider;
 
@@ -215,34 +218,29 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
     var logged_in_resolver = $q.defer();
     $rootScope.logged_in = logged_in_resolver.promise;
     $transitions.onBefore({to: function(state){
-        $timeout(function(){
-            $rootScope.hide_quickstart = !!(state.data||{}).hide_quickstart;
-        });
         return !['app', 'faq'].includes(state.name);
     }}, function(transition){
-        return $q(function(resolve, reject){
-            $q.resolve($rootScope.logged_in).then(function(logged_in){
-                if (logged_in)
+        return etask(function*(){
+            const logged_in = yield $q.resolve($rootScope.logged_in);
+            const seen_welcome = yield onboarding.has_seen_welcome();
+            if (logged_in)
+            {
+                if (!seen_welcome)
                 {
-                    if (!$window.localStorage.getItem('quickstart-intro')
-                        && $window.localStorage.getItem('quickstart')
-                            !='dismissed')
-                    {
-                        $window.localStorage.setItem('quickstart-intro', true);
-                        $timeout(()=>$('#welcome_modal').modal(), 1500);
-                        return resolve(transition.router.stateService.target(
-                                'setup_guide'));
-                    }
-                    if (transition.to().name!='settings')
-                        return resolve(true);
-                    return resolve(transition.router.stateService.target(
-                            'proxies', undefined, {location: true}));
+                    $timeout(()=>$('#welcome_modal').modal(), 1000);
+                    onboarding.check_welcome();
+                    return transition.router.stateService.target(
+                        'setup_guide', undefined, {location: true});
                 }
-                if (transition.to().name=='settings')
-                    return resolve(true);
-                return resolve(transition.router.stateService.target(
-                    'settings', undefined, {location: false}));
-            });
+                if (transition.to().name!='settings')
+                    return true;
+                return transition.router.stateService.target(
+                    'proxies', undefined, {location: true});
+            }
+            if (transition.to().name=='settings')
+                return true;
+            return transition.router.stateService.target(
+                'settings', undefined, {location: false});
         });
     });
     $http.get('/api/mode').then(function(data){
@@ -438,12 +436,6 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         $rootScope.settings = settings.data;
         $rootScope.beta_features = settings.data.argv
             .includes('beta_features');
-        if (!$rootScope.settings.request_disallowed&&
-            !$rootScope.settings.customer)
-        {
-            if (!$window.localStorage.getItem('quickstart'))
-                $window.localStorage.setItem('quickstart', 'show');
-        }
     });
     $http.get('/api/ip').then(function(ip){
         $scope.ip = ip.data.ip; });
@@ -469,8 +461,10 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     $proxies.update();
     setdb.set('head.callbacks.proxies.update', $proxies.update);
     setdb.set('head.callbacks.state.go', $state.go);
+    window.setdb = setdb;
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
+    $scope.$root.no_proxies = zno_proxies;
     $scope.$root.progress_modal = Progress_modal;
     $scope.$root.welcome_modal = zwelcome_modal;
     $scope.$root.notif_center = znotif_center;
@@ -536,16 +530,8 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         };
         $window.$('#confirmation').modal();
     };
-    $scope.logout = function(){
-        $http.post('/api/logout').then(function(){
-            show_reload();
-            setTimeout(function _check_reload(){
-                const retry = ()=>{ setTimeout(_check_reload, 500); };
-                $http.get('/proxies').then(function(res){
-                    $window.location = '/'; }, retry);
-            }, 3000);
-        });
-    };
+    $scope.logout = ()=>{
+        $http.post('/api/logout').then(()=>{ $window.location = '/'; }); };
     $scope.warnings = function(){
         if (!$rootScope.run_config||!$rootScope.run_config.warnings)
             return [];
@@ -738,19 +724,6 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
             $window.location.reload(); }, function(){
                 setTimeout(check_reload, 500); });
     };
-    var show_reload = function(){
-        $window.$('#restarting').modal({
-            backdrop: 'static',
-            keyboard: false,
-        });
-    };
-    const send_event_user_logged = ()=>{
-        if (!$window.localStorage.getItem('quickstart-intro') &&
-            $window.localStorage.getItem('quickstart')!='dismissed')
-        {
-            ga_event('lpm-onboarding', '02 login successful', 'new user');
-        }
-    };
     $scope.user_data = {username: '', password: ''};
     let token;
     $scope.save_user = function(){
@@ -780,7 +753,7 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
         $scope.user_error = null;
         if ($scope.user_customers)
             creds.customer = $scope.user_data.customer;
-        $http.post('/api/creds_user', creds).then(function(d){
+        $http.post('/api/creds_user', creds).then(d=>{
             if (d.data.customers)
             {
                 $scope.saving_user = false;
@@ -789,13 +762,12 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
             }
             else
             {
-                send_event_user_logged();
-                show_reload();
-                setTimeout(check_reload, 3000);
+                onboarding.check_login();
+                check_reload();
             }
-        }).catch(function(error){
+        }).catch(e=>{
             $scope.saving_user = false;
-            $scope.user_error = error.data.error;
+            $scope.user_error = e.data.error;
         });
     };
     $scope.google_click = function(e){
@@ -896,8 +868,6 @@ function($scope, $http, $filter, $window){
             $scope.proxies.push(
                 [''+proxies.data[i].port, ''+proxies.data[i].port]);
         }
-        if (!$scope.proxy)
-            $scope.proxy = $scope.proxies[1][0];
     });
     $scope.request = {};
     $scope.go = function(proxy){
@@ -1098,10 +1068,13 @@ function check_reg_exp(v){
 
 module.controller('proxies', Proxies);
 Proxies.$inject = ['$scope', '$rootScope', '$http', '$proxies', '$window',
-    '$q', '$timeout', '$stateParams', '$success_rate'];
+    '$q', '$timeout', '$stateParams', '$success_rate', '$state'];
 function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
-    $stateParams, $success_rate)
+    $stateParams, $success_rate, $state)
 {
+    $scope.ratio_tooltip = 'Ratio of successful requests out of total'
+    +' requests, where successful requests are calculated as 2xx, 3xx or 404'
+    +' HTTP status codes';
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     $success_rate.listen();
@@ -1114,16 +1087,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         {
             key: 'port',
             title: 'Port',
-            type: 'number',
-            check: function(v, config){
-                if (check_number(v) && v>=24000)
-                {
-                    var conflicts = $proxies.proxies.filter(function(proxy){
-                        return proxy.port==v&&proxy.port!=config.port; });
-                    return !conflicts.length;
-                }
-                return false;
-            },
         },
         {
             key: '_status',
@@ -1421,6 +1384,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     });
     $scope.proxies_loading = function(){
         return !$scope.proxies || !$scope.consts || !$scope.defaults; };
+    $scope.edit_proxy = proxy=>{
+        $state.go('edit_proxy', {port: proxy.port}); };
     $scope.dup_proxies = proxy=>{
         $scope.$root.confirmation = {
             text: 'Are you sure you want to duplicate the proxy?',

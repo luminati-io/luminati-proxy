@@ -130,7 +130,6 @@ const show_port_conflict = (addr, port)=>{
 };
 
 let run = run_config=>{
-    console.log(`Starting Luminati version ${version}`);
     manager = new Manager(args, Object.assign({ua}, run_config));
     if (!manager.argv.no_usage_stats)
         ua.event('app', 'run');

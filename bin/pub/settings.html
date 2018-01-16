@@ -36,56 +36,70 @@
     <pre class=top-margin>npm uninstall -g @luminati-io/luminati-proxy</pre>
     <pre class=top-margin>npm install -g @luminati-io/luminati-proxy</pre>
   </div>
-  <div class=row>
-    <div class="col-xs-12 text-center">
-      <h3>Login with your luminati.io credentials</h3>
-    </div>
+  <div class="row login_header">
+    <h3>Login with your luminati.io credentials</h3>
   </div>
-  <div class=row>
-    <div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8
-      col-md-offset-3 col-md-6 col-lg-offset-4 col-lg-4">
-      <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
-        <div ng-hide="user_customers || google_login" class=btn_google_wrapper>
-          <a class="btn btn_lpm btn_google" ng-click=google_click($event)
-            href="https://accounts.google.com/o/oauth2/v2/auth?client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.googleusercontent.com&response_type=code&redirect_uri=https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account">
-            <div class=img></div>
-            Log in with Google
-          </a>
+  <div class="login_form" ng-if=!user_customers>
+    <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
+      <div class="row">
+        <div class="col col_google col-sm-6">
+          <h2>Using your Google account</h2>
+          <div ng-hide="google_login" class=btn_google_wrapper>
+            <a class="btn btn_lpm btn_google" ng-click=google_click($event)
+              href="https://accounts.google.com/o/oauth2/v2/auth?client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.googleusercontent.com&response_type=code&redirect_uri=https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account">
+              <div class=img></div>
+              Log in with Google
+            </a>
+          </div>
         </div>
-        <div class=form-group ng-hide="user_customers || google_login"
-          ng-class="{'has-error': user_error&&user_error.username}">
-          <label for=username>Email</label>
-          <input type=email name=username id=username
-            ng-model=user_data.username ng-disabled=user_customers>
+        <div class="col col_pass col-sm-6">
+          <h2>Using your work email</h2>
+          <div class=form-group ng-hide="google_login"
+            ng-class="{'has-error': user_error&&user_error.username}">
+            <label for=username>Email</label>
+            <input type=email name=username id=username
+              ng-model=user_data.username>
+          </div>
+          <div class=form-group ng-hide="google_login"
+            ng-class="{'has-error': user_error&&user_error.password}">
+            <label for=user_password>Password</label>
+            <input type=password name=password id=user_password
+              ng-model=user_data.password>
+          </div>
+          <button type=submit class="btn btn_lpm btn_login"
+            ng-disabled=saving_user>
+            {{saving_user ? 'Logging in...' : 'Log in'}}
+          </button>
         </div>
-        <div class=form-group ng-hide="user_customers || google_login"
-          ng-class="{'has-error': user_error&&user_error.password}">
-          <label for=user_password>Password</label>
-          <input type=password name=password id=user_password
-            ng-model=user_data.password ng-disabled=user_customers>
-        </div>
-        <div class="warning choose_customer" ng-if=user_customers>
-          Please choose a customer.</div>
-        <div class=form-group ng-if=user_customers>
-          <label for=user_customer>Customer</label>
-          <ui-select id=user_customer ng-model=user_data.customer>
-            <ui-select-match placeholder="select customer">
-              {{$select.selected}}</ui-select-match>
-            <ui-select-choices ui-disable-choice="$index==50"
-              repeat="c in user_customers|filter:$select.search|limitTo:51">
-              <span>{{$index==50 ? 'start typing to see more...' : c}}</span>
-            </ui-select-choices>
-          </ui-select>
-        </div>
-        <button type=submit class="btn btn_lpm btn_login"
-          ng-disabled=saving_user>
-          {{saving_user ? 'Logging in...' : 'Log in'}}
-        </button>
+        <div class=or_circle>Or</div>
+      </div>
+      <div class=row>
         <div class=signup>
           You do not have an account?
           <a href="https://luminati.io/?need_signup=1" target=_blank>Sign up</a>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
+  </div>
+  <div class="row customers_form" ng-if=user_customers>
+    <form ng-if="$root.mode=='root'" name=user ng-submit=save_user()>
+      <div class="warning choose_customer">
+        Please choose a customer.</div>
+      <div class=form-group>
+        <label for=user_customer>Customer</label>
+        <ui-select id=user_customer ng-model=user_data.customer>
+          <ui-select-match placeholder="select customer">
+            {{$select.selected}}</ui-select-match>
+          <ui-select-choices ui-disable-choice="$index==50"
+            repeat="c in user_customers|filter:$select.search|limitTo:51">
+            <span>{{$index==50 ? 'start typing to see more...' : c}}</span>
+          </ui-select-choices>
+        </ui-select>
+      </div>
+      <button type=submit class="btn btn_lpm btn_login"
+        ng-disabled=saving_user>
+        {{saving_user ? 'Logging in...' : 'Log in'}}
+      </button>
+    </form>
   </div>
 </div>

@@ -3,11 +3,7 @@
     class="warning warning_upgrade">
     <div class="warning_icon"></div>
     <div>
-      A new version <strong>{{$parent.ver_last.version}}</strong> is available, see
-      <a target="_blank"
-        href=https://github.com/luminati-io/luminati-proxy/blob/master/CHANGELOG.md#luminati-proxy-manager---change-log>change
-        log
-      </a> for specifics.
+      A new version <strong>{{$parent.ver_last.version}}</strong> is available
     </div>
     <div class="buttons buttons_upgrade">
       <button class="btn btn_lpm btn_upgrade" ng-click=upgrade()
@@ -17,7 +13,7 @@
       </button>
       <a ng-href="https://github.com/luminati-io/luminati-proxy/releases/download/v{{$parent.ver_last.version}}/luminati-proxy-manager-v{{$parent.ver_last.version}}-setup.exe"
         ng-if="is_electron()">
-        Download upgrade
+        Upgrade
       </a>
     </div>
     <div ng-if=ver_node&&!ver_node.satisfied&&!is_electron()>

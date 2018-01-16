@@ -75,12 +75,12 @@ class StatusCodeRow extends React.Component {
         }
         return (
             <tr className={class_name} onClick={click}>
-              <OverlayTrigger overlay={tooltip} placement="top">
-                <td>
+              <td>
+                <OverlayTrigger overlay={tooltip} placement="top">
                   <a href={`${this.props.path}/`+this.props.stat.status_code}>
                     {this.props.stat.status_code}</a>
-                </td>
-              </OverlayTrigger>
+                </OverlayTrigger>
+              </td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>

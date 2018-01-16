@@ -9,7 +9,7 @@ import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import {If, Modal, Loader, Select, Input, Warning, Warnings, presets,
-    onboarding_steps, emitter} from './common.js';
+    onboarding, emitter} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -578,6 +578,7 @@ class Index extends React.Component {
         const update_url = '/api/proxies/'+this.port;
         const _this = this;
         return etask(function*(){
+            const tested_proxy = yield onboarding.has_tested_proxy();
             const raw_update = yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -590,12 +591,9 @@ class Index extends React.Component {
             if (status.status=='ok')
             {
                 ga_event('top bar', 'click save', 'successful');
-                const curr_step = JSON.parse(window.localStorage.getItem(
-                    'quickstart-step'));
-                if (curr_step==onboarding_steps.ADD_PROXY_STARTED)
+                onboarding.check_created_proxy();
+                if (!tested_proxy)
                 {
-                    emitter.emit('setup_guide:set_step',
-                        onboarding_steps.ADD_PROXY_DONE);
                     emitter.emit('setup_guide:progress_modal',`Great! You have`
                         +` configured proxy on port ${data.port}`, 1500);
                 }
@@ -798,8 +796,12 @@ class Index extends React.Component {
         }
         const support = presets && this.state.form.preset &&
             presets[this.state.form.preset].support||{};
-        const zones = this.state.consts&&
+        let zones = this.state.consts&&
             this.state.consts.proxy.zone.values||[];
+        zones = zones.filter(z=>{
+            const plan = z.plans && z.plans.slice(-1)[0] || {};
+            return !plan.archive && !plan.disable;
+        });
         const default_zone=this.state.consts&&
             this.state.consts.proxy.zone.def;
         const warning_dirty = (<span>
@@ -979,8 +981,8 @@ class Tooltip_icon extends React.Component {
     render(){
         return this.props.title ?
             <div className="info_icon" data-toggle="tooltip"
-              data-placement="bottom" title={this.props.title}
-              ref={this.save_ref.bind(this)}/> : null;
+              data-placement="top" title={this.props.title}
+              data-container="body" ref={this.save_ref.bind(this)}/> : null;
     }
 }
 
@@ -1203,15 +1205,21 @@ class Targeting extends React.Component {
         const curr_plan = this.props.get_curr_plan();
         return curr_plan&&(curr_plan.type=='static'||curr_plan.vip);
     }
+    show_dc_note(){
+        const curr_plan = this.props.get_curr_plan();
+        return curr_plan&&curr_plan.type=='static';
+    }
     render(){
         return (
             <With_data {...this.props} tab_id="target">
-              <Note>
-                <span>To change Data Center country visit your </span>
-                <a target="_blank" rel="noopener noreferrer"
-                  href="https://luminati.io/cp/zones">zone page</a>
-                <span> and change your zone plan.</span>
-              </Note>
+              <If when={this.show_dc_note()}>
+                <Note>
+                  <span>To change Data Center country visit your </span>
+                  <a target="_blank" rel="noopener noreferrer"
+                    href="https://luminati.io/cp/zones">zone page</a>
+                  <span> and change your zone plan.</span>
+                </Note>
+              </If>
               <Section_with_fields type="select" id="country"
                 data={this.allowed_countries()}
                 on_change={this.country_changed.bind(this)}

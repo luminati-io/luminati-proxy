@@ -60,8 +60,6 @@ class Stats extends React.Component {
     componentDidMount(){
         E.install();
         const _this = this;
-        if (window.localStorage.getItem('quickstart-test-proxy'))
-            window.localStorage.setItem('quickstart-stats', true);
         E.sp.spawn(etask(function*(){
             const res = yield Common.StatsService.get_all({sort: 1,
                 by: 'hostname'});

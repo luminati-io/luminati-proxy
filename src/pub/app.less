@@ -232,41 +232,11 @@ div.proxies .btn-wrapper {
 .proxies-table-input input, .proxies-table-input select {
     width: 100%;
 }
-.proxies-check { width: 32px; }
 .col_success_rate {
     white-space: nowrap;
     width: 80px;
 }
-.proxies-actions {
-    white-space: nowrap;
-    width: 80px;
-}
-.proxies-action {
-    cursor: pointer;
-    color: #428bca;
-    outline: 3px solid transparent;
-    border: 1px solid transparent;
-    line-height: 20px;
-    margin: 0;
-}
-.proxies-action-disabled {
-    border: 1px solid transparent;
-    line-height: 20px;
-    margin: 0;
-}
-a.proxies-action-edit {
-    visibility: hidden;
-    &:hover {
-        background: none;
-        border-color: transparent;
-        box-shadow: none;
-    }
-}
-.proxies tr:hover .proxies-action-edit {
-    visibility: visible;
-    cursor: pointer;
-}
-.proxies-action-delete, .proxies-action-duplicate { cursor: pointer; }
+.proxies-actions { white-space: nowrap; }
 .proxies-warning { color: red; }
 #history .modal-dialog, #history_details .modal-dialog, #pool .modal-dialog {
     width: auto;
@@ -354,53 +324,95 @@ a.proxies-action-edit {
     text-align: center;
 }
 .lum_login {
+    .login_form {
+        position: relative;
+        max-width: 800px;
+        margin: auto;
+        .col {
+            padding: 15px 55px;
+            h2 {
+                text-align: center;
+                font-size: 20px;
+                color: #818c93;
+                font-weight: 300;
+                margin-bottom: 35px;
+            }
+        }
+        .col_google {
+            text-align: center;
+            .btn_google_wrapper, .btn_google_wrapper:hover,
+            .btn_google_wrapper:active {
+                text-align: center;
+                .btn_google {
+                    margin: 46px 0 40px 0;
+                    padding: 4px 0;
+                    width: 240px;
+                    height: 40px;
+                    color: white;
+                    background-color: #df4a32;
+                    border: none;
+                    .img {
+                        background-image: url(/img/google.svg);
+                        width: 20px;
+                        height: 20px;
+                        display: inline-block;
+                        position: relative;
+                        top: 5px;
+                        right: 20px;
+                    }
+                }
+            }
+        }
+        .col_pass {
+            border-left: 1px solid #dde1e2;
+        }
+        .or_circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            border: 1px solid #ddd;
+            text-align: center;
+            line-height: 30px;
+            margin-left: -15px;
+            margin-top: -42px;
+            background-color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+        .signup {
+            margin-top: 25px;
+            color: #818c93;
+            letter-spacing: 1px;
+            text-align: center;
+            font-size: 1.1em;
+            a, a:hover { margin-left: 6px; text-decoration: none; }
+        }
+    }
+    .customers_form {
+        width: 500px;
+        margin: auto;
+    }
     .warning {
         position: relative;
         top: -20px;
         a { margin: 0 6px; }
-    }
-    h3 {
-        font-weight: bold;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    .btn_google_wrapper, .btn_google_wrapper:hover,
-    .btn_google_wrapper:active {
-        text-align: center;
-        .btn_google {
-            margin: 46px 0 40px 0;
-            padding: 4px 0;
-            width: 240px;
-            height: 40px;
-            color: white;
-            background-color: #df4a32;
-            border: none;
-            .img {
-                background-image: url(/img/google.svg);
-                width: 20px;
-                height: 20px;
-                display: inline-block;
-                position: relative;
-                top: 5px;
-                right: 20px;
-            }
-        }
     }
     .btn.btn_lpm.btn_login {
         margin: 20px 0;
         width: 100%;
         height: 40px;
     }
-    .signup {
-        text-align: center;
-        font-size: 14px;
-        a, a:hover { text-decoration: none; }
-    }
     .warning.choose_customer { top: 0; margin: 20px 0; }
     label {
         font-size: 14px;
         font-weight: 300;
         margin-bottom: 3px;
+    }
+    .login_header {
+        h3 { font-size: 30px; }
+        margin-bottom: 30px;
+        text-align: center;
     }
 }
 .panel .panel-heading button.btn.btn-ico {
@@ -421,19 +433,18 @@ a.proxies-action-edit {
     height: 100%;
     vertical-align: baseline;
 }
-.panel .panel-heading button.btn.btn-ico[disabled] img {
-    opacity: 0.25;
-}
-.tooltip.in {
-    opacity: 1;
-}
+.panel .panel-heading button.btn.btn-ico[disabled] img { opacity: 0.25; }
+.tooltip.in { opacity: 1; }
 .tooltip-proxy-status .tooltip-inner, .tooltip-default .tooltip-inner,
 .tooltip .tooltip-inner {
     max-width: 250px;
-    border: solid 1px black;
-    background: #fff;
-    color: black;
+    border: solid 1px @second_color;
+    background: white;
+    color: @first_color;
+    font-size: 13px;
 }
+.tooltip.top .tooltip-arrow { border-top-color: @second_color; }
+.tooltip.bottom .tooltip-arrow { border-bottom-color: @second_color; }
 .status-details-wrapper {
     background-color: @warning;
     font-size: 12px;
@@ -441,7 +452,7 @@ a.proxies-action-edit {
 table.table-hover tbody tr.status-details-wrapper:hover {
     background-color: @warning;
 }
-.proxy_status { position: relative; }
+.proxy_status { position: relative; width: 23px; }
 .text-err { color: #d8393c; }
 .text-ok { color: #4ca16a; }
 .text-warn { color: #f5a623; }
@@ -1242,18 +1253,20 @@ input.form-control[type=checkbox] {
             top: 2px;
             position: relative;
             display: inline-block;
-            cursor: pointer;
             margin: 0 1px;
-            &.edit {
-                opacity: 0.4;
-                background: url(/img/edit.svg);
-            }
+            opacity: 0.3;
+            cursor: pointer;
+            &.edit { background: url(/img/edit.svg); }
             &.refresh { background: url(/img/refresh.svg); }
             &.history { background: url(/img/history.svg); }
             &.pool { background: url(/img/pool.svg); }
             &.duplicate { background: url(/img/duplicate.svg); }
             &.delete { background: url(/img/trash.svg); }
-            &.disabled { opacity: 0.3; cursor: default; }
+            &:hover { opacity: 1; }
+            &.disabled {
+                cursor: default;
+                &:hover { opacity: 0.3; }
+            }
         }
         .btn {
             padding: 0 4px;
@@ -1579,7 +1592,7 @@ input.form-control[type=checkbox] {
         }
     }
     .btn_lang { margin: 0 2px; }
-    .onboarding_buttons { display: flex; }
+    .onboarding_buttons { text-align: center; }
     // XXX krzysztof: move it to .lpm to make it common
     .instructions {
         margin-left: 30px;
@@ -1766,12 +1779,14 @@ input.form-control[type=checkbox] {
         background-color: @x_light;
         display: inline-block;
     }
-    .logo {
-        background-image: url('img/luminati_logo_2.svg');
+    .logo, .logo:hover {
+        display: block;
+        background-image: url('img/logo_1.svg');
+        cursor: pointer;
         width: 166px;
         height: 35px;
         position: relative;
-        top: 8px;
+        top: 9px;
         left: 24px;
     }
     .version {
@@ -1779,8 +1794,8 @@ input.form-control[type=checkbox] {
         font-weight: bold;
         float: right;
         position: relative;
-        top: 4px;
-        right: 3px;
+        top: -8px;
+        right: 32px;
         opacity: 0.5;
     }
     .nav_top_right {
@@ -1858,6 +1873,46 @@ input.form-control[type=checkbox] {
             .text {
                 font-size: 13px;
             }
+        }
+    }
+}
+.no_proxies {
+    text-align: center;
+    .attention_img {
+        background: url(/img/attention.svg);
+        width: 40px;
+        height: 40px;
+        margin: 40px auto 30px;
+    }
+    .header {
+        height: auto;
+        h1 {
+            font-size: 30px;
+            line-height: 1;
+        }
+    }
+    .sub_header {
+        max-width: 500px;
+        margin: 12px auto 20px;
+        h2 {
+            letter-spacing: normal;
+            font-size: 18px;
+            font-weight: 300;
+        }
+    }
+    .btn_add_port {
+        margin: 20px auto;
+        height: 40px;
+        width: 210px;
+        font-weight: 300;
+        .img {
+            position: relative;
+            right: 12px;
+            top: 4px;
+            display: inline-block;
+            background: url(/img/create.svg);
+            width: 20px;
+            height: 20px;
         }
     }
 }

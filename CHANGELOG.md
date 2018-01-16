@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.79.346
+- :bug: fixed socks5 for Firefox browser
+- :sparkles: ui improvments
+
 ## 1.78.485
 - :star: onboarding flow for easier setup
 - :sparkles: multiple ui improvments

@@ -7,7 +7,7 @@ import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {If, Modal, Loader, onboarding_steps, presets,
+import {If, Modal, Loader, onboarding, presets,
     emitter} from './common.js';
 import util from './util.js';
 
@@ -22,8 +22,15 @@ class Add_proxy extends React.Component {
         this.state = {zone: '', preset: 'sequential', show_loader: false};
     }
     componentWillMount(){
-        this.listener = setdb.on('head.consts', consts=>
-            this.setState({consts, zones: consts&&consts.proxy.zone.values}));
+        this.listener = setdb.on('head.consts', consts=>{
+            if (!consts)
+                return;
+            const zones = (consts.proxy.zone.values||[]).filter(z=>{
+                const plan = z.plans && z.plans.slice(-1)[0] || {};
+                return !plan.archive && !plan.disable;
+            });
+            this.setState({consts, zones});
+        });
     }
     componentWillUnmount(){ setdb.off(this.listener); }
     persist(){
@@ -69,11 +76,11 @@ class Add_proxy extends React.Component {
         const _this = this;
         this.sp.spawn(etask(function*(){
             const port = yield _this.persist();
+            onboarding.check_created_proxy();
             const callbacks = setdb.get('head.callbacks');
             yield callbacks.proxies.update();
+            const tested_proxy = yield onboarding.has_tested_proxy();
             $('#add_proxy_modal').modal('hide');
-            const curr_step = JSON.parse(window.localStorage.getItem(
-                'quickstart-step'));
             window.localStorage.setItem('quickstart-first-proxy', port);
             if (opt.redirect)
             {
@@ -82,10 +89,8 @@ class Add_proxy extends React.Component {
                     state_opt.field = opt.field;
                 return yield callbacks.state.go('edit_proxy', state_opt);
             }
-            if (curr_step<=onboarding_steps.ADD_PROXY_STARTED)
+            if (!tested_proxy)
             {
-                emitter.emit('setup_guide:set_step',
-                    onboarding_steps.ADD_PROXY_DONE);
                 emitter.emit('setup_guide:progress_modal',`Great! You have`
                     +` configured proxy on port ${port}`, 500);
             }

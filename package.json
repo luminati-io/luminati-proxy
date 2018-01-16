@@ -66,7 +66,7 @@
     "semver": "^5.3.0",
     "sequelize": "^3.30.2",
     "@luminati-io/socksv5": "0.0.7",
-    "sqlite3": "3.1.8",
+    "sqlite3": "3.1.13",
     "sudo-prompt": "^6.2.1",
     "taskkill": "^2.0.0",
     "tasklist": "^3.1.0",
@@ -125,7 +125,8 @@
     "react-bootstrap-typeahead": "^2.0.2"
   },
   "engines": {
-    "node": ">=6&&<9"
+    "node": ">=6",
+    "npm": ">=4.6.1"
   },
   "homepage": "https://luminati.io/",
   "keywords": [
@@ -152,11 +153,13 @@
       "bin/pub/history.html",
       "bin/pub/img/add.svg",
       "bin/pub/img/arrow_down.svg",
+      "bin/pub/img/attention.svg",
       "bin/pub/img/bell.svg",
       "bin/pub/img/check.svg",
       "bin/pub/img/check_radio.svg",
       "bin/pub/img/columns.svg",
       "bin/pub/img/country.png",
+      "bin/pub/img/create.svg",
       "bin/pub/img/debug.svg",
       "bin/pub/img/delete.svg",
       "bin/pub/img/down.svg",
@@ -201,6 +204,7 @@
       "bin/pub/img/info.svg",
       "bin/pub/img/loader.gif",
       "bin/pub/img/logo.png",
+      "bin/pub/img/logo_1.svg",
       "bin/pub/img/lpm_infographics.png",
       "bin/pub/img/luminati_logo_2.svg",
       "bin/pub/img/ok_warning.svg",
@@ -265,6 +269,7 @@
       "src/pub/index.html",
       "src/pub/instructions.js",
       "src/pub/notif_center.js",
+      "src/pub/no_proxies.js",
       "src/pub/proxy_tester.js",
       "src/pub/setup_guide.js",
       "src/pub/stats/common.js",
@@ -280,7 +285,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "b9984a5bb9e530a53825a787c5f3a52f"
+    "md5": "212802b1062ae45abd5c5ed06a14c5a7"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -319,5 +324,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.78.485"
+  "version": "1.79.346"
 }

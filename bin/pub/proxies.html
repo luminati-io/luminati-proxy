@@ -14,15 +14,15 @@
   <div ng-hide=!proxies_loading() class="alert alert-info">
     Loading...
   </div>
-  <div class="lpm">
+  <div react-view=no_proxies ng-show="proxies && !proxies.length"></div>
+  <div ng-show="proxies && proxies.length" class="lpm">
     <div class="col-md-12 nav_header">
       <h3>My Proxies</h3>
       <div class="subtitle">
-        Create, edit and view your configured proxy ports on this computer
-      </div>
+        Create, edit and view your configured proxy ports on this computer</div>
     </div>
   </div>
-  <div class="col-lg-8 lpm proxies">
+  <div ng-show="proxies && proxies.length" class="col-lg-8 lpm proxies">
     <div ng-if=!proxies_loading() class="panel proxies_panel">
       <div class=panel_heading>
         <h2>Proxies</h2>
@@ -49,11 +49,10 @@
         <table class="table table-hover proxies">
           <thead>
             <tr>
-              <th class=proxies-check></th>
+              <th>Actions</th>
               <th ng-repeat="col in columns" ng-class="'col_'+col.key">
                 {{col.title}}
               </th>
-              <th class=proxies-actions>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -61,19 +60,69 @@
               |startFrom:(pagination.page-1)*pagination.per_page
               |limitTo:pagination.per_page"
               ng-class="{opened: showed_status_proxies[proxy.port]}">
-              <td>
-                <a ng-if="$root.mode!='guest'&&is_action_available('edit',
-                  proxy)"
-                  href="proxy/{{proxy.port}}"
-                  uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
-                  class=proxies-action-edit>
-                  <div class="action_icon edit"></div>
-                </a>
+              <td class=proxies-actions>
+                <div ng-if="$root.mode!='guest'&&is_action_available('delete',
+                  proxy)" ng-click=delete_proxies(proxy.port)
+                  uib-tooltip=Delete tooltip-class=tooltip-default
+                  class="action_icon delete">
+                </div>
+                <div ng-if="$root.mode=='guest'||!is_action_available('delete',
+                  proxy)" uib-tooltip="You can't delete this Proxy"
+                  tooltip-class=tooltip-default
+                  class="action_icon delete disabled">
+                </div>
+                <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session
+                  ng-click=show_pool(proxy)
+                  uib-tooltip="Current pool" tooltip-class=tooltip-default
+                  class="action_icon pool">
+                </div>
+                <div ng-if=!proxy.pool_size&&!proxy.sticky_ip&&!proxy.session
+                  uib-tooltip="Pool empty; size is set to zero"
+                  tooltip-class=tooltip-default
+                  class="action_icon pool disabled">
+                </div>
+                <div ng-if=proxy._history
+                  ng-click=show_history(proxy)
+                  uib-tooltip=History tooltip-class=tooltip-default
+                  class="action_icon history">
+                </div>
+                <div ng-if=!proxy._history
+                  uib-tooltip="No history" tooltip-class=tooltip-default
+                  class="action_icon history disabled">
+                </div>
+                <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session===true
+                  ng-click=refresh_sessions(proxy)
+                  uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default
+                  class="action_icon refresh">
+                </div>
+                <div
+                  ng-if=!proxy.pool_size&&!proxy.sticky_ip&&proxy.session!==true
+                  uib-tooltip="No session pool" tooltip-class=tooltip-default
+                  class="action_icon refresh disabled">
+                </div>
+                <div ng-if="$root.mode!='guest'
+                  &&is_action_available('duplicate', proxy)"
+                  uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
+                  ng-click="dup_proxies(proxy)"
+                  class="action_icon duplicate">
+                </div>
+                <div ng-if="$root.mode=='guest'
+                  ||!is_action_available('duplicate', proxy)"
+                  uib-tooltip="You can't duplicate this Proxy"
+                  tooltip-class=tooltip-default
+                  class="action_icon duplicate disabled">
+                </div>
+                <div ng-if="$root.mode!='guest'&&is_action_available('edit',
+                  proxy)" uib-tooltip="Edit Proxy" tooltip-class=tooltip-default
+                  ng-click="edit_proxy(proxy)" class="action_icon edit">
+                </div>
+                <div ng-if="$root.mode=='guest'||!is_action_available('edit',
+                  proxy)" uib-tooltip="You can't edit this Proxy"
+                  tooltip-class=tooltip-default class="action_icon edit disabled">
+                </div>
               </td>
               <td ng-repeat="col in columns" ng-init="val=proxy[col.key]">
-                <span uib-tooltip="Ratio of successful requests out of total
-                  requests, where successful requests are calculated as 2xx,
-                  3xx or 404 HTTP status codes"
+                <span uib-tooltip-html=ratio_tooltip tooltip-append-to-body
                   tooltip-class=tooltip-default
                   ng-if="col.key=='success_rate'&&proxy.success_rate"
                   ng-mouseenter="success_rate_hover(proxy.success_rate)"
@@ -86,6 +135,19 @@
                     +'interfaces since '+proxy.config.iface+' is not available '
                     +'for binding'}}"
                     class="proxies-warning glyphicon glyphicon-exclamation-sign">
+                  </span>
+                </span>
+                <span ng-if="col.key=='port'&&(proxy.iface!='0.0.0.0'||
+                  !proxy.config.iface||proxy.config.iface=='0.0.0.0')">
+                  <span ng-if="$root.mode!='guest'&&is_action_available('edit', proxy)"
+                    ng-click="edit_proxy(proxy)" class=clickable
+                    tooltip-class=tooltip-default uib-tooltip="Edit Proxy">
+                    {{val}}
+                  </span>
+                  <span ng-if="$root.mode=='guest'||!is_action_available('edit',
+                    proxy)" tooltip-class=tooltip-default
+                    uib-tooltip="You can't edit this Proxy">
+                    {{val}}
                   </span>
                 </span>
                 <div ng-if="col.key=='_status'"
@@ -129,7 +191,7 @@
                   </span>
                 </span>
                 <span ng-if="col.key!='_status'&&col.key!='success_rate'
-                  &&$root.mode!='guest'"
+                  &&col.key!='port'&&$root.mode!='guest'"
                   ng-click="inline_edit_click(proxy, col)"
                   uib-tooltip-html="get_column_tooltip(proxy, col)"
                   tooltip-class=tooltip-default
@@ -212,48 +274,6 @@
                   </span>
                 </span>
               </td>
-              <td class=proxies-actions>
-                <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session===true
-                  ng-click=refresh_sessions(proxy)
-                  uib-tooltip="Refresh Sessions" tooltip-class=tooltip-default
-                  class="action_icon refresh">
-                </div>
-                <div
-                  ng-if=!proxy.pool_size&&!proxy.sticky_ip&&proxy.session!==true
-                  uib-tooltip="No session pool" tooltip-class=tooltip-default
-                  class="action_icon refresh disabled">
-                </div>
-                <div ng-if=proxy._history
-                  ng-click=show_history(proxy)
-                  uib-tooltip=History tooltip-class=tooltip-default
-                  class="action_icon history">
-                </div>
-                <div ng-if=!proxy._history
-                  uib-tooltip="No history" tooltip-class=tooltip-default
-                  class="action_icon history disabled">
-                </div>
-                <div ng-if=proxy.pool_size||proxy.sticky_ip||proxy.session
-                  ng-click=show_pool(proxy)
-                  uib-tooltip="Current pool" tooltip-class=tooltip-default
-                  class="action_icon pool">
-                </div>
-                <div ng-if=!proxy.pool_size&&!proxy.sticky_ip&&!proxy.session
-                  uib-tooltip="Pool empty; size is set to zero"
-                  tooltip-class=tooltip-default
-                  class="action_icon pool disabled">
-                </div>
-                <div ng-if="$root.mode!='guest'
-                  &&is_action_available('duplicate', proxy)"
-                  uib-tooltip="Duplicate Proxy" tooltip-class=tooltip-default
-                  ng-click="dup_proxies(proxy)"
-                  class="action_icon duplicate">
-                </div>
-                <div ng-if="$root.mode!='guest'&&is_action_available('delete',
-                  proxy)" ng-click=delete_proxies(proxy.port)
-                  uib-tooltip=Delete tooltip-class=tooltip-default
-                  class="action_icon delete">
-                </div>
-              </td>
             </tr>
             <tr ng-repeat-end ng-if="showed_status_proxies[proxy.port]"
               class=status-details-wrapper>
@@ -279,7 +299,7 @@
       </div>
     </div>
   </div>
-  <div class=col-lg-4>
+  <div ng-show="proxies && proxies.length" class=col-lg-4>
     <div react-view=react_component></div>
   </div>
   <div ng-repeat="h in history_dialog" ng-controller=history
