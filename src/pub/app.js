@@ -13,6 +13,8 @@ import csv from 'hutil/util/csv';
 import zurl from 'hutil/util/url';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
+import ajax from 'hutil/util/ajax';
+import zescape from 'hutil/util/escape';
 import regeneratorRuntime from 'regenerator-runtime';
 import req_stats from './stats/stats.js';
 import status_codes from './stats/status_codes.js';
@@ -308,28 +310,32 @@ function proxies_factory($http, $q){
             func(service.proxies);
     }
     function update_proxies(){
-        var get_status = function(force){
-            var proxy = this;
+        const get_status = function(force){
+            const proxy = this;
             if (!proxy._status_call || force)
             {
-                var url = '/api/proxy_status/'+proxy.port;
+                const params = {};
                 if (proxy.proxy_type!='duplicate')
-                    url += '?with_details';
-                proxy._status_call = $http.get(url);
+                    params.with_details = true;
+                if (force)
+                    params.force = true;
+                const url = zescape.uri('/api/proxy_status/'+proxy.port,
+                    params);
+                proxy._status_call = ajax.json({url});
             }
             this._status_call.then(function(res){
-                if (res.data.status=='ok')
+                if (res.status=='ok')
                 {
                     proxy._status = 'ok';
-                    proxy._status_details = res.data.status_details||[];
+                    proxy._status_details = res.status_details||[];
                 }
                 else
                 {
                     proxy._status = 'error';
-                    var errors = res.data.status_details.filter(function(s){
+                    const errors = res.status_details.filter(function(s){
                         return s.lvl=='err'; });
                     proxy._status_details = errors.length ? errors
-                        : [{lvl: 'err', msg: res.data.status}];
+                        : [{lvl: 'err', msg: res.status}];
                 }
             }).catch(function(){
                 proxy._status_call = null;
@@ -358,6 +364,46 @@ function proxies_factory($http, $q){
     }
 }
 
+module.factory('$proxy_stats', proxy_stats_factory);
+proxy_stats_factory.$inject = ['$proxies', '$timeout'];
+
+function proxy_stats_factory($proxies, $timeout){
+    const poll_interval = 1000;
+    let sp, get_timeout;
+    const _prepare_stats = data=>{
+        return data.reduce((acc, el)=>{
+            acc[el.port] = {bw: el.in_bw+el.out_bw, reqs: el.reqs};
+            return acc;
+        }, {});
+    };
+    const _track_stats = ()=>{
+        if (!sp)
+            return;
+        sp.spawn(etask(function*(){
+            const stats = yield ajax.json({url: '/api/proxy_stats'});
+            const stats_per_port = _prepare_stats(stats);
+            $proxies.proxies = $proxies.proxies.map(p=>{
+                if (''+p.port in stats_per_port)
+                    p.stats = stats_per_port[p.port];
+                return p;
+            });
+            $proxies.trigger();
+            get_timeout = $timeout(_track_stats, poll_interval);
+        }));
+    };
+    const listen = ()=>{
+        sp = etask('proxy_stats_factory', function*(){ yield this.wait(); });
+        _track_stats();
+    };
+    const stop_listening = ()=>{
+        if (get_timeout)
+            $timeout.cancel(get_timeout);
+        sp.return();
+        sp = undefined;
+    };
+    return {listen, stop_listening};
+}
+
 module.factory('$success_rate', success_rate_factory);
 success_rate_factory.$inject = ['$http', '$proxies', '$timeout'];
 
@@ -366,7 +412,6 @@ function success_rate_factory($http, $proxies, $timeout){
     let get_timeout = false;
     const poll_interval = 3000;
     return {listen, stop_listening};
-
     function listen(){
         if (is_listening)
             return;
@@ -380,13 +425,11 @@ function success_rate_factory($http, $proxies, $timeout){
             });
         }
     }
-
     function stop_listening(){
         is_listening = false;
         if (get_timeout)
             $timeout.cancel(get_timeout);
     }
-
     function get_request_rate(){
         return $http.get('/api/req_status').then(function(res){
             let rates = res.data;
@@ -396,9 +439,8 @@ function success_rate_factory($http, $proxies, $timeout){
                 let rstat = {total: 0, success: 0};
                 if (''+p.port in rates)
                     rstat = rates[p.port];
-                p.success_rate = rstat.total==0 ?
-                    0 : rstat.success/rstat.total*100;
-                p.success_rate = p.success_rate.toFixed(0);
+                p.success_rate = rstat.total==0 ? null
+                    : (rstat.success/rstat.total*100).toFixed(0);
                 return p;
             });
             $proxies.trigger();
@@ -648,12 +690,10 @@ function Resolve($scope, $http, $window){
     .on('hidden.bs.collapse', $scope.update)
     .on('show.bs.collapse', function(){
         setTimeout(function(){
-            $window.$('#resolve-textarea').scrollTop(0).scrollLeft(0);
-        }, 0);
+            $window.$('#resolve-textarea').scrollTop(0).scrollLeft(0); }, 0);
     });
     $scope.cancel = function(){
-        $window.$('#resolve-panel > .collapse').collapse('hide');
-    };
+        $window.$('#resolve-panel > .collapse').collapse('hide'); };
     $scope.new_host = function(){
         $window.$('#resolve_add').one('shown.bs.modal', function(){
             $window.$('#resolve_add input').select();
@@ -821,14 +861,11 @@ function Zones($scope, $http, $filter, $window){
     })
     .catch(function(e){ $scope.error = true; });
     $http.get('/api/whitelist').then(function(whitelist){
-        $scope.whitelist = whitelist.data;
-    });
+        $scope.whitelist = whitelist.data; });
     $http.get('/api/recent_ips').then(function(recent_ips){
-        $scope.recent_ips = recent_ips.data;
-    });
+        $scope.recent_ips = recent_ips.data; });
     $scope.edit_zone = function(zone){
-        $window.location = 'https://luminati.io/cp/zones/'+zone;
-    };
+        $window.location = 'https://luminati.io/cp/zones/'+zone; };
     $scope.new_zone = function(){
         $window.location = 'https://luminati.io/cp/zones?add_new_zone=1';
         ga_event('page: zones', 'click', 'new zone');
@@ -1068,9 +1105,10 @@ function check_reg_exp(v){
 
 module.controller('proxies', Proxies);
 Proxies.$inject = ['$scope', '$rootScope', '$http', '$proxies', '$window',
-    '$q', '$timeout', '$stateParams', '$success_rate', '$state'];
+    '$q', '$timeout', '$stateParams', '$success_rate', '$state',
+    '$proxy_stats'];
 function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
-    $stateParams, $success_rate, $state)
+    $stateParams, $success_rate, $state, $proxy_stats)
 {
     $scope.ratio_tooltip = 'Ratio of successful requests out of total'
     +' requests, where successful requests are calculated as 2xx, 3xx or 404'
@@ -1078,8 +1116,11 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     var prepare_opts = function(opt){
         return opt.map(function(o){ return {key: o, value: o}; }); };
     $success_rate.listen();
+    $proxy_stats.listen();
     $scope.$on('$destroy', function(){
-        $success_rate.stop_listening(); });
+        $success_rate.stop_listening();
+        $proxy_stats.stop_listening();
+    });
     var iface_opts = [], zone_opts = [];
     var country_opts = [], region_opts = {}, cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [], debug_opts = [];
@@ -1351,7 +1392,10 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     }, true);
     var apply_consts = function(data){
         iface_opts = data.iface.values;
-        zone_opts = data.zone.values;
+        zone_opts = (data.zone.values||[]).filter(z=>{
+            const plan = z.plans && z.plans.slice(-1)[0] || {};
+            return !plan.archive && !plan.disable;
+        });
         country_opts = data.country.values;
         pool_type_opts = data.pool_type.values;
         dns_opts = prepare_opts(data.dns.values);
@@ -1415,22 +1459,24 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         $window.$('#confirmation').modal();
         ga_event('page: proxies', 'click', 'delete proxy');
     };
-    $scope.refresh_sessions = function(proxy){
+    $scope.refresh_sessions = proxy=>{
         $http.post('/api/refresh_sessions/'+proxy.port)
         .then(function(){ return $proxies.update(); });
+        proxy.get_status(true);
     };
     $scope.show_history = function(proxy){
+        ga_event('page: proxies', 'click', 'show history');
         $scope.history_dialog = [{port: proxy.port}];
     };
     $scope.show_pool = function(proxy){
+        ga_event('page: proxies', 'click', 'show pool');
         $scope.pool_dialog = [{
             port: proxy.port,
             sticky_ip: proxy.sticky_ip,
             pool_size: proxy.pool_size,
         }];
     };
-    $scope.add_proxy_new = function(){
-        $('#add_proxy_modal').modal('show'); };
+    $scope.add_proxy_new = ()=>{ $('#add_proxy_modal').modal('show'); };
     $scope.get_static_country = function(proxy){
         var zone = proxy.zones[proxy.zone];
         if (!zone)
@@ -1458,8 +1504,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         filesaver.saveAs(csv.to_blob(data), 'proxies.csv');
     };
     $scope.success_rate_hover = function(rate){
-        ga_event('page: proxies', 'hover', 'success_rate', rate);
-    };
+        ga_event('page: proxies', 'hover', 'success_rate', rate); };
     $scope.inline_edit_click = function(proxy, col){
         if (proxy.proxy_type!='persist'
             || !$scope.is_valid_field(proxy, col.key)
@@ -1589,7 +1634,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         for (var i = 0; i<$scope.columns.length; i++)
         {
             if ($scope.columns[i].key=='_status')
-                return [i+1, $scope.columns.length-i+1];
+                return [i+1, $scope.columns.length-i+2];
         }
         return [0, 0];
     };

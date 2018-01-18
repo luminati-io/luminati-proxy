@@ -105,7 +105,7 @@ class SuccessRatio extends React.Component {
     componentWillUnmount(){ this.sp.return(); }
     render (){
         const {total, success} = this.state;
-        const ratio = total==0 ? 0 : success/total*100;
+        const ratio = total==0 ? NaN : success/total*100;
         const overallSuccessTooltip = <Tooltip
               id="succes-tooltip">
               Ratio of successful requests out of total
@@ -121,7 +121,7 @@ class SuccessRatio extends React.Component {
                   placement="top"><span>Overall success</span></OverlayTrigger>
               </Col>
               <Col sm={4} className="success_value">
-                {ratio.toFixed(2)}%
+                {isNaN(ratio) ? '' : ratio.toFixed(2)+'%'}
               </Col>
             </Row>
         );

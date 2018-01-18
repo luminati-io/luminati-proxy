@@ -104,9 +104,7 @@ nav a:hover { box-shadow: none; }
     padding: 1em;
     margin-bottom: 20px;
 }
-.form-group {
-    margin-bottom: 12px;
-}
+.form-group { margin-bottom: 12px; }
 .alert-inline {
     display: inline;
     padding: 6px 12px;
@@ -114,38 +112,19 @@ nav a:hover { box-shadow: none; }
     top: 2px;
     margin: 0 8px;
 }
-.tester-body {
-    margin-bottom: 18px;
-}
-.tester-body textarea {
-    height: 100px;
-}
-.tools-header {
-    margin-bottom: 12px;
-}
-.tester-body:after, .tools-header:after {
-    content: '';
-    display: block;
-    clear: both;
-}
-.tools-add-header {
-    margin-bottom: 18px;
-}
+.tools-header { margin-bottom: 12px; }
+.tools-add-header { margin-bottom: 18px; }
 .tester-alert {
     margin-top: 20px;
     padding: 7.5px 11.5px;
 }
-.tester-results {
-    margin-top: 20px;
-}
+.tester-results { margin-top: 20px; }
 .tools-table {
     width: auto;
     float: none;
     margin: 20px auto;
 }
-.tools-table th {
-    text-align: center;
-}
+.tools-table th { text-align: center; }
 .countries-list {
     text-align: center;
     margin-top: 20px;
@@ -201,9 +180,7 @@ table.proxies {
     overflow: auto;
     max-height: calc(~"100vh - 190px");
 }
-div.proxies .panel-footer, div.proxies .panel-heading {
-    position: relative;
-}
+div.proxies .panel-footer, div.proxies .panel-heading { position: relative; }
 div.proxies .panel-heading {
     height: 65px;
 }
@@ -229,14 +206,11 @@ div.proxies .btn-wrapper {
     top: -5px;
     background-color: white;
 }
-.proxies-table-input input, .proxies-table-input select {
-    width: 100%;
-}
+.proxies-table-input input, .proxies-table-input select { width: 100%; }
 .col_success_rate {
     white-space: nowrap;
     width: 80px;
 }
-.proxies-actions { white-space: nowrap; }
 .proxies-warning { color: red; }
 #history .modal-dialog, #history_details .modal-dialog, #pool .modal-dialog {
     width: auto;
@@ -247,12 +221,8 @@ div.proxies .btn-wrapper {
     overflow: auto;
     max-height: calc(~"100vh - 164px");
 }
-#history label {
-    font-weight: normal;
-}
-.proxies-history-navigation {
-    margin-bottom: 25px;
-}
+#history label { font-weight: normal; }
+.proxies-history-navigation { margin-bottom: 25px; }
 .proxies-history-filter {
     font-size: 11px;
     border-bottom: 1px dashed;
@@ -363,9 +333,7 @@ div.proxies .btn-wrapper {
                 }
             }
         }
-        .col_pass {
-            border-left: 1px solid #dde1e2;
-        }
+        .col_pass { border-left: 1px solid #dde1e2; }
         .or_circle {
             width: 32px;
             height: 32px;
@@ -452,7 +420,7 @@ div.proxies .btn-wrapper {
 table.table-hover tbody tr.status-details-wrapper:hover {
     background-color: @warning;
 }
-.proxy_status { position: relative; width: 23px; }
+.proxy_status { position: relative; width: 18px; }
 .text-err { color: #d8393c; }
 .text-ok { color: #4ca16a; }
 .text-warn { color: #f5a623; }
@@ -598,9 +566,7 @@ input.form-control[type=checkbox] {
             height: 37px;
             line-height: 37px;
         }
-        .subtitle {
-            margin-bottom: 15px;
-        }
+        .subtitle { margin-bottom: 15px; }
     }
     select, input[type=number], input[type=text], input[type=password],
     input[type=email], textarea {
@@ -942,6 +908,13 @@ input.form-control[type=checkbox] {
         right: 6px;
         cursor: pointer;
     }
+    .info_icon_filler {
+        width: 11px;
+        height: 1ppx;
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+    }
     .nav_wrapper {
         .nav_header {
             h3 { margin: 10px 0; }
@@ -1078,14 +1051,11 @@ input.form-control[type=checkbox] {
         position: relative;
         top: 250px;
         padding-bottom: 40px;
+        display: flex;
     }
     .section_wrapper {
-        display: flex;
-        position: relative;
-        align-items: center;
         &:focus { outline: 0; }
         .outlined {
-            width: 70%;
             position: relative;
             border: solid 1px @grey_border;
             border-radius: 4px;
@@ -1104,6 +1074,11 @@ input.form-control[type=checkbox] {
                 .field_row {
                     display: flex;
                     align-items: center;
+                    .info_icon, .info_icon_filler {
+                        position: relative;
+                        top: -1px;
+                        left: -7px;
+                    }
                     &:not(:first-child) { margin-top: 15px; }
                     &.disabled {
                         color: @grey;
@@ -1115,14 +1090,14 @@ input.form-control[type=checkbox] {
                     }
                 }
                 .desc {
-                    flex: 3 3;
+                    width: 20vw;
                     line-height: 1.07;
-                    padding-right: 35px;
+                    padding-right: 10px;
                 }
                 .field {
+                    flex: 1;
                     .inline_field { display: flex; }
                     padding-right: 20px;
-                    flex: 5 5;
                     align-items: center;
                     .sufix { margin-left: 20px; }
                     .double_field {
@@ -1172,36 +1147,7 @@ input.form-control[type=checkbox] {
                 }
                 border-color: @light;
             }
-            &.active {
-                .desc { color: @second_color; }
-                .arrow { border-left: solid 6px @second_color; }
-                border-color: @second_color;
-            }
-            &.disabled {
-            }
-        }
-        .message_wrapper {
-            position: absolute;
-            width: 30%;
-            right: 0;
-            top: 4px;
-            margin-left: 25px;
-            display: inline-block;
-            .message {
-                margin-left: 25px;
-                display: none;
-                font-size: 14px;
-                line-height: 1.17;
-                border-radius: 4px;
-                padding: 14px 19px;
-                background-color: @x_light;
-                &.active, &.hovered { display: block; }
-                &.error {
-                    display: block;
-                    background-color: @error_x_light;
-                    color: @error_dark;
-                }
-            }
+            &.active { border-color: @second_color; }
         }
     }
     .allocated_ips_modal {
@@ -1247,25 +1193,28 @@ input.form-control[type=checkbox] {
             top: 9px;
             background: url(/img/down.svg);
         }
-        .action_icon {
-            width: 18px;
-            height: 18px;
-            top: 2px;
-            position: relative;
-            display: inline-block;
-            margin: 0 1px;
-            opacity: 0.3;
-            cursor: pointer;
-            &.edit { background: url(/img/edit.svg); }
-            &.refresh { background: url(/img/refresh.svg); }
-            &.history { background: url(/img/history.svg); }
-            &.pool { background: url(/img/pool.svg); }
-            &.duplicate { background: url(/img/duplicate.svg); }
-            &.delete { background: url(/img/trash.svg); }
-            &:hover { opacity: 1; }
-            &.disabled {
-                cursor: default;
-                &:hover { opacity: 0.3; }
+        .proxy_row {
+            .proxies_actions { white-space: nowrap; }
+            &:hover .proxies_actions .action_icon { visibility: visible; }
+            .action_icon {
+                visibility: hidden;
+                width: 18px;
+                height: 18px;
+                top: 2px;
+                position: relative;
+                display: inline-block;
+                margin: 0 1px;
+                cursor: pointer;
+                &.edit { background: url(/img/edit.svg); }
+                &.refresh { background: url(/img/refresh.svg); }
+                &.history { background: url(/img/history.svg); }
+                &.pool { background: url(/img/pool.svg); }
+                &.duplicate { background: url(/img/duplicate.svg); }
+                &.delete { background: url(/img/trash.svg); }
+                &.disabled {
+                    cursor: default;
+                    opacity: 0.3;
+                }
             }
         }
         .btn {
@@ -1593,7 +1542,6 @@ input.form-control[type=checkbox] {
     }
     .btn_lang { margin: 0 2px; }
     .onboarding_buttons { text-align: center; }
-    // XXX krzysztof: move it to .lpm to make it common
     .instructions {
         margin-left: 30px;
         border-left: 1px solid @second_color;
@@ -1870,9 +1818,7 @@ input.form-control[type=checkbox] {
                 font-size: 16px;
                 font-weight: bold
             }
-            .text {
-                font-size: 13px;
-            }
+            .text { font-size: 13px; }
         }
     }
 }

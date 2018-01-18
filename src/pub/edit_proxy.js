@@ -53,6 +53,10 @@ const tabs = {
                 tooltip: 'Specific ASN provider',
                 placeholder: 'ASN code e.g. 42793'
             },
+            carrier: {
+                label: 'Carrier',
+                tooltip: 'Network provider company name',
+            },
         },
     },
     speed: {
@@ -363,7 +367,6 @@ class Index extends React.Component {
         ];
     }
     componentDidMount(){
-        $('[data-toggle="tooltip"]').tooltip();
         setTimeout(()=>{
             const url_o = zurl.parse(document.location.href);
             const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -375,6 +378,7 @@ class Index extends React.Component {
         this.sp.return();
         this.listeners.forEach(l=>setdb.off(l));
     }
+    componentDidUpdate(){ $('[data-toggle="tooltip"]').tooltip(); }
     delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
     update_loader(){
         this.setState(state=>{
@@ -479,6 +483,8 @@ class Index extends React.Component {
         }
         if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
             return permissions.includes(field_name);
+        if (field_name=='carrier')
+            return permissions.includes('asn');
         return true;
     }
     apply_preset(_form, preset){
@@ -841,6 +847,7 @@ class Index extends React.Component {
                   default_opt={this.default_opt.bind(this)}
                   get_curr_plan={this.get_curr_plan.bind(this)}
                   goto_field={this.goto_field.bind(this)}/>
+                <div className="filler"/>
               </div>
               <Modal className="warnings_modal" id="save_proxy_warnings"
                 title="Warnings:" click_ok={this.save_from_modal.bind(this)}>
@@ -982,7 +989,8 @@ class Tooltip_icon extends React.Component {
         return this.props.title ?
             <div className="info_icon" data-toggle="tooltip"
               data-placement="top" title={this.props.title}
-              data-container="body" ref={this.save_ref.bind(this)}/> : null;
+              data-container="body" ref={this.save_ref.bind(this)}/> :
+            <div className="info_icon_filler"/>;
     }
 }
 
@@ -1025,12 +1033,6 @@ class Section extends React.Component {
                   {this.props.children}
                 </div>
                 <div className="icon"/>
-                <div className="arrow"/>
-              </div>
-              <div className="message_wrapper">
-                <div className={classnames('message', dynamic_class)}>
-                  {message}
-                </div>
               </div>
             </div>
         );
@@ -1132,8 +1134,14 @@ const Section_field = props=>{
     const val = form[id]===undefined ? '' : form[id];
     const placeholder = tabs[tab_id].fields[id].placeholder||'';
     return (
-        <div className={classnames('field_row', {disabled})}>
-          <div className="desc">{tabs[tab_id].fields[id].label}</div>
+        <div className={classnames('field_row', {disabled, note})}>
+          <div className="desc">
+            <span data-toggle="tooltip" data-placement="top"
+              data-container="body"
+              title={tabs[tab_id].fields[id].tooltip}>
+              {tabs[tab_id].fields[id].label}
+            </span>
+          </div>
           <div className="field">
             <div className="inline_field">
               <Comp form={form} id={id} data={data} type={type}
@@ -1162,6 +1170,36 @@ class Targeting extends React.Component {
     constructor(props){
         super(props);
         this.def_value = {key: 'Any (default)', value: ''};
+        this.init_carriers();
+    }
+    init_carriers(){
+        const subject = 'Add new carrier option';
+        const n = '%0D%0A';
+        const body = `Hi,${n}${n}Didn't find the carrier you're looking for?`
+        +`${n}${n}Write here the carrier's name: __________${n}${n}We will add`
+        +` it in less than 2 business days!`;
+        const mail = 'lumext@luminati.io';
+        const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
+        this.carriers_note = <a href={mailto}>More carriers</a>;
+        this.carriers = [
+            {value: '', key: ''},
+            {value: 'att', key: 'AT&T'},
+            {value: 'telefonica', key: 'Telefonica'},
+            {value: 'tmobile', key: 'T-Mobile'},
+            {value: 'vodafone', key: 'Vodafone'},
+            {value: 'dt', key: 'Deutsche Telekom'},
+            {value: 'reliance_jio', key: 'Reliance Jio'},
+            {value: 'airtel', key: 'Airtel'},
+            {value: 'claro', key: 'Claro'},
+            {value: 'verizon', key: 'Verizon'},
+            {value: 'orange', key: 'Orange'},
+            {value: 'telstra', key: 'Telstra'},
+            {value: 'optus', key: 'Optus'},
+            {value: 'aircel', key: 'Aircel'},
+            {value: 'sprint', key: 'Sprint'},
+            {value: 'chinamobile', key: 'China Mobile'},
+            {value: 'etisalat', key: 'Etisalat'},
+        ];
     }
     allowed_countries(){
         const res = this.props.locations.countries.map(c=>
@@ -1230,7 +1268,11 @@ class Targeting extends React.Component {
               <Section_with_fields type="typeahead" id="city"
                 data={this.cities()}
                 on_change={this.city_changed.bind(this)}/>
-              <Section_with_fields type="number" id="asn"/>
+              <Section_with_fields type="number" id="asn"
+                disabled={this.props.form.carrier}/>
+              <Section_with_fields type="select" id="carrier"
+                data={this.carriers} note={this.carriers_note}
+                disabled={this.props.form.asn}/>
             </With_data>
         );
     }
@@ -1389,6 +1431,7 @@ const Note = props=>(
 class Rules extends React.Component {
     constructor(props){
         super(props);
+        this.port = window.location.pathname.split('/').slice(-1)[0];
         this.state={
             show_statuses: this.props.form.trigger_type=='status',
             show_body_regex: this.props.form.trigger_type=='body',
@@ -1396,6 +1439,14 @@ class Rules extends React.Component {
             show_custom_status: this.props.form.status_code=='Custom',
         };
     }
+    componentWillMount(){
+        this.listener = setdb.on('head.proxies_running', proxies=>{
+            const ports = (proxies||[]).filter(p=>p.port!=this.port)
+            .map(p=>({key: p.port, value: p.port}));
+            this.setState({ports});
+        });
+    }
+    componentWillUnmount(){ setdb.off(this.listener); }
     type_changed(val){
         if (val=='status')
             this.setState({show_statuses: true});
@@ -1421,6 +1472,13 @@ class Rules extends React.Component {
         }
         if (!val)
             this.props.on_change_field('trigger_url_regex', '');
+    }
+    action_changed(val){
+        if (val=='retry_port')
+        {
+            const def_port = this.state.ports.length&&this.state.ports[0].key;
+            this.props.on_change_field(val, def_port||'');
+        }
     }
     status_changed(val){
         this.setState({show_custom_status: val=='Custom'});
@@ -1501,7 +1559,8 @@ class Rules extends React.Component {
                   note="IP will change for every entry"
                   on_change_field={on_change_field}>
                   <Section_field id="action" tab_id="rules"
-                    type="select" data={action_types} {...this.props}/>
+                    type="select" data={action_types} {...this.props}
+                    on_change={this.action_changed.bind(this)}/>
                   <If when={this.props.form.action=='retry'}>
                     <Section_field id="retry_number" tab_id="rules"
                       type="number" {...this.props} min="0" max="20"
@@ -1509,7 +1568,7 @@ class Rules extends React.Component {
                   </If>
                   <If when={this.props.form.action=='retry_port'}>
                     <Section_field id="retry_port" tab_id="rules"
-                      type="number" {...this.props}/>
+                      type="select" data={this.state.ports} {...this.props}/>
                   </If>
                   <If when={this.props.form.action=='ban_ip'}>
                     <Section_field id="ban_ip_duration" tab_id="rules"

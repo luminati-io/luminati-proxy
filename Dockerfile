@@ -5,7 +5,9 @@
 #
 
 # Pull base image.
-FROM node:6
+FROM node:9.4.0
+
+RUN npm install -g npm@4.6.1
 
 # Install Luminati Proxy Manager
 RUN npm install -g @luminati-io/luminati-proxy

@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 1.79.778
+- :bug: proxy port with default zone
+- :star: added 'carier' selector for mobile/residential
+- :star: number of requests per port
+- :star: bandwidth calculation per port
+
 ## 1.79.346
 - :bug: fixed socks5 for Firefox browser
 - :sparkles: ui improvments

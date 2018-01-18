@@ -13,7 +13,7 @@ install_npm=0;
 install_curl=0;
 install_brew=0;
 desired_node_ver='9.4.0';
-desired_npm_ver='5.6.0';
+desired_npm_ver='4.6.1';
 downgrade_node=0;
 update_node=0;
 update_npm=0;
@@ -170,7 +170,7 @@ check_node()
     if [ "$install_npm" == "0" ] && is_cmd_defined 'npm'
         then
         local npm_ver=$(npm -v);
-        if [[ "$npm_ver" =~ ^([3,6-9]\.|[1-9][0-9]+\.) ]]
+        if [[ "$npm_ver" =~ ^([3,5-9]\.|[1-9][0-9]+\.) ]]
             then
             update_npm=1;
             perr "check_npm_bad_version" "$npm_ver"

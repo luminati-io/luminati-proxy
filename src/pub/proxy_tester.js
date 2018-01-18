@@ -61,8 +61,11 @@ class Request extends React.Component {
             if (!proxies||!proxies.length)
                 return;
             this.setState({proxies});
-            this.setState(prev_state=>
-                ({params: {...prev_state.params, proxy: proxies[0].port}}));
+            this.setState(prev_state=>{
+                const def_port = proxies[0].port;
+                this.default_state.params.proxy = def_port;
+                return {params: {...prev_state.params, proxy: def_port}};
+            });
         })];
     }
     componentWillUnmount(){
