@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati-Proxy-Manager ${version}",
+    "productName": "Luminati-Proxy-Manager",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -324,5 +324,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.79.778"
+  "version": "1.79.834"
 }

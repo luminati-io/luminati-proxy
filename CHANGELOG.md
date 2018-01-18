@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.79.834
+- :bug: fixed exe installer
+
 ## 1.79.778
 - :bug: proxy port with default zone
 - :star: added 'carier' selector for mobile/residential
