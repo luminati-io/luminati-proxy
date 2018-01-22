@@ -252,14 +252,15 @@
       "lib/find_iface.js",
       "lib/hutil-loader.js",
       "lib/log.js",
+      "lib/lpm.js",
       "lib/luminati.js",
-      "lib/lum_cluster.js",
       "lib/manager.js",
       "lib/md5_util.js",
       "lib/perr.js",
       "lib/socks.js",
       "lib/ssl.js",
       "lib/username.js",
+      "lib/util.js",
       "src/pub/add_proxy.js",
       "src/pub/app.js",
       "src/pub/app.less",
@@ -285,7 +286,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "af83f511886f13ca7dce1d32fa13d82b"
+    "md5": "9ba3193a96e78ab1bd495ab4b3e6dc72"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -324,5 +325,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.79.834"
+  "version": "1.80.111"
 }

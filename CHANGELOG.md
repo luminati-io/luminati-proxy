@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.80.111
+
 ## 1.79.834
 - :bug: fixed exe installer
 

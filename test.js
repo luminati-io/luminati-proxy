@@ -305,14 +305,14 @@ describe('proxy', ()=>{
         t('http post', ()=>{
             return {url: ping.http.url, method: 'POST', body: 'test body'};
         });
-        t('https', ()=>ping.https.url);
+        t('https', ()=>ping.https.url, {ssl: false});
         t('https post', ()=>{
             return {url: ping.https.url, method: 'POST', body: 'test body'};
-        });
-        t('https sniffing', ()=>ping.https.url, {ssl: true, insecure: true});
+        }, {ssl: false});
+        t('https sniffing', ()=>ping.https.url, {insecure: true});
         t('https sniffing post', ()=>{
             return {url: ping.https.url, method: 'POST', body: 'test body'};
-        }, {ssl: true, insecure: true});
+        }, {insecure: true});
     });
     describe('headers', ()=>{
         describe('X-Hola-Agent', ()=>{
@@ -358,9 +358,9 @@ describe('proxy', ()=>{
             t('bypass proxy', ()=>ping.http.url, {bypass_proxy: '.*'},
                 ()=>ping.history[0]);
             t('http', ()=>test_url, {}, ()=>proxy.history[0]);
-            t('https sniffing', ()=>ping.https.url,
-                {ssl: true, insecure: true}, ()=>proxy.history[0]);
-            t('https connect', ()=>ping.https.url, {ssl: true, insecure: true},
+            t('https sniffing', ()=>ping.https.url, {insecure: true},
+                ()=>proxy.history[0]);
+            t('https connect', ()=>ping.https.url, {insecure: true},
                 ()=>proxy.history[0]);
         });
         describe('keep letter caseing and order', ()=>{
@@ -379,13 +379,13 @@ describe('proxy', ()=>{
                     'order');
             }));
             t('http', ()=>test_url);
-            t('https', ()=>ping.https.url);
-            t('https sniffing', ()=>ping.https.url,
-                {ssl: true, insecure: true});
+            t('https', ()=>ping.https.url, {ssl: false});
+            t('https sniffing', ()=>ping.https.url, {insecure: true});
             t('bypass http', ()=>ping.http.url, {bypass_proxy: '.*'});
-            t('bypass https', ()=>ping.https.url, {bypass_proxy: '.*'});
+            t('bypass https', ()=>ping.https.url,
+                {bypass_proxy: '.*', ssl: false});
             t('bypass https sniffing', ()=>ping.https.url+'?match',
-                {bypass_proxy: 'match', ssl: true, insecure: true});
+                {bypass_proxy: 'match', insecure: true});
         });
     });
     it('Listening without specifing port', ()=>etask(function*(){
@@ -396,7 +396,7 @@ describe('proxy', ()=>{
     describe('options', ()=>{
         describe('passthrough (allow_proxy_auth)', ()=>{
             it('disabled', ()=>etask(function*(){
-                l = yield lum({pool_size: 3});
+                l = yield lum({pool_size: 3, allow_proxy_auth: false});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
                         (new Buffer('lum-customer-user-zone-zzz:pass'))
@@ -410,7 +410,7 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.zone, 'static');
             }));
             it('enabled', ()=>etask(function*(){
-                l = yield lum({pool_size: 3, allow_proxy_auth: true});
+                l = yield lum({pool_size: 3});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
                         (new Buffer('lum-customer-user-zone-zzz:pass'))
@@ -426,10 +426,7 @@ describe('proxy', ()=>{
         describe('short_username', ()=>{
             const t = (name, user, short, expected)=>it(name, ()=>etask(
             function*(){
-                l = yield lum({
-                    allow_proxy_auth: true,
-                    short_username: short,
-                });
+                l = yield lum({short_username: short});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
                         (new Buffer(user+':pass'))
@@ -744,8 +741,7 @@ describe('proxy', ()=>{
             t('http', ()=>ping.http.url+'match',
                 ()=>ping.http.url+'n-o--m-a-t-c-h');
             t('https sniffing', ()=>ping.https.url+'match',
-                ()=>ping.https.url+'n-o--m-a-t-c-h',
-                {ssl: true, insecure: true});
+                ()=>ping.https.url+'n-o--m-a-t-c-h', {insecure: true});
             it('https connect', ()=>'https://match.com/', ()=>ping.https.url,
                 {insecure: true});
         });
@@ -900,12 +896,12 @@ describe('proxy', ()=>{
                 port: 24000,
                 url: '127.0.0.1:'+ping.https.port,
                 method: 'CONNECT',
-            }), {insecure: true});
+            }), {insecure: true, ssl: false});
             t('https sniffing', ()=>ping.https.url, ()=>({
                 port: 24000,
                 method: 'GET',
                 url: ping.https.url,
-            }), {ssl: true, insecure: true});
+            }), {insecure: true});
             t('bypass http', ()=>ping.http.url, ()=>({
                 port: 24000,
                 url: ping.http.url,
@@ -917,7 +913,7 @@ describe('proxy', ()=>{
                 url: ping.https.url,
                 method: 'CONNECT',
                 super_proxy: null,
-            }), {bypass_proxy: '.*', insecure: true});
+            }), {bypass_proxy: '.*', insecure: true, ssl: false});
             t('null_response', ()=>ping.http.url, ()=>({
                 port: 24000,
                 status_code: 200,
@@ -1236,8 +1232,7 @@ describe('manager', ()=>{
         }));
 
         t('off', ['--no-dropin'], []);
-        t('on', ['--dropin'], [{port: Luminati.dropin.port,
-            allow_proxy_auth: true}]);
+        t('on', ['--dropin'], [{port: Luminati.dropin.port}]);
     });
     describe('api', ()=>{
         it('ssl', ()=>etask(function*(){
@@ -1502,7 +1497,8 @@ describe('manager', ()=>{
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(qw`--customer mock_user --port 24000
-                    --request_stats`.concat(opt.args));
+                    --request_stats --ssl false --allow_proxy_auth false`
+                    .concat(opt.args));
                 yield etask.nfn_apply(request, [{
                     proxy: 'http://127.0.0.1:24000',
                     url: `${opt.proto||'http'}://lumtest.com/myip`,
@@ -1549,4 +1545,50 @@ describe('manager', ()=>{
         ]);
         t('conflict with www', [{port: Manager.default.www}]);
     });
+});
+
+const util = require('./lib/util.js');
+
+describe('util', ()=>{
+    it('param_rand_range', ()=>{
+        assert.equal(util.param_rand_range('0:0'), 0);
+        assert.equal(util.param_rand_range(0), 0);
+        assert.equal(util.param_rand_range('0'), 0);
+        assert.equal(util.param_rand_range('1'), 1);
+        assert.equal(util.param_rand_range('5:1'), 5);
+        assert.equal(util.param_rand_range('5:1', 100), 500);
+        assert.equal(util.param_rand_range([5, 1], 100), 500);
+        assert.equal(util.param_rand_range('sdasda'), 0);
+        assert.equal(util.param_rand_range(5), 5);
+        let rand_range = util.param_rand_range('2:4');
+        assert.ok(rand_range>=2 && rand_range<=4);
+        rand_range = util.param_rand_range('2:4', 100);
+        assert.ok(rand_range>=200 && rand_range<=400);
+    });
+    it('write_http_reply', ()=>{});
+});
+
+const {Session} = require('./lib/lpm.js');
+
+describe('Session', ()=>{
+    it('should calculate username', ()=>{
+        const t = (obj, res)=>{
+            let sess = new Session(obj);
+            let username = sess.calculate_username();
+            assert.equal(username, res);
+        };
+        t({zone: 'test_zone', customer: 'test_customer'},
+            'lum-customer-test_customer-zone-test_zone');
+        t({zone: 'test_zone', customer: 'test_customer', 'password': 123},
+            'lum-customer-test_customer-zone-test_zone');
+    });
+    it('should expire', ()=>{});
+});
+
+describe('Http_server', ()=>{
+    it('should accept http requests', ()=>{});
+});
+
+describe('Https_sever', ()=>{
+    it('should accept https requests', ()=>{});
 });

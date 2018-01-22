@@ -206,7 +206,9 @@ const tabs = {
             max_requests: {
                 label: 'Max Requests',
                 tooltip: `Change session based on number of requests can be a
-                    range or a fixed number`,
+                    range or a fixed number. when using browser it should be
+                    taken into consideration that one page load will attempt
+                    multiple requests under the hood`,
             },
             session_duration: {
                 label: 'Session Duration (seconds)',
@@ -423,7 +425,8 @@ class Index extends React.Component {
     is_dirty(form){
         for (let key in form)
         {
-            if (form[key]||this.original_form[key])
+            if (form[key]===false||form[key]||this.original_form[key]
+                ||this.original_form[key]===false)
             {
                 if (typeof form[key]=='object' &&
                     !_.isEqual(form[key], this.original_form[key]))
@@ -431,7 +434,7 @@ class Index extends React.Component {
                     return true;
                 }
                 else if (typeof form[key]!='object' &&
-                    form[key]!=this.original_form[key])
+                    form[key]!==this.original_form[key])
                 {
                     return true;
                 }

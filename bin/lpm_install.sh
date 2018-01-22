@@ -2,7 +2,7 @@
 
 arg=$1;
 
-run_id=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+run_id=$(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 start_time=$(date +"%s");
 
 PERR_URL="https://perr.luminati.io/client_cgi/perr";
@@ -198,7 +198,11 @@ install_nave_fn()
         perr "install_nave";
         mkdir -p ~/.nave
         cd ~/.nave;
-        wget http://github.com/isaacs/nave/raw/master/nave.sh
+        local gzip_flag=''
+        if [ "$os_name" == "Mac" ]; then
+            gzip_flag = '--compression=none'
+        fi
+        wget ${gzip_flag} http://github.com/isaacs/nave/raw/master/nave.sh
         chmod +x ./nave.sh
         sudo_cmd "ln -s $PWD/nave.sh /usr/local/bin/nave"
         sudo_cmd "mkdir -p /usr/local/{share/man,bin,lib/node,include/node}"
@@ -213,7 +217,7 @@ install_node_fn()
     perr "install_node";
     sudo_cmd "rm -rf ~/.nave/cache/$desired_node_ver"
     sudo_cmd "rm -rf /root/.nave/cache/v$desired_node_ver";
-    sudo_cmd "nave usemain $desired_node_ver";
+    sudo_cmd "SHELL=/bin/bash nave usemain $desired_node_ver";
     if ! is_cmd_defined "node"
         then
         perr "install_error_node";

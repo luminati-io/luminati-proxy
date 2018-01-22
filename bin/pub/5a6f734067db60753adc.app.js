@@ -15023,7 +15023,7 @@ var tabs = {
             },
             max_requests: {
                 label: 'Max Requests',
-                tooltip: 'Change session based on number of requests can be a\n                    range or a fixed number'
+                tooltip: 'Change session based on number of requests can be a\n                    range or a fixed number. when using browser it should be\n                    taken into consideration that one page load will attempt\n                    multiple requests under the hood'
             },
             session_duration: {
                 label: 'Session Duration (seconds)',
@@ -15285,10 +15285,10 @@ var Index = function (_React$Component) {
         key: 'is_dirty',
         value: function is_dirty(form) {
             for (var key in form) {
-                if (form[key] || this.original_form[key]) {
+                if (form[key] === false || form[key] || this.original_form[key] || this.original_form[key] === false) {
                     if (_typeof(form[key]) == 'object' && !_lodash2.default.isEqual(form[key], this.original_form[key])) {
                         return true;
-                    } else if (_typeof(form[key]) != 'object' && form[key] != this.original_form[key]) {
+                    } else if (_typeof(form[key]) != 'object' && form[key] !== this.original_form[key]) {
                         return true;
                     }
                 }
