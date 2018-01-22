@@ -1,6 +1,7 @@
  Luminati Proxy manager - Change Log
 
 ## 1.80.111
+- :sparkles: improved bash installation script on Mac
 
 ## 1.79.834
 - :bug: fixed exe installer
