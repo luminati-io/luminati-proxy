@@ -46,6 +46,8 @@ class Modal extends React.Component {
             footer = this.props.footer || (
                 <Footer_default cancel_clicked={this.click_cancel.bind(this)}
                   ok_clicked={this.click_ok.bind(this)}
+                  ok_btn_title={this.props.ok_btn_title}
+                  ok_btn_classes={this.props.ok_btn_classes}
                   no_cancel_btn={this.props.no_cancel_btn}/>
             );
         }
@@ -90,8 +92,9 @@ const Footer_default = props=>(
           className="btn btn_lpm btn_lpm_default cancel">Cancel
         </button>
       </If>
-      <button onClick={props.ok_clicked} className="btn btn_lpm ok">
-        OK</button>
+      <button onClick={props.ok_clicked}
+        className={props.ok_btn_classes||'btn btn_lpm ok'}>
+        {props.ok_btn_title||'OK'}</button>
     </div>
 );
 
@@ -204,11 +207,13 @@ const onboarding = {
             body: JSON.stringify({lpm_onboarding: {[step]: 1}}),
         });
     },
+    has_dismissed(){ return this._is_checked('dismissed'); },
     has_logged(){ return this._is_checked('first_login'); },
     has_seen_welcome(){ return this._is_checked('welcome_modal'); },
     has_created_proxy(){ return this._is_checked('created_proxy'); },
     has_tested_proxy(){ return this._is_checked('tested_proxy'); },
     has_seen_examples(){ return this._is_checked('seen_examples'); },
+    check_dismiss(){ this._check('dismissed'); },
     check_login(){ this._check('first_login'); },
     check_welcome(){ this._check('welcome_modal'); },
     check_created_proxy(){ this._check('created_proxy'); },

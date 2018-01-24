@@ -14,10 +14,11 @@
   </head>
   <body ng-cloak ng-controller=root>
     <div class="top_nav_wrapper"
-      ng-class="{'no_nav': section.name=='settings' || section.name=='welcome'}">
+      ng-class="{'no_nav': section.name=='settings' || section.name=='welcome',
+      'no_padding': section.name=='proxies'}">
       <div class="lpm nav_top">
         <div class=logo_wrapper>
-          <a href="https://luminati.io/cp" target=_blank class=logo></a>
+          <a href="/proxies" class=logo></a>
           <span class=version ng-if=ver_cur>V{{ver_cur}}</span>
         </div>
         <div class=nav_top_right>
@@ -194,6 +195,6 @@
     <div react-view=welcome_modal></div>
     <div react-view=progress_modal></div>
     <div id=notif_react_modal></div>
-  <script type="text/javascript" src="/27ac1d59d6d1f5f81159.runtime.js"></script><script type="text/javascript" src="/f2c00ac315cea5ae0ff6.vendor.js"></script><script type="text/javascript" src="/5a6f734067db60753adc.app.js"></script></body>
+  <script type="text/javascript" src="/959b1b1f126ff6a6a083.runtime.js"></script><script type="text/javascript" src="/de102a674c7975d4f173.vendor.js"></script><script type="text/javascript" src="/06490e47a21c1af5c40d.app.js"></script></body>
 </html>
 

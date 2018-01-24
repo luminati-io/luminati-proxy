@@ -5,6 +5,7 @@ import React from 'react';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
+import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
     install: ()=>E.sp = etask('domains', [function(){ return this.wait(); }]),
@@ -14,21 +15,25 @@ const E = {
     },
 };
 
-class DomainRow extends React.Component {
+class DomainRow extends Pure_component {
+    componentWillMount(){
+        this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
     render(){
         let class_name = '';
         let click = ()=>{};
         if (this.props.go)
         {
-            click = ()=>(window.location =
-                `${this.props.path}/${this.props.stat.hostname}`);
+            click = ()=>this.state.go('domains_detail',
+                {domain: this.props.stat.hostname});
             class_name = 'row_clickable';
         }
         return (
             <tr className={class_name} onClick={click}>
               <td>
-                <a href={`${this.props.path}/`+this.props.stat.hostname}>
-                  {this.props.stat.hostname}</a>
+                <a className="link"
+                   href={`${this.props.path}/`+this.props.stat.hostname}>
+                  {this.props.stat.hostname}
+                </a>
               </td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
@@ -44,9 +49,9 @@ class DomainTable extends React.Component {
         return <Common.StatTable row={DomainRow} path="/domains"
               row_key="hostname" go {...this.props}>
               <tr>
-                <th>Domain</th>
-                <th className="col-md-2">Bandwidth</th>
-                <th className="col-md-5">Requests</th>
+                <th className="col-md-4">Domain</th>
+                <th className="col-md-4">Bandwidth</th>
+                <th className="col-md-4">Requests</th>
               </tr>
             </Common.StatTable>;
     }

@@ -7,6 +7,7 @@ import {Col, Table, Pagination, OverlayTrigger, Tooltip}
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
+import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
     install: ()=>
@@ -58,7 +59,9 @@ const status_codes = {
     505: 'HTTP Version Not Supported',
 };
 
-class StatusCodeRow extends React.Component {
+class StatusCodeRow extends Pure_component {
+    componentWillMount(){
+        this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
     render(){
         const tooltip = <Tooltip
               id={`status_code_${this.props.stat.status_code}`}>
@@ -69,16 +72,18 @@ class StatusCodeRow extends React.Component {
         let click = ()=>{};
         if (this.props.go)
         {
-            click = ()=>(window.location =
-                `${this.props.path}/${this.props.stat.status_code}`);
+            click = ()=>this.state.go('status_codes_detail',
+                {code: this.props.stat.status_code});
             class_name = 'row_clickable';
         }
         return (
             <tr className={class_name} onClick={click}>
               <td>
                 <OverlayTrigger overlay={tooltip} placement="top">
-                  <a href={`${this.props.path}/`+this.props.stat.status_code}>
-                    {this.props.stat.status_code}</a>
+                  <a className="link"
+                     href={`${this.props.path}/`+this.props.stat.status_code}>
+                    {this.props.stat.status_code}
+                  </a>
                 </OverlayTrigger>
               </td>
               <td className={this.props.class_bw}>
@@ -95,9 +100,9 @@ class StatusCodeTable extends React.Component {
         return <Common.StatTable row={StatusCodeRow} path="/status_codes"
               row_key="status_code" go {...this.props}>
               <tr>
-                <th>Code</th>
-                <th className="col-md-2">Bandwidth</th>
-                <th className="col-md-5">Requests</th>
+                <th className="col-md-4">Code</th>
+                <th className="col-md-4">Bandwidth</th>
+                <th className="col-md-4">Requests</th>
               </tr>
             </Common.StatTable>;
     }

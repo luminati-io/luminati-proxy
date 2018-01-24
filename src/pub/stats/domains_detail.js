@@ -41,12 +41,20 @@ class StatsDetails extends React.Component {
         return <Common.StatsDetails stats={this.state.stats}
               header={`Domain name: ${this.props.domain}`}>
               <Col md={6}>
-                <h3>Status codes</h3>
-                <StatusCodeTable stats={this.state.statuses.stats} go/>
+                <div className="panel">
+                  <div className="panel_heading"><h2>Status codes</h2></div>
+                  <div className="panel_body">
+                    <StatusCodeTable stats={this.state.statuses.stats} go/>
+                  </div>
+                </div>
               </Col>
               <Col md={6}>
-                <h3>Protocols</h3>
-                <ProtocolTable stats={this.state.protocols.stats} go/>
+                <div className="panel">
+                  <div className="panel_heading"><h2>Protocols</h2></div>
+                  <div className="panel_body">
+                    <ProtocolTable stats={this.state.protocols.stats} go/>
+                  </div>
+                </div>
               </Col>
             </Common.StatsDetails>;
     }

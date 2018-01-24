@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati-Proxy-Manager",
+    "productName": "Luminati Proxy Manager 1.80.565",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -89,6 +89,7 @@
     "angular-ui-bootstrap": "^2.3.1",
     "animate.css": "^3.5.2",
     "axios": "^0.16.2",
+    "sinon": "4.2.0",
     "babel-cli": "^6.24.1",
     "babel-loader": "^7.1.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -96,6 +97,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "6.23.0",
+    "babel-plugin-transform-runtime": "6.23.0",
     "bootstrap": "^3.3.7",
     "bootstrap-datepicker": "^1.6.4",
     "codemirror": "^5.21.0",
@@ -205,6 +207,7 @@
       "bin/pub/img/loader.gif",
       "bin/pub/img/logo.png",
       "bin/pub/img/logo_1.svg",
+      "bin/pub/img/logo_big.svg",
       "bin/pub/img/lpm_infographics.png",
       "bin/pub/img/luminati_logo_2.svg",
       "bin/pub/img/ok_warning.svg",
@@ -286,7 +289,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "9ba3193a96e78ab1bd495ab4b3e6dc72"
+    "md5": "d9f7e48b0e266aff8a7b734d7ce0d17e"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -325,5 +328,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.80.111"
+  "version": "1.80.565"
 }

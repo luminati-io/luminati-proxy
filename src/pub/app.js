@@ -55,9 +55,6 @@ const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
 window.feature_flag = (flag, enable=true)=>{
     window.localStorage.setItem(flag, JSON.stringify(enable)); };
 
-const is_feature_flag_on = flag=>{
-    return JSON.parse(window.localStorage.getItem(flag)); };
-
 var is_electron = window.process && window.process.versions.electron;
 
 var is_valid_field = function(proxy, name, zone_definition){
@@ -145,8 +142,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'status_codes_detail',
         parent: 'app',
         url: '/status_codes/{code:int}',
-        template: `<div react-view=react_component state-props=code
-        class=container></div>`,
+        template: `<div react-view=react_component state-props=code></div>`,
         controller: function($scope){
             $scope.react_component = status_codes_detail; },
     });
@@ -161,8 +157,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'domains_detail',
         parent: 'app',
         url: '/domains/{domain:string}',
-        template: `<div react-view=react_component state-props=domain
-        class=container></div>`,
+        template: `<div react-view=react_component state-props=domain></div>`,
         controller: function($scope){
             $scope.react_component = domains_detail; },
     });
@@ -177,8 +172,8 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         name: 'protocols_detail',
         parent: 'app',
         url: '/protocols/{protocol:string}',
-        template: `<div react-view=react_component state-props=protocol
-        class=container></div>`,
+        template: `<div react-view=react_component state-props=protocol>
+        </div>`,
         controller: function($scope){
             $scope.react_component = protocols_detail; },
     });
@@ -217,16 +212,16 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
 module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
     $timeout)
 {
-    var logged_in_resolver = $q.defer();
+    const logged_in_resolver = $q.defer();
     $rootScope.logged_in = logged_in_resolver.promise;
     $transitions.onBefore({to: function(state){
         return !['app', 'faq'].includes(state.name);
     }}, function(transition){
         return etask(function*(){
             const logged_in = yield $q.resolve($rootScope.logged_in);
-            const seen_welcome = yield onboarding.has_seen_welcome();
             if (logged_in)
             {
+                const seen_welcome = yield onboarding.has_seen_welcome();
                 if (!seen_welcome)
                 {
                     $timeout(()=>$('#welcome_modal').modal(), 1000);
@@ -1122,7 +1117,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         $proxy_stats.stop_listening();
     });
     var iface_opts = [], zone_opts = [];
-    var country_opts = [], region_opts = {}, cities_opts = {};
+    var country_opts = [], cities_opts = {};
     var pool_type_opts = [], dns_opts = [], log_opts = [], debug_opts = [];
     var opt_columns = [
         {
@@ -1186,12 +1181,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
                 }
                 return country_opts;
             },
-        },
-        {
-            key: 'state',
-            title: 'State',
-            type: 'options',
-            options: function(proxy){ return load_regions(proxy.country); },
         },
         {
             key: 'city',
@@ -1381,7 +1370,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         zone: true,
         country: true,
         city: true,
-        state: true,
         success_rate: true,
     };
     $scope.cols_conf = JSON.parse(
@@ -1396,12 +1384,21 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             const plan = z.plans && z.plans.slice(-1)[0] || {};
             return !plan.archive && !plan.disable;
         });
-        country_opts = data.country.values;
         pool_type_opts = data.pool_type.values;
         dns_opts = prepare_opts(data.dns.values);
         log_opts = data.log.values;
         debug_opts = data.debug.values;
     };
+    setdb.on('head.locations', locations=>{
+        if (!locations)
+            return;
+        const countries = locations.countries.map(c=>(
+            {key: c.country_name, value: c.country_id}));
+        country_opts = [
+            {key: 'Default (Any)', value: ''},
+            {key: 'Any', value: '*'}
+        ].concat(countries);
+    });
     $scope.$on('consts', function(e, data){ apply_consts(data.proxy); });
     if ($scope.$root.consts)
         apply_consts($scope.$root.consts.proxy);
@@ -1609,7 +1606,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             .map(function(p){ return +p; });
     };
     $scope.is_action_available = function(action, port){
-        var proxies = $scope.get_selected_proxies()|| port ? [port] : [];
+        const proxies = $scope.get_selected_proxies()|| port ? [port] : [];
         if (!proxies.length)
             return false;
         if (port)
@@ -1619,9 +1616,16 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
                 sp.proxy_type!='persist';
         });
     };
-    $scope.option_key = function(col, val){
-        var opt = col.options().find(function(o){ return o.value==val; });
+    $scope.option_key = (col, val)=>{
+        const opt = col.options().find(o=>o.value==val);
         return opt&&opt.key;
+    };
+    $scope.get_country_state = (col, val, proxy)=>{
+        const country = $scope.option_key(col, val);
+        const state = proxy.state&&proxy.state.toUpperCase();
+        if (!state)
+            return country;
+        return `${country} (${state})`;
     };
     $scope.toggle_proxy_status_details = function(proxy){
         if (proxy._status_details.length)
@@ -1655,7 +1659,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             return $scope.option_key(col, proxy[col.key]);
         if (col.key == 'session' && proxy.session === true)
                 return 'Random';
-        if (['state', 'city'].includes(col.key) &&
+        if (['city'].includes(col.key) &&
             [undefined, '', '*'].includes(proxy.country))
         {
             return 'Set the country first';
@@ -1690,13 +1694,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     };
     $scope.on_page_change = function(){
         $scope.selected_proxies = {}; };
-    var load_regions = function(country){
-        if (!country||country=='*')
-            return [];
-        return region_opts[country] || (region_opts[country] =
-            $http.get('/api/regions/'+country.toUpperCase()).then(function(r){
-                return region_opts[country] = r.data; }));
-    };
     var load_cities = function(proxy){
         var country = proxy.country||''.toUpperCase();
         var state = proxy.state;
@@ -2276,6 +2273,14 @@ function request_filter(){
         }));
     };
 }
+
+module.directive('customTooltip', ()=>({
+    restrict: 'A',
+    scope: {title: '@customTooltip'},
+    link: (scope, element)=>{
+        $(element).attr('title', scope.title).tooltip('fixTitle');
+    },
+}));
 
 module.directive('initInputSelect', ['$window', function($window){
     return {

@@ -13,7 +13,7 @@ import Common from './common.js';
 import {StatusCodeRow, StatusCodeTable} from './status_codes.js';
 import {DomainRow, DomainTable} from './domains.js';
 import {ProtocolRow, ProtocolTable} from './protocols.js';
-import {Dialog} from '../common.js';
+import {Dialog, If} from '../common.js';
 import 'animate.css';
 
 const E = {
@@ -116,13 +116,16 @@ class SuccessRatio extends React.Component {
             <Row className="overall-success-ratio" onMouseEnter={()=>{
               util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
             }}>
-              <Col sm={8} className="success_title">
-                <OverlayTrigger overlay={overallSuccessTooltip}
-                  placement="top"><span>Overall success</span></OverlayTrigger>
-              </Col>
-              <Col sm={4} className="success_value">
-                {isNaN(ratio) ? '' : ratio.toFixed(2)+'%'}
-              </Col>
+              <If when={!isNaN(ratio)}>
+                <Col sm={8} className="success_title">
+                  <OverlayTrigger overlay={overallSuccessTooltip}
+                    placement="top"><span>Overall success</span>
+                  </OverlayTrigger>
+                </Col>
+                <Col sm={4} className="success_value">
+                  {isNaN(ratio) ? '' : ratio.toFixed(2)+'%'}
+                </Col>
+              </If>
             </Row>
         );
     }

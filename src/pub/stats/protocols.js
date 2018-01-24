@@ -6,6 +6,7 @@ import {Row, Col, Button} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
+import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
     install: ()=>
@@ -23,7 +24,9 @@ class CertificateButton extends React.Component {
     }
 }
 
-class ProtocolRow extends React.Component {
+class ProtocolRow extends Pure_component {
+    componentWillMount(){
+        this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
     handle_https_btn_click = (evt)=>{
         evt.stopPropagation();
         this.props.enable_https_button_click(evt);
@@ -34,15 +37,17 @@ class ProtocolRow extends React.Component {
         let value = this.props.stat.value||0;
         if (this.props.go)
         {
-            click = ()=>(window.location =
-                `${this.props.path}/${this.props.stat.protocol}`);
+            click = ()=>this.state.go('protocols_detail',
+                {protocol: this.props.stat.protocol});
             class_name = 'row_clickable';
         }
         return (
             <tr className={class_name} onClick={click}>
               <td>
-                <a href={`${this.props.path}/${this.props.stat.protocol}`}>
-                  {this.props.stat.protocol}</a>
+                <a className="link"
+                   href={`${this.props.path}/${this.props.stat.protocol}`}>
+                  {this.props.stat.protocol}
+                </a>
               </td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
@@ -74,9 +79,9 @@ class ProtocolTable extends React.Component {
                   this.props.enable_https_button_click}}
                 {...this.props}>
               <tr>
-                <th>Protocol</th>
-                <th className="col-md-2">Bandwidth</th>
-                <th className="col-md-5">Requests</th>
+                <th className="col-md-4">Protocol</th>
+                <th className="col-md-4">Bandwidth</th>
+                <th className="col-md-4">Requests</th>
               </tr>
             </Common.StatTable>;
     }

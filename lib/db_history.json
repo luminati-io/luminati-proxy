@@ -25,6 +25,51 @@
             "username": "TEXT",
             "content_size": {"type": "INTEGER", "index": true},
             "context": {"type": "TEXT", "index": true},
+            "success": "INTEGER",
+            "in_bw": "INTEGER",
+            "out_bw": "INTEGER"
+        },
+        "proxy_hosts": {
+            "proxy": {"type": "TEXT", "index": true},
+            "host": {"type": "TEXT", "index": true}
+        },
+        "zone": {
+            "zone": "TEXT",
+            "perm": "TEXT",
+            "ips": "TEXT",
+            "plans": "TEXT"
+        }
+    },
+    "add": {
+        "request": ["in_bw", "out_bw"]
+    }
+}, {
+    "schema": {
+        "schema_info": {
+            "hash": "TEXT",
+            "version": "TEXT",
+            "timestamp": {"type": "INTEGER", "default": "CURRENT_TIMESTAMP"}
+        },
+        "request": {
+            "port": {"type": "INTEGER", "index": true},
+            "url": {"type": "TEXT", "index": true},
+            "method": {"type": "TEXT", "index": true},
+            "request_headers": "TEXT",
+            "request_body": "TEXT",
+            "response_headers": "TEXT",
+            "status_code": {"type": "INTEGER", "index": true},
+            "status_message": {"type": "TEXT", "index": true},
+            "timestamp": {"type": "INTEGER", "index": true},
+            "elapsed": {"type": "INTEGER", "index": true},
+            "response_time": {"type": "INTEGER", "index": true},
+            "node_latency": {"type": "INTEGER", "index": true},
+            "proxy_peer": {"type": "TEXT", "index": true},
+            "country": {"type": "TEXT", "index": true},
+            "timeline": "TEXT",
+            "super_proxy": "TEXT",
+            "username": "TEXT",
+            "content_size": {"type": "INTEGER", "index": true},
+            "context": {"type": "TEXT", "index": true},
             "success": "INTEGER"
         },
         "proxy_hosts": {
@@ -37,6 +82,9 @@
             "ips": "TEXT",
             "plans": "TEXT"
         }
+    },
+    "add": {
+        "request": ["success"]
     }
 }, {
     "schema": {

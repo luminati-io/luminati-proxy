@@ -26,17 +26,32 @@ class Progress_modal extends React.Component {
     constructor(props){
         super(props);
         this.state = {};
+        this.open_modal = this.open_modal.bind(this);
+        this.dismiss_clicked = this.dismiss_clicked.bind(this);
     }
     componentWillMount(){
-        emitter.on('setup_guide:progress_modal', this.open_modal.bind(this)); }
+        emitter.on('setup_guide:progress_modal', this.open_modal);
+        this.listener = setdb.on('head.onboarding.steps',
+            steps=>this.setState({steps}));
+    }
+    componentWillUnmount(){
+        emitter.removeListener('setup_guide:progress_modal', this.open_modal);
+        setdb.off(this.listener);
+    }
     open_modal(title, timeout=0){
+        if (this.state.steps&&this.state.steps.dismissed)
+            return;
         this.setState({title});
         window.setTimeout(()=>$('#progress_modal').modal(), timeout);
     }
+    dismiss_clicked(){ onboarding.check_dismiss(); }
     render(){
         return (
             <div className="setup_guide lpm">
-              <Modal id="progress_modal" title={this.state.title} no_footer>
+              <Modal id="progress_modal" title={this.state.title}
+                no_cancel_btn ok_btn_title="I will do it later"
+                ok_btn_classes="link ok"
+                click_ok={this.dismiss_clicked}>
                 <List/>
               </Modal>
             </div>
@@ -91,11 +106,13 @@ class List extends React.Component {
                   text="This will configure your proxy settings"
                   on_click={this.click_add_proxy.bind(this)}
                   done={this.state.steps.created_proxy}/>
+                <div className="vertical_line"/>
                 <Section header="Test your proxy" img="test"
                   text="Verify your proxies are enabled and active"
                   on_click={this.click_test.bind(this)}
                   disabled={!this.state.steps.created_proxy}
                   done={this.state.steps.tested_proxy}/>
+                <div className="vertical_line"/>
                 <Section header="Use your proxy" img="req"
                   text="Learn how to use your proxy port in any platform"
                   on_click={this.click_make_request.bind(this)}
@@ -113,14 +130,17 @@ const Section = props=>{
         [`${props.img}_disabled`]: !props.done && props.disabled,
         done: props.done,
     });
+    const section_class = classnames('section', {
+        disabled: props.disabled,
+        done: props.done,
+    });
     const on_click = ()=>{
         if (props.disabled)
             return;
         props.on_click();
     };
     return (
-        <div onClick={on_click}
-          className={'section'+(props.disabled ? ' disabled' : '')}>
+        <div onClick={on_click} className={section_class}>
           <div className="img_block">
             <div className="circle_wrapper"/>
             <div className={img_class}/>

@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.80.565
+- :bug: fix crash when enabling history
+
 ## 1.80.111
 - :sparkles: improved bash installation script on Mac
 
@@ -27,14 +30,14 @@
 
 ## 1.77.506
 - :star: added proxy tester tool in main nav bar
-- :sparkles: improved performance of edit and save proxies 
+- :sparkles: improved performance of edit and save proxies
 - :bug: fixed request authorization feature
 
 ## 1.76.851
 - :star: add file log transport
 - :bug: fix google bypass on selective dc zones
 - :bug: fix whitelist IP to include localhost
-- :sparkles: improvments in UI on proxies page and rules 
+- :sparkles: improvments in UI on proxies page and rules
 
 ## 1.76.363
 - :bug: fix multiply and duplicate port conflict

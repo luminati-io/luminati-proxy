@@ -4,6 +4,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
+const sinon = require('sinon');
 const net = require('net');
 const url = require('url');
 const path = require('path');
@@ -350,7 +351,8 @@ describe('proxy', ()=>{
                     const target_req = target();
                     assert.equal(target_req['x-hola-context'], undefined);
                 }
-                yield etask.sleep(10);
+                yield etask.sleep(400);
+                console.log('context', history);
                 assert.equal(history.length, 1);
                 assert.equal(history[0].context, context);
             }));
@@ -881,7 +883,7 @@ describe('proxy', ()=>{
                     history_aggregator: aggregator}, opt));
                 assert.equal(history.length, 0);
                 let res = yield l.test(_url());
-                yield etask.sleep(40);
+                yield etask.sleep(400);
                 res.socket.destroy();
                 assert.equal(history.length, 1);
                 assert_has(history[0], expected());
@@ -929,9 +931,9 @@ describe('proxy', ()=>{
                 l = yield lum({pool_size: 1, keep_alive: 0.01, history: true,
                     history_aggregator: one_each_aggregator});
                 yield l.test();
-                yield etask.sleep(20);
+                yield etask.sleep(400);
                 yield l.session_mgr.update_all_sessions();
-                yield etask.sleep(20);
+                yield etask.sleep(400);
                 assert.equal(history.length, 3);
                 assert_has(history, [
                     {context: 'RESPONSE'},
@@ -994,10 +996,10 @@ describe('proxy', ()=>{
             for (var i=0; i<5; i++)
             {
                 yield l.test();
-                yield etask.sleep(20);
+                yield etask.sleep(400);
             }
             yield l.test({headers: {'x-lpm-reserved': true}});
-            yield etask.sleep(20);
+            yield etask.sleep(400);
             let unames = history.map(h=>h.username);
             assert.notEqual(unames[0], unames[2]);
             assert.equal(unames[unames.length-1], unames[0]);
@@ -1504,7 +1506,7 @@ describe('manager', ()=>{
                     url: `${opt.proto||'http'}://lumtest.com/myip`,
                     strictSSL: false,
                 }]);
-                yield etask.sleep(100);
+                yield etask.sleep(400);
                 const res = yield api_json(`api/request_stats${path}`);
                 assert_has(res.body, expected);
             }));
@@ -1568,12 +1570,13 @@ describe('util', ()=>{
     it('write_http_reply', ()=>{});
 });
 
-const {Session} = require('./lib/lpm.js');
+const lpm = require('./lib/lpm.js');
 
-describe('Session', ()=>{
+describe('Lsession', ()=>{
+    const {Lsession} = lpm;
     it('should calculate username', ()=>{
         const t = (obj, res)=>{
-            let sess = new Session(obj);
+            let sess = new Lsession(obj);
             let username = sess.calculate_username();
             assert.equal(username, res);
         };
@@ -1585,10 +1588,65 @@ describe('Session', ()=>{
     it('should expire', ()=>{});
 });
 
-describe('Http_server', ()=>{
+describe('Lhttp_server', ()=>{
     it('should accept http requests', ()=>{});
 });
 
-describe('Https_sever', ()=>{
+describe('Lhttps_sever', ()=>{
     it('should accept https requests', ()=>{});
+});
+
+describe('session pool', ()=>{
+    const {Lround_robin_pool, Lseq_pool} = lpm;
+    describe('populate', ()=>{
+        let itm_constr, pool_cls, pool_size, pool;
+        beforeEach(()=>{
+            itm_constr = sinon.stub().returns({});
+            if (pool_size)
+                pool = new pool_cls(itm_constr, pool_size);
+            else
+                pool = new pool_cls(itm_constr);
+        });
+        let t = (name)=>it(`${name} ${pool_size}`, ()=>etask(function*(){
+            assert.ok(!pool.ready);
+            yield pool.populate();
+            assert.equal(pool.size, pool.itms.length);
+            assert.ok(pool.ready);
+            assert.ok(!pool.populate_sp);
+            assert.equal(itm_constr.callCount, pool.size);
+        }));
+        pool_cls = Lround_robin_pool;
+        pool_size = 5;
+        t('round-robin');
+        pool_size = 1;
+        t('round-robin');
+        pool_size = 3;
+        t('round-robin');
+        pool_cls = Lseq_pool;
+        pool_size = 1;
+        t('sequential');
+    });
+    describe('next', ()=>{
+        let pool, pool_cls = Lround_robin_pool;
+        beforeEach(()=>{
+            pool = new pool_cls(()=>{});
+            pool.ready = true;
+        });
+        let t = (name, itms, itrs, expected)=>it(name, ()=>{
+            pool.size = itms.length;
+            pool.itms = itms.slice(0);
+            let res = [];
+            for (var i=0; i<itrs; i++)
+                res.push(pool.next());
+            assert.equal(expected, res.join('-'));
+        });
+        let itms = [1, 2, 3];
+        t('round-robin 5', itms, 6, '1-2-3-1-2-3');
+        t('round-robin 7', itms, 7, '1-2-3-1-2-3-1');
+        t('round-robin 1', itms, 1, '1');
+        t('round-robin 2', itms, 2, '1-2');
+        itms = [4];
+        t('sequential 4', itms, 4, '4-4-4-4');
+        t('sequential 8', itms, 8, '4-4-4-4-4-4-4-4');
+    });
 });

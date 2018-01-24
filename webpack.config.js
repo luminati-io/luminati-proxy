@@ -43,12 +43,12 @@ module.exports = {
                 use: ['babel-loader'],
             },
             {
-                test: /hutil/,
-                parser: {node: false, commonjs: false},
-                use: ['hutil-loader'],
+                test: /www[\\\/].+\.js$/,
+                exclude: /node_modules/,
+                use: ['hutil-loader', 'babel-loader'],
             },
             {
-                test: /pure_component\.js/,
+                test: /hutil/,
                 parser: {node: false, commonjs: false},
                 use: ['hutil-loader'],
             },

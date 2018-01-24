@@ -45,7 +45,9 @@ const tabs = {
             asn: {
                 label: <span>
                     ASN (
-                    <a href="http://bgp.potaroo.net/cidr/autnums.html"
+                    <a
+                      className="link"
+                      href="http://bgp.potaroo.net/cidr/autnums.html"
                       target="_blank" rel="noopener noreferrer">
                       ASN list
                     </a>)
@@ -72,8 +74,15 @@ const tabs = {
                 tooltip: `Maintain number of IPs that will be pinged constantly
                     - must have keep_alive to work properly`,
             },
-            multiply_ips: {label: 'Multiply IPs'},
-            multiply_vips: {label: 'Multiply gIPs'},
+            multiply_ips: {
+                label: 'Multiply IPs',
+                tooltip: `Create proxy port for every selected IP from the pool`
+            },
+            multiply_vips: {
+                label: 'Multiply gIPs',
+                tooltip: `Create proxy port for every selected gIP from pool
+                    of available gIPS in your zone`
+            },
             request_timeout: {
                 label: 'Timeout for requests on the super proxy',
                 tooltip: `Kill requests to super proxy and try new one if
@@ -194,13 +203,13 @@ const tabs = {
             },
             session: {
                 label: 'Explicit Session',
-                tooltip: `Insert session ID to maintain the same ip 
+                tooltip: `Insert session ID to maintain the same ip
                     for as long as possible.`,
             },
             sticky_ip: {
                 label: 'Sticky IP',
                 tooltip: `When connecting to remote lpm server stick sessions
-                    to each computer. each connected computer will receive 
+                    to each computer. each connected computer will receive
                     unique session`,
             },
             max_requests: {
@@ -823,7 +832,7 @@ class Index extends React.Component {
               <Loader show={this.state.show_loader}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
-                  <h3>Edit port {this.port}</h3>
+                  <h3>Port {this.port}</h3>
                   <div className="warning_wrapper">
                     <If when={this.state.dirty}>
                       <Warning text={warning_dirty}/>
@@ -850,7 +859,6 @@ class Index extends React.Component {
                   default_opt={this.default_opt.bind(this)}
                   get_curr_plan={this.get_curr_plan.bind(this)}
                   goto_field={this.goto_field.bind(this)}/>
-                <div className="filler"/>
               </div>
               <Modal className="warnings_modal" id="save_proxy_warnings"
                 title="Warnings:" click_ok={this.save_from_modal.bind(this)}>
@@ -928,11 +936,13 @@ class Action_buttons extends React.Component {
             {disabled: !this.props.dirty});
         return (
             <div className="action_buttons">
-              <a href="/proxies" onClick={this.cancel_clicked.bind(this)}
-                className="btn btn_lpm btn_lpm_normal btn_cancel">Cancel
-              </a>
-              <button className={save_btn_class}
-                onClick={this.save_clicked.bind(this)}>Save</button>
+              <If when={this.props.dirty}>
+                <a href="/proxies" onClick={this.cancel_clicked.bind(this)}
+                  className="btn btn_lpm btn_lpm_normal btn_cancel">Cancel
+                </a>
+                <button className={save_btn_class}
+                  onClick={this.save_clicked.bind(this)}>Save</button>
+              </If>
             </div>
         );
     }
@@ -992,8 +1002,7 @@ class Tooltip_icon extends React.Component {
         return this.props.title ?
             <div className="info_icon" data-toggle="tooltip"
               data-placement="top" title={this.props.title}
-              data-container="body" ref={this.save_ref.bind(this)}/> :
-            <div className="info_icon_filler"/>;
+              data-container="body" ref={this.save_ref.bind(this)}/> : null;
     }
 }
 
@@ -1136,13 +1145,17 @@ const Section_field = props=>{
     }
     const val = form[id]===undefined ? '' : form[id];
     const placeholder = tabs[tab_id].fields[id].placeholder||'';
+    const tooltip = tabs[tab_id].fields[id].tooltip;
     return (
         <div className={classnames('field_row', {disabled, note})}>
           <div className="desc">
             <span data-toggle="tooltip" data-placement="top"
               data-container="body"
-              title={tabs[tab_id].fields[id].tooltip}>
+              title={tooltip}>
               {tabs[tab_id].fields[id].label}
+              <If when={!!tooltip}>
+                <div className="info_icon"/>
+              </If>
             </span>
           </div>
           <div className="field">
@@ -1183,25 +1196,30 @@ class Targeting extends React.Component {
         +` it in less than 2 business days!`;
         const mail = 'lumext@luminati.io';
         const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
-        this.carriers_note = <a href={mailto}>More carriers</a>;
+        this.carriers_note = <a className="link"
+                                href={mailto}>More carriers</a>;
         this.carriers = [
-            {value: '', key: ''},
-            {value: 'att', key: 'AT&T'},
-            {value: 'telefonica', key: 'Telefonica'},
-            {value: 'tmobile', key: 'T-Mobile'},
-            {value: 'vodafone', key: 'Vodafone'},
-            {value: 'dt', key: 'Deutsche Telekom'},
-            {value: 'reliance_jio', key: 'Reliance Jio'},
+            {value: '', key: 'None'},
+                        {value: 'aircel', key: 'Aircel'},
             {value: 'airtel', key: 'Airtel'},
-            {value: 'claro', key: 'Claro'},
-            {value: 'verizon', key: 'Verizon'},
-            {value: 'orange', key: 'Orange'},
-            {value: 'telstra', key: 'Telstra'},
-            {value: 'optus', key: 'Optus'},
-            {value: 'aircel', key: 'Aircel'},
-            {value: 'sprint', key: 'Sprint'},
+            {value: 'att', key: 'AT&T'},
             {value: 'chinamobile', key: 'China Mobile'},
+            {value: 'claro', key: 'Claro'},
+            {value: 'dt', key: 'Deutsche Telekom'},
+            {value: 'docomo', key: 'Docomo'},
+            {value: 'dtac', key: 'DTAC Trinet'},
             {value: 'etisalat', key: 'Etisalat'},
+            {value: 'mtn', key: 'MTN - Mahanager Telephone'},
+            {value: 'optus', key: 'Optus'},
+            {value: 'orange', key: 'Orange'},
+            {value: 'reliance_jio', key: 'Reliance Jio'},
+            {value: 'sprint', key: 'Sprint'},
+            {value: 'telefonica', key: 'Telefonica'},
+            {value: 'telstra', key: 'Telstra'},
+            {value: 'tmobile', key: 'T-Mobile'},
+            {value: 'tigo', key: 'Tigo'},
+            {value: 'vodafone', key: 'Vodafone'},
+            {value: 'verizon', key: 'Verizon'},
         ];
     }
     allowed_countries(){
@@ -1256,7 +1274,7 @@ class Targeting extends React.Component {
               <If when={this.show_dc_note()}>
                 <Note>
                   <span>To change Data Center country visit your </span>
-                  <a target="_blank" rel="noopener noreferrer"
+                  <a className="link" target="_blank" rel="noopener noreferrer"
                     href="https://luminati.io/cp/zones">zone page</a>
                   <span> and change your zone plan.</span>
                 </Note>
@@ -1370,7 +1388,8 @@ class Speed extends React.Component {
         let pool_size_note;
         if (this.props.support.pool_size&&render_modal)
         {
-            pool_size_note = <a onClick={()=>this.open_modal(type)}>
+            pool_size_note = <a className="link"
+                                onClick={()=>this.open_modal(type)}>
               {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
             </a>;
         }
@@ -1426,7 +1445,6 @@ class Speed extends React.Component {
 
 const Note = props=>(
     <div className="note">
-      <span className="highlight">Note:</span>
       <span>{props.children}</span>
     </div>
 );
@@ -1523,11 +1541,6 @@ class Rules extends React.Component {
               <div className="tab_header">
                 Configure an action to be taken in response to a given Trigger
               </div>
-              <Note>
-                <span>Rules will apply when 'SSL analyzing' </span>
-                <a onClick={()=>this.props.goto_field('ssl')}>enabled</a>
-                <span> (See 'Debugging' section)</span>
-              </Note>
               <With_data {...this.props} tab_id="rules">
                 <Section id="trigger_type" header="Trigger"
                   correct={trigger_correct}>

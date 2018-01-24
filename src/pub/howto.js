@@ -9,11 +9,11 @@ import {Code, onboarding, emitter, Modal} from './common.js';
 import util from './util.js';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
-import regeneratorRuntime from 'regenerator-runtime';
+import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
 
-class Howto extends React.Component {
+class Howto extends Pure_component {
     constructor(props){
         super(props);
         this.state = {};
@@ -27,7 +27,7 @@ class Howto extends React.Component {
     choose_click(option){
         this.setState({option});
         ga_event('How-to-tab', 'select code/browser', option);
-        etask(function*(){
+        this.etask(etask(function*(){
             const seen_examples = yield onboarding.has_seen_examples();
             if (seen_examples)
                 return;
@@ -38,7 +38,7 @@ class Howto extends React.Component {
                 window.setTimeout(()=>
                     $('#finish_onboarding_modal').modal(), 2000);
             }
-        });
+        }));
     }
     render(){
         let subheader;

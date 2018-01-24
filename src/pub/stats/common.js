@@ -8,6 +8,7 @@ import {Col, Table, Pagination} from 'react-bootstrap';
 import axios from 'axios';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
+import classnames from 'classnames';
 
 class StatTable extends React.Component {
     render(){
@@ -98,7 +99,11 @@ class StatsService {
         return res.value();
     });
     static reset = etask._fn(function*(_this){
-        return yield _this.get('reset');
+        let resps = yield etask.all([
+            _this.get('reset'),
+            axios.get(`/api/proxy_stats/reset`),
+        ]);
+        return resps[0];
     });
     static get = etask._fn(function*(_, stats){
         let res = yield etask(()=>axios.get(`${StatsService.base}/${stats}`));
@@ -121,13 +126,17 @@ class StatsDetails extends React.Component {
         if (props.items_per_page!=this.props.items_per_page)
             Object.assign(update, {items_per_page: props.items_per_page});
         if (props.stats!=this.props.stats)
-            Object.assign(update, {all_stats: props.stats});
+        {
+            Object.assign(update, {all_stats: props.stats.map((s, idx)=>{
+                s.id = idx;
+                return s;
+            })});
+        }
         if (Object.keys(update).length)
             this.setState(update, ()=>this.paginate());
     }
-    componentDidMount(){
-        this.paginate();
-    }
+    componentDidMount(){ this.paginate(); }
+    select_item(preview_req){ this.setState({preview_req}); }
     paginate(page = -1){
         page = page > -1 ? page : this.state.cur_page;
         let stats = this.state.all_stats;
@@ -137,6 +146,7 @@ class StatsDetails extends React.Component {
             stats: stats.slice(cur_page*this.state.items_per_page,
                 (cur_page+1)*this.state.items_per_page),
             cur_page,
+            preview_req: stats[0]||{},
         });
     }
     page_change = page=>this.paginate(page-1);
@@ -161,50 +171,86 @@ class StatsDetails extends React.Component {
                 <Pagination next={next} boundaryLinks
                   activePage={this.state.cur_page+1}
                   bsSize="small" onSelect={this.page_change}
-                  items={pages} maxButtons={5} />
+                  items={pages} maxButtons={5}/>
             );
         }
-        return <div>
-              <div className="page-header">
-                <h3>{this.props.header}</h3>
+        return <div className="lpm stats">
+              <div className="panel top_panel">
+                <div className="panel_single_heading">
+                  <h3>{this.props.header}</h3>
+                </div>
               </div>
               <div>
-                {this.props.title}
-                <h3>Requests</h3>
-                <Table hover className="table-consolidate">
-                  <thead>
-                    <tr>
-                      <th className="col-sm-6">URL</th>
-                      <th>Bandwidth</th>
-                      <th>Response time</th>
-                      <th>Date</th>
-                      <th>IP used</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {this.state.stats.map((s, i)=>{
-                      let rh = JSON.parse(s.response_headers);
-                      let local = moment(rh.date).format('YYYY-MM-DD HH:mm:ss');
-                      return <tr key={i}>
-                        <td>
-                            {s.url}
-                            {this.render_headers(JSON.parse(s.request_headers))}
-                        </td>
-                        <td>{util.bytes_format(s.bw)}</td>
-                        <td>{s.response_time} ms</td>
-                        <td>{local}</td>
-                        <td>{s.proxy_peer}</td>
-                      </tr>;
-                    })}
-                  </tbody>
-                  <tfoot>
-                    <tr><td colSpan={5}>{pagination}</td></tr>
-                  </tfoot>
-                </Table>
+                <h3 className="top_header">Summary</h3>
+                <div className="panel summary_panel">
+                  <div className="panel_heading">
+                    <h2>Recent Requests</h2>
+                  </div>
+                  <div className="panel_body">
+                    <div className="list_wrapper">
+                      <div className="title">URL</div>
+                      <div className="list">
+                        {this.state.stats.map((s, i)=>
+                          <Request_item key={i} req={s}
+                            select_item={this.select_item.bind(this)}
+                            active={this.state.preview_req.id==s.id}/>
+                        )}
+                      </div>
+                      {pagination}
+                    </div>
+                    <Preview_req req={this.state.preview_req}/>
+                  </div>
+                </div>
                 {this.props.children}
               </div>
             </div>;
     }
 }
+
+const Request_item = props=>{
+    return (
+        <div onClick={()=>props.select_item(props.req)}
+          className={classnames('request_item', {active: props.active})}>
+          {props.req.url}
+        </div>
+    );
+};
+
+const Preview_req = props=>{
+    if (!props.req||!props.req.status_code)
+        return null;
+    const {response_headers, request_headers, status_code, url,
+        id} = props.req;
+    const resp_hs = JSON.parse(response_headers);
+    const req_hs = JSON.parse(request_headers);
+    return (
+        <div className="preview">
+          <div className="section">
+            <div className="title">General</div>
+            <Key_value k="Request URL" val={url}/>
+            <Key_value k="Status Code" val={status_code}/>
+          </div>
+          <div className="section">
+            <div className="title">Response headers</div>
+            {Object.entries(resp_hs).map(pair=>
+              <Key_value key={pair[0]} k={pair[0]} val={pair[1]}/>
+            )}
+          </div>
+          <div className="section">
+            <div className="title">Request headers</div>
+            {Object.entries(req_hs).map(pair=>
+              <Key_value key={pair[0]} k={pair[0]} val={pair[1]}/>
+            )}
+          </div>
+        </div>
+    );
+};
+
+const Key_value = ({k, val})=>(
+    <div className="key_value">
+      <div className="key">{k}</div>
+      <div className="value">{val}</div>
+    </div>
+);
 
 export default {StatsDetails, StatTable, StatsService};
