@@ -11,16 +11,12 @@ import classnames from 'classnames';
 const ga_event = util.ga_event;
 const localhost = window.location.origin;
 
-class Setup_guide extends React.Component {
-    render(){
-        return (
-            <div className="setup_guide lpm">
-              <h1 className="header">Start using Luminati Proxy Manager</h1>
-              <List/>
-            </div>
-        );
-    }
-}
+const Setup_guide = ()=>(
+    <div className="setup_guide lpm">
+      <h1 className="header">Start using Luminati Proxy Manager</h1>
+      <List/>
+    </div>
+);
 
 class Progress_modal extends React.Component {
     constructor(props){

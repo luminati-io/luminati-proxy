@@ -16,7 +16,7 @@
   </div>
   <div react-view=no_proxies ng-show="proxies && !proxies.length"></div>
   <div ng-show="proxies && proxies.length" class="lpm">
-    <div class="nav_header">
+    <div class="proxies nav_header">
       <h3>My Proxies</h3>
       <div class="subtitle">
         Create, edit and view your configured proxy ports on this computer</div>
@@ -297,11 +297,13 @@
         </div>
       </div>
       <div class=panel_footer>
-        <div uib-pagination ng-if="pagination.per_page<proxies.length"
-          ng-model=pagination.page ng-change=on_page_change()
-          items-per-page=pagination.per_page total-items=proxies.length
-          rotate=true boundary-link-numbers=true max-size=3
-          force-ellipses=true previous-text=" " next-text="Next">
+        <div class=pagination_panel>
+          <div uib-pagination ng-if="pagination.per_page<proxies.length"
+            ng-model=pagination.page ng-change=on_page_change()
+            items-per-page=pagination.per_page total-items=proxies.length
+            rotate=true boundary-link-numbers=true max-size=3
+            force-ellipses=true previous-text=" " next-text="Next">
+          </div>
         </div>
       </div>
     </div>

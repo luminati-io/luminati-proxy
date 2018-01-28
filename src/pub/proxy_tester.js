@@ -1,19 +1,18 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, If, Loader, Modal, Warnings,
-    onboarding, emitter} from './common.js';
+import {Input, Select, If, Loader, Modal, Warnings, onboarding,
+    emitter} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
-import setdb from 'hutil/util/setdb';
 import util from './util.js';
+import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
 
-class Proxy_tester extends React.Component {
+class Proxy_tester extends Pure_component {
     constructor(props){
         super(props);
         this.state = {response: {}};
@@ -48,7 +47,7 @@ const Nav = ()=>(
     </div>
 );
 
-class Request extends React.Component {
+class Request extends Pure_component {
     constructor(props){
         super(props);
         this.default_state = {headers: [], max_idx: 0, params: {
@@ -56,8 +55,7 @@ class Request extends React.Component {
         this.state = {...this.default_state, show_loader: false};
     }
     componentWillMount(){
-        this.sp = etask('Request', function*(){ yield this.wait(); });
-        this.listeners = [setdb.on('head.proxies_running', proxies=>{
+        this.setdb_on('head.proxies_running', proxies=>{
             if (!proxies||!proxies.length)
                 return;
             this.setState({proxies});
@@ -66,11 +64,7 @@ class Request extends React.Component {
                 this.default_state.params.proxy = def_port;
                 return {params: {...prev_state.params, proxy: def_port}};
             });
-        })];
-    }
-    componentWillUnmount(){
-        this.listeners.forEach(l=>setdb.off(l));
-        this.sp.return();
+        });
     }
     add_header(){
         ga_event('proxy-tester-tab', 'add header');
@@ -127,7 +121,7 @@ class Request extends React.Component {
         };
         this.setState({show_loader: true});
         const _this = this;
-        this.sp.spawn(etask(function*(){
+        this.etask(etask(function*(){
             this.on('uncaught', e=>{
                 console.error(e);
                 _this.setState({show_loader: false});

@@ -41,14 +41,10 @@ body {
     overflow-y: scroll;
     padding-top: 70px;
 }
-.no_padding {
-    .page-body { padding: 0; }
-    .nav_header { padding: 0 15px; }
-}
 .no_nav {
     .page-body { margin-left: 0; }
     .nav_top { background-color: white; }
-    .logo_wrapper { visibility: hidden; }
+    .logo_wrapper { background-color: white !important; }
 }
 .alert.alert-info { margin: 0 15px 20px; }
 .page-body {
@@ -309,33 +305,6 @@ div.proxies .btn-wrapper {
 .lum_login {
     position: relative;
     top: -20px;
-    .logo_header_wrapper {
-        margin: auto;
-        text-align: center;
-        .logo_header {
-            text-decoration: none;
-            display: inline-block;
-            .logo {
-                background-image: url(/img/logo_big.svg);
-                width: 251px;
-                height: 74px;
-                margin: auto;
-                margin-bottom: 14px
-            }
-            .logo_text {
-                text-transform: uppercase;
-                font-size: 28px;
-                letter-spacing: -1px;
-                background-color: @x_light;
-                color: @second_color;
-                width: 245px;
-                margin: auto;
-                padding: 8px;
-                border-radius: 7px;
-                text-align: center;
-            }
-        }
-    }
     .login_form {
         position: relative;
         max-width: 800px;
@@ -356,7 +325,7 @@ div.proxies .btn-wrapper {
             .btn_google_wrapper:active {
                 text-align: center;
                 .btn_google {
-                    margin: 46px 0 40px 0;
+                    margin: 89px 0 40px 0;
                     padding: 4px 0;
                     width: 240px;
                     height: 40px;
@@ -447,6 +416,7 @@ div.proxies .btn-wrapper {
 .tooltip.in { opacity: 1; }
 .tooltip-proxy-status .tooltip-inner, .tooltip-default .tooltip-inner,
 .tooltip .tooltip-inner {
+    word-break: break-word;
     max-width: 250px;
     border: solid 1px @second_color;
     background: white;
@@ -875,7 +845,10 @@ input.form-control[type=checkbox] {
             }
         }
         .panel_body { padding: 20px; }
-        .panel_footer { padding: 20px; }
+        .panel_footer {
+            padding: 20px;
+            position: relative;
+        }
         table {
             thead tr th {
                 font-weight: 300;
@@ -948,6 +921,19 @@ input.form-control[type=checkbox] {
                 color: @second_color;
                 mark { color: @first_color; }
             }
+        }
+    }
+    .pagination_panel {
+        height: 40px;
+        position: absolute;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        border-top: solid 1px @grey_border;
+        .pagination {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
         }
     }
 }
@@ -1208,6 +1194,7 @@ input.form-control[type=checkbox] {
     }
 }
 .proxies {
+    &.nav_header { padding: 0 15px; }
     .proxies_panel {
         .panel_body { position: relative; }
         .proxies_table_wrapper {
@@ -1215,7 +1202,10 @@ input.form-control[type=checkbox] {
             margin-left: 105px;
             overflow-y: visible;
         }
-        table { &.col__status { text-align: center; } }
+        table {
+            margin-bottom: 0;
+            &.col__status { text-align: center; }
+        }
         .status_icon {
             width: 18px;
             height: 18px;
@@ -1362,41 +1352,54 @@ input.form-control[type=checkbox] {
     .summary_panel {
         margin: 0 15px 20px;
         .panel_body {
-            display: flex;
-            .list_wrapper {
-                position: relative;
-                width: 230px;
-                .title {
-                    color: @blue_grey;
-                    border-bottom: solid 1px @grey_border;
-                    font-size: 14px;
-                    padding: 8px 10px;
-                }
-                .list {
-                    .request_item {
-                        font-size: 14px;
-                        padding: 8px 10px;
+            height: 490px;
+            overflow: hidden;
+            position: relative;
+            .requests_table {
+                margin-left: 230px;
+                table {
+                    width: 100%;
+                    .fixed_col {
+                        position: absolute;
+                        left: 20px;
+                        width: 230px;
+                    }
+                    td, th { padding: 8px 10px; }
+                    td { z-index: 0; }
+                    th { z-index: 1; }
+                    tr {
                         cursor: pointer;
-                        &.active {
+                        &:hover td { background-color: @xx_light; }
+                        &.active td {
                             background-color: @x_light;
                             cursor: default;
                         }
+                        td {
+                            overflow: hidden;
+                            white-space: nowrap;
+                        }
                     }
                 }
-                .pagination {
-                    position: absolute;
-                    bottom: 0;
-                    left: 5px;
-                }
+            }
+            .x_btn {
+                background: url(/img/delete.svg);
+                position: absolute;
+                width: 15px;
+                height: 15px;
+                background-size: contain;
+                top: 10px;
+                left: 260px;
+                cursor: pointer;
+                z-index: 10;
             }
             .preview {
-                flex: 1;
+                height: 450px;
+                max-height: 450px;
+                position: absolute;
+                top: 0;
                 padding: 30px;
                 background-color: @x_light;
-                height: 500px;
-                max-height: 500px;
-                overflow-y: auto;
-                overflow-x: hidden;
+                overflow: auto;
                 .section {
                     font-size: 14px;
                     margin-bottom: 7px;
@@ -1414,6 +1417,7 @@ input.form-control[type=checkbox] {
                     .key_value {
                         display: flex;
                         .key { min-width: 180px; width: 180px; }
+                        .value { word-break: break-all; }
                     }
                 }
             }
@@ -1474,9 +1478,7 @@ input.form-control[type=checkbox] {
             }
             .add_header_wrapper {
                 text-align: center;
-                .btn_add_header {
-                    font-weight: 300;
-                }
+                .btn_add_header { font-weight: 300; }
             }
             .footer_buttons {
                 text-align: center;
@@ -1758,30 +1760,38 @@ input.form-control[type=checkbox] {
     }
 }
 .add_proxy_modal.modal .modal-content {
-    .icon {
-        position: absolute;
-        width: 26px;
-        height: 26px;
+    .fields_wrapper {
+        display: flex;
+        .fields {
+            .field {
+                margin-bottom: 25px;
+                &:last-child { margin-bottom: 0; }
+                .field_header {
+                    position: absolute;
+                    .icon {
+                        position: absolute;
+                        width: 26px;
+                        height: 26px;
+                    }
+                    .zone_icon { background: url(/img/zone_icon.png); }
+                    .preset_icon { background: url(/img/preset_icon.png); }
+                    h4 {
+                        color: @second_color;
+                        font-weight: bold;
+                        font-size: 20px;
+                        letter-spacing: 0.5px;
+                        position: relative;
+                        left: 40px;
+                        top: 3px;
+                    }
+                }
+                select { margin-top: 40px; }
+            }
+        }
     }
-    .zone_icon { background: url(/img/zone_icon.png); }
-    .preset_icon { background: url(/img/preset_icon.png); }
     .modal-footer {
         button { margin: 10px 16px; }
         button.options { width: 190px; }
-    }
-    .section {
-        margin-bottom: 37px;
-        &:last-child { margin-bottom: 10px; }
-        h4 {
-            color: @second_color;
-            font-weight: bold;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-            position: relative;
-            left: 50px;
-            top: 3px;
-        }
-        select { margin-top: 25px; }
     }
     .preview {
         margin-top: 15px;
@@ -1799,15 +1809,19 @@ input.form-control[type=checkbox] {
             margin-bottom: 12px;
         }
     }
-    ul { padding-left: 0; }
-    ul li { list-style: none; }
-    ul li::before {
-        color: @second_color;
-        content: "\2022";
-        font-size: 26px;
-        padding-right: 6px;
-        position: relative;
-        top: 2px;
+    ul {
+        padding-left: 0;
+        li {
+            list-style: none;
+            &::before {
+                color: @second_color;
+                content: "\2022";
+                font-size: 26px;
+                padding-right: 6px;
+                position: relative;
+                top: 2px;
+            }
+        }
     }
 }
 .nav_left {

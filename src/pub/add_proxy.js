@@ -1,28 +1,26 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import regeneratorRuntime from 'regenerator-runtime';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {If, Modal, Loader, onboarding, presets,
-    emitter} from './common.js';
+import {If, Modal, Loader, onboarding, presets, emitter} from './common.js';
 import util from './util.js';
+import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
 
-class Add_proxy extends React.Component {
+class Add_proxy extends Pure_component {
     constructor(props){
         super(props);
-        this.sp = etask('Add_proxy', function*(){ yield this.wait(); });
         this.presets_opt = Object.keys(presets).map(p=>
             ({key: presets[p].title, value: p}));
         this.state = {zone: '', preset: 'sequential', show_loader: false};
     }
     componentWillMount(){
-        this.listener = setdb.on('head.consts', consts=>{
+        this.setdb_on('head.consts', consts=>{
             if (!consts)
                 return;
             const zones = (consts.proxy.zone.values||[]).filter(z=>{
@@ -32,7 +30,6 @@ class Add_proxy extends React.Component {
             this.setState({consts, zones});
         });
     }
-    componentWillUnmount(){ setdb.off(this.listener); }
     persist(){
         const preset = this.state.preset;
         const form = {
@@ -74,7 +71,7 @@ class Add_proxy extends React.Component {
     }
     save(opt={}){
         const _this = this;
-        this.sp.spawn(etask(function*(){
+        this.etask(etask(function*(){
             const port = yield _this.persist();
             onboarding.check_created_proxy();
             const callbacks = setdb.get('head.callbacks');
@@ -119,30 +116,30 @@ class Add_proxy extends React.Component {
               <Loader show={this.state.show_loader}/>
               <Modal id="add_proxy_modal" title="Add new proxy"
                 footer={Footer_wrapper} className="add_proxy_modal">
-                <div className="section">
-                  <Field icon_class="zone_icon" val={this.state.zone}
-                    options={this.state.zones} title="Choose Zone"
-                    on_change={this.field_changed('zone').bind(this)}/>
-                </div>
-                <div className="section">
-                  <Field icon_class="preset_icon" val={this.state.preset}
-                    options={this.presets_opt}
-                    title="Select preset configuration"
-                    on_change={this.field_changed('preset').bind(this)}/>
-                  <div className="preview">
-                    <div className="header">
-                      {presets[this.state.preset].title}</div>
-                    <div className="desc">
-                      {presets[this.state.preset].subtitle}</div>
-                    <ul>
-                    {(presets[this.state.preset].rules||[]).map((r, i)=>(
-                      <li key={i}>
-                        <a onClick={()=>this.rule_clicked(r.field)}>
-                          {r.label}</a>
-                      </li>
-                    ))}
-                    </ul>
+                <div className="fields_wrapper">
+                  <div className="fields">
+                    <Field icon_class="zone_icon" val={this.state.zone}
+                      options={this.state.zones} title="Choose Zone"
+                      on_change={this.field_changed('zone').bind(this)}/>
+                    <Field icon_class="preset_icon" val={this.state.preset}
+                      options={this.presets_opt}
+                      title="Select preset configuration"
+                      on_change={this.field_changed('preset').bind(this)}/>
                   </div>
+                </div>
+                <div className="preview">
+                  <div className="header">
+                    {presets[this.state.preset].title}</div>
+                  <div className="desc">
+                    {presets[this.state.preset].subtitle}</div>
+                  <ul>
+                  {(presets[this.state.preset].rules||[]).map((r, i)=>(
+                    <li key={i}>
+                      <a onClick={()=>this.rule_clicked(r.field)}>
+                        {r.label}</a>
+                    </li>
+                  ))}
+                  </ul>
                 </div>
               </Modal>
             </div>
@@ -151,9 +148,11 @@ class Add_proxy extends React.Component {
 }
 
 const Field = props=>(
-    <div>
-      <div className={classnames('icon', props.icon_class)}/>
-      <h4>{props.title}</h4>
+    <div className="field">
+      <div className="field_header">
+        <div className={classnames('icon', props.icon_class)}/>
+        <h4>{props.title}</h4>
+      </div>
       <select onChange={e=>props.on_change(e.target.value)} value={props.val}>
         {props.options.map((o, i)=>(
             <option key={i} value={o.value}>{o.key}</option>

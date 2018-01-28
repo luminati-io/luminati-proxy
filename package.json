@@ -12,6 +12,7 @@
   },
   "build": {
     "appId": "luminati.proxy_manager",
+    "category": "public.app-category.utilities",
     "asar": false,
     "artifactName": "${name}-${version}.${ext}",
     "directories": {
@@ -33,15 +34,30 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.80.565",
+    "productName": "Luminati Proxy Manager 1.80.942",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
     },
     "win": {
-      "target": {
-        "target": "nsis"
-      }
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "tar.gz"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     }
   },
   "dependencies": {
@@ -289,7 +305,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "d9f7e48b0e266aff8a7b734d7ce0d17e"
+    "md5": "a1486bb6a018b1ea924217d9ebef27b6"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -328,5 +344,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.80.565"
+  "version": "1.80.942"
 }

@@ -993,6 +993,7 @@ describe('proxy', ()=>{
                 reserved_keep_alive: 1});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
+            _this.timeout(6000);
             for (var i=0; i<5; i++)
             {
                 yield l.test();
@@ -1552,40 +1553,69 @@ describe('manager', ()=>{
 const util = require('./lib/util.js');
 
 describe('util', ()=>{
-    it('param_rand_range', ()=>{
-        assert.equal(util.param_rand_range('0:0'), 0);
-        assert.equal(util.param_rand_range(0), 0);
-        assert.equal(util.param_rand_range('0'), 0);
-        assert.equal(util.param_rand_range('1'), 1);
-        assert.equal(util.param_rand_range('5:1'), 5);
-        assert.equal(util.param_rand_range('5:1', 100), 500);
-        assert.equal(util.param_rand_range([5, 1], 100), 500);
-        assert.equal(util.param_rand_range('sdasda'), 0);
-        assert.equal(util.param_rand_range(5), 5);
-        let rand_range = util.param_rand_range('2:4');
-        assert.ok(rand_range>=2 && rand_range<=4);
-        rand_range = util.param_rand_range('2:4', 100);
-        assert.ok(rand_range>=200 && rand_range<=400);
+    describe('param_rand_range', ()=>{
+        const t = (arg, res, mult)=>{
+            let name = JSON.stringify(arg)+(mult>0 ? ' mult:'+mult : '');
+            it(name, ()=>{
+                let rand_range = util.param_rand_range(arg, mult);
+                assert.equal(rand_range, res);
+            });
+        };
+        t('0:0', 0);
+        t(0, 0);
+        t('1', 1);
+        t('5:1', 5);
+        t('5:1', 500, 100);
+        t([5, 1], 500, 100);
+        t('test', 0);
+        t(5, 5);
+        it('in range 2:4', ()=>{
+            let rand_range = util.param_rand_range('2:4');
+            assert.ok(rand_range>=2 && rand_range<=4);
+        });
+        it('in range 2:4 mult 100', ()=>{
+            let rand_range = util.param_rand_range('2:4', 100);
+            assert.ok(rand_range>=200 && rand_range<=400);
+        });
     });
-    it('write_http_reply', ()=>{});
 });
 
 const lpm = require('./lib/lpm.js');
 
 describe('Lsession', ()=>{
     const {Lsession} = lpm;
-    it('should calculate username', ()=>{
-        const t = (obj, res)=>{
+    describe('calculate username', ()=>{
+        const t = (name, obj, res)=>it(name, ()=>{
             let sess = new Lsession(obj);
-            let username = sess.calculate_username();
-            assert.equal(username, res);
-        };
-        t({zone: 'test_zone', customer: 'test_customer'},
+            let uname = sess.calculate_username();
+            assert.equal(uname, res);
+        });
+        t('general', {zone: 'test_zone', customer: 'test_customer'},
             'lum-customer-test_customer-zone-test_zone');
-        t({zone: 'test_zone', customer: 'test_customer', 'password': 123},
-            'lum-customer-test_customer-zone-test_zone');
+        t('omit password', {zone: 'test_zone', customer: 'test_customer',
+            'password': '123'}, 'lum-customer-test_customer-zone-test_zone');
     });
-    it('should expire', ()=>{});
+    describe('should expire', ()=>{});
+});
+
+describe('Lreverse_dns', ()=>{
+    const {Lreverse_dns} = lpm;
+    describe('parse_values', ()=>{
+       const t = (name, vals, expect)=>it(name, ()=>{
+           let ldns = new Lreverse_dns();
+           assert.deepEqual(ldns.parse_vals(vals), expect);
+       });
+       t('no values', [], {});
+       t('one value', ['1.1.1.1 test.com'], {'1.1.1.1': 'test.com'});
+       t('one value with comment', ['1.1.1.1 test.com #I am a comment'],
+           {'1.1.1.1': 'test.com'});
+       t('too match domains', ['1.1.1.1 test.com test2.com'], {});
+       let many_vals = ['1.1.1.1 test.com', '1.2.3.4 test2.com',
+           '192.43.54.123 test3.com'];
+       let many_vals_expect = {'1.1.1.1': 'test.com', '1.2.3.4': 'test2.com',
+           '192.43.54.123': 'test3.com'};
+       t('many values', many_vals, many_vals_expect);
+    });
 });
 
 describe('Lhttp_server', ()=>{
@@ -1607,7 +1637,7 @@ describe('session pool', ()=>{
             else
                 pool = new pool_cls(itm_constr);
         });
-        let t = (name)=>it(`${name} ${pool_size}`, ()=>etask(function*(){
+        let t = name=>it(`${name} ${pool_size}`, ()=>etask(function*(){
             assert.ok(!pool.ready);
             yield pool.populate();
             assert.equal(pool.size, pool.itms.length);
@@ -1650,3 +1680,4 @@ describe('session pool', ()=>{
         t('sequential 8', itms, 8, '4-4-4-4-4-4-4-4');
     });
 });
+

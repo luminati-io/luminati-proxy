@@ -82,7 +82,7 @@ const Lang_btn = props=>{
     return <button className={class_names}>{props.text}</button>;
 };
 
-class Code_instructions extends React.Component {
+class Code_instructions extends Pure_component {
     constructor(props){
         super(props);
         this.state = {lang: 'shell'};
@@ -130,7 +130,7 @@ class Code_instructions extends React.Component {
     }
 }
 
-class Browser_instructions extends React.Component {
+class Browser_instructions extends Pure_component {
     constructor(props){
         super(props);
         this.state = {browser: 'chrome_win'};

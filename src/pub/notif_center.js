@@ -4,28 +4,26 @@ import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import etask from 'hutil/util/etask';
-import setdb from 'hutil/util/setdb';
 import ajax from 'hutil/util/ajax';
 import {Modal, If} from './common.js';
 import $ from 'jquery';
 import util from './util.js';
+import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
 
-class Notif_center extends React.Component {
+class Notif_center extends Pure_component {
     constructor(props){
         super(props);
         this.state = {loaded: false, messages: []};
     }
     componentWillMount(){
-        this.sp = etask('Notif', function*(){ yield this.wait(); });
         const _this = this;
-        this.sp.spawn(etask(function*(){
+        this.etask(etask(function*(){
             const www_lpm = yield ajax.json({url: 'api/www_lpm'});
             _this.setState({messages: www_lpm.messages, loaded: true});
         }));
     }
-    componentWillUnmount(){ this.sp.return(); }
     open(){
         if (this.state.loaded)
         {
@@ -73,7 +71,7 @@ const Message = ({subject, text})=>{
 };
 
 
-class Modal_portal extends React.Component {
+class Modal_portal extends Pure_component {
     render(){
         return ReactDOM.createPortal(this.props.children,
             document.getElementById('notif_react_modal'));

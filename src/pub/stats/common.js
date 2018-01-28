@@ -9,6 +9,9 @@ import axios from 'axios';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import classnames from 'classnames';
+import {If} from '../common.js';
+import Pure_component from '../../../www/util/pub/pure_component.js';
+import $ from 'jquery';
 
 class StatTable extends React.Component {
     render(){
@@ -136,7 +139,12 @@ class StatsDetails extends React.Component {
             this.setState(update, ()=>this.paginate());
     }
     componentDidMount(){ this.paginate(); }
-    select_item(preview_req){ this.setState({preview_req}); }
+    select_req(id){
+        this.setState(prev_state=>{
+            const req = prev_state.all_stats.filter(s=>s.id==id)[0]||{};
+            return {preview_req: req};
+        });
+    }
     paginate(page = -1){
         page = page > -1 ? page : this.state.cur_page;
         let stats = this.state.all_stats;
@@ -146,7 +154,7 @@ class StatsDetails extends React.Component {
             stats: stats.slice(cur_page*this.state.items_per_page,
                 (cur_page+1)*this.state.items_per_page),
             cur_page,
-            preview_req: stats[0]||{},
+            preview_req: {},
         });
     }
     page_change = page=>this.paginate(page-1);
@@ -187,18 +195,10 @@ class StatsDetails extends React.Component {
                     <h2>Recent Requests</h2>
                   </div>
                   <div className="panel_body">
-                    <div className="list_wrapper">
-                      <div className="title">URL</div>
-                      <div className="list">
-                        {this.state.stats.map((s, i)=>
-                          <Request_item key={i} req={s}
-                            select_item={this.select_item.bind(this)}
-                            active={this.state.preview_req.id==s.id}/>
-                        )}
-                      </div>
-                      {pagination}
-                    </div>
-                    <Preview_req req={this.state.preview_req}/>
+                    <Requests_table reqs={this.state.stats}
+                      select_req={this.select_req.bind(this)}
+                      preview_req={this.state.preview_req}/>
+                    <div className="pagination_panel">{pagination}</div>
                   </div>
                 </div>
                 {this.props.children}
@@ -207,12 +207,70 @@ class StatsDetails extends React.Component {
     }
 }
 
-const Request_item = props=>{
+const Requests_table = props=>{
+    const reset = ()=>{ props.select_req(null); };
     return (
-        <div onClick={()=>props.select_item(props.req)}
-          className={classnames('request_item', {active: props.active})}>
-          {props.req.url}
+        <div className="requests_table">
+          <If when={props.preview_req&&props.preview_req.id!==undefined}>
+            <div onClick={reset} className="x_btn"/>
+          </If>
+          <Preview_req req={props.preview_req}/>
+          <table>
+            <thead>
+              <tr>
+                <th className="fixed_col">Domain</th>
+                <th>Code</th>
+                <th>Bandwidth</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Proxy Peer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {props.reqs.map(r=>(
+                <Request_row select_req={props.select_req}
+                  key={r.id} req={r} preview_id={props.preview_req.id}/>
+              ))}
+            </tbody>
+          </table>
         </div>
+    );
+};
+
+class Tooltip extends Pure_component {
+    componentDidMount(){ $(this.el).tooltip(); }
+    ref(el){ this.el = el; }
+    render(){
+        const {children, title} = this.props;
+        return (
+            <span style={{display: 'inline-block'}} data-toggle="tooltip"
+              data-placement="top" title={title} ref={this.ref.bind(this)}
+              data-container="body">
+              {children}
+            </span>
+        );
+    }
+}
+
+const Request_row = props=>{
+    const req = props.req;
+    const rh = JSON.parse(req.response_headers);
+    const local = moment(rh.date).format('YYYY-MM-DD HH:mm:ss');
+    const active = props.preview_id==req.id;
+    return (
+        <tr className={classnames({active})}
+          onClick={()=>props.select_req(req.id)}>
+          <td className="fixed_col">
+            <Tooltip title={req.url}>{req.hostname}</Tooltip>
+          </td>
+          <td>
+            <Tooltip title={req.status_message}>{req.status_code}</Tooltip>
+          </td>
+          <td>{util.bytes_format(req.bw)}</td>
+          <td>{local}</td>
+          <td>{req.response_time} ms</td>
+          <td>{req.proxy_peer}</td>
+        </tr>
     );
 };
 
@@ -223,28 +281,28 @@ const Preview_req = props=>{
         id} = props.req;
     const resp_hs = JSON.parse(response_headers);
     const req_hs = JSON.parse(request_headers);
+    const general_entries = [['Request URL', url],
+        ['Status Code', status_code]];
+    const width = 'calc(100% - 250px)';
     return (
-        <div className="preview">
-          <div className="section">
-            <div className="title">General</div>
-            <Key_value k="Request URL" val={url}/>
-            <Key_value k="Status Code" val={status_code}/>
-          </div>
-          <div className="section">
-            <div className="title">Response headers</div>
-            {Object.entries(resp_hs).map(pair=>
-              <Key_value key={pair[0]} k={pair[0]} val={pair[1]}/>
-            )}
-          </div>
-          <div className="section">
-            <div className="title">Request headers</div>
-            {Object.entries(req_hs).map(pair=>
-              <Key_value key={pair[0]} k={pair[0]} val={pair[1]}/>
-            )}
-          </div>
+        <div className="preview" style={{minWidth: width, maxWidth: width}}>
+          <Preview_section title="General" entries={general_entries}/>
+          <Preview_section title="Response headers"
+            entries={Object.entries(resp_hs)}/>
+          <Preview_section title="Request headers"
+            entries={Object.entries(req_hs)}/>
         </div>
     );
 };
+
+const Preview_section = props=>(
+    <div className="section">
+      <div className="title">{props.title}</div>
+      {(props.entries||[]).map(pair=>
+        <Key_value key={pair[0]} k={pair[0]} val={pair[1]}/>
+      )}
+    </div>
+);
 
 const Key_value = ({k, val})=>(
     <div className="key_value">

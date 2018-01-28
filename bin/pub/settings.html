@@ -1,10 +1,4 @@
 <div ng-controller=settings id=settings-page class="lpm lum_login">
-  <div class=logo_header_wrapper>
-    <a href="https://luminati.io/cp" target=_blank class=logo_header>
-      <div class=logo></div>
-      <div class=logo_text>proxy manager</div>
-    </a>
-  </div>
   <div class="warning error settings-alert" ng-if=user_error ng-bind-html=user_error.message>
     <div class=warning_icon></div>
   </div>
@@ -13,9 +7,7 @@
     The application is running with the following arguments:
     <strong>
       <span ng-repeat="p in parse_arguments($root.settings.argv)">
-        <span ng-if=!($index%2)||args_password>
-          {{p}}
-        </span>
+        <span ng-if=!($index%2)||args_password>{{p}}</span>
         <span ng-if=$index%2&&!args_password>
           <a ng-click=show_password() href=#>(show)</a>
         </span>

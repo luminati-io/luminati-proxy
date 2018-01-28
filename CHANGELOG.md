@@ -1,7 +1,13 @@
  Luminati Proxy manager - Change Log
 
+## 1.80.942
+- :star: adding HAR view for request history
+- :sparkles: UI and bug fixing
+
 ## 1.80.565
 - :bug: fix crash when enabling history
+- :sparkles: improved view of request history
+- :sparkles: polishing UI elements
 
 ## 1.80.111
 - :sparkles: improved bash installation script on Mac

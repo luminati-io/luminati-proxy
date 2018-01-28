@@ -14,11 +14,12 @@
   </head>
   <body ng-cloak ng-controller=root>
     <div class="top_nav_wrapper"
-      ng-class="{'no_nav': section.name=='settings' || section.name=='welcome',
-      'no_padding': section.name=='proxies'}">
+      ng-class="{'no_nav': section.name=='settings'}">
       <div class="lpm nav_top">
         <div class=logo_wrapper>
-          <a href="/proxies" class=logo></a>
+          <a ng-if="section.name!='settings'" href="/proxies" class=logo></a>
+          <a ng-if="section.name=='settings'" href="https://luminati.io/cp"
+            target=_blank class=logo></a>
           <span class=version ng-if=ver_cur>V{{ver_cur}}</span>
         </div>
         <div class=nav_top_right>
@@ -56,8 +57,9 @@
         </div>
         <div class=menu_filler></div>
         <div class=footer>
-          <a href=http://luminati.io/faq#proxy target="_blank">FAQ</a>
-          | <a href=mailto:lpm@luminati.io>Contact us</a>
+          <a href=http://luminati.io/faq#proxy target="_blank" class="link">
+            FAQ</a>
+          | <a href=mailto:lpm@luminati.io class="link">Contact us</a>
         </div>
       </div>
       <div class="container page-body">
