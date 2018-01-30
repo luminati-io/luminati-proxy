@@ -101,9 +101,9 @@
                   <td>{{r.proxy_peer}}</td>
                   <td>{{r.context}}</td>
                   <td>
-                    <a title=Replay href="{{r | request}}"
-                      ng-click=$event.stopPropagation()>
-                      <span class="glyphicon glyphicon-repeat"></span>
+                    <a title=Replay ng-click="$event.stopPropagation()">
+                      <span ng-click=replay(r)
+                        class="glyphicon glyphicon-repeat"></span>
                     </a>
                   </td>
                 </tr>

@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.81.318
+- :star: add min request time as rule trigger type
+- :sparkles: improved multiply feature
+
 ## 1.80.942
 - :star: adding HAR view for request history
 - :sparkles: UI and bug fixing

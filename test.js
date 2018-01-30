@@ -360,9 +360,9 @@ describe('proxy', ()=>{
             t('bypass proxy', ()=>ping.http.url, {bypass_proxy: '.*'},
                 ()=>ping.history[0]);
             t('http', ()=>test_url, {}, ()=>proxy.history[0]);
-            t('https sniffing', ()=>ping.https.url, {insecure: true},
-                ()=>proxy.history[0]);
-            t('https connect', ()=>ping.https.url, {insecure: true},
+            t('https sniffing', ()=>ping.https.url,
+                {insecure: true, ssl: true}, ()=>proxy.history[0]);
+            t('https connect', ()=>ping.https.url, {insecure: true, ssl: true},
                 ()=>proxy.history[0]);
         });
         describe('keep letter caseing and order', ()=>{
@@ -743,7 +743,8 @@ describe('proxy', ()=>{
             t('http', ()=>ping.http.url+'match',
                 ()=>ping.http.url+'n-o--m-a-t-c-h');
             t('https sniffing', ()=>ping.https.url+'match',
-                ()=>ping.https.url+'n-o--m-a-t-c-h', {insecure: true});
+                ()=>ping.https.url+'n-o--m-a-t-c-h',
+                {insecure: true, ssl: true});
             it('https connect', ()=>'https://match.com/', ()=>ping.https.url,
                 {insecure: true});
         });
@@ -903,7 +904,7 @@ describe('proxy', ()=>{
                 port: 24000,
                 method: 'GET',
                 url: ping.https.url,
-            }), {insecure: true});
+            }), {insecure: true, ssl: true});
             t('bypass http', ()=>ping.http.url, ()=>({
                 port: 24000,
                 url: ping.http.url,

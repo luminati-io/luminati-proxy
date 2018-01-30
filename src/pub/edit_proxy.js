@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import classnames from 'classnames';
 import $ from 'jquery';
@@ -14,7 +13,12 @@ import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {Netmask} from 'netmask';
+import Pure_component from '../../www/util/pub/pure_component.js';
+import {getContext, withContext} from 'recompose';
+import PropTypes from 'prop-types';
 
+const provider = provide=>withContext({provide: PropTypes.object},
+    ()=>({provide}));
 const event_tracker = {};
 const ga_event = (category, action, label, opt={})=>{
     const id = category+action+label;
@@ -74,15 +78,6 @@ const tabs = {
                 tooltip: `Maintain number of IPs that will be pinged constantly
                     - must have keep_alive to work properly`,
             },
-            multiply_ips: {
-                label: 'Multiply IPs',
-                tooltip: `Create proxy port for every selected IP from the pool`
-            },
-            multiply_vips: {
-                label: 'Multiply gIPs',
-                tooltip: `Create proxy port for every selected gIP from pool
-                    of available gIPS in your zone`
-            },
             request_timeout: {
                 label: 'Timeout for requests on the super proxy',
                 tooltip: `Kill requests to super proxy and try new one if
@@ -139,6 +134,10 @@ const tabs = {
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
                 placeholder:`i.e. (captcha|robot)`
+            },
+            min_req_time: {
+                label: 'Minimum request time',
+                placeholder: '500',
             },
             max_req_time: {
                 label: 'Maximum request time',
@@ -272,8 +271,18 @@ const tabs = {
                 tooltip: `Specify a network interface for the machine to use`,
             },
             multiply: {
-                label: 'Multiply',
+                label: 'Multiply port',
                 tooltip: `Create multiple identical ports`,
+            },
+            multiply_ips: {
+                label: 'Multiply port per IP',
+                tooltip: `Create proxy port for every selected IP from the
+                    pool`
+            },
+            multiply_vips: {
+                label: 'Multiply port per gIP',
+                tooltip: `Create proxy port for every selected gIP from pool
+                    of available gIPS in your zone`
             },
             socks: {
                 label: 'SOCKS 5 port',
@@ -311,7 +320,7 @@ const tabs = {
                 tooltip: `Insert URL pattern for which requests will NOT be
                     passed through super proxy`,
             },
-             allow_proxy_auth: {
+            allow_proxy_auth: {
                 label: 'Allow request authentication',
                 tooltip: `Pass auth data per request (use lpm like
                     api)`,
@@ -375,6 +384,8 @@ class Index extends React.Component {
             setdb.on('head.locations',
                 locations=>this.setState({locations}, this.delayed_loader())),
             setdb.on('head.callbacks', callbacks=>this.setState({callbacks})),
+            setdb.on('edit_proxy.loading', loading=>this.setState({loading})),
+            setdb.on('edit_proxy.tab', (tab='target')=>this.setState({tab})),
         ];
     }
     componentDidMount(){
@@ -395,6 +406,9 @@ class Index extends React.Component {
         this.setState(state=>{
             const show_loader = !state.consts || !state.locations ||
                 !state.proxies || !state.defaults;
+            const zone_name = !show_loader&&
+                (state.form.zone||state.consts.proxy.zone.def);
+            setdb.set('edit_proxy.zone_name', zone_name);
             return {show_loader};
         });
     }
@@ -410,7 +424,7 @@ class Index extends React.Component {
             }
         }
         if (tab)
-            this.setState({tab});
+            this.click_tab(tab);
     }
     guess_preset(form){
         let res;
@@ -428,7 +442,7 @@ class Index extends React.Component {
         return res;
     }
     click_tab(tab){
-        this.setState({tab});
+        setdb.set('edit_proxy.tab', tab);
         ga_event('categories', 'click', tab);
     }
     is_dirty(form){
@@ -522,6 +536,11 @@ class Index extends React.Component {
             form.trigger_url_regex = form.rule.url;
             form.trigger_type = form.rule.trigger_type;
             form.body_regex = form.rule.body_regex;
+            if (form.rule.min_req_time)
+            {
+                const min_req_time = form.rule.min_req_time.match(/\d+/);
+                form.min_req_time = Number(min_req_time&&min_req_time[0]);
+            }
             if (form.rule.max_req_time)
             {
                 const max_req_time = form.rule.max_req_time.match(/\d+/);
@@ -715,6 +734,11 @@ class Index extends React.Component {
                 arg: form.body_regex};
             form.rule.body_regex = form.body_regex;
         }
+        else if (form.trigger_type=='min_req_time'&&form.min_req_time)
+        {
+            form.rules.post[0].res[0].min_req_time = form.min_req_time+'ms';
+            form.rule.min_req_time = form.min_req_time+'ms';
+        }
         else if (form.trigger_type=='max_req_time'&&form.max_req_time)
         {
             form.rules.post[0].res[0].max_req_time = form.max_req_time+'ms';
@@ -723,6 +747,7 @@ class Index extends React.Component {
         else if (!form.rules.post && !form.rules.pre)
             form.rules = null;
         delete form.trigger_type;
+        delete form.min_req_time;
         delete form.max_req_time;
         delete form.status_code;
         delete form.status_custom;
@@ -827,9 +852,16 @@ class Index extends React.Component {
             <strong> 'Save' </strong>
             to apply the changes
         </span>);
+        // XXX krzysztof: cleanup
+        const curr_plan = this.state.consts&&this.get_curr_plan();
+        let type;
+        if (curr_plan&&curr_plan.type=='static')
+            type = 'ips';
+        else if (curr_plan&&!!curr_plan.vip)
+            type = 'vips';
         return (
             <div className="lpm edit_proxy">
-              <Loader show={this.state.show_loader}/>
+              <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
                   <h3>Port {this.port}</h3>
@@ -868,28 +900,37 @@ class Index extends React.Component {
                 title="Errors:" no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
+              <Alloc_modal type={type} form={this.state.form} support={support}
+                zone={this.state.form.zone||default_zone}
+                on_change_field={this.field_changed.bind(this)}/>
             </div>
         );
     }
 }
 
 const Nav = props=>{
-    const update_preset = val=>{
-        props.on_change_preset(props.form, val);
-        ga_event('top bar', 'edit field', 'preset');
-    };
-    const update_zone = val=>{
-        const zone_name = val||props.default_zone;
-        const zone = props.zones.filter(z=>z.key==zone_name)[0]||{};
-        props.on_change_field('zone', val);
-        props.on_change_field('password', zone.password);
-        if (props.form.ips.length || props.form.vips.length)
-            props.on_change_field('pool_size', 0);
+    const reset_fields = ()=>{
+        // XXX krzysztof: this should be moved in more generic place
         props.on_change_field('ips', []);
         props.on_change_field('vips', []);
         props.on_change_field('multiply_ips', false);
         props.on_change_field('multiply_vips', false);
         props.on_change_field('multiply', 1);
+    };
+    const update_preset = val=>{
+        props.on_change_preset(props.form, val);
+        reset_fields();
+        ga_event('top bar', 'edit field', 'preset');
+    };
+    const update_zone = val=>{
+        const zone_name = val||props.default_zone;
+        setdb.set('edit_proxy.zone_name', zone_name);
+        const zone = props.zones.filter(z=>z.key==zone_name)[0]||{};
+        props.on_change_field('zone', val);
+        props.on_change_field('password', zone.password);
+        if (props.form.ips.length || props.form.vips.length)
+            props.on_change_field('pool_size', 0);
+        reset_fields();
     };
     const presets_opt = Object.keys(presets).map(p=>
         ({key: presets[p].title, value: p}));
@@ -1010,7 +1051,7 @@ const Section_header = props=>{
     return props.text ? <div className="header">{props.text}</div> : null;
 };
 
-class Section extends React.Component {
+class Section_raw extends React.Component {
     constructor(props){
         super(props);
         this.state = {focused: false};
@@ -1033,7 +1074,7 @@ class Section extends React.Component {
         };
         const message = this.props.error_msg
             ? this.props.error_msg
-            : tabs[this.props.tab_id].fields[this.props.id].tooltip;
+            : tabs[this.props.provide.tab_id].fields[this.props.id].tooltip;
         return (
             <div tabIndex="0" onFocus={this.on_focus.bind(this)}
               onBlur={this.on_blur.bind(this)} className="section_wrapper"
@@ -1050,6 +1091,7 @@ class Section extends React.Component {
         );
     }
 }
+const Section = getContext({provide: PropTypes.object})(Section_raw);
 
 const Textarea = props=>{
     return (
@@ -1080,10 +1122,12 @@ const Input_boolean = props=>{
         val = val=='true';
         props.on_change_wrapper(val);
     };
+    const on_click_on = props.on_boolean_clicked||(()=>{});
     return (
         <div className="radio_buttons">
           <div className="option">
             <input type="radio" checked={props.val==true}
+              onClick={on_click_on}
               onChange={e=>update(e.target.value)} id={props.id+'_enable'}
               name={props.id} value="true" disabled={props.disabled}/>
             <div className="checked_icon"/>
@@ -1107,22 +1151,23 @@ const Typeahead_wrapper = props=>(
 );
 
 const Section_with_fields = props=>{
-    const {id, form, tab_id, header, errors, init_focus} = props;
+    const {id, form, header, errors, init_focus} = props;
     const disabled = props.disabled || !props.is_valid_field(id);
     const is_empty_arr = Array.isArray(form[id]) && !form[id][0];
     const correct = form[id] && form[id]!='*' && !is_empty_arr;
     const error_msg = errors[id];
     return (
-        <Section correct={correct} disabled={disabled} id={id} tab_id={tab_id}
+        <Section correct={correct} disabled={disabled} id={id}
           header={header} error_msg={error_msg} init_focus={init_focus}>
           <Section_field {...props} disabled={disabled} correct={correct}/>
         </Section>
     );
 };
 
-const Section_field = props=>{
-    const {tab_id, id, form, sufix, note, type, disabled, data, on_change,
-        on_change_field, min, max, validator} = props;
+let Section_field = props=>{
+    const {id, form, sufix, note, type, disabled, data, on_change,
+        on_change_field, min, max, validator, on_boolean_clicked} = props;
+    const {tab_id} = props.provide;
     const on_blur = e=>{
         if (validator)
             on_change_field(id, validator(e.target.value));
@@ -1163,7 +1208,8 @@ const Section_field = props=>{
               <Comp form={form} id={id} data={data} type={type}
                 on_change_wrapper={on_change_wrapper} val={val}
                 disabled={disabled} min={min} max={max}
-                placeholder={placeholder} on_blur={on_blur}/>
+                placeholder={placeholder} on_blur={on_blur}
+                on_boolean_clicked={on_boolean_clicked}/>
               {sufix ? <span className="sufix">{sufix}</span> : null}
             </div>
             {note ? <Note>{note}</Note> : null}
@@ -1171,6 +1217,8 @@ const Section_field = props=>{
         </div>
     );
 };
+Section_field = getContext({provide: PropTypes.object})
+    (Section_field);
 
 class With_data extends React.Component {
     wrapped_children(){
@@ -1182,7 +1230,7 @@ class With_data extends React.Component {
     render(){ return <div>{this.wrapped_children()}</div>; }
 }
 
-class Targeting extends React.Component {
+class Targeting_raw extends React.Component {
     constructor(props){
         super(props);
         this.def_value = {key: 'Any (default)', value: ''};
@@ -1205,6 +1253,8 @@ class Targeting extends React.Component {
             {value: 'att', key: 'AT&T'},
             {value: 'chinamobile', key: 'China Mobile'},
             {value: 'claro', key: 'Claro'},
+            {value: 'comcast', key: 'Comcast'},
+            {value: 'cox', key: 'Cox'},
             {value: 'dt', key: 'Deutsche Telekom'},
             {value: 'docomo', key: 'Docomo'},
             {value: 'dtac', key: 'DTAC Trinet'},
@@ -1262,18 +1312,24 @@ class Targeting extends React.Component {
     }
     country_disabled(){
         const curr_plan = this.props.get_curr_plan();
-        return curr_plan&&(curr_plan.type=='static'||curr_plan.vip);
-    }
-    show_dc_note(){
-        const curr_plan = this.props.get_curr_plan();
-        return curr_plan&&curr_plan.type=='static';
+        return curr_plan&&(curr_plan.type=='static'||
+            ['domain', 'domain_p'].includes(curr_plan.vips_type));
     }
     render(){
+        const curr_plan = this.props.get_curr_plan();
+        const show_dc_note = curr_plan&&curr_plan.type=='static';
+        const show_vips_note = curr_plan&&
+            (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
         return (
-            <With_data {...this.props} tab_id="target">
-              <If when={this.show_dc_note()}>
+            <With_data {...this.props}>
+              <If when={show_dc_note||show_vips_note}>
                 <Note>
-                  <span>To change Data Center country visit your </span>
+                  <If when={show_dc_note}>
+                    <span>To change Data Center country visit your </span>
+                  </If>
+                  <If when={show_vips_note}>
+                    <span>To change Exclusive gIP country visit your </span>
+                  </If>
                   <a className="link" target="_blank" rel="noopener noreferrer"
                     href="https://luminati.io/cp/zones">zone page</a>
                   <span> and change your zone plan.</span>
@@ -1298,11 +1354,11 @@ class Targeting extends React.Component {
         );
     }
 }
+const Targeting = provider({tab_id: 'target'})(Targeting_raw);
 
-class Speed extends React.Component {
+class Speed_raw extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {list: [], loading: false};
         this.dns_options = [
             {key: 'Local (default) - resolved by the super proxy',
                 value: 'local'},
@@ -1312,111 +1368,38 @@ class Speed extends React.Component {
             {key: 'DNS', value: 'dns'}, {key: 'File', value: 'file'},
             {key: 'Values', value: 'values'}];
     }
-    componentWillMount(){
-        this.sp = etask('Rotation', function*(){ yield this.wait(); }); }
-    componentWillUnmount(){ this.sp.return(); }
-    toggle(type){
-        return e=>{
-            let {value, checked} = e.target;
-            if (type=='vips')
-                value = Number(value);
-            const {form, on_change_field} = this.props;
-            let new_alloc;
-            if (checked)
-                new_alloc = [...form[type], value];
-            else
-                new_alloc = form[type].filter(r=>r!=value);
-            on_change_field(type, new_alloc);
-            if (!form.multiply_ips && !form.multiply_vips)
-                on_change_field('pool_size', new_alloc.length);
-            else
-                on_change_field('multiply', new_alloc.length);
-        };
-    }
-    open_modal(type){
-        if (!this.props.support.pool_size)
-            return;
-        const {form} = this.props;
-        this.setState({loading: true});
-        const zone = form.zone||this.props.proxy.zone.def;
-        const keypass = form.password||'';
-        let base_url;
-        if (type=='ips')
-            base_url = '/api/allocated_ips';
-        else
-            base_url = '/api/allocated_vips';
-        const url = base_url+'?zone='+zone+'&key='+keypass;
-        const _this = this;
-        this.sp.spawn(etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-                _this.setState({loading: false});
-            });
-            const res = yield ajax.json({url});
-            let list;
-            if (type=='ips')
-                list = res.ips;
-            else
-                list = res.slice(0, 100);
-            _this.setState({list, loading: false});
-            $('#allocated_ips').modal('show');
-        }));
-    }
-    multiply_changed(val){
-        const {on_change_field, form} = this.props;
-        const size = Math.max(form.ips.length, form.vips.length);
-        if (val)
-        {
-            on_change_field('pool_size', 0);
-            on_change_field('multiply', size);
-            return;
-        }
-        on_change_field('pool_size', size);
-        on_change_field('multiply', 1);
-    }
-    render(){
-        const {form, support} = this.props;
-        const pool_size_disabled = !support.pool_size ||
-            form.ips.length || form.vips.length;
+    open_modal(){ $('#allocated_ips').modal('show'); }
+    get_type(){
         const curr_plan = this.props.get_curr_plan();
         let type;
         if (curr_plan&&curr_plan.type=='static')
             type = 'ips';
         else if (curr_plan&&!!curr_plan.vip)
             type = 'vips';
+        return type;
+    }
+    render(){
+        const {form, support} = this.props;
+        const pool_size_disabled = !support.pool_size ||
+            form.ips.length || form.vips.length;
+        const type = this.get_type();
         const render_modal = ['ips', 'vips'].includes(type);
         let pool_size_note;
         if (this.props.support.pool_size&&render_modal)
         {
-            pool_size_note = <a className="link"
-                                onClick={()=>this.open_modal(type)}>
-              {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
-            </a>;
+            pool_size_note = (
+                <a className="link"
+                  onClick={()=>this.open_modal()}>
+                  {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
+                </a>
+            );
         }
         return (
-            <With_data {...this.props} tab_id="speed">
-              <Loader show={this.state.loading}/>
-              <Alloc_modal list={this.state.list} type={type}
-                zone_name={form.zone||this.props.proxy.zone.def}
-                loading={this.state.loading} toggle={this.toggle.bind(this)}/>
+            <With_data {...this.props}>
               <Section_with_fields type="select" id="dns"
                 data={this.dns_options}/>
-              <Section id="pool_size" correct={this.props.form.pool_size}
-                disabled={pool_size_disabled}>
-                <Section_field {...this.props} type="number" id="pool_size"
-                  tab_id="speed" note={pool_size_note} min="0"
-                  disabled={pool_size_disabled}/>
-                <If when={type=='ips'}>
-                  <Section_field {...this.props} type="boolean"
-                    id="multiply_ips" tab_id="speed"
-                    on_change={this.multiply_changed.bind(this)}/>
-                </If>
-                <If when={type=='vips'}>
-                  <Section_field {...this.props} type="boolean"
-                    id="multiply_vips" tab_id="speed"
-                    on_change={this.multiply_changed.bind(this)}/>
-                </If>
-              </Section>
+              <Section_with_fields type="number" id="pool_size"
+                min="0" note={pool_size_note} disabled={pool_size_disabled}/>
               <Section_with_fields type="number" id="request_timeout"
                 sufix="seconds" min="0"/>
               <Section_with_fields type="number" id="session_init_timeout"
@@ -1427,21 +1410,22 @@ class Speed extends React.Component {
               <Section_with_fields type="number" id="proxy_switch" min="0"/>
               <Section_with_fields type="number" id="throttle" min="0"/>
               <Section id="reverse_lookup">
-                <Section_field type="select" id="reverse_lookup" tab_id="speed"
+                <Section_field type="select" id="reverse_lookup"
                   {...this.props} data={this.reverse_lookup_options}/>
                 <If when={this.props.form.reverse_lookup=='file'}>
                   <Section_field type="text" id="reverse_lookup_file"
-                    tab_id="speed" {...this.props}/>
+                    {...this.props}/>
                 </If>
                 <If when={this.props.form.reverse_lookup=='values'}>
                   <Section_field type="textarea" id="reverse_lookup_values"
-                    tab_id="speed" {...this.props}/>
+                    {...this.props}/>
                 </If>
               </Section>
             </With_data>
         );
     }
 }
+const Speed = provider({tab_id: 'speed'})(Speed_raw);
 
 const Note = props=>(
     <div className="note">
@@ -1449,13 +1433,14 @@ const Note = props=>(
     </div>
 );
 
-class Rules extends React.Component {
+class Rules_raw extends React.Component {
     constructor(props){
         super(props);
         this.port = window.location.pathname.split('/').slice(-1)[0];
         this.state={
             show_statuses: this.props.form.trigger_type=='status',
             show_body_regex: this.props.form.trigger_type=='body',
+            show_min_time: this.props.form.trigger_type=='min_req_time',
             show_max_time: this.props.form.trigger_type=='max_req_time',
             show_custom_status: this.props.form.status_code=='Custom',
         };
@@ -1484,6 +1469,13 @@ class Rules extends React.Component {
             this.setState({show_body_regex: false});
             this.props.on_change_field('body_regex', '');
         }
+        if (val=='min_req_time')
+            this.setState({show_min_time: true});
+        else
+        {
+            this.setState({show_min_time: false});
+            this.props.on_change_field('min_req_time', '');
+        }
         if (val=='max_req_time')
             this.setState({show_max_time: true});
         else
@@ -1511,6 +1503,7 @@ class Rules extends React.Component {
             {key:'Select condition type for your Trigger rule', value: ''},
             {key: 'Status code', value: 'status'},
             {key: 'HTML body element', value: 'body'},
+            {key: 'Minimum request time', value: 'min_req_time'},
             {key: 'Maximum request time', value: 'max_req_time'},
         ];
         const action_types = [
@@ -1541,56 +1534,60 @@ class Rules extends React.Component {
               <div className="tab_header">
                 Configure an action to be taken in response to a given Trigger
               </div>
-              <With_data {...this.props} tab_id="rules">
+              <With_data {...this.props}>
                 <Section id="trigger_type" header="Trigger"
                   correct={trigger_correct}>
-                  <Section_field tab_id="rules" id="trigger_type"
+                  <Section_field id="trigger_type"
                     form={form} type="select" data={trigger_types}
                     on_change_field={on_change_field}
                     on_change={this.type_changed.bind(this)}/>
                   <If when={this.state.show_body_regex}>
-                    <Section_field tab_id="rules" id="body_regex"
+                    <Section_field id="body_regex"
                       type="text" {...this.props}/>
                   </If>
+                  <If when={this.state.show_min_time}>
+                    <Section_field id="min_req_time" type="number"
+                    {...this.props} sufix="milliseconds"/>
+                  </If>
                   <If when={this.state.show_max_time}>
-                    <Section_field tab_id="rules" id="max_req_time"
-                      type="number" {...this.props} sufix="milliseconds"/>
+                    <Section_field id="max_req_time" type="number"
+                    {...this.props} sufix="milliseconds"/>
                   </If>
                   <If when={this.state.show_statuses}>
-                    <Section_field tab_id="rules" id="status_code"
+                    <Section_field id="status_code"
                       form={form} type="select" data={status_types}
                       on_change_field={on_change_field}
                       on_change={this.status_changed.bind(this)}/>
                   </If>
                   <If when={this.state.show_custom_status}>
-                    <Section_field tab_id="rules" id="status_custom"
+                    <Section_field id="status_custom"
                       form={form} type="text" data={status_types}
                       on_change_field={on_change_field}/>
                   </If>
-                  <Section_field tab_id="rules" id="trigger_url_regex"
+                  <Section_field id="trigger_url_regex"
                     form={form} type="text"
                     on_change_field={on_change_field}/>
                 </Section>
                 <Section id="action" header="Action"
                   note="IP will change for every entry"
                   on_change_field={on_change_field}>
-                  <Section_field id="action" tab_id="rules"
+                  <Section_field id="action"
                     type="select" data={action_types} {...this.props}
                     on_change={this.action_changed.bind(this)}/>
                   <If when={this.props.form.action=='retry'}>
-                    <Section_field id="retry_number" tab_id="rules"
+                    <Section_field id="retry_number"
                       type="number" {...this.props} min="0" max="20"
                       validator={validators.number(0, 20)}/>
                   </If>
                   <If when={this.props.form.action=='retry_port'}>
-                    <Section_field id="retry_port" tab_id="rules"
+                    <Section_field id="retry_port"
                       type="select" data={this.state.ports} {...this.props}/>
                   </If>
                   <If when={this.props.form.action=='ban_ip'}>
-                    <Section_field id="ban_ip_duration" tab_id="rules"
+                    <Section_field id="ban_ip_duration"
                       type="select" data={ban_options} {...this.props}/>
                     <If when={this.props.form.ban_ip_duration=='custom'}>
-                      <Section_field id="ban_ip_custom" tab_id="rules"
+                      <Section_field id="ban_ip_custom"
                         type="number" {...this.props} sufix="minutes"/>
                     </If>
                   </If>
@@ -1600,6 +1597,7 @@ class Rules extends React.Component {
         );
     }
 }
+const Rules = provider({tab_id: 'rules'})(Rules_raw);
 
 const Checkbox = props=>(
   <div className="form-check">
@@ -1611,35 +1609,120 @@ const Checkbox = props=>(
   </div>
 );
 
-const Alloc_modal = props=>{
-    if (!props.type)
-        return null;
-    const type_label = props.type=='ips' ? 'IPs' : 'vIPs';
-    const title = 'Select '+type_label+': '+props.zone_name;
-    const checked = row=>props.form[props.type].includes(row);
-    const reset = ()=>{
-        props.on_change_field(props.type, []);
-        props.on_change_field('pool_size', '');
-    };
-    return (
-        <Modal id="allocated_ips" className="allocated_ips_modal"
-          title={title} no_cancel_btn>
-          <button onClick={reset}
-            className="btn btn_lpm btn_lpm_normal random_ips_btn">
-            Random {type_label}
-          </button>
-          {props.list.map(row=>
-            <Checkbox on_change={props.toggle(props.type)} key={row}
-              text={row} value={row} checked={checked(row)}/>
-          )}
-        </Modal>
-    );
-};
+class Alloc_modal extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {available_list: []};
+    }
+    componentDidMount(){
+        this.setdb_on('edit_proxy.zone_name', zone_name=>
+            this.setState({available_list: []}));
+        this.setdb_on('edit_proxy.tab', tab=>this.setState({curr_tab: tab}));
+        $('#allocated_ips').on('show.bs.modal', this.load.bind(this));
+    }
+    load(){
+        if (this.state.available_list.length)
+            return;
+        this.loading(true);
+        const {form} = this.props;
+        const key = form.password||'';
+        let endpoint;
+        if (this.props.type=='ips')
+            endpoint = '/api/allocated_ips';
+        else
+            endpoint = '/api/allocated_vips';
+        const url = zurl.qs_add(window.location.host+endpoint,
+            {zone: this.props.zone, key});
+        const _this = this;
+        this.etask(etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                _this.loading(false);
+            });
+            const res = yield ajax.json({url});
+            let available_list;
+            if (_this.props.type=='ips')
+                available_list = res.ips;
+            else
+                available_list = res.slice(0, 100);
+            _this.setState({available_list});
+            _this.loading(false);
+        }));
+    }
+    loading(loading){
+        setdb.set('edit_proxy.loading', loading);
+        this.setState({loading});
+    }
+    checked(row){ return this.props.form[this.props.type].includes(row); }
+    reset(){
+        this.props.on_change_field(this.props.type, []);
+        this.props.on_change_field('pool_size', '');
+        this.props.on_change_field('multiply', 1);
+    }
+    toggle(e){
+        let {value, checked} = e.target;
+        const {type, form, on_change_field} = this.props;
+        if (type=='vips')
+            value = Number(value);
+        let new_alloc;
+        if (checked)
+            new_alloc = [...form[type], value];
+        else
+            new_alloc = form[type].filter(r=>r!=value);
+        on_change_field(type, new_alloc);
+        this.update_multiply_and_pool_size(new_alloc.length);
+    }
+    select_all(){
+        const {type, on_change_field} = this.props;
+        on_change_field(type, this.state.available_list);
+        this.update_multiply_and_pool_size(this.state.available_list.length);
+    }
+    update_multiply_and_pool_size(size){
+        const {form, on_change_field} = this.props;
+        if (!form.multiply_ips && !form.multiply_vips)
+            on_change_field('pool_size', size);
+        else
+        {
+            on_change_field('pool_size', 1);
+            on_change_field('multiply', size);
+        }
+    }
+    render(){
+        const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
+        let title;
+        if (this.state.curr_tab=='general')
+        {
+            title = 'Select the '+type_label+' to multiply ('
+            +this.props.zone+')';
+        }
+        else
+            title = 'Select the '+type_label+' ('+this.props.zone+')';
+        return (
+            <Modal id="allocated_ips" className="allocated_ips_modal"
+              title={title} no_cancel_btn>
+              <div className="action_buttons">
+                <button onClick={this.reset.bind(this)}
+                  className="btn btn_lpm btn_lpm_normal">
+                  Reset
+                </button>
+                <button onClick={this.select_all.bind(this)}
+                  className="btn btn_lpm btn_lpm_normal">
+                  Select all
+                </button>
+              </div>
+              {this.state.available_list.map(row=>
+                <Checkbox on_change={this.toggle.bind(this)} key={row}
+                  text={row} value={row} checked={this.checked(row)}/>
+              )}
+            </Modal>
+        );
+    }
+}
 
-const Rotation = props=>{
+let Rotation = props=>{
     const {support, form, proxy} = props;
     return (
-        <With_data {...props} tab_id="rotation">
+        <With_data {...props}>
           <Section_with_fields type="text" id="ip"/>
           <Section_with_fields type="text" id="vip"/>
           <Section_with_fields type="select" id="pool_type"
@@ -1663,9 +1746,10 @@ const Rotation = props=>{
         </With_data>
     );
 };
+Rotation = provider({tab_id: 'rotation'})(Rotation);
 
-const Debug = props=>(
-    <With_data {...props} tab_id="debug">
+let Debug = props=>(
+    <With_data {...props}>
       <Section_with_fields type="select" id="history"
         data={props.default_opt('history')}/>
       <Section_with_fields type="select" id="ssl"
@@ -1676,25 +1760,59 @@ const Debug = props=>(
         data={props.proxy.debug.values}/>
     </With_data>
 );
+Debug = provider({tab_id: 'debug'})(Debug);
 
-const General = props=>(
-    <With_data {...props} tab_id="general">
-      <Section_with_fields type="number" id="port"/>
-      <Section_with_fields type="password" id="password"/>
-      <Section_with_fields type="number" id="multiply" min="1"
-        disabled={!props.support.multiply}/>
-      <Section_with_fields type="number" id="socks" min="0"/>
-      <Section_with_fields type="select" id="secure_proxy"
-        data={props.default_opt('secure_proxy')}/>
-      <Section_with_fields type="text" id="null_response"/>
-      <Section_with_fields type="text" id="bypass_proxy"/>
-      <Section_with_fields type="text" id="direct_include"/>
-      <Section_with_fields type="text" id="direct_exclude"/>
-      <Section_with_fields type="select" id="allow_proxy_auth"
-        data={props.default_opt('allow_proxy_auth')}/>
-      <Section_with_fields type="select" id="iface"
-        data={props.proxy.iface.values}/>
-    </With_data>
-);
+let General = props=>{
+    const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
+    const multiply_changed = val=>{
+        const {on_change_field, form} = props;
+        const size = Math.max(form.ips.length, form.vips.length);
+        if (val)
+        {
+            on_change_field('pool_size', 1);
+            on_change_field('multiply', size);
+            return;
+        }
+        on_change_field('pool_size', size);
+        on_change_field('multiply', 1);
+    };
+    // XXX krzysztof: cleanup type
+    const curr_plan = props.get_curr_plan();
+    let type;
+    if (curr_plan&&curr_plan.type=='static')
+        type = 'ips';
+    else if (curr_plan&&!!curr_plan.vip)
+        type = 'vips';
+    return (
+        <With_data {...props}>
+          <Section_with_fields type="number" id="port"/>
+          <Section_with_fields type="password" id="password"/>
+          <Section_with_fields type="number" id="multiply" min="1"
+            disabled={!props.support.multiply}/>
+          <If when={type=='ips'}>
+            <Section_with_fields {...props}
+              type="boolean" id="multiply_ips" on_boolean_clicked={open_modal}
+              on_change={multiply_changed}/>
+          </If>
+          <If when={type=='vips'}>
+            <Section_with_fields {...props}
+              type="boolean" id="multiply_vips" on_boolean_clicked={open_modal}
+              on_change={multiply_changed}/>
+          </If>
+          <Section_with_fields type="number" id="socks" min="0"/>
+          <Section_with_fields type="select" id="secure_proxy"
+            data={props.default_opt('secure_proxy')}/>
+          <Section_with_fields type="text" id="null_response"/>
+          <Section_with_fields type="text" id="bypass_proxy"/>
+          <Section_with_fields type="text" id="direct_include"/>
+          <Section_with_fields type="text" id="direct_exclude"/>
+          <Section_with_fields type="select" id="allow_proxy_auth"
+            data={props.default_opt('allow_proxy_auth')}/>
+          <Section_with_fields type="select" id="iface"
+            data={props.proxy.iface.values}/>
+        </With_data>
+    );
+};
+General = provider({tab_id: 'general'})(General);
 
 export default Index;

@@ -7,9 +7,28 @@ import {Loader, emitter, Modal, onboarding} from './common.js';
 import util from './util.js';
 import $ from 'jquery';
 import classnames from 'classnames';
+import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
 const localhost = window.location.origin;
+
+const click_add_proxy = ()=>{
+    ga_event('lpm-onboarding', '04 first request button clicked');
+    setdb.get('head.callbacks.state.go')('proxies');
+    window.setTimeout(()=>$('#add_proxy_modal').modal('show'), 200);
+    $('#progress_modal').modal('hide');
+};
+const click_test = ()=>{
+    ga_event('lpm-onboarding', '05 proxy tester button clicked');
+    const port = localStorage.getItem('quickstart-first-proxy');
+    setdb.get('head.callbacks.state.go')('proxy_tester', {port});
+    $('#progress_modal').modal('hide');
+};
+const click_make_request = ()=>{
+    ga_event('lpm-onboarding', '06 first request button clicked');
+    setdb.get('head.callbacks.state.go')('howto');
+    $('#progress_modal').modal('hide');
+};
 
 const Setup_guide = ()=>(
     <div className="setup_guide lpm">
@@ -18,21 +37,19 @@ const Setup_guide = ()=>(
     </div>
 );
 
-class Progress_modal extends React.Component {
+class Progress_modal extends Pure_component {
     constructor(props){
         super(props);
         this.state = {};
         this.open_modal = this.open_modal.bind(this);
-        this.dismiss_clicked = this.dismiss_clicked.bind(this);
     }
     componentWillMount(){
         emitter.on('setup_guide:progress_modal', this.open_modal);
-        this.listener = setdb.on('head.onboarding.steps',
+        this.setdb_on('head.onboarding.steps',
             steps=>this.setState({steps}));
     }
-    componentWillUnmount(){
+    willUnmount(){
         emitter.removeListener('setup_guide:progress_modal', this.open_modal);
-        setdb.off(this.listener);
     }
     open_modal(title, timeout=0){
         if (this.state.steps&&this.state.steps.dismissed)
@@ -40,22 +57,40 @@ class Progress_modal extends React.Component {
         this.setState({title});
         window.setTimeout(()=>$('#progress_modal').modal(), timeout);
     }
-    dismiss_clicked(){ onboarding.check_dismiss(); }
+    dismiss_clicked(){
+        $('#progress_modal').modal('hide');
+        setTimeout(()=>$('#dismiss_progress_modal').modal(), 500);
+    }
+    close_dismiss_modal(){ $('#dismiss_progress_modal').modal('hide'); }
+    dismiss_forever(){
+        onboarding.check_dismiss();
+        this.close_dismiss_modal();
+    }
     render(){
         return (
             <div className="setup_guide lpm">
               <Modal id="progress_modal" title={this.state.title}
-                no_cancel_btn ok_btn_title="I will do it later"
-                ok_btn_classes="link ok"
-                click_ok={this.dismiss_clicked}>
+                className="progress_modal" no_footer
+                on_dismiss={this.dismiss_clicked.bind(this)}>
                 <List/>
+              </Modal>
+              <Modal id="dismiss_progress_modal" title="Are you sure?"
+                no_footer className="dismiss_progress_modal">
+                <div className="buttons">
+                  <button onClick={this.close_dismiss_modal.bind(this)}
+                    className="btn btn_lpm btn_lpm_default btn_remind">
+                    No, remind me later
+                  </button>
+                  <button onClick={this.dismiss_forever.bind(this)}
+                    className="btn btn_lpm">Yes, exit</button>
+                </div>
               </Modal>
             </div>
         );
     }
 }
 
-class List extends React.Component {
+class List extends Pure_component {
     constructor(props){
         super(props);
         let loading = false;
@@ -64,61 +99,50 @@ class List extends React.Component {
         this.state = {loading, steps: {}};
     }
     componentWillMount(){
-        const _this = this;
-        this.listeners = [
-            setdb.on('head.consts', consts=>{
-                if (consts)
-                    this.setState({loading: false});
-            }),
-            setdb.on('head.onboarding.steps', steps=>{
-                if (steps)
-                    this.setState({steps});
-            }),
-        ];
-    }
-    componentWillUnmount(){ this.listeners.forEach(l=>setdb.off(l)); }
-    click_add_proxy(){
-        ga_event('lpm-onboarding', '04 first request button clicked');
-        setdb.get('head.callbacks.state.go')('proxies');
-        window.setTimeout(()=>$('#add_proxy_modal').modal('show'), 200);
-        $('#progress_modal').modal('hide');
-    }
-    click_test(){
-        ga_event('lpm-onboarding', '05 proxy tester button clicked');
-        setdb.get('head.callbacks.state.go')('proxy_tester');
-        $('#progress_modal').modal('hide');
-    }
-    click_make_request(){
-        ga_event('lpm-onboarding', '06 first request button clicked');
-        setdb.get('head.callbacks.state.go')('howto');
-        $('#progress_modal').modal('hide');
+        this.setdb_on('head.consts', consts=>{
+            if (consts)
+                this.setState({loading: false});
+        });
+        this.setdb_on('head.onboarding.steps', steps=>{
+            if (steps)
+                this.setState({steps: {...steps}});
+        });
     }
     render(){
         return (
             <div>
               <Loader show={this.state.loading}/>
               <div className="section_list">
-                <Section header="Create new proxy" img="create"
-                  text="This will configure your proxy settings"
-                  on_click={this.click_add_proxy.bind(this)}
-                  done={this.state.steps.created_proxy}/>
+                <Create_proxy_section steps={this.state.steps}/>
                 <div className="vertical_line"/>
-                <Section header="Test your proxy" img="test"
-                  text="Verify your proxies are enabled and active"
-                  on_click={this.click_test.bind(this)}
-                  disabled={!this.state.steps.created_proxy}
-                  done={this.state.steps.tested_proxy}/>
+                <Test_proxy_section steps={this.state.steps}/>
                 <div className="vertical_line"/>
-                <Section header="Use your proxy" img="req"
-                  text="Learn how to use your proxy port in any platform"
-                  on_click={this.click_make_request.bind(this)}
-                  disabled={!this.state.steps.tested_proxy}
-                  done={this.state.steps.seen_examples}/>
+                <Examples_section steps={this.state.steps}/>
               </div>
             </div>
         );
     }
 }
+
+const Create_proxy_section = props=>(
+    <Section header="Create new proxy" img="create"
+      text="This will configure your proxy settings"
+      on_click={click_add_proxy} done={props.steps.created_proxy}/>
+);
+
+const Test_proxy_section = props=>(
+    <Section header="Test your proxy" img="test"
+      text="Verify your proxies are enabled and active"
+      on_click={click_test} disabled={!props.steps.created_proxy}
+      done={props.steps.tested_proxy}/>
+);
+
+const Examples_section = props=>(
+    <Section header="Use your proxy" img="req"
+      text="Learn how to use your proxy port in any platform"
+      on_click={click_make_request} disabled={!props.steps.tested_proxy}
+      done={props.steps.seen_examples}/>
+);
 
 const Section = props=>{
     const img_class = classnames('img', {

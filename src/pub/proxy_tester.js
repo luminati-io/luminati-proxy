@@ -8,6 +8,7 @@ import {Input, Select, If, Loader, Modal, Warnings, onboarding,
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import util from './util.js';
+import zurl from 'hutil/util/url';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
@@ -25,8 +26,8 @@ class Proxy_tester extends Pure_component {
             <div className="lpm proxy_tester">
               <Nav/>
               <Request update_response={this.update_response.bind(this)}/>
-              <If when={body}>
-                <Body body={body}/>
+              <Body body={body}/>
+              <If when={this.state.response.status_code}>
                 <Row>
                   <Col md={4}><Info {...this.state.response}/></Col>
                   <Col md={8}>
@@ -54,15 +55,23 @@ class Request extends Pure_component {
             url: 'http://lumtest.com/myip.json', method: 'GET'}};
         this.state = {...this.default_state, show_loader: false};
     }
-    componentWillMount(){
-        this.setdb_on('head.proxies_running', proxies=>{
-            if (!proxies||!proxies.length)
-                return;
-            this.setState({proxies});
-            this.setState(prev_state=>{
-                const def_port = proxies[0].port;
-                this.default_state.params.proxy = def_port;
-                return {params: {...prev_state.params, proxy: def_port}};
+    componentDidMount(){
+        setTimeout(()=>{
+            const url_o = zurl.parse(document.location.href);
+            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+            const url = qs_o.url||this.state.params.url;
+            const method = qs_o.method||this.state.params.method;
+            const port = qs_o.port||this.state.params.port;
+            this.setdb_on('head.proxies_running', proxies=>{
+                if (!proxies||!proxies.length)
+                    return;
+                this.setState({proxies});
+                this.setState(prev_state=>{
+                    const def_port = proxies[0].port;
+                    this.default_state.params.proxy = def_port;
+                    return {params: {...prev_state.params,
+                        proxy: port||def_port, method, url}};
+                });
             });
         });
     }
@@ -262,20 +271,24 @@ const Footer_buttons = ({reset_clicked, go_clicked})=>(
     </div>
 );
 
-const Body = ({body})=>(
-    <div className="panel body">
-      <div className="panel_heading">
-        <h2>Body</h2>
-      </div>
-      <div className="panel_body">
-        <div className="panel code">
+const Body = ({body})=>{
+    if (!body)
+        return null;
+    return (
+        <div className="panel body">
+          <div className="panel_heading">
+            <h2>Body</h2>
+          </div>
           <div className="panel_body">
-            <span>{body}</span>
+            <div className="panel code">
+              <div className="panel_body">
+                <span>{body}</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-);
+    );
+};
 
 const Title_value_pairs = props=>(
     <div className="title_value_pairs">

@@ -5,7 +5,6 @@ import $ from 'jquery';
 import classnames from 'classnames';
 import React from 'react';
 import * as Bootstrap from 'react-bootstrap';
-import regeneratorRuntime from 'regenerator-runtime';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
@@ -39,6 +38,10 @@ class Modal extends React.Component {
                 yield _this.props.click_ok();
         });
     }
+    on_dismiss(){
+        if (this.props.on_dismiss)
+            this.props.on_dismiss();
+    }
     render(){
         let footer = null;
         if (!this.props.no_footer)
@@ -58,7 +61,8 @@ class Modal extends React.Component {
                 <div className="modal-content">
                   <div className="modal-header">
                     <button className="close close_icon" data-dismiss="modal"
-                        aria-label="Close">
+                        aria-label="Close"
+                        onClick={this.on_dismiss.bind(this)}>
                     </button>
                     <h4 className="modal-title">{this.props.title}</h4>
                   </div>
@@ -240,7 +244,6 @@ const presets = {
             && opt.session===true && opt.keep_alive; },
         set: opt=>{
             opt.pool_size = 0;
-            opt.ips = [];
             opt.keep_alive = opt.keep_alive||50;
             opt.pool_type = null;
             opt.sticky_ip = false;
@@ -278,7 +281,6 @@ const presets = {
             && opt.session===true && !opt.keep_alive; },
         set: function(opt){
             opt.pool_size = 0;
-            opt.ips = [];
             opt.keep_alive = 0;
             opt.pool_type = null;
             opt.sticky_ip = false;
@@ -313,11 +315,9 @@ const presets = {
         check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
         set: function(opt){
             opt.pool_size = 0;
-            opt.ips = [];
             opt.pool_type = null;
             opt.sticky_ip = true;
             opt.session = '';
-            opt.multiply = 1;
         },
         clean: opt=>{
             opt.sticky_ip = null;
@@ -351,6 +351,7 @@ const presets = {
         set: function(opt){
             opt.pool_size = opt.pool_size||1;
             opt.pool_type = 'sequential';
+            opt.keep_alive = opt.keep_alive||45;
             opt.sticky_ip = null;
             opt.session = '';
         },
@@ -359,12 +360,12 @@ const presets = {
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.multiply = 1;
             opt.seed = '';
         },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `sequential pool type`},
+            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
             {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
             {field: 'session', label: `disables 'Random Session'`},
         ],
@@ -387,9 +388,9 @@ const presets = {
         set: function(opt){
             opt.pool_size = opt.pool_size||1;
             opt.pool_type = 'round-robin';
+            opt.keep_alive = opt.keep_alive||45;
             opt.sticky_ip = null;
             opt.session = '';
-            opt.multiply = 1;
         },
         clean: opt=>{
             opt.pool_size = 1;
@@ -401,6 +402,7 @@ const presets = {
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `round-robin pool type`},
+            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
             {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
             {field: 'session', label: `disables 'Random Session'`},
             {field: 'multiply', label: `disables 'Multiply' options`},
@@ -434,7 +436,6 @@ const presets = {
         clean: opt=>{
             opt.pool_size = 1;
             opt.keep_alive = 0;
-            opt.multiply = 1;
             opt.proxy_count = '';
             opt.session_init_timeout = '';
             opt.race_reqs = '';
@@ -490,7 +491,7 @@ const presets = {
             }];
             opt.rules.post = opt.rules.post||[];
         },
-        clean: opt=>{ opt.multiply = 1; },
+        clean: opt=>{ },
         support: {multiply: true},
     },
     custom: {
@@ -507,7 +508,6 @@ const presets = {
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.multiply = 1;
             opt.seed = '';
         },
         support: {

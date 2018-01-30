@@ -15,6 +15,7 @@ import {DomainRow, DomainTable} from './domains.js';
 import {ProtocolRow, ProtocolTable} from './protocols.js';
 import {Dialog, If} from '../common.js';
 import 'animate.css';
+import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
     install: ()=>E.sp = etask('stats', [function(){ return this.wait(); }]),
@@ -24,38 +25,44 @@ const E = {
     },
 };
 
-class StatRow extends React.Component {
+class Stat_row extends Pure_component {
     constructor(props){
         super(props);
         this.state = {};
+        this.timeouts = [];
     }
     componentWillReceiveProps(props){
         _.each(props.stat, (v, k)=>{
             if (!this.state[`class_${k}`] && this.props.stat[k]!=v)
             {
                 this.setState({[`class_${k}`]: 'stats_row_change'});
-                setTimeout(()=>this.setState({[`class_${k}`]: undefined}),
-                    1000);
+                this.timeouts.push(setTimeout(()=>{
+                    this.setState({[`class_${k}`]: undefined});
+                }, 1000));
             }
         });
     }
+    willUnmount(){
+        if (this.timeouts.length)
+            this.timeouts.forEach(t=>clearTimeout(t));
+    }
 }
 
-class SRow extends StatRow {
+class S_row extends Stat_row {
     render(){
         return <StatusCodeRow class_value={this.state.class_value}
               class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
-class DRow extends StatRow {
+class D_row extends Stat_row {
     render(){
         return <DomainRow class_value={this.state.class_value}
               class_bw={this.state.class_bw} {...this.props} />;
     }
 }
 
-class PRow extends StatRow {
+class P_row extends Stat_row {
     render(){
         return <ProtocolRow class_value={this.state.class_value}
               class_bw={this.state.class_bw} {...this.props} />;
@@ -185,15 +192,15 @@ class Stats extends React.Component {
               </div>
               <div className="panel_body">
                 <SuccessRatio/>
-                <StatTable table={StatusCodeTable} row={SRow}
+                <StatTable table={StatusCodeTable} row={S_row}
                   title={`Top status codes`} dataType="status_codes"
                   stats={this.state.statuses.stats}
                   show_more={this.state.statuses.has_more}/>
-                <StatTable table={DomainTable} row={DRow}
+                <StatTable table={DomainTable} row={D_row}
                   dataType="domains" stats={this.state.domains.stats}
                   show_more={this.state.domains.has_more}
                   title={`Top domains`} />
-                <StatTable table={ProtocolTable} row={PRow}
+                <StatTable table={ProtocolTable} row={P_row}
                   dataType="protocols" stats={this.state.protocols.stats}
                   show_more={this.state.protocols.has_more}
                   title={`All protocols`}

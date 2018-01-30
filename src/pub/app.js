@@ -194,9 +194,9 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     state_registry.register({
         name: 'proxy_tester',
         parent: 'app',
-        url: '/proxy_tester',
+        url: '/proxy_tester?url&port&method',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = proxy_tester; },
+        controller: $scope=>{ $scope.react_component = proxy_tester; },
     });
     state_registry.register({
         name: 'edit_proxy',
@@ -489,7 +489,8 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         setdb.set('head.defaults', defaults.data);
         $scope.$root.defaults = defaults.data;
     });
-    $http.get('/api/all_locations').then(function(locations){
+    etask(function*(){
+        const locations = yield $http.get('/api/all_locations');
         setdb.set('head.locations', locations.data);
         $scope.$root.all_locations = locations.data;
     });
@@ -1112,9 +1113,21 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         return opt.map(function(o){ return {key: o, value: o}; }); };
     $success_rate.listen();
     $proxy_stats.listen();
+    const update_locations = locations=>{
+        if (!locations)
+            return;
+        const countries = locations.countries.map(c=>(
+            {key: c.country_name, value: c.country_id}));
+        country_opts = [
+            {key: 'Default (Any)', value: ''},
+            {key: 'Any', value: '*'}
+        ].concat(countries);
+    };
+    const locations_listener = setdb.on('head.locations', update_locations);
     $scope.$on('$destroy', function(){
         $success_rate.stop_listening();
         $proxy_stats.stop_listening();
+        setdb.off(locations_listener);
     });
     var iface_opts = [], zone_opts = [];
     var country_opts = [], cities_opts = {};
@@ -1133,7 +1146,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             key: 'iface',
             title: 'Interface',
             type: 'options',
-            options: function(){ return iface_opts; },
+            options: ()=>iface_opts,
         },
         {
             key: 'multiply',
@@ -1160,7 +1173,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             key: 'zone',
             title: 'Zone',
             type: 'options',
-            options: function(){ return zone_opts; },
+            options: ()=>zone_opts,
         },
         {
             key: 'secure_proxy',
@@ -1186,7 +1199,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             key: 'city',
             title: 'City',
             type: 'autocomplete',
-            check: function(){ return true; },
+            check: ()=>true,
             options: function(proxy, view_val){
                 var cities = load_cities(proxy);
                 if (!view_val)
@@ -1276,25 +1289,24 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         },
         {
             key: 'allow_proxy_auth',
-            title: 'Allow request authentication',
+            title: 'Request authentication',
             type: 'boolean',
         },
         {
             key: 'session_init_timeout',
-            title: 'Session init timeout (sec)',
+            title: 'Session timeout',
             type: 'number',
             check: function(v){ return !v ||check_number(v); },
         },
         {
             key: 'proxy_count',
-            title: 'Min number of super proxies',
+            title: 'Mininum super proxies',
             type: 'number',
             check: function(v){ return !v ||check_number(v); },
         },
         {
             key: 'race_reqs',
-            title: 'Race request via different super proxies and take the'
-            +' fastest',
+            title: 'Race request',
             type: 'number',
             check: function(v){ return !v ||check_number(v); },
         },
@@ -1378,7 +1390,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         $scope.columns = opt_columns.filter(function(col){
             return col.key.match(/^_/) || $scope.cols_conf[col.key]; });
     }, true);
-    var apply_consts = function(data){
+    const apply_consts = data=>{
+        update_locations(setdb.get('head.locations'));
         iface_opts = data.iface.values;
         zone_opts = (data.zone.values||[]).filter(z=>{
             const plan = z.plans && z.plans.slice(-1)[0] || {};
@@ -1389,16 +1402,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         log_opts = data.log.values;
         debug_opts = data.debug.values;
     };
-    setdb.on('head.locations', locations=>{
-        if (!locations)
-            return;
-        const countries = locations.countries.map(c=>(
-            {key: c.country_name, value: c.country_id}));
-        country_opts = [
-            {key: 'Default (Any)', value: ''},
-            {key: 'Any', value: '*'}
-        ].concat(countries);
-    });
     $scope.$on('consts', function(e, data){ apply_consts(data.proxy); });
     if ($scope.$root.consts)
         apply_consts($scope.$root.consts.proxy);
@@ -1481,7 +1484,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         var plan = zone.plans[zone.plans.length-1];
         if (plan.type=='static')
             return plan.country||'any';
-        if (plan.vip==1)
+        if (['domain', 'domain_p'].includes(plan.vips_type))
             return plan.vip_country||'any';
         return false;
     };
@@ -1622,6 +1625,8 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     };
     $scope.get_country_state = (col, val, proxy)=>{
         const country = $scope.option_key(col, val);
+        if (!country)
+            return '';
         const state = proxy.state&&proxy.state.toUpperCase();
         if (!state)
             return country;
@@ -1729,21 +1734,18 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
 }
 
 module.controller('history', History);
-History.$inject = ['$scope', '$http', '$window'];
-function History($scope, $http, $window){
+History.$inject = ['$scope', '$http', '$window', '$state'];
+function History($scope, $http, $window, $state){
     $scope.hola_headers = [];
-    $http.get('/api/hola_headers').then(function(h){
-        $scope.hola_headers = h.data;
-    });
+    $http.get('/api/hola_headers').then(h=>{ $scope.hola_headers = h.data; });
     $scope.init = function(locals){
         var loader_delay = 100;
         var timestamp_changed_by_select = false;
         $scope.initial_loading = true;
         $scope.port = locals.port;
         $scope.show_modal = function(){ $window.$('#history').modal(); };
-        $http.get('/api/history_context/'+locals.port).then(function(c){
-            $scope.history_context = c.data;
-        });
+        $http.get('/api/history_context/'+locals.port).then(c=>{
+            $scope.history_context = c.data; });
         $scope.periods = [
             {label: 'all time', value: '*'},
             {label: '1 year', value: {y: 1}},
@@ -2115,6 +2117,11 @@ function History($scope, $http, $window){
             }
             timestamp_changed_by_select = true;
             $scope.update();
+        };
+        $scope.replay = req=>{
+            $('.modal').modal('hide');
+            setTimeout(()=>$state.go('proxy_tester',
+                {url: req.url, port: req.port, method: req.method}), 500);
         };
         $scope.$watch('filters.timestamp', function(after){
             if (!after)

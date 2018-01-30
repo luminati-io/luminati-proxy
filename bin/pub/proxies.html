@@ -191,8 +191,7 @@
                     'proxies-editable': proxy.proxy_type=='persist'&&
                     is_valid_field(proxy, col.key)&&(col.key!='country'
                     ||!get_static_country(proxy))}">
-                    <span ng-if="col.key=='country'&&!get_static_country(proxy)"
-                      class=col_country>
+                    <span ng-if="col.key=='country'&&!get_static_country(proxy)">
                       <span ng-if="val&&val!='*'" class="flag-icon flag-icon-{{val}}">
                         </span>
                       <img ng-if="!val||val=='*'" src=/img/flag_any_country.svg>
@@ -201,7 +200,7 @@
                         {{get_country_state(col, val, proxy)}}</span>
                     </span>
                     <span ng-if="col.key=='country'&&get_static_country(proxy)"
-                      ng-init="val=get_static_country(proxy)" class=col_country>
+                      ng-init="val=get_static_country(proxy)">
                       <span ng-if="val&&val!='any'" class="flag-icon flag-icon-{{val}}">
                         </span>
                       <img ng-if="!val||val=='any'"

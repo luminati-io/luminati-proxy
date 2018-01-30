@@ -46,6 +46,10 @@ body {
     .nav_top { background-color: white; }
     .logo_wrapper { background-color: white !important; }
 }
+.flag-icon {
+    border-radius: 2px;
+    margin-right: 1px;
+}
 .alert.alert-info { margin: 0 15px 20px; }
 .page-body {
     padding: 0;
@@ -184,6 +188,7 @@ table.proxies {
     table-layout: fixed;
     min-width: 100%;
     width: auto;
+    th { white-space: nowrap; }
 }
 .proxies-settings, .columns-settings {
     overflow: auto;
@@ -309,16 +314,7 @@ div.proxies .btn-wrapper {
         position: relative;
         max-width: 800px;
         margin: auto;
-        .col {
-            padding: 15px 55px;
-            h2 {
-                text-align: center;
-                font-size: 20px;
-                color: #818c93;
-                font-weight: 300;
-                margin-bottom: 35px;
-            }
-        }
+        .col { padding: 15px 55px; }
         .col_google {
             text-align: center;
             .btn_google_wrapper, .btn_google_wrapper:hover,
@@ -635,7 +631,6 @@ input.form-control[type=checkbox] {
         position: relative;
         top: 1px;
     }
-    .highlight { color: @second_color; margin-right: 5px; font-weight: bold; }
     a.btn_lpm {
         text-decoration: none;
         color: @first_color;
@@ -1190,7 +1185,10 @@ input.form-control[type=checkbox] {
         }
     }
     .allocated_ips_modal {
-        .random_ips_btn { margin-bottom: 20px; }
+        .action_buttons {
+            margin-bottom: 20px;
+            text-align: center;
+        }
     }
 }
 .proxies {
@@ -1254,12 +1252,11 @@ input.form-control[type=checkbox] {
                 }
             }
             .proxies_actions {
-                white-space: nowrap;
                 width: 105px;
                 position: absolute;
                 left: 20px;
             }
-            .col_country { white-space: nowrap; }
+            td { white-space: nowrap; }
             &:hover .proxies_actions .action_icon { visibility: visible; }
             .action_icon {
                 visibility: hidden;
@@ -1491,6 +1488,8 @@ input.form-control[type=checkbox] {
                 background-color: #fafafa;
                 margin-bottom: 0;
                 .panel_body {
+                    overflow: auto;
+                    max-height: 400px;
                     padding: 15px;
                     span { word-wrap: break-word; }
                 }
@@ -1613,9 +1612,22 @@ input.form-control[type=checkbox] {
         &.req_disabled { background: url(/img/step_req_disabled.svg); }
         &.done { background: url(/img/step_done.svg); }
     }
-    .modal .modal-footer .link.ok {
-        margin: 0px 70px 10px;
-        width: 105px;
+    .progress_modal {
+        .vertical_line { display: none; }
+        .section.done, .section.disabled { display: none; }
+        .circle_wrapper { visibility: hidden; }
+        .img:before { display: none; }
+        .modal-footer .link.ok {
+            margin: 0px 70px 10px;
+            width: 105px;
+        }
+    }
+    .dismiss_progress_modal {
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+            .btn_remind { width: 200px; }
+        }
     }
 }
 .howto {
