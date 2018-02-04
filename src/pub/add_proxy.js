@@ -50,7 +50,7 @@ class Add_proxy extends Pure_component {
         return etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
-                ga_event('add-new-port', 'failed saved');
+                ga_event('add-new-port', 'failed saved', e.message);
             });
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             let port = 24000;

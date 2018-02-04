@@ -3,11 +3,9 @@
 import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
-import 'codemirror/lib/codemirror.css';
 import angular from 'angular';
 import _ from 'lodash';
 import moment from 'moment';
-import codemirror from 'codemirror/lib/codemirror';
 import date from 'hutil/util/date';
 import csv from 'hutil/util/csv';
 import zurl from 'hutil/util/url';
@@ -15,7 +13,6 @@ import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import zescape from 'hutil/util/escape';
-import regeneratorRuntime from 'regenerator-runtime';
 import req_stats from './stats/stats.js';
 import status_codes from './stats/status_codes.js';
 import status_codes_detail from './stats/status_codes_detail.js';
@@ -29,13 +26,13 @@ import zno_proxies from './no_proxies.js';
 import znotif_center from './notif_center.js';
 import zedit_proxy from './edit_proxy.js';
 import zhowto from './howto.js';
-import proxy_tester from './proxy_tester.js';
+import zproxy_tester from './proxy_tester.js';
+import zconfig from './config.js';
 import protocols_detail from './stats/protocols_detail.js';
 import util from './util.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import 'codemirror/mode/javascript/javascript';
 import 'jquery';
 import 'angular-sanitize';
 import 'bootstrap';
@@ -120,12 +117,6 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         params: {zone: {squash: true, value: null}},
     });
     state_registry.register({
-        name: 'tools',
-        parent: 'app',
-        url: '/tools',
-        templateUrl: 'tools.html',
-    });
-    state_registry.register({
         name: 'faq',
         parent: 'app',
         url: '/faq',
@@ -136,37 +127,35 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         parent: 'app',
         url: '/status_codes',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = status_codes; },
+        controller: $scope=>{ $scope.react_component = status_codes; },
     });
     state_registry.register({
         name: 'status_codes_detail',
         parent: 'app',
         url: '/status_codes/{code:int}',
         template: `<div react-view=react_component state-props=code></div>`,
-        controller: function($scope){
-            $scope.react_component = status_codes_detail; },
+        controller: $scope=>{ $scope.react_component = status_codes_detail; },
     });
     state_registry.register({
         name: 'domains',
         parent: 'app',
         url: '/domains',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = domains; },
+        controller: $scope=>{ $scope.react_component = domains; },
     });
     state_registry.register({
         name: 'domains_detail',
         parent: 'app',
         url: '/domains/{domain:string}',
         template: `<div react-view=react_component state-props=domain></div>`,
-        controller: function($scope){
-            $scope.react_component = domains_detail; },
+        controller: $scope=>{ $scope.react_component = domains_detail; },
     });
     state_registry.register({
         name: 'protocols',
         parent: 'app',
         url: '/protocols',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = protocols; },
+        controller: $scope=>{ $scope.react_component = protocols; },
     });
     state_registry.register({
         name: 'protocols_detail',
@@ -174,29 +163,35 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         url: '/protocols/{protocol:string}',
         template: `<div react-view=react_component state-props=protocol>
         </div>`,
-        controller: function($scope){
-            $scope.react_component = protocols_detail; },
+        controller: $scope=>{ $scope.react_component = protocols_detail; },
     });
     state_registry.register({
         name: 'setup_guide',
         parent: 'app',
         url: '/setup_guide',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = Setup_guide; },
+        controller: $scope=>{ $scope.react_component = Setup_guide; },
     });
     state_registry.register({
         name: 'howto',
         parent: 'app',
         url: '/howto',
         template: '<div react-view=react_component></div>',
-        controller: function($scope){ $scope.react_component = zhowto; },
+        controller: $scope=>{ $scope.react_component = zhowto; },
     });
     state_registry.register({
         name: 'proxy_tester',
         parent: 'app',
         url: '/proxy_tester?url&port&method',
         template: '<div react-view=react_component></div>',
-        controller: $scope=>{ $scope.react_component = proxy_tester; },
+        controller: $scope=>{ $scope.react_component = zproxy_tester; },
+    });
+    state_registry.register({
+        name: 'config',
+        parent: 'app',
+        url: '/config',
+        template: '<div react-view=react_component></div>',
+        controller: $scope=>{ $scope.react_component = zconfig; },
     });
     state_registry.register({
         name: 'edit_proxy',
@@ -204,7 +199,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         url: '/proxy/{port:string}?field',
         template: `<div react-view=react_component state-props=port
             extra-props=field></div>`,
-        controller: function($scope, $rootScope){
+        controller: ($scope, $rootScope)=>{
             $scope.react_component = zedit_proxy; },
     });
 }]);
@@ -367,7 +362,7 @@ function proxy_stats_factory($proxies, $timeout){
     let sp, get_timeout;
     const _prepare_stats = data=>{
         return data.reduce((acc, el)=>{
-            acc[el.port] = {bw: el.in_bw+el.out_bw, reqs: el.reqs};
+            acc[el.port_id] = el;
             return acc;
         }, {});
     };
@@ -375,11 +370,13 @@ function proxy_stats_factory($proxies, $timeout){
         if (!sp)
             return;
         sp.spawn(etask(function*(){
-            const stats = yield ajax.json({url: '/api/proxy_stats'});
-            const stats_per_port = _prepare_stats(stats);
+            const data = yield ajax.json({url: '/api/proxy_stats'});
+            const stats_per_port = _prepare_stats(data.stats);
             $proxies.proxies = $proxies.proxies.map(p=>{
                 if (''+p.port in stats_per_port)
                     p.stats = stats_per_port[p.port];
+                else
+                    p.stats = {bw: 0, real_bw: 0, reqs: 0};
                 return p;
             });
             $proxies.trigger();
@@ -454,11 +451,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         {name: 'proxies', title: 'Proxies', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'howto', title: 'Examples', navbar: true},
-        {name: 'tools', title: 'Tools', navbar: true, children: [
-            {name: 'howto', title: 'How to use', navbar: true},
-            {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
-        ]},
-        {name: 'welcome', navbar: false},
+        {name: 'config', title: 'Configuration', navbar: true},
     ];
     $transitions.onSuccess({}, function(transition){
         var state = transition.to(), section;
@@ -471,6 +464,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         return s.name==$state.$current.name; });
     $http.get('/api/settings').then(function(settings){
         $rootScope.settings = settings.data;
+        setdb.set('head.settings', settings.data);
         $rootScope.beta_features = settings.data.argv
             .includes('beta_features');
     });
@@ -500,6 +494,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     setdb.set('head.callbacks.proxies.update', $proxies.update);
     setdb.set('head.callbacks.state.go', $state.go);
     window.setdb = setdb;
+    window.reset_onboarding = ()=>{ setdb.set('head.onboarding.steps', {}); };
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
     $scope.$root.no_proxies = zno_proxies;
@@ -593,132 +588,6 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     };
     $scope.zone_click = function(name){ ga_event('navbar', 'click', name); };
 }]);
-
-module.controller('config', Config);
-Config.$inject = ['$scope', '$http', '$window'];
-function Config($scope, $http, $window){
-    $http.get('/api/config').then(function(config){
-        $scope.config = config.data.config;
-        setTimeout(function(){
-            $scope.codemirror = codemirror.fromTextArea(
-                $window.$('#config-textarea').get(0), {mode: 'javascript'});
-        }, 0);
-    });
-    var show_reload = function(){
-        $window.$('#restarting').modal({
-            backdrop: 'static',
-            keyboard: false,
-        });
-    };
-    var check_reload = function(){
-        const retry = ()=>{ setTimeout(check_reload, 500); };
-        $http.get('/tools').then(function(res){
-            $window.location.reload(); }, retry);
-    };
-    $scope.save = function(){
-        $scope.errors = null;
-        $http.post('/api/config_check', {config: $scope.codemirror.getValue()})
-        .then(function(res){
-            $scope.errors = res.data;
-            if ($scope.errors.length)
-                return;
-            $scope.$root.confirmation = {
-                text: 'Editing the configuration manually may result in your '
-                    +'proxies working incorrectly. Do you still want to modify'
-                    +' the configuration file?',
-                confirmed: function(){
-                    $scope.config = $scope.codemirror.getValue();
-                    show_reload();
-                    $http.post('/api/config', {config: $scope.config})
-                    .then(setTimeout(check_reload, 3000));
-                },
-            };
-            $window.$('#confirmation').modal();
-        });
-    };
-    $scope.update = function(){
-        $http.get('/api/config').then(function(config){
-            $scope.config = config.data.config;
-            $scope.codemirror.setValue($scope.config);
-        });
-    };
-    $window.$('#config-panel')
-    .on('hidden.bs.collapse', $scope.update)
-    .on('show.bs.collapse', function(){
-        setTimeout(function(){
-            $scope.codemirror.scrollTo(0, 0);
-            $scope.codemirror.refresh();
-        }, 0);
-    });
-    $scope.cancel = function(){
-        $window.$('#config-panel > .collapse').collapse('hide');
-    };
-}
-
-module.controller('resolve', Resolve);
-Resolve.$inject = ['$scope', '$http', '$window'];
-function Resolve($scope, $http, $window){
-    $scope.resolve = {text: ''};
-    $scope.update = function(){
-        $http.get('/api/resolve').then(function(resolve){
-            $scope.resolve.text = resolve.data.resolve;
-        });
-    };
-    $scope.update();
-    var show_reload = function(){
-        $window.$('#restarting').modal({
-            backdrop: 'static',
-            keyboard: false,
-        });
-    };
-    // XXX krzysztof/ovidiu: incorrect usage of promises
-    var check_reload = function(){
-        $http.get('/api/config').catch(
-            function(){ setTimeout(check_reload, 500); })
-        .then(function(){ $window.location.reload(); });
-    };
-    $scope.save = function(){
-        show_reload();
-        $http.post('/api/resolve', {resolve: $scope.resolve.text})
-        .then(check_reload);
-    };
-    $window.$('#resolve-panel')
-    .on('hidden.bs.collapse', $scope.update)
-    .on('show.bs.collapse', function(){
-        setTimeout(function(){
-            $window.$('#resolve-textarea').scrollTop(0).scrollLeft(0); }, 0);
-    });
-    $scope.cancel = function(){
-        $window.$('#resolve-panel > .collapse').collapse('hide'); };
-    $scope.new_host = function(){
-        $window.$('#resolve_add').one('shown.bs.modal', function(){
-            $window.$('#resolve_add input').select();
-        }).modal();
-    };
-    $scope.add_host = function(){
-        $scope.adding = true;
-        $scope.error = false;
-        var host = $scope.host.host.trim();
-        $http.get('/api/resolve_host/'+host)
-        .then(function(ips){
-            $scope.adding = false;
-            if (ips.data.ips&&ips.data.ips.length)
-            {
-                for (var i=0; i<ips.data.ips.length; i++)
-                    $scope.resolve.text += '\n'+ips.data.ips[i]+' '+host;
-                setTimeout(function(){
-                    var textarea = $window.$('#resolve-textarea');
-                    textarea.scrollTop(textarea.prop('scrollHeight'));
-                }, 0);
-                $scope.host.host = '';
-                $scope.resolve_frm.$setPristine();
-                $window.$('#resolve_add').modal('hide');
-            }
-            else
-                $scope.error = true;
-        });
-    };
-}
 
 module.controller('settings', Settings);
 Settings.$inject = ['$scope', '$http', '$window', '$sce', '$rootScope',
@@ -887,205 +756,6 @@ function Faq($scope){
     ];
 }
 
-module.controller('test-ports', ['$scope', '$http', '$filter', '$window',
-function($scope, $http, $filter, $window){
-    var preset = JSON.parse(decodeURIComponent(($window.location.search.match(
-        /[?&]test-ports=([^&]+)/)||['', 'null'])[1]));
-    if (preset)
-        $scope.proxy = ''+preset.port;
-    $http.get('/api/proxies').then(function(proxies){
-        $scope.proxies = [['0', 'All proxies']];
-        proxies.data.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
-        for (var i=0; i<proxies.data.length; i++)
-        {
-            $scope.proxies.push(
-                [''+proxies.data[i].port, ''+proxies.data[i].port]);
-        }
-    });
-    $scope.request = {};
-    $scope.go = function(proxy){
-        $scope.reset();
-        var req = {
-            method: 'GET',
-            url: '/api/test-ports?ports='+(+proxy==0 ? $scope.proxies.map(
-                function(p){ return +p[0]; }).filter(Boolean).join(',') :
-                proxy),
-        };
-        $scope.loading = true;
-        $http(req).then(function(r){
-            $scope.loading = false;
-            r = r.data;
-            if (!r.error)
-            {
-                for (var port in r)
-                    $scope.request[port] = r[port];
-            }
-            $scope.request.responses = [];
-            for (var p in $scope.request)
-            {
-                if (!+p)
-                    continue;
-                var response = $scope.request[p].response ||
-                    $scope.request[p].error;
-                $scope.request.responses.push({
-                    proxy: p,
-                    body: response.body||{pass: false},
-                    ts: response.ts||+new Date(),
-                });
-            }
-        });
-    };
-    $scope.reset = function(){
-        $scope.request = {};
-    };
-}]);
-
-module.controller('countries', Countries);
-Countries.$inject = ['$scope', '$http', '$window'];
-function Countries($scope, $http, $window){
-    $scope.url = '';
-    $scope.ua = '';
-    $scope.path = '';
-    $scope.headers = [];
-    $scope.started = 0;
-    $scope.num_loading = 0;
-    $scope.add_header = function(){
-        $scope.headers.push({key: '', value: ''});
-    };
-    $scope.remove_header = function(index){
-        $scope.headers.splice(index, 1);
-    };
-    var normalize_headers = function(headers){
-        var result = {};
-        for (var h in headers)
-            result[headers[h].key] = headers[h].value;
-        return result;
-    };
-    $scope.go = function(){
-        var process = function(){
-            $scope.started++;
-            $scope.countries = [];
-            var max_concur = 4;
-            $scope.num_loading = 0;
-            $scope.cur_index = 0;
-            var progress = function(apply){
-                while ($scope.cur_index<$scope.countries.length&&
-                    $scope.num_loading<max_concur)
-                {
-                    if (!$scope.countries[$scope.cur_index].status)
-                    {
-                        $scope.countries[$scope.cur_index].status = 1;
-                        $scope.countries[$scope.cur_index].img.src =
-                            $scope.countries[$scope.cur_index].url;
-                        $scope.num_loading++;
-                    }
-                    $scope.cur_index++;
-                }
-                if (apply)
-                    $scope.$apply();
-            };
-            var nheaders = JSON.stringify(normalize_headers($scope.headers));
-            for (var c_index in $scope.$root.consts.proxy.country.values)
-            {
-                var c = $scope.$root.consts.proxy.country.values[c_index];
-                if (!c.value)
-                    continue;
-                var params = {
-                    country: c.value,
-                    url: $scope.url,
-                    path: $scope.path,
-                    ua: $scope.ua,
-                    headers: nheaders,
-                };
-                var nparams = [];
-                for (var p in params)
-                    nparams.push(p+'='+encodeURIComponent(params[p]));
-                var data = {
-                    code: c.value,
-                    name: c.key,
-                    status: 0,
-                    url: '/api/country?'+nparams.join('&'),
-                    img: new Image(),
-                    index: $scope.countries.length,
-                };
-                data.img.onerror = (function(started){
-                    return function(){
-                        if ($scope.started!=started)
-                            return;
-                        data.status = 3;
-                        $scope.num_loading--;
-                        progress(true);
-                    };
-                })($scope.started);
-                data.img.onload = (function(started){
-                    return function(){
-                        if ($scope.started!=started)
-                            return;
-                        data.status = 4;
-                        $scope.num_loading--;
-                        progress(true);
-                    };
-                })($scope.started);
-                $scope.countries.push(data);
-            }
-            progress(false);
-        };
-        if ($scope.started)
-        {
-            $scope.$root.confirmation = {
-                text: 'The currently made screenshots will be lost. '
-                    +'Do you want to continue?',
-                confirmed: process,
-            };
-            $window.$('#confirmation').modal();
-        }
-        else
-            process();
-    };
-    $scope.view = function(country){
-        $scope.screenshot = {
-            country: country.name,
-            url: country.url,
-        };
-        $window.$('#countries-screenshot').one('shown.bs.modal', function(){
-            $window.$('#countries-screenshot .modal-body > div')
-            .scrollTop(0).scrollLeft(0);
-        }).modal();
-    };
-    $scope.cancel = function(country){
-        if (!country.status)
-            country.status = 2;
-        else if (country.status==1)
-            country.img.src = '';
-    };
-    $scope.cancel_all = function(){
-        $scope.$root.confirmation = {
-            text: 'Do you want to stop all the remaining countries?',
-            confirmed: function(){
-                    for (var c_i=$scope.countries.length-1; c_i>=0; c_i--)
-                    {
-                        var country = $scope.countries[c_i];
-                        if (country.status<2)
-                            $scope.cancel(country);
-                    }
-                },
-            };
-        $window.$('#confirmation').modal();
-    };
-    $scope.retry = function(country){
-        if ($scope.cur_index>country.index)
-        {
-            country.status = 1;
-            // XXX colin/ovidiu: why not use urlencoding?
-            country.url = country.url.replace(/&\d+$/, '')+'&'+(+date());
-            $scope.num_loading++;
-            country.img.src = country.url;
-        }
-        else
-            country.status = 0;
-    };
-}
-
 module.filter('startFrom', function(){
     return function(input, start){
         return input.slice(+start);
@@ -1106,6 +776,14 @@ Proxies.$inject = ['$scope', '$rootScope', '$http', '$proxies', '$window',
 function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
     $stateParams, $success_rate, $state, $proxy_stats)
 {
+    $scope.show_proxies_panel = ()=>{
+        return $proxies.proxies && $proxies.proxies.filter(p=>
+            p.port!==22225||p.stats&&p.stats.real_bw>0).length;
+    };
+    $scope.show_no_proxies_panel = ()=>{
+        return $proxies.proxies && !$proxies.proxies.filter(p=>
+            p.port!==22225||p.stats&&p.stats.real_bw>0).length;
+    };
     $scope.ratio_tooltip = 'Ratio of successful requests out of total'
     +' requests, where successful requests are calculated as 2xx, 3xx or 404'
     +' HTTP status codes';
@@ -2267,19 +1945,6 @@ function requests_filter($filter){
 module.filter('bytes', function(){
     return util.bytes_format;
 });
-
-module.filter('request', request_filter);
-function request_filter(){
-    return function(r){
-        return '/tools?test='+encodeURIComponent(JSON.stringify({
-            port: r.port,
-            url: r.url,
-            method: r.method,
-            body: r.request_body,
-            headers: r.request_headers,
-        }));
-    };
-}
 
 module.directive('customTooltip', ()=>({
     restrict: 'A',

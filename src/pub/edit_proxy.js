@@ -627,7 +627,7 @@ class Index extends React.Component {
             _this.setState({show_loader: false});
             if (status.status=='ok')
             {
-                ga_event('top bar', 'click save', 'successful');
+                ga_event('top bar', 'successfully saved');
                 onboarding.check_created_proxy();
                 if (!tested_proxy)
                 {
@@ -638,7 +638,7 @@ class Index extends React.Component {
             }
             else
             {
-                ga_event('top bar', 'click save', 'failed');
+                ga_event('top bar', 'failed save', status.status);
                 _this.setState({error_list: [{msg: status.status}]});
                 $('#save_proxy_errors').modal('show');
             }
@@ -1248,7 +1248,7 @@ class Targeting_raw extends React.Component {
                                 href={mailto}>More carriers</a>;
         this.carriers = [
             {value: '', key: 'None'},
-                        {value: 'aircel', key: 'Aircel'},
+            {value: 'aircel', key: 'Aircel'},
             {value: 'airtel', key: 'Airtel'},
             {value: 'att', key: 'AT&T'},
             {value: 'chinamobile', key: 'China Mobile'},
@@ -1262,6 +1262,7 @@ class Targeting_raw extends React.Component {
             {value: 'mtn', key: 'MTN - Mahanager Telephone'},
             {value: 'optus', key: 'Optus'},
             {value: 'orange', key: 'Orange'},
+            {value: 'qwest', key: 'Qwest'},
             {value: 'reliance_jio', key: 'Reliance Jio'},
             {value: 'sprint', key: 'Sprint'},
             {value: 'telefonica', key: 'Telefonica'},

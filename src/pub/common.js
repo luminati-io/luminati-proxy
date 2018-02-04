@@ -174,6 +174,20 @@ const Input = props=>{
     );
 };
 
+const Nav = ({title, subtitle, warning})=>(
+    <div className="nav_header">
+      <h3>{title}</h3>
+      <div className="subtitle">{subtitle}</div>
+      <Warning_msg warning={warning}/>
+    </div>
+);
+
+const Warning_msg = ({warning})=>{
+    if (!warning)
+        return null;
+    return <Warning text={warning}/>;
+};
+
 const onboarding = {
     _is_checked(step){
         if (!setdb.get('head.onboarding.steps') &&
@@ -529,4 +543,4 @@ for (let k in presets)
 const emitter = new EventEmitter();
 
 export {Dialog, Code, If, Modal, Loader, Select, Input, Warnings,
-    Warning, onboarding, presets, emitter};
+    Warning, Nav, onboarding, presets, emitter};

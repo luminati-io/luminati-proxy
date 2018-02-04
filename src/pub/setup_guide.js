@@ -10,7 +10,6 @@ import classnames from 'classnames';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
 const ga_event = util.ga_event;
-const localhost = window.location.origin;
 
 const click_add_proxy = ()=>{
     ga_event('lpm-onboarding', '04 first request button clicked');
@@ -72,7 +71,7 @@ class Progress_modal extends Pure_component {
               <Modal id="progress_modal" title={this.state.title}
                 className="progress_modal" no_footer
                 on_dismiss={this.dismiss_clicked.bind(this)}>
-                <List/>
+                <List progress_bar/>
               </Modal>
               <Modal id="dismiss_progress_modal" title="Are you sure?"
                 no_footer className="dismiss_progress_modal">
@@ -89,6 +88,47 @@ class Progress_modal extends Pure_component {
         );
     }
 }
+
+const steps_states = {
+    create: {
+        disabled: ()=>false,
+        done: steps=>steps.created_proxy,
+    },
+    test: {
+        disabled: steps=>!steps.created_proxy,
+        done: steps=>steps.tested_proxy,
+    },
+    req: {
+        disabled: steps=>!steps.tested_proxy,
+        done: steps=>steps.seen_examples,
+    },
+};
+
+const Progress_bar = ({steps, show})=>{
+    if (!show)
+        return null;
+    return (
+        <div className="progress_bar">
+          <Progress_step label="Create" id="create" steps={steps}/>
+          <div className="horizontal_line"/>
+          <Progress_step label="Test" id="test" steps={steps}/>
+          <div className="horizontal_line"/>
+          <Progress_step label="Use" id="req" steps={steps}/>
+        </div>
+    );
+};
+
+const Progress_step = props=>{
+    const done = steps_states[props.id].done(props.steps);
+    const img_class = classnames('img', {not_done: !done, done});
+    const step_class = classnames('img_block', {done});
+    return (
+        <div className={step_class}>
+          <div className={img_class}/>
+          <div className="text">{props.label}</div>
+        </div>
+    );
+};
 
 class List extends Pure_component {
     constructor(props){
@@ -112,6 +152,8 @@ class List extends Pure_component {
         return (
             <div>
               <Loader show={this.state.loading}/>
+              <Progress_bar show={this.props.progress_bar}
+                steps={this.state.steps}/>
               <div className="section_list">
                 <Create_proxy_section steps={this.state.steps}/>
                 <div className="vertical_line"/>
@@ -125,37 +167,34 @@ class List extends Pure_component {
 }
 
 const Create_proxy_section = props=>(
-    <Section header="Create new proxy" img="create"
+    <Section header="Create new proxy" id="create"
       text="This will configure your proxy settings"
-      on_click={click_add_proxy} done={props.steps.created_proxy}/>
+      steps={props.steps} on_click={click_add_proxy}/>
 );
 
 const Test_proxy_section = props=>(
-    <Section header="Test your proxy" img="test"
+    <Section header="Test your proxy" id="test"
       text="Verify your proxies are enabled and active"
-      on_click={click_test} disabled={!props.steps.created_proxy}
-      done={props.steps.tested_proxy}/>
+      steps={props.steps} on_click={click_test}/>
 );
 
 const Examples_section = props=>(
-    <Section header="Use your proxy" img="req"
+    <Section header="Use your proxy" id="req"
       text="Learn how to use your proxy port in any platform"
-      on_click={click_make_request} disabled={!props.steps.tested_proxy}
-      done={props.steps.seen_examples}/>
+      steps={props.steps} on_click={click_make_request}/>
 );
 
 const Section = props=>{
+    const disabled = steps_states[props.id].disabled(props.steps);
+    const done = steps_states[props.id].done(props.steps);
     const img_class = classnames('img', {
-        [props.img]: !props.done && !props.disabled,
-        [`${props.img}_disabled`]: !props.done && props.disabled,
-        done: props.done,
+        [props.id]: !done && !disabled,
+        [`${props.id}_disabled`]: !done && disabled,
+        done: done,
     });
-    const section_class = classnames('section', {
-        disabled: props.disabled,
-        done: props.done,
-    });
+    const section_class = classnames('section', {disabled, done});
     const on_click = ()=>{
-        if (props.disabled)
+        if (disabled)
             return;
         props.on_click();
     };

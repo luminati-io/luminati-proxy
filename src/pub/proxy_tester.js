@@ -4,7 +4,7 @@ import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
 import {Input, Select, If, Loader, Modal, Warnings, onboarding,
-    emitter} from './common.js';
+    emitter, Nav} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import util from './util.js';
@@ -17,6 +17,8 @@ class Proxy_tester extends Pure_component {
     constructor(props){
         super(props);
         this.state = {response: {}};
+        this.title = 'Proxy Tester';
+        this.subtitle = 'Emulate requests from your proxies to any target URL';
     }
     update_response(response){ this.setState({response}); }
     render(){
@@ -24,7 +26,7 @@ class Proxy_tester extends Pure_component {
         const headers = this.state.response&&this.state.response.headers;
         return (
             <div className="lpm proxy_tester">
-              <Nav/>
+              <Nav title={this.title} subtitle={this.subtitle}/>
               <Request update_response={this.update_response.bind(this)}/>
               <Body body={body}/>
               <If when={this.state.response.status_code}>
@@ -38,15 +40,6 @@ class Proxy_tester extends Pure_component {
         );
     }
 }
-
-const Nav = ()=>(
-    <div className="nav_header">
-      <h3>Proxy Tester</h3>
-      <div className="subtitle">
-        Emulate requests from your proxies to any target URL
-      </div>
-    </div>
-);
 
 class Request extends Pure_component {
     constructor(props){
@@ -134,7 +127,7 @@ class Request extends Pure_component {
             this.on('uncaught', e=>{
                 console.error(e);
                 _this.setState({show_loader: false});
-                ga_event('proxy-tester-tab', 'unexpected error');
+                ga_event('proxy-tester-tab', 'unexpected error', e.message);
             });
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
@@ -155,7 +148,8 @@ class Request extends Pure_component {
             {
                 _this.setState({warnings: [{msg: json_check.error}]});
                 $('#warnings_modal').modal();
-                ga_event('proxy-tester-tab', 'response has errors');
+                ga_event('proxy-tester-tab', 'response has errors',
+                    json_check.error);
             }
             else
                 ga_event('proxy-tester-tab', 'response successful');

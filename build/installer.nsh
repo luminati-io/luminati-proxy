@@ -72,6 +72,6 @@
   Push "^ "
   Call StrRep
   Pop $escapedExe
-  CreateShortCut "$startMenuLink" "%comspec%" "/C $\"$escapedExe$\"" "$appExe" 0 "" "" "${APP_DESCRIPTION}"
+  CreateShortCut "$startMenuLink" "%comspec%" "/C $\"^$\"$escapedExe^$\"$\"" "$appExe" 0 "" "" "${APP_DESCRIPTION}"
   CreateShortCut "$desktopLink" "%comspec%" "/C $\"$escapedExe$\"" $appExe" 0 "" "" "${APP_DESCRIPTION}"
 !macroend
