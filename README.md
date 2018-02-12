@@ -46,6 +46,10 @@ curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
 ```
+if the command is returning error try installing using --unsafe-perm flag
+```sh
+sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm
+```
 ### Upgrade
 - Use npm to upgrade
 ```sh
