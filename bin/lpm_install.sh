@@ -332,11 +332,12 @@ check_install()
     echo 'check install';
     if ! luminati -v > /dev/null
     then
-        echo 'there was an error installing Luminait';
+        echo 'there was an error installing Luminati';
         perr "install_error_lpm_check";
         exit 1;
     fi
-    echo "Luminati installed successfully";
+    echo "Luminati installed successfully!";
+    echo "To run the process enter 'luminati'";
     perr "install_success_lpm_check";
 }
 

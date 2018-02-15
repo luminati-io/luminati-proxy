@@ -302,6 +302,8 @@ function proxies_factory($http, $q){
     function update_proxies(){
         const get_status = function(force){
             const proxy = this;
+            if (proxy.port==22225 && !(proxy.stats && proxy.stats.real_bw))
+                return;
             if (!proxy._status_call || force)
             {
                 const params = {};

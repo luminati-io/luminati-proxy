@@ -71,7 +71,7 @@ class Add_proxy extends Pure_component {
     }
     save(opt={}){
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             const port = yield _this.persist();
             onboarding.check_created_proxy();
             const callbacks = setdb.get('head.callbacks');
@@ -91,7 +91,7 @@ class Add_proxy extends Pure_component {
                 emitter.emit('setup_guide:progress_modal',`Great! You have`
                     +` configured proxy on port ${port}`, 500);
             }
-        }));
+        });
     }
     rule_clicked(field){
         ga_event('add-new-port', 'rules clicked', field);

@@ -11,7 +11,7 @@ const No_proxies = ()=>(
       <div className="header">
         <h1>There are no proxies configured</h1></div>
       <button onClick={open_modal} className="btn btn_lpm btn_add_port">
-        <div className="img"/>Create new proxy</button>
+        <div className="img"/>Create new proxy port</button>
     </div>
 );
 

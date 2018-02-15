@@ -38,8 +38,8 @@ class T extends Pure_component {
             if (!translation)
                 return this.setState({text: this.key});
             if (!translation[this.key])
-                return console.info('Missing translation for: "'+this.key+'"');
-            this.setState({text: translation[this.key]});
+                console.info('Missing translation for: "'+this.key+'"');
+            this.setState({text: translation[this.key]||this.key});
         });
     }
     render(){ return this.state.text; }

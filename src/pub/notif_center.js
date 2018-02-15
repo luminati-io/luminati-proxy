@@ -19,10 +19,10 @@ class Notif_center extends Pure_component {
     }
     componentWillMount(){
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             const www_lpm = yield ajax.json({url: 'api/www_lpm'});
             _this.setState({messages: www_lpm.messages, loaded: true});
-        }));
+        });
     }
     open(){
         if (this.state.loaded)

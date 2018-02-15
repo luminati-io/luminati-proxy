@@ -127,7 +127,7 @@ const tabs = {
         fields: {
             trigger_type: {
                 label: 'Rule type',
-                tooltip: `In every request the response will be analyzed. 
+                tooltip: `In every request the response will be analyzed.
                     if the configured Trigger rule is true, the Action
                     will be executed automatically`,
             },
@@ -1284,7 +1284,7 @@ class Targeting_raw extends React.Component {
     }
     states(){
         const country = this.props.form.country;
-        if (!country)
+        if (!country||country=='*')
             return [];
         const res = this.props.locations.regions[country].map(r=>
             ({key: r.region_name, value: r.region_id}));
@@ -1635,7 +1635,7 @@ class Alloc_modal extends Pure_component {
         const url = zurl.qs_add(window.location.host+endpoint,
             {zone: this.props.zone, key});
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
                 _this.loading(false);
@@ -1648,7 +1648,7 @@ class Alloc_modal extends Pure_component {
                 available_list = res.slice(0, 100);
             _this.setState({available_list});
             _this.loading(false);
-        }));
+        });
     }
     loading(loading){
         setdb.set('edit_proxy.loading', loading);

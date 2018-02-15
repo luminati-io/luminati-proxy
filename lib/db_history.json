@@ -45,9 +45,6 @@
             "real_bw": {"type": "INTEGER"},
             "reqs": {"type": "INTEGER"}
         }
-    },
-    "add": {
-        "usage": ["port_id", "bw", "real_bw", "reqs"]
     }
 }, {
     "schema": {

@@ -123,7 +123,7 @@ class Request extends Pure_component {
         };
         this.setState({show_loader: true});
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             this.on('uncaught', e=>{
                 console.error(e);
                 _this.setState({show_loader: false});
@@ -153,7 +153,7 @@ class Request extends Pure_component {
             }
             else
                 ga_event('proxy-tester-tab', 'response successful');
-        }));
+        });
     }
     render() {
         return (

@@ -35,10 +35,12 @@ class Pure_component extends React.PureComponent {
         }
     }
     setdb_on(path, cb){ this.listeners[path] = setdb.on(path, cb); }
-    etask(task){
+    etask(sp){
         if (!this.sp)
             this.sp = etask('Component', function*(){ yield this.wait(); });
-        this.sp.spawn(task);
+        if (sp.constructor.name!='Etask')
+            sp = etask(sp);
+        this.sp.spawn(sp);
     }
     setState(updater, cb){
         let t0, t1, t2, t3;

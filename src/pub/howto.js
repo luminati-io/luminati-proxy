@@ -27,7 +27,7 @@ class Howto extends Pure_component {
     choose_click(option){
         this.setState({option});
         ga_event('How-to-tab', 'select code/browser', option);
-        this.etask(etask(function*(){
+        this.etask(function*(){
             const seen_examples = yield onboarding.has_seen_examples();
             if (seen_examples)
                 return;
@@ -38,7 +38,7 @@ class Howto extends Pure_component {
                 window.setTimeout(()=>
                     $('#finish_onboarding_modal').modal(), 2000);
             }
-        }));
+        });
     }
     render(){
         let subheader;

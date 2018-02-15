@@ -28,11 +28,11 @@ class Config extends Pure_component {
         this.cm.setSize('auto', 420);
         this.cm.on('change', this.on_cm_change.bind(this));
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             const config = yield ajax.json({url: '/api/config'});
             _this.setState({persisted_config: config.config});
             _this.cm.doc.setValue(config.config);
-        }));
+        });
         this.setdb_on('head.settings', settings=>this.setState({settings}));
     }
     on_cm_change(e){
@@ -49,7 +49,7 @@ class Config extends Pure_component {
             return;
         ga_event('configuration', 'click save');
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             const check_url = '/api/config_check';
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
@@ -64,7 +64,7 @@ class Config extends Pure_component {
             }
             else
                 $('#conf_confirmation_modal').modal();
-        }));
+        });
     }
     check_reload(){
         const _this = this;
@@ -79,7 +79,7 @@ class Config extends Pure_component {
         ga_event('configuration', 'click save in modal');
         this.set_editable(false);
         const _this = this;
-        this.etask(etask(function*(){
+        this.etask(function*(){
             const save_url = '/api/config';
             yield window.fetch(save_url, {
                 method: 'POST',
@@ -89,7 +89,7 @@ class Config extends Pure_component {
             $('#restarting').modal({backdrop: 'static', keyboard: false});
             yield etask.sleep(3000);
             yield _this.check_reload();
-        }));
+        });
     }
     download(){
         ga_event('configuration', 'click download');

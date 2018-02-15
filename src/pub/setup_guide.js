@@ -167,19 +167,19 @@ class List extends Pure_component {
 }
 
 const Create_proxy_section = props=>(
-    <Section header="Create new proxy" id="create"
-      text="This will configure your proxy settings"
+    <Section header="Create new proxy port" id="create"
+      text="Will set up local port with proxy configuration"
       steps={props.steps} on_click={click_add_proxy}/>
 );
 
 const Test_proxy_section = props=>(
-    <Section header="Test your proxy" id="test"
+    <Section header="Test your proxy port" id="test"
       text="Verify your proxies are enabled and active"
       steps={props.steps} on_click={click_test}/>
 );
 
 const Examples_section = props=>(
-    <Section header="Use your proxy" id="req"
+    <Section header="Use your proxy port" id="req"
       text="Learn how to use your proxy port in any platform"
       steps={props.steps} on_click={click_make_request}/>
 );

@@ -352,7 +352,6 @@ describe('proxy', ()=>{
                     assert.equal(target_req['x-hola-context'], undefined);
                 }
                 yield etask.sleep(400);
-                console.log('context', history);
                 assert.equal(history.length, 1);
                 assert.equal(history[0].context, context);
             }));
@@ -718,7 +717,7 @@ describe('proxy', ()=>{
                         'http://lumtest.com/myip',
                         true);
                     it('https connect', ()=>etask(function*(){
-                        l = yield lum({null_response: 'match', log: 'DEBUG'});
+                        l = yield lum({null_response: 'match'});
                         try {
                             yield l.test('https://match.com');
                         } catch(e){
@@ -1599,12 +1598,11 @@ describe('Lsession', ()=>{
     describe('should expire', ()=>{});
 });
 
-describe('Lreverse_dns', ()=>{
-    const {Lreverse_dns} = lpm;
+describe('Lreverse_lookup', ()=>{
+    const {Lreverse_lookup} = lpm;
     describe('parse_values', ()=>{
        const t = (name, vals, expect)=>it(name, ()=>{
-           let ldns = new Lreverse_dns();
-           assert.deepEqual(ldns.parse_vals(vals), expect);
+           assert.deepEqual(Lreverse_lookup.parse_vals(vals), expect);
        });
        t('no values', [], {});
        t('one value', ['1.1.1.1 test.com'], {'1.1.1.1': 'test.com'});
