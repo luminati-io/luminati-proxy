@@ -5,10 +5,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import {Modal, If} from './common.js';
+import {Modal} from './common.js';
 import $ from 'jquery';
 import util from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import {If} from '/www/util/pub/react_util.js';
 
 const ga_event = util.ga_event;
 

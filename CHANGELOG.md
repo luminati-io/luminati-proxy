@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.84.22
+
 ## 1.83.446
 - :star: added banip api endpoint
 - :sparkles: UI and bug fixing

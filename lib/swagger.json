@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.83.446",
+        "version": "1.84.22",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -250,6 +250,23 @@
                 }
             }
         },
+        "/proxies/{port}/ban_ip":{
+            "post": {
+                "description": "On a pecific port ban an IP for a certain amount of time",
+            "tags": [
+                "Proxy"
+            ],
+            "parameters":{
+                "ip": "string",
+                "min": "integer"
+            },
+             "responses": {
+                 "200": {
+                        "description": "Successful response"
+                 }
+             }
+          }
+        },
         "/refresh_sessions/{port}": {
             "post": {
                 "description": "Switch luminati sessions to new sessions (get new IPs)",
@@ -373,6 +390,10 @@
                     "type": "boolean",
                     "description": "Validate proxy credentials"
                 },
+                "use_proxy_cache": {
+                    "type": "boolean",
+                    "description": "Cache resolved ips of superagents"
+                },
                 "request_stats": {
                     "type": "boolean",
                     "description": "Enable requests statistics"
@@ -458,6 +479,14 @@
                 "proxy_switch": {
                     "type": "integer",
                     "description": "Automatically switch super proxy on failure"
+                },
+                "proxy_retry": {
+                    "type": "integer",
+                    "description": "Automatically retry on super proxy failure"
+                },
+                "use_proxy_cache": {
+                    "type": "boolean",
+                    "description": "Cache resolved ips of superagents"
                 },
                 "insecure": {
                     "type": "boolean",

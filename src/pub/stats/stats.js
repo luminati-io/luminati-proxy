@@ -13,9 +13,10 @@ import Common from './common.js';
 import {StatusCodeRow, StatusCodeTable} from './status_codes.js';
 import {DomainRow, DomainTable} from './domains.js';
 import {ProtocolRow, ProtocolTable} from './protocols.js';
-import {Dialog, If} from '../common.js';
+import {Dialog} from '../common.js';
 import 'animate.css';
 import Pure_component from '../../../www/util/pub/pure_component.js';
+import {If} from '/www/util/pub/react_util.js';
 
 const E = {
     install: ()=>E.sp = etask('stats', [function(){ return this.wait(); }]),

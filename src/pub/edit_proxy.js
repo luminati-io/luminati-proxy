@@ -7,13 +7,14 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {If, Modal, Loader, Select, Input, Warning, Warnings, presets,
-    onboarding, emitter} from './common.js';
+import {Modal, Loader, Select, Input, Warning, Warnings, presets, onboarding,
+    emitter} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {Netmask} from 'netmask';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import {If} from '/www/util/pub/react_util.js';
 import {getContext, withContext} from 'recompose';
 import PropTypes from 'prop-types';
 
@@ -1251,6 +1252,7 @@ class Targeting_raw extends React.Component {
             {value: 'aircel', key: 'Aircel'},
             {value: 'airtel', key: 'Airtel'},
             {value: 'att', key: 'AT&T'},
+            {value: 'vimpelcom', key: 'Beeline Russia'},
             {value: 'chinamobile', key: 'China Mobile'},
             {value: 'claro', key: 'Claro'},
             {value: 'comcast', key: 'Comcast'},
@@ -1259,7 +1261,9 @@ class Targeting_raw extends React.Component {
             {value: 'docomo', key: 'Docomo'},
             {value: 'dtac', key: 'DTAC Trinet'},
             {value: 'etisalat', key: 'Etisalat'},
+            {value: 'megafont', key: 'Megafon Russia'},
             {value: 'mtn', key: 'MTN - Mahanager Telephone'},
+            {value: 'mts', key: 'MTS Russia'},
             {value: 'optus', key: 'Optus'},
             {value: 'orange', key: 'Orange'},
             {value: 'qwest', key: 'Qwest'},

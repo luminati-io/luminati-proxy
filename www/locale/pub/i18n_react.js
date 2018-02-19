@@ -27,6 +27,17 @@ const set_curr_lang = lang=>{
         }
     );
 };
+const get_translation = (translation, key)=>{
+    if (!translation)
+        return key;
+    if (!translation[key])
+        console.info('Missing translation for: "'+key+'"');
+    return translation[key]||key;
+};
+const translate = key=>{
+    const translation = setdb.get('i18n.translation');
+    return get_translation(translation, key);
+};
 class T extends Pure_component {
     constructor(props){
         super(props);
@@ -35,17 +46,13 @@ class T extends Pure_component {
     }
     componentWillMount(){
         this.setdb_on('i18n.translation', translation=>{
-            if (!translation)
-                return this.setState({text: this.key});
-            if (!translation[this.key])
-                console.info('Missing translation for: "'+this.key+'"');
-            this.setState({text: translation[this.key]||this.key});
+            this.setState({text: get_translation(translation, this.key)});
         });
     }
     render(){ return this.state.text; }
 }
 
-const E = {T, init, set_curr_lang};
+const E = {T, translate, init, set_curr_lang};
 return E;
 
 });

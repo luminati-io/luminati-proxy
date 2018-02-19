@@ -9,6 +9,7 @@ import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import EventEmitter from 'events';
+import {If} from '/www/util/pub/react_util.js';
 
 class Dialog extends React.Component {
     render(){
@@ -29,13 +30,17 @@ class Dialog extends React.Component {
 }
 
 class Modal extends React.Component {
-    click_cancel(){ $('#'+this.props.id).modal('hide'); }
+    click_cancel(){
+        if (this.props.cancel_clicked)
+            this.props.cancel_clicked();
+        $('#'+this.props.id).modal('hide');
+    }
     click_ok(){
         const _this = this;
         etask(function*(){
-            _this.click_cancel();
             if (_this.props.click_ok)
                 yield _this.props.click_ok();
+            _this.click_cancel();
         });
     }
     on_dismiss(){
@@ -137,8 +142,6 @@ const Code = props=>{
         </code>
     );
 };
-
-const If = ({when, children})=>when ? children : null;
 
 const Select = props=>{
     const update = val=>{
@@ -439,11 +442,9 @@ const presets = {
             opt.max_requests = 0;
             opt.pool_type = 'round-robin';
             opt.seed = false;
-            opt.session = true;
+            opt.proxy_count = 20;
             opt.session_duration = 0;
             opt.session_random = false;
-            opt.sticky_ip = false;
-            opt.proxy_count = 5;
             opt.session_init_timeout = 5;
             opt.race_reqs = 5;
         },
@@ -542,5 +543,5 @@ for (let k in presets)
 
 const emitter = new EventEmitter();
 
-export {Dialog, Code, If, Modal, Loader, Select, Input, Warnings,
+export {Dialog, Code, Modal, Loader, Select, Input, Warnings,
     Warning, Nav, onboarding, presets, emitter};

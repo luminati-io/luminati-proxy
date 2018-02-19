@@ -3,13 +3,14 @@
 import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, If, Loader, Modal, Warnings, onboarding,
-    emitter, Nav} from './common.js';
+import {Input, Select, Loader, Modal, Warnings, onboarding, emitter,
+    Nav} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import {If} from '/www/util/pub/react_util.js';
 
 const ga_event = util.ga_event;
 

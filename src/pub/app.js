@@ -20,6 +20,7 @@ import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
 import zwelcome_modal from './welcome.js';
+import zreport_bug_modal from './report_bug.js';
 import {Progress_modal, Setup_guide} from './setup_guide.js';
 import zadd_proxy from './add_proxy.js';
 import zno_proxies from './no_proxies.js';
@@ -502,6 +503,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     $scope.$root.no_proxies = zno_proxies;
     $scope.$root.progress_modal = Progress_modal;
     $scope.$root.welcome_modal = zwelcome_modal;
+    $scope.$root.report_bug_modal = zreport_bug_modal;
     $scope.$root.notif_center = znotif_center;
     var show_reload = function(){
         $window.$('#restarting').modal({
@@ -550,6 +552,9 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         };
         $window.$('#confirmation').modal();
     };
+    $scope.report_bug_allowed = ()=>{
+        return JSON.parse(window.localStorage.getItem('report_bug')); };
+    $scope.open_report_bug = ()=>{ $('#report_bug_modal').modal(); };
     $scope.shutdown = function(){
         $scope.$root.confirmation = {
             text: 'Are you sure you want to shut down the local proxies?',

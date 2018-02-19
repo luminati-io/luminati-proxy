@@ -68,9 +68,12 @@ module.exports = {
         ],
     },
     resolve: {
+        modules: [__dirname, 'node_modules'],
         alias: {
             '/util': 'hutil/util/',
             jquery: 'jquery/src/jquery.js',
+            virt_jquery_all: 'jquery/src/jquery.js',
+            '/www': 'www/',
         },
     },
     resolveLoader: {

@@ -6,7 +6,7 @@ import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {If, Modal, Loader, onboarding, presets, emitter} from './common.js';
+import {Modal, Loader, onboarding, presets, emitter} from './common.js';
 import util from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 

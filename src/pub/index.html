@@ -11,6 +11,7 @@
     <link rel=stylesheet href=req/font-awesome/css/font-awesome.css>
     <link rel=stylesheet href=req/flag-icon-css/css/flag-icon.css>
     <style>[ng-cloak] { display: none; }</style>
+    <!-- Hotjar Tracking Code for http://luminati.io -->
   </head>
   <body ng-cloak ng-controller=root>
     <div class="top_nav_wrapper"
@@ -31,6 +32,9 @@
             <ul class="dropdown-menu dropdown-menu-right">
               <li ng-if="is_upgradable()">
                 <a href=# ng-click=upgrade()>Upgrade</a>
+              </li>
+              <li ng-if=report_bug_allowed()>
+                <a href=# ng-click=open_report_bug()>Report a bug</a>
               </li>
               <li><a href=# ng-click=logout()>Log out</a></li>
               <li><a href=# ng-click=shutdown()>Shut down</a></li>
@@ -200,6 +204,7 @@
     </div>
     <div react-view=add_proxy_modal></div>
     <div react-view=welcome_modal></div>
+    <div react-view=report_bug_modal></div>
     <div react-view=progress_modal></div>
     <div id=notif_react_modal></div>
   </body>

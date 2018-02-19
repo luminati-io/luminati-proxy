@@ -9,8 +9,8 @@ import axios from 'axios';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import classnames from 'classnames';
-import {If} from '../common.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
+import {If} from '/www/util/pub/react_util.js';
 import $ from 'jquery';
 
 class StatTable extends React.Component {
