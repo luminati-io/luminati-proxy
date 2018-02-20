@@ -11378,9 +11378,6 @@ _module.controller('root', ['$rootScope', '$scope', '$http', '$window', '$state'
         };
         $window.$('#confirmation').modal();
     };
-    $scope.report_bug_allowed = function () {
-        return JSON.parse(window.localStorage.getItem('report_bug'));
-    };
     $scope.open_report_bug = function () {
         (0, _jquery2.default)('#report_bug_modal').modal();
     };

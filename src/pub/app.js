@@ -552,8 +552,6 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         };
         $window.$('#confirmation').modal();
     };
-    $scope.report_bug_allowed = ()=>{
-        return JSON.parse(window.localStorage.getItem('report_bug')); };
     $scope.open_report_bug = ()=>{ $('#report_bug_modal').modal(); };
     $scope.shutdown = function(){
         $scope.$root.confirmation = {
