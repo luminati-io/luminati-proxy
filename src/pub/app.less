@@ -45,6 +45,7 @@ body {
     .page-body { margin-left: 0; }
     .nav_top { background-color: white; }
     .logo_wrapper { background-color: white !important; }
+    .notif { display: none; }
 }
 .flag-icon {
     border-radius: 2px;
@@ -2034,20 +2035,25 @@ input.form-control[type=checkbox] {
     }
 }
 .notif_modal {
-    .messages {
+    .notifs {
+        h4.no_messages { text-align: center; }
         .message {
             width: 100%;
-            background-color: @x_light;
+            background-color: @light_grey;
             border-radius: 2px;
             padding: 15px;
             margin: 10px 0;
-            cursor: pointer;
             .subject {
-                color: @second_color;
+                color: @first_color;
                 font-size: 16px;
                 font-weight: bold
             }
             .text { font-size: 13px; }
+            &.unread {
+                background-color: @x_light;
+                .subject { color: @second_color; }
+            }
+            &.clickable { cursor: pointer; }
         }
     }
 }

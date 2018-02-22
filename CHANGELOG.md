@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.84.634
+- :bug: fixed recent stats bandwidth calculations
+- :sparkles: added links to messages in notification center
+
 ## 1.84.166
 - :star: added report a bug to easily get support 
 

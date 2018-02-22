@@ -810,6 +810,8 @@ class Index extends React.Component {
             save_form.session = false;
         if (save_form.session_random)
             save_form.session = true;
+        if (!save_form.socks)
+            save_form.socks = null;
         return save_form;
     }
     get_curr_plan(){

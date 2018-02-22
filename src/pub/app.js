@@ -473,8 +473,10 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     });
     $http.get('/api/ip').then(function(ip){
         $scope.ip = ip.data.ip; });
-    $http.get('/api/version').then(function(version){
-        $scope.ver_cur = version.data.version; });
+    $http.get('/api/version').then(version=>{
+        $scope.ver_cur = version.data.version;
+        setdb.set('head.version', version.data.version);
+    });
     $http.get('/api/last_version').then(function(version){
         $scope.ver_last = version.data; });
     $http.get('/api/consts').then(function(consts){
@@ -498,6 +500,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     setdb.set('head.callbacks.state.go', $state.go);
     window.setdb = setdb;
     window.reset_onboarding = ()=>{ setdb.set('head.onboarding.steps', {}); };
+    window.to_state = $state.go;
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
     $scope.$root.no_proxies = zno_proxies;

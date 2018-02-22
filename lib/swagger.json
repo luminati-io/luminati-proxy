@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.84.166",
+        "version": "1.84.634",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -256,10 +256,28 @@
             "tags": [
                 "Proxy"
             ],
-            "parameters":{
-                "ip": "string",
-                "min": "integer"
-            },
+            "parameters":[
+                   {
+                       "name": "port",
+                       "in": "path",
+                       "description": "Existing proxy port",
+                       "required": true,
+                       "type": "integer"
+                    },
+                    {
+                       "name": "banip",
+                       "in": "body",
+                       "required": true,
+                       "description": "Specify the ip to ban and for how long in minutes",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "ip": "string",
+                                "min": "integer"
+                              }
+                          }
+                     }
+             ],
              "responses": {
                  "200": {
                         "description": "Successful response"

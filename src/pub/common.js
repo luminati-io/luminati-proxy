@@ -38,9 +38,9 @@ class Modal extends React.Component {
     click_ok(){
         const _this = this;
         etask(function*(){
+            _this.click_cancel();
             if (_this.props.click_ok)
                 yield _this.props.click_ok();
-            _this.click_cancel();
         });
     }
     on_dismiss(){
