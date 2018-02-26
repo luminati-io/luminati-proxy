@@ -3,9 +3,8 @@
     <div class=modal-content>
       <div class=modal-header>
         <div class=text-right>
-          <button type=button class="close pull-none" data-dismiss=modal>
-            &times;
-          </button>
+          <button class="close pull-none glyphicon glyphicon-remove"
+            type=button data-dismiss=modal></button>
         </div>
         <div class=history__header>
           <form class="form-inline pull-right">
@@ -59,10 +58,8 @@
                       <a ng-if=filters[f.field] ng-click=filter(f)>
                         {{filters[f.field]}}
                       </a>
-                      <a ng-if=filters[f.field]
-                        ng-click=filter_cancel(f)>
-                        &times;
-                      </a>
+                      <a ng-if=filters[f.field] ng-click=filter_cancel(f)
+                        class="glyphicon glyphicon-remove"></a>
                       <a ng-if=!filters[f.field] ng-click=filter(f)>
                         No filter
                       </a>
@@ -254,9 +251,8 @@
   <div class=modal-dialog>
     <div class=modal-content>
       <div class=modal-header>
-        <button type=button class=close data-dismiss=modal>
-          &times;
-        </button>
+        <button type=button class="close glyphicon glyphicon-remove"
+          data-dismiss=modal></button>
         <h4 class=modal-title>{{field.title}} Filter</h4>
       </div>
       <div class=modal-body>

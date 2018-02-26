@@ -73,9 +73,8 @@
         <div class=modal-dialog>
           <div class=modal-content>
             <div class=modal-header>
-              <button type=button class=close data-dismiss=modal>
-                &times;
-              </button>
+              <button type=button class="close glyphicon glyphicon-remove"
+                data-dismiss=modal></button>
               <h4 class=modal-title>{{confirmation.text}}</h4>
               <ul ng-if=confirmation.items class=confirmation-items>
                 <li ng-repeat="i in confirmation.items">{{i}}</li>
@@ -141,8 +140,8 @@
         <div class=modal-content>
           <div class=modal-header>
             <h4 class=modal-title>
-              <button type=button class=close data-dismiss=modal>
-                &times;</button>
+              <button type=button class="close glyphicon glyphicon-remove"
+                data-dismiss=modal></button>
               Select IPs:
               <span class=blue>{{allocated_ips.zone}}</span>
             </h4>
@@ -173,8 +172,8 @@
         <div class=modal-content>
           <div class=modal-header>
             <h4 class=modal-title>
-              <button type=button class=close data-dismiss=modal>
-                &times;</button>
+              <button type=button class="close glyphicon glyphicon-remove"
+                data-dismiss=modal></button>
               Select VIPs:
               <span class=blue>{{allocated_vips.zone}}</span>
             </h4>

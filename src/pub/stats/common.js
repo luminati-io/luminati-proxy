@@ -53,8 +53,6 @@ class StatsService {
                 bw: v.bw}, v)) && s;
         }, {statuses: {stats: []}, domains: {stats: []},
             protocols: {stats: []}});
-        if (!state.protocols.stats.some(_.matches({protocol: 'https'})))
-            state.protocols.stats.push({protocol: 'https', bw: 0, value: 0});
         if (opt.sort||opt.limit)
         {
             for (let k of ['statuses', 'domains', 'protocols'])
@@ -255,7 +253,7 @@ class Tooltip extends Pure_component {
 const Request_row = props=>{
     const req = props.req;
     const rh = JSON.parse(req.response_headers);
-    const local = moment(rh.date).format('YYYY-MM-DD HH:mm:ss');
+    const local = moment(new Date(rh.date)).format('YYYY-MM-DD HH:mm:ss');
     const active = props.preview_id==req.id;
     return (
         <tr className={classnames({active})}

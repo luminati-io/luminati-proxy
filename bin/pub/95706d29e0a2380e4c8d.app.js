@@ -26,22 +26,25 @@ var module;
 (function(){
 var  process, zerr, assert;
 var is_node = typeof module=='object' && module.exports && module.children;
+var is_rn = typeof navigator=='object' && navigator.product=='ReactNative';
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 if (!is_node)
 {
     if (is_ff_addon)
         ;
+    else if (is_rn)
+    {
+    }
     else
         ;
     process = {
         nextTick: function(fn){ setTimeout(fn, 0); },
         env: {},
     };
-    assert = function(){}; // XXX romank: add proper assert
     // XXX romank: use zerr.js
     // XXX bahaa: require bext/pub/zerr.js for extensions
-    if (!is_ff_addon && self.hola && self.hola.zerr)
+    if (!is_ff_addon && !is_rn && self.hola && self.hola.zerr)
         zerr = self.hola.zerr;
     else
     {
@@ -62,6 +65,10 @@ else
     assert = require('assert');
     ;
 }
+// XXX odin: normally this would only be run for !is_node, but 'who' unittests
+// loads a stubbed assert
+if (typeof assert!='function')
+    assert = function(){}; // XXX romank: add proper assert
 // XXX yuval: /util/events.js -> events when node 6 (support prependListener)
 // is here
 !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(389), __webpack_require__(146), __webpack_require__(221)], __WEBPACK_AMD_DEFINE_RESULT__ = function(events, array, zutil){
@@ -75,10 +82,14 @@ E.nextTick = process.nextTick;
 // XXX arik/romank: hack, rm set_zerr, get zerzerrusing require
 E.set_zerr = function(_zerr){ zerr = _zerr; };
 E.events = new events();
-var cb_pre, cb_post, longcb_ms, perf_enable;
+var cb_pre, cb_post, cb_ctx, longcb_ms, perf_enable;
 E.perf_stat = {};
+// XXX romang: hack to import in react native
+if (is_rn)
+    E.etask = E;
 function _cb_pre(et){ return {start: Date.now()}; }
 function _cb_post(et, ctx){
+    ctx = ctx||cb_ctx;
     var ms = Date.now()-ctx.start;
     if (longcb_ms && ms>longcb_ms)
     {
@@ -98,9 +109,10 @@ function cb_set(){
     {
         cb_pre = _cb_pre;
         cb_post = _cb_post;
+        cb_ctx = {start: Date.now()};
     }
     else
-        cb_pre = cb_post = undefined;
+        cb_pre = cb_post = cb_ctx = undefined;
 }
 E.longcb = function(ms){
     longcb_ms = ms;
@@ -301,7 +313,7 @@ E.prototype._complete = function(){
     this._ecancel_child();
     this.emit_safe('finally1');
     while (this.then_waiting.length)
-        this.then_waiting.pop()();
+        this.then_waiting.shift()();
 };
 E.prototype._next = function(rv){
     if (this.tm_completed)
@@ -574,8 +586,7 @@ E.prototype.set_state = function(name){
 };
 
 E.prototype.finally = function(cb){
-    this.prependListener('finally', cb);
-};
+    this.prependListener('finally', cb); };
 E.prototype.goto_fn = function(name){
     return this.goto.bind(this, name); };
 E.prototype.goto = function(name, promise){
@@ -657,7 +668,9 @@ E.prototype._got_retval = function(wait_retval, res){
     if (this.wait_retval!==wait_retval || wait_retval.completed)
         return;
     wait_retval.completed = true;
-    this._next_run(E._res2rv(res));
+    // inline _next_run to reduce stack depth
+    if (!this._next(E._res2rv(res)))
+        this._run();
 };
 E.prototype.continue_fn = function(){
     return this.continue.bind(this); };
@@ -1429,12 +1442,16 @@ function etask_fn(opt, states, push_this){
         states = opt;
         opt = undefined;
     }
+    var is_generator = typeof states=='function' &&
+        states.constructor.name=='GeneratorFunction';
     return function(){
         var _opt = assign({}, opt);
         _opt.state0_args = Array.from(arguments);
         if (push_this)
             _opt.state0_args.unshift(this);
-        return etask(_opt, states);
+        if (is_generator)
+            return E._generator(null, states, _opt);
+        return new Etask(_opt, states);
     };
 }
 E.fn = function(opt, states){ return etask_fn(opt, states, false); };
@@ -1445,7 +1462,7 @@ E._generator = function(gen, ctor, opt){
     if (opt.cancel===undefined)
         opt.cancel = true;
     var done;
-    return etask(opt, [function(){
+    return new Etask(opt, [function(){
         this.generator = gen = gen||ctor.apply(this, opt.state0_args||[]);
         this.generator_ctor = ctor;
         return {ret: undefined, err: undefined};
@@ -2916,7 +2933,6 @@ StatsService.get_top = _etask2.default._fn( /*#__PURE__*/_regenerator2.default.m
                     }, { statuses: { stats: [] }, domains: { stats: [] },
                         protocols: { stats: [] } });
 
-                    if (!state.protocols.stats.some(_lodash2.default.matches({ protocol: 'https' }))) state.protocols.stats.push({ protocol: 'https', bw: 0, value: 0 });
                     if (opt.sort || opt.limit) {
                         _arr = ['statuses', 'domains', 'protocols'];
 
@@ -2939,7 +2955,7 @@ StatsService.get_top = _etask2.default._fn( /*#__PURE__*/_regenerator2.default.m
                     }
                     return _context.abrupt('return', state);
 
-                case 9:
+                case 8:
                 case 'end':
                     return _context.stop();
             }
@@ -3286,7 +3302,7 @@ var Tooltip = function (_Pure_component) {
 var Request_row = function Request_row(props) {
     var req = props.req;
     var rh = JSON.parse(req.response_headers);
-    var local = (0, _moment2.default)(rh.date).format('YYYY-MM-DD HH:mm:ss');
+    var local = (0, _moment2.default)(new Date(rh.date)).format('YYYY-MM-DD HH:mm:ss');
     var active = props.preview_id == req.id;
     return _react2.default.createElement(
         'tr',
@@ -5171,7 +5187,6 @@ if (!is_node && !is_ff_addon)
     ;
 else
 {
-    ;
     qs = require(is_ff_addon ? 'sdk/querystring' : 'querystring');
 }
 !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function(){
@@ -13107,12 +13122,10 @@ var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 if (!is_node && !is_ff_addon)
 {
-    ;
     process = {env: {}};
 }
 else
 {
-    ;
     if (is_ff_addon)
         process = {env: {}};
     else if (is_node)
@@ -13120,7 +13133,6 @@ else
         process = global.process||require('_process');
         require('./config.js');
         var cluster = require('cluster');
-        var fs = require('fs');
         var version = require('./version.js').version;
     }
 }
@@ -13160,7 +13172,7 @@ E.assert = function(exp, msg){
 
 E.json = function(o, replacer, space){
     try { return JSON.stringify(o, replacer, space)||''; }
-    catch(err){ return '[circular]'; }
+    catch(e){ return '[circular]'; }
 };
 
 E.is = function(level){ return level<=E.level; };
@@ -13189,8 +13201,9 @@ function wrap_perr(perr_fn){
     }
     return function(id, info, opt){
         opt = opt||{};
-        var ms = (opt.rate_limit && opt.rate_limit.ms)||date.ms.HOUR;
-        var count = (opt.rate_limit && opt.rate_limit.count)||10;
+        var _rate_limit = opt.rate_limit||{};
+        var ms = _rate_limit.ms||date.ms.HOUR, count = _rate_limit.count||10;
+        var disable_drop_count = _rate_limit.disable_drop_count;
         var rl_hash = perr_orig.rl_hash = perr_orig.rl_hash||{};
         var rl = rl_hash[id] = rl_hash[id]||{};
         if (pre_send)
@@ -13199,7 +13212,7 @@ function wrap_perr(perr_fn){
         {
             if (perr_dropped[id])
             {
-                if (info && typeof info!='string')
+                if (!disable_drop_count && info && typeof info!='string')
                     info.w = perr_dropped[id];
                 perr_dropped[id] = null;
             }
@@ -13348,11 +13361,22 @@ E.zexit = function(args){
         debugger;
         process.exit(1);
     }
+    // workaround for process.zon override issue
+    if (process.zon && process.zon.main)
+    {
+        // XXX mikhail: expose contsants via zutil module
+        var LCRIT = 2;
+        var LCONSOLE = 0x100;
+        var emb_zutil = process.binding('zutil');
+        emb_zutil.zerr(LCRIT|LCONSOLE, 'perr node_zexit '+E.e2s(args));
+        process.exit(1);
+    }
+    var conf = require('./conf.js');
     var zcounter_file = require('./zcounter_file.js');
     zcounter_file.inc('server_zexit');
     args = zerr_format(arguments);
     write_zexit_log({id: 'server_zexit', info: ''+args, ts: date.to_sql(),
-        backtrace: stack, version: version});
+        backtrace: stack, version: version, app: conf.app});
     E.flush();
     debugger;
     process.exit(1);
@@ -16372,6 +16396,14 @@ var Circle_icon = function Circle_icon(_ref) {
     );
 };
 
+var No_new_messages = function No_new_messages() {
+    return _react2.default.createElement(
+        'h4',
+        { className: 'no_messages' },
+        'You have no new messages.'
+    );
+};
+
 var No_messages = function No_messages() {
     return _react2.default.createElement(
         'h4',
@@ -16383,9 +16415,18 @@ var No_messages = function No_messages() {
 var Messages = function Messages(_ref2) {
     var notifs = _ref2.notifs,
         _on_click = _ref2.on_click;
+
+    var new_messages = notifs.filter(function (n) {
+        return n.status == 'new';
+    }).length;
     return _react2.default.createElement(
         'div',
         null,
+        _react2.default.createElement(
+            _react_util.If,
+            { when: !new_messages },
+            _react2.default.createElement(No_new_messages, null)
+        ),
         notifs.map(function (m) {
             return _react2.default.createElement(Message, (0, _extends3.default)({ on_click: function on_click() {
                     return _on_click(m);

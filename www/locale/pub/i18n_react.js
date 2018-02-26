@@ -28,7 +28,7 @@ const set_curr_lang = lang=>{
     );
 };
 const get_translation = (translation, key)=>{
-    if (!translation)
+    if (!translation || !key)
         return key;
     if (!translation[key])
         console.info('Missing translation for: "'+key+'"');
@@ -41,7 +41,7 @@ const translate = key=>{
 class T extends Pure_component {
     constructor(props){
         super(props);
-        this.key = props.children.replace(/\s+/g, ' ');
+        this.key = (props.children||'').replace(/\s+/g, ' ');
         this.state = {text: this.key};
     }
     componentWillMount(){

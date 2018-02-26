@@ -114,18 +114,28 @@ const Circle_icon = ({number})=>(
     </If>
 );
 
+const No_new_messages = ()=>(
+    <h4 className="no_messages">You have no new messages.</h4>
+);
+
 const No_messages = ()=>(
     <h4 className="no_messages">You don't have any messages yet.</h4>
 );
 
-const Messages = ({notifs, on_click})=>(
-    <div>
-      {notifs.map(m=>(
-        <Message on_click={()=>on_click(m)} clickable={!!m.code}
-          key={m.msg_id} {...m}/>
-      ))}
-    </div>
-);
+const Messages = ({notifs, on_click})=>{
+    const new_messages = notifs.filter(n=>n.status=='new').length;
+    return (
+        <div>
+          <If when={!new_messages}>
+            <No_new_messages/>
+          </If>
+          {notifs.map(m=>(
+            <Message on_click={()=>on_click(m)} clickable={!!m.code}
+              key={m.msg_id} {...m}/>
+          ))}
+        </div>
+    );
+};
 
 const Message = ({title, message, status, clickable, on_click})=>{
     const classes = classnames('message', {unread: status=='new', clickable});

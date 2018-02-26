@@ -1680,3 +1680,42 @@ describe('session pool', ()=>{
     });
 });
 
+describe('Lserver', ()=>{
+    const {Lserver} = lpm;
+    describe('sanity', ()=>{
+        const t= (name, opt={})=>it(`${name}`, ()=>etask(function*(){
+            let s = new Lserver(assign({log: 'debug'}, opt));
+            assert.ok(s);
+            yield s.start();
+            assert.ok(s.is_running);
+            // XXX maximk: disable development
+            if (0)
+            yield etask.nfn_apply(request, [{
+                url: 'http://lumtest.com/myip.json',
+                proxy: `http://localhost:${opt.port||24000}`,
+            }]);
+            yield s.stop();
+            assert.ok(!s.is_running);
+            s.destroy();
+        }));
+        t('empty opt');
+        t('only port', {port: 24000});
+        t('configure', {port: 24001, ssl: true, proxy_count: 10,
+            pool_type: 'round-robin', pool_size: 20, customer: 'test_user',
+            password: 'wapo7qecwke7', zone: 'gen'});
+    });
+});
+
+describe('Lsession_mgr', ()=>{
+    const {Lsession_mgr} = lpm;
+    describe('sanity', ()=>{
+
+    });
+});
+
+describe('Lhost', ()=>{
+    const {Lhost} = lpm;
+    describe('fetch', ()=>{
+        // XXX maximk proxy count check
+    });
+});
