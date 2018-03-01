@@ -2420,7 +2420,8 @@ var presets = {
             opt.session_duration = 0;
             opt.session_random = false;
             opt.session_init_timeout = 5;
-            opt.race_reqs = 5;
+            opt.use_proxy_cache = false;
+            opt.race_reqs = 2;
         },
         clean: function clean(opt) {
             opt.pool_size = 1;
@@ -2428,6 +2429,7 @@ var presets = {
             opt.proxy_count = '';
             opt.session_init_timeout = '';
             opt.race_reqs = '';
+            opt.use_proxy_cahce = true;
         },
         rules: [{ field: 'pool_size', label: "sets 'Pool size' to 50" }, { field: 'keep_alive', label: "sets 'Keep-alive' to 40" }, { field: 'pool_type', label: "round-robin pool type" }, { field: 'seed', label: "disables 'Session ID Seed'" }],
         support: { multiply: true }
@@ -16706,32 +16708,49 @@ var tabs = {
             },
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
-                placeholder: 'i.e. (captcha|robot)'
+                placeholder: 'i.e. (captcha|robot)',
+                tooltip: 'A string(regular expression) to be scanned in the\n                    body of the response'
             },
             min_req_time: {
                 label: 'Minimum request time',
-                placeholder: '500'
+                placeholder: '500',
+                tooltip: 'Any request time above the given value in milliseconds\n                    will trigger the action'
             },
             max_req_time: {
                 label: 'Maximum request time',
-                placeholder: '500'
+                placeholder: '500',
+                tooltip: 'Any request time below the given value in milliseconds\n                    will trigger the action'
             },
             trigger_url_regex: {
                 label: 'Apply only on specific domains (optional)',
-                placeholder: 'i.e. example.com'
+                placeholder: 'i.e. example.com',
+                tooltip: 'enable trigger to certain urls'
             },
-            status_code: { label: 'Status Code string to be scanned' },
+            status_code: {
+                label: 'Status Code string to be scanned',
+                tooltip: 'status code to be scanned in the response headers'
+            },
             status_custom: {
                 label: 'Custom Status Code(Regex)',
-                placeholder: 'i.e. (2..|3..|404)'
+                placeholder: 'i.e. (2..|3..|404)',
+                tooltip: 'A string(regular expression) to be scanned in the\n                    head of the response'
             },
             action: {
                 label: 'Action type',
-                tooltip: 'The action to be executed when rule is met '
+                tooltip: 'The action to be executed when rule is met'
             },
-            retry_number: { label: 'Number of retries' },
-            retry_port: { label: 'Retry using a different port' },
-            ban_ip_duration: { label: 'Ban IP for' },
+            retry_number: {
+                label: 'Number of retries',
+                tooltip: 'maximum number of retries to execute'
+            },
+            retry_port: {
+                label: 'Retry using a different port',
+                tooltip: 'Make additional request using a different port'
+            },
+            ban_ip_duration: {
+                label: 'Ban IP for',
+                tooltip: 'will remove the IP for a defined amount of time'
+            },
             ban_ip_custom: { label: 'Custom duration' }
         }
     },
@@ -27127,6 +27146,16 @@ var Code_instructions = function (_Pure_component2) {
                                 _react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: code } })
                             )
                         )
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    null,
+                    'View available API endpoints',
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'link', href: 'http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy' },
+                        'here'
                     )
                 )
             );

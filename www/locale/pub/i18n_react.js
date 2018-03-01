@@ -7,12 +7,12 @@ define(['react', 'react-dom', '/www/util/pub/pure_component.js',
 // XXX saarya: change key once angular is removed
 const storage_key = 'NG_TRANSLATE_LANG_KEY';
 let path;
-const init = (supported_lang, _path)=>{
+const init = (supported_lang, _path, def_lang)=>{
     path = _path;
     setdb.set('i18n.config', {supported_lang, path: _path});
     const url_o = zurl.parse(document.location.href);
     const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-    const lang = qs_o.hl||storage.get(storage_key);
+    const lang = qs_o.hl||storage.get(storage_key)||def_lang;
     if (lang)
         set_curr_lang(lang);
 };

@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.85.660
+- :sparkles: multiple performance improvements in request pipeline
+
 ## 1.85.98
 - :sparkles: improved recent stats to show only user generated requests 
 - :bug: socks5 to work with multiply ports

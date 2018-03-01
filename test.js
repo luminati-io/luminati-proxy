@@ -1238,6 +1238,9 @@ describe('manager', ()=>{
         t('on', ['--dropin'], [{port: Luminati.dropin.port}]);
     });
     describe('api', ()=>{
+        afterEach(()=>{
+            nock.cleanAll();
+        });
         it('ssl', ()=>etask(function*(){
             app = yield app_with_args();
             let res = yield api('ssl');
@@ -1256,6 +1259,11 @@ describe('manager', ()=>{
             }));
         });
         describe('stats', ()=>{
+            beforeEach(()=>{
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({proxy: pkg.version, customer: 'opt'}).twice()
+                    .reply(200, {opt: {zone: 'gen'}});
+            });
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
                 url: 'https://luminati.io/api/get_customer_bw?details=1',
@@ -1276,6 +1284,11 @@ describe('manager', ()=>{
             }));
         });
         describe('whitelist', ()=>{
+            beforeEach(()=>{
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({proxy: pkg.version, customer}).twice()
+                    .reply(200, {[customer]: {zone: 'static'}});
+            });
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
                 url: 'https://luminati.io/api/get_whitelist?zones=*',
@@ -1302,6 +1315,11 @@ describe('manager', ()=>{
                 headers: {'x-hola-auth': `lum-customer-${customer}`
                     +`-zone-static-key-${password}`},
             };
+            beforeEach(()=>{
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({proxy: pkg.version, customer}).twice()
+                    .reply(200, {[customer]: {zone: 'static'}});
+            });
             it('get', ()=>etask(function*(){
                 app = yield app_with_args(
                     qw`--customer ${customer} --password ${password}`);
@@ -1472,7 +1490,12 @@ describe('manager', ()=>{
             }));
             it('login required', ()=>etask(function*(){
                 nock('https://luminati.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version}).twice()
+                    .query({customer: 'mock_user', proxy: pkg.version})
+                    .thrice()
+                    .reply(403, 'login_required');
+                nock('https://luminati.io').get('/cp/lum_local_conf')
+                    .query({customer: '', token: '', proxy: pkg.version})
+                    .thrice()
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
                 try {
@@ -1486,6 +1509,7 @@ describe('manager', ()=>{
                 let updated = {_defaults: {customer: 'updated'}};
                 nock('https://luminati.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
+                    .thrice()
                     .reply(200, updated);
                 app = yield app_with_args(['--customer', 'mock_user']);
                 let res = yield app.manager.get_lum_local_conf();
@@ -1496,6 +1520,7 @@ describe('manager', ()=>{
         describe('request_stats', ()=>{
             const t = (name, path, expected, opt = {})=>
             it(name, etask._fn(function*(_this){
+                nock.cleanAll();
                 nock('https://luminati.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
@@ -1684,25 +1709,26 @@ describe('Lserver', ()=>{
     const {Lserver} = lpm;
     describe('sanity', ()=>{
         const t= (name, opt={})=>it(`${name}`, ()=>etask(function*(){
-            let s = new Lserver(assign({log: 'debug'}, opt));
+            let s = new Lserver(assign({}, opt));
             assert.ok(s);
             yield s.start();
             assert.ok(s.is_running);
             // XXX maximk: disable development
-            if (0)
-            yield etask.nfn_apply(request, [{
-                url: 'http://lumtest.com/myip.json',
-                proxy: `http://localhost:${opt.port||24000}`,
-            }]);
+            // if (0)
+            // let res = yield etask.nfn_apply(request, [{
+            //     url: 'https://lumtest.com/myip.json',
+            //     proxy: `http://localhost:${opt.port||24000}`
+            // }]);
+            // console.log(res.body, res.headers);
             yield s.stop();
             assert.ok(!s.is_running);
             s.destroy();
         }));
-        t('empty opt');
-        t('only port', {port: 24000});
-        t('configure', {port: 24001, ssl: true, proxy_count: 10,
+        // t('empty opt');
+        // t('only port', {port: 24000});
+        t('configure', {port: 24001, proxy_count: 10, ssl: true,
             pool_type: 'round-robin', pool_size: 20, customer: 'test_user',
-            password: 'wapo7qecwke7', zone: 'gen'});
+            password: '91x72uph26lg', zone: 'gen', country: 'BG'});
     });
 });
 

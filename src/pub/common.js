@@ -446,7 +446,8 @@ const presets = {
             opt.session_duration = 0;
             opt.session_random = false;
             opt.session_init_timeout = 5;
-            opt.race_reqs = 5;
+            opt.use_proxy_cache = false;
+            opt.race_reqs = 2;
         },
         clean: opt=>{
             opt.pool_size = 1;
@@ -454,6 +455,7 @@ const presets = {
             opt.proxy_count = '';
             opt.session_init_timeout = '';
             opt.race_reqs = '';
+            opt.use_proxy_cahce = true;
         },
         rules: [
             {field: 'pool_size', label: "sets 'Pool size' to 50"},
