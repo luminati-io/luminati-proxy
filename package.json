@@ -12,7 +12,6 @@
   },
   "build": {
     "appId": "luminati.proxy_manager",
-    "category": "public.app-category.utilities",
     "asar": false,
     "artifactName": "${name}-${version}.${ext}",
     "directories": {
@@ -34,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.85.660",
+    "productName": "Luminati Proxy Manager 1.85.983",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -64,7 +63,7 @@
     "body-parser": "1.15.2",
     "check-node-version": "2.0.1",
     "country-language": "0.1.7",
-    "electron-updater": "2.2.1",
+    "electron-updater": "2.8.9",
     "express": "4.14.0",
     "font-awesome": "4.7.0",
     "flag-icon-css": "2.8.0",
@@ -118,9 +117,9 @@
     "bootstrap-datepicker": "1.6.4",
     "codemirror": "5.21.0",
     "css-loader": "0.28.4",
-    "electron": "1.4.1",
-    "electron-builder": "13.9.0",
-    "electron-rebuild": "1.5.7",
+    "electron": "1.7.1",
+    "electron-builder": "16.6.1",
+    "electron-rebuild": "1.7.2",
     "es6-shim": "0.35.3",
     "file-loader": "0.11.2",
     "html-webpack-plugin": "2.30.1",
@@ -311,7 +310,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "1e54e5fa8ae481bbde155bee06ed21ae"
+    "md5": "9e8be43db04c9741e97a711b08e9ddda"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -352,5 +351,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.85.660"
+  "version": "1.85.983"
 }
