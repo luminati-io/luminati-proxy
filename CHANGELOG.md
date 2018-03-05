@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 1.85.983
+## 1.86.25
 
 ## 1.85.660
 - :sparkles: multiple performance improvements in request pipeline
