@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true*/
-define(['virt_jquery_all', 'react', 'react-dom', '/util/url.js',
-    '/www/util/pub/pure_component.js'], ($, React, ReactDOM, url,
-    Pure_component)=>{
+define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
+    '/util/url.js', '/www/util/pub/pure_component.js'], ($, React, ReactDOM,
+    RouterDOM, url, Pure_component)=>{
 
 const E = {};
 
@@ -15,6 +15,14 @@ const If = ({children, when})=>{
     return (children instanceof Function) ? children() : children;
 };
 E.If = If;
+
+const Responsive = ({children, when, mobile, no_mobile})=>{
+    const is_mobile = $(window).width()<=480;
+    if (when=='mobile'&&is_mobile||when=='!mobile'&&!is_mobile)
+        return children;
+    return is_mobile ? mobile||null : no_mobile||null;
+};
+E.Responsive = Responsive;
 
 class Popover extends Pure_component {
     constructor(props){
@@ -285,7 +293,6 @@ E.hash_links_hoc = Component=>{
         }
         componentWillUnmount(){
             window.removeEventListener('popstate', this.popstate_scroll);
-            this.close();
         }
         componentDidMount(){
             const url_o = url.parse(document.location.href);
@@ -295,6 +302,36 @@ E.hash_links_hoc = Component=>{
         render(){ return <Component {...this.props}/>; }
     };
 };
+
+let save_sitemap;
+class Nav_hook extends Pure_component {
+    constructor(props){
+        super(props);
+        save_sitemap = this.sitemap = this.props.sitemap||save_sitemap||{};
+    }
+    componentDidUpdate(prevProps){
+        if (this.props.location == prevProps.location)
+            return;
+        let url_o = url.parse(this.props.location.href);
+        if (this.props.update_meta)
+            this.set_meta(url_o);
+        if (this.props.scroll_to_top&&!url_o.hash)
+            window.scrollTo(0, 0);
+    }
+    set_meta(url_o){
+        const m = this.sitemap[url_o.pathname];
+        if (!m)
+            return;
+        $('title').text(m.title);
+        $('meta[name="description"]').attr('content', m.description);
+        $('meta[property="og:url"]').attr('content', m.og_url);
+        $('meta[property="og:title"]').attr('content', m.og_title);
+        $('meta[property="og:description"]').attr('content', m.og_description);
+        $('meta[property="og:image"]').attr('content', m.og_image);
+    }
+    render(){return this.props.children;}
+}
+E.Nav_hook = RouterDOM.withRouter(Nav_hook);
 
 return E;
 

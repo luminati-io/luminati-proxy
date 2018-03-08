@@ -29,6 +29,7 @@ import zedit_proxy from './edit_proxy.js';
 import zhowto from './howto.js';
 import zproxy_tester from './proxy_tester.js';
 import zconfig from './config.js';
+import zstats from './stats.js';
 import protocols_detail from './stats/protocols_detail.js';
 import util from './util.js';
 import React from 'react';
@@ -202,6 +203,13 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
             extra-props=field></div>`,
         controller: ($scope, $rootScope)=>{
             $scope.react_component = zedit_proxy; },
+    });
+    state_registry.register({
+        name: 'stats',
+        parent: 'app',
+        url: '/stats',
+        template: `<div react-view=react_component></div>`,
+        controller: $scope=>{ $scope.react_component = zstats; },
     });
 }]);
 

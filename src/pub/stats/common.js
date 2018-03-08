@@ -7,6 +7,7 @@ import React from 'react';
 import {Col, Table, Pagination} from 'react-bootstrap';
 import axios from 'axios';
 import etask from 'hutil/util/etask';
+import zurl from 'hutil/util/url';
 import util from '../util.js';
 import classnames from 'classnames';
 import Pure_component from '../../../www/util/pub/pure_component.js';
@@ -103,6 +104,7 @@ class StatsService {
         let resps = yield etask.all([
             _this.get('reset'),
             axios.get(`/api/proxy_stats/reset`),
+            axios.get(`/api/req_status/reset`),
         ]);
         return resps[0];
     });
@@ -119,7 +121,7 @@ class StatsDetails extends React.Component {
             stats: [],
             all_stats: props.stats||[],
             cur_page: 0,
-            items_per_page: props.items_per_page||10,
+            items_per_page: props.items_per_page||20,
         };
     }
     componentWillReceiveProps(props){
@@ -205,38 +207,79 @@ class StatsDetails extends React.Component {
     }
 }
 
-const Requests_table = props=>{
-    const reset = ()=>{ props.select_req(null); };
-    return (
-        <div className="requests_table">
-          <If when={props.preview_req&&props.preview_req.id!==undefined}>
-            <div onClick={reset} className="x_btn"/>
-          </If>
-          <Preview_req req={props.preview_req}/>
-          <table>
-            <thead>
-              <tr>
-                <th className="fixed_col">Domain</th>
-                <th>Code</th>
-                <th>Bandwidth</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Proxy Peer</th>
-              </tr>
-            </thead>
-            <tbody>
-              {props.reqs.map(r=>(
-                <Request_row select_req={props.select_req}
-                  key={r.id} req={r} preview_id={props.preview_req.id}/>
-              ))}
-            </tbody>
-          </table>
-        </div>
-    );
-};
+// XXX krzysztof: this is to be deleted once stats migration is done
+class Requests_table extends Pure_component {
+    constructor(props){
+        super(props);
+        this.default_state = {curr_tab: 'general'};
+        this.state = this.default_state;
+    }
+    reset(){
+        this.props.select_req(null);
+        this.setState(this.default_state);
+    }
+    set_tab(tab){ this.setState({curr_tab: tab}); }
+    render(){
+        return (
+            <div className="requests_table">
+              <If when={this.props.preview_req&&
+                  this.props.preview_req.id!==undefined}>
+                <Tab_nav click_reset={this.reset.bind(this)}
+                  curr_tab={this.state.curr_tab}
+                  set_tab={this.set_tab.bind(this)}/>
+              </If>
+              <Preview_req curr_tab={this.state.curr_tab}
+                req={this.props.preview_req}/>
+              <table>
+                <thead>
+                  <tr>
+                    <th className="fixed_col">Domain</th>
+                    <th>Code</th>
+                    <th>Bandwidth</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Proxy Peer</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.props.reqs.map(r=>(
+                    <Request_row select_req={this.props.select_req}
+                      key={r.id} req={r}
+                      preview_id={this.props.preview_req.id}/>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+        );
+    }
+}
+
+const Tab_nav = props=>(
+    <div className="tab_nav">
+      <div onClick={props.click_reset} className="x_btn"/>
+      <Tab_btn set_tab={props.set_tab} title="General" id="general"
+        curr_tab={props.curr_tab}/>
+      <Tab_btn set_tab={props.set_tab} title="Response" id="response"
+        curr_tab={props.curr_tab}/>
+    </div>
+);
+
+const Tab_btn = props=>(
+    <div onClick={()=>props.set_tab(props.id)}
+      className={classnames('tab_btn', {active: props.id==props.curr_tab})}>
+      {props.title}
+    </div>
+);
 
 class Tooltip extends Pure_component {
-    componentDidMount(){ $(this.el).tooltip(); }
+    componentDidMount(){
+        $(this.el).tooltip({
+            template: `<div class="stats_tooltip tooltip" role="tooltip">
+              <div class="tooltip-arrow"></div>
+              <div class="tooltip-inner"></div>
+            </div>`,
+        });
+    }
     ref(el){ this.el = el; }
     render(){
         const {children, title} = this.props;
@@ -252,7 +295,7 @@ class Tooltip extends Pure_component {
 
 const Request_row = props=>{
     const req = props.req;
-    const rh = JSON.parse(req.response_headers);
+    const rh = req.response_headers&&JSON.parse(req.response_headers);
     const local = moment(new Date(rh.date)).format('YYYY-MM-DD HH:mm:ss');
     const active = props.preview_id==req.id;
     return (
@@ -264,7 +307,7 @@ const Request_row = props=>{
           <td>
             <Tooltip title={req.status_message}>{req.status_code}</Tooltip>
           </td>
-          <td>{util.bytes_format(req.bw)}</td>
+          <td>{util.bytes_format(req.bw||0)}</td>
           <td>{local}</td>
           <td>{req.response_time} ms</td>
           <td>{req.proxy_peer}</td>
@@ -277,13 +320,30 @@ const Preview_req = props=>{
         return null;
     const {response_headers, request_headers, status_code, url,
         id} = props.req;
-    const resp_hs = JSON.parse(response_headers);
-    const req_hs = JSON.parse(request_headers);
-    const general_entries = [['Request URL', url],
-        ['Status Code', status_code]];
-    const width = 'calc(100% - 250px)';
+    const width = 'calc(100% - 200px)';
+    const height = 'calc(100% - 76px)';
+    const style = {minWidth: width, maxWidth: width, height};
     return (
-        <div className="preview" style={{minWidth: width, maxWidth: width}}>
+        <div className="preview" style={style}>
+          <If when={props.curr_tab=='general'}>
+            <General_tab status_code={status_code} url={url}
+              response_headers={response_headers}
+              request_headers={request_headers}/>
+          </If>
+          <If when={props.curr_tab=='response'}>
+            <Response_tab body={props.req.response_body}/>
+          </If>
+        </div>
+    );
+};
+
+const General_tab = props=>{
+    const resp_hs = JSON.parse(props.response_headers);
+    const req_hs = JSON.parse(props.request_headers);
+    const general_entries = [['Request URL', props.url],
+        ['Status Code', props.status_code]];
+    return (
+        <div className="tab header_tab">
           <Preview_section title="General" entries={general_entries}/>
           <Preview_section title="Response headers"
             entries={Object.entries(resp_hs)}/>
@@ -292,6 +352,12 @@ const Preview_req = props=>{
         </div>
     );
 };
+
+const Response_tab = props=>(
+    <div className="tab header_tab">
+      <Preview_section title="Response body" entries={[[null, props.body]]}/>
+    </div>
+);
 
 const Preview_section = props=>(
     <div className="section">
@@ -304,9 +370,9 @@ const Preview_section = props=>(
 
 const Key_value = ({k, val})=>(
     <div className="key_value">
-      <div className="key">{k}</div>
+      <If when={k}><div className="key">{k}</div></If>
       <div className="value">{val}</div>
     </div>
 );
 
-export default {StatsDetails, StatTable, StatsService};
+export default {StatsDetails, StatTable, StatsService, Requests_table};

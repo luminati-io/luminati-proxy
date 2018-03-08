@@ -351,6 +351,11 @@ div.proxies .btn-wrapper {
     color: @first_color;
     font-size: 13px;
 }
+.tooltip.stats_tooltip .tooltip-inner {
+    max-width: 550px;
+    text-align: left;
+    word-break: break-all;
+}
 .tooltip.top .tooltip-arrow { border-top-color: @second_color; }
 .tooltip.bottom .tooltip-arrow { border-bottom-color: @second_color; }
 .status-details-wrapper {
@@ -1302,19 +1307,23 @@ input.form-control[type=checkbox] {
     .summary_panel {
         margin: 0 15px 20px;
         .panel_body {
-            height: 490px;
+            min-height: 400px;
+            padding-top: 10px;
+            padding-bottom: 40px;
             overflow: hidden;
             position: relative;
             .requests_table {
-                margin-left: 230px;
+                margin-left: 180px;
+                margin-right: -20px;
                 table {
+                    font-size: 14px;
                     width: 100%;
                     .fixed_col {
                         position: absolute;
                         left: 20px;
-                        width: 230px;
+                        width: 180px;
                     }
-                    td, th { padding: 8px 10px; }
+                    td, th { padding: 1px 10px; }
                     td { z-index: 0; }
                     th { z-index: 1; }
                     tr {
@@ -1331,23 +1340,43 @@ input.form-control[type=checkbox] {
                     }
                 }
             }
-            .x_btn {
-                background: url(/img/delete.svg);
+            .tab_nav {
+                display: flex;
+                align-items: flex-end;
+                background-color: @x_light;
                 position: absolute;
-                width: 15px;
-                height: 15px;
-                background-size: contain;
-                top: 10px;
-                left: 260px;
-                cursor: pointer;
+                width: 100%;
+                height: 36px;
+                top: 0;
+                left: 200px;
                 z-index: 10;
+                border-bottom: solid 1px @dark_grey;
+                .x_btn {
+                    background: url(/img/delete.svg);
+                    width: 12px;
+                    height: 12px;
+                    background-size: contain;
+                    cursor: pointer;
+                    position: relative;
+                    margin: 10px;
+                }
+                .tab_btn {
+                    cursor: pointer;
+                    padding: 3px 10px;
+                    font-size: 13px;
+                    border: solid 1px transparent;
+                    border-bottom: none;
+                    &.active {
+                        border: solid 1px @dark_grey;
+                        border-bottom: none;
+                        font-weight: bold;
+                    }
+                }
             }
             .preview {
-                height: 450px;
-                max-height: 450px;
                 position: absolute;
-                top: 0;
-                padding: 30px;
+                top: 36px;
+                padding: 10px 30px 30px 30px;
                 background-color: @x_light;
                 overflow: auto;
                 .section {
@@ -2084,7 +2113,7 @@ input.form-control[type=checkbox] {
     .btn_add_port {
         margin: 20px auto;
         height: 40px;
-        width: 210px;
+        width: 240px;
         font-weight: 300;
         .img {
             position: relative;

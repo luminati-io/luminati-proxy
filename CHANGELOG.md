@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.86.704
+- :star: view response body in recent request log viewer
+- :sparkles: stability fixes  
+
 ## 1.86.25
 - :sparkles: improved upgrading on windwos binary
 - :bug: allow google authentication token to be refreshed

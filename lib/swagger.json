@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.86.25",
+        "version": "1.86.704",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -436,6 +436,10 @@
                 "port": {
                     "type": "integer",
                     "description": "Port for the HTTP proxy"
+                },
+                "proxy_type": {
+                     "type": "string",
+                     "description": "Decide if to save proxy into the configuration file. specifing \"persist\" in \"proxy_type\" value will create port and save it in the configuration file."
                 },
                 "multiply": {
                     "type": "integer",
