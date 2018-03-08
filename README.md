@@ -206,6 +206,7 @@ Make sure to forward appropriate ports. Proxy manager uses by default 22999
 for the web console and the api, 22555 for dropin and 24000 for first
 configurable proxy.
 
+#### Docker with predefined config file
 To use lpm's config file, docker volumes can be used:
 https://docs.docker.com/storage/volumes/
 
