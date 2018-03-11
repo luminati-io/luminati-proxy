@@ -16,7 +16,7 @@ import {ProtocolRow, ProtocolTable} from './protocols.js';
 import {Dialog} from '../common.js';
 import 'animate.css';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react_util.js';
+import {If} from '/www/util/pub/react.js';
 
 const E = {
     install: ()=>E.sp = etask('stats', [function(){ return this.wait(); }]),

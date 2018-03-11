@@ -14,7 +14,7 @@ import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {Netmask} from 'netmask';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react_util.js';
+import {If} from '/www/util/pub/react.js';
 import {getContext, withContext} from 'recompose';
 import PropTypes from 'prop-types';
 

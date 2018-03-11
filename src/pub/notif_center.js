@@ -9,7 +9,7 @@ import {Modal} from './common.js';
 import $ from 'jquery';
 import util from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react_util.js';
+import {If} from '/www/util/pub/react.js';
 import classnames from 'classnames';
 
 const ga_event = util.ga_event;

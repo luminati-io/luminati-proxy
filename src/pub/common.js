@@ -9,7 +9,7 @@ import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import EventEmitter from 'events';
-import {If} from '/www/util/pub/react_util.js';
+import {If} from '/www/util/pub/react.js';
 
 class Dialog extends React.Component {
     render(){

@@ -36,26 +36,36 @@ ua.set('av', `v${version}`);
 
 let manager, args = process.argv.slice(2), wnd, upgrade_available, can_upgrade;
 
-const upgrade = (v)=>{
+const upgrade = v=>{
+    const run_upgrade_now = ()=>{
+        console.log('Starting upgrade');
+        return autoUpdater.quitAndInstall();
+    };
+    if (can_upgrade)
+        return run_upgrade_now();
     dialog.showMessageBox({
-            type: 'info',
-            title: 'Luminati update',
-            message: (v ? `Luminati version ${v}` : 'Luminati update')
-            +' will be installed on exit',
-            buttons: ['Install on exit', 'Install now'],
+        type: 'info',
+        title: 'Luminati update',
+        message: (v ? `Luminati version ${v}` : 'Luminati update')
+        +' will be installed on exit',
+        buttons: ['Install on exit', 'Install now'],
     }, (res)=>{
         if (res==1)
-        {
-            console.log('Starting update');
-            return autoUpdater.quitAndInstall();
-        }
+            return run_upgrade_now();
         console.log('Update postponed until exit');
     });
+
 };
 autoUpdater.allowDowngrade = true;
 autoUpdater.autoDownload = false;
 autoUpdater.on('update-available', e=>{
     console.log(`Update version ${e.version} is available`);
+    const download_upgrade_now = ()=>{
+        console.log('Downloading upgrade');
+        return autoUpdater.downloadUpdate();
+    };
+    if (can_upgrade)
+        return download_upgrade_now();
     dialog.showMessageBox({
         type: 'info',
         title: `Luminati update ${e.version} is available`,
@@ -64,10 +74,7 @@ autoUpdater.on('update-available', e=>{
         buttons: ['No', 'Yes'],
     }, (res)=>{
         if (res==1)
-        {
-            console.log('Downloading update');
-            return autoUpdater.downloadUpdate();
-        }
+            return download_upgrade_now();
         console.log('Will not download update');
     });
 });
@@ -150,7 +157,7 @@ let run = run_config=>{
         if (upgrade_available)
             upgrade();
         else
-            cb();
+            autoUpdater.checkForUpdates();
     })
     .on('stop', ()=>{
         if (manager.argv.no_usage_stats)

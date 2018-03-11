@@ -351,6 +351,11 @@ div.proxies .btn-wrapper {
     color: @first_color;
     font-size: 13px;
 }
+.tooltip.stats_tooltip .tooltip-inner {
+    max-width: 550px;
+    text-align: left;
+    word-break: break-all;
+}
 .tooltip.top .tooltip-arrow { border-top-color: @second_color; }
 .tooltip.bottom .tooltip-arrow { border-bottom-color: @second_color; }
 .status-details-wrapper {
@@ -1299,24 +1304,116 @@ input.form-control[type=checkbox] {
 .stats {
     .top_panel { margin: 10px 15px 20px; }
     .top_header { margin: 0 15px 16px; }
+    .filtering {
+        padding: 15px;
+        margin-bottom: 20px;
+        .search_input { height: 40px; }
+        .react-autosuggest__container {
+            position: relative;
+            .react-autosuggest__suggestions-container--open {
+                border: solid 1px @grey_border;
+                border-top: none;
+                box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2);
+                max-height: 200px;
+                overflow-y: scroll;
+                position: absolute;
+                width: 100%;
+                background: white;
+                z-index: 100;
+                .react-autosuggest__section-container {
+                    &:first-child {
+                        .react-autosuggest__section-title {
+                            padding-top: 10px;
+                        }
+                    }
+                    .react-autosuggest__section-title {
+                        cursor: default;
+                        padding: 0 20px;
+                        font-weight: bold;
+                    }
+                    .react-autosuggest__suggestions-list {
+                        list-style-type: none;
+                        padding-left: 0;
+                        margin-bottom: 5px;
+                        .react-autosuggest__suggestion {
+                            cursor: pointer;
+                            padding: 3px 30px;
+                            &:hover { background-color: @xx_light; }
+                        }
+                    }
+                }
+            }
+        }
+        .filters_list {
+            .filter {
+                display: inline-block;
+                border: solid 1px @grey_border;
+                border-radius: 3px;
+                background: @xx_light;
+                padding: 0 5px;
+                margin: 5px 5px 0 0;
+                font-size: 14px;
+                cursor: default;
+                .text {
+                    display: inline-block;
+                    .section { font-weight: bold; }
+                    .value { color: @second_color; }
+                }
+                .x_btn_wrapper {
+                    display: inline-block;
+                    .x_btn {
+                        background-image: url(/img/delete.svg);
+                        width: 12px;
+                        height: 12px;
+                        background-size: contain;
+                        margin-left: 3px;
+                        position: relative;
+                        top: 2px;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
     .summary_panel {
         margin: 0 15px 20px;
+        .panel_heading {
+            position: relative;
+            .btn_har {
+                position: absolute;
+                top: -16px;
+                right: -1px;
+                width: 60px;
+                font-size: 12px;
+            }
+        }
         .panel_body {
-            height: 490px;
+            min-height: 400px;
+            padding-top: 10px;
+            padding-bottom: 40px;
             overflow: hidden;
             position: relative;
             .requests_table {
-                margin-left: 230px;
+                margin-left: 180px;
+                margin-right: -20px;
                 table {
+                    font-size: 14px;
                     width: 100%;
                     .fixed_col {
                         position: absolute;
                         left: 20px;
-                        width: 230px;
+                        width: 180px;
                     }
-                    td, th { padding: 8px 10px; }
+                    td, th { padding: 1px 10px; }
                     td { z-index: 0; }
-                    th { z-index: 1; }
+                    th {
+                        z-index: 1;
+                        .sort_arrow {
+                            font-size: 10px;
+                            margin-left: 3px;
+                            .invisible { visibility: hidden; }
+                        }
+                    }
                     tr {
                         cursor: pointer;
                         &:hover td { background-color: @xx_light; }
@@ -1331,23 +1428,62 @@ input.form-control[type=checkbox] {
                     }
                 }
             }
-            .x_btn {
-                background: url(/img/delete.svg);
+            .tab_nav {
+                display: flex;
+                align-items: flex-end;
+                background-color: white;
                 position: absolute;
-                width: 15px;
-                height: 15px;
-                background-size: contain;
-                top: 10px;
-                left: 260px;
-                cursor: pointer;
+                width: 100%;
+                height: 36px;
+                top: 0;
+                left: 200px;
                 z-index: 10;
+                border: solid 1px @grey_border;
+                border-bottom: none;
+                border-radius: 4px;
+                .tab_btn {
+                    height: 100%;
+                    cursor: pointer;
+                    padding: 5px 10px 0;
+                    font-size: 13px;
+                    border: solid 1px transparent;
+                    border-top: none;
+                    border-bottom: solid 1px @grey_border;
+                    border-left: solid 1px transparent;
+                    border-right: solid 1px transparent;
+                    &.x_btn {
+                        width: 32px;
+                        height: 100%;
+                        background-image: url(/img/delete.svg);
+                        background-position: center;
+                        background-size: 12px 12px;
+                        background-repeat: no-repeat;
+                        cursor: pointer;
+                        position: relative;
+                        border-bottom: solid 1px @grey_border;
+                        &:active {
+                            border-left: transparent;
+                            border-right: transparent;
+                            border-bottom: solid 1px @grey_border;
+                        }
+                    }
+                    &:hover { background-color: @xx_light; }
+                    &:active, &.active {
+                        border: solid 1px @grey_border;
+                        border-bottom: none;
+                        border-top: none;
+                        background-color: @x_light;
+                    }
+                }
+                .filler {
+                    border-bottom: solid 1px @grey_border;
+                    flex: 1
+                }
             }
             .preview {
-                height: 450px;
-                max-height: 450px;
                 position: absolute;
-                top: 0;
-                padding: 30px;
+                top: 36px;
+                padding: 10px 30px 30px 30px;
                 background-color: @x_light;
                 overflow: auto;
                 .section {
@@ -2084,7 +2220,7 @@ input.form-control[type=checkbox] {
     .btn_add_port {
         margin: 20px auto;
         height: 40px;
-        width: 210px;
+        width: 240px;
         font-weight: 300;
         .img {
             position: relative;

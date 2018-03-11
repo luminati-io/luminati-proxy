@@ -10,7 +10,7 @@ import etask from 'hutil/util/etask';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react_util.js';
+import {If} from '/www/util/pub/react.js';
 
 const ga_event = util.ga_event;
 
