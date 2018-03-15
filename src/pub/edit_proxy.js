@@ -959,8 +959,6 @@ const Nav = props=>{
     const presets_opt = Object.keys(presets).map(p=>
         ({key: presets[p].title, value: p}));
     let {preset} = props.form;
-    let preset_tooltip = preset&&presets[preset].subtitle||'';
-    preset_tooltip = preset_tooltip.replace(/\s\s+/g, ' ');
     return (
         <div className="nav">
           <Field on_change={update_zone} options={props.zones} label="Zone"
@@ -968,7 +966,6 @@ const Nav = props=>{
           <div className="preset_field">
             <Field on_change={update_preset} label="Preset"
               options={presets_opt} value={preset}/>
-            <Tooltip_icon id={preset} title={preset_tooltip}/>
           </div>
           <Action_buttons save={props.save} dirty={props.dirty}/>
         </div>
@@ -1035,14 +1032,15 @@ const Tab_btn = props=>{
     }).length;
     const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
     return (
-        <div onClick={()=>props.on_tab_click(props.id)}
-          className={btn_class}>
-          <Tab_icon id={props.id} changes={changes}
-            error={errors.length}/>
-          <div className="title">{tabs[props.id].label}</div>
-          <div className="arrow"/>
-          <Tooltip_icon title={tabs[props.id].tooltip}/>
-        </div>
+          <div onClick={()=>props.on_tab_click(props.id)}
+            className={btn_class}>
+        <Tooltip title={tabs[props.id].tooltip}>
+            <Tab_icon id={props.id} changes={changes}
+              error={errors.length}/>
+            <div className="title">{tabs[props.id].label}</div>
+            <div className="arrow"/>
+        </Tooltip>
+          </div>
     );
 };
 
@@ -1068,6 +1066,25 @@ class Tooltip_icon extends React.Component {
             <div className="info_icon" data-toggle="tooltip"
               data-placement="top" title={this.props.title}
               data-container="body" ref={this.save_ref.bind(this)}/> : null;
+    }
+}
+
+class Tooltip extends Pure_component {
+    componentDidUpdate(){
+        $(this.el).attr('title', this.props.title).tooltip('fixTitle'); }
+    save_ref(e){ this.el = e; }
+    on_click(){ $(this.el).tooltip('hide'); }
+    render(){
+        if (!this.props.title)
+            return <span>{this.props.children}</span>;
+        return (
+            <div data-toggle="tooltip" className="tooltip_block"
+              data-placement="top" title={this.props.title}
+              data-container="body" ref={this.save_ref.bind(this)}
+              onClick={this.on_click.bind(this)}>
+              {this.props.children}
+            </div>
+        );
     }
 }
 
@@ -1222,9 +1239,6 @@ let Section_field = props=>{
               data-container="body"
               title={tooltip}>
               {tabs[tab_id].fields[id].label}
-              <If when={!!tooltip}>
-                <div className="info_icon"/>
-              </If>
             </span>
           </div>
           <div className="field">
@@ -1296,6 +1310,7 @@ class Targeting_raw extends React.Component {
             {value: 'telstra', key: 'Telstra'},
             {value: 'tmobile', key: 'T-Mobile'},
             {value: 'tigo', key: 'Tigo'},
+            {value: 'tim', key: 'TIM (Telecom Italia)'},
             {value: 'vodafone', key: 'Vodafone'},
             {value: 'verizon', key: 'Verizon'},
         ];
@@ -1814,7 +1829,7 @@ let General = props=>{
     return (
         <With_data {...props}>
           <Section_with_fields type="number" id="port"/>
-          <Section_with_fields type="password" id="password"/>
+          <Section_with_fields type="text" id="password"/>
           <Section_with_fields type="number" id="multiply" min="1"
             disabled={!props.support.multiply}/>
           <If when={type=='ips'}>

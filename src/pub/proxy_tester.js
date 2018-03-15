@@ -144,7 +144,7 @@ class Request extends Pure_component {
                     'Looks good? now lets browse the web', 2000);
             }
             _this.setState({show_loader: false});
-            _this.props.update_response(json_check.response);
+            _this.props.update_response(json_check.response||{});
             if (json_check.error)
             {
                 _this.setState({warnings: [{msg: json_check.error}]});

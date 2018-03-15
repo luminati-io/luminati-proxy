@@ -34,7 +34,7 @@ class Stats extends Pure_component {
         this.etask(function*(){
             const har = yield ajax.json({url: '/api/request_stats/har'});
             _this.setState({har, entries: har.log.entries},
-                _this.apply_filters);
+                ()=>_this.apply_filters());
         });
     }
     select_entry(uuid){
@@ -74,15 +74,22 @@ class Stats extends Pure_component {
         this.setState({sorted: {field, dir}, filtered_entries: sorted},
             this.paginate);
     }
-    apply_filters(filters=[]){
+    apply_filters(filters={}){
         const filtered_entries = this.state.entries.filter(entry=>{
-            return !filters.length||_.some(filters, filter=>{
-                if (filter.section=='domain')
-                    return filter.value==entry.request.host;
-                else if (filter.section=='status code')
-                    return filter.value==entry.response.status;
-                else
+            return _.every(Object.entries(filters), group=>{
+                const [section, filters] = group;
+                if (!filters||!filters.length)
                     return true;
+                return _.some(filters, val=>{
+                    if (section=='domain')
+                        return val==entry.request.host;
+                    else if (section=='status code')
+                        return val==entry.response.status;
+                    else if (section=='protocol')
+                        return val==entry.details.protocol;
+                    else if (section=='port')
+                        return true;
+                });
             });
         });
         this.setState({filtered_entries}, this.paginate);
@@ -117,19 +124,21 @@ class Stats extends Pure_component {
                 <div className="panel summary_panel">
                   <div className="panel_heading">
                     <h2>Recent Requests</h2>
-                    <button onClick={this.download_har.bind(this)}
-                      className="btn btn_lpm btn_lpm_normal btn_har">
-                      HAR
-                    </button>
+                    <div className="buttons_wrapper">
+                      <button onClick={this.download_har.bind(this)}
+                        className="btn btn_lpm btn_lpm_normal btn_har">
+                        HAR
+                      </button>
+                    </div>
                   </div>
-                  <div className="panel_body">
+                  <div className="panel_body with_table">
                     <Main_table entries={this.state.displayed_entries}
                       select_entry={this.select_entry.bind(this)}
                       preview_entry={this.state.preview_entry}
                       sort={this.sort.bind(this)} sorted={this.state.sorted}/>
-                    <div className="pagination_panel">{pagination}</div>
                   </div>
                 </div>
+                <div className="pagination_panel">{pagination}</div>
               </div>
             </div>
         );
@@ -139,8 +148,12 @@ class Stats extends Pure_component {
 class Filtering extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {value: '', suggestions: [], selected_filters: []};
+        this.state = {value: '', suggestions: [], selected_filters: {}};
         this.filters = [{
+            title: 'Ports',
+            name: 'port',
+            values: ['22225', '24000'],
+        }, {
             title: 'Domains',
             name: 'domain',
             values: ['amazon.com', 'lumtest.com'],
@@ -168,18 +181,21 @@ class Filtering extends Pure_component {
     get_section_suggestions(section){ return section.values; }
     get_suggestion_value(s){ return s.val; }
     on_suggestion_selected(e, chosen){
-        const new_filter = {
-            value: chosen.suggestion.val,
-            section: chosen.suggestion.section,
-        };
+        const {val, section} = chosen.suggestion;
         this.setState(prev_state=>({
-            selected_filters: [...prev_state.selected_filters, new_filter],
+            selected_filters: {
+                ...prev_state.selected_filters,
+                [section]: [...(prev_state.selected_filters[section]||[]), val]
+            },
             value: '',
         }), this.apply_current_filters);
     }
-    remove_filter(filter){
+    remove_filter(section, val){
         this.setState(prev=>({
-            selected_filters: prev.selected_filters.filter(f=>f!=filter),
+            selected_filters: {
+                ...prev.selected_filters,
+                [section]: prev.selected_filters[section].filter(f=>f!=val),
+            },
         }), this.apply_current_filters);
     }
     apply_current_filters(){
@@ -199,6 +215,9 @@ class Filtering extends Pure_component {
             onChange: this.on_input_change,
             className: 'search_input',
         };
+        const filters = Object.entries(this.state.selected_filters)
+        .reduce((acc, e)=>
+            acc.concat(e[1].map(f=>({section: e[0], val: f}))), []);
         return (
             <div className="filtering">
               <Autosuggest suggestions={this.state.suggestions}
@@ -212,13 +231,13 @@ class Filtering extends Pure_component {
                 shouldRenderSuggestions={this.should_render_suggestions}
                 onSuggestionSelected={this.on_suggestion_selected.bind(this)}/>
               <div className="filters_list">
-                {this.state.selected_filters.map(f=>(
-                  <div key={f.section+f.value} className="filter">
+                {filters.map(f=>(
+                  <div key={f.section+f.val} className="filter">
                     <div className="text">
                       <span className="section">{f.section}: </span>
-                      <span className="value">{f.value}</span>
+                      <span className="value">{f.val}</span>
                     </div>
-                    <div onClick={()=>this.remove_filter(f)}
+                    <div onClick={()=>this.remove_filter(f.section, f.val)}
                       className="x_btn_wrapper">
                       <div className="x_btn"/>
                     </div>
@@ -376,7 +395,7 @@ const Preview = ({curr_tab, entry})=>{
     if (!entry||!entry.uuid)
         return null;
     const width = 'calc(100% - 200px)';
-    const height = 'calc(100% - 76px)';
+    const height = 'calc(100% - 36px)';
     const style = {minWidth: width, maxWidth: width, height};
     return (
         <div className="preview" style={style}>

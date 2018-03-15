@@ -70,7 +70,7 @@ class P_row extends Stat_row {
     }
 }
 
-class StatTable extends React.Component {
+class Stat_table extends React.Component {
     enter = ()=>{
         let dt = this.props.dataType;
         E.sp.spawn(this.sp = etask(function*(){
@@ -83,17 +83,17 @@ class StatTable extends React.Component {
             this.sp.return();
     };
     render(){
-        const Table = this.props.table || Common.StatTable;
-        return <div onMouseEnter={this.enter} onMouseLeave={this.leave}>
+        const Table = this.props.table || Common.Stat_table;
+        return <div className="stat_table_wrapper" onMouseEnter={this.enter}
+            onMouseLeave={this.leave}>
               <Table go {...this.props} />
             </div>;
     }
 }
 
-class SuccessRatio extends React.Component {
+class Success_ratio extends Pure_component {
     constructor(props){
         super(props);
-        this.sp = etask('SuccessRatio', function*(){ yield this.wait(); });
         this.state = {total: 0, success: 0};
         this.get_req_status_stats = etask._fn(function*(_this){
             let res = yield etask(()=>axios.get('/api/req_status'));
@@ -102,39 +102,35 @@ class SuccessRatio extends React.Component {
     }
     componentDidMount(){
         const _this = this;
-        this.sp.spawn(etask(function*(){
+        this.etask(function*(){
             while (true)
             {
                 _this.setState(yield _this.get_req_status_stats());
                 yield etask.sleep(3000);
             }
-        }));
+        });
     }
-    componentWillUnmount(){ this.sp.return(); }
     render (){
         const {total, success} = this.state;
         const ratio = total==0 ? NaN : success/total*100;
-        const overallSuccessTooltip = <Tooltip
+        const tooltip = <Tooltip
               id="succes-tooltip">
               Ratio of successful requests out of total
               requests, where successful requests are calculated as 2xx,
               3xx or 404 HTTP status codes
             </Tooltip>;
         return (
-            <Row className="overall-success-ratio" onMouseEnter={()=>{
+            <div className="overall_success_ratio" onMouseEnter={()=>{
               util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
             }}>
-              <If when={!isNaN(ratio)}>
-                <Col sm={8} className="success_title">
-                  <OverlayTrigger overlay={overallSuccessTooltip}
-                    placement="top"><span>Overall success</span>
-                  </OverlayTrigger>
-                </Col>
-                <Col sm={4} className="success_value">
-                  {isNaN(ratio) ? '' : ratio.toFixed(2)+'%'}
-                </Col>
-              </If>
-            </Row>
+              <div className="success_title">
+                <OverlayTrigger overlay={tooltip}
+                  placement="top"><span>Overall success:</span>
+                </OverlayTrigger>
+              </div>
+              <div className="success_value">
+                {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}</div>
+            </div>
         );
     }
 }
@@ -188,23 +184,25 @@ class Stats extends React.Component {
             <div className="panel stats_panel">
               <div className="panel_heading">
                 <h2>Recent statistics</h2>
-                <button className="btn btn_lpm btn_lpm_normal btn_reset"
-                  onClick={this.confirm}>Reset</button>
+                <div className="buttons_wrapper">
+                  <button className="btn btn_lpm btn_lpm_normal btn_reset"
+                    onClick={this.confirm}>Reset</button>
+                </div>
               </div>
-              <div className="panel_body">
-                <SuccessRatio/>
-                <StatTable table={StatusCodeTable} row={S_row}
-                  title={`Top status codes`} dataType="status_codes"
+              <div className="panel_body with_table">
+                <Success_ratio/>
+                <Stat_table table={StatusCodeTable} row={S_row}
+                  title={`By status codes`} dataType="status_codes"
                   stats={this.state.statuses.stats}
                   show_more={this.state.statuses.has_more}/>
-                <StatTable table={DomainTable} row={D_row}
+                <Stat_table table={DomainTable} row={D_row}
                   dataType="domains" stats={this.state.domains.stats}
                   show_more={this.state.domains.has_more}
-                  title={`Top domains`} />
-                <StatTable table={ProtocolTable} row={P_row}
+                  title={`By domains`} />
+                <Stat_table table={ProtocolTable} row={P_row}
                   dataType="protocols" stats={this.state.protocols.stats}
                   show_more={this.state.protocols.has_more}
-                  title={`All protocols`}
+                  title={`By protocols`}
                   show_enable_https_button
                   enable_https_button_click={this.enable_https_statistics}/>
                 <Dialog show={this.state.show_reset} onHide={this.close}

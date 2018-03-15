@@ -14,27 +14,36 @@ import Pure_component from '../../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
 
-class StatTable extends React.Component {
-    render(){
-        const Row = this.props.row;
-        return <div>
-              <h4>
-                {this.props.title}
-                {this.props.show_more &&
-                  <small>&nbsp;<a href={this.props.path}>show all</a></small>}
-              </h4>
-              <Table hover condensed>
-                <thead>{this.props.children}</thead>
-                <tbody>
-                  {this.props.stats.map(s=>
-                    <Row stat={s} key={s[this.props.row_key||'key']}
-                      path={this.props.path} go={this.props.go}
-                      {...(this.props.row_opts||{})}/>)}
-                </tbody>
-              </Table>
-            </div>;
-    }
-}
+const Empty_row = ()=>(
+    <tr className="empty_row">
+      <td>-</td><td>-</td><td>-</td>
+    </tr>
+);
+
+const Stat_table = props=>{
+    const Row = props.row;
+    return (
+        <div className="stat_table">
+          <h4>
+            {props.title}
+            {props.show_more &&
+              <small>&nbsp;<a href={props.path}>show all</a></small>}
+          </h4>
+          <Table hover condensed>
+            <thead>{props.children}</thead>
+            <tbody>
+              <If when={!props.stats.length}>
+                <Empty_row/>
+              </If>
+              {props.stats.map(s=>
+                <Row stat={s} key={s[props.row_key||'key']}
+                  path={props.path} go={props.go}
+                  {...(props.row_opts||{})}/>)}
+            </tbody>
+          </Table>
+        </div>
+    );
+};
 
 class StatsService {
     static base = '/api/request_stats';
@@ -194,13 +203,13 @@ class StatsDetails extends React.Component {
                   <div className="panel_heading">
                     <h2>Recent Requests</h2>
                   </div>
-                  <div className="panel_body">
+                  <div className="panel_body with_table">
                     <Requests_table reqs={this.state.stats}
                       select_req={this.select_req.bind(this)}
                       preview_req={this.state.preview_req}/>
-                    <div className="pagination_panel">{pagination}</div>
                   </div>
                 </div>
+                <div className="pagination_panel">{pagination}</div>
                 {this.props.children}
               </div>
             </div>;
@@ -322,7 +331,7 @@ const Preview_req = props=>{
     const {response_headers, request_headers, status_code, url,
         id} = props.req;
     const width = 'calc(100% - 200px)';
-    const height = 'calc(100% - 76px)';
+    const height = 'calc(100% - 36px)';
     const style = {minWidth: width, maxWidth: width, height};
     return (
         <div className="preview" style={style}>
@@ -376,4 +385,4 @@ const Key_value = ({k, val})=>(
     </div>
 );
 
-export default {StatsDetails, StatTable, StatsService, Requests_table};
+export default {StatsDetails, Stat_table, StatsService, Requests_table};

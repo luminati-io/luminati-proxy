@@ -22,11 +22,12 @@
           <a ng-if="section.name=='settings'" href="https://luminati.io/cp"
             target=_blank class=logo></a>
           <span class=version ng-if=ver_cur>V{{ver_cur}}</span>
+          <div class=version_filler></div>
         </div>
         <div class=nav_top_right>
           <div class=notif_icon react-view=notif_center></div>
           <div class=dropdown ng-if="section.name!='settings'">
-            <a href=# class=dropdown-toggle data-toggle=dropdown>
+            <a href=# class="link dropdown-toggle" data-toggle=dropdown>
               {{settings.customer}}<span class=caret></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
@@ -59,11 +60,15 @@
         </div>
         <div class=menu_filler></div>
         <div class=footer>
-          <a href=http://luminati.io/faq#proxy target="_blank" class="link">
-            FAQ</a>
-          | <a href=mailto:lpm@luminati.io class="link">Contact</a>
-          | <a href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy" class="link">
+          <div>
+            <a href=http://luminati.io/faq#proxy target="_blank" class="link">
+              FAQ</a>
+            | <a href=mailto:lpm@luminati.io class="link">Contact</a>
+          </div>
+          <div>
+          <a href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy" class="link">
             API Docs</a>
+          </div>
         </div>
       </div>
       <div class="container page-body">

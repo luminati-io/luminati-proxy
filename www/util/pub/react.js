@@ -270,56 +270,34 @@ E.Paginator = class Paginator extends Pure_component {
     }
 };
 
-const hash_scroll = hash=>{
-    const el = $(hash);
-    if (!el[0])
-        return;
-    el[0].scrollIntoView();
-};
-E.hash_link = (evt, hash)=>{
-    let url_o = url.parse(window.location.href);
-    url_o.hash = '#'+hash;
-    let url_str = url.uri_obj_href(url_o);
-    window.history.pushState({hash}, '', url_str);
-    hash_scroll('#'+hash);
-    evt.preventDefault();
-};
-E.hash_links_hoc = Component=>{
-    return class extends Pure_component {
-        constructor(props){
-            super(props);
-            this.popstate_scroll = e=>e.state && e.state.hash
-                && hash_scroll('#'+e.state.hash);
-        }
-        componentWillUnmount(){
-            window.removeEventListener('popstate', this.popstate_scroll);
-        }
-        componentDidMount(){
-            const url_o = url.parse(document.location.href);
-            hash_scroll(url_o.hash);
-            window.addEventListener('popstate', this.popstate_scroll);
-        }
-        render(){ return <Component {...this.props}/>; }
-    };
-};
-
 let save_sitemap;
 class Nav_hook extends Pure_component {
     constructor(props){
         super(props);
+        this.reset = this.reset.bind(this);
         save_sitemap = this.sitemap = this.props.sitemap||save_sitemap||{};
+        if (this.props.hash_scroll)
+        {
+            props.history.listen(location=>
+                location.hash&&this.hash_scroll_on_load(location.hash));
+        }
+    }
+    componentDidMount(){
+        if (this.props.hash_scroll&&this.props.location.hash)
+            this.hash_scroll_on_load(this.props.location.hash);
     }
     componentDidUpdate(prevProps){
         if (this.props.location == prevProps.location)
             return;
-        let url_o = url.parse(this.props.location.href);
+        const l = this.props.location;
+        const url_o = url.parse(l.href);
         if (this.props.update_meta)
-            this.set_meta(url_o);
-        if (this.props.scroll_to_top&&!url_o.hash)
+            this.set_meta(l.pathname);
+        if (this.props.scroll_to_top&&!l.hash)
             window.scrollTo(0, 0);
     }
-    set_meta(url_o){
-        const m = this.sitemap[url_o.pathname];
+    set_meta(pathname){
+        const m = this.sitemap[pathname];
         if (!m)
             return;
         $('title').text(m.title);
@@ -328,6 +306,25 @@ class Nav_hook extends Pure_component {
         $('meta[property="og:title"]').attr('content', m.og_title);
         $('meta[property="og:description"]').attr('content', m.og_description);
         $('meta[property="og:image"]').attr('content', m.og_image);
+    }
+    hash_scroll(hash){
+        const el = $(hash);
+        return el[0]&&(el[0].scrollIntoView()||true);
+    }
+    hash_scroll_on_load(hash){
+        this.reset();
+        if (this.hash_scroll(hash))
+            return;
+        this.observer = new MutationObserver(()=>
+            this.hash_scroll(hash)&&this.reset());
+        this.timeout = setTimeout(this.reset, 10000);
+        this.observer.observe(document,
+            {attributes: true, childList: true,subtree: true});
+    }
+    reset(){
+        this.observer&&this.observer.disconnect();
+        this.timeout&&clearTimeout(this.timeout);
+        this.observer = this.timeout = null;
     }
     render(){return this.props.children;}
 }

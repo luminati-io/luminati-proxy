@@ -114,7 +114,7 @@ class Add_proxy extends Pure_component {
         return (
             <div className="lpm">
               <Loader show={this.state.show_loader}/>
-              <Modal id="add_proxy_modal" title="Add new proxy"
+              <Modal id="add_proxy_modal" no_header
                 footer={Footer_wrapper} className="add_proxy_modal">
                 <div className="fields_wrapper">
                   <div className="fields">
@@ -135,7 +135,8 @@ class Add_proxy extends Pure_component {
                   <ul>
                   {(presets[this.state.preset].rules||[]).map((r, i)=>(
                     <li key={i}>
-                      <a onClick={()=>this.rule_clicked(r.field)}>
+                      <a className="link"
+                        onClick={()=>this.rule_clicked(r.field)}>
                         {r.label}</a>
                     </li>
                   ))}

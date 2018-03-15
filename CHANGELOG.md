@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.87.565
+
 ## 1.86.979
 - :star: view response body in recent request log viewer
 - :sparkles: stability fixes  

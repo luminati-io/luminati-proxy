@@ -63,11 +63,6 @@ class StatusCodeRow extends Pure_component {
     componentWillMount(){
         this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
     render(){
-        const tooltip = <Tooltip
-              id={`status_code_${this.props.stat.status_code}`}>
-              {status_codes[this.props.stat.status_code]||
-                this.props.stat.status_code}
-            </Tooltip>;
         let class_name = '';
         let click = ()=>{};
         if (this.props.go)
@@ -78,14 +73,7 @@ class StatusCodeRow extends Pure_component {
         }
         return (
             <tr className={class_name} onClick={click}>
-              <td>
-                <OverlayTrigger overlay={tooltip} placement="top">
-                  <a className="link"
-                     href={`${this.props.path}/`+this.props.stat.status_code}>
-                    {this.props.stat.status_code}
-                  </a>
-                </OverlayTrigger>
-              </td>
+              <td>{this.props.stat.status_code}</td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
@@ -97,14 +85,14 @@ class StatusCodeRow extends Pure_component {
 
 class StatusCodeTable extends React.Component {
     render(){
-        return <Common.StatTable row={StatusCodeRow} path="/status_codes"
+        return <Common.Stat_table row={StatusCodeRow} path="/status_codes"
               row_key="status_code" go {...this.props}>
               <tr>
                 <th className="col-md-4">Code</th>
                 <th className="col-md-4">Bandwidth</th>
                 <th className="col-md-4">Requests</th>
               </tr>
-            </Common.StatTable>;
+            </Common.Stat_table>;
     }
 }
 

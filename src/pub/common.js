@@ -59,17 +59,21 @@ class Modal extends React.Component {
                   no_cancel_btn={this.props.no_cancel_btn}/>
             );
         }
+        const header_classes = classnames('modal-header',
+            {no_header: this.props.no_header});
         return (
             <div id={this.props.id} tabIndex="-1"
               className={classnames('modal', 'fade', this.props.className)}>
               <div className="modal-dialog">
                 <div className="modal-content">
-                  <div className="modal-header">
+                  <div className={header_classes}>
                     <button className="close close_icon" data-dismiss="modal"
                         aria-label="Close"
                         onClick={this.on_dismiss.bind(this)}>
                     </button>
-                    <h4 className="modal-title">{this.props.title}</h4>
+                    <If when={!this.props.no_header}>
+                      <h4 className="modal-title">{this.props.title}</h4>
+                    </If>
                   </div>
                   <div className="modal-body">{this.props.children}</div>
                   <div className="modal-footer">{footer}</div>

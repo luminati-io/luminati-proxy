@@ -29,12 +29,7 @@ class DomainRow extends Pure_component {
         }
         return (
             <tr className={class_name} onClick={click}>
-              <td>
-                <a className="link"
-                   href={`${this.props.path}/`+this.props.stat.hostname}>
-                  {this.props.stat.hostname}
-                </a>
-              </td>
+              <td>{this.props.stat.hostname}</td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
@@ -46,14 +41,14 @@ class DomainRow extends Pure_component {
 
 class DomainTable extends React.Component {
     render(){
-        return <Common.StatTable row={DomainRow} path="/domains"
+        return <Common.Stat_table row={DomainRow} path="/domains"
               row_key="hostname" go {...this.props}>
               <tr>
                 <th className="col-md-4">Domain</th>
                 <th className="col-md-4">Bandwidth</th>
                 <th className="col-md-4">Requests</th>
               </tr>
-            </Common.StatTable>;
+            </Common.Stat_table>;
     }
 }
 

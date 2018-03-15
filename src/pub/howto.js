@@ -127,7 +127,8 @@ class Code_instructions extends Pure_component {
               </div>
               <div>
                 View available API endpoints
-                <a className="link" href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy">
+                <a className="link api_link"
+                  href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy">
                 here</a>
               </div>
             </div>

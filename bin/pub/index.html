@@ -22,11 +22,12 @@
           <a ng-if="section.name=='settings'" href="https://luminati.io/cp"
             target=_blank class=logo></a>
           <span class=version ng-if=ver_cur>V{{ver_cur}}</span>
+          <div class=version_filler></div>
         </div>
         <div class=nav_top_right>
           <div class=notif_icon react-view=notif_center></div>
           <div class=dropdown ng-if="section.name!='settings'">
-            <a href=# class=dropdown-toggle data-toggle=dropdown>
+            <a href=# class="link dropdown-toggle" data-toggle=dropdown>
               {{settings.customer}}<span class=caret></span>
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
@@ -59,11 +60,15 @@
         </div>
         <div class=menu_filler></div>
         <div class=footer>
-          <a href=http://luminati.io/faq#proxy target="_blank" class="link">
-            FAQ</a>
-          | <a href=mailto:lpm@luminati.io class="link">Contact</a>
-          | <a href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy" class="link">
+          <div>
+            <a href=http://luminati.io/faq#proxy target="_blank" class="link">
+              FAQ</a>
+            | <a href=mailto:lpm@luminati.io class="link">Contact</a>
+          </div>
+          <div>
+          <a href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy" class="link">
             API Docs</a>
+          </div>
         </div>
       </div>
       <div class="container page-body">
@@ -206,6 +211,6 @@
     <div react-view=report_bug_modal></div>
     <div react-view=progress_modal></div>
     <div id=notif_react_modal></div>
-  <script type="text/javascript" src="/89cc4baa222fafa28dde.runtime.js"></script><script type="text/javascript" src="/768c9f1d7612d99ba577.vendor.js"></script><script type="text/javascript" src="/b2a8533821f789e3646e.app.js"></script></body>
+  <script type="text/javascript" src="/5ca88dde6d1480feb159.runtime.js"></script><script type="text/javascript" src="/9f9301d493ecea3d7495.vendor.js"></script><script type="text/javascript" src="/7b84e4e7a0a62ee2f597.app.js"></script></body>
 </html>
 

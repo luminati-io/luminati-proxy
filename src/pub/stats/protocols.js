@@ -43,12 +43,7 @@ class ProtocolRow extends Pure_component {
         }
         return (
             <tr className={class_name} onClick={click}>
-              <td>
-                <a className="link"
-                   href={`${this.props.path}/${this.props.stat.protocol}`}>
-                  {this.props.stat.protocol}
-                </a>
-              </td>
+              <td>{this.props.stat.protocol}</td>
               <td className={this.props.class_bw}>
                 {util.bytes_format(this.props.stat.bw)}</td>
               <td className={this.props.class_value}>
@@ -61,7 +56,7 @@ class ProtocolRow extends Pure_component {
 
 class ProtocolTable extends React.Component {
     render(){
-        return <Common.StatTable row={ProtocolRow} path="/protocols"
+        return <Common.Stat_table row={ProtocolRow} path="/protocols"
               row_key="protocol" title={
                   <Row>
                     <Col md={6}>{this.props.title}</Col>
@@ -83,7 +78,7 @@ class ProtocolTable extends React.Component {
                 <th className="col-md-4">Bandwidth</th>
                 <th className="col-md-4">Requests</th>
               </tr>
-            </Common.StatTable>;
+            </Common.Stat_table>;
     }
 }
 

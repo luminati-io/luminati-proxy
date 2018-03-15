@@ -74,14 +74,18 @@ prompt()
     fi
     local default=$answer
     if [[ -t 0 ]]; then
-        echo -e -n "$color"
+        if ((!OS_MAC)); then
+            echo -e -n "$color"
+        fi
         read -n 1 -p $"$question ($yn) " answer
-        echo -e -n '\e[0m\n'
+        if ((!OS_MAC)); then
+            echo -e -n '\e[0m\n'
+        fi
     fi
-    if [[ $answer == "" && $default == "n" ]]; then
-        return 1;
+    if [[ -z $answer && $default == "n" ]]; then
+        return 1
     fi
-    if [[ $answer =~ ^(y|Y|)$ ]]; then
+    if [[ -z $answer || $answer =~ ^(y|Y)$ ]]; then
         return 0
     fi
     return 1;
@@ -416,12 +420,15 @@ setup()
     perr "complete"
     echo "Luminati install script complete. Install id: $RID"
     echo "To run the process enter 'luminati'"
+    echo "if this does not work try $(npm bin -g)/luminati"
 }
 
 on_exit()
 {
     local exit_code=$?
-    echo -e -n '\e[0m\n'
+    if ((!OS_MAC)); then
+        echo -e -n '\e[0m\n'
+    fi
     if ((!exit_code)); then
         perr "exit_ok" $exit_code
     else
@@ -476,7 +483,7 @@ while [ "${1:0:1}" = - ]; do
     shift
 done
 
-if [[ -n "$1" && "$1" == @(setup|dev-clean|clean) ]]; then
+if [[ -n "$1" && "$1" =~ (setup|dev-clean|clean) ]]; then
     ACTION="$1"
     shift
 fi
