@@ -1,10 +1,14 @@
  Luminati Proxy manager - Change Log
 
+## 1.87.994
+- :bug: fixed overload error on osx
+- :sparkles: ui improvments
+
 ## 1.87.565
 
 ## 1.86.979
 - :star: view response body in recent request log viewer
-- :sparkles: stability fixes  
+- :sparkles: stability fixes
 
 ## 1.86.25
 - :sparkles: improved upgrading on windwos binary
@@ -14,7 +18,7 @@
 - :sparkles: multiple performance improvements in request pipeline
 
 ## 1.85.98
-- :sparkles: improved recent stats to show only user generated requests 
+- :sparkles: improved recent stats to show only user generated requests
 - :bug: socks5 to work with multiply ports
 
 ## 1.84.634
@@ -22,7 +26,7 @@
 - :sparkles: added links to messages in notification center
 
 ## 1.84.166
-- :star: added report a bug to easily get support 
+- :star: added report a bug to easily get support
 
 ## 1.84.22
 - :sparkles: optimization improvments for linux/mac

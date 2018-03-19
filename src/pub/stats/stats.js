@@ -125,7 +125,7 @@ class Success_ratio extends Pure_component {
             }}>
               <div className="success_title">
                 <OverlayTrigger overlay={tooltip}
-                  placement="top"><span>Overall success:</span>
+                  placement="top"><span>Success rate:</span>
                 </OverlayTrigger>
               </div>
               <div className="success_value">
@@ -183,9 +183,9 @@ class Stats extends React.Component {
         return <div className="proxies lpm">
             <div className="panel stats_panel">
               <div className="panel_heading">
-                <h2>Recent statistics</h2>
+                <h2>Statistics</h2>
                 <div className="buttons_wrapper">
-                  <button className="btn btn_lpm btn_lpm_normal btn_reset"
+                  <button className="btn btn_lpm btn_lpm_normal btn_lpm_small"
                     onClick={this.confirm}>Reset</button>
                 </div>
               </div>

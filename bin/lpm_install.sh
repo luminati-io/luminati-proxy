@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# LICENSE_CODE ZON ISC
 PERR_URL="https://perr.luminati.io/client_cgi/perr"
 ACTION="setup"
 RID=$(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 |\
@@ -368,6 +368,7 @@ lpm_install()
         exit $?
     else
         if is_cmd_defined "rt"; then
+            # fix luminati binary not found on luminati ubuntu
             echo "running nave relink"
             sudo_cmd "nave relink"
         fi

@@ -1,15 +1,3 @@
-<div ng-repeat="warning in warnings()"
-  class="alert alert-info settings-alert">
-  {{warning}}
-  <button class="btn btn-default" ng-click=dismiss_warning(warning)>
-    Dismiss
-  </button>
-</div>
-<ng-include src="'/upgrade.html'"></ng-include>
-<div class="alert alert-info settings-alert"
-  ng-if="$root.mode=='root'&&$root.settings.resolve===true">
-  IP resolution is done automatically.
-</div>
 <div ng-controller=proxies>
   <div ng-hide=!proxies_loading() class="alert alert-info">
     Loading...
@@ -25,22 +13,18 @@
       <div class=panel_heading>
         <h2>Proxies</h2>
         <div class=buttons_wrapper>
-          <button class="btn btn_lpm btn_lpm_normal btn_csv"
-            ng-click=download_csv() uib-tooltip="Download all ports as CSV"
-            tooltip-class=tooltip-default>
-            <div class="icon"></div>
-            csv
-          </button>
-          <button class="btn btn_lpm btn_lpm_normal btn_columns"
-            ng-click=edit_cols() uib-tooltip="Edit Columns"
-            tooltip-class=tooltip-default>
-            <div class="icon"></div>
-          </button>
-          <button class="btn btn_lpm btn_add"
-            ng-if="$root.mode!='guest'" ng-click=add_proxy_new()
+          <span class="icon_link" ng-click=download_csv()
+            custom-tooltip="Download all ports as CSV">
+            <i class="glyphicon glyphicon-download"></i>
+          </span>
+          <span class="link icon_link" ng-click=edit_cols()
+            custom-tooltip="Edit columns">
+            <i class="glyphicon glyphicon-filter"></i>
+          </span>
+          <span class="link icon_link right top" ng-click=add_proxy_new()
             custom-tooltip="Add new Proxy port">
-            <b>+ New Proxy</b>
-          </button>
+            <i class="glyphicon glyphicon-plus"></i>
+          </span>
         </div>
       </div>
       <div class="panel_body with_table" ng-show="columns">
@@ -207,12 +191,6 @@
   </div>
   <div ng-show="show_proxies_panel()" class="col-lg-4 stats_wrapper">
     <div react-view=react_component></div>
-  </div>
-  <div ng-repeat="h in history_dialog" ng-controller=history
-    ng-include="'history.html'" ng-init=init(h)>
-  </div>
-  <div ng-repeat="p in pool_dialog" ng-controller=pool
-    ng-include="'pool.html'" ng-init=init(p)>
   </div>
   <div ng-repeat="c in columns_dialog" ng-controller=columns
     ng-include="'proxy_cols.html'" ng-init=init(c)>

@@ -126,7 +126,7 @@ class Stats extends Pure_component {
                     <h2>Recent Requests</h2>
                     <div className="buttons_wrapper">
                       <button onClick={this.download_har.bind(this)}
-                        className="btn btn_lpm btn_lpm_normal btn_har">
+                        className="btn btn_lpm btn_lpm_small">
                         HAR
                       </button>
                     </div>

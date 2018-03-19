@@ -6,7 +6,7 @@ import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, onboarding, presets, emitter} from './common.js';
+import {Modal, Loader, presets} from './common.js';
 import util from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
@@ -45,7 +45,6 @@ class Add_proxy extends Pure_component {
         const zone = this.state.zones.filter(z=>z.key==form.zone)[0]||{};
         form.password = zone.password;
         presets[preset].set(form);
-        this.setState({show_loader: true});
         const _this = this;
         return etask(function*(){
             this.on('uncaught', e=>{
@@ -65,19 +64,25 @@ class Add_proxy extends Pure_component {
                 body: JSON.stringify({proxy: form}),
             });
             ga_event('add-new-port', 'successfully saved');
-            _this.setState({show_loader: false});
             return port;
         });
     }
     save(opt={}){
         const _this = this;
         this.etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+            });
+            _this.setState({show_loader: true});
             const port = yield _this.persist();
-            onboarding.check_created_proxy();
             const callbacks = setdb.get('head.callbacks');
             yield callbacks.proxies.update();
-            const tested_proxy = yield onboarding.has_tested_proxy();
-            $('#add_proxy_modal').modal('hide');
+            if (_this.props.id)
+                $('#'+_this.props.id).modal('hide');
+            else
+                $('#add_proxy_modal').modal('hide');
+            _this.setState({show_loader: false});
+            yield etask.sleep(500);
             window.localStorage.setItem('quickstart-first-proxy', port);
             if (opt.redirect)
             {
@@ -85,11 +90,6 @@ class Add_proxy extends Pure_component {
                 if (opt.field)
                     state_opt.field = opt.field;
                 return yield callbacks.state.go('edit_proxy', state_opt);
-            }
-            if (!tested_proxy)
-            {
-                emitter.emit('setup_guide:progress_modal',`Great! You have`
-                    +` configured proxy on port ${port}`, 500);
             }
         });
     }
@@ -114,7 +114,7 @@ class Add_proxy extends Pure_component {
         return (
             <div className="lpm">
               <Loader show={this.state.show_loader}/>
-              <Modal id="add_proxy_modal" no_header
+              <Modal id={this.props.id||'add_proxy_modal'} no_header
                 footer={Footer_wrapper} className="add_proxy_modal">
                 <div className="fields_wrapper">
                   <div className="fields">
@@ -173,11 +173,10 @@ const Footer = props=>{
     };
     return (
         <div>
-          <button onClick={advanced_clicked}
-            className="btn btn_lpm_default btn_lpm options">
+          <button onClick={advanced_clicked} className="btn btn_lpm">
             Advanced options</button>
-          <button onClick={save_clicked} className="btn btn_lpm save">
-            Save</button>
+          <button onClick={save_clicked}
+            className="btn btn_lpm btn_lpm_primary">Save</button>
         </div>
     );
 };

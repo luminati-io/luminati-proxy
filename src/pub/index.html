@@ -41,8 +41,7 @@
           </div>
         </div>
       </div>
-      <div ng-if="section.name!='settings' && section.name!='welcome'"
-        class="lpm nav_left">
+      <div ng-if="section.name!='settings'" class="lpm nav_left">
         <div class=menu>
           <div ng-repeat="s in sections" ng-if="s.navbar" ui-state=s.name
             ng-click=zone_click(s.name)>
@@ -72,6 +71,20 @@
         </div>
       </div>
       <div class="container page-body">
+        <div class ng-if="section.name=='overview'||section.name=='proxies'">
+          <ng-include src="'/upgrade.html'"></ng-include>
+          <div ng-repeat="warning in warnings()"
+            class="alert alert-info settings-alert">
+            {{warning}}
+            <button class="btn btn-default" ng-click=dismiss_warning(warning)>
+              Dismiss
+            </button>
+          </div>
+          <div class="alert alert-info settings-alert"
+            ng-if="$root.mode=='root'&&$root.settings.resolve===true">
+            IP resolution is done automatically.
+          </div>
+        </div>
         <ui-view></ui-view>
       </div>
     </div>
@@ -92,7 +105,7 @@
                 data-dismiss=modal>
                 Cancel
               </button>
-              <button type=button class="btn btn_lpm btn_lpm_default"
+              <button type=button class="btn btn_lpm btn_lpm_primary"
                 data-dismiss=modal ng-click=confirmation.confirmed()>
                 OK
               </button>
@@ -207,10 +220,11 @@
       </div>
     </div>
     <div react-view=add_proxy_modal></div>
-    <div react-view=welcome_modal></div>
     <div react-view=report_bug_modal></div>
-    <div react-view=progress_modal></div>
     <div id=notif_react_modal></div>
+    <div ng-repeat="h in history_dialog" ng-controller=history
+      ng-include="'history.html'" ng-init=init(h)>
+    </div>
   </body>
 </html>
 

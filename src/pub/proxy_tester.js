@@ -3,8 +3,7 @@
 import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, Loader, Modal, Warnings, onboarding, emitter,
-    Nav} from './common.js';
+import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import util from './util.js';
@@ -45,8 +44,12 @@ class Proxy_tester extends Pure_component {
 class Request extends Pure_component {
     constructor(props){
         super(props);
-        this.default_state = {headers: [], max_idx: 0, params: {
-            url: 'http://lumtest.com/myip.json', method: 'GET'}};
+        this.first_header = {idx: 0, header: '', value: ''};
+        this.default_state = {
+            headers: [this.first_header],
+            max_idx: 0,
+            params: {url: 'http://lumtest.com/myip.json', method: 'GET'},
+        };
         this.state = {...this.default_state, show_loader: false};
     }
     componentDidMount(){
@@ -72,15 +75,20 @@ class Request extends Pure_component {
     add_header(){
         ga_event('proxy-tester-tab', 'add header');
         this.setState(prev_state=>({
-            headers: [...prev_state.headers, {idx: prev_state.max_idx,
+            headers: [...prev_state.headers, {idx: prev_state.max_idx+1,
                 header: '', value: ''}],
             max_idx: prev_state.max_idx+1,
         }));
     }
     remove_header(idx){
         ga_event('proxy-tester-tab', 'remove header');
-        this.setState(prev_state=>
-            ({headers: prev_state.headers.filter(h=>h.idx!=idx)}));
+        if (this.state.headers.length==1)
+            this.setState({headers: [this.first_header]});
+        else
+        {
+            this.setState(prev_state=>
+                ({headers: prev_state.headers.filter(h=>h.idx!=idx)}));
+        }
     }
     update_header(idx, field, value){
         this.setState(prev_state=>({
@@ -136,13 +144,6 @@ class Request extends Pure_component {
                 body: JSON.stringify(body),
             });
             const json_check = yield raw_check.json();
-            onboarding.check_tested_proxy();
-            const seen_examples = yield onboarding.has_seen_examples();
-            if (!seen_examples)
-            {
-                emitter.emit('setup_guide:progress_modal',
-                    'Looks good? now lets browse the web', 2000);
-            }
             _this.setState({show_loader: false});
             _this.props.update_response(json_check.response||{});
             if (json_check.error)
@@ -170,9 +171,8 @@ class Request extends Pure_component {
                   proxies={this.state.proxies}/>
                 <Headers headers={this.state.headers}
                   clicked_remove={this.remove_header.bind(this)}
+                  clicked_add={this.add_header.bind(this)}
                   update={this.update_header.bind(this)}/>
-                <Add_header_btn
-                  clicked_add={this.add_header.bind(this)}/>
                 <Footer_buttons reset_clicked={this.reset.bind(this)}
                   go_clicked={this.go.bind(this)}/>
               </div>
@@ -223,25 +223,19 @@ const Field = ({type, update, name, params, ...props})=>{
     );
 };
 
-const Add_header_btn = ({clicked_add})=>(
-    <div className="add_header_wrapper">
-      <button onClick={clicked_add}
-        className="btn btn_lpm btn_lpm_normal btn_add_header">
-        Add header
-      </button>
-    </div>
-);
-
-const Headers = ({headers, clicked_remove, update})=>(
+const Headers = ({headers, clicked_remove, clicked_add, update})=>(
     <div className="headers">
-      {headers.map(h=>
-        <New_header_params clicked_remove={clicked_remove} header={h}
+      {headers.map((h, i)=>
+        <New_header_params clicked_remove={clicked_remove}
+          last={i+1==headers.length} clicked_add={clicked_add} header={h}
           key={h.idx} update={update}/>
       )}
     </div>
 );
 
-const New_header_params = ({clicked_remove, update, header})=>{
+const New_header_params = ({clicked_add, clicked_remove, update, header,
+    last})=>
+{
     const input_changed = field=>value=>{
         update(header.idx, field, value); };
     return (
@@ -252,17 +246,32 @@ const New_header_params = ({clicked_remove, update, header})=>{
           <Input val={header.value}
             on_change_wrapper={input_changed('value')}
             type="text" placeholder="Value" className="value_input"/>
-          <button onClick={()=>clicked_remove(header.idx)}
-            className="btn btn_lpm btn_lpm_error">Remove</button>
+          <div className="action_icons">
+            <span className="link icon_link top"
+              onClick={()=>clicked_remove(header.idx)}>
+              <i className="glyphicon glyphicon-trash"/>
+            </span>
+            <If when={last}>
+              <Add_icon click={clicked_add}/>
+            </If>
+          </div>
         </div>
     );
 };
 
+const Add_icon = ({click})=>(
+    <span className="link icon_link top right add_header"
+      onClick={click}>
+      <i className="glyphicon glyphicon-plus"/>
+    </span>
+);
+
 const Footer_buttons = ({reset_clicked, go_clicked})=>(
     <div className="footer_buttons">
-      <button onClick={go_clicked} className="btn btn_lpm btn_go">Go</button>
+      <button onClick={go_clicked} className="btn btn_lpm btn_lpm_primary">
+        Go</button>
       <button onClick={reset_clicked}
-        className="btn btn_lpm btn_lpm_error btn_reset">Reset</button>
+        className="btn btn_lpm">Reset</button>
     </div>
 );
 

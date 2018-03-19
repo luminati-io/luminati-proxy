@@ -36,9 +36,9 @@ class Modal extends React.Component {
         $('#'+this.props.id).modal('hide');
     }
     click_ok(){
+        $('#'+this.props.id).modal('hide');
         const _this = this;
         etask(function*(){
-            _this.click_cancel();
             if (_this.props.click_ok)
                 yield _this.props.click_ok();
         });
@@ -71,8 +71,12 @@ class Modal extends React.Component {
                         aria-label="Close"
                         onClick={this.on_dismiss.bind(this)}>
                     </button>
-                    <If when={!this.props.no_header}>
+                    <If
+                      when={!this.props.no_header&&!this.props.custom_header}>
                       <h4 className="modal-title">{this.props.title}</h4>
+                    </If>
+                    <If when={this.props.custom_header}>
+                      {this.props.custom_header}
                     </If>
                   </div>
                   <div className="modal-body">{this.props.children}</div>
@@ -102,7 +106,7 @@ const Footer_default = props=>(
     <div className="default_footer">
       <If when={!props.no_cancel_btn}>
         <button onClick={props.cancel_clicked}
-          className="btn btn_lpm btn_lpm_default cancel">Cancel
+          className="btn btn_lpm cancel">Cancel
         </button>
       </If>
       <button onClick={props.ok_clicked}
@@ -141,7 +145,7 @@ const Code = props=>{
           <textarea defaultValue={value}
             style={{position: 'fixed', top: '-1000px'}}/>
           <button onClick={copy}
-            className="btn btn_lpm btn_lpm_default btn_copy">
+            className="btn btn_lpm btn_lpm_small btn_copy">
             Copy</button>
         </code>
     );
@@ -181,6 +185,16 @@ const Input = props=>{
     );
 };
 
+const Checkbox = props=>(
+  <div className="form-check">
+    <label className="form-check-label">
+      <input className="form-check-input" type="checkbox" value={props.value}
+        onChange={e=>props.on_change(e)} checked={props.checked}/>
+        {props.text}
+    </label>
+  </div>
+);
+
 const Nav = ({title, subtitle, warning})=>(
     <div className="nav_header">
       <h3>{title}</h3>
@@ -193,66 +207,6 @@ const Warning_msg = ({warning})=>{
     if (!warning)
         return null;
     return <Warning text={warning}/>;
-};
-
-const onboarding = {
-    _is_checked(step){
-        if (!setdb.get('head.onboarding.steps') &&
-            !setdb.get('head.onboarding.loading'))
-        {
-            setdb.set('head.onboarding.loading', true);
-            etask(function*(){
-                const steps = yield ajax.json({url: '/api/get_onboarding'});
-                if (steps.done)
-                {
-                    steps.first_login = true;
-                    steps.welcome_modal = true;
-                    steps.created_proxy = true;
-                    steps.tested_proxy = true;
-                    steps.seen_examples = true;
-                }
-                setdb.set('head.onboarding.steps', steps);
-                setdb.set('head.onboarding.loading', false);
-            });
-        }
-        const et = etask.wait();
-        const listener = setdb.on('head.onboarding.steps', steps=>{
-            if (!steps)
-                return;
-            setdb.off(listener);
-            et.return(!!steps[step]||!!steps.done);
-        });
-        return et;
-    },
-    _check(step){
-        setdb.set('head.onboarding.steps.'+step, true);
-        return window.fetch('/api/update_onboarding', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({lpm_onboarding: {[step]: 1}}),
-        });
-    },
-    has_dismissed(){ return this._is_checked('dismissed'); },
-    has_logged(){ return this._is_checked('first_login'); },
-    has_seen_welcome(){ return this._is_checked('welcome_modal'); },
-    has_created_proxy(){ return this._is_checked('created_proxy'); },
-    has_tested_proxy(){ return this._is_checked('tested_proxy'); },
-    has_seen_examples(){ return this._is_checked('seen_examples'); },
-    check_dismiss(){ this._check('dismissed'); },
-    check_login(){ this._check('first_login'); },
-    check_welcome(){ this._check('welcome_modal'); },
-    check_created_proxy(){ this._check('created_proxy'); },
-    check_tested_proxy(){ this._check('tested_proxy'); },
-    check_seen_examples(){ this._check('seen_examples'); },
-    is_all_done(){
-        const _this = this;
-        return etask(function*(){
-            const proxy = yield _this.has_created_proxy();
-            const test = yield _this.has_tested_proxy();
-            const examples = yield _this.has_seen_examples();
-            return proxy && test && examples;
-        });
-    },
 };
 
 const presets = {
@@ -549,5 +503,5 @@ for (let k in presets)
 
 const emitter = new EventEmitter();
 
-export {Dialog, Code, Modal, Loader, Select, Input, Warnings,
-    Warning, Nav, onboarding, presets, emitter};
+export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
+    Checkbox, presets, emitter};

@@ -5,7 +5,7 @@ import React from 'react';
 import $ from 'jquery';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code, onboarding, emitter, Modal} from './common.js';
+import {Code, Modal} from './common.js';
 import util from './util.js';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
@@ -27,18 +27,6 @@ class Howto extends Pure_component {
     choose_click(option){
         this.setState({option});
         ga_event('How-to-tab', 'select code/browser', option);
-        this.etask(function*(){
-            const seen_examples = yield onboarding.has_seen_examples();
-            if (seen_examples)
-                return;
-            onboarding.check_seen_examples();
-            const all_done = yield onboarding.is_all_done();
-            if (all_done)
-            {
-                window.setTimeout(()=>
-                    $('#finish_onboarding_modal').modal(), 2000);
-            }
-        });
     }
     render(){
         let subheader;
@@ -51,7 +39,6 @@ class Howto extends Pure_component {
             Instructions = Code_instructions;
         return (
             <div className="howto lpm">
-              <Finish_onboarding_modal/>
               <div className="howto_panel">
                 <h1 className="header">How to use the Proxy Manager</h1>
                 <Subheader value={subheader}/>
@@ -77,7 +64,7 @@ const Subheader = props=>(
 );
 
 const Lang_btn = props=>{
-    const class_names = 'btn btn_lpm btn_lpm_default btn_lpm_small btn_lang'
+    const class_names = 'btn btn_lpm btn_lpm_small btn_lang'
     +(props.active ? ' active' : '');
     return <button className={class_names}>{props.text}</button>;
 };
@@ -180,35 +167,6 @@ const Choice = props=>{
             <div className="text_bigger">{props.option}</div>
           </div>
         </div>
-    );
-};
-
-const Finish_onboarding_modal = ()=>{
-    const finish_text = 'Congrats! Your new proxy is configured';
-    const close_modal = ()=>{ $('#finish_onboarding_modal').modal('hide'); };
-    const proxies_list = ()=>{
-        close_modal();
-        window.setTimeout(()=>setdb.get('head.callbacks.state.go')('proxies'),
-            500);
-    };
-    return (
-        <Modal id="finish_onboarding_modal" title={finish_text} no_footer>
-        <div> What's next?</div>
-        <ul>
-            <li onClick={proxies_list} >
-              Create more proxies each with it's own configuration
-            </li>
-            <li>Explore the advanced settings the Proxy Manager has to offer</li>
-            <li>Start running your proxies in production</li>
-            <li>Watch statistics and logs for all your proxies</li>
-          </ul>
-          <div className="onboarding_buttons">
-            <button onClick={close_modal} className="btn btn_lpm btn_lpm">
-              See more examples</button>
-            <button onClick={proxies_list} className="btn btn_lpm btn_lpm">
-              Go to proxies list</button>
-          </div>
-        </Modal>
     );
 };
 

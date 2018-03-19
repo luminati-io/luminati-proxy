@@ -19,15 +19,14 @@ import status_codes_detail from './stats/status_codes_detail.js';
 import domains from './stats/domains.js';
 import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
-import zwelcome_modal from './welcome.js';
 import zreport_bug_modal from './report_bug.js';
-import {Progress_modal, Setup_guide} from './setup_guide.js';
 import zadd_proxy from './add_proxy.js';
 import zno_proxies from './no_proxies.js';
 import znotif_center from './notif_center.js';
 import zedit_proxy from './edit_proxy.js';
 import zhowto from './howto.js';
 import zproxy_tester from './proxy_tester.js';
+import zoverview from './overview.js';
 import zconfig from './config.js';
 import zstats from './stats.js';
 import protocols_detail from './stats/protocols_detail.js';
@@ -46,7 +45,7 @@ import 'angular-google-analytics';
 import 'ui-select';
 import '@uirouter/angularjs';
 import filesaver from 'file-saver';
-import {presets, onboarding} from './common.js';
+import {presets} from './common.js';
 
 const url_o = zurl.parse(document.location.href);
 const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -125,6 +124,13 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         templateUrl: 'faq.html',
     });
     state_registry.register({
+        name: 'overview',
+        parent: 'app',
+        url: '/overview',
+        template: '<div react-view=react_component></div>',
+        controller: $scope=>{ $scope.react_component = zoverview; },
+    });
+    state_registry.register({
         name: 'status_codes',
         parent: 'app',
         url: '/status_codes',
@@ -166,13 +172,6 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         template: `<div react-view=react_component state-props=protocol>
         </div>`,
         controller: $scope=>{ $scope.react_component = protocols_detail; },
-    });
-    state_registry.register({
-        name: 'setup_guide',
-        parent: 'app',
-        url: '/setup_guide',
-        template: '<div react-view=react_component></div>',
-        controller: $scope=>{ $scope.react_component = Setup_guide; },
     });
     state_registry.register({
         name: 'howto',
@@ -225,18 +224,10 @@ module.run(function($rootScope, $http, $window, $transitions, $q, Analytics,
             const logged_in = yield $q.resolve($rootScope.logged_in);
             if (logged_in)
             {
-                const seen_welcome = yield onboarding.has_seen_welcome();
-                if (!seen_welcome)
-                {
-                    $timeout(()=>$('#welcome_modal').modal(), 1000);
-                    onboarding.check_welcome();
-                    return transition.router.stateService.target(
-                        'setup_guide', undefined, {location: true});
-                }
                 if (transition.to().name!='settings')
                     return true;
                 return transition.router.stateService.target(
-                    'proxies', undefined, {location: true});
+                    'overview', undefined, {location: true});
             }
             if (transition.to().name=='settings')
                 return true;
@@ -462,9 +453,9 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
 {
     $scope.get_value = (proxy, key)=>_.get(proxy, key);
     $scope.sections = [
-        {name: 'setup_guide', title: 'Start using', navbar: true},
         {name: 'settings', title: 'Settings', navbar: false},
-        {name: 'proxies', title: 'Overview', navbar: true},
+        {name: 'proxies', title: 'Overview', navbar: false},
+        {name: 'overview', title: 'Overview', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'howto', title: 'Examples', navbar: true},
         {name: 'config', title: 'Configuration', navbar: true},
@@ -511,14 +502,17 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     $proxies.update();
     setdb.set('head.callbacks.proxies.update', $proxies.update);
     setdb.set('head.callbacks.state.go', $state.go);
+    $scope.$root.show_history = function(proxy){
+        ga_event('page: proxies', 'click', 'show history');
+        $scope.$root.history_dialog = [{port: proxy.port}];
+    };
+    setdb.set('head.callbacks.show_history', $scope.$root.show_history);
+    setdb.set('head.root_scope', $scope.$root);
     window.setdb = setdb;
-    window.reset_onboarding = ()=>{ setdb.set('head.onboarding.steps', {}); };
     window.to_state = $state.go;
     $scope.$root.presets = presets;
     $scope.$root.add_proxy_modal = zadd_proxy;
     $scope.$root.no_proxies = zno_proxies;
-    $scope.$root.progress_modal = Progress_modal;
-    $scope.$root.welcome_modal = zwelcome_modal;
     $scope.$root.report_bug_modal = zreport_bug_modal;
     $scope.$root.notif_center = znotif_center;
     const show_reload = function(){
@@ -687,10 +681,7 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
                 $scope.user_data.customer = $scope.user_customers[0];
             }
             else
-            {
-                onboarding.check_login();
                 check_reload();
-            }
         }).catch(e=>{
             $scope.saving_user = false;
             $scope.user_error = e.data.error;
@@ -708,54 +699,6 @@ function Settings($scope, $http, $window, $sce, $rootScope, $state, $location){
         token = m[1];
         $scope.save_user();
     }
-}
-
-module.controller('zones', Zones);
-Zones.$inject = ['$scope', '$http', '$filter', '$window'];
-function Zones($scope, $http, $filter, $window){
-    var today = new Date();
-    var one_day_ago = (new Date()).setDate(today.getDate()-1);
-    var two_days_ago = (new Date()).setDate(today.getDate()-2);
-    var one_month_ago = (new Date()).setMonth(today.getMonth()-1, 1);
-    var two_months_ago = (new Date()).setMonth(today.getMonth()-2, 1);
-    $scope.times = [
-        {title: moment(two_months_ago).format('MMM-YYYY'), key: 'back_m2'},
-        {title: moment(one_month_ago).format('MMM-YYYY'), key: 'back_m1'},
-        {title: moment(today).format('MMM-YYYY'), key: 'back_m0'},
-        {title: moment(two_days_ago).format('DD-MMM-YYYY'), key: 'back_d2'},
-        {title: moment(one_day_ago).format('DD-MMM-YYYY'), key: 'back_d1'},
-        {title: moment(today).format('DD-MMM-YYYY'), key: 'back_d0'},
-    ];
-    var number_filter = $filter('requests');
-    var size_filter = $filter('bytes');
-    $scope.fields = [
-        {key: 'http_svc_req', title: 'HTTP', filter: number_filter},
-        {key: 'https_svc_req', title: 'HTTPS', filter: number_filter},
-        {key: 'bw_up', title: 'Upload', filter: size_filter},
-        {key: 'bw_dn', title: 'Download', filter: size_filter},
-        {key: 'bw_sum', title: 'Total Bandwidth', filter: size_filter}
-    ];
-    $http.get('/api/stats').then(function(stats){
-        if (stats.data.login_failure)
-        {
-            $window.location = '/';
-            return;
-        }
-        $scope.stats = stats.data;
-        if (!Object.keys($scope.stats).length)
-            $scope.error = true;
-    })
-    .catch(function(e){ $scope.error = true; });
-    $http.get('/api/whitelist').then(function(whitelist){
-        $scope.whitelist = whitelist.data; });
-    $http.get('/api/recent_ips').then(function(recent_ips){
-        $scope.recent_ips = recent_ips.data; });
-    $scope.edit_zone = function(zone){
-        $window.location = 'https://luminati.io/cp/zones/'+zone; };
-    $scope.new_zone = function(){
-        $window.location = 'https://luminati.io/cp/zones?add_new_zone=1';
-        ga_event('page: zones', 'click', 'new zone');
-    };
 }
 
 module.controller('faq', Faq);
@@ -837,11 +780,15 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         {
             key: 'port',
             title: 'Port',
+            tooltip: 'A port is a number that refers to a specific virtual '
+                +'location on a computer. Create and configure ports, then '
+                +'connect the crawler to send requests through the port',
         },
         {
             key: '_status',
             title: 'Status',
             type: 'status',
+            tooltip: 'Real time proxy status',
         },
         {
             key: 'iface',
@@ -853,16 +800,22 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             key: 'multiply',
             title: 'Multiple',
             type: 'number',
+            tooltip: 'Number of multiplied ports. A port can be multiplied '
+                +'through the proxy settings page',
         },
         {
             key: 'history',
             title: 'History',
             type: 'boolean',
+            tooltip: 'Enable history to save and log all sent requests',
         },
         {
             key: 'ssl',
             title: 'SSL analyzing',
             type: 'boolean',
+            tooltip: 'In order to see HTTPS requests and log their history, '
+                +'SSL analyzing should be enabled through the proxy settings '
+                +'page',
         },
         {
             key: 'socks',
@@ -1171,10 +1124,6 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
         .then(function(){ return $proxies.update(); });
         proxy.get_status(true);
     };
-    $scope.show_history = function(proxy){
-        ga_event('page: proxies', 'click', 'show history');
-        $scope.history_dialog = [{port: proxy.port}];
-    };
     $scope.show_pool = function(proxy){
         ga_event('page: proxies', 'click', 'show pool');
         $scope.pool_dialog = [{
@@ -1218,7 +1167,7 @@ function Proxies($scope, $root, $http, $proxies, $window, $q, $timeout,
             .map(function(p){ return +p; });
     };
     $scope.is_action_available = function(action, port){
-        const proxies = $scope.get_selected_proxies()|| port ? [port] : [];
+        const proxies = $scope.get_selected_proxies()||port ? [port] : [];
         if (!proxies.length)
             return false;
         if (port)
@@ -1746,26 +1695,6 @@ function History_filter($scope, $window){
                 locals.update();
             }
         };
-    };
-}
-
-module.controller('pool', Pool);
-Pool.$inject = ['$scope', '$http', '$window'];
-function Pool($scope, $http, $window){
-    $scope.init = function(locals){
-        $scope.port = locals.port;
-        $scope.pool_size = locals.pool_size;
-        $scope.sticky_ip = locals.sticky_ip;
-        $scope.pagination = {page: 1, per_page: 10};
-        $scope.show_modal = function(){ $window.$('#pool').modal(); };
-        $scope.update = function(refresh){
-            $scope.pool = null;
-            $http.get('/api/sessions/'+$scope.port+(refresh ? '?refresh' : ''))
-            .then(function(res){
-                $scope.pool = res.data.data;
-            });
-        };
-        $scope.update();
     };
 }
 

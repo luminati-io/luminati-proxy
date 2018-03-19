@@ -1,4 +1,5 @@
 @first_color: #004d74;
+@first_odd: #4a8398;
 @second_color: #05bed1;
 @grey: #ccdbe3;
 @grey_border: #E0E9EE;
@@ -52,7 +53,7 @@ body {
 }
 .flag-icon {
     border-radius: 2px;
-    margin-right: 1px;
+    margin-right: 2px;
 }
 .alert.alert-info { margin: 0 15px 20px; }
 .page-body {
@@ -430,7 +431,6 @@ input.form-control[type=checkbox] {
         background: none;
         border: none;
     }
-    .disabled { visibility: hidden; }
 }
 .lpm {
     font-family: "Lato";
@@ -534,91 +534,41 @@ input.form-control[type=checkbox] {
         position: relative;
         top: 1px;
     }
-    a.btn_lpm {
-        text-decoration: none;
-        color: @first_color;
-        &:hover {
-            border-width: 1px;
-            border-style: solid;
-        }
-    }
     .btn_lpm {
-        width: 160px;
+        width: auto;
+        min-width: 140px;
         height: 32px;
         border-radius: 2px;
-        background-color: @second_color;
-        border: solid 1px @second_color;
-        color: white;
+        background-color: white;
+        border: solid 1px @grey;
+        color: @first_color;
         font-size: 16px;
-        font-weight: bold;
+        font-weight: 300;
         padding-top: 3px;
         margin: 0 2px;
         box-shadow: none;
         &:hover {
             background-color: @first_color;
             border-color: @first_color;
-        }
-        &:active, &.active {
-            background-color: @dark;
-            border-color: @dark;
-            color: @second_color;
+            color: white;
         }
         &:focus { outline: none; }
+    }
+    .btn_lpm_primary {
+        color: white;
+        background-color: @first_color;
+        border-color: @first_color;
+        &:hover {
+            background-color: @first_odd;
+            border-color: @first_odd;
+        }
     }
     .btn_lpm.disabled {
         background-color: @grey;
         border-color: @grey;
         cursor: default;
         &:active { color: white; }
-    }
-    .btn_lpm_default {
-        color: @second_color;
-        background-color: white;
-        border-color: @second_color;
-        &:hover {
-            background-color: @light;
-            border-color: @second_color;
-        }
-        &:active, &.active {
-            background-color: @second_color;
-            border-color: @second_color;
-            color: white;
-        }
-    }
-    .btn_lpm_default.disabled {
-        color: white;
-        background-color: @grey;
-        border-color: @grey;
-        cursor: default;
-        &:active { color: white; }
-    }
-    .btn_lpm_normal {
-        color: @first_color;
-        border-color: @grey;
-        background-color: white;
-        &:hover {
-            background-color: @light_grey;
-            border-color: @grey;
-        }
-        &:active, &.active {
-            background-color: @dark_grey;
-            border-color: @dark_grey;
-            color: @first_color;
-        }
-    }
-    .btn_lpm_error {
-        color: @error;
-        border-color: @error;
-        background-color: white;
-        &:hover {
-            background-color: @error_x_light;
-            border-color: @error;
-        }
-        &:active, &.active {
-            color: white;
-            background-color: @error;
-            border-color: @error;
-        }
+        &:hover { color: @first_color; }
     }
     .btn_lpm_big {
         line-height: 0;
@@ -630,13 +580,12 @@ input.form-control[type=checkbox] {
         height: 60px;
     }
     .btn_lpm_small {
-        font-size: 11px;
-        height: 27px;
+        height: 24px;
+        font-size: 12px;
         width: auto;
+        min-width: auto;
     }
     .btn_copy {
-        color: @second_color;
-        border-color: @second_color;
         font-size: 9px;
         padding: 0;
         width: 35px;
@@ -655,13 +604,32 @@ input.form-control[type=checkbox] {
         background: none;
         text-decoration: none;
         &:hover {
-            box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
-            -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
+            box-shadow: @link -2px 0 0 1px, @link 2px 0 0 1px;
+            -webkit-box-shadow: @link -2px 0 0 1px, @link 2px 0 0 1px;
             border-radius: 0.15em;
             background-color: @link;
             border-color: @link;
             color: white;
         }
+    }
+    span.icon_link {
+        color: @first_color;
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 18px;
+        height: 18px;
+        vertical-align: middle;
+        border-radius: 2px;
+        font-size: 14px;
+        position: relative;
+        &:hover {
+            background-color: @first_color;
+            color: white;
+        }
+        &.right i { left: 1px; }
+        &.top i { top: 0; }
     }
     .loader_wrapper {
         position: fixed;
@@ -760,7 +728,32 @@ input.form-control[type=checkbox] {
         }
         .panel_body {
             padding: 5px 10px 10px;
-            &.with_table { padding-bottom: 0; }
+            &.with_table {
+                padding-bottom: 0;
+                .pagination_panel {
+                    height: 28px;
+                    .pagination { display: inline-block; }
+                    select {
+                        float: right;
+                        width: auto;
+                        height: 24px;
+                        margin-left: 5px;
+                        background-position: right 7px center;
+                        padding: 0 19px 0 4px
+                    }
+                    .table_buttons {
+                        display: inline-block;
+                        float: right;
+                        position: relative;
+                        top: -3px;
+                    }
+                    .numbers {
+                        float: right;
+                        margin-left: 5px;
+                    }
+                    &.bottom { margin-top: 5px; }
+                }
+            }
         }
         .panel_footer {
             padding: 20px;
@@ -799,6 +792,7 @@ input.form-control[type=checkbox] {
                 line-height: 0;
             }
             .close_icon {
+                z-index: 100;
                 background: url(/img/delete.svg);
                 width: 16px;
                 height: 16px;
@@ -814,7 +808,7 @@ input.form-control[type=checkbox] {
             border: 0;
             text-align: center;
             .default_footer {
-                text-align: right;
+                text-align: center;
                 .cancel { width: 72px; }
                 .ok { width: 88px; }
             }
@@ -1140,7 +1134,7 @@ input.form-control[type=checkbox] {
             th, td { padding: 1px 10px; }
             th { white-space: nowrap; }
             td { height: 25px; white-space: nowrap; }
-            &.col__status { text-align: center; }
+            th.col__status { width: 80px; }
             tr.multiplied { }
         }
         .head_actions {
@@ -1169,7 +1163,7 @@ input.form-control[type=checkbox] {
                 left: -6px;
                 position: relative;
                 display: inline-block;
-                margin: 0 1px;
+                margin: 0 2px;
                 cursor: pointer;
                 background-size: contain;
                 background-repeat: no-repeat;
@@ -1189,39 +1183,11 @@ input.form-control[type=checkbox] {
                 }
             }
         }
-        .btn {
-            padding: 0 4px;
-            height: 26px;
-            width: 26px;
-            font-weight: 300;
-            font-size: 12px;
-        }
-        .btn_csv {
-            width: 44px;
-            .icon {
-                display: inline-block;
-                position: relative;
-                top: 2px;
-                background: url(/img/arrow_down.svg);
-                height: 10px;
-                width: 8px;
-            }
-        }
         .btn_columns {
             .icon {
                 background: url(/img/columns.svg);
                 width: 16px;
                 height: 14px;
-            }
-        }
-        .btn_add {
-            width: 80px;
-            .icon {
-                background: url(/img/add.svg);
-                width: 14px;
-                height: 14px;
-                position: relative;
-                left: 1px;
             }
         }
     }
@@ -1236,12 +1202,6 @@ input.form-control[type=checkbox] {
             white-space: normal;
             height: auto;
             padding: 0;
-        }
-        .btn_reset {
-            width: 60px;
-            height: 24px;
-            font-size: 12px;
-            font-weight: 300;
         }
         table {
             table-layout: fixed;
@@ -1340,10 +1300,6 @@ input.form-control[type=checkbox] {
     }
     .summary_panel {
         margin: 0 15px 10px;
-        .panel_heading {
-            position: relative;
-            .btn_har { width: 60px; font-size: 12px; }
-        }
         .panel_body {
             min-height: 400px;
             padding-top: 10px;
@@ -1470,70 +1426,37 @@ input.form-control[type=checkbox] {
     }
 }
 .config {
+    font-size: 14px;
     margin-bottom: 5px;
     padding: 0 15px;
-    .wrapper_panel {
+    .btn { width: 140px; }
+    .nav_buttons {
+        position: absolute;
+        z-index: 10;
+        right: 30px;
+        top: 15px;
+        white-space: nowrap;
+        flex: 1;
+        .btn:last-child { margin-right: 0; }
+    }
+    .code_panel {
         .panel_body {
-            padding-bottom: 0;
-            font-size: 14px;
-        }
-        .nav_buttons {
-            position: absolute;
-            z-index: 10;
-            right: 30px;
-            top: 15px;
-            white-space: nowrap;
-            flex: 1;
-            .btn {
-                font-weight: normal;
-                &:last-child { margin-right: 0; }
-                width: 140px;
-            }
-            .c_btn {
-                padding-top: 1px;
-                .content { display: inline-block; }
-                .img {
-                    width: 20px;
-                    height: 20px;
-                    display: inline-block;
-                    position: relative;
-                    top: 4px;
-                    left: -9px;
-                }
-                &.active { cursor: default; }
-                &.download .img {
-                    background-image: url(/img/c_download.svg); }
-                &.download:active .img, &.download.active .img {
-                    background-image: url(/img/c_download_active.svg); }
-                &.edit .img {
-                    background-image: url(/img/c_edit.svg); }
-                &.edit:active .img, &.edit.active .img {
-                    background-image: url(/img/c_edit_active.svg); }
-                &.import .img {
-                    background-image: url(/img/c_import.svg); }
-                &.import:active .img, &.import.active .img {
-                    background-image: url(/img/c_import_active.svg); }
-            }
-        }
-        .code_panel {
-            .panel_body {
-                background-color: @light_grey;
-                position: relative;
-                padding: 1px;
-                .CodeMirror {
-                    &.cm-s-default {
-                        padding: 5px;
-                        background-color: @light_grey;
-                    }
+            background-color: @light_grey;
+            position: relative;
+            padding: 1px;
+            .CodeMirror {
+                &.cm-s-default {
+                    padding: 5px;
+                    background-color: @light_grey;
                 }
             }
         }
-        .code_panel.editable {
-            border-color: @second_color;
-            .panel_body {
-                background-color: transparent;
-                .CodeMirror.cm-s-default { background-color: white; }
-            }
+    }
+    .code_panel.editable {
+        border-color: @second_color;
+        .panel_body {
+            background-color: transparent;
+            .CodeMirror.cm-s-default { background-color: white; }
         }
     }
 }
@@ -1574,24 +1497,24 @@ input.form-control[type=checkbox] {
             .headers {
                 .header_line {
                     display: flex;
-                    margin: 10px 0;
+                    align-items: center;
+                    margin: 5px 0;
                     &:first-child { margin-top: 0; }
-                    &:last-child { margin-bottom: 20px; }
+                    &:last-child { margin-bottom: 10px; }
                     button { min-width: 140px; }
                     .header_input {
                         margin-right: 10px;
                         flex: 1;
                     }
                     .value_input {
-                        margin-left: 10px;
-                        margin-right: 20px;
+                        margin-right: 5px;
                         flex: 2;
                     }
+                    .action_icons {
+                        width: 45px;
+                        .add_header { margin-left: 5px; }
+                    }
                 }
-            }
-            .add_header_wrapper {
-                text-align: center;
-                .btn_add_header { font-weight: 300; }
             }
             .footer_buttons {
                 text-align: center;
@@ -1623,157 +1546,6 @@ input.form-control[type=checkbox] {
     }
 }
 .modal-backdrop.fade.in { opacity: 0.15; }
-.welcome {
-    height: 100%;
-    text-align: center;
-    margin-top: 10px;
-    .sub_header { margin-top: 10px; }
-    .img_welcome {
-        background: url(/img/lpm_infographics.png);
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: 330px;
-    }
-}
-.setup_guide {
-    padding-top: 20px;
-    .header, .sub_header { text-align: center; }
-    .section {
-        cursor: pointer;
-        text-align: initial;
-        width: 470px;
-        height: 83px;
-        margin: auto;
-        border: 2px solid @second_color;
-        border-radius: 4px;
-        margin-top: 8px;
-        margin-bottom: 8px;
-        padding-top: 17px;
-        .img_block {
-            position: absolute;
-            .circle_wrapper {
-                border: 1px solid @second_color;
-                width: 20px;
-                height: 20px;
-                position: relative;
-                border-radius: 50%;
-                left: 19px;
-                z-index: 1;
-                background-color: white;
-            }
-        }
-        .text_block {
-            display: inline-block;
-            position: relative;
-            left: 110px;
-            height: 46px;
-        }
-        .title {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .subtitle {
-            font-size: 14px;
-            color: @second_color;
-        }
-        .right_arrow {
-            width: 14px;
-            height: 14px;
-            position: relative;
-            top: -32px;
-            left: 425px;
-            transform: rotate(45deg);
-            border-top: 2px solid @second_color;
-            border-right: 2px solid @second_color;
-        }
-        &.disabled, &.done {
-            border: solid 1px @grey_border;
-            color: #9cb5be;
-            .subtitle { color: #9cb5be; }
-            .right_arrow { border-color: #9cb5be; }
-        }
-        &.disabled { cursor: default; }
-    }
-    .section_list {
-        counter-reset: section;
-        .vertical_line {
-            margin: auto;
-            height: 21px;
-            width: 400px;
-            border-left: dashed 2px @second_color;
-        }
-    }
-    .img {
-        width: 40px;
-        height: 40px;
-        position: relative;
-        left: 30px;
-        top: -18px;
-        &:before {
-            color: @second_color;
-            counter-increment: section;
-            content: counters(section, ".");
-            font-size: 12px;
-            position: absolute;
-            left: -4px;
-            top: -4px;
-            z-index: 2;
-        }
-        &.create { background: url(/img/step_create_active.svg); }
-        &.create_disabled { background: url(/img/step_create_disabled.svg); }
-        &.test { background: url(/img/step_test_active.svg); }
-        &.test_disabled { background: url(/img/step_test_disabled.svg); }
-        &.req { background: url(/img/step_req_active.svg); }
-        &.req_disabled { background: url(/img/step_req_disabled.svg); }
-        &.done { background: url(/img/step_done.svg); }
-        &.not_done { background: url(/img/step_not_done.svg); }
-    }
-    .progress_modal {
-        .vertical_line { display: none; }
-        .section.done, .section.disabled { display: none; }
-        .circle_wrapper { visibility: hidden; }
-        .img:before { display: none; }
-        .modal-footer .link.ok {
-            margin: 0px 70px 10px;
-            width: 105px;
-        }
-        .progress_bar {
-            display: flex;
-            width: 400px;
-            margin: auto;
-            margin-bottom: 35px;
-            margin-top: 15px;
-            .img_block {
-                flex: 1;
-                .img {
-                    position: static;
-                    margin: auto;
-                }
-                .text {
-                    text-align: center;
-                    font-size: 17px;
-                    font-weight: 300;
-                    margin-top: 6px;
-                    cursor: default;
-                }
-            }
-        }
-        .horizontal_line {
-            width: 65px;
-            border-top: dashed 1px #05bed1;
-            position: relative;
-            top: 20px;
-        }
-    }
-    .dismiss_progress_modal {
-        .buttons {
-            text-align: center;
-            margin-top: 20px;
-            .btn_remind { width: 200px; }
-        }
-    }
-}
 .howto {
     padding-top: 20px;
     .howto_panel {
@@ -1786,7 +1558,6 @@ input.form-control[type=checkbox] {
     h1.sub_header {
         line-height: 0;
         margin: 0 0 25px 0;
-        color: @second_color;
     }
     .choices { height: 140px; }
     .choice {
@@ -1852,7 +1623,6 @@ input.form-control[type=checkbox] {
         }
     }
     .btn_lang { margin: 0 2px; }
-    .onboarding_buttons { text-align: center; }
     .instructions {
         margin-left: 30px;
         border-left: 1px solid @second_color;
@@ -1943,10 +1713,6 @@ input.form-control[type=checkbox] {
             }
         }
     }
-    .modal-footer {
-        button { margin: 10px 16px; }
-        button.options { width: 190px; }
-    }
     .preview {
         margin-top: 15px;
         border: solid 1px @grey;
@@ -1988,7 +1754,7 @@ input.form-control[type=checkbox] {
             position: relative;
             cursor: pointer;
             .text {
-                color: @second_color;
+                color: #004d7499;
                 height: 22px;
                 position: absolute;
                 top: 50%;
@@ -2001,6 +1767,9 @@ input.form-control[type=checkbox] {
                 cursor: default;
                 .text { color: @first_color; }
             }
+            &:hover {
+                .text { color: @first_color; }
+            }
         }
         .icon {
             padding: 0;
@@ -2010,9 +1779,9 @@ input.form-control[type=checkbox] {
             top: 10px;
             left: 20px;
         }
-        .setup_guide { background-image: url('img/setup_guide.svg'); }
         .howto { background-image: url('img/howto.svg'); }
         .proxies { background-image: url('img/proxies.svg'); }
+        .overview { background-image: url('img/proxies.svg'); }
         .stats { background-image: url('img/stats.svg'); }
         .zones { background-image: url('img/zones.svg'); }
         .proxy_tester { background-image: url('img/tester.svg'); }

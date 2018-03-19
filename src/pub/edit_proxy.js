@@ -7,8 +7,8 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {Modal, Loader, Select, Input, Warning, Warnings, presets, onboarding,
-    emitter} from './common.js';
+import {Modal, Loader, Select, Input, Warning, Warnings, presets,
+    Checkbox} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -637,7 +637,6 @@ class Index extends React.Component {
         const update_url = '/api/proxies/'+this.port;
         const _this = this;
         return etask(function*(){
-            const tested_proxy = yield onboarding.has_tested_proxy();
             const raw_update = yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -650,13 +649,7 @@ class Index extends React.Component {
             if (status.status=='ok')
             {
                 ga_event('top bar', 'successfully saved');
-                onboarding.check_created_proxy();
-                if (!tested_proxy)
-                {
-                    emitter.emit('setup_guide:progress_modal',`Great! You have`
-                        +` configured proxy on port ${data.port}`, 1500);
-                }
-                _this.state.callbacks.state.go('proxies');
+                _this.state.callbacks.state.go('overview');
             }
             else
             {
@@ -987,21 +980,26 @@ const Field = props=>{
     );
 };
 
-class Action_buttons extends React.Component {
-    cancel_clicked(){ ga_event('top bar', 'cancel'); }
+class Action_buttons extends Pure_component {
+    componentDidMount(){
+        this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
+    }
+    cancel_clicked(){
+        ga_event('top bar', 'cancel');
+        this.state.callbacks.state.go('overview');
+    }
     save_clicked(){
         if (this.props.dirty)
             this.props.save();
     }
     render(){
         const save_btn_class = classnames('btn btn_lpm btn_save',
-            {disabled: !this.props.dirty});
+            'btn_lpm_primary', {disabled: !this.props.dirty});
         return (
             <div className="action_buttons">
               <If when={this.props.dirty}>
-                <a href="/proxies" onClick={this.cancel_clicked.bind(this)}
-                  className="btn btn_lpm btn_lpm_normal btn_cancel">Cancel
-                </a>
+                <button onClick={this.cancel_clicked.bind(this)}
+                  className="btn btn_lpm btn_cancel">Cancel</button>
                 <button className={save_btn_class}
                   onClick={this.save_clicked.bind(this)}>Save</button>
               </If>
@@ -1034,12 +1032,10 @@ const Tab_btn = props=>{
     return (
           <div onClick={()=>props.on_tab_click(props.id)}
             className={btn_class}>
-        <Tooltip title={tabs[props.id].tooltip}>
             <Tab_icon id={props.id} changes={changes}
               error={errors.length}/>
             <div className="title">{tabs[props.id].label}</div>
             <div className="arrow"/>
-        </Tooltip>
           </div>
     );
 };
@@ -1056,37 +1052,6 @@ const Tab_icon = props=>{
         </div>
     );
 };
-
-class Tooltip_icon extends React.Component {
-    componentDidUpdate(){
-        $(this.el).attr('title', this.props.title).tooltip('fixTitle'); }
-    save_ref(e){ this.el = e; }
-    render(){
-        return this.props.title ?
-            <div className="info_icon" data-toggle="tooltip"
-              data-placement="top" title={this.props.title}
-              data-container="body" ref={this.save_ref.bind(this)}/> : null;
-    }
-}
-
-class Tooltip extends Pure_component {
-    componentDidUpdate(){
-        $(this.el).attr('title', this.props.title).tooltip('fixTitle'); }
-    save_ref(e){ this.el = e; }
-    on_click(){ $(this.el).tooltip('hide'); }
-    render(){
-        if (!this.props.title)
-            return <span>{this.props.children}</span>;
-        return (
-            <div data-toggle="tooltip" className="tooltip_block"
-              data-placement="top" title={this.props.title}
-              data-container="body" ref={this.save_ref.bind(this)}
-              onClick={this.on_click.bind(this)}>
-              {this.props.children}
-            </div>
-        );
-    }
-}
 
 const Section_header = props=>{
     return props.text ? <div className="header">{props.text}</div> : null;
@@ -1113,9 +1078,6 @@ class Section_raw extends React.Component {
             hovered: this.state.hovered,
             disabled: this.props.disabled,
         };
-        const message = this.props.error_msg
-            ? this.props.error_msg
-            : tabs[this.props.provide.tab_id].fields[this.props.id].tooltip;
         return (
             <div tabIndex="0" onFocus={this.on_focus.bind(this)}
               onBlur={this.on_blur.bind(this)} className="section_wrapper"
@@ -1641,16 +1603,6 @@ class Rules_raw extends React.Component {
     }
 }
 const Rules = provider({tab_id: 'rules'})(Rules_raw);
-
-const Checkbox = props=>(
-  <div className="form-check">
-    <label className="form-check-label">
-      <input className="form-check-input" type="checkbox" value={props.value}
-        onChange={e=>props.on_change(e)} checked={props.checked}/>
-        {props.text}
-    </label>
-  </div>
-);
 
 class Alloc_modal extends Pure_component {
     constructor(props){

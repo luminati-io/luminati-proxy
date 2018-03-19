@@ -114,19 +114,15 @@ class Config extends Pure_component {
             <div className="lpm config">
               <Nav title={this.title} subtitle={this.subtitle}
                 warning={this.state.warning}/>
-              <div className="panel wrapper_panel">
+              <div className={panel_class}>
                 <div className="panel_body">
-                  <div className={panel_class}>
-                    <div className="panel_body">
-                      <Nav_buttons editable={this.state.editable}
-                        changed={this.state.changed}
-                        click_edit={this.click_edit.bind(this)}
-                        click_save={this.check.bind(this)}
-                        click_download={this.download.bind(this)}
-                        click_cancel={this.click_cancel.bind(this)}/>
-                      <textarea ref={this.set_textarea.bind(this)}/>
-                    </div>
-                  </div>
+                  <Nav_buttons editable={this.state.editable}
+                    changed={this.state.changed}
+                    click_edit={this.click_edit.bind(this)}
+                    click_save={this.check.bind(this)}
+                    click_download={this.download.bind(this)}
+                    click_cancel={this.click_cancel.bind(this)}/>
+                  <textarea ref={this.set_textarea.bind(this)}/>
                 </div>
               </div>
               <Conf_modal click_ok={this.save.bind(this)}/>
@@ -136,14 +132,13 @@ class Config extends Pure_component {
 }
 
 const Nav_buttons = props=>{
-    const save_class = classnames('btn btn_lpm save_btn',
-        {disabled: !props.changed});
-    const cancel_class = classnames('btn btn_lpm btn_lpm_default cancel_btn');
+    const btn_class = 'btn btn_lpm';
+    const save_class = classnames(btn_class, {disabled: !props.changed});
     if (props.editable)
     {
         return (
             <div className="nav_buttons">
-              <button onClick={props.click_cancel} className={cancel_class}>
+              <button onClick={props.click_cancel} className={btn_class}>
                 Cancel</button>
               <button onClick={props.click_save} className={save_class}>
                 Save</button>
@@ -154,24 +149,13 @@ const Nav_buttons = props=>{
     {
         return (
             <div className="nav_buttons">
-              <Action_btn on_click={props.click_edit} id="edit"
-                content="Edit"/>
-              <Action_btn on_click={props.click_download} id="download"
-                content="Download"/>
+              <button onClick={props.click_edit} className={btn_class}>
+                Edit</button>
+              <button onClick={props.click_download} className={btn_class}>
+                Download</button>
             </div>
         );
     }
-};
-
-const Action_btn = ({class_names, id, content, on_click})=>{
-    const btn_class = classnames('btn btn_lpm btn_lpm_default c_btn', id,
-        class_names);
-    return (
-        <button className={btn_class} onClick={on_click}>
-          <div className={classnames('img', id)}/>
-          <div className="content">{content}</div>
-        </button>
-    );
 };
 
 const Conf_modal = props=>{

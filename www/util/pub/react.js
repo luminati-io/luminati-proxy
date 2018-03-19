@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true*/
 define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
-    '/util/url.js', '/www/util/pub/pure_component.js'], ($, React, ReactDOM,
-    RouterDOM, url, Pure_component)=>{
+    '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js'], ($,
+    React, ReactDOM, RouterDOM, url, ajax, Pure_component)=>{
 
 const E = {};
 
@@ -270,12 +270,11 @@ E.Paginator = class Paginator extends Pure_component {
     }
 };
 
-let save_sitemap;
+let sitemap = {};
 class Nav_hook extends Pure_component {
     constructor(props){
         super(props);
         this.reset = this.reset.bind(this);
-        save_sitemap = this.sitemap = this.props.sitemap||save_sitemap||{};
         if (this.props.hash_scroll)
         {
             props.history.listen(location=>
@@ -285,6 +284,13 @@ class Nav_hook extends Pure_component {
     componentDidMount(){
         if (this.props.hash_scroll&&this.props.location.hash)
             this.hash_scroll_on_load(this.props.location.hash);
+        if (this.props.sitemap)
+        {
+            const _this = this;
+            this.etask(function*(){
+                sitemap = yield ajax.json({url: _this.props.sitemap});
+            });
+        }
     }
     componentDidUpdate(prevProps){
         if (this.props.location == prevProps.location)
@@ -292,12 +298,12 @@ class Nav_hook extends Pure_component {
         const l = this.props.location;
         const url_o = url.parse(l.href);
         if (this.props.update_meta)
-            this.set_meta(l.pathname);
+            this.set_meta(url_o.pathname);
         if (this.props.scroll_to_top&&!l.hash)
             window.scrollTo(0, 0);
     }
     set_meta(pathname){
-        const m = this.sitemap[pathname];
+        const m = sitemap[pathname];
         if (!m)
             return;
         $('title').text(m.title);

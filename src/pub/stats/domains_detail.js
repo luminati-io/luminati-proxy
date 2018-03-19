@@ -43,7 +43,7 @@ class StatsDetails extends React.Component {
               <Col md={6}>
                 <div className="panel">
                   <div className="panel_heading"><h2>Status codes</h2></div>
-                  <div className="panel_body">
+                  <div className="panel_body with_table">
                     <StatusCodeTable stats={this.state.statuses.stats} go/>
                   </div>
                 </div>
@@ -51,7 +51,7 @@ class StatsDetails extends React.Component {
               <Col md={6}>
                 <div className="panel">
                   <div className="panel_heading"><h2>Protocols</h2></div>
-                  <div className="panel_body">
+                  <div className="panel_body with_table">
                     <ProtocolTable stats={this.state.protocols.stats} go/>
                   </div>
                 </div>
