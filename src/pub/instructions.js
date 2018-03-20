@@ -109,95 +109,103 @@ E.browser = (proxy=24000)=>({
     chrome_win: (
         <ol>
           <Li>Click the Chrome menu on the browser toolbar.</Li>
-          <Li>Select "Settings".</Li>
-          <Li>Click "Advanced settings".</Li>
-          <Li>In the "System" section, click "Open proxy settings".</Li>
-          <Li>Click "LAN settings".</Li>
-          <Li>Select the "Use a proxy server for your LAN" check box under
-            "Proxy Server".</Li>
+          <Li>Select <code>Settings</code></Li>
+          <Li>Click <code>Advanced settings</code></Li>
+          <Li>In the <code>System</code> section, click
+            <code>Open proxy settings</code></Li>
+          <Li>Click <code>LAN settings</code></Li>
+          <Li>Select the <code>Use a proxy server for your LAN</code> check
+            box under <code>Proxy Server</code></Li>
           <Li>
-            Enter "Address":
-            <Code id="address">127.0.0.1</Code>
+            Enter <code>Address</code>:
+            <Code>127.0.0.1</Code>
           </Li>
           <Li>
-            Enter "Port":
-            <Code id="address">{proxy}</Code>
+            Enter <code>Port</code>:
+            <Code>{proxy}</Code>
           </Li>
-          <Li>Save changes by pressing "OK".</Li>
+          <Li>Save changes by pressing <code>OK</code></Li>
         </ol>
     ),
     chrome_mac: (
         <ol>
           <Li>Click the Chrome menu on the browser toolbar.</Li>
-          <Li>Select "Settings".</Li>
-          <Li>Click "Show advanced settings".</Li>
-          <Li>In the "Network" section, click "Change proxy settings".</Li>
+          <Li>Select <code>Settings</code></Li>
+          <Li>Click <code>Show advanced settings</code></Li>
+          <Li>In the <code>Network</code> section, click
+            <code>Change proxy settings</code></Li>
           <Li>System Preferences should start up automatically, with the
             Network window open and Proxies selected.</Li>
-          <Li>Choose "Web Proxy (HTTP)".</Li>
+          <Li>Choose <code>Web Proxy (HTTP)</code></Li>
           <Li>
-            Enter "Web Proxy Server":
-            <Code id="address">127.0.0.1</Code>
+            Enter <code>Web Proxy Server</code>:
+            <Code>127.0.0.1</Code>
           </Li>
           <Li>
-            Enter "Port":
-            <Code id="address">{proxy}</Code>
+            Enter <code>Port</code>:
+            <Code>{proxy}</Code>
           </Li>
-          <Li>Save changes by pressing "OK".</Li>
+          <Li>Save changes by pressing <code>OK</code>.</Li>
         </ol>
     ),
     ie: (
         <ol>
           <Li>Click the Tools button, and then click Internet options.</Li>
           <Li>Click the Connections tab.</Li>
-          <Li>Click "LAN settings".</Li>
-          <Li>Select the "Use a proxy server for your LAN" check box.</Li>
+          <Li>Click <code>LAN settings</code></Li>
+          <Li>Select the <code>Use a proxy server for your LAN</code>
+            check box.</Li>
           <Li>
-            Enter "Address":
-            <Code id="address">127.0.0.1</Code>
+            Enter <code>Address</code>:
+            <Code>127.0.0.1</Code>
           </Li>
           <Li>
-            Enter "Port":
-            <Code id="address">{proxy}</Code>
+            Enter <code>Port</code>:
+            <Code>{proxy}</Code>
           </Li>
-          <Li>Save changes by pressing "OK".</Li>
+          <Li>Save changes by pressing <code>OK</code></Li>
         </ol>
     ),
     firefox: (
         <ol>
-          <Li>In main menu, click on "Options".</Li>
-          <Li>Click the "General" tab and scroll down to "Network Proxy".</Li>
-          <Li>Open network settings by clicking "Settings..." button.</Li>
-          <Li>Choose "Manual proxy configuration" radio button.</Li>
+          <Li>In main menu, click on <code>Options</code></Li>
+          <Li>Click the <code>General</code> tab and scroll down to
+            <code>Network Proxy</code>.</Li>
+          <Li>Open network settings by clicking <code>Settings...</code>
+            button.</Li>
+          <Li>Choose <code>Manual proxy configuration</code> radio button.</Li>
           <Li>
-            Enter "HTTP Proxy":
-            <Code id="address">127.0.0.1</Code>
+            Enter <code>HTTP Proxy</code>:
+            <Code>127.0.0.1</Code>
           </Li>
           <Li>
-            Enter "Port":
-            <Code id="address">{proxy}</Code>
+            Enter <code>Port</code>:
+            <Code>{proxy}</Code>
           </Li>
-          <Li>Tick "Use this proxy server for all protocols" checkbox.</Li>
-          <Li>Save changes by pressing "OK".</Li>
+          <Li>Tick <code>Use this proxy server for all protocols</code>
+            checkbox.</Li>
+          <Li>Save changes by pressing <code>OK</code></Li>
         </ol>
     ),
     safari: (
         <ol>
-          <Li>Pull down the Safari menu and select "Preferences".</Li>
-          <Li>Click on the "Advanced" icon.</Li>
-          <Li>In the "Proxies" option, click on Change Settings.</Li>
+          <Li>
+            Pull down the Safari menu and select <code>Preferences</code></Li>
+          <Li>Click on the <code>Advanced</code> icon.</Li>
+          <Li>In the <code>Proxies</code> option, click on Change Settings.
+            </Li>
           <Li>System Preferences should start up automatically, with the
             Network window open and Proxies selected.</Li>
-          <Li>Choose "Web Proxy (HTTP)".</Li>
+          <Li>Choose <code>Web Proxy (HTTP)</code></Li>
           <Li>
-            Enter "Web Proxy Server":
-            <Code id="address">127.0.0.1</Code>
+            Enter <code>Web Proxy Server</code>:
+            <Code>127.0.0.1</Code>
           </Li>
           <Li>
-            Enter "Port":
-            <Code id="address">{proxy}</Code>
+            Enter <code>Port</code>:
+            <Code>{proxy}</Code>
           </Li>
-          <Li>Save changes by pressing "OK".</Li>
+          <Li>Save changes by pressing <code>OK</code></Li>
         </ol>
     ),
 });

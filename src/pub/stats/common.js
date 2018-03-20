@@ -24,11 +24,7 @@ const Stat_table = props=>{
     const Row = props.row;
     return (
         <div className="stat_table">
-          <h4>
-            {props.title}
-            {props.show_more &&
-              <small>&nbsp;<a href={props.path}>show all</a></small>}
-          </h4>
+          {props.show_more && <small><a href={props.path}>show all</a></small>}
           <Table hover condensed>
             <thead>{props.children}</thead>
             <tbody>

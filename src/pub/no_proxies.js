@@ -3,7 +3,7 @@
 import React from 'react';
 import $ from 'jquery';
 
-const open_modal = ()=>{ $('#add_proxy_modal').modal(); };
+const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
 
 const No_proxies = ()=>(
     <div className="lpm no_proxies">
@@ -11,7 +11,7 @@ const No_proxies = ()=>(
       <div className="header">
         <h1>There are no proxies configured</h1></div>
       <button onClick={open_modal} className="btn btn_lpm btn_add_port">
-        <div className="img"/>Create new proxy port</button>
+        Create new proxy port</button>
     </div>
 );
 

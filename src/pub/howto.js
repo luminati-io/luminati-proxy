@@ -87,9 +87,8 @@ class Code_instructions extends Pure_component {
         );
         const tutorial_port = window.localStorage.getItem(
             'quickstart-first-proxy')||24000;
-        const code = prism.highlight(
-            instructions.code(tutorial_port)[this.state.lang],
-            prism.languages.clike);
+        const to_copy = instructions.code(tutorial_port)[this.state.lang];
+        const code = prism.highlight(to_copy, prism.languages.clike);
         return (
             <div className="code_instructions">
               <div className="well header_well">
@@ -106,9 +105,9 @@ class Code_instructions extends Pure_component {
               <div className="well instructions_well">
                 <pre>
                   <code>
-                    <Code id={this.state.lang}
-                      on_click={()=>this.click_copy(this.state.lang)}>
-                      <div dangerouslySetInnerHTML={{__html:  code}}/></Code>
+                    <Code on_click={()=>this.click_copy(this.state.lang)}>
+                      <div dangerouslySetInnerHTML={{__html:  code}}/>
+                    </Code>
                   </code>
                 </pre>
               </div>

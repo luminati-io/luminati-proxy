@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 1.87.994
+## 1.88.182
 - :bug: fixed overload error on osx
 - :sparkles: ui improvments
 

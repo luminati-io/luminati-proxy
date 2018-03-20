@@ -261,7 +261,7 @@ const tabs = {
                     through UI or download from UI`,
             },
             ssl: {
-                label: 'Enable SSL analyzing',
+                label: 'Enable SSL Log',
                 tooltip: `Allow the proxy manager to read HTTPS requests`,
             },
             log: {
@@ -881,7 +881,7 @@ class Index extends React.Component {
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
-                  <h3>Port {this.port}</h3>
+                  <h3>Proxy on port {this.port}</h3>
                   <div className="warning_wrapper">
                     <If when={this.state.dirty}>
                       <Warning text={warning_dirty}/>

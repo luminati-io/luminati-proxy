@@ -535,6 +535,8 @@ input.form-control[type=checkbox] {
         top: 1px;
     }
     .btn_lpm {
+        padding-left: 11px;
+        padding-right: 11px;
         width: auto;
         min-width: 140px;
         height: 32px;
@@ -1153,6 +1155,12 @@ input.form-control[type=checkbox] {
                 width: 90px;
                 position: absolute;
                 left: 10px;
+                .multiplied_mark {
+                    font-size: 10px;
+                    position: absolute;
+                    left: -1px;
+                    top: 4px;
+                }
             }
             &:hover .proxies_actions .action_icon { visibility: visible; }
             .action_icon {
@@ -1181,6 +1189,15 @@ input.form-control[type=checkbox] {
                     cursor: default;
                     opacity: 0;
                 }
+            }
+            &.multiplied {
+                td.port { padding-left: 20px; }
+                td { opacity: 0.6; }
+                td.proxies_actions { opacity: 1; }
+            }
+            &.default {
+                td { opacity: 0.6; }
+                td.proxies_actions { opacity: 1; }
             }
         }
         .btn_columns {
@@ -1433,7 +1450,7 @@ input.form-control[type=checkbox] {
     .nav_buttons {
         position: absolute;
         z-index: 10;
-        right: 30px;
+        right: 15px;
         top: 15px;
         white-space: nowrap;
         flex: 1;
@@ -1591,7 +1608,7 @@ input.form-control[type=checkbox] {
         text-align: left;
         box-shadow: none;
         border-radius: 3px;
-        background-color: @light_grey;
+        background-color: white;
     }
     .browser_instructions .header_well {
         font-size: 14px;
@@ -1614,7 +1631,7 @@ input.form-control[type=checkbox] {
         pre {
             border: none;
             font-size: 12px;
-            background-color: @x_light;
+            background-color: @xx_light;
             .btn_copy {
                 position: absolute;
                 top: 28px;
@@ -1642,7 +1659,7 @@ input.form-control[type=checkbox] {
         ol li .circle_wrapper {
             position: absolute;
             left: 37px;
-            background-color: @light_grey;
+            background-color: white;
             height: 28px;
             display: inline-block;
         }
@@ -1670,15 +1687,16 @@ input.form-control[type=checkbox] {
             top: -5px;
         }
         code {
-            font-family: Lato;
-            font-size: 13px;
-            font-weight: bold;
+            font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+            font-size: 12px;
+            font-weight: 300;
             letter-spacing: -0.1px;
+            background-color: rgba(34,34,34,0.03);
+            border: 1px solid rgba(34,34,34,0.1);
+            color: black;
             border-radius: 3px;
-            background-color: #e7f9fa;
-            color: #005271;
-            padding: 3px 10px;
-            margin: 0 5px;
+            padding: 5px 7px 3px;
+            margin: 0 3px;
         }
     }
     .api_link { margin-left: 3px; }
@@ -1933,7 +1951,7 @@ input.form-control[type=checkbox] {
         background: url(/img/attention.svg);
         width: 40px;
         height: 40px;
-        margin: 40px auto 30px;
+        margin: 10px auto 10px;
     }
     .header {
         height: auto;
@@ -1951,19 +1969,5 @@ input.form-control[type=checkbox] {
             font-weight: 300;
         }
     }
-    .btn_add_port {
-        margin: 20px auto;
-        height: 40px;
-        width: 240px;
-        font-weight: 300;
-        .img {
-            position: relative;
-            right: 12px;
-            top: 4px;
-            display: inline-block;
-            background: url(/img/create.svg);
-            width: 20px;
-            height: 20px;
-        }
-    }
+    .btn_add_port { margin: 20px auto; }
 }

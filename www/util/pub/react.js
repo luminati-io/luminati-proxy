@@ -214,9 +214,8 @@ E.Paginator = class Paginator extends Pure_component {
             current_page: 1});
         return (
             <div className="rutils_paginator">
-              <div className="row">
-                <div className="col-lg-3">
-                  <span className="ru_pr_btn_group">
+                <div className="left_col">
+                    <span className="ru_pr_btn_group">
                     <If when={first}>
                       <a className="ru_pr_btn"
                         onClick={()=>this.click(1)}>1</a>
@@ -245,26 +244,23 @@ E.Paginator = class Paginator extends Pure_component {
                     </If>
                   </span>
                 </div>
-                <div className="col-lg-6">
+                <div className="center_col">
                   <If when={p.custom_controls}>{()=>p.custom_controls()}</If>
                 </div>
-                <div className="col-lg-3">
-                  <div className="pull-right">
-                    <label>
+                <div className="right_col">
+                  <label>
                       <select className="form-control dropdown"
-                        value={p.page_size} onChange={on_size_changed}>
-                        <Foreach data={[10, 20, 50, 100, 200, 500, 1000]}>{v=>(
+                      value={p.page_size} onChange={on_size_changed}>
+                      <Foreach data={[10, 20, 50, 100, 200, 500, 1000]}>{v=>(
                           <option value={v}>{v}</option>)}
-                        </Foreach>
+                      </Foreach>
                       </select>
-                    </label>
-                    <strong>{1+(p.current_page-1)*p.page_size}
+                  </label>
+                  <strong>{1+(p.current_page-1)*p.page_size}
                       -{p.current_page==page_count ? p.items_count
                       : p.current_page*p.page_size}</strong>
                       &nbsp;of <strong>{p.items_count}</strong>
-                  </div>
                 </div>
-              </div>
             </div>
         );
     }

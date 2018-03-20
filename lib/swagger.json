@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.87.994",
+        "version": "1.88.182",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -538,6 +538,25 @@
                 "vip": {
                     "type": "integer",
                     "description": "VIP"
+                },
+                "ext_proxies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "A list of proxies from external vendors. Format: [username:password@]ip[:port]"
+                },
+                "ext_proxy_username": {
+                    "type": "string",
+                    "description": "default username for external vendor ips"
+                },
+                "ext_proxy_password": {
+                    "type": "string",
+                    "description": "default password for external vendor ips"
+                },
+                "ext_proxy_port": {
+                    "type": "integer",
+                    "description": "default port for external vendor ips"
                 },
                 "dns": {
                     "type": "string",

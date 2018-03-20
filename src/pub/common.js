@@ -10,6 +10,7 @@ import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import EventEmitter from 'events';
 import {If} from '/www/util/pub/react.js';
+import Pure_component from '../../www/util/pub/pure_component.js';
 
 class Dialog extends React.Component {
     render(){
@@ -126,30 +127,40 @@ const Loader = ({show})=>(
     </If>
 );
 
-const Code = props=>{
-    const copy = ()=>{
-        if (props.on_click)
-            props.on_click();
-        const area = document.querySelector('#copy_'+props.id+'>textarea');
-        const source = document.querySelector('#copy_'+props.id+'>.source');
+class Code extends Pure_component {
+    componentDidMount(){
+        $(this.ref).find('.btn_copy').tooltip('show')
+        .attr('title', 'Copy to clipboard').tooltip('fixTitle');
+    }
+    set_ref(e){ this.ref = e; }
+    copy(){
+        if (this.props.on_click)
+            this.props.on_click();
+        const area = $(this.ref).children('textarea')[0];
+        const source = $(this.ref).children('.source')[0];
         area.value = source.innerText;
         area.select();
-        try { document.execCommand('copy'); }
+        try {
+            document.execCommand('copy');
+            $(this.ref).find('.btn_copy').attr('title', 'Copied!')
+            .tooltip('fixTitle')
+            .tooltip('show').attr('title', 'Copy to clipboard')
+            .tooltip('fixTitle');
+        }
         catch(e){ console.log('Oops, unable to copy'); }
-    };
-    const value = props.children.innerText
-        ? props.children.innerText() : props.children;
-    return (
-        <code id={'copy_'+props.id}>
-          <span className="source">{props.children}</span>
-          <textarea defaultValue={value}
-            style={{position: 'fixed', top: '-1000px'}}/>
-          <button onClick={copy}
-            className="btn btn_lpm btn_lpm_small btn_copy">
-            Copy</button>
-        </code>
-    );
-};
+    }
+    render(){
+        return (
+            <code ref={this.set_ref.bind(this)}>
+              <span className="source">{this.props.children}</span>
+              <textarea style={{position: 'fixed', top: '-1000px'}}/>
+              <button onClick={this.copy.bind(this)} data-container="body"
+                className="btn btn_lpm btn_lpm_small btn_copy">
+                Copy</button>
+            </code>
+        );
+    }
+}
 
 const Select = props=>{
     const update = val=>{
@@ -208,6 +219,44 @@ const Warning_msg = ({warning})=>{
         return null;
     return <Warning text={warning}/>;
 };
+
+const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
+    children, top, bottom, update_items_per_page})=>
+{
+    let pagination = null;
+    if (entries.length>items_per_page)
+    {
+        let next = false;
+        let pages = Math.ceil(entries.length/items_per_page);
+        if (cur_page+1<pages)
+            next = 'Next';
+        pagination = (
+            <Bootstrap.Pagination next={next} boundaryLinks
+              activePage={cur_page+1}
+              bsSize="small" onSelect={page_change}
+              items={pages} maxButtons={5}/>
+        );
+    }
+    let buttons = null;
+    if (top)
+        buttons = <div className="table_buttons">{children}</div>;
+    const display_options = [10, 20, 50, 100, 200, 500, 1000].map(v=>({
+        key: v, value: v}));
+    const from = Math.min(cur_page*items_per_page+1, entries.length);
+    const to = Math.min((cur_page+1)*items_per_page, entries.length);
+    return (
+        <div className={classnames('pagination_panel', {top, bottom})}>
+          {pagination}
+          <div className="numbers">
+            <strong>{from}-{to}</strong> of <strong>{entries.length}</strong>
+          </div>
+          <Select val={items_per_page} data={display_options}
+            on_change_wrapper={update_items_per_page}/>
+          {buttons}
+        </div>
+    );
+};
+
 
 const presets = {
     session_long: {
@@ -504,4 +553,4 @@ for (let k in presets)
 const emitter = new EventEmitter();
 
 export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
-    Checkbox, presets, emitter};
+    Checkbox, presets, emitter, Pagination_panel};

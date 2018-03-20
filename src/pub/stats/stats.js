@@ -192,17 +192,15 @@ class Stats extends React.Component {
               <div className="panel_body with_table">
                 <Success_ratio/>
                 <Stat_table table={StatusCodeTable} row={S_row}
-                  title={`By status codes`} dataType="status_codes"
+                  dataType="status_codes"
                   stats={this.state.statuses.stats}
                   show_more={this.state.statuses.has_more}/>
                 <Stat_table table={DomainTable} row={D_row}
                   dataType="domains" stats={this.state.domains.stats}
-                  show_more={this.state.domains.has_more}
-                  title={`By domains`} />
+                  show_more={this.state.domains.has_more}/>
                 <Stat_table table={ProtocolTable} row={P_row}
                   dataType="protocols" stats={this.state.protocols.stats}
                   show_more={this.state.protocols.has_more}
-                  title={`By protocols`}
                   show_enable_https_button
                   enable_https_button_click={this.enable_https_statistics}/>
                 <Dialog show={this.state.show_reset} onHide={this.close}

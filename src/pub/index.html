@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="container page-body">
-        <div class ng-if="section.name=='overview'||section.name=='proxies'">
+        <div class ng-if="section.name=='overview'">
           <ng-include src="'/upgrade.html'"></ng-include>
           <div ng-repeat="warning in warnings()"
             class="alert alert-info settings-alert">
@@ -219,7 +219,6 @@
         </div>
       </div>
     </div>
-    <div react-view=add_proxy_modal></div>
     <div react-view=report_bug_modal></div>
     <div id=notif_react_modal></div>
     <div ng-repeat="h in history_dialog" ng-controller=history
