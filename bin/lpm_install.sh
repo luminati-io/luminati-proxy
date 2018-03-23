@@ -2,6 +2,15 @@
 # LICENSE_CODE ZON ISC
 PERR_URL="https://perr.luminati.io/client_cgi/perr"
 ACTION="setup"
+IS_ROOT=0
+if [ $(id -u) = 0 ]; then
+    IS_ROOT=1
+fi
+LUM=0
+VERSION="1.88.679"
+if [ -f  "/usr/local/hola/zon_config.sh" ]; then
+    LUM=1
+fi
 RID=$(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 |\
     head -n 1)
 TS_START=$(date +"%s")
@@ -102,8 +111,11 @@ sudo_cmd()
 {
     local sdo="sudo -i"
     local cmd="$1"
-    if is_cmd_defined "rt"; then
+    if ((LUM)); then
         sdo="rt"
+    fi
+    if ((IS_ROOT)); then
+        sdo=""
     fi
     eval "$sdo $cmd"
     return $?
@@ -115,7 +127,7 @@ perr()
     local note=$2
     local ts=$(date +"%s")
     local url="${PERR_URL}/?id=lpm_sh_${name}"
-    local data="{\"uuid\": \"$RID\", \"timestamp\": \"$ts\", \"info\": {\"platform\": \"$OS\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$TS_START\", \"note\": \"$note\"}}"
+    local data="{\"uuid\": \"$RID\", \"timestamp\": \"$ts\", \"ver\": \"$VERSION\", \"info\": {\"platform\": \"$OS\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$TS_START\", \"note\": \"$note\", \"lum\": $LUM, \"root\":$IS_ROOT}}"
     if ((PRINT_PERR)); then
         echo "perr $url $data"
     fi
@@ -367,7 +379,7 @@ lpm_install()
         perr "install_error_lpm"
         exit $?
     else
-        if is_cmd_defined "rt"; then
+        if ((LUM)); then
             # fix luminati binary not found on luminati ubuntu
             echo "running nave relink"
             sudo_cmd "nave relink"

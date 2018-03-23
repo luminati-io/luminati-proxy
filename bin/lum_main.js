@@ -130,10 +130,21 @@ let read_status_file = ()=>{
 
 let manager, args = process.argv.slice(2), shutdowning = false;
 const enable_cluster = process.argv.includes('--cluster');
+let shutdown_timeout;
 let shutdown = (reason, send_ev = true, error = null)=>{
     if (shutdowning)
         return;
     shutdowning = true;
+    shutdown_timeout = setTimeout(()=>{
+        if (shutdowning)
+        {
+            if (manager)
+                manager._log.crit('Forcing exit after 10 sec');
+            else
+                console.error('Forcing exit after 10 sec');
+            process.exit(1);
+        }
+    }, 10000);
     write_ua_file();
     write_status_file('shutdowning', error, manager&&manager._total_conf,
         reason);
@@ -141,7 +152,7 @@ let shutdown = (reason, send_ev = true, error = null)=>{
     {
         manager._log.info(`Shutdown, reason is ${reason}`);
         if (error)
-            manager._log.error(reason, error);
+            manager._log.error('%s %s', reason, error);
         let stop_manager = ()=>{
             manager.stop(reason, true);
             manager = null;
@@ -160,8 +171,16 @@ let shutdown = (reason, send_ev = true, error = null)=>{
 };
 ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
+    // XXX maximk: find origin and catch it there
+    // XXX maximk: fix process fail on oveload
+    if (err && (err.message||'').includes('SQLITE'))
+    {
+        manager._log.crit(errstr);
+        manager.perr('sqlite', {error: errstr});
+        return;
+    }
     if (err&&manager)
-        manager._log.error(errstr);
+        manager._log.crit(errstr);
     if (err&&manager&&!manager.argv.no_usage_stats)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
@@ -193,6 +212,8 @@ let on_upgrade_finished;
     manager.on('stop', ()=>{
         write_ua_file();
         zerr.flush();
+        if (shutdown_timeout)
+            clearTimeout(shutdown_timeout);
         process.exit();
     })
     .on('error', (e, fatal)=>{

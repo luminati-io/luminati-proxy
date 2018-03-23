@@ -12,9 +12,9 @@ import zurl from 'hutil/util/url';
 import util from './util.js';
 import filesaver from 'file-saver';
 import Autosuggest from 'react-autosuggest';
-import {Pagination} from 'react-bootstrap';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
+import {Pagination_panel, Tooltip, Link_icon} from './common.js';
 
 class Stats extends Pure_component {
     constructor(props){
@@ -27,15 +27,64 @@ class Stats extends Pure_component {
             preview_entry: {},
             items_per_page: 20,
             sorted: {},
+            filters: [],
+            selected_filters: {},
         };
     }
     componentWillMount(){
         const _this = this;
         this.etask(function*(){
             const har = yield ajax.json({url: '/api/request_stats/har'});
-            _this.setState({har, entries: har.log.entries},
-                ()=>_this.apply_filters());
+            const filters = _this.prepare_filters(har.log.entries);
+            _this.setState({har, entries: har.log.entries, filters},
+                ()=>_this.apply_filters(_this.state.selected_filters));
         });
+    }
+    componentDidMount(){
+        setTimeout(()=>{
+            const url_o = zurl.parse(document.location.href);
+            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+            const selected_filters = {};
+            Object.keys(qs_o).forEach(param=>{
+                if (param)
+                    selected_filters[param] = [qs_o[param]];
+            });
+            this.setState({selected_filters});
+            this.apply_filters(selected_filters);
+        });
+    }
+    prepare_filters(entries){
+        const domains = {};
+        const ports = {};
+        const protocols = {};
+        const statuses = {};
+        entries.forEach(e=>{
+            domains[e.request.host] = true;
+            statuses[''+e.response.status] = true;
+            protocols[e.details.protocol] = true;
+            ports[''+e.details.port] = true;
+        });
+        const filters = [{
+            title: 'Ports',
+            name: 'port',
+            values: Object.keys(ports),
+        }, {
+            title: 'Domains',
+            name: 'domain',
+            values: Object.keys(domains),
+        }, {
+            title: 'Status Codes',
+            name: 'code',
+            values: Object.keys(statuses),
+        }, {
+            title: 'Protocols',
+            name: 'protocol',
+            values: Object.keys(protocols),
+        }];
+        filters.forEach(f=>{
+            f.values = f.values.map(v=>({val: v, section: f.name}));
+        });
+        return filters;
     }
     select_entry(uuid){
         this.setState(prev_state=>{
@@ -43,6 +92,8 @@ class Stats extends Pure_component {
             return {preview_entry: entry};
         });
     }
+    update_items_per_page(items_per_page){
+        this.setState({items_per_page}, ()=>this.paginate(0)); }
     paginate(page=-1){
         page = page>-1 ? page : this.state.cur_page;
         const pages = Math.ceil(
@@ -83,16 +134,16 @@ class Stats extends Pure_component {
                 return _.some(filters, val=>{
                     if (section=='domain')
                         return val==entry.request.host;
-                    else if (section=='status code')
+                    else if (section=='code')
                         return val==entry.response.status;
                     else if (section=='protocol')
                         return val==entry.details.protocol;
                     else if (section=='port')
-                        return true;
+                        return val==entry.details.port;
                 });
             });
         });
-        this.setState({filtered_entries}, this.paginate);
+        this.setState({filtered_entries}, ()=>this.paginate(0));
     }
     page_change = page=>this.paginate(page-1);
     download_har(){
@@ -101,73 +152,80 @@ class Stats extends Pure_component {
         filesaver.saveAs(blob, 'recent_stats.har');
     }
     render(){
-        let pagination = null;
-        if (this.state.entries.length>this.state.items_per_page)
-        {
-            let next = false;
-            let pages = Math.ceil(
-                this.state.entries.length/this.state.items_per_page);
-            if (this.state.cur_page+1<pages)
-                next = 'Next';
-            pagination = (
-                <Pagination next={next} boundaryLinks
-                  activePage={this.state.cur_page+1}
-                  bsSize="small" onSelect={this.page_change}
-                  items={pages} maxButtons={5}/>
-            );
-        }
         return (
             <div className="lpm stats">
-              <Filtering apply_filters={this.apply_filters.bind(this)}/>
+              <Filtering
+                filters={this.state.filters}
+                apply_filters={this.apply_filters.bind(this)}/>
               <div>
-                <h3 className="top_header">Summary</h3>
                 <div className="panel summary_panel">
                   <div className="panel_heading">
                     <h2>Recent Requests</h2>
-                    <div className="buttons_wrapper">
-                      <button onClick={this.download_har.bind(this)}
-                        className="btn btn_lpm btn_lpm_small">
-                        HAR
-                      </button>
-                    </div>
                   </div>
                   <div className="panel_body with_table">
-                    <Main_table entries={this.state.displayed_entries}
+                    <Stats_pagination
+                      entries={this.state.filtered_entries}
+                      top
+                      download_har={this.download_har.bind(this)}
+                      items_per_page={this.state.items_per_page}
+                      update_items_per_page={this.update_items_per_page.bind(this)}
+                      cur_page={this.state.cur_page}
+                      page_change={this.page_change.bind(this)}
+                      update_items_page_page={()=>null}/>
+                    <Main_table
+                      entries={this.state.displayed_entries}
                       select_entry={this.select_entry.bind(this)}
                       preview_entry={this.state.preview_entry}
-                      sort={this.sort.bind(this)} sorted={this.state.sorted}/>
+                      sort={this.sort.bind(this)}
+                      sorted={this.state.sorted}/>
+                    <Stats_pagination
+                      entries={this.state.filtered_entries}
+                      bottom
+                      download_har={this.download_har.bind(this)}
+                      items_per_page={this.state.items_per_page}
+                      update_items_per_page={this.update_items_per_page.bind(this)}
+                      cur_page={this.state.cur_page}
+                      page_change={this.page_change.bind(this)}
+                      update_items_page_page={()=>null}/>
                   </div>
                 </div>
-                <div className="pagination_panel">{pagination}</div>
               </div>
             </div>
         );
     }
 }
 
+const Stats_pagination = ({entries, items_per_page, cur_page, bottom,
+    top, page_change, update_items_per_page, download_har})=>
+(
+    <Pagination_panel entries={entries} items_per_page={items_per_page}
+      cur_page={cur_page} page_change={page_change} top={top} bottom={bottom}
+      update_items_per_page={update_items_per_page}>
+        <Tooltip title="Download all logs as HAR">
+          <span className="icon_link" onClick={download_har}>
+            <i className="glyphicon glyphicon-download"></i>
+          </span>
+        </Tooltip>
+    </Pagination_panel>
+);
+
 class Filtering extends Pure_component {
     constructor(props){
         super(props);
         this.state = {value: '', suggestions: [], selected_filters: {}};
-        this.filters = [{
-            title: 'Ports',
-            name: 'port',
-            values: ['22225', '24000'],
-        }, {
-            title: 'Domains',
-            name: 'domain',
-            values: ['amazon.com', 'lumtest.com'],
-        }, {
-            title: 'Status Codes',
-            name: 'status code',
-            values: ['200', '503', '301'],
-        }, {
-            title: 'Protocols',
-            name: 'protocol',
-            values: ['http', 'https'],
-        }];
-        this.filters.forEach(f=>{
-            f.values = f.values.map(v=>({val: v, section: f.name}));
+    }
+    // XXX krzysztof: It's an ungly hack. remove duplicated logic from parent
+    // component
+    componentDidMount(){
+        setTimeout(()=>{
+            const url_o = zurl.parse(document.location.href);
+            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
+            const selected_filters = {};
+            Object.keys(qs_o).forEach(param=>{
+                if (param)
+                    selected_filters[param] = [qs_o[param]];
+            });
+            this.setState({selected_filters});
         });
     }
     on_input_change = (e, ref)=>{
@@ -204,9 +262,26 @@ class Filtering extends Pure_component {
     get_suggestions(value){
         const input_value = value.trim().toLowerCase();
         const input_len = input_value.length;
-        return input_len==0 ? this.filters : this.filters.filter(f=>
-            f.title.toLowerCase().slice(0, input_len)==input_value
-        );
+        const unsel_filters = this.props.filters.reduce((acc, e)=>{
+            const sel_values = this.state.selected_filters[e.name]||[];
+            const unsel_values = e.values.filter(v=>
+                !sel_values.includes(v.val));
+            if (unsel_values.length)
+                return acc.concat({...e, values: unsel_values});
+            return acc;
+        }, []);
+        if (input_len==0)
+            return unsel_filters;
+        const _this = this;
+        return unsel_filters.reduce((acc, e)=>{
+            if (e.title.toLowerCase().slice(0, input_len)==input_value)
+                return acc.concat(e);
+            const values = e.values.filter(v=>
+                v.val.toLowerCase().slice(0, input_len)==input_value);
+            if (values.length)
+                return acc.concat(Object.assign(e, {values}));
+            return acc;
+        }, []);
     }
     render(){
         const inputProps = {
@@ -237,10 +312,9 @@ class Filtering extends Pure_component {
                       <span className="section">{f.section}: </span>
                       <span className="value">{f.val}</span>
                     </div>
-                    <div onClick={()=>this.remove_filter(f.section, f.val)}
-                      className="x_btn_wrapper">
-                      <div className="x_btn"/>
-                    </div>
+                    <Link_icon tooltip="Remove filter" id="remove" small
+                      on_click={()=>this.remove_filter(f.section, f.val)}
+                      classes="remove_filter_btn"/>
                   </div>
                 ))}
               </div>
@@ -258,6 +332,9 @@ class Main_table extends Pure_component {
             title: 'Domain',
             class_name: 'fixed_col',
             sort_by: 'request.url',
+        }, {
+            title: 'Port',
+            sort_by: 'details.port',
         }, {
             title: 'Code',
             sort_by: 'response.status',
@@ -331,7 +408,10 @@ const Column = ({col, sort, sorted})=>{
 
 const Tab_nav = props=>(
     <div className="tab_nav">
-      <div onClick={props.click_reset} className="tab_btn x_btn"/>
+      <div className="close_btn">
+        <Link_icon tooltip="Close" id="remove" on_click={props.click_reset}
+          small/>
+      </div>
       <Tab_btn set_tab={props.set_tab} title="Headers" id="general"
         curr_tab={props.curr_tab}/>
       <Tab_btn set_tab={props.set_tab} title="Response" id="response"
@@ -347,28 +427,6 @@ const Tab_btn = props=>(
     </div>
 );
 
-class Tooltip extends Pure_component {
-    componentDidMount(){
-        $(this.el).tooltip({
-            template: `<div class="stats_tooltip tooltip" role="tooltip">
-              <div class="tooltip-arrow"></div>
-              <div class="tooltip-inner"></div>
-            </div>`,
-        });
-    }
-    ref(el){ this.el = el; }
-    render(){
-        const {children, title} = this.props;
-        return (
-            <span style={{display: 'inline-block'}} data-toggle="tooltip"
-              data-placement="top" title={title} ref={this.ref.bind(this)}
-              data-container="body">
-              {children}
-            </span>
-        );
-    }
-}
-
 const Row = ({entry, preview_uuid, select_entry})=>{
     const local = moment(new Date(entry.startedDateTime))
     .format('YYYY-MM-DD HH:mm:ss');
@@ -379,6 +437,7 @@ const Row = ({entry, preview_uuid, select_entry})=>{
           <td className="fixed_col">
             <Tooltip title={entry.request.url}>{entry.request.host}</Tooltip>
           </td>
+          <td>{entry.details.port}</td>
           <td>
             <Tooltip title={entry.response.statusText}>
               {entry.response.status}</Tooltip>
@@ -395,7 +454,7 @@ const Preview = ({curr_tab, entry})=>{
     if (!entry||!entry.uuid)
         return null;
     const width = 'calc(100% - 200px)';
-    const height = 'calc(100% - 36px)';
+    const height = 'calc(100% - 59px)';
     const style = {minWidth: width, maxWidth: width, height};
     return (
         <div className="preview" style={style}>

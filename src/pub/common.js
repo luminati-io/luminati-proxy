@@ -162,6 +162,14 @@ class Code extends Pure_component {
     }
 }
 
+const Textarea = props=>{
+    return (
+        <textarea value={props.val} rows={props.rows||3}
+          placeholder={props.placeholder}
+          onChange={e=>props.on_change_wrapper(e.target.value)}/>
+    );
+};
+
 const Select = props=>{
     const update = val=>{
         if (val=='true')
@@ -221,7 +229,7 @@ const Warning_msg = ({warning})=>{
 };
 
 const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
-    children, top, bottom, update_items_per_page})=>
+    children, top, bottom, update_items_per_page, max_buttons})=>
 {
     let pagination = null;
     if (entries.length>items_per_page)
@@ -234,7 +242,7 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
             <Bootstrap.Pagination next={next} boundaryLinks
               activePage={cur_page+1}
               bsSize="small" onSelect={page_change}
-              items={pages} maxButtons={5}/>
+              items={pages} maxButtons={max_buttons||5}/>
         );
     }
     let buttons = null;
@@ -257,6 +265,53 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
     );
 };
 
+class Tooltip extends Pure_component {
+    componentDidMount(){
+        if (!this.ref)
+            return;
+        $(this.ref).tooltip();
+    }
+    componentWillUnmount(){ $(this.ref).tooltip('destroy'); }
+    set_ref(e){ this.ref = e; }
+    render(){
+        if (!this.props.children)
+            return null;
+        if (!this.props.title)
+            return this.props.children;
+        const props = {
+            'data-toggle': 'tooltip',
+            'data-placement': 'top',
+            'data-container': 'body',
+            title: this.props.title,
+            ref: this.set_ref.bind(this),
+        };
+        return React.Children.map(this.props.children, c=>{
+            if (typeof c=='number')
+                c = ''+c;
+            if (typeof c=='string')
+                return React.createElement('span', props, c);
+            return React.cloneElement(c, props);
+        });
+    }
+}
+
+const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
+    small})=>
+{
+    if (invisible)
+        tooltip = '';
+    if (disabled||invisible)
+        on_click = ()=>null;
+    classes = classnames(classes, {small});
+    return (
+        <Tooltip title={tooltip}>
+          <span className={classnames('link', 'icon_link', classes)}
+            onClick={on_click}>
+            <i className={classnames('glyphicon', 'glyphicon-'+id)}/>
+          </span>
+        </Tooltip>
+    );
+};
 
 const presets = {
     session_long: {
@@ -372,15 +427,15 @@ const presets = {
             session (IP) switching`,
         check: function(opt){ return opt.pool_size &&
             (!opt.pool_type || opt.pool_type=='sequential'); },
-        set: function(opt){
-            opt.pool_size = opt.pool_size||1;
+        set: opt=>{
+            opt.pool_size = 0;
             opt.pool_type = 'sequential';
             opt.keep_alive = opt.keep_alive||45;
             opt.sticky_ip = null;
             opt.session = '';
         },
         clean: opt=>{
-            opt.pool_size = 1;
+            opt.pool_size = 0;
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
@@ -394,7 +449,6 @@ const presets = {
             {field: 'session', label: `disables 'Random Session'`},
         ],
         support: {
-            pool_size: true,
             keep_alive: true,
             max_requests: true,
             session_duration: true,
@@ -409,7 +463,7 @@ const presets = {
             max_requests & proxy_count to optimize performance`,
         check: function(opt){ return opt.pool_size
             && opt.pool_type=='round-robin' && !opt.multiply; },
-        set: function(opt){
+        set: opt=>{
             opt.pool_size = opt.pool_size||1;
             opt.pool_type = 'round-robin';
             opt.keep_alive = opt.keep_alive||45;
@@ -452,7 +506,6 @@ const presets = {
             opt.proxy_count = 20;
             opt.session_duration = 0;
             opt.session_random = false;
-            opt.session_init_timeout = 5;
             opt.use_proxy_cache = false;
             opt.race_reqs = 2;
         },
@@ -460,9 +513,8 @@ const presets = {
             opt.pool_size = 1;
             opt.keep_alive = 0;
             opt.proxy_count = '';
-            opt.session_init_timeout = '';
             opt.race_reqs = '';
-            opt.use_proxy_cahce = true;
+            opt.use_proxy_cache = true;
         },
         rules: [
             {field: 'pool_size', label: "sets 'Pool size' to 50"},
@@ -516,7 +568,10 @@ const presets = {
             opt.rules.post = opt.rules.post||[];
         },
         clean: opt=>{ },
-        support: {multiply: true},
+        support: {
+            multiply: true,
+            max_requests: true,
+        },
     },
     custom: {
         title: 'Custom',
@@ -553,4 +608,5 @@ for (let k in presets)
 const emitter = new EventEmitter();
 
 export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
-    Checkbox, presets, emitter, Pagination_panel};
+    Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
+    Textarea};

@@ -67,7 +67,7 @@ class StatusCodeRow extends Pure_component {
         let click = ()=>{};
         if (this.props.go)
         {
-            click = ()=>this.state.go('status_codes_detail',
+            click = ()=>this.state.go('stats',
                 {code: this.props.stat.status_code});
             class_name = 'row_clickable';
         }

@@ -23,7 +23,7 @@ class DomainRow extends Pure_component {
         let click = ()=>{};
         if (this.props.go)
         {
-            click = ()=>this.state.go('domains_detail',
+            click = ()=>this.state.go('stats',
                 {domain: this.props.stat.hostname});
             class_name = 'row_clickable';
         }

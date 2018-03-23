@@ -12,6 +12,7 @@
             "request_headers": "TEXT",
             "request_body": "TEXT",
             "response_headers": "TEXT",
+            "response_body": "TEXT",
             "status_code": {"type": "INTEGER", "index": true},
             "status_message": {"type": "TEXT", "index": true},
             "timestamp": {"type": "INTEGER", "index": true},

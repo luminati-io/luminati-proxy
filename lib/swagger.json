@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.88.182",
+        "version": "1.88.679",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -369,7 +369,7 @@
                 },
                 "database": {
                     "type": "string",
-                    "description": "Database file containing history and cached values"
+                    "description": "Database file containing logs and cached values"
                 },
                 "cookie": {
                     "type": "string",
@@ -377,7 +377,7 @@
                 },
                 "database_history": {
                     "type": "string",
-                    "description": "Database containing history"
+                    "description": "Database containing logs"
                 },
                 "mode": {
                     "type": "string",
@@ -447,7 +447,7 @@
                 },
                 "history": {
                     "type": "boolean",
-                    "description": "Log request history"
+                    "description": "Logs"
                 },
                 "ssl": {
                     "type": "boolean",
@@ -612,10 +612,6 @@
                     "type": "string",
                     "pattern": "^(sequential|round-robin)?$",
                     "description": "Pool session iteration order"
-                },
-                "session_init_timeout": {
-                    "type": "integer",
-                    "description": "Session establish timeout (seconds)"
                 },
                 "keep_alive": {
                     "type": "integer",

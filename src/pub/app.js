@@ -13,9 +13,7 @@ import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import zescape from 'hutil/util/escape';
 import status_codes from './stats/status_codes.js';
-import status_codes_detail from './stats/status_codes_detail.js';
 import domains from './stats/domains.js';
-import domains_detail from './stats/domains_detail.js';
 import protocols from './stats/protocols.js';
 import zreport_bug_modal from './report_bug.js';
 import znotif_center from './notif_center.js';
@@ -25,7 +23,6 @@ import zproxy_tester from './proxy_tester.js';
 import zoverview from './overview.js';
 import zconfig from './config.js';
 import zstats from './stats.js';
-import protocols_detail from './stats/protocols_detail.js';
 import util from './util.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -126,13 +123,6 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         controller: $scope=>{ $scope.react_component = status_codes; },
     });
     state_registry.register({
-        name: 'status_codes_detail',
-        parent: 'app',
-        url: '/status_codes/{code:int}',
-        template: `<div react-view=react_component state-props=code></div>`,
-        controller: $scope=>{ $scope.react_component = status_codes_detail; },
-    });
-    state_registry.register({
         name: 'domains',
         parent: 'app',
         url: '/domains',
@@ -140,26 +130,11 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
         controller: $scope=>{ $scope.react_component = domains; },
     });
     state_registry.register({
-        name: 'domains_detail',
-        parent: 'app',
-        url: '/domains/{domain:string}',
-        template: `<div react-view=react_component state-props=domain></div>`,
-        controller: $scope=>{ $scope.react_component = domains_detail; },
-    });
-    state_registry.register({
         name: 'protocols',
         parent: 'app',
         url: '/protocols',
         template: '<div react-view=react_component></div>',
         controller: $scope=>{ $scope.react_component = protocols; },
-    });
-    state_registry.register({
-        name: 'protocols_detail',
-        parent: 'app',
-        url: '/protocols/{protocol:string}',
-        template: `<div react-view=react_component state-props=protocol>
-        </div>`,
-        controller: $scope=>{ $scope.react_component = protocols_detail; },
     });
     state_registry.register({
         name: 'howto',
@@ -194,7 +169,7 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
     state_registry.register({
         name: 'stats',
         parent: 'app',
-        url: '/stats',
+        url: '/stats?code&?domain&?port&?protocol',
         template: `<div react-view=react_component></div>`,
         controller: $scope=>{ $scope.react_component = zstats; },
     });
@@ -396,6 +371,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         {name: 'overview', title: 'Overview', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'howto', title: 'Examples', navbar: true},
+        {name: 'stats', title: 'Statistics', navbar: true},
         {name: 'config', title: 'Configuration', navbar: true},
     ];
     $transitions.onSuccess({}, function(transition){

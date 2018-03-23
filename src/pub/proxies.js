@@ -14,7 +14,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Add_proxy from './add_proxy.js';
 import No_proxies from './no_proxies.js';
-import {Modal, Checkbox, Pagination_panel} from './common.js';
+import {Modal, Checkbox, Pagination_panel, Link_icon,
+    Tooltip} from './common.js';
 import {If} from '/www/util/pub/react.js';
 
 let country_names = {};
@@ -92,14 +93,29 @@ const Session_cell = ({proxy})=>{
         return proxy.session;
 };
 
+const Type_cell = ({proxy})=>{
+    if (proxy.ext_proxies)
+        return 'External';
+    return 'Luminati';
+};
+
 const columns = [
     {
         key: 'port',
         title: 'Port',
         sticky: true,
         tooltip: 'A port is a number that refers to a specific virtual '
-                +'location on a computer. Create and configure ports, then '
-                +'connect the crawler to send requests through the port',
+            +'location on a computer. Create and configure ports, then '
+            +'connect the crawler to send requests through the port',
+        ext: true,
+    },
+    {
+        key: 'proxy_type',
+        title: 'Type',
+        render: Type_cell,
+        tooltip: 'Proxy Type',
+        sticky: true,
+        ext: true,
     },
     {
         key: '_status',
@@ -108,48 +124,62 @@ const columns = [
         render: Status_cell,
         sticky: true,
         tooltip: 'Real time proxy status',
+        ext: true,
     },
     {
         key: 'iface',
         title: 'Interface',
         type: 'options',
+        tooltip: 'Specific network interface on which the local machine is '
+            +'running. Switch interfaces in the proxy configuration page',
+        ext: true,
     },
     {
         key: 'multiply',
         title: 'Multiple',
         type: 'number',
         tooltip: 'Number of multiplied ports. A port can be multiplied '
-            +'through the proxy settings page',
+            +'in the proxy configuration page',
+        ext: true,
     },
     {
         key: 'history',
-        title: 'History',
+        title: 'Logs',
         render: Boolean_cell,
-        tooltip: 'Enable history to save and log all sent requests',
+        tooltip: 'Last 1K requests are automatically logged for easy '
+            +'debugging. To save all requests, Enable Logs in proxy '
+            +'configuration page',
+        ext: true,
     },
     {
         key: 'ssl',
         title: 'SSL Log',
         render: Boolean_cell,
-        tooltip: 'In order to see HTTPS requests and log their history, '
-            +'SSL Log should be enabled through the proxy settings '
-            +'page',
+        tooltip: 'In order to log HTTPS requests, enable SSL Logs in proxy '
+            +'configuration',
+        ext: true,
     },
     {
         key: 'socks',
         title: 'SOCKS port',
         type: 'number',
+        tooltip: 'Routing of SOCKS5 requests. Enable SOCKS5 port in proxy '
+            +'configuration page',
+        ext: true,
     },
     {
         key: 'zone',
         title: 'Zone',
         type: 'options',
         default: true,
+        tooltip: 'Specific Luminati zone configured for this proxy. Switch '
+            +'zones in proxy configuration page.',
     },
     {
         key: 'secure_proxy',
         title: 'SSL for super proxy',
         render: Boolean_cell,
+        ext: true,
     },
     {
         key: 'country',
@@ -157,11 +187,14 @@ const columns = [
         type: 'options',
         default: true,
         render: Targeting_cell,
+        tooltip: 'Exit node (IP) GEO location',
     },
     {
         key: 'asn',
         title: 'ASN',
         type: 'number',
+        tooltip: 'ASN uniquely identifies each network on the internet. You '
+            +'can target exit nodes (IPs) on specific ASNs',
     },
     {
         key: 'ip',
@@ -170,38 +203,47 @@ const columns = [
     },
     {
         key: 'vip',
-        title: 'VIP',
+        title: 'gIP',
         type: 'number',
+        tooltip: 'A gIP is a group of exclusive residential IPs. Using gIPs '
+            +'ensures that nobody else uses the same IPs with the same target '
+            +'sites as you do.',
     },
     {
         key: 'max_requests',
         title: 'Max requests',
         type: 'text',
+        ext: true,
     },
     {
         key: 'session_duration',
         title: 'Session duration (sec)',
         type: 'text',
+        ext: true,
     },
     {
         key: 'pool_size',
         title: 'Pool size',
         type: 'number',
+        ext: true,
     },
     {
         key: 'pool_type',
         title: 'Pool type',
         type: 'options',
+        ext: true,
     },
     {
         key: 'sticky_ip',
         title: 'Sticky IP',
         render: Boolean_cell,
+        ext: true,
     },
     {
         key: 'keep_alive',
         title: 'Keep-alive',
         type: 'number',
+        ext: true,
     },
     {
         key: 'seed',
@@ -217,11 +259,6 @@ const columns = [
         key: 'allow_proxy_auth',
         title: 'Request authentication',
         render: Boolean_cell,
-    },
-    {
-        key: 'session_init_timeout',
-        title: 'Session timeout',
-        type: 'number',
     },
     {
         key: 'proxy_count',
@@ -242,6 +279,7 @@ const columns = [
         key: 'log',
         title: 'Log Level',
         type: 'options',
+        ext: true,
     },
     {
         key: 'proxy_switch',
@@ -252,11 +290,13 @@ const columns = [
         key: 'throttle',
         title: 'Throttle concurrent connections',
         type: 'number',
+        ext: true,
     },
     {
         key: 'request_timeout',
         title: 'Request timeout (sec)',
         type: 'number',
+        ext: true,
     },
     {
         key: 'debug',
@@ -267,11 +307,13 @@ const columns = [
         key: 'null_response',
         title: 'NULL response',
         type: 'text',
+        ext: true,
     },
     {
         key: 'bypass_proxy',
         title: 'Bypass proxy',
         type: 'text',
+        ext: true,
     },
     {
         key: 'direct_include',
@@ -285,59 +327,36 @@ const columns = [
     },
     {
         key: 'success_rate',
-        title: 'Success rate',
-        type: 'success_rate',
+        title: 'Success',
         tooltip: 'Ratio of successful requests out of total requests, '
             +'where successful requests are calculated as 2xx, 3xx or 404 '
             +'HTTP status codes',
         render: ({proxy})=>proxy.success_rate&&(proxy.success_rate+'%')||'—',
         default: true,
+        ext: true,
     },
     {
         key: 'bw_up',
         title: 'BW Up',
         render: ({proxy})=>util.bytes_format(proxy.bw_up||0)||'—',
         sticky: true,
+        ext: true,
     },
     {
         key: 'bw_down',
         title: 'BW Down',
         render: ({proxy})=>util.bytes_format(proxy.bw_down||0)||'—',
         sticky: true,
+        ext: true,
     },
     {
         key: 'reqs',
         title: 'Requests',
         sticky: true,
         render: ({proxy})=>proxy.reqs||0,
+        ext: true,
     },
 ];
-
-class Tooltip extends Pure_component {
-    componentDidMount(){
-        if (!this.ref)
-            return;
-        $(this.ref).tooltip();
-    }
-    componentWillUnmount(){ $(this.ref).tooltip('destroy'); }
-    set_ref(e){ this.ref = e; }
-    render(){
-        if (!this.props.title)
-            return this.props.children;
-        const props = {
-            'data-toggle': 'tooltip',
-            'data-placement': 'top',
-            'data-container': 'body',
-            title: this.props.title,
-            ref: this.set_ref.bind(this),
-        };
-        return React.Children.map(this.props.children, c=>{
-            if (typeof c=='string')
-                return React.createElement('span', props, c);
-            return React.cloneElement(c, props);
-        });
-    }
-}
 
 class Columns_modal extends Pure_component {
     constructor(props){
@@ -410,17 +429,20 @@ class Proxies extends Pure_component {
         const default_cols = columns.filter(c=>c.default).map(col=>col.key);
         this.state = {
             selected_cols: from_storage.length&&from_storage||default_cols,
-            proxies: [],
-            displayed_proxies: [],
             items_per_page: 10,
             cur_page: 0,
+            proxies: [],
+            displayed_proxies: [],
+            loaded: false,
         };
         setdb.set('head.proxies.update', this.update.bind(this));
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies)
+                return;
             proxies = this.prepare_proxies(proxies||[]);
-            this.setState({proxies}, this.paginate);
+            this.setState({proxies, loaded: true}, this.paginate);
         });
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -456,13 +478,14 @@ class Proxies extends Pure_component {
         return proxies.filter(proxy=>proxy.port!=22225||
             (proxy.stats&&proxy.stats.real_bw));
     }
-    update_items_per_page(val){
-        this.setState({items_per_page: val, cur_page: 0}); }
+    update_items_per_page(items_per_page){
+        this.setState({items_per_page}, ()=>this.paginate(0)); }
     req_status(){
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
             const stats = yield ajax.json({url: '/api/req_status'});
+            setdb.set('head.req_status', stats);
             _this.setState(prev=>{
                 const new_proxies = prev.proxies.map(p=>{
                     let stat = {total: 0, success: 0, bw_down: 0, bw_up: 0,
@@ -509,11 +532,6 @@ class Proxies extends Pure_component {
             displayed_proxies: prev.displayed_proxies.map(map)}));
     }
     get_status(proxy, opt={}){
-        //if (this.state.proxy.port==22225 &&
-        //    !(this.state.proxy.stats && this.state.proxy.stats.real_bw))
-        //{
-        //    return;
-        //}
         const _this = this;
         return this.etask(function*(){
             this.on('uncaught', e=>{
@@ -568,18 +586,14 @@ class Proxies extends Pure_component {
               <div className="panel_heading">
                 <h2>
                   Proxies
-                  <Tooltip title="Add new proxy">
-                    <span className="link icon_link right top"
-                      onClick={this.add_proxy.bind(this)}>
-                      <i className="glyphicon glyphicon-plus"/>
-                    </span>
-                  </Tooltip>
+                  <Link_icon tooltip="Add new proxy" classes="right top"
+                    on_click={this.add_proxy.bind(this)} id="plus"/>
                 </h2>
               </div>
-              <If when={!this.state.proxies.length}>
+              <If when={this.state.loaded&&!this.state.proxies.length}>
                 <No_proxies/>
               </If>
-              <If when={this.state.proxies.length}>
+              <If when={this.state.loaded&&this.state.proxies.length}>
                 <div className="panel_body with_table">
                   <Proxies_pagination entries={this.state.proxies}
                     cur_page={this.state.cur_page}
@@ -622,7 +636,7 @@ class Proxies extends Pure_component {
                     bottom/>
                 </div>
               </If>
-              <Add_proxy id="add_new_proxy_modal"/>
+              <Add_proxy/>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns.bind(this)}/>
             </div>
@@ -636,18 +650,9 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
     <Pagination_panel entries={entries} items_per_page={items_per_page}
       cur_page={cur_page} page_change={page_change} top={top} bottom={bottom}
       update_items_per_page={update_items_per_page}>
-        <Tooltip title="Edit columns">
-          <span onClick={edit_columns}
-            className="link icon_link">
-            <i className="glyphicon glyphicon-filter"></i>
-          </span>
-        </Tooltip>
-        <Tooltip title="Download all ports as CSV">
-          <span onClick={download_csv}
-            className="icon_link">
-            <i className="glyphicon glyphicon-download"></i>
-          </span>
-        </Tooltip>
+        <Link_icon tooltip="Edit columns" on_click={edit_columns} id="filter"/>
+        <Link_icon tooltip="Download all ports as CSV" on_click={download_csv}
+          id="download"/>
     </Pagination_panel>
 );
 
@@ -679,15 +684,22 @@ class Proxy_row extends Pure_component {
               {this.props.cols.map(col=>(
                 <td onClick={this.edit.bind(this)} key={col.key}
                   className={cell_class(col)}>
-                  {col.render ?  col.render({proxy, col: col.key}) :
-                      _.get(proxy, col.key)
-                  }
+                  <Cell proxy={proxy} col={col}/>
                 </td>
               ))}
             </tr>
         );
     }
 }
+
+const Cell = ({proxy, col})=>{
+    if (!col.ext && proxy.ext_proxies)
+        return '—';
+    if (col.render)
+        return col.render({proxy, col: col.key})||null;
+    else
+        return _.get(proxy, col.key)||null;
+};
 
 class Actions extends Pure_component {
     delete_proxy(){
@@ -704,7 +716,6 @@ class Actions extends Pure_component {
             const url = '/api/refresh_sessions/'+_this.props.proxy.port;
             yield ajax.json({url, method: 'POST'});
             yield _this.props.get_status(_this.props.proxy, {force: true});
-            //yield _this.props.update_proxies();
         });
     }
     duplicate(){
@@ -721,7 +732,9 @@ class Actions extends Pure_component {
             yield _this.props.update_proxies();
         });
     }
-    show_history(){
+    show_logs(){
+        //setdb.get('head.callbacks.state.go')('stats',
+        //    {port: this.props.proxy.port});
         const root = setdb.get('head.root_scope');
         root.history_dialog = [{
             port: this.props.proxy.port}];
@@ -731,7 +744,7 @@ class Actions extends Pure_component {
         const persist = this.props.proxy.proxy_type=='persist';
         return (
             <td className="proxies_actions">
-              <Action_icon id="delete" on_click={this.delete_proxy.bind(this)}
+              <Action_icon id="trash" on_click={this.delete_proxy.bind(this)}
                 tooltip="Delete" invisible={!persist}/>
               <Action_icon id="duplicate" on_click={this.duplicate.bind(this)}
                 tooltip="Duplicate Proxy"
@@ -739,10 +752,8 @@ class Actions extends Pure_component {
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions.bind(this)}
                 tooltip="Refresh Sessions"/>
-              <Action_icon id="history" on_click={this.show_history.bind(this)}
-                tooltip="History"
-                tooltip_disabled="History is not enabled for this proxy"
-                disabled={!this.props.proxy._history}/>
+              <Action_icon id="time" on_click={this.show_logs.bind(this)}
+                tooltip="Logs"/>
             </td>
         );
     }
@@ -751,25 +762,13 @@ class Actions extends Pure_component {
 const Action_icon = ({on_click, disabled, invisible, id, tooltip,
     tooltip_disabled})=>
 {
-    if (invisible)
-        return <div className={classnames('action_icon invisible', id)}/>;
-    else if (disabled)
-    {
-        return (
-            <Tooltip title={tooltip_disabled}>
-              <div className={classnames('action_icon disabled', id)}/>
-            </Tooltip>
-        );
-    }
-    else
-    {
-        return (
-            <Tooltip title={tooltip}>
-              <div onClick={on_click}
-                className={classnames('action_icon', id)}/>
-            </Tooltip>
-        );
-    }
+    const classes = classnames('action_icon', {disabled, invisible});
+    if (disabled)
+        tooltip = tooltip_disabled;
+    return (
+        <Link_icon tooltip={tooltip} on_click={on_click} id={id}
+          classes={classes} invisible={invisible} disabled={disabled}/>
+    );
 };
 
 export default Proxies;

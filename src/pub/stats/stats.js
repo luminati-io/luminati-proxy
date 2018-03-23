@@ -95,20 +95,10 @@ class Success_ratio extends Pure_component {
     constructor(props){
         super(props);
         this.state = {total: 0, success: 0};
-        this.get_req_status_stats = etask._fn(function*(_this){
-            let res = yield etask(()=>axios.get('/api/req_status'));
-            return res.data;
-        });
     }
     componentDidMount(){
-        const _this = this;
-        this.etask(function*(){
-            while (true)
-            {
-                _this.setState(yield _this.get_req_status_stats());
-                yield etask.sleep(3000);
-            }
-        });
+        this.setdb_on('head.req_status', req_status=>
+            this.setState({...req_status}));
     }
     render (){
         const {total, success} = this.state;

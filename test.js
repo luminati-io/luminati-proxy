@@ -211,7 +211,7 @@ const http_ping = ()=>etask(function*(){
     ping.https = {
         server: _https,
         port: _https.address().port,
-        url: `https://127.0.0.1:${_https.address().port}/`,
+        url: `https://localhost:${_https.address().port}/`,
     };
     ping.stop = etask._fn(function*(_this){
         yield etask.nfn_apply(_this.http.server, '.close', []);
@@ -896,7 +896,7 @@ describe('proxy', ()=>{
             }));
             t('https connect', ()=>ping.https.url, ()=>({
                 port: 24000,
-                url: '127.0.0.1:'+ping.https.port,
+                url: 'localhost:'+ping.https.port,
                 method: 'CONNECT',
             }), {insecure: true, ssl: false});
             t('https sniffing', ()=>ping.https.url, ()=>({

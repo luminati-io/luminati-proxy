@@ -1,5 +1,16 @@
  Luminati Proxy manager - Change Log
 
+## 1.88.679
+- :sparkles: add external proxies support
+- :sparkles: UI improvements
+- :sparkles: install script improvements
+- :star: improved logging
+- :star: allow tcp requests to 43 (whois) via socks and connect (only on zones
+   with special permission)
+- :bug: fixed proxy error handing and provide meaningful proxy errors
+- :bug: fixed socks connection establish error handling
+- :bug: fix https request to ip (will not be ssl analyzed)
+
 ## 1.88.182
 - :bug: fixed overload error on osx
 - :sparkles: ui improvments

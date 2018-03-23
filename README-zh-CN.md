@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.88.182/luminati-proxy-manager-v1.88.182-setup.exe">代理管理安装器</a>.
+下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.88.679/luminati-proxy-manager-v1.88.679-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -121,8 +121,6 @@ Options:
   --pool_size             Session pool size                [number] [default: 3]
   --pool_type             Pool session iteration order
                                                 [string] [default: "sequential"]
-  --session_init_timeout  Session establish timeout (seconds)
-                                                           [number] [default: 5]
   --keep_alive            Generate request to keep session alive after given
                           idle time (seconds)                           [number]
   --seed                  Session ID seed used for identifying sessions from

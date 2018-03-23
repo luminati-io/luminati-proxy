@@ -7,8 +7,8 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {Modal, Loader, Select, Input, Warning, Warnings, presets,
-    Checkbox} from './common.js';
+import {Modal, Loader, Select, Input, Warnings, presets,
+    Checkbox, Textarea, Tooltip} from './common.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -57,7 +57,8 @@ const tabs = {
                       ASN list
                     </a>)
                     </span>,
-                tooltip: 'Specific ASN provider',
+                tooltip: `ASN uniquely identifies each network on the internet.
+                    Target exit nodes (IPs) on a specific ASN`,
                 placeholder: 'ASN code e.g. 42793'
             },
             carrier: {
@@ -78,16 +79,13 @@ const tabs = {
                 label: 'Pool size',
                 tooltip: `Maintain number of IPs that will be pinged constantly
                     - must have keep_alive to work properly`,
+                ext: true,
             },
             request_timeout: {
-                label: 'Timeout for requests on the super proxy',
-                tooltip: `Kill requests to super proxy and try new one if
+                label: 'Timeout for requests',
+                tooltip: `Kill requests to proxy and try new one if
                     timeout is exceeded`,
-            },
-            session_init_timeout: {
-                label: 'Session establish timeout',
-                tooltip: `Time in seconds for the request to complete before
-                    establishing connection to new peer`,
+                ext: true,
             },
             race_reqs: {
                 label: 'Parallel race requests',
@@ -106,11 +104,13 @@ const tabs = {
             },
             throttle: {
                 label: 'Throttle requests above given number',
-                tooltip: 'Allow maximum number of requests per unit of time',
+                tooltip: 'Allow maximum number of parallel requests',
+                ext: true,
             },
             reverse_lookup: {
                 label: 'Reverse resolve',
                 tooltip: 'resolve DNS from IP to url',
+                ext: true,
             },
             reverse_lookup_file: {
                 label: 'Path to file',
@@ -206,21 +206,25 @@ const tabs = {
             pool_type: {
                 label: 'Pool type',
                 tooltip: `How to pull the IPs - roundrobin / sequential`,
+                ext: true,
             },
             keep_alive: {
                 label: 'Keep-alive',
                 tooltip: `Chosen number of sec to ping ip and keep it
                     connected. depending on peer availability.`,
+                ext: true,
             },
             whitelist_ips: {
                 label: 'Whitelist IP access',
                 tooltip: `Grant proxy access to specific IPs. only those
                     IPs will be able to send requests to this proxy Port`,
-                placeholder: `e.g. 1.1.1.1,23.23.23.23`
+                placeholder: `e.g. 1.1.1.1,23.23.23.23`,
+                ext: true,
             },
             session_random: {
                 label: 'Random Session',
                 tooltip: `Switch session ID on each request`,
+                ext: true,
             },
             session: {
                 label: 'Explicit Session',
@@ -232,6 +236,7 @@ const tabs = {
                 tooltip: `When connecting to remote lpm server stick sessions
                     to each computer. each connected computer will receive
                     unique session`,
+                ext: true,
             },
             max_requests: {
                 label: 'Max Requests',
@@ -239,10 +244,12 @@ const tabs = {
                     range or a fixed number. when using browser it should be
                     taken into consideration that one page load will attempt
                     multiple requests under the hood`,
+                ext: true,
             },
             session_duration: {
                 label: 'Session Duration (seconds)',
                 tooltip: `Change session after fixed number of seconds`,
+                ext: true,
             },
             seed: {
                 label: 'Session ID Seed',
@@ -256,17 +263,20 @@ const tabs = {
         tooltip: 'Improve the info you receive from the Proxy Manager',
         fields: {
             history: {
-                label: 'Log request history',
-                tooltip: `Keep track of requests made through LPM, view
-                    through UI or download from UI`,
+                label: 'Enable Logs',
+                tooltip: `Last 1K requests are automatically logged for easy
+                    debugging. Enable Logs to save all requests`,
+                ext: true,
             },
             ssl: {
-                label: 'Enable SSL Log',
-                tooltip: `Allow the proxy manager to read HTTPS requests`,
+                label: 'Enable SSL Logs',
+                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
+                ext: true,
             },
             log: {
                 label: 'Log level',
                 tooltip: `Decide which data to show in logs`,
+                ext: true,
             },
             debug: {
                 label: 'Luminati request debug info',
@@ -282,19 +292,23 @@ const tabs = {
                 label: 'Port',
                 tooltip: `The port number that will be used for the current
                     proxy configuration`,
+                ext: true,
             },
             password: {
-                label: 'Password',
+                label: 'Zone password',
                 tooltip: `Zone password as it appears in your zones page in
                     your Luminati's control panel http://luminati.io/cp/zones`,
             },
             iface: {
                 label: 'Interface',
-                tooltip: `Specify a network interface for the machine to use`,
+                tooltip: 'Define a specific network interface on which '
+                    +'the local machine is running',
+                ext: true,
             },
             multiply: {
                 label: 'Multiply port',
                 tooltip: `Create multiple identical ports`,
+                ext: true,
             },
             multiply_ips: {
                 label: 'Multiply port per IP',
@@ -309,19 +323,21 @@ const tabs = {
             socks: {
                 label: 'SOCKS 5 port',
                 tooltip: `In addition to current port, creates a separate port
-                    with a socks5 server (input should be the SOCKS port
-                    number)`,
+                    with a SOCKS5 server (add SOCKS port number)`,
+                ext: true,
             },
             secure_proxy: {
                 label: 'SSL to super proxy',
                 tooltip: `Encrypt requests sent to super proxy to avoid
                     detection on DNS`,
+                ext: true,
             },
             null_response: {
                 label: 'URL regex pattern for null response',
                 tooltip: `on this url pattern, lpm will return a "null
                     response" without proxying (useful when users don't want
                     to make a request, but a browser expects 200 response)`,
+                ext: true,
             },
             bypass_proxy: {
                 label: `URL regex for bypassing the proxy manager and send
@@ -329,6 +345,7 @@ const tabs = {
                 tooltip: `Insert URL pattern for which requests will be passed
                     directly to target site without any proxy
                     (super proxy or peer)`,
+                ext: true,
             },
             direct_include: {
                 label: `URL regex for requests to be sent directly from super
@@ -350,6 +367,9 @@ const tabs = {
         },
     },
 };
+
+const all_fields = Object.keys(tabs).map(k=>tabs[k].fields).reduce((acc, el)=>
+    ({...acc, ...el}), {});
 
 const validators = {
     number: (min, max, req=false)=>val=>{
@@ -516,6 +536,11 @@ class Index extends React.Component {
         const form = this.state.form;
         if (!proxy)
             return false;
+        if (form.ext_proxies && all_fields[field_name] &&
+            !all_fields[field_name].ext)
+        {
+            return false;
+        }
         const zone = form.zone||proxy.zone.def;
         if (['city', 'state'].includes(field_name) &&
             (!form.country||form.country=='*'))
@@ -541,9 +566,18 @@ class Index extends React.Component {
             presets[form.last_preset_applied] : null;
         if (last_preset&&last_preset.key!=preset&&last_preset.clean)
             last_preset.clean(form);
-        form.preset = preset;
-        form.last_preset_applied = preset;
-        presets[preset].set(form);
+        if (form.ext_proxies)
+        {
+            form.preset = '';
+            form.zone = '';
+            form.password = '';
+        }
+        else
+        {
+            form.preset = preset;
+            form.last_preset_applied = preset;
+            presets[preset].set(form);
+        }
         if (form.session===true)
         {
             form.session_random = true;
@@ -817,7 +851,8 @@ class Index extends React.Component {
         if (!save_form.max_requests)
             save_form.max_requests = 0;
         delete save_form.rules;
-        presets[save_form.preset].set(save_form);
+        if (!save_form.ext_proxies)
+            presets[save_form.preset].set(save_form);
         this.prepare_rules(save_form);
         delete save_form.preset;
         if (!save_form.session)
@@ -864,12 +899,6 @@ class Index extends React.Component {
         });
         const default_zone=this.state.consts&&
             this.state.consts.proxy.zone.def;
-        const warning_dirty = (<span>
-            You have unsaved changes. Сlick
-            <strong> 'Save' </strong>
-            to apply the changes
-        </span>);
-        // XXX krzysztof: cleanup
         const curr_plan = this.state.consts&&this.get_curr_plan();
         let type;
         if (curr_plan&&curr_plan.type=='static')
@@ -882,13 +911,9 @@ class Index extends React.Component {
               <div className="nav_wrapper">
                 <div className="nav_header">
                   <h3>Proxy on port {this.port}</h3>
-                  <div className="warning_wrapper">
-                    <If when={this.state.dirty}>
-                      <Warning text={warning_dirty}/>
-                    </If>
-                  </div>
                 </div>
                 <Nav zones={zones} default_zone={default_zone}
+                  disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_field={this.field_changed.bind(this)}
                   on_change_preset={this.apply_preset.bind(this)}
@@ -925,7 +950,7 @@ class Index extends React.Component {
     }
 }
 
-const Nav = props=>{
+const Nav = ({disabled, ...props})=>{
     const reset_fields = ()=>{
         // XXX krzysztof: this should be moved in more generic place
         props.on_change_field('ips', []);
@@ -954,29 +979,28 @@ const Nav = props=>{
     let {preset} = props.form;
     return (
         <div className="nav">
-          <Field on_change={update_zone} options={props.zones} label="Zone"
-            value={props.form.zone}/>
-          <div className="preset_field">
-            <Field on_change={update_preset} label="Preset"
-              options={presets_opt} value={preset}/>
-          </div>
+          <Field on_change={update_zone} options={props.zones} tooltip="Zone"
+            value={props.form.zone} disabled={disabled}/>
+          <Field on_change={update_preset} tooltip="Preset"
+            options={presets_opt} value={preset} disabled={disabled}/>
           <Action_buttons save={props.save} dirty={props.dirty}/>
         </div>
     );
 };
 
-const Field = props=>{
+const Field = ({disabled, tooltip, ...props})=>{
     const options = props.options||[];
     return (
-        <div className="field">
-          <div className="title">{props.label}</div>
-          <select value={props.value}
-            onChange={e=>props.on_change(e.target.value)}>
-            {options.map(o=>(
-              <option key={o.key} value={o.value}>{o.key}</option>
-            ))}
-          </select>
-        </div>
+        <Tooltip title={tooltip}>
+          <div className="field">
+            <select value={props.value} disabled={disabled}
+              onChange={e=>props.on_change(e.target.value)}>
+              {options.map(o=>(
+                <option key={o.key} value={o.value}>{o.key}</option>
+              ))}
+            </select>
+          </div>
+        </Tooltip>
     );
 };
 
@@ -1088,20 +1112,12 @@ class Section_raw extends React.Component {
                 <div className="section_body">
                   {this.props.children}
                 </div>
-                <div className="icon"/>
               </div>
             </div>
         );
     }
 }
 const Section = getContext({provide: PropTypes.object})(Section_raw);
-
-const Textarea = props=>{
-    return (
-        <textarea value={props.val} rows="3" placeholder={props.placeholder}
-          onChange={e=>props.on_change_wrapper(e.target.value)}/>
-    );
-};
 
 const Double_number = props=>{
     const vals = (''+props.val).split(':');
@@ -1407,8 +1423,6 @@ class Speed_raw extends Pure_component {
                 min="0" note={pool_size_note} disabled={pool_size_disabled}/>
               <Section_with_fields type="number" id="request_timeout"
                 sufix="seconds" min="0"/>
-              <Section_with_fields type="number" id="session_init_timeout"
-                sufix="seconds" min="0"/>
               <Section_with_fields type="number" id="race_reqs" min="1"
                 max="3"/>
               <Section_with_fields type="number" id="proxy_count" min="1"/>
@@ -1504,6 +1518,7 @@ class Rules_raw extends React.Component {
             this.props.on_change_field('status_custom', '');
     }
     render(){
+        const disabled = !!this.props.form.ext_proxies;
         const trigger_types = [
             {key:'Select condition type for your Trigger rule', value: ''},
             {key: 'Status code', value: 'status'},
@@ -1536,14 +1551,15 @@ class Rules_raw extends React.Component {
         const trigger_correct = form.trigger_type||form.trigger_url_regex;
         return (
             <div>
-              <div className="tab_header">
-                Configure an action to be taken in response to a given Trigger
-              </div>
-              <With_data {...this.props}>
+              <With_data {...this.props} disabled={disabled}>
                 <Section id="trigger_type" header="Trigger"
                   correct={trigger_correct}>
-                  <Section_field id="trigger_type"
-                    form={form} type="select" data={trigger_types}
+                  <Section_field
+                    id="trigger_type"
+                    form={form}
+                    type="select"
+                    data={trigger_types}
+                    disabled={disabled}
                     on_change_field={on_change_field}
                     on_change={this.type_changed.bind(this)}/>
                   <If when={this.state.show_body_regex}>
@@ -1571,13 +1587,18 @@ class Rules_raw extends React.Component {
                   </If>
                   <Section_field id="trigger_url_regex"
                     form={form} type="text"
+                    disabled={disabled}
                     on_change_field={on_change_field}/>
                 </Section>
                 <Section id="action" header="Action"
                   note="IP will change for every entry"
+                  disabled={disabled}
                   on_change_field={on_change_field}>
                   <Section_field id="action"
-                    type="select" data={action_types} {...this.props}
+                    {...this.props}
+                    type="select"
+                    data={action_types}
+                    disabled={disabled}
                     on_change={this.action_changed.bind(this)}/>
                   <If when={this.props.form.action=='retry'}>
                     <Section_field id="retry_number"
