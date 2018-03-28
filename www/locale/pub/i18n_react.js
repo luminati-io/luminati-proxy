@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true*/
-define(['react', 'react-dom', '/www/util/pub/pure_component.js',
+define(['lodash', 'react', 'react-dom', '/www/util/pub/pure_component.js',
     '/util/setdb.js', '/util/storage.js', '/util/url.js'],
-    (React, ReactDOM, Pure_component, setdb, storage, zurl)=>{
+    (_, React, ReactDOM, Pure_component, setdb, storage, zurl)=>{
 
 // XXX saarya: change key once angular is removed
 const storage_key = 'NG_TRANSLATE_LANG_KEY';
@@ -34,25 +34,34 @@ const get_translation = (translation, key)=>{
         console.info('Missing translation for: "'+key+'"');
     return translation[key]||key;
 };
-const translate = key=>{
+const t = key=>{
     const translation = setdb.get('i18n.translation');
     return get_translation(translation, key);
 };
 class T extends Pure_component {
     constructor(props){
         super(props);
-        this.key = (props.children||'').replace(/\s+/g, ' ');
-        this.state = {text: this.key};
+        this.key = _.isString(this.props.children) ?
+            (props.children||'').replace(/\s+/g, ' ') : '';
+        this.state = {text: this.key, translation: {}};
     }
-    componentWillMount(){
-        this.setdb_on('i18n.translation', translation=>{
-            this.setState({text: get_translation(translation, this.key)});
-        });
+    componentDidMount(){
+        if (this.key)
+        {
+            this.setdb_on('i18n.translation', translation=>
+                this.setState({text: get_translation(translation, this.key)})
+            );
+        } else {
+            this.setdb_on('i18n.translation', translation=>
+                this.setState({translation}));
+        }
     }
-    render(){ return this.state.text; }
+    render(){
+        return this.key ? this.state.text : this.props.children(key=>
+            get_translation(this.state.translation, key));
+    }
 }
-
-const E = {T, translate, init, set_curr_lang};
+const E = {T, t, init, set_curr_lang};
 return E;
 
 });

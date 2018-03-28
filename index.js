@@ -26,6 +26,7 @@ const BrowserWindow = electron.BrowserWindow;
 const Notification = electron.Notification;
 const hutil = require('hutil');
 const etask = hutil.etask;
+const zerr = hutil.zerr;
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const analytics = require('universal-analytics');
@@ -203,7 +204,15 @@ let run = run_config=>{
     manager.start();
 };
 
-let quit = ()=>{
+let quit = (err)=>{
+    if (err)
+    {
+        zerr.perr(err);
+        if (manager)
+            manager._log.error('uncaught exception %s', zerr.e2s(err));
+        else
+             console.error('uncaught exception'+zerr.e2s(err));
+    }
     if (manager&&manager.argv.no_usage_stats)
         app.quit();
     else

@@ -15,7 +15,7 @@ import $ from 'jquery';
 import Add_proxy from './add_proxy.js';
 import No_proxies from './no_proxies.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip} from './common.js';
+    Tooltip, get_static_country} from './common.js';
 import {If} from '/www/util/pub/react.js';
 
 let country_names = {};
@@ -31,17 +31,6 @@ const Targeting_cell = ({proxy})=>{
               </span>
             </Tooltip>
         );
-    };
-    const get_static_country = proxy=>{
-        const zone = proxy.zones[proxy.zone];
-        if (!zone)
-            return false;
-        const plan = zone.plans[zone.plans.length-1];
-        if (plan.type=='static')
-            return plan.country||'any';
-        if (['domain', 'domain_p'].includes(plan.vips_type))
-            return plan.vip_country||'any';
-        return false;
     };
     const static_country = get_static_country(proxy);
     if (static_country&&static_country!='any'&&static_country!='*')
@@ -732,14 +721,6 @@ class Actions extends Pure_component {
             yield _this.props.update_proxies();
         });
     }
-    show_logs(){
-        //setdb.get('head.callbacks.state.go')('stats',
-        //    {port: this.props.proxy.port});
-        const root = setdb.get('head.root_scope');
-        root.history_dialog = [{
-            port: this.props.proxy.port}];
-        root.$digest();
-    }
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
         return (
@@ -752,8 +733,6 @@ class Actions extends Pure_component {
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions.bind(this)}
                 tooltip="Refresh Sessions"/>
-              <Action_icon id="time" on_click={this.show_logs.bind(this)}
-                tooltip="Logs"/>
             </td>
         );
     }

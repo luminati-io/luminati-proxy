@@ -229,13 +229,14 @@ const Warning_msg = ({warning})=>{
 };
 
 const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
-    children, top, bottom, update_items_per_page, max_buttons})=>
+    children, top, bottom, update_items_per_page, max_buttons, total})=>
 {
+    total = total||entries&&entries.length||0;
     let pagination = null;
-    if (entries.length>items_per_page)
+    if (total>items_per_page)
     {
         let next = false;
-        let pages = Math.ceil(entries.length/items_per_page);
+        let pages = Math.ceil(total/items_per_page);
         if (cur_page+1<pages)
             next = 'Next';
         pagination = (
@@ -250,13 +251,13 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
         buttons = <div className="table_buttons">{children}</div>;
     const display_options = [10, 20, 50, 100, 200, 500, 1000].map(v=>({
         key: v, value: v}));
-    const from = Math.min(cur_page*items_per_page+1, entries.length);
-    const to = Math.min((cur_page+1)*items_per_page, entries.length);
+    const from = Math.min(cur_page*items_per_page+1, total);
+    const to = Math.min((cur_page+1)*items_per_page, total);
     return (
         <div className={classnames('pagination_panel', {top, bottom})}>
           {pagination}
           <div className="numbers">
-            <strong>{from}-{to}</strong> of <strong>{entries.length}</strong>
+            <strong>{from}-{to}</strong> of <strong>{total}</strong>
           </div>
           <Select val={items_per_page} data={display_options}
             on_change_wrapper={update_items_per_page}/>
@@ -607,6 +608,20 @@ for (let k in presets)
 
 const emitter = new EventEmitter();
 
+const get_static_country = proxy=>{
+    if (!proxy.zone||!proxy.zones)
+        return false;
+    const zone = proxy.zones[proxy.zone];
+    if (!zone)
+        return false;
+    const plan = zone.plans[zone.plans.length-1];
+    if (plan.type=='static')
+        return plan.country||'any';
+    if (['domain', 'domain_p'].includes(plan.vips_type))
+        return plan.vip_country||'any';
+    return false;
+};
+
 export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
     Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
-    Textarea};
+    Textarea, get_static_country};

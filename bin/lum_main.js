@@ -139,12 +139,12 @@ let shutdown = (reason, send_ev = true, error = null)=>{
         if (shutdowning)
         {
             if (manager)
-                manager._log.crit('Forcing exit after 10 sec');
+                manager._log.crit('Forcing exit after 3 sec');
             else
-                console.error('Forcing exit after 10 sec');
+                console.error('Forcing exit after 3 sec');
             process.exit(1);
         }
-    }, 10000);
+    }, 3000);
     write_ua_file();
     write_status_file('shutdowning', error, manager&&manager._total_conf,
         reason);

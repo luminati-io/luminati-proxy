@@ -1,8 +1,9 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true*/
 define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
-    '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js'], ($,
-    React, ReactDOM, RouterDOM, url, ajax, Pure_component)=>{
+    '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js',
+    'react-bootstrap'], ($, React, ReactDOM, RouterDOM, url, ajax,
+    Pure_component, RB)=>{
 
 const E = {};
 
@@ -118,55 +119,6 @@ class Popover extends Pure_component {
 }
 E.Popover = Popover;
 
-function prepare_tooltip_props(props)
-{
-    props.margin = 0;
-    props.autoclose = 0;
-    props.show_arrows = 1;
-    props.tooltip = 1;
-    props.shadow = 0;
-    props.align = ['left', 'right'].includes(props.position) ? 'middle'
-        : 'center';
-}
-
-E.Tooltip = class Tooltip extends Popover
-{
-    constructor(props){
-        prepare_tooltip_props(props);
-        super(props);
-    }
-    componentDidUpdate(){
-        let targetArray = document.querySelectorAll('[ru_tooltip]');
-        for (let btn of targetArray)
-        {
-            btn.onmouseleave = e=>{
-                this.hide();
-            };
-            btn.onmouseenter = e=>{
-                this.props.target = ()=>e.target;
-                this.show();
-            };
-        }
-    }
-    componentWillReceiveProps(props){ prepare_tooltip_props(props); }
-    content(){
-        let p = this.props, t = p.target ? p.target() : null, content;
-        if (p.children)
-        {
-            content = p.children instanceof Function
-                ? p.children(t.attributes['ru_tooltip'].value)
-                : p.children;
-        }
-        else
-            content = t ? t.attributes['ru_tooltip'].value : '';
-        return (
-            <div className="ru_tooltip">
-              {content}
-            </div>
-        );
-    }
-};
-
 E.Paginator = class Paginator extends Pure_component {
     constructor(props){ super(props); }
     click(v){
@@ -271,32 +223,35 @@ class Nav_hook extends Pure_component {
     constructor(props){
         super(props);
         this.reset = this.reset.bind(this);
-        if (this.props.hash_scroll)
-        {
-            props.history.listen(location=>
-                location.hash&&this.hash_scroll_on_load(location.hash));
-        }
     }
     componentDidMount(){
-        if (this.props.hash_scroll&&this.props.location.hash)
-            this.hash_scroll_on_load(this.props.location.hash);
+        const p = this.props;
+        const l = this.props.location;
+        if (p.hash_scroll&&l.hash)
+            this.hash_scroll(l.hash);
         if (this.props.sitemap)
-        {
-            const _this = this;
-            this.etask(function*(){
-                sitemap = yield ajax.json({url: _this.props.sitemap});
-            });
-        }
+            this.etask([()=>ajax.json({url: p.sitemap}), sm=>sitemap = sm]);
     }
     componentDidUpdate(prevProps){
         if (this.props.location == prevProps.location)
             return;
+        const p = this.props;
         const l = this.props.location;
         const url_o = url.parse(l.href);
-        if (this.props.update_meta)
+        if (p.update_meta)
             this.set_meta(url_o.pathname);
-        if (this.props.scroll_to_top&&!l.hash)
+        if (p.scroll_to_top&&!l.hash)
             window.scrollTo(0, 0);
+        if (p.hash_scroll&&l.hash)
+            this.hash_scroll(l.hash);
+        if (p.ga&&window.ga)
+        {
+            window.ga('set', 'page', l.pathname);
+            window.ga('send', 'pageview');
+        }
+        if (p.on_nav){
+            p.on_nav(url_o);
+        }
     }
     set_meta(pathname){
         const m = sitemap[pathname];
@@ -314,16 +269,6 @@ class Nav_hook extends Pure_component {
         const el = $(hash);
         return el[0]&&(el[0].scrollIntoView()||true);
     }
-    hash_scroll_on_load(hash){
-        this.reset();
-        if (this.hash_scroll(hash))
-            return;
-        this.observer = new MutationObserver(()=>
-            this.hash_scroll(hash)&&this.reset());
-        this.timeout = setTimeout(this.reset, 10000);
-        this.observer.observe(document,
-            {attributes: true, childList: true,subtree: true});
-    }
     reset(){
         this.observer&&this.observer.disconnect();
         this.timeout&&clearTimeout(this.timeout);
@@ -332,6 +277,15 @@ class Nav_hook extends Pure_component {
     render(){return this.props.children;}
 }
 E.Nav_hook = RouterDOM.withRouter(Nav_hook);
+
+const Tooltip = props=>{
+    if(!props.tip)
+        return props.children;
+    const tooltip = <RB.Tooltip id="tooltip">{props.tip}</RB.Tooltip>;
+    return (<RB.OverlayTrigger placement={props.placement||'top'}
+        overlay={tooltip}>{props.children}</RB.OverlayTrigger>);
+};
+E.Tooltip = Tooltip;
 
 return E;
 

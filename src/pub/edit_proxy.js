@@ -9,6 +9,7 @@ import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import {Modal, Loader, Select, Input, Warnings, presets,
     Checkbox, Textarea, Tooltip} from './common.js';
+import Logs from './logs.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -30,6 +31,7 @@ const ga_event = (category, action, label, opt={})=>{
     }
 };
 const tabs = {
+    logs: {fields: [], label: 'Logs'},
     target: {
         label: 'Targeting',
         tooltip: 'Select specific targeting for your proxy exit node',
@@ -94,17 +96,18 @@ const tabs = {
                 placeholder: 'Number of parallel requests'
             },
             proxy_count: {
-                label: 'Minimum number of super proxies to use',
-                tooltip: `Number of super proxies to use in parallel`,
+                label: 'Minimum number of super proxies',
+                tooltip: `Minimum number of super proxies to use in parallel`,
             },
             proxy_switch: {
-                label: 'Automatically switch super proxy on failure',
+                label: 'Switch super proxy on failure',
                 tooltip: `Number of failed requests(status 403, 429, 502, 503)
                     to switch to different super proxy`,
             },
             throttle: {
-                label: 'Throttle requests above given number',
-                tooltip: 'Allow maximum number of parallel requests',
+                label: 'Throttle requests',
+                tooltip: `Throttle requests above the given number. Allow
+                    maximum number of parallel requests`,
                 ext: true,
             },
             reverse_lookup: {
@@ -333,29 +336,26 @@ const tabs = {
                 ext: true,
             },
             null_response: {
-                label: 'URL regex pattern for null response',
+                label: 'URL regex for null response',
                 tooltip: `on this url pattern, lpm will return a "null
                     response" without proxying (useful when users don't want
                     to make a request, but a browser expects 200 response)`,
                 ext: true,
             },
             bypass_proxy: {
-                label: `URL regex for bypassing the proxy manager and send
-                    directly to host`,
+                label: `URL regex for bypassing`,
                 tooltip: `Insert URL pattern for which requests will be passed
                     directly to target site without any proxy
                     (super proxy or peer)`,
                 ext: true,
             },
             direct_include: {
-                label: `URL regex for requests to be sent directly from super
-                    proxy`,
+                label: `URL regex for super proxy`,
                 tooltip: `Insert URL pattern for which requests will be passed
                     through super proxy directly (not through peers)`,
             },
             direct_exclude: {
-                label: `URL regex for requests to not be sent directly from
-                    super proxy`,
+                label: `URL regex for not super proxy`,
                 tooltip: `Insert URL pattern for which requests will NOT be
                     passed through super proxy`,
             },
@@ -404,7 +404,7 @@ class Index extends React.Component {
     constructor(props){
         super(props);
         this.sp = etask('Index', function*(){ yield this.wait(); });
-        this.state = {tab: 'target', form: {zones: {}}, warnings: [],
+        this.state = {tab: 'logs', form: {zones: {}}, warnings: [],
             errors: {}, show_loader: false};
     }
     componentWillMount(){
@@ -415,6 +415,7 @@ class Index extends React.Component {
                 this.port = window.location.pathname.split('/').slice(-1)[0];
                 const proxy = proxies.filter(p=>p.port==this.port)[0].config;
                 const form = Object.assign({}, proxy);
+                setdb.set('head.edit_proxy.form', form);
                 const preset = this.guess_preset(form);
                 this.apply_preset(form, preset);
                 this.setState({proxies}, this.delayed_loader());
@@ -426,8 +427,10 @@ class Index extends React.Component {
             setdb.on('head.locations',
                 locations=>this.setState({locations}, this.delayed_loader())),
             setdb.on('head.callbacks', callbacks=>this.setState({callbacks})),
-            setdb.on('edit_proxy.loading', loading=>this.setState({loading})),
-            setdb.on('edit_proxy.tab', (tab='target')=>this.setState({tab})),
+            setdb.on('head.edit_proxy.loading', loading=>
+                this.setState({loading})),
+            setdb.on('head.edit_proxy.tab', (tab='logs')=>
+                this.setState({tab})),
         ];
     }
     componentDidMount(){
@@ -441,6 +444,8 @@ class Index extends React.Component {
     componentWillUnmount(){
         this.sp.return();
         this.listeners.forEach(l=>setdb.off(l));
+        setdb.set('head.edit_proxy.form', undefined);
+        setdb.set('head.edit_proxy', undefined);
     }
     componentDidUpdate(){ $('[data-toggle="tooltip"]').tooltip(); }
     delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
@@ -450,7 +455,7 @@ class Index extends React.Component {
                 !state.proxies || !state.defaults;
             const zone_name = !show_loader&&
                 (state.form.zone||state.consts.proxy.zone.def);
-            setdb.set('edit_proxy.zone_name', zone_name);
+            setdb.set('head.edit_proxy.zone_name', zone_name);
             return {show_loader};
         });
     }
@@ -484,7 +489,7 @@ class Index extends React.Component {
         return res;
     }
     click_tab(tab){
-        setdb.set('edit_proxy.tab', tab);
+        setdb.set('head.edit_proxy.tab', tab);
         ga_event('categories', 'click', tab);
     }
     is_dirty(form){
@@ -512,6 +517,7 @@ class Index extends React.Component {
             const new_form = {...prev_state.form, [field_name]: value};
             return {form: new_form, dirty: this.is_dirty(new_form)};
         });
+        setdb.set('head.edit_proxy.form.'+field_name, value);
         this.send_ga(field_name);
     }
     send_ga(id){
@@ -875,8 +881,10 @@ class Index extends React.Component {
     }
     render(){
         let Main_window;
+        const tab = this.state.tab;
         switch (this.state.tab)
         {
+        case 'logs': Main_window = Logs; break;
         case 'target': Main_window = Targeting; break;
         case 'speed': Main_window = Speed; break;
         case 'rules': Main_window = Rules; break;
@@ -922,7 +930,7 @@ class Index extends React.Component {
                   on_tab_click={this.click_tab.bind(this)}
                   errors={this.state.errors}/>
               </div>
-              <div className="main_window">
+              <div className={classnames('main_window', {[tab]: true})}>
                 <Main_window proxy={this.state.consts&&this.state.consts.proxy}
                   locations={this.state.locations}
                   defaults={this.state.defaults} form={this.state.form}
@@ -966,7 +974,7 @@ const Nav = ({disabled, ...props})=>{
     };
     const update_zone = val=>{
         const zone_name = val||props.default_zone;
-        setdb.set('edit_proxy.zone_name', zone_name);
+        setdb.set('head.edit_proxy.zone_name', zone_name);
         const zone = props.zones.filter(z=>z.key==zone_name)[0]||{};
         props.on_change_field('zone', val);
         props.on_change_field('password', zone.password);
@@ -1034,6 +1042,7 @@ class Action_buttons extends Pure_component {
 
 const Nav_tabs = props=>(
     <div className="nav_tabs">
+      <Tab_btn {...props} id="logs"/>
       <Tab_btn {...props} id="target"/>
       <Tab_btn {...props} id="speed"/>
       <Tab_btn {...props} id="rules"/>
@@ -1046,7 +1055,7 @@ const Nav_tabs = props=>(
 const Tab_btn = props=>{
     const btn_class = classnames('btn_tab',
         {active: props.curr_tab==props.id});
-    const tab_fields = Object.keys(tabs[props.id].fields);
+    const tab_fields = Object.keys(tabs[props.id].fields||{});
     const changes = Object.keys(props.form).filter(f=>{
         const val = props.form[f];
         const is_empty_arr = Array.isArray(val) && !val[0];
@@ -1086,32 +1095,14 @@ class Section_raw extends React.Component {
         super(props);
         this.state = {focused: false};
     }
-    on_focus(){
-        if (!this.props.disabled)
-            this.setState({focused: true});
-    }
-    on_blur(){ this.setState({focused: false}); }
-    on_mouse_enter(){ this.setState({hovered: true}); }
-    on_mouse_leave(){ this.setState({hovered: false}); }
     render(){
         const error = !!this.props.error_msg;
-        const dynamic_class = {
-            error,
-            correct: this.props.correct && !error,
-            active: this.state.focused && !error,
-            hovered: this.state.hovered,
-            disabled: this.props.disabled,
-        };
+        const dynamic_class = {disabled: this.props.disabled};
         return (
-            <div tabIndex="0" onFocus={this.on_focus.bind(this)}
-              onBlur={this.on_blur.bind(this)} className="section_wrapper"
-              onMouseEnter={this.on_mouse_enter.bind(this)}
-              onMouseLeave={this.on_mouse_leave.bind(this)}>
-              <div className={classnames('outlined', dynamic_class)}>
-                <Section_header text={this.props.header}/>
-                <div className="section_body">
-                  {this.props.children}
-                </div>
+            <div className={classnames('section_wrapper', dynamic_class)}>
+              <Section_header text={this.props.header}/>
+              <div className="section_body">
+                {this.props.children}
               </div>
             </div>
         );
@@ -1128,7 +1119,7 @@ const Double_number = props=>{
           <Input {...props} val={vals[0]||''} id={props.id+'_start'}
             type="number" disabled={props.disabled}
             on_change_wrapper={val=>update(val, vals[1])}/>
-          <span className="divider">:</span>
+          <span className="devider">:</span>
           <Input {...props} val={vals[1]||''} id={props.id+'_end'}
             type="number" disabled={props.disabled}
             on_change_wrapper={val=>update(vals[0], val)}/>
@@ -1173,12 +1164,11 @@ const Section_with_fields = props=>{
     const {id, form, header, errors, init_focus} = props;
     const disabled = props.disabled || !props.is_valid_field(id);
     const is_empty_arr = Array.isArray(form[id]) && !form[id][0];
-    const correct = form[id] && form[id]!='*' && !is_empty_arr;
     const error_msg = errors[id];
     return (
-        <Section correct={correct} disabled={disabled} id={id}
+        <Section disabled={disabled} id={id}
           header={header} error_msg={error_msg} init_focus={init_focus}>
-          <Section_field {...props} disabled={disabled} correct={correct}/>
+          <Section_field {...props} disabled={disabled}/>
         </Section>
     );
 };
@@ -1548,12 +1538,10 @@ class Rules_raw extends React.Component {
             '503 - Service unavailable', '504 - Gateway timeout', 'Custom']
             .map(s=>({key: s, value: s}));
         const {form, on_change_field} = this.props;
-        const trigger_correct = form.trigger_type||form.trigger_url_regex;
         return (
             <div>
               <With_data {...this.props} disabled={disabled}>
-                <Section id="trigger_type" header="Trigger"
-                  correct={trigger_correct}>
+                <Section id="trigger_type" header="Trigger">
                   <Section_field
                     id="trigger_type"
                     form={form}
@@ -1631,9 +1619,10 @@ class Alloc_modal extends Pure_component {
         this.state = {available_list: []};
     }
     componentDidMount(){
-        this.setdb_on('edit_proxy.zone_name', zone_name=>
+        this.setdb_on('head.edit_proxy.zone_name', zone_name=>
             this.setState({available_list: []}));
-        this.setdb_on('edit_proxy.tab', tab=>this.setState({curr_tab: tab}));
+        this.setdb_on('head.edit_proxy.tab', tab=>
+            this.setState({curr_tab: tab}));
         $('#allocated_ips').on('show.bs.modal', this.load.bind(this));
     }
     load(){
@@ -1666,7 +1655,7 @@ class Alloc_modal extends Pure_component {
         });
     }
     loading(loading){
-        setdb.set('edit_proxy.loading', loading);
+        setdb.set('head.edit_proxy.loading', loading);
         this.setState({loading});
     }
     checked(row){ return this.props.form[this.props.type].includes(row); }

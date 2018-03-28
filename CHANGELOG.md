@@ -1,5 +1,11 @@
  Luminati Proxy manager - Change Log
 
+## 1.89.371
+- :sparkles: new logs viewer
+- :bug: fixed bugs related to socks5
+- :bug: fixed reverse resolve bug
+- :star: daemon mode improvements
+
 ## 1.88.679
 - :sparkles: add external proxies support
 - :sparkles: UI improvements

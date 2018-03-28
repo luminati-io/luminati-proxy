@@ -22,7 +22,8 @@ import zhowto from './howto.js';
 import zproxy_tester from './proxy_tester.js';
 import zoverview from './overview.js';
 import zconfig from './config.js';
-import zstats from './stats.js';
+import zlogs from './logs.js';
+import zschema from './schema.js';
 import util from './util.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -167,11 +168,11 @@ function($uibTooltipProvider, $uiRouter, $location_provider,
             $scope.react_component = zedit_proxy; },
     });
     state_registry.register({
-        name: 'stats',
+        name: 'logs',
         parent: 'app',
-        url: '/stats?code&?domain&?port&?protocol',
+        url: '/logs?code&?domain&?port&?protocol',
         template: `<div react-view=react_component></div>`,
-        controller: $scope=>{ $scope.react_component = zstats; },
+        controller: $scope=>{ $scope.react_component = zlogs; },
     });
 }]);
 
@@ -371,7 +372,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         {name: 'overview', title: 'Overview', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'howto', title: 'Examples', navbar: true},
-        {name: 'stats', title: 'Statistics', navbar: true},
+        {name: 'logs', title: 'Logs', navbar: true},
         {name: 'config', title: 'Configuration', navbar: true},
     ];
     $transitions.onSuccess({}, function(transition){
@@ -427,6 +428,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     window.to_state = $state.go;
     $scope.$root.presets = presets;
     $scope.$root.report_bug_modal = zreport_bug_modal;
+    $scope.$root.schema_widget = zschema;
     $scope.$root.notif_center = znotif_center;
     const show_reload = function(){
         $('#restarting').modal({

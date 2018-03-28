@@ -23,8 +23,6 @@ class Add_proxy extends Pure_component {
             preset: 'sequential',
             show_loader: false,
             cur_tab: 'proxy_lum',
-            username: '',
-            password: '',
         };
     }
     componentWillMount(){
@@ -63,10 +61,6 @@ class Add_proxy extends Pure_component {
                 proxy_type: 'persist',
                 ext_proxies: this.state.parsed_ips_list,
             };
-            if (this.state.username)
-                form.ext_proxy_username = this.state.username;
-            if (this.state.password)
-                form.ext_proxy_password = this.state.password;
         }
         const _this = this;
         return etask(function*(){
@@ -164,8 +158,6 @@ class Add_proxy extends Pure_component {
                 <Ext_proxy
                   parse_error={this.state.parse_error}
                   ips_list={this.state.ips_list}
-                  username={this.state.username}
-                  password={this.state.password}
                   on_field_change={this.field_changed.bind(this)}/>
             );
         }
@@ -183,8 +175,7 @@ class Add_proxy extends Pure_component {
     }
 }
 
-const Ext_proxy = ({ips_list, on_field_change, parse_error, username,
-    password})=>
+const Ext_proxy = ({ips_list, on_field_change, parse_error})=>
 {
     const json_example = '[\'1.1.1.2\', \'username:password@1.2.3.4:8888\']';
     const placeholder = 'List of IPs to the external proxies in the following '
@@ -213,18 +204,6 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error, username,
     };
     return (
         <div className="ext_proxy">
-          <div className="field">
-            <div className="field_label">Username:</div>
-            <Input type="text" val={username}
-              on_change_wrapper={on_field_change('username')}
-              placeholder="default username"/>
-          </div>
-          <div className="field">
-            <div className="field_label">Password:</div>
-            <Input type="text" val={password}
-              on_change_wrapper={on_field_change('password')}
-              placeholder="default password"/>
-          </div>
           <Textarea rows={6} val={ips_list}
             placeholder={placeholder}
             on_change_wrapper={on_change_list}/>

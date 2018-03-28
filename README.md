@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.88.679/luminati-proxy-manager-v1.88.679-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.89.371/luminati-proxy-manager-v1.89.371-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -173,7 +173,6 @@ Options:
                                           [string] [default: "~/.luminati.json"]
   --database              Database file containing history and cached values
                                        [string] [default: "~/.luminati.sqlite3"]
-  --database_history      Database URI to save history instead of default DB
   --resolve               Reverse DNS lookup file                       [string]
   --mode                  Defines a set of permissible operations within the
                           UI/API                      [string] [default: "root"]

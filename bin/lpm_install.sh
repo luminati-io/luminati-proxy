@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.88.679"
+VERSION="1.89.371"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -23,12 +23,15 @@ NODE_VER='9.4.0'
 NPM_VER='4.6.1'
 UPDATE_NODE=0
 UPDATE_NPM=0
-OS="Linux"
+OS=""
 OS_MAC=0
+OS_LINUX=0
+OS_RELEASE=""
 ASSUME_YES=0
 case "$(uname -s)" in
 Linux*)
     OS="Linux"
+    OS_LINUX=1
     ;;
 Darwin*)
     OS="Mac"
@@ -44,6 +47,9 @@ MINGW*)
     OS="$OS"
     ;;
 esac
+if ((OS_LINUX)); then
+    OS_RELEASE=$(lsb_release -a)
+fi
 
 usage()
 {
@@ -127,7 +133,7 @@ perr()
     local note=$2
     local ts=$(date +"%s")
     local url="${PERR_URL}/?id=lpm_sh_${name}"
-    local data="{\"uuid\": \"$RID\", \"timestamp\": \"$ts\", \"ver\": \"$VERSION\", \"info\": {\"platform\": \"$OS\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$TS_START\", \"note\": \"$note\", \"lum\": $LUM, \"root\":$IS_ROOT}}"
+    local data="{\"uuid\": \"$RID\", \"timestamp\": \"$ts\", \"ver\": \"$VERSION\", \"info\": {\"platform\": \"$OS\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$TS_START\", \"note\": \"$note\", \"lum\": $LUM, \"root\":$IS_ROOT, \"os_release\":\"$OS_RELEASE\"}}"
     if ((PRINT_PERR)); then
         echo "perr $url $data"
     fi
@@ -383,6 +389,11 @@ lpm_install()
             # fix luminati binary not found on luminati ubuntu
             echo "running nave relink"
             sudo_cmd "nave relink"
+        elif ! [ -f "/usr/local/bin/luminati" ]; then
+            sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"
+        fi
+        if [ -f "/usr/local/bin/luminati" ]; then
+            sudo_cmd "chmod a+x /usr/local/bin/luminati"
         fi
         perr "install_success_lpm"
     fi

@@ -37,7 +37,7 @@ class ProtocolRow extends Pure_component {
         let value = this.props.stat.value||0;
         if (this.props.go)
         {
-            click = ()=>this.state.go('stats',
+            click = ()=>this.state.go('logs',
                 {protocol: this.props.stat.protocol});
             class_name = 'row_clickable';
         }
