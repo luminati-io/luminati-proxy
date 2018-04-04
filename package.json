@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.90.331",
+    "productName": "Luminati Proxy Manager 1.90.377",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -310,7 +310,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "2092e7c7ea462635e1200b49160b75fe"
+    "md5": "2fa5c822aea222d482c9d3b7ea53ac5b"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -351,5 +351,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.90.331"
+  "version": "1.90.377"
 }

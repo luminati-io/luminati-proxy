@@ -32560,7 +32560,7 @@ var Login = function (_Pure_component) {
             var url_o = _url2.default.parse(document.location.href);
             var qs_o = _url2.default.qs_parse((url_o.search || '').substr(1));
             if (qs_o.t) {
-                this.token = qs_o.t;
+                this.token = qs_o.t.replace(/\s+/g, '+');
                 this.save_user();
             }
         }

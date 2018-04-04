@@ -1,6 +1,6 @@
  Luminati Proxy manager - Change Log
 
-## 1.90.331
+## 1.90.377
 
 ## 1.89.371
 - :sparkles: new logs viewer

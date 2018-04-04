@@ -22,7 +22,7 @@ class Login extends Pure_component {
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
         if (qs_o.t)
         {
-            this.token = qs_o.t;
+            this.token = qs_o.t.replace(/\s+/g, '+');
             this.save_user();
         }
     }

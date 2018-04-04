@@ -1235,7 +1235,6 @@ describe('manager', ()=>{
         }));
 
         t('off', ['--no-dropin'], []);
-        t('on', ['--dropin'], [{port: Luminati.dropin.port}]);
     });
     describe('api', ()=>{
         it('ssl', ()=>etask(function*(){
