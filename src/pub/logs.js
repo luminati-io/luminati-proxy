@@ -153,16 +153,16 @@ class Logs extends Pure_component {
         return (
             <div className="lpm logs">
               <Loader show={this.state.show_loader}/>
-              <Filtering
-                port_page={!!this.props.form}
-                add_filter={this.add_filter.bind(this)}
-                remove_filter={this.remove_filter.bind(this)}
-                selected_filters={this.state.selected_filters}
-                filters={this.state.filters}/>
               <div>
-                <div className="panel summary_panel">
+                <div className="panel logs_panel">
                   <div className="panel_heading">
                     <h2>Recent Requests</h2>
+                    <Filtering
+                      port_page={!!this.props.form}
+                      add_filter={this.add_filter.bind(this)}
+                      remove_filter={this.remove_filter.bind(this)}
+                      selected_filters={this.state.selected_filters}
+                      filters={this.state.filters}/>
                   </div>
                   <div className="panel_body with_table">
                     <Logs_pagination
@@ -332,10 +332,10 @@ class Main_table extends Pure_component {
     }
     set_tab(tab){ this.setState({curr_tab: tab}); }
     render(){
+        const open = this.props.preview_entry&&this.props.preview_entry.uuid;
         return (
-            <div className="requests_table">
-              <If when={this.props.preview_entry&&
-                  this.props.preview_entry.uuid}>
+            <div className={classnames('requests_table', {open})}>
+              <If when={open}>
                 <Tab_nav click_reset={this.reset.bind(this)}
                   curr_tab={this.state.curr_tab}
                   set_tab={this.set_tab.bind(this)}/>
@@ -359,7 +359,6 @@ class Main_table extends Pure_component {
                   ))}
                 </tbody>
               </table>
-              <div className="filler"/>
             </div>
         );
     }
@@ -380,20 +379,6 @@ const Column = ({col, sort, sorted})=>{
     );
 };
 
-const Tab_nav = props=>(
-    <div className="tab_nav">
-      <div className="close_btn">
-        <Link_icon tooltip="Close" id="remove" on_click={props.click_reset}
-          small/>
-      </div>
-      <Tab_btn set_tab={props.set_tab} title="Headers" id="general"
-        curr_tab={props.curr_tab}/>
-      <Tab_btn set_tab={props.set_tab} title="Response" id="response"
-        curr_tab={props.curr_tab}/>
-      <div className="filler"/>
-    </div>
-);
-
 const Tab_btn = props=>(
     <div onClick={()=>props.set_tab(props.id)}
       className={classnames('tab_btn', {active: props.id==props.curr_tab})}>
@@ -405,11 +390,16 @@ const Row = ({entry, preview_uuid, select_entry})=>{
     const local = moment(new Date(entry.startedDateTime))
     .format('YYYY-MM-DD HH:mm:ss');
     const active = preview_uuid==entry.uuid;
+    let host;
+    if (entry.request.host.length>25)
+        host = entry.request.host.slice(0, 22)+'...';
+    else
+        host = entry.request.host;
     return (
         <tr className={classnames({active})}
           onClick={()=>select_entry(entry.uuid)}>
           <td className="fixed_col">
-            <Tooltip title={entry.request.url}>{entry.request.host}</Tooltip>
+            <Tooltip title={entry.request.url}>{host}</Tooltip>
           </td>
           <td>{entry.details.port}</td>
           <td>
@@ -424,12 +414,32 @@ const Row = ({entry, preview_uuid, select_entry})=>{
     );
 };
 
+const panel_width = 'calc(100% - 179px)';
+
+const Tab_nav = props=>{
+    const style = {minWidth: panel_width, maxWidth: panel_width};
+    return (
+        <div className="tab_nav" style={style}>
+          <div className="close_btn">
+            <Link_icon tooltip="Close" id="remove" on_click={props.click_reset}
+              small/>
+          </div>
+          <Tab_btn set_tab={props.set_tab} title="Headers" id="general"
+            curr_tab={props.curr_tab}/>
+          <Tab_btn set_tab={props.set_tab} title="Response" id="response"
+            curr_tab={props.curr_tab}/>
+          <div className="filler"/>
+        </div>
+    );
+};
+
 const Preview = ({curr_tab, entry})=>{
     if (!entry||!entry.uuid)
         return null;
-    const width = 'calc(100% - 180px)';
-    const height = 'calc(100% - 57px)';
-    const style = {minWidth: width, maxWidth: width, height};
+    const height = '400px';
+    const min_height = 'calc(100% - 57px)';
+    const style = {minWidth: panel_width, maxWidth: panel_width, height,
+        minHeight: min_height};
     return (
         <div className="preview" style={style}>
           <If when={curr_tab=='general'}>
@@ -465,18 +475,37 @@ const Response_tab = ({body})=>(
     </div>
 );
 
-const Preview_section = ({title, pairs})=>(
-    <div className="section">
-      <div className="title">{title}</div>
-      {(pairs||[]).map(pair=>
-        <Key_value key={pair.value} name={pair.name} value={pair.value}/>
-      )}
-    </div>
-);
+class Preview_section extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {open: true};
+    }
+    toggle(){ this.setState(prev=>({open: !prev.open})); }
+    render(){
+        const glyph_class = classnames('glyphicon sort_arrow', {
+            'glyphicon-chevron-down': this.state.open,
+            'glyphicon-chevron-right': !this.state.open,
+        });
+        return (
+            <div className="section">
+              <div className="title" onClick={this.toggle.bind(this)}>
+                <span className={glyph_class}/>
+                {this.props.title}
+              </div>
+              <If when={this.state.open}>
+                {(this.props.pairs||[]).map(pair=>
+                  <Key_value key={pair.value} name={pair.name}
+                    value={pair.value}/>
+                )}
+              </If>
+            </div>
+        );
+    }
+}
 
 const Key_value = ({name, value})=>(
     <div className="key_value">
-      <If when={name}><div className="key">{name}</div></If>
+      <If when={name}><div className="key">{name}:</div></If>
       <div className="value">{value}</div>
     </div>
 );

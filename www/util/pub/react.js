@@ -253,13 +253,19 @@ class Nav_hook extends Pure_component {
             p.on_nav(url_o);
         }
     }
+    add_domain(path){
+        return this.props.domain&&`https://${this.props.domain}${path}`||path;
+    }
     set_meta(pathname){
         const m = sitemap[pathname];
         if (!m)
             return;
+        m.og_url = this.add_domain(m.og_url||pathname);
+        m.og_image = m.og_image&&this.add_domain(m.og_image);
         $('title').text(m.title);
         $('meta[name="description"]').attr('content', m.description);
         $('meta[property="og:url"]').attr('content', m.og_url);
+        $('link[rel="canonical"]').attr('href', m.og_url);
         $('meta[property="og:title"]').attr('content', m.og_title);
         $('meta[property="og:description"]').attr('content', m.og_description);
         $('meta[property="og:image"]').attr('content', m.og_image);

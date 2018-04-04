@@ -26,71 +26,6 @@ const E = {
     },
 };
 
-class Stat_row extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-        this.timeouts = [];
-    }
-    componentWillReceiveProps(props){
-        _.each(props.stat, (v, k)=>{
-            if (!this.state[`class_${k}`] && this.props.stat[k]!=v)
-            {
-                this.setState({[`class_${k}`]: 'stats_row_change'});
-                this.timeouts.push(setTimeout(()=>{
-                    this.setState({[`class_${k}`]: undefined});
-                }, 1000));
-            }
-        });
-    }
-    willUnmount(){
-        if (this.timeouts.length)
-            this.timeouts.forEach(t=>clearTimeout(t));
-    }
-}
-
-class S_row extends Stat_row {
-    render(){
-        return <StatusCodeRow class_value={this.state.class_value}
-              class_bw={this.state.class_bw} {...this.props} />;
-    }
-}
-
-class D_row extends Stat_row {
-    render(){
-        return <DomainRow class_value={this.state.class_value}
-              class_bw={this.state.class_bw} {...this.props} />;
-    }
-}
-
-class P_row extends Stat_row {
-    render(){
-        return <ProtocolRow class_value={this.state.class_value}
-              class_bw={this.state.class_bw} {...this.props} />;
-    }
-}
-
-class Stat_table extends React.Component {
-    enter = ()=>{
-        let dt = this.props.dataType;
-        E.sp.spawn(this.sp = etask(function*(){
-            yield etask.sleep(2*date.ms.SEC);
-            util.ga_event('stats panel', 'hover', dt);
-        }));
-    };
-    leave = ()=>{
-        if (this.sp)
-            this.sp.return();
-    };
-    render(){
-        const Table = this.props.table || Common.Stat_table;
-        return <div className="stat_table_wrapper" onMouseEnter={this.enter}
-            onMouseLeave={this.leave}>
-              <Table go {...this.props} />
-            </div>;
-    }
-}
-
 class Success_ratio extends Pure_component {
     constructor(props){
         super(props);
@@ -170,7 +105,7 @@ class Stats extends React.Component {
         this.setState({show_certificate: false});
     };
     render(){
-        return <div className="proxies lpm">
+        return (
             <div className="panel stats_panel">
               <div className="panel_heading">
                 <h2>Statistics</h2>
@@ -181,14 +116,14 @@ class Stats extends React.Component {
               </div>
               <div className="panel_body with_table">
                 <Success_ratio/>
-                <Stat_table table={StatusCodeTable} row={S_row}
+                <StatusCodeTable row={StatusCodeRow}
                   dataType="status_codes"
                   stats={this.state.statuses.stats}
                   show_more={this.state.statuses.has_more}/>
-                <Stat_table table={DomainTable} row={D_row}
+                <DomainTable row={DomainRow}
                   dataType="domains" stats={this.state.domains.stats}
                   show_more={this.state.domains.has_more}/>
-                <Stat_table table={ProtocolTable} row={P_row}
+                <ProtocolTable row={ProtocolRow}
                   dataType="protocols" stats={this.state.protocols.stats}
                   show_more={this.state.protocols.has_more}
                   show_enable_https_button
@@ -223,7 +158,7 @@ class Stats extends React.Component {
                 </Dialog>
               </div>
             </div>
-          </div>;
+        );
     }
 }
 

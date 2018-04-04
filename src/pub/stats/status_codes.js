@@ -2,11 +2,10 @@
 'use strict'; /*jslint react:true*/
 import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
-import {Col, Table, Pagination, OverlayTrigger, Tooltip}
-    from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
+import {Tooltip} from './../common.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
@@ -63,21 +62,15 @@ class StatusCodeRow extends Pure_component {
     componentWillMount(){
         this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
     render(){
-        let class_name = '';
-        let click = ()=>{};
-        if (this.props.go)
-        {
-            click = ()=>this.state.go('logs',
-                {code: this.props.stat.status_code});
-            class_name = 'row_clickable';
-        }
+        const click = ()=>{
+            this.state.go('logs', {code: this.props.stat.status_code});
+        };
         return (
-            <tr className={class_name} onClick={click}>
+            <tr onClick={click}>
               <td>{this.props.stat.status_code}</td>
-              <td className={this.props.class_bw}>
-                {util.bytes_format(this.props.stat.bw)}</td>
-              <td className={this.props.class_value}>
-                {this.props.stat.value}</td>
+              <td>{util.bytes_format(this.props.stat.out_bw)}</td>
+              <td>{util.bytes_format(this.props.stat.in_bw)}</td>
+              <td className="reqs">{this.props.stat.value}</td>
             </tr>
         );
     }
@@ -85,12 +78,17 @@ class StatusCodeRow extends Pure_component {
 
 class StatusCodeTable extends React.Component {
     render(){
-        return <Common.Stat_table row={StatusCodeRow} path="/status_codes"
-              row_key="status_code" go {...this.props}>
+        return <Common.Stat_table row={StatusCodeRow} path="/logs"
+              row_key="status_code" {...this.props}>
               <tr>
-                <th className="col-md-4">Code</th>
-                <th className="col-md-4">Bandwidth</th>
-                <th className="col-md-4">Requests</th>
+                <th className="col val">Code</th>
+                <th className="col bw">BW up</th>
+                <th className="col bw">BW down</th>
+                <th className="col reqs">
+                  <Tooltip title="Number of requests">
+                    <span>Requests</span>
+                  </Tooltip>
+                </th>
               </tr>
             </Common.Stat_table>;
     }

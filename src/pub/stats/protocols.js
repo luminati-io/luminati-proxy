@@ -6,6 +6,7 @@ import {Row, Col, Button} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
+import {Tooltip} from './../common.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
@@ -32,23 +33,16 @@ class ProtocolRow extends Pure_component {
         this.props.enable_https_button_click(evt);
     };
     render(){
-        let class_name = '';
-        let click = ()=>{};
-        let value = this.props.stat.value||0;
-        if (this.props.go)
-        {
-            click = ()=>this.state.go('logs',
-                {protocol: this.props.stat.protocol});
-            class_name = 'row_clickable';
-        }
+        const value = this.props.stat.value||0;
+        const click = ()=>{
+            this.state.go('logs', {protocol: this.props.stat.protocol});
+        };
         return (
-            <tr className={class_name} onClick={click}>
+            <tr onClick={click}>
               <td>{this.props.stat.protocol}</td>
-              <td className={this.props.class_bw}>
-                {util.bytes_format(this.props.stat.bw)}</td>
-              <td className={this.props.class_value}>
-                {value}
-              </td>
+              <td>{util.bytes_format(this.props.stat.out_bw)}</td>
+              <td>{util.bytes_format(this.props.stat.in_bw)}</td>
+              <td className="reqs">{value}</td>
             </tr>
         );
     }
@@ -56,7 +50,7 @@ class ProtocolRow extends Pure_component {
 
 class ProtocolTable extends React.Component {
     render(){
-        return <Common.Stat_table row={ProtocolRow} path="/protocols"
+        return <Common.Stat_table row={ProtocolRow} path="/logs"
               row_key="protocol" title={
                   <Row>
                     <Col md={6}>{this.props.title}</Col>
@@ -68,15 +62,19 @@ class ProtocolTable extends React.Component {
                       </Col>}
                   </Row>
                 }
-                go
                 row_opts={{show_enable_https_button:
                   this.props.show_enable_https_button, enable_https_button_click:
                   this.props.enable_https_button_click}}
                 {...this.props}>
               <tr>
-                <th className="col-md-4">Protocol</th>
-                <th className="col-md-4">Bandwidth</th>
-                <th className="col-md-4">Requests</th>
+                <th className="col val">Protocol</th>
+                <th className="col bw">BW up</th>
+                <th className="col bw">BW down</th>
+                <th className="col reqs">
+                  <Tooltip title="Number of requests">
+                    <span>Requests</span>
+                  </Tooltip>
+                </th>
               </tr>
             </Common.Stat_table>;
     }

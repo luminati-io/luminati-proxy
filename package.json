@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.89.371",
+    "productName": "Luminati Proxy Manager 1.90.331",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -137,8 +137,9 @@
     "react-bootstrap": "0.31.0",
     "react-bootstrap-typeahead": "2.0.2",
     "react-dom": "16.1.1",
-    "react-router-dom": "4.1.1",
     "react-autosuggest": "9.3.4",
+    "react-router": "4.2.0",
+    "react-router-dom": "4.2.2",
     "style-loader": "0.18.2",
     "swagger-ui": "2.2.8",
     "ui-select": "0.19.8",
@@ -166,14 +167,9 @@
       "bin/check_compat.js",
       "bin/luminati.js",
       "bin/lum_main.js",
-      "bin/pub/faq/links.html",
-      "bin/pub/faq/ssl.html",
-      "bin/pub/faq/upgrade.html",
-      "bin/pub/faq.html",
       "bin/pub/favicon.ico",
       "bin/pub/font/lato_bold.woff2",
       "bin/pub/font/lato_regular.woff2",
-      "bin/pub/history.html",
       "bin/pub/img/add.svg",
       "bin/pub/img/arrow_down.svg",
       "bin/pub/img/attention.svg",
@@ -206,6 +202,7 @@
       "bin/pub/img/icon_explorer.png",
       "bin/pub/img/icon_firefox.jpg",
       "bin/pub/img/icon_safari.jpg",
+      "bin/pub/img/ic_cancel.svg",
       "bin/pub/img/ic_checkmark.svg",
       "bin/pub/img/ic_columns.svg",
       "bin/pub/img/ic_delete.svg",
@@ -230,6 +227,7 @@
       "bin/pub/img/ic_table_disabled.svg",
       "bin/pub/img/ic_thumbs_down.svg",
       "bin/pub/img/ic_thumbs_up.svg",
+      "bin/pub/img/ic_warning.svg",
       "bin/pub/img/info.svg",
       "bin/pub/img/loader.gif",
       "bin/pub/img/logo.png",
@@ -269,8 +267,6 @@
       "bin/pub/img/warning.svg",
       "bin/pub/img/zones.svg",
       "bin/pub/img/zone_icon.png",
-      "bin/pub/settings.html",
-      "bin/pub/upgrade.html",
       "index.js",
       "lib/cities.js",
       "lib/db_history.json",
@@ -295,7 +291,9 @@
       "src/pub/howto.js",
       "src/pub/index.html",
       "src/pub/instructions.js",
+      "src/pub/login.js",
       "src/pub/logs.js",
+      "src/pub/nav.js",
       "src/pub/notif_center.js",
       "src/pub/no_proxies.js",
       "src/pub/overview.js",
@@ -312,7 +310,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "b651a8b11cf45beb9b10c9208508c34f"
+    "md5": "2092e7c7ea462635e1200b49160b75fe"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -353,5 +351,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.89.371"
+  "version": "1.90.331"
 }

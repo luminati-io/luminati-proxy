@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true*/
 define(['lodash', 'react', 'react-dom', '/www/util/pub/pure_component.js',
-    '/util/setdb.js', '/util/storage.js', '/util/url.js'],
-    (_, React, ReactDOM, Pure_component, setdb, storage, zurl)=>{
+    '/util/setdb.js', '/util/storage.js', '/www/util/pub/urlp.js'],
+    (_, React, ReactDOM, Pure_component, setdb, storage, zurlp)=>{
 
 // XXX saarya: change key once angular is removed
 const storage_key = 'NG_TRANSLATE_LANG_KEY';
@@ -10,9 +10,8 @@ let path;
 const init = (supported_lang, _path, def_lang)=>{
     path = _path;
     setdb.set('i18n.config', {supported_lang, path: _path});
-    const url_o = zurl.parse(document.location.href);
-    const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-    const lang = qs_o.hl||storage.get(storage_key)||def_lang;
+    const urlp = new zurlp.Urlp();
+    const lang = urlp.qs.hl||storage.get(storage_key)||def_lang;
     if (lang)
         set_curr_lang(lang);
 };
@@ -57,8 +56,14 @@ class T extends Pure_component {
         }
     }
     render(){
-        return this.key ? this.state.text : this.props.children(key=>
-            get_translation(this.state.translation, key));
+        if (this.key )
+            return this.state.text;
+        if (typeof this.props.children=='function')
+            return this.props.children(key=>
+                get_translation(this.state.translation, key));
+        console.error('<T> must receive text to translate or a translate '
+            +'function. Received: ', this.props.children);
+        return null;
     }
 }
 const E = {T, t, init, set_curr_lang};

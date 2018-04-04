@@ -127,6 +127,13 @@ const Loader = ({show})=>(
     </If>
 );
 
+const Loader_small = ({show})=>(
+    <div className={classnames('loader_small', {hide: !show})}>
+      <div className="spinner"/>
+      <div className="saving_label">Saving...</div>
+    </div>
+);
+
 class Code extends Pure_component {
     componentDidMount(){
         $(this.ref).find('.btn_copy').tooltip('show')
@@ -273,6 +280,17 @@ class Tooltip extends Pure_component {
         $(this.ref).tooltip();
     }
     componentWillUnmount(){ $(this.ref).tooltip('destroy'); }
+    componentDidUpdate(prev){
+        if (!this.ref||prev.title==this.props.title)
+            return;
+        $(this.ref).tooltip('destroy');
+        $(this.ref).tooltip();
+    }
+    on_mouse_leave(){
+        if (!this.ref)
+            return;
+        $(this.ref).tooltip('hide');
+    }
     set_ref(e){ this.ref = e; }
     render(){
         if (!this.props.children)
@@ -281,10 +299,11 @@ class Tooltip extends Pure_component {
             return this.props.children;
         const props = {
             'data-toggle': 'tooltip',
-            'data-placement': 'top',
+            'data-placement': this.props.placement||'top',
             'data-container': 'body',
             title: this.props.title,
             ref: this.set_ref.bind(this),
+            onMouseLeave: this.on_mouse_leave.bind(this),
         };
         return React.Children.map(this.props.children, c=>{
             if (typeof c=='number')
@@ -429,7 +448,7 @@ const presets = {
         check: function(opt){ return opt.pool_size &&
             (!opt.pool_type || opt.pool_type=='sequential'); },
         set: opt=>{
-            opt.pool_size = 0;
+            opt.pool_size = 1;
             opt.pool_type = 'sequential';
             opt.keep_alive = opt.keep_alive||45;
             opt.sticky_ip = null;
@@ -523,7 +542,7 @@ const presets = {
             {field: 'pool_type', label: "round-robin pool type"},
             {field: 'seed', label: "disables 'Session ID Seed'"},
         ],
-        support: {multiply: true},
+        support: {max_requests: true, multiply: true},
     },
     rnd_usr_agent_and_cookie_header: {
         title: 'Random User-Agent and cookie headers',
@@ -608,8 +627,10 @@ for (let k in presets)
 
 const emitter = new EventEmitter();
 
+const is_electron = window.process && window.process.versions.electron;
+
 const get_static_country = proxy=>{
-    if (!proxy.zone||!proxy.zones)
+    if (!proxy||!proxy.zone||!proxy.zones)
         return false;
     const zone = proxy.zones[proxy.zone];
     if (!zone)
@@ -624,4 +645,4 @@ const get_static_country = proxy=>{
 
 export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
     Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
-    Textarea, get_static_country};
+    Textarea, get_static_country, Loader_small, is_electron};

@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.89.371"
+VERSION="1.90.331"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -117,7 +117,7 @@ sudo_cmd()
 {
     local sdo="sudo -i"
     local cmd="$1"
-    if ((LUM)); then
+    if ((LUM)) && is_cmd_defined 'rt' ; then
         sdo="rt"
     fi
     if ((IS_ROOT)); then
@@ -311,6 +311,14 @@ install_curl()
     sys_install "curl"
 }
 
+install_build_tools()
+{
+    echo "installing build tools"
+    perr "install_build_tools"
+    sys_install "build-essential"
+    sys_install "base-devel"
+}
+
 install_brew()
 {
     echo "installing brew"
@@ -350,12 +358,13 @@ deps_install()
     if ((INSTALL_NODE||UPDATE_NODE)); then
         install_node
     fi
-    if ((INSTALL_NPM)); then
+    if ((INSTALL_NPM)) && ! is_cmd_defined 'npm'; then
         install_npm
     fi
     if ((UPDATE_NPM)); then
         update_npm
     fi
+    install_build_tools
 }
 
 lpm_clean()
@@ -416,6 +425,10 @@ dev_clean()
     local lib_path="$(npm prefix -g)/lib"
     if prompt "Remove curl, wget, nodejs and npm" n; then
         sys_rm "curl wget nodejs npm"
+    fi
+    if prompt "Remove build essential" n; then
+        sys_rm "build-essential"
+        sys_rm "base-devel"
     fi
     if prompt "Remove node and all node modules?" n; then
         sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules"
@@ -482,7 +495,7 @@ main()
         ;;
     dev-clean)
         if prompt "Clean machine from lpm install?" n; then
-            echo "dev_clean"
+           dev_clean
         fi
         ;;
     esac

@@ -5,6 +5,7 @@ import React from 'react';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import Common from './common.js';
+import {Tooltip} from './../common.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 
 const E = {
@@ -19,21 +20,15 @@ class DomainRow extends Pure_component {
     componentWillMount(){
         this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
     render(){
-        let class_name = '';
-        let click = ()=>{};
-        if (this.props.go)
-        {
-            click = ()=>this.state.go('logs',
-                {domain: this.props.stat.hostname});
-            class_name = 'row_clickable';
-        }
+        const click = ()=>{
+            this.state.go('logs', {domain: this.props.stat.hostname});
+        };
         return (
-            <tr className={class_name} onClick={click}>
+            <tr onClick={click}>
               <td>{this.props.stat.hostname}</td>
-              <td className={this.props.class_bw}>
-                {util.bytes_format(this.props.stat.bw)}</td>
-              <td className={this.props.class_value}>
-                {this.props.stat.value}</td>
+              <td>{util.bytes_format(this.props.stat.out_bw)}</td>
+              <td>{util.bytes_format(this.props.stat.in_bw)}</td>
+              <td className="reqs">{this.props.stat.value}</td>
             </tr>
         );
     }
@@ -41,14 +36,21 @@ class DomainRow extends Pure_component {
 
 class DomainTable extends React.Component {
     render(){
-        return <Common.Stat_table row={DomainRow} path="/domains"
-              row_key="hostname" go {...this.props}>
+        return (
+            <Common.Stat_table row={DomainRow}
+              row_key="hostname" {...this.props}>
               <tr>
-                <th className="col-md-4">Domain</th>
-                <th className="col-md-4">Bandwidth</th>
-                <th className="col-md-4">Requests</th>
+                <th className="col val">Domain</th>
+                <th className="col bw">BW up</th>
+                <th className="col bw">BW down</th>
+                <th className="col reqs">
+                  <Tooltip title="Number of requests">
+                    <span>Requests</span>
+                  </Tooltip>
+                </th>
               </tr>
-            </Common.Stat_table>;
+            </Common.Stat_table>
+        );
     }
 }
 
@@ -72,7 +74,7 @@ class Stats extends React.Component {
               <div className="page-header">
                 <h3>Domains</h3>
               </div>
-              <DomainTable stats={this.state.stats} />
+              <DomainTable stats={this.state.stats}/>
             </div>;
     }
 }

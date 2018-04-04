@@ -7,8 +7,9 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {Modal, Loader, Select, Input, Warnings, presets,
-    Checkbox, Textarea, Tooltip} from './common.js';
+import {Modal, Loader, Select, Input, Warnings, presets, Link_icon,
+    Checkbox, Textarea, Tooltip, Pagination_panel,
+    Loader_small} from './common.js';
 import Logs from './logs.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
@@ -405,9 +406,19 @@ class Index extends React.Component {
         super(props);
         this.sp = etask('Index', function*(){ yield this.wait(); });
         this.state = {tab: 'logs', form: {zones: {}}, warnings: [],
-            errors: {}, show_loader: false};
+            errors: {}, show_loader: false, saving: false};
+        this.debounced_save = _.debounce(this.save.bind(this), 500);
     }
     componentWillMount(){
+        if (!setdb.get('head.proxies_running'))
+        {
+            const _this = this;
+            this.sp.spawn(etask(function*(){
+                const proxies_running = yield ajax.json(
+                    {url: '/api/proxies_running'});
+                setdb.set('head.proxies_running', proxies_running);
+            }));
+        }
         this.listeners = [
             setdb.on('head.proxies_running', proxies=>{
                 if (!proxies||this.state.proxies)
@@ -492,31 +503,11 @@ class Index extends React.Component {
         setdb.set('head.edit_proxy.tab', tab);
         ga_event('categories', 'click', tab);
     }
-    is_dirty(form){
-        for (let key in form)
-        {
-            if (form[key]===false||form[key]||this.original_form[key]
-                ||this.original_form[key]===false)
-            {
-                if (typeof form[key]=='object' &&
-                    !_.isEqual(form[key], this.original_form[key]))
-                {
-                    return true;
-                }
-                else if (typeof form[key]!='object' &&
-                    form[key]!==this.original_form[key])
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
     field_changed(field_name, value){
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
-            return {form: new_form, dirty: this.is_dirty(new_form)};
-        });
+            return {form: new_form};
+        }, this.debounced_save);
         setdb.set('head.edit_proxy.form.'+field_name, value);
         this.send_ga(field_name);
     }
@@ -648,8 +639,6 @@ class Index extends React.Component {
             form.city = [];
         if (!this.original_form)
             this.original_form = form;
-        else
-            this.setState({dirty: this.is_dirty(form)});
         this.setState({form});
     }
     default_opt(option){
@@ -665,32 +654,14 @@ class Index extends React.Component {
             Object.assign(acc, {[e.field]: e.msg}), {});
         this.setState({errors, error_list: _errors});
     }
-    save_from_modal(){
-        const _this = this;
-        return etask(function*(){
-            const data = _this.prepare_to_save();
-            yield _this.persist(data);
-        });
-    }
+    // XXX krzysztof: remove this method
     persist(data){
-        this.setState({show_loader: true});
-        const update_url = '/api/proxies/'+this.port;
         const _this = this;
-        return etask(function*(){
-            const raw_update = yield window.fetch(update_url, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({proxy: data}),
-            });
+        this.etask(function*(){
             const status = yield ajax.json({
                 url: '/api/proxy_status/'+data.port});
-            yield _this.state.callbacks.proxies.update();
-            _this.setState({show_loader: false});
             if (status.status=='ok')
-            {
                 ga_event('top bar', 'successfully saved');
-                _this.state.callbacks.state.go('overview');
-            }
             else
             {
                 ga_event('top bar', 'failed save', status.status);
@@ -699,17 +670,30 @@ class Index extends React.Component {
             }
         });
     }
+    update_proxies(){
+        return etask(function*(){
+            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            setdb.set('head.proxies_running', proxies);
+        });
+    }
     save(){
+        if (this.saving)
+        {
+            this.resave = true;
+            return;
+        }
         const data = this.prepare_to_save();
         const check_url = '/api/proxy_check/'+this.port;
-        this.setState({show_loader: true});
+        this.saving = true;
+        this.setState({saving: true});
         const _this = this;
         this.sp.spawn(etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
                 ga_event('top bar', 'click save', 'failed');
                 _this.setState({error_list: [{msg: 'Something went wrong'}],
-                    show_loader: false});
+                    saving: false});
+                _this.saving = false;
                 $('#save_proxy_errors').modal('show');
             });
             const raw_check = yield window.fetch(check_url, {
@@ -720,21 +704,31 @@ class Index extends React.Component {
             const json_check = yield raw_check.json();
             const errors = json_check.filter(e=>e.lvl=='err');
             _this.set_errors(errors);
-            _this.setState({show_loader: false});
             if (errors.length)
             {
                 ga_event('top bar', 'click save', 'failed');
                 $('#save_proxy_errors').modal('show');
+                _this.setState({saving: false});
+                _this.saving = false;
                 return;
             }
             const warnings = json_check.filter(w=>w.lvl=='warn');
             if (warnings.length)
-            {
                 _this.setState({warnings});
-                $('#save_proxy_warnings').modal('show');
+            const update_url = '/api/proxies/'+_this.port;
+            const raw_update = yield window.fetch(update_url, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({proxy: data}),
+            });
+            _this.setState({saving: false});
+            _this.saving = false;
+            if (_this.resave)
+            {
+                _this.resave = false;
+                _this.save();
             }
-            else
-                yield _this.persist(data);
+            _this.update_proxies();
         }));
     }
     prepare_rules(form){
@@ -919,13 +913,14 @@ class Index extends React.Component {
               <div className="nav_wrapper">
                 <div className="nav_header">
                   <h3>Proxy on port {this.port}</h3>
+                  <Loader_small show={this.state.saving}/>
                 </div>
                 <Nav zones={zones} default_zone={default_zone}
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_field={this.field_changed.bind(this)}
                   on_change_preset={this.apply_preset.bind(this)}
-                  save={this.save.bind(this)} dirty={this.state.dirty}/>
+                  save={this.save.bind(this)}/>
                 <Nav_tabs curr_tab={this.state.tab} form={this.state.form}
                   on_tab_click={this.click_tab.bind(this)}
                   errors={this.state.errors}/>
@@ -942,10 +937,6 @@ class Index extends React.Component {
                   get_curr_plan={this.get_curr_plan.bind(this)}
                   goto_field={this.goto_field.bind(this)}/>
               </div>
-              <Modal className="warnings_modal" id="save_proxy_warnings"
-                title="Warnings:" click_ok={this.save_from_modal.bind(this)}>
-                <Warnings warnings={this.state.warnings}/>
-              </Modal>
               <Modal className="warnings_modal" id="save_proxy_errors"
                 title="Errors:" no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
@@ -991,7 +982,6 @@ const Nav = ({disabled, ...props})=>{
             value={props.form.zone} disabled={disabled}/>
           <Field on_change={update_preset} tooltip="Preset"
             options={presets_opt} value={preset} disabled={disabled}/>
-          <Action_buttons save={props.save} dirty={props.dirty}/>
         </div>
     );
 };
@@ -1011,34 +1001,6 @@ const Field = ({disabled, tooltip, ...props})=>{
         </Tooltip>
     );
 };
-
-class Action_buttons extends Pure_component {
-    componentDidMount(){
-        this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
-    }
-    cancel_clicked(){
-        ga_event('top bar', 'cancel');
-        this.state.callbacks.state.go('overview');
-    }
-    save_clicked(){
-        if (this.props.dirty)
-            this.props.save();
-    }
-    render(){
-        const save_btn_class = classnames('btn btn_lpm btn_save',
-            'btn_lpm_primary', {disabled: !this.props.dirty});
-        return (
-            <div className="action_buttons">
-              <If when={this.props.dirty}>
-                <button onClick={this.cancel_clicked.bind(this)}
-                  className="btn btn_lpm btn_cancel">Cancel</button>
-                <button className={save_btn_class}
-                  onClick={this.save_clicked.bind(this)}>Save</button>
-              </If>
-            </div>
-        );
-    }
-}
 
 const Nav_tabs = props=>(
     <div className="nav_tabs">
@@ -1616,7 +1578,12 @@ const Rules = provider({tab_id: 'rules'})(Rules_raw);
 class Alloc_modal extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {available_list: []};
+        this.state = {
+            available_list: [],
+            displayed_list: [],
+            cur_page: 0,
+            items_per_page: 20,
+        };
     }
     componentDidMount(){
         this.setdb_on('head.edit_proxy.zone_name', zone_name=>
@@ -1649,10 +1616,20 @@ class Alloc_modal extends Pure_component {
             if (_this.props.type=='ips')
                 available_list = res.ips;
             else
-                available_list = res.slice(0, 100);
-            _this.setState({available_list});
+                available_list = res;
+            _this.setState({available_list, cur_page: 0}, _this.paginate);
             _this.loading(false);
         });
+    }
+    paginate(page=-1){
+        page = page>-1 ? page : this.state.cur_page;
+        const pages = Math.ceil(
+            this.state.available_list.length/this.state.items_per_page);
+        const cur_page = Math.min(pages, page);
+        const displayed_list = this.state.available_list.slice(
+            cur_page*this.state.items_per_page,
+            (cur_page+1)*this.state.items_per_page);
+        this.setState({displayed_list, cur_page});
     }
     loading(loading){
         setdb.set('head.edit_proxy.loading', loading);
@@ -1692,6 +1669,9 @@ class Alloc_modal extends Pure_component {
             on_change_field('multiply', size);
         }
     }
+    update_items_per_page(items_per_page){
+        this.setState({items_per_page}, ()=>this.paginate(0)); }
+    page_change(page){ this.paginate(page-1); }
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
         let title;
@@ -1705,20 +1685,34 @@ class Alloc_modal extends Pure_component {
         return (
             <Modal id="allocated_ips" className="allocated_ips_modal"
               title={title} no_cancel_btn>
-              <div className="action_buttons">
-                <button onClick={this.reset.bind(this)}
-                  className="btn btn_lpm btn_lpm_normal">
-                  Reset
-                </button>
-                <button onClick={this.select_all.bind(this)}
-                  className="btn btn_lpm btn_lpm_normal">
-                  Select all
-                </button>
-              </div>
-              {this.state.available_list.map(row=>
+              <Pagination_panel
+                entries={this.state.available_list}
+                items_per_page={this.state.items_per_page}
+                cur_page={this.state.cur_page}
+                page_change={this.page_change.bind(this)}
+                top
+                update_items_per_page={this.update_items_per_page.bind(this)}>
+                <Link_icon tooltip="Unselect all"
+                  on_click={this.reset.bind(this)} id="unchecked"/>
+                <Link_icon tooltip="Select all"
+                  on_click={this.select_all.bind(this)} id="check"/>
+              </Pagination_panel>
+              {this.state.displayed_list.map(row=>
                 <Checkbox on_change={this.toggle.bind(this)} key={row}
                   text={row} value={row} checked={this.checked(row)}/>
               )}
+              <Pagination_panel
+                entries={this.state.available_list}
+                items_per_page={this.state.items_per_page}
+                cur_page={this.state.cur_page}
+                page_change={this.page_change.bind(this)}
+                bottom
+                update_items_per_page={this.update_items_per_page.bind(this)}>
+                <Link_icon tooltip="Unselect all"
+                  on_click={this.reset.bind(this)} id="unchecked"/>
+                <Link_icon tooltip="Select all"
+                  on_click={this.select_all.bind(this)} id="check"/>
+              </Pagination_panel>
             </Modal>
         );
     }

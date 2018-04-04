@@ -93,8 +93,8 @@ class Add_proxy extends Pure_component {
             });
             _this.setState({show_loader: true});
             const port = yield _this.persist();
-            const callbacks = setdb.get('head.callbacks');
-            yield callbacks.proxies.update();
+            const proxies = setdb.get('head.proxies');
+            yield proxies.update();
             $('#add_new_proxy_modal').modal('hide');
             _this.setState({show_loader: false});
             yield etask.sleep(500);
@@ -104,6 +104,7 @@ class Add_proxy extends Pure_component {
                 const state_opt = {port};
                 if (opt.field)
                     state_opt.field = opt.field;
+                const callbacks = setdb.get('head.callbacks');
                 return yield callbacks.state.go('edit_proxy', state_opt);
             }
         });

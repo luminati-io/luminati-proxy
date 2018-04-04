@@ -63,7 +63,16 @@ const Status_cell = ({proxy})=>{
     else if (status=='error')
         return <Tooltip title={details}>Error</Tooltip>;
     else if (status=='ok'&&details)
-        return <Tooltip title={details}>OK!</Tooltip>;
+    {
+        return (
+            <Tooltip title={details}>
+              <span>
+                OK
+                <div className="ic_warning"/>
+              </span>
+            </Tooltip>
+        );
+    }
     else if (status=='ok'&&!details)
         return 'OK';
 };
@@ -102,7 +111,8 @@ const columns = [
         key: 'proxy_type',
         title: 'Type',
         render: Type_cell,
-        tooltip: 'Proxy Type',
+        tooltip: 'Type of connected proxy - Luminati proxy or external proxy '
+            +'(non-Luminati)',
         sticky: true,
         ext: true,
     },
@@ -317,26 +327,30 @@ const columns = [
     {
         key: 'success_rate',
         title: 'Success',
-        tooltip: 'Ratio of successful requests out of total requests, '
-            +'where successful requests are calculated as 2xx, 3xx or 404 '
-            +'HTTP status codes',
+        tooltip: 'The ratio of successful requests out of total requests. A '
+            +'request considered as successful if the server of the '
+            +'destination website responded',
         render: ({proxy})=>proxy.success_rate&&(proxy.success_rate+'%')||'—',
         default: true,
         ext: true,
     },
     {
         key: 'bw_up',
-        title: 'BW Up',
+        title: 'BW up',
         render: ({proxy})=>util.bytes_format(proxy.bw_up||0)||'—',
         sticky: true,
         ext: true,
+        tooltip: 'Data transmitted to destination website. This includes'
+            +'request headers, request data, response headers, response data',
     },
     {
         key: 'bw_down',
-        title: 'BW Down',
+        title: 'BW down',
         render: ({proxy})=>util.bytes_format(proxy.bw_down||0)||'—',
         sticky: true,
         ext: true,
+        tooltip: 'Data transmitted to destination website. This includes'
+            +'request headers, request data, response headers, response data',
     },
     {
         key: 'reqs',
@@ -344,6 +358,7 @@ const columns = [
         sticky: true,
         render: ({proxy})=>proxy.reqs||0,
         ext: true,
+        tooltip: 'Number of all requests sent from this port',
     },
 ];
 
@@ -441,6 +456,8 @@ class Proxies extends Pure_component {
             this.setState({countries});
         });
         this.setdb_on('head.callbacks.state.go', go=>this.setState({go}));
+        if (!setdb.get('head.proxies_running'))
+            this.update();
         this.req_status();
     }
     prepare_proxies(proxies){
@@ -464,8 +481,7 @@ class Proxies extends Pure_component {
                 proxies[i].group = 'end';
             }
         }
-        return proxies.filter(proxy=>proxy.port!=22225||
-            (proxy.stats&&proxy.stats.real_bw));
+        return proxies;
     }
     update_items_per_page(items_per_page){
         this.setState({items_per_page}, ()=>this.paginate(0)); }
@@ -568,6 +584,7 @@ class Proxies extends Pure_component {
     render(){
         const cols = columns.filter(col=>
             this.state.selected_cols.includes(col.key)||col.sticky);
+        const displayed_proxies = this.state.displayed_proxies;
         if (!this.state.countries)
             return null;
         return (
@@ -582,7 +599,7 @@ class Proxies extends Pure_component {
               <If when={this.state.loaded&&!this.state.proxies.length}>
                 <No_proxies/>
               </If>
-              <If when={this.state.loaded&&this.state.proxies.length}>
+              <If when={this.state.loaded&&displayed_proxies.length}>
                 <div className="panel_body with_table">
                   <Proxies_pagination entries={this.state.proxies}
                     cur_page={this.state.cur_page}
@@ -606,7 +623,7 @@ class Proxies extends Pure_component {
                         </tr>
                       </thead>
                       <tbody>
-                        {this.state.displayed_proxies.map(proxy=>
+                        {displayed_proxies.map(proxy=>
                           <Proxy_row key={proxy.port} go={this.state.go}
                             update_proxies={this.update.bind(this)}
                             get_status={this.get_status.bind(this)}

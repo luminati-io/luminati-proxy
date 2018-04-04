@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.90.331
+
 ## 1.89.371
 - :sparkles: new logs viewer
 - :bug: fixed bugs related to socks5
