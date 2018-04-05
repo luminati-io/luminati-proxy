@@ -3,28 +3,16 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
-import {Button, ButtonToolbar, Row, Col, Panel, Modal, OverlayTrigger, Tooltip}
-    from 'react-bootstrap';
+import {Button, ButtonToolbar, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import util from '../util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import axios from 'axios';
 import Common from './common.js';
-import {StatusCodeRow, StatusCodeTable} from './status_codes.js';
-import {DomainRow, DomainTable} from './domains.js';
-import {ProtocolRow, ProtocolTable} from './protocols.js';
 import {Dialog} from '../common.js';
 import 'animate.css';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
-
-const E = {
-    install: ()=>E.sp = etask('stats', [function(){ return this.wait(); }]),
-    uninstall: ()=>{
-        if (E.sp)
-            E.sp.return();
-    },
-};
 
 class Success_ratio extends Pure_component {
     constructor(props){
@@ -45,9 +33,7 @@ class Success_ratio extends Pure_component {
               3xx or 404 HTTP status codes
             </Tooltip>;
         return (
-            <div className="overall_success_ratio" onMouseEnter={()=>{
-              util.ga_event('stats panel', 'hover', 'success_ratio', ratio);
-            }}>
+            <div className="overall_success_ratio">
               <div className="success_title">
                 <OverlayTrigger overlay={tooltip}
                   placement="top"><span>Success rate:</span>
@@ -60,7 +46,7 @@ class Success_ratio extends Pure_component {
     }
 }
 
-class Stats extends React.Component {
+class Stats extends Pure_component {
     constructor(props){
         super(props);
         this.state = {
@@ -69,20 +55,18 @@ class Stats extends React.Component {
             protocols: {stats: []},
         };
     }
-    get_stats = etask._fn(function*(_this){
-        this.catch(e=>console.log(e));
-        while (true)
-        {
-            _this.setState(yield Common.StatsService.get_top({sort: 'value',
-                limit: 5}));
-            yield etask.sleep(date.ms.SEC);
-        }
-    });
     componentDidMount(){
-        E.install();
-        E.sp.spawn(this.get_stats());
+        const _this = this;
+        this.etask(function*(){
+            this.on('uncaught', e=>console.log(e));
+            while (true)
+            {
+                _this.setState(yield Common.StatsService.get_top(
+                    {sort: 'value', limit: 5}));
+                yield etask.sleep(date.ms.SEC);
+            }
+        });
     }
-    componentWillUnmount(){ E.uninstall(); }
     close = ()=>this.setState({show_reset: false});
     confirm = ()=>this.setState({show_reset: true});
     reset_stats = ()=>{
@@ -90,20 +74,18 @@ class Stats extends React.Component {
             return;
         this.setState({resetting: true});
         const _this = this;
-        E.sp.spawn(etask(function*(){
+        this.etask(function*(){
             yield Common.StatsService.reset();
             _this.setState({resetting: undefined});
             _this.close();
-        }));
+        });
         util.ga_event('stats panel', 'click', 'reset btn');
     };
     enable_https_statistics = ()=>{
         this.setState({show_certificate: true});
         util.ga_event('stats panel', 'click', 'enable https stats');
     };
-    close_certificate = ()=>{
-        this.setState({show_certificate: false});
-    };
+    close_certificate = ()=>{ this.setState({show_certificate: false}); };
     render(){
         return (
             <div className="panel stats_panel">
@@ -116,18 +98,12 @@ class Stats extends React.Component {
               </div>
               <div className="panel_body with_table">
                 <Success_ratio/>
-                <StatusCodeTable row={StatusCodeRow}
-                  dataType="status_codes"
-                  stats={this.state.statuses.stats}
-                  show_more={this.state.statuses.has_more}/>
-                <DomainTable row={DomainRow}
-                  dataType="domains" stats={this.state.domains.stats}
-                  show_more={this.state.domains.has_more}/>
-                <ProtocolTable row={ProtocolRow}
-                  dataType="protocols" stats={this.state.protocols.stats}
-                  show_more={this.state.protocols.has_more}
-                  show_enable_https_button
-                  enable_https_button_click={this.enable_https_statistics}/>
+                <Common.Stat_table stats={this.state.statuses.stats}
+                  row_key="status_code" logs="code" title="Code"/>
+                <Common.Stat_table stats={this.state.domains.stats}
+                  row_key="hostname" logs="domain" title="Domain"/>
+                <Common.Stat_table stats={this.state.protocols.stats}
+                  row_key="protocol" logs="protocol" title="Protocol"/>
                 <Dialog show={this.state.show_reset} onHide={this.close}
                   title="Reset stats" footer={
                     <ButtonToolbar>
@@ -161,5 +137,22 @@ class Stats extends React.Component {
         );
     }
 }
+
+//<Protocol_table
+//  stats={this.state.protocols.stats}
+//  show_more={this.state.protocols.has_more}
+//  show_enable_https_button
+//  enable_https_button_click={this.enable_https_statistics}/>
+//  handle_https_btn_click = (evt)=>{
+//      evt.stopPropagation();
+//      this.props.enable_https_button_click(evt);
+//  };
+
+//<Certificate_btn bs_style="success"
+//  onClick={props.enable_https_button_click}/>
+//row_opts={{show_enable_https_button:
+//      props.show_enable_https_button, enable_https_button_click:
+//      props.enable_https_button_click}}
+//    {...props}
 
 export default Stats;

@@ -1207,7 +1207,7 @@ describe('manager', ()=>{
             const zones = {static: assign({}, zone_static),
                 gen: assign({}, zone_gen)};
             const t2 = (name, config, expected, _defaults = {zone: 'static'})=>
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                 .query({customer: 'testc1', proxy: pkg.version})
                 .reply(200, {_defaults}) && t(name, _.set(config,
                     'cli.customer', 'testc1'), expected);
@@ -1257,7 +1257,7 @@ describe('manager', ()=>{
         describe('stats', ()=>{
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
-                url: 'https://luminati.io/api/get_customer_bw?details=1',
+                url: 'https://luminati-china.io/api/get_customer_bw?details=1',
                 headers: {'x-hola-auth': 'lum-customer-opt'
                     +`-zone-static-key-${password}`},
             };
@@ -1277,7 +1277,7 @@ describe('manager', ()=>{
         describe('whitelist', ()=>{
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
-                url: 'https://luminati.io/api/get_whitelist?zones=*',
+                url: 'https://luminati-china.io/api/get_whitelist?zones=*',
                 headers: {'x-hola-auth': `lum-customer-${customer}`
                     +`-zone-static-key-${password}`},
             };
@@ -1297,7 +1297,7 @@ describe('manager', ()=>{
         describe('recent_ips', ()=>{
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
-                url: 'https://luminati.io/api/get_recent_ips?zones=*',
+                url: 'https://luminati-china.io/api/get_recent_ips?zones=*',
                 headers: {'x-hola-auth': `lum-customer-${customer}`
                     +`-zone-static-key-${password}`},
             };
@@ -1324,7 +1324,7 @@ describe('manager', ()=>{
                 {zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2'},
             ];
             it('get', ()=>etask(function*(){
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
                     .reply(200, zone_resp);
                 app = yield app_with_args(
@@ -1333,7 +1333,7 @@ describe('manager', ()=>{
                 assert_has(body, zone_expected, 'zones');
             }));
             it('get with config', ()=>etask(function*(){
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
                     .reply(200, zone_resp);
                 app = yield app_with_config({config: {_defaults:
@@ -1349,7 +1349,7 @@ describe('manager', ()=>{
                     {zone: 'a', perm: 'abc', plans: 'plan',
                         password: undefined}
                 ];
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
                     .reply(200, no_pwd_resp);
                 app = yield app_with_args(
@@ -1462,7 +1462,7 @@ describe('manager', ()=>{
         });
         describe('user credentials', ()=>{
             it('success', ()=>etask(function*(){
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
@@ -1470,11 +1470,11 @@ describe('manager', ()=>{
                 assert_has(result, {mock_result: true});
             }));
             it('login required', ()=>etask(function*(){
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', token: '',
                         proxy: pkg.version})
                     .reply(403, 'login_required');
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({token: '', proxy: pkg.version})
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
@@ -1487,7 +1487,7 @@ describe('manager', ()=>{
             }));
             it('update defaults', ()=>etask(function*(){
                 let updated = {_defaults: {customer: 'updated'}};
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, updated);
                 app = yield app_with_args(['--customer', 'mock_user']);
@@ -1499,7 +1499,7 @@ describe('manager', ()=>{
         describe('request_stats', ()=>{
             const t = (name, path, expected, opt = {})=>
             it(name, etask._fn(function*(_this){
-                nock('https://luminati.io').get('/cp/lum_local_conf')
+                nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(qw`--customer mock_user --port 24000

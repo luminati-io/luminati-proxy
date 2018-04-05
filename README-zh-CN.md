@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.90.506/luminati-proxy-manager-v1.90.506-setup.exe">代理管理安装器</a>.
+下载 <a href="https://github.com/luminati-io/luminati-proxy/releases/download/v1.90.546/luminati-proxy-manager-v1.90.546-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -92,7 +92,7 @@ Options:
   --zone                  Zone                         [string] [default: "gen"]
   --password              Zone password                                 [string]
   --proxy                 Hostname or IP of super proxy
-                                        [string] [default: "zproxy.luminati.io"]
+                                  [string] [default: "zproxy.lum-superproxy.io"]
   --proxy_port            Super proxy port             [number] [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]

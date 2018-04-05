@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.90.506/luminati-proxy-manager-v1.90.506-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.90.546/luminati-proxy-manager-v1.90.546-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -125,7 +125,7 @@ Options:
   --zone                  Zone                         [string] [default: "gen"]
   --password              Zone password                                 [string]
   --proxy                 Hostname or IP of super proxy
-                                        [string] [default: "zproxy.luminati.io"]
+                                  [string] [default: "zproxy.lum-superproxy.io"]
   --proxy_port            Super proxy port             [number] [default: 22225]
   --proxy_count           Minimum number of super proxies to use
                                                            [number] [default: 1]

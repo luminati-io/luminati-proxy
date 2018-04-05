@@ -1,17 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
-import moment from 'moment';
 import React from 'react';
-import {Col, Table, Pagination} from 'react-bootstrap';
 import axios from 'axios';
 import etask from 'hutil/util/etask';
-import zurl from 'hutil/util/url';
 import util from '../util.js';
 import classnames from 'classnames';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
+import {Tooltip} from './../common.js';
 import $ from 'jquery';
 
 const Empty_row = ()=>(
@@ -20,23 +17,58 @@ const Empty_row = ()=>(
     </tr>
 );
 
+class Row extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {};
+    }
+    componentWillMount(){
+        this.setdb_on('head.callbacks.state.go', go=>this.setState({go})); }
+    click(){
+        this.state.go('logs',
+            {[this.props.logs]: this.props.stat[this.props.row_key]});
+    }
+    render(){
+        const {stat, row_key} = this.props;
+        return (
+            <tr onClick={this.click.bind(this)}>
+              <td>{stat[row_key]}</td>
+              <td>{util.bytes_format(stat.out_bw)}</td>
+              <td>{util.bytes_format(stat.in_bw)}</td>
+              <td className="reqs">{stat.value}</td>
+            </tr>
+        );
+    }
+}
+
 const Stat_table = props=>{
-    const Row = props.row;
     return (
         <div className="stat_table_wrapper">
           <div className="stat_table">
             {props.show_more && <small><a href="/logs">show all</a></small>}
-            <Table hover condensed>
-              <thead>{props.children}</thead>
+            <table className="table table-condensed table-hover">
+              <thead>
+                <tr>
+                  <th className="col val">{props.title}</th>
+                  <th className="col bw">BW up</th>
+                  <th className="col bw">BW down</th>
+                  <th className="col reqs">
+                    <Tooltip title="Number of requests">
+                      <span>Requests</span>
+                    </Tooltip>
+                  </th>
+                </tr>
+              </thead>
               <tbody>
-                <If when={!props.stats.length}>
+                <If when={!props.stats||!props.stats.length}>
                   <Empty_row/>
                 </If>
-                {props.stats.map(s=>
-                  <Row stat={s} key={s[props.row_key||'key']}
-                    path={props.path} {...(props.row_opts||{})}/>)}
+                {(props.stats||[]).map(s=>
+                  <Row stat={s} key={s[props.row_key]} row_key={props.row_key}
+                    logs={props.logs}
+                    {...(props.row_opts||{})}/>)}
               </tbody>
-            </Table>
+            </table>
           </div>
         </div>
     );

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # LICENSE_CODE ZON ISC
-PERR_URL="https://perr.luminati.io/client_cgi/perr"
+PERR_URL="https://perr.luminati-china.io/client_cgi/perr"
 ACTION="setup"
 IS_ROOT=0
 if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.90.506"
+VERSION="1.90.546"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
