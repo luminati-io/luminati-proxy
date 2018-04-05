@@ -59,7 +59,12 @@ const Status_cell = ({proxy})=>{
     const details = proxy._status_details&&
         proxy._status_details.map(d=>d.msg).join(',');
     if (!status)
-        return 'Testing';
+    {
+        return (
+            <Tooltip title="Status of this proxy is being tested">
+              Testing</Tooltip>
+        );
+    }
     else if (status=='error')
         return <Tooltip title={details}>Error</Tooltip>;
     else if (status=='ok'&&details)
@@ -74,7 +79,7 @@ const Status_cell = ({proxy})=>{
         );
     }
     else if (status=='ok'&&!details)
-        return 'OK';
+        return <Tooltip title="This proxy works correctly">OK</Tooltip>;
 };
 
 const Boolean_cell = ({proxy, col})=>{
@@ -97,11 +102,29 @@ const Type_cell = ({proxy})=>{
     return 'Luminati';
 };
 
+const last_req_max_length = 20;
+const Last_req_cell = ({proxy})=>{
+    const val = (proxy.last_req||{}).url||'—';
+    if (val.length>last_req_max_length)
+        return (
+            <Tooltip title={val}>
+              {val.slice(0, last_req_max_length-3)+'...'}</Tooltip>
+        );
+    return val;
+};
+
+const Port_cell = ({proxy, master_port})=>{
+    if (!master_port&&proxy.multiply&&proxy.multiply>1)
+        return proxy.port+':1..'+proxy.multiply;
+    return proxy.port;
+};
+
 const columns = [
     {
         key: 'port',
         title: 'Port',
         sticky: true,
+        render: Port_cell,
         tooltip: 'A port is a number that refers to a specific virtual '
             +'location on a computer. Create and configure ports, then '
             +'connect the crawler to send requests through the port',
@@ -356,9 +379,17 @@ const columns = [
         key: 'reqs',
         title: 'Requests',
         sticky: true,
-        render: ({proxy})=>proxy.reqs||0,
+        render: ({proxy})=>proxy.reqs||'0',
         ext: true,
         tooltip: 'Number of all requests sent from this port',
+    },
+    {
+        key: 'last_req.url',
+        title: 'Last request',
+        sticky: true,
+        render: Last_req_cell,
+        ext: true,
+        tooltip: 'Last request that was sent on this port',
     },
 ];
 
@@ -436,6 +467,7 @@ class Proxies extends Pure_component {
             items_per_page: 10,
             cur_page: 0,
             proxies: [],
+            filtered_proxies: [],
             displayed_proxies: [],
             loaded: false,
         };
@@ -446,7 +478,9 @@ class Proxies extends Pure_component {
             if (!proxies)
                 return;
             proxies = this.prepare_proxies(proxies||[]);
-            this.setState({proxies, loaded: true}, this.paginate);
+            const filtered_proxies = this.filter_proxies(proxies);
+            this.setState({proxies, filtered_proxies, loaded: true},
+                this.paginate);
         });
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -460,26 +494,23 @@ class Proxies extends Pure_component {
             this.update();
         this.req_status();
     }
+    filter_proxies(proxies){
+        return proxies.filter(p=>{
+            let mp;
+            if (mp = this.props.master_port)
+                return ''+p.port==mp||''+p.master_port==mp;
+            else
+                return p.proxy_type!='duplicate';
+        });
+    }
     prepare_proxies(proxies){
-        let within_group = false;
         proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
         for (let i=0; i<proxies.length; i++)
         {
-            if (Array.isArray(proxies[i].proxy)&&proxies[i].proxy.length==1)
-                proxies[i].proxy = proxies[i].proxy[0];
-            proxies[i]._status_details = proxies[i]._status_details||[];
-            if (!within_group && proxies[i+1] &&
-                proxies[i+1].proxy_type=='duplicate')
-            {
-                within_group = true;
-                proxies[i].group = 'start';
-            }
-            else if (within_group && (!proxies[i+1] ||
-                proxies[i+1] && proxies[i+1].proxy_type!='duplicate'))
-            {
-                within_group = false;
-                proxies[i].group = 'end';
-            }
+            const cur = proxies[i];
+            if (Array.isArray(cur.proxy)&&cur.proxy.length==1)
+                cur.proxy = cur.proxy[0];
+            cur._status_details = cur._status_details||[];
         }
         return proxies;
     }
@@ -502,9 +533,31 @@ class Proxies extends Pure_component {
                     p.bw_down = stat.bw_down||0;
                     p.bw_up = stat.bw_up||0;
                     p.reqs = stat.real_reqs||0;
+                    p.last_req = stat.last_req;
                     return p;
-                });
-                return {proxies: new_proxies};
+                }).reduce((acc, p)=>({...acc, [p.port]: p}), {});
+                if (!_this.props.master_port)
+                {
+                    for (let p of Object.values(new_proxies))
+                    {
+                        if (p.proxy_type=='duplicate')
+                        {
+                            const master_port = new_proxies[p.master_port];
+                            master_port.bw_down += p.bw_down;
+                            master_port.bw_up += p.bw_up;
+                            master_port.reqs += p.reqs;
+                            if (!master_port.last_req.date ||
+                                p.last_req.date &&
+                                p.last_req.date>master_port.last_req.date)
+                            {
+                                master_port.last_req = p.last_req;
+                            }
+                        }
+                    }
+                }
+                const filtered_proxies = _this.filter_proxies(
+                    Object.values(new_proxies));
+                return {proxies: Object.values(new_proxies), filtered_proxies};
             }, ()=>_this.paginate(_this.state.cur_page));
             yield etask.sleep(1000);
             _this.req_status();
@@ -570,9 +623,9 @@ class Proxies extends Pure_component {
     paginate(page=-1){
         page = page>-1 ? page : this.state.cur_page;
         const pages = Math.ceil(
-            this.state.proxies.length/this.state.items_per_page);
+            this.state.filtered_proxies.length/this.state.items_per_page);
         const cur_page = Math.min(pages, page);
-        const displayed_proxies = this.state.proxies.slice(
+        const displayed_proxies = this.state.filtered_proxies.slice(
             cur_page*this.state.items_per_page,
             (cur_page+1)*this.state.items_per_page);
         this.setState({
@@ -596,12 +649,12 @@ class Proxies extends Pure_component {
                     on_click={this.add_proxy.bind(this)} id="plus"/>
                 </h2>
               </div>
-              <If when={this.state.loaded&&!this.state.proxies.length}>
+              <If when={this.state.loaded&&!this.state.filtered_proxies.length}>
                 <No_proxies/>
               </If>
               <If when={this.state.loaded&&displayed_proxies.length}>
                 <div className="panel_body with_table">
-                  <Proxies_pagination entries={this.state.proxies}
+                  <Proxies_pagination entries={this.state.filtered_proxies}
                     cur_page={this.state.cur_page}
                     items_per_page={this.state.items_per_page}
                     page_change={this.page_change.bind(this)}
@@ -624,15 +677,19 @@ class Proxies extends Pure_component {
                       </thead>
                       <tbody>
                         {displayed_proxies.map(proxy=>
-                          <Proxy_row key={proxy.port} go={this.state.go}
+                          <Proxy_row
+                            key={proxy.port}
+                            go={this.state.go}
                             update_proxies={this.update.bind(this)}
                             get_status={this.get_status.bind(this)}
-                            proxy={proxy} cols={cols}/>
+                            proxy={proxy}
+                            cols={cols}
+                            master_port={this.props.master_port}/>
                         )}
                       </tbody>
                     </table>
                   </div>
-                  <Proxies_pagination entries={this.state.proxies}
+                  <Proxies_pagination entries={this.state.filtered_proxies}
                     cur_page={this.state.cur_page}
                     items_per_page={this.state.items_per_page}
                     page_change={this.page_change.bind(this)}
@@ -669,19 +726,22 @@ class Proxy_row extends Pure_component {
     edit(){
         if (this.props.proxy.proxy_type!='persist')
             return;
-        this.props.go('edit_proxy', {port: this.props.proxy.port});
+        if (!this.props.master_port && this.props.proxy.multiply &&
+            this.props.proxy.multiply>1)
+        {
+            this.props.go('overview_multiplied',
+                {port: this.props.proxy.port});
+        }
+        else
+            this.props.go('edit_proxy', {port: this.props.proxy.port});
     }
     render(){
         const proxy = this.props.proxy;
-        const cell_class = col=> classnames(col.key, {
+        const cell_class = col=> classnames(col.key.replace(/\./g, '_'), {
             default_cursor: this.props.proxy.proxy_type!='persist',
         });
-        const row_class = classnames('proxy_row', {
-            start_group: proxy.group=='start',
-            end_group: proxy.group=='end',
-            multiplied: proxy.proxy_type=='duplicate',
-            default: proxy.port==22225,
-        });
+        const row_class = classnames('proxy_row',
+            {default: proxy.port==22225});
         return (
             <tr className={row_class}>
               <Actions proxy={proxy}
@@ -690,7 +750,8 @@ class Proxy_row extends Pure_component {
               {this.props.cols.map(col=>(
                 <td onClick={this.edit.bind(this)} key={col.key}
                   className={cell_class(col)}>
-                  <Cell proxy={proxy} col={col}/>
+                  <Cell proxy={proxy} col={col}
+                    master_port={this.props.master_port}/>
                 </td>
               ))}
             </tr>
@@ -698,11 +759,11 @@ class Proxy_row extends Pure_component {
     }
 }
 
-const Cell = ({proxy, col})=>{
+const Cell = ({proxy, col, master_port})=>{
     if (!col.ext && proxy.ext_proxies)
         return '—';
     if (col.render)
-        return col.render({proxy, col: col.key})||null;
+        return col.render({proxy, col: col.key, master_port})||null;
     else
         return _.get(proxy, col.key)||null;
 };

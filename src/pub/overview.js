@@ -7,27 +7,52 @@ import Logs from './logs';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import {is_electron} from './common.js';
+import zurl from 'hutil/util/url';
 import $ from 'jquery';
 
-const Overview = ()=>(
-    <div className="overview lpm">
-      <Upgrade/>
-      <div className="proxies nav_header">
-        <h3>Overview</h3>
-      </div>
-      <div className="panels">
-        <div className="proxies proxies_wrapper">
-          <Proxies/>
-        </div>
-        <div className="stats_wrapper">
-          <Recent_stats/>
-        </div>
-      </div>
-      <div className="logs_wrapper">
-        <Logs/>
-      </div>
-    </div>
-);
+class Overview extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {};
+    }
+    componentWillMount(){
+        this.setdb_on('head.section', section=>{
+            if (!section)
+                return;
+            const update = {section};
+            if (section.name=='overview_multiplied')
+            {
+                update.master_port = window.location.pathname.split('/')
+                .slice(-1)[0];
+            }
+            this.setState(update);
+        });
+    }
+    render(){
+        const title = this.state.master_port ?
+            `Overview of multiplied port - ${this.state.master_port}` :
+            'Overview';
+        return (
+            <div className="overview lpm">
+              <Upgrade/>
+              <div className="proxies nav_header">
+                <h3>{title}</h3>
+              </div>
+              <div className="panels">
+                <div className="proxies proxies_wrapper">
+                  <Proxies master_port={this.state.master_port}/>
+                </div>
+                <div className="stats_wrapper">
+                  <Recent_stats master_port={this.state.master_port}/>
+                </div>
+              </div>
+              <div className="logs_wrapper">
+                <Logs master_port={this.state.master_port}/>
+              </div>
+            </div>
+        );
+    }
+}
 
 class Upgrade extends Pure_component {
     constructor(props){

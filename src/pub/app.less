@@ -998,7 +998,8 @@ nav a:hover { box-shadow: none; }
             th { white-space: nowrap; }
             td { height: 25px; white-space: nowrap; }
             th.col__status { width: 80px; }
-            tr.multiplied { }
+            td.last_req_url { width: 120px; }
+            td.port { width: 1px; }
         }
         .head_actions {
             width: 64px;
@@ -1016,12 +1017,6 @@ nav a:hover { box-shadow: none; }
                 width: 64px;
                 position: absolute;
                 left: 5px;
-                .multiplied_mark {
-                    font-size: 10px;
-                    position: absolute;
-                    left: -1px;
-                    top: 4px;
-                }
             }
             &:hover .proxies_actions .action_icon { visibility: visible; }
             .action_icon {
@@ -1040,11 +1035,6 @@ nav a:hover { box-shadow: none; }
                     cursor: default;
                     opacity: 0;
                 }
-            }
-            &.multiplied {
-                td.port { padding-left: 20px; }
-                td { opacity: 0.6; }
-                td.proxies_actions { opacity: 1; }
             }
             &.default {
                 td { opacity: 0.6; }

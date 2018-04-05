@@ -2,7 +2,8 @@
 'use strict'; /*jslint react:true*/
 import _ from 'lodash';
 import React from 'react';
-import axios from 'axios';
+import ajax from 'hutil/util/ajax';
+import zescape from 'hutil/util/escape';
 import etask from 'hutil/util/etask';
 import util from '../util.js';
 import classnames from 'classnames';
@@ -76,8 +77,9 @@ const Stat_table = props=>{
 
 class StatsService {
     static base = '/api/request_stats';
-    static get_top = etask._fn(function*(_this, opt = {}){
-        const res = yield _this.get('top'), assign = Object.assign;
+    static get_top = etask._fn(function*(_this, opt={}){
+        const res = yield _this.get('top', opt.master_port);
+        const assign = Object.assign;
         opt = assign({reverse: true}, opt);
         let state = _.reduce(res, (s, v, k)=>{
             if (_.isInteger(+k))
@@ -117,39 +119,19 @@ class StatsService {
         }
         return state;
     });
-    static get_all = etask._fn(function*(_this, opt = {}){
-        opt = Object.assign({reverse: 1}, opt);
-        let res = yield _this.get('all');
-        if (opt.by)
-        {
-            res = _(Object.values(res.reduce((s, v, k)=>{
-                let c = v[opt.by];
-                s[c] = s[c]||Object.assign({value: 0, in_bw: 0, out_bw: 0}, v);
-                s[c].value += 1;
-                s[c].in_bw += v.in_bw;
-                s[c].out_bw += v.out_bw;
-                return s;
-            }, {})));
-        }
-        else
-            res = _(res);
-        if (opt.sort)
-            res = res.sortBy(_.isString(opt.sort)&&opt.sort||'value');
-        if (opt.reverse)
-            res = res.reverse();
-        return res.value();
-    });
     static reset = etask._fn(function*(_this){
         let resps = yield etask.all([
             _this.get('reset'),
-            axios.get(`/api/proxy_stats/reset`),
-            axios.get(`/api/req_status/reset`),
+            ajax({url: '/api/proxy_stats/reset'}),
+            ajax({url: '/api/req_status/reset'}),
         ]);
         return resps[0];
     });
-    static get = etask._fn(function*(_, stats){
-        let res = yield etask(()=>axios.get(`${StatsService.base}/${stats}`));
-        return res.data[stats];
+    static get = etask._fn(function*(_, stats, master_port){
+        const url = zescape.uri(`${StatsService.base}/${stats}`,
+            {master_port});
+        let res = yield ajax.json({url});
+        return res[stats];
     });
 }
 

@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import regeneratorRuntime from 'regenerator-runtime';
 import _ from 'lodash';
 import React from 'react';
 import {Button, ButtonToolbar, OverlayTrigger, Tooltip} from 'react-bootstrap';
@@ -10,7 +9,6 @@ import date from 'hutil/util/date';
 import axios from 'axios';
 import Common from './common.js';
 import {Dialog} from '../common.js';
-import 'animate.css';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 
@@ -61,8 +59,11 @@ class Stats extends Pure_component {
             this.on('uncaught', e=>console.log(e));
             while (true)
             {
-                _this.setState(yield Common.StatsService.get_top(
-                    {sort: 'value', limit: 5}));
+                _this.setState(yield Common.StatsService.get_top({
+                    sort: 'value',
+                    limit: 5,
+                    master_port: _this.props.master_port,
+                }));
                 yield etask.sleep(date.ms.SEC);
             }
         });
@@ -137,22 +138,5 @@ class Stats extends Pure_component {
         );
     }
 }
-
-//<Protocol_table
-//  stats={this.state.protocols.stats}
-//  show_more={this.state.protocols.has_more}
-//  show_enable_https_button
-//  enable_https_button_click={this.enable_https_statistics}/>
-//  handle_https_btn_click = (evt)=>{
-//      evt.stopPropagation();
-//      this.props.enable_https_button_click(evt);
-//  };
-
-//<Certificate_btn bs_style="success"
-//  onClick={props.enable_https_button_click}/>
-//row_opts={{show_enable_https_button:
-//      props.show_enable_https_button, enable_https_button_click:
-//      props.enable_https_button_click}}
-//    {...props}
 
 export default Stats;

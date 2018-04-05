@@ -85,6 +85,13 @@ function($uiRouter, $location_provider, _analytics_provider){
         controller: $scope=>{ $scope.react_component = zoverview; },
     });
     state_registry.register({
+        name: 'overview_multiplied',
+        parent: 'app',
+        url: '/overview/{port:string}',
+        template: '<div react-view=react_component></div>',
+        controller: $scope=>{ $scope.react_component = zoverview; },
+    });
+    state_registry.register({
         name: 'howto',
         parent: 'app',
         url: '/howto',
@@ -199,6 +206,7 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
 {
     $scope.sections = [
         {name: 'login', title: 'Login', navbar: false},
+        {name: 'overview_multiplied', title: 'Overview', navbar: false},
         {name: 'overview', title: 'Overview', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
         {name: 'howto', title: 'Examples', navbar: true},
