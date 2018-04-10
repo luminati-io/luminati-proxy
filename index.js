@@ -7,7 +7,7 @@ const Luminati = require('./lib/luminati.js');
 const version = require('./package.json').version;
 let is_electron = process.versions && !!process.versions.electron;
 
-if (!is_electron)
+if (!is_electron || process.env.LUMINATI_DISABLE_ELECTRON === 'true')
 {
     module.exports = {Luminati, Manager, version};
     return;
