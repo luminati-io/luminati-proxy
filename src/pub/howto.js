@@ -10,28 +10,20 @@ import util from './util.js';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import classnames from 'classnames';
 
 const ga_event = util.ga_event;
 
 class Howto extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
-    render_children(){
-        return React.Children.map(this.props.children, child=>{
-            return React.cloneElement(child, {
-                on_click: child.props.on_click(this.state.option)});
-        });
-    }
+    state = {option: 'code'};
     choose_click(option){
         this.setState({option});
         ga_event('How-to-tab', 'select code/browser', option);
     }
     render(){
-        let subheader;
+        let cur_title;
         if (this.state.option)
-            subheader = 'using '+this.state.option;
+            cur_title = 'using '+this.state.option;
         let Instructions = ()=>null;
         if (this.state.option=='browser')
             Instructions = Browser_instructions;
@@ -39,29 +31,38 @@ class Howto extends Pure_component {
             Instructions = Code_instructions;
         return (
             <div className="howto lpm">
+              <div className="nav_header">
+                <h3>How to use the Proxy Manager {cur_title}</h3>
+              </div>
               <div className="howto_panel">
-                <h1 className="header">How to use the Proxy Manager</h1>
-                <Subheader value={subheader}/>
-                <div className="choices">
-                  <Choice option="Browser"
-                    selected={this.state.option=='browser'}
-                    on_click={()=>this.choose_click('browser')}/>
-                  <div className="text_middle">or</div>
-                  <Choice option="Code"
-                    selected={this.state.option=='code'}
-                    on_click={()=>this.choose_click('code')}/>
+                <div className="panel_inner">
+                  <div className="nav_tabs tabs">
+                    <Tab id="code" title="Code"
+                      on_click={this.choose_click.bind(this)}
+                      cur_tab={this.state.option}/>
+                    <Tab id="browser" title="Browser"
+                      on_click={this.choose_click.bind(this)}
+                      cur_tab={this.state.option}/>
+                  </div>
+                  <Instructions>{this.props.children}</Instructions>
                 </div>
-                <Instructions>{this.props.children}</Instructions>
-                {this.state.option ? this.render_children() : null}
               </div>
             </div>
         );
     }
 }
 
-const Subheader = props=>(
-    props.value ? <h1 className="sub_header">{props.value}</h1> : null
-);
+const Tab = ({id, on_click, title, cur_tab})=>{
+    const active = cur_tab==id;
+    const btn_class = classnames('btn_tab', {active});
+    return (
+        <div onClick={()=>on_click(id)} className={btn_class}>
+          <div className={classnames('icon', id)}/>
+          <div className="title">{title}</div>
+          <div className="arrow"/>
+        </div>
+    );
+};
 
 const Lang_btn = props=>{
     const class_names = 'btn btn_lpm btn_lpm_small btn_lang'
@@ -91,7 +92,7 @@ class Code_instructions extends Pure_component {
         const code = prism.highlight(to_copy, prism.languages.clike);
         return (
             <div className="code_instructions">
-              <div className="well header_well">
+              <div className="options">
                 <Lang_btn_clickable lang="shell" text="Shell"/>
                 <Lang_btn_clickable lang="node" text="Node.js"/>
                 <Lang_btn_clickable lang="java" text="Java"/>
@@ -137,7 +138,7 @@ class Browser_instructions extends Pure_component {
     render(){
         return (
             <div className="browser_instructions">
-              <div className="well header_well">
+              <div className="header_well">
                 <p>Choose browser</p>
                 <select onChange={this.browser_changed.bind(this)}>
                   <option value="chrome_win">Chrome Windows</option>
@@ -147,7 +148,7 @@ class Browser_instructions extends Pure_component {
                   <option value="safari">Safari</option>
                 </select>
               </div>
-              <div className="well instructions_well">
+              <div className="instructions_well">
                 <div className="instructions">
                   {instructions.browser(this.port)[this.state.browser]}
                 </div>

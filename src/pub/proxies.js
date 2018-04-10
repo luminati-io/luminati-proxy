@@ -15,7 +15,7 @@ import $ from 'jquery';
 import Add_proxy from './add_proxy.js';
 import No_proxies from './no_proxies.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip, get_static_country} from './common.js';
+    Tooltip, get_static_country, Modal_dialog} from './common.js';
 import {If} from '/www/util/pub/react.js';
 
 let country_names = {};
@@ -114,9 +114,22 @@ const Last_req_cell = ({proxy})=>{
 };
 
 const Port_cell = ({proxy, master_port})=>{
+    let val;
     if (!master_port&&proxy.multiply&&proxy.multiply>1)
-        return proxy.port+':1..'+proxy.multiply;
-    return proxy.port;
+        val = proxy.port+':1..'+proxy.multiply;
+    else
+        val = proxy.port;
+    const title = `${proxy.port} is a port that refers to a specific virtual
+        location on a computer. You can use it as a virtual proxy to sends
+        requests`;
+    return <Tooltip title={title}>{val}</Tooltip>;
+};
+
+const Success_rate_cell = ({proxy})=>{
+    const val = !proxy.reqs ? '—' :
+        (proxy.success/proxy.reqs*100).toFixed(2)+'%';
+    const title = `total: ${proxy.reqs}, success: ${proxy.success}`;
+    return <Tooltip title={title}>{val}</Tooltip>;
 };
 
 const columns = [
@@ -353,23 +366,23 @@ const columns = [
         tooltip: 'The ratio of successful requests out of total requests. A '
             +'request considered as successful if the server of the '
             +'destination website responded',
-        render: ({proxy})=>proxy.success_rate&&(proxy.success_rate+'%')||'—',
+        render: Success_rate_cell,
         default: true,
         ext: true,
     },
     {
-        key: 'bw_up',
+        key: 'in_bw',
         title: 'BW up',
-        render: ({proxy})=>util.bytes_format(proxy.bw_up||0)||'—',
+        render: ({proxy})=>util.bytes_format(proxy.in_bw||0)||'—',
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
     },
     {
-        key: 'bw_down',
+        key: 'out_bw',
         title: 'BW down',
-        render: ({proxy})=>util.bytes_format(proxy.bw_down||0)||'—',
+        render: ({proxy})=>util.bytes_format(proxy.out_bw||0)||'—',
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -520,20 +533,22 @@ class Proxies extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
-            const stats = yield ajax.json({url: '/api/req_status'});
-            setdb.set('head.req_status', stats);
+            const params = {};
+            if (_this.props.master_port)
+                params.master_port = _this.props.master_port;
+            const url = zescape.uri('/api/recent_stats', params);
+            const stats = yield ajax.json({url});
+            setdb.set('head.recent_stats', stats);
             _this.setState(prev=>{
                 const new_proxies = prev.proxies.map(p=>{
-                    let stat = {total: 0, success: 0, bw_down: 0, bw_up: 0,
-                        real_reqs: 0};
-                    if (''+p.port in stats)
-                        stat = stats[p.port];
-                    p.success_rate = stat.total==0 ? null
-                        : (stat.success/stat.total*100).toFixed(0);
-                    p.bw_down = stat.bw_down||0;
-                    p.bw_up = stat.bw_up||0;
-                    p.reqs = stat.real_reqs||0;
-                    p.last_req = stat.last_req;
+                    let stat = {reqs: 0, success: 0, in_bw: 0, out_bw: 0};
+                    if (''+p.port in stats.ports)
+                        stat = stats.ports[p.port];
+                    p.in_bw = stat.in_bw;
+                    p.out_bw = stat.out_bw;
+                    p.reqs = stat.reqs;
+                    p.success = stat.success;
+                    p.last_req = {url: stat.url, ts: stat.timestamp};
                     return p;
                 }).reduce((acc, p)=>({...acc, [p.port]: p}), {});
                 if (!_this.props.master_port)
@@ -543,12 +558,13 @@ class Proxies extends Pure_component {
                         if (p.proxy_type=='duplicate')
                         {
                             const master_port = new_proxies[p.master_port];
-                            master_port.bw_down += p.bw_down;
-                            master_port.bw_up += p.bw_up;
+                            master_port.in_bw += p.in_bw;
+                            master_port.out_bw += p.out_bw;
                             master_port.reqs += p.reqs;
-                            if (!master_port.last_req.date ||
-                                p.last_req.date &&
-                                p.last_req.date>master_port.last_req.date)
+                            master_port.success += p.success;
+                            if (!master_port.last_req.ts ||
+                                p.last_req.ts &&
+                                p.last_req.ts>master_port.last_req.ts)
                             {
                                 master_port.last_req = p.last_req;
                             }
@@ -640,6 +656,8 @@ class Proxies extends Pure_component {
         const displayed_proxies = this.state.displayed_proxies;
         if (!this.state.countries)
             return null;
+        if (this.state.loaded&&!this.state.filtered_proxies.length)
+            return <No_proxies/>;
         return (
             <div className="panel proxies_panel">
               <div className="panel_heading">
@@ -649,9 +667,6 @@ class Proxies extends Pure_component {
                     on_click={this.add_proxy.bind(this)} id="plus"/>
                 </h2>
               </div>
-              <If when={this.state.loaded&&!this.state.filtered_proxies.length}>
-                <No_proxies/>
-              </If>
               <If when={this.state.loaded&&displayed_proxies.length}>
                 <div className="panel_body with_table">
                   <Proxies_pagination entries={this.state.filtered_proxies}
@@ -769,12 +784,16 @@ const Cell = ({proxy, col, master_port})=>{
 };
 
 class Actions extends Pure_component {
+    state = {open_delete_dialog: false};
+    open_delete_dialog = ()=>{ this.setState({open_delete_dialog: true}); };
+    close_delete_dialog = ()=>{ this.setState({open_delete_dialog: false}); };
     delete_proxy(){
         const _this = this;
         this.etask(function*(){
             yield ajax.json({url: '/api/proxies/'+_this.props.proxy.port,
                 method: 'DELETE'});
             yield _this.props.update_proxies();
+            _this.close_delete_dialog();
         });
     }
     refresh_sessions(){
@@ -801,9 +820,12 @@ class Actions extends Pure_component {
     }
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
+        const delete_title = `Are you sure you want to delete port
+            ${this.props.proxy.port}?`;
         return (
             <td className="proxies_actions">
-              <Action_icon id="trash" on_click={this.delete_proxy.bind(this)}
+              <Action_icon id="trash"
+                on_click={this.open_delete_dialog.bind(this)}
                 tooltip="Delete" invisible={!persist}/>
               <Action_icon id="duplicate" on_click={this.duplicate.bind(this)}
                 tooltip="Duplicate Proxy"
@@ -811,6 +833,10 @@ class Actions extends Pure_component {
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions.bind(this)}
                 tooltip="Refresh Sessions"/>
+              <Modal_dialog title={delete_title}
+                open={this.state.open_delete_dialog}
+                ok_clicked={this.delete_proxy.bind(this)}
+                cancel_clicked={this.close_delete_dialog.bind(this)}/>
             </td>
         );
     }

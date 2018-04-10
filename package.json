@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.90.563",
+    "productName": "Luminati Proxy Manager 1.91.108",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -151,7 +151,7 @@
   },
   "engines": {
     "node": ">=7.5",
-    "npm": ">=4.6.1"
+    "npm": "4.6.1"
   },
   "homepage": "https://luminati.io/",
   "keywords": [
@@ -202,8 +202,10 @@
       "bin/pub/img/icon_explorer.png",
       "bin/pub/img/icon_firefox.jpg",
       "bin/pub/img/icon_safari.jpg",
+      "bin/pub/img/ic_browser.svg",
       "bin/pub/img/ic_cancel.svg",
       "bin/pub/img/ic_checkmark.svg",
+      "bin/pub/img/ic_code.svg",
       "bin/pub/img/ic_columns.svg",
       "bin/pub/img/ic_delete.svg",
       "bin/pub/img/ic_download_mini.svg",
@@ -230,6 +232,9 @@
       "bin/pub/img/ic_warning.svg",
       "bin/pub/img/info.svg",
       "bin/pub/img/loader.gif",
+      "bin/pub/img/logo-80legs.svg",
+      "bin/pub/img/logo-crawlera.svg",
+      "bin/pub/img/logo-import.svg",
       "bin/pub/img/logo.png",
       "bin/pub/img/logo_1.svg",
       "bin/pub/img/logo_big.svg",
@@ -301,13 +306,12 @@
       "src/pub/proxy_tester.js",
       "src/pub/report_bug.js",
       "src/pub/schema.js",
-      "src/pub/stats/common.js",
-      "src/pub/stats/stats.js",
+      "src/pub/stats.js",
       "src/pub/util.js",
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "c1413cbfa3827fc79cc79c6a1ca69d8c"
+    "md5": "1dd0fd8dfe513ff61da87cac9dd1883f"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -336,7 +340,7 @@
     "heapdump": "0.3.9"
   },
   "preferGlobal": true,
-  "recomendedNode": ">=6",
+  "recomendedNode": ">=9.4.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -348,5 +352,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.90.563"
+  "version": "1.91.108"
 }

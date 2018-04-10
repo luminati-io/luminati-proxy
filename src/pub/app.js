@@ -208,8 +208,8 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
         {name: 'login', title: 'Login', navbar: false},
         {name: 'overview_multiplied', title: 'Overview', navbar: false},
         {name: 'overview', title: 'Overview', navbar: true},
+        {name: 'howto', title: 'Instructions', navbar: true},
         {name: 'proxy_tester', title: 'Proxy Tester', navbar: true},
-        {name: 'howto', title: 'Examples', navbar: true},
         {name: 'logs', title: 'Logs', navbar: true},
         {name: 'config', title: 'Configuration', navbar: true},
     ];
@@ -238,11 +238,6 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     $http.get('/api/last_version').then(version=>{
         $scope.ver_last = version.data;
         setdb.set('head.ver_last', version.data);
-    });
-    $http.get('/api/consts').then(function(consts){
-        setdb.set('head.consts', consts.data);
-        $rootScope.consts = consts.data;
-        $scope.$broadcast('consts', consts.data);
     });
     $http.get('/api/defaults').then(function(defaults){
         setdb.set('head.defaults', defaults.data);

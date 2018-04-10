@@ -2,19 +2,18 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Proxies from './proxies.js';
-import Recent_stats from './stats/stats.js';
+import ajax from 'hutil/util/ajax';
+import setdb from 'hutil/util/setdb';
+import Stats from './stats.js';
 import Logs from './logs';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
-import {is_electron} from './common.js';
+import {is_electron, Loader} from './common.js';
 import zurl from 'hutil/util/url';
 import $ from 'jquery';
 
 class Overview extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
+    state = {loading: false};
     componentWillMount(){
         this.setdb_on('head.section', section=>{
             if (!section)
@@ -27,13 +26,40 @@ class Overview extends Pure_component {
             }
             this.setState(update);
         });
+        this.setdb_on('head.proxies_running', proxies=>
+            this.setState({proxies}));
+        this.setdb_on('head.consts', consts=>this.setState({consts}));
+        window.setTimeout(this.fetch_globals.bind(this));
+    }
+    fetch_globals(){
+        const _this = this;
+        this.etask(function*(){
+            // XXX krzysztof: optimize /api/consts endpoint
+            //_this.setState({loading: true});
+            if (!_this.state.consts)
+            {
+                const consts = yield ajax.json({url: '/api/consts'});
+                setdb.set('head.consts', consts);
+            }
+            _this.setState({loading: false});
+        });
     }
     render(){
         const title = this.state.master_port ?
             `Overview of multiplied port - ${this.state.master_port}` :
             'Overview';
+        let ports;
+        if (this.state.master_port&&this.state.proxies)
+        {
+            const mp = this.state.proxies.find(p=>
+                p.port==[this.state.master_port]);
+            ports = [];
+            for (let i=mp.port; i<mp.port+mp.multiply; i++)
+                ports.push(i);
+        }
         return (
             <div className="overview lpm">
+              <Loader show={this.state.loading}/>
               <Upgrade/>
               <div className="proxies nav_header">
                 <h3>{title}</h3>
@@ -43,11 +69,11 @@ class Overview extends Pure_component {
                   <Proxies master_port={this.state.master_port}/>
                 </div>
                 <div className="stats_wrapper">
-                  <Recent_stats master_port={this.state.master_port}/>
+                  <Stats master_port={this.state.master_port}/>
                 </div>
               </div>
               <div className="logs_wrapper">
-                <Logs master_port={this.state.master_port}/>
+                <Logs ports={ports}/>
               </div>
             </div>
         );

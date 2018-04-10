@@ -8,7 +8,23 @@ import {If} from '/www/util/pub/react.js';
 import {Tooltip, get_static_country} from './common.js';
 
 const tooltips = {
-    crawler: 'Your crawler',
+    crawler: `Your crawler or bot that systematically browses the web. Connect
+          any type of crawler to the Luminati Proxy Manager:
+          <ul>
+          <li>
+            <div>Browser and extension based crawlers</div>
+            <div class="browser_icon firefox"/>
+            <div class="browser_icon chrome"/>
+            <div class="browser_icon safari"/>
+            <div class="browser_icon explorer"/>
+          </li>
+          <li>
+            <div>Dedicated crawling solutions</div>
+            <div class="logo_icon crawlera"/>
+            <div class="logo_icon legs"/>
+            <div class="logo_icon import"/>
+          </li>
+        </ul>`,
     port_numbers: 'Defined ports in Luminati Proxy Manager',
     lpm: 'Luminati Proxy Manager - open-source proxy service that holds '
         +'valuble features, such as: IP rotation control, auto retry, speed '
@@ -83,21 +99,23 @@ const Port_layer = ({proxies, form})=>{
     return <Layer no_btn id="port_numbers">{label}</Layer>;
 };
 
-const Layer = ({tooltip, id, no_btn, no_arr, class_names, children})=>(
-    <div className={classnames('layer', id, class_names)}>
-      <Tooltip placement="bottom" title={tooltips[id]}>
-        <span>
-          <If when={!no_btn}>
-            <If when={!no_arr}><div className="arr"/></If>
-            <div className="layer_btn">{children}</div>
-          </If>
-          <If when={no_btn}>
-            {children}
-          </If>
-        </span>
-      </Tooltip>
-    </div>
-);
+const Layer = ({id, no_btn, no_arr, class_names, children})=>{
+    return (
+        <div className={classnames('layer', id, class_names)}>
+          <Tooltip placement="bottom" title={tooltips[id]}>
+            <span>
+              <If when={!no_btn}>
+                <If when={!no_arr}><div className="arr"/></If>
+                <div className="layer_btn">{children}</div>
+              </If>
+              <If when={no_btn}>
+                {children}
+              </If>
+            </span>
+          </Tooltip>
+        </div>
+    );
+};
 
 const Peer = ({proxies, form})=>{
     if (form.port)

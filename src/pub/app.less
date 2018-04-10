@@ -93,13 +93,6 @@ nav a:hover { box-shadow: none; }
     margin-bottom: 20px;
 }
 .form-group { margin-bottom: 12px; }
-.alert-inline {
-    display: inline;
-    padding: 6px 12px;
-    position: relative;
-    top: 2px;
-    margin: 0 8px;
-}
 .clickable { cursor: pointer; }
 .default_cursor { cursor: default; }
 .settings-alert { position: relative; }
@@ -109,16 +102,6 @@ nav a:hover { box-shadow: none; }
     top: 9px;
 }
 .github { margin-top: 12px; }
-.form-range { width: 100%; }
-.form-range .form-control {
-    display: inline-block;
-    width: 48%;
-}
-.form-range .range-seperator {
-    display: inline-block;
-    width: 2%;
-    text-align: center;
-}
 .lum_login {
     position: relative;
     top: -20px;
@@ -203,25 +186,6 @@ nav a:hover { box-shadow: none; }
         text-align: center;
     }
 }
-.panel .panel-heading button.btn.btn-ico {
-    padding: 7px;
-    border: solid 1px #c8c2bf;
-    background-color: #fcfcfc;
-    width: 35px;
-    height: 34px;
-    margin: 0 1px;
-    &.old_ui_btn {
-        color: @first_color;
-        background-color: @grey;
-        border-color: @grey;
-    }
-}
-.panel .panel-heading button.btn.btn-ico img {
-    width: 100%;
-    height: 100%;
-    vertical-align: baseline;
-}
-.panel .panel-heading button.btn.btn-ico[disabled] img { opacity: 0.25; }
 .tooltip.in { opacity: 1; }
 .tooltip-proxy-status .tooltip-inner, .tooltip-default .tooltip-inner,
 .tooltip .tooltip-inner {
@@ -232,6 +196,7 @@ nav a:hover { box-shadow: none; }
     color: @first_color;
     font-size: 14px;
     text-align: left;
+    ul { padding-left: 20px; padding-top: 10px; }
 }
 .tooltip.stats_tooltip .tooltip-inner {
     max-width: 550px;
@@ -244,11 +209,8 @@ nav a:hover { box-shadow: none; }
 .table-hover>tbody>tr.opened:hover { background-color: @x_light; }
 .table-hover>tbody>tr>td { border: none; }
 .table-hover .no-hover:hover { background: none; }
-.pull-none { float: none !important; }
 .modal-open .modal { overflow-y: scroll; }
-.blue { color: #4a90e2; }
 .pagination>li>a:hover, .pagination>.disabled>a:hover { box-shadow: none; }
-.page-header { margin: 20px 0 20px; }
 .pagination {
     margin: 0;
     .active>a, .active>a:focus, .active>span {
@@ -378,28 +340,6 @@ nav a:hover { box-shadow: none; }
     }
     input[type=number] { -moz-appearance: textfield; }
     input[type=number], input[type=text] { padding-right: 10px; }
-    .radio_buttons {
-        width: 100%;
-        display: flex;
-        .option { flex: 1; }
-        input[type=radio] { display:none; }
-        label {
-            cursor:pointer;
-            font-size: 12px;
-            font-weight: 300;
-        }
-        input[type=radio] + .checked_icon {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            margin: -2px 6px 0 0;
-            vertical-align:middle;
-            background: none;
-        }
-        input[type=radio]:checked + .checked_icon {
-            background: url(/img/check_radio.svg) left top no-repeat;
-        }
-    }
     label.form-check-label {
         font-weight: 300;
         cursor: pointer;
@@ -424,7 +364,7 @@ nav a:hover { box-shadow: none; }
         padding-top: 3px;
         margin: 0 2px;
         box-shadow: none;
-        &:hover {
+        &:hover, &.active {
             background-color: @first_color;
             border-color: @first_color;
             color: white;
@@ -604,14 +544,14 @@ nav a:hover { box-shadow: none; }
         -webkit-box-shadow: none;
         border: solid 1px @grey_border;
         border-radius: 4px;
-        .panel_heading, .panel-heading {
+        .panel_heading {
             padding: 10px 5px 0;
             position: relative;
             h2 { font-size: 18px; }
             .buttons_wrapper {
                 position: absolute;
-                right: 10px;
-                top: 10px;
+                right: 5px;
+                top: 5px;
             }
         }
         .panel_body {
@@ -647,7 +587,7 @@ nav a:hover { box-shadow: none; }
         }
         .modal-header {
             border: 0;
-            h4 {
+            h4.modal-title, h4 {
                 font-size: 24px;
                 font-weight: bold;
                 text-align: center;
@@ -772,6 +712,8 @@ nav a:hover { box-shadow: none; }
         .icon.general { background-image: url(/img/general.svg); }
         .icon.proxy_ext { background-image: url(/img/proxy_ext.svg); }
         .icon.proxy_lum { background-image: url(/img/proxy_lum.svg); }
+        .icon.code { background-image: url(/img/ic_code.svg); }
+        .icon.browser { background-image: url(/img/ic_browser.svg); }
         &:first-child { margin-left: 0; }
         &:last-child { margin-right: 0; }
         &.active, &:hover {
@@ -898,8 +840,7 @@ nav a:hover { box-shadow: none; }
                 align-items: center;
                 .sufix { margin-left: 10px; }
                 .double_field {
-                    display: flex;
-                    input { flex: 1; }
+                    input { width: 79px; }
                     .devider { margin: 0 5px; }
                 }
             }
@@ -927,9 +868,9 @@ nav a:hover { box-shadow: none; }
         margin-right: 7px;
     }
     .stats_wrapper {
-        width: 300px;
-        min-width: 300px;
-        max-width: 300px;
+        width: 305px;
+        min-width: 305px;
+        max-width: 305px;
         margin-left: 7px;
         margin-right: 15px;
         .stats_panel {
@@ -950,6 +891,7 @@ nav a:hover { box-shadow: none; }
                 th.col.bw { width: 70px; }
                 td { overflow: hidden; }
                 .empty_row td { cursor: default; }
+                .enable_ssl { margin-left: 2px; }
             }
             .stat_table_wrapper {
                 margin-bottom: 15px;
@@ -971,16 +913,16 @@ nav a:hover { box-shadow: none; }
         .logs_panel { border: solid 1px @grey_border; }
     }
 }
+.ic_warning {
+    background-image: url(/img/ic_warning.svg);
+    width: 15px;
+    height: 13px;
+    display: inline-block;
+    position: relative;
+    top: 2px;
+    margin: 0 2px;
+}
 .proxies {
-    .ic_warning {
-        background-image: url(/img/ic_warning.svg);
-        width: 14px;
-        height: 14px;
-        display: inline-block;
-        position: relative;
-        top: 2px;
-        left: 2px;
-    }
     font-size: 14px;
     &.nav_header { padding: 0 15px 10px; }
     .proxies_panel {
@@ -1300,8 +1242,6 @@ nav a:hover { box-shadow: none; }
         &.request {
             .request_params {
                 display: flex;
-                border-bottom: solid 1px @grey_border;
-                padding-bottom: 20px;
                 margin-bottom: 20px;
             }
             .field {
@@ -1313,9 +1253,7 @@ nav a:hover { box-shadow: none; }
                     margin-bottom: 3px;
                     margin-left: 2px;
                 }
-                &.proxy { flex: 1; }
-                &.url { flex: 3; }
-                &.method { flex: 1; }
+                &.url { flex: 1; }
             }
             .headers {
                 .header_line {
@@ -1370,46 +1308,12 @@ nav a:hover { box-shadow: none; }
 }
 .modal-backdrop.fade.in { opacity: 0.15; }
 .howto {
-    padding-top: 20px;
-    .howto_panel {
-        width: 537px;
-        margin: auto;
-        margin-bottom: 20px;
-        text-align: center;
-    }
+    .howto_panel { margin: 0 15px; }
+    .nav_header { padding: 0 15px 10px; }
+    .nav_tabs { margin-bottom: 15px; }
+    .panel_inner { width: 600px; }
     h1.header { width: auto; }
-    h1.sub_header {
-        line-height: 0;
-        margin: 0 0 25px 0;
-    }
-    .choices { height: 90px; }
-    .choice {
-        cursor: pointer;
-        display: inline-block;
-        width: 205px;
-        height: 55px;
-        border-radius: 4px;
-        border: solid 1px @grey_border;
-        margin: 15px 20px;
-        .text_smaller { font-size: 14px; }
-        .text_bigger {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        &.active, &:hover {
-            border: solid 2px @first_color;
-            margin-top: 14px;
-        }
-    }
-    .text_middle {
-        display: inline-block;
-        font-size: 17px;
-        font-weight: bold;
-        position: relative;
-        top: -10px;
-    }
     .well {
-        text-align: left;
         box-shadow: none;
         border-radius: 3px;
         background-color: white;
@@ -1419,37 +1323,36 @@ nav a:hover { box-shadow: none; }
         font-weight: bold;
         display: flex;
         align-items: center;
-        p { margin: 10px; }
+        p { margin: 0 10px 0 5px; }
         select {
             background-color: white;
             width: auto;
         }
     }
-    .code_instructions .header_well {
-        text-align: center;
-    }
+    .code_instructions .header_well { text-align: center; }
     .instructions_well {
-        margin-top: 25px;
-        margin-bottom: 25px;
+        margin: 10px 0;
+        padding: 5px;
         position: relative;
         pre {
+            margin: 0;
             border: none;
             font-size: 12px;
-            background-color: @xx_light;
+            background-color: white;
             .btn_copy {
                 position: absolute;
-                top: 28px;
-                right: 28px;
+                top: 12px;
+                right: 9px;
             }
         }
     }
     .btn_lang { margin: 0 2px; }
     .instructions {
-        margin-left: 30px;
+        margin-left: 10px;
         border-left: 1px solid @first_color;
         .single_instruction {
             font-size: 14px;
-            padding-left: 23px;
+            padding-left: 18px;
             position: relative;
             top: 2px;
         }
@@ -1462,7 +1365,7 @@ nav a:hover { box-shadow: none; }
         li { padding-bottom: 12px; }
         ol li .circle_wrapper {
             position: absolute;
-            left: 37px;
+            left: 3px;
             background-color: white;
             height: 28px;
             display: inline-block;
@@ -1845,27 +1748,34 @@ nav a:hover { box-shadow: none; }
 }
 .no_proxies {
     text-align: center;
-    .attention_img {
-        background: url(/img/attention.svg);
-        width: 40px;
-        height: 40px;
-        margin: -15px auto 10px;
-    }
-    .header {
-        height: auto;
-        h1 {
-            font-size: 30px;
-            line-height: 1;
-        }
-    }
-    .sub_header {
-        max-width: 500px;
-        margin: 12px auto 20px;
-        h2 {
-            letter-spacing: normal;
-            font-size: 18px;
-            font-weight: 300;
-        }
-    }
     .btn_add_port { margin: 20px auto; }
+}
+.browser_icon {
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    display: inline-block;
+    &.firefox { background-image: url(/img/icon_firefox.jpg); }
+    &.chrome { background-image: url(/img/icon_chrome.jpg); }
+    &.explorer { background-image: url(/img/icon_explorer.png); }
+    &.safari { background-image: url(/img/icon_safari.jpg); }
+}
+.logo_icon {
+    height: 20px;
+    background-size: contain;
+    display: inline-block;
+    background-repeat: no-repeat;
+    margin-right: 4px;
+    &.crawlera {
+        background-image: url(/img/logo-crawlera.svg);
+        width: 20px;
+    }
+    &.import {
+        background-image: url(/img/logo-import.svg);
+        width: 100px;
+    }
+    &.legs {
+        background-image: url(/img/logo-80legs.svg);
+        width: 56px;
+    }
 }

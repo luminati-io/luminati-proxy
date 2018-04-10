@@ -53,14 +53,22 @@ class Login extends Pure_component {
             _this.setState({loading: true});
             const res = yield ajax.json({url: '/api/creds_user',
                 method: 'POST', data: creds, timeout: 60000});
-            if (res.customers)
+            if (res.error)
             {
-                _this.setState({user_customers: res.customers,
-                    user_data: {customer: res.customers[0]}});
+                _this.setState({error_message:
+                    res.error.message||'Something went wrong'});
+            }
+            else if (res.customers)
+            {
+                _this.setState({
+                    user_customers: res.customers,
+                    error_message: '',
+                    user_data: {customer: res.customers[0]},
+                });
             }
             else
                 _this.check_reload();
-            _this.setState({loading: false, error_message: ''});
+            _this.setState({loading: false});
         });
     }
     check_reload(){
@@ -107,7 +115,7 @@ const Messages = ({error_message, settings, ver_node})=>(
       </If>
       <If when={error_message}>
         <div className="warning error settings-alert">
-          {error_message}
+          <div dangerouslySetInnerHTML={{__html: error_message}}/>
         </div>
       </If>
       <Node_message ver_node={ver_node}/>

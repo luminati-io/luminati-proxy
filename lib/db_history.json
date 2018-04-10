@@ -43,14 +43,21 @@
             "plans": "TEXT"
         },
         "usage": {
-            "port_id": {"type": "INTEGER", "index": true, "unique": true},
-            "bw": {"type": "INTEGER"},
-            "real_bw": {"type": "INTEGER"},
-            "reqs": {"type": "INTEGER"}
+            "port_id": {"type": "INTEGER", "multi_index": ["port_id",
+                "status_code", "hostname", "protocol"]},
+            "reqs": {"type": "INTEGER"},
+            "in_bw": {"type": "INTEGER"},
+            "out_bw": {"type": "INTEGER"},
+            "status_code": {"type": "TEXT"},
+            "hostname": {"type": "TEXT"},
+            "protocol": {"type": "TEXT"},
+            "success": {"type": "INTEGER"}
         }
     },
     "add": {
-        "request": ["response_body", "protocol", "hostname"]
+        "request": ["response_body", "protocol", "hostname"],
+        "usage": ["status_code", "hostname", "protocol", "in_bw", "out_bw",
+            "success"]
     }
 }, {
     "schema": {

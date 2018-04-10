@@ -16,8 +16,12 @@ const ga_event = util.ga_event;
 class Add_proxy extends Pure_component {
     constructor(props){
         super(props);
-        this.presets_opt = Object.keys(presets).map(p=>
-            ({key: presets[p].title, value: p}));
+        this.presets_opt = Object.keys(presets).map(p=>{
+            let key = presets[p].title;
+            if (presets[p].default)
+                key = `Default (${key})`;
+            return {key, value: p};
+        });
         this.state = {
             zone: '',
             preset: 'sequential',
@@ -225,13 +229,13 @@ const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
           <Field
             icon_class="zone_icon"
             val={zone}
-            options={zones} title="Choose Zone"
+            options={zones} title="Zone"
             on_change={on_field_change('zone')}/>
           <Field
             icon_class="preset_icon"
             val={preset}
             options={presets_opt}
-            title="Select preset configuration"
+            title="Preset configuration"
             on_change={on_field_change('preset')}/>
         </div>
       </div>

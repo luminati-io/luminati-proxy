@@ -990,14 +990,14 @@ describe('proxy', ()=>{
             history = [];
             l = yield lum({history: true, history_aggregator: aggregator,
                 rules, session: true, max_requests: 1,
-                reserved_keep_alive: 1});
+                reserved_keep_alive: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);
             for (var i=0; i<5; i++)
             {
                 yield l.test();
-                yield etask.sleep(400);
+                yield etask.sleep(100);
             }
             yield l.test({headers: {'x-lpm-reserved': true}});
             yield etask.sleep(400);
@@ -1496,39 +1496,35 @@ describe('manager', ()=>{
                 assert_has(app.manager._defaults, res._defaults, '_defaults');
             }));
         });
-        describe('request_stats', ()=>{
-            const t = (name, path, expected, opt = {})=>
+        describe('recent_stats', ()=>{
+            const t = (name, expected)=>
             it(name, etask._fn(function*(_this){
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(qw`--customer mock_user --port 24000
-                    --request_stats --ssl false --allow_proxy_auth false`
-                    .concat(opt.args));
+                    --request_stats --ssl false --allow_proxy_auth false`);
                 yield etask.nfn_apply(request, [{
                     proxy: 'http://127.0.0.1:24000',
-                    url: `${opt.proto||'http'}://lumtest.com/myip`,
+                    url: 'http://lumtest.com/myip.json',
                     strictSSL: false,
                 }]);
                 yield etask.sleep(400);
-                const res = yield api_json(`api/request_stats${path}`);
+                const res = yield api_json(`api/recent_stats`);
                 assert_has(res.body, expected);
             }));
-            t('path empty', '', {top: {200: {count: 1}, http: {count: 1},
-                'lumtest.com': {count: 1}}});
-            t('top', '/top', {top: {200: {count: 1}, http: {count: 1},
-                'lumtest.com': {count: 1}}});
-            t('all', '/all', {all: [{status_code: 200, protocol: 'http',
-                url: 'http://lumtest.com/myip', hostname: 'lumtest.com'}]});
-            t('status_code', '/200', {200: [{status_code: 200}]});
-            t('http', '/http', {http: [{status_code: 200, protocol: 'http'}]});
-            const https_exp = {https: [{status_code: 200, protocol: 'https',
-                hostname: 'lumtest.com'}]};
-            t('https', '/https', https_exp, {proto: 'https'});
-            t('https sniff', '/https', https_exp, {proto: 'https',
-                args: qw`--ssl --insecure`});
-            t('domain', '/lumtest.com', {'lumtest.com': [{status_code: 200,
-                hostname: 'lumtest.com'}]});
+            t('main', {
+                status_code: [{key: '200', reqs: 1}],
+                protocol: [{key: 'http', reqs: 1}],
+                hostname: [{key: 'lumtest.com', reqs: 1}],
+                ports: {24000: {
+                    reqs: 1,
+                    success: 1,
+                    url: 'http://lumtest.com/myip.json',
+                }},
+                success: 1,
+                total: 1,
+            });
         });
     });
     describe('crash on load error', ()=>{

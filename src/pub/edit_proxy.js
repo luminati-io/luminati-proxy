@@ -71,11 +71,11 @@ const tabs = {
         },
     },
     speed: {
-        label: 'Request Speed',
+        label: 'Request speed',
         tooltip: 'Control the speed of your request to improve performance',
         fields: {
             dns: {
-                label: 'DNS Lookup',
+                label: 'DNS lookup',
                 tooltip: 'Location of DNS resolve',
             },
             pool_size: {
@@ -160,11 +160,11 @@ const tabs = {
                 tooltip: `enable trigger to certain urls`
             },
             status_code: {
-                label: 'Status Code string to be scanned',
+                label: 'Status code string to be scanned',
                 tooltip: `status code to be scanned in the response headers`
             },
             status_custom: {
-                label: 'Custom Status Code(Regex)',
+                label: 'Custom status code (regex)',
                 placeholder:`i.e. (2..|3..|404)`,
                 tooltip: `A string(regular expression) to be scanned in the
                     head of the response`
@@ -189,7 +189,7 @@ const tabs = {
         },
     },
     rotation: {
-        label: 'IP Control',
+        label: 'IP control',
         tooltip: 'Set the conditions for which your IPs will change',
         fields: {
             ip: {
@@ -226,12 +226,12 @@ const tabs = {
                 ext: true,
             },
             session_random: {
-                label: 'Random Session',
+                label: 'Random session',
                 tooltip: `Switch session ID on each request`,
                 ext: true,
             },
             session: {
-                label: 'Explicit Session',
+                label: 'Explicit session',
                 tooltip: `Insert session ID to maintain the same ip
                     for as long as possible.`,
             },
@@ -243,7 +243,7 @@ const tabs = {
                 ext: true,
             },
             max_requests: {
-                label: 'Max Requests',
+                label: 'Max requests',
                 tooltip: `Change session based on number of requests can be a
                     range or a fixed number. when using browser it should be
                     taken into consideration that one page load will attempt
@@ -251,12 +251,12 @@ const tabs = {
                 ext: true,
             },
             session_duration: {
-                label: 'Session Duration (seconds)',
+                label: 'Session duration (seconds)',
                 tooltip: `Change session after fixed number of seconds`,
                 ext: true,
             },
             seed: {
-                label: 'Session ID Seed',
+                label: 'Session ID seed',
                 tooltip: `Seed used for random number generator in random
                     sessions`,
             }
@@ -267,13 +267,13 @@ const tabs = {
         tooltip: 'Improve the info you receive from the Proxy Manager',
         fields: {
             history: {
-                label: 'Enable Logs',
+                label: 'Enable logs',
                 tooltip: `Last 1K requests are automatically logged for easy
                     debugging. Enable Logs to save all requests`,
                 ext: true,
             },
             ssl: {
-                label: 'Enable SSL Logs',
+                label: 'Enable SSL logs',
                 tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
                 ext: true,
             },
@@ -443,6 +443,18 @@ class Index extends React.Component {
             setdb.on('head.edit_proxy.tab', (tab='logs')=>
                 this.setState({tab})),
         ];
+        window.setTimeout(this.fetch_globals.bind(this));
+    }
+    // XXX krzysztof: remove when intorudced ReactRouter
+    fetch_globals(){
+        const _this = this;
+        this.sp.spawn(etask(function*(){
+            if (!_this.state.consts)
+            {
+                const consts = yield ajax.json({url: '/api/consts'});
+                setdb.set('head.consts', consts);
+            }
+        }));
     }
     componentDidMount(){
         setTimeout(()=>{
@@ -915,24 +927,32 @@ class Index extends React.Component {
                   <h3>Proxy on port {this.port}</h3>
                   <Loader_small show={this.state.saving}/>
                 </div>
-                <Nav zones={zones} default_zone={default_zone}
+                <Nav
+                  zones={zones}
+                  default_zone={default_zone}
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_field={this.field_changed.bind(this)}
                   on_change_preset={this.apply_preset.bind(this)}
                   save={this.save.bind(this)}/>
-                <Nav_tabs curr_tab={this.state.tab} form={this.state.form}
+                <Nav_tabs
+                  curr_tab={this.state.tab}
+                  form={this.state.form}
                   on_tab_click={this.click_tab.bind(this)}
                   errors={this.state.errors}/>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
-                <Main_window proxy={this.state.consts&&this.state.consts.proxy}
+                <Main_window
+                  proxy={this.state.consts&&this.state.consts.proxy}
+                  ports={[this.state.form.port]}
                   locations={this.state.locations}
-                  defaults={this.state.defaults} form={this.state.form}
+                  defaults={this.state.defaults}
+                  form={this.state.form}
                   init_focus={this.init_focus}
                   is_valid_field={this.is_valid_field.bind(this)}
                   on_change_field={this.field_changed.bind(this)}
-                  support={support} errors={this.state.errors}
+                  support={support}
+                  errors={this.state.errors}
                   default_opt={this.default_opt.bind(this)}
                   get_curr_plan={this.get_curr_plan.bind(this)}
                   goto_field={this.goto_field.bind(this)}/>
@@ -1089,33 +1109,6 @@ const Double_number = props=>{
     );
 };
 
-const Input_boolean = props=>{
-    const update = val=>{
-        val = val=='true';
-        props.on_change_wrapper(val);
-    };
-    const on_click_on = props.on_boolean_clicked||(()=>{});
-    return (
-        <div className="radio_buttons">
-          <div className="option">
-            <input type="radio" checked={props.val==true}
-              onClick={on_click_on}
-              onChange={e=>update(e.target.value)} id={props.id+'_enable'}
-              name={props.id} value="true" disabled={props.disabled}/>
-            <div className="checked_icon"/>
-            <label htmlFor={props.id+'_enable'}>Enabled</label>
-          </div>
-          <div className="option">
-            <input type="radio" checked={props.val==false}
-              onChange={e=>update(e.target.value)} id={props.id+'_disable'}
-              name={props.id} value="false" disabled={props.disabled}/>
-            <div className="checked_icon"/>
-            <label htmlFor={props.id+'_disable'}>Disabled</label>
-          </div>
-        </div>
-    );
-};
-
 const Typeahead_wrapper = props=>(
     <Typeahead options={props.data} maxResults={10}
       minLength={1} disabled={props.disabled} selectHintOnEnter
@@ -1137,7 +1130,7 @@ const Section_with_fields = props=>{
 
 let Section_field = props=>{
     const {id, form, sufix, note, type, disabled, data, on_change,
-        on_change_field, min, max, validator, on_boolean_clicked} = props;
+        on_change_field, min, max, validator} = props;
     const {tab_id} = props.provide;
     const on_blur = e=>{
         if (validator)
@@ -1153,7 +1146,6 @@ let Section_field = props=>{
     switch (type)
     {
     case 'select': Comp = Select; break;
-    case 'boolean': Comp = Input_boolean; break;
     case 'double_number': Comp = Double_number; break;
     case 'typeahead': Comp = Typeahead_wrapper; break;
     case 'textarea': Comp = Textarea; break;
@@ -1176,8 +1168,7 @@ let Section_field = props=>{
               <Comp form={form} id={id} data={data} type={type}
                 on_change_wrapper={on_change_wrapper} val={val}
                 disabled={disabled} min={min} max={max}
-                placeholder={placeholder} on_blur={on_blur}
-                on_boolean_clicked={on_boolean_clicked}/>
+                placeholder={placeholder} on_blur={on_blur}/>
               {sufix ? <span className="sufix">{sufix}</span> : null}
             </div>
             {note ? <Note>{note}</Note> : null}
@@ -1730,8 +1721,8 @@ let Rotation = props=>{
             disabled={!support.keep_alive}/>
           <Section_with_fields type="text" id="whitelist_ips"
             validator={validators.ips_list}/>
-          <Section_with_fields type="boolean" id="session_random"
-            disabled={!support.session}/>
+          <Section_with_fields type="select" id="session_random"
+            data={props.default_opt('session_random')}/>
           <Section_with_fields type="text" id="session"
             disabled={form.session_random && !support.session}/>
           <Section_with_fields type="select" id="sticky_ip"
@@ -1770,6 +1761,7 @@ let General = props=>{
         {
             on_change_field('pool_size', 1);
             on_change_field('multiply', size);
+            open_modal();
             return;
         }
         on_change_field('pool_size', size);
@@ -1790,13 +1782,15 @@ let General = props=>{
             disabled={!props.support.multiply}/>
           <If when={type=='ips'}>
             <Section_with_fields {...props}
-              type="boolean" id="multiply_ips" on_boolean_clicked={open_modal}
-              on_change={multiply_changed}/>
+              type="select" id="multiply_ips"
+              on_change={multiply_changed}
+              data={props.default_opt('multiply_ips')}/>
           </If>
           <If when={type=='vips'}>
             <Section_with_fields {...props}
-              type="boolean" id="multiply_vips" on_boolean_clicked={open_modal}
-              on_change={multiply_changed}/>
+              type="select" id="multiply_vips"
+              on_change={multiply_changed}
+              data={props.default_opt('multiply_vips')}/>
           </If>
           <Section_with_fields type="number" id="socks" min="0"/>
           <Section_with_fields type="select" id="secure_proxy"

@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.91.108
+
 ## 1.90.563
 
 ## 1.90.546

@@ -30,6 +30,42 @@ class Dialog extends React.Component {
     }
 }
 
+class Modal_dialog extends React.Component {
+    componentDidMount(){
+    }
+    componentWillReceiveProps(new_props){
+        if (this.props.open==new_props.open)
+            return;
+        if (new_props.open)
+            $(this.ref).modal();
+        else
+            $(this.ref).modal('hide');
+    }
+    set_ref(e){ this.ref = e; }
+    render(){
+        return (
+            <div tabIndex="-1"
+              ref={this.set_ref.bind(this)}
+              className={classnames('modal', 'fade', this.props.className)}>
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <button className="close close_icon" data-dismiss="modal"
+                        aria-label="Close"/>
+                    <h4 className="modal-title">{this.props.title}</h4>
+                  </div>
+                  <div className="modal-body">{this.props.children}</div>
+                  <div className="modal-footer">
+                    <Footer_default ok_clicked={this.props.ok_clicked}
+                      cancel_clicked={this.props.cancel_clicked}/>
+                  </div>
+                </div>
+              </div>
+            </div>
+        );
+    }
+}
+
 class Modal extends React.Component {
     click_cancel(){
         if (this.props.cancel_clicked)
@@ -106,9 +142,8 @@ const Warning = props=>(
 const Footer_default = props=>(
     <div className="default_footer">
       <If when={!props.no_cancel_btn}>
-        <button onClick={props.cancel_clicked}
-          className="btn btn_lpm cancel">Cancel
-        </button>
+        <button onClick={props.cancel_clicked} className="btn btn_lpm cancel">
+          Cancel</button>
       </If>
       <button onClick={props.ok_clicked}
         className={props.ok_btn_classes||'btn btn_lpm ok'}>
@@ -301,6 +336,7 @@ class Tooltip extends Pure_component {
             'data-toggle': 'tooltip',
             'data-placement': this.props.placement||'top',
             'data-container': 'body',
+            'data-html': true,
             title: this.props.title,
             ref: this.set_ref.bind(this),
             onMouseLeave: this.on_mouse_leave.bind(this),
@@ -334,6 +370,44 @@ const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
 };
 
 const presets = {
+    sequential: {
+        default: true,
+        title: 'Sequential session IP pool',
+        subtitle: `Sequential pool of pre-established of sessions (IPs). For
+            running groups of requests sharing the same IP to a target site.
+            Use refresh_sessions max_requests & session_duration to control
+            session (IP) switching`,
+        check: function(opt){ return opt.pool_size &&
+            (!opt.pool_type || opt.pool_type=='sequential'); },
+        set: opt=>{
+            opt.pool_size = 1;
+            opt.pool_type = 'sequential';
+            opt.keep_alive = opt.keep_alive||45;
+            opt.sticky_ip = null;
+            opt.session = '';
+        },
+        clean: opt=>{
+            opt.pool_size = 0;
+            opt.keep_alive = 0;
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.seed = '';
+        },
+        rules: [
+            {field: 'pool_size', label: `sets 'Pool size' to 1`},
+            {field: 'pool_type', label: `sequential pool type`},
+            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
+            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
+            {field: 'session', label: `disables 'Random Session'`},
+        ],
+        support: {
+            keep_alive: true,
+            max_requests: true,
+            session_duration: true,
+            multiply: true,
+            seed: true,
+        },
+    },
     session_long: {
         title: 'Long single session (IP)',
         subtitle: `All requests share the same long session (IP). For
@@ -436,43 +510,6 @@ const presets = {
             keep_alive: true,
             max_requests: true,
             session_duration: true,
-            seed: true,
-        },
-    },
-    sequential: {
-        title: 'Sequential session (IP) pool',
-        subtitle: `Sequential pool of pre-established of sessions (IPs). For
-            running groups of requests sharing the same IP to a target site.
-            Use refresh_sessions max_requests & session_duration to control
-            session (IP) switching`,
-        check: function(opt){ return opt.pool_size &&
-            (!opt.pool_type || opt.pool_type=='sequential'); },
-        set: opt=>{
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-        ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
             seed: true,
         },
     },
@@ -686,4 +723,5 @@ const status_codes = {
 
 export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
     Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
-    Textarea, get_static_country, Loader_small, is_electron, status_codes};
+    Textarea, get_static_country, Loader_small, is_electron, status_codes,
+    Modal_dialog};

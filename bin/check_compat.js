@@ -4,9 +4,9 @@
 const E = exports;
 
 E.is_env_compat = ()=>{
-    if (!Array.prototype.includes)
+    if (!Object.values)
     {
-        console.log('Luminati proxy manager requires Node.js V6.\n'
+        console.log('Luminati proxy manager requires Node.js V7.5.\n'
             +'Please upgrade your Node using nvm or nave, or visit nodejs.org '
             +'and download a newer version.\nAfter that run the following '
             +'command to reinstall Luminati Proxy Manager:\nnpm uninstall -g '

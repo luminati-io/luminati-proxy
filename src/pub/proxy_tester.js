@@ -7,6 +7,8 @@ import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import util from './util.js';
+import ajax from 'hutil/util/ajax';
+import setdb from 'hutil/util/setdb';
 import zurl from 'hutil/util/url';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
@@ -68,6 +70,17 @@ class Request extends Pure_component {
                     this.default_state.params.proxy = def_port;
                     return {params: {...prev_state.params,
                         proxy: port||def_port, method, url}};
+                });
+            });
+            // XXX krzysztof: delete once ReactRouter is introduced
+            const _this = this;
+            window.setTimeout(()=>{
+                this.etask(function*(){
+                    if (_this.state.proxies)
+                        return;
+                    const proxies = yield ajax.json({
+                        url: '/api/proxies_running'});
+                    setdb.set('head.proxies_running', proxies);
                 });
             });
         });
@@ -268,10 +281,10 @@ const Add_icon = ({click})=>(
 
 const Footer_buttons = ({reset_clicked, go_clicked})=>(
     <div className="footer_buttons">
-      <button onClick={go_clicked} className="btn btn_lpm btn_lpm_primary">
-        Go</button>
       <button onClick={reset_clicked}
         className="btn btn_lpm">Reset</button>
+      <button onClick={go_clicked} className="btn btn_lpm btn_lpm_primary">
+        Go</button>
     </div>
 );
 

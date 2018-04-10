@@ -41,18 +41,26 @@ class Logs extends Pure_component {
         setTimeout(()=>{
             const url_o = zurl.parse(document.location.href);
             const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-            const selected_filters = {};
+            const selected_filters = this.state.selected_filters;
             Object.keys(qs_o).forEach(param=>{
                 if (param)
-                    selected_filters[param] = [qs_o[param]];
+                {
+                    selected_filters[param] = selected_filters[param]||[];
+                    selected_filters[param].push(qs_o[param]);
+                }
             });
-            if (this.props.form)
-            {
-                selected_filters.port = selected_filters.port||[];
-                selected_filters.port.push(''+this.props.form.port);
-            }
             this.setState({selected_filters}, this.get_data);
         });
+    }
+    componentWillReceiveProps(new_props){
+        if (new_props.ports)
+        {
+            const selected_filters = this.state.selected_filters||{};
+            selected_filters.port = selected_filters.port||[];
+            new_props.ports.forEach(port=>
+                selected_filters.port.push(''+port));
+            this.setState({selected_filters}, this.get_data);
+        }
     }
     get_params(opt={}){
         const params = {
@@ -110,7 +118,7 @@ class Logs extends Pure_component {
             title: 'Protocols',
             name: 'protocol',
             values: suggestions.protocols,
-        }].filter(f=>f.name!='port'||!this.props.form);
+        }].filter(f=>f.name!='port'||!this.props.ports);
         filters.forEach(f=>{
             f.values = f.values.map(v=>({val: v, section: f.name}));
         });
@@ -158,7 +166,7 @@ class Logs extends Pure_component {
                   <div className="panel_heading">
                     <h2>Recent Requests</h2>
                     <Filtering
-                      port_page={!!this.props.form}
+                      preselected_ports={!!this.props.ports}
                       add_filter={this.add_filter.bind(this)}
                       remove_filter={this.remove_filter.bind(this)}
                       selected_filters={this.state.selected_filters}
@@ -264,7 +272,7 @@ class Filtering extends Pure_component {
             className: 'search_input',
         };
         const filters = Object.entries(this.props.selected_filters)
-        .filter(f=>f[0]!='port'||!this.props.port_page)
+        .filter(f=>f[0]!='port'||!this.props.preselected_ports)
         .reduce((acc, e)=>
             acc.concat(e[1].map(f=>({section: e[0], val: f}))), []);
         return (
@@ -390,6 +398,7 @@ const Row = ({entry, preview_uuid, select_entry})=>{
     const local = moment(new Date(entry.startedDateTime))
     .format('YYYY-MM-DD HH:mm:ss');
     const active = preview_uuid==entry.uuid;
+    entry.request.host = entry.request.host||'';
     let host;
     if (entry.request.host.length>25)
         host = entry.request.host.slice(0, 22)+'...';

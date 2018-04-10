@@ -17,8 +17,8 @@ import {withRouter} from 'react-router-dom';
 const sections = [
     {name: 'settings', title: 'Settings', navbar: false},
     {name: 'overview', title: 'Overview', navbar: true},
+    {name: 'howto', title: 'Instructions', navbar: true},
     {name: 'proxy_tester', title: 'Proxy Tester', navbar: true, react: true},
-    {name: 'howto', title: 'Examples', navbar: true},
     {name: 'logs', title: 'Logs', navbar: true},
     {name: 'config', title: 'Configuration', navbar: true},
 ];
