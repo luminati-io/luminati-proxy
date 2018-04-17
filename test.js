@@ -1254,26 +1254,6 @@ describe('manager', ()=>{
                 assert.equal(body.version, pkg.version);
             }));
         });
-        describe('stats', ()=>{
-            Manager.prototype.json = mock_json(200);
-            const expect_opt = {
-                url: 'https://luminati-china.io/api/get_customer_bw?details=1',
-                headers: {'x-hola-auth': 'lum-customer-opt'
-                    +`-zone-static-key-${password}`},
-            };
-            it('get', ()=>etask(function*(){
-                app = yield app_with_args(
-                    qw`--customer opt --password ${password}`);
-                const body = yield json('api/stats');
-                assert_has(body, expect_opt);
-            }));
-            it('get with config', ()=>etask(function*(){
-                app = yield app_with_config({config: {_defaults:
-                    {customer: 'opt', password}}, only_explicit: true});
-                const body = yield json('api/stats');
-                assert_has(body, expect_opt);
-            }));
-        });
         describe('whitelist', ()=>{
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
@@ -1371,7 +1351,7 @@ describe('manager', ()=>{
             });
             describe('post', ()=>{
                 it('normal non-persist', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001};
+                    let sample_proxy = {port: 24001, proxy_type: 'non-persist'};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies', 'post',
@@ -1383,7 +1363,7 @@ describe('manager', ()=>{
                     assert.equal(res.length, 1);
                 }));
                 it('normal persist', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001, proxy_type: 'persist'};
+                    let sample_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies', 'post',
@@ -1395,7 +1375,8 @@ describe('manager', ()=>{
                     assert_has(res, [{}, sample_proxy], 'proxies');
                 }));
                 it('inherit defaults', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001};
+                    let sample_proxy = {port: 24001, proxy_type:
+                        'non-persist'};
                     let proxies = [{port: 24000}];
                     let res_proxy = assign({}, {customer, password},
                         sample_proxy);

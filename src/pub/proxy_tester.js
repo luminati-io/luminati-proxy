@@ -117,11 +117,6 @@ class Request extends Pure_component {
         this.setState(prev_state=>({
             params: {...prev_state.params, [field]: value}}));
     }
-    reset(){
-        ga_event('proxy-tester-tab', 'reset clicked');
-        this.setState({...this.default_state});
-        this.props.update_response({});
-    }
     go(){
         ga_event('proxy-tester-tab', 'run test');
         if (!this.state.params.proxy)
@@ -172,7 +167,7 @@ class Request extends Pure_component {
     }
     render() {
         return (
-            <div className="panel request">
+            <div className="panel no_border request">
               <Loader show={this.state.show_loader}/>
               <Modal className="warnings_modal" id="warnings_modal"
                 title="Warnings:" no_cancel_btn>
@@ -186,8 +181,10 @@ class Request extends Pure_component {
                   clicked_remove={this.remove_header.bind(this)}
                   clicked_add={this.add_header.bind(this)}
                   update={this.update_header.bind(this)}/>
-                <Footer_buttons reset_clicked={this.reset.bind(this)}
-                  go_clicked={this.go.bind(this)}/>
+                <div className="footer_buttons">
+                  <button onClick={this.go.bind(this)}
+                    className="btn btn_lpm btn_lpm_primary">Go</button>
+                </div>
               </div>
             </div>
         );
@@ -279,20 +276,11 @@ const Add_icon = ({click})=>(
     </span>
 );
 
-const Footer_buttons = ({reset_clicked, go_clicked})=>(
-    <div className="footer_buttons">
-      <button onClick={reset_clicked}
-        className="btn btn_lpm">Reset</button>
-      <button onClick={go_clicked} className="btn btn_lpm btn_lpm_primary">
-        Go</button>
-    </div>
-);
-
 const Body = ({body})=>{
     if (!body)
         return null;
     return (
-        <div className="panel body">
+        <div className="panel body no_border">
           <div className="panel_heading">
             <h2>Body</h2>
           </div>

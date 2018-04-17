@@ -41,6 +41,7 @@ class Pure_component extends React.PureComponent {
         if (sp.constructor.name!='Etask')
             sp = etask(sp);
         this.sp.spawn(sp);
+        return sp;
     }
     setState(updater, cb){
         let t0, t1, t2, t3;

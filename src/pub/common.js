@@ -1,10 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-import _ from 'lodash';
 import $ from 'jquery';
 import classnames from 'classnames';
 import React from 'react';
-import * as Bootstrap from 'react-bootstrap';
+import {Pagination} from 'react-bootstrap';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
@@ -12,26 +11,12 @@ import EventEmitter from 'events';
 import {If} from '/www/util/pub/react.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
-class Dialog extends React.Component {
-    render(){
-        return <Bootstrap.Modal {..._.omit(this.props,
-              ['title', 'footer', 'children'])}>
-              <Bootstrap.Modal.Header closeButton>
-                <Bootstrap.Modal.Title>
-                  {this.props.title}</Bootstrap.Modal.Title>
-              </Bootstrap.Modal.Header>
-              <Bootstrap.Modal.Body>
-                {this.props.children}
-              </Bootstrap.Modal.Body>
-              <Bootstrap.Modal.Footer>
-                {this.props.footer}
-              </Bootstrap.Modal.Footer>
-            </Bootstrap.Modal>;
-    }
-}
-
 class Modal_dialog extends React.Component {
     componentDidMount(){
+        const _this = this;
+        $(this.ref).on('hide.bs.modal', function(){
+            _this.props.cancel_clicked();
+        });
     }
     componentWillReceiveProps(new_props){
         if (this.props.open==new_props.open)
@@ -54,7 +39,8 @@ class Modal_dialog extends React.Component {
                         aria-label="Close"/>
                     <h4 className="modal-title">{this.props.title}</h4>
                   </div>
-                  <div className="modal-body">{this.props.children}</div>
+                  {this.props.children &&
+                    <div className="modal-body">{this.props.children}</div>}
                   <div className="modal-footer">
                     <Footer_default ok_clicked={this.props.ok_clicked}
                       cancel_clicked={this.props.cancel_clicked}/>
@@ -104,10 +90,12 @@ class Modal extends React.Component {
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className={header_classes}>
-                    <button className="close close_icon" data-dismiss="modal"
-                        aria-label="Close"
-                        onClick={this.on_dismiss.bind(this)}>
-                    </button>
+                    {!this.props.no_close &&
+                      <button className="close close_icon" data-dismiss="modal"
+                          aria-label="Close"
+                          onClick={this.on_dismiss.bind(this)}>
+                      </button>
+                    }
                     <If
                       when={!this.props.no_header&&!this.props.custom_header}>
                       <h4 className="modal-title">{this.props.title}</h4>
@@ -116,7 +104,9 @@ class Modal extends React.Component {
                       {this.props.custom_header}
                     </If>
                   </div>
-                  <div className="modal-body">{this.props.children}</div>
+                  {this.props.children &&
+                    <div className="modal-body">{this.props.children}</div>
+                  }
                   <div className="modal-footer">{footer}</div>
                 </div>
               </div>
@@ -146,7 +136,7 @@ const Footer_default = props=>(
           Cancel</button>
       </If>
       <button onClick={props.ok_clicked}
-        className={props.ok_btn_classes||'btn btn_lpm ok'}>
+        className={props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok'}>
         {props.ok_btn_title||'OK'}</button>
     </div>
 );
@@ -282,7 +272,7 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
         if (cur_page+1<pages)
             next = 'Next';
         pagination = (
-            <Bootstrap.Pagination next={next} boundaryLinks
+            <Pagination next={next} boundaryLinks
               activePage={cur_page+1}
               bsSize="small" onSelect={page_change}
               items={pages} maxButtons={max_buttons||5}/>
@@ -315,12 +305,8 @@ class Tooltip extends Pure_component {
         $(this.ref).tooltip();
     }
     componentWillUnmount(){ $(this.ref).tooltip('destroy'); }
-    componentDidUpdate(prev){
-        if (!this.ref||prev.title==this.props.title)
-            return;
-        $(this.ref).tooltip('destroy');
-        $(this.ref).tooltip();
-    }
+    componentDidUpdate(){
+        $(this.ref).attr('title', this.props.title).tooltip('fixTitle'); }
     on_mouse_leave(){
         if (!this.ref)
             return;
@@ -360,7 +346,7 @@ const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
         on_click = ()=>null;
     classes = classnames(classes, {small});
     return (
-        <Tooltip title={tooltip}>
+        <Tooltip title={tooltip} key={id}>
           <span className={classnames('link', 'icon_link', classes)}
             onClick={on_click}>
             <i className={classnames('glyphicon', 'glyphicon-'+id)}/>
@@ -680,6 +666,21 @@ const get_static_country = proxy=>{
     return false;
 };
 
+const save_pagination = (table, opt={})=>{
+    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
+    curr[table] = curr[table]||{};
+    if (opt.page)
+        curr[table].page = opt.page;
+    if (opt.items)
+        curr[table].items = opt.items;
+    window.localStorage.setItem('pagination', JSON.stringify(curr));
+};
+
+const get_pagination = table=>{
+    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
+    return {items: 10, page: 0, ...(curr[table]||{})};
+};
+
 const status_codes = {
     200: 'OK',
     201: 'Created',
@@ -721,7 +722,7 @@ const status_codes = {
     505: 'HTTP Version Not Supported',
 };
 
-export {Dialog, Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
+export {Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
     Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
     Textarea, get_static_country, Loader_small, is_electron, status_codes,
-    Modal_dialog};
+    Modal_dialog, save_pagination, get_pagination};

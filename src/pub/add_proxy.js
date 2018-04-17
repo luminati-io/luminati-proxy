@@ -169,7 +169,7 @@ class Add_proxy extends Pure_component {
         return (
             <div className="lpm">
               <Loader show={this.state.show_loader}/>
-              <Modal id="add_new_proxy_modal" no_header
+              <Modal id="add_new_proxy_modal" no_header no_close
                 footer={Footer_wrapper} className="add_proxy_modal">
                 <Nav_tabs change_tab={this.change_tab.bind(this)}
                   cur_tab={this.state.cur_tab}/>

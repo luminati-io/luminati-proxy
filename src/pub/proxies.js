@@ -15,7 +15,8 @@ import $ from 'jquery';
 import Add_proxy from './add_proxy.js';
 import No_proxies from './no_proxies.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip, get_static_country, Modal_dialog} from './common.js';
+    Tooltip, get_static_country, Modal_dialog, save_pagination,
+    get_pagination} from './common.js';
 import {If} from '/www/util/pub/react.js';
 
 let country_names = {};
@@ -54,10 +55,8 @@ const Targeting_cell = ({proxy})=>{
         `${val} (${state}), ${proxy.city}`);
 };
 
-const Status_cell = ({proxy})=>{
-    const status = proxy._status;
-    const details = proxy._status_details&&
-        proxy._status_details.map(d=>d.msg).join(',');
+const Status_cell = ({proxy, status, status_details})=>{
+    const details = status_details && status_details.map(d=>d.msg).join(',');
     if (!status)
     {
         return (
@@ -142,6 +141,7 @@ const columns = [
             +'location on a computer. Create and configure ports, then '
             +'connect the crawler to send requests through the port',
         ext: true,
+        dynamic: true,
     },
     {
         key: 'proxy_type',
@@ -160,6 +160,7 @@ const columns = [
         sticky: true,
         tooltip: 'Real time proxy status',
         ext: true,
+        dynamic: true,
     },
     {
         key: 'iface',
@@ -369,6 +370,7 @@ const columns = [
         render: Success_rate_cell,
         default: true,
         ext: true,
+        dynamic: true,
     },
     {
         key: 'in_bw',
@@ -378,6 +380,7 @@ const columns = [
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
+        dynamic: true,
     },
     {
         key: 'out_bw',
@@ -387,6 +390,7 @@ const columns = [
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
+        dynamic: true,
     },
     {
         key: 'reqs',
@@ -395,6 +399,7 @@ const columns = [
         render: ({proxy})=>proxy.reqs||'0',
         ext: true,
         tooltip: 'Number of all requests sent from this port',
+        dynamic: true,
     },
     {
         key: 'last_req.url',
@@ -403,6 +408,7 @@ const columns = [
         render: Last_req_cell,
         ext: true,
         tooltip: 'Last request that was sent on this port',
+        dynamic: true,
     },
 ];
 
@@ -475,9 +481,10 @@ class Proxies extends Pure_component {
             'columns'))||{};
         from_storage = Object.keys(from_storage).filter(c=>from_storage[c]);
         const default_cols = columns.filter(c=>c.default).map(col=>col.key);
+        const pagination = get_pagination('proxies');
         this.state = {
             selected_cols: from_storage.length&&from_storage||default_cols,
-            items_per_page: 10,
+            items_per_page: pagination.items,
             cur_page: 0,
             proxies: [],
             filtered_proxies: [],
@@ -528,7 +535,9 @@ class Proxies extends Pure_component {
         return proxies;
     }
     update_items_per_page(items_per_page){
-        this.setState({items_per_page}, ()=>this.paginate(0)); }
+        this.setState({items_per_page}, ()=>this.paginate(0));
+        save_pagination('proxies', {items: items_per_page});
+    }
     req_status(){
         const _this = this;
         this.etask(function*(){
@@ -539,6 +548,13 @@ class Proxies extends Pure_component {
             const url = zescape.uri('/api/recent_stats', params);
             const stats = yield ajax.json({url});
             setdb.set('head.recent_stats', stats);
+            if (!_this.state.proxies.length ||
+                _.isEqual(stats, _this.state.stats))
+            {
+                yield etask.sleep(1000);
+                _this.req_status();
+                return;
+            }
             _this.setState(prev=>{
                 const new_proxies = prev.proxies.map(p=>{
                     let stat = {reqs: 0, success: 0, in_bw: 0, out_bw: 0};
@@ -573,7 +589,8 @@ class Proxies extends Pure_component {
                 }
                 const filtered_proxies = _this.filter_proxies(
                     Object.values(new_proxies));
-                return {proxies: Object.values(new_proxies), filtered_proxies};
+                return {proxies: Object.values(new_proxies), filtered_proxies,
+                    stats};
             }, ()=>_this.paginate(_this.state.cur_page));
             yield etask.sleep(1000);
             _this.req_status();
@@ -595,47 +612,6 @@ class Proxies extends Pure_component {
         this.setState({selected_cols: new_columns});
     }
     add_proxy(){ $('#add_new_proxy_modal').modal('show'); }
-    update_state_proxy(proxy, obj){
-        const map = p=>{
-            if (p.port!=proxy.port)
-                return p;
-            else
-                return {...p, ...obj};
-        };
-        this.setState(prev=>({proxies: prev.proxies.map(map),
-            displayed_proxies: prev.displayed_proxies.map(map)}));
-    }
-    get_status(proxy, opt={}){
-        const _this = this;
-        return this.etask(function*(){
-            this.on('uncaught', e=>{
-                _this.update_state_proxy(proxy, {_status: 'error',
-                    _status_details: [{msg: 'Failed to get proxy status'}]});
-            });
-            const params = {};
-            if (proxy.proxy_type!='duplicate')
-                params.with_details = true;
-            if (opt.force)
-                params.force = true;
-            const uri = '/api/proxy_status/'+proxy.port;
-            const url = zescape.uri(uri, params);
-            _this.update_state_proxy(proxy, {_status: undefined,
-                _status_details: undefined});
-            const res = yield ajax.json({url});
-            if (res.status=='ok')
-            {
-                _this.update_state_proxy(proxy, {_status: res.status,
-                    _status_details: res.status_details});
-            }
-            else
-            {
-                let errors = res.status_details.filter(s=>s.lvl=='err');
-                errors = errors.length ? errors : [{msg: res.status}];
-                _this.update_state_proxy(proxy, {_status: 'error',
-                    _status_details: errors});
-            }
-        });
-    }
     paginate(page=-1){
         page = page>-1 ? page : this.state.cur_page;
         const pages = Math.ceil(
@@ -649,7 +625,10 @@ class Proxies extends Pure_component {
             cur_page,
         });
     }
-    page_change(page){ this.paginate(page-1); }
+    page_change(page){
+        this.paginate(page-1);
+        save_pagination('proxies', {page});
+    }
     render(){
         const cols = columns.filter(col=>
             this.state.selected_cols.includes(col.key)||col.sticky);
@@ -663,8 +642,13 @@ class Proxies extends Pure_component {
               <div className="panel_heading">
                 <h2>
                   Proxies
-                  <Link_icon tooltip="Add new proxy" classes="right top"
-                    on_click={this.add_proxy.bind(this)} id="plus"/>
+                  <Tooltip title="Add new proxy">
+                    <button className="btn btn_lpm btn_lpm_small add_proxy_btn"
+                      onClick={this.add_proxy.bind(this)}>
+                      New proxy
+                      <i className="glyphicon glyphicon-plus"/>
+                    </button>
+                  </Tooltip>
                 </h2>
               </div>
               <If when={this.state.loaded&&displayed_proxies.length}>
@@ -696,7 +680,6 @@ class Proxies extends Pure_component {
                             key={proxy.port}
                             go={this.state.go}
                             update_proxies={this.update.bind(this)}
-                            get_status={this.get_status.bind(this)}
                             proxy={proxy}
                             cols={cols}
                             master_port={this.props.master_port}/>
@@ -735,8 +718,42 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
 );
 
 class Proxy_row extends Pure_component {
-    componentDidMount(){
-        window.setTimeout(()=>this.props.get_status(this.props.proxy));
+    constructor(props){
+        super(props);
+        this.state = {status: this.props.proxy._status};
+    }
+    componentDidMount(){ this.get_status(); }
+    get_status(opt={}){
+        const {proxy} = this.props;
+        const _this = this;
+        return this.etask(function*(){
+            this.on('uncaught', e=>{
+                _this.setState({status: 'error', status_details:
+                    [{msg: 'Failed to get proxy status'}]});
+            });
+            const params = {};
+            if (proxy.proxy_type!='duplicate')
+                params.with_details = true;
+            if (opt.force)
+            {
+                _this.setState({status: undefined});
+                params.force = true;
+            }
+            const uri = '/api/proxy_status/'+proxy.port;
+            const url = zescape.uri(uri, params);
+            const res = yield ajax.json({url});
+            if (res.status=='ok')
+            {
+                _this.setState({status: res.status,
+                    status_details: res.status_details});
+            }
+            else
+            {
+                let errors = res.status_details.filter(s=>s.lvl=='err');
+                errors = errors.length ? errors : [{msg: res.status}];
+                _this.setState({status: 'error', status_details: errors});
+            }
+        });
     }
     edit(){
         if (this.props.proxy.proxy_type!='persist')
@@ -760,28 +777,42 @@ class Proxy_row extends Pure_component {
         return (
             <tr className={row_class}>
               <Actions proxy={proxy}
-                get_status={this.props.get_status}
+                get_status={this.get_status.bind(this)}
                 update_proxies={this.props.update_proxies}/>
               {this.props.cols.map(col=>(
-                <td onClick={this.edit.bind(this)} key={col.key}
-                  className={cell_class(col)}>
-                  <Cell proxy={proxy} col={col}
-                    master_port={this.props.master_port}/>
-                </td>
+                <Cell
+                  key={col.key}
+                  proxy={proxy}
+                  col={col}
+                  status={this.state.status}
+                  status_details={this.state.status_details}
+                  master_port={this.props.master_port}
+                  on_click={this.edit.bind(this)}
+                  className={cell_class(col)}/>
               ))}
             </tr>
         );
     }
 }
 
-const Cell = ({proxy, col, master_port})=>{
-    if (!col.ext && proxy.ext_proxies)
-        return '—';
-    if (col.render)
-        return col.render({proxy, col: col.key, master_port})||null;
-    else
-        return _.get(proxy, col.key)||null;
-};
+class Cell extends React.Component {
+    shouldComponentUpdate(){ return !!this.props.col.dynamic; }
+    render(){
+        const {proxy, col, master_port, status, status_details, on_click,
+            className} = this.props;
+        let val;
+        if (!col.ext && proxy.ext_proxies)
+            val = '—';
+        else if (col.render)
+        {
+            val = col.render({proxy, col: col.key, master_port, status,
+                status_details})||null;
+        }
+        else
+            val = _.get(proxy, col.key)||null;
+        return <td onClick={on_click} className={className}>{val}</td>;
+    }
+}
 
 class Actions extends Pure_component {
     state = {open_delete_dialog: false};
@@ -801,7 +832,7 @@ class Actions extends Pure_component {
         this.etask(function*(){
             const url = '/api/refresh_sessions/'+_this.props.proxy.port;
             yield ajax.json({url, method: 'POST'});
-            yield _this.props.get_status(_this.props.proxy, {force: true});
+            yield _this.props.get_status({force: true});
         });
     }
     duplicate(){

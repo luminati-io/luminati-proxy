@@ -558,10 +558,13 @@ class Index extends React.Component {
         }
         const details = proxy.zone.values.filter(z=>z.value==zone)[0];
         const permissions = details&&details.perm.split(' ')||[];
+        const plan = details&&details.plans[details.plans.length-1]||{};
         if (field_name=='vip')
-        {
-            const plan = details&&details.plans[details.plans.length-1]||{};
             return !!plan.vip;
+        if (field_name=='country'&&(plan.type=='static'||
+            ['domain', 'domain_p'].includes(plan.vips_type)))
+        {
+            return false;
         }
         if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
             return permissions.includes(field_name);
@@ -651,6 +654,8 @@ class Index extends React.Component {
             form.city = [];
         if (!this.original_form)
             this.original_form = form;
+        form.country = (form.country||'').toLowerCase();
+        form.state = (form.state||'').toLowerCase();
         this.setState({form});
     }
     default_opt(option){
@@ -993,8 +998,12 @@ const Nav = ({disabled, ...props})=>{
             props.on_change_field('pool_size', 0);
         reset_fields();
     };
-    const presets_opt = Object.keys(presets).map(p=>
-        ({key: presets[p].title, value: p}));
+    const presets_opt = Object.keys(presets).map(p=>{
+        let key = presets[p].title;
+        if (presets[p].default)
+            key = `Default (${key})`;
+        return {key, value: p};
+    });
     let {preset} = props.form;
     return (
         <div className="nav">
@@ -1068,10 +1077,6 @@ const Tab_icon = props=>{
     );
 };
 
-const Section_header = props=>{
-    return props.text ? <div className="header">{props.text}</div> : null;
-};
-
 class Section_raw extends React.Component {
     constructor(props){
         super(props);
@@ -1082,7 +1087,6 @@ class Section_raw extends React.Component {
         const dynamic_class = {disabled: this.props.disabled};
         return (
             <div className={classnames('section_wrapper', dynamic_class)}>
-              <Section_header text={this.props.header}/>
               <div className="section_body">
                 {this.props.children}
               </div>
@@ -1116,13 +1120,13 @@ const Typeahead_wrapper = props=>(
 );
 
 const Section_with_fields = props=>{
-    const {id, form, header, errors, init_focus} = props;
+    const {id, form, errors, init_focus} = props;
     const disabled = props.disabled || !props.is_valid_field(id);
     const is_empty_arr = Array.isArray(form[id]) && !form[id][0];
     const error_msg = errors[id];
     return (
         <Section disabled={disabled} id={id}
-          header={header} error_msg={error_msg} init_focus={init_focus}>
+          error_msg={error_msg} init_focus={init_focus}>
           <Section_field {...props} disabled={disabled}/>
         </Section>
     );
@@ -1274,11 +1278,6 @@ class Targeting_raw extends React.Component {
         if (e&&e.length)
             this.props.on_change_field('state', e[0].region);
     }
-    country_disabled(){
-        const curr_plan = this.props.get_curr_plan();
-        return curr_plan&&(curr_plan.type=='static'||
-            ['domain', 'domain_p'].includes(curr_plan.vips_type));
-    }
     render(){
         const curr_plan = this.props.get_curr_plan();
         const show_dc_note = curr_plan&&curr_plan.type=='static';
@@ -1301,8 +1300,7 @@ class Targeting_raw extends React.Component {
               </If>
               <Section_with_fields type="select" id="country"
                 data={this.allowed_countries()}
-                on_change={this.country_changed.bind(this)}
-                disabled={this.country_disabled()}/>
+                on_change={this.country_changed.bind(this)}/>
               <Section_with_fields type="select" id="state"
                 data={this.states()}
                 on_change={this.state_changed.bind(this)}/>
@@ -1463,15 +1461,14 @@ class Rules_raw extends React.Component {
     render(){
         const disabled = !!this.props.form.ext_proxies;
         const trigger_types = [
-            {key:'Select condition type for your Trigger rule', value: ''},
+            {key: 'i.e. Status code', value: ''},
             {key: 'Status code', value: 'status'},
             {key: 'HTML body element', value: 'body'},
             {key: 'Minimum request time', value: 'min_req_time'},
             {key: 'Maximum request time', value: 'max_req_time'},
         ];
         const action_types = [
-            {key: 'Select the Action to execute when Trigger pulled',
-                value: ''},
+            {key: 'i.e. Retry with new IP', value: ''},
             {key: 'Retry with new IP', value: 'retry'},
             {key: 'Retry with new port (Waterfall)', value: 'retry_port'},
             {key: 'Ban IP', value: 'ban_ip'},
@@ -1485,7 +1482,8 @@ class Rules_raw extends React.Component {
             {key: '50 minutes', value: '50min'},
             {key: 'Custom', value: 'custom'},
         ];
-        const status_types = ['', '200 - Succeeded requests',
+        const status_types = ['i.e. 200 - Succeeded requests',
+            '200 - Succeeded requests',
             '403 - Forbidden', '404 - Not found',
             '500 - Internal server error', '502 - Bad gateway',
             '503 - Service unavailable', '504 - Gateway timeout', 'Custom']
@@ -1494,7 +1492,7 @@ class Rules_raw extends React.Component {
         return (
             <div>
               <With_data {...this.props} disabled={disabled}>
-                <Section id="trigger_type" header="Trigger">
+                <Section id="trigger_type">
                   <Section_field
                     id="trigger_type"
                     form={form}
@@ -1531,7 +1529,7 @@ class Rules_raw extends React.Component {
                     disabled={disabled}
                     on_change_field={on_change_field}/>
                 </Section>
-                <Section id="action" header="Action"
+                <Section id="action"
                   note="IP will change for every entry"
                   disabled={disabled}
                   on_change_field={on_change_field}>

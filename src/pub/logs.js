@@ -3,7 +3,6 @@
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
 import moment from 'moment';
-import _ from 'lodash';
 import classnames from 'classnames';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
@@ -253,7 +252,7 @@ class Filtering extends Pure_component {
             if (e.title.toLowerCase().slice(0, input_len)==input_value)
                 return acc.concat(e);
             const values = e.values.filter(v=>
-                v.val.toLowerCase().slice(0, input_len)==input_value);
+                (v.val||'').toLowerCase().slice(0, input_len)==input_value);
             if (values.length)
                 return acc.concat(Object.assign(e, {values}));
             return acc;
@@ -266,10 +265,10 @@ class Filtering extends Pure_component {
     }
     render(){
         const inputProps = {
-            placeholder: 'Search requests history',
+            placeholder: '',
             value: this.state.value,
             onChange: this.on_input_change,
-            className: 'search_input',
+            className: classnames('search_input', {empty: !this.state.value}),
         };
         const filters = Object.entries(this.props.selected_filters)
         .filter(f=>f[0]!='port'||!this.props.preselected_ports)

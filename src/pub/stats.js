@@ -1,13 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import _ from 'lodash';
 import React from 'react';
-import {Button, ButtonToolbar} from 'react-bootstrap';
 import util from './util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import ajax from 'hutil/util/ajax';
-import {Dialog, Tooltip, Modal} from './common.js';
+import {Modal_dialog, Tooltip, Modal} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
@@ -20,28 +18,29 @@ class Success_ratio extends Pure_component {
         const tooltip = `Ratio of successful requests out of total
             requests, where successful requests are calculated as 2xx,
             3xx or 404 HTTP status codes`;
+        const val_tooltip = `total: ${total}, success: ${success}`;
         return (
             <div className="overall_success_ratio">
               <div className="success_title">
                 <Tooltip title={tooltip}>Success rate:</Tooltip>
               </div>
               <div className="success_value">
-                {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}</div>
+                <Tooltip title={val_tooltip}>
+                  {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}
+                </Tooltip>
+              </div>
             </div>
         );
     }
 }
 
 class Stats extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {
-            statuses: {stats: []},
-            domains: {stats: []},
-            protocols: {stats: []},
-            stats: {},
-        };
-    }
+    state = {
+        statuses: {stats: []},
+        domains: {stats: []},
+        protocols: {stats: []},
+        stats: {},
+    };
     componentWillMount(){
         this.setdb_on('head.callbacks.state.go', go=>this.setState({go}));
         this.setdb_on('head.recent_stats', stats=>{
@@ -59,25 +58,16 @@ class Stats extends Pure_component {
             yield ajax({url: '/api/enable_ssl', method: 'POST'});
         });
     }
-    close = ()=>this.setState({show_reset: false});
-    confirm = ()=>this.setState({show_reset: true});
+    close_reset_dialog = ()=>this.setState({show_reset: false});
+    show_reset_dialog = ()=>this.setState({show_reset: true});
     reset_stats = ()=>{
-        if (this.state.resetting)
-            return;
-        this.setState({resetting: true});
+        util.ga_event('stats panel', 'click', 'reset btn');
         const _this = this;
         this.etask(function*(){
             yield ajax({url: '/api/recent_stats/reset'});
-            _this.setState({resetting: undefined});
-            _this.close();
+            _this.close_reset_dialog();
         });
-        util.ga_event('stats panel', 'click', 'reset btn');
     };
-    enable_https_statistics = ()=>{
-        this.setState({show_certificate: true});
-        util.ga_event('stats panel', 'click', 'enable https stats');
-    };
-    close_certificate = ()=>{ this.setState({show_certificate: false}); };
     render(){
         return (
             <div className="panel stats_panel">
@@ -85,7 +75,7 @@ class Stats extends Pure_component {
                 <h2>Statistics</h2>
                 <div className="buttons_wrapper">
                   <button className="btn btn_lpm btn_lpm_normal btn_lpm_small"
-                    onClick={this.confirm}>Reset</button>
+                    onClick={this.show_reset_dialog}>Reset</button>
                 </div>
               </div>
               <div className="panel_body with_table">
@@ -97,18 +87,10 @@ class Stats extends Pure_component {
                   row_key="hostname" logs="domain" title="Domain"/>
                 <Protocol_table stats={this.state.stats} go={this.state.go}
                   enable_ssl_click={this.enable_ssl_click.bind(this)}/>
-                <Dialog show={this.state.show_reset} onHide={this.close}
-                  title="Reset stats" footer={
-                    <ButtonToolbar>
-                      <Button bsStyle="primary" onClick={this.reset_stats}
-                        disabled={this.state.resetting}>
-                        {this.state.resetting ? 'Resetting...' : 'OK'}
-                      </Button>
-                      <Button onClick={this.close}>Cancel</Button>
-                    </ButtonToolbar>
-                  }>
-                  <h4>Are you sure you want to reset stats?</h4>
-                </Dialog>
+                <Modal_dialog open={this.state.show_reset}
+                  title="Are you sure you want to reset stats?"
+                  ok_clicked={this.reset_stats}
+                  cancel_clicked={this.close_reset_dialog}/>
                 <Enable_ssl_modal enable_ssl={this.enable_ssl.bind(this)}/>
               </div>
             </div>
@@ -170,7 +152,7 @@ const Key_cell = ({title, enable, warning, enable_click})=>{
     );
 };
 
-const Stat_table = ({title, stats, row_key, logs, row_opts, go,
+const Stat_table = ({title, stats, row_key, logs, go,
     enable_ssl_click})=>
 {
     const show_more = stats[row_key]&&stats[row_key].length > 5;
@@ -194,10 +176,10 @@ const Stat_table = ({title, stats, row_key, logs, row_opts, go,
               </thead>
               <tbody>
                 <If when={!stats.length}><Empty_row/></If>
-                {stats.map(s=>
+                {stats.map(s=>(
                   <Row stat={s} key={s.key} row_key={row_key} logs={logs}
-                    go={go} enable_ssl_click={enable_ssl_click}
-                    {...(row_opts||{})}/>)}
+                    go={go} enable_ssl_click={enable_ssl_click}/>
+                ))}
               </tbody>
             </table>
           </div>

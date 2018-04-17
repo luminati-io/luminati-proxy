@@ -269,6 +269,8 @@ class Nav_hook extends Pure_component {
         $('meta[property="og:title"]').attr('content', m.og_title);
         $('meta[property="og:description"]').attr('content', m.og_description);
         $('meta[property="og:image"]').attr('content', m.og_image);
+        $('script[type="application/ld+json"]')
+            .text(JSON.stringify(m.json_ld));
         m.ga_num!==undefined&&window.set_ga_num&&window.set_ga_num(m.ga_num);
     }
     hash_scroll(hash){

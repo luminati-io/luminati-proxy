@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.91.108",
+    "productName": "Luminati Proxy Manager 1.92.43",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -96,7 +96,8 @@
     "rotating-file-stream": "1.3.4",
     "server-destroy": "1.0.1",
     "uuid": "3.2.1",
-    "compression": "1.7.2"
+    "compression": "1.7.2",
+    "json-object-stream": "0.1.1"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -242,6 +243,7 @@
       "bin/pub/img/lpm_infographics.png",
       "bin/pub/img/luminati_logo_2.svg",
       "bin/pub/img/lum_logo_short.svg",
+      "bin/pub/img/medium_icons.png",
       "bin/pub/img/ok_warning.svg",
       "bin/pub/img/pool.svg",
       "bin/pub/img/preset_icon.png",
@@ -249,9 +251,11 @@
       "bin/pub/img/proxy_ext.svg",
       "bin/pub/img/proxy_lum.svg",
       "bin/pub/img/refresh.svg",
+      "bin/pub/img/resource_document_icon_small.png",
       "bin/pub/img/rotation.svg",
       "bin/pub/img/rules.svg",
       "bin/pub/img/setup_guide.svg",
+      "bin/pub/img/small_icons.png",
       "bin/pub/img/social_btns.svg",
       "bin/pub/img/speed.svg",
       "bin/pub/img/stats.svg",
@@ -268,6 +272,7 @@
       "bin/pub/img/tester.svg",
       "bin/pub/img/tools.svg",
       "bin/pub/img/trash.svg",
+      "bin/pub/img/treeoutline_triangles.png",
       "bin/pub/img/up.svg",
       "bin/pub/img/warning.svg",
       "bin/pub/img/zones.svg",
@@ -298,6 +303,7 @@
       "src/pub/instructions.js",
       "src/pub/login.js",
       "src/pub/logs.js",
+      "src/pub/logs2.js",
       "src/pub/nav.js",
       "src/pub/notif_center.js",
       "src/pub/no_proxies.js",
@@ -311,7 +317,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "1dd0fd8dfe513ff61da87cac9dd1883f"
+    "md5": "17a8aa3d9d38d2b774bcc9ed1caa5315"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -352,5 +358,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.91.108"
+  "version": "1.92.43"
 }

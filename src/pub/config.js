@@ -5,7 +5,7 @@ import ajax from 'hutil/util/ajax';
 import etask from 'hutil/util/etask';
 import classnames from 'classnames';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {Nav, Modal} from './common.js';
+import {Nav, Modal, Link_icon} from './common.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
@@ -132,16 +132,15 @@ class Config extends Pure_component {
 }
 
 const Nav_buttons = props=>{
-    const btn_class = 'btn btn_lpm';
-    const save_class = classnames(btn_class, {disabled: !props.changed});
+    const save_class = classnames({disabled: !props.changed});
     if (props.editable)
     {
         return (
             <div className="nav_buttons">
-              <button onClick={props.click_cancel} className={btn_class}>
-                Cancel</button>
-              <button onClick={props.click_save} className={save_class}>
-                Save</button>
+              <Link_icon tooltip="Cancel" on_click={props.click_cancel}
+                id="remove"/>
+              <Link_icon tooltip="Save" on_click={props.click_save}
+                classes={save_class} id="ok"/>
             </div>
         );
     }
@@ -149,10 +148,10 @@ const Nav_buttons = props=>{
     {
         return (
             <div className="nav_buttons">
-              <button onClick={props.click_edit} className={btn_class}>
-                Edit</button>
-              <button onClick={props.click_download} className={btn_class}>
-                Download</button>
+              <Link_icon tooltip="Edit config" on_click={props.click_edit}
+                id="pencil"/>
+              <Link_icon tooltip="Download as JSON"
+                on_click={props.click_download} id="download"/>
             </div>
         );
     }
