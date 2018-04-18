@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
+import _ from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
 import setdb from 'hutil/util/setdb';
@@ -14,7 +15,9 @@ import filesaver from 'file-saver';
 import Autosuggest from 'react-autosuggest';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
-import {Tooltip, Link_icon, Loader} from './common.js';
+import {Tooltip, Link_icon, Loader, status_codes} from './common.js';
+
+const H_tooltip = props=><Tooltip className="har_tooltip" {...props}/>;
 
 class Logs extends Pure_component {
     moving = false;
@@ -22,11 +25,7 @@ class Logs extends Pure_component {
     state = {
         cur_preview: null,
         network_width: 200,
-        reqs: [],
     };
-    componentWillMount(){
-        this.get_data();
-    }
     componentDidMount(){
         window.document.addEventListener('mousemove',
             this.on_mouse_move.bind(this));
@@ -60,16 +59,6 @@ class Logs extends Pure_component {
         this.moving = false;
         $(this.main_panel).removeClass('moving');
     }
-    get_data(){
-        const _this = this;
-        this.etask(function*(){
-            const uri = '/api/logs';
-            const params = {limit: 0, skip: 0};
-            const url = zescape.uri(uri, params);
-            const res = yield ajax.json({url});
-            _this.setState({reqs: res.log.entries, total: res.total});
-        });
-    }
     set_main_panel_ref(ref){ this.main_panel = ref; }
     render(){
         return (
@@ -78,7 +67,6 @@ class Logs extends Pure_component {
                 ref={this.set_main_panel_ref.bind(this)}>
                 <div className="split_widget vbox flex_auto">
                   <Network_container
-                    reqs={this.state.reqs}
                     main_panel={this.main_panel}
                     open_preview={this.open_preview.bind(this)}
                     width={this.state.network_width}
@@ -107,33 +95,61 @@ const Network_resizer = ({show, offset, start_moving})=>{
 class Network_container extends Pure_component {
     moving_col = null;
     min_width = 22;
-    cols = ['Name', 'Status', 'Port', 'Bandwidth', 'Super proxy'];
+    cols = [
+        {title: 'Name', data: 'request.url'},
+        {title: 'Status', data: 'response.status'},
+        {title: 'Port', data: 'details.port'},
+        {title: 'Bandwidth', data: 'details.bw'},
+        {title: 'Time', data: 'time'},
+        {title: 'Peer proxy', data: 'details.proxy_peer'}
+    ];
     state = {
-        cols: this.cols.map(c=>({title: c, width: 0, offset: 0})),
+        cols: this.cols.map(c=>({...c, offset: 0, width: 0})),
         focused: false,
+        reqs: [],
+        sorted: {col: 0, dir: 1},
     };
+    componentWillMount(){ this.get_data(); }
     componentDidMount(){
         this.resize_columns();
-        window.onresize = ()=>{
-            this.resize_columns();
-        };
+        window.onresize = ()=>{ this.resize_columns(); };
         window.document.addEventListener('mousemove',
             this.on_mouse_move.bind(this));
         window.document.addEventListener('mouseup',
             this.on_mouse_up.bind(this));
     }
-    componentWillUnmount(){
-        window.onresize = null;
-    }
-    componentDidUpdate(prev_props){
-        if (prev_props.cur_preview!=this.props.cur_preview)
-            this.resize_columns();
-    }
+    componentWillUnmount(){ window.onresize = null; }
     on_focus(){ this.setState({focused: true}); }
     on_blur(){ this.setState({focused: false}); }
     on_mouse_up(){
         this.moving_col = null;
         $(this.props.main_panel).removeClass('moving');
+    }
+    get_data(){
+        const _this = this;
+        this.etask(function*(){
+            const uri = '/api/logs';
+            const params = {limit: 100, skip: 0};
+            const url = zescape.uri(uri, params);
+            const res = yield ajax.json({url});
+            const sorted = _this.sort_reqs(res.log.entries);
+            _this.setState({reqs: sorted, total: res.total,
+                sum_out: res.sum_out, sum_in: res.sum_in});
+        });
+    }
+    sort_reqs(reqs, sort={col: 0, dir: 1}){
+        const col = this.cols[sort.col];
+        return reqs.slice().sort((a, b)=>{
+            const val_a = _.get(a, col.data);
+            const val_b = _.get(b, col.data);
+            return val_a > val_b ? 1*sort.dir : -1*sort.dir;
+        });
+    }
+    set_sort(idx){
+        const new_sorted = {col: idx,
+            dir: this.state.sorted.col==idx ? this.state.sorted.dir*-1 : 1};
+        const sorted_reqs = this.sort_reqs(this.state.reqs, new_sorted);
+        this.setState({reqs: sorted_reqs, sorted: new_sorted});
     }
     resize_columns(){
         const total_width = this.network_container.offsetWidth;
@@ -188,28 +204,50 @@ class Network_container extends Pure_component {
     render(){
         const style = {};
         if (!!this.props.cur_preview)
+        {
             style.flex = `0 0 ${this.props.width}px`;
+            style.width = this.props.width;
+        }
         return (
-            <div className="network_container"
+            <div className="network_container vbox"
               tabIndex="-1"
               style={style}
               onFocus={this.on_focus.bind(this)}
               onBlur={this.on_blur.bind(this)}
               ref={this.set_network_ref.bind(this)}>
-              <Header_container cols={this.state.cols}
-                only_name={!!this.props.cur_preview}/>
-              <Data_container cols={this.state.cols}
-                reqs={this.props.reqs}
-                focused={this.state.focused}
-                cur_preview={this.props.cur_preview}
-                open_preview={this.props.open_preview}/>
-              <Grid_resizers cols={this.state.cols}
-                show={!this.props.cur_preview}
-                start_moving={this.start_moving.bind(this)}/>
+              <div className="reqs_container">
+                <Header_container cols={this.state.cols}
+                  sort={this.set_sort.bind(this)}
+                  sorted={this.state.sorted}
+                  only_name={!!this.props.cur_preview}/>
+                <Data_container cols={this.state.cols}
+                  reqs={this.state.reqs}
+                  focused={this.state.focused}
+                  cur_preview={this.props.cur_preview}
+                  open_preview={this.props.open_preview}/>
+                <Grid_resizers cols={this.state.cols}
+                  show={!this.props.cur_preview}
+                  start_moving={this.start_moving.bind(this)}/>
+              </div>
+              <Network_summary_bar total={this.state.total}
+                sum_in={this.state.sum_in}
+                sum_out={this.state.sum_out}/>
             </div>
         );
     }
 }
+
+const Network_summary_bar = ({total, sum_in, sum_out})=>{
+    sum_out = util.bytes_format(sum_out);
+    sum_in = util.bytes_format(sum_in);
+    return (
+        <div className="network_summary_bar">
+          <span>
+            {total} requests | {sum_out} sent | {sum_in} received
+          </span>
+        </div>
+    );
+};
 
 const Grid_resizers = ({cols, start_moving, show})=>{
     if (!show)
@@ -225,7 +263,7 @@ const Grid_resizers = ({cols, start_moving, show})=>{
     );
 };
 
-const Header_container = ({cols, only_name})=>{
+const Header_container = ({cols, only_name, sorted, sort})=>{
     if (only_name)
         cols = cols.slice(0, 1);
     return (
@@ -239,10 +277,10 @@ const Header_container = ({cols, only_name})=>{
             </colgroup>
             <tbody>
               <tr>
-                {cols.map(c=>(
-                  <th key={c.title}>
+                {cols.map((c, i)=>(
+                  <th key={c.title} onClick={()=>sort(i)}>
                     <div>{c.title}</div>
-                    <div className="sort_icon"/>
+                    <Sort_icon show={i==sorted.col} dir={sorted.dir}/>
                   </th>
                 ))}
               </tr>
@@ -250,6 +288,14 @@ const Header_container = ({cols, only_name})=>{
           </table>
         </div>
     );
+};
+
+const Sort_icon = ({show, dir})=>{
+    if (!show)
+        return null;
+    const classes = classnames('small_icon_mask', {sort_asc: dir==1,
+        sort_desc: dir==-1});
+    return <div className="sort_icon"><span className={classes}/></div>;
 };
 
 const Data_container = ({cols, open_preview, cur_preview, focused, reqs})=>{
@@ -277,7 +323,7 @@ const Data_container = ({cols, open_preview, cur_preview, focused, reqs})=>{
 
 class Data_rows extends React.Component {
     shouldComponentUpdate(next_props){
-        return next_props.reqs.length!=this.props.reqs.length ||
+        return next_props.reqs!=this.props.reqs ||
             next_props.cur_preview!=this.props.cur_preview ||
             next_props.focused!=this.props.focused;
     }
@@ -319,19 +365,30 @@ const Cell_value = ({col, req})=>{
     if (col=='Name')
     {
         return (
-            <span>
-              <img className="icon script"/>
-              <span>{req.request.url}</span>
-            </span>
+            <H_tooltip title={req.request.url}>
+              <div>
+                <img className="icon script"/>
+                <div className="disp_value">{req.request.url}</div>
+              </div>
+            </H_tooltip>
         );
     }
     else if (col=='Status')
-        return req.response.status;
+    {
+        const status = status_codes[req.response.status];
+        return (
+            <H_tooltip title={req.response.status+' '+status}>
+              <div className="disp_value">{req.response.status}</div>
+            </H_tooltip>
+        );
+    }
     else if (col=='Port')
         return req.details.port;
     else if (col=='Bandwidth')
         return util.bytes_format(req.details.bw);
-    else if (col=='Super proxy')
+    else if (col=='Time')
+        return req.time+' ms';
+    else if (col=='Peer proxy')
         return req.details.proxy_peer;
     return col;
 };
@@ -431,12 +488,17 @@ class Preview_section extends React.Component {
     }
 }
 
-const Header_pair = ({name, value})=>(
-    <li className="treeitem">
-      <div className="header_name">{name}: </div>
-      <div className="header_value">{value}</div>
-    </li>
-);
+const Header_pair = ({name, value})=>{
+    if (name=='Status Code'&&value=='200')
+        value = <div className="status_wrapper">
+            <div className="small_icon green_status"/>{value}</div>;
+    return (
+        <li className="treeitem">
+          <div className="header_name">{name}: </div>
+          <div className="header_value">{value}</div>
+        </li>
+    );
+};
 
 const Pane_empty = ()=>null;
 

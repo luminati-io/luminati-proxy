@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.92.212
+- :bug: fix port conflicts on starting the process
+
 ## 1.92.43
 - :star: improved performance of starting the process
 - :sparkles: UI improvements

@@ -323,6 +323,11 @@ class Tooltip extends Pure_component {
             'data-placement': this.props.placement||'top',
             'data-container': 'body',
             'data-html': true,
+            'data-template': `<div class="tooltip ${this.props.className||''}"
+                role="tooltip">
+                <div class="arrow"></div>
+                <div class="tooltip-inner"></div>
+            </div>`,
             title: this.props.title,
             ref: this.set_ref.bind(this),
             onMouseLeave: this.on_mouse_leave.bind(this),

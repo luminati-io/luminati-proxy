@@ -287,11 +287,18 @@ class Nav_hook extends Pure_component {
 E.Nav_hook = RouterDOM.withRouter(Nav_hook);
 
 const Tooltip = props=>{
-    if(!props.tip)
+    const {tip, children} = props;
+    if(!tip)
         return props.children;
-    const tooltip = <RB.Tooltip id="tooltip">{props.tip}</RB.Tooltip>;
-    return (<RB.OverlayTrigger placement={props.placement||'top'}
-        overlay={tooltip}>{props.children}</RB.OverlayTrigger>);
+    const is_react_child =
+        typeof React.Children.only(children).type == 'function';
+    const tooltip = <RB.Tooltip id="tooltip" {...props.tooltip_props}>
+      {tip}</RB.Tooltip>;
+    return <RB.OverlayTrigger placement={props.placement||'top'}
+        overlay={tooltip}>
+        {!is_react_child ? children
+          : <span style={{display: 'inline-block'}}>{children}</span>}
+        </RB.OverlayTrigger>;
 };
 E.Tooltip = Tooltip;
 
