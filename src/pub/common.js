@@ -325,7 +325,7 @@ class Tooltip extends Pure_component {
             'data-html': true,
             'data-template': `<div class="tooltip ${this.props.className||''}"
                 role="tooltip">
-                <div class="arrow"></div>
+                <div class="tooltip-arrow"></div>
                 <div class="tooltip-inner"></div>
             </div>`,
             title: this.props.title,

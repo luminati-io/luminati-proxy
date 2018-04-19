@@ -198,28 +198,31 @@ nav a:hover { box-shadow: none; }
     text-align: left;
     ul { padding-left: 20px; padding-top: 10px; }
 }
-.tooltip.har_tooltip .tooltip-inner {
-    max-width: 550px;
-    word-break: break-all;
-    background: hsl(0, 0%, 95%);
-    border-radius: 2px;
-    color: hsl(0, 0%, 20%);
-    padding: 5px 8px;
-    line-height: 14px;
-    display: flex;
-    align-items: center;
-    -webkit-filter: drop-shadow(0 1px 2px hsla(0, 0%, 0%, 0.3));
-    border: 1px solid hsla(0, 0%, 0%, 0.1);
-    background-clip: padding-box;
-    box-sizing: border-box;
-    transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, .2, 1);
-    z-index: 20001;
-    top: 0;
-    left: 0;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-size: 12px;
-    font-family: Roboto, Ubuntu, Arial, sans-serif;
+.tooltip.har_tooltip {
+    .tooltip-inner {
+        max-width: 550px;
+        word-break: break-all;
+        background: hsl(0, 0%, 95%);
+        border-radius: 2px;
+        color: hsl(0, 0%, 20%);
+        padding: 5px 8px;
+        line-height: 14px;
+        display: flex;
+        align-items: center;
+        -webkit-filter: drop-shadow(0 1px 2px hsla(0, 0%, 0%, 0.3));
+        border: 1px solid hsla(0, 0%, 0%, 0.1);
+        background-clip: padding-box;
+        box-sizing: border-box;
+        transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, .2, 1);
+        z-index: 20001;
+        top: 0;
+        left: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-size: 12px;
+        font-family: Roboto, Ubuntu, Arial, sans-serif;
+    }
+    .tooltip-arrow { display: none; }
 }
 .tooltip.top .tooltip-arrow { border-top-color: @tooltip; }
 .tooltip.bottom .tooltip-arrow { border-bottom-color: @tooltip; }
@@ -925,7 +928,10 @@ nav a:hover { box-shadow: none; }
                 th, td { padding: 1px; }
                 th.col.reqs { width: 55px; }
                 th.col.bw { width: 70px; }
-                td { overflow: hidden; }
+                td {
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
                 .empty_row td { cursor: default; }
                 .enable_ssl { margin-left: 2px; }
             }
@@ -978,9 +984,14 @@ nav a:hover { box-shadow: none; }
             width: auto;
             th, td { padding: 1px 10px; }
             th { white-space: nowrap; }
-            td { height: 25px; white-space: nowrap; }
+            td {
+                height: 25px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
             th.col__status { width: 80px; }
-            td.last_req_url { width: 120px; }
+            td.last_req_url { max-width: 120px; }
             td.port { width: 1px; }
         }
         .head_actions {
@@ -2096,6 +2107,7 @@ nav a:hover { box-shadow: none; }
                 overflow-x: hidden;
                 flex: auto;
                 background-color: white;
+                position: relative;
                 ol {
                     text-overflow: ellipsis;
                     white-space: nowrap;
@@ -2164,6 +2176,30 @@ nav a:hover { box-shadow: none; }
                                     align-items: center;
                                 }
                             }
+                        }
+                    }
+                }
+                .codemirror_wrapper {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                }
+                .timing_view_wrapper {
+                    margin: 6px;
+                    color: rgb(30%, 30%, 30%);
+                    table {
+                        border-spacing: 0;
+                        margin-left: 10px;
+                        margin-right: 10px;
+                        line-height: initial;
+                        td { padding: 4px 0; }
+                        .table_header td, .table_footer td {
+                            border-top: 10px solid transparent;
+                        }
+                        .table_header td {
+                            color: #bbb;
                         }
                     }
                 }

@@ -16,6 +16,9 @@ import Autosuggest from 'react-autosuggest';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
 import {Tooltip, Link_icon, Loader, status_codes} from './common.js';
+import codemirror from 'codemirror/lib/codemirror';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/lib/codemirror.css';
 
 const H_tooltip = props=><Tooltip className="har_tooltip" {...props}/>;
 
@@ -61,6 +64,8 @@ class Logs extends Pure_component {
     }
     set_main_panel_ref(ref){ this.main_panel = ref; }
     render(){
+        const preview_style = {
+            maxWidth: `calc(100% - ${this.state.network_width}px`};
         return (
             <div className="har_viewer">
               <div className="main_panel vbox"
@@ -72,6 +77,7 @@ class Logs extends Pure_component {
                     width={this.state.network_width}
                     cur_preview={this.state.cur_preview}/>
                   <Preview cur_preview={this.state.cur_preview}
+                    style={preview_style}
                     close_preview={this.close_preview.bind(this)}/>
                   <Network_resizer show={!!this.state.cur_preview}
                     start_moving={this.start_moving.bind(this)}
@@ -240,10 +246,11 @@ class Network_container extends Pure_component {
 const Network_summary_bar = ({total, sum_in, sum_out})=>{
     sum_out = util.bytes_format(sum_out);
     sum_in = util.bytes_format(sum_in);
+    const cont = `${total} requests | ${sum_out} sent | ${sum_in} received`;
     return (
         <div className="network_summary_bar">
           <span>
-            {total} requests | {sum_out} sent | {sum_in} received
+            <H_tooltip title={cont}>{cont}</H_tooltip>
           </span>
         </div>
     );
@@ -397,8 +404,8 @@ class Preview extends Pure_component {
     panes = [
         {id: 'headers', width: 65, comp: Pane_headers},
         {id: 'preview', width: 63, comp: Pane_preview},
-        {id: 'response', width: 72, comp: Pane_empty},
-        {id: 'timing', width: 57, comp: Pane_empty},
+        {id: 'response', width: 72, comp: Pane_response},
+        {id: 'timing', width: 57, comp: Pane_timing},
     ];
     state = {cur_pane: 0};
     select_pane = id=>{ this.setState({cur_pane: id}); };
@@ -407,7 +414,7 @@ class Preview extends Pure_component {
             return null;
         const Pane_content = this.panes[this.state.cur_pane].comp;
         return (
-            <div className="preview_container">
+            <div style={this.props.style} className="preview_container">
               <div className="tabbed_pane_header">
                 <div className="left_pane">
                   <div onClick={this.props.close_preview}
@@ -451,7 +458,7 @@ const Pane = ({id, idx, width, on_click, active})=>(
     </div>
 );
 
-class Pane_headers extends React.Component {
+class Pane_headers extends Pure_component {
     render(){
         const {req} = this.props;
         const general_entries = [{name: 'Request URL', value: req.request.url},
@@ -468,7 +475,33 @@ class Pane_headers extends React.Component {
     }
 }
 
-class Preview_section extends React.Component {
+class Pane_response extends Pure_component {
+    componentDidMount(){
+        this.cm = codemirror.fromTextArea(this.textarea, {
+            mode: 'javascript',
+            readOnly: 'nocursor',
+            lineNumbers: true,
+            value: 'const pies = 3',
+        });
+        this.cm.setSize('100%', '100%');
+        this.cm.doc.setValue(this.props.req.response.content.text);
+    }
+    componentDidUpdate(){
+        this.cm.doc.setValue(this.props.req.response.content.text);
+    }
+    set_ref(e){ this.ref = e; }
+    set_textarea(el){ this.textarea = el; }
+    render(){
+        return (
+            <div className="codemirror_wrapper">
+              <div ref={this.set_ref.bind(this)}/>
+              <textarea ref={this.set_textarea.bind(this)}/>
+            </div>
+        );
+    }
+}
+
+class Preview_section extends Pure_component {
     state = {open: true};
     toggle(){ this.setState(prev=>({open: !prev.open})); }
     render(){
@@ -500,7 +533,37 @@ const Header_pair = ({name, value})=>{
     );
 };
 
-const Pane_empty = ()=>null;
+class Pane_timing extends Pure_component {
+    render(){
+        return (
+            <div className="timing_view_wrapper">
+              <table>
+                <thead className="network_timing_start">
+                  <tr><td colSpan="2">Queued at 908.45 ms</td></tr>
+                  <tr><td colSpan="2">Started at 916.32 ms</td></tr>
+                </thead>
+                <tbody>
+                  <tr className="table_header">
+                    <td>Resource Scheduling</td><td></td><td>TIME</td>
+                  </tr>
+                  <tr>
+                    <td>Queueing</td>
+                    <td>
+                      <div className="timing_row">
+                        <span className="timing_bar queueing"
+                          style={{left: 0, right: '90.6802%'}}>&#8203;</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="timing_bar_title">7.87&nbsp;ms</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+        );
+    }
+}
 
 const Pane_preview = ()=>(
     <div className="pane_preview">

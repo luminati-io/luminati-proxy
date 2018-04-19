@@ -101,15 +101,9 @@ const Type_cell = ({proxy})=>{
     return 'Luminati';
 };
 
-const last_req_max_length = 20;
 const Last_req_cell = ({proxy})=>{
     const val = (proxy.last_req||{}).url||'—';
-    if (val.length>last_req_max_length)
-        return (
-            <Tooltip title={val}>
-              {val.slice(0, last_req_max_length-3)+'...'}</Tooltip>
-        );
-    return val;
+    return <Tooltip title={val}>{val}</Tooltip>;
 };
 
 const Port_cell = ({proxy, master_port})=>{
