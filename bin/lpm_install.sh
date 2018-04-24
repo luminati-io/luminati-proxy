@@ -7,18 +7,20 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.92.281"
+VERSION="1.92.822"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
 RID=$(cat /dev/urandom | LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 32 |\
     head -n 1)
-TS_START=$(date +"%s")
+TS_START=$(date +"%s000")
+OS_RELEASE=$(uname -r)
 INSTALL_NODE=0
 INSTALL_WGET=0
 INSTALL_NPM=0
 INSTALL_CURL=0
 INSTALL_BREW=0
+USE_NVM=0
 NODE_VER='9.4.0'
 NPM_VER='4.6.1'
 UPDATE_NODE=0
@@ -26,30 +28,69 @@ UPDATE_NPM=0
 OS=""
 OS_MAC=0
 OS_LINUX=0
-OS_RELEASE=""
 ASSUME_YES=0
+SUDO_CMD="sudo -i"
+NVM_DIR="$HOME/.nvm"
+LOGFILE="/tmp/lpm_install_$RID.log"
+LOG=""
+RS=""
+
 case "$(uname -s)" in
 Linux*)
-    OS="Linux"
+    OS=linux
     OS_LINUX=1
     ;;
 Darwin*)
-    OS="Mac"
+    OS=darwin
     OS_MAC=1
     ;;
 CYGWIN*)
-    OS="Cygwin"
+    OS=cygwin
     ;;
 MINGW*)
-    OS="MinGw"
+    OS=mingw
     ;;
 *)
     OS="$OS"
     ;;
 esac
-if ((OS_LINUX)); then
-    OS_RELEASE=$(lsb_release -a)
+
+WGET_FLAG=""
+
+if ((OS_MAC)); then
+    WGET_FLAG='--compression=none'
 fi
+
+is_cmd_defined()
+{
+    local cmd=$1
+    type -P "$cmd" > /dev/null
+    return $?
+}
+
+is_fn_defined()
+{
+    local fn=$1
+    command -v "$fn" > /dev/null
+    return $?
+}
+
+check_sudo()
+{
+    if ((LUM)) && is_cmd_defined "rt" ; then
+        SUDO_CMD=rt
+    fi
+    if ((IS_ROOT)); then
+        SUDO_CMD=""
+    fi
+}
+
+escape_json()
+{
+    local strip_nl=${1//$'\n'/\\n}
+    local strip_tabs=${strip_nl//$'\t'/\ }
+    RS=$strip_tabs
+}
 
 usage()
 {
@@ -106,33 +147,71 @@ prompt()
     return 1;
 }
 
-is_cmd_defined()
+zerr(){ LOG="$LOG$1\n"; }
+
+run_cmd()
 {
-    local cmd=$1
-    type -P "$cmd" > /dev/null
-    return $?
+    local cmd=$1 force_log=$2
+    echo -n > $LOGFILE
+    eval "$cmd" 2> >(tee $LOGFILE >&2)
+    local ret=$?
+    local error=$(tail -n 10 $LOGFILE | base64 2>&1)
+    error=${error/$'\n'/ }
+    if ((!ret&&!force_log)); then
+        error=""
+    fi
+    if ((!ret)); then
+        zerr "CMD $cmd: OK $error"
+    else
+        zerr "CMD $cmd: FAIL($ret) $error"
+    fi
+    return $ret;
 }
 
 sudo_cmd()
 {
-    local sdo="sudo -i"
-    local cmd="$1"
-    if ((LUM)) && is_cmd_defined 'rt' ; then
-        sdo="rt"
-    fi
-    if ((IS_ROOT)); then
-        sdo=""
-    fi
-    eval "$sdo $cmd"
+    local cmd=$1 force_log=$2
+    run_cmd "$SUDO_CMD $cmd" $2
     return $?
+}
+
+run_script()
+{
+    local url=$1 lang=$2
+    if [ -z "$lang" ]; then
+        lang="sh"
+    fi
+    if is_cmd_defined "wget"; then
+        run_cmd "wget -qO- ${WGET_FLAG} $url | $lang"
+    else
+        run_cmd "curl -fsSL $url | $lang"
+    fi
+    return $?
+}
+
+check_linux_distr()
+{
+    local name=''
+    if is_cmd_defined "lsb_release"; then
+	name=$(lsb_release -s -d)
+    elif [ -f "/etc/os-release" ]; then
+	name=$(grep -m1 PRETTY_NAME /etc/os-release | \
+            sed -e 's/PRETTY_NAME=//g' -e 's/"//g')
+    elif [ -f "/etc/redhat-release" ]; then
+	name=$(cat /etc/redhat-release)
+    elif [ -f "/etc/debian_version" ]; then
+	name="Debian $(cat /etc/debian_version)"
+    fi
+    escape_json $name
+    zerr "Linux distr: $name"
 }
 
 perr()
 {
-    local name=$1
-    local note=$2
-    local ts=$(date +"%s")
-    local url="${PERR_URL}/?id=lpm_sh_${name}"
+    local name=$1 note="$2" ts=$(date +"%s")
+    escape_json "$note"
+    zerr "$name"
+    local note=$RS url="${PERR_URL}/?id=lpm_sh_${name}"
     local data="{\"uuid\": \"$RID\", \"timestamp\": \"$ts\", \"ver\": \"$VERSION\", \"info\": {\"platform\": \"$OS\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$TS_START\", \"note\": \"$note\", \"lum\": $LUM, \"root\":$IS_ROOT, \"os_release\":\"$OS_RELEASE\"}}"
     if ((PRINT_PERR)); then
         echo "perr $url $data"
@@ -161,7 +240,7 @@ sys_install()
     local pkg_mng="apt-get install -y"
     if ((OS_MAC)); then
         pkg_mng="brew install -y"
-        eval "${pkg_mng} ${pkg}"
+        run_cmd "${pkg_mng} ${pkg}"
     else
         if is_cmd_defined "yum"; then
             pkg_mng="yum install -y"
@@ -180,7 +259,7 @@ sys_rm()
     local pkg_mng="apt-get remove -y"
     if ((OS_MAC)); then
         pkg_mng="brew uninstall -y"
-        eval "${pkg_mng} ${pkg}"
+        run_cmd "${pkg_mng} ${pkg}"
     else
         if is_cmd_defined "yum"; then
             pkg_mng="yum remove -y"
@@ -210,6 +289,18 @@ check_brew()
     fi
 }
 
+check_nvm()
+{
+    if is_fn_defined "nvm"; then
+        return 0
+    fi
+    if [ -s "$NVM_DIR/nvm.sh" ]; then
+        source "$NVM_DIR/nvm.sh"
+    fi
+    is_fn_defined "nvm"
+    return $?
+}
+
 check_node()
 {
     echo "checking nodejs..."
@@ -229,14 +320,17 @@ check_node()
     else
         echo 'node is not installed'
         INSTALL_NODE=1
-        UPDATE_NPM=1
         perr "check_no_node"
     fi
-    if ((INSTALL_NODE)) && ! is_cmd_defined 'npm'; then
+}
+
+check_npm()
+{
+    echo "checking npm..."
+    if ! is_cmd_defined 'npm'; then
         INSTALL_NPM=1
         perr "check_no_npm"
-    fi
-    if ((!INSTALL_NPM)) && is_cmd_defined 'npm'; then
+    else
         local npm_ver=$(npm -v)
         if [[ "$npm_ver" =~ ^([3,5-9]\.|[1-9][0-9]+\.) ]]; then
             UPDATE_NPM=1
@@ -257,31 +351,33 @@ check_curl()
 
 install_nave()
 {
-    local gzip_flag=''
-    if ! is_cmd_defined "nave"; then
-        echo "installing nave"
-        perr "install_nave"
-        mkdir -p ~/.nave
-        cd ~/.nave
-        if ((OS_MAC)); then
-            gzip_flag = '--compression=none'
-        fi
-        wget ${gzip_flag} http://github.com/isaacs/nave/raw/master/nave.sh
-        chmod +x ./nave.sh
-        sudo_cmd "ln -s $PWD/nave.sh /usr/local/bin/nave"
-        sudo_cmd "mkdir -p /usr/local/{share/man,bin,lib/node,include/node}"
-        cd -
+    if is_cmd_defined "nave"; then
+        return 0
     fi
+    echo "installing nave"
+    perr "install_nave"
+    mkdir -p ~/.nave
+    cd ~/.nave
+    local url="http://github.com/isaacs/nave/raw/master/nave.sh"
+    if is_cmd_defined "wget"; then
+        run_cmd "wget ${WGET_FLAG} $url"
+    else
+        run_cmd "curl -fsSL -o nave.sh $url"
+    fi
+    run_cmd "chmod +x ./nave.sh"
+    sudo_cmd "ln -s $PWD/nave.sh /usr/local/bin/nave"
+    sudo_cmd "mkdir -p /usr/local/{share/man,bin,lib/node,include/node}"
+    cd -
 }
 
-install_node()
+install_nave_node()
 {
     install_nave
-    echo "installing node $NODE_VER"
-    perr "install_node"
+    echo "installing nave node $NODE_VER"
+    perr "install_nave_node"
     sudo_cmd "rm -rf ~/.nave/cache/$NODE_VER"
     sudo_cmd "rm -rf /root/.nave/cache/v$NODE_VER"
-    sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER"
+    sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
     if ! is_cmd_defined "node"; then
         perr "install_error_node"
         echo 'could not install node'
@@ -289,11 +385,35 @@ install_node()
     fi
 }
 
+install_nvm_node()
+{
+    echo "installing nvm node $NODE_VER"
+    perr "install_nvm_node"
+    nvm install $NODE_VER
+    nvm alias default $NODE_VER
+}
+
+install_node()
+{
+    if is_fn_defined "nvm"; then
+        install_nvm_node
+        if [ $? -ne 0 ]; then
+            perr "install_nvm_node_error"
+        else
+            USE_NVM=1
+            return 0
+        fi
+    else
+        perr "install_no_nvm"
+    fi
+    install_nave_node
+}
+
 install_npm()
 {
     echo "installing npm"
     perr "install_npm"
-    curl https://www.npmjs.com/install.sh | sh
+    run_script "https://www.npmjs.com/install.sh"
     UPDATE_NPM=1
 }
 
@@ -323,8 +443,7 @@ install_brew()
 {
     echo "installing brew"
     perr "install_brew"
-    /usr/bin/ruby -e \
-        "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    run_script "https://raw.githubusercontent.com/Homebrew/install/master/install" "ruby"
 }
 
 update_npm()
@@ -340,6 +459,8 @@ check_env()
     check_brew
     check_curl
     check_wget
+    # XXX romank: WIP
+    #check_nvm
     check_node
 }
 
@@ -358,7 +479,8 @@ deps_install()
     if ((INSTALL_NODE||UPDATE_NODE)); then
         install_node
     fi
-    if ((INSTALL_NPM)) && ! is_cmd_defined 'npm'; then
+    check_npm
+    if ((INSTALL_NPM)); then
         install_npm
     fi
     if ((UPDATE_NPM)); then
@@ -370,17 +492,26 @@ deps_install()
 lpm_clean()
 {
     echo "cleaning lpm related node packages"
-    sudo_cmd "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
     local lib_path="$(npm prefix -g)/lib"
-    local home=$HOME
-    sudo_cmd \
+    local install_cmd=(
+        "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
         "rm -rf $lib_path/node_modules/{@luminati-io,sqlite3,luminati-proxy}"
-    echo "cleaning node cache"
-    sudo_cmd "rm -rf $home/.npm /root/.npm"
-    echo "removing luminati links"
-    sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
-    mkdir -p $HOME/.npm/_cacache
-    mkdir -p $HOME/.npm/_logs
+    )
+    for cmd in "${install_cmd[@]}"; do
+        if ((USE_NVM)); then
+            run_cmd "$install_cmd"
+        else
+            sudo_cmd "$install_cmd"
+        fi
+    done
+    if ((!USE_NVM)); then
+        echo "cleaning node cache"
+        sudo_cmd "rm -rf $HOME/.npm /root/.npm"
+        echo "removing luminati links"
+        sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
+        mkdir -p $HOME/.npm/_cacache
+        mkdir -p $HOME/.npm/_logs
+    fi
 }
 
 lpm_install()
@@ -388,12 +519,18 @@ lpm_install()
     echo "installing Luminati proxy manager"
     perr "install" "lpm"
     lpm_clean
-    sudo_cmd "npm install -g --unsafe-perm @luminati-io/luminati-proxy > /dev/null"
+    local cmd="npm install -g --unsafe-perm @luminati-io/luminati-proxy > /dev/null"
+    if ((USE_NVM)); then
+        run_cmd "$cmd"
+    else
+        sudo_cmd "$cmd"
+    fi
     if [[ ! $? ]]; then
         echo "Luminati failed to install from npm"
         perr "install_error_lpm"
         exit $?
-    else
+    fi
+    if ((!USE_NVM)); then
         if ((LUM)); then
             # fix luminati binary not found on luminati ubuntu
             echo "running nave relink"
@@ -404,8 +541,8 @@ lpm_install()
         if [ -f "/usr/local/bin/luminati" ]; then
             sudo_cmd "chmod a+x /usr/local/bin/luminati"
         fi
-        perr "install_success_lpm"
     fi
+    perr "install_success_lpm"
 }
 
 check_install()
@@ -430,6 +567,10 @@ dev_clean()
         sys_rm "build-essential"
         sys_rm "base-devel"
     fi
+    if ((OS_MAC)); then
+        run_script "https://raw.githubusercontent.com/Homebrew/install/master/uninstall" "ruby"
+    fi
+    rm -rf $HOME/.nvm
     if prompt "Remove node and all node modules?" n; then
         sudo_cmd "rm -rf $lib_path/node $lib_path/node_modules"
     fi
@@ -451,6 +592,7 @@ setup()
         perr "user_cancel"
         exit 0
     fi
+    zerr "deps_install"
     deps_install
     lpm_install
     check_install
@@ -470,7 +612,9 @@ on_exit()
         perr "exit_ok" $exit_code
     else
         perr "exit_error" $exit_code
+        perr "exit_error_report" "$LOG"
     fi
+    rm $LOGFILE
 }
 
 signal_handler()
@@ -484,6 +628,10 @@ main()
 {
     trap on_exit EXIT
     trap 'signal_handler "sigint"' INT
+    check_sudo
+    if ((OS_LINUX)); then
+        check_linux_distr
+    fi
     case "$ACTION" in
     setup)
         setup

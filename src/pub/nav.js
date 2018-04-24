@@ -99,6 +99,7 @@ class Nav_left extends Pure_component {
               <div className="menu">
                 {sections.map(s=>(
                   <Section_element_router
+                    cb={s.cb}
                     key={s.name}
                     name={s.name}
                     title={s.title}

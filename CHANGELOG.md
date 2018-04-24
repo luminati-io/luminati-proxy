@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.92.822
+
 ## 1.92.281
 - :sparkles: UI improvements
 - :star: compability with broken config files

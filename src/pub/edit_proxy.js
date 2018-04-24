@@ -31,6 +31,13 @@ const ga_event = (category, action, label, opt={})=>{
         util.ga_event(category, action, label);
     }
 };
+const before_save = {
+    regex: val=>{
+        try { new RegExp(val); }
+        catch(e){ val = null; }
+        return val;
+    },
+};
 const tabs = {
     logs: {fields: [], label: 'Logs'},
     target: {
@@ -342,6 +349,7 @@ const tabs = {
                     response" without proxying (useful when users don't want
                     to make a request, but a browser expects 200 response)`,
                 ext: true,
+                before_save: before_save.regex,
             },
             bypass_proxy: {
                 label: `URL regex for bypassing`,
@@ -349,16 +357,19 @@ const tabs = {
                     directly to target site without any proxy
                     (super proxy or peer)`,
                 ext: true,
+                before_save: before_save.regex,
             },
             direct_include: {
                 label: `URL regex for super proxy`,
                 tooltip: `Insert URL pattern for which requests will be passed
                     through super proxy directly (not through peers)`,
+                before_save: before_save.regex,
             },
             direct_exclude: {
                 label: `URL regex for not super proxy`,
                 tooltip: `Insert URL pattern for which requests will NOT be
                     passed through super proxy`,
+                before_save: before_save.regex,
             },
             allow_proxy_auth: {
                 label: 'Allow request authentication',
@@ -398,6 +409,8 @@ const validators = {
             catch(e){ console.log('incorrect ip format'); }
         });
         return res.join(',');
+    },
+    regex: val=>{
     },
 };
 
@@ -829,6 +842,9 @@ class Index extends React.Component {
         const save_form = Object.assign({}, this.state.form);
         for (let field in save_form)
         {
+            let before_save;
+            if (before_save = all_fields[field] && all_fields[field].before_save)
+                save_form[field] = before_save(save_form[field]);
             if (!this.is_valid_field(field) || save_form[field]===null)
                 save_form[field] = '';
         }
@@ -1211,6 +1227,7 @@ class Targeting_raw extends React.Component {
                                 href={mailto}>More carriers</a>;
         this.carriers = [
             {value: '', key: 'None'},
+            {value: 'a1', key: 'A1 Austria'},
             {value: 'aircel', key: 'Aircel'},
             {value: 'airtel', key: 'Airtel'},
             {value: 'att', key: 'AT&T'},
@@ -1223,6 +1240,7 @@ class Targeting_raw extends React.Component {
             {value: 'docomo', key: 'Docomo'},
             {value: 'dtac', key: 'DTAC Trinet'},
             {value: 'etisalat', key: 'Etisalat'},
+            {value: 'meo', key: 'MEO Portugal'},
             {value: 'megafont', key: 'Megafon Russia'},
             {value: 'mtn', key: 'MTN - Mahanager Telephone'},
             {value: 'mts', key: 'MTS Russia'},

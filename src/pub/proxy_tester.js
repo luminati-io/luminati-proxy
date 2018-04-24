@@ -3,7 +3,8 @@
 import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
+import {Input, Select, Loader, Modal, Warnings, Nav,
+    is_json_str} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
 import util from './util.js';
@@ -12,6 +13,7 @@ import setdb from 'hutil/util/setdb';
 import zurl from 'hutil/util/url';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
+import JSON_viewer from './json_viewer.js';
 
 const ga_event = util.ga_event;
 
@@ -287,12 +289,22 @@ const Body = ({body})=>{
           <div className="panel_body">
             <div className="panel code">
               <div className="panel_body">
-                <span>{body}</span>
+                <span>
+                  <Body_content body={body}/>
+                </span>
               </div>
             </div>
           </div>
         </div>
     );
+};
+
+const Body_content = ({body})=>{
+    let json;
+    if (json = is_json_str(body))
+        return <JSON_viewer json={json}/>;
+    else
+        return body;
 };
 
 const Title_value_pairs = props=>(

@@ -727,7 +727,14 @@ const status_codes = {
     505: 'HTTP Version Not Supported',
 };
 
+const is_json_str = str=>{
+    let resp;
+    try { resp = JSON.parse(str); }
+    catch(e){ return false; }
+    return resp;
+};
+
 export {Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
     Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
     Textarea, get_static_country, Loader_small, is_electron, status_codes,
-    Modal_dialog, save_pagination, get_pagination};
+    Modal_dialog, save_pagination, get_pagination, is_json_str};

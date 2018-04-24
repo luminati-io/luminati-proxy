@@ -249,9 +249,8 @@ class Nav_hook extends Pure_component {
             window.ga('set', 'page', l.pathname);
             window.ga('send', 'pageview');
         }
-        if (p.on_nav){
+        if (p.on_nav)
             p.on_nav(url_o);
-        }
     }
     add_domain(path){
         return this.props.domain&&`https://${this.props.domain}${path}`||path;
@@ -301,6 +300,22 @@ const Tooltip = props=>{
         </RB.OverlayTrigger>;
 };
 E.Tooltip = Tooltip;
+
+const Alert = ({show, text, type})=>(
+    <If when={show}>
+      <div className="alert_wrapper">
+        <div className={'alert alert-'+(type||'danger')} role="alert">
+          {text}</div>
+      </div>
+    </If>
+);
+Alert.fade = (component, text, opt={})=>{
+    const duration=opt.duration||2000;
+    const type=opt.type||'danger';
+    component.setState({alert: {show: true, text, type}});
+    setTimeout(()=>component.setState({alert: {show: false}}), duration);
+};
+E.Alert = Alert;
 
 return E;
 

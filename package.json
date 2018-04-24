@@ -33,7 +33,7 @@
       "artifactName": "${name}-${version}-setup.${ext}",
       "warningsAsErrors": false
     },
-    "productName": "Luminati Proxy Manager 1.92.281",
+    "productName": "Luminati Proxy Manager 1.92.822",
     "publish": {
       "provider": "generic",
       "url": "http://luminati.io/static/lpm"
@@ -72,7 +72,6 @@
     "json-stable-stringify": "1.0.1",
     "json2csv": "3.7.3",
     "lodash": "4.17.2",
-    "mysql": "2.13.0",
     "node-forge": "0.6.46",
     "notosans-fontface": "1.0.1",
     "pm2": "2.10.1",
@@ -87,7 +86,6 @@
     "tasklist": "3.1.0",
     "tough-cookie-file-store": "1.2.0",
     "universal-analytics": "0.4.9",
-    "winston": "2.3.0",
     "yargs": "6.5.0",
     "opn": "5.1.0",
     "prismjs": "1.8.4",
@@ -97,7 +95,9 @@
     "server-destroy": "1.0.1",
     "uuid": "3.2.1",
     "compression": "1.7.2",
-    "json-object-stream": "0.1.1"
+    "json-object-stream": "0.1.1",
+    "socket-pair": "1.0.3",
+    "ws": "5.1.1"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -232,6 +232,7 @@
       "bin/pub/img/ic_thumbs_up.svg",
       "bin/pub/img/ic_warning.svg",
       "bin/pub/img/info.svg",
+      "bin/pub/img/large_icons.png",
       "bin/pub/img/loader.gif",
       "bin/pub/img/logo-80legs.svg",
       "bin/pub/img/logo-crawlera.svg",
@@ -279,8 +280,10 @@
       "bin/pub/img/zone_icon.png",
       "index.js",
       "lib/cities.js",
+      "lib/cluster_route.js",
       "lib/db_history.json",
       "lib/find_iface.js",
+      "lib/hash.js",
       "lib/hutil-loader.js",
       "lib/log.js",
       "lib/lpm.js",
@@ -301,6 +304,7 @@
       "src/pub/howto.js",
       "src/pub/index.html",
       "src/pub/instructions.js",
+      "src/pub/json_viewer.js",
       "src/pub/login.js",
       "src/pub/logs.js",
       "src/pub/logs2.js",
@@ -317,7 +321,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "311eec9490821e45e40b7eaaca5bdf63"
+    "md5": "1d01ca27a92be185877bf193bfb73bf0"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -358,5 +362,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.92.281"
+  "version": "1.92.822"
 }

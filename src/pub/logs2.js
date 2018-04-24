@@ -15,19 +15,24 @@ import filesaver from 'file-saver';
 import Autosuggest from 'react-autosuggest';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
-import {Tooltip, Link_icon, Loader, status_codes} from './common.js';
+import {Tooltip, Link_icon, Loader, status_codes,
+    is_json_str} from './common.js';
+import JSON_viewer from './json_viewer.js';
 import codemirror from 'codemirror/lib/codemirror';
-import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 
 const H_tooltip = props=><Tooltip className="har_tooltip" {...props}/>;
 
 class Logs extends Pure_component {
-    moving = false;
+    moving_width = false;
     min_width = 22;
+    min_height = 100;
     state = {
         cur_preview: null,
         network_width: 200,
+        logs_height: 600,
     };
     componentDidMount(){
         window.document.addEventListener('mousemove',
@@ -39,37 +44,63 @@ class Logs extends Pure_component {
         this.setState({cur_preview: req}); }
     close_preview(){
         this.setState({cur_preview: null}); }
-    start_moving(e){
+    start_moving_width(e){
         if (e.nativeEvent.which!=1)
             return;
-        this.moving = true;
+        this.moving_width = true;
         $(this.main_panel).addClass('moving');
         this.start_offset = e.pageX;
         this.start_width = this.state.network_width;
     }
-    on_mouse_move(e){
-        if (!this.moving)
+    start_moving_height(e){
+        if (e.nativeEvent.which!=1)
             return;
+        this.moving_height = true;
+        $('body').addClass('moving_height');
+        $(this.main_panel).addClass('moving_height');
+        this.start_offset = e.pageY;
+        this.start_height = this.state.logs_height;
+    }
+    on_resize_width(e){
         const offset = e.pageX-this.start_offset;
         let new_width = this.start_width+offset;
         if (new_width<this.min_width)
             new_width = this.min_width;
-        this.setState(prev=>{
-            return {network_width: new_width};
-        });
+        this.setState({network_width: new_width});
+    }
+    on_resize_height(e){
+        const offset = e.pageY-this.start_offset;
+        let new_height = this.start_height-offset;
+        if (new_height<this.min_height)
+            new_height = this.min_height;
+        this.setState({logs_height: new_height});
+    }
+    on_mouse_move(e){
+        if (this.moving_width)
+            this.on_resize_width(e);
+        else if (this.moving_height)
+            this.on_resize_height(e);
     }
     on_mouse_up(){
-        this.moving = false;
+        this.moving_width = false;
+        this.moving_height = false;
         $(this.main_panel).removeClass('moving');
+        $(this.main_panel).removeClass('moving_height');
+        $('body').removeClass('moving_height');
     }
     set_main_panel_ref(ref){ this.main_panel = ref; }
     render(){
         const preview_style = {
             maxWidth: `calc(100% - ${this.state.network_width}px`};
+        const main_style = {
+            height: this.state.logs_height,
+        };
         return (
-            <div className="har_viewer">
+            <div className="har_viewer panel_style">
               <div className="main_panel vbox"
+                style={main_style}
                 ref={this.set_main_panel_ref.bind(this)}>
+                <Toolbar close_preview={this.close_preview.bind(this)}/>
                 <div className="split_widget vbox flex_auto">
                   <Network_container
                     main_panel={this.main_panel}
@@ -80,14 +111,50 @@ class Logs extends Pure_component {
                     style={preview_style}
                     close_preview={this.close_preview.bind(this)}/>
                   <Network_resizer show={!!this.state.cur_preview}
-                    start_moving={this.start_moving.bind(this)}
+                    start_moving={this.start_moving_width.bind(this)}
                     offset={this.state.network_width}/>
                 </div>
+                <Window_resizer
+                  start_moving={this.start_moving_height.bind(this)}/>
               </div>
             </div>
         );
     }
 }
+
+class Toolbar extends Pure_component {
+    clear(){
+        const _this = this;
+        this.etask(function*(){
+            yield ajax({url: '/api/logs_reset'});
+            _this.props.close_preview();
+            setdb.set('head.har_viewer.reqs', []);
+        });
+    }
+    render(){
+        return (
+            <div className="toolbar_container">
+              <div className="toolbar">
+                <Toolbar_button id="clear" tooltip="Clear"
+                  on_click={this.clear.bind(this)}/>
+              </div>
+            </div>
+        );
+    }
+}
+
+const Toolbar_button = ({id, tooltip, on_click, tooltip_placement})=>(
+    <H_tooltip title={tooltip} placement={tooltip_placement||'top'}>
+      <div className={classnames('toolbar_item toolbar_button', id)}
+        onClick={on_click}>
+        <span className={id}/>
+      </div>
+    </H_tooltip>
+);
+
+const Window_resizer = ({start_moving})=>(
+    <div className="logs_resizer" onMouseDown={start_moving}/>
+);
 
 const Network_resizer = ({show, offset, start_moving})=>{
     if (!show)
@@ -123,6 +190,11 @@ class Network_container extends Pure_component {
             this.on_mouse_move.bind(this));
         window.document.addEventListener('mouseup',
             this.on_mouse_up.bind(this));
+        this.setdb_on('head.har_viewer.reqs', reqs=>{
+            if (!reqs)
+                return;
+            this.setState({reqs});
+        });
     }
     componentWillUnmount(){ window.onresize = null; }
     on_focus(){ this.setState({focused: true}); }
@@ -139,8 +211,9 @@ class Network_container extends Pure_component {
             const url = zescape.uri(uri, params);
             const res = yield ajax.json({url});
             const sorted = _this.sort_reqs(res.log.entries);
-            _this.setState({reqs: sorted, total: res.total,
+            _this.setState({total: res.total,
                 sum_out: res.sum_out, sum_in: res.sum_in});
+            setdb.set('head.har_viewer.reqs', sorted);
         });
     }
     sort_reqs(reqs, sort={col: 0, dir: 1}){
@@ -243,18 +316,23 @@ class Network_container extends Pure_component {
     }
 }
 
-const Network_summary_bar = ({total, sum_in, sum_out})=>{
-    sum_out = util.bytes_format(sum_out);
-    sum_in = util.bytes_format(sum_in);
-    const cont = `${total} requests | ${sum_out} sent | ${sum_in} received`;
-    return (
-        <div className="network_summary_bar">
-          <span>
-            <H_tooltip title={cont}>{cont}</H_tooltip>
-          </span>
-        </div>
-    );
-};
+class Network_summary_bar extends React.Component {
+    shouldComponentUpdate(next_props){
+        return next_props.total!=this.props.total; }
+    render(){
+        let {total, sum_in, sum_out} = this.props;
+        sum_out = util.bytes_format(sum_out);
+        sum_in = util.bytes_format(sum_in);
+        const c = `${total} requests | ${sum_out} sent | ${sum_in} received`;
+        return (
+            <div className="network_summary_bar">
+              <span>
+                <H_tooltip title={c}>{c}</H_tooltip>
+              </span>
+            </div>
+        );
+    }
+}
 
 const Grid_resizers = ({cols, start_moving, show})=>{
     if (!show)
@@ -307,15 +385,19 @@ const Sort_icon = ({show, dir})=>{
 
 const Data_container = ({cols, open_preview, cur_preview, focused, reqs})=>{
     const preview_mode = !!cur_preview;
-    if (preview_mode)
-        cols = cols.slice(0, 1);
+    cols = cols.map((c, idx)=>{
+        if (!preview_mode)
+            return c;
+        if (preview_mode&&idx==0)
+            return {...c, width: 'auto'};
+        return {...c, width: 0};
+    });
     return (
         <div className="data_container">
           <table>
             <colgroup>
               {cols.map(c=>(
-                <col key={c.title}
-                  style={{width: !!cur_preview ? 'auto' : c.width}}/>
+                <col key={c.title} style={{width: c.width}}/>
               ))}
             </colgroup>
             <Data_rows reqs={reqs}
@@ -337,8 +419,8 @@ class Data_rows extends React.Component {
     render(){
         return (
             <tbody>
-              {this.props.reqs.map((r, i)=>(
-                <Data_row cols={this.props.cols} key={r.uuid} i={i}
+              {this.props.reqs.map(r=>(
+                <Data_row cols={this.props.cols} key={r.uuid}
                   open_preview={this.props.open_preview}
                   cur_preview={this.props.cur_preview}
                   focused={this.props.focused} req={r}/>
@@ -351,22 +433,31 @@ class Data_rows extends React.Component {
     }
 }
 
-const Data_row = ({cur_preview, i, open_preview, cols, focused, req})=>{
-    const classes = classnames({
-        odd: i%2==0,
-        selected: cur_preview==req,
-        focused: cur_preview==req&&focused,
-    });
-    return (
-        <tr key={i} className={classes}>
-          {cols.map(c=>(
-            <td key={c.title} onClick={()=>open_preview(req)}>
-              <Cell_value col={c.title} req={req}/>
-            </td>
-          ))}
-        </tr>
-    );
-};
+class Data_row extends React.Component {
+    shouldComponentUpdate(next_props){
+        const selected = (this.props.cur_preview==this.props.req);
+        const will_selected = (next_props.cur_preview==next_props.req);
+        const selection_changed = selected!=will_selected;
+        const focused_changed = this.props.focused!=next_props.focused;
+        return selection_changed||focused_changed&&selected;
+    }
+    render(){
+        const {cur_preview, open_preview, cols, focused, req} = this.props;
+        const classes = classnames({
+            selected: cur_preview==req,
+            focused: cur_preview==req&&focused,
+        });
+        return (
+            <tr className={classes}>
+              {cols.map(c=>(
+                <td key={c.title} onClick={()=>open_preview(req)}>
+                  <Cell_value col={c.title} req={req}/>
+                </td>
+              ))}
+            </tr>
+        );
+    }
+}
 
 const Cell_value = ({col, req})=>{
     if (col=='Name')
@@ -390,15 +481,21 @@ const Cell_value = ({col, req})=>{
         );
     }
     else if (col=='Port')
-        return req.details.port;
+        return <Tooltip_and_value val={req.details.port}/>;
     else if (col=='Bandwidth')
-        return util.bytes_format(req.details.bw);
+        return <Tooltip_and_value val={util.bytes_format(req.details.bw)}/>;
     else if (col=='Time')
-        return req.time+' ms';
+        return <Tooltip_and_value val={req.time+' ms'}/>;
     else if (col=='Peer proxy')
-        return req.details.proxy_peer;
+        return <Tooltip_and_value val={req.details.proxy_peer}/>;
     return col;
 };
+
+const Tooltip_and_value = ({val})=>(
+    <H_tooltip title={val}>
+      <div className="disp_value">{val}</div>
+    </H_tooltip>
+);
 
 class Preview extends Pure_component {
     panes = [
@@ -413,6 +510,7 @@ class Preview extends Pure_component {
         if (!this.props.cur_preview)
             return null;
         const Pane_content = this.panes[this.state.cur_pane].comp;
+        const req = this.props.cur_preview;
         return (
             <div style={this.props.style} className="preview_container">
               <div className="tabbed_pane_header">
@@ -434,7 +532,7 @@ class Preview extends Pure_component {
                 </div>
               </div>
               <div className="tabbed_pane_content">
-                <Pane_content req={this.props.cur_preview}/>
+                <Pane_content key={req.uuid} req={req}/>
               </div>
             </div>
         );
@@ -478,16 +576,29 @@ class Pane_headers extends Pure_component {
 class Pane_response extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea, {
-            mode: 'javascript',
             readOnly: 'nocursor',
             lineNumbers: true,
-            value: 'const pies = 3',
         });
         this.cm.setSize('100%', '100%');
         this.cm.doc.setValue(this.props.req.response.content.text);
+        this.set_ct();
     }
     componentDidUpdate(){
         this.cm.doc.setValue(this.props.req.response.content.text);
+        this.set_ct();
+    }
+    set_ct(){
+        const header = this.props.req.response.headers.filter(
+            h=>h.name=='content-type');
+        if (!header[0])
+            return this.cm.setOption('mode', 'javascript');
+        const ct = header[0].value;
+        let mode = 'javascript';
+        if (ct.match(/json/))
+            mode = 'javascript';
+        if (ct.match(/html/))
+            mode = 'htmlmixed';
+        this.cm.setOption('mode', mode);
     }
     set_ref(e){ this.ref = e; }
     set_textarea(el){ this.textarea = el; }
@@ -535,29 +646,57 @@ const Header_pair = ({name, value})=>{
 
 class Pane_timing extends Pure_component {
     render(){
+        const {timings, time, startedDateTime} = this.props.req;
+        const sections = ['Resource Scheduling', 'Request/Response'];
+        const perc = [
+            {label: 'Queueing', id: 'blocked', section: 0},
+            {label: 'Request sent', id: 'send', section: 1},
+            {label: 'Waiting (TTFB)', id: 'wait', section: 1},
+            {label: 'Content Download', id: 'receive', section: 1},
+        ].reduce((acc, el)=>{
+            const cur_time = timings[el.id];
+            const left = acc.offset;
+            const dur = Number((cur_time/time).toFixed(4));
+            const right = 1-acc.offset-dur;
+            return {offset: acc.offset+dur, data: [...acc.data,
+                {...el, left: `${left*100}%`, right: `${right*100}%`}]};
+        }, {offset: 0, data: []}).data
+        .reduce((acc, el)=>{
+            if (el.section!=acc.last_section)
+                return {last_section: el.section, data: [...acc.data, [el]]};
+            return {
+                last_section: el.section,
+                data: [
+                    ...acc.data.slice(0, -1),
+                    [...acc.data.slice(-1)[0], el],
+                ],
+            };
+        }, {last_section: -1, data: []}).data;
+        const started_at = moment(new Date(startedDateTime)).format(
+            'YYYY-MM-DD HH:mm:ss');
         return (
             <div className="timing_view_wrapper">
               <table>
+                <colgroup>
+                  <col className="labels"/>
+                  <col className="bars"/>
+                  <col className="duration"/>
+                </colgroup>
                 <thead className="network_timing_start">
-                  <tr><td colSpan="2">Queued at 908.45 ms</td></tr>
-                  <tr><td colSpan="2">Started at 916.32 ms</td></tr>
+                  <tr>
+                    <td colSpan="2">Started at {started_at}</td>
+                  </tr>
                 </thead>
                 <tbody>
-                  <tr className="table_header">
-                    <td>Resource Scheduling</td><td></td><td>TIME</td>
-                  </tr>
-                  <tr>
-                    <td>Queueing</td>
-                    <td>
-                      <div className="timing_row">
-                        <span className="timing_bar queueing"
-                          style={{left: 0, right: '90.6802%'}}>&#8203;</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="timing_bar_title">7.87&nbsp;ms</div>
-                    </td>
-                  </tr>
+                  {perc.map((s, i)=>(
+                    <Timing_header key={i} title={sections[s[0].section]}>
+                    {s.map(p=>(
+                      <Timing_row title={p.label} id={p.id} left={p.left}
+                        key={p.id} right={p.right} time={timings[p.id]}/>
+                      ))}
+                    </Timing_header>
+                  ))}
+                  <Timing_footer total={time}/>
                 </tbody>
               </table>
             </div>
@@ -565,10 +704,63 @@ class Pane_timing extends Pure_component {
     }
 }
 
-const Pane_preview = ()=>(
-    <div className="pane_preview">
-      preview
-    </div>
+const Timing_header = ({title, children})=>[
+    <tr key="timing_header" className="table_header">
+      <td>{title}</td>
+      <td></td>
+      <td>TIME</td>
+    </tr>,
+    ...children,
+];
+
+const Timing_row = ({title, id, left, right, time})=>(
+    <tr className="timing_row">
+      <td>{title}</td>
+      <td>
+        <div className="timing_bar_wrapper">
+          <span className={classnames('timing_bar', id)} style={{left, right}}>
+            &#8203;</span>
+        </div>
+      </td>
+      <td><div className="timing_bar_title">{time} ms</div></td>
+    </tr>
 );
+
+const network_explanation_url = 'https://developers.google.com/web/tools/'
++'chrome-devtools/network-performance/reference#timing-explanation';
+const Timing_footer = ({total})=>(
+    <tr className="timing_footer">
+      <td colSpan="1">
+        <a className="devtools_link"
+          role="link"
+          tabIndex="0"
+          target="_blank"
+          href={network_explanation_url}
+          style={{display: 'inline', cursor: 'pointer'}}>
+          Explanation
+        </a>
+      </td>
+      <td></td>
+      <td>{total} ms</td>
+    </tr>
+);
+
+class Pane_preview extends Pure_component {
+    state = {};
+    componentDidMount(){
+        setdb.on('test', json=>this.setState({json}));
+    }
+    set_ref(e){ this.ref = e; }
+    render(){
+        let json;
+        const text = this.props.req.response.content.text;
+        if (json = this.state.json||is_json_str(text))
+            return <JSON_viewer json={json}/>;
+        return (
+            <div className="pane_preview" ref={this.set_ref.bind(this)}>
+            </div>
+        );
+    }
+}
 
 export default Logs;

@@ -35,12 +35,11 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
       U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+html, body { height: 100%; }
 body {
-    font-family: "Noto Sans", sans-serif;
-    font-size: 15px;
     line-height: 23px;
-    overflow-y: scroll;
     padding-top: 70px;
+    &.moving_height { cursor: row-resize !important; }
 }
 .no_nav {
     .page-body { margin-left: 0; }
@@ -200,6 +199,8 @@ nav a:hover { box-shadow: none; }
 }
 .tooltip.har_tooltip {
     .tooltip-inner {
+        top: 9px;
+        position: relative;
         max-width: 550px;
         word-break: break-all;
         background: hsl(0, 0%, 95%);
@@ -215,8 +216,6 @@ nav a:hover { box-shadow: none; }
         box-sizing: border-box;
         transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, .2, 1);
         z-index: 20001;
-        top: 0;
-        left: 0;
         text-overflow: ellipsis;
         overflow: hidden;
         font-size: 12px;
@@ -1341,12 +1340,11 @@ nav a:hover { box-shadow: none; }
         &.body {
             .panel.code {
                 font-size: 14px;
-                background-color: #fafafa;
                 margin-bottom: 0;
                 .panel_body {
                     overflow: auto;
                     max-height: 400px;
-                    padding: 15px;
+                    padding: 5px;
                     span { word-wrap: break-word; }
                 }
             }
@@ -1837,6 +1835,7 @@ nav a:hover { box-shadow: none; }
 }
 .har_viewer {
     &.panel_style {
+        width: 100%;
         .main_panel {
             border: 1px solid #d0d0d0;
             position: initial;
@@ -1852,6 +1851,19 @@ nav a:hover { box-shadow: none; }
         display: flex;
         flex-direction: column !important;
         position: relative;
+    }
+    .devtools_link {
+        color: rgb(17, 85, 204);
+        text-decoration: underline;
+        display: inline;
+        cursor: pointer;
+        &:hover {
+            box-shadow: none;
+            background: none;
+            border-color: transparent;
+            text-decoration: underline;
+            color: rgb(17, 85, 204);
+        }
     }
     .flex_auto { flex: auto; }
     .split_widget {
@@ -1896,16 +1908,70 @@ nav a:hover { box-shadow: none; }
         width: 5px;
         z-index: 500;
     }
+    .logs_resizer {
+        z-index: 1000;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -2px;
+        width: 100%;
+        height: 5px;
+        cursor: row-resize;
+    }
     .main_panel {
-        &.moving * {
-            cursor: col-resize !important;
-        }
+        z-index: 1000;
         position: fixed;
         bottom: 0;
         left: 0;
-        height: 500px;
         width: 100%;
         border-top: 1px solid #d0d0d0;
+        &.moving * { cursor: col-resize !important; }
+        &.moving_height * { cursor: row-resize !important; }
+        .toolbar_container {
+            background-color: #f3f3f3;
+            border-bottom: solid 1px #d0d0d0;
+            padding: 0 2px;
+            .toolbar {
+                position: relative;
+                white-space: nowrap;
+                height: 26px;
+                overflow: hidden;
+                z-index: 12;
+                flex: none;
+                align-items: center;
+                .toolbar_item {
+                    position: relative;
+                    display: inline-block;
+                    background-color: transparent;
+                    flex: none;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0;
+                    height: 26px;
+                    border: none;
+                    color: #5a5a5a;
+                }
+                .toolbar_button {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    min-width: 28px;
+                    background: transparent;
+                    border-radius: 0;
+                    &:hover { span { background-color: #333; } }
+                    &.close_logs { float: right; }
+                    span {
+                        display: inline-block;
+                        width: 28px;
+                        height: 24px;
+                        background-color: rgb(110, 110, 110);
+                        -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);
+                        -webkit-mask-position: var(--spritesheet-position);
+                        &.clear { --spritesheet-position: 0 144px; }
+                        &.close_logs { --spritesheet-position: 140px 0; }
+                    }
+                }
+            }
+        }
         .network_container {
             width: 100%;
             outline: none;
@@ -1993,8 +2059,11 @@ nav a:hover { box-shadow: none; }
                 table {
                     tr {
                         height: 20px;
-                        background-color: rgb(245, 245, 245);
-                        &.odd {
+                        background-color: ;
+                        &:nth-child(even) {
+                            background-color: rgb(245, 245, 245);
+                        }
+                        &:nth-child(odd) {
                             background-color: white;
                         }
                         &:hover {
@@ -2103,6 +2172,7 @@ nav a:hover { box-shadow: none; }
                 }
             }
             .tabbed_pane_content {
+                display: flex;
                 max-height: 100%;
                 overflow-x: hidden;
                 flex: auto;
@@ -2114,6 +2184,7 @@ nav a:hover { box-shadow: none; }
                     list-style-type: none;
                 }
                 .tree_outline {
+                    width: 100%;
                     padding: 0 0 4px 0;
                     li {
                         padding-left: 5px;
@@ -2180,6 +2251,8 @@ nav a:hover { box-shadow: none; }
                     }
                 }
                 .codemirror_wrapper {
+                    font-family: dejavu sans mono, monospace;
+                    font-size: 11px !important;
                     position: absolute;
                     bottom: 0;
                     left: 0;
@@ -2187,12 +2260,12 @@ nav a:hover { box-shadow: none; }
                     top: 0;
                 }
                 .timing_view_wrapper {
-                    margin: 6px;
+                    width: 100%;
+                    margin: 6px 16px;
                     color: rgb(30%, 30%, 30%);
                     table {
+                        width: 100%;
                         border-spacing: 0;
-                        margin-left: 10px;
-                        margin-right: 10px;
                         line-height: initial;
                         td { padding: 4px 0; }
                         .table_header td, .table_footer td {
@@ -2200,9 +2273,106 @@ nav a:hover { box-shadow: none; }
                         }
                         .table_header td {
                             color: #bbb;
+                            &:last-child { text-align: right; }
+                        }
+                        colgroup {
+                            .labels { width: 156px; }
+                            .duration { width: 80px; }
+                        }
+                        .timing_row {
+                            .timing_bar_title {
+                                color: #222;
+                                white-space: nowrap;
+                                text-align: right;
+                            }
+                            .timing_bar_wrapper {
+                                position: relative;
+                                height: 15px;
+                                .timing_bar {
+                                    min-width: 1px;
+                                    position: absolute;
+                                    top: 0;
+                                    bottom: 0;
+                                    &.blocked {
+                                        border: 1px solid rgba(0, 0, 0, 0.1);
+                                    }
+                                    &.send { background-color: #B0BEC5; }
+                                    &.wait { background-color: #00C853; }
+                                    &.receive { background-color: #03A9F4; }
+                                }
+                            }
+                        }
+                        .timing_footer {
+                            td { border-top: 10px solid transparent; }
+                            td:last-child {
+                                font-weight: bold;
+                                text-align: right;
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+}
+.json_viewer {
+    color: #303942;
+    cursor: default;
+    width: 100%;
+    font-family: dejavu sans mono, monospace;
+    font-size: 11px !important;
+    padding: 4px 6px;
+    overflow: auto;
+    ol.tree_root { padding: 0; }
+    ol.children { padding-left: 12px; }
+    li.tree_item {
+        &:before {
+            -webkit-user-select: none;
+            -webkit-mask-image: url(/img/treeoutline_triangles.png);
+            -webkit-mask-size: 32px 24px;
+            content: "aa";
+            color: transparent;
+            text-shadow: none;
+            margin-right: -2px;
+            height: 12px;
+            -webkit-mask-position: 0 0;
+            background-color: #727272;
+        }
+        &:not(.parent):before {
+            background-color: transparent;
+        }
+        &.expanded:before {
+            -webkit-mask-position: -16px 0;
+        }
+    }
+    li.tree_item {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-height: 16px;
+        height: 12px;
+        span { line-height: 13px; }
+        .name {
+            color: rgb(136, 19, 145);
+            flex-shrink: 0;
+        }
+        .separator {
+            flex-shrink: 0;
+            padding-right: 5px;
+        }
+        .value {
+            &.number {
+                color: rgb(28, 0, 207);
+            }
+            &.boolean {
+                color: rgb(13, 34, 170);
+            }
+            &.string {
+                white-space: pre;
+                unicode-bidi: -webkit-isolate;
+                color: rgb(196, 26, 22);
             }
         }
     }
