@@ -40,6 +40,7 @@ body {
     line-height: 23px;
     padding-top: 70px;
     &.moving_height { cursor: row-resize !important; }
+    &.waiting * { cursor: wait !important; }
 }
 .no_nav {
     .page-body { margin-left: 0; }
@@ -2140,6 +2141,7 @@ nav a:hover { box-shadow: none; }
                     }
                 }
                 .right_panes {
+                    overflow: hidden;
                     flex: auto;
                     display: flex;
                     position: relative;

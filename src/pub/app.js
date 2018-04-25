@@ -249,7 +249,10 @@ module.controller('root', ['$rootScope', '$scope', '$http', '$window',
     });
     $http.get('/api/defaults').then(function(defaults){
         setdb.set('head.defaults', defaults.data);
-        $scope.$root.defaults = defaults.data;
+        const socket = new WebSocket(
+            `ws://${window.location.hostname}:${defaults.data.ws}`);
+        setdb.set('head.defaults', defaults.data);
+        setdb.set('head.ws', socket);
     });
     etask(function*(){
         const locations = yield ajax.json({url: '/api/all_locations'});

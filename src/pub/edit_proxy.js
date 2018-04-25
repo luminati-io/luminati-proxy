@@ -1240,6 +1240,7 @@ class Targeting_raw extends React.Component {
             {value: 'docomo', key: 'Docomo'},
             {value: 'dtac', key: 'DTAC Trinet'},
             {value: 'etisalat', key: 'Etisalat'},
+            {value: 'idea', key: 'Idea India'},
             {value: 'meo', key: 'MEO Portugal'},
             {value: 'megafont', key: 'Megafon Russia'},
             {value: 'mtn', key: 'MTN - Mahanager Telephone'},

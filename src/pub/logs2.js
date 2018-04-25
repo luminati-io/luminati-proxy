@@ -8,15 +8,11 @@ import classnames from 'classnames';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
-import zurl from 'hutil/util/url';
 import zescape from 'hutil/util/escape';
 import util from './util.js';
 import filesaver from 'file-saver';
-import Autosuggest from 'react-autosuggest';
-import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
-import {Tooltip, Link_icon, Loader, status_codes,
-    is_json_str} from './common.js';
+import {Tooltip, status_codes, is_json_str} from './common.js';
 import JSON_viewer from './json_viewer.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -27,7 +23,7 @@ const H_tooltip = props=><Tooltip className="har_tooltip" {...props}/>;
 
 class Logs extends Pure_component {
     moving_width = false;
-    min_width = 22;
+    min_width = 50;
     min_height = 100;
     state = {
         cur_preview: null,
@@ -35,24 +31,20 @@ class Logs extends Pure_component {
         logs_height: 600,
     };
     componentDidMount(){
-        window.document.addEventListener('mousemove',
-            this.on_mouse_move.bind(this));
-        window.document.addEventListener('mouseup',
-            this.on_mouse_up.bind(this));
+        window.document.addEventListener('mousemove', this.on_mouse_move);
+        window.document.addEventListener('mouseup', this.on_mouse_up);
     }
-    open_preview(req){
-        this.setState({cur_preview: req}); }
-    close_preview(){
-        this.setState({cur_preview: null}); }
-    start_moving_width(e){
+    open_preview = req=>this.setState({cur_preview: req});
+    close_preview = ()=>this.setState({cur_preview: null});
+    start_moving_width = e=>{
         if (e.nativeEvent.which!=1)
             return;
         this.moving_width = true;
         $(this.main_panel).addClass('moving');
         this.start_offset = e.pageX;
         this.start_width = this.state.network_width;
-    }
-    start_moving_height(e){
+    };
+    start_moving_height = e=>{
         if (e.nativeEvent.which!=1)
             return;
         this.moving_height = true;
@@ -60,35 +52,38 @@ class Logs extends Pure_component {
         $(this.main_panel).addClass('moving_height');
         this.start_offset = e.pageY;
         this.start_height = this.state.logs_height;
-    }
-    on_resize_width(e){
+    };
+    on_resize_width = e=>{
         const offset = e.pageX-this.start_offset;
         let new_width = this.start_width+offset;
         if (new_width<this.min_width)
             new_width = this.min_width;
+        const max_width = this.main_panel.offsetWidth-this.min_width;
+        if (new_width>max_width)
+            new_width = max_width;
         this.setState({network_width: new_width});
-    }
-    on_resize_height(e){
+    };
+    on_resize_height = e=>{
         const offset = e.pageY-this.start_offset;
         let new_height = this.start_height-offset;
         if (new_height<this.min_height)
             new_height = this.min_height;
         this.setState({logs_height: new_height});
-    }
-    on_mouse_move(e){
+    };
+    on_mouse_move = e=>{
         if (this.moving_width)
             this.on_resize_width(e);
         else if (this.moving_height)
             this.on_resize_height(e);
-    }
-    on_mouse_up(){
+    };
+    on_mouse_up = ()=>{
         this.moving_width = false;
         this.moving_height = false;
         $(this.main_panel).removeClass('moving');
         $(this.main_panel).removeClass('moving_height');
         $('body').removeClass('moving_height');
-    }
-    set_main_panel_ref(ref){ this.main_panel = ref; }
+    };
+    set_main_panel_ref = ref=>{ this.main_panel = ref; };
     render(){
         const preview_style = {
             maxWidth: `calc(100% - ${this.state.network_width}px`};
@@ -99,23 +94,23 @@ class Logs extends Pure_component {
             <div className="har_viewer panel_style">
               <div className="main_panel vbox"
                 style={main_style}
-                ref={this.set_main_panel_ref.bind(this)}>
-                <Toolbar close_preview={this.close_preview.bind(this)}/>
+                ref={this.set_main_panel_ref}>
+                <Toolbar close_preview={this.close_preview}/>
                 <div className="split_widget vbox flex_auto">
                   <Network_container
                     main_panel={this.main_panel}
-                    open_preview={this.open_preview.bind(this)}
+                    open_preview={this.open_preview}
                     width={this.state.network_width}
                     cur_preview={this.state.cur_preview}/>
                   <Preview cur_preview={this.state.cur_preview}
                     style={preview_style}
-                    close_preview={this.close_preview.bind(this)}/>
+                    close_preview={this.close_preview}/>
                   <Network_resizer show={!!this.state.cur_preview}
-                    start_moving={this.start_moving_width.bind(this)}
+                    start_moving={this.start_moving_width}
                     offset={this.state.network_width}/>
                 </div>
                 <Window_resizer
-                  start_moving={this.start_moving_height.bind(this)}/>
+                  start_moving={this.start_moving_height}/>
               </div>
             </div>
         );
@@ -123,20 +118,24 @@ class Logs extends Pure_component {
 }
 
 class Toolbar extends Pure_component {
-    clear(){
+    clear = ()=>{
         const _this = this;
         this.etask(function*(){
+            $('body').addClass('waiting');
             yield ajax({url: '/api/logs_reset'});
             _this.props.close_preview();
             setdb.set('head.har_viewer.reqs', []);
+            setdb.set('head.har_viewer.stats', {total: 0, sum_out: 0,
+                sum_in: 0});
+            $('body').removeClass('waiting');
         });
-    }
+    };
     render(){
         return (
             <div className="toolbar_container">
               <div className="toolbar">
                 <Toolbar_button id="clear" tooltip="Clear"
-                  on_click={this.clear.bind(this)}/>
+                  on_click={this.clear}/>
               </div>
             </div>
         );
@@ -152,9 +151,9 @@ const Toolbar_button = ({id, tooltip, on_click, tooltip_placement})=>(
     </H_tooltip>
 );
 
-const Window_resizer = ({start_moving})=>(
-    <div className="logs_resizer" onMouseDown={start_moving}/>
-);
+const Window_resizer = ({start_moving})=>{
+    return <div className="logs_resizer" onMouseDown={start_moving}/>;
+};
 
 const Network_resizer = ({show, offset, start_moving})=>{
     if (!show)
@@ -168,6 +167,9 @@ const Network_resizer = ({show, offset, start_moving})=>{
 class Network_container extends Pure_component {
     moving_col = null;
     min_width = 22;
+    uri = '/api/logs';
+    batch_size = 100;
+    loaded = {from: 0, to: 0};
     cols = [
         {title: 'Name', data: 'request.url'},
         {title: 'Status', data: 'response.status'},
@@ -177,45 +179,61 @@ class Network_container extends Pure_component {
         {title: 'Peer proxy', data: 'details.proxy_peer'}
     ];
     state = {
-        cols: this.cols.map(c=>({...c, offset: 0, width: 0})),
         focused: false,
         reqs: [],
         sorted: {col: 0, dir: 1},
+        stats: {total: 0, sum_out: 0, sum_in: 0},
     };
     componentWillMount(){ this.get_data(); }
     componentDidMount(){
         this.resize_columns();
         window.onresize = ()=>{ this.resize_columns(); };
-        window.document.addEventListener('mousemove',
-            this.on_mouse_move.bind(this));
-        window.document.addEventListener('mouseup',
-            this.on_mouse_up.bind(this));
+        window.document.addEventListener('mousemove', this.on_mouse_move);
+        window.document.addEventListener('mouseup', this.on_mouse_up);
         this.setdb_on('head.har_viewer.reqs', reqs=>{
             if (!reqs)
                 return;
             this.setState({reqs});
         });
-    }
-    componentWillUnmount(){ window.onresize = null; }
-    on_focus(){ this.setState({focused: true}); }
-    on_blur(){ this.setState({focused: false}); }
-    on_mouse_up(){
-        this.moving_col = null;
-        $(this.props.main_panel).removeClass('moving');
-    }
-    get_data(){
-        const _this = this;
-        this.etask(function*(){
-            const uri = '/api/logs';
-            const params = {limit: 100, skip: 0};
-            const url = zescape.uri(uri, params);
-            const res = yield ajax.json({url});
-            const sorted = _this.sort_reqs(res.log.entries);
-            _this.setState({total: res.total,
-                sum_out: res.sum_out, sum_in: res.sum_in});
-            setdb.set('head.har_viewer.reqs', sorted);
+        this.setdb_on('head.har_viewer.stats', stats=>{
+            if (!stats)
+                return;
+            this.setState({stats});
+        });
+        this.setdb_on('head.ws', ws=>{
+            if (!ws||this.ws)
+                return;
+            this.start_listening_ws(ws);
         });
     }
+    willUnmount(){
+        window.onresize = null;
+        if (this.ws)
+            this.ws.removeEventListener('message', this.on_ws_message);
+    }
+    fetch_missing_data = pos=>{
+        if (pos=='bottom')
+            this.get_data({skip: this.loaded.to});
+    };
+    get_data = (opt={})=>{
+        opt.limit = opt.limit||this.batch_size;
+        opt.skip = opt.skip||0;
+        const _this = this;
+        this.etask(function*(){
+            const params = opt;
+            const url = zescape.uri(_this.uri, params);
+            const res = yield ajax.json({url});
+            const sorted = _this.sort_reqs(res.log.entries);
+            setdb.set('head.har_viewer.reqs',
+                [..._this.state.reqs, ...sorted]);
+            _this.loaded.to = opt.skip+sorted.length;
+            if (!_this.state.stats.total)
+            {
+                setdb.set('head.har_viewer.stats', {total: res.total,
+                    sum_out: res.sum_out, sum_in: res.sum_in});
+            }
+        });
+    };
     sort_reqs(reqs, sort={col: 0, dir: 1}){
         const col = this.cols[sort.col];
         return reqs.slice().sort((a, b)=>{
@@ -224,20 +242,41 @@ class Network_container extends Pure_component {
             return val_a > val_b ? 1*sort.dir : -1*sort.dir;
         });
     }
-    set_sort(idx){
+    set_sort = idx=>{
         const new_sorted = {col: idx,
             dir: this.state.sorted.col==idx ? this.state.sorted.dir*-1 : 1};
         const sorted_reqs = this.sort_reqs(this.state.reqs, new_sorted);
         this.setState({reqs: sorted_reqs, sorted: new_sorted});
+    };
+    on_focus = ()=>this.setState({focused: true});
+    on_blur = ()=>this.setState({focused: false});
+    start_listening_ws(ws){
+        this.ws = ws;
+        ws.addEventListener('message', this.on_ws_message);
     }
-    resize_columns(){
+    on_ws_message = event=>{
+        const req = JSON.parse(event.data);
+        this.setState(prev=>({
+            reqs: [...prev.reqs, req],
+            stats: {
+                total: prev.stats.total+1,
+                sum_out: prev.stats.sum_out+req.details.out_bw,
+                sum_in: prev.stats.sum_in+req.details.in_bw,
+            },
+        }));
+    };
+    on_mouse_up = ()=>{
+        this.moving_col = null;
+        $(this.props.main_panel).removeClass('moving');
+    };
+    resize_columns = ()=>{
         const total_width = this.network_container.offsetWidth;
-        const width = total_width/this.state.cols.length;
-        const cols = this.state.cols.map((c, idx)=>({...c, width,
+        const width = total_width/this.cols.length;
+        const cols = this.cols.map((c, idx)=>({...c, width,
             offset: width*idx}));
         this.setState({cols});
-    }
-    start_moving(e, idx){
+    };
+    start_moving = (e, idx)=>{
         if (e.nativeEvent.which!=1)
             return;
         $(this.props.main_panel).addClass('moving');
@@ -245,8 +284,8 @@ class Network_container extends Pure_component {
         this.start_offset = e.pageX;
         this.start_width = this.state.cols[idx].width;
         this.start_width_last = this.state.cols.slice(-1)[0].width;
-    }
-    on_mouse_move(e){
+    };
+    on_mouse_move = e=>{
         if (this.moving_col===null)
             return;
         this.setState(prev=>{
@@ -278,8 +317,8 @@ class Network_container extends Pure_component {
             });
             return {cols};
         });
-    }
-    set_network_ref(ref){ this.network_container = ref; }
+    };
+    set_network_ref = ref=>{ this.network_container = ref; };
     render(){
         const style = {};
         if (!!this.props.cur_preview)
@@ -291,38 +330,35 @@ class Network_container extends Pure_component {
             <div className="network_container vbox"
               tabIndex="-1"
               style={style}
-              onFocus={this.on_focus.bind(this)}
-              onBlur={this.on_blur.bind(this)}
-              ref={this.set_network_ref.bind(this)}>
+              onFocus={this.on_focus}
+              onBlur={this.on_blur}
+              ref={this.set_network_ref}>
               <div className="reqs_container">
                 <Header_container cols={this.state.cols}
-                  sort={this.set_sort.bind(this)}
+                  sort={this.set_sort}
                   sorted={this.state.sorted}
                   only_name={!!this.props.cur_preview}/>
                 <Data_container cols={this.state.cols}
+                  fetch_missing_data={this.fetch_missing_data}
                   reqs={this.state.reqs}
                   focused={this.state.focused}
                   cur_preview={this.props.cur_preview}
                   open_preview={this.props.open_preview}/>
                 <Grid_resizers cols={this.state.cols}
                   show={!this.props.cur_preview}
-                  start_moving={this.start_moving.bind(this)}/>
+                  start_moving={this.start_moving}/>
               </div>
-              <Network_summary_bar total={this.state.total}
-                sum_in={this.state.sum_in}
-                sum_out={this.state.sum_out}/>
+              <Network_summary_bar stats={this.state.stats}/>
             </div>
         );
     }
 }
 
-class Network_summary_bar extends React.Component {
-    shouldComponentUpdate(next_props){
-        return next_props.total!=this.props.total; }
+class Network_summary_bar extends Pure_component {
     render(){
-        let {total, sum_in, sum_out} = this.props;
-        sum_out = util.bytes_format(sum_out);
-        sum_in = util.bytes_format(sum_in);
+        let {total, sum_in, sum_out} = this.props.stats;
+        sum_out = util.bytes_format(sum_out)||'0 B';
+        sum_in = util.bytes_format(sum_in)||'0 B';
         const c = `${total} requests | ${sum_out} sent | ${sum_in} received`;
         return (
             <div className="network_summary_bar">
@@ -335,7 +371,7 @@ class Network_summary_bar extends React.Component {
 }
 
 const Grid_resizers = ({cols, start_moving, show})=>{
-    if (!show)
+    if (!show||!cols)
         return null;
     return (
         <div>
@@ -349,6 +385,8 @@ const Grid_resizers = ({cols, start_moving, show})=>{
 };
 
 const Header_container = ({cols, only_name, sorted, sort})=>{
+    if (!cols)
+        return null;
     if (only_name)
         cols = cols.slice(0, 1);
     return (
@@ -383,32 +421,48 @@ const Sort_icon = ({show, dir})=>{
     return <div className="sort_icon"><span className={classes}/></div>;
 };
 
-const Data_container = ({cols, open_preview, cur_preview, focused, reqs})=>{
-    const preview_mode = !!cur_preview;
-    cols = cols.map((c, idx)=>{
-        if (!preview_mode)
-            return c;
-        if (preview_mode&&idx==0)
-            return {...c, width: 'auto'};
-        return {...c, width: 0};
-    });
-    return (
-        <div className="data_container">
-          <table>
-            <colgroup>
-              {cols.map(c=>(
-                <col key={c.title} style={{width: c.width}}/>
-              ))}
-            </colgroup>
-            <Data_rows reqs={reqs}
-              cols={cols}
-              open_preview={open_preview}
-              cur_preview={cur_preview}
-              focused={focused}/>
-          </table>
-        </div>
-    );
-};
+class Data_container extends Pure_component {
+    componentDidMount(){
+        this.dc.addEventListener('scroll', this.on_scroll, false);
+    }
+    willUnmount(){
+        this.dc.removeEventListener('scroll', this.on_scroll, false);
+    }
+    set_dc_ref = ref=>{ this.dc = ref; };
+    on_scroll = ()=>{
+        if (this.dc.scrollTop==0)
+            this.props.fetch_missing_data('top');
+        if (this.dc.scrollHeight-this.dc.scrollTop==this.dc.offsetHeight)
+            this.props.fetch_missing_data('bottom');
+    };
+    render(){
+        let {cols, open_preview, cur_preview, focused, reqs} = this.props;
+        const preview_mode = !!cur_preview;
+        cols = (cols||[]).map((c, idx)=>{
+            if (!preview_mode)
+                return c;
+            if (preview_mode&&idx==0)
+                return {...c, width: 'auto'};
+            return {...c, width: 0};
+        });
+        return (
+            <div ref={this.set_dc_ref} className="data_container">
+              <table>
+                <colgroup>
+                  {cols.map(c=>(
+                    <col key={c.title} style={{width: c.width}}/>
+                  ))}
+                </colgroup>
+                <Data_rows reqs={reqs}
+                  cols={cols}
+                  open_preview={open_preview}
+                  cur_preview={cur_preview}
+                  focused={focused}/>
+              </table>
+            </div>
+        );
+    }
+}
 
 class Data_rows extends React.Component {
     shouldComponentUpdate(next_props){
@@ -524,7 +578,7 @@ class Preview extends Pure_component {
                 <div className="right_panes">
                   {this.panes.map((p, idx)=>(
                     <Pane key={p.id} width={p.width} id={p.id} idx={idx}
-                      on_click={this.select_pane.bind(this)}
+                      on_click={this.select_pane}
                       active={this.state.cur_pane==idx}/>
                   ))}
                   <Pane_slider panes={this.panes}
@@ -584,7 +638,7 @@ class Pane_response extends Pure_component {
         this.set_ct();
     }
     componentDidUpdate(){
-        this.cm.doc.setValue(this.props.req.response.content.text);
+        this.cm.doc.setValue(this.props.req.response.content.text||'');
         this.set_ct();
     }
     set_ct(){
@@ -600,13 +654,11 @@ class Pane_response extends Pure_component {
             mode = 'htmlmixed';
         this.cm.setOption('mode', mode);
     }
-    set_ref(e){ this.ref = e; }
-    set_textarea(el){ this.textarea = el; }
+    set_textarea = ref=>{ this.textarea = ref; };
     render(){
         return (
             <div className="codemirror_wrapper">
-              <div ref={this.set_ref.bind(this)}/>
-              <textarea ref={this.set_textarea.bind(this)}/>
+              <textarea ref={this.set_textarea}/>
             </div>
         );
     }
@@ -614,10 +666,10 @@ class Pane_response extends Pure_component {
 
 class Preview_section extends Pure_component {
     state = {open: true};
-    toggle(){ this.setState(prev=>({open: !prev.open})); }
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
     render(){
         return [
-            <li key="li" onClick={this.toggle.bind(this)}
+            <li key="li" onClick={this.toggle}
               className={classnames('parent', {open: this.state.open})}>
               {this.props.title}
               {!this.state.open ? ` (${this.props.pairs.length})` : ''}
@@ -750,15 +802,13 @@ class Pane_preview extends Pure_component {
     componentDidMount(){
         setdb.on('test', json=>this.setState({json}));
     }
-    set_ref(e){ this.ref = e; }
     render(){
         let json;
         const text = this.props.req.response.content.text;
         if (json = this.state.json||is_json_str(text))
             return <JSON_viewer json={json}/>;
         return (
-            <div className="pane_preview" ref={this.set_ref.bind(this)}>
-            </div>
+            <div className="pane_preview"></div>
         );
     }
 }

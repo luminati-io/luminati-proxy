@@ -193,6 +193,8 @@ let shutdown = (reason, send_ev = true, error = null)=>{
 }));
 let on_upgrade_finished;
 (function run(run_config){
+    if (process.env.DEBUG_ETASKS)
+        start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
     read_status_file();
     if (enable_cluster&&cluster.isMaster)
     {
@@ -265,3 +267,11 @@ process.on('message', msg=>{
     case 'shutdown': shutdown(msg.reason, true, msg.error); break;
     }
 });
+
+function start_debug_etasks(interval = 10000){
+    setInterval(()=>{
+        console.log('=======================================');
+        console.log('counter ps', etask.ps());
+        console.log('=======================================');
+    }, interval);
+}

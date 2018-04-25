@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.92.822",
+        "version": "1.93.58",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -361,7 +361,11 @@
                 },
                 "www": {
                     "type": "integer",
-                    "description": "UI/API port"
+                    "description": "UI/API HTTP port"
+                },
+                "ws": {
+                    "type": "integer",
+                    "description": "UI/API websocket port"
                 },
                 "config": {
                     "type": "string",
@@ -412,13 +416,17 @@
                     "type": "boolean",
                     "description": "Enable requests statistics"
                 },
+                "request_stats_limit": {
+                    "type": "integer",
+                    "description": "Maximum request stats to keep"
+                },
                 "beta_features": {
                     "type": "boolean",
                     "description": "Enable beta features"
                 },
                 "test_url": {
                     "type": "string",
-                    "description": "A url for testing proxy (default: http://lumtest.com/myip.json)"
+                    "description": "A url for testing proxy"
                 },
                 "disable_color": {
                     "type": "boolean",

@@ -1,6 +1,12 @@
  Luminati Proxy manager - Change Log
 
+## 1.93.58
+- :bug: Fixed memory leak introduced in latest versions
+- :star: Added request_stats_limit flag to limit usage stats saved to sqite db
+   (this will not affect ports with history: true)
+
 ## 1.92.822
+- :bug: fix saving RegExp in proxy configuration
 
 ## 1.92.281
 - :sparkles: UI improvements
@@ -14,8 +20,12 @@
 - :sparkles: UI improvements
 
 ## 1.91.108
+- :sparkles: UI improvements
+- :bug: bug fixes
 
 ## 1.90.563
+- :sparkles: UI improvements
+- :bug: bug fixes
 
 ## 1.90.546
 
