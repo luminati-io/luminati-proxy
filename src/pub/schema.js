@@ -36,7 +36,7 @@ const tooltips = {
     peer: 'Exit node (IP) - This might be a residential IP provided through '
         +'cable modem, DSL or wireless router | Datacenter IP (static) | '
         +'Mobile IP based on a 3G or 4G cellular network',
-    destination: 'The target website that the crawler is collcting data from',
+    destination: 'The target website that the crawler is collecting data from',
 };
 
 class Schema extends Pure_component {
