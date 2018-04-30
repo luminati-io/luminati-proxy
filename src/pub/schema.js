@@ -27,9 +27,9 @@ const tooltips = {
         </ul>`,
     port_numbers: 'Defined ports in Luminati Proxy Manager',
     lpm: 'Luminati Proxy Manager - open-source proxy service that holds '
-        +'valuble features, such as: IP rotation control, auto retry, speed '
+        +'valuable features, such as: IP rotation control, auto retry, speed '
         +'optimization, auto blacklist of bad IPs, powerful debugging options '
-        +' and more. View full list of features by clicking any port in the'
+        +' and more. View full list of features by clicking any port in the '
         +'Proxies table',
     super_proxy: 'Load balancing servers, that manage the traffic between the '
         +'Luminati Proxy Manager and the peer',
