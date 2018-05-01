@@ -17,8 +17,7 @@ import Proxy_tester from './proxy_tester.js';
 import zlogin from './login.js';
 import zoverview from './overview.js';
 import zconfig from './config.js';
-import zlogs from './logs.js';
-import zlogs2 from './logs2.js';
+import zlogs from './logs2.js';
 import util from './util.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -128,13 +127,6 @@ function($uiRouter, $location_provider, _analytics_provider){
         url: '/logs?code&?domain&?port&?protocol',
         template: `<div react-view=react_component></div>`,
         controller: $scope=>{ $scope.react_component = zlogs; },
-    });
-    state_registry.register({
-        name: 'logs2',
-        parent: 'app',
-        url: '/logs2?code&?domain&?port&?protocol',
-        template: `<div react-view=react_component></div>`,
-        controller: $scope=>{ $scope.react_component = zlogs2; },
     });
 }]);
 

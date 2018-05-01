@@ -2,10 +2,12 @@
 'use strict'; /*jslint react:true*/
 define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
     '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js',
-    'react-bootstrap'], ($, React, ReactDOM, RouterDOM, url, ajax,
-    Pure_component, RB)=>{
+    'react-bootstrap', '/util/setdb.js', '/util/etask.js',
+    '/www/locale/pub/i18n_react.js'], ($, React, ReactDOM, RouterDOM, url,
+    ajax, Pure_component, RB, setdb, etask, {T})=>{
 
 const E = {};
+const {Modal, Button} = RB;
 
 const Foreach = ({children, data})=>data.map((d, i)=>children(d, i));
 E.Foreach = Foreach;
@@ -270,6 +272,10 @@ class Nav_hook extends Pure_component {
         $('meta[property="og:image"]').attr('content', m.og_image);
         $('script[type="application/ld+json"]')
             .text(JSON.stringify(m.json_ld));
+        if (m.noindex)
+            $('head').append('<meta name=robots content=noindex>');
+        else
+            $('meta[name=robots]').remove();
         m.ga_num!==undefined&&window.set_ga_num&&window.set_ga_num(m.ga_num);
     }
     hash_scroll(hash){
@@ -301,21 +307,78 @@ const Tooltip = props=>{
 };
 E.Tooltip = Tooltip;
 
-const Alert = ({show, text, type})=>(
-    <If when={show}>
-      <div className="alert_wrapper">
-        <div className={'alert alert-'+(type||'danger')} role="alert">
-          {text}</div>
-      </div>
-    </If>
+const Alert = ({text, type})=>(
+    <div className={'alert alert-'+(type||'danger')} role="alert">{text}</div>
 );
-Alert.fade = (component, text, opt={})=>{
-    const duration=opt.duration||2000;
-    const type=opt.type||'danger';
-    component.setState({alert: {show: true, text, type}});
-    setTimeout(()=>component.setState({alert: {show: false}}), duration);
-};
 E.Alert = Alert;
+class Alerts extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {alerts: []};
+    }
+    componentWillMount(){
+        this.setdb_on('alerts', alerts=>this.setState({alerts: alerts||[]}));
+    }
+    render() { return this.state.alerts.map(a=><Alert key={a.key} {...a}/>); }
+    static key = 0;
+    static push(text, opt){
+        let alert = {...opt, text, key: Alerts.key++};
+        const max_len = 3;
+        let alerts = [...(setdb.get('alerts')||[]).slice(-max_len+1), alert];
+        setdb.set('alerts', alerts);
+        const duration=alert.duration||2000;
+        setTimeout(()=>setdb.set('alerts', setdb.get('alerts')
+            .filter(a=>a!=alert)), duration);
+    }
+}
+E.Alerts = Alerts;
+
+class Confirm extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {};
+    }
+    componentWillMount(){ this.setdb_on('confirm', this.setState.bind(this)); }
+    render(){
+        let {show, confirm, cancel, title, content} = this.state;
+        return <Modal show={show} onHide={cancel}>
+              <Modal.Header closeButton>
+                <Modal.Title>{title}
+                  <br/>
+                  <T>Are you sure?</T>
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>{content}</Modal.Body>
+              <Modal.Footer>
+                <Button onClick={cancel}>
+                  <T>Cancel</T></Button>
+                <Button onClick={confirm}>
+                  <T>Yes</T></Button>
+              </Modal.Footer>
+            </Modal>;
+    }
+    static modal(props){
+        return etask([function()
+    {
+        if (setdb.get('confirm.show'))
+            setdb.get('confirm.cancel')();
+        const close = ()=>setdb.set('confirm', {show: false});
+        setdb.set('confirm', {show: true,
+            confirm: ()=>{
+                this.return(true);
+                close();
+            },
+            cancel: ()=>{
+                this.return(false);
+                close();
+            },
+            ...props
+        });
+        return this.wait();
+    }]);
+    }
+}
+E.Confirm = Confirm;
 
 return E;
 

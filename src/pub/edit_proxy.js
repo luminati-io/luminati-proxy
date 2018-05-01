@@ -10,7 +10,7 @@ import setdb from 'hutil/util/setdb';
 import {Modal, Loader, Select, Input, Warnings, presets, Link_icon,
     Checkbox, Textarea, Tooltip, Pagination_panel,
     Loader_small} from './common.js';
-import Logs from './logs.js';
+import Logs from './logs2.js';
 import util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -965,7 +965,6 @@ class Index extends React.Component {
               <div className={classnames('main_window', {[tab]: true})}>
                 <Main_window
                   proxy={this.state.consts&&this.state.consts.proxy}
-                  ports={[this.state.form.port]}
                   locations={this.state.locations}
                   defaults={this.state.defaults}
                   form={this.state.form}

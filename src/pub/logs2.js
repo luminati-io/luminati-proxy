@@ -15,25 +15,36 @@ import $ from 'jquery';
 import {Tooltip, status_codes, is_json_str} from './common.js';
 import JSON_viewer from './json_viewer.js';
 import codemirror from 'codemirror/lib/codemirror';
+import Waypoint from 'react-waypoint';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 
 const H_tooltip = props=><Tooltip className="har_tooltip" {...props}/>;
+const loader = {
+    start: ()=>$('#har_viewer').addClass('waiting'),
+    end: ()=>$('#har_viewer').removeClass('waiting'),
+};
 
 class Logs extends Pure_component {
     moving_width = false;
     min_width = 50;
-    min_height = 100;
     state = {
         cur_preview: null,
         network_width: 200,
-        logs_height: 600,
     };
     componentDidMount(){
         window.document.addEventListener('mousemove', this.on_mouse_move);
         window.document.addEventListener('mouseup', this.on_mouse_up);
     }
+    componentWillMount(){
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies)
+                return;
+            this.setState({proxies});
+        });
+    }
+    willUnmount(){ loader.end(); }
     open_preview = req=>this.setState({cur_preview: req});
     close_preview = ()=>this.setState({cur_preview: null});
     start_moving_width = e=>{
@@ -43,15 +54,6 @@ class Logs extends Pure_component {
         $(this.main_panel).addClass('moving');
         this.start_offset = e.pageX;
         this.start_width = this.state.network_width;
-    };
-    start_moving_height = e=>{
-        if (e.nativeEvent.which!=1)
-            return;
-        this.moving_height = true;
-        $('body').addClass('moving_height');
-        $(this.main_panel).addClass('moving_height');
-        this.start_offset = e.pageY;
-        this.start_height = this.state.logs_height;
     };
     on_resize_width = e=>{
         const offset = e.pageX-this.start_offset;
@@ -63,41 +65,32 @@ class Logs extends Pure_component {
             new_width = max_width;
         this.setState({network_width: new_width});
     };
-    on_resize_height = e=>{
-        const offset = e.pageY-this.start_offset;
-        let new_height = this.start_height-offset;
-        if (new_height<this.min_height)
-            new_height = this.min_height;
-        this.setState({logs_height: new_height});
-    };
     on_mouse_move = e=>{
         if (this.moving_width)
             this.on_resize_width(e);
-        else if (this.moving_height)
-            this.on_resize_height(e);
     };
     on_mouse_up = ()=>{
         this.moving_width = false;
-        this.moving_height = false;
         $(this.main_panel).removeClass('moving');
-        $(this.main_panel).removeClass('moving_height');
-        $('body').removeClass('moving_height');
     };
     set_main_panel_ref = ref=>{ this.main_panel = ref; };
+    main_panel_moving = ()=>{ $(this.main_panel).addClass('moving'); };
+    main_panel_stopped_moving = ()=>{
+        $(this.main_panel).removeClass('moving'); };
     render(){
+        if (!this.state.proxies)
+            return null;
         const preview_style = {
             maxWidth: `calc(100% - ${this.state.network_width}px`};
-        const main_style = {
-            height: this.state.logs_height,
-        };
         return (
-            <div className="har_viewer panel_style">
+            <div id="har_viewer" className="har_viewer panel_style">
               <div className="main_panel vbox"
-                style={main_style}
                 ref={this.set_main_panel_ref}>
                 <Toolbar close_preview={this.close_preview}/>
                 <div className="split_widget vbox flex_auto">
                   <Network_container
+                    main_panel_moving={this.main_panel_moving}
+                    main_panel_stopped_moving={this.main_panel_stopped_moving}
                     main_panel={this.main_panel}
                     open_preview={this.open_preview}
                     width={this.state.network_width}
@@ -109,8 +102,6 @@ class Logs extends Pure_component {
                     start_moving={this.start_moving_width}
                     offset={this.state.network_width}/>
                 </div>
-                <Window_resizer
-                  start_moving={this.start_moving_height}/>
               </div>
             </div>
         );
@@ -121,13 +112,11 @@ class Toolbar extends Pure_component {
     clear = ()=>{
         const _this = this;
         this.etask(function*(){
-            $('body').addClass('waiting');
+            loader.start();
             yield ajax({url: '/api/logs_reset'});
             _this.props.close_preview();
-            setdb.set('head.har_viewer.reqs', []);
-            setdb.set('head.har_viewer.stats', {total: 0, sum_out: 0,
-                sum_in: 0});
-            $('body').removeClass('waiting');
+            setdb.emit_path('head.har_viewer.reset_reqs');
+            loader.end();
         });
     };
     render(){
@@ -151,10 +140,6 @@ const Toolbar_button = ({id, tooltip, on_click, tooltip_placement})=>(
     </H_tooltip>
 );
 
-const Window_resizer = ({start_moving})=>{
-    return <div className="logs_resizer" onMouseDown={start_moving}/>;
-};
-
 const Network_resizer = ({show, offset, start_moving})=>{
     if (!show)
         return null;
@@ -168,28 +153,35 @@ class Network_container extends Pure_component {
     moving_col = null;
     min_width = 22;
     uri = '/api/logs';
-    batch_size = 100;
+    batch_size = 30;
     loaded = {from: 0, to: 0};
     cols = [
-        {title: 'Name', data: 'request.url'},
-        {title: 'Status', data: 'response.status'},
-        {title: 'Port', data: 'details.port'},
-        {title: 'Bandwidth', data: 'details.bw'},
-        {title: 'Time', data: 'time'},
-        {title: 'Peer proxy', data: 'details.proxy_peer'}
+        {title: 'Name', sort_by: 'url', data: 'request.url'},
+        {title: 'Port', sort_by: 'port', data: 'details.port'},
+        {title: 'Status', sort_by: 'status_code', data: 'response.status'},
+        {title: 'Bandwidth', sort_by: 'bw', data: 'details.bw'},
+        {title: 'Time', sort_by: 'elapsed', data: 'time'},
+        {title: 'Peer proxy', sort_by: 'proxy_peer',
+            data: 'details.proxy_peer'},
+        {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
     ];
     state = {
         focused: false,
         reqs: [],
-        sorted: {col: 0, dir: 1},
-        stats: {total: 0, sum_out: 0, sum_in: 0},
+        sorted: {field: 'timestamp', dir: 1},
     };
-    componentWillMount(){ this.get_data(); }
     componentDidMount(){
         this.resize_columns();
         window.onresize = ()=>{ this.resize_columns(); };
         window.document.addEventListener('mousemove', this.on_mouse_move);
         window.document.addEventListener('mouseup', this.on_mouse_up);
+        this.setdb_on('head.har_viewer.reset_reqs', ()=>{
+            this.loaded.to = 0;
+            this.setState({
+                reqs: [],
+                stats: {total: 0, sum_out: 0, sum_in: 0},
+            });
+        });
         this.setdb_on('head.har_viewer.reqs', reqs=>{
             if (!reqs)
                 return;
@@ -203,61 +195,106 @@ class Network_container extends Pure_component {
         this.setdb_on('head.ws', ws=>{
             if (!ws||this.ws)
                 return;
-            this.start_listening_ws(ws);
+            this.ws = ws;
+            this.ws.addEventListener('message', this.on_message);
         });
     }
     willUnmount(){
         window.onresize = null;
         if (this.ws)
-            this.ws.removeEventListener('message', this.on_ws_message);
+            this.ws.removeEventListener('message', this.on_message);
+        setdb.set('head.har_viewer.reqs', []);
+        setdb.set('head.har_viewer.stats', null);
     }
     fetch_missing_data = pos=>{
+        if (this.state.stats&&this.state.reqs.length==this.state.stats.total)
+            return;
         if (pos=='bottom')
             this.get_data({skip: this.loaded.to});
     };
-    get_data = (opt={})=>{
-        opt.limit = opt.limit||this.batch_size;
-        opt.skip = opt.skip||0;
+    set_location_params(params){
+        let r;
+        if ((r = window.location.pathname.match(/overview\/(\d+)/))
+            &&window.location.port)
+        {
+            const proxies = setdb.get('head.proxies_running');
+            const mp = proxies.find(p=>p.port==+r[1]);
+            this.port_range = {from: mp.port, to: mp.port+mp.multiply-1};
+            params.port_from = this.port_range.from;
+            params.port_to = this.port_range.to;
+        }
+        else if ((r = window.location.pathname.match(/proxy\/(\d+)/))
+            &&window.location.port)
+        {
+            this.port = +r[1];
+            params.port = this.port;
+        }
+    }
+    get_data = (opt={}, replace=false)=>{
+        const params = opt;
+        params.limit = opt.limit||this.batch_size;
+        params.skip = opt.skip||0;
+        this.set_location_params(params);
+        if (this.state.sorted)
+        {
+            params.sort = this.state.sorted.field;
+            if (this.state.sorted.dir==1)
+                params.sort_desc = true;
+        }
         const _this = this;
         this.etask(function*(){
-            const params = opt;
+            loader.start();
             const url = zescape.uri(_this.uri, params);
             const res = yield ajax.json({url});
-            const sorted = _this.sort_reqs(res.log.entries);
-            setdb.set('head.har_viewer.reqs',
-                [..._this.state.reqs, ...sorted]);
-            _this.loaded.to = opt.skip+sorted.length;
-            if (!_this.state.stats.total)
+            const reqs = res.log.entries;
+            const new_reqs = [...(replace ? [] : _this.state.reqs), ...reqs];
+            setdb.set('head.har_viewer.reqs', new_reqs);
+            _this.loaded.to = opt.skip+reqs.length;
+            if (!_this.state.stats||!_this.state.stats.total)
             {
                 setdb.set('head.har_viewer.stats', {total: res.total,
                     sum_out: res.sum_out, sum_in: res.sum_in});
             }
+            loader.end();
         });
     };
-    sort_reqs(reqs, sort={col: 0, dir: 1}){
-        const col = this.cols[sort.col];
-        return reqs.slice().sort((a, b)=>{
-            const val_a = _.get(a, col.data);
-            const val_b = _.get(b, col.data);
-            return val_a > val_b ? 1*sort.dir : -1*sort.dir;
+    set_sort = field=>{
+        let dir = 1;
+        if (this.state.sorted.field==field)
+            dir = -1*this.state.sorted.dir;
+        this.setState({sorted: {field, dir}}, ()=>{
+            this.loaded.to = 0;
+            setdb.emit_path('head.har_viewer.dc_top');
+            this.get_data({}, true);
         });
-    }
-    set_sort = idx=>{
-        const new_sorted = {col: idx,
-            dir: this.state.sorted.col==idx ? this.state.sorted.dir*-1 : 1};
-        const sorted_reqs = this.sort_reqs(this.state.reqs, new_sorted);
-        this.setState({reqs: sorted_reqs, sorted: new_sorted});
     };
     on_focus = ()=>this.setState({focused: true});
     on_blur = ()=>this.setState({focused: false});
-    start_listening_ws(ws){
-        this.ws = ws;
-        ws.addEventListener('message', this.on_ws_message);
-    }
-    on_ws_message = event=>{
+    on_message = event=>{
         const req = JSON.parse(event.data);
+        const port = req.details.port;
+        if (this.port&&port!=this.port)
+            return;
+        if (this.port_range&&
+            (port<this.port_range.from||port>this.port_range.to))
+        {
+            return;
+        }
+        const sorted_field = this.cols.find(
+            c=>c.sort_by==this.state.sorted.field).data;
+        const dir = this.state.sorted.dir;
+        const new_size = Math.max(this.state.reqs.length, this.batch_size);
+        if (new_size>this.state.reqs.length)
+            this.loaded.to = this.loaded.to+1;
+        const new_reqs = [...this.state.reqs, req].sort((a, b)=>{
+            const val_a = _.get(a, sorted_field);
+            const val_b = _.get(b, sorted_field);
+            if (val_a==val_b)
+                return a.uuid > b.uuid ? -1*dir : dir;
+            return val_a > val_b ? -1*dir : dir;
+        }).slice(0, new_size);
         this.setState(prev=>({
-            reqs: [...prev.reqs, req],
+            reqs: new_reqs,
             stats: {
                 total: prev.stats.total+1,
                 sum_out: prev.stats.sum_out+req.details.out_bw,
@@ -267,7 +304,7 @@ class Network_container extends Pure_component {
     };
     on_mouse_up = ()=>{
         this.moving_col = null;
-        $(this.props.main_panel).removeClass('moving');
+        this.props.main_panel_stopped_moving();
     };
     resize_columns = ()=>{
         const total_width = this.network_container.offsetWidth;
@@ -279,7 +316,7 @@ class Network_container extends Pure_component {
     start_moving = (e, idx)=>{
         if (e.nativeEvent.which!=1)
             return;
-        $(this.props.main_panel).addClass('moving');
+        this.props.main_panel_moving();
         this.moving_col = idx;
         this.start_offset = e.pageX;
         this.start_width = this.state.cols[idx].width;
@@ -356,7 +393,8 @@ class Network_container extends Pure_component {
 
 class Network_summary_bar extends Pure_component {
     render(){
-        let {total, sum_in, sum_out} = this.props.stats;
+        let {total, sum_in, sum_out} = this.props.stats||
+            {total: 0, sum_in: 0, sum_out: 0};
         sum_out = util.bytes_format(sum_out)||'0 B';
         sum_in = util.bytes_format(sum_in)||'0 B';
         const c = `${total} requests | ${sum_out} sent | ${sum_in} received`;
@@ -393,17 +431,19 @@ const Header_container = ({cols, only_name, sorted, sort})=>{
         <div className="header_container">
           <table>
             <colgroup>
-              {cols.map(c=>(
+              {cols.map((c, idx)=>(
                 <col key={c.title}
-                  style={{width: only_name ? 'auto' : c.width}}/>
+                  style={{width: only_name||idx==cols.length-1 ?
+                    'auto' : c.width}}/>
               ))}
             </colgroup>
             <tbody>
               <tr>
-                {cols.map((c, i)=>(
-                  <th key={c.title} onClick={()=>sort(i)}>
+                {cols.map(c=>(
+                  <th key={c.title} onClick={()=>sort(c.sort_by)}>
                     <div>{c.title}</div>
-                    <Sort_icon show={i==sorted.col} dir={sorted.dir}/>
+                    <Sort_icon show={c.sort_by==sorted.field}
+                      dir={sorted.dir}/>
                   </th>
                 ))}
               </tr>
@@ -416,24 +456,19 @@ const Header_container = ({cols, only_name, sorted, sort})=>{
 const Sort_icon = ({show, dir})=>{
     if (!show)
         return null;
-    const classes = classnames('small_icon_mask', {sort_asc: dir==1,
-        sort_desc: dir==-1});
+    const classes = classnames('small_icon_mask', {sort_asc: dir==-1,
+        sort_desc: dir==1});
     return <div className="sort_icon"><span className={classes}/></div>;
 };
 
 class Data_container extends Pure_component {
     componentDidMount(){
-        this.dc.addEventListener('scroll', this.on_scroll, false);
-    }
-    willUnmount(){
-        this.dc.removeEventListener('scroll', this.on_scroll, false);
+        this.setdb_on('head.har_viewer.dc_top', ()=>{
+            this.dc.scrollTop = 0; });
     }
     set_dc_ref = ref=>{ this.dc = ref; };
-    on_scroll = ()=>{
-        if (this.dc.scrollTop==0)
-            this.props.fetch_missing_data('top');
-        if (this.dc.scrollHeight-this.dc.scrollTop==this.dc.offsetHeight)
-            this.props.fetch_missing_data('bottom');
+    handle_viewpoint_enter = ()=>{
+        this.props.fetch_missing_data('bottom');
     };
     render(){
         let {cols, open_preview, cur_preview, focused, reqs} = this.props;
@@ -449,8 +484,10 @@ class Data_container extends Pure_component {
             <div ref={this.set_dc_ref} className="data_container">
               <table>
                 <colgroup>
-                  {cols.map(c=>(
-                    <col key={c.title} style={{width: c.width}}/>
+                  {cols.map((c, idx)=>(
+                    <col key={c.title}
+                      style={{width: !preview_mode&&idx==cols.length-1 ?
+                        'auto': c.width}}/>
                   ))}
                 </colgroup>
                 <Data_rows reqs={reqs}
@@ -459,6 +496,10 @@ class Data_container extends Pure_component {
                   cur_preview={cur_preview}
                   focused={focused}/>
               </table>
+              <Waypoint
+                key={reqs.length}
+                scrollableAncestor={this.dc}
+                onEnter={this.handle_viewpoint_enter}/>
             </div>
         );
     }
@@ -489,17 +530,20 @@ class Data_rows extends React.Component {
 
 class Data_row extends React.Component {
     shouldComponentUpdate(next_props){
-        const selected = (this.props.cur_preview==this.props.req);
-        const will_selected = (next_props.cur_preview==next_props.req);
+        const selected = _.get(this.props.cur_preview, 'uuid')==
+            this.props.req.uuid;
+        const will_selected = _.get(next_props.cur_preview, 'uuid')==
+            next_props.req.uuid;
         const selection_changed = selected!=will_selected;
         const focused_changed = this.props.focused!=next_props.focused;
         return selection_changed||focused_changed&&selected;
     }
     render(){
         const {cur_preview, open_preview, cols, focused, req} = this.props;
+        const selected = _.get(cur_preview, 'uuid')==req.uuid;
         const classes = classnames({
-            selected: cur_preview==req,
-            focused: cur_preview==req&&focused,
+            selected,
+            focused: selected&&focused,
         });
         return (
             <tr className={classes}>
@@ -542,6 +586,12 @@ const Cell_value = ({col, req})=>{
         return <Tooltip_and_value val={req.time+' ms'}/>;
     else if (col=='Peer proxy')
         return <Tooltip_and_value val={req.details.proxy_peer}/>;
+    else if (col=='Date')
+    {
+        const local = moment(new Date(req.startedDateTime)).format(
+            'YYYY-MM-DD HH:mm:ss');
+        return <Tooltip_and_value val={local}/>;
+    }
     return col;
 };
 

@@ -16,32 +16,22 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const ua = analytics('UA-60520689-2');
-const cluster = require('cluster');
+const cluster_mode = require('../lib/cluster_mode.js');
+const E = module.exports = {};
+const is_win = process.platform=='win32';
+const shutdown_timeout = 3000;
 
-ua.set('an', 'LPM');
-ua.set('av', `v${version}`);
-
-const ua_filename = path.resolve(os.homedir(),
-    '.luminati_ua_ev.json'.substr(process.platform=='win32' ? 1 : 0));
-const status_filename = path.resolve(os.homedir(),
-    '.luminati_status.json'.substr(process.platform=='win32' ? 1 : 0));
-let lpm_status = {
-    status: 'initializing',
-    config: null,
-    error: null,
-    create_date: hutil.date(),
-    update_date: hutil.date(),
-    customer_name: null,
-    version,
+const gen_filename = name=>{
+    return path.resolve(os.homedir(),
+        `.luminati_${name}.json`.substr(is_win ? 1 : 0));
 };
-let last_ev;
-const ua_event = ua.event.bind(ua);
-ua.event = (...args)=>{
+
+E.ua_event = (...args)=>{
     let send = true, hash;
-    if (!last_ev)
+    if (!E.last_ev)
     {
-        try { last_ev = JSON.parse(file.read_e(ua_filename)); }
-        catch(e){ last_ev = {}; }
+        try { E.last_ev = JSON.parse(file.read_e(E.ua_filename)); }
+        catch(e){ E.last_ev = {}; }
     }
     const cb = _.isFunction(_.last(args)) ? args.pop() : null;
     let params;
@@ -53,23 +43,23 @@ ua.event = (...args)=>{
     {
         hash = crypto.createHash('md5').update(_.values(params).join(''))
             .digest('hex');
-        send = !last_ev[hash] || last_ev[hash].ts<Date.now()-10*60*1000;
+        send = !E.last_ev[hash] || E.last_ev[hash].ts<Date.now()-10*60*1000;
     }
     const last_day = Date.now()-24*3600*1000;
-    if (!last_ev.clean || last_ev.clean.ts<last_day)
+    if (!E.last_ev.clean || E.last_ev.clean.ts<last_day)
     {
-        for (let k in last_ev)
+        for (let k in E.last_ev)
         {
-            if (last_ev[k].ts<last_day)
-                delete last_ev[k];
+            if (E.last_ev[k].ts<last_day)
+                delete E.last_ev[k];
         }
-        last_ev.clean = {ts: Date.now()};
+        E.last_ev.clean = {ts: Date.now()};
     }
     let ev;
     if (hash)
     {
-        ev = (last_ev[hash]&&last_ev[hash].c||0)+1;
-        last_ev[hash] = {ts: Date.now(), c: send ? 0 : ev};
+        ev = (E.last_ev[hash]&&E.last_ev[hash].c||0)+1;
+        E.last_ev[hash] = {ts: Date.now(), c: send ? 0 : ev};
     }
     if (send)
     {
@@ -80,10 +70,10 @@ ua.event = (...args)=>{
             category: params.ec,
             label: params.el,
             value: params.ev,
-            customer_name: manager&&manager._defaults
-                &&manager._defaults.customer,
+            customer_name: E.manager&&E.manager._defaults
+                &&E.manager._defaults.customer,
         });
-        ua_event(params, (..._args)=>{
+        E.ua_event(params, (..._args)=>{
             if (_.isFunction(cb))
                 cb.apply(null, _args);
         });
@@ -91,18 +81,20 @@ ua.event = (...args)=>{
     else if (_.isFunction(cb))
         cb();
 };
-let write_ua_file = ()=>{
-    if (!last_ev)
+
+E.write_ua_file = ()=>{
+    if (!E.last_ev)
         return;
     try {
-        file.write_e(ua_filename, JSON.stringify(last_ev));
-        last_ev = null;
+        file.write_e(E.ua_filename, JSON.stringify(E.last_ev));
+        E.last_ev = null;
     } catch(e){ }
 };
-let write_status_file = (status, error = null, config = null, reason = null)=>{
+
+E.write_status_file = (status, error = null, config = null, reason = null)=>{
     if (error)
         error = zerr.e2s(error);
-    Object.assign(lpm_status, {
+    Object.assign(E.lpm_status, {
         last_updated: hutil.date(),
         status,
         reason,
@@ -111,120 +103,107 @@ let write_status_file = (status, error = null, config = null, reason = null)=>{
         customer_name: config&&config._defaults&&config._defaults.customer
     });
     try {
-        file.write_e(status_filename, JSON.stringify(lpm_status));
+        file.write_e(E.status_filename, JSON.stringify(E.lpm_status));
     } catch(e){ }
 };
-let read_status_file = ()=>{
+
+E.read_status_file = ()=>{
     let status_file;
     let invalid_start = {'running': 1, 'initializing': 1, 'shutdowning': 1};
-    try { status_file = JSON.parse(file.read_e(status_filename)); }
+    try { status_file = JSON.parse(file.read_e(E.status_filename)); }
     catch(e){ status_file = {}; }
     if (status_file)
-        lpm_status = status_file;
+        E.lpm_status = status_file;
     if (status_file && invalid_start[status_file.status])
     {
         ua.event('manager', 'crash_sudden', JSON.stringify(status_file));
-        zerr.perr('crash_sudden', lpm_status);
+        zerr.perr('crash_sudden', E.lpm_status);
     }
 };
 
-let manager, args = process.argv.slice(2), shutdowning = false;
-const enable_cluster = process.argv.includes('--cluster');
-let shutdown_timeout;
-let shutdown = (reason, send_ev = true, error = null)=>{
-    if (shutdowning)
+E.shutdown = (reason, send_ev = true, error = null)=>{
+    if (E.shutdowning)
         return;
-    shutdowning = true;
-    shutdown_timeout = setTimeout(()=>{
-        if (shutdowning)
+    E.shutdowning = true;
+    E.shutdown_timeout = setTimeout(()=>{
+        if (E.shutdowning)
         {
-            if (manager)
-                manager._log.crit('Forcing exit after 3 sec');
+            if (E.manager)
+                E.manager._log.crit('Forcing exit after 3 sec');
             else
                 console.error('Forcing exit after 3 sec');
+            E.uninit();
             process.exit(1);
         }
-    }, 3000);
-    write_ua_file();
-    write_status_file('shutdowning', error, manager&&manager._total_conf,
+    }, shutdown_timeout);
+    E.write_ua_file();
+    E.write_status_file('shutdowning', error, E.manager&&E.manager._total_conf,
         reason);
-    if (manager)
+    if (E.manager)
     {
-        manager._log.info(`Shutdown, reason is ${reason}`);
+        E.manager._log.info(`Shutdown, reason is ${reason}`);
         if (error)
-            manager._log.error('%s %s', reason, error);
+            E.manager._log.error('%s %s', reason, error);
         let stop_manager = ()=>{
-            manager.stop(reason, true);
-            manager = null;
+            E.manager.stop(reason, true);
+            E.manager = null;
         };
-        if (manager.argv.no_usage_stats||!send_ev)
+        if (E.manager.argv.no_usage_stats||!send_ev)
             stop_manager();
         else
             ua.event('manager', 'stop', reason, stop_manager);
     }
-    else if (enable_cluster&&cluster.isMaster)
-        cluster.workers.forEach(w=>{ w.send('shutdown'); });
     else
         console.log(`Shutdown, reason is ${reason}`, error.stack);
-    write_status_file('shutdown', error, manager&&manager._total_conf,
+    if (cluster_mode.is_enabled())
+        cluster_mode.uninit();
+    E.write_status_file('shutdown', error, E.manager&&E.manager._total_conf,
         reason);
 };
-['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>process.on(sig, err=>{
+
+E.handle_signal = (sig, err)=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
     // XXX maximk: find origin and catch it there
     // XXX maximk: fix process fail on oveload
     if (err && (err.message||'').includes('SQLITE'))
     {
-        manager._log.crit(errstr);
-        manager.perr('sqlite', {error: errstr});
+        E.manager._log.crit(errstr);
+        E.manager.perr('sqlite', {error: errstr});
         return;
     }
-    if (err&&manager)
-        manager._log.crit(errstr);
-    if (err&&manager&&!manager.argv.no_usage_stats)
+    if (err&&E.manager)
+        E.manager._log.crit(errstr);
+    if (err&&E.manager&&!E.manager.argv.no_usage_stats)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
-            ()=>shutdown(errstr, false, err));
+            ()=>E.shutdown(errstr, false, err));
         zerr.perr('crash', {error: errstr, reason: sig,
-            config: manager&&manager._total_conf});
+            config: E.manager&&E.manager._total_conf});
     }
     else
-        shutdown(errstr, true, err);
-}));
-let on_upgrade_finished;
-(function run(run_config){
-    if (process.env.DEBUG_ETASKS)
-        start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
-    read_status_file();
-    if (enable_cluster&&cluster.isMaster)
-    {
-        console.log('WARNING: cluster mode is experimental');
-        const cpus = os.cpus().length;
-        for (let i=0; i<cpus; i++)
-            cluster.fork();
-        cluster.on('exit', worker=>{
-            console.log('worker %d died', worker.id);
-            if (!shutdowning)
-                cluster.fork();
-        });
-        return;
-    }
-    write_status_file('initializing', null, manager&&manager._total_conf);
-    manager = new Manager(args, Object.assign({ua}, run_config));
-    manager.on('stop', ()=>{
-        write_ua_file();
+        E.shutdown(errstr, true, err);
+};
+
+E.run = run_config=>{
+    E.read_status_file();
+    E.write_status_file('initializing', null,
+        E.manager&&E.manager._total_conf);
+    E.manager = new Manager(E.args, Object.assign({ua}, run_config));
+    E.manager.on('stop', ()=>{
+        E.write_ua_file();
         zerr.flush();
-        if (shutdown_timeout)
-            clearTimeout(shutdown_timeout);
+        if (E.shutdown_timeout)
+            clearTimeout(E.shutdown_timeout);
+        E.uninit();
         process.exit();
     })
     .on('error', (e, fatal)=>{
         console.log(e.raw ? e.message : 'Unhandled error: '+e);
         let handle_fatal = ()=>{
             if (fatal)
-                manager.stop();
+                E.manager.stop();
         };
-        if (manager.argv.no_usage_stats||e.raw)
+        if (E.manager.argv.no_usage_stats||e.raw)
             handle_fatal();
         else
         {
@@ -233,45 +212,145 @@ let on_upgrade_finished;
         }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
-        write_status_file('changing_config', null, zone_autoupdate);
-        if (!manager.argv.no_usage_stats)
+        E.write_status_file('changing_config', null, zone_autoupdate);
+        if (!E.manager.argv.no_usage_stats)
         {
             ua.event('manager', 'config_changed',
                 JSON.stringify(zone_autoupdate));
         }
-        args = manager.get_params();
-        yield manager.stop('config change', true, true);
-        setTimeout(()=>run(zone_autoupdate&&zone_autoupdate.prev ? {
+        E.args = E.manager.get_params();
+        yield E.manager.stop('config change', true, true);
+        setTimeout(()=>E.run(zone_autoupdate&&zone_autoupdate.prev ? {
             warnings: [`Your default zone has been automatically changed from `
                 +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
         } : {}), 0);
     }))
     .on('upgrade', cb=>{
-        if (on_upgrade_finished)
+        if (E.on_upgrade_finished)
             return;
         process.send({command: 'upgrade'});
-        on_upgrade_finished = cb;
+        E.on_upgrade_finished = cb;
     }).on('restart', ()=>process.send({command: 'restart'}));
-    manager.start();
-    write_status_file('running', null, manager&&manager._total_conf);
-})();
+    E.manager.start();
+    E.write_status_file('running', null, E.manager&&E.manager._total_conf);
+};
 
-process.on('message', msg=>{
-    switch (msg.command)
+E.handle_upgrade_finished = msg=>{
+    if (E.on_upgrade_finished)
+        E.on_upgrade_finished(msg.error);
+    E.on_upgrade_finished = undefined;
+};
+
+E.handle_shutdown = msg=>{
+    E.shutdown(msg.reason, true, msg.error);
+};
+
+E.handle_msg = msg=>{
+    let cmd = msg.command||msg.cmd;
+    switch (cmd)
     {
     case 'upgrade_finished':
-        if (on_upgrade_finished)
-            on_upgrade_finished(msg.error);
-        on_upgrade_finished = undefined;
-        break;
-    case 'shutdown': shutdown(msg.reason, true, msg.error); break;
+        E.handle_upgrade_finished(msg); break;
+    case 'shutdown':
+        E.handle_shutdown(msg); break;
     }
-});
+};
 
-function start_debug_etasks(interval = 10000){
-    setInterval(()=>{
+E.init_ua = ()=>{
+    ua.set('an', 'LPM');
+    ua.set('av', `v${version}`);
+    E.ua_filename = gen_filename('ua_ev');
+    E.last_ev = null;
+    E.ua_event = ua.event.bind(ua);
+    ua.event = E.ua_event;
+};
+
+E.uninit_ua = ()=>{};
+
+E.init_status = ()=>{
+    E.status_filename = gen_filename('status');
+    E.lpm_status = {
+        status: 'initializing',
+        config: null,
+        error: null,
+        create_date: hutil.date(),
+        update_date: hutil.date(),
+        customer_name: null,
+        version,
+    };
+};
+
+E.uninit_status = ()=>{};
+
+E.init_traps = ()=>{
+    E.trap_handlers = ['SIGTERM', 'SIGINT', 'uncaughtException'].map(
+        sig=>({sig, handler: E.handle_signal.bind(E, sig)}));
+    E.trap_handlers.forEach(({sig, handler})=>process.on(sig, handler));
+};
+
+E.uninit_traps = ()=>{
+    if (!E.trap_handlers)
+        return;
+    E.trap_handlers.forEach(({sig, handler})=>process.removeListener(sig,
+        handler));
+};
+
+E.init_cmd = ()=>{
+    process.on('message', E.handle_msg);
+};
+
+E.uninit_cmd = ()=>{
+    process.removeListener('message', E.handle_msg);
+};
+
+E.init = ()=>{
+    if (E.initialized)
+        return;
+    E.initialized = true;
+    E.shutdown_timeout = null;
+    E.shutdowning = false;
+    E.manager = null;
+    E.args = process.argv.slice(2);
+    E.on_upgrade_finished = null;
+    E.init_ua();
+    E.init_status();
+    E.init_traps();
+    E.init_cmd();
+    if (process.env.DEBUG_ETASKS)
+        E.start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
+    E.enable_cluster = process.argv.includes('--cluster');
+    E.enable_cluster_sticky = process.argv.includes('--cluster-sticky');
+    if (E.enable_cluster)
+    {
+        cluster_mode.init({
+            force_stop_delay: shutdown_timeout,
+            sticky: E.enable_cluster_sticky
+        });
+    }
+};
+
+E.uninit = ()=>{
+    if (E.enable_cluster)
+        cluster_mode.uninit();
+    E.uninit_ua();
+    E.uninit_status();
+    E.uninit_traps();
+    E.uninit_cmd();
+    if (E.debug_etask_itv)
+        clearInterval(E.debug_etask_itv);
+    E.initialized = false;
+};
+
+E.start_debug_etasks = (interval = 10000)=>{
+    E.debug_etask_itv = setInterval(()=>{
         console.log('=======================================');
         console.log('counter ps', etask.ps());
         console.log('=======================================');
     }, interval);
+};
+
+if (!module.parent)
+{
+    E.init();
+    E.run();
 }

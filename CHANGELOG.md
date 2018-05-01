@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.93.813
+- :star: added new HAR viewer
+- :bug: fixed setting max requests
+
 ## 1.93.58
 - :bug: Fixed memory leak introduced in latest versions
 - :star: Added request_stats_limit flag to limit usage stats saved to sqite db

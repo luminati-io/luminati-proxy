@@ -35,12 +35,16 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
       U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
-html, body { height: 100%; }
+html,
+body,
+div[react-view=react_component],
+div.page-body,
+div.top_nav_wrapper {
+    height: 100%;
+}
 body {
     line-height: 23px;
     padding-top: 70px;
-    &.moving_height { cursor: row-resize !important; }
-    &.waiting * { cursor: wait !important; }
 }
 .no_nav {
     .page-body { margin-left: 0; }
@@ -200,7 +204,7 @@ nav a:hover { box-shadow: none; }
 }
 .tooltip.har_tooltip {
     .tooltip-inner {
-        top: 9px;
+        top: 7px;
         position: relative;
         max-width: 550px;
         word-break: break-all;
@@ -779,8 +783,15 @@ nav a:hover { box-shadow: none; }
     }
 }
 .edit_proxy {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     font-size: 14px;
     margin: 0 15px;
+    .har_viewer.panel_style {
+        padding-left: 0;
+        padding-right: 0;
+    }
     .info_icon {
         background: url(/img/info.svg);
         width: 11px;
@@ -819,6 +830,7 @@ nav a:hover { box-shadow: none; }
     .main_window {
         margin-top: 10px;
         display: flex;
+        height: 100%;
         &.logs {
             .logs {
                 width: 100%;
@@ -898,7 +910,10 @@ nav a:hover { box-shadow: none; }
         button.ok { margin-right: 0; }
     }
 }
-.overview {
+.overview_page {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
     .panels { display: flex; }
     .proxies_wrapper {
         flex: 1;
@@ -927,7 +942,7 @@ nav a:hover { box-shadow: none; }
                 table-layout: fixed;
                 th, td { padding: 1px; }
                 th.col.reqs { width: 55px; }
-                th.col.bw { width: 70px; }
+                th.col.bw { width: 72px; }
                 td {
                     overflow: hidden;
                     text-overflow: ellipsis;
@@ -952,7 +967,9 @@ nav a:hover { box-shadow: none; }
         }
     }
     .logs_wrapper {
-        .logs_panel { border: solid 1px @grey_border; }
+        flex: 1;
+        display: flex;
+        .har_viewer.panel_style { height: auto; }
     }
 }
 .ic_warning {
@@ -1249,8 +1266,8 @@ nav a:hover { box-shadow: none; }
     }
 }
 .config {
+    height: 100%;
     font-size: 14px;
-    margin-bottom: 5px;
     padding: 0 15px;
     .btn { width: 140px; }
     .nav_buttons {
@@ -1268,6 +1285,10 @@ nav a:hover { box-shadow: none; }
             position: relative;
             padding: 1px;
             .CodeMirror {
+                flex: auto;
+                display: flex;
+                flex-direction: column;
+                .CodeMirror-scroll { flex: auto; }
                 &.cm-s-default {
                     padding: 5px;
                     background-color: @light_grey;
@@ -1834,25 +1855,30 @@ nav a:hover { box-shadow: none; }
         width: 56px;
     }
 }
+.vbox {
+    display: flex;
+    flex-direction: column !important;
+    position: relative;
+}
+.flex_auto { flex: auto; }
 .har_viewer {
+    &.waiting * { cursor: wait !important; }
     &.panel_style {
         width: 100%;
+        height: 100%;
+        min-height: 300px;
+        padding: 5px 15px 15px;
         .main_panel {
             border: 1px solid #d0d0d0;
             position: initial;
-            margin: 15px;
             width: auto;
+            height: 100%;
         }
     }
     user-select: none;
     font-size: 12px;
     font-family: Roboto, Ubuntu, Arial, sans-serif;
     color: rgb(48, 57, 66);
-    .vbox {
-        display: flex;
-        flex-direction: column !important;
-        position: relative;
-    }
     .devtools_link {
         color: rgb(17, 85, 204);
         text-decoration: underline;
@@ -1866,7 +1892,6 @@ nav a:hover { box-shadow: none; }
             color: rgb(17, 85, 204);
         }
     }
-    .flex_auto { flex: auto; }
     .split_widget {
         flex-direction: row !important;
         position: relative;
@@ -1909,16 +1934,6 @@ nav a:hover { box-shadow: none; }
         width: 5px;
         z-index: 500;
     }
-    .logs_resizer {
-        z-index: 1000;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: -2px;
-        width: 100%;
-        height: 5px;
-        cursor: row-resize;
-    }
     .main_panel {
         z-index: 1000;
         position: fixed;
@@ -1927,7 +1942,6 @@ nav a:hover { box-shadow: none; }
         width: 100%;
         border-top: 1px solid #d0d0d0;
         &.moving * { cursor: col-resize !important; }
-        &.moving_height * { cursor: row-resize !important; }
         .toolbar_container {
             background-color: #f3f3f3;
             border-bottom: solid 1px #d0d0d0;
@@ -2174,10 +2188,11 @@ nav a:hover { box-shadow: none; }
                 }
             }
             .tabbed_pane_content {
+                flex-basis: 0;
+                flex-grow: 1;
                 display: flex;
                 max-height: 100%;
                 overflow-x: hidden;
-                flex: auto;
                 background-color: white;
                 position: relative;
                 ol {

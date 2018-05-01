@@ -506,7 +506,7 @@ class Proxies extends Pure_component {
         this.setdb_on('head.callbacks.state.go', go=>this.setState({go}));
         if (!setdb.get('head.proxies_running'))
             this.update();
-        this.req_status();
+        window.setTimeout(this.req_status.bind(this));
     }
     filter_proxies(proxies){
         return proxies.filter(p=>{

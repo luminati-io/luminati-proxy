@@ -5,7 +5,7 @@ import Proxies from './proxies.js';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import Stats from './stats.js';
-import Logs from './logs';
+import Logs from './logs2';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import {is_electron, Loader} from './common.js';
@@ -48,17 +48,8 @@ class Overview extends Pure_component {
         const title = this.state.master_port ?
             `Overview of multiplied port - ${this.state.master_port}` :
             'Overview';
-        let ports;
-        if (this.state.master_port&&this.state.proxies)
-        {
-            const mp = this.state.proxies.find(p=>
-                p.port==[this.state.master_port]);
-            ports = [];
-            for (let i=mp.port; i<mp.port+mp.multiply; i++)
-                ports.push(i);
-        }
         return (
-            <div className="overview lpm">
+            <div className="overview_page lpm">
               <Loader show={this.state.loading}/>
               <Upgrade/>
               <div className="proxies nav_header">
@@ -73,7 +64,7 @@ class Overview extends Pure_component {
                 </div>
               </div>
               <div className="logs_wrapper">
-                <Logs ports={ports}/>
+                <Logs/>
               </div>
             </div>
         );
