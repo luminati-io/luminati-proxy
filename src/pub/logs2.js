@@ -32,6 +32,7 @@ class Logs extends Pure_component {
     state = {
         cur_preview: null,
         network_width: 200,
+        search: '',
     };
     componentDidMount(){
         window.document.addEventListener('mousemove', this.on_mouse_move);
@@ -77,6 +78,9 @@ class Logs extends Pure_component {
     main_panel_moving = ()=>{ $(this.main_panel).addClass('moving'); };
     main_panel_stopped_moving = ()=>{
         $(this.main_panel).removeClass('moving'); };
+    on_change_search = e=>{
+        this.setState({search: e.target.value});
+    };
     render(){
         if (!this.state.proxies)
             return null;
@@ -86,7 +90,10 @@ class Logs extends Pure_component {
             <div id="har_viewer" className="har_viewer panel_style">
               <div className="main_panel vbox"
                 ref={this.set_main_panel_ref}>
-                <Toolbar close_preview={this.close_preview}/>
+                <Toolbar
+                  close_preview={this.close_preview}
+                  on_change_search={this.on_change_search}
+                  search={this.state.search}/>
                 <div className="split_widget vbox flex_auto">
                   <Network_container
                     main_panel_moving={this.main_panel_moving}
@@ -94,6 +101,7 @@ class Logs extends Pure_component {
                     main_panel={this.main_panel}
                     open_preview={this.open_preview}
                     width={this.state.network_width}
+                    search={this.state.search}
                     cur_preview={this.state.cur_preview}/>
                   <Preview cur_preview={this.state.cur_preview}
                     style={preview_style}
@@ -125,11 +133,27 @@ class Toolbar extends Pure_component {
               <div className="toolbar">
                 <Toolbar_button id="clear" tooltip="Clear"
                   on_click={this.clear}/>
+                <Devider/>
+                <Search_box val={this.props.val}
+                  on_change={this.props.on_change_search}/>
               </div>
             </div>
         );
     }
 }
+
+const Devider = ()=>(
+    <div className="devider"/>
+);
+
+const Search_box = ({val, on_change})=>(
+    <div className="search_box">
+      <input value={val}
+        onChange={on_change}
+        type="text"
+        placeholder="Filter"/>
+    </div>
+);
 
 const Toolbar_button = ({id, tooltip, on_click, tooltip_placement})=>(
     <H_tooltip title={tooltip} placement={tooltip_placement||'top'}>
@@ -170,6 +194,9 @@ class Network_container extends Pure_component {
         reqs: [],
         sorted: {field: 'timestamp', dir: 1},
     };
+    componentWillReceiveProps(props){
+        this.set_search_debounced(props.search);
+    }
     componentDidMount(){
         this.resize_columns();
         window.onresize = ()=>{ this.resize_columns(); };
@@ -183,15 +210,15 @@ class Network_container extends Pure_component {
             });
         });
         this.setdb_on('head.har_viewer.reqs', reqs=>{
-            if (!reqs)
-                return;
-            this.setState({reqs});
+            if (reqs)
+                this.setState({reqs});
         });
         this.setdb_on('head.har_viewer.stats', stats=>{
-            if (!stats)
-                return;
-            this.setState({stats});
+            if (stats)
+                this.setState({stats});
         });
+        this.setdb_on('head.har_viewer.sub_stats', sub_stats=>
+            this.setState({sub_stats}));
         this.setdb_on('head.ws', ws=>{
             if (!ws||this.ws)
                 return;
@@ -230,11 +257,13 @@ class Network_container extends Pure_component {
             params.port = this.port;
         }
     }
-    get_data = (opt={}, replace=false)=>{
+    get_data = (opt={})=>{
         const params = opt;
         params.limit = opt.limit||this.batch_size;
         params.skip = opt.skip||0;
         this.set_location_params(params);
+        if (this.props.search&&this.props.search.trim())
+            params.search = this.props.search;
         if (this.state.sorted)
         {
             params.sort = this.state.sorted.field;
@@ -247,17 +276,25 @@ class Network_container extends Pure_component {
             const url = zescape.uri(_this.uri, params);
             const res = yield ajax.json({url});
             const reqs = res.log.entries;
-            const new_reqs = [...(replace ? [] : _this.state.reqs), ...reqs];
+            const new_reqs = [...(opt.replace ? [] : _this.state.reqs), ...reqs];
             setdb.set('head.har_viewer.reqs', new_reqs);
             _this.loaded.to = opt.skip+reqs.length;
+            const stats = {total: res.total, sum_out: res.sum_out, sum_in: res.sum_in};
             if (!_this.state.stats||!_this.state.stats.total)
-            {
-                setdb.set('head.har_viewer.stats', {total: res.total,
-                    sum_out: res.sum_out, sum_in: res.sum_in});
-            }
+                setdb.set('head.har_viewer.stats', stats);
+            if (params.search)
+                setdb.set('head.har_viewer.sub_stats', stats);
+            else if (_this.state.sub_stats)
+                setdb.set('head.har_viewer.sub_stats', null);
             loader.end();
         });
     };
+    set_search = search=>{
+        this.loaded.to = 0;
+        setdb.emit_path('head.har_viewer.dc_top');
+        this.get_data({replace: true});
+    };
+    set_search_debounced = _.debounce(this.set_search, 400);
     set_sort = field=>{
         let dir = 1;
         if (this.state.sorted.field==field)
@@ -265,7 +302,7 @@ class Network_container extends Pure_component {
         this.setState({sorted: {field, dir}}, ()=>{
             this.loaded.to = 0;
             setdb.emit_path('head.har_viewer.dc_top');
-            this.get_data({}, true);
+            this.get_data({replace: true});
         });
     };
     on_focus = ()=>this.setState({focused: true});
@@ -362,6 +399,7 @@ class Network_container extends Pure_component {
         {
             style.flex = `0 0 ${this.props.width}px`;
             style.width = this.props.width;
+            style.maxWidth = this.props.width;
         }
         return (
             <div className="network_container vbox"
@@ -385,7 +423,8 @@ class Network_container extends Pure_component {
                   show={!this.props.cur_preview}
                   start_moving={this.start_moving}/>
               </div>
-              <Network_summary_bar stats={this.state.stats}/>
+              <Network_summary_bar stats={this.state.stats}
+                sub_stats={this.state.sub_stats}/>
             </div>
         );
     }
@@ -397,11 +436,23 @@ class Network_summary_bar extends Pure_component {
             {total: 0, sum_in: 0, sum_out: 0};
         sum_out = util.bytes_format(sum_out)||'0 B';
         sum_in = util.bytes_format(sum_in)||'0 B';
-        const c = `${total} requests | ${sum_out} sent | ${sum_in} received`;
+        let text;
+        if (!this.props.sub_stats)
+            text = `${total} requests | ${sum_out} sent | ${sum_in} received`;
+        else
+        {
+            let sub_total = this.props.sub_stats.total;
+            let sub_sum_out = this.props.sub_stats.sum_out;
+            let sub_sum_in = this.props.sub_stats.sum_in;
+            sub_sum_out = util.bytes_format(sub_sum_out)||'0 B';
+            sub_sum_in = util.bytes_format(sub_sum_in)||'0 B';
+            text = `${sub_total} / ${total} requests | ${sub_sum_out} /
+            ${sum_out} sent | ${sub_sum_in} / ${sum_in} received`;
+        }
         return (
             <div className="network_summary_bar">
               <span>
-                <H_tooltip title={c}>{c}</H_tooltip>
+                <H_tooltip title={text}>{text}</H_tooltip>
               </span>
             </div>
         );
@@ -563,7 +614,7 @@ const Cell_value = ({col, req})=>{
         return (
             <H_tooltip title={req.request.url}>
               <div>
-                <img className="icon script"/>
+                <div className="icon script"/>
                 <div className="disp_value">{req.request.url}</div>
               </div>
             </H_tooltip>
@@ -615,6 +666,10 @@ class Preview extends Pure_component {
             return null;
         const Pane_content = this.panes[this.state.cur_pane].comp;
         const req = this.props.cur_preview;
+        let content_type = req.response.headers.find(
+            h=>h.name=='content-type');
+        if (content_type)
+            content_type = content_type.value;
         return (
             <div style={this.props.style} className="preview_container">
               <div className="tabbed_pane_header">
@@ -636,7 +691,8 @@ class Preview extends Pure_component {
                 </div>
               </div>
               <div className="tabbed_pane_content">
-                <Pane_content key={req.uuid} req={req}/>
+                <Pane_content key={req.uuid} req={req}
+                  content_type={content_type}/>
               </div>
             </div>
         );
@@ -692,15 +748,13 @@ class Pane_response extends Pure_component {
         this.set_ct();
     }
     set_ct(){
-        const header = this.props.req.response.headers.filter(
-            h=>h.name=='content-type');
-        if (!header[0])
+        const {content_type} = this.props;
+        if (!content_type)
             return this.cm.setOption('mode', 'javascript');
-        const ct = header[0].value;
         let mode = 'javascript';
-        if (ct.match(/json/))
+        if (content_type.match(/json/))
             mode = 'javascript';
-        if (ct.match(/html/))
+        if (content_type.match(/html/))
             mode = 'htmlmixed';
         this.cm.setOption('mode', mode);
     }
@@ -848,15 +902,13 @@ const Timing_footer = ({total})=>(
 );
 
 class Pane_preview extends Pure_component {
-    state = {};
-    componentDidMount(){
-        setdb.on('test', json=>this.setState({json}));
-    }
     render(){
         let json;
         const text = this.props.req.response.content.text;
-        if (json = this.state.json||is_json_str(text))
+        if (json = is_json_str(text))
             return <JSON_viewer json={json}/>;
+        if (this.props.content_type.match(/text\/plain/))
+            return <div className="pane_preview">{text}</div>;
         return (
             <div className="pane_preview"></div>
         );

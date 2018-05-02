@@ -1027,6 +1027,7 @@ nav a:hover { box-shadow: none; }
                 width: 64px;
                 position: absolute;
                 left: 5px;
+                text-overflow: initial;
             }
             &:hover .proxies_actions .action_icon { visibility: visible; }
             .action_icon {
@@ -1875,9 +1876,10 @@ nav a:hover { box-shadow: none; }
             height: 100%;
         }
     }
+    -webkit-user-select: none;
     user-select: none;
     font-size: 12px;
-    font-family: Roboto, Ubuntu, Arial, sans-serif;
+    font-family: Roboto, Ubuntu, Arial, sans-serif !important;
     color: rgb(48, 57, 66);
     .devtools_link {
         color: rgb(17, 85, 204);
@@ -1897,7 +1899,7 @@ nav a:hover { box-shadow: none; }
         position: relative;
     }
     .small_icon {
-        background-image: -webkit-image-set(url(/img/small_icons.png) 1x);
+        background-image: url(/img/small_icons.png);
         background-position: var(--spritesheet-position);
         width: 10px;
         height: 10px;
@@ -1912,13 +1914,14 @@ nav a:hover { box-shadow: none; }
         width: 10px;
         height: 10px;
         -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);
+        mask-image: url(/img/small_icons.png);
         -webkit-mask-position: var(--spritesheet-position);
         background-color: rgb(110, 110, 110);
         &.sort_asc { --spritesheet-position: -20px 10px; }
         &.sort_desc { --spritesheet-position: -80px 30px; }
     }
     .medium_icon {
-        background-image: -webkit-image-set(url(/img/medium_icons.png) 1x);
+        background-image: url(/img/medium_icons.png);
         background-position: var(--spritesheet-position);
         &.close_btn_h {
             --spritesheet-position: 0px 16px;
@@ -1947,6 +1950,7 @@ nav a:hover { box-shadow: none; }
             border-bottom: solid 1px #d0d0d0;
             padding: 0 2px;
             .toolbar {
+                display: flex;
                 position: relative;
                 white-space: nowrap;
                 height: 26px;
@@ -1980,9 +1984,37 @@ nav a:hover { box-shadow: none; }
                         height: 24px;
                         background-color: rgb(110, 110, 110);
                         -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);
+                        mask-image: url(/img/large_icons.png);
                         -webkit-mask-position: var(--spritesheet-position);
+                        mask-position: var(--spritesheet-position);
                         &.clear { --spritesheet-position: 0 144px; }
                         &.close_logs { --spritesheet-position: 140px 0; }
+                    }
+                }
+                .devider {
+                    background-color: #ccc;
+                    height: 16px;
+                    width: 1px;
+                    margin: auto 2px;
+                    display: inline-block;
+                }
+                .search_box {
+                    margin: 0 3px;
+                    input {
+                        height: 18px;
+                        width: 160px;
+                        border: none;
+                        padding: 0 0 0 3px;
+                        border-radius: 0;
+                        color: rgb(48, 57, 66);
+                        font-family: Roboto, Ubuntu, Arial, sans-serif;
+                        font-weight: normal;
+                        &:hover {
+                            box-shadow: 0 0 0 1px #e0e0e0;
+                        }
+                        &:focus {
+                            box-shadow: 0 0 0 1px #03a9f4;
+                        }
                     }
                 }
             }
@@ -2008,6 +2040,7 @@ nav a:hover { box-shadow: none; }
                     line-height: 18px;
                     height: 18px;
                     padding: 1px 4px;
+                    -webkit-user-select: none;
                     user-select: none;
                 }
             }
@@ -2120,7 +2153,7 @@ nav a:hover { box-shadow: none; }
                             margin-top: 1px;
                             margin-right: 3px;
                             &.script {
-                                content: url(/img/resource_document_icon_small.png)
+                                background-image: url(/img/resource_document_icon_small.png)
                             }
                         }
                     }
@@ -2219,9 +2252,12 @@ nav a:hover { box-shadow: none; }
                         height: 26px;
                         display: flex;
                         align-items: center;
+                        cursor: default;
                         &:before {
                             -webkit-user-select: none;
+                            user-select: none;
                             -webkit-mask-image: url(/img/treeoutline_triangles.png);
+                            mask-image: url(/img/treeoutline_triangles.png);
                             -webkit-mask-size: 32px 24px;
                             content: "aa";
                             color: transparent;
@@ -2238,7 +2274,8 @@ nav a:hover { box-shadow: none; }
                         display: none;
                         &.open { display: block; }
                         li.treeitem {
-                            user-select: text;
+                            -webkit-user-select: none;
+                            user-select: none;
                             cursor: default;
                             margin-left: 10px;
                             margin-top: 1px;
@@ -2328,6 +2365,9 @@ nav a:hover { box-shadow: none; }
                         }
                     }
                 }
+                .pane_preview {
+                    padding: 4px 8px;
+                }
             }
         }
     }
@@ -2345,6 +2385,7 @@ nav a:hover { box-shadow: none; }
     li.tree_item {
         &:before {
             -webkit-user-select: none;
+            user-select: none;
             -webkit-mask-image: url(/img/treeoutline_triangles.png);
             -webkit-mask-size: 32px 24px;
             content: "aa";

@@ -410,8 +410,6 @@ const validators = {
         });
         return res.join(',');
     },
-    regex: val=>{
-    },
 };
 
 class Index extends React.Component {

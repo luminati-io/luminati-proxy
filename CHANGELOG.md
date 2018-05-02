@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.93.910
+- :star: added support for HAR viewer in Firefox
+
 ## 1.93.813
 - :star: added new HAR viewer
 - :bug: fixed setting max requests
