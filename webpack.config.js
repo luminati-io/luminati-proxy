@@ -15,7 +15,7 @@ module.exports = {
             'ui-select', 'ui-select/dist/select.css',
             'codemirror/lib/codemirror', 'codemirror/lib/codemirror.css',
             'codemirror/mode/javascript/javascript',
-            'react', 'react-dom', 'react-bootstrap', 'axios',
+            'react', 'react-dom', 'react-bootstrap',
             'regenerator-runtime', 'es6-shim', 'animate.css']
     },
     output: {

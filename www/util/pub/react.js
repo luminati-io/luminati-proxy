@@ -2,9 +2,9 @@
 'use strict'; /*jslint react:true*/
 define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
     '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js',
-    'react-bootstrap', '/util/setdb.js', '/util/etask.js',
+    'react-bootstrap', '/util/setdb.js', '/util/etask.js', '/util/match.js',
     '/www/locale/pub/i18n_react.js'], ($, React, ReactDOM, RouterDOM, url,
-    ajax, Pure_component, RB, setdb, etask, {T})=>{
+    ajax, Pure_component, RB, setdb, etask, match, {T})=>{
 
 const E = {};
 const {Modal, Button} = RB;
@@ -258,7 +258,14 @@ class Nav_hook extends Pure_component {
         return this.props.domain&&`https://${this.props.domain}${path}`||path;
     }
     set_meta(pathname){
-        const m = sitemap[pathname];
+        let m;
+        for (let key in sitemap)
+        {
+            if (!match.match(key, pathname, {glob: 1}))
+                continue;
+            m = sitemap[key];
+            break;
+        }
         if (!m)
             return;
         m.og_url = this.add_domain(m.og_url||pathname);
@@ -272,10 +279,7 @@ class Nav_hook extends Pure_component {
         $('meta[property="og:image"]').attr('content', m.og_image);
         $('script[type="application/ld+json"]')
             .text(JSON.stringify(m.json_ld));
-        if (m.noindex)
-            $('head').append('<meta name=robots content=noindex>');
-        else
-            $('meta[name=robots]').remove();
+        $('meta[content=noindex]').remove();
         m.ga_num!==undefined&&window.set_ga_num&&window.set_ga_num(m.ga_num);
     }
     hash_scroll(hash){
@@ -319,7 +323,7 @@ class Alerts extends Pure_component {
     componentWillMount(){
         this.setdb_on('alerts', alerts=>this.setState({alerts: alerts||[]}));
     }
-    render() { return this.state.alerts.map(a=><Alert key={a.key} {...a}/>); }
+    render(){ return this.state.alerts.map(a=><Alert key={a.key} {...a}/>); }
     static key = 0;
     static push(text, opt){
         let alert = {...opt, text, key: Alerts.key++};

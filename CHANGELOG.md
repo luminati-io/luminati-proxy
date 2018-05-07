@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.94.415
+- :sparkles: HAR viewer improvements
+
 ## 1.93.910
 - :star: added support for HAR viewer in Firefox
 

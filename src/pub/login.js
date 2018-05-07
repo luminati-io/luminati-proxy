@@ -7,10 +7,12 @@ import classnames from 'classnames';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import $ from 'jquery';
 import ajax from 'hutil/util/ajax';
+import setdb from 'hutil/util/setdb';
 import zurl from 'hutil/util/url';
 import {Loader} from './common.js';
+import {withRouter} from 'react-router-dom';
 
-class Login extends Pure_component {
+const Login = withRouter(class Login extends Pure_component {
     constructor(props){
         super(props);
         this.state = {password: '', username: '', loading: false};
@@ -67,21 +69,26 @@ class Login extends Pure_component {
                 });
             }
             else
-                _this.check_reload();
+                _this.get_in();
             _this.setState({loading: false});
         });
     }
-    check_reload(){
+    get_in(){
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', _this.check_reload);
-            yield ajax({url: '/overview'});
-            window.location = '/overview';
+            this.on('uncaught', _this.get_in);
+            const settings = yield ajax.json({url: '/api/settings'});
+            window.ga('set', 'dimension1', settings.customer);
+            setdb.set('head.settings', settings);
+            const consts = yield ajax.json({url: '/api/consts'});
+            setdb.set('head.consts', consts);
+            _this.props.history.push('/overview');
         });
     }
     render(){
         return (
             <div className="lpm lum_login">
+              <Logo/>
               <Messages error_message={this.state.error_message}
                 settings={this.state.settings}
                 ver_node={this.state.ver_node}/>
@@ -95,6 +102,21 @@ class Login extends Pure_component {
                 update_password={this.update_password.bind(this)}
                 update_username={this.update_username.bind(this)}
                 select_customer={this.select_customer.bind(this)}/>
+            </div>
+        );
+    }
+});
+
+class Logo extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.version', ver=>this.setState({ver})); }
+    render(){
+        return (
+            <div className="nav_top">
+              <a href="https://luminati.io/cp" rel="noopener noreferrer"
+                target="_blank" className="logo_big"/>
+              <div className="version">V{this.state.ver}</div>
             </div>
         );
     }
@@ -153,7 +175,7 @@ const Node_message = ({ver_node})=>{
 };
 
 const Header = ()=>(
-    <div className="row login_header">
+    <div className="login_header">
       <h3>Login with your Luminati account</h3>
     </div>
 );
@@ -161,7 +183,11 @@ const Header = ()=>(
 const Form = ({user_customers, save_user, update_password, update_username,
     select_customer, password, username})=>
 {
-    const google_login_url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.googleusercontent.com&response_type=code&redirect_uri=https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account";
+    const google_login_url = 'https://accounts.google.com/o/oauth2/v2/auth?'
+    +'client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.'
+    +'googleusercontent.com&response_type=code&redirect_uri='
+    +'https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2F'
+    +'www.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account';
     const google_click = e=>{
         const google = $(e);
         const l = window.location;
@@ -211,7 +237,8 @@ class Customers_form extends Pure_component {
                 Please choose a customer.</div>
               <div className="form-group">
                 <label htmlFor="user_customer">Customer</label>
-                <Typeahead_wrapper data={this.props.user_customers}
+                <Typeahead_wrapper
+                  data={this.props.user_customers}
                   val={this.state.cur_customer}
                   on_change={this.on_change.bind(this)}/>
               </div>
@@ -227,6 +254,10 @@ class Customers_form extends Pure_component {
 }
 
 class First_form extends Pure_component {
+    on_key_up = e=>{
+        if (e.keyCode==13)
+            this.props.save_user();
+    };
     render(){
         const {google_click, saving_user, password, username} = this.props;
         return (
@@ -245,17 +276,22 @@ class First_form extends Pure_component {
                   <div className="col col_pass col-sm-6">
                     <div className="form-group">
                       <label htmlFor="username">Email</label>
-                      <input type="email" name="username"
+                      <input type="email"
+                        name="username"
                         onChange={this.props.update_username}
+                        onKeyUp={this.on_key_up}
                         value={username}/>
                     </div>
                     <div className="form-group">
                       <label htmlFor="user_password">Password</label>
-                      <input type="password" name="password"
+                      <input type="password"
+                        name="password"
                         onChange={this.props.update_password}
+                        onKeyUp={this.on_key_up}
                         value={password}/>
                     </div>
-                    <button type="submit" className="btn btn_lpm btn_login"
+                    <button type="submit"
+                      className="btn btn_lpm btn_login"
                       onClick={this.props.save_user}>
                       {saving_user ? 'Logging in...' : 'Log in'}
                     </button>

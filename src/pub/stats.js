@@ -5,10 +5,12 @@ import util from './util.js';
 import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import ajax from 'hutil/util/ajax';
+import zurl from 'hutil/util/url';
 import {Modal_dialog, Tooltip, Modal} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
+import {withRouter} from 'react-router-dom';
 
 class Success_ratio extends Pure_component {
     render (){
@@ -42,7 +44,6 @@ class Stats extends Pure_component {
         stats: {},
     };
     componentWillMount(){
-        this.setdb_on('head.callbacks.state.go', go=>this.setState({go}));
         this.setdb_on('head.recent_stats', stats=>{
             if (stats)
                 this.setState({stats});
@@ -81,11 +82,11 @@ class Stats extends Pure_component {
               <div className="panel_body with_table">
                 <Success_ratio total={this.state.stats.total}
                   success={this.state.stats.success}/>
-                <Stat_table stats={this.state.stats} go={this.state.go}
+                <Stat_table stats={this.state.stats}
                   row_key="status_code" logs="code" title="Code"/>
-                <Stat_table stats={this.state.stats} go={this.state.go}
+                <Stat_table stats={this.state.stats}
                   row_key="hostname" logs="domain" title="Domain"/>
-                <Protocol_table stats={this.state.stats} go={this.state.go}
+                <Protocol_table stats={this.state.stats}
                   enable_ssl_click={this.enable_ssl_click.bind(this)}/>
                 <Modal_dialog open={this.state.show_reset}
                   title="Are you sure you want to reset stats?"
@@ -103,9 +104,9 @@ const Enable_ssl_modal = ({enable_ssl})=>(
       click_ok={enable_ssl}/>
 );
 
-const Protocol_table = ({stats, go, enable_ssl_click})=>{
+const Protocol_table = ({stats, enable_ssl_click})=>{
     return (
-        <Stat_table stats={stats} go={go} row_key="protocol" logs="protocol"
+        <Stat_table stats={stats} row_key="protocol" logs="protocol"
           title="Protocol" enable_ssl_click={enable_ssl_click}/>
     );
 };
@@ -116,13 +117,15 @@ const Empty_row = ()=>(
     </tr>
 );
 
-class Row extends Pure_component {
-    click(){
-        this.props.go('logs', {[this.props.logs]: this.props.stat.key}); }
+const Row = withRouter(class Row extends Pure_component {
+    click = ()=>{
+        const url = `/logs?${this.props.logs}=${this.props.stat.key}`;
+        this.props.history.push(url);
+    };
     render(){
         const {stat, row_key} = this.props;
         return (
-            <tr onClick={this.click.bind(this)}>
+            <tr onClick={this.click}>
               <Key_cell title={stat.key} enable={stat.enable}
                 warning={stat.warning}
                 enable_click={this.props.enable_ssl_click}/>
@@ -132,7 +135,7 @@ class Row extends Pure_component {
             </tr>
         );
     }
-}
+});
 
 const Key_cell = ({title, enable, warning, enable_click})=>{
     const warning_tooltip = `Some of your ports don't have SSL analyzing
@@ -152,8 +155,7 @@ const Key_cell = ({title, enable, warning, enable_click})=>{
     );
 };
 
-const Stat_table = ({title, stats, row_key, logs, go,
-    enable_ssl_click})=>
+const Stat_table = ({title, stats, row_key, logs, enable_ssl_click})=>
 {
     const show_more = stats[row_key]&&stats[row_key].length > 5;
     stats = stats[row_key]&&stats[row_key].slice(0, 5)||[];
@@ -178,7 +180,7 @@ const Stat_table = ({title, stats, row_key, logs, go,
                 <If when={!stats.length}><Empty_row/></If>
                 {stats.map(s=>(
                   <Row stat={s} key={s.key} row_key={row_key} logs={logs}
-                    go={go} enable_ssl_click={enable_ssl_click}/>
+                    enable_ssl_click={enable_ssl_click}/>
                 ))}
               </tbody>
             </table>

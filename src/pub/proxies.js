@@ -18,6 +18,7 @@ import {Modal, Checkbox, Pagination_panel, Link_icon,
     Tooltip, get_static_country, Modal_dialog, save_pagination,
     get_pagination} from './common.js';
 import {If} from '/www/util/pub/react.js';
+import {withRouter} from 'react-router-dom';
 
 let country_names = {};
 
@@ -492,7 +493,8 @@ class Proxies extends Pure_component {
             if (!proxies)
                 return;
             proxies = this.prepare_proxies(proxies||[]);
-            const filtered_proxies = this.filter_proxies(proxies);
+            const filtered_proxies = this.filter_proxies(proxies,
+                this.props.master_port);
             this.setState({proxies, filtered_proxies, loaded: true},
                 this.paginate);
         });
@@ -503,15 +505,19 @@ class Proxies extends Pure_component {
             country_names = countries;
             this.setState({countries});
         });
-        this.setdb_on('head.callbacks.state.go', go=>this.setState({go}));
-        if (!setdb.get('head.proxies_running'))
-            this.update();
         window.setTimeout(this.req_status.bind(this));
     }
-    filter_proxies(proxies){
+    componentWillReceiveProps(props){
+        if (props.master_port!=this.props.master_port)
+        {
+            const filtered_proxies = this.filter_proxies(this.state.proxies,
+                props.master_port);
+            this.setState({filtered_proxies}, this.paginate);
+        }
+    }
+    filter_proxies(proxies, mp){
         return proxies.filter(p=>{
-            let mp;
-            if (mp = this.props.master_port)
+            if (mp)
                 return ''+p.port==mp||''+p.master_port==mp;
             else
                 return p.proxy_type!='duplicate';
@@ -582,7 +588,7 @@ class Proxies extends Pure_component {
                     }
                 }
                 const filtered_proxies = _this.filter_proxies(
-                    Object.values(new_proxies));
+                    Object.values(new_proxies), _this.props.master_port);
                 return {proxies: Object.values(new_proxies), filtered_proxies,
                     stats};
             }, ()=>_this.paginate(_this.state.cur_page));
@@ -591,7 +597,6 @@ class Proxies extends Pure_component {
         });
     }
     update(){
-        const _this = this;
         this.etask(function*(){
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             setdb.set('head.proxies_running', proxies);
@@ -711,7 +716,7 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
     </Pagination_panel>
 );
 
-class Proxy_row extends Pure_component {
+const Proxy_row = withRouter(class Proxy_row extends Pure_component {
     constructor(props){
         super(props);
         this.state = {status: this.props.proxy._status};
@@ -755,11 +760,10 @@ class Proxy_row extends Pure_component {
         if (!this.props.master_port && this.props.proxy.multiply &&
             this.props.proxy.multiply>1)
         {
-            this.props.go('overview_multiplied',
-                {port: this.props.proxy.port});
+            this.props.history.push(`/overview/${this.props.proxy.port}`);
         }
         else
-            this.props.go('edit_proxy', {port: this.props.proxy.port});
+            this.props.history.push(`/proxy/${this.props.proxy.port}`);
     }
     render(){
         const proxy = this.props.proxy;
@@ -787,7 +791,7 @@ class Proxy_row extends Pure_component {
             </tr>
         );
     }
-}
+});
 
 class Cell extends React.Component {
     shouldComponentUpdate(){ return !!this.props.col.dynamic; }
@@ -832,9 +836,7 @@ class Actions extends Pure_component {
     duplicate(){
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-            });
+            this.on('uncaught', e=>console.log(e));
             yield window.fetch('/api/proxy_dup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

@@ -74,17 +74,6 @@ class Request extends Pure_component {
                         proxy: port||def_port, method, url}};
                 });
             });
-            // XXX krzysztof: delete once ReactRouter is introduced
-            const _this = this;
-            window.setTimeout(()=>{
-                this.etask(function*(){
-                    if (_this.state.proxies)
-                        return;
-                    const proxies = yield ajax.json({
-                        url: '/api/proxies_running'});
-                    setdb.set('head.proxies_running', proxies);
-                });
-            });
         });
     }
     add_header(){

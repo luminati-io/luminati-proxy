@@ -5,66 +5,38 @@ import Proxies from './proxies.js';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import Stats from './stats.js';
-import Logs from './logs2';
+import Har_viewer from './har_viewer';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
-import {is_electron, Loader} from './common.js';
-import zurl from 'hutil/util/url';
+import {is_electron} from './common.js';
 import $ from 'jquery';
 
 class Overview extends Pure_component {
-    state = {loading: false};
-    componentWillMount(){
-        this.setdb_on('head.section', section=>{
-            if (!section)
-                return;
-            const update = {section};
-            if (section.name=='overview_multiplied')
-            {
-                update.master_port = window.location.pathname.split('/')
-                .slice(-1)[0];
-            }
-            this.setState(update);
-        });
+    componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>
             this.setState({proxies}));
         this.setdb_on('head.consts', consts=>this.setState({consts}));
-        window.setTimeout(this.fetch_globals.bind(this));
-    }
-    fetch_globals(){
-        const _this = this;
-        this.etask(function*(){
-            // XXX krzysztof: optimize /api/consts endpoint
-            //_this.setState({loading: true});
-            if (!_this.state.consts)
-            {
-                const consts = yield ajax.json({url: '/api/consts'});
-                setdb.set('head.consts', consts);
-            }
-            _this.setState({loading: false});
-        });
     }
     render(){
-        const title = this.state.master_port ?
-            `Overview of multiplied port - ${this.state.master_port}` :
-            'Overview';
+        const master_port = this.props.match.params.master_port;
+        const title = master_port ?
+            `Overview of multiplied port - ${master_port}` : 'Overview';
         return (
             <div className="overview_page lpm">
-              <Loader show={this.state.loading}/>
               <Upgrade/>
               <div className="proxies nav_header">
                 <h3>{title}</h3>
               </div>
               <div className="panels">
                 <div className="proxies proxies_wrapper">
-                  <Proxies master_port={this.state.master_port}/>
+                  <Proxies master_port={master_port}/>
                 </div>
                 <div className="stats_wrapper">
-                  <Stats master_port={this.state.master_port}/>
+                  <Stats master_port={master_port}/>
                 </div>
               </div>
               <div className="logs_wrapper">
-                <Logs/>
+                <Har_viewer master_port={master_port}/>
               </div>
             </div>
         );

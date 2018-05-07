@@ -5,36 +5,22 @@
     <title>Luminati Proxy Manager</title>
     <meta name=viewport
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-60520689-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
     <base href=/>
     <link rel="shortcut icon" href=/favicon.ico>
     <link rel=stylesheet href=req/notosans-fontface/css/notosans-fontface.css>
     <link rel=stylesheet href=req/font-awesome/css/font-awesome.css>
     <link rel=stylesheet href=req/flag-icon-css/css/flag-icon.css>
-    <style>[ng-cloak] { display: none; }</style>
     <!-- Hotjar Tracking Code for http://luminati.io -->
   </head>
-  <body ng-cloak ng-controller=root>
-    <div class="top_nav_wrapper"
-      ng-class="{'no_nav': section.name=='settings'||section.name=='login'}">
-      <div id="react_root"></div>
-      <div class="container page-body">
-        <div class ng-if="section.name=='overview'">
-          <div ng-repeat="warning in warnings()"
-            class="alert alert-info settings-alert">
-            {{warning}}
-            <button class="btn btn-default" ng-click=dismiss_warning(warning)>
-              Dismiss
-            </button>
-          </div>
-          <div class="alert alert-info settings-alert"
-            ng-if="$root.mode=='root'&&$root.settings.resolve===true">
-            IP resolution is done automatically.
-          </div>
-        </div>
-        <ui-view></ui-view>
-      </div>
-    </div>
+  <body>
+    <div id="react_root"></div>
     <div id=notif_react_modal></div>
-  <script type="text/javascript" src="/f8903377cf6eef37aa06.runtime.js"></script><script type="text/javascript" src="/411834200f760e334358.vendor.js"></script><script type="text/javascript" src="/38b87508201ba5caeb90.app.js"></script></body>
+  <script type="text/javascript" src="/cb54be2d5945e78fcd6c.runtime.js"></script><script type="text/javascript" src="/b8a6b32394df6a97e7f5.vendor.js"></script><script type="text/javascript" src="/b5c0563a4bad08d45223.app.js"></script></body>
 </html>
 
