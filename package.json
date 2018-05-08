@@ -359,7 +359,7 @@
   "scripts": {
     "electron": "electron .",
     "start": "bin/luminati.js",
-    "test": "./node_modules/mocha/bin/mocha",
+    "test": "./node_modules/mocha/bin/mocha --timeout 5000",
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
