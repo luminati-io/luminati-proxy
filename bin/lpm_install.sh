@@ -387,7 +387,7 @@ check_npm()
         perr "check_no_npm"
     else
         local npm_ver=$(npm -v)
-        if [[ "$npm_ver" =~ ^([3,5-9]\.|[1-9][0-9]+\.) ]]; then
+        if [[ "$npm_ver" =~ ^([3,7-9]\.|[1-9][0-9]+\.) ]]; then
             UPDATE_NPM=1
             perr "check_npm_bad_version" "$npm_ver"
         fi
