@@ -223,6 +223,12 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         font-family: Roboto, Ubuntu, Arial, sans-serif;
     }
     .tooltip-arrow { display: none; }
+    &.bottom {
+        margin-top: 0;
+        padding-top: 0;
+        margin-left: 9px;
+        .tooltip-inner { top: 1px; }
+    }
 }
 .tooltip.top .tooltip-arrow { border-top-color: @tooltip; }
 .tooltip.bottom .tooltip-arrow { border-bottom-color: @tooltip; }
@@ -1324,7 +1330,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
             .field {
                 &:first-child { margin-left: 0; }
                 &:last-child { margin-right: 0; }
-                margin: 0 10px;
+                margin: 0 5px;
                 .title {
                     font-size: 14px;
                     margin-bottom: 3px;
@@ -1734,7 +1740,8 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
                     top: -8px;
                     font-size: 12px;
                     line-height: 1.2;
-                    margin-right: 40px;
+                    margin-right: 20px;
+                    margin-left: -14px;
                     flex: 0;
                 }
                 .globe {
@@ -1776,9 +1783,9 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
                 width: auto;
                 font-size: 12px;
                 .layer {
-                    margin-right: 15px;
+                    margin-right: 22px;
                     &.port_numbers {
-                        margin-right: 20px;
+                        margin-right: 18px;
                         font-size: 11px;
                     }
                     .layer_btn { padding: 0 4px; }
@@ -1891,10 +1898,12 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         width: 10px;
         height: 10px;
         &.close_btn { --spritesheet-position: -20px 70px; }
-        &.green_status {
-            --spritesheet-position: -20px 50px;
+        &.status {
             margin-right: 4px;
             margin-bottom: 2px;
+            &.green { --spritesheet-position: -20px 50px; }
+            &.yellow { --spritesheet-position: 50px 50px; }
+            &.red { --spritesheet-position: 0 30px; }
         }
     }
     .small_icon_mask {
@@ -2167,6 +2176,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
                                 cursor: default;
                             }
                         }
+                        &.error:not(.selected) { color: rgb(230, 0, 0); }
                     }
                     td {
                         border-left: 1px solid #e1e1e1;

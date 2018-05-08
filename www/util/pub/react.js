@@ -7,7 +7,7 @@ define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
     ajax, Pure_component, RB, setdb, etask, match, {T})=>{
 
 const E = {};
-const {Modal, Button} = RB;
+const {Modal, Button, Alert} = RB;
 
 const Foreach = ({children, data})=>data.map((d, i)=>children(d, i));
 E.Foreach = Foreach;
@@ -311,10 +311,6 @@ const Tooltip = props=>{
 };
 E.Tooltip = Tooltip;
 
-const Alert = ({text, type})=>(
-    <div className={'alert alert-'+(type||'danger')} role="alert">{text}</div>
-);
-E.Alert = Alert;
 class Alerts extends Pure_component {
     constructor(props){
         super(props);
@@ -325,14 +321,23 @@ class Alerts extends Pure_component {
     }
     render(){ return this.state.alerts.map(a=><Alert key={a.key} {...a}/>); }
     static key = 0;
-    static push(text, opt){
-        let alert = {...opt, text, key: Alerts.key++};
+    static push(children, opt){
+        if (opt.dismissable&&opt.id&&(setdb.get('alerts')||[]).some(
+            a=>a.id==opt.id))
+        {
+            return;
+        }
+        let alert = {bsStyle: opt.type||'danger', children, key: Alerts.key++,
+            id: opt.id};
+        const dismiss = ()=>setdb.set('alerts', setdb.get('alerts')
+            .filter(a=>a!=alert));
+        if (opt.dismissable)
+            alert.onDismiss = dismiss;
+        else
+            setTimeout(dismiss, opt.duration||2000);
         const max_len = 3;
         let alerts = [...(setdb.get('alerts')||[]).slice(-max_len+1), alert];
         setdb.set('alerts', alerts);
-        const duration=alert.duration||2000;
-        setTimeout(()=>setdb.set('alerts', setdb.get('alerts')
-            .filter(a=>a!=alert)), duration);
     }
 }
 E.Alerts = Alerts;

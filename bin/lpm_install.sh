@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.94.415"
+VERSION="1.94.520"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -23,6 +23,8 @@ INSTALL_BREW=0
 USE_NVM=0
 NODE_VER='9.4.0'
 NPM_VER='4.6.1'
+NETWORK_RETRY=3
+NETWORK_ERROR=0
 UPDATE_NODE=0
 UPDATE_NPM=0
 OS=""
@@ -136,6 +138,8 @@ prompt()
         read -n 1 -p $"$question ($yn) " answer
         if ((!OS_MAC)); then
             echo -e -n '\e[0m\n'
+        else
+            echo -e -n '\n'
         fi
     fi
     if [[ -z $answer && $default == "n" ]]; then
@@ -153,7 +157,7 @@ run_cmd()
 {
     local cmd=$1 force_log=$2
     echo -n > $LOGFILE
-    eval "$cmd" 2> >(tee $LOGFILE >&2)
+    eval "$cmd" 2>$LOGFILE > /dev/null
     local ret=$?
     local error=$(tail -n 10 $LOGFILE | base64 2>&1)
     error=${error/$'\n'/ }
@@ -168,6 +172,18 @@ run_cmd()
     return $ret;
 }
 
+retry_cmd()
+{
+    local cmd=$1 force_log=$2 ret=0
+    for ((i=0; i<NETWORK_RETRY; i++)); do
+        zerr "retry_cmd $cmd $i"
+        run_cmd "$1 $2"
+        ret=$?
+        if ((!ret)); then break; fi
+    done
+    return $ret
+}
+
 sudo_cmd()
 {
     local cmd=$1 force_log=$2
@@ -175,18 +191,48 @@ sudo_cmd()
     return $?
 }
 
+retry_sudo_cmd()
+{
+    local cmd=$1 force_log=$2 ret=0
+    for ((i=0; i<NETWORK_RETRY; i++)); do
+        zerr "retry_sudo_cmd $cmd $i"
+        sudo_cmd "$1 $2"
+        ret=$?
+        if ((!ret)); then break; fi
+    done
+    return $ret
+}
+
+download_script()
+{
+    local url=$1 out_path=$2
+    rm $out_path 2> /dev/null
+    for ((i=0; i<NETWORK_RETRY; i++)); do
+        zerr "download_script $url retry: $i"
+        if is_cmd_defined "curl"; then
+            run_cmd "curl -fsSL $url -o $out_path"
+        else
+            run_cmd "wget -q ${WGET_FLAG} $url -O $out_path"
+        fi
+        ret=$?
+        if ((!ret)); then
+            return $ret
+        fi
+    done
+    if ((ret)); then NETWORK_ERROR=1; fi
+    return $ret
+}
+
 run_script()
 {
-    local url=$1 lang=$2
+    local name=$1 url=$2 lang=$2
     if [ -z "$lang" ]; then
         lang="sh"
     fi
-    if is_cmd_defined "wget"; then
-        run_cmd "wget -qO- ${WGET_FLAG} $url | $lang"
-    else
-        run_cmd "curl -fsSL $url | $lang"
-    fi
-    return $?
+    local script_path="/tmp/lpm_install_$name_$RID"
+    download_script "$url" "$script_path"
+    retry_cmd "cat $script_path | $lang"
+    rm $script_path
 }
 
 check_linux_distr()
@@ -203,14 +249,14 @@ check_linux_distr()
 	name="Debian $(cat /etc/debian_version)"
     fi
     escape_json $name
-    zerr "Linux distr: $name"
+    zerr "linux distr: $name"
 }
 
 perr()
 {
     local name=$1 note="$2" ts=$(date +"%s")
     escape_json "$note"
-    zerr "$name"
+    zerr "PERR $name"
     local note=$RS url="${PERR_URL}/?id=lpm_sh_${name}"
     local data="{\"uuid\": \"$RID\", \"timestamp\": \"$ts\", \"ver\": \"$VERSION\", \"info\": {\"platform\": \"$OS\", \"c_ts\": \"$ts\", \"c_up_ts\": \"$TS_START\", \"note\": \"$note\", \"lum\": $LUM, \"root\":$IS_ROOT, \"os_release\":\"$OS_RELEASE\"}}"
     if ((PRINT_PERR)); then
@@ -240,14 +286,21 @@ sys_install()
     local pkg_mng="apt-get install -y"
     if ((OS_MAC)); then
         pkg_mng="brew install -y"
-        run_cmd "${pkg_mng} ${pkg}"
+        retry_cmd "${pkg_mng} ${pkg}"
     else
         if is_cmd_defined "yum"; then
             pkg_mng="yum install -y"
         fi
-        sudo_cmd "${pkg_mng} ${pkg}"
+        retry_sudo_cmd "${pkg_mng} ${pkg}"
     fi
-    return $?
+    retry_sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
+}
+
+install_shasum(){
+    # hack for centos nave installation
+    if ! is_cmd_defined "shasum"; then
+        sys_install "perl-Digest-SHA"
+    fi
 }
 
 sys_rm()
@@ -276,6 +329,8 @@ check_wget()
         echo "will install wget"
         perr "check_no_wget"
         INSTALL_WGET=1
+    else
+        zerr "found_curl: $(wget --version | head -n 1 2>/dev/null)"
     fi
 }
 
@@ -346,6 +401,8 @@ check_curl()
         echo 'curl is not installed'
         perr 'check_no_curl'
         INSTALL_CURL=1
+    else
+        zerr "found_curl: $(curl --version | head -n 1 2>/dev/null)"
     fi
 }
 
@@ -356,18 +413,13 @@ install_nave()
     fi
     echo "installing nave"
     perr "install_nave"
-    mkdir -p ~/.nave
-    cd ~/.nave
-    local url="http://github.com/isaacs/nave/raw/master/nave.sh"
-    if is_cmd_defined "wget"; then
-        run_cmd "wget ${WGET_FLAG} $url"
-    else
-        run_cmd "curl -fsSL -o nave.sh $url"
-    fi
-    run_cmd "chmod +x ./nave.sh"
-    sudo_cmd "ln -s $PWD/nave.sh /usr/local/bin/nave"
+    run_cmd "mkdir -p ~/.nave"
+    local nave_path="$HOME/.nave/nave.sh"
+    download_script "http://github.com/isaacs/nave/raw/master/nave.sh" \
+        "$nave_path"
+    run_cmd "chmod +x $nave_path"
+    sudo_cmd "ln -s $nave_path /usr/local/bin/nave"
     sudo_cmd "mkdir -p /usr/local/{share/man,bin,lib/node,include/node}"
-    cd -
 }
 
 install_nave_node()
@@ -377,7 +429,7 @@ install_nave_node()
     perr "install_nave_node"
     sudo_cmd "rm -rf ~/.nave/cache/$NODE_VER"
     sudo_cmd "rm -rf /root/.nave/cache/v$NODE_VER"
-    sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
+    retry_sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
     if ! is_cmd_defined "node"; then
         perr "install_error_node"
         echo 'could not install node'
@@ -389,23 +441,12 @@ install_nvm_node()
 {
     echo "installing nvm node $NODE_VER"
     perr "install_nvm_node"
-    nvm install $NODE_VER
-    nvm alias default $NODE_VER
+    run_cmd "nvm install $NODE_VER"
+    run_cmd "nvm alias default $NODE_VER"
 }
 
 install_node()
 {
-    if is_fn_defined "nvm"; then
-        install_nvm_node
-        if [ $? -ne 0 ]; then
-            perr "install_nvm_node_error"
-        else
-            USE_NVM=1
-            return 0
-        fi
-    else
-        perr "install_no_nvm"
-    fi
     install_nave_node
 }
 
@@ -413,7 +454,7 @@ install_npm()
 {
     echo "installing npm"
     perr "install_npm"
-    run_script "https://www.npmjs.com/install.sh"
+    run_script "install_npm" "https://www.npmjs.com/install.sh"
     UPDATE_NPM=1
 }
 
@@ -443,14 +484,16 @@ install_brew()
 {
     echo "installing brew"
     perr "install_brew"
-    run_script "https://raw.githubusercontent.com/Homebrew/install/master/install" "ruby"
+    run_script "install_brew" \
+        "https://raw.githubusercontent.com/Homebrew/install/master/install" \
+        "ruby"
 }
 
 update_npm()
 {
     echo "updating npm to $NPM_VER"
-    perr "install_npm" "$NPM_VER"
-    sudo_cmd "npm install -g npm@$NPM_VER > /dev/null"
+    perr "update_npm" "$NPM_VER"
+    retry_sudo_cmd "npm install -g npm@$NPM_VER > /dev/null"
 }
 
 check_env()
@@ -476,6 +519,7 @@ deps_install()
     if ((INSTALL_CURL)); then
         install_curl
     fi
+    install_shasum
     if ((INSTALL_NODE||UPDATE_NODE)); then
         install_node
     fi
@@ -509,8 +553,8 @@ lpm_clean()
         sudo_cmd "rm -rf $HOME/.npm /root/.npm"
         echo "removing luminati links"
         sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
-        mkdir -p $HOME/.npm/_cacache
-        mkdir -p $HOME/.npm/_logs
+        run_cmd "mkdir -p $HOME/.npm/_cacache"
+        run_cmd "mkdir -p $HOME/.npm/_logs"
     fi
 }
 
@@ -521,11 +565,11 @@ lpm_install()
     lpm_clean
     local cmd="npm install -g --unsafe-perm @luminati-io/luminati-proxy > /dev/null"
     if ((USE_NVM)); then
-        run_cmd "$cmd"
+        retry_cmd "$cmd"
     else
-        sudo_cmd "$cmd"
+        retry_sudo_cmd "$cmd"
     fi
-    if [[ ! $? ]]; then
+    if (($?)); then
         echo "Luminati failed to install from npm"
         perr "install_error_lpm"
         exit $?
@@ -566,9 +610,12 @@ dev_clean()
     if prompt "Remove build essential" n; then
         sys_rm "build-essential"
         sys_rm "base-devel"
+        sys_rm "perl-Digest-SHA"
     fi
     if ((OS_MAC)); then
-        run_script "https://raw.githubusercontent.com/Homebrew/install/master/uninstall" "ruby"
+        run_script "remove_brew" \
+            "https://raw.githubusercontent.com/Homebrew/install/master/uninstall" \
+            "ruby"
     fi
     rm -rf $HOME/.nvm
     if prompt "Remove node and all node modules?" n; then
@@ -612,6 +659,9 @@ on_exit()
         perr "exit_ok" $exit_code
     else
         perr "exit_error" $exit_code
+        if ((NETWORK_ERROR)); then
+            perr "exit_error_network"
+        fi
         perr "exit_error_report" "$LOG"
     fi
     rm $LOGFILE

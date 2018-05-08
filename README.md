@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.94.415/luminati-proxy-manager-v1.94.415-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.94.520/luminati-proxy-manager-v1.94.520-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -197,8 +197,8 @@ Options:
   --race_reqs              Race several requests at once and choose fastest
                                                                         [number]
   --disable_color          Disable colors in log      [boolean] [default: false]
-  --www                    UI/API HTTP port                     [default: 22999]
-  --ws                     UI/API websocket port                [default: 22998]
+  --www                    HTTP port for browser admin UI       [default: 22999]
+  --ws                     websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "/home/maximk/.luminati.json"]
   --database               Database file containing logs and cached values

@@ -115,7 +115,6 @@ const Index = withRouter(class Index extends React.Component {
         setdb.set('head.edit_proxy.form', undefined);
         setdb.set('head.edit_proxy', undefined);
     }
-    componentDidUpdate(){ $('[data-toggle="tooltip"]').tooltip(); }
     delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
     update_loader(){
         this.setState(state=>{
@@ -638,11 +637,15 @@ const Nav = ({disabled, ...props})=>{
         return {key, value: p};
     });
     let {preset} = props.form;
+    const preset_tooltip = preset&&presets[preset].subtitle
+    +(presets[preset].rules&&
+    '<ul>'+presets[preset].rules.map(r=>`<li>${r.label}</li>`).join('')
+    +'</ul>');
     return (
         <div className="nav">
           <Field on_change={update_zone} options={props.zones} tooltip="Zone"
             value={props.form.zone} disabled={disabled}/>
-          <Field on_change={update_preset} tooltip="Preset"
+          <Field on_change={update_preset} tooltip={preset_tooltip}
             options={presets_opt} value={preset} disabled={disabled}/>
         </div>
     );
@@ -651,7 +654,7 @@ const Nav = ({disabled, ...props})=>{
 const Field = ({disabled, tooltip, ...props})=>{
     const options = props.options||[];
     return (
-        <Tooltip title={tooltip}>
+        <Tooltip title={tooltip} placement="bottom">
           <div className="field">
             <select value={props.value} disabled={disabled}
               onChange={e=>props.on_change(e.target.value)}>
@@ -687,6 +690,7 @@ const Tab_btn = props=>{
     }).length;
     const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
     return (
+        <Tooltip title={tabs[props.id].tooltip}>
           <div onClick={()=>props.on_tab_click(props.id)}
             className={btn_class}>
             <Tab_icon id={props.id} changes={changes}
@@ -694,6 +698,7 @@ const Tab_btn = props=>{
             <div className="title">{tabs[props.id].label}</div>
             <div className="arrow"/>
           </div>
+        </Tooltip>
     );
 };
 
@@ -794,11 +799,9 @@ let Section_field = props=>{
     return (
         <div className={classnames('field_row', {disabled, note})}>
           <div className="desc">
-            <span data-toggle="tooltip" data-placement="top"
-              data-container="body"
-              title={tooltip}>
+            <Tooltip title={tooltip}>
               {tabs[tab_id].fields[id].label}
-            </span>
+            </Tooltip>
           </div>
           <div className="field">
             <div className="inline_field">
@@ -1114,7 +1117,8 @@ class Rules_raw extends React.Component {
         const action_types = [
             {key: 'i.e. Retry with new IP', value: ''},
             {key: 'Retry with new IP', value: 'retry'},
-            {key: 'Retry with new port (Waterfall)', value: 'retry_port'},
+            {key: 'Retry with new proxy port (Waterfall)',
+                value: 'retry_port'},
             {key: 'Ban IP', value: 'ban_ip'},
             {key: 'Save IP to reserved pool', value: 'save_to_pool'},
         ];

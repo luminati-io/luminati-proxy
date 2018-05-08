@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.94.520
+
 ## 1.94.415
 - :sparkles: HAR viewer improvements
 

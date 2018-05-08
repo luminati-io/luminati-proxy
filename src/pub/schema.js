@@ -9,8 +9,8 @@ import {Tooltip, get_static_country} from './common.js';
 
 const tooltips = {
     crawler: `Your crawler or bot that systematically browses the web. Connect
-          any type of crawler to the Luminati Proxy Manager:
-          <ul>
+        any type of crawler to the Luminati Proxy Manager:
+        <ul>
           <li>
             <div>Browser and extension based crawlers</div>
             <div class="browser_icon firefox"/>
@@ -25,18 +25,28 @@ const tooltips = {
             <div class="logo_icon import"/>
           </li>
         </ul>`,
-    port_numbers: 'Defined ports in Luminati Proxy Manager',
-    lpm: 'Luminati Proxy Manager - open-source proxy service that holds '
-        +'valuble features, such as: IP rotation control, auto retry, speed '
-        +'optimization, auto blacklist of bad IPs, powerful debugging options '
-        +' and more. View full list of features by clicking any port in the'
-        +'Proxies table',
-    super_proxy: 'Load balancing servers, that manage the traffic between the '
-        +'Luminati Proxy Manager and the peer',
-    peer: 'Exit node (IP) - This might be a residential IP provided through '
-        +'cable modem, DSL or wireless router | Datacetner IP (static) | '
-        +'Mobile IP based on a 3G or 4G cellular network',
-    destination: 'The target website that the crawler is collcting data from',
+    port_numbers: `Defined proxy ports in Luminati Proxy Manager`,
+    lpm: `Luminati Proxy Manager - open-source proxy service that holds
+        valuble features, such as:
+        <ul>
+          <li>IP rotation control</li>
+          <li>auto retry</li>
+          <li>speed optimization</li>
+          <li>auto blacklist of bad IPs</li>
+          <li>powerful debugging options</li>
+        </ul>
+        and more. View full list of features by clicking any proxy port in
+        the <strong>Proxies</strong> table`,
+    super_proxy: `Load balancing servers, that manage the traffic between the
+        Luminati Proxy Manager and the peer`,
+    peer: `Exit node (IP) - This might be:
+        <ul>
+          <li>Residential IP - provided through cable modem, DSL or wireless
+            router</li>
+          <li>Datacetner IP (static)</li>
+          <li>Mobile IP - based on a 3G or 4G cellular network</li>
+        </ul>`,
+    destination: `The target website that the crawler is collcting data from`,
 };
 
 class Schema extends Pure_component {
@@ -67,15 +77,18 @@ class Schema extends Pure_component {
               <Layer id="crawler" no_arr>
                 Crawler
               </Layer>
-              <Port_layer proxies={this.state.proxies} form={this.state.form}/>
+              <Proxy_port_layer proxies={this.state.proxies}
+                form={this.state.form}/>
               <Layer id="lpm" class_names="port active">
                 <div className="icon"/>
                 LPM
               </Layer>
+              <Layer no_btn id="port_numbers">Port 22225</Layer>
               <Layer id="super_proxy">
                 <span className="flag-icon flag-icon-us"/>
                 Super Proxy
               </Layer>
+              <Layer no_btn id="port_numbers">Port 80, 443</Layer>
               <Layer id="peer">
                 <Peer proxies={this.state.proxies} form={this.state.form}/>
                 Peer
@@ -86,16 +99,19 @@ class Schema extends Pure_component {
     }
 }
 
-const Port_layer = ({proxies, form})=>{
+const Proxy_port_layer = ({proxies, form})=>{
     let label;
     if (form.port)
-        label = 'Port '+form.port;
+        label = 'Proxy port '+form.port;
     else if (!proxies.length)
-        label = 'Port';
+        label = 'Proxy port';
     else if (proxies.length==1)
-        label = 'Port '+proxies[0].port;
+        label = 'Proxy port '+proxies[0].port;
     else
-        label = 'Port '+proxies[0].port+' - '+proxies[proxies.length-1].port;
+    {
+        label = 'Proxy port '+proxies[0].port+' - '
+        +proxies[proxies.length-1].port;
+    }
     return <Layer no_btn id="port_numbers">{label}</Layer>;
 };
 

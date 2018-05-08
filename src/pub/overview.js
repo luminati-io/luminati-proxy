@@ -20,7 +20,7 @@ class Overview extends Pure_component {
     render(){
         const master_port = this.props.match.params.master_port;
         const title = master_port ?
-            `Overview of multiplied port - ${master_port}` : 'Overview';
+            `Overview of multiplied proxy port - ${master_port}` : 'Overview';
         return (
             <div className="overview_page lpm">
               <Upgrade/>

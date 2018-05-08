@@ -200,7 +200,7 @@ export const tabs = {
             whitelist_ips: {
                 label: 'Whitelist IP access',
                 tooltip: `Grant proxy access to specific IPs. only those
-                    IPs will be able to send requests to this proxy Port`,
+                    IPs will be able to send requests to this proxy port`,
                 placeholder: `e.g. 1.1.1.1,23.23.23.23`,
                 ext: true,
             },
@@ -272,7 +272,7 @@ export const tabs = {
         tooltip: '',
         fields: {
             port: {
-                label: 'Port',
+                label: 'Proxy port',
                 tooltip: `The port number that will be used for the current
                     proxy configuration`,
                 ext: true,
@@ -289,24 +289,24 @@ export const tabs = {
                 ext: true,
             },
             multiply: {
-                label: 'Multiply port',
-                tooltip: `Create multiple identical ports`,
+                label: 'Multiply proxy port',
+                tooltip: `Create multiple identical porxy ports`,
                 ext: true,
             },
             multiply_ips: {
-                label: 'Multiply port per IP',
+                label: 'Multiply proxy port per IP',
                 tooltip: `Create proxy port for every selected IP from the
                     pool`
             },
             multiply_vips: {
-                label: 'Multiply port per gIP',
+                label: 'Multiply proxy port per gIP',
                 tooltip: `Create proxy port for every selected gIP from pool
                     of available gIPS in your zone`
             },
             socks: {
                 label: 'SOCKS 5 port',
-                tooltip: `In addition to current port, creates a separate port
-                    with a SOCKS5 server (add SOCKS port number)`,
+                tooltip: `In addition to current proxy port, creates a separate
+                    port with a SOCKS5 server (add SOCKS port number)`,
                 ext: true,
             },
             secure_proxy: {

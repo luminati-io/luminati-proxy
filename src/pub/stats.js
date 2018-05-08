@@ -11,6 +11,7 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
 import {withRouter} from 'react-router-dom';
+import classnames from 'classnames';
 
 class Success_ratio extends Pure_component {
     render (){
@@ -105,6 +106,7 @@ const Enable_ssl_modal = ({enable_ssl})=>(
 );
 
 const Protocol_table = ({stats, enable_ssl_click})=>{
+    stats.protocol&&stats.protocol.sort((a, b)=>a.key>b.key);
     return (
         <Stat_table stats={stats} row_key="protocol" logs="protocol"
           title="Protocol" enable_ssl_click={enable_ssl_click}/>
@@ -124,21 +126,31 @@ const Row = withRouter(class Row extends Pure_component {
     };
     render(){
         const {stat, row_key} = this.props;
-        return (
-            <tr onClick={this.click}>
-              <Key_cell title={stat.key} enable={stat.enable}
-                warning={stat.warning}
-                enable_click={this.props.enable_ssl_click}/>
+        return [
+            <tr onClick={this.click} key="1">
+              <Key_cell title={stat.key} warning={stat.warning}/>
               <td>{util.bytes_format(stat.out_bw)||'—'}</td>
               <td>{util.bytes_format(stat.in_bw)||'—'}</td>
               <td className="reqs">{stat.reqs||'—'}</td>
-            </tr>
-        );
+            </tr>,
+            stat.enable ?
+              <tr key="2">
+                <td colSpan="4" onClick={this.props.enable_ssl_click}>
+                  <a className="link enable_https">
+                    <Tooltip
+                      title="Enable HTTPS analyzing for all your proxies">
+                      Enable HTTPS request logging and debugging
+                    </Tooltip>
+                  </a>
+                </td>
+              </tr> : null
+            ,
+        ].filter(Boolean);
     }
 });
 
-const Key_cell = ({title, enable, warning, enable_click})=>{
-    const warning_tooltip = `Some of your ports don't have SSL analyzing
+const Key_cell = ({title, warning})=>{
+    const warning_tooltip = `Some of your proxy ports don't have SSL analyzing
         enabled and there are connections on HTTPS protocol detected`;
     return (
         <td>
@@ -147,9 +159,6 @@ const Key_cell = ({title, enable, warning, enable_click})=>{
             <Tooltip title={warning_tooltip}>
               <div className="ic_warning"/>
             </Tooltip>
-          </If>
-          <If when={enable}>
-            <a className="link enable_ssl" onClick={enable_click}>enable</a>
           </If>
         </td>
     );
@@ -161,7 +170,7 @@ const Stat_table = ({title, stats, row_key, logs, enable_ssl_click})=>
     stats = stats[row_key]&&stats[row_key].slice(0, 5)||[];
     return (
         <div className="stat_table_wrapper">
-          <div className="stat_table">
+          <div className={classnames('stat_table', row_key)}>
             {show_more && <small><a href="/logs">show all</a></small>}
             <table className="table table-condensed table-hover">
               <thead>

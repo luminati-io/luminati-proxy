@@ -180,8 +180,8 @@ const Toolbar = ({clear, search_val, on_change_search, type_filter,
     </div>
 );
 
-const Toolbar_button = ({id, tooltip, on_click, tooltip_placement})=>(
-    <H_tooltip title={tooltip} placement={tooltip_placement||'top'}>
+const Toolbar_button = ({id, tooltip, on_click})=>(
+    <H_tooltip title={tooltip} placement={'bottom'}>
       <div className={classnames('toolbar_item toolbar_button', id)}
         onClick={on_click}>
         <span className={id}/>
@@ -201,7 +201,7 @@ class Filters extends Pure_component {
             return null;
         const filters = [
             {name: 'port', default_value: this.props.master_port ?
-                `Multiplied ${this.props.master_port}` : 'All ports'},
+                `Multiplied ${this.props.master_port}` : 'All proxy ports'},
             {name: 'status_code', default_value: 'All status codes'},
             {name: 'protocol', default_value: 'All protocols'},
         ];
@@ -231,21 +231,27 @@ const Filter = ({vals, val, set, default_value})=>(
     </div>
 );
 
-const type_filters = ['XHR', 'JS', 'CSS', 'Img', 'Media', 'Font', 'Other'];
+const type_filters = [{name: 'XHR', tooltip: 'XHR and fetch'},
+    {name: 'JS', tooltip: 'Scripts'}, {name: 'CSS', tooltip: 'Stylesheets'},
+    {name: 'Img', tooltip: 'Images'}, {name: 'Media', tooltip: 'Media'},
+    {name: 'Font', tooltip: 'Fonts'}, {name: 'Other', tooltip: 'Other'}];
 const Type_filters = ({filter, set})=>(
     <div className="filters">
-      <Type_filter name="All" on_click={set.bind(null, 'All')} cur={filter}/>
+      <Type_filter name="All" on_click={set.bind(null, 'All')} cur={filter}
+        tooltip="All types"/>
       <Devider/>
       {type_filters.map(f=>(
-        <Type_filter on_click={set.bind(null, f)} key={f} name={f}
-          cur={filter}/>
+        <Type_filter on_click={set.bind(null, f.name)} key={f.name}
+          name={f.name} cur={filter} tooltip={f.tooltip}/>
       ))}
     </div>
 );
 
-const Type_filter = ({name, cur, on_click})=>(
-    <div className={classnames('filter', {active: cur==name})}
-      onClick={on_click}>{name}</div>
+const Type_filter = ({name, cur, tooltip, on_click})=>(
+    <H_tooltip title={tooltip} placement="bottom">
+      <div className={classnames('filter', {active: cur==name})}
+        onClick={on_click}>{name}</div>
+    </H_tooltip>
 );
 
 const Devider = ()=>(
@@ -278,7 +284,7 @@ class Network_container extends Pure_component {
     loaded = {from: 0, to: 0};
     cols = [
         {title: 'Name', sort_by: 'url', data: 'request.url'},
-        {title: 'Port', sort_by: 'port', data: 'details.port'},
+        {title: 'Proxy port', sort_by: 'port', data: 'details.port'},
         {title: 'Status', sort_by: 'status_code', data: 'response.status'},
         {title: 'Bandwidth', sort_by: 'bw', data: 'details.bw'},
         {title: 'Time', sort_by: 'elapsed', data: 'time'},
@@ -726,6 +732,7 @@ class Data_row extends React.Component {
         const classes = classnames({
             selected,
             focused: selected&&focused,
+            error: !req.details.success,
         });
         return (
             <tr className={classes}>
@@ -760,7 +767,7 @@ const Cell_value = ({col, req})=>{
             </H_tooltip>
         );
     }
-    else if (col=='Port')
+    else if (col=='Proxy port')
         return <Tooltip_and_value val={req.details.port}/>;
     else if (col=='Bandwidth')
         return <Tooltip_and_value val={util.bytes_format(req.details.bw)}/>;
@@ -920,14 +927,26 @@ class Preview_section extends Pure_component {
 }
 
 const Header_pair = ({name, value})=>{
-    if (name=='Status Code'&&value=='200')
-        value = <div className="status_wrapper">
-            <div className="small_icon green_status"/>{value}</div>;
+    if (name=='Status Code')
+        value = <Status_value value={value}/>;
     return (
         <li className="treeitem">
           <div className="header_name">{name}: </div>
           <div className="header_value">{value}</div>
         </li>
+    );
+};
+
+const Status_value = ({value})=>{
+    const green = /2../.test(value);
+    const yellow = /3../.test(value);
+    const red = !(green||yellow);
+    const classes = classnames('small_icon', 'status', {
+        green, yellow, red});
+    return (
+        <div className="status_wrapper">
+          <div className={classes}/>{value}
+        </div>
     );
 };
 

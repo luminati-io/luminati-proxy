@@ -197,7 +197,7 @@ const Request_params = ({params, update, proxies})=>{
 };
 
 const Field = ({type, update, name, params, ...props})=>{
-    const fields = {proxy: 'Proxy', url: 'URL', method: 'Method'};
+    const fields = {proxy: 'Proxy port', url: 'URL', method: 'Method'};
     const on_change_wrapper = val=>{
         if (name!='url')
             ga_event('proxy-tester-tab', 'edit '+name);

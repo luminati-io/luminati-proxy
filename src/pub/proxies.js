@@ -113,9 +113,9 @@ const Port_cell = ({proxy, master_port})=>{
         val = proxy.port+':1..'+proxy.multiply;
     else
         val = proxy.port;
-    const title = `${proxy.port} is a port that refers to a specific virtual
-        location on a computer. You can use it as a virtual proxy to sends
-        requests`;
+    const title = `${proxy.port} is a proxy port that refers to a specific
+        virtual location on a computer. You can use it as a virtual proxy to
+        sends requests`;
     return <Tooltip title={title}>{val}</Tooltip>;
 };
 
@@ -129,11 +129,11 @@ const Success_rate_cell = ({proxy})=>{
 const columns = [
     {
         key: 'port',
-        title: 'Port',
+        title: 'Proxy port',
         sticky: true,
         render: Port_cell,
-        tooltip: 'A port is a number that refers to a specific virtual '
-            +'location on a computer. Create and configure ports, then '
+        tooltip: 'A proxy port is a number that refers to a specific virtual '
+            +'location on a computer. Create and configure proxy ports, then '
             +'connect the crawler to send requests through the port',
         ext: true,
         dynamic: true,
@@ -169,8 +169,8 @@ const columns = [
         key: 'multiply',
         title: 'Multiple',
         type: 'number',
-        tooltip: 'Number of multiplied ports. A port can be multiplied '
-            +'in the proxy configuration page',
+        tooltip: 'Number of multiplied proxy ports. A proxy port can be '
+            +'multiplied in the proxy configuration page',
         ext: true,
     },
     {
@@ -393,7 +393,7 @@ const columns = [
         sticky: true,
         render: ({proxy})=>proxy.reqs||'0',
         ext: true,
-        tooltip: 'Number of all requests sent from this port',
+        tooltip: 'Number of all requests sent from this proxy port',
         dynamic: true,
     },
     {
@@ -402,7 +402,7 @@ const columns = [
         sticky: true,
         render: Last_req_cell,
         ext: true,
-        tooltip: 'Last request that was sent on this port',
+        tooltip: 'Last request that was sent on this proxy port',
         dynamic: true,
     },
 ];
@@ -711,8 +711,8 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
       cur_page={cur_page} page_change={page_change} top={top} bottom={bottom}
       update_items_per_page={update_items_per_page}>
         <Link_icon tooltip="Edit columns" on_click={edit_columns} id="filter"/>
-        <Link_icon tooltip="Download all ports as CSV" on_click={download_csv}
-          id="download"/>
+        <Link_icon tooltip="Download all proxy ports as CSV"
+          on_click={download_csv} id="download"/>
     </Pagination_panel>
 );
 
@@ -847,7 +847,7 @@ class Actions extends Pure_component {
     }
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
-        const delete_title = `Are you sure you want to delete port
+        const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
         return (
             <td className="proxies_actions">
@@ -855,7 +855,7 @@ class Actions extends Pure_component {
                 on_click={this.open_delete_dialog.bind(this)}
                 tooltip="Delete" invisible={!persist}/>
               <Action_icon id="duplicate" on_click={this.duplicate.bind(this)}
-                tooltip="Duplicate Proxy"
+                tooltip="Duplicate proxy port"
                 invisible={!persist}/>
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions.bind(this)}
