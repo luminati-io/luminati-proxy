@@ -1272,7 +1272,7 @@ class Alloc_modal extends Pure_component {
         setdb.set('head.edit_proxy.loading', loading);
         this.setState({loading});
     }
-    checked(row){ return this.props.form[this.props.type].includes(row); }
+    checked = row=>(this.props.form[this.props.type]||[]).includes(row);
     reset(){
         this.props.on_change_field(this.props.type, []);
         this.props.on_change_field('pool_size', '');

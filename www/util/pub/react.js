@@ -261,7 +261,7 @@ class Nav_hook extends Pure_component {
         let m;
         for (let key in sitemap)
         {
-            if (!match.match(key, pathname, {glob: 1}))
+            if (!match.match(key, pathname.toLowerCase(), {glob: 1}))
                 continue;
             m = sitemap[key];
             break;
@@ -295,18 +295,24 @@ class Nav_hook extends Pure_component {
 }
 E.Nav_hook = RouterDOM.withRouter(Nav_hook);
 
+// XXX viktor: wrap_in_div is ugly but it is needed to attach mouse event to
+// XXX viktor: since most of the React components swallow events
 const Tooltip = props=>{
-    const {tip, children} = props;
+    const {tip} = props;
     if(!tip)
         return props.children;
     const is_react_child =
-        typeof React.Children.only(children).type == 'function';
+        typeof React.Children.only(props.children).type == 'function';
     const tooltip = <RB.Tooltip id="tooltip" {...props.tooltip_props}>
       {tip}</RB.Tooltip>;
+    let children = props.children;
+    if (props.wrap_in_div)
+        children = <div>{children}</div>;
+    else if (is_react_child)
+        children = <span style={{display: 'inline-block'}}>{children}</span>;
     return <RB.OverlayTrigger placement={props.placement||'top'}
-        overlay={tooltip}>
-        {!is_react_child ? children
-          : <span style={{display: 'inline-block'}}>{children}</span>}
+          overlay={tooltip}>
+          {children}
         </RB.OverlayTrigger>;
 };
 E.Tooltip = Tooltip;

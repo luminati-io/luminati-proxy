@@ -31,7 +31,7 @@ class Har_viewer extends Pure_component {
     min_width = 50;
     state = {
         cur_preview: null,
-        network_width: 200,
+        tables_width: 200,
         search: this.props.domain||'',
         type_filter: 'All',
         filters: {
@@ -62,7 +62,7 @@ class Har_viewer extends Pure_component {
         this.moving_width = true;
         $(this.main_panel).addClass('moving');
         this.start_offset = e.pageX;
-        this.start_width = this.state.network_width;
+        this.start_width = this.state.tables_width;
     };
     on_resize_width = e=>{
         const offset = e.pageX-this.start_offset;
@@ -72,7 +72,7 @@ class Har_viewer extends Pure_component {
         const max_width = this.main_panel.offsetWidth-this.min_width;
         if (new_width>max_width)
             new_width = max_width;
-        this.setState({network_width: new_width});
+        this.setState({tables_width: new_width});
     };
     on_mouse_move = e=>{
         if (this.moving_width)
@@ -116,9 +116,9 @@ class Har_viewer extends Pure_component {
         if (!this.state.proxies)
             return null;
         const preview_style = {
-            maxWidth: `calc(100% - ${this.state.network_width}px`};
+            maxWidth: `calc(100% - ${this.state.tables_width}px`};
         return (
-            <div id="har_viewer" className="har_viewer panel_style">
+            <div id="har_viewer" className="har_viewer chrome">
               <div className="main_panel vbox"
                 ref={this.set_main_panel_ref}>
                 <Toolbar
@@ -134,14 +134,14 @@ class Har_viewer extends Pure_component {
                   on_change_search={this.on_change_search}
                   search_val={this.state.search}/>
                 <div className="split_widget vbox flex_auto">
-                  <Network_container
+                  <Tables_container
                     key={''+this.props.master_port}
                     master_port={this.props.master_port}
                     main_panel_moving={this.main_panel_moving}
                     main_panel_stopped_moving={this.main_panel_stopped_moving}
                     main_panel={this.main_panel}
                     open_preview={this.open_preview}
-                    width={this.state.network_width}
+                    width={this.state.tables_width}
                     search={this.state.search}
                     type_filter={this.state.type_filter}
                     filters={this.state.filters}
@@ -149,9 +149,9 @@ class Har_viewer extends Pure_component {
                   <Preview cur_preview={this.state.cur_preview}
                     style={preview_style}
                     close_preview={this.close_preview}/>
-                  <Network_resizer show={!!this.state.cur_preview}
+                  <Tables_resizer show={!!this.state.cur_preview}
                     start_moving={this.start_moving_width}
-                    offset={this.state.network_width}/>
+                    offset={this.state.tables_width}/>
                 </div>
               </div>
             </div>
@@ -267,7 +267,7 @@ const Search_box = ({val, on_change})=>(
     </div>
 );
 
-const Network_resizer = ({show, offset, start_moving})=>{
+const Tables_resizer = ({show, offset, start_moving})=>{
     if (!show)
         return null;
     return (
@@ -276,7 +276,7 @@ const Network_resizer = ({show, offset, start_moving})=>{
     );
 };
 
-class Network_container extends Pure_component {
+class Tables_container extends Pure_component {
     moving_col = null;
     min_width = 22;
     uri = '/api/logs';
@@ -479,7 +479,8 @@ class Network_container extends Pure_component {
         this.props.main_panel_stopped_moving();
     };
     resize_columns = ()=>{
-        const total_width = this.network_container.offsetWidth;
+        const total_width = (this.props.main_panel||this.tables_container)
+        .offsetWidth;
         const width = total_width/this.cols.length;
         const cols = this.cols.map((c, idx)=>({...c, width,
             offset: width*idx}));
@@ -527,7 +528,7 @@ class Network_container extends Pure_component {
             return {cols};
         });
     };
-    set_network_ref = ref=>{ this.network_container = ref; };
+    set_tables_ref = ref=>{ this.tables_container = ref; };
     render(){
         const style = {};
         if (!!this.props.cur_preview)
@@ -537,12 +538,12 @@ class Network_container extends Pure_component {
             style.maxWidth = this.props.width;
         }
         return (
-            <div className="network_container vbox"
+            <div className="tables_container vbox"
               tabIndex="-1"
               style={style}
               onFocus={this.on_focus}
               onBlur={this.on_blur}
-              ref={this.set_network_ref}>
+              ref={this.set_tables_ref}>
               <div className="reqs_container">
                 <Header_container cols={this.state.cols}
                   sort={this.set_sort}
@@ -558,14 +559,14 @@ class Network_container extends Pure_component {
                   show={!this.props.cur_preview}
                   start_moving={this.start_moving}/>
               </div>
-              <Network_summary_bar stats={this.state.stats}
+              <Summary_bar stats={this.state.stats}
                 sub_stats={this.state.sub_stats}/>
             </div>
         );
     }
 }
 
-class Network_summary_bar extends Pure_component {
+class Summary_bar extends Pure_component {
     render(){
         let {total, sum_in, sum_out} = this.props.stats||
             {total: 0, sum_in: 0, sum_out: 0};
@@ -585,7 +586,7 @@ class Network_summary_bar extends Pure_component {
             ${sum_out} sent | ${sub_sum_in} / ${sum_in} received`;
         }
         return (
-            <div className="network_summary_bar">
+            <div className="summary_bar">
               <span>
                 <H_tooltip title={text}>{text}</H_tooltip>
               </span>

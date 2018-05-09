@@ -1,5 +1,9 @@
  Luminati Proxy manager - Change Log
 
+## 1.94.794
+- :bug: fixed debug log info
+- :bug: fixed targeting for certain cities
+
 ## 1.94.520
 
 ## 1.94.415

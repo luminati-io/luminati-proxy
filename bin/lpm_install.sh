@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.94.520"
+VERSION="1.94.794"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -225,7 +225,7 @@ download_script()
 
 run_script()
 {
-    local name=$1 url=$2 lang=$2
+    local name=$1 url=$2 lang=$3
     if [ -z "$lang" ]; then
         lang="sh"
     fi
@@ -476,8 +476,10 @@ install_build_tools()
 {
     echo "installing build tools"
     perr "install_build_tools"
-    sys_install "build-essential"
-    sys_install "base-devel"
+    if ((!OS_MAC)); then
+        sys_install "build-essential"
+        sys_install "base-devel"
+    fi
 }
 
 install_brew()

@@ -30,7 +30,7 @@ const set_curr_lang = lang=>{
 const get_translation = (translation, key)=>{
     if (!translation || !key)
         return key;
-    if (!translation[key])
+    if (!translation[key]&&!mute_logging)
         console.info('Missing translation for: "'+key+'"');
     return translation[key]||key;
 };
@@ -68,6 +68,8 @@ class T extends Pure_component {
     }
 }
 const E = {T, t, init, set_curr_lang};
+let mute_logging = false; // for development
+E.mute_logging = ()=>mute_logging = true;
 return E;
 
 });

@@ -31,6 +31,7 @@ const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const analytics = require('universal-analytics');
 const ua = analytics('UA-60520689-2');
+const assign = Object.assign;
 
 ua.set('an', 'LPM-electron');
 ua.set('av', `v${version}`);
@@ -167,6 +168,7 @@ let run = run_config=>{
             ua.event('manager', 'stop', ()=>process.exit());
     })
     .on('error', (e, fatal)=>{
+        let e_msg = e.raw ? e.message : 'Unhandled error: '+e;
         let handle_fatal = ()=>{
             let err;
             if (err = (e.message||'').match(/((?:\d{1,3}\.?){4}):(\d+)$/))
@@ -174,19 +176,20 @@ let run = run_config=>{
             if (fatal)
             {
                 if (manager&&manager._log)
-                {
-                    manager._log.error(e.raw ? e.message :
-                        'Unhandled error: '+e, e);
-                }
+                    manager._log.error(e_msg, e);
                 else
-                    console.log(e.raw ? e.message : 'Unhandled error: '+e);
+                    console.log(e_msg);
                 process.exit();
             }
         };
         if (manager.argv.no_usage_stats)
             handle_fatal();
         else
+        {
+            if (e.raw)
+                e = assign({message: e.message}, e);
             ua.event('manager', 'error', JSON.stringify(e), handle_fatal);
+        }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         if (!manager.argv.no_usage_stats)
