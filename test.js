@@ -772,7 +772,7 @@ describe('proxy', ()=>{
                 {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
-                    {state: 'ny', city: 'new_york'});
+                    {state: 'ny', city: 'newyork'});
                 t('short',
                     {state: 'NY', city: 'New York', short_username: true},
                     {state: 'ny', city: 'newyork'});
@@ -2184,7 +2184,7 @@ describe('lpm_proxy', ()=>{
                 {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
-                    {state: 'ny', city: 'new_york'});
+                    {state: 'ny', city: 'newyork'});
                 t('short',
                     {state: 'NY', city: 'New York', short_username: true},
                     {state: 'ny', city: 'newyork'});

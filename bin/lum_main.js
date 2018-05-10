@@ -26,7 +26,8 @@ const gen_filename = name=>{
         `.luminati_${name}.json`.substr(is_win ? 1 : 0));
 };
 
-E.ua_event = (...args)=>{
+let prev_ua_event = ua.event.bind(ua);
+let ua_event_wrapper = (...args)=>{
     let send = true, hash;
     if (!E.last_ev)
     {
@@ -73,7 +74,7 @@ E.ua_event = (...args)=>{
             customer_name: E.manager&&E.manager._defaults
                 &&E.manager._defaults.customer,
         });
-        E.ua_event(params, (..._args)=>{
+        prev_ua_event(params, (..._args)=>{
             if (_.isFunction(cb))
                 cb.apply(null, _args);
         });
@@ -261,11 +262,10 @@ E.init_ua = ()=>{
     ua.set('av', `v${version}`);
     E.ua_filename = gen_filename('ua_ev');
     E.last_ev = null;
-    E.ua_event = ua.event.bind(ua);
-    ua.event = E.ua_event;
+    ua.event = ua_event_wrapper;
 };
 
-E.uninit_ua = ()=>{};
+E.uninit_ua = ()=>ua.event = prev_ua_event;
 
 E.init_status = ()=>{
     E.status_filename = gen_filename('status');
