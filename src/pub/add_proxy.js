@@ -6,13 +6,11 @@ import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, Textarea, Input, presets} from './common.js';
-import util from './util.js';
+import {Modal, Loader, Textarea, Input} from './common.js';
+import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import {withRouter} from 'react-router-dom';
-
-const ga_event = util.ga_event;
 
 const Add_proxy = withRouter(class Add_proxy extends Pure_component {
     constructor(props){

@@ -1,3 +1,4 @@
+Caption "${PRODUCT_NAME} ${VERSION} Setup"
 !define StrRep "!insertmacro StrRep"
 !macro StrRep output string old new
     Push `${string}`

@@ -11,9 +11,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
-import util from './util.js';
-
-const ga_event = util.ga_event;
+import {ga_event} from './util.js';
 
 class Config extends Pure_component {
     constructor(props){

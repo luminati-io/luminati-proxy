@@ -1,9 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
-import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
-import angular from 'angular';
 import _ from 'lodash';
 import setdb from 'hutil/util/setdb';
 import ajax from 'hutil/util/ajax';
@@ -20,14 +18,10 @@ import ReactDOM from 'react-dom';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
 import $ from 'jquery';
 import 'jquery';
-import 'angular-sanitize';
 import 'bootstrap';
 import 'bootstrap-datepicker';
 import './app.less';
-import 'angular-ui-bootstrap';
 import 'es6-shim';
-import 'angular-google-analytics';
-import 'ui-select';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
 window.setdb = setdb;
@@ -52,7 +46,7 @@ const App = withRouter(class App extends Pure_component {
         });
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/last_version'});
-            setdb.set('head.ver_last', version.data);
+            setdb.set('head.ver_last', version);
         });
         this.etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});

@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.94.794"
+VERSION="1.95.360"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -293,7 +293,6 @@ sys_install()
         fi
         retry_sudo_cmd "${pkg_mng} ${pkg}"
     fi
-    retry_sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
 }
 
 install_shasum(){
@@ -387,7 +386,7 @@ check_npm()
         perr "check_no_npm"
     else
         local npm_ver=$(npm -v)
-        if [[ "$npm_ver" =~ ^([3,5-9]\.|[1-9][0-9]+\.) ]]; then
+        if [[ "$npm_ver" =~ ^([3,7-9]\.|[1-9][0-9]+\.) ]]; then
             UPDATE_NPM=1
             perr "check_npm_bad_version" "$npm_ver"
         fi
@@ -474,9 +473,9 @@ install_curl()
 
 install_build_tools()
 {
-    echo "installing build tools"
-    perr "install_build_tools"
-    if ((!OS_MAC)); then
+    if ((!OS_MAC)) && is_cmd_defined "apt-get"; then
+        echo "installing build tools"
+        perr "install_build_tools"
         sys_install "build-essential"
         sys_install "base-devel"
     fi

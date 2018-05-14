@@ -8,10 +8,7 @@ const version = require('./package.json').version;
 let is_electron = process.versions && !!process.versions.electron;
 
 if (!is_electron)
-{
-    module.exports = {Luminati, Manager, version};
-    return;
-}
+    return void (module.exports = {Luminati, Manager, version});
 
 Manager.default.disable_color = Luminati.default.disable_color = true;
 
@@ -20,16 +17,16 @@ const app = electron.app, dialog = electron.dialog;
 const opn = require('opn');
 let _info_bkp = console.info;
 console.info = function(){};
-const autoUpdater = require('electron-updater').autoUpdater;
+const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
 const BrowserWindow = electron.BrowserWindow;
-const Notification = electron.Notification;
 const hutil = require('hutil');
 const etask = hutil.etask;
 const zerr = hutil.zerr;
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const analytics = require('universal-analytics');
+const child_process = require('child_process');
 const ua = analytics('UA-60520689-2');
 const assign = Object.assign;
 
@@ -38,112 +35,129 @@ ua.set('av', `v${version}`);
 
 let manager, args = process.argv.slice(2), wnd, upgrade_available, can_upgrade;
 
-const upgrade = v=>{
-    const run_upgrade_now = ()=>{
-        console.log('Starting upgrade');
-        return autoUpdater.quitAndInstall();
-    };
-    if (can_upgrade)
-        return run_upgrade_now();
-    dialog.showMessageBox({
-        type: 'info',
-        title: 'Luminati update',
-        message: (v ? `Luminati version ${v}` : 'Luminati update')
-        +' will be installed on exit',
-        buttons: ['Install on exit', 'Install now'],
-    }, (res)=>{
-        if (res==1)
-            return run_upgrade_now();
-        console.log('Update postponed until exit');
-    });
-
-};
-autoUpdater.allowDowngrade = true;
-autoUpdater.autoDownload = false;
-autoUpdater.on('update-available', e=>{
-    console.log(`Update version ${e.version} is available`);
-    const download_upgrade_now = ()=>{
-        console.log('Downloading upgrade');
-        return autoUpdater.downloadUpdate();
-    };
-    if (can_upgrade)
-        return download_upgrade_now();
-    dialog.showMessageBox({
-        type: 'info',
-        title: `Luminati update ${e.version} is available`,
-        message: 'Luminati version '+e.version
-        +' is available, would you like to download it?',
-        buttons: ['No', 'Yes'],
-    }, (res)=>{
-        if (res==1)
-            return download_upgrade_now();
-        console.log('Will not download update');
-    });
+let show_message = opt=>etask(function*(){
+    let [res] = yield etask.cb_apply({ret_a: true}, dialog, '.showMessageBox',
+        [opt]);
+    return res;
 });
-autoUpdater.on('update-downloaded', e=>{
+
+let mgr_err = msg=>{
+    if (manager&&manager._log)
+        manager._log.error(msg);
+    else
+        console.log(msg);
+};
+// saves stdio (unlike app.relaunch)
+let restart = ()=>{
+    let child = child_process.spawn(process.execPath, process.argv.slice(1),
+        {detached: true, stdio: ['inherit', 'inherit', 'inherit', 'ipc']});
+    // wait until child re-open stdio
+    child.on('message', msg=>{
+        if (!msg || msg.cmd!='lpm_restart_init')
+            return;
+        child.unref();
+        app.quit();
+    });
+};
+
+let upgrade = ver=>etask(function*(){
+    if (!can_upgrade)
+    {
+        let res = yield show_message({type: 'info', title: 'Luminati update',
+            message: (ver ? `Luminati version ${ver}` : 'Luminati update')
+            +' will be installed on exit',
+            buttons: ['Install on exit', 'Install now']});
+        if (!res)
+            return void console.log('Update postponed until exit');
+    }
+    console.log('Starting upgrade');
+    auto_updater.quitAndInstall();
+});
+
+auto_updater.allowDowngrade = true;
+auto_updater.autoDownload = false;
+auto_updater.on('error', ()=>{});
+
+auto_updater.on('update-available', e=>etask(function*(){
+    console.log(`Update version ${e.version} is available`);
+    if (!can_upgrade)
+    {
+        let res = yield show_message({type: 'info',
+            title: `Luminati update ${e.version} is available`,
+            message: 'Luminati version '+e.version
+            +' is available, would you like to download it?',
+            buttons: ['No', 'Yes']});
+        if (!res)
+            return void console.log('Will not download update');
+    }
+    console.log(`Downloading version ${e.version}`);
+    auto_updater.downloadUpdate();
+}));
+
+auto_updater.on('update-downloaded', e=>{
     console.log('Update downloaded');
     if (manager && manager.argv && !manager.argv.no_usage_stats)
         ua.event('app', 'update-downloaded');
     upgrade_available = true;
     upgrade(e.version);
 });
-autoUpdater.on('error', ()=>{});
 
-let dialog_shown;
-const show_port_conflict = (addr, port)=>{
-    if (dialog_shown)
-        return;
-    dialog_shown = true;
-    const restart = ()=>{
-        app.relaunch({args: process.argv.slice(1)});
-        app.exit();
-    };
-    const show = tasks=>{
-        let res = dialog.showMessageBox({
+let _show_port_conflict = (addr, port)=>etask(function*(){
+    let tasks;
+    try { tasks = yield tasklist(); }
+    catch(e){ process.exit(); }
+    tasks = tasks.filter(t=>t.imageName.includes('Luminati Proxy Manager') &&
+        t.pid!=process.pid);
+    let res = dialog.showMessageBox({
+        type: 'warning',
+        title: 'Address in use',
+        message: `There is already an application running on ${addr}:${port}\n`
+            +(tasks.length ? 'Click OK button to try stopping the '
+            +'offending processes or Cancel to close Luminati Proxy '
+            +'Manager and stop other instances manually.\n\n'
+            +'Suspected processes:\n'
+            +'PID\t Image Name\t Session Name\t Mem Usage\n'
+            +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
+                +`${t.memUsage}`).join('\n') :
+            'Stop other running instances manually then click OK button '
+            +'to restart Luminati Proxy Manager.'),
+        buttons: ['Ok', 'Cancel'],
+    });
+    if (res)
+        return app.exit();
+    try {
+        if (tasks.length)
+            yield taskkill(tasks.map(t=>t.pid), {tree: true, force: true});
+    } catch(e){
+        dialog.showMessageBox({
             type: 'warning',
-            title: 'Address in use',
-            message: `There is already an application running on ${addr}:`
-                +`${port}\n`
-                +(tasks.length ? 'Click OK button to try stopping the '
-                +'offending processes or Cancel to close Luminati Proxy '
-                +'Manager and stop other instances manually.\n\n'
-                +'Suspected processes:\nPID\t Image Name\t Session Name\t '
-                +'Mem Usage\n'
-                +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
-                    +`${t.memUsage}`).join('\n') :
-                'Stop other running instances manually then click OK button '
-                +'to restart Luminati Proxy Manager.'),
-            buttons: ['Ok', 'Cancel'],
+            title: 'Failed stopping processes',
+            message: 'Failed stopping processes. Restart Luminati Proxy '
+                +'Manager as administrator or stop the processes manually '
+                +'and then restart.\n\n'+e,
+            buttons: ['Ok'],
         });
-        if (res==1)
-            return app.exit();
-        if (!tasks.length)
-            return restart();
-        taskkill(tasks.map(t=>t.pid), {tree: true, force: true})
-        .then(restart, e=>{
-            dialog.showMessageBox({
-                type: 'warning',
-                title: 'Failed stopping processes',
-                message: 'Failed stopping processes. Restart Luminati Proxy '
-                    +'Manager as administrator or stop the processes manually '
-                    +'and then restart.\n\n'+e,
-                buttons: ['Ok'],
-            });
-            process.exit();
-        });
-    };
-    tasklist({filter: ['imagename eq node.exe']}).then(tasks=>{
-        tasks = tasks.filter(t=>t.pid!=process.pid);
-        show(tasks);
-    }, e=>process.exit());
+        process.exit();
+    }
+    restart();
+});
+
+let conflict_shown;
+let show_port_conflict = (addr, port)=>{
+    if (conflict_shown)
+        return;
+    conflict_shown = true;
+    _show_port_conflict(addr, port);
 };
 
 let run = run_config=>{
+    if (process.send)
+        process.send({cmd: 'lpm_restart_init'});
     manager = new Manager(args, Object.assign({ua}, run_config));
     if (!manager.argv.no_usage_stats)
         ua.event('app', 'run');
-    autoUpdater.logger = manager._log;
-    setTimeout(()=>autoUpdater.checkForUpdates(), 15000);
+    auto_updater.logger = manager._log;
+    setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
             ua.event('manager', 'www_ready', url).send();
@@ -159,7 +173,7 @@ let run = run_config=>{
         if (upgrade_available)
             upgrade();
         else
-            autoUpdater.checkForUpdates();
+            auto_updater.checkForUpdates();
     })
     .on('stop', ()=>{
         if (manager.argv.no_usage_stats)
@@ -175,10 +189,7 @@ let run = run_config=>{
                 return show_port_conflict(err[1], err[2]);
             if (fatal)
             {
-                if (manager&&manager._log)
-                    manager._log.error(e_msg, e);
-                else
-                    console.log(e_msg);
+                mgr_err(e_msg);
                 process.exit();
             }
         };
@@ -207,14 +218,12 @@ let run = run_config=>{
     manager.start();
 };
 
-let quit = (err)=>{
+let quit = err=>{
     if (err)
     {
-        zerr.perr(err);
-        if (manager)
-            manager._log.error('uncaught exception %s', zerr.e2s(err));
-        else
-             console.error('uncaught exception'+zerr.e2s(err));
+        if (!manager||!manager.argv.no_usage_stats)
+            zerr.perr(err);
+        mgr_err('uncaught exception '+zerr.e2s(err));
     }
     if (manager&&manager.argv.no_usage_stats)
         app.quit();

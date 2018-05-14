@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
-
 const Manager = require('../lib/manager.js');
 const hutil = require('hutil');
 const etask = hutil.etask;

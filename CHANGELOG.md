@@ -1,5 +1,12 @@
  Luminati Proxy manager - Change Log
 
+## 1.95.360
+- :bug: fixed dialog on port conflict in electron app 
+- :bug: no version in exe name (for resident tasks)
+- :star: HAR viewer improvements
+- :bug: lpm_install.sh: fixed npm downgrade issue
+- :bug: lpm_install.sh: fixed build_tools installation on non-debian systems
+
 ## 1.94.794
 - :bug: fixed debug log info
 - :bug: fixed targeting for certain cities

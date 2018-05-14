@@ -7,12 +7,9 @@ module.exports = {
     entry: {
         app: './app.js',
         vendor: ['jquery', 'lodash', 'moment',
-            'angular', 'angular-sanitize', 'angular-ui-bootstrap',
-            '@uirouter/angularjs', 'angular-google-analytics',
             'bootstrap', 'bootstrap/dist/css/bootstrap.css',
             'bootstrap-datepicker', 'bootstrap-datepicker/dist/css/bootstrap-'
                 +'datepicker3.css',
-            'ui-select', 'ui-select/dist/select.css',
             'codemirror/lib/codemirror', 'codemirror/lib/codemirror.css',
             'codemirror/mode/javascript/javascript',
             'react', 'react-dom', 'react-bootstrap',

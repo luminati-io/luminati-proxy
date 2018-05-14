@@ -11,7 +11,7 @@ import EventEmitter from 'events';
 import {If} from '/www/util/pub/react.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
-class Modal_dialog extends React.Component {
+export class Modal_dialog extends React.Component {
     componentDidMount(){
         const _this = this;
         $(this.ref).on('hide.bs.modal', function(){
@@ -52,7 +52,7 @@ class Modal_dialog extends React.Component {
     }
 }
 
-class Modal extends React.Component {
+export class Modal extends React.Component {
     click_cancel(){
         if (this.props.cancel_clicked)
             this.props.cancel_clicked();
@@ -115,20 +115,6 @@ class Modal extends React.Component {
     }
 }
 
-const Warnings = props=>(
-    <div>
-      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
-    </div>
-);
-
-const Warning = props=>(
-    <div className="warning">
-      <div className="warning_icon"/>
-      <div className="text">{props.text}</div>
-    </div>
-);
-
-
 const Footer_default = props=>(
     <div className="default_footer">
       <If when={!props.no_cancel_btn}>
@@ -141,7 +127,20 @@ const Footer_default = props=>(
     </div>
 );
 
-const Loader = ({show})=>(
+export const Warnings = props=>(
+    <div>
+      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
+    </div>
+);
+
+export const Warning = props=>(
+    <div className="warning">
+      <div className="warning_icon"/>
+      <div className="text">{props.text}</div>
+    </div>
+);
+
+export const Loader = ({show})=>(
     <If when={show}>
       <div className="loader_wrapper">
         <div className="mask"/>
@@ -152,14 +151,14 @@ const Loader = ({show})=>(
     </If>
 );
 
-const Loader_small = ({show})=>(
+export const Loader_small = ({show})=>(
     <div className={classnames('loader_small', {hide: !show})}>
       <div className="spinner"/>
       <div className="saving_label">Saving...</div>
     </div>
 );
 
-class Code extends Pure_component {
+export class Code extends Pure_component {
     componentDidMount(){
         $(this.ref).find('.btn_copy').tooltip('show')
         .attr('title', 'Copy to clipboard').tooltip('fixTitle');
@@ -194,7 +193,7 @@ class Code extends Pure_component {
     }
 }
 
-const Textarea = props=>{
+export const Textarea = props=>{
     return (
         <textarea value={props.val} rows={props.rows||3}
           placeholder={props.placeholder}
@@ -202,7 +201,7 @@ const Textarea = props=>{
     );
 };
 
-const Select = props=>{
+export const Select = props=>{
     const update = val=>{
         if (val=='true')
             val = true;
@@ -221,7 +220,7 @@ const Select = props=>{
     );
 };
 
-const Input = props=>{
+export const Input = props=>{
     const update = val=>{
         if (props.type=='number' && val)
             val = Number(val);
@@ -236,7 +235,7 @@ const Input = props=>{
     );
 };
 
-const Checkbox = props=>(
+export const Checkbox = props=>(
   <div className="form-check">
     <label className="form-check-label">
       <input className="form-check-input" type="checkbox" value={props.value}
@@ -246,7 +245,7 @@ const Checkbox = props=>(
   </div>
 );
 
-const Nav = ({title, subtitle, warning})=>(
+export const Nav = ({title, subtitle, warning})=>(
     <div className="nav_header">
       <h3>{title}</h3>
       <div className="subtitle">{subtitle}</div>
@@ -260,8 +259,9 @@ const Warning_msg = ({warning})=>{
     return <Warning text={warning}/>;
 };
 
-const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
-    children, top, bottom, update_items_per_page, max_buttons, total})=>
+export const Pagination_panel = ({entries, items_per_page, cur_page,
+    page_change, children, top, bottom, update_items_per_page, max_buttons,
+    total})=>
 {
     total = total||entries&&entries.length||0;
     let pagination = null;
@@ -298,7 +298,7 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
     );
 };
 
-class Tooltip extends Pure_component {
+export class Tooltip extends Pure_component {
     componentDidMount(){
         if (!this.ref)
             return;
@@ -342,7 +342,7 @@ class Tooltip extends Pure_component {
     }
 }
 
-const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
+export const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
     small})=>
 {
     if (invisible)
@@ -359,380 +359,3 @@ const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
         </Tooltip>
     );
 };
-
-const presets = {
-    sequential: {
-        default: true,
-        title: 'Sequential session IP pool',
-        subtitle: `Sequential pool of pre-established of sessions (IPs). For
-            running groups of requests sharing the same IP to a target site.
-            Use refresh_sessions max_requests & session_duration to control
-            session (IP) switching`,
-        check: function(opt){ return opt.pool_size &&
-            (!opt.pool_type || opt.pool_type=='sequential'); },
-        set: opt=>{
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-        ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
-        },
-    },
-    session_long: {
-        title: 'Long single session (IP)',
-        subtitle: `All requests share the same long session (IP). For
-            connecting a browser to Luminati, maintaining the same IP for as
-            long as possible`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
-            && opt.session===true && opt.keep_alive; },
-        set: opt=>{
-            opt.pool_size = 0;
-            opt.keep_alive = opt.keep_alive||50;
-            opt.pool_type = null;
-            opt.sticky_ip = false;
-            opt.session = true;
-            opt.seed = false;
-        },
-        clean: opt=>{
-            opt.keep_alive = 0;
-            opt.session = '';
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 50 seconds`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `enables 'Random Session'`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
-        ],
-        support: {
-            keep_alive: true,
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
-        },
-    },
-    session: {
-        title: 'Single session (IP)',
-        subtitle: `All requests share the same active session (IP). For
-            connecting a single app/browser that does not need to maintain IP
-            on idle times`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
-            && opt.session===true && !opt.keep_alive; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.pool_type = null;
-            opt.sticky_ip = false;
-            opt.session = true;
-            opt.seed = false;
-        },
-        clean: opt=>{
-            opt.session = '';
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 0 seconds`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `enables 'Random Session'`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
-        ],
-        support: {
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
-        },
-    },
-    sticky_ip: {
-        title: 'Session (IP) per machine',
-        subtitle: `Each requesting machine will have its own session (IP).
-            For connecting several computers to a single Luminati Proxy
-            Manager, each of them having its own single session (IP)`,
-        check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.pool_type = null;
-            opt.sticky_ip = true;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.sticky_ip = null;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `enables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-            {field: 'multiply', label: `disables 'Multiply' option`},
-        ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            seed: true,
-        },
-    },
-    round_robin: {
-        title: 'Round-robin (IP) pool',
-        subtitle: `Round-robin pool of pre-established sessions (IPs). For
-            spreading requests across large number of IPs. Tweak pool_size,
-            max_requests & proxy_count to optimize performance`,
-        check: function(opt){ return opt.pool_size
-            && opt.pool_type=='round-robin' && !opt.multiply; },
-        set: opt=>{
-            opt.pool_size = opt.pool_size||1;
-            opt.pool_type = 'round-robin';
-            opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 1;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `round-robin pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-            {field: 'multiply', label: `disables 'Multiply' options`},
-        ],
-        support: {
-            pool_size: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            seed: true,
-        },
-    },
-    high_performance: {
-        title: 'High performance',
-        subtitle: 'Maximum request speed',
-        check: opt=>true,
-        set: opt=>{
-            opt.pool_size = 50;
-            opt.keep_alive = 40;
-            opt.pool_type = 'round-robin';
-            opt.seed = false;
-            opt.proxy_count = 20;
-            opt.session_duration = 0;
-            opt.session_random = false;
-            opt.use_proxy_cache = false;
-            opt.race_reqs = 2;
-        },
-        clean: opt=>{
-            opt.pool_size = 1;
-            opt.keep_alive = 0;
-            opt.proxy_count = '';
-            opt.race_reqs = '';
-            opt.use_proxy_cache = true;
-        },
-        rules: [
-            {field: 'pool_size', label: "sets 'Pool size' to 50"},
-            {field: 'keep_alive', label: "sets 'Keep-alive' to 40"},
-            {field: 'pool_type', label: "round-robin pool type"},
-            {field: 'seed', label: "disables 'Session ID Seed'"},
-        ],
-        support: {max_requests: true, multiply: true},
-    },
-    rnd_usr_agent_and_cookie_header: {
-        title: 'Random User-Agent and cookie headers',
-        subtitle: 'Rotate User-Agent and cookie on each request',
-        check: opt=>true,
-        set: opt=>{
-            opt.session = '';
-            opt.sticky_ip = false;
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = 0;
-            opt.session_duration = 0;
-            opt.seed = false;
-            opt.rules = opt.rules||{};
-            opt.rules.pre = [{
-                alphabet: 'wertyuiop;lkjhgfdQWERTYUJBVCF5467',
-                header: true,
-                name: 'cookie',
-                prefix: 'v=',
-                random: 'string',
-                size: 8,
-                suffix: 'end of cookie',
-                url: '**'
-            },
-            {
-                arg: [
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246',
-                'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36',
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9',
-                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36',
-                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-                'Mozilla/5.0 (X11; Linux x86_64; rv:2.0b4) Gecko/20100818 Firefox/4.0b4',
-                'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36',
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36',
-                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
-                'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'],
-                header: true,
-                name: 'User-Agent',
-                random: 'list',
-                url: '**'
-            }];
-            opt.rules.post = opt.rules.post||[];
-        },
-        clean: opt=>{ },
-        support: {
-            multiply: true,
-            max_requests: true,
-        },
-    },
-    custom: {
-        title: 'Custom',
-        subtitle: `Manually adjust all settings to your needs For advanced
-            use cases`,
-        check: function(opt){ return true; },
-        set: function(opt){},
-        clean: opt=>{
-            opt.session = '';
-            opt.sticky_ip = null;
-            opt.pool_size = 1;
-            opt.pool_type = null;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        support: {
-            session: true,
-            sticky_ip: true,
-            pool_size: true,
-            pool_type: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
-        },
-    },
-};
-for (let k in presets)
-    presets[k].key = k;
-
-const emitter = new EventEmitter();
-
-const is_electron = window.process && window.process.versions.electron;
-
-const get_static_country = proxy=>{
-    if (!proxy||!proxy.zone||!proxy.zones)
-        return false;
-    const zone = proxy.zones[proxy.zone];
-    if (!zone)
-        return false;
-    const plan = zone.plans[zone.plans.length-1];
-    if (plan.type=='static')
-        return plan.country||'any';
-    if (['domain', 'domain_p'].includes(plan.vips_type))
-        return plan.vip_country||'any';
-    return false;
-};
-
-const save_pagination = (table, opt={})=>{
-    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    curr[table] = curr[table]||{};
-    if (opt.page)
-        curr[table].page = opt.page;
-    if (opt.items)
-        curr[table].items = opt.items;
-    window.localStorage.setItem('pagination', JSON.stringify(curr));
-};
-
-const get_pagination = table=>{
-    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    return {items: 10, page: 0, ...(curr[table]||{})};
-};
-
-const status_codes = {
-    200: 'OK',
-    201: 'Created',
-    202: 'Accepted',
-    203: 'Non-Authoritative Information',
-    204: 'No Content',
-    205: 'Reset Content',
-    206: 'Partial Content',
-    300: 'Multiple Choices',
-    301: 'Moved Permanently',
-    302: 'Found',
-    303: 'See Other',
-    304: 'Not Modified',
-    305: 'Use Proxy',
-    307: 'Temporary Redirect',
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    402: 'Payment Required',
-    403: 'Forbidden',
-    404: 'Not Found',
-    405: 'Method Not Allowed',
-    406: 'Not Acceptable',
-    407: 'Proxy Authentication Required',
-    408: 'Request Timeout',
-    409: 'Conflict',
-    410: 'Gone',
-    411: 'Length Required',
-    412: 'Precondition Failed',
-    413: 'Request Entity Too Large',
-    414: 'Request-URI Too Long',
-    415: 'Unsupported Media Type',
-    416: 'Requested Range Not Satisfiable',
-    417: 'Expectation Failed',
-    500: 'Internal Server Error',
-    501: 'Not Implemented',
-    502: 'Bad Gateway',
-    503: 'Service Unavailable',
-    504: 'Gateway Timeout',
-    505: 'HTTP Version Not Supported',
-};
-
-const is_json_str = str=>{
-    let resp;
-    try { resp = JSON.parse(str); }
-    catch(e){ return false; }
-    return resp;
-};
-
-export {Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
-    Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
-    Textarea, get_static_country, Loader_small, is_electron, status_codes,
-    Modal_dialog, save_pagination, get_pagination, is_json_str};

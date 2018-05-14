@@ -5,7 +5,8 @@ import React from 'react';
 import zurl from 'hutil/util/url';
 import classnames from 'classnames';
 import {If} from '/www/util/pub/react.js';
-import {Tooltip, get_static_country} from './common.js';
+import {Tooltip} from './common.js';
+import {get_static_country} from './util.js';
 
 const tooltips = {
     crawler: `Your crawler or bot that systematically browses the web. Connect

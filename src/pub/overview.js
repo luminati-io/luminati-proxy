@@ -8,7 +8,6 @@ import Stats from './stats.js';
 import Har_viewer from './har_viewer';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
-import {is_electron} from './common.js';
 import $ from 'jquery';
 
 class Overview extends Pure_component {
@@ -59,6 +58,7 @@ class Upgrade extends Pure_component {
     render(){
         const {upgrading, upgrade_error, ver_last, ver_node} = this.state;
         const is_upgradable = ver_last&&ver_last.newer;
+        const is_electron = window.process && window.process.versions.electron;
         const electron = ver_node&&ver_node.is_electron||is_electron;
         if (!is_upgradable||!ver_node)
             return null;

@@ -328,6 +328,7 @@ class Alerts extends Pure_component {
     render(){ return this.state.alerts.map(a=><Alert key={a.key} {...a}/>); }
     static key = 0;
     static push(children, opt){
+        opt = opt||{};
         if (opt.dismissable&&opt.id&&(setdb.get('alerts')||[]).some(
             a=>a.id==opt.id))
         {

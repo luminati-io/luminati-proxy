@@ -9,14 +9,13 @@ import csv from 'hutil/util/csv';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
 import etask from 'hutil/util/etask';
-import util from './util.js';
+import {bytes_format, get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import Add_proxy from './add_proxy.js';
 import No_proxies from './no_proxies.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip, get_static_country, Modal_dialog, save_pagination,
-    get_pagination} from './common.js';
+    Tooltip, Modal_dialog} from './common.js';
 import {If} from '/www/util/pub/react.js';
 import {withRouter} from 'react-router-dom';
 
@@ -370,7 +369,7 @@ const columns = [
     {
         key: 'in_bw',
         title: 'BW up',
-        render: ({proxy})=>util.bytes_format(proxy.in_bw||0)||'—',
+        render: ({proxy})=>bytes_format(proxy.in_bw||0)||'—',
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -380,7 +379,7 @@ const columns = [
     {
         key: 'out_bw',
         title: 'BW down',
-        render: ({proxy})=>util.bytes_format(proxy.out_bw||0)||'—',
+        render: ({proxy})=>bytes_format(proxy.out_bw||0)||'—',
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -468,6 +467,21 @@ class Columns_modal extends Pure_component {
         );
     }
 }
+
+const save_pagination = (table, opt={})=>{
+    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
+    curr[table] = curr[table]||{};
+    if (opt.page)
+        curr[table].page = opt.page;
+    if (opt.items)
+        curr[table].items = opt.items;
+    window.localStorage.setItem('pagination', JSON.stringify(curr));
+};
+
+const get_pagination = table=>{
+    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
+    return {items: 10, page: 0, ...(curr[table]||{})};
+};
 
 class Proxies extends Pure_component {
     constructor(props){

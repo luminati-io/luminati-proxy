@@ -7,11 +7,11 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {Modal, Loader, Select, Input, Warnings, presets, Link_icon,
+import {Modal, Loader, Select, Input, Warnings, Link_icon,
     Checkbox, Textarea, Tooltip, Pagination_panel,
     Loader_small} from './common.js';
 import Har_viewer from './har_viewer.js';
-import util from './util.js';
+import * as util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {Netmask} from 'netmask';
@@ -22,6 +22,7 @@ import PropTypes from 'prop-types';
 import {withRouter} from 'react-router-dom';
 import {tabs, all_fields} from './proxy_fields.js';
 
+const presets = util.presets;
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 const event_tracker = {};
