@@ -6,13 +6,11 @@ import $ from 'jquery';
 import prism from 'prismjs';
 import instructions from './instructions.js';
 import {Code, Modal} from './common.js';
-import util from './util.js';
+import {ga_event} from './util.js';
 import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
-
-const ga_event = util.ga_event;
 
 class Howto extends Pure_component {
     state = {option: 'code'};
@@ -71,10 +69,9 @@ const Lang_btn = props=>{
 };
 
 class Code_instructions extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {lang: 'shell'};
-    }
+    state = {lang: 'shell'};
+    swagger_url = 'http://petstore.swagger.io/?url=https://cdn.rawgit.com/'
+    +'luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy';
     click_lang(lang){
         this.setState({lang});
         ga_event('How-to-tab', 'select option', lang);
@@ -114,9 +111,7 @@ class Code_instructions extends Pure_component {
               </div>
               <div>
                 View available API endpoints
-                <a className="link api_link"
-                  href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy">
-                here</a>
+                <a className="link api_link" href={this.swagger_url}>here</a>
               </div>
             </div>
         );

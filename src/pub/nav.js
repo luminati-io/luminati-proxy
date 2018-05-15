@@ -12,10 +12,10 @@ import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
 import $ from 'jquery';
 import {If} from '/www/util/pub/react.js';
-import {withRouter} from 'react-router-dom';
+import {Route, withRouter, Link} from 'react-router-dom';
 
+// XXX krzysztof: get rid of this object
 const sections = [
-    {name: 'settings', title: 'Settings', navbar: false},
     {name: 'overview', title: 'Overview', navbar: true},
     {name: 'howto', title: 'Instructions', navbar: true},
     {name: 'proxy_tester', title: 'Proxy Tester', navbar: true, react: true},
@@ -81,35 +81,55 @@ const Old_modals = ()=>(
     </div>
 );
 
-class Nav_left extends Pure_component {
+const Nav_left = ()=>(
+    <div className="nav_left">
+      <div className="menu">
+        {sections.map(s=>(
+          <Nav_link
+            to={'/'+s.name}
+            key={s.name}
+            name={s.name}
+            label={s.title}/>
+        ))}
+      </div>
+      <div className="menu_filler"/>
+      <Footer/>
+    </div>
+);
+
+const Nav_link = ({label, to, name})=>(
+    <Route path={to} exact>
+      {({match})=>
+        <Nav_link_inner label={label} to={to} name={name} match={match}/>}
+    </Route>
+
+);
+
+const Nav_link_inner = ({label, to, name, match})=>(
+    <Link to={to}>
+      <div className={classnames('menu_item', {active: match})}>
+        <Tooltip title={label} placement="right">
+          <div className={classnames('icon', name)}/>
+        </Tooltip>
+      </div>
+    </Link>
+);
+
+class Nav_top extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {};
+        this.state = {ver: ''};
     }
     componentWillMount(){
-        this.setdb_on('head.section', section=>this.setState({section})); }
+        this.setdb_on('head.version', ver=>this.setState({ver})); }
     render(){
-        if (this.state.section&&(this.state.section.name=='settings'
-            ||this.state.section.name=='login'))
-        {
-            return null;
-        }
+        const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
         return (
-            <div className="nav_left">
-              <div className="menu">
-                {sections.map(s=>(
-                  <Section_element_router
-                    cb={s.cb}
-                    key={s.name}
-                    name={s.name}
-                    title={s.title}
-                    show={s.navbar}
-                    current={this.state.section}
-                    react={s.react}/>
-                ))}
-              </div>
-              <div className="menu_filler"/>
-              <Footer/>
+            <div className="lpm nav_top">
+              <Tooltip title={tooltip} placement="right">
+                <div><Logo/></div>
+              </Tooltip>
+              <Nav_right/>
             </div>
         );
     }
@@ -137,110 +157,15 @@ const Footer = ()=>(
     </div>
 );
 
-class Section_element extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
-    componentWillMount(){
-        this.setdb_on('head.callbacks.state', state=>
-            this.setState({go: state.go}));
-    }
-    goto_section(){
-        //if (this.props.react)
-        //{
-        //    console.log('react router');
-        //    this.props.history.push('/'+this.props.name);
-        //    return;
-        //}
-        if (!this.state.go)
-            return;
-        this.state.go(this.props.name);
-    }
-    render(){
-        if (!this.props.show)
-            return null;
-        const cur_name = this.props.current&&this.props.current.name||'';
-        const classes = classnames('menu_item', {
-            active: cur_name==this.props.name});
-        return (
-            <div className={classes} onClick={this.goto_section.bind(this)}>
-              <Tooltip title={this.props.title} placement="right">
-                <div className={classnames('icon', this.props.name)}/>
-              </Tooltip>
-            </div>
-        );
-    }
-}
-const Section_element_router = withRouter(Section_element);
+const Logo = withRouter(()=><Link to="/overview" className="logo"/>);
 
-class Nav_top extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {ver: ''};
-    }
-    componentWillMount(){
-        this.setdb_on('head.version', ver=>this.setState({ver})); }
-    render(){
-        const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
-        return (
-            <div className="lpm nav_top">
-              <Tooltip title={tooltip} placement="right">
-                <div><Logo/></div>
-              </Tooltip>
-              <Nav_right/>
-            </div>
-        );
-    }
-}
-
-class Logo extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
-    componentWillMount(){
-        this.setdb_on('head.section', section=>this.setState({section}));
-        this.setdb_on('head.version', ver=>this.setState({ver}));
-    }
-    render(){
-        if (!this.state.section||this.state.section.name!='settings'&&
-            this.state.section.name!='login')
-        {
-            return <a href="/overview" className="logo"/>;
-        }
-        return (
-            <div>
-              <a href="https://luminati.io/cp" rel="noopener noreferrer"
-                target="_blank" className="logo_big"/>
-              <div className="version">V{this.state.ver}</div>
-            </div>
-        );
-    }
-}
-
-class Nav_right extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
-    componentWillMount(){
-        this.setdb_on('head.section', section=>this.setState({section})); }
-    render(){
-        if (this.state.section&&(this.state.section.name=='settings'||
-            this.state.section.name=='login'))
-        {
-            return null;
-        }
-        return (
-            <div className="nav_top_right">
-              <div className="schema"><Schema/></div>
-              <div className="notif_icon"><Notif/></div>
-              <Dropdown/>
-            </div>
-        );
-    }
-}
+const Nav_right = ()=>(
+    <div className="nav_top_right">
+      <div className="schema"><Schema/></div>
+      <div className="notif_icon"><Notif/></div>
+      <Dropdown/>
+    </div>
+);
 
 const show_reload = function(){
     $('#restarting').modal({
@@ -304,13 +229,12 @@ class Shutdown_modal extends Pure_component {
     }
 }
 
-class Dropdown extends Pure_component {
+const Dropdown = withRouter(class Dropdown extends Pure_component {
     constructor(props){
         super(props);
         this.state = {};
     }
     componentWillMount(){
-        this.setdb_on('head.section', section=>this.setState({section}));
         this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
     }
@@ -318,18 +242,19 @@ class Dropdown extends Pure_component {
     upgrade(){ $('#upgrade_modal').modal(); }
     shutdown(){ $('#shutdown_modal').modal(); }
     logout(){
+        const _this = this;
         this.etask(function*(){
             yield ajax({url: '/api/logout', method: 'POST'});
-            window.location = '/';
+            _this.props.history.push('/login');
         });
     }
     render(){
-        if (!this.state.settings||this.state.section=='settings')
+        if (!this.state.settings)
             return null;
         const is_upgradable = this.state.ver_last&&this.state.ver_last.newer;
         return (
             <div className="dropdown">
-              <a href="#" className="link dropdown-toggle"
+              <a className="link dropdown-toggle"
                 data-toggle="dropdown">
                 {this.state.settings.customer}
                 <span className="caret"/>
@@ -337,23 +262,23 @@ class Dropdown extends Pure_component {
               <ul className="dropdown-menu dropdown-menu-right">
                 <If when={is_upgradable}>
                   <li>
-                    <a href="#" onClick={this.upgrade.bind(this)}>Upgrade</a>
+                    <a onClick={this.upgrade.bind(this)}>Upgrade</a>
                   </li>
                 </If>
                 <li>
-                  <a href="#" onClick={this.open_report_bug.bind(this)}>
+                  <a onClick={this.open_report_bug.bind(this)}>
                     Report a bug</a>
                 </li>
                 <li>
-                  <a href="#" onClick={this.logout.bind(this)}>Log out</a>
+                  <a onClick={this.logout.bind(this)}>Log out</a>
                 </li>
                 <li>
-                  <a href="#" onClick={this.shutdown.bind(this)}>Shut down</a>
+                  <a onClick={this.shutdown.bind(this)}>Shut down</a>
                 </li>
               </ul>
             </div>
         );
     }
-}
+});
 
 export default Nav;

@@ -6,14 +6,13 @@ import setdb from 'hutil/util/setdb';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, Textarea, Input, presets} from './common.js';
-import util from './util.js';
+import {Modal, Loader, Textarea, Input} from './common.js';
+import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
+import {withRouter} from 'react-router-dom';
 
-const ga_event = util.ga_event;
-
-class Add_proxy extends Pure_component {
+const Add_proxy = withRouter(class Add_proxy extends Pure_component {
     constructor(props){
         super(props);
         this.presets_opt = Object.keys(presets).map(p=>{
@@ -105,11 +104,13 @@ class Add_proxy extends Pure_component {
             window.localStorage.setItem('quickstart-first-proxy', port);
             if (opt.redirect)
             {
-                const state_opt = {port};
+                const state_opt = {};
                 if (opt.field)
                     state_opt.field = opt.field;
-                const callbacks = setdb.get('head.callbacks');
-                return yield callbacks.state.go('edit_proxy', state_opt);
+                _this.props.history.push({
+                    pathname: `/proxy/${port}`,
+                    state: state_opt,
+                });
             }
         });
     }
@@ -178,7 +179,7 @@ class Add_proxy extends Pure_component {
             </div>
         );
     }
-}
+});
 
 const Ext_proxy = ({ips_list, on_field_change, parse_error})=>
 {

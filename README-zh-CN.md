@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.93.58-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.95.360-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -164,8 +164,8 @@ Options:
   --race_reqs              Race several requests at once and choose fastest
                                                                         [number]
   --disable_color          Disable colors in log      [boolean] [default: false]
-  --www                    UI/API HTTP port                     [default: 22999]
-  --ws                     UI/API websocket port                [default: 22998]
+  --www                    HTTP port for browser admin UI       [default: 22999]
+  --ws                     Websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "/home/maximk/.luminati.json"]
   --database               Database file containing logs and cached values

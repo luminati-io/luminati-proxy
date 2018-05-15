@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.93.58",
+        "version": "1.95.360",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -361,11 +361,11 @@
                 },
                 "www": {
                     "type": "integer",
-                    "description": "UI/API HTTP port"
+                    "description": "HTTP port for browser admin UI"
                 },
                 "ws": {
                     "type": "integer",
-                    "description": "UI/API websocket port"
+                    "description": "websocket port used for request logs"
                 },
                 "config": {
                     "type": "string",

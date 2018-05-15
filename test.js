@@ -772,7 +772,7 @@ describe('proxy', ()=>{
                 {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
-                    {state: 'ny', city: 'new_york'});
+                    {state: 'ny', city: 'newyork'});
                 t('short',
                     {state: 'NY', city: 'New York', short_username: true},
                     {state: 'ny', city: 'newyork'});
@@ -1487,7 +1487,7 @@ describe('manager', ()=>{
                     --request_stats --ssl false --allow_proxy_auth false`);
                 yield etask.nfn_apply(request, [{
                     proxy: 'http://127.0.0.1:24000',
-                    url: 'http://lumtest.com/myip.json',
+                    url: 'http://linkedin.com/',
                     strictSSL: false,
                 }]);
                 yield etask.sleep(400);
@@ -1497,11 +1497,11 @@ describe('manager', ()=>{
             t('main', {
                 status_code: [{key: '200', reqs: 1}],
                 protocol: [{key: 'http', reqs: 1}],
-                hostname: [{key: 'lumtest.com', reqs: 1}],
+                hostname: [{key: 'linkedin.com', reqs: 1}],
                 ports: {24000: {
                     reqs: 1,
                     success: 1,
-                    url: 'http://lumtest.com/myip.json',
+                    url: 'http://linkedin.com/',
                 }},
                 success: 1,
                 total: 1,
@@ -2184,7 +2184,7 @@ describe('lpm_proxy', ()=>{
                 {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
-                    {state: 'ny', city: 'new_york'});
+                    {state: 'ny', city: 'newyork'});
                 t('short',
                     {state: 'NY', city: 'New York', short_username: true},
                     {state: 'ny', city: 'newyork'});

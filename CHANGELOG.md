@@ -1,5 +1,28 @@
  Luminati Proxy manager - Change Log
 
+## 1.95.360
+- :bug: fixed dialog on port conflict in electron app 
+- :bug: no version in exe name (for resident tasks)
+- :star: HAR viewer improvements
+- :bug: lpm_install.sh: fixed npm downgrade issue
+- :bug: lpm_install.sh: fixed build_tools installation on non-debian systems
+
+## 1.94.794
+- :bug: fixed debug log info
+- :bug: fixed targeting for certain cities
+
+## 1.94.520
+
+## 1.94.415
+- :sparkles: HAR viewer improvements
+
+## 1.93.910
+- :star: added support for HAR viewer in Firefox
+
+## 1.93.813
+- :star: added new HAR viewer
+- :bug: fixed setting max requests
+
 ## 1.93.58
 - :bug: Fixed memory leak introduced in latest versions
 - :star: Added request_stats_limit flag to limit usage stats saved to sqite db

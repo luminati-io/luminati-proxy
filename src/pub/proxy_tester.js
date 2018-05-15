@@ -3,59 +3,44 @@
 import React from 'react';
 import $ from 'jquery';
 import {Row, Col} from 'react-bootstrap';
-import {Input, Select, Loader, Modal, Warnings, Nav,
-    is_json_str} from './common.js';
+import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
 import classnames from 'classnames';
 import etask from 'hutil/util/etask';
-import util from './util.js';
+import {ga_event} from './util.js';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
 import zurl from 'hutil/util/url';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import JSON_viewer from './json_viewer.js';
-
-const ga_event = util.ga_event;
+import Preview from './har_preview.js';
 
 class Proxy_tester extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {response: {}};
-        this.title = 'Proxy Tester';
-        this.subtitle = 'Emulate requests from your proxies to any target URL';
-    }
-    update_response(response){ this.setState({response}); }
+    state = {};
+    title = 'Proxy Tester';
+    subtitle = 'Emulate requests from your proxies to any target URL';
+    update_response = response=>this.setState({response});
+    clear_response = ()=>this.setState({response: undefined});
     render(){
-        const body = this.state.response&&this.state.response.body;
-        const headers = this.state.response&&this.state.response.headers;
         return (
-            <div className="lpm proxy_tester">
+            <div className="lpm proxy_tester vbox">
               <Nav title={this.title} subtitle={this.subtitle}/>
-              <Request update_response={this.update_response.bind(this)}/>
-              <Body body={body}/>
-              <If when={this.state.response.status_code}>
-                <Row>
-                  <Col md={4}><Info {...this.state.response}/></Col>
-                  <Col md={8}>
-                    <Response headers={headers}/></Col>
-                </Row>
-              </If>
+              <Request update_response={this.update_response}/>
+              <Preview cur_preview={this.state.response}
+                close_preview={this.clear_response}/>
             </div>
         );
     }
 }
 
 class Request extends Pure_component {
-    constructor(props){
-        super(props);
-        this.first_header = {idx: 0, header: '', value: ''};
-        this.default_state = {
-            headers: [this.first_header],
-            max_idx: 0,
-            params: {url: 'http://lumtest.com/myip.json', method: 'GET'},
-        };
-        this.state = {...this.default_state, show_loader: false};
-    }
+    first_header = {idx: 0, header: '', value: ''};
+    default_state = {
+        headers: [this.first_header],
+        max_idx: 0,
+        params: {url: 'http://lumtest.com/myip.json', method: 'GET'},
+    };
+    state = {...this.default_state, show_loader: false};
     componentDidMount(){
         setTimeout(()=>{
             const url_o = zurl.parse(document.location.href);
@@ -74,28 +59,30 @@ class Request extends Pure_component {
                         proxy: port||def_port, method, url}};
                 });
             });
-            // XXX krzysztof: delete once ReactRouter is introduced
-            const _this = this;
-            window.setTimeout(()=>{
-                this.etask(function*(){
-                    if (_this.state.proxies)
-                        return;
-                    const proxies = yield ajax.json({
-                        url: '/api/proxies_running'});
-                    setdb.set('head.proxies_running', proxies);
-                });
-            });
+        });
+        this.setdb_on('head.ws', ws=>{
+            if (!ws||this.ws)
+                return;
+            this.ws = ws;
         });
     }
-    add_header(){
+    on_message = event=>{
+        const req = JSON.parse(event.data);
+        if (this.last_port!=req.details.port)
+            return;
+        if (this.ws)
+            this.ws.removeEventListener('message', this.on_message);
+        this.props.update_response(req);
+    };
+    add_header = ()=>{
         ga_event('proxy-tester-tab', 'add header');
         this.setState(prev_state=>({
             headers: [...prev_state.headers, {idx: prev_state.max_idx+1,
                 header: '', value: ''}],
             max_idx: prev_state.max_idx+1,
         }));
-    }
-    remove_header(idx){
+    };
+    remove_header = idx=>{
         ga_event('proxy-tester-tab', 'remove header');
         if (this.state.headers.length==1)
             this.setState({headers: [this.first_header]});
@@ -104,8 +91,8 @@ class Request extends Pure_component {
             this.setState(prev_state=>
                 ({headers: prev_state.headers.filter(h=>h.idx!=idx)}));
         }
-    }
-    update_header(idx, field, value){
+    };
+    update_header = (idx, field, value)=>{
         this.setState(prev_state=>({
             headers: prev_state.headers.map(h=>{
                 if (h.idx!=idx)
@@ -114,13 +101,15 @@ class Request extends Pure_component {
                     return {...h, [field]: value};
             }),
         }));
-    }
-    update_params(field, value){
+    };
+    update_params = (field, value)=>{
         this.setState(prev_state=>({
             params: {...prev_state.params, [field]: value}}));
-    }
-    go(){
+    };
+    go = ()=>{
         ga_event('proxy-tester-tab', 'run test');
+        this.ws.addEventListener('message', this.on_message);
+        this.last_port = this.state.params.proxy;
         if (!this.state.params.proxy)
         {
             ga_event('proxy-tester-tab', 'no proxy chosen');
@@ -155,7 +144,6 @@ class Request extends Pure_component {
             });
             const json_check = yield raw_check.json();
             _this.setState({show_loader: false});
-            _this.props.update_response(json_check.response||{});
             if (json_check.error)
             {
                 _this.setState({warnings: [{msg: json_check.error}]});
@@ -166,7 +154,7 @@ class Request extends Pure_component {
             else
                 ga_event('proxy-tester-tab', 'response successful');
         });
-    }
+    };
     render() {
         return (
             <div className="panel no_border request">
@@ -177,14 +165,14 @@ class Request extends Pure_component {
               </Modal>
               <div className="panel_body">
                 <Request_params params={this.state.params}
-                  update={this.update_params.bind(this)}
+                  update={this.update_params}
                   proxies={this.state.proxies}/>
                 <Headers headers={this.state.headers}
-                  clicked_remove={this.remove_header.bind(this)}
-                  clicked_add={this.add_header.bind(this)}
-                  update={this.update_header.bind(this)}/>
+                  clicked_remove={this.remove_header}
+                  clicked_add={this.add_header}
+                  update={this.update_header}/>
                 <div className="footer_buttons">
-                  <button onClick={this.go.bind(this)}
+                  <button onClick={this.go}
                     className="btn btn_lpm btn_lpm_primary">Go</button>
                 </div>
               </div>
@@ -208,7 +196,7 @@ const Request_params = ({params, update, proxies})=>{
 };
 
 const Field = ({type, update, name, params, ...props})=>{
-    const fields = {proxy: 'Proxy', url: 'URL', method: 'Method'};
+    const fields = {proxy: 'Proxy port', url: 'URL', method: 'Method'};
     const on_change_wrapper = val=>{
         if (name!='url')
             ga_event('proxy-tester-tab', 'edit '+name);
@@ -277,78 +265,5 @@ const Add_icon = ({click})=>(
       <i className="glyphicon glyphicon-plus"/>
     </span>
 );
-
-const Body = ({body})=>{
-    if (!body)
-        return null;
-    return (
-        <div className="panel body no_border">
-          <div className="panel_heading">
-            <h2>Body</h2>
-          </div>
-          <div className="panel_body">
-            <div className="panel code">
-              <div className="panel_body">
-                <span>
-                  <Body_content body={body}/>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-    );
-};
-
-const Body_content = ({body})=>{
-    let json;
-    if (json = is_json_str(body))
-        return <JSON_viewer json={json}/>;
-    else
-        return body;
-};
-
-const Title_value_pairs = props=>(
-    <div className="title_value_pairs">
-      {props.pairs.map((p, idx)=>(
-        <Pair key={idx} title={p.title} value={p.value}/>))}
-    </div>
-);
-
-const Pair = props=>(
-    <div className="pair">
-      <div className="key">{props.title}</div>
-      <div className="value">{props.value}</div>
-    </div>
-);
-
-const Info = ({status_code, status_message, version})=>{
-    const pairs = Object.entries({status_code, status_message, version})
-    .map(e=>({title: e[0], value: e[1]}));
-    return (
-        <div className="panel info">
-          <div className="panel_heading">
-            <h2>Info</h2>
-          </div>
-          <div className="panel_body">
-            <Title_value_pairs pairs={pairs}/>
-          </div>
-        </div>
-    );
-};
-
-const Response = ({headers = {}})=>{
-    const pairs = Object.entries(headers)
-    .map(e=>({title: e[0], value: e[1]}));
-    return (
-        <div className="panel response">
-          <div className="panel_heading">
-            <h2>Response headers</h2>
-          </div>
-          <div className="panel_body">
-            <Title_value_pairs pairs={pairs}/>
-          </div>
-        </div>
-    );
-};
 
 export default Proxy_tester;

@@ -9,15 +9,15 @@ import csv from 'hutil/util/csv';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
 import etask from 'hutil/util/etask';
-import util from './util.js';
+import {bytes_format, get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import Add_proxy from './add_proxy.js';
 import No_proxies from './no_proxies.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip, get_static_country, Modal_dialog, save_pagination,
-    get_pagination} from './common.js';
+    Tooltip, Modal_dialog} from './common.js';
 import {If} from '/www/util/pub/react.js';
+import {withRouter} from 'react-router-dom';
 
 let country_names = {};
 
@@ -112,9 +112,9 @@ const Port_cell = ({proxy, master_port})=>{
         val = proxy.port+':1..'+proxy.multiply;
     else
         val = proxy.port;
-    const title = `${proxy.port} is a port that refers to a specific virtual
-        location on a computer. You can use it as a virtual proxy to sends
-        requests`;
+    const title = `${proxy.port} is a proxy port that refers to a specific
+        virtual location on a computer. You can use it as a virtual proxy to
+        sends requests`;
     return <Tooltip title={title}>{val}</Tooltip>;
 };
 
@@ -128,11 +128,11 @@ const Success_rate_cell = ({proxy})=>{
 const columns = [
     {
         key: 'port',
-        title: 'Port',
+        title: 'Proxy port',
         sticky: true,
         render: Port_cell,
-        tooltip: 'A port is a number that refers to a specific virtual '
-            +'location on a computer. Create and configure ports, then '
+        tooltip: 'A proxy port is a number that refers to a specific virtual '
+            +'location on a computer. Create and configure proxy ports, then '
             +'connect the crawler to send requests through the port',
         ext: true,
         dynamic: true,
@@ -168,8 +168,8 @@ const columns = [
         key: 'multiply',
         title: 'Multiple',
         type: 'number',
-        tooltip: 'Number of multiplied ports. A port can be multiplied '
-            +'in the proxy configuration page',
+        tooltip: 'Number of multiplied proxy ports. A proxy port can be '
+            +'multiplied in the proxy configuration page',
         ext: true,
     },
     {
@@ -369,7 +369,7 @@ const columns = [
     {
         key: 'in_bw',
         title: 'BW up',
-        render: ({proxy})=>util.bytes_format(proxy.in_bw||0)||'—',
+        render: ({proxy})=>bytes_format(proxy.in_bw||0)||'—',
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -379,7 +379,7 @@ const columns = [
     {
         key: 'out_bw',
         title: 'BW down',
-        render: ({proxy})=>util.bytes_format(proxy.out_bw||0)||'—',
+        render: ({proxy})=>bytes_format(proxy.out_bw||0)||'—',
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -392,7 +392,7 @@ const columns = [
         sticky: true,
         render: ({proxy})=>proxy.reqs||'0',
         ext: true,
-        tooltip: 'Number of all requests sent from this port',
+        tooltip: 'Number of all requests sent from this proxy port',
         dynamic: true,
     },
     {
@@ -401,7 +401,7 @@ const columns = [
         sticky: true,
         render: Last_req_cell,
         ext: true,
-        tooltip: 'Last request that was sent on this port',
+        tooltip: 'Last request that was sent on this proxy port',
         dynamic: true,
     },
 ];
@@ -468,6 +468,21 @@ class Columns_modal extends Pure_component {
     }
 }
 
+const save_pagination = (table, opt={})=>{
+    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
+    curr[table] = curr[table]||{};
+    if (opt.page)
+        curr[table].page = opt.page;
+    if (opt.items)
+        curr[table].items = opt.items;
+    window.localStorage.setItem('pagination', JSON.stringify(curr));
+};
+
+const get_pagination = table=>{
+    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
+    return {items: 10, page: 0, ...(curr[table]||{})};
+};
+
 class Proxies extends Pure_component {
     constructor(props){
         super(props);
@@ -492,7 +507,8 @@ class Proxies extends Pure_component {
             if (!proxies)
                 return;
             proxies = this.prepare_proxies(proxies||[]);
-            const filtered_proxies = this.filter_proxies(proxies);
+            const filtered_proxies = this.filter_proxies(proxies,
+                this.props.master_port);
             this.setState({proxies, filtered_proxies, loaded: true},
                 this.paginate);
         });
@@ -503,15 +519,19 @@ class Proxies extends Pure_component {
             country_names = countries;
             this.setState({countries});
         });
-        this.setdb_on('head.callbacks.state.go', go=>this.setState({go}));
-        if (!setdb.get('head.proxies_running'))
-            this.update();
-        this.req_status();
+        window.setTimeout(this.req_status.bind(this));
     }
-    filter_proxies(proxies){
+    componentWillReceiveProps(props){
+        if (props.master_port!=this.props.master_port)
+        {
+            const filtered_proxies = this.filter_proxies(this.state.proxies,
+                props.master_port);
+            this.setState({filtered_proxies}, this.paginate);
+        }
+    }
+    filter_proxies(proxies, mp){
         return proxies.filter(p=>{
-            let mp;
-            if (mp = this.props.master_port)
+            if (mp)
                 return ''+p.port==mp||''+p.master_port==mp;
             else
                 return p.proxy_type!='duplicate';
@@ -582,7 +602,7 @@ class Proxies extends Pure_component {
                     }
                 }
                 const filtered_proxies = _this.filter_proxies(
-                    Object.values(new_proxies));
+                    Object.values(new_proxies), _this.props.master_port);
                 return {proxies: Object.values(new_proxies), filtered_proxies,
                     stats};
             }, ()=>_this.paginate(_this.state.cur_page));
@@ -591,7 +611,6 @@ class Proxies extends Pure_component {
         });
     }
     update(){
-        const _this = this;
         this.etask(function*(){
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             setdb.set('head.proxies_running', proxies);
@@ -706,12 +725,12 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
       cur_page={cur_page} page_change={page_change} top={top} bottom={bottom}
       update_items_per_page={update_items_per_page}>
         <Link_icon tooltip="Edit columns" on_click={edit_columns} id="filter"/>
-        <Link_icon tooltip="Download all ports as CSV" on_click={download_csv}
-          id="download"/>
+        <Link_icon tooltip="Download all proxy ports as CSV"
+          on_click={download_csv} id="download"/>
     </Pagination_panel>
 );
 
-class Proxy_row extends Pure_component {
+const Proxy_row = withRouter(class Proxy_row extends Pure_component {
     constructor(props){
         super(props);
         this.state = {status: this.props.proxy._status};
@@ -755,11 +774,10 @@ class Proxy_row extends Pure_component {
         if (!this.props.master_port && this.props.proxy.multiply &&
             this.props.proxy.multiply>1)
         {
-            this.props.go('overview_multiplied',
-                {port: this.props.proxy.port});
+            this.props.history.push(`/overview/${this.props.proxy.port}`);
         }
         else
-            this.props.go('edit_proxy', {port: this.props.proxy.port});
+            this.props.history.push(`/proxy/${this.props.proxy.port}`);
     }
     render(){
         const proxy = this.props.proxy;
@@ -787,7 +805,7 @@ class Proxy_row extends Pure_component {
             </tr>
         );
     }
-}
+});
 
 class Cell extends React.Component {
     shouldComponentUpdate(){ return !!this.props.col.dynamic; }
@@ -832,9 +850,7 @@ class Actions extends Pure_component {
     duplicate(){
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-            });
+            this.on('uncaught', e=>console.log(e));
             yield window.fetch('/api/proxy_dup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -845,7 +861,7 @@ class Actions extends Pure_component {
     }
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
-        const delete_title = `Are you sure you want to delete port
+        const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
         return (
             <td className="proxies_actions">
@@ -853,7 +869,7 @@ class Actions extends Pure_component {
                 on_click={this.open_delete_dialog.bind(this)}
                 tooltip="Delete" invisible={!persist}/>
               <Action_icon id="duplicate" on_click={this.duplicate.bind(this)}
-                tooltip="Duplicate Proxy"
+                tooltip="Duplicate proxy port"
                 invisible={!persist}/>
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions.bind(this)}

@@ -7,11 +7,11 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {Modal, Loader, Select, Input, Warnings, presets, Link_icon,
+import {Modal, Loader, Select, Input, Warnings, Link_icon,
     Checkbox, Textarea, Tooltip, Pagination_panel,
     Loader_small} from './common.js';
-import Logs from './logs.js';
-import util from './util.js';
+import Har_viewer from './har_viewer.js';
+import * as util from './util.js';
 import zurl from 'hutil/util/url';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {Netmask} from 'netmask';
@@ -19,7 +19,10 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import {getContext, withContext} from 'recompose';
 import PropTypes from 'prop-types';
+import {withRouter} from 'react-router-dom';
+import {tabs, all_fields} from './proxy_fields.js';
 
+const presets = util.presets;
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 const event_tracker = {};
@@ -31,357 +34,6 @@ const ga_event = (category, action, label, opt={})=>{
         util.ga_event(category, action, label);
     }
 };
-const before_save = {
-    regex: val=>{
-        try { new RegExp(val); }
-        catch(e){ val = null; }
-        return val;
-    },
-};
-const tabs = {
-    logs: {fields: [], label: 'Logs'},
-    target: {
-        label: 'Targeting',
-        tooltip: 'Select specific targeting for your proxy exit node',
-        fields: {
-            country: {
-                label: 'Country',
-                tooltip: 'Choose your exit country for your requests',
-            },
-            state: {
-                label: 'State',
-                tooltip: 'Specific state in a given country',
-            },
-            city: {
-                label: 'City',
-                tooltip: 'The city from which IP will be allocated',
-                placeholder: 'Type in city name'
-            },
-            asn: {
-                label: <span>
-                    ASN (
-                    <a
-                      className="link"
-                      href="http://bgp.potaroo.net/cidr/autnums.html"
-                      target="_blank" rel="noopener noreferrer">
-                      ASN list
-                    </a>)
-                    </span>,
-                tooltip: `ASN uniquely identifies each network on the internet.
-                    Target exit nodes (IPs) on a specific ASN`,
-                placeholder: 'ASN code e.g. 42793'
-            },
-            carrier: {
-                label: 'Carrier',
-                tooltip: 'Network provider company name',
-            },
-        },
-    },
-    speed: {
-        label: 'Request speed',
-        tooltip: 'Control the speed of your request to improve performance',
-        fields: {
-            dns: {
-                label: 'DNS lookup',
-                tooltip: 'Location of DNS resolve',
-            },
-            pool_size: {
-                label: 'Pool size',
-                tooltip: `Maintain number of IPs that will be pinged constantly
-                    - must have keep_alive to work properly`,
-                ext: true,
-            },
-            request_timeout: {
-                label: 'Timeout for requests',
-                tooltip: `Kill requests to proxy and try new one if
-                    timeout is exceeded`,
-                ext: true,
-            },
-            race_reqs: {
-                label: 'Parallel race requests',
-                tooltip: `Sends multiple requests in parallel via different
-                    super proxies and uses the fastest request`,
-                placeholder: 'Number of parallel requests'
-            },
-            proxy_count: {
-                label: 'Minimum number of super proxies',
-                tooltip: `Minimum number of super proxies to use in parallel`,
-            },
-            proxy_switch: {
-                label: 'Switch super proxy on failure',
-                tooltip: `Number of failed requests(status 403, 429, 502, 503)
-                    to switch to different super proxy`,
-            },
-            throttle: {
-                label: 'Throttle requests',
-                tooltip: `Throttle requests above the given number. Allow
-                    maximum number of parallel requests`,
-                ext: true,
-            },
-            reverse_lookup: {
-                label: 'Reverse resolve',
-                tooltip: 'resolve DNS from IP to url',
-                ext: true,
-            },
-            reverse_lookup_file: {
-                label: 'Path to file',
-                placeholder: '/path/to/file',
-            },
-            reverse_lookup_values: {
-                label: 'Values',
-                placeholder: '1.1.1.1 example.com',
-            },
-        },
-    },
-    rules: {
-        label: 'Rules',
-        tooltip: 'Define custom action for specific rule',
-        fields: {
-            trigger_type: {
-                label: 'Rule type',
-                tooltip: `In every request the response will be analyzed.
-                    if the configured Trigger rule is true, the Action
-                    will be executed automatically`,
-            },
-            body_regex: {
-                label: 'String to be scanned in body (Regex)',
-                placeholder:`i.e. (captcha|robot)`,
-                tooltip:`A string(regular expression) to be scanned in the
-                    body of the response`
-            },
-            min_req_time: {
-                label: 'Minimum request time',
-                placeholder: '500',
-                tooltip: `Any request time above the given value in milliseconds
-                    will trigger the action`
-            },
-            max_req_time: {
-                label: 'Maximum request time',
-                placeholder: '500',
-                tooltip: `Any request time below the given value in milliseconds
-                    will trigger the action`
-            },
-            trigger_url_regex: {
-                label: 'Apply only on specific domains (optional)',
-                placeholder:`i.e. example.com`,
-                tooltip: `enable trigger to certain urls`
-            },
-            status_code: {
-                label: 'Status code string to be scanned',
-                tooltip: `status code to be scanned in the response headers`
-            },
-            status_custom: {
-                label: 'Custom status code (regex)',
-                placeholder:`i.e. (2..|3..|404)`,
-                tooltip: `A string(regular expression) to be scanned in the
-                    head of the response`
-            },
-            action: {
-                label: 'Action type',
-                tooltip: `The action to be executed when rule is met`,
-            },
-            retry_number: {
-                label: 'Number of retries',
-                tooltip: 'maximum number of retries to execute'
-            },
-            retry_port: {
-                label: 'Retry using a different port',
-                tooltip: 'Make additional request using a different port'
-            },
-            ban_ip_duration: {
-                label: 'Ban IP for',
-                tooltip: 'will remove the IP for a defined amount of time'
-            },
-            ban_ip_custom: {label: 'Custom duration'},
-        },
-    },
-    rotation: {
-        label: 'IP control',
-        tooltip: 'Set the conditions for which your IPs will change',
-        fields: {
-            ip: {
-                label: 'Data center IP',
-                tooltip: `Choose specific data center IP. to ensure
-                    all requests are executed using specific Data Center IP.
-                    to view the pool of your IPs take a look at 'pool size'
-                    option`,
-                placeholder: 'insert IP value from your pool'
-            },
-            vip: {
-                label: 'gIP',
-                tooltip: `Choose specific gIP to ensure all requests are
-                    executed using specific gIP. to view the pool of your gIPs
-                    take a look at 'pool size' option`,
-                placeholder: 'insert gIP id'
-            },
-            pool_type: {
-                label: 'Pool type',
-                tooltip: `How to pull the IPs - roundrobin / sequential`,
-                ext: true,
-            },
-            keep_alive: {
-                label: 'Keep-alive',
-                tooltip: `Chosen number of sec to ping ip and keep it
-                    connected. depending on peer availability.`,
-                ext: true,
-            },
-            whitelist_ips: {
-                label: 'Whitelist IP access',
-                tooltip: `Grant proxy access to specific IPs. only those
-                    IPs will be able to send requests to this proxy Port`,
-                placeholder: `e.g. 1.1.1.1,23.23.23.23`,
-                ext: true,
-            },
-            session_random: {
-                label: 'Random session',
-                tooltip: `Switch session ID on each request`,
-                ext: true,
-            },
-            session: {
-                label: 'Explicit session',
-                tooltip: `Insert session ID to maintain the same ip
-                    for as long as possible.`,
-            },
-            sticky_ip: {
-                label: 'Sticky IP',
-                tooltip: `When connecting to remote lpm server stick sessions
-                    to each computer. each connected computer will receive
-                    unique session`,
-                ext: true,
-            },
-            max_requests: {
-                label: 'Max requests',
-                tooltip: `Change session based on number of requests can be a
-                    range or a fixed number. when using browser it should be
-                    taken into consideration that one page load will attempt
-                    multiple requests under the hood`,
-                ext: true,
-            },
-            session_duration: {
-                label: 'Session duration (seconds)',
-                tooltip: `Change session after fixed number of seconds`,
-                ext: true,
-            },
-            seed: {
-                label: 'Session ID seed',
-                tooltip: `Seed used for random number generator in random
-                    sessions`,
-            }
-        },
-    },
-    debug: {
-        label: 'Debugging',
-        tooltip: 'Improve the info you receive from the Proxy Manager',
-        fields: {
-            history: {
-                label: 'Enable logs',
-                tooltip: `Last 1K requests are automatically logged for easy
-                    debugging. Enable Logs to save all requests`,
-                ext: true,
-            },
-            ssl: {
-                label: 'Enable SSL logs',
-                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
-                ext: true,
-            },
-            log: {
-                label: 'Log level',
-                tooltip: `Decide which data to show in logs`,
-                ext: true,
-            },
-            debug: {
-                label: 'Luminati request debug info',
-                tooltip: `Send debug info on every request`,
-            },
-        },
-    },
-    general: {
-        label: 'General',
-        tooltip: '',
-        fields: {
-            port: {
-                label: 'Port',
-                tooltip: `The port number that will be used for the current
-                    proxy configuration`,
-                ext: true,
-            },
-            password: {
-                label: 'Zone password',
-                tooltip: `Zone password as it appears in your zones page in
-                    your Luminati's control panel http://luminati.io/cp/zones`,
-            },
-            iface: {
-                label: 'Interface',
-                tooltip: 'Define a specific network interface on which '
-                    +'the local machine is running',
-                ext: true,
-            },
-            multiply: {
-                label: 'Multiply port',
-                tooltip: `Create multiple identical ports`,
-                ext: true,
-            },
-            multiply_ips: {
-                label: 'Multiply port per IP',
-                tooltip: `Create proxy port for every selected IP from the
-                    pool`
-            },
-            multiply_vips: {
-                label: 'Multiply port per gIP',
-                tooltip: `Create proxy port for every selected gIP from pool
-                    of available gIPS in your zone`
-            },
-            socks: {
-                label: 'SOCKS 5 port',
-                tooltip: `In addition to current port, creates a separate port
-                    with a SOCKS5 server (add SOCKS port number)`,
-                ext: true,
-            },
-            secure_proxy: {
-                label: 'SSL to super proxy',
-                tooltip: `Encrypt requests sent to super proxy to avoid
-                    detection on DNS`,
-                ext: true,
-            },
-            null_response: {
-                label: 'URL regex for null response',
-                tooltip: `on this url pattern, lpm will return a "null
-                    response" without proxying (useful when users don't want
-                    to make a request, but a browser expects 200 response)`,
-                ext: true,
-                before_save: before_save.regex,
-            },
-            bypass_proxy: {
-                label: `URL regex for bypassing`,
-                tooltip: `Insert URL pattern for which requests will be passed
-                    directly to target site without any proxy
-                    (super proxy or peer)`,
-                ext: true,
-                before_save: before_save.regex,
-            },
-            direct_include: {
-                label: `URL regex for super proxy`,
-                tooltip: `Insert URL pattern for which requests will be passed
-                    through super proxy directly (not through peers)`,
-                before_save: before_save.regex,
-            },
-            direct_exclude: {
-                label: `URL regex for not super proxy`,
-                tooltip: `Insert URL pattern for which requests will NOT be
-                    passed through super proxy`,
-                before_save: before_save.regex,
-            },
-            allow_proxy_auth: {
-                label: 'Allow request authentication',
-                tooltip: `Pass auth data per request (use lpm like
-                    api)`,
-            },
-        },
-    },
-};
-
-const all_fields = Object.keys(tabs).map(k=>tabs[k].fields).reduce((acc, el)=>
-    ({...acc, ...el}), {});
 
 const validators = {
     number: (min, max, req=false)=>val=>{
@@ -410,11 +62,9 @@ const validators = {
         });
         return res.join(',');
     },
-    regex: val=>{
-    },
 };
 
-class Index extends React.Component {
+const Index = withRouter(class Index extends React.Component {
     constructor(props){
         super(props);
         this.sp = etask('Index', function*(){ yield this.wait(); });
@@ -422,7 +72,7 @@ class Index extends React.Component {
             errors: {}, show_loader: false, saving: false};
         this.debounced_save = _.debounce(this.save.bind(this), 500);
     }
-    componentWillMount(){
+    componentDidMount(){
         if (!setdb.get('head.proxies_running'))
         {
             const _this = this;
@@ -456,26 +106,9 @@ class Index extends React.Component {
             setdb.on('head.edit_proxy.tab', (tab='logs')=>
                 this.setState({tab})),
         ];
-        window.setTimeout(this.fetch_globals.bind(this));
-    }
-    // XXX krzysztof: remove when intorudced ReactRouter
-    fetch_globals(){
-        const _this = this;
-        this.sp.spawn(etask(function*(){
-            if (!_this.state.consts)
-            {
-                const consts = yield ajax.json({url: '/api/consts'});
-                setdb.set('head.consts', consts);
-            }
-        }));
-    }
-    componentDidMount(){
-        setTimeout(()=>{
-            const url_o = zurl.parse(document.location.href);
-            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-            if (qs_o.field)
-                this.goto_field(qs_o.field);
-        });
+        let state;
+        if ((state = this.props.location.state)&&state.field)
+            this.goto_field(state.field);
     }
     componentWillUnmount(){
         this.sp.return();
@@ -483,7 +116,6 @@ class Index extends React.Component {
         setdb.set('head.edit_proxy.form', undefined);
         setdb.set('head.edit_proxy', undefined);
     }
-    componentDidUpdate(){ $('[data-toggle="tooltip"]').tooltip(); }
     delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
     update_loader(){
         this.setState(state=>{
@@ -683,22 +315,6 @@ class Index extends React.Component {
         const errors = _errors.reduce((acc, e)=>
             Object.assign(acc, {[e.field]: e.msg}), {});
         this.setState({errors, error_list: _errors});
-    }
-    // XXX krzysztof: remove this method
-    persist(data){
-        const _this = this;
-        this.etask(function*(){
-            const status = yield ajax.json({
-                url: '/api/proxy_status/'+data.port});
-            if (status.status=='ok')
-                ga_event('top bar', 'successfully saved');
-            else
-            {
-                ga_event('top bar', 'failed save', status.status);
-                _this.setState({error_list: [{msg: status.status}]});
-                $('#save_proxy_errors').modal('show');
-            }
-        });
     }
     update_proxies(){
         return etask(function*(){
@@ -911,7 +527,7 @@ class Index extends React.Component {
         const tab = this.state.tab;
         switch (this.state.tab)
         {
-        case 'logs': Main_window = Logs; break;
+        case 'logs': Main_window = Har_viewer; break;
         case 'target': Main_window = Targeting; break;
         case 'speed': Main_window = Speed; break;
         case 'rules': Main_window = Rules; break;
@@ -940,6 +556,7 @@ class Index extends React.Component {
             type = 'ips';
         else if (curr_plan&&!!curr_plan.vip)
             type = 'vips';
+        const port = this.props.match.params.port;
         return (
             <div className="lpm edit_proxy">
               <Loader show={this.state.show_loader||this.state.loading}/>
@@ -964,8 +581,8 @@ class Index extends React.Component {
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
                 <Main_window
+                  port={port}
                   proxy={this.state.consts&&this.state.consts.proxy}
-                  ports={[this.state.form.port]}
                   locations={this.state.locations}
                   defaults={this.state.defaults}
                   form={this.state.form}
@@ -988,7 +605,7 @@ class Index extends React.Component {
             </div>
         );
     }
-}
+});
 
 const Nav = ({disabled, ...props})=>{
     const reset_fields = ()=>{
@@ -1021,11 +638,15 @@ const Nav = ({disabled, ...props})=>{
         return {key, value: p};
     });
     let {preset} = props.form;
+    const preset_tooltip = preset&&presets[preset].subtitle
+    +(presets[preset].rules&&
+    '<ul>'+presets[preset].rules.map(r=>`<li>${r.label}</li>`).join('')
+    +'</ul>');
     return (
         <div className="nav">
           <Field on_change={update_zone} options={props.zones} tooltip="Zone"
             value={props.form.zone} disabled={disabled}/>
-          <Field on_change={update_preset} tooltip="Preset"
+          <Field on_change={update_preset} tooltip={preset_tooltip}
             options={presets_opt} value={preset} disabled={disabled}/>
         </div>
     );
@@ -1034,7 +655,7 @@ const Nav = ({disabled, ...props})=>{
 const Field = ({disabled, tooltip, ...props})=>{
     const options = props.options||[];
     return (
-        <Tooltip title={tooltip}>
+        <Tooltip title={tooltip} placement="bottom">
           <div className="field">
             <select value={props.value} disabled={disabled}
               onChange={e=>props.on_change(e.target.value)}>
@@ -1070,6 +691,7 @@ const Tab_btn = props=>{
     }).length;
     const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
     return (
+        <Tooltip title={tabs[props.id].tooltip}>
           <div onClick={()=>props.on_tab_click(props.id)}
             className={btn_class}>
             <Tab_icon id={props.id} changes={changes}
@@ -1077,6 +699,7 @@ const Tab_btn = props=>{
             <div className="title">{tabs[props.id].label}</div>
             <div className="arrow"/>
           </div>
+        </Tooltip>
     );
 };
 
@@ -1177,11 +800,9 @@ let Section_field = props=>{
     return (
         <div className={classnames('field_row', {disabled, note})}>
           <div className="desc">
-            <span data-toggle="tooltip" data-placement="top"
-              data-container="body"
-              title={tooltip}>
+            <Tooltip title={tooltip}>
               {tabs[tab_id].fields[id].label}
-            </span>
+            </Tooltip>
           </div>
           <div className="field">
             <div className="inline_field">
@@ -1232,31 +853,39 @@ class Targeting_raw extends React.Component {
             {value: 'airtel', key: 'Airtel'},
             {value: 'att', key: 'AT&T'},
             {value: 'vimpelcom', key: 'Beeline Russia'},
+            {value: 'celcom', key: 'Celcom'},
             {value: 'chinamobile', key: 'China Mobile'},
             {value: 'claro', key: 'Claro'},
             {value: 'comcast', key: 'Comcast'},
             {value: 'cox', key: 'Cox'},
             {value: 'dt', key: 'Deutsche Telekom'},
+            {value: 'digi', key: 'Digi Malaysia'},
             {value: 'docomo', key: 'Docomo'},
             {value: 'dtac', key: 'DTAC Trinet'},
             {value: 'etisalat', key: 'Etisalat'},
             {value: 'idea', key: 'Idea India'},
+            {value: 'kyivstar', key: 'Kyivstar'},
             {value: 'meo', key: 'MEO Portugal'},
             {value: 'megafont', key: 'Megafon Russia'},
             {value: 'mtn', key: 'MTN - Mahanager Telephone'},
+            {value: 'mtnza', key: 'MTN South Africa'},
             {value: 'mts', key: 'MTS Russia'},
             {value: 'optus', key: 'Optus'},
             {value: 'orange', key: 'Orange'},
             {value: 'qwest', key: 'Qwest'},
             {value: 'reliance_jio', key: 'Reliance Jio'},
+            {value: 'robi', key: 'Robi'},
             {value: 'sprint', key: 'Sprint'},
             {value: 'telefonica', key: 'Telefonica'},
             {value: 'telstra', key: 'Telstra'},
             {value: 'tmobile', key: 'T-Mobile'},
             {value: 'tigo', key: 'Tigo'},
             {value: 'tim', key: 'TIM (Telecom Italia)'},
+            {value: 'vodacomza', key: 'Vodacom South Africa'},
             {value: 'vodafone', key: 'Vodafone'},
             {value: 'verizon', key: 'Verizon'},
+            {value: 'vivo', key: 'Vivo'},
+            {value: 'zain', key: 'Zain'}
         ];
     }
     allowed_countries(){
@@ -1489,7 +1118,8 @@ class Rules_raw extends React.Component {
         const action_types = [
             {key: 'i.e. Retry with new IP', value: ''},
             {key: 'Retry with new IP', value: 'retry'},
-            {key: 'Retry with new port (Waterfall)', value: 'retry_port'},
+            {key: 'Retry with new proxy port (Waterfall)',
+                value: 'retry_port'},
             {key: 'Ban IP', value: 'ban_ip'},
             {key: 'Save IP to reserved pool', value: 'save_to_pool'},
         ];
@@ -1643,7 +1273,7 @@ class Alloc_modal extends Pure_component {
         setdb.set('head.edit_proxy.loading', loading);
         this.setState({loading});
     }
-    checked(row){ return this.props.form[this.props.type].includes(row); }
+    checked = row=>(this.props.form[this.props.type]||[]).includes(row);
     reset(){
         this.props.on_change_field(this.props.type, []);
         this.props.on_change_field('pool_size', '');

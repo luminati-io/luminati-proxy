@@ -11,9 +11,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
-import util from './util.js';
-
-const ga_event = util.ga_event;
+import {ga_event} from './util.js';
 
 class Config extends Pure_component {
     constructor(props){
@@ -25,7 +23,6 @@ class Config extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea,
             {mode: 'javascript', readOnly: 'nocursor'});
-        this.cm.setSize('auto', 420);
         this.cm.on('change', this.on_cm_change.bind(this));
         const _this = this;
         this.etask(function*(){
@@ -108,14 +105,14 @@ class Config extends Pure_component {
         ga_event('configuration', 'click cancel');
     }
     render(){
-        const panel_class = classnames('panel code_panel', {
+        const panel_class = classnames('panel code_panel flex_auto vbox', {
             editable: this.state.editable});
         return (
-            <div className="lpm config">
+            <div className="lpm config vbox">
               <Nav title={this.title} subtitle={this.subtitle}
                 warning={this.state.warning}/>
               <div className={panel_class}>
-                <div className="panel_body">
+                <div className="panel_body flex_auto vbox">
                   <Nav_buttons editable={this.state.editable}
                     changed={this.state.changed}
                     click_edit={this.click_edit.bind(this)}
