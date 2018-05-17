@@ -87,6 +87,21 @@ class Pane_headers extends Pure_component {
 }
 
 class Pane_response extends Pure_component {
+    render(){
+        const content_type = this.props.req.details.content_type;
+        if (!content_type||['xhr', 'css', 'js', 'font'].includes(content_type))
+            return <Codemirror_wrapper req={this.props.req}/>;
+        return <No_response_data/>;
+    }
+}
+
+const No_response_data = ()=>(
+    <div className="empty_view">
+      <div>This request has no response data available.</div>
+    </div>
+);
+
+class Codemirror_wrapper extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea, {
             readOnly: 'nocursor',
@@ -101,14 +116,10 @@ class Pane_response extends Pure_component {
         this.set_ct();
     }
     set_ct(){
-        const {content_type} = this.props;
-        if (!content_type)
-            return this.cm.setOption('mode', 'javascript');
-        let mode = 'javascript';
-        if (content_type.match(/json/))
+        const content_type = this.props.req.details.content_type;
+        let mode;
+        if (!content_type||content_type=='xhr')
             mode = 'javascript';
-        if (content_type.match(/html/))
-            mode = 'htmlmixed';
         this.cm.setOption('mode', mode);
     }
     set_textarea = ref=>{ this.textarea = ref; };
@@ -287,7 +298,11 @@ class Pane_preview extends Pure_component {
 }
 
 const Img_viewer = ({img})=>(
-    <p>img {img}</p>
+    <div className="img_viewer">
+      <div className="image">
+        <img src={img}/>
+      </div>
+    </div>
 );
 
 export default Preview;

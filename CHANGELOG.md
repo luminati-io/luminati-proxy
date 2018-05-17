@@ -1,5 +1,7 @@
  Luminati Proxy manager - Change Log
 
+## 1.95.899
+
 ## 1.95.360
 - :bug: fixed dialog on port conflict in electron app 
 - :bug: no version in exe name (for resident tasks)

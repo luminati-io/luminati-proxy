@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.95.360"
+VERSION="1.95.899"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -164,10 +164,15 @@ run_cmd()
     if ((!ret&&!force_log)); then
         error=""
     fi
+    local cmd_log=""
     if ((!ret)); then
-        zerr "CMD $cmd: OK $error"
+        cmd_log="CMD $cmd: OK $error"
     else
-        zerr "CMD $cmd: FAIL($ret) $error"
+        cmd_log="CMD $cmd: FAIL($ret) $error"
+    fi
+    zerr "$cmd_log"
+    if ((PRINT_PERR)); then
+        echo "$cmd_log"
     fi
     return $ret;
 }
@@ -329,7 +334,7 @@ check_wget()
         perr "check_no_wget"
         INSTALL_WGET=1
     else
-        zerr "found_curl: $(wget --version | head -n 1 2>/dev/null)"
+        zerr "check_wget: $(wget --version | head -n 1 2>/dev/null)"
     fi
 }
 
@@ -360,6 +365,7 @@ check_node()
     echo "checking nodejs..."
     if is_cmd_defined "node"; then
         local node_ver=$(node -v)
+        zerr "check_node: $node_ver"
         echo "node ${node_ver} is installed"
         if ! [[ "$node_ver" =~ ^(v[6-9]\.|v[1-9][0-9]+\.) ]]; then
             echo "minimum required node version is 6"
@@ -386,7 +392,8 @@ check_npm()
         perr "check_no_npm"
     else
         local npm_ver=$(npm -v)
-        if [[ "$npm_ver" =~ ^([3,7-9]\.|[1-9][0-9]+\.) ]]; then
+        zerr "check_npm: $npm_ver"
+        if [[ "$npm_ver" =~ ^([3,5,7-9]\.|[1-9][0-9]+\.) ]]; then
             UPDATE_NPM=1
             perr "check_npm_bad_version" "$npm_ver"
         fi
@@ -401,7 +408,7 @@ check_curl()
         perr 'check_no_curl'
         INSTALL_CURL=1
     else
-        zerr "found_curl: $(curl --version | head -n 1 2>/dev/null)"
+        zerr "check_curl: $(curl --version | head -n 1 2>/dev/null)"
     fi
 }
 
@@ -536,34 +543,35 @@ deps_install()
 
 lpm_clean()
 {
-    echo "cleaning lpm related node packages"
+    echo "cleaning lpm related node packages and npm cache"
     local lib_path="$(npm prefix -g)/lib"
-    local install_cmd=(
+    local clean_cmd=(
         "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
         "rm -rf $lib_path/node_modules/{@luminati-io,sqlite3,luminati-proxy}"
+        "rm -rf $HOME/.npm"
+        "mkdir -p $HOME/.npm/_cacache"
+        "mkdir -p $HOME/.npm/_logs"
+        "npm cache clean --force"
+        "npm cache verify"
     )
-    for cmd in "${install_cmd[@]}"; do
+    for cmd in "${clean_cmd[@]}"; do
         if ((USE_NVM)); then
-            run_cmd "$install_cmd"
+            run_cmd "$cmd"
         else
-            sudo_cmd "$install_cmd"
+            sudo_cmd "$cmd"
         fi
     done
     if ((!USE_NVM)); then
-        echo "cleaning node cache"
-        sudo_cmd "rm -rf $HOME/.npm /root/.npm"
+        sudo_cmd "rm -rf /root/.npm"
         echo "removing luminati links"
         sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
-        run_cmd "mkdir -p $HOME/.npm/_cacache"
-        run_cmd "mkdir -p $HOME/.npm/_logs"
     fi
 }
 
 lpm_install()
 {
-    echo "installing Luminati proxy manager"
     perr "install" "lpm"
-    lpm_clean
+    echo "installing Luminati proxy manager"
     local cmd="npm install -g --unsafe-perm @luminati-io/luminati-proxy > /dev/null"
     if ((USE_NVM)); then
         retry_cmd "$cmd"
@@ -573,7 +581,7 @@ lpm_install()
     if (($?)); then
         echo "Luminati failed to install from npm"
         perr "install_error_lpm"
-        exit $?
+        exit 1
     fi
     if ((!USE_NVM)); then
         if ((LUM)); then
@@ -642,6 +650,7 @@ setup()
     fi
     zerr "deps_install"
     deps_install
+    lpm_clean
     lpm_install
     check_install
     perr "complete"

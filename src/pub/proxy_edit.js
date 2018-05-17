@@ -1,0 +1,1463 @@
+// LICENSE_CODE ZON ISC
+'use strict'; /*jslint react:true, es6:true*/
+import React from 'react';
+import Pure_component from '../../www/util/pub/pure_component.js';
+import classnames from 'classnames';
+import $ from 'jquery';
+import _ from 'lodash';
+import etask from 'hutil/util/etask';
+import ajax from 'hutil/util/ajax';
+import setdb from 'hutil/util/setdb';
+import {Modal, Loader, Select, Input, Warnings, Link_icon,
+    Checkbox, Textarea, Tooltip, Pagination_panel,
+    Loader_small} from './common.js';
+import Har_viewer from './har_viewer.js';
+import * as util from './util.js';
+import zurl from 'hutil/util/url';
+import {Typeahead} from 'react-bootstrap-typeahead';
+import {Netmask} from 'netmask';
+import {getContext, withContext} from 'recompose';
+import PropTypes from 'prop-types';
+import {withRouter} from 'react-router-dom';
+import {tabs, all_fields} from './proxy_fields.js';
+
+const presets = util.presets;
+const provider = provide=>withContext({provide: PropTypes.object},
+    ()=>({provide}));
+const event_tracker = {};
+const ga_event = (action, label, opt={})=>{
+    const id = action+label;
+    if (!event_tracker[id] || !opt.single)
+    {
+        event_tracker[id] = true;
+        util.ga_event('proxy_edit', action, label);
+    }
+};
+
+const validators = {
+    number: (min, max, req=false)=>val=>{
+        val = Number(val);
+        if (isNaN(val))
+        {
+            if (req)
+                return min;
+            else
+                return undefined;
+        }
+        else if (val < min)
+            return min;
+        else if (val > max)
+            return max;
+        else
+            return val;
+    },
+    ips_list: val=>{
+        val = val.replace(/\s/g, '');
+        const ips = val.split(',');
+        const res = [];
+        ips.forEach(ip=>{
+            try { res.push(new Netmask(ip).base); }
+            catch(e){ console.log('incorrect ip format'); }
+        });
+        return res.join(',');
+    },
+};
+
+const Index = withRouter(class Index extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {form: {zones: {}}, warnings: [], errors: {},
+            show_loader: false, saving: false};
+        this.debounced_save = _.debounce(this.save, 500);
+        setdb.set('head.proxy_edit.set_field', this.set_field);
+        setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
+    }
+    componentDidMount(){
+        if (!setdb.get('head.proxies_running'))
+        {
+            const _this = this;
+            this.etask(function*(){
+                const proxies_running = yield ajax.json(
+                    {url: '/api/proxies_running'});
+                setdb.set('head.proxies_running', proxies_running);
+            });
+        }
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies||this.state.proxies)
+                return;
+            this.port = this.props.match.params.port;
+            const proxy = proxies.filter(p=>p.port==this.port)[0].config;
+            const form = Object.assign({}, proxy);
+            const preset = this.guess_preset(form);
+            this.apply_preset(form, preset);
+            this.setState({proxies}, this.delayed_loader());
+        });
+        this.setdb_on('head.consts', consts=>
+            this.setState({consts}, this.delayed_loader()));
+        this.setdb_on('head.defaults', defaults=>
+            this.setState({defaults}, this.delayed_loader()));
+        this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
+        this.setdb_on('head.proxy_edit.loading', loading=>
+            this.setState({loading}));
+        this.setdb_on('head.proxy_edit.tab', (tab='logs')=>
+            this.setState({tab}));
+        let state;
+        if ((state = this.props.location.state)&&state.field)
+            this.goto_field(state.field);
+    }
+    willUnmount(){
+        setdb.set('head.proxy_edit.form', undefined);
+        setdb.set('head.proxy_edit', undefined);
+    }
+    delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
+    update_loader(){
+        this.setState(state=>{
+            const show_loader = !state.consts || !state.proxies ||
+                !state.defaults;
+            const zone_name = !show_loader &&
+                (state.form.zone||state.consts.proxy.zone.def);
+            setdb.set('head.proxy_edit.zone_name', zone_name);
+            return {show_loader};
+        });
+    }
+    goto_field = field=>{
+        let tab;
+        for (let [tab_id, tab_o] of Object.entries(tabs))
+        {
+            if (Object.keys(tab_o.fields).includes(field))
+            {
+                tab = tab_id;
+                break;
+            }
+        }
+        if (tab)
+            setdb.set('head.proxy_edit.tab', tab);
+    };
+    guess_preset(form){
+        let res;
+        for (let p in presets)
+        {
+            const preset = presets[p];
+            if (preset.check(form))
+            {
+                res = p;
+                break;
+            }
+        }
+        if (form.last_preset_applied && presets[form.last_preset_applied])
+            res = form.last_preset_applied;
+        return res;
+    }
+    set_field = (field_name, value)=>{
+        this.setState(prev_state=>{
+            const new_form = {...prev_state.form, [field_name]: value};
+            return {form: new_form};
+        }, this.debounced_save);
+        setdb.set('head.proxy_edit.form.'+field_name, value);
+        this.send_ga(field_name, value);
+    };
+    send_ga(id, value){
+        if (id=='zone')
+        {
+            ga_event('edit zone', value);
+            return;
+        }
+        let tab_label;
+        for (let t in tabs)
+        {
+            if (Object.keys(tabs[t].fields).includes(id))
+            {
+                tab_label = tabs[t].label;
+                break;
+            }
+        }
+        ga_event('edit '+id, value, {single: true});
+    }
+    is_valid_field = field_name=>{
+        const proxy = this.state.consts.proxy;
+        const form = this.state.form;
+        if (!proxy)
+            return false;
+        if (form.ext_proxies && all_fields[field_name] &&
+            !all_fields[field_name].ext)
+        {
+            return false;
+        }
+        const zone = form.zone||proxy.zone.def;
+        if (['city', 'state'].includes(field_name) &&
+            (!form.country||form.country=='*'))
+        {
+            return false;
+        }
+        const details = proxy.zone.values.filter(z=>z.value==zone)[0];
+        const permissions = details&&details.perm.split(' ')||[];
+        const plan = details&&details.plans[details.plans.length-1]||{};
+        if (field_name=='vip')
+            return !!plan.vip;
+        if (field_name=='country'&&(plan.type=='static'||
+            ['domain', 'domain_p'].includes(plan.vips_type)))
+        {
+            return false;
+        }
+        if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
+            return permissions.includes(field_name);
+        if (field_name=='carrier')
+            return permissions.includes('asn');
+        return true;
+    };
+    apply_preset(_form, preset){
+        const form = Object.assign({}, _form);
+        const last_preset = form.last_preset_applied ?
+            presets[form.last_preset_applied] : null;
+        if (last_preset&&last_preset.key!=preset&&last_preset.clean)
+            last_preset.clean(form);
+        if (form.ext_proxies)
+        {
+            form.preset = '';
+            form.zone = '';
+            form.password = '';
+        }
+        else
+        {
+            form.preset = preset;
+            form.last_preset_applied = preset;
+            presets[preset].set(form);
+        }
+        this.apply_rules(form);
+        if (form.session===true)
+        {
+            form.session_random = true;
+            form.session = '';
+        }
+        else
+            form.session_random = false;
+        if (form.reverse_lookup===undefined)
+        {
+            if (form.reverse_lookup_dns)
+                form.reverse_lookup = 'dns';
+            else if (form.reverse_lookup_file)
+                form.reverse_lookup = 'file';
+            else if (form.reverse_lookup_values)
+            {
+                form.reverse_lookup = 'values';
+                form.reverse_lookup_values = form.reverse_lookup_values
+                .join('\n');
+            }
+        }
+        if (!form.ips)
+            form.ips = [];
+        if (!form.vips)
+            form.vips = [];
+        if (Array.isArray(form.whitelist_ips))
+            form.whitelist_ips = form.whitelist_ips.join(',');
+        if (form.city && !Array.isArray(form.city) && form.state)
+        {
+            form.city = [{id: form.city,
+                label: form.city+' ('+form.state+')'}];
+        }
+        else if (!Array.isArray(form.city))
+            form.city = [];
+        if (!this.original_form)
+            this.original_form = form;
+        form.country = (form.country||'').toLowerCase();
+        form.state = (form.state||'').toLowerCase();
+        this.setState({form});
+        setdb.set('head.proxy_edit.form', form);
+    }
+    rule_map_to_form = (rule, id)=>{
+        const result = {id};
+        const res = rule.res[0];
+        if (res.status)
+        {
+            if (!res.status_custom)
+                result.status_code = res.status.arg;
+            else
+            {
+                result.status_code = 'Custom';
+                result.status_custom = res.status.arg;
+            }
+        }
+        result.trigger_url_regex = rule.url;
+        result.trigger_type = res.trigger_type;
+        result.body_regex = res.body&&res.body.arg;
+        if (res.min_req_time)
+        {
+            const min_req_time = res.min_req_time.match(/\d+/);
+            result.min_req_time = Number(min_req_time&&min_req_time[0]);
+        }
+        if (res.max_req_time)
+        {
+            const max_req_time = res.max_req_time.match(/\d+/);
+            result.max_req_time = Number(max_req_time&&max_req_time[0]);
+        }
+        result.action = res.action_type;
+        result.retry_port = res.action.retry_port;
+        result.retry_number = res.action.retry;
+        if (res.action.ban_ip)
+        {
+            result.ban_ip_duration = 'custom';
+            const minutes = res.action.ban_ip.match(/\d+/);
+            result.ban_ip_custom = Number(minutes&&minutes[0]);
+        }
+        return result;
+    };
+    apply_rules = (form)=>{
+        if (form.rules&&form.rules.post)
+        {
+            const rules = form.rules.post.map(this.rule_map_to_form);
+            setdb.set('head.proxy_edit.rules', rules);
+        }
+    };
+    default_opt = option=>{
+        const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
+        return [
+            {key: 'No', value: false},
+            {key: 'Default ('+default_label+')', value: ''},
+            {key: 'Yes', value: true},
+        ];
+    };
+    set_errors = _errors=>{
+        const errors = _errors.reduce((acc, e)=>
+            Object.assign(acc, {[e.field]: e.msg}), {});
+        this.setState({errors, error_list: _errors});
+    };
+    update_proxies = ()=>{
+        return etask(function*(){
+            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            setdb.set('head.proxies_running', proxies);
+        });
+    };
+    save = ()=>{
+        if (this.saving)
+        {
+            this.resave = true;
+            return;
+        }
+        const data = this.prepare_to_save();
+        const check_url = '/api/proxy_check/'+this.port;
+        this.saving = true;
+        this.setState({saving: true});
+        const _this = this;
+        this.etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                ga_event('save failed', e.message);
+                _this.setState({error_list: [{msg: 'Something went wrong'}],
+                    saving: false});
+                _this.saving = false;
+                $('#save_proxy_errors').modal('show');
+            });
+            const raw_check = yield window.fetch(check_url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+            });
+            const json_check = yield raw_check.json();
+            const errors = json_check.filter(e=>e.lvl=='err');
+            _this.set_errors(errors);
+            if (errors.length)
+            {
+                ga_event('save failed', JSON.stringify(errors));
+                $('#save_proxy_errors').modal('show');
+                _this.setState({saving: false});
+                _this.saving = false;
+                return;
+            }
+            const warnings = json_check.filter(w=>w.lvl=='warn');
+            if (warnings.length)
+                _this.setState({warnings});
+            const update_url = '/api/proxies/'+_this.port;
+            const raw_update = yield window.fetch(update_url, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({proxy: data}),
+            });
+            _this.setState({saving: false});
+            _this.saving = false;
+            if (_this.resave)
+            {
+                _this.resave = false;
+                _this.save();
+            }
+            _this.update_proxies();
+        });
+    };
+    prepare_to_save = ()=>{
+        const save_form = Object.assign({}, this.state.form);
+        for (let field in save_form)
+        {
+            let before_save;
+            if (before_save = all_fields[field] &&
+                all_fields[field].before_save)
+            {
+                save_form[field] = before_save(save_form[field]);
+            }
+            if (!this.is_valid_field(field) || save_form[field]===null)
+                save_form[field] = '';
+        }
+        const effective = attr=>{
+            return save_form[attr]===undefined ?
+                this.state.defaults[attr] : save_form[attr];
+        };
+        save_form.zone = save_form.zone||this.state.consts.proxy.zone.def;
+        save_form.history = effective('history');
+        save_form.ssl = effective('ssl');
+        save_form.max_requests = effective('max_requests');
+        save_form.session_duration = effective('session_duration');
+        save_form.keep_alive = effective('keep_alive');
+        save_form.pool_size = effective('pool_size');
+        save_form.proxy_type = 'persist';
+        if (save_form.reverse_lookup=='dns')
+            save_form.reverse_lookup_dns = true;
+        else
+            save_form.reverse_lookup_dns = '';
+        if (save_form.reverse_lookup!='file')
+            save_form.reverse_lookup_file = '';
+        if (save_form.reverse_lookup=='values')
+        {
+            save_form.reverse_lookup_values =
+                save_form.reverse_lookup_values.split('\n');
+        }
+        else
+            save_form.reverse_lookup_values = '';
+        delete save_form.reverse_lookup;
+        if (save_form.whitelist_ips)
+            save_form.whitelist_ips = save_form.whitelist_ips.split(',')
+        .filter(Boolean);
+        if (save_form.city.length)
+            save_form.city = save_form.city[0].id;
+        else
+            save_form.city = '';
+        if (!save_form.max_requests)
+            save_form.max_requests = 0;
+        delete save_form.preset;
+        if (!save_form.session)
+            save_form.session = false;
+        if (save_form.session_random)
+            save_form.session = true;
+        delete save_form.session_random;
+        if (!save_form.socks)
+            save_form.socks = null;
+        return save_form;
+    };
+    get_curr_plan = ()=>{
+        const zone_name = this.state.form.zone||
+            this.state.consts.proxy.zone.def;
+        const zones = this.state.consts.proxy.zone.values;
+        const curr_zone = zones.filter(p=>p.key==zone_name);
+        let curr_plan;
+        if (curr_zone.length)
+            curr_plan = curr_zone[0].plans.slice(-1)[0];
+        return curr_plan;
+    };
+    render(){
+        let Main_window;
+        const tab = this.state.tab;
+        switch (this.state.tab)
+        {
+        case 'target': Main_window = Targeting; break;
+        case 'speed': Main_window = Speed; break;
+        case 'rules': Main_window = Rules; break;
+        case 'rotation': Main_window = Rotation; break;
+        case 'debug': Main_window = Debug; break;
+        case 'general': Main_window = General; break;
+        case 'logs':
+        default: Main_window = Har_viewer;
+        }
+        if (!this.state.consts||!this.state.defaults||!this.state.proxies)
+            Main_window = ()=>null;
+        const support = presets && this.state.form.preset &&
+            presets[this.state.form.preset].support||{};
+        let zones = this.state.consts&&
+            this.state.consts.proxy.zone.values||[];
+        zones = zones.filter(z=>{
+            const plan = z.plans && z.plans.slice(-1)[0] || {};
+            return !plan.archive && !plan.disable;
+        });
+        const default_zone=this.state.consts&&
+            this.state.consts.proxy.zone.def;
+        const curr_plan = this.state.consts&&this.get_curr_plan();
+        let type;
+        if (curr_plan&&curr_plan.type=='static')
+            type = 'ips';
+        else if (curr_plan&&!!curr_plan.vip)
+            type = 'vips';
+        const port = this.props.match.params.port;
+        return (
+            <div className="lpm proxy_edit">
+              <Loader show={this.state.show_loader||this.state.loading}/>
+              <div className="nav_wrapper">
+                <div className="nav_header">
+                  <h3>Proxy on port {this.port}</h3>
+                  <Loader_small show={this.state.saving}/>
+                </div>
+                <Nav
+                  zones={zones}
+                  default_zone={default_zone}
+                  disabled={!!this.state.form.ext_proxies}
+                  form={this.state.form}
+                  on_change_preset={this.apply_preset.bind(this)}/>
+                <Nav_tabs
+                  form={this.state.form}
+                  errors={this.state.errors}/>
+              </div>
+              <div className={classnames('main_window', {[tab]: true})}>
+                <Main_window
+                  port={port}
+                  proxy={this.state.consts&&this.state.consts.proxy}
+                  defaults={this.state.defaults}
+                  form={this.state.form}
+                  support={support}
+                  default_opt={this.default_opt}
+                  get_curr_plan={this.get_curr_plan}/>
+              </div>
+              <Modal className="warnings_modal" id="save_proxy_errors"
+                title="Errors:" no_cancel_btn>
+                <Warnings warnings={this.state.error_list}/>
+              </Modal>
+              <Alloc_modal type={type} form={this.state.form} support={support}
+                zone={this.state.form.zone||default_zone}/>
+            </div>
+        );
+    }
+});
+
+class Nav extends Pure_component {
+    set_field = setdb.get('head.proxy_edit.set_field');
+    _reset_fields = ()=>{
+        this.set_field('ips', []);
+        this.set_field('vips', []);
+        this.set_field('multiply_ips', false);
+        this.set_field('multiply_vips', false);
+        this.set_field('multiply', 1);
+    };
+    update_preset = val=>{
+        this.props.on_change_preset(this.props.form, val);
+        this._reset_fields();
+        ga_event('edit preset', val);
+    };
+    update_zone = val=>{
+        const zone_name = val||this.props.default_zone;
+        setdb.set('head.proxy_edit.zone_name', zone_name);
+        const zone = this.props.zones.filter(z=>z.key==zone_name)[0]||{};
+        this.set_field('zone', val);
+        this.set_field('password', zone.password);
+        if (this.props.form.ips.length || this.props.form.vips.length)
+            this.set_field('pool_size', 0);
+        this._reset_fields();
+    };
+    render(){
+        const presets_opt = Object.keys(presets).map(p=>{
+            let key = presets[p].title;
+            if (presets[p].default)
+                key = `Default (${key})`;
+            return {key, value: p};
+        });
+        const preset = this.props.form.preset;
+        const preset_tooltip = preset&&presets[preset].subtitle
+        +(presets[preset].rules&&
+        '<ul>'+presets[preset].rules.map(r=>`<li>${r.label}</li>`).join('')
+        +'</ul>');
+        return (
+            <div className="nav">
+              <Field on_change={this.update_zone} options={this.props.zones}
+                tooltip="Zone" value={this.props.form.zone}
+                disabled={this.props.disabled}/>
+              <Field on_change={this.update_preset} tooltip={preset_tooltip}
+                options={presets_opt} value={preset}
+                disabled={this.props.disabled}/>
+            </div>
+        );
+    }
+}
+
+const Field = ({disabled, tooltip, ...props})=>{
+    const options = props.options||[];
+    return (
+        <Tooltip title={tooltip} placement="bottom">
+          <div className="field">
+            <select value={props.value} disabled={disabled}
+              onChange={e=>props.on_change(e.target.value)}>
+              {options.map(o=>(
+                <option key={o.key} value={o.value}>{o.key}</option>
+              ))}
+            </select>
+          </div>
+        </Tooltip>
+    );
+};
+
+class Nav_tabs extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.tab', (tab='logs')=>
+            this.setState({tab}));
+    }
+    render(){
+        const {form, errors} = this.props;
+        // XXX krzysztof: remove ...props
+        return (
+            <div className="nav_tabs">
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="logs"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="target"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="speed"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="rules"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab}
+                id="rotation"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="debug"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="general"/>
+            </div>
+        );
+    }
+}
+
+const Tab_btn = props=>{
+    const btn_class = classnames('btn_tab',
+        {active: props.curr_tab==props.id});
+    const tab_fields = Object.keys(tabs[props.id].fields||{});
+    let changes;
+    if (props.id=='rules')
+        changes = _.get(props, 'form.rules.post.length');
+    else
+    {
+        changes = Object.keys(props.form).filter(f=>{
+            const val = props.form[f];
+            const is_empty_arr = Array.isArray(val) && !val[0];
+            return tab_fields.includes(f) && val && !is_empty_arr;
+        }).length;
+    }
+    const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
+    return (
+        <Tooltip title={tabs[props.id].tooltip}>
+          <div onClick={()=>setdb.set('head.proxy_edit.tab', props.id)}
+            className={btn_class}>
+            <Tab_icon id={props.id} changes={changes}
+              error={errors.length}/>
+            <div className="title">{tabs[props.id].label}</div>
+            <div className="arrow"/>
+          </div>
+        </Tooltip>
+    );
+};
+
+const Tab_icon = props=>{
+    const circle_class = classnames('circle_wrapper', {
+        active: props.error||props.changes, error: props.error});
+    const content = props.error ? '!' : props.changes;
+    return (
+        <div className={classnames('icon', props.id)}>
+          <div className={circle_class}>
+            <div className="circle">{content}</div>
+          </div>
+        </div>
+    );
+};
+
+const Double_number = props=>{
+    const vals = (''+props.val).split(':');
+    const update = (start, end)=>{
+        props.on_change_wrapper([start||0, end].join(':')); };
+    return (
+        <span className="double_field">
+          <Input {...props} val={vals[0]||''} id={props.id+'_start'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(val, vals[1])}/>
+          <span className="devider">:</span>
+          <Input {...props} val={vals[1]||''} id={props.id+'_end'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(vals[0], val)}/>
+        </span>
+    );
+};
+
+const Typeahead_wrapper = props=>(
+    <Typeahead options={props.data} maxResults={10}
+      minLength={1} disabled={props.disabled} selectHintOnEnter
+      onChange={props.on_change_wrapper} selected={props.val}/>
+);
+
+const Config = getContext({provide: PropTypes.object})(
+class Config extends Pure_component {
+    set_field = setdb.get('head.proxy_edit.set_field');
+    is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
+    state = {};
+    on_blur = ({target: {value}})=>{
+        if (this.props.validator)
+            this.set_field(this.props.id, this.props.validator(value));
+    };
+    on_change_wrapper = (value, _id)=>{
+        const curr_id = _id||this.props.id;
+        if (this.props.on_change)
+            this.props.on_change(value);
+        this.set_field(curr_id, value);
+    };
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.form.'+this.props.id, val=>{
+            this.setState({val, show: true});
+        });
+    }
+    render(){
+        if (!this.state.show)
+            return null;
+        const {id, sufix, note, type, data, min, max} = this.props;
+        const {tab_id} = this.props.provide;
+        const disabled = this.props.disabled || !this.is_valid_field(id);
+        const val = this.state.val===undefined ? '' : this.state.val;
+        const placeholder = tabs[tab_id].fields[id].placeholder||'';
+        const tooltip = tabs[tab_id].fields[id].tooltip;
+        return (
+            <div className={classnames('field_row', {disabled, note})}>
+              <div className="desc">
+                <Tooltip title={tooltip}>
+                  {tabs[tab_id].fields[id].label}
+                </Tooltip>
+              </div>
+              <div className="field">
+                <div className="inline_field">
+                  <Form_controller id={id} data={data} type={type}
+                    on_change_wrapper={this.on_change_wrapper} val={val}
+                    disabled={disabled} min={min} max={max}
+                    placeholder={placeholder} on_blur={this.on_blur}/>
+                  {sufix && <span className="sufix">{sufix}</span>}
+                </div>
+                {note && <Note>{note}</Note>}
+              </div>
+            </div>
+        );
+    }
+});
+
+const Rule_config = getContext({provide: PropTypes.object})(
+class Rule_config extends Pure_component {
+    value_change = value=>{
+        if (this.props.on_change)
+            this.props.on_change(value);
+        setdb.emit('head.proxy_edit.update_rule', {field: this.props.id,
+            rule_id: this.props.rule.id, value});
+    };
+    render(){
+        const {id, sufix, note, type, data, disabled, rule} = this.props;
+        const val = rule[id]||'';
+        const {tab_id} = this.props.provide;
+        const placeholder = tabs[tab_id].fields[id].placeholder||'';
+        const tooltip = tabs[tab_id].fields[id].tooltip;
+        return (
+            <div className={classnames('field_row', {disabled, note})}>
+              <div className="desc">
+                <Tooltip title={tooltip}>
+                  {tabs[tab_id].fields[id].label}
+                </Tooltip>
+              </div>
+              <div className="field">
+                <div className="inline_field">
+                  <Form_controller id={id} data={data} type={type} val={val}
+                    on_change_wrapper={this.value_change}
+                    disabled={disabled} placeholder={placeholder}/>
+                  {sufix && <span className="sufix">{sufix}</span>}
+                </div>
+                {note && <Note>{note}</Note>}
+              </div>
+            </div>
+        );
+    }
+});
+
+const Form_controller = props=>{
+    const type = props.type;
+    if (type=='select')
+        return <Select {...props}/>;
+    else if (type=='double_number')
+        return <Double_number {...props}/>;
+    else if (type=='typeahead')
+        return <Typeahead_wrapper {...props}/>;
+    else if (type=='textarea')
+        return <Textarea {...props}/>;
+    return <Input {...props}/>;
+};
+
+const Note = props=>(
+    <div className="note">
+      <span>{props.children}</span>
+    </div>
+);
+
+const Targeting = provider({tab_id: 'target'})(
+class Targeting extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {};
+        this.def_value = {key: 'Any (default)', value: ''};
+        this.init_carriers();
+        this.set_field = setdb.get('head.proxy_edit.set_field');
+    }
+    componentDidMount(){
+        this.setdb_on('head.locations', locations=>this.setState({locations}));
+    }
+    init_carriers(){
+        const subject = 'Add new carrier option';
+        const n = '%0D%0A';
+        const body = `Hi,${n}${n}Didn't find the carrier you're looking for?`
+        +`${n}${n}Write here the carrier's name: __________${n}${n}We will add`
+        +` it in less than 2 business days!`;
+        const mail = 'lumext@luminati.io';
+        const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
+        this.carriers_note = <a className="link" href={mailto}>
+            More carriers</a>;
+        this.carriers = [
+            {value: '', key: 'None'},
+            {value: 'a1', key: 'A1 Austria'},
+            {value: 'aircel', key: 'Aircel'},
+            {value: 'airtel', key: 'Airtel'},
+            {value: 'att', key: 'AT&T'},
+            {value: 'vimpelcom', key: 'Beeline Russia'},
+            {value: 'celcom', key: 'Celcom'},
+            {value: 'chinamobile', key: 'China Mobile'},
+            {value: 'claro', key: 'Claro'},
+            {value: 'comcast', key: 'Comcast'},
+            {value: 'cox', key: 'Cox'},
+            {value: 'dt', key: 'Deutsche Telekom'},
+            {value: 'digi', key: 'Digi Malaysia'},
+            {value: 'docomo', key: 'Docomo'},
+            {value: 'dtac', key: 'DTAC Trinet'},
+            {value: 'etisalat', key: 'Etisalat'},
+            {value: 'idea', key: 'Idea India'},
+            {value: 'kyivstar', key: 'Kyivstar'},
+            {value: 'meo', key: 'MEO Portugal'},
+            {value: 'megafont', key: 'Megafon Russia'},
+            {value: 'mtn', key: 'MTN - Mahanager Telephone'},
+            {value: 'mtnza', key: 'MTN South Africa'},
+            {value: 'mts', key: 'MTS Russia'},
+            {value: 'optus', key: 'Optus'},
+            {value: 'orange', key: 'Orange'},
+            {value: 'qwest', key: 'Qwest'},
+            {value: 'reliance_jio', key: 'Reliance Jio'},
+            {value: 'robi', key: 'Robi'},
+            {value: 'sprint', key: 'Sprint'},
+            {value: 'telefonica', key: 'Telefonica'},
+            {value: 'telstra', key: 'Telstra'},
+            {value: 'tmobile', key: 'T-Mobile'},
+            {value: 'tigo', key: 'Tigo'},
+            {value: 'tim', key: 'TIM (Telecom Italia)'},
+            {value: 'vodacomza', key: 'Vodacom South Africa'},
+            {value: 'vodafone', key: 'Vodafone'},
+            {value: 'verizon', key: 'Verizon'},
+            {value: 'vivo', key: 'Vivo'},
+            {value: 'zain', key: 'Zain'}
+        ];
+    }
+    allowed_countries(){
+        const res = this.state.locations.countries.map(c=>
+            ({key: c.country_name, value: c.country_id}));
+        return [this.def_value, ...res];
+    }
+    country_changed(){
+        this.set_field('city', []);
+        this.set_field('state', '');
+    }
+    states(){
+        const country = this.props.form.country;
+        if (!country||country=='*')
+            return [];
+        const res = this.state.locations.regions[country].map(r=>
+            ({key: r.region_name, value: r.region_id}));
+        return [this.def_value, ...res];
+    }
+    state_changed(){ this.set_field('city', []); }
+    cities(){
+        const {country, state} = this.props.form;
+        let res;
+        if (!country)
+            return [];
+        res = this.state.locations.cities.filter(c=>c.country_id==country);
+        if (state)
+            res = res.filter(c=>c.region_id==state);
+        const regions = this.states();
+        res = res.map(c=>{
+            const region = regions.filter(r=>r.value==c.region_id)[0];
+            return {label: c.city_name+' ('+region.value+')', id: c.city_name,
+                region: region.value};
+        });
+        return res;
+    }
+    city_changed(e){
+        if (e&&e.length)
+            this.set_field('state', e[0].region);
+    }
+    render(){
+        if (!this.state.locations)
+            return null;
+        const curr_plan = this.props.get_curr_plan();
+        const show_dc_note = curr_plan&&curr_plan.type=='static';
+        const show_vips_note = curr_plan&&
+            (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
+        return (
+            <div>
+              {(show_dc_note || show_vips_note) &&
+                <Note>
+                  {show_dc_note &&
+                    <span>To change Data Center country visit your </span>
+                  }
+                  {show_vips_note &&
+                    <span>To change Exclusive gIP country visit your </span>
+                  }
+                  <a className="link" target="_blank" rel="noopener noreferrer"
+                    href="https://luminati.io/cp/zones">zone page</a>
+                  <span> and change your zone plan.</span>
+                </Note>
+              }
+              <Config type="select" id="country"
+                data={this.allowed_countries()}
+                on_change={this.country_changed.bind(this)}/>
+              <Config type="select" id="state" data={this.states()}
+                on_change={this.state_changed.bind(this)}/>
+              <Config type="typeahead" id="city" data={this.cities()}
+                on_change={this.city_changed.bind(this)}/>
+              <Config type="number" id="asn"
+                disabled={this.props.form.carrier}/>
+              <Config type="select" id="carrier" data={this.carriers}
+                note={this.carriers_note} disabled={this.props.form.asn}/>
+            </div>
+        );
+    }
+});
+
+const Speed = provider({tab_id: 'speed'})(
+class Speed extends Pure_component {
+    constructor(props){
+        super(props);
+        this.dns_options = [
+            {key: 'Local (default) - resolved by the super proxy',
+                value: 'local'},
+            {key: 'Remote - resolved by peer', value: 'remote'},
+        ];
+        this.reverse_lookup_options = [{key: 'No', value: ''},
+            {key: 'DNS', value: 'dns'}, {key: 'File', value: 'file'},
+            {key: 'Values', value: 'values'}];
+    }
+    open_modal(){ $('#allocated_ips').modal('show'); }
+    get_type(){
+        const curr_plan = this.props.get_curr_plan();
+        let type;
+        if (curr_plan&&curr_plan.type=='static')
+            type = 'ips';
+        else if (curr_plan&&!!curr_plan.vip)
+            type = 'vips';
+        return type;
+    }
+    render(){
+        const {form, support} = this.props;
+        const pool_size_disabled = !support.pool_size ||
+            form.ips.length || form.vips.length;
+        const type = this.get_type();
+        const render_modal = ['ips', 'vips'].includes(type);
+        let pool_size_note;
+        if (this.props.support.pool_size&&render_modal)
+        {
+            pool_size_note = (
+                <a className="link" onClick={()=>this.open_modal()}>
+                  {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
+                </a>
+            );
+        }
+        return (
+            <div>
+              <Config type="select" id="dns" data={this.dns_options}/>
+              <Config type="number" id="pool_size" min="0"
+                note={pool_size_note} disabled={pool_size_disabled}/>
+              <Config type="number" id="request_timeout" sufix="seconds"
+                min="0"/>
+              <Config type="number" id="race_reqs" min="1" max="3"/>
+              <Config type="number" id="proxy_count" min="1"/>
+              <Config type="number" id="proxy_switch" min="0"/>
+              <Config type="number" id="throttle" min="0"/>
+              <Config type="select" id="reverse_lookup"
+                data={this.reverse_lookup_options}/>
+              {this.props.form.reverse_lookup=='file' &&
+                <Config type="text" id="reverse_lookup_file"/>
+              }
+              {this.props.form.reverse_lookup=='values' &&
+                <Config type="textarea" id="reverse_lookup_values"/>
+              }
+            </div>
+        );
+    }
+});
+
+const Rules = provider({tab_id: 'rules'})(
+class Rules extends Pure_component {
+    set_field = setdb.get('head.proxy_edit.set_field');
+    state = {rules: [{id: 0}], max_id: 0};
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.form', form=>this.setState({form}));
+        this.setdb_on('head.proxy_edit.rules', rules=>{
+            if (!rules||!rules.length)
+                return;
+            this.setState({rules, max_id: Math.max(...rules.map(r=>r.id))});
+        });
+        this.setdb_on('head.proxy_edit.update_rule', this.update_rule);
+    }
+    update_rule = rule=>{
+        if (!rule)
+            return;
+        this.setState(prev=>({
+            rules: prev.rules.map(r=>{
+                if (r.id!=rule.rule_id)
+                    return r;
+                else
+                    return {...r, [rule.field]: rule.value};
+            }),
+        }), this.rules_update);
+    };
+    rule_add = ()=>{
+        this.setState(prev=>({
+            rules: [...prev.rules, {id: prev.max_id+1}],
+            max_id: prev.max_id+1,
+        }));
+    };
+    rule_del = id=>{
+        if (this.state.rules.length==1)
+            this.setState({rules: [{id: 0}], max_id: 0}, this.rules_update);
+        else
+        {
+            this.setState(prev=>({rules: prev.rules.filter(r=>r.id!=id)}),
+                this.rules_update);
+        }
+    };
+    rule_prepare = rule=>{
+        const action_raw = {};
+        if (['retry', 'retry_port', 'ban_ip'].includes(rule.action))
+            action_raw.retry = true;
+        if (rule.action=='retry' && rule.retry_number)
+            action_raw.retry = rule.retry_number;
+        else if (rule.action=='retry_port')
+            action_raw.retry_port = rule.retry_port;
+        else if (rule.action=='ban_ip')
+        {
+            if (rule.ban_ip_duration!='custom')
+                action_raw.ban_ip = rule.ban_ip_duration||'10min';
+            else
+                action_raw.ban_ip = rule.ban_ip_custom+'min';
+        }
+        else if (rule.action=='save_to_pool')
+            action_raw.reserve_session = true;
+        let result = null;
+        if (rule.trigger_type)
+        {
+            result = {
+                res: [{
+                    head: true,
+                    action: action_raw,
+                    action_type: rule.action,
+                    trigger_type: rule.trigger_type,
+                }],
+                url: (rule.trigger_url_regex||'**'),
+            };
+        }
+        if (rule.trigger_type=='status')
+        {
+            let rule_status = rule.status_code=='Custom' ?
+                rule.status_custom : rule.status_code;
+            rule_status = rule_status||'';
+            result.res[0].status = {type: 'in', arg: rule_status};
+            result.res[0].status_custom = rule.status_code=='Custom';
+        }
+        else if (rule.trigger_type=='body'&&rule.body_regex)
+            result.res[0].body = {type: '=~', arg: rule.body_regex};
+        else if (rule.trigger_type=='min_req_time'&&rule.min_req_time)
+            result.res[0].min_req_time = rule.min_req_time+'ms';
+        else if (rule.trigger_type=='max_req_time'&&rule.max_req_time)
+            result.res[0].max_req_time = rule.max_req_time+'ms';
+        return result;
+    };
+    rules_update = ()=>{
+        setdb.set('head.proxy_edit.rules', this.state.rules);
+        const post = this.state.rules.map(this.rule_prepare).filter(Boolean);
+        let rules = this.state.form.rules||{};
+        if (post.length)
+            rules.post = post;
+        else
+            delete rules.post;
+        if (!rules.post&&(!rules.pre||!rules.pre.length))
+            rules = null;
+        this.set_field('rules', rules);
+    };
+    render(){
+        return (
+            <div>
+              {this.state.rules.map(r=>(
+                <Rule key={r.id} rule={r} rule_del={this.rule_del}/>
+              ))}
+              <button className="btn btn_lpm btn_lpm_small rule_add_btn"
+                onClick={this.rule_add}>
+                New rule
+                <i className="glyphicon glyphicon-plus"/>
+              </button>
+            </div>
+        );
+    }
+});
+
+const Rule = withRouter(class Rule extends Pure_component {
+    state = {ports: []};
+    trigger_types = [
+        {key: 'i.e. Status code', value: ''},
+        {key: 'Status code', value: 'status'},
+        {key: 'HTML body element', value: 'body'},
+        {key: 'Minimum request time', value: 'min_req_time'},
+        {key: 'Maximum request time', value: 'max_req_time'},
+    ];
+    action_types = [
+        {key: 'i.e. Retry with new IP', value: ''},
+        {key: 'Retry with new IP', value: 'retry'},
+        {key: 'Retry with new proxy port (Waterfall)',
+            value: 'retry_port'},
+        {key: 'Ban IP', value: 'ban_ip'},
+        {key: 'Save IP to reserved pool', value: 'save_to_pool'},
+    ];
+    ban_options = [
+        {key: '10 minutes', value: '10min'},
+        {key: '20 minutes', value: '20min'},
+        {key: '30 minutes', value: '30min'},
+        {key: '40 minutes', value: '40min'},
+        {key: '50 minutes', value: '50min'},
+        {key: 'Custom', value: 'custom'},
+    ];
+    status_types = [
+        'i.e. 200 - Succeeded requests',
+        '200 - Succeeded requests',
+        '403 - Forbidden', '404 - Not found',
+        '500 - Internal server error', '502 - Bad gateway',
+        '503 - Service unavailable', '504 - Gateway timeout', 'Custom'
+    ].map(s=>({key: s, value: s}));
+    componentDidMount(){
+        this.setdb_on('head.proxies_running', proxies=>{
+            const cur_port = this.props.match.params.port;
+            const ports = (proxies||[])
+                .filter(p=>p.port!=cur_port)
+                .map(p=>({key: p.port, value: p.port}));
+            this.setState({ports});
+        });
+    }
+    set_rule_field = (field, value)=>{
+        setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
+            field, value});
+    };
+    trigger_change = val=>{
+        if (val!='status')
+        {
+            this.set_rule_field('status_code', '');
+            this.set_rule_field('status_custom', '');
+        }
+        if (val!='body')
+            this.set_rule_field('body_regex', '');
+        if (val!='min_req_time')
+            this.set_rule_field('min_req_time', '');
+        if (val!='max_req_time')
+            this.set_rule_field('max_req_time', '');
+        if (!val)
+            this.set_rule_field('trigger_url_regex', '');
+    };
+    action_changed = val=>{
+        if (val=='retry_port')
+        {
+            const def_port = this.state.ports.length&&this.state.ports[0].key;
+            this.set_rule_field(val, def_port||'');
+        }
+        if (val!='ban_ip')
+        {
+            this.set_rule_field('ban_ip_duration', '');
+            this.set_rule_field('ban_ip_custom', '');
+        }
+    };
+    status_changed = val=>{
+        if (val!='Custom')
+            this.set_rule_field('status_custom', '');
+    };
+    render(){
+        const rule = this.props.rule;
+        return (
+            <div className="rule_wrapper">
+              <Btn_rule_del
+                on_click={()=>this.props.rule_del(this.props.rule.id)}/>
+              <Rule_config id="trigger_type" type="select"
+                data={this.trigger_types} on_change={this.trigger_change}
+                rule={this.props.rule}/>
+              {rule.trigger_type=='body' &&
+                <Rule_config id="body_regex" type="text"
+                  rule={this.props.rule}/>
+              }
+              {rule.trigger_type=='min_req_time' &&
+                <Rule_config id="min_req_time" type="number"
+                  sufix="milliseconds" rule={this.props.rule}/>
+              }
+              {rule.trigger_type=='max_req_time' &&
+                <Rule_config id="max_req_time" type="number"
+                  sufix="milliseconds" rule={this.props.rule}/>
+              }
+              {rule.trigger_type=='status' &&
+                <Rule_config id="status_code" type="select"
+                  data={this.status_types} on_change={this.status_changed}
+                  rule={this.props.rule}/>
+              }
+              {rule.status_code=='Custom' &&
+                <Rule_config id="status_custom" type="text"
+                  rule={this.props.rule}/>
+              }
+              <Rule_config id="trigger_url_regex" type="text"
+                rule={this.props.rule}/>
+              <Rule_config id="action" type="select" data={this.action_types}
+                on_change={this.action_changed} rule={this.props.rule}/>
+              {this.props.rule.action=='retry' &&
+                <Rule_config id="retry_number" type="number" min="0" max="20"
+                  validator={validators.number(0, 20)} rule={this.props.rule}/>
+              }
+              {this.props.rule.action=='retry_port' &&
+                <Rule_config id="retry_port" type="select"
+                  data={this.state.ports} rule={this.props.rule}/>
+              }
+              {this.props.rule.action=='ban_ip' &&
+                <Rule_config id="ban_ip_duration" type="select"
+                  data={this.ban_options} rule={this.props.rule}/>
+              }
+              {this.props.rule.ban_ip_duration=='custom' &&
+                <Rule_config id="ban_ip_custom" type="number" sufix="minutes"
+                  rule={this.props.rule}/>
+              }
+            </div>
+        );
+    }
+});
+
+const Btn_rule_del = ({on_click})=>(
+    <div className="btn_rule_del" onClick={on_click}/>
+);
+
+class Alloc_modal extends Pure_component {
+    set_field = setdb.get('head.proxy_edit.set_field');
+    state = {
+        available_list: [],
+        displayed_list: [],
+        cur_page: 0,
+        items_per_page: 20,
+    };
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.zone_name', zone_name=>
+            this.setState({available_list: []}));
+        this.setdb_on('head.proxy_edit.tab', tab=>
+            this.setState({curr_tab: tab}));
+        $('#allocated_ips').on('show.bs.modal', this.load.bind(this));
+    }
+    load(){
+        if (this.state.available_list.length)
+            return;
+        this.loading(true);
+        const key = this.props.form.password||'';
+        let endpoint;
+        if (this.props.type=='ips')
+            endpoint = '/api/allocated_ips';
+        else
+            endpoint = '/api/allocated_vips';
+        const url = zurl.qs_add(window.location.host+endpoint,
+            {zone: this.props.zone, key});
+        const _this = this;
+        this.etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                _this.loading(false);
+            });
+            const res = yield ajax.json({url});
+            let available_list;
+            if (_this.props.type=='ips')
+                available_list = res.ips;
+            else
+                available_list = res;
+            _this.setState({available_list, cur_page: 0}, _this.paginate);
+            _this.loading(false);
+        });
+    }
+    paginate(page=-1){
+        page = page>-1 ? page : this.state.cur_page;
+        const pages = Math.ceil(
+            this.state.available_list.length/this.state.items_per_page);
+        const cur_page = Math.min(pages, page);
+        const displayed_list = this.state.available_list.slice(
+            cur_page*this.state.items_per_page,
+            (cur_page+1)*this.state.items_per_page);
+        this.setState({displayed_list, cur_page});
+    }
+    loading(loading){
+        setdb.set('head.proxy_edit.loading', loading);
+        this.setState({loading});
+    }
+    checked = row=>(this.props.form[this.props.type]||[]).includes(row);
+    reset = ()=>{
+        this.set_field(this.props.type, []);
+        this.set_field('pool_size', '');
+        this.set_field('multiply', 1);
+    };
+    toggle = e=>{
+        let {value, checked} = e.target;
+        const {type, form} = this.props;
+        if (type=='vips')
+            value = Number(value);
+        let new_alloc;
+        if (checked)
+            new_alloc = [...form[type], value];
+        else
+            new_alloc = form[type].filter(r=>r!=value);
+        this.set_field(type, new_alloc);
+        this.update_multiply_and_pool_size(new_alloc.length);
+    };
+    select_all(){
+        this.set_field(this.props.type, this.state.available_list);
+        this.update_multiply_and_pool_size(this.state.available_list.length);
+    }
+    update_multiply_and_pool_size(size){
+        if (!this.props.form.multiply_ips && !this.props.form.multiply_vips)
+            this.set_field('pool_size', size);
+        else
+        {
+            this.set_field('pool_size', 1);
+            this.set_field('multiply', size);
+        }
+    }
+    update_items_per_page(items_per_page){
+        this.setState({items_per_page}, ()=>this.paginate(0)); }
+    page_change(page){ this.paginate(page-1); }
+    render(){
+        const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
+        let title;
+        if (this.state.curr_tab=='general')
+        {
+            title = 'Select the '+type_label+' to multiply ('
+            +this.props.zone+')';
+        }
+        else
+            title = 'Select the '+type_label+' ('+this.props.zone+')';
+        return (
+            <Modal id="allocated_ips" className="allocated_ips_modal"
+              title={title} no_cancel_btn>
+              <Pagination_panel
+                entries={this.state.available_list}
+                items_per_page={this.state.items_per_page}
+                cur_page={this.state.cur_page}
+                page_change={this.page_change.bind(this)}
+                top
+                update_items_per_page={this.update_items_per_page.bind(this)}>
+                <Link_icon tooltip="Unselect all"
+                  on_click={this.reset} id="unchecked"/>
+                <Link_icon tooltip="Select all"
+                  on_click={this.select_all.bind(this)} id="check"/>
+              </Pagination_panel>
+              {this.state.displayed_list.map(row=>
+                <Checkbox on_change={this.toggle} key={row}
+                  text={row} value={row} checked={this.checked(row)}/>
+              )}
+              <Pagination_panel
+                entries={this.state.available_list}
+                items_per_page={this.state.items_per_page}
+                cur_page={this.state.cur_page}
+                page_change={this.page_change.bind(this)}
+                bottom
+                update_items_per_page={this.update_items_per_page.bind(this)}>
+                <Link_icon tooltip="Unselect all"
+                  on_click={this.reset} id="unchecked"/>
+                <Link_icon tooltip="Select all"
+                  on_click={this.select_all.bind(this)} id="check"/>
+              </Pagination_panel>
+            </Modal>
+        );
+    }
+}
+
+const Rotation = provider({tab_id: 'rotation'})(props=>{
+    const {support, form, proxy} = props;
+    return (
+        <div>
+          <Config type="text" id="ip"/>
+          <Config type="text" id="vip"/>
+          <Config type="select" id="pool_type" data={proxy.pool_type.values}
+            disabled={!support.pool_type}/>
+          <Config type="number" id="keep_alive" min="0"
+            disabled={!support.keep_alive}/>
+          <Config type="text" id="whitelist_ips"
+            validator={validators.ips_list}/>
+          <Config type="select" id="session_random"
+            data={props.default_opt('session_random')}/>
+          <Config type="text" id="session"
+            disabled={form.session_random && !support.session}/>
+          <Config type="select" id="sticky_ip"
+            data={props.default_opt('sticky_ip')}
+            disabled={!support.sticky_ip}/>
+          <Config type="double_number" id="max_requests"
+            disabled={!support.max_requests}/>
+          <Config type="double_number" id="session_duration"
+            disabled={!support.session_duration}/>
+          <Config type="text" id="seed" disabled={!support.seed}/>
+        </div>
+    );
+});
+
+const Debug = provider({tab_id: 'debug'})(props=>(
+    <div>
+      <Config type="select" id="history" data={props.default_opt('history')}/>
+      <Config type="select" id="ssl" data={props.default_opt('ssl')}/>
+      <Config type="select" id="log" data={props.proxy.log.values}/>
+      <Config type="select" id="debug" data={props.proxy.debug.values}/>
+    </div>
+));
+
+const General = provider({tab_id: 'general'})(props=>{
+    const set_field = setdb.get('head.proxy_edit.set_field');
+    const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
+    const multiply_changed = val=>{
+        const size = Math.max(props.form.ips.length, props.form.vips.length);
+        if (val)
+        {
+            set_field('pool_size', 1);
+            set_field('multiply', size);
+            open_modal();
+            return;
+        }
+        set_field('pool_size', size);
+        set_field('multiply', 1);
+    };
+    // XXX krzysztof: cleanup type
+    const curr_plan = props.get_curr_plan();
+    let type;
+    if (curr_plan&&curr_plan.type=='static')
+        type = 'ips';
+    else if (curr_plan&&!!curr_plan.vip)
+        type = 'vips';
+    return (
+        <div>
+          <Config type="number" id="port"/>
+          <Config type="text" id="password"/>
+          <Config type="number" id="multiply" min="1"
+            disabled={!props.support.multiply}/>
+          {type=='ips' &&
+            <Config type="select" id="multiply_ips"
+              on_change={multiply_changed}
+              data={props.default_opt('multiply_ips')}/>
+          }
+          {type=='vips' &&
+            <Config type="select" id="multiply_vips"
+              on_change={multiply_changed}
+              data={props.default_opt('multiply_vips')}/>
+          }
+          <Config type="number" id="socks" min="0"/>
+          <Config type="select" id="secure_proxy"
+            data={props.default_opt('secure_proxy')}/>
+          <Config type="text" id="null_response"/>
+          <Config type="text" id="bypass_proxy"/>
+          <Config type="text" id="direct_include"/>
+          <Config type="text" id="direct_exclude"/>
+          <Config type="select" id="allow_proxy_auth"
+            data={props.default_opt('allow_proxy_auth')}/>
+          <Config type="select" id="iface"
+            data={props.proxy.iface.values}/>
+        </div>
+    );
+});
+
+export default Index;

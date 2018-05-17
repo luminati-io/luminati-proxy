@@ -1,17 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Code} from './common.js';
+import {Code, Circle_li as Li} from './common.js';
 
 const E = {};
-const Li = props=>(
-    <li>
-      <div className="circle_wrapper">
-        <div className="circle"></div>
-      </div>
-      <div className="single_instruction">{props.children}</div>
-    </li>
-);
 
 E.code = (proxy=24000)=>({
     shell: `curl --proxy 127.0.0.1:${proxy} "http://lumtest.com/myip.json"`,

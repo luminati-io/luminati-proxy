@@ -56,13 +56,13 @@ class Schema extends Pure_component {
         this.state = {form: {}, proxies: []};
     }
     componentDidMount(){
-        this.setdb_on('head.edit_proxy.form', (form={})=>{
+        this.setdb_on('head.proxy_edit.form', (form={})=>{
             this.setState({form: {...form}});
         });
-        this.setdb_on('head.edit_proxy.form.port', port=>{
+        this.setdb_on('head.proxy_edit.form.port', port=>{
             this.setState({form: {port}});
         });
-        this.setdb_on('head.edit_proxy.form.country', country=>{
+        this.setdb_on('head.proxy_edit.form.country', country=>{
             this.setState({form: {country}});
         });
         this.setdb_on('head.proxies_running', proxies=>{

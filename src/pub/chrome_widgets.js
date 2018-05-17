@@ -117,3 +117,11 @@ const Grid_resizers = ({cols, start_moving, show})=>{
         </div>
     );
 };
+
+export const Sort_icon = ({show, dir})=>{
+    if (!show)
+        return null;
+    const classes = classnames('small_icon_mask', {sort_asc: dir==-1,
+        sort_desc: dir==1});
+    return <div className="sort_icon"><span className={classes}/></div>;
+};

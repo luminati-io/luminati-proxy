@@ -13,7 +13,7 @@ import {bytes_format} from './util.js';
 import $ from 'jquery';
 import {status_codes} from './util.js';
 import Waypoint from 'react-waypoint';
-import {Toolbar_button, Tooltip, Devider,
+import {Toolbar_button, Tooltip, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
 import Preview from './har_preview.js';
 
@@ -119,8 +119,7 @@ class Har_viewer extends Pure_component {
         const preview_style = {maxWidth: width, minWidth: width};
         return (
             <div id="har_viewer" className="har_viewer chrome">
-              <div className="main_panel vbox"
-                ref={this.set_main_panel_ref}>
+              <div className="main_panel vbox" ref={this.set_main_panel_ref}>
                 <Toolbar
                   undock={this.undock}
                   dock_mode={this.props.dock_mode}
@@ -417,8 +416,18 @@ class Tables_container extends Pure_component {
         {
             return true;
         }
-        if (this.props.port_filter&&
-            this.props.port_filter!=request.details.port)
+        if (this.props.filters.port&&
+            this.props.filters.port!=request.details.port)
+        {
+            return true;
+        }
+        if (this.props.filters.protocol&&
+            this.props.filters.protocol!=request.details.protocol)
+        {
+            return true;
+        }
+        if (this.props.filters.status_code&&
+            this.props.filters.status_code!=request.response.status)
         {
             return true;
         }
@@ -555,14 +564,6 @@ const Header_container = ({cols, only_name, sorted, sort})=>{
           </table>
         </div>
     );
-};
-
-const Sort_icon = ({show, dir})=>{
-    if (!show)
-        return null;
-    const classes = classnames('small_icon_mask', {sort_asc: dir==-1,
-        sort_desc: dir==1});
-    return <div className="sort_icon"><span className={classes}/></div>;
 };
 
 class Data_container extends Pure_component {

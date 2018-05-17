@@ -169,6 +169,7 @@
       "bin/pub/img/attention.svg",
       "bin/pub/img/bell.svg",
       "bin/pub/img/check.svg",
+      "bin/pub/img/checker.png",
       "bin/pub/img/check_radio.svg",
       "bin/pub/img/columns.svg",
       "bin/pub/img/country.png",
@@ -295,7 +296,6 @@
       "src/pub/chrome_widgets.js",
       "src/pub/common.js",
       "src/pub/config.js",
-      "src/pub/edit_proxy.js",
       "src/pub/har_preview.js",
       "src/pub/har_viewer.js",
       "src/pub/howto.js",
@@ -309,6 +309,7 @@
       "src/pub/no_proxies.js",
       "src/pub/overview.js",
       "src/pub/proxies.js",
+      "src/pub/proxy_edit.js",
       "src/pub/proxy_fields.js",
       "src/pub/proxy_tester.js",
       "src/pub/report_bug.js",
@@ -318,7 +319,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "e87b2260b9a940f707aa65b7d47890c2"
+    "md5": "0a2e10ee98c6c4df01c99760262d7d8c"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -359,5 +360,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.95.360"
+  "version": "1.95.899"
 }

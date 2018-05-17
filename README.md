@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.95.360/luminati-proxy-manager-v1.95.360-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.95.899/luminati-proxy-manager-v1.95.899-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -305,7 +305,7 @@ Or contact [support@luminati.io](mailto:support@luminati.io).
 
 Working documentation of the API can be found inside the app.
 
-A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json)
+A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json)
 
 ## Node.js API
 

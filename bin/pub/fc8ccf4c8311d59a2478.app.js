@@ -71,7 +71,7 @@ var _possibleConstructorReturn2 = __webpack_require__(2);
 
 var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
 
-var _get2 = __webpack_require__(558);
+var _get2 = __webpack_require__(426);
 
 var _get3 = _interopRequireDefault(_get2);
 
@@ -1876,7 +1876,7 @@ return E;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.Link_icon = exports.Tooltip = exports.Pagination_panel = exports.Nav = exports.Checkbox = exports.Input = exports.Select = exports.Textarea = exports.Code = exports.Loader_small = exports.Loader = exports.Warning = exports.Warnings = exports.Modal = exports.Modal_dialog = undefined;
+exports.Circle_li = exports.Link_icon = exports.Tooltip = exports.Pagination_panel = exports.Nav = exports.Checkbox = exports.Input = exports.Select = exports.Textarea = exports.Code = exports.Loader_small = exports.Loader = exports.Warning = exports.Warnings = exports.Modal = exports.Modal_dialog = undefined;
 
 var _regenerator = __webpack_require__(25);
 
@@ -1928,7 +1928,7 @@ var _events = __webpack_require__(139);
 
 var _events2 = _interopRequireDefault(_events);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _pure_component = __webpack_require__(16);
 
@@ -2482,11 +2482,31 @@ var Link_icon = exports.Link_icon = function Link_icon(_ref6) {
     );
 };
 
+var Circle_li = exports.Circle_li = function Circle_li(props) {
+    return _react2.default.createElement(
+        'li',
+        null,
+        _react2.default.createElement(
+            'div',
+            { className: 'circle_wrapper' },
+            _react2.default.createElement('div', { className: 'circle' })
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'single_instruction' },
+            props.children
+        )
+    );
+};
+
 /***/ }),
 /* 28 */,
 /* 29 */,
 /* 30 */,
-/* 31 */
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -3187,9 +3207,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 32 */,
-/* 33 */,
-/* 34 */,
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3459,15 +3476,16 @@ var presets = {
                 suffix: 'end of cookie',
                 url: '**'
             }, {
-                arg: ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', 'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1', 'Mozilla/5.0 (X11; Linux x86_64; rv:2.0b4) Gecko/20100818 Firefox/4.0b4', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36', 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'],
                 header: true,
                 name: 'User-Agent',
-                random: 'list',
+                random: 'user-agent',
                 url: '**'
             }];
             opt.rules.post = opt.rules.post || [];
         },
-        clean: function clean(opt) {},
+        clean: function clean(opt) {
+            opt.rules.pre = [];
+        },
         support: {
             multiply: true,
             max_requests: true
@@ -3560,31 +3578,31 @@ module.exports = isArray;
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__ = __webpack_require__(533);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__ = __webpack_require__(540);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BrowserRouter", function() { return __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HashRouter__ = __webpack_require__(535);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HashRouter__ = __webpack_require__(542);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "HashRouter", function() { return __WEBPACK_IMPORTED_MODULE_1__HashRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Link__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Link__ = __webpack_require__(285);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Link", function() { return __WEBPACK_IMPORTED_MODULE_2__Link__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__ = __webpack_require__(537);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__ = __webpack_require__(544);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MemoryRouter", function() { return __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__NavLink__ = __webpack_require__(540);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__NavLink__ = __webpack_require__(547);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "NavLink", function() { return __WEBPACK_IMPORTED_MODULE_4__NavLink__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Prompt__ = __webpack_require__(543);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Prompt__ = __webpack_require__(550);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Prompt", function() { return __WEBPACK_IMPORTED_MODULE_5__Prompt__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Redirect__ = __webpack_require__(545);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Redirect__ = __webpack_require__(552);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Redirect", function() { return __WEBPACK_IMPORTED_MODULE_6__Redirect__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(285);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(286);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Route", function() { return __WEBPACK_IMPORTED_MODULE_7__Route__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Router__ = __webpack_require__(172);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Router", function() { return __WEBPACK_IMPORTED_MODULE_8__Router__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StaticRouter__ = __webpack_require__(551);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StaticRouter__ = __webpack_require__(558);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "StaticRouter", function() { return __WEBPACK_IMPORTED_MODULE_9__StaticRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Switch__ = __webpack_require__(553);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Switch__ = __webpack_require__(560);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Switch", function() { return __WEBPACK_IMPORTED_MODULE_10__Switch__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__matchPath__ = __webpack_require__(555);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__matchPath__ = __webpack_require__(562);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "matchPath", function() { return __WEBPACK_IMPORTED_MODULE_11__matchPath__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__withRouter__ = __webpack_require__(556);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__withRouter__ = __webpack_require__(563);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "withRouter", function() { return __WEBPACK_IMPORTED_MODULE_12__withRouter__["a"]; });
 
 
@@ -4818,8 +4836,8 @@ module.exports = toKey;
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createLocation; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return locationsAreEqual; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(281);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(282);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(282);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(283);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PathUtils__ = __webpack_require__(88);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -6771,11 +6789,11 @@ exports.locationsAreEqual = exports.createLocation = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _resolvePathname = __webpack_require__(281);
+var _resolvePathname = __webpack_require__(282);
 
 var _resolvePathname2 = _interopRequireDefault(_resolvePathname);
 
-var _valueEqual = __webpack_require__(282);
+var _valueEqual = __webpack_require__(283);
 
 var _valueEqual2 = _interopRequireDefault(_valueEqual);
 
@@ -7069,7 +7087,7 @@ Router.childContextTypes = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_path_to_regexp__ = __webpack_require__(541);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_path_to_regexp__ = __webpack_require__(548);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_path_to_regexp___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_path_to_regexp__);
 
 
@@ -7476,8 +7494,7 @@ var Har_viewer = function (_Pure_component) {
                 { id: 'har_viewer', className: 'har_viewer chrome' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'main_panel vbox',
-                        ref: this.set_main_panel_ref },
+                    { className: 'main_panel vbox', ref: this.set_main_panel_ref },
                     _react2.default.createElement(Toolbar, {
                         undock: this.undock,
                         dock_mode: this.props.dock_mode,
@@ -7792,7 +7809,13 @@ var Tables_container = (0, _chrome_widgets.with_resizable_cols)(cols, function (
             if (_this7.props.type_filter && _this7.props.type_filter != 'All' && request.details.content_type != _this7.props.type_filter.toLowerCase()) {
                 return true;
             }
-            if (_this7.props.port_filter && _this7.props.port_filter != request.details.port) {
+            if (_this7.props.filters.port && _this7.props.filters.port != request.details.port) {
+                return true;
+            }
+            if (_this7.props.filters.protocol && _this7.props.filters.protocol != request.details.protocol) {
+                return true;
+            }
+            if (_this7.props.filters.status_code && _this7.props.filters.status_code != request.response.status) {
                 return true;
             }
             return false;
@@ -8004,7 +8027,7 @@ var Header_container = function Header_container(_ref12) {
                                 null,
                                 c.title
                             ),
-                            _react2.default.createElement(Sort_icon, { show: c.sort_by == sorted.field,
+                            _react2.default.createElement(_chrome_widgets.Sort_icon, { show: c.sort_by == sorted.field,
                                 dir: sorted.dir })
                         );
                     })
@@ -8014,25 +8037,11 @@ var Header_container = function Header_container(_ref12) {
     );
 };
 
-var Sort_icon = function Sort_icon(_ref13) {
-    var show = _ref13.show,
-        dir = _ref13.dir;
-
-    if (!show) return null;
-    var classes = (0, _classnames2.default)('small_icon_mask', { sort_asc: dir == -1,
-        sort_desc: dir == 1 });
-    return _react2.default.createElement(
-        'div',
-        { className: 'sort_icon' },
-        _react2.default.createElement('span', { className: classes })
-    );
-};
-
 var Data_container = function (_Pure_component5) {
     (0, _inherits3.default)(Data_container, _Pure_component5);
 
     function Data_container() {
-        var _ref14;
+        var _ref13;
 
         var _temp4, _this10, _ret4;
 
@@ -8042,7 +8051,7 @@ var Data_container = function (_Pure_component5) {
             args[_key4] = arguments[_key4];
         }
 
-        return _ret4 = (_temp4 = (_this10 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Data_container.__proto__ || Object.getPrototypeOf(Data_container)).call.apply(_ref14, [this].concat(args))), _this10), _this10.set_dc_ref = function (ref) {
+        return _ret4 = (_temp4 = (_this10 = (0, _possibleConstructorReturn3.default)(this, (_ref13 = Data_container.__proto__ || Object.getPrototypeOf(Data_container)).call.apply(_ref13, [this].concat(args))), _this10), _this10.set_dc_ref = function (ref) {
             _this10.dc = ref;
         }, _this10.handle_viewpoint_enter = function () {
             _this10.props.fetch_missing_data('bottom');
@@ -8195,9 +8204,9 @@ var Data_row = function (_React$Component2) {
     return Data_row;
 }(_react2.default.Component);
 
-var Cell_value = function Cell_value(_ref15) {
-    var col = _ref15.col,
-        req = _ref15.req;
+var Cell_value = function Cell_value(_ref14) {
+    var col = _ref14.col,
+        req = _ref14.req;
 
     if (col == 'Name') {
         return _react2.default.createElement(
@@ -8232,8 +8241,8 @@ var Cell_value = function Cell_value(_ref15) {
     return col;
 };
 
-var Tooltip_and_value = function Tooltip_and_value(_ref16) {
-    var val = _ref16.val;
+var Tooltip_and_value = function Tooltip_and_value(_ref15) {
+    var val = _ref15.val;
     return _react2.default.createElement(
         _chrome_widgets.Tooltip,
         { title: val },
@@ -8859,7 +8868,22 @@ module.exports = { "default": __webpack_require__(326), __esModule: true };
 /* 236 */,
 /* 237 */,
 /* 238 */,
-/* 239 */,
+/* 239 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// most Object methods by ES6 should accept primitives
+var $export = __webpack_require__(31);
+var core = __webpack_require__(17);
+var fails = __webpack_require__(64);
+module.exports = function (KEY, exec) {
+  var fn = (core.Object || {})[KEY] || Object[KEY];
+  var exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function () { fn(1); }), 'Object', exp);
+};
+
+
+/***/ }),
 /* 240 */,
 /* 241 */,
 /* 242 */,
@@ -8901,7 +8925,8 @@ module.exports = { "default": __webpack_require__(326), __esModule: true };
 /* 278 */,
 /* 279 */,
 /* 280 */,
-/* 281 */
+/* 281 */,
+/* 282 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8978,7 +9003,7 @@ function resolvePathname(to) {
 /* harmony default export */ __webpack_exports__["default"] = (resolvePathname);
 
 /***/ }),
-/* 282 */
+/* 283 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9023,7 +9048,7 @@ function valueEqual(a, b) {
 /* harmony default export */ __webpack_exports__["default"] = (valueEqual);
 
 /***/ }),
-/* 283 */
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9084,7 +9109,7 @@ var isExtraneousPopstateEvent = exports.isExtraneousPopstateEvent = function isE
 };
 
 /***/ }),
-/* 284 */
+/* 285 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9194,18 +9219,18 @@ Link.contextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Link);
 
 /***/ }),
-/* 285 */
+/* 286 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__ = __webpack_require__(287);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__["a" /* default */]);
 
 /***/ }),
-/* 286 */
+/* 287 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9354,7 +9379,7 @@ Route.childContextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Route);
 
 /***/ }),
-/* 287 */
+/* 288 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9420,7 +9445,7 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 };
 
 /***/ }),
-/* 288 */
+/* 289 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -9498,22 +9523,6 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 
 
 /***/ }),
-/* 289 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// most Object methods by ES6 should accept primitives
-var $export = __webpack_require__(32);
-var core = __webpack_require__(17);
-var fails = __webpack_require__(64);
-module.exports = function (KEY, exec) {
-  var fn = (core.Object || {})[KEY] || Object[KEY];
-  var exp = {};
-  exp[KEY] = exec(fn);
-  $export($export.S + $export.F * fails(function () { fn(1); }), 'Object', exp);
-};
-
-
-/***/ }),
 /* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9524,7 +9533,7 @@ module.exports = function (KEY, exec) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.with_resizable_cols = exports.Devider = exports.Tooltip = exports.Toolbar_button = undefined;
+exports.Sort_icon = exports.with_resizable_cols = exports.Devider = exports.Tooltip = exports.Toolbar_button = undefined;
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -9701,6 +9710,20 @@ var Grid_resizers = function Grid_resizers(_ref3) {
                 },
                 className: 'data_grid_resizer' });
         })
+    );
+};
+
+var Sort_icon = exports.Sort_icon = function Sort_icon(_ref4) {
+    var show = _ref4.show,
+        dir = _ref4.dir;
+
+    if (!show) return null;
+    var classes = (0, _classnames2.default)('small_icon_mask', { sort_asc: dir == -1,
+        sort_desc: dir == 1 });
+    return _react2.default.createElement(
+        'div',
+        { className: 'sort_icon' },
+        _react2.default.createElement('span', { className: classes })
     );
 };
 
@@ -9906,22 +9929,53 @@ var Pane_response = function (_Pure_component3) {
     (0, _inherits3.default)(Pane_response, _Pure_component3);
 
     function Pane_response() {
+        (0, _classCallCheck3.default)(this, Pane_response);
+        return (0, _possibleConstructorReturn3.default)(this, (Pane_response.__proto__ || Object.getPrototypeOf(Pane_response)).apply(this, arguments));
+    }
+
+    (0, _createClass3.default)(Pane_response, [{
+        key: 'render',
+        value: function render() {
+            var content_type = this.props.req.details.content_type;
+            if (!content_type || ['xhr', 'css', 'js', 'font'].includes(content_type)) return _react2.default.createElement(Codemirror_wrapper, { req: this.props.req });
+            return _react2.default.createElement(No_response_data, null);
+        }
+    }]);
+    return Pane_response;
+}(_pure_component2.default);
+
+var No_response_data = function No_response_data() {
+    return _react2.default.createElement(
+        'div',
+        { className: 'empty_view' },
+        _react2.default.createElement(
+            'div',
+            null,
+            'This request has no response data available.'
+        )
+    );
+};
+
+var Codemirror_wrapper = function (_Pure_component4) {
+    (0, _inherits3.default)(Codemirror_wrapper, _Pure_component4);
+
+    function Codemirror_wrapper() {
         var _ref4;
 
-        var _temp2, _this4, _ret2;
+        var _temp2, _this5, _ret2;
 
-        (0, _classCallCheck3.default)(this, Pane_response);
+        (0, _classCallCheck3.default)(this, Codemirror_wrapper);
 
         for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             args[_key2] = arguments[_key2];
         }
 
-        return _ret2 = (_temp2 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref4 = Pane_response.__proto__ || Object.getPrototypeOf(Pane_response)).call.apply(_ref4, [this].concat(args))), _this4), _this4.set_textarea = function (ref) {
-            _this4.textarea = ref;
-        }, _temp2), (0, _possibleConstructorReturn3.default)(_this4, _ret2);
+        return _ret2 = (_temp2 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref4 = Codemirror_wrapper.__proto__ || Object.getPrototypeOf(Codemirror_wrapper)).call.apply(_ref4, [this].concat(args))), _this5), _this5.set_textarea = function (ref) {
+            _this5.textarea = ref;
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this5, _ret2);
     }
 
-    (0, _createClass3.default)(Pane_response, [{
+    (0, _createClass3.default)(Codemirror_wrapper, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
             this.cm = _codemirror2.default.fromTextArea(this.textarea, {
@@ -9941,12 +9995,9 @@ var Pane_response = function (_Pure_component3) {
     }, {
         key: 'set_ct',
         value: function set_ct() {
-            var content_type = this.props.content_type;
-
-            if (!content_type) return this.cm.setOption('mode', 'javascript');
-            var mode = 'javascript';
-            if (content_type.match(/json/)) mode = 'javascript';
-            if (content_type.match(/html/)) mode = 'htmlmixed';
+            var content_type = this.props.req.details.content_type;
+            var mode = void 0;
+            if (!content_type || content_type == 'xhr') mode = 'javascript';
             this.cm.setOption('mode', mode);
         }
     }, {
@@ -9959,16 +10010,16 @@ var Pane_response = function (_Pure_component3) {
             );
         }
     }]);
-    return Pane_response;
+    return Codemirror_wrapper;
 }(_pure_component2.default);
 
-var Preview_section = function (_Pure_component4) {
-    (0, _inherits3.default)(Preview_section, _Pure_component4);
+var Preview_section = function (_Pure_component5) {
+    (0, _inherits3.default)(Preview_section, _Pure_component5);
 
     function Preview_section() {
         var _ref5;
 
-        var _temp3, _this5, _ret3;
+        var _temp3, _this6, _ret3;
 
         (0, _classCallCheck3.default)(this, Preview_section);
 
@@ -9976,11 +10027,11 @@ var Preview_section = function (_Pure_component4) {
             args[_key3] = arguments[_key3];
         }
 
-        return _ret3 = (_temp3 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Preview_section.__proto__ || Object.getPrototypeOf(Preview_section)).call.apply(_ref5, [this].concat(args))), _this5), _this5.state = { open: true }, _this5.toggle = function () {
-            return _this5.setState(function (prev) {
+        return _ret3 = (_temp3 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Preview_section.__proto__ || Object.getPrototypeOf(Preview_section)).call.apply(_ref5, [this].concat(args))), _this6), _this6.state = { open: true }, _this6.toggle = function () {
+            return _this6.setState(function (prev) {
                 return { open: !prev.open };
             });
-        }, _temp3), (0, _possibleConstructorReturn3.default)(_this5, _ret3);
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this6, _ret3);
     }
 
     (0, _createClass3.default)(Preview_section, [{
@@ -10043,8 +10094,8 @@ var Status_value = function Status_value(_ref7) {
     );
 };
 
-var Pane_timing = function (_Pure_component5) {
-    (0, _inherits3.default)(Pane_timing, _Pure_component5);
+var Pane_timing = function (_Pure_component6) {
+    (0, _inherits3.default)(Pane_timing, _Pure_component6);
 
     function Pane_timing() {
         (0, _classCallCheck3.default)(this, Pane_timing);
@@ -10223,8 +10274,8 @@ var is_json_str = function is_json_str(str) {
     return resp;
 };
 
-var Pane_preview = function (_Pure_component6) {
-    (0, _inherits3.default)(Pane_preview, _Pure_component6);
+var Pane_preview = function (_Pure_component7) {
+    (0, _inherits3.default)(Pane_preview, _Pure_component7);
 
     function Pane_preview() {
         (0, _classCallCheck3.default)(this, Pane_preview);
@@ -10248,10 +10299,13 @@ var Pane_preview = function (_Pure_component6) {
 var Img_viewer = function Img_viewer(_ref11) {
     var img = _ref11.img;
     return _react2.default.createElement(
-        'p',
-        null,
-        'img ',
-        img
+        'div',
+        { className: 'img_viewer' },
+        _react2.default.createElement(
+            'div',
+            { className: 'image' },
+            _react2.default.createElement('img', { src: img })
+        )
     );
 };
 
@@ -12878,7 +12932,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _reactRouterDom = __webpack_require__(38);
 
@@ -13329,9 +13383,9 @@ var _defineProperty2 = __webpack_require__(61);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
-var _extends4 = __webpack_require__(6);
+var _extends3 = __webpack_require__(6);
 
-var _extends5 = _interopRequireDefault(_extends4);
+var _extends4 = _interopRequireDefault(_extends3);
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -13365,9 +13419,9 @@ var _ajax = __webpack_require__(22);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _edit_proxy = __webpack_require__(410);
+var _proxy_edit = __webpack_require__(410);
 
-var _edit_proxy2 = _interopRequireDefault(_edit_proxy);
+var _proxy_edit2 = _interopRequireDefault(_proxy_edit);
 
 var _howto = __webpack_require__(718);
 
@@ -13450,7 +13504,7 @@ var App = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                                 locations = _context.sent;
 
                                 locations.countries_by_code = locations.countries.reduce(function (acc, e) {
-                                    return (0, _extends5.default)({}, acc, (0, _defineProperty3.default)({}, e.country_id, e.country_name));
+                                    return (0, _extends4.default)({}, acc, (0, _defineProperty3.default)({}, e.country_id, e.country_name));
                                 }, {});
                                 _setdb2.default.set('head.locations', locations);
 
@@ -13550,23 +13604,20 @@ var App = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 }, _callee5, this);
             }));
             this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee6() {
-                var locations;
+                var node;
                 return _regenerator2.default.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
                                 _context6.next = 2;
-                                return _ajax2.default.json({ url: '/api/all_locations' });
+                                return _ajax2.default.json({ url: '/api/node_version' });
 
                             case 2:
-                                locations = _context6.sent;
+                                node = _context6.sent;
 
-                                locations.countries_by_code = locations.countries.reduce(function (acc, e) {
-                                    return (0, _extends5.default)({}, acc, (0, _defineProperty3.default)({}, e.country_id, e.country_name));
-                                }, {});
-                                _setdb2.default.set('head.locations', locations);
+                                _setdb2.default.set('head.ver_node', node);
 
-                            case 5:
+                            case 4:
                             case 'end':
                                 return _context6.stop();
                         }
@@ -13574,18 +13625,18 @@ var App = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 }, _callee6, this);
             }));
             this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee7() {
-                var node;
+                var proxies;
                 return _regenerator2.default.wrap(function _callee7$(_context7) {
                     while (1) {
                         switch (_context7.prev = _context7.next) {
                             case 0:
                                 _context7.next = 2;
-                                return _ajax2.default.json({ url: '/api/node_version' });
+                                return _ajax2.default.json({ url: '/api/proxies_running' });
 
                             case 2:
-                                node = _context7.sent;
+                                proxies = _context7.sent;
 
-                                _setdb2.default.set('head.ver_node', node);
+                                _setdb2.default.set('head.proxies_running', proxies);
 
                             case 4:
                             case 'end':
@@ -13595,18 +13646,18 @@ var App = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 }, _callee7, this);
             }));
             this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
-                var proxies;
+                var consts;
                 return _regenerator2.default.wrap(function _callee8$(_context8) {
                     while (1) {
                         switch (_context8.prev = _context8.next) {
                             case 0:
                                 _context8.next = 2;
-                                return _ajax2.default.json({ url: '/api/proxies_running' });
+                                return _ajax2.default.json({ url: '/api/consts' });
 
                             case 2:
-                                proxies = _context8.sent;
+                                consts = _context8.sent;
 
-                                _setdb2.default.set('head.proxies_running', proxies);
+                                _setdb2.default.set('head.consts', consts);
 
                             case 4:
                             case 'end':
@@ -13616,77 +13667,56 @@ var App = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 }, _callee8, this);
             }));
             this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee9() {
-                var consts;
+                var data, run_config;
                 return _regenerator2.default.wrap(function _callee9$(_context9) {
                     while (1) {
                         switch (_context9.prev = _context9.next) {
                             case 0:
-                                _context9.next = 2;
-                                return _ajax2.default.json({ url: '/api/consts' });
-
-                            case 2:
-                                consts = _context9.sent;
-
-                                _setdb2.default.set('head.consts', consts);
-
-                            case 4:
-                            case 'end':
-                                return _context9.stop();
-                        }
-                    }
-                }, _callee9, this);
-            }));
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee10() {
-                var data, run_config;
-                return _regenerator2.default.wrap(function _callee10$(_context10) {
-                    while (1) {
-                        switch (_context10.prev = _context10.next) {
-                            case 0:
                                 this.on('uncaught', function (e) {
                                     return console.log(e);
                                 });
-                                _context10.next = 3;
+                                _context9.next = 3;
                                 return _ajax2.default.json({ url: '/api/mode' });
 
                             case 3:
-                                data = _context10.sent;
+                                data = _context9.sent;
                                 run_config = data.run_config;
 
                                 if (!data.logged_in) {
-                                    _context10.next = 9;
+                                    _context9.next = 9;
                                     break;
                                 }
 
                                 if (!(_this.props.location.pathname != '/login')) {
-                                    _context10.next = 8;
+                                    _context9.next = 8;
                                     break;
                                 }
 
-                                return _context10.abrupt('return');
+                                return _context9.abrupt('return');
 
                             case 8:
-                                return _context10.abrupt('return', _this.props.history.replace('/overview'));
+                                return _context9.abrupt('return', _this.props.history.replace('/overview'));
 
                             case 9:
                                 if (!(_this.props.location.pathname == '/login')) {
-                                    _context10.next = 11;
+                                    _context9.next = 11;
                                     break;
                                 }
 
-                                return _context10.abrupt('return');
+                                return _context9.abrupt('return');
 
                             case 11:
-                                return _context10.abrupt('return', _this.props.history.replace({
+                                return _context9.abrupt('return', _this.props.history.replace({
                                     pathname: '/login',
                                     search: _this.props.location.search
                                 }));
 
                             case 12:
                             case 'end':
-                                return _context10.stop();
+                                return _context9.stop();
                         }
                     }
-                }, _callee10, this);
+                }, _callee9, this);
             }));
         }
     }, {
@@ -13722,7 +13752,7 @@ var Page = function Page() {
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/overview', exact: true, component: _overview2.default }),
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/overview/:master_port', exact: true,
                     component: _overview2.default }),
-                _react2.default.createElement(_reactRouterDom.Route, { path: '/proxy/:port', exact: true, component: _edit_proxy2.default }),
+                _react2.default.createElement(_reactRouterDom.Route, { path: '/proxy/:port', exact: true, component: _proxy_edit2.default }),
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/howto', exact: true, component: _howto2.default }),
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/logs', exact: true, component: _logs.Logs }),
                 _react2.default.createElement(_reactRouterDom.Route, { path: '/proxy_tester', exact: true, component: _proxy_tester2.default }),
@@ -13759,7 +13789,7 @@ module.exports = function defineProperty(it, key, desc) {
 /* 327 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var $export = __webpack_require__(32);
+var $export = __webpack_require__(31);
 // 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
 $export($export.S + $export.F * !__webpack_require__(48), 'Object', { defineProperty: __webpack_require__(40).f });
 
@@ -14815,21 +14845,21 @@ var _objectWithoutProperties2 = __webpack_require__(7);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
+var _regenerator = __webpack_require__(25);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
 var _defineProperty2 = __webpack_require__(61);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
-var _extends3 = __webpack_require__(6);
+var _extends4 = __webpack_require__(6);
 
-var _extends4 = _interopRequireDefault(_extends3);
+var _extends5 = _interopRequireDefault(_extends4);
 
 var _slicedToArray2 = __webpack_require__(417);
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
-
-var _regenerator = __webpack_require__(25);
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -14850,6 +14880,10 @@ var _inherits3 = _interopRequireDefault(_inherits2);
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
+
+var _pure_component = __webpack_require__(16);
+
+var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _classnames2 = __webpack_require__(4);
 
@@ -14893,12 +14927,6 @@ var _reactBootstrapTypeahead = __webpack_require__(293);
 
 var _netmask = __webpack_require__(711);
 
-var _pure_component = __webpack_require__(16);
-
-var _pure_component2 = _interopRequireDefault(_pure_component);
-
-var _react3 = __webpack_require__(31);
-
 var _recompose = __webpack_require__(712);
 
 var _propTypes = __webpack_require__(5);
@@ -14920,13 +14948,13 @@ var provider = function provider(provide) {
     });
 };
 var event_tracker = {};
-var ga_event = function ga_event(category, action, label) {
-    var opt = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+var ga_event = function ga_event(action, label) {
+    var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-    var id = category + action + label;
+    var id = action + label;
     if (!event_tracker[id] || !opt.single) {
         event_tracker[id] = true;
-        util.ga_event(category, action, label);
+        util.ga_event('proxy_edit', action, label);
     }
 };
 
@@ -14955,121 +14983,15 @@ var validators = {
     }
 };
 
-var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
-    (0, _inherits3.default)(Index, _React$Component);
+var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
+    (0, _inherits3.default)(Index, _Pure_component);
 
     function Index(props) {
         (0, _classCallCheck3.default)(this, Index);
 
         var _this2 = (0, _possibleConstructorReturn3.default)(this, (Index.__proto__ || Object.getPrototypeOf(Index)).call(this, props));
 
-        _this2.sp = (0, _etask2.default)('Index', /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-            return _regenerator2.default.wrap(function _callee$(_context) {
-                while (1) {
-                    switch (_context.prev = _context.next) {
-                        case 0:
-                            _context.next = 2;
-                            return this.wait();
-
-                        case 2:
-                        case 'end':
-                            return _context.stop();
-                    }
-                }
-            }, _callee, this);
-        }));
-        _this2.state = { tab: 'logs', form: { zones: {} }, warnings: [],
-            errors: {}, show_loader: false, saving: false };
-        _this2.debounced_save = _lodash2.default.debounce(_this2.save.bind(_this2), 500);
-        return _this2;
-    }
-
-    (0, _createClass3.default)(Index, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            var _this3 = this;
-
-            if (!_setdb2.default.get('head.proxies_running')) {
-                var _this = this;
-                this.sp.spawn((0, _etask2.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-                    var proxies_running;
-                    return _regenerator2.default.wrap(function _callee2$(_context2) {
-                        while (1) {
-                            switch (_context2.prev = _context2.next) {
-                                case 0:
-                                    _context2.next = 2;
-                                    return _ajax2.default.json({ url: '/api/proxies_running' });
-
-                                case 2:
-                                    proxies_running = _context2.sent;
-
-                                    _setdb2.default.set('head.proxies_running', proxies_running);
-
-                                case 4:
-                                case 'end':
-                                    return _context2.stop();
-                            }
-                        }
-                    }, _callee2, this);
-                })));
-            }
-            this.listeners = [_setdb2.default.on('head.proxies_running', function (proxies) {
-                if (!proxies || _this3.state.proxies) return;
-                _this3.port = window.location.pathname.split('/').slice(-1)[0];
-                var proxy = proxies.filter(function (p) {
-                    return p.port == _this3.port;
-                })[0].config;
-                var form = Object.assign({}, proxy);
-                _setdb2.default.set('head.edit_proxy.form', form);
-                var preset = _this3.guess_preset(form);
-                _this3.apply_preset(form, preset);
-                _this3.setState({ proxies: proxies }, _this3.delayed_loader());
-            }), _setdb2.default.on('head.consts', function (consts) {
-                return _this3.setState({ consts: consts }, _this3.delayed_loader());
-            }), _setdb2.default.on('head.defaults', function (defaults) {
-                return _this3.setState({ defaults: defaults }, _this3.delayed_loader());
-            }), _setdb2.default.on('head.locations', function (locations) {
-                return _this3.setState({ locations: locations }, _this3.delayed_loader());
-            }), _setdb2.default.on('head.callbacks', function (callbacks) {
-                return _this3.setState({ callbacks: callbacks });
-            }), _setdb2.default.on('head.edit_proxy.loading', function (loading) {
-                return _this3.setState({ loading: loading });
-            }), _setdb2.default.on('head.edit_proxy.tab', function () {
-                var tab = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'logs';
-                return _this3.setState({ tab: tab });
-            })];
-            var state = void 0;
-            if ((state = this.props.location.state) && state.field) this.goto_field(state.field);
-        }
-    }, {
-        key: 'componentWillUnmount',
-        value: function componentWillUnmount() {
-            this.sp.return();
-            this.listeners.forEach(function (l) {
-                return _setdb2.default.off(l);
-            });
-            _setdb2.default.set('head.edit_proxy.form', undefined);
-            _setdb2.default.set('head.edit_proxy', undefined);
-        }
-    }, {
-        key: 'delayed_loader',
-        value: function delayed_loader() {
-            return _lodash2.default.debounce(this.update_loader.bind(this));
-        }
-    }, {
-        key: 'update_loader',
-        value: function update_loader() {
-            this.setState(function (state) {
-                var show_loader = !state.consts || !state.locations || !state.proxies || !state.defaults;
-                var zone_name = !show_loader && (state.form.zone || state.consts.proxy.zone.def);
-                _setdb2.default.set('head.edit_proxy.zone_name', zone_name);
-                return { show_loader: show_loader };
-            });
-        }
-    }, {
-        key: 'goto_field',
-        value: function goto_field(field) {
-            this.init_focus = field;
+        _this2.goto_field = function (field) {
             var tab = void 0;
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -15104,59 +15026,21 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                 }
             }
 
-            if (tab) this.click_tab(tab);
-        }
-    }, {
-        key: 'guess_preset',
-        value: function guess_preset(form) {
-            var res = void 0;
-            for (var p in presets) {
-                var preset = presets[p];
-                if (preset.check(form)) {
-                    res = p;
-                    break;
-                }
-            }
-            if (form.last_preset_applied && presets[form.last_preset_applied]) res = form.last_preset_applied;
-            return res;
-        }
-    }, {
-        key: 'click_tab',
-        value: function click_tab(tab) {
-            _setdb2.default.set('head.edit_proxy.tab', tab);
-            ga_event('categories', 'click', tab);
-        }
-    }, {
-        key: 'field_changed',
-        value: function field_changed(field_name, value) {
-            this.setState(function (prev_state) {
-                var new_form = (0, _extends4.default)({}, prev_state.form, (0, _defineProperty3.default)({}, field_name, value));
+            if (tab) _setdb2.default.set('head.proxy_edit.tab', tab);
+        };
+
+        _this2.set_field = function (field_name, value) {
+            _this2.setState(function (prev_state) {
+                var new_form = (0, _extends5.default)({}, prev_state.form, (0, _defineProperty3.default)({}, field_name, value));
                 return { form: new_form };
-            }, this.debounced_save);
-            _setdb2.default.set('head.edit_proxy.form.' + field_name, value);
-            this.send_ga(field_name);
-        }
-    }, {
-        key: 'send_ga',
-        value: function send_ga(id) {
-            if (id == 'zone') {
-                ga_event('top bar', 'edit field', id);
-                return;
-            }
-            var tab_label = void 0;
-            for (var t in _proxy_fields.tabs) {
-                if (Object.keys(_proxy_fields.tabs[t].fields).includes(id)) {
-                    tab_label = _proxy_fields.tabs[t].label;
-                    break;
-                }
-            }
-            ga_event(tab_label, 'edit field', id, { single: true });
-        }
-    }, {
-        key: 'is_valid_field',
-        value: function is_valid_field(field_name) {
-            var proxy = this.state.consts.proxy;
-            var form = this.state.form;
+            }, _this2.debounced_save);
+            _setdb2.default.set('head.proxy_edit.form.' + field_name, value);
+            _this2.send_ga(field_name, value);
+        };
+
+        _this2.is_valid_field = function (field_name) {
+            var proxy = _this2.state.consts.proxy;
+            var form = _this2.state.form;
             if (!proxy) return false;
             if (form.ext_proxies && _proxy_fields.all_fields[field_name] && !_proxy_fields.all_fields[field_name].ext) {
                 return false;
@@ -15177,134 +15061,107 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
             if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name)) return permissions.includes(field_name);
             if (field_name == 'carrier') return permissions.includes('asn');
             return true;
-        }
-    }, {
-        key: 'apply_preset',
-        value: function apply_preset(_form, preset) {
-            var form = Object.assign({}, _form);
-            var last_preset = form.last_preset_applied ? presets[form.last_preset_applied] : null;
-            if (last_preset && last_preset.key != preset && last_preset.clean) last_preset.clean(form);
-            if (form.ext_proxies) {
-                form.preset = '';
-                form.zone = '';
-                form.password = '';
-            } else {
-                form.preset = preset;
-                form.last_preset_applied = preset;
-                presets[preset].set(form);
-            }
-            if (form.session === true) {
-                form.session_random = true;
-                form.session = '';
-            } else form.session_random = false;
-            if (form.rule) {
-                form.status_code = form.rule.status;
-                form.status_custom = form.rule.custom;
-                form.trigger_url_regex = form.rule.url;
-                form.trigger_type = form.rule.trigger_type;
-                form.body_regex = form.rule.body_regex;
-                if (form.rule.min_req_time) {
-                    var min_req_time = form.rule.min_req_time.match(/\d+/);
-                    form.min_req_time = Number(min_req_time && min_req_time[0]);
-                }
-                if (form.rule.max_req_time) {
-                    var max_req_time = form.rule.max_req_time.match(/\d+/);
-                    form.max_req_time = Number(max_req_time && max_req_time[0]);
-                }
-                if (form.rule.action) {
-                    form.action = form.rule.action.value;
-                    form.retry_port = form.rule.action.raw.retry_port;
-                    form.retry_number = form.rule.action.raw.retry;
-                    if (form.rule.action.raw.ban_ip) {
-                        form.ban_ip_duration = 'custom';
-                        var minutes = form.rule.action.raw.ban_ip.match(/\d+/);
-                        form.ban_ip_custom = Number(minutes && minutes[0]);
-                    }
-                }
-                delete form.rule;
-            }
-            if (form.reverse_lookup === undefined) {
-                if (form.reverse_lookup_dns) form.reverse_lookup = 'dns';else if (form.reverse_lookup_file) form.reverse_lookup = 'file';else if (form.reverse_lookup_values) {
-                    form.reverse_lookup = 'values';
-                    form.reverse_lookup_values = form.reverse_lookup_values.join('\n');
+        };
+
+        _this2.rule_map_to_form = function (rule, id) {
+            var result = { id: id };
+            var res = rule.res[0];
+            if (res.status) {
+                if (!res.status_custom) result.status_code = res.status.arg;else {
+                    result.status_code = 'Custom';
+                    result.status_custom = res.status.arg;
                 }
             }
-            if (!form.ips) form.ips = [];
-            if (!form.vips) form.vips = [];
-            if (Array.isArray(form.whitelist_ips)) form.whitelist_ips = form.whitelist_ips.join(',');
-            if (form.city && !Array.isArray(form.city) && form.state) form.city = [{ id: form.city,
-                label: form.city + ' (' + form.state + ')' }];else if (!Array.isArray(form.city)) form.city = [];
-            if (!this.original_form) this.original_form = form;
-            form.country = (form.country || '').toLowerCase();
-            form.state = (form.state || '').toLowerCase();
-            this.setState({ form: form });
-        }
-    }, {
-        key: 'default_opt',
-        value: function default_opt(option) {
-            var default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
+            result.trigger_url_regex = rule.url;
+            result.trigger_type = res.trigger_type;
+            result.body_regex = res.body && res.body.arg;
+            if (res.min_req_time) {
+                var min_req_time = res.min_req_time.match(/\d+/);
+                result.min_req_time = Number(min_req_time && min_req_time[0]);
+            }
+            if (res.max_req_time) {
+                var max_req_time = res.max_req_time.match(/\d+/);
+                result.max_req_time = Number(max_req_time && max_req_time[0]);
+            }
+            result.action = res.action_type;
+            result.retry_port = res.action.retry_port;
+            result.retry_number = res.action.retry;
+            if (res.action.ban_ip) {
+                result.ban_ip_duration = 'custom';
+                var minutes = res.action.ban_ip.match(/\d+/);
+                result.ban_ip_custom = Number(minutes && minutes[0]);
+            }
+            return result;
+        };
+
+        _this2.apply_rules = function (form) {
+            if (form.rules && form.rules.post) {
+                var rules = form.rules.post.map(_this2.rule_map_to_form);
+                _setdb2.default.set('head.proxy_edit.rules', rules);
+            }
+        };
+
+        _this2.default_opt = function (option) {
+            var default_label = !!_this2.state.defaults[option] ? 'Yes' : 'No';
             return [{ key: 'No', value: false }, { key: 'Default (' + default_label + ')', value: '' }, { key: 'Yes', value: true }];
-        }
-    }, {
-        key: 'set_errors',
-        value: function set_errors(_errors) {
+        };
+
+        _this2.set_errors = function (_errors) {
             var errors = _errors.reduce(function (acc, e) {
                 return Object.assign(acc, (0, _defineProperty3.default)({}, e.field, e.msg));
             }, {});
-            this.setState({ errors: errors, error_list: _errors });
-        }
-    }, {
-        key: 'update_proxies',
-        value: function update_proxies() {
-            return (0, _etask2.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+            _this2.setState({ errors: errors, error_list: _errors });
+        };
+
+        _this2.update_proxies = function () {
+            return (0, _etask2.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                 var proxies;
-                return _regenerator2.default.wrap(function _callee3$(_context3) {
+                return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context.prev = _context.next) {
                             case 0:
-                                _context3.next = 2;
+                                _context.next = 2;
                                 return _ajax2.default.json({ url: '/api/proxies_running' });
 
                             case 2:
-                                proxies = _context3.sent;
+                                proxies = _context.sent;
 
                                 _setdb2.default.set('head.proxies_running', proxies);
 
                             case 4:
                             case 'end':
-                                return _context3.stop();
+                                return _context.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee, this);
             }));
-        }
-    }, {
-        key: 'save',
-        value: function save() {
-            if (this.saving) {
-                this.resave = true;
+        };
+
+        _this2.save = function () {
+            if (_this2.saving) {
+                _this2.resave = true;
                 return;
             }
-            var data = this.prepare_to_save();
-            var check_url = '/api/proxy_check/' + this.port;
-            this.saving = true;
-            this.setState({ saving: true });
-            var _this = this;
-            this.sp.spawn((0, _etask2.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+            var data = _this2.prepare_to_save();
+            var check_url = '/api/proxy_check/' + _this2.port;
+            _this2.saving = true;
+            _this2.setState({ saving: true });
+            var _this = _this2;
+            _this2.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
                 var raw_check, json_check, errors, warnings, update_url, raw_update;
-                return _regenerator2.default.wrap(function _callee4$(_context4) {
+                return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context2.prev = _context2.next) {
                             case 0:
                                 this.on('uncaught', function (e) {
                                     console.log(e);
-                                    ga_event('top bar', 'click save', 'failed');
+                                    ga_event('save failed', e.message);
                                     _this.setState({ error_list: [{ msg: 'Something went wrong' }],
                                         saving: false });
                                     _this.saving = false;
                                     (0, _jquery2.default)('#save_proxy_errors').modal('show');
                                 });
-                                _context4.next = 3;
+                                _context2.next = 3;
                                 return window.fetch(check_url, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
@@ -15312,12 +15169,12 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                                 });
 
                             case 3:
-                                raw_check = _context4.sent;
-                                _context4.next = 6;
+                                raw_check = _context2.sent;
+                                _context2.next = 6;
                                 return raw_check.json();
 
                             case 6:
-                                json_check = _context4.sent;
+                                json_check = _context2.sent;
                                 errors = json_check.filter(function (e) {
                                     return e.lvl == 'err';
                                 });
@@ -15325,15 +15182,15 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                                 _this.set_errors(errors);
 
                                 if (!errors.length) {
-                                    _context4.next = 15;
+                                    _context2.next = 15;
                                     break;
                                 }
 
-                                ga_event('top bar', 'click save', 'failed');
+                                ga_event('save failed', JSON.stringify(errors));
                                 (0, _jquery2.default)('#save_proxy_errors').modal('show');
                                 _this.setState({ saving: false });
                                 _this.saving = false;
-                                return _context4.abrupt('return');
+                                return _context2.abrupt('return');
 
                             case 15:
                                 warnings = json_check.filter(function (w) {
@@ -15342,7 +15199,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
 
                                 if (warnings.length) _this.setState({ warnings: warnings });
                                 update_url = '/api/proxies/' + _this.port;
-                                _context4.next = 20;
+                                _context2.next = 20;
                                 return window.fetch(update_url, {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
@@ -15350,7 +15207,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                                 });
 
                             case 20:
-                                raw_update = _context4.sent;
+                                raw_update = _context2.sent;
 
                                 _this.setState({ saving: false });
                                 _this.saving = false;
@@ -15362,80 +15219,26 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
 
                             case 25:
                             case 'end':
-                                return _context4.stop();
+                                return _context2.stop();
                         }
                     }
-                }, _callee4, this);
-            })));
-        }
-    }, {
-        key: 'prepare_rules',
-        value: function prepare_rules(form) {
-            var action_raw = {};
-            if (['retry', 'retry_port', 'ban_ip'].includes(form.action)) action_raw.retry = true;
-            if (form.action == 'retry' && form.retry_number) action_raw.retry = form.retry_number;else if (form.action == 'retry_port') action_raw.retry_port = form.retry_port;else if (form.action == 'ban_ip') {
-                if (form.ban_ip_duration != 'custom') action_raw.ban_ip = form.ban_ip_duration || '10min';else action_raw.ban_ip = form.ban_ip_custom + 'min';
-            } else if (form.action == 'save_to_pool') action_raw.reserve_session = true;
-            if (!form.rules) form.rules = {};
-            if (form.trigger_type) {
-                form.rules.post = [{
-                    res: [{
-                        head: true,
-                        action: action_raw
-                    }],
-                    url: form.trigger_url_regex || '**'
-                }];
-                form.rule = {
-                    url: form.trigger_url_regex || '**',
-                    action: { raw: action_raw, value: form.action },
-                    trigger_type: form.trigger_type
-                };
-            } else form.rule = null;
-            if (form.trigger_type == 'status') {
-                var rule_status = form.status_code == 'Custom' ? form.status_custom : form.status_code;
-                rule_status = rule_status || '';
-                form.rules.post[0].res[0].status = { type: 'in', arg: rule_status };
-                form.rule.status = form.status_code;
-                if (form.rule.status == 'Custom') form.rule.custom = form.status_custom;
-            } else if (form.trigger_type == 'body' && form.body_regex) {
-                form.rules.post[0].res[0].body = { type: '=~',
-                    arg: form.body_regex };
-                form.rule.body_regex = form.body_regex;
-            } else if (form.trigger_type == 'min_req_time' && form.min_req_time) {
-                form.rules.post[0].res[0].min_req_time = form.min_req_time + 'ms';
-                form.rule.min_req_time = form.min_req_time + 'ms';
-            } else if (form.trigger_type == 'max_req_time' && form.max_req_time) {
-                form.rules.post[0].res[0].max_req_time = form.max_req_time + 'ms';
-                form.rule.max_req_time = form.max_req_time + 'ms';
-            } else if (!form.rules.post && !form.rules.pre) form.rules = null;
-            delete form.trigger_type;
-            delete form.min_req_time;
-            delete form.max_req_time;
-            delete form.status_code;
-            delete form.status_custom;
-            delete form.body_regex;
-            delete form.action;
-            delete form.trigger_url_regex;
-            delete form.retry_number;
-            delete form.retry_port;
-            delete form.ban_ip_duration;
-            delete form.ban_ip_custom;
-        }
-    }, {
-        key: 'prepare_to_save',
-        value: function prepare_to_save() {
-            var _this4 = this;
+                }, _callee2, this);
+            }));
+        };
 
-            var save_form = Object.assign({}, this.state.form);
+        _this2.prepare_to_save = function () {
+            var save_form = Object.assign({}, _this2.state.form);
             for (var field in save_form) {
                 var before_save = void 0;
-                if (before_save = _proxy_fields.all_fields[field] && _proxy_fields.all_fields[field].before_save) save_form[field] = before_save(save_form[field]);
-                if (!this.is_valid_field(field) || save_form[field] === null) save_form[field] = '';
+                if (before_save = _proxy_fields.all_fields[field] && _proxy_fields.all_fields[field].before_save) {
+                    save_form[field] = before_save(save_form[field]);
+                }
+                if (!_this2.is_valid_field(field) || save_form[field] === null) save_form[field] = '';
             }
             var effective = function effective(attr) {
-                return save_form[attr] === undefined ? _this4.state.defaults[attr] : save_form[attr];
+                return save_form[attr] === undefined ? _this2.state.defaults[attr] : save_form[attr];
             };
-            save_form.zone = save_form.zone || this.state.consts.proxy.zone.def;
+            save_form.zone = save_form.zone || _this2.state.consts.proxy.zone.def;
             save_form.history = effective('history');
             save_form.ssl = effective('ssl');
             save_form.max_requests = effective('max_requests');
@@ -15452,26 +15255,181 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
             if (save_form.whitelist_ips) save_form.whitelist_ips = save_form.whitelist_ips.split(',').filter(Boolean);
             if (save_form.city.length) save_form.city = save_form.city[0].id;else save_form.city = '';
             if (!save_form.max_requests) save_form.max_requests = 0;
-            delete save_form.rules;
-            if (!save_form.ext_proxies) presets[save_form.preset].set(save_form);
-            this.prepare_rules(save_form);
             delete save_form.preset;
             if (!save_form.session) save_form.session = false;
             if (save_form.session_random) save_form.session = true;
+            delete save_form.session_random;
             if (!save_form.socks) save_form.socks = null;
             return save_form;
-        }
-    }, {
-        key: 'get_curr_plan',
-        value: function get_curr_plan() {
-            var zone_name = this.state.form.zone || this.state.consts.proxy.zone.def;
-            var zones = this.state.consts.proxy.zone.values;
+        };
+
+        _this2.get_curr_plan = function () {
+            var zone_name = _this2.state.form.zone || _this2.state.consts.proxy.zone.def;
+            var zones = _this2.state.consts.proxy.zone.values;
             var curr_zone = zones.filter(function (p) {
                 return p.key == zone_name;
             });
             var curr_plan = void 0;
             if (curr_zone.length) curr_plan = curr_zone[0].plans.slice(-1)[0];
             return curr_plan;
+        };
+
+        _this2.state = { form: { zones: {} }, warnings: [], errors: {},
+            show_loader: false, saving: false };
+        _this2.debounced_save = _lodash2.default.debounce(_this2.save, 500);
+        _setdb2.default.set('head.proxy_edit.set_field', _this2.set_field);
+        _setdb2.default.set('head.proxy_edit.is_valid_field', _this2.is_valid_field);
+        return _this2;
+    }
+
+    (0, _createClass3.default)(Index, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this3 = this;
+
+            if (!_setdb2.default.get('head.proxies_running')) {
+                var _this = this;
+                this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+                    var proxies_running;
+                    return _regenerator2.default.wrap(function _callee3$(_context3) {
+                        while (1) {
+                            switch (_context3.prev = _context3.next) {
+                                case 0:
+                                    _context3.next = 2;
+                                    return _ajax2.default.json({ url: '/api/proxies_running' });
+
+                                case 2:
+                                    proxies_running = _context3.sent;
+
+                                    _setdb2.default.set('head.proxies_running', proxies_running);
+
+                                case 4:
+                                case 'end':
+                                    return _context3.stop();
+                            }
+                        }
+                    }, _callee3, this);
+                }));
+            }
+            this.setdb_on('head.proxies_running', function (proxies) {
+                if (!proxies || _this3.state.proxies) return;
+                _this3.port = _this3.props.match.params.port;
+                var proxy = proxies.filter(function (p) {
+                    return p.port == _this3.port;
+                })[0].config;
+                var form = Object.assign({}, proxy);
+                var preset = _this3.guess_preset(form);
+                _this3.apply_preset(form, preset);
+                _this3.setState({ proxies: proxies }, _this3.delayed_loader());
+            });
+            this.setdb_on('head.consts', function (consts) {
+                return _this3.setState({ consts: consts }, _this3.delayed_loader());
+            });
+            this.setdb_on('head.defaults', function (defaults) {
+                return _this3.setState({ defaults: defaults }, _this3.delayed_loader());
+            });
+            this.setdb_on('head.callbacks', function (callbacks) {
+                return _this3.setState({ callbacks: callbacks });
+            });
+            this.setdb_on('head.proxy_edit.loading', function (loading) {
+                return _this3.setState({ loading: loading });
+            });
+            this.setdb_on('head.proxy_edit.tab', function () {
+                var tab = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'logs';
+                return _this3.setState({ tab: tab });
+            });
+            var state = void 0;
+            if ((state = this.props.location.state) && state.field) this.goto_field(state.field);
+        }
+    }, {
+        key: 'willUnmount',
+        value: function willUnmount() {
+            _setdb2.default.set('head.proxy_edit.form', undefined);
+            _setdb2.default.set('head.proxy_edit', undefined);
+        }
+    }, {
+        key: 'delayed_loader',
+        value: function delayed_loader() {
+            return _lodash2.default.debounce(this.update_loader.bind(this));
+        }
+    }, {
+        key: 'update_loader',
+        value: function update_loader() {
+            this.setState(function (state) {
+                var show_loader = !state.consts || !state.proxies || !state.defaults;
+                var zone_name = !show_loader && (state.form.zone || state.consts.proxy.zone.def);
+                _setdb2.default.set('head.proxy_edit.zone_name', zone_name);
+                return { show_loader: show_loader };
+            });
+        }
+    }, {
+        key: 'guess_preset',
+        value: function guess_preset(form) {
+            var res = void 0;
+            for (var p in presets) {
+                var preset = presets[p];
+                if (preset.check(form)) {
+                    res = p;
+                    break;
+                }
+            }
+            if (form.last_preset_applied && presets[form.last_preset_applied]) res = form.last_preset_applied;
+            return res;
+        }
+    }, {
+        key: 'send_ga',
+        value: function send_ga(id, value) {
+            if (id == 'zone') {
+                ga_event('edit zone', value);
+                return;
+            }
+            var tab_label = void 0;
+            for (var t in _proxy_fields.tabs) {
+                if (Object.keys(_proxy_fields.tabs[t].fields).includes(id)) {
+                    tab_label = _proxy_fields.tabs[t].label;
+                    break;
+                }
+            }
+            ga_event('edit ' + id, value, { single: true });
+        }
+    }, {
+        key: 'apply_preset',
+        value: function apply_preset(_form, preset) {
+            var form = Object.assign({}, _form);
+            var last_preset = form.last_preset_applied ? presets[form.last_preset_applied] : null;
+            if (last_preset && last_preset.key != preset && last_preset.clean) last_preset.clean(form);
+            if (form.ext_proxies) {
+                form.preset = '';
+                form.zone = '';
+                form.password = '';
+            } else {
+                form.preset = preset;
+                form.last_preset_applied = preset;
+                presets[preset].set(form);
+            }
+            this.apply_rules(form);
+            if (form.session === true) {
+                form.session_random = true;
+                form.session = '';
+            } else form.session_random = false;
+            if (form.reverse_lookup === undefined) {
+                if (form.reverse_lookup_dns) form.reverse_lookup = 'dns';else if (form.reverse_lookup_file) form.reverse_lookup = 'file';else if (form.reverse_lookup_values) {
+                    form.reverse_lookup = 'values';
+                    form.reverse_lookup_values = form.reverse_lookup_values.join('\n');
+                }
+            }
+            if (!form.ips) form.ips = [];
+            if (!form.vips) form.vips = [];
+            if (Array.isArray(form.whitelist_ips)) form.whitelist_ips = form.whitelist_ips.join(',');
+            if (form.city && !Array.isArray(form.city) && form.state) {
+                form.city = [{ id: form.city,
+                    label: form.city + ' (' + form.state + ')' }];
+            } else if (!Array.isArray(form.city)) form.city = [];
+            if (!this.original_form) this.original_form = form;
+            form.country = (form.country || '').toLowerCase();
+            form.state = (form.state || '').toLowerCase();
+            this.setState({ form: form });
+            _setdb2.default.set('head.proxy_edit.form', form);
         }
     }, {
         key: 'render',
@@ -15479,8 +15437,6 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
             var Main_window = void 0;
             var tab = this.state.tab;
             switch (this.state.tab) {
-                case 'logs':
-                    Main_window = _har_viewer2.default;break;
                 case 'target':
                     Main_window = Targeting;break;
                 case 'speed':
@@ -15493,12 +15449,13 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                     Main_window = Debug;break;
                 case 'general':
                     Main_window = General;break;
+                case 'logs':
+                default:
+                    Main_window = _har_viewer2.default;
             }
-            if (!this.state.consts || !this.state.defaults || !this.state.locations || !this.state.proxies) {
-                Main_window = function Main_window() {
-                    return null;
-                };
-            }
+            if (!this.state.consts || !this.state.defaults || !this.state.proxies) Main_window = function Main_window() {
+                return null;
+            };
             var support = presets && this.state.form.preset && presets[this.state.form.preset].support || {};
             var zones = this.state.consts && this.state.consts.proxy.zone.values || [];
             zones = zones.filter(function (z) {
@@ -15512,7 +15469,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
             var port = this.props.match.params.port;
             return _react2.default.createElement(
                 'div',
-                { className: 'lpm edit_proxy' },
+                { className: 'lpm proxy_edit' },
                 _react2.default.createElement(_common.Loader, { show: this.state.show_loader || this.state.loading }),
                 _react2.default.createElement(
                     'div',
@@ -15533,13 +15490,9 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                         default_zone: default_zone,
                         disabled: !!this.state.form.ext_proxies,
                         form: this.state.form,
-                        on_change_field: this.field_changed.bind(this),
-                        on_change_preset: this.apply_preset.bind(this),
-                        save: this.save.bind(this) }),
+                        on_change_preset: this.apply_preset.bind(this) }),
                     _react2.default.createElement(Nav_tabs, {
-                        curr_tab: this.state.tab,
                         form: this.state.form,
-                        on_tab_click: this.click_tab.bind(this),
                         errors: this.state.errors })
                 ),
                 _react2.default.createElement(
@@ -15548,17 +15501,11 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                     _react2.default.createElement(Main_window, {
                         port: port,
                         proxy: this.state.consts && this.state.consts.proxy,
-                        locations: this.state.locations,
                         defaults: this.state.defaults,
                         form: this.state.form,
-                        init_focus: this.init_focus,
-                        is_valid_field: this.is_valid_field.bind(this),
-                        on_change_field: this.field_changed.bind(this),
                         support: support,
-                        errors: this.state.errors,
-                        default_opt: this.default_opt.bind(this),
-                        get_curr_plan: this.get_curr_plan.bind(this),
-                        goto_field: this.goto_field.bind(this) })
+                        default_opt: this.default_opt,
+                        get_curr_plan: this.get_curr_plan })
                 ),
                 _react2.default.createElement(
                     _common.Modal,
@@ -15567,61 +15514,76 @@ var Index = (0, _reactRouterDom.withRouter)(function (_React$Component) {
                     _react2.default.createElement(_common.Warnings, { warnings: this.state.error_list })
                 ),
                 _react2.default.createElement(Alloc_modal, { type: type, form: this.state.form, support: support,
-                    zone: this.state.form.zone || default_zone,
-                    on_change_field: this.field_changed.bind(this) })
+                    zone: this.state.form.zone || default_zone })
             );
         }
     }]);
     return Index;
-}(_react2.default.Component));
+}(_pure_component2.default));
 
-var Nav = function Nav(_ref3) {
-    var disabled = _ref3.disabled,
-        props = (0, _objectWithoutProperties3.default)(_ref3, ['disabled']);
+var Nav = function (_Pure_component2) {
+    (0, _inherits3.default)(Nav, _Pure_component2);
 
-    var reset_fields = function reset_fields() {
-        // XXX krzysztof: this should be moved in more generic place
-        props.on_change_field('ips', []);
-        props.on_change_field('vips', []);
-        props.on_change_field('multiply_ips', false);
-        props.on_change_field('multiply_vips', false);
-        props.on_change_field('multiply', 1);
-    };
-    var update_preset = function update_preset(val) {
-        props.on_change_preset(props.form, val);
-        reset_fields();
-        ga_event('top bar', 'edit field', 'preset');
-    };
-    var update_zone = function update_zone(val) {
-        var zone_name = val || props.default_zone;
-        _setdb2.default.set('head.edit_proxy.zone_name', zone_name);
-        var zone = props.zones.filter(function (z) {
-            return z.key == zone_name;
-        })[0] || {};
-        props.on_change_field('zone', val);
-        props.on_change_field('password', zone.password);
-        if (props.form.ips.length || props.form.vips.length) props.on_change_field('pool_size', 0);
-        reset_fields();
-    };
-    var presets_opt = Object.keys(presets).map(function (p) {
-        var key = presets[p].title;
-        if (presets[p].default) key = 'Default (' + key + ')';
-        return { key: key, value: p };
-    });
-    var preset = props.form.preset;
+    function Nav() {
+        var _ref3;
 
-    var preset_tooltip = preset && presets[preset].subtitle + (presets[preset].rules && '<ul>' + presets[preset].rules.map(function (r) {
-        return '<li>' + r.label + '</li>';
-    }).join('') + '</ul>');
-    return _react2.default.createElement(
-        'div',
-        { className: 'nav' },
-        _react2.default.createElement(Field, { on_change: update_zone, options: props.zones, tooltip: 'Zone',
-            value: props.form.zone, disabled: disabled }),
-        _react2.default.createElement(Field, { on_change: update_preset, tooltip: preset_tooltip,
-            options: presets_opt, value: preset, disabled: disabled })
-    );
-};
+        var _temp, _this4, _ret;
+
+        (0, _classCallCheck3.default)(this, Nav);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Nav.__proto__ || Object.getPrototypeOf(Nav)).call.apply(_ref3, [this].concat(args))), _this4), _this4.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this4._reset_fields = function () {
+            _this4.set_field('ips', []);
+            _this4.set_field('vips', []);
+            _this4.set_field('multiply_ips', false);
+            _this4.set_field('multiply_vips', false);
+            _this4.set_field('multiply', 1);
+        }, _this4.update_preset = function (val) {
+            _this4.props.on_change_preset(_this4.props.form, val);
+            _this4._reset_fields();
+            ga_event('edit preset', val);
+        }, _this4.update_zone = function (val) {
+            var zone_name = val || _this4.props.default_zone;
+            _setdb2.default.set('head.proxy_edit.zone_name', zone_name);
+            var zone = _this4.props.zones.filter(function (z) {
+                return z.key == zone_name;
+            })[0] || {};
+            _this4.set_field('zone', val);
+            _this4.set_field('password', zone.password);
+            if (_this4.props.form.ips.length || _this4.props.form.vips.length) _this4.set_field('pool_size', 0);
+            _this4._reset_fields();
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this4, _ret);
+    }
+
+    (0, _createClass3.default)(Nav, [{
+        key: 'render',
+        value: function render() {
+            var presets_opt = Object.keys(presets).map(function (p) {
+                var key = presets[p].title;
+                if (presets[p].default) key = 'Default (' + key + ')';
+                return { key: key, value: p };
+            });
+            var preset = this.props.form.preset;
+            var preset_tooltip = preset && presets[preset].subtitle + (presets[preset].rules && '<ul>' + presets[preset].rules.map(function (r) {
+                return '<li>' + r.label + '</li>';
+            }).join('') + '</ul>');
+            return _react2.default.createElement(
+                'div',
+                { className: 'nav' },
+                _react2.default.createElement(Field, { on_change: this.update_zone, options: this.props.zones,
+                    tooltip: 'Zone', value: this.props.form.zone,
+                    disabled: this.props.disabled }),
+                _react2.default.createElement(Field, { on_change: this.update_preset, tooltip: preset_tooltip,
+                    options: presets_opt, value: preset,
+                    disabled: this.props.disabled })
+            );
+        }
+    }]);
+    return Nav;
+}(_pure_component2.default);
 
 var Field = function Field(_ref4) {
     var disabled = _ref4.disabled,
@@ -15653,28 +15615,69 @@ var Field = function Field(_ref4) {
     );
 };
 
-var Nav_tabs = function Nav_tabs(props) {
-    return _react2.default.createElement(
-        'div',
-        { className: 'nav_tabs' },
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'logs' })),
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'target' })),
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'speed' })),
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'rules' })),
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'rotation' })),
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'debug' })),
-        _react2.default.createElement(Tab_btn, (0, _extends4.default)({}, props, { id: 'general' }))
-    );
-};
+var Nav_tabs = function (_Pure_component3) {
+    (0, _inherits3.default)(Nav_tabs, _Pure_component3);
+
+    function Nav_tabs() {
+        var _ref5;
+
+        var _temp2, _this5, _ret2;
+
+        (0, _classCallCheck3.default)(this, Nav_tabs);
+
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        return _ret2 = (_temp2 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Nav_tabs.__proto__ || Object.getPrototypeOf(Nav_tabs)).call.apply(_ref5, [this].concat(args))), _this5), _this5.state = {}, _temp2), (0, _possibleConstructorReturn3.default)(_this5, _ret2);
+    }
+
+    (0, _createClass3.default)(Nav_tabs, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this6 = this;
+
+            this.setdb_on('head.proxy_edit.tab', function () {
+                var tab = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'logs';
+                return _this6.setState({ tab: tab });
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _props = this.props,
+                form = _props.form,
+                errors = _props.errors;
+            // XXX krzysztof: remove ...props
+
+            return _react2.default.createElement(
+                'div',
+                { className: 'nav_tabs' },
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab, id: 'logs' })),
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab, id: 'target' })),
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab, id: 'speed' })),
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab, id: 'rules' })),
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab,
+                    id: 'rotation' })),
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab, id: 'debug' })),
+                _react2.default.createElement(Tab_btn, (0, _extends5.default)({}, this.props, { curr_tab: this.state.tab, id: 'general' }))
+            );
+        }
+    }]);
+    return Nav_tabs;
+}(_pure_component2.default);
 
 var Tab_btn = function Tab_btn(props) {
     var btn_class = (0, _classnames3.default)('btn_tab', { active: props.curr_tab == props.id });
     var tab_fields = Object.keys(_proxy_fields.tabs[props.id].fields || {});
-    var changes = Object.keys(props.form).filter(function (f) {
-        var val = props.form[f];
-        var is_empty_arr = Array.isArray(val) && !val[0];
-        return tab_fields.includes(f) && val && !is_empty_arr;
-    }).length;
+    var changes = void 0;
+    if (props.id == 'rules') changes = _lodash2.default.get(props, 'form.rules.post.length');else {
+        changes = Object.keys(props.form).filter(function (f) {
+            var val = props.form[f];
+            var is_empty_arr = Array.isArray(val) && !val[0];
+            return tab_fields.includes(f) && val && !is_empty_arr;
+        }).length;
+    }
     var errors = Object.keys(props.errors).filter(function (f) {
         return tab_fields.includes(f);
     });
@@ -15684,7 +15687,7 @@ var Tab_btn = function Tab_btn(props) {
         _react2.default.createElement(
             'div',
             { onClick: function onClick() {
-                    return props.on_tab_click(props.id);
+                    return _setdb2.default.set('head.proxy_edit.tab', props.id);
                 },
                 className: btn_class },
             _react2.default.createElement(Tab_icon, { id: props.id, changes: changes,
@@ -15718,39 +15721,6 @@ var Tab_icon = function Tab_icon(props) {
     );
 };
 
-var Section_raw = function (_React$Component2) {
-    (0, _inherits3.default)(Section_raw, _React$Component2);
-
-    function Section_raw(props) {
-        (0, _classCallCheck3.default)(this, Section_raw);
-
-        var _this5 = (0, _possibleConstructorReturn3.default)(this, (Section_raw.__proto__ || Object.getPrototypeOf(Section_raw)).call(this, props));
-
-        _this5.state = { focused: false };
-        return _this5;
-    }
-
-    (0, _createClass3.default)(Section_raw, [{
-        key: 'render',
-        value: function render() {
-            var error = !!this.props.error_msg;
-            var dynamic_class = { disabled: this.props.disabled };
-            return _react2.default.createElement(
-                'div',
-                { className: (0, _classnames3.default)('section_wrapper', dynamic_class) },
-                _react2.default.createElement(
-                    'div',
-                    { className: 'section_body' },
-                    this.props.children
-                )
-            );
-        }
-    }]);
-    return Section_raw;
-}(_react2.default.Component);
-
-var Section = (0, _recompose.getContext)({ provide: _propTypes2.default.object })(Section_raw);
-
 var Double_number = function Double_number(props) {
     var vals = ('' + props.val).split(':');
     var update = function update(start, end) {
@@ -15759,7 +15729,7 @@ var Double_number = function Double_number(props) {
     return _react2.default.createElement(
         'span',
         { className: 'double_field' },
-        _react2.default.createElement(_common.Input, (0, _extends4.default)({}, props, { val: vals[0] || '', id: props.id + '_start',
+        _react2.default.createElement(_common.Input, (0, _extends5.default)({}, props, { val: vals[0] || '', id: props.id + '_start',
             type: 'number', disabled: props.disabled,
             on_change_wrapper: function on_change_wrapper(val) {
                 return update(val, vals[1]);
@@ -15769,7 +15739,7 @@ var Double_number = function Double_number(props) {
             { className: 'devider' },
             ':'
         ),
-        _react2.default.createElement(_common.Input, (0, _extends4.default)({}, props, { val: vals[1] || '', id: props.id + '_end',
+        _react2.default.createElement(_common.Input, (0, _extends5.default)({}, props, { val: vals[1] || '', id: props.id + '_end',
             type: 'number', disabled: props.disabled,
             on_change_wrapper: function on_change_wrapper(val) {
                 return update(vals[0], val);
@@ -15783,144 +15753,218 @@ var Typeahead_wrapper = function Typeahead_wrapper(props) {
         onChange: props.on_change_wrapper, selected: props.val });
 };
 
-var Section_with_fields = function Section_with_fields(props) {
-    var id = props.id,
-        form = props.form,
-        errors = props.errors,
-        init_focus = props.init_focus;
+var Config = (0, _recompose.getContext)({ provide: _propTypes2.default.object })(function (_Pure_component4) {
+    (0, _inherits3.default)(Config, _Pure_component4);
 
-    var disabled = props.disabled || !props.is_valid_field(id);
-    var is_empty_arr = Array.isArray(form[id]) && !form[id][0];
-    var error_msg = errors[id];
-    return _react2.default.createElement(
-        Section,
-        { disabled: disabled, id: id,
-            error_msg: error_msg, init_focus: init_focus },
-        _react2.default.createElement(Section_field, (0, _extends4.default)({}, props, { disabled: disabled }))
-    );
-};
+    function Config() {
+        var _ref6;
 
-var Section_field = function Section_field(props) {
-    var id = props.id,
-        form = props.form,
-        sufix = props.sufix,
-        note = props.note,
-        type = props.type,
-        disabled = props.disabled,
-        data = props.data,
-        on_change = props.on_change,
-        on_change_field = props.on_change_field,
-        min = props.min,
-        max = props.max,
-        validator = props.validator;
-    var tab_id = props.provide.tab_id;
+        var _temp3, _this7, _ret3;
 
-    var on_blur = function on_blur(e) {
-        if (validator) on_change_field(id, validator(e.target.value));
-    };
-    var on_change_wrapper = function on_change_wrapper(value, _id) {
-        var curr_id = _id || id;
-        if (on_change) on_change(value);
-        on_change_field(curr_id, value);
-    };
-    var Comp = void 0;
-    switch (type) {
-        case 'select':
-            Comp = _common.Select;break;
-        case 'double_number':
-            Comp = Double_number;break;
-        case 'typeahead':
-            Comp = Typeahead_wrapper;break;
-        case 'textarea':
-            Comp = _common.Textarea;break;
-        default:
-            Comp = _common.Input;
-    }
-    var val = form[id] === undefined ? '' : form[id];
-    var placeholder = _proxy_fields.tabs[tab_id].fields[id].placeholder || '';
-    var tooltip = _proxy_fields.tabs[tab_id].fields[id].tooltip;
-    return _react2.default.createElement(
-        'div',
-        { className: (0, _classnames3.default)('field_row', { disabled: disabled, note: note }) },
-        _react2.default.createElement(
-            'div',
-            { className: 'desc' },
-            _react2.default.createElement(
-                _common.Tooltip,
-                { title: tooltip },
-                _proxy_fields.tabs[tab_id].fields[id].label
-            )
-        ),
-        _react2.default.createElement(
-            'div',
-            { className: 'field' },
-            _react2.default.createElement(
-                'div',
-                { className: 'inline_field' },
-                _react2.default.createElement(Comp, { form: form, id: id, data: data, type: type,
-                    on_change_wrapper: on_change_wrapper, val: val,
-                    disabled: disabled, min: min, max: max,
-                    placeholder: placeholder, on_blur: on_blur }),
-                sufix ? _react2.default.createElement(
-                    'span',
-                    { className: 'sufix' },
-                    sufix
-                ) : null
-            ),
-            note ? _react2.default.createElement(
-                Note,
-                null,
-                note
-            ) : null
-        )
-    );
-};
-Section_field = (0, _recompose.getContext)({ provide: _propTypes2.default.object })(Section_field);
+        (0, _classCallCheck3.default)(this, Config);
 
-var With_data = function (_React$Component3) {
-    (0, _inherits3.default)(With_data, _React$Component3);
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+        }
 
-    function With_data() {
-        (0, _classCallCheck3.default)(this, With_data);
-        return (0, _possibleConstructorReturn3.default)(this, (With_data.__proto__ || Object.getPrototypeOf(With_data)).apply(this, arguments));
+        return _ret3 = (_temp3 = (_this7 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Config.__proto__ || Object.getPrototypeOf(Config)).call.apply(_ref6, [this].concat(args))), _this7), _this7.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this7.is_valid_field = _setdb2.default.get('head.proxy_edit.is_valid_field'), _this7.state = {}, _this7.on_blur = function (_ref7) {
+            var value = _ref7.target.value;
+
+            if (_this7.props.validator) _this7.set_field(_this7.props.id, _this7.props.validator(value));
+        }, _this7.on_change_wrapper = function (value, _id) {
+            var curr_id = _id || _this7.props.id;
+            if (_this7.props.on_change) _this7.props.on_change(value);
+            _this7.set_field(curr_id, value);
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this7, _ret3);
     }
 
-    (0, _createClass3.default)(With_data, [{
-        key: 'wrapped_children',
-        value: function wrapped_children() {
-            var props = Object.assign({}, this.props);
-            delete props.children;
-            return _react2.default.Children.map(this.props.children, function (child) {
-                return _react2.default.cloneElement(child, props);
+    (0, _createClass3.default)(Config, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this8 = this;
+
+            this.setdb_on('head.proxy_edit.form.' + this.props.id, function (val) {
+                _this8.setState({ val: val, show: true });
             });
         }
     }, {
         key: 'render',
         value: function render() {
+            if (!this.state.show) return null;
+            var _props2 = this.props,
+                id = _props2.id,
+                sufix = _props2.sufix,
+                note = _props2.note,
+                type = _props2.type,
+                data = _props2.data,
+                min = _props2.min,
+                max = _props2.max;
+            var tab_id = this.props.provide.tab_id;
+
+            var disabled = this.props.disabled || !this.is_valid_field(id);
+            var val = this.state.val === undefined ? '' : this.state.val;
+            var placeholder = _proxy_fields.tabs[tab_id].fields[id].placeholder || '';
+            var tooltip = _proxy_fields.tabs[tab_id].fields[id].tooltip;
             return _react2.default.createElement(
                 'div',
-                null,
-                this.wrapped_children()
+                { className: (0, _classnames3.default)('field_row', { disabled: disabled, note: note }) },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'desc' },
+                    _react2.default.createElement(
+                        _common.Tooltip,
+                        { title: tooltip },
+                        _proxy_fields.tabs[tab_id].fields[id].label
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'field' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'inline_field' },
+                        _react2.default.createElement(Form_controller, { id: id, data: data, type: type,
+                            on_change_wrapper: this.on_change_wrapper, val: val,
+                            disabled: disabled, min: min, max: max,
+                            placeholder: placeholder, on_blur: this.on_blur }),
+                        sufix && _react2.default.createElement(
+                            'span',
+                            { className: 'sufix' },
+                            sufix
+                        )
+                    ),
+                    note && _react2.default.createElement(
+                        Note,
+                        null,
+                        note
+                    )
+                )
             );
         }
     }]);
-    return With_data;
-}(_react2.default.Component);
+    return Config;
+}(_pure_component2.default));
 
-var Targeting_raw = function (_React$Component4) {
-    (0, _inherits3.default)(Targeting_raw, _React$Component4);
+var Rule_config = (0, _recompose.getContext)({ provide: _propTypes2.default.object })(function (_Pure_component5) {
+    (0, _inherits3.default)(Rule_config, _Pure_component5);
 
-    function Targeting_raw(props) {
-        (0, _classCallCheck3.default)(this, Targeting_raw);
+    function Rule_config() {
+        var _ref8;
 
-        var _this7 = (0, _possibleConstructorReturn3.default)(this, (Targeting_raw.__proto__ || Object.getPrototypeOf(Targeting_raw)).call(this, props));
+        var _temp4, _this9, _ret4;
 
-        _this7.def_value = { key: 'Any (default)', value: '' };
-        _this7.init_carriers();
-        return _this7;
+        (0, _classCallCheck3.default)(this, Rule_config);
+
+        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
+        }
+
+        return _ret4 = (_temp4 = (_this9 = (0, _possibleConstructorReturn3.default)(this, (_ref8 = Rule_config.__proto__ || Object.getPrototypeOf(Rule_config)).call.apply(_ref8, [this].concat(args))), _this9), _this9.value_change = function (value) {
+            if (_this9.props.on_change) _this9.props.on_change(value);
+            _setdb2.default.emit('head.proxy_edit.update_rule', { field: _this9.props.id,
+                rule_id: _this9.props.rule.id, value: value });
+        }, _temp4), (0, _possibleConstructorReturn3.default)(_this9, _ret4);
     }
 
-    (0, _createClass3.default)(Targeting_raw, [{
+    (0, _createClass3.default)(Rule_config, [{
+        key: 'render',
+        value: function render() {
+            var _props3 = this.props,
+                id = _props3.id,
+                sufix = _props3.sufix,
+                note = _props3.note,
+                type = _props3.type,
+                data = _props3.data,
+                disabled = _props3.disabled,
+                rule = _props3.rule;
+
+            var val = rule[id] || '';
+            var tab_id = this.props.provide.tab_id;
+
+            var placeholder = _proxy_fields.tabs[tab_id].fields[id].placeholder || '';
+            var tooltip = _proxy_fields.tabs[tab_id].fields[id].tooltip;
+            return _react2.default.createElement(
+                'div',
+                { className: (0, _classnames3.default)('field_row', { disabled: disabled, note: note }) },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'desc' },
+                    _react2.default.createElement(
+                        _common.Tooltip,
+                        { title: tooltip },
+                        _proxy_fields.tabs[tab_id].fields[id].label
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'field' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'inline_field' },
+                        _react2.default.createElement(Form_controller, { id: id, data: data, type: type, val: val,
+                            on_change_wrapper: this.value_change,
+                            disabled: disabled, placeholder: placeholder }),
+                        sufix && _react2.default.createElement(
+                            'span',
+                            { className: 'sufix' },
+                            sufix
+                        )
+                    ),
+                    note && _react2.default.createElement(
+                        Note,
+                        null,
+                        note
+                    )
+                )
+            );
+        }
+    }]);
+    return Rule_config;
+}(_pure_component2.default));
+
+var Form_controller = function Form_controller(props) {
+    var type = props.type;
+    if (type == 'select') return _react2.default.createElement(_common.Select, props);else if (type == 'double_number') return _react2.default.createElement(Double_number, props);else if (type == 'typeahead') return _react2.default.createElement(Typeahead_wrapper, props);else if (type == 'textarea') return _react2.default.createElement(_common.Textarea, props);
+    return _react2.default.createElement(_common.Input, props);
+};
+
+var Note = function Note(props) {
+    return _react2.default.createElement(
+        'div',
+        { className: 'note' },
+        _react2.default.createElement(
+            'span',
+            null,
+            props.children
+        )
+    );
+};
+
+var Targeting = provider({ tab_id: 'target' })(function (_Pure_component6) {
+    (0, _inherits3.default)(Targeting, _Pure_component6);
+
+    function Targeting(props) {
+        (0, _classCallCheck3.default)(this, Targeting);
+
+        var _this10 = (0, _possibleConstructorReturn3.default)(this, (Targeting.__proto__ || Object.getPrototypeOf(Targeting)).call(this, props));
+
+        _this10.state = {};
+        _this10.def_value = { key: 'Any (default)', value: '' };
+        _this10.init_carriers();
+        _this10.set_field = _setdb2.default.get('head.proxy_edit.set_field');
+        return _this10;
+    }
+
+    (0, _createClass3.default)(Targeting, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this11 = this;
+
+            this.setdb_on('head.locations', function (locations) {
+                return _this11.setState({ locations: locations });
+            });
+        }
+    }, {
         key: 'init_carriers',
         value: function init_carriers() {
             var subject = 'Add new carrier option';
@@ -15930,8 +15974,7 @@ var Targeting_raw = function (_React$Component4) {
             var mailto = 'mailto:' + mail + '?subject=' + subject + '&body=' + body;
             this.carriers_note = _react2.default.createElement(
                 'a',
-                { className: 'link',
-                    href: mailto },
+                { className: 'link', href: mailto },
                 'More carriers'
             );
             this.carriers = [{ value: '', key: 'None' }, { value: 'a1', key: 'A1 Austria' }, { value: 'aircel', key: 'Aircel' }, { value: 'airtel', key: 'Airtel' }, { value: 'att', key: 'AT&T' }, { value: 'vimpelcom', key: 'Beeline Russia' }, { value: 'celcom', key: 'Celcom' }, { value: 'chinamobile', key: 'China Mobile' }, { value: 'claro', key: 'Claro' }, { value: 'comcast', key: 'Comcast' }, { value: 'cox', key: 'Cox' }, { value: 'dt', key: 'Deutsche Telekom' }, { value: 'digi', key: 'Digi Malaysia' }, { value: 'docomo', key: 'Docomo' }, { value: 'dtac', key: 'DTAC Trinet' }, { value: 'etisalat', key: 'Etisalat' }, { value: 'idea', key: 'Idea India' }, { value: 'kyivstar', key: 'Kyivstar' }, { value: 'meo', key: 'MEO Portugal' }, { value: 'megafont', key: 'Megafon Russia' }, { value: 'mtn', key: 'MTN - Mahanager Telephone' }, { value: 'mtnza', key: 'MTN South Africa' }, { value: 'mts', key: 'MTS Russia' }, { value: 'optus', key: 'Optus' }, { value: 'orange', key: 'Orange' }, { value: 'qwest', key: 'Qwest' }, { value: 'reliance_jio', key: 'Reliance Jio' }, { value: 'robi', key: 'Robi' }, { value: 'sprint', key: 'Sprint' }, { value: 'telefonica', key: 'Telefonica' }, { value: 'telstra', key: 'Telstra' }, { value: 'tmobile', key: 'T-Mobile' }, { value: 'tigo', key: 'Tigo' }, { value: 'tim', key: 'TIM (Telecom Italia)' }, { value: 'vodacomza', key: 'Vodacom South Africa' }, { value: 'vodafone', key: 'Vodafone' }, { value: 'verizon', key: 'Verizon' }, { value: 'vivo', key: 'Vivo' }, { value: 'zain', key: 'Zain' }];
@@ -15939,7 +15982,7 @@ var Targeting_raw = function (_React$Component4) {
     }, {
         key: 'allowed_countries',
         value: function allowed_countries() {
-            var res = this.props.locations.countries.map(function (c) {
+            var res = this.state.locations.countries.map(function (c) {
                 return { key: c.country_name, value: c.country_id };
             });
             return [this.def_value].concat((0, _toConsumableArray3.default)(res));
@@ -15947,15 +15990,15 @@ var Targeting_raw = function (_React$Component4) {
     }, {
         key: 'country_changed',
         value: function country_changed() {
-            this.props.on_change_field('city', []);
-            this.props.on_change_field('state', '');
+            this.set_field('city', []);
+            this.set_field('state', '');
         }
     }, {
         key: 'states',
         value: function states() {
             var country = this.props.form.country;
             if (!country || country == '*') return [];
-            var res = this.props.locations.regions[country].map(function (r) {
+            var res = this.state.locations.regions[country].map(function (r) {
                 return { key: r.region_name, value: r.region_id };
             });
             return [this.def_value].concat((0, _toConsumableArray3.default)(res));
@@ -15963,7 +16006,7 @@ var Targeting_raw = function (_React$Component4) {
     }, {
         key: 'state_changed',
         value: function state_changed() {
-            this.props.on_change_field('city', []);
+            this.set_field('city', []);
         }
     }, {
         key: 'cities',
@@ -15974,7 +16017,7 @@ var Targeting_raw = function (_React$Component4) {
 
             var res = void 0;
             if (!country) return [];
-            res = this.props.locations.cities.filter(function (c) {
+            res = this.state.locations.cities.filter(function (c) {
                 return c.country_id == country;
             });
             if (state) res = res.filter(function (c) {
@@ -15993,91 +16036,75 @@ var Targeting_raw = function (_React$Component4) {
     }, {
         key: 'city_changed',
         value: function city_changed(e) {
-            if (e && e.length) this.props.on_change_field('state', e[0].region);
+            if (e && e.length) this.set_field('state', e[0].region);
         }
     }, {
         key: 'render',
         value: function render() {
+            if (!this.state.locations) return null;
             var curr_plan = this.props.get_curr_plan();
             var show_dc_note = curr_plan && curr_plan.type == 'static';
             var show_vips_note = curr_plan && (curr_plan.vips_type == 'domain' || curr_plan.vips_type == 'domain_p');
             return _react2.default.createElement(
-                With_data,
-                this.props,
-                _react2.default.createElement(
-                    _react3.If,
-                    { when: show_dc_note || show_vips_note },
-                    _react2.default.createElement(
-                        Note,
+                'div',
+                null,
+                (show_dc_note || show_vips_note) && _react2.default.createElement(
+                    Note,
+                    null,
+                    show_dc_note && _react2.default.createElement(
+                        'span',
                         null,
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: show_dc_note },
-                            _react2.default.createElement(
-                                'span',
-                                null,
-                                'To change Data Center country visit your '
-                            )
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: show_vips_note },
-                            _react2.default.createElement(
-                                'span',
-                                null,
-                                'To change Exclusive gIP country visit your '
-                            )
-                        ),
-                        _react2.default.createElement(
-                            'a',
-                            { className: 'link', target: '_blank', rel: 'noopener noreferrer',
-                                href: 'https://luminati.io/cp/zones' },
-                            'zone page'
-                        ),
-                        _react2.default.createElement(
-                            'span',
-                            null,
-                            ' and change your zone plan.'
-                        )
+                        'To change Data Center country visit your '
+                    ),
+                    show_vips_note && _react2.default.createElement(
+                        'span',
+                        null,
+                        'To change Exclusive gIP country visit your '
+                    ),
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'link', target: '_blank', rel: 'noopener noreferrer',
+                            href: 'https://luminati.io/cp/zones' },
+                        'zone page'
+                    ),
+                    _react2.default.createElement(
+                        'span',
+                        null,
+                        ' and change your zone plan.'
                     )
                 ),
-                _react2.default.createElement(Section_with_fields, { type: 'select', id: 'country',
+                _react2.default.createElement(Config, { type: 'select', id: 'country',
                     data: this.allowed_countries(),
                     on_change: this.country_changed.bind(this) }),
-                _react2.default.createElement(Section_with_fields, { type: 'select', id: 'state',
-                    data: this.states(),
+                _react2.default.createElement(Config, { type: 'select', id: 'state', data: this.states(),
                     on_change: this.state_changed.bind(this) }),
-                _react2.default.createElement(Section_with_fields, { type: 'typeahead', id: 'city',
-                    data: this.cities(),
+                _react2.default.createElement(Config, { type: 'typeahead', id: 'city', data: this.cities(),
                     on_change: this.city_changed.bind(this) }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'asn',
+                _react2.default.createElement(Config, { type: 'number', id: 'asn',
                     disabled: this.props.form.carrier }),
-                _react2.default.createElement(Section_with_fields, { type: 'select', id: 'carrier',
-                    data: this.carriers, note: this.carriers_note,
-                    disabled: this.props.form.asn })
+                _react2.default.createElement(Config, { type: 'select', id: 'carrier', data: this.carriers,
+                    note: this.carriers_note, disabled: this.props.form.asn })
             );
         }
     }]);
-    return Targeting_raw;
-}(_react2.default.Component);
+    return Targeting;
+}(_pure_component2.default));
 
-var Targeting = provider({ tab_id: 'target' })(Targeting_raw);
+var Speed = provider({ tab_id: 'speed' })(function (_Pure_component7) {
+    (0, _inherits3.default)(Speed, _Pure_component7);
 
-var Speed_raw = function (_Pure_component) {
-    (0, _inherits3.default)(Speed_raw, _Pure_component);
+    function Speed(props) {
+        (0, _classCallCheck3.default)(this, Speed);
 
-    function Speed_raw(props) {
-        (0, _classCallCheck3.default)(this, Speed_raw);
+        var _this12 = (0, _possibleConstructorReturn3.default)(this, (Speed.__proto__ || Object.getPrototypeOf(Speed)).call(this, props));
 
-        var _this8 = (0, _possibleConstructorReturn3.default)(this, (Speed_raw.__proto__ || Object.getPrototypeOf(Speed_raw)).call(this, props));
-
-        _this8.dns_options = [{ key: 'Local (default) - resolved by the super proxy',
+        _this12.dns_options = [{ key: 'Local (default) - resolved by the super proxy',
             value: 'local' }, { key: 'Remote - resolved by peer', value: 'remote' }];
-        _this8.reverse_lookup_options = [{ key: 'No', value: '' }, { key: 'DNS', value: 'dns' }, { key: 'File', value: 'file' }, { key: 'Values', value: 'values' }];
-        return _this8;
+        _this12.reverse_lookup_options = [{ key: 'No', value: '' }, { key: 'DNS', value: 'dns' }, { key: 'File', value: 'file' }, { key: 'Values', value: 'values' }];
+        return _this12;
     }
 
-    (0, _createClass3.default)(Speed_raw, [{
+    (0, _createClass3.default)(Speed, [{
         key: 'open_modal',
         value: function open_modal() {
             (0, _jquery2.default)('#allocated_ips').modal('show');
@@ -16093,11 +16120,11 @@ var Speed_raw = function (_Pure_component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this9 = this;
+            var _this13 = this;
 
-            var _props = this.props,
-                form = _props.form,
-                support = _props.support;
+            var _props4 = this.props,
+                form = _props4.form,
+                support = _props4.support;
 
             var pool_size_disabled = !support.pool_size || form.ips.length || form.vips.length;
             var type = this.get_type();
@@ -16106,287 +16133,308 @@ var Speed_raw = function (_Pure_component) {
             if (this.props.support.pool_size && render_modal) {
                 pool_size_note = _react2.default.createElement(
                     'a',
-                    { className: 'link',
-                        onClick: function onClick() {
-                            return _this9.open_modal();
+                    { className: 'link', onClick: function onClick() {
+                            return _this13.open_modal();
                         } },
                     'set from allocated ' + (type == 'ips' ? 'IPs' : 'vIPs')
                 );
             }
             return _react2.default.createElement(
-                With_data,
-                this.props,
-                _react2.default.createElement(Section_with_fields, { type: 'select', id: 'dns',
-                    data: this.dns_options }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'pool_size',
-                    min: '0', note: pool_size_note, disabled: pool_size_disabled }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'request_timeout',
-                    sufix: 'seconds', min: '0' }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'race_reqs', min: '1',
-                    max: '3' }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'proxy_count', min: '1' }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'proxy_switch', min: '0' }),
-                _react2.default.createElement(Section_with_fields, { type: 'number', id: 'throttle', min: '0' }),
-                _react2.default.createElement(
-                    Section,
-                    { id: 'reverse_lookup' },
-                    _react2.default.createElement(Section_field, (0, _extends4.default)({ type: 'select', id: 'reverse_lookup'
-                    }, this.props, { data: this.reverse_lookup_options })),
-                    _react2.default.createElement(
-                        _react3.If,
-                        { when: this.props.form.reverse_lookup == 'file' },
-                        _react2.default.createElement(Section_field, (0, _extends4.default)({ type: 'text', id: 'reverse_lookup_file'
-                        }, this.props))
-                    ),
-                    _react2.default.createElement(
-                        _react3.If,
-                        { when: this.props.form.reverse_lookup == 'values' },
-                        _react2.default.createElement(Section_field, (0, _extends4.default)({ type: 'textarea', id: 'reverse_lookup_values'
-                        }, this.props))
-                    )
-                )
+                'div',
+                null,
+                _react2.default.createElement(Config, { type: 'select', id: 'dns', data: this.dns_options }),
+                _react2.default.createElement(Config, { type: 'number', id: 'pool_size', min: '0',
+                    note: pool_size_note, disabled: pool_size_disabled }),
+                _react2.default.createElement(Config, { type: 'number', id: 'request_timeout', sufix: 'seconds',
+                    min: '0' }),
+                _react2.default.createElement(Config, { type: 'number', id: 'race_reqs', min: '1', max: '3' }),
+                _react2.default.createElement(Config, { type: 'number', id: 'proxy_count', min: '1' }),
+                _react2.default.createElement(Config, { type: 'number', id: 'proxy_switch', min: '0' }),
+                _react2.default.createElement(Config, { type: 'number', id: 'throttle', min: '0' }),
+                _react2.default.createElement(Config, { type: 'select', id: 'reverse_lookup',
+                    data: this.reverse_lookup_options }),
+                this.props.form.reverse_lookup == 'file' && _react2.default.createElement(Config, { type: 'text', id: 'reverse_lookup_file' }),
+                this.props.form.reverse_lookup == 'values' && _react2.default.createElement(Config, { type: 'textarea', id: 'reverse_lookup_values' })
             );
         }
     }]);
-    return Speed_raw;
-}(_pure_component2.default);
+    return Speed;
+}(_pure_component2.default));
 
-var Speed = provider({ tab_id: 'speed' })(Speed_raw);
+var Rules = provider({ tab_id: 'rules' })(function (_Pure_component8) {
+    (0, _inherits3.default)(Rules, _Pure_component8);
 
-var Note = function Note(props) {
-    return _react2.default.createElement(
-        'div',
-        { className: 'note' },
-        _react2.default.createElement(
-            'span',
-            null,
-            props.children
-        )
-    );
-};
+    function Rules() {
+        var _ref9;
 
-var Rules_raw = function (_React$Component5) {
-    (0, _inherits3.default)(Rules_raw, _React$Component5);
+        var _temp5, _this14, _ret5;
 
-    function Rules_raw(props) {
-        (0, _classCallCheck3.default)(this, Rules_raw);
+        (0, _classCallCheck3.default)(this, Rules);
 
-        var _this10 = (0, _possibleConstructorReturn3.default)(this, (Rules_raw.__proto__ || Object.getPrototypeOf(Rules_raw)).call(this, props));
+        for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+            args[_key5] = arguments[_key5];
+        }
 
-        _this10.port = window.location.pathname.split('/').slice(-1)[0];
-        _this10.state = {
-            show_statuses: _this10.props.form.trigger_type == 'status',
-            show_body_regex: _this10.props.form.trigger_type == 'body',
-            show_min_time: _this10.props.form.trigger_type == 'min_req_time',
-            show_max_time: _this10.props.form.trigger_type == 'max_req_time',
-            show_custom_status: _this10.props.form.status_code == 'Custom'
-        };
-        return _this10;
+        return _ret5 = (_temp5 = (_this14 = (0, _possibleConstructorReturn3.default)(this, (_ref9 = Rules.__proto__ || Object.getPrototypeOf(Rules)).call.apply(_ref9, [this].concat(args))), _this14), _this14.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this14.state = { rules: [{ id: 0 }], max_id: 0 }, _this14.update_rule = function (rule) {
+            if (!rule) return;
+            _this14.setState(function (prev) {
+                return {
+                    rules: prev.rules.map(function (r) {
+                        if (r.id != rule.rule_id) return r;else return (0, _extends5.default)({}, r, (0, _defineProperty3.default)({}, rule.field, rule.value));
+                    })
+                };
+            }, _this14.rules_update);
+        }, _this14.rule_add = function () {
+            _this14.setState(function (prev) {
+                return {
+                    rules: [].concat((0, _toConsumableArray3.default)(prev.rules), [{ id: prev.max_id + 1 }]),
+                    max_id: prev.max_id + 1
+                };
+            });
+        }, _this14.rule_del = function (id) {
+            if (_this14.state.rules.length == 1) _this14.setState({ rules: [{ id: 0 }], max_id: 0 }, _this14.rules_update);else {
+                _this14.setState(function (prev) {
+                    return { rules: prev.rules.filter(function (r) {
+                            return r.id != id;
+                        }) };
+                }, _this14.rules_update);
+            }
+        }, _this14.rule_prepare = function (rule) {
+            var action_raw = {};
+            if (['retry', 'retry_port', 'ban_ip'].includes(rule.action)) action_raw.retry = true;
+            if (rule.action == 'retry' && rule.retry_number) action_raw.retry = rule.retry_number;else if (rule.action == 'retry_port') action_raw.retry_port = rule.retry_port;else if (rule.action == 'ban_ip') {
+                if (rule.ban_ip_duration != 'custom') action_raw.ban_ip = rule.ban_ip_duration || '10min';else action_raw.ban_ip = rule.ban_ip_custom + 'min';
+            } else if (rule.action == 'save_to_pool') action_raw.reserve_session = true;
+            var result = null;
+            if (rule.trigger_type) {
+                result = {
+                    res: [{
+                        head: true,
+                        action: action_raw,
+                        action_type: rule.action,
+                        trigger_type: rule.trigger_type
+                    }],
+                    url: rule.trigger_url_regex || '**'
+                };
+            }
+            if (rule.trigger_type == 'status') {
+                var rule_status = rule.status_code == 'Custom' ? rule.status_custom : rule.status_code;
+                rule_status = rule_status || '';
+                result.res[0].status = { type: 'in', arg: rule_status };
+                result.res[0].status_custom = rule.status_code == 'Custom';
+            } else if (rule.trigger_type == 'body' && rule.body_regex) result.res[0].body = { type: '=~', arg: rule.body_regex };else if (rule.trigger_type == 'min_req_time' && rule.min_req_time) result.res[0].min_req_time = rule.min_req_time + 'ms';else if (rule.trigger_type == 'max_req_time' && rule.max_req_time) result.res[0].max_req_time = rule.max_req_time + 'ms';
+            return result;
+        }, _this14.rules_update = function () {
+            _setdb2.default.set('head.proxy_edit.rules', _this14.state.rules);
+            var post = _this14.state.rules.map(_this14.rule_prepare).filter(Boolean);
+            var rules = _this14.state.form.rules || {};
+            if (post.length) rules.post = post;else delete rules.post;
+            if (!rules.post && (!rules.pre || !rules.pre.length)) rules = null;
+            _this14.set_field('rules', rules);
+        }, _temp5), (0, _possibleConstructorReturn3.default)(_this14, _ret5);
     }
 
-    (0, _createClass3.default)(Rules_raw, [{
-        key: 'componentWillMount',
-        value: function componentWillMount() {
-            var _this11 = this;
+    (0, _createClass3.default)(Rules, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this15 = this;
 
-            this.listener = _setdb2.default.on('head.proxies_running', function (proxies) {
-                var ports = (proxies || []).filter(function (p) {
-                    return p.port != _this11.port;
-                }).map(function (p) {
-                    return { key: p.port, value: p.port };
-                });
-                _this11.setState({ ports: ports });
+            this.setdb_on('head.proxy_edit.form', function (form) {
+                return _this15.setState({ form: form });
             });
-        }
-    }, {
-        key: 'componentWillUnmount',
-        value: function componentWillUnmount() {
-            _setdb2.default.off(this.listener);
-        }
-    }, {
-        key: 'type_changed',
-        value: function type_changed(val) {
-            if (val == 'status') this.setState({ show_statuses: true });else {
-                this.setState({ show_statuses: false, show_custom_status: false });
-                this.props.on_change_field('status_code', '');
-                this.props.on_change_field('status_custom', '');
-            }
-            if (val == 'body') this.setState({ show_body_regex: true });else {
-                this.setState({ show_body_regex: false });
-                this.props.on_change_field('body_regex', '');
-            }
-            if (val == 'min_req_time') this.setState({ show_min_time: true });else {
-                this.setState({ show_min_time: false });
-                this.props.on_change_field('min_req_time', '');
-            }
-            if (val == 'max_req_time') this.setState({ show_max_time: true });else {
-                this.setState({ show_max_time: false });
-                this.props.on_change_field('max_req_time', '');
-            }
-            if (!val) this.props.on_change_field('trigger_url_regex', '');
-        }
-    }, {
-        key: 'action_changed',
-        value: function action_changed(val) {
-            if (val == 'retry_port') {
-                var def_port = this.state.ports.length && this.state.ports[0].key;
-                this.props.on_change_field(val, def_port || '');
-            }
-        }
-    }, {
-        key: 'status_changed',
-        value: function status_changed(val) {
-            this.setState({ show_custom_status: val == 'Custom' });
-            if (val != 'Custom') this.props.on_change_field('status_custom', '');
+            this.setdb_on('head.proxy_edit.rules', function (rules) {
+                if (!rules || !rules.length) return;
+                _this15.setState({ rules: rules, max_id: Math.max.apply(Math, (0, _toConsumableArray3.default)(rules.map(function (r) {
+                        return r.id;
+                    }))) });
+            });
+            this.setdb_on('head.proxy_edit.update_rule', this.update_rule);
         }
     }, {
         key: 'render',
         value: function render() {
-            var disabled = !!this.props.form.ext_proxies;
-            var trigger_types = [{ key: 'i.e. Status code', value: '' }, { key: 'Status code', value: 'status' }, { key: 'HTML body element', value: 'body' }, { key: 'Minimum request time', value: 'min_req_time' }, { key: 'Maximum request time', value: 'max_req_time' }];
-            var action_types = [{ key: 'i.e. Retry with new IP', value: '' }, { key: 'Retry with new IP', value: 'retry' }, { key: 'Retry with new proxy port (Waterfall)',
-                value: 'retry_port' }, { key: 'Ban IP', value: 'ban_ip' }, { key: 'Save IP to reserved pool', value: 'save_to_pool' }];
-            var ban_options = [{ key: '10 minutes', value: '10min' }, { key: '20 minutes', value: '20min' }, { key: '30 minutes', value: '30min' }, { key: '40 minutes', value: '40min' }, { key: '50 minutes', value: '50min' }, { key: 'Custom', value: 'custom' }];
-            var status_types = ['i.e. 200 - Succeeded requests', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
-                return { key: s, value: s };
-            });
-            var _props2 = this.props,
-                form = _props2.form,
-                on_change_field = _props2.on_change_field;
+            var _this16 = this;
 
             return _react2.default.createElement(
                 'div',
                 null,
+                this.state.rules.map(function (r) {
+                    return _react2.default.createElement(Rule, { key: r.id, rule: r, rule_del: _this16.rule_del });
+                }),
                 _react2.default.createElement(
-                    With_data,
-                    (0, _extends4.default)({}, this.props, { disabled: disabled }),
-                    _react2.default.createElement(
-                        Section,
-                        { id: 'trigger_type' },
-                        _react2.default.createElement(Section_field, {
-                            id: 'trigger_type',
-                            form: form,
-                            type: 'select',
-                            data: trigger_types,
-                            disabled: disabled,
-                            on_change_field: on_change_field,
-                            on_change: this.type_changed.bind(this) }),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.state.show_body_regex },
-                            _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'body_regex',
-                                type: 'text' }, this.props))
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.state.show_min_time },
-                            _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'min_req_time', type: 'number'
-                            }, this.props, { sufix: 'milliseconds' }))
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.state.show_max_time },
-                            _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'max_req_time', type: 'number'
-                            }, this.props, { sufix: 'milliseconds' }))
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.state.show_statuses },
-                            _react2.default.createElement(Section_field, { id: 'status_code',
-                                form: form, type: 'select', data: status_types,
-                                on_change_field: on_change_field,
-                                on_change: this.status_changed.bind(this) })
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.state.show_custom_status },
-                            _react2.default.createElement(Section_field, { id: 'status_custom',
-                                form: form, type: 'text', data: status_types,
-                                on_change_field: on_change_field })
-                        ),
-                        _react2.default.createElement(Section_field, { id: 'trigger_url_regex',
-                            form: form, type: 'text',
-                            disabled: disabled,
-                            on_change_field: on_change_field })
-                    ),
-                    _react2.default.createElement(
-                        Section,
-                        { id: 'action',
-                            note: 'IP will change for every entry',
-                            disabled: disabled,
-                            on_change_field: on_change_field },
-                        _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'action'
-                        }, this.props, {
-                            type: 'select',
-                            data: action_types,
-                            disabled: disabled,
-                            on_change: this.action_changed.bind(this) })),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.props.form.action == 'retry' },
-                            _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'retry_number',
-                                type: 'number' }, this.props, { min: '0', max: '20',
-                                validator: validators.number(0, 20) }))
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.props.form.action == 'retry_port' },
-                            _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'retry_port',
-                                type: 'select', data: this.state.ports }, this.props))
-                        ),
-                        _react2.default.createElement(
-                            _react3.If,
-                            { when: this.props.form.action == 'ban_ip' },
-                            _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'ban_ip_duration',
-                                type: 'select', data: ban_options }, this.props)),
-                            _react2.default.createElement(
-                                _react3.If,
-                                { when: this.props.form.ban_ip_duration == 'custom' },
-                                _react2.default.createElement(Section_field, (0, _extends4.default)({ id: 'ban_ip_custom',
-                                    type: 'number' }, this.props, { sufix: 'minutes' }))
-                            )
-                        )
-                    )
+                    'button',
+                    { className: 'btn btn_lpm btn_lpm_small rule_add_btn',
+                        onClick: this.rule_add },
+                    'New rule',
+                    _react2.default.createElement('i', { className: 'glyphicon glyphicon-plus' })
                 )
             );
         }
     }]);
-    return Rules_raw;
-}(_react2.default.Component);
+    return Rules;
+}(_pure_component2.default));
 
-var Rules = provider({ tab_id: 'rules' })(Rules_raw);
+var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component9) {
+    (0, _inherits3.default)(Rule, _Pure_component9);
 
-var Alloc_modal = function (_Pure_component2) {
-    (0, _inherits3.default)(Alloc_modal, _Pure_component2);
+    function Rule() {
+        var _ref10;
 
-    function Alloc_modal(props) {
+        var _temp6, _this17, _ret6;
+
+        (0, _classCallCheck3.default)(this, Rule);
+
+        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
+        }
+
+        return _ret6 = (_temp6 = (_this17 = (0, _possibleConstructorReturn3.default)(this, (_ref10 = Rule.__proto__ || Object.getPrototypeOf(Rule)).call.apply(_ref10, [this].concat(args))), _this17), _this17.state = { ports: [] }, _this17.trigger_types = [{ key: 'i.e. Status code', value: '' }, { key: 'Status code', value: 'status' }, { key: 'HTML body element', value: 'body' }, { key: 'Minimum request time', value: 'min_req_time' }, { key: 'Maximum request time', value: 'max_req_time' }], _this17.action_types = [{ key: 'i.e. Retry with new IP', value: '' }, { key: 'Retry with new IP', value: 'retry' }, { key: 'Retry with new proxy port (Waterfall)',
+            value: 'retry_port' }, { key: 'Ban IP', value: 'ban_ip' }, { key: 'Save IP to reserved pool', value: 'save_to_pool' }], _this17.ban_options = [{ key: '10 minutes', value: '10min' }, { key: '20 minutes', value: '20min' }, { key: '30 minutes', value: '30min' }, { key: '40 minutes', value: '40min' }, { key: '50 minutes', value: '50min' }, { key: 'Custom', value: 'custom' }], _this17.status_types = ['i.e. 200 - Succeeded requests', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
+            return { key: s, value: s };
+        }), _this17.set_rule_field = function (field, value) {
+            _setdb2.default.emit('head.proxy_edit.update_rule', { rule_id: _this17.props.rule.id,
+                field: field, value: value });
+        }, _this17.trigger_change = function (val) {
+            if (val != 'status') {
+                _this17.set_rule_field('status_code', '');
+                _this17.set_rule_field('status_custom', '');
+            }
+            if (val != 'body') _this17.set_rule_field('body_regex', '');
+            if (val != 'min_req_time') _this17.set_rule_field('min_req_time', '');
+            if (val != 'max_req_time') _this17.set_rule_field('max_req_time', '');
+            if (!val) _this17.set_rule_field('trigger_url_regex', '');
+        }, _this17.action_changed = function (val) {
+            if (val == 'retry_port') {
+                var def_port = _this17.state.ports.length && _this17.state.ports[0].key;
+                _this17.set_rule_field(val, def_port || '');
+            }
+            if (val != 'ban_ip') {
+                _this17.set_rule_field('ban_ip_duration', '');
+                _this17.set_rule_field('ban_ip_custom', '');
+            }
+        }, _this17.status_changed = function (val) {
+            if (val != 'Custom') _this17.set_rule_field('status_custom', '');
+        }, _temp6), (0, _possibleConstructorReturn3.default)(_this17, _ret6);
+    }
+
+    (0, _createClass3.default)(Rule, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this18 = this;
+
+            this.setdb_on('head.proxies_running', function (proxies) {
+                var cur_port = _this18.props.match.params.port;
+                var ports = (proxies || []).filter(function (p) {
+                    return p.port != cur_port;
+                }).map(function (p) {
+                    return { key: p.port, value: p.port };
+                });
+                _this18.setState({ ports: ports });
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this19 = this;
+
+            var rule = this.props.rule;
+            return _react2.default.createElement(
+                'div',
+                { className: 'rule_wrapper' },
+                _react2.default.createElement(Btn_rule_del, {
+                    on_click: function on_click() {
+                        return _this19.props.rule_del(_this19.props.rule.id);
+                    } }),
+                _react2.default.createElement(Rule_config, { id: 'trigger_type', type: 'select',
+                    data: this.trigger_types, on_change: this.trigger_change,
+                    rule: this.props.rule }),
+                rule.trigger_type == 'body' && _react2.default.createElement(Rule_config, { id: 'body_regex', type: 'text',
+                    rule: this.props.rule }),
+                rule.trigger_type == 'min_req_time' && _react2.default.createElement(Rule_config, { id: 'min_req_time', type: 'number',
+                    sufix: 'milliseconds', rule: this.props.rule }),
+                rule.trigger_type == 'max_req_time' && _react2.default.createElement(Rule_config, { id: 'max_req_time', type: 'number',
+                    sufix: 'milliseconds', rule: this.props.rule }),
+                rule.trigger_type == 'status' && _react2.default.createElement(Rule_config, { id: 'status_code', type: 'select',
+                    data: this.status_types, on_change: this.status_changed,
+                    rule: this.props.rule }),
+                rule.status_code == 'Custom' && _react2.default.createElement(Rule_config, { id: 'status_custom', type: 'text',
+                    rule: this.props.rule }),
+                _react2.default.createElement(Rule_config, { id: 'trigger_url_regex', type: 'text',
+                    rule: this.props.rule }),
+                _react2.default.createElement(Rule_config, { id: 'action', type: 'select', data: this.action_types,
+                    on_change: this.action_changed, rule: this.props.rule }),
+                this.props.rule.action == 'retry' && _react2.default.createElement(Rule_config, { id: 'retry_number', type: 'number', min: '0', max: '20',
+                    validator: validators.number(0, 20), rule: this.props.rule }),
+                this.props.rule.action == 'retry_port' && _react2.default.createElement(Rule_config, { id: 'retry_port', type: 'select',
+                    data: this.state.ports, rule: this.props.rule }),
+                this.props.rule.action == 'ban_ip' && _react2.default.createElement(Rule_config, { id: 'ban_ip_duration', type: 'select',
+                    data: this.ban_options, rule: this.props.rule }),
+                this.props.rule.ban_ip_duration == 'custom' && _react2.default.createElement(Rule_config, { id: 'ban_ip_custom', type: 'number', sufix: 'minutes',
+                    rule: this.props.rule })
+            );
+        }
+    }]);
+    return Rule;
+}(_pure_component2.default));
+
+var Btn_rule_del = function Btn_rule_del(_ref11) {
+    var on_click = _ref11.on_click;
+    return _react2.default.createElement('div', { className: 'btn_rule_del', onClick: on_click });
+};
+
+var Alloc_modal = function (_Pure_component10) {
+    (0, _inherits3.default)(Alloc_modal, _Pure_component10);
+
+    function Alloc_modal() {
+        var _ref12;
+
+        var _temp7, _this20, _ret7;
+
         (0, _classCallCheck3.default)(this, Alloc_modal);
 
-        var _this12 = (0, _possibleConstructorReturn3.default)(this, (Alloc_modal.__proto__ || Object.getPrototypeOf(Alloc_modal)).call(this, props));
+        for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+            args[_key7] = arguments[_key7];
+        }
 
-        _this12.checked = function (row) {
-            return (_this12.props.form[_this12.props.type] || []).includes(row);
-        };
-
-        _this12.state = {
+        return _ret7 = (_temp7 = (_this20 = (0, _possibleConstructorReturn3.default)(this, (_ref12 = Alloc_modal.__proto__ || Object.getPrototypeOf(Alloc_modal)).call.apply(_ref12, [this].concat(args))), _this20), _this20.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this20.state = {
             available_list: [],
             displayed_list: [],
             cur_page: 0,
             items_per_page: 20
-        };
-        return _this12;
+        }, _this20.checked = function (row) {
+            return (_this20.props.form[_this20.props.type] || []).includes(row);
+        }, _this20.reset = function () {
+            _this20.set_field(_this20.props.type, []);
+            _this20.set_field('pool_size', '');
+            _this20.set_field('multiply', 1);
+        }, _this20.toggle = function (e) {
+            var _e$target = e.target,
+                value = _e$target.value,
+                checked = _e$target.checked;
+            var _this20$props = _this20.props,
+                type = _this20$props.type,
+                form = _this20$props.form;
+
+            if (type == 'vips') value = Number(value);
+            var new_alloc = void 0;
+            if (checked) new_alloc = [].concat((0, _toConsumableArray3.default)(form[type]), [value]);else new_alloc = form[type].filter(function (r) {
+                return r != value;
+            });
+            _this20.set_field(type, new_alloc);
+            _this20.update_multiply_and_pool_size(new_alloc.length);
+        }, _temp7), (0, _possibleConstructorReturn3.default)(_this20, _ret7);
     }
 
     (0, _createClass3.default)(Alloc_modal, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this13 = this;
+            var _this21 = this;
 
-            this.setdb_on('head.edit_proxy.zone_name', function (zone_name) {
-                return _this13.setState({ available_list: [] });
+            this.setdb_on('head.proxy_edit.zone_name', function (zone_name) {
+                return _this21.setState({ available_list: [] });
             });
-            this.setdb_on('head.edit_proxy.tab', function (tab) {
-                return _this13.setState({ curr_tab: tab });
+            this.setdb_on('head.proxy_edit.tab', function (tab) {
+                return _this21.setState({ curr_tab: tab });
             });
             (0, _jquery2.default)('#allocated_ips').on('show.bs.modal', this.load.bind(this));
         }
@@ -16395,28 +16443,26 @@ var Alloc_modal = function (_Pure_component2) {
         value: function load() {
             if (this.state.available_list.length) return;
             this.loading(true);
-            var form = this.props.form;
-
-            var key = form.password || '';
+            var key = this.props.form.password || '';
             var endpoint = void 0;
             if (this.props.type == 'ips') endpoint = '/api/allocated_ips';else endpoint = '/api/allocated_vips';
             var url = _url2.default.qs_add(window.location.host + endpoint, { zone: this.props.zone, key: key });
             var _this = this;
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
+            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
                 var res, available_list;
-                return _regenerator2.default.wrap(function _callee5$(_context5) {
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 this.on('uncaught', function (e) {
                                     console.log(e);
                                     _this.loading(false);
                                 });
-                                _context5.next = 3;
+                                _context4.next = 3;
                                 return _ajax2.default.json({ url: url });
 
                             case 3:
-                                res = _context5.sent;
+                                res = _context4.sent;
                                 available_list = void 0;
 
                                 if (_this.props.type == 'ips') available_list = res.ips;else available_list = res;
@@ -16425,10 +16471,10 @@ var Alloc_modal = function (_Pure_component2) {
 
                             case 8:
                             case 'end':
-                                return _context5.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee5, this);
+                }, _callee4, this);
             }));
         }
     }, {
@@ -16445,64 +16491,30 @@ var Alloc_modal = function (_Pure_component2) {
     }, {
         key: 'loading',
         value: function loading(_loading) {
-            _setdb2.default.set('head.edit_proxy.loading', _loading);
+            _setdb2.default.set('head.proxy_edit.loading', _loading);
             this.setState({ loading: _loading });
-        }
-    }, {
-        key: 'reset',
-        value: function reset() {
-            this.props.on_change_field(this.props.type, []);
-            this.props.on_change_field('pool_size', '');
-            this.props.on_change_field('multiply', 1);
-        }
-    }, {
-        key: 'toggle',
-        value: function toggle(e) {
-            var _e$target = e.target,
-                value = _e$target.value,
-                checked = _e$target.checked;
-            var _props3 = this.props,
-                type = _props3.type,
-                form = _props3.form,
-                on_change_field = _props3.on_change_field;
-
-            if (type == 'vips') value = Number(value);
-            var new_alloc = void 0;
-            if (checked) new_alloc = [].concat((0, _toConsumableArray3.default)(form[type]), [value]);else new_alloc = form[type].filter(function (r) {
-                return r != value;
-            });
-            on_change_field(type, new_alloc);
-            this.update_multiply_and_pool_size(new_alloc.length);
         }
     }, {
         key: 'select_all',
         value: function select_all() {
-            var _props4 = this.props,
-                type = _props4.type,
-                on_change_field = _props4.on_change_field;
-
-            on_change_field(type, this.state.available_list);
+            this.set_field(this.props.type, this.state.available_list);
             this.update_multiply_and_pool_size(this.state.available_list.length);
         }
     }, {
         key: 'update_multiply_and_pool_size',
         value: function update_multiply_and_pool_size(size) {
-            var _props5 = this.props,
-                form = _props5.form,
-                on_change_field = _props5.on_change_field;
-
-            if (!form.multiply_ips && !form.multiply_vips) on_change_field('pool_size', size);else {
-                on_change_field('pool_size', 1);
-                on_change_field('multiply', size);
+            if (!this.props.form.multiply_ips && !this.props.form.multiply_vips) this.set_field('pool_size', size);else {
+                this.set_field('pool_size', 1);
+                this.set_field('multiply', size);
             }
         }
     }, {
         key: 'update_items_per_page',
         value: function update_items_per_page(items_per_page) {
-            var _this14 = this;
+            var _this22 = this;
 
             this.setState({ items_per_page: items_per_page }, function () {
-                return _this14.paginate(0);
+                return _this22.paginate(0);
             });
         }
     }, {
@@ -16513,7 +16525,7 @@ var Alloc_modal = function (_Pure_component2) {
     }, {
         key: 'render',
         value: function render() {
-            var _this15 = this;
+            var _this23 = this;
 
             var type_label = this.props.type == 'ips' ? 'IPs' : 'vIPs';
             var title = void 0;
@@ -16534,13 +16546,13 @@ var Alloc_modal = function (_Pure_component2) {
                         top: true,
                         update_items_per_page: this.update_items_per_page.bind(this) },
                     _react2.default.createElement(_common.Link_icon, { tooltip: 'Unselect all',
-                        on_click: this.reset.bind(this), id: 'unchecked' }),
+                        on_click: this.reset, id: 'unchecked' }),
                     _react2.default.createElement(_common.Link_icon, { tooltip: 'Select all',
                         on_click: this.select_all.bind(this), id: 'check' })
                 ),
                 this.state.displayed_list.map(function (row) {
-                    return _react2.default.createElement(_common.Checkbox, { on_change: _this15.toggle.bind(_this15), key: row,
-                        text: row, value: row, checked: _this15.checked(row) });
+                    return _react2.default.createElement(_common.Checkbox, { on_change: _this23.toggle, key: row,
+                        text: row, value: row, checked: _this23.checked(row) });
                 }),
                 _react2.default.createElement(
                     _common.Pagination_panel,
@@ -16552,7 +16564,7 @@ var Alloc_modal = function (_Pure_component2) {
                         bottom: true,
                         update_items_per_page: this.update_items_per_page.bind(this) },
                     _react2.default.createElement(_common.Link_icon, { tooltip: 'Unselect all',
-                        on_click: this.reset.bind(this), id: 'unchecked' }),
+                        on_click: this.reset, id: 'unchecked' }),
                     _react2.default.createElement(_common.Link_icon, { tooltip: 'Select all',
                         on_click: this.select_all.bind(this), id: 'check' })
                 )
@@ -16562,113 +16574,94 @@ var Alloc_modal = function (_Pure_component2) {
     return Alloc_modal;
 }(_pure_component2.default);
 
-var Rotation = function Rotation(props) {
+var Rotation = provider({ tab_id: 'rotation' })(function (props) {
     var support = props.support,
         form = props.form,
         proxy = props.proxy;
 
     return _react2.default.createElement(
-        With_data,
-        props,
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'ip' }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'vip' }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'pool_type',
-            data: proxy.pool_type.values, disabled: !support.pool_type }),
-        _react2.default.createElement(Section_with_fields, { type: 'number', id: 'keep_alive', min: '0',
+        'div',
+        null,
+        _react2.default.createElement(Config, { type: 'text', id: 'ip' }),
+        _react2.default.createElement(Config, { type: 'text', id: 'vip' }),
+        _react2.default.createElement(Config, { type: 'select', id: 'pool_type', data: proxy.pool_type.values,
+            disabled: !support.pool_type }),
+        _react2.default.createElement(Config, { type: 'number', id: 'keep_alive', min: '0',
             disabled: !support.keep_alive }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'whitelist_ips',
+        _react2.default.createElement(Config, { type: 'text', id: 'whitelist_ips',
             validator: validators.ips_list }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'session_random',
+        _react2.default.createElement(Config, { type: 'select', id: 'session_random',
             data: props.default_opt('session_random') }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'session',
+        _react2.default.createElement(Config, { type: 'text', id: 'session',
             disabled: form.session_random && !support.session }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'sticky_ip',
+        _react2.default.createElement(Config, { type: 'select', id: 'sticky_ip',
             data: props.default_opt('sticky_ip'),
             disabled: !support.sticky_ip }),
-        _react2.default.createElement(Section_with_fields, { type: 'double_number', id: 'max_requests',
+        _react2.default.createElement(Config, { type: 'double_number', id: 'max_requests',
             disabled: !support.max_requests }),
-        _react2.default.createElement(Section_with_fields, { type: 'double_number', id: 'session_duration',
+        _react2.default.createElement(Config, { type: 'double_number', id: 'session_duration',
             disabled: !support.session_duration }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'seed', disabled: !support.seed })
+        _react2.default.createElement(Config, { type: 'text', id: 'seed', disabled: !support.seed })
     );
-};
-Rotation = provider({ tab_id: 'rotation' })(Rotation);
+});
 
-var Debug = function Debug(props) {
+var Debug = provider({ tab_id: 'debug' })(function (props) {
     return _react2.default.createElement(
-        With_data,
-        props,
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'history',
-            data: props.default_opt('history') }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'ssl',
-            data: props.default_opt('ssl') }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'log',
-            data: props.proxy.log.values }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'debug',
-            data: props.proxy.debug.values })
+        'div',
+        null,
+        _react2.default.createElement(Config, { type: 'select', id: 'history', data: props.default_opt('history') }),
+        _react2.default.createElement(Config, { type: 'select', id: 'ssl', data: props.default_opt('ssl') }),
+        _react2.default.createElement(Config, { type: 'select', id: 'log', data: props.proxy.log.values }),
+        _react2.default.createElement(Config, { type: 'select', id: 'debug', data: props.proxy.debug.values })
     );
-};
-Debug = provider({ tab_id: 'debug' })(Debug);
+});
 
-var General = function General(props) {
+var General = provider({ tab_id: 'general' })(function (props) {
+    var set_field = _setdb2.default.get('head.proxy_edit.set_field');
     var open_modal = function open_modal() {
         (0, _jquery2.default)('#allocated_ips').modal('show');
     };
     var multiply_changed = function multiply_changed(val) {
-        var on_change_field = props.on_change_field,
-            form = props.form;
-
-        var size = Math.max(form.ips.length, form.vips.length);
+        var size = Math.max(props.form.ips.length, props.form.vips.length);
         if (val) {
-            on_change_field('pool_size', 1);
-            on_change_field('multiply', size);
+            set_field('pool_size', 1);
+            set_field('multiply', size);
             open_modal();
             return;
         }
-        on_change_field('pool_size', size);
-        on_change_field('multiply', 1);
+        set_field('pool_size', size);
+        set_field('multiply', 1);
     };
     // XXX krzysztof: cleanup type
     var curr_plan = props.get_curr_plan();
     var type = void 0;
     if (curr_plan && curr_plan.type == 'static') type = 'ips';else if (curr_plan && !!curr_plan.vip) type = 'vips';
     return _react2.default.createElement(
-        With_data,
-        props,
-        _react2.default.createElement(Section_with_fields, { type: 'number', id: 'port' }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'password' }),
-        _react2.default.createElement(Section_with_fields, { type: 'number', id: 'multiply', min: '1',
+        'div',
+        null,
+        _react2.default.createElement(Config, { type: 'number', id: 'port' }),
+        _react2.default.createElement(Config, { type: 'text', id: 'password' }),
+        _react2.default.createElement(Config, { type: 'number', id: 'multiply', min: '1',
             disabled: !props.support.multiply }),
-        _react2.default.createElement(
-            _react3.If,
-            { when: type == 'ips' },
-            _react2.default.createElement(Section_with_fields, (0, _extends4.default)({}, props, {
-                type: 'select', id: 'multiply_ips',
-                on_change: multiply_changed,
-                data: props.default_opt('multiply_ips') }))
-        ),
-        _react2.default.createElement(
-            _react3.If,
-            { when: type == 'vips' },
-            _react2.default.createElement(Section_with_fields, (0, _extends4.default)({}, props, {
-                type: 'select', id: 'multiply_vips',
-                on_change: multiply_changed,
-                data: props.default_opt('multiply_vips') }))
-        ),
-        _react2.default.createElement(Section_with_fields, { type: 'number', id: 'socks', min: '0' }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'secure_proxy',
+        type == 'ips' && _react2.default.createElement(Config, { type: 'select', id: 'multiply_ips',
+            on_change: multiply_changed,
+            data: props.default_opt('multiply_ips') }),
+        type == 'vips' && _react2.default.createElement(Config, { type: 'select', id: 'multiply_vips',
+            on_change: multiply_changed,
+            data: props.default_opt('multiply_vips') }),
+        _react2.default.createElement(Config, { type: 'number', id: 'socks', min: '0' }),
+        _react2.default.createElement(Config, { type: 'select', id: 'secure_proxy',
             data: props.default_opt('secure_proxy') }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'null_response' }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'bypass_proxy' }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'direct_include' }),
-        _react2.default.createElement(Section_with_fields, { type: 'text', id: 'direct_exclude' }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'allow_proxy_auth',
+        _react2.default.createElement(Config, { type: 'text', id: 'null_response' }),
+        _react2.default.createElement(Config, { type: 'text', id: 'bypass_proxy' }),
+        _react2.default.createElement(Config, { type: 'text', id: 'direct_include' }),
+        _react2.default.createElement(Config, { type: 'text', id: 'direct_exclude' }),
+        _react2.default.createElement(Config, { type: 'select', id: 'allow_proxy_auth',
             data: props.default_opt('allow_proxy_auth') }),
-        _react2.default.createElement(Section_with_fields, { type: 'select', id: 'iface',
+        _react2.default.createElement(Config, { type: 'select', id: 'iface',
             data: props.proxy.iface.values })
     );
-};
-General = provider({ tab_id: 'general' })(General);
+});
 
 exports.default = Index;
 
@@ -16797,13 +16790,111 @@ module.exports = __webpack_require__(17).getIterator = function (it) {
 /***/ }),
 /* 424 */,
 /* 425 */,
-/* 426 */,
-/* 427 */,
-/* 428 */,
-/* 429 */,
-/* 430 */,
-/* 431 */,
-/* 432 */,
+/* 426 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _getPrototypeOf = __webpack_require__(427);
+
+var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+var _getOwnPropertyDescriptor = __webpack_require__(430);
+
+var _getOwnPropertyDescriptor2 = _interopRequireDefault(_getOwnPropertyDescriptor);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = (0, _getOwnPropertyDescriptor2.default)(object, property);
+
+  if (desc === undefined) {
+    var parent = (0, _getPrototypeOf2.default)(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+/***/ }),
+/* 427 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(428), __esModule: true };
+
+/***/ }),
+/* 428 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(429);
+module.exports = __webpack_require__(17).Object.getPrototypeOf;
+
+
+/***/ }),
+/* 429 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.9 Object.getPrototypeOf(O)
+var toObject = __webpack_require__(93);
+var $getPrototypeOf = __webpack_require__(202);
+
+__webpack_require__(239)('getPrototypeOf', function () {
+  return function getPrototypeOf(it) {
+    return $getPrototypeOf(toObject(it));
+  };
+});
+
+
+/***/ }),
+/* 430 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(431), __esModule: true };
+
+/***/ }),
+/* 431 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(432);
+var $Object = __webpack_require__(17).Object;
+module.exports = function getOwnPropertyDescriptor(it, key) {
+  return $Object.getOwnPropertyDescriptor(it, key);
+};
+
+
+/***/ }),
+/* 432 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+var toIObject = __webpack_require__(41);
+var $getOwnPropertyDescriptor = __webpack_require__(138).f;
+
+__webpack_require__(239)('getOwnPropertyDescriptor', function () {
+  return function getOwnPropertyDescriptor(it, key) {
+    return $getOwnPropertyDescriptor(toIObject(it), key);
+  };
+});
+
+
+/***/ }),
 /* 433 */,
 /* 434 */,
 /* 435 */,
@@ -16904,7 +16995,14 @@ module.exports = __webpack_require__(17).getIterator = function (it) {
 /* 530 */,
 /* 531 */,
 /* 532 */,
-/* 533 */
+/* 533 */,
+/* 534 */,
+/* 535 */,
+/* 536 */,
+/* 537 */,
+/* 538 */,
+/* 539 */,
+/* 540 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -16914,7 +17012,7 @@ module.exports = __webpack_require__(17).getIterator = function (it) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory__ = __webpack_require__(534);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory__ = __webpack_require__(541);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(172);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -16971,7 +17069,7 @@ BrowserRouter.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (BrowserRouter);
 
 /***/ }),
-/* 534 */
+/* 541 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16999,7 +17097,7 @@ var _createTransitionManager = __webpack_require__(171);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
-var _DOMUtils = __webpack_require__(283);
+var _DOMUtils = __webpack_require__(284);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -17284,7 +17382,7 @@ var createBrowserHistory = function createBrowserHistory() {
 exports.default = createBrowserHistory;
 
 /***/ }),
-/* 535 */
+/* 542 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17294,7 +17392,7 @@ exports.default = createBrowserHistory;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createHashHistory__ = __webpack_require__(536);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createHashHistory__ = __webpack_require__(543);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createHashHistory___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_history_createHashHistory__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(172);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17350,7 +17448,7 @@ HashRouter.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (HashRouter);
 
 /***/ }),
-/* 536 */
+/* 543 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17376,7 +17474,7 @@ var _createTransitionManager = __webpack_require__(171);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
-var _DOMUtils = __webpack_require__(283);
+var _DOMUtils = __webpack_require__(284);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -17680,18 +17778,18 @@ var createHashHistory = function createHashHistory() {
 exports.default = createHashHistory;
 
 /***/ }),
-/* 537 */
+/* 544 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_MemoryRouter__ = __webpack_require__(538);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_MemoryRouter__ = __webpack_require__(545);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_MemoryRouter__["a" /* default */]);
 
 /***/ }),
-/* 538 */
+/* 545 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17701,7 +17799,7 @@ exports.default = createHashHistory;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createMemoryHistory__ = __webpack_require__(539);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createMemoryHistory__ = __webpack_require__(546);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createMemoryHistory___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_history_createMemoryHistory__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(173);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17758,7 +17856,7 @@ MemoryRouter.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (MemoryRouter);
 
 /***/ }),
-/* 539 */
+/* 546 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17934,7 +18032,7 @@ var createMemoryHistory = function createMemoryHistory() {
 exports.default = createMemoryHistory;
 
 /***/ }),
-/* 540 */
+/* 547 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -17942,8 +18040,8 @@ exports.default = createMemoryHistory;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Route__ = __webpack_require__(285);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(284);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Route__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(285);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -18015,10 +18113,10 @@ NavLink.defaultProps = {
 /* harmony default export */ __webpack_exports__["a"] = (NavLink);
 
 /***/ }),
-/* 541 */
+/* 548 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isarray = __webpack_require__(542)
+var isarray = __webpack_require__(549)
 
 /**
  * Expose `pathToRegexp`.
@@ -18447,7 +18545,7 @@ function pathToRegexp (path, keys, options) {
 
 
 /***/ }),
-/* 542 */
+/* 549 */
 /***/ (function(module, exports) {
 
 module.exports = Array.isArray || function (arr) {
@@ -18456,18 +18554,18 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 543 */
+/* 550 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Prompt__ = __webpack_require__(544);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Prompt__ = __webpack_require__(551);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_Prompt__["a" /* default */]);
 
 /***/ }),
-/* 544 */
+/* 551 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18558,18 +18656,18 @@ Prompt.contextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Prompt);
 
 /***/ }),
-/* 545 */
+/* 552 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Redirect__ = __webpack_require__(546);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Redirect__ = __webpack_require__(553);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_Redirect__["a" /* default */]);
 
 /***/ }),
-/* 546 */
+/* 553 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18581,7 +18679,7 @@ Prompt.contextTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_invariant__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_history__ = __webpack_require__(547);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_history__ = __webpack_require__(554);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -18677,15 +18775,15 @@ Redirect.contextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Redirect);
 
 /***/ }),
-/* 547 */
+/* 554 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createBrowserHistory__ = __webpack_require__(548);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createBrowserHistory__ = __webpack_require__(555);
 /* unused harmony reexport createBrowserHistory */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__createHashHistory__ = __webpack_require__(549);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__createHashHistory__ = __webpack_require__(556);
 /* unused harmony reexport createHashHistory */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__createMemoryHistory__ = __webpack_require__(550);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__createMemoryHistory__ = __webpack_require__(557);
 /* unused harmony reexport createMemoryHistory */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__LocationUtils__ = __webpack_require__(110);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_3__LocationUtils__["a"]; });
@@ -18704,7 +18802,7 @@ Redirect.contextTypes = {
 
 
 /***/ }),
-/* 548 */
+/* 555 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18715,7 +18813,7 @@ Redirect.contextTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(110);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(175);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(288);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -19008,7 +19106,7 @@ var createBrowserHistory = function createBrowserHistory() {
 /* unused harmony default export */ var _unused_webpack_default_export = (createBrowserHistory);
 
 /***/ }),
-/* 549 */
+/* 556 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19019,7 +19117,7 @@ var createBrowserHistory = function createBrowserHistory() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(110);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(175);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(287);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(288);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
@@ -19329,7 +19427,7 @@ var createHashHistory = function createHashHistory() {
 /* unused harmony default export */ var _unused_webpack_default_export = (createHashHistory);
 
 /***/ }),
-/* 550 */
+/* 557 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19497,18 +19595,18 @@ var createMemoryHistory = function createMemoryHistory() {
 /* unused harmony default export */ var _unused_webpack_default_export = (createMemoryHistory);
 
 /***/ }),
-/* 551 */
+/* 558 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_StaticRouter__ = __webpack_require__(552);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_StaticRouter__ = __webpack_require__(559);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_StaticRouter__["a" /* default */]);
 
 /***/ }),
-/* 552 */
+/* 559 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19691,18 +19789,18 @@ StaticRouter.childContextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (StaticRouter);
 
 /***/ }),
-/* 553 */
+/* 560 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Switch__ = __webpack_require__(554);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Switch__ = __webpack_require__(561);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_Switch__["a" /* default */]);
 
 /***/ }),
-/* 554 */
+/* 561 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19796,7 +19894,7 @@ Switch.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Switch);
 
 /***/ }),
-/* 555 */
+/* 562 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19807,18 +19905,18 @@ Switch.propTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_matchPath__["a" /* default */]);
 
 /***/ }),
-/* 556 */
+/* 563 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_withRouter__ = __webpack_require__(557);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_withRouter__ = __webpack_require__(564);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_withRouter__["a" /* default */]);
 
 /***/ }),
-/* 557 */
+/* 564 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19826,9 +19924,9 @@ Switch.propTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(289);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(286);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(287);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -19861,111 +19959,6 @@ var withRouter = function withRouter(Component) {
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (withRouter);
-
-/***/ }),
-/* 558 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-
-var _getPrototypeOf = __webpack_require__(559);
-
-var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-
-var _getOwnPropertyDescriptor = __webpack_require__(562);
-
-var _getOwnPropertyDescriptor2 = _interopRequireDefault(_getOwnPropertyDescriptor);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = (0, _getOwnPropertyDescriptor2.default)(object, property);
-
-  if (desc === undefined) {
-    var parent = (0, _getPrototypeOf2.default)(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-/***/ }),
-/* 559 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = { "default": __webpack_require__(560), __esModule: true };
-
-/***/ }),
-/* 560 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(561);
-module.exports = __webpack_require__(17).Object.getPrototypeOf;
-
-
-/***/ }),
-/* 561 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.9 Object.getPrototypeOf(O)
-var toObject = __webpack_require__(93);
-var $getPrototypeOf = __webpack_require__(202);
-
-__webpack_require__(289)('getPrototypeOf', function () {
-  return function getPrototypeOf(it) {
-    return $getPrototypeOf(toObject(it));
-  };
-});
-
-
-/***/ }),
-/* 562 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = { "default": __webpack_require__(563), __esModule: true };
-
-/***/ }),
-/* 563 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(564);
-var $Object = __webpack_require__(17).Object;
-module.exports = function getOwnPropertyDescriptor(it, key) {
-  return $Object.getOwnPropertyDescriptor(it, key);
-};
-
-
-/***/ }),
-/* 564 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-var toIObject = __webpack_require__(41);
-var $getOwnPropertyDescriptor = __webpack_require__(138).f;
-
-__webpack_require__(289)('getOwnPropertyDescriptor', function () {
-  return function getOwnPropertyDescriptor(it, key) {
-    return $getOwnPropertyDescriptor(toIObject(it), key);
-  };
-});
-
 
 /***/ }),
 /* 565 */
@@ -28481,7 +28474,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _deprecated = __webpack_require__(263);
+var _deprecated = __webpack_require__(264);
 
 var _deprecated2 = _interopRequireDefault(_deprecated);
 
@@ -29548,7 +29541,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fbjs_lib_shallowEqual__ = __webpack_require__(162);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fbjs_lib_shallowEqual___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fbjs_lib_shallowEqual__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(288);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(289);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_change_emitter__ = __webpack_require__(713);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_change_emitter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_change_emitter__);
@@ -31254,7 +31247,7 @@ var Code_instructions = function (_Pure_component2) {
             args[_key2] = arguments[_key2];
         }
 
-        return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Code_instructions.__proto__ || Object.getPrototypeOf(Code_instructions)).call.apply(_ref3, [this].concat(args))), _this2), _this2.state = { lang: 'shell' }, _this2.swagger_url = 'http://petstore.swagger.io/?url=https://cdn.rawgit.com/' + 'luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy', _temp2), (0, _possibleConstructorReturn3.default)(_this2, _ret2);
+        return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Code_instructions.__proto__ || Object.getPrototypeOf(Code_instructions)).call.apply(_ref3, [this].concat(args))), _this2), _this2.state = { lang: 'shell' }, _this2.swagger_url = 'http://petstore.swagger.io/?url=https://' + 'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/' + 'swagger.json#/Proxy', _temp2), (0, _possibleConstructorReturn3.default)(_this2, _ret2);
     }
 
     (0, _createClass3.default)(Code_instructions, [{
@@ -32344,22 +32337,6 @@ var _common = __webpack_require__(27);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var E = {};
-var Li = function Li(props) {
-    return _react2.default.createElement(
-        'li',
-        null,
-        _react2.default.createElement(
-            'div',
-            { className: 'circle_wrapper' },
-            _react2.default.createElement('div', { className: 'circle' })
-        ),
-        _react2.default.createElement(
-            'div',
-            { className: 'single_instruction' },
-            props.children
-        )
-    );
-};
 
 E.code = function () {
     var proxy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 24000;
@@ -32382,12 +32359,12 @@ E.browser = function () {
             'ol',
             null,
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click the Chrome menu on the browser toolbar.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Select ',
                 _react2.default.createElement(
@@ -32397,7 +32374,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click ',
                 _react2.default.createElement(
@@ -32407,7 +32384,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'In the ',
                 _react2.default.createElement(
@@ -32423,7 +32400,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click ',
                 _react2.default.createElement(
@@ -32433,7 +32410,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Select the ',
                 _react2.default.createElement(
@@ -32449,7 +32426,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32465,7 +32442,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32481,7 +32458,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Save changes by pressing ',
                 _react2.default.createElement(
@@ -32495,12 +32472,12 @@ E.browser = function () {
             'ol',
             null,
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click the Chrome menu on the browser toolbar.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Select ',
                 _react2.default.createElement(
@@ -32510,7 +32487,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click ',
                 _react2.default.createElement(
@@ -32520,7 +32497,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'In the ',
                 _react2.default.createElement(
@@ -32536,12 +32513,12 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'System Preferences should start up automatically, with the Network window open and Proxies selected.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Choose ',
                 _react2.default.createElement(
@@ -32551,7 +32528,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32567,7 +32544,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32583,7 +32560,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Save changes by pressing ',
                 _react2.default.createElement(
@@ -32598,17 +32575,17 @@ E.browser = function () {
             'ol',
             null,
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click the Tools button, and then click Internet options.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click the Connections tab.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click ',
                 _react2.default.createElement(
@@ -32618,7 +32595,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Select the ',
                 _react2.default.createElement(
@@ -32629,7 +32606,7 @@ E.browser = function () {
                 'check box.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32645,7 +32622,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32661,7 +32638,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Save changes by pressing ',
                 _react2.default.createElement(
@@ -32675,7 +32652,7 @@ E.browser = function () {
             'ol',
             null,
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'In main menu, click on ',
                 _react2.default.createElement(
@@ -32685,7 +32662,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click the ',
                 _react2.default.createElement(
@@ -32702,7 +32679,7 @@ E.browser = function () {
                 '.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Open network settings by clicking ',
                 _react2.default.createElement(
@@ -32713,7 +32690,7 @@ E.browser = function () {
                 'button.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Choose ',
                 _react2.default.createElement(
@@ -32724,7 +32701,7 @@ E.browser = function () {
                 ' radio button.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32740,7 +32717,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32756,7 +32733,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Tick ',
                 _react2.default.createElement(
@@ -32767,7 +32744,7 @@ E.browser = function () {
                 'checkbox.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Save changes by pressing ',
                 _react2.default.createElement(
@@ -32781,7 +32758,7 @@ E.browser = function () {
             'ol',
             null,
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Pull down the Safari menu and select ',
                 _react2.default.createElement(
@@ -32791,7 +32768,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Click on the ',
                 _react2.default.createElement(
@@ -32802,7 +32779,7 @@ E.browser = function () {
                 ' icon.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'In the ',
                 _react2.default.createElement(
@@ -32813,12 +32790,12 @@ E.browser = function () {
                 ' option, click on Change Settings.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'System Preferences should start up automatically, with the Network window open and Proxies selected.'
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Choose ',
                 _react2.default.createElement(
@@ -32828,7 +32805,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32844,7 +32821,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Enter ',
                 _react2.default.createElement(
@@ -32860,7 +32837,7 @@ E.browser = function () {
                 )
             ),
             _react2.default.createElement(
-                Li,
+                _common.Circle_li,
                 null,
                 'Save changes by pressing ',
                 _react2.default.createElement(
@@ -32949,7 +32926,7 @@ var _jquery = __webpack_require__(10);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _reactRouterDom = __webpack_require__(38);
 
@@ -33186,7 +33163,7 @@ var Footer = function Footer() {
       null,
       _react2.default.createElement(
         'a',
-        { href: 'http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy',
+        { href: 'http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy',
           className: 'link' },
         'API'
       )
@@ -33532,7 +33509,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _common = __webpack_require__(27);
 
@@ -33565,15 +33542,15 @@ var Schema = function (_Pure_component) {
         value: function componentDidMount() {
             var _this2 = this;
 
-            this.setdb_on('head.edit_proxy.form', function () {
+            this.setdb_on('head.proxy_edit.form', function () {
                 var form = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
                 _this2.setState({ form: (0, _extends3.default)({}, form) });
             });
-            this.setdb_on('head.edit_proxy.form.port', function (port) {
+            this.setdb_on('head.proxy_edit.form.port', function (port) {
                 _this2.setState({ form: { port: port } });
             });
-            this.setdb_on('head.edit_proxy.form.country', function (country) {
+            this.setdb_on('head.proxy_edit.form.country', function (country) {
                 _this2.setState({ form: { country: country } });
             });
             this.setdb_on('head.proxies_running', function (proxies) {
@@ -33784,7 +33761,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _classnames = __webpack_require__(4);
 
@@ -34307,7 +34284,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _json_viewer = __webpack_require__(292);
 
@@ -34376,7 +34353,6 @@ var Request = function (_Pure_component2) {
             params: { url: 'http://lumtest.com/myip.json', method: 'GET' }
         }, _this3.state = (0, _extends6.default)({}, _this3.default_state, { show_loader: false }), _this3.on_message = function (event) {
             var req = JSON.parse(event.data);
-            if (_this3.last_port != req.details.port) return;
             if (_this3.ws) _this3.ws.removeEventListener('message', _this3.on_message);
             _this3.props.update_response(req);
         }, _this3.add_header = function () {
@@ -34704,7 +34680,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _classnames = __webpack_require__(4);
 
@@ -35326,7 +35302,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _jquery = __webpack_require__(10);
 
@@ -35587,7 +35563,7 @@ var _no_proxies2 = _interopRequireDefault(_no_proxies);
 
 var _common = __webpack_require__(27);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _reactRouterDom = __webpack_require__(38);
 
@@ -37073,7 +37049,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _react3 = __webpack_require__(31);
+var _react3 = __webpack_require__(34);
 
 var _jquery = __webpack_require__(10);
 
@@ -37147,9 +37123,9 @@ var Stats = function (_Pure_component) {
     }, {
         key: 'render',
         value: function render() {
-            return _react2.default.createElement(
+            return [_react2.default.createElement(
                 'div',
-                { className: 'chrome stats_panel' },
+                { key: '1', className: 'chrome stats_panel' },
                 _react2.default.createElement(
                     'div',
                     { className: 'main_panel' },
@@ -37162,19 +37138,61 @@ var Stats = function (_Pure_component) {
                         ssl_warning: this.state.stats.ssl_warning,
                         row_key: 'protocol', logs: 'protocol', title: 'Protocol' }),
                     _react2.default.createElement(Summary_bar, { enable_ssl_click: this.enable_ssl_click,
-                        show: this.state.stats.ssl_enable }),
-                    _react2.default.createElement(Enable_ssl_modal, { enable_ssl: this.enable_ssl })
+                        show: this.state.stats.ssl_enable })
                 )
-            );
+            ), _react2.default.createElement(Enable_ssl_modal, { key: '2', enable_ssl: this.enable_ssl })];
         }
     }]);
     return Stats;
 }(_pure_component2.default);
 
+var faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
 var Enable_ssl_modal = function Enable_ssl_modal(_ref2) {
     var enable_ssl = _ref2.enable_ssl;
-    return _react2.default.createElement(_common.Modal, { id: 'enable_ssl_modal', title: 'Enable SSL analyzing for all proxies',
-        click_ok: enable_ssl });
+    return _react2.default.createElement(
+        _common.Modal,
+        { id: 'enable_ssl_modal', title: 'Enable SSL analyzing for all proxies',
+            click_ok: enable_ssl, className: 'enable_ssl_modal' },
+        _react2.default.createElement(
+            'p',
+            { className: 'cert_info' },
+            'You will also need to add certificate file to browsers. Gathering stats for HTTPS requests requires setting a certificate key.'
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'instructions' },
+            _react2.default.createElement(
+                'ol',
+                null,
+                _react2.default.createElement(
+                    _common.Circle_li,
+                    null,
+                    'Download our free certificate key',
+                    _react2.default.createElement(
+                        'a',
+                        { href: '/ssl', target: '_blank', download: true },
+                        ' here'
+                    )
+                ),
+                _react2.default.createElement(
+                    _common.Circle_li,
+                    null,
+                    'Add the certificate to your browser. You can find more detailed instructions ',
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'link', href: faq_cert_url,
+                            rel: 'noopener noreferrer', target: '_blank' },
+                        'here'
+                    )
+                ),
+                _react2.default.createElement(
+                    _common.Circle_li,
+                    null,
+                    'Refresh the page'
+                )
+            )
+        )
+    );
 };
 
 var Empty_row = function Empty_row() {
@@ -37235,21 +37253,21 @@ var Row = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
             return _react2.default.createElement(
                 'tr',
                 { onClick: this.click },
-                _react2.default.createElement(Key_cell, { title: stat.key, warning: warning }),
+                _react2.default.createElement(Key_cell, { row_key: row_key, title: stat.key, warning: warning }),
                 _react2.default.createElement(
                     'td',
                     null,
-                    (0, _util.bytes_format)(stat.out_bw) || '—'
+                    _react2.default.createElement(Cell, { title: (0, _util.bytes_format)(stat.out_bw) || '—' })
                 ),
                 _react2.default.createElement(
                     'td',
                     null,
-                    (0, _util.bytes_format)(stat.in_bw) || '—'
+                    _react2.default.createElement(Cell, { title: (0, _util.bytes_format)(stat.in_bw) || '—' })
                 ),
                 _react2.default.createElement(
                     'td',
                     null,
-                    stat.reqs || '—'
+                    _react2.default.createElement(Cell, { title: stat.reqs || '—' })
                 )
             );
         }
@@ -37259,13 +37277,14 @@ var Row = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
 
 var Key_cell = function Key_cell(_ref4) {
     var title = _ref4.title,
-        warning = _ref4.warning;
+        warning = _ref4.warning,
+        row_key = _ref4.row_key;
 
     var warning_tooltip = 'Some of your proxy ports don\'t have SSL analyzing\n        enabled and there are connections on HTTPS protocol detected';
     return _react2.default.createElement(
         'td',
         null,
-        title,
+        _react2.default.createElement(Cell, { row_key: row_key, title: title }),
         _react2.default.createElement(
             _react3.If,
             { when: warning },
@@ -37278,26 +37297,85 @@ var Key_cell = function Key_cell(_ref4) {
     );
 };
 
-var Stat_table = (0, _chrome_widgets.with_resizable_cols)([1, 2, 3, 4], function (props) {
-    var title = props.title,
-        stats = props.stats,
-        row_key = props.row_key,
-        logs = props.logs,
-        ssl_warning = props.ssl_warning;
+var Cell = function Cell(_ref5) {
+    var row_key = _ref5.row_key,
+        title = _ref5.title;
 
-    var cur_stats = stats[row_key] || [];
-    return _react2.default.createElement(
-        'div',
-        { className: 'tables_container vbox' },
-        _react2.default.createElement(Header_container, { title: title, cols: props.cols }),
-        _react2.default.createElement(Data_container, { stats: cur_stats, row_key: row_key, logs: logs,
-            ssl_warning: ssl_warning, cols: props.cols })
-    );
-});
+    if (row_key == 'status_code') {
+        return _react2.default.createElement(
+            _chrome_widgets.Tooltip,
+            { title: title + ' ' + _util.status_codes[title] },
+            _react2.default.createElement(
+                'div',
+                { className: 'disp_value' },
+                title
+            )
+        );
+    } else {
+        return _react2.default.createElement(
+            _chrome_widgets.Tooltip,
+            { title: title },
+            _react2.default.createElement(
+                'div',
+                { className: 'disp_value' },
+                title
+            )
+        );
+    }
+};
 
-var Header_container = function Header_container(_ref5) {
-    var title = _ref5.title,
-        cols = _ref5.cols;
+var Stat_table = (0, _chrome_widgets.with_resizable_cols)([{ id: 'key' }, { id: 'out_bw' }, { id: 'in_bw' }, { id: 'reqs' }], function (_Pure_component3) {
+    (0, _inherits3.default)(Stat_table, _Pure_component3);
+
+    function Stat_table() {
+        var _ref6;
+
+        var _temp3, _this5, _ret3;
+
+        (0, _classCallCheck3.default)(this, Stat_table);
+
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+        }
+
+        return _ret3 = (_temp3 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Stat_table.__proto__ || Object.getPrototypeOf(Stat_table)).call.apply(_ref6, [this].concat(args))), _this5), _this5.state = { sorting: { col: 0, dir: 1 } }, _this5.sort = function (col) {
+            var cur_sorting = _this5.state.sorting;
+            var dir = cur_sorting.col == col ? -1 * cur_sorting.dir : 1;
+            _this5.setState({ sorting: { dir: dir, col: col } });
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this5, _ret3);
+    }
+
+    (0, _createClass3.default)(Stat_table, [{
+        key: 'render',
+        value: function render() {
+            var _props2 = this.props,
+                title = _props2.title,
+                stats = _props2.stats,
+                row_key = _props2.row_key,
+                logs = _props2.logs,
+                ssl_warning = _props2.ssl_warning,
+                cols = _props2.cols;
+
+            var cur_stats = stats[row_key] || [];
+            return _react2.default.createElement(
+                'div',
+                { className: 'tables_container vbox' },
+                _react2.default.createElement(Header_container, { title: title, cols: cols,
+                    sorting: this.state.sorting, sort: this.sort }),
+                _react2.default.createElement(Data_container, { stats: cur_stats, row_key: row_key, logs: logs,
+                    ssl_warning: ssl_warning, cols: cols,
+                    sorting: this.state.sorting })
+            );
+        }
+    }]);
+    return Stat_table;
+}(_pure_component2.default));
+
+var Header_container = function Header_container(_ref7) {
+    var title = _ref7.title,
+        cols = _ref7.cols,
+        sorting = _ref7.sorting,
+        sort = _ref7.sort;
     return _react2.default.createElement(
         'div',
         { className: 'header_container' },
@@ -37317,38 +37395,50 @@ var Header_container = function Header_container(_ref5) {
                 _react2.default.createElement(
                     'tr',
                     null,
-                    _react2.default.createElement(
-                        'th',
-                        null,
-                        title
-                    ),
-                    _react2.default.createElement(
-                        'th',
-                        null,
-                        'BW up'
-                    ),
-                    _react2.default.createElement(
-                        'th',
-                        null,
-                        'BW down'
-                    ),
-                    _react2.default.createElement(
-                        'th',
-                        null,
-                        'Requests'
-                    )
+                    _react2.default.createElement(Header, { sort: sort, id: 0, label: title, sorting: sorting }),
+                    _react2.default.createElement(Header, { sort: sort, id: 1, label: 'BW up', sorting: sorting }),
+                    _react2.default.createElement(Header, { sort: sort, id: 2, label: 'BW down', sorting: sorting }),
+                    _react2.default.createElement(Header, { sort: sort, id: 3, label: 'Requests', sorting: sorting })
                 )
             )
         )
     );
 };
 
-var Data_container = function Data_container(_ref6) {
-    var stats = _ref6.stats,
-        row_key = _ref6.row_key,
-        logs = _ref6.logs,
-        ssl_warning = _ref6.ssl_warning,
-        cols = _ref6.cols;
+var Header = function Header(_ref8) {
+    var sort = _ref8.sort,
+        sorting = _ref8.sorting,
+        id = _ref8.id,
+        label = _ref8.label;
+    return _react2.default.createElement(
+        'th',
+        { onClick: function onClick() {
+                return sort(id);
+            } },
+        _react2.default.createElement(
+            'div',
+            null,
+            label
+        ),
+        _react2.default.createElement(_chrome_widgets.Sort_icon, { show: sorting.col == id, dir: sorting.dir })
+    );
+};
+
+var Data_container = function Data_container(_ref9) {
+    var stats = _ref9.stats,
+        row_key = _ref9.row_key,
+        logs = _ref9.logs,
+        ssl_warning = _ref9.ssl_warning,
+        cols = _ref9.cols,
+        sorting = _ref9.sorting;
+
+    var sorted = stats.slice().sort(function (a, b) {
+        var field = cols[sorting.col].id;
+        var val_a = a[field];
+        var val_b = b[field];
+        var res = val_a > val_b;
+        return sorting.dir == -1 ? res : !res;
+    });
     return _react2.default.createElement(
         'div',
         { className: 'data_container' },
@@ -37367,10 +37457,10 @@ var Data_container = function Data_container(_ref6) {
                 null,
                 _react2.default.createElement(
                     _react3.If,
-                    { when: !stats.length },
+                    { when: !sorted.length },
                     _react2.default.createElement(Empty_row, null)
                 ),
-                stats.map(function (s) {
+                sorted.map(function (s) {
                     return _react2.default.createElement(Row, { stat: s, key: s.key, row_key: row_key, logs: logs,
                         warning: ssl_warning && s.key == 'https' });
                 }),
@@ -37387,9 +37477,9 @@ var Data_container = function Data_container(_ref6) {
     );
 };
 
-var Summary_bar = function Summary_bar(_ref7) {
-    var enable_ssl_click = _ref7.enable_ssl_click,
-        show = _ref7.show;
+var Summary_bar = function Summary_bar(_ref10) {
+    var enable_ssl_click = _ref10.enable_ssl_click,
+        show = _ref10.show;
 
     if (!show) return null;
     var tooltip = 'Enable HTTPS analyzing for all your proxies. You will also\n        need to install SSL certificate. It allows you to use rules and logs\n        for HTTPS requests';
@@ -37408,24 +37498,24 @@ var Summary_bar = function Summary_bar(_ref7) {
     );
 };
 
-var Toolbar = function (_Pure_component3) {
-    (0, _inherits3.default)(Toolbar, _Pure_component3);
+var Toolbar = function (_Pure_component4) {
+    (0, _inherits3.default)(Toolbar, _Pure_component4);
 
     function Toolbar() {
-        var _ref8;
+        var _ref11;
 
-        var _temp3, _this5, _ret3;
+        var _temp4, _this6, _ret4;
 
         (0, _classCallCheck3.default)(this, Toolbar);
 
-        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-            args[_key3] = arguments[_key3];
+        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
         }
 
-        return _ret3 = (_temp3 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref8 = Toolbar.__proto__ || Object.getPrototypeOf(Toolbar)).call.apply(_ref8, [this].concat(args))), _this5), _this5.clear = function () {
+        return _ret4 = (_temp4 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref11 = Toolbar.__proto__ || Object.getPrototypeOf(Toolbar)).call.apply(_ref11, [this].concat(args))), _this6), _this6.clear = function () {
             (0, _util.ga_event)('stats panel', 'click', 'reset btn');
-            var _this = _this5;
-            _this5.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+            var _this = _this6;
+            _this6.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -37440,7 +37530,7 @@ var Toolbar = function (_Pure_component3) {
                     }
                 }, _callee2, this);
             }));
-        }, _temp3), (0, _possibleConstructorReturn3.default)(_this5, _ret3);
+        }, _temp4), (0, _possibleConstructorReturn3.default)(_this6, _ret4);
     }
 
     (0, _createClass3.default)(Toolbar, [{
@@ -37464,11 +37554,11 @@ var Toolbar = function (_Pure_component3) {
     return Toolbar;
 }(_pure_component2.default);
 
-var Success_ratio = function Success_ratio(_ref9) {
-    var _ref9$total = _ref9.total,
-        total = _ref9$total === undefined ? 0 : _ref9$total,
-        _ref9$success = _ref9.success,
-        success = _ref9$success === undefined ? 0 : _ref9$success;
+var Success_ratio = function Success_ratio(_ref12) {
+    var _ref12$total = _ref12.total,
+        total = _ref12$total === undefined ? 0 : _ref12$total,
+        _ref12$success = _ref12.success,
+        success = _ref12$success === undefined ? 0 : _ref12$success;
 
     var ratio = total == 0 ? NaN : success / total * 100;
     var tooltip = 'Ratio of successful requests out of total\n        requests, where successful requests are calculated as 2xx,\n        3xx or 404 HTTP status codes';
@@ -37936,7 +38026,7 @@ exports = module.exports = __webpack_require__(66)(undefined);
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nhtml,\nbody {\n  line-height: 23px;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.lum_login {\n  padding-top: 70px;\n}\n.lum_login .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3 {\n  font-size: 30px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  display: flex;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 1px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n.lpm {\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.lpm .pagination_panel {\n  height: 28px;\n}\n.lpm .pagination_panel .pagination {\n  display: inline-block;\n}\n.lpm .pagination_panel select {\n  float: right;\n  width: auto;\n  height: 24px;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 19px 0 4px;\n}\n.lpm .pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.lpm .pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.lpm .pagination_panel.bottom {\n  margin-top: 5px;\n}\n.lpm h1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\n.lpm h2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\n.lpm h3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\n.lpm h4 {\n  margin: 0;\n}\n.lpm .tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.lpm .nav_header {\n  position: relative;\n}\n.lpm .nav_header h3 {\n  height: 37px;\n  line-height: 37px;\n}\n.lpm .nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.lpm .nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.lpm select,\n.lpm input[type=number],\n.lpm input[type=text],\n.lpm input[type=password],\n.lpm input[type=email],\n.lpm textarea {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n.lpm select:focus,\n.lpm input[type=number]:focus,\n.lpm input[type=text]:focus,\n.lpm input[type=password]:focus,\n.lpm input[type=email]:focus,\n.lpm textarea:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\n.lpm input[disabled],\n.lpm select[disabled] {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.lpm textarea {\n  height: auto;\n  resize: vertical;\n}\n.lpm select {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\n.lpm input[type=number]::-webkit-inner-spin-button,\n.lpm input[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\n.lpm input[type=number] {\n  -moz-appearance: textfield;\n}\n.lpm input[type=number],\n.lpm input[type=text] {\n  padding-right: 10px;\n}\n.lpm label.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\n.lpm input[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\n.lpm .btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.lpm .btn_lpm:hover,\n.lpm .btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.lpm .btn_lpm:focus {\n  outline: none;\n}\n.lpm .btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.lpm .btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.lpm .btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.lpm .btn_lpm.disabled:active {\n  color: white;\n}\n.lpm .btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.lpm .btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.lpm .btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.lpm .btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.lpm .btn_copy:hover {\n  color: white;\n}\n.lpm a.link,\n.lpm button.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\n.lpm a.link:hover,\n.lpm button.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\n.lpm span.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\n.lpm span.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\n.lpm span.icon_link.right i {\n  left: 1px;\n}\n.lpm span.icon_link.top i {\n  top: 0;\n}\n.lpm span.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\n.lpm span.icon_link.small i {\n  font-size: 11px;\n}\n.lpm span.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\n.lpm span.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.lpm .loader_small {\n  display: flex;\n  align-items: center;\n}\n.lpm .loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n}\n.lpm .loader_small .saving_label {\n  margin-left: 5px;\n}\n.lpm .loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.lpm .loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.lpm .loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.lpm .loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.lpm .warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.lpm .warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.lpm .warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.lpm .warning_upgrade {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.lpm .buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.lpm .btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.lpm .panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n}\n.lpm .panel.no_border {\n  border: none;\n}\n.lpm .panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.lpm .panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.lpm .panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.lpm .panel .panel_heading h2 {\n  font-size: 18px;\n}\n.lpm .panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.lpm .panel .panel_body {\n  padding: 5px;\n}\n.lpm .panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.lpm .panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.lpm .panel table {\n  margin-bottom: 0;\n}\n.lpm .panel table.table-condensed {\n  font-size: 14px;\n}\n.lpm .panel table.table-condensed td,\n.lpm .panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.lpm .panel table tr {\n  cursor: pointer;\n}\n.lpm .panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.lpm .panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #E0E9EE;\n}\n.lpm .modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.lpm .modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.lpm .modal .modal-header h4.modal-title,\n.lpm .modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.lpm .modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.lpm .modal .modal-header.no_header {\n  padding: 5px;\n}\n.lpm .modal .modal-body {\n  padding: 15px 20px 0;\n}\n.lpm .modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.lpm .modal .modal-footer .default_footer {\n  text-align: right;\n}\n.lpm .modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.lpm .rbt.open {\n  width: 100%;\n}\n.lpm .rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.lpm .rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.lpm .rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.lpm .rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.lpm .rbt .dropdown-menu {\n  width: 100%;\n}\n.lpm .rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.lpm .rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.lpm .pagination_panel {\n  width: 100%;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #004d74;\n  position: relative;\n  left: 29px;\n  top: 0;\n  border-radius: 50%;\n}\n.nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.debug {\n  background-image: url(/img/debug.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.edit_proxy {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.edit_proxy .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.edit_proxy .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.edit_proxy .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.edit_proxy .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.edit_proxy .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.edit_proxy .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.edit_proxy .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.edit_proxy .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.edit_proxy .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.edit_proxy .main_window {\n  margin-top: 10px;\n  display: flex;\n  height: 100%;\n}\n.edit_proxy .main_window.logs .logs {\n  width: 100%;\n}\n.edit_proxy .main_window.logs .logs .filtering {\n  padding-top: 0;\n  padding-left: 0;\n  padding-right: 0;\n}\n.edit_proxy .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.edit_proxy .main_window.target .section_body .desc {\n  width: 100px;\n}\n.edit_proxy .main_window.speed .section_body .desc {\n  width: 195px;\n}\n.edit_proxy .main_window.rules .section_body .desc {\n  width: 200px;\n}\n.edit_proxy .main_window.rotation .section_body .desc {\n  width: 125px;\n}\n.edit_proxy .main_window.debug .section_body .desc {\n  width: 120px;\n}\n.edit_proxy .main_window.general .section_body .desc {\n  width: 195px;\n}\n.edit_proxy .section_wrapper {\n  padding: 3px;\n}\n.edit_proxy .section_wrapper .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.edit_proxy .section_wrapper .section_body .note {\n  margin-bottom: 0;\n}\n.edit_proxy .section_wrapper .section_body .field_row {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .section_body .field_row:not(:first-child) {\n  margin-top: 5px;\n}\n.edit_proxy .section_wrapper .section_body .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.edit_proxy .section_wrapper .section_body .field_row.disabled {\n  color: #ccdbe3;\n}\n.edit_proxy .section_wrapper .section_body .field_row.disabled input,\n.edit_proxy .section_wrapper .section_body .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.edit_proxy .section_wrapper .section_body .field_row.disabled label {\n  cursor: default;\n}\n.edit_proxy .section_wrapper .section_body .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.edit_proxy .section_wrapper .section_body .field {\n  flex: 1;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .section_body .field .inline_field {\n  display: flex;\n  align-items: center;\n}\n.edit_proxy .section_wrapper .section_body .field .sufix {\n  margin-left: 10px;\n}\n.edit_proxy .section_wrapper .section_body .field .double_field input {\n  width: 79px;\n}\n.edit_proxy .section_wrapper .section_body .field .double_field .devider {\n  margin: 0 5px;\n}\n.edit_proxy .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_value {\n  margin-left: 5px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #E0E9EE;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading .filtering {\n  width: 295px;\n  margin-top: -5px;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter {\n  display: inline-block;\n  border: solid 1px #E0E9EE;\n  border-radius: 3px;\n  background: #F3FBFC;\n  padding: 0 5px;\n  margin: 5px 5px 0 0;\n  font-size: 14px;\n  cursor: default;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .text {\n  display: inline-block;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .text .section {\n  font-weight: bold;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .x_btn_wrapper {\n  display: inline-block;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .x_btn_wrapper .x_btn {\n  background-image: url(/img/delete.svg);\n  width: 12px;\n  height: 12px;\n  background-size: contain;\n  margin-left: 3px;\n  position: relative;\n  top: 2px;\n  cursor: pointer;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #E0E9EE;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #E0E9EE;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  text-align: center;\n  margin-top: 10px;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  margin: 10px 0;\n  padding: 5px;\n  position: relative;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.howto .instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n}\n.howto .instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.howto .instructions ul {\n  margin: 0;\n}\n.howto .instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.howto .instructions li {\n  padding-bottom: 12px;\n}\n.howto .instructions ol li .circle_wrapper {\n  position: absolute;\n  left: 3px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.howto .instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.howto .instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.howto .instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  left: 7px;\n  top: -5px;\n}\n.howto .instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.howto .api_link {\n  margin-left: 3px;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper {\n  display: flex;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header {\n  position: absolute;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 40px;\n  top: 1px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field select {\n  margin-top: 35px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 16px;\n  padding-right: 6px;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .zones {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 1000;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n  padding: 0 2px;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filters .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filters .filter.active,\n.chrome .toolbar_container .filters .filter:hover {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filters .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filters .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  z-index: 2000;\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  user-select: text;\n  -webkit-user-select: text;\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  margin: 6px 16px;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_footer td:last-child {\n  font-weight: bold;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nhtml,\nbody {\n  line-height: 23px;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.lum_login {\n  padding-top: 70px;\n}\n.lum_login .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3 {\n  font-size: 30px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  display: flex;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n.lpm {\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.lpm .pagination_panel {\n  height: 28px;\n}\n.lpm .pagination_panel .pagination {\n  display: inline-block;\n}\n.lpm .pagination_panel select {\n  float: right;\n  width: auto;\n  height: 24px;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 19px 0 4px;\n}\n.lpm .pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.lpm .pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.lpm .pagination_panel.bottom {\n  margin-top: 5px;\n}\n.lpm h1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\n.lpm h2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\n.lpm h3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\n.lpm h4 {\n  margin: 0;\n}\n.lpm .tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.lpm .nav_header {\n  position: relative;\n}\n.lpm .nav_header h3 {\n  height: 37px;\n  line-height: 37px;\n}\n.lpm .nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.lpm .nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.lpm select,\n.lpm input[type=number],\n.lpm input[type=text],\n.lpm input[type=password],\n.lpm input[type=email],\n.lpm textarea {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\n.lpm select:focus,\n.lpm input[type=number]:focus,\n.lpm input[type=text]:focus,\n.lpm input[type=password]:focus,\n.lpm input[type=email]:focus,\n.lpm textarea:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\n.lpm input[disabled],\n.lpm select[disabled] {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.lpm textarea {\n  height: auto;\n  resize: vertical;\n}\n.lpm select {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\n.lpm input[type=number]::-webkit-inner-spin-button,\n.lpm input[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\n.lpm input[type=number] {\n  -moz-appearance: textfield;\n}\n.lpm input[type=number],\n.lpm input[type=text] {\n  padding-right: 10px;\n}\n.lpm label.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\n.lpm input[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\n.lpm .btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.lpm .btn_lpm:hover,\n.lpm .btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.lpm .btn_lpm:focus {\n  outline: none;\n}\n.lpm .btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.lpm .btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.lpm .btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.lpm .btn_lpm.disabled:active {\n  color: white;\n}\n.lpm .btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.lpm .btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.lpm .btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.lpm .btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.lpm .btn_copy:hover {\n  color: white;\n}\n.lpm a.link,\n.lpm button.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\n.lpm a.link:hover,\n.lpm button.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\n.lpm span.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\n.lpm span.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\n.lpm span.icon_link.right i {\n  left: 1px;\n}\n.lpm span.icon_link.top i {\n  top: 0;\n}\n.lpm span.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\n.lpm span.icon_link.small i {\n  font-size: 11px;\n}\n.lpm span.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\n.lpm span.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.lpm .loader_small {\n  display: flex;\n  align-items: center;\n}\n.lpm .loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n}\n.lpm .loader_small .saving_label {\n  margin-left: 5px;\n}\n.lpm .loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.lpm .loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.lpm .loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.lpm .loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.lpm .warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.lpm .warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.lpm .warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.lpm .warning_upgrade {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.lpm .buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.lpm .btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.lpm .panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n}\n.lpm .panel.no_border {\n  border: none;\n}\n.lpm .panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.lpm .panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.lpm .panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.lpm .panel .panel_heading h2 {\n  font-size: 18px;\n}\n.lpm .panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.lpm .panel .panel_body {\n  padding: 5px;\n}\n.lpm .panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.lpm .panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.lpm .panel table {\n  margin-bottom: 0;\n}\n.lpm .panel table.table-condensed {\n  font-size: 14px;\n}\n.lpm .panel table.table-condensed td,\n.lpm .panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.lpm .panel table tr {\n  cursor: pointer;\n}\n.lpm .panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.lpm .panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #E0E9EE;\n}\n.lpm .modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.lpm .modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.lpm .modal .modal-header h4.modal-title,\n.lpm .modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.lpm .modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.lpm .modal .modal-header.no_header {\n  padding: 5px;\n}\n.lpm .modal .modal-body {\n  padding: 15px 20px 0;\n}\n.lpm .modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.lpm .modal .modal-footer .default_footer {\n  text-align: right;\n}\n.lpm .modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.lpm .rbt.open {\n  width: 100%;\n}\n.lpm .rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.lpm .rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.lpm .rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.lpm .rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.lpm .rbt .dropdown-menu {\n  width: 100%;\n}\n.lpm .rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.lpm .rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.lpm .pagination_panel {\n  width: 100%;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #004d74;\n  position: relative;\n  left: 29px;\n  top: 0;\n  border-radius: 50%;\n}\n.nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.debug {\n  background-image: url(/img/debug.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  height: 100%;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .filtering {\n  padding-top: 0;\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.debug .desc {\n  width: 120px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .field {\n  flex: 1;\n  align-items: center;\n}\n.proxy_edit .main_window .field .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .field .double_field input {\n  width: 79px;\n}\n.proxy_edit .main_window .field .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #E0E9EE;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading .filtering {\n  width: 295px;\n  margin-top: -5px;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter {\n  display: inline-block;\n  border: solid 1px #E0E9EE;\n  border-radius: 3px;\n  background: #F3FBFC;\n  padding: 0 5px;\n  margin: 5px 5px 0 0;\n  font-size: 14px;\n  cursor: default;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .text {\n  display: inline-block;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .text .section {\n  font-weight: bold;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .x_btn_wrapper {\n  display: inline-block;\n}\n.logs .logs_panel .panel_heading .filtering .filters_list .filter .x_btn_wrapper .x_btn {\n  background-image: url(/img/delete.svg);\n  width: 12px;\n  height: 12px;\n  background-size: contain;\n  margin-left: 3px;\n  position: relative;\n  top: 2px;\n  cursor: pointer;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #E0E9EE;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #E0E9EE;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  text-align: center;\n  margin-top: 10px;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.howto .api_link {\n  margin-left: 3px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  left: 7px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper {\n  display: flex;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header {\n  position: absolute;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 40px;\n  top: 1px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field select {\n  margin-top: 35px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 16px;\n  padding-right: 6px;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .zones {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 1000;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n  padding: 0 2px;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filters .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filters .filter.active,\n.chrome .toolbar_container .filters .filter:hover {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filters .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filters .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  user-select: text;\n  -webkit-user-select: text;\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  margin: 6px 16px;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_footer td:last-child {\n  font-weight: bold;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
 
 // exports
 

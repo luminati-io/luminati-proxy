@@ -6,14 +6,15 @@ import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import ajax from 'hutil/util/ajax';
 import zurl from 'hutil/util/url';
-import {Modal} from './common.js';
+import {Modal, Circle_li as Li} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
 import {withRouter} from 'react-router-dom';
 import classnames from 'classnames';
-import {Tooltip, Toolbar_button, Devider,
+import {Tooltip, Toolbar_button, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
+import {status_codes} from './util.js';
 
 class Stats extends Pure_component {
     state = {
@@ -40,8 +41,8 @@ class Stats extends Pure_component {
     };
     show_reset_dialog = ()=>this.setState({show_reset: true});
     render(){
-        return (
-            <div className="chrome stats_panel">
+        return [
+            <div key="1" className="chrome stats_panel">
               <div className="main_panel">
                 <Toolbar stats={this.state.stats}/>
                 <Stat_table stats={this.state.stats}
@@ -53,16 +54,35 @@ class Stats extends Pure_component {
                   row_key="protocol" logs="protocol" title="Protocol"/>
                 <Summary_bar enable_ssl_click={this.enable_ssl_click}
                   show={this.state.stats.ssl_enable}/>
-                <Enable_ssl_modal enable_ssl={this.enable_ssl}/>
               </div>
-            </div>
-        );
+            </div>,
+            <Enable_ssl_modal key="2" enable_ssl={this.enable_ssl}/>,
+        ];
     }
 }
 
+const faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
 const Enable_ssl_modal = ({enable_ssl})=>(
     <Modal id="enable_ssl_modal" title="Enable SSL analyzing for all proxies"
-      click_ok={enable_ssl}/>
+      click_ok={enable_ssl} className="enable_ssl_modal">
+      <p className="cert_info">
+        You will also need to add certificate file to browsers.
+        Gathering stats for HTTPS requests requires setting a certificate key.
+      </p>
+      <div className="instructions">
+        <ol>
+          <Li>Download our free certificate key
+            <a href="/ssl" target="_blank" download> here</a>
+          </Li>
+          <Li>
+            Add the certificate to your browser. You can find more detailed
+            instructions <a className="link" href={faq_cert_url}
+              rel="noopener noreferrer" target="_blank">here</a>
+          </Li>
+          <Li>Refresh the page</Li>
+        </ol>
+      </div>
+    </Modal>
 );
 
 const Empty_row = ()=>(
@@ -80,21 +100,21 @@ const Row = withRouter(class Row extends Pure_component {
         const {stat, row_key, warning} = this.props;
         return (
             <tr onClick={this.click}>
-              <Key_cell title={stat.key} warning={warning}/>
-              <td>{bytes_format(stat.out_bw)||'—'}</td>
-              <td>{bytes_format(stat.in_bw)||'—'}</td>
-              <td>{stat.reqs||'—'}</td>
+              <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
+              <td><Cell title={bytes_format(stat.out_bw)||'—'}/></td>
+              <td><Cell title={bytes_format(stat.in_bw)||'—'}/></td>
+              <td><Cell title={stat.reqs||'—'}/></td>
             </tr>
         );
     }
 });
 
-const Key_cell = ({title, warning})=>{
+const Key_cell = ({title, warning, row_key})=>{
     const warning_tooltip = `Some of your proxy ports don't have SSL analyzing
         enabled and there are connections on HTTPS protocol detected`;
     return (
         <td>
-          {title}
+          <Cell row_key={row_key} title={title}/>
           <If when={warning}>
             <Tooltip title={warning_tooltip}>
               <div className="ic_warning"/>
@@ -104,19 +124,50 @@ const Key_cell = ({title, warning})=>{
     );
 };
 
-const Stat_table = with_resizable_cols([1, 2, 3, 4], props=>{
-    const {title, stats, row_key, logs, ssl_warning} = props;
-    const cur_stats = stats[row_key]||[];
-    return (
-        <div className="tables_container vbox">
-          <Header_container title={title} cols={props.cols}/>
-          <Data_container stats={cur_stats} row_key={row_key} logs={logs}
-            ssl_warning={ssl_warning} cols={props.cols}/>
-        </div>
-    );
+const Cell = ({row_key, title})=>{
+    if (row_key=='status_code')
+    {
+        return (
+            <Tooltip title={title+' '+status_codes[title]}>
+              <div className="disp_value">{title}</div>
+            </Tooltip>
+        );
+    }
+    else
+    {
+        return (
+            <Tooltip title={title}>
+              <div className="disp_value">{title}</div>
+            </Tooltip>
+        );
+    }
+};
+
+const Stat_table = with_resizable_cols([{id: 'key'}, {id: 'out_bw'},
+    {id: 'in_bw'}, {id: 'reqs'}],
+class Stat_table extends Pure_component {
+    state = {sorting: {col: 0, dir: 1}};
+    sort = col=>{
+        const cur_sorting = this.state.sorting;
+        const dir = cur_sorting.col==col ?  -1*cur_sorting.dir : 1;
+        this.setState({sorting: {dir, col}});
+    };
+    render(){
+        const {title, stats, row_key, logs, ssl_warning, cols} = this.props;
+        const cur_stats = stats[row_key]||[];
+        return (
+            <div className="tables_container vbox">
+              <Header_container title={title} cols={cols}
+                sorting={this.state.sorting} sort={this.sort}/>
+              <Data_container stats={cur_stats} row_key={row_key} logs={logs}
+                ssl_warning={ssl_warning} cols={cols}
+                sorting={this.state.sorting}/>
+            </div>
+        );
+    }
 });
 
-const Header_container = ({title, cols})=>(
+const Header_container = ({title, cols, sorting, sort})=>(
     <div className="header_container">
       <table>
         <colgroup>
@@ -126,40 +177,56 @@ const Header_container = ({title, cols})=>(
         </colgroup>
         <tbody>
           <tr>
-            <th>{title}</th>
-            <th>BW up</th>
-            <th>BW down</th>
-            <th>Requests</th>
+            <Header sort={sort} id={0} label={title} sorting={sorting}/>
+            <Header sort={sort} id={1} label="BW up" sorting={sorting}/>
+            <Header sort={sort} id={2} label="BW down" sorting={sorting}/>
+            <Header sort={sort} id={3} label="Requests" sorting={sorting}/>
           </tr>
         </tbody>
       </table>
     </div>
 );
 
-const Data_container = ({stats, row_key, logs, ssl_warning, cols})=>(
-    <div className="data_container">
-      <table>
-        <colgroup>
-          {(cols||[]).map((c, idx)=>(
-            <col key={idx} style={{width: c.width}}/>
-          ))}
-        </colgroup>
-        <tbody>
-          <If when={!stats.length}><Empty_row/></If>
-          {stats.map(s=>(
-            <Row stat={s} key={s.key} row_key={row_key} logs={logs}
-              warning={ssl_warning&&s.key=='https'}/>
-          ))}
-          <tr className="filler">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+const Header = ({sort, sorting, id, label})=>(
+    <th onClick={()=>sort(id)}>
+      <div>{label}</div>
+      <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
+    </th>
 );
+
+const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
+    const sorted = stats.slice().sort((a, b)=>{
+        const field = cols[sorting.col].id;
+        const val_a = a[field];
+        const val_b = b[field];
+        let res = val_a>val_b;
+        return sorting.dir==-1 ? res : !res;
+    });
+    return (
+        <div className="data_container">
+          <table>
+            <colgroup>
+              {(cols||[]).map((c, idx)=>(
+                <col key={idx} style={{width: c.width}}/>
+              ))}
+            </colgroup>
+            <tbody>
+              <If when={!sorted.length}><Empty_row/></If>
+              {sorted.map(s=>(
+                <Row stat={s} key={s.key} row_key={row_key} logs={logs}
+                  warning={ssl_warning&&s.key=='https'}/>
+              ))}
+              <tr className="filler">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+    );
+};
 
 const Summary_bar = ({enable_ssl_click, show})=>{
     if (!show)

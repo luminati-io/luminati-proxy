@@ -359,3 +359,12 @@ export const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
         </Tooltip>
     );
 };
+
+export const Circle_li = props=>(
+    <li>
+      <div className="circle_wrapper">
+        <div className="circle"/>
+      </div>
+      <div className="single_instruction">{props.children}</div>
+    </li>
+);

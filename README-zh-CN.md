@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.95.360-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.95.899-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -227,7 +227,7 @@ docker run luminati/luminati-proxy luminati --version
 
 API的解说文件能在APP里找着
 
-详细解释能在 [这里](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json) 找到
+详细解释能在 [这里](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json) 找到
 
 ## Node.js API
 

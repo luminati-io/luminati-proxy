@@ -70,8 +70,9 @@ const Lang_btn = props=>{
 
 class Code_instructions extends Pure_component {
     state = {lang: 'shell'};
-    swagger_url = 'http://petstore.swagger.io/?url=https://cdn.rawgit.com/'
-    +'luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy';
+    swagger_url = 'http://petstore.swagger.io/?url=https://'
+    +'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/'
+    +'swagger.json#/Proxy';
     click_lang(lang){
         this.setState({lang});
         ga_event('How-to-tab', 'select option', lang);

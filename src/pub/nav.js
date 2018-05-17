@@ -149,7 +149,7 @@ const Footer = ()=>(
           Contact</a>
       </div>
       <div>
-        <a href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy"
+        <a href="http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy"
           className="link">
           API
         </a>

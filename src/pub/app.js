@@ -5,7 +5,7 @@ import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
 import _ from 'lodash';
 import setdb from 'hutil/util/setdb';
 import ajax from 'hutil/util/ajax';
-import Edit_proxy from './edit_proxy.js';
+import Proxy_edit from './proxy_edit.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
 import Proxy_tester from './proxy_tester.js';
@@ -54,12 +54,6 @@ const App = withRouter(class App extends Pure_component {
             const socket = new WebSocket(
                 `ws://${window.location.hostname}:${defaults.ws}`);
             setdb.set('head.ws', socket);
-        });
-        this.etask(function*(){
-            const locations = yield ajax.json({url: '/api/all_locations'});
-            locations.countries_by_code = locations.countries
-            .reduce((acc, e)=>({...acc, [e.country_id]: e.country_name}), {});
-            setdb.set('head.locations', locations);
         });
         this.etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});
@@ -112,7 +106,7 @@ const Page = ()=>(
           <Route path="/overview" exact component={Overview}/>
           <Route path="/overview/:master_port" exact
             component={Overview}/>
-          <Route path="/proxy/:port" exact component={Edit_proxy}/>
+          <Route path="/proxy/:port" exact component={Proxy_edit}/>
           <Route path="/howto" exact component={Howto}/>
           <Route path="/logs" exact component={Logs}/>
           <Route path="/proxy_tester" exact component={Proxy_tester}/>
