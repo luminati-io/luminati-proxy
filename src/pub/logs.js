@@ -9,14 +9,14 @@ import zurl from 'hutil/util/url';
 export const Logs = withRouter(({location})=>{
     const qs_o = zurl.qs_parse((location.search||'').substr(1));
     return (
-        <div className="lpm logs">
+        <div className="logs">
           <Har_viewer {...qs_o}/>
         </div>
     );
 });
 
 export const Dock_logs = ()=>(
-    <div className="lpm dock_logs">
+    <div className="dock_logs">
       <Har_viewer dock_mode/>
     </div>
 );

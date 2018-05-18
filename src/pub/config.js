@@ -108,7 +108,7 @@ class Config extends Pure_component {
         const panel_class = classnames('panel code_panel flex_auto vbox', {
             editable: this.state.editable});
         return (
-            <div className="lpm config vbox">
+            <div className="config vbox">
               <Nav title={this.title} subtitle={this.subtitle}
                 warning={this.state.warning}/>
               <div className={panel_class}>

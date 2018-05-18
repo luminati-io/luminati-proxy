@@ -8,13 +8,12 @@ import _ from 'lodash';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import setdb from 'hutil/util/setdb';
-import {Modal, Loader, Select, Input, Warnings, Link_icon,
-    Checkbox, Textarea, Tooltip, Pagination_panel,
-    Loader_small} from './common.js';
+import {Modal, Loader, Warnings, Link_icon, Form_controller, Checkbox,
+    Tooltip, Pagination_panel, Loader_small, Note,
+    Labeled_controller} from './common.js';
 import Har_viewer from './har_viewer.js';
 import * as util from './util.js';
 import zurl from 'hutil/util/url';
-import {Typeahead} from 'react-bootstrap-typeahead';
 import {Netmask} from 'netmask';
 import {getContext, withContext} from 'recompose';
 import PropTypes from 'prop-types';
@@ -484,7 +483,7 @@ const Index = withRouter(class Index extends Pure_component {
             type = 'vips';
         const port = this.props.match.params.port;
         return (
-            <div className="lpm proxy_edit">
+            <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
@@ -653,29 +652,6 @@ const Tab_icon = props=>{
     );
 };
 
-const Double_number = props=>{
-    const vals = (''+props.val).split(':');
-    const update = (start, end)=>{
-        props.on_change_wrapper([start||0, end].join(':')); };
-    return (
-        <span className="double_field">
-          <Input {...props} val={vals[0]||''} id={props.id+'_start'}
-            type="number" disabled={props.disabled}
-            on_change_wrapper={val=>update(val, vals[1])}/>
-          <span className="devider">:</span>
-          <Input {...props} val={vals[1]||''} id={props.id+'_end'}
-            type="number" disabled={props.disabled}
-            on_change_wrapper={val=>update(vals[0], val)}/>
-        </span>
-    );
-};
-
-const Typeahead_wrapper = props=>(
-    <Typeahead options={props.data} maxResults={10}
-      minLength={1} disabled={props.disabled} selectHintOnEnter
-      onChange={props.on_change_wrapper} selected={props.val}/>
-);
-
 const Config = getContext({provide: PropTypes.object})(
 class Config extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -699,30 +675,24 @@ class Config extends Pure_component {
     render(){
         if (!this.state.show)
             return null;
-        const {id, sufix, note, type, data, min, max} = this.props;
-        const {tab_id} = this.props.provide;
-        const disabled = this.props.disabled || !this.is_valid_field(id);
-        const val = this.state.val===undefined ? '' : this.state.val;
-        const placeholder = tabs[tab_id].fields[id].placeholder||'';
-        const tooltip = tabs[tab_id].fields[id].tooltip;
+        const id = this.props.id;
+        const tab_id = this.props.provide.tab_id;
         return (
-            <div className={classnames('field_row', {disabled, note})}>
-              <div className="desc">
-                <Tooltip title={tooltip}>
-                  {tabs[tab_id].fields[id].label}
-                </Tooltip>
-              </div>
-              <div className="field">
-                <div className="inline_field">
-                  <Form_controller id={id} data={data} type={type}
-                    on_change_wrapper={this.on_change_wrapper} val={val}
-                    disabled={disabled} min={min} max={max}
-                    placeholder={placeholder} on_blur={this.on_blur}/>
-                  {sufix && <span className="sufix">{sufix}</span>}
-                </div>
-                {note && <Note>{note}</Note>}
-              </div>
-            </div>
+            <Labeled_controller
+              id={id}
+              sufix={this.props.sufix}
+              data={this.props.data}
+              type={this.props.type}
+              on_change_wrapper={this.on_change_wrapper}
+              val={this.state.val===undefined ? '' : this.state.val}
+              disabled={this.props.disabled || !this.is_valid_field(id)}
+              min={this.props.min}
+              max={this.props.max}
+              note={this.props.note}
+              placeholder={tabs[tab_id].fields[id].placeholder||''}
+              on_blur={this.on_blur}
+              label={tabs[tab_id].fields[id].label}
+              tooltip={tabs[tab_id].fields[id].tooltip}/>
         );
     }
 });
@@ -736,50 +706,27 @@ class Rule_config extends Pure_component {
             rule_id: this.props.rule.id, value});
     };
     render(){
-        const {id, sufix, note, type, data, disabled, rule} = this.props;
-        const val = rule[id]||'';
-        const {tab_id} = this.props.provide;
-        const placeholder = tabs[tab_id].fields[id].placeholder||'';
-        const tooltip = tabs[tab_id].fields[id].tooltip;
+        const id = this.props.id;
+        const tab_id = this.props.provide.tab_id;
         return (
-            <div className={classnames('field_row', {disabled, note})}>
-              <div className="desc">
-                <Tooltip title={tooltip}>
-                  {tabs[tab_id].fields[id].label}
-                </Tooltip>
-              </div>
-              <div className="field">
-                <div className="inline_field">
-                  <Form_controller id={id} data={data} type={type} val={val}
-                    on_change_wrapper={this.value_change}
-                    disabled={disabled} placeholder={placeholder}/>
-                  {sufix && <span className="sufix">{sufix}</span>}
-                </div>
-                {note && <Note>{note}</Note>}
-              </div>
-            </div>
+            <Labeled_controller
+              id={id}
+              sufix={this.props.sufix}
+              data={this.props.data}
+              type={this.props.type}
+              on_change_wrapper={this.value_change}
+              val={this.props.rule[id]||''}
+              disabled={this.props.disabled}
+              min={this.props.min}
+              max={this.props.max}
+              note={this.props.note}
+              placeholder={tabs[tab_id].fields[id].placeholder||''}
+              on_blur={this.on_blur}
+              label={tabs[tab_id].fields[id].label}
+              tooltip={tabs[tab_id].fields[id].tooltip}/>
         );
     }
 });
-
-const Form_controller = props=>{
-    const type = props.type;
-    if (type=='select')
-        return <Select {...props}/>;
-    else if (type=='double_number')
-        return <Double_number {...props}/>;
-    else if (type=='typeahead')
-        return <Typeahead_wrapper {...props}/>;
-    else if (type=='textarea')
-        return <Textarea {...props}/>;
-    return <Input {...props}/>;
-};
-
-const Note = props=>(
-    <div className="note">
-      <span>{props.children}</span>
-    </div>
-);
 
 const Targeting = provider({tab_id: 'target'})(
 class Targeting extends Pure_component {

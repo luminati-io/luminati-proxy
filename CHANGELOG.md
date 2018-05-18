@@ -1,5 +1,8 @@
  Luminati Proxy manager - Change Log
 
+## 1.96.18
+- :bug: lpm_install.sh: fixed issue with PATH in sudo
+
 ## 1.95.899
 
 ## 1.95.360

@@ -87,7 +87,7 @@ const Login = withRouter(class Login extends Pure_component {
     }
     render(){
         return (
-            <div className="lpm lum_login">
+            <div className="lum_login">
               <Logo/>
               <Messages error_message={this.state.error_message}
                 settings={this.state.settings}

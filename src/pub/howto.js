@@ -28,7 +28,7 @@ class Howto extends Pure_component {
         else if (this.state.option=='code')
             Instructions = Code_instructions;
         return (
-            <div className="howto lpm">
+            <div className="howto">
               <div className="nav_header">
                 <h3>How to use the Proxy Manager {cur_title}</h3>
               </div>

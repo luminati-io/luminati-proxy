@@ -23,7 +23,7 @@ class Proxy_tester extends Pure_component {
     clear_response = ()=>this.setState({response: undefined});
     render(){
         return (
-            <div className="lpm proxy_tester vbox">
+            <div className="proxy_tester vbox">
               <Nav title={this.title} subtitle={this.subtitle}/>
               <Request update_response={this.update_response}/>
               <Preview cur_preview={this.state.response}

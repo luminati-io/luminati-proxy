@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.95.899"
+VERSION="1.96.18"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -31,7 +31,7 @@ OS=""
 OS_MAC=0
 OS_LINUX=0
 ASSUME_YES=0
-SUDO_CMD="sudo -i"
+SUDO_CMD="sudo -i -E env \"PATH=$PATH\" \"SHELL=/bin/bash\""
 NVM_DIR="$HOME/.nvm"
 LOGFILE="/tmp/lpm_install_$RID.log"
 LOG=""
@@ -182,7 +182,7 @@ retry_cmd()
     local cmd=$1 force_log=$2 ret=0
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "retry_cmd $cmd $i"
-        run_cmd "$1 $2"
+        run_cmd "$cmd" $force_log
         ret=$?
         if ((!ret)); then break; fi
     done
@@ -192,7 +192,7 @@ retry_cmd()
 sudo_cmd()
 {
     local cmd=$1 force_log=$2
-    run_cmd "$SUDO_CMD $cmd" $2
+    run_cmd "$SUDO_CMD $cmd" $force_log
     return $?
 }
 
@@ -201,7 +201,7 @@ retry_sudo_cmd()
     local cmd=$1 force_log=$2 ret=0
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "retry_sudo_cmd $cmd $i"
-        sudo_cmd "$1 $2"
+        sudo_cmd "$cmd" $force_log
         ret=$?
         if ((!ret)); then break; fi
     done
@@ -435,7 +435,7 @@ install_nave_node()
     perr "install_nave_node"
     sudo_cmd "rm -rf ~/.nave/cache/$NODE_VER"
     sudo_cmd "rm -rf /root/.nave/cache/v$NODE_VER"
-    retry_sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
+    retry_sudo_cmd "nave usemain $NODE_VER" 1
     if ! is_cmd_defined "node"; then
         perr "install_error_node"
         echo 'could not install node'

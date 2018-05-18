@@ -14,17 +14,8 @@ import $ from 'jquery';
 import {If} from '/www/util/pub/react.js';
 import {Route, withRouter, Link} from 'react-router-dom';
 
-// XXX krzysztof: get rid of this object
-const sections = [
-    {name: 'overview', title: 'Overview', navbar: true},
-    {name: 'howto', title: 'Instructions', navbar: true},
-    {name: 'proxy_tester', title: 'Proxy Tester', navbar: true, react: true},
-    {name: 'logs', title: 'Logs', navbar: true},
-    {name: 'config', title: 'Configuration', navbar: true},
-];
-
 const Nav = ()=>(
-    <div className="lpm nav">
+    <div className="nav">
       <Nav_top/>
       <Nav_left/>
       <Report_bug_modal/>
@@ -84,13 +75,11 @@ const Old_modals = ()=>(
 const Nav_left = ()=>(
     <div className="nav_left">
       <div className="menu">
-        {sections.map(s=>(
-          <Nav_link
-            to={'/'+s.name}
-            key={s.name}
-            name={s.name}
-            label={s.title}/>
-        ))}
+        <Nav_link to="/overview" name="overview" label="Overview"/>
+        <Nav_link to="/howto" name="howto" label="Instructions"/>
+        <Nav_link to="/proxy_tester" name="proxy_tester" label="Proxy tester"/>
+        <Nav_link to="/logs" name="logs" label="Logs"/>
+        <Nav_link to="/config" name="config" label="Manual configuration"/>
       </div>
       <div className="menu_filler"/>
       <Footer/>
@@ -125,7 +114,7 @@ class Nav_top extends Pure_component {
     render(){
         const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
         return (
-            <div className="lpm nav_top">
+            <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
                 <div><Logo/></div>
               </Tooltip>

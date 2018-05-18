@@ -48,7 +48,7 @@ class Index extends Pure_component {
     }
     render(){
         return (
-            <div className="lpm report_bug">
+            <div className="report_bug">
               <Loader show={this.state.sending}/>
               <Modal title="Report a bug" id="report_bug_modal"
                 ok_btn_title="Report"

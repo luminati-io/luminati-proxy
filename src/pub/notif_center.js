@@ -81,7 +81,7 @@ class Notif_center extends Pure_component {
         return (
             <div className="notif">
               <Modal_portal>
-                <div className="lpm notif_modal">
+                <div className="notif_modal">
                   <Modal id="notif_modal" title="Messages:"
                     no_cancel_btn>
                     <div className="notifs">

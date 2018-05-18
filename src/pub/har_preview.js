@@ -166,7 +166,7 @@ const Header_pair = ({name, value})=>{
 const Status_value = ({value})=>{
     const green = /2../.test(value);
     const yellow = /3../.test(value);
-    const red = !(green||yellow);
+    const red = /4|5../.test(value);
     const classes = classnames('small_icon', 'status', {
         green, yellow, red});
     return (

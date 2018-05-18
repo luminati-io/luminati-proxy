@@ -21,7 +21,7 @@ class Overview extends Pure_component {
         const title = master_port ?
             `Overview of multiplied proxy port - ${master_port}` : 'Overview';
         return (
-            <div className="overview_page lpm">
+            <div className="overview_page">
               <Upgrade/>
               <div className="proxies nav_header">
                 <h3>{title}</h3>

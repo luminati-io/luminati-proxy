@@ -9,7 +9,7 @@ const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
 const No_proxies = ()=>(
     <div>
       <Add_proxy/>
-      <div className="lpm no_proxies">
+      <div className="no_proxies">
         <button onClick={open_modal}
           className="btn btn_lpm btn_lpm_big btn_add_port">
           Start

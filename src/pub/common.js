@@ -10,6 +10,7 @@ import setdb from 'hutil/util/setdb';
 import EventEmitter from 'events';
 import {If} from '/www/util/pub/react.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import {Typeahead} from 'react-bootstrap-typeahead';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -219,6 +220,65 @@ export const Select = props=>{
         </select>
     );
 };
+
+const Double_number = props=>{
+    const vals = (''+props.val).split(':');
+    const update = (start, end)=>{
+        props.on_change_wrapper([start||0, end].join(':')); };
+    return (
+        <span className="double_field">
+          <Input {...props} val={vals[0]||''} id={props.id+'_start'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(val, vals[1])}/>
+          <span className="devider">:</span>
+          <Input {...props} val={vals[1]||''} id={props.id+'_end'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(vals[0], val)}/>
+        </span>
+    );
+};
+
+const Typeahead_wrapper = props=>(
+    <Typeahead options={props.data} maxResults={10}
+      minLength={1} disabled={props.disabled} selectHintOnEnter
+      onChange={props.on_change_wrapper} selected={props.val}/>
+);
+
+export const Form_controller = props=>{
+    const type = props.type;
+    if (type=='select')
+        return <Select {...props}/>;
+    else if (type=='double_number')
+        return <Double_number {...props}/>;
+    else if (type=='typeahead')
+        return <Typeahead_wrapper {...props}/>;
+    else if (type=='textarea')
+        return <Textarea {...props}/>;
+    return <Input {...props}/>;
+};
+
+export const Note = props=>(
+    <div className="note">
+      <span>{props.children}</span>
+    </div>
+);
+
+export const Labeled_controller = ({label, tooltip, disabled, note, sufix,
+    ...props})=>
+(
+    <div className={classnames('field_row', {disabled, note})}>
+      <div className="desc">
+        <Tooltip title={tooltip}>{label}</Tooltip>
+      </div>
+      <div className="field">
+        <div className="inline_field">
+          <Form_controller disabled={disabled} {...props}/>
+          {sufix && <span className="sufix">{sufix}</span>}
+        </div>
+        {note && <Note>{note}</Note>}
+      </div>
+    </div>
+);
 
 export const Input = props=>{
     const update = val=>{

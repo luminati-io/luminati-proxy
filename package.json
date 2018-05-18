@@ -172,14 +172,13 @@
       "bin/pub/img/checker.png",
       "bin/pub/img/check_radio.svg",
       "bin/pub/img/columns.svg",
+      "bin/pub/img/config.svg",
       "bin/pub/img/country.png",
       "bin/pub/img/create.svg",
       "bin/pub/img/c_download.svg",
       "bin/pub/img/c_download_active.svg",
       "bin/pub/img/c_edit.svg",
       "bin/pub/img/c_edit_active.svg",
-      "bin/pub/img/c_import.svg",
-      "bin/pub/img/c_import_active.svg",
       "bin/pub/img/debug.svg",
       "bin/pub/img/delete.svg",
       "bin/pub/img/down.svg",
@@ -314,12 +313,13 @@
       "src/pub/proxy_tester.js",
       "src/pub/report_bug.js",
       "src/pub/schema.js",
+      "src/pub/settings.js",
       "src/pub/stats.js",
       "src/pub/util.js",
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "0a2e10ee98c6c4df01c99760262d7d8c"
+    "md5": "64f9a5abf5080ec3afae963706ee5cad"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -360,5 +360,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.95.899"
+  "version": "1.96.18"
 }
