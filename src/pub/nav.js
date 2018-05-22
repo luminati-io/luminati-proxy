@@ -79,6 +79,8 @@ const Nav_left = ()=>(
         <Nav_link to="/howto" name="howto" label="Instructions"/>
         <Nav_link to="/proxy_tester" name="proxy_tester" label="Proxy tester"/>
         <Nav_link to="/logs" name="logs" label="Logs"/>
+        <Nav_link to="/settings" name="general_config"
+          label="General settings"/>
         <Nav_link to="/config" name="config" label="Manual configuration"/>
       </div>
       <div className="menu_filler"/>

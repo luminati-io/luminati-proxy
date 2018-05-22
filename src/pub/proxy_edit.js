@@ -193,6 +193,8 @@ const Index = withRouter(class Index extends Pure_component {
         const plan = details&&details.plans[details.plans.length-1]||{};
         if (field_name=='vip')
             return !!plan.vip;
+        if (field_name=='country'&&plan.ip_alloc_preset=='shared_block')
+            return true;
         if (field_name=='country'&&(plan.type=='static'||
             ['domain', 'domain_p'].includes(plan.vips_type)))
         {
@@ -399,7 +401,6 @@ const Index = withRouter(class Index extends Pure_component {
                 this.state.defaults[attr] : save_form[attr];
         };
         save_form.zone = save_form.zone||this.state.consts.proxy.zone.def;
-        save_form.history = effective('history');
         save_form.ssl = effective('ssl');
         save_form.max_requests = effective('max_requests');
         save_form.session_duration = effective('session_duration');
@@ -450,21 +451,7 @@ const Index = withRouter(class Index extends Pure_component {
         return curr_plan;
     };
     render(){
-        let Main_window;
         const tab = this.state.tab;
-        switch (this.state.tab)
-        {
-        case 'target': Main_window = Targeting; break;
-        case 'speed': Main_window = Speed; break;
-        case 'rules': Main_window = Rules; break;
-        case 'rotation': Main_window = Rotation; break;
-        case 'debug': Main_window = Debug; break;
-        case 'general': Main_window = General; break;
-        case 'logs':
-        default: Main_window = Har_viewer;
-        }
-        if (!this.state.consts||!this.state.defaults||!this.state.proxies)
-            Main_window = ()=>null;
         const support = presets && this.state.form.preset &&
             presets[this.state.form.preset].support||{};
         let zones = this.state.consts&&
@@ -473,6 +460,9 @@ const Index = withRouter(class Index extends Pure_component {
             const plan = z.plans && z.plans.slice(-1)[0] || {};
             return !plan.archive && !plan.disable;
         });
+        let sett = setdb.get('head.settings')||{}, def;
+        if (zones[0] && !zones[0].value && (def = sett.zone||zones[0].key))
+            zones[0] = {key: `Default (${def})`, value: ''};
         const default_zone=this.state.consts&&
             this.state.consts.proxy.zone.def;
         const curr_plan = this.state.consts&&this.get_curr_plan();
@@ -482,6 +472,8 @@ const Index = withRouter(class Index extends Pure_component {
         else if (curr_plan&&!!curr_plan.vip)
             type = 'vips';
         const port = this.props.match.params.port;
+        const show_main_window = this.state.consts&&this.state.defaults&&
+            this.state.proxies;
         return (
             <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
@@ -502,6 +494,8 @@ const Index = withRouter(class Index extends Pure_component {
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
                 <Main_window
+                  show={show_main_window}
+                  tab={tab}
                   port={port}
                   proxy={this.state.consts&&this.state.consts.proxy}
                   defaults={this.state.defaults}
@@ -520,6 +514,24 @@ const Index = withRouter(class Index extends Pure_component {
         );
     }
 });
+
+const Main_window = ({show, tab, ...props})=>{
+    if (!show)
+        return null;
+    let Comp;
+    switch (tab)
+    {
+    case 'target': Comp = Targeting; break;
+    case 'speed': Comp = Speed; break;
+    case 'rules': Comp = Rules; break;
+    case 'rotation': Comp = Rotation; break;
+    case 'debug': Comp = Debug; break;
+    case 'general': Comp = General; break;
+    case 'logs':
+    default: Comp = Har_viewer;
+    }
+    return <Comp {...props}/>;
+};
 
 class Nav extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -793,8 +805,14 @@ class Targeting extends Pure_component {
         ];
     }
     allowed_countries(){
-        const res = this.state.locations.countries.map(c=>
+        let res = this.state.locations.countries.map(c=>
             ({key: c.country_name, value: c.country_id}));
+        const curr_plan = this.props.get_curr_plan();
+        if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
+        {
+            res = res.filter(r=>
+                this.state.locations.shared_countries.includes(r.value));
+        }
         return [this.def_value, ...res];
     }
     country_changed(){
@@ -1347,7 +1365,6 @@ const Rotation = provider({tab_id: 'rotation'})(props=>{
 
 const Debug = provider({tab_id: 'debug'})(props=>(
     <div>
-      <Config type="select" id="history" data={props.default_opt('history')}/>
       <Config type="select" id="ssl" data={props.default_opt('ssl')}/>
       <Config type="select" id="log" data={props.proxy.log.values}/>
       <Config type="select" id="debug" data={props.proxy.debug.values}/>

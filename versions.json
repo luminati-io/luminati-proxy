@@ -1,0 +1,3116 @@
+[
+    {
+        "ver": "1.96.336",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added global settings page"
+            },
+            {
+                "type": "bug",
+                "text": "fixed countries list for global shared zones"
+            }
+        ]
+    },
+    {
+        "ver": "1.96.18",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "lpm_install.sh: fixed issue with PATH in sudo"
+            }
+        ]
+    },
+    {
+        "ver": "1.95.899",
+        "type": "stable",
+        "changes": []
+    },
+    {
+        "ver": "1.95.360",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed dialog on port conflict in electron app"
+            },
+            {
+                "type": "bug",
+                "text": "no version in exe name (for resident tasks)"
+            },
+            {
+                "type": "star",
+                "text": "HAR viewer improvements"
+            },
+            {
+                "type": "bug",
+                "text": "lpm_install.sh: fixed npm downgrade issue"
+            },
+            {
+                "type": "bug",
+                "text": "lpm_install.sh: fixed build_tools installation on non-debian systems"
+            }
+        ]
+    },
+    {
+        "ver": "1.94.794",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed debug log info"
+            },
+            {
+                "type": "bug",
+                "text": "fixed targeting for certain cities"
+            }
+        ]
+    },
+    {
+        "ver": "1.94.520",
+        "type": "stable",
+        "changes": []
+    },
+    {
+        "ver": "1.94.415",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "HAR viewer improvements"
+            }
+        ]
+    },
+    {
+        "ver": "1.93.910",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added support for HAR viewer in Firefox"
+            }
+        ]
+    },
+    {
+        "ver": "1.93.813",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added new HAR viewer"
+            },
+            {
+                "type": "bug",
+                "text": "fixed setting max requests"
+            }
+        ]
+    },
+    {
+        "ver": "1.93.58",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed memory leak introduced in latest versions"
+            },
+            {
+                "type": "star: Added request_stats_limit flag to limit usage stats saved to sqite db (this will not affect ports with history",
+                "text": "true)"
+            }
+        ]
+    },
+    {
+        "ver": "1.92.822",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix saving RegExp in proxy configuration"
+            }
+        ]
+    },
+    {
+        "ver": "1.92.281",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            },
+            {
+                "type": "star",
+                "text": "compability with broken config files"
+            }
+        ]
+    },
+    {
+        "ver": "1.92.212",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix port conflicts on starting the process"
+            }
+        ]
+    },
+    {
+        "ver": "1.92.43",
+        "changes": [
+            {
+                "type": "star",
+                "text": "improved performance of starting the process"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            }
+        ]
+    },
+    {
+        "ver": "1.91.108",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            },
+            {
+                "type": "bug",
+                "text": "bug fixes"
+            }
+        ]
+    },
+    {
+        "ver": "1.90.563",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            },
+            {
+                "type": "bug",
+                "text": "bug fixes"
+            }
+        ]
+    },
+    {
+        "ver": "1.90.546",
+        "changes": []
+    },
+    {
+        "ver": "1.90.506",
+        "changes": []
+    },
+    {
+        "ver": "1.90.377",
+        "changes": []
+    },
+    {
+        "ver": "1.89.371",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "new logs viewer"
+            },
+            {
+                "type": "bug",
+                "text": "fixed bugs related to socks5"
+            },
+            {
+                "type": "bug",
+                "text": "fixed reverse resolve bug"
+            },
+            {
+                "type": "star",
+                "text": "daemon mode improvements"
+            }
+        ]
+    },
+    {
+        "ver": "1.88.679",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "add external proxies support"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            },
+            {
+                "type": "sparkles",
+                "text": "install script improvements"
+            },
+            {
+                "type": "star",
+                "text": "improved logging"
+            },
+            {
+                "type": "star",
+                "text": "allow tcp requests to 43 (whois) via socks and connect (only on zones with special permission)"
+            },
+            {
+                "type": "bug",
+                "text": "fixed proxy error handing and provide meaningful proxy errors"
+            },
+            {
+                "type": "bug",
+                "text": "fixed socks connection establish error handling"
+            },
+            {
+                "type": "bug",
+                "text": "fix https request to ip (will not be ssl analyzed)"
+            }
+        ]
+    },
+    {
+        "ver": "1.88.182",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed overload error on osx"
+            },
+            {
+                "type": "sparkles",
+                "text": "ui improvments"
+            }
+        ]
+    },
+    {
+        "ver": "1.87.565",
+        "changes": []
+    },
+    {
+        "ver": "1.86.979",
+        "changes": [
+            {
+                "type": "star",
+                "text": "view response body in recent request log viewer"
+            },
+            {
+                "type": "sparkles",
+                "text": "stability fixes"
+            }
+        ]
+    },
+    {
+        "ver": "1.86.25",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improved upgrading on windwos binary"
+            },
+            {
+                "type": "bug",
+                "text": "allow google authentication token to be refreshed"
+            }
+        ]
+    },
+    {
+        "ver": "1.85.660",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "multiple performance improvements in request pipeline"
+            }
+        ]
+    },
+    {
+        "ver": "1.85.98",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improved recent stats to show only user generated requests"
+            },
+            {
+                "type": "bug",
+                "text": "socks5 to work with multiply ports"
+            }
+        ]
+    },
+    {
+        "ver": "1.84.634",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed recent stats bandwidth calculations"
+            },
+            {
+                "type": "sparkles",
+                "text": "added links to messages in notification center"
+            }
+        ]
+    },
+    {
+        "ver": "1.84.166",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added report a bug to easily get support"
+            }
+        ]
+    },
+    {
+        "ver": "1.84.22",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "optimization improvments for linux/mac"
+            }
+        ]
+    },
+    {
+        "ver": "1.83.446",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added banip api endpoint"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI and bug fixing"
+            }
+        ]
+    },
+    {
+        "ver": "1.81.930",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improved configuration tab and added download option"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI and bug fixing"
+            }
+        ]
+    },
+    {
+        "ver": "1.81.318",
+        "changes": [
+            {
+                "type": "star",
+                "text": "add min request time as rule trigger type"
+            },
+            {
+                "type": "sparkles",
+                "text": "improved multiply feature"
+            }
+        ]
+    },
+    {
+        "ver": "1.80.942",
+        "changes": [
+            {
+                "type": "star",
+                "text": "adding HAR view for request history"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI and bug fixing"
+            }
+        ]
+    },
+    {
+        "ver": "1.80.565",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix crash when enabling history"
+            },
+            {
+                "type": "sparkles",
+                "text": "improved view of request history"
+            },
+            {
+                "type": "sparkles",
+                "text": "polishing UI elements"
+            }
+        ]
+    },
+    {
+        "ver": "1.80.111",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improved bash installation script on Mac"
+            }
+        ]
+    },
+    {
+        "ver": "1.79.834",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed exe installer"
+            }
+        ]
+    },
+    {
+        "ver": "1.79.778",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "proxy port with default zone"
+            },
+            {
+                "type": "star",
+                "text": "added 'carier' selector for mobile/residential"
+            },
+            {
+                "type": "star",
+                "text": "number of requests per port"
+            },
+            {
+                "type": "star",
+                "text": "bandwidth calculation per port"
+            }
+        ]
+    },
+    {
+        "ver": "1.79.346",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed socks5 for Firefox browser"
+            },
+            {
+                "type": "sparkles",
+                "text": "ui improvments"
+            }
+        ]
+    },
+    {
+        "ver": "1.78.485",
+        "changes": [
+            {
+                "type": "star",
+                "text": "onboarding flow for easier setup"
+            },
+            {
+                "type": "sparkles",
+                "text": "multiple ui improvments"
+            }
+        ]
+    },
+    {
+        "ver": "1.77.943",
+        "changes": [
+            {
+                "type": "star",
+                "text": "rule trigger 'max request time'"
+            },
+            {
+                "type": "star",
+                "text": "notification center"
+            },
+            {
+                "type": "bug",
+                "text": "add subjectAltName on certificate generation"
+            }
+        ]
+    },
+    {
+        "ver": "1.77.506",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added proxy tester tool in main nav bar"
+            },
+            {
+                "type": "sparkles",
+                "text": "improved performance of edit and save proxies"
+            },
+            {
+                "type": "bug",
+                "text": "fixed request authorization feature"
+            }
+        ]
+    },
+    {
+        "ver": "1.76.851",
+        "changes": [
+            {
+                "type": "star",
+                "text": "add file log transport"
+            },
+            {
+                "type": "bug",
+                "text": "fix google bypass on selective dc zones"
+            },
+            {
+                "type": "bug",
+                "text": "fix whitelist IP to include localhost"
+            },
+            {
+                "type": "sparkles",
+                "text": "improvments in UI on proxies page and rules"
+            }
+        ]
+    },
+    {
+        "ver": "1.76.363",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix multiply and duplicate port conflict"
+            },
+            {
+                "type": "bug",
+                "text": "fix reserved session timeout"
+            },
+            {
+                "type": "sparkles",
+                "text": "peformance improvments and UI for proxies page"
+            }
+        ]
+    },
+    {
+        "ver": "1.75.912",
+        "changes": [
+            {
+                "type": "star",
+                "text": "html body as a rule trigger"
+            },
+            {
+                "type": "star",
+                "text": "'ban ip' as a rule action"
+            },
+            {
+                "type": "star",
+                "text": "'reserved IP pool' as a rule action"
+            }
+        ]
+    },
+    {
+        "ver": "1.75.443",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix session_duration 0 to disable session duration"
+            },
+            {
+                "type": "star",
+                "text": "'waterfall' rule action to retry using different port"
+            }
+        ]
+    },
+    {
+        "ver": "1.75.355",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added password and port fields to edit page"
+            },
+            {
+                "type": "star",
+                "text": "instant proxy duplication"
+            },
+            {
+                "type": "bug",
+                "text": "fix selection of boolean values in edit page"
+            }
+        ]
+    },
+    {
+        "ver": "1.74.978",
+        "changes": [
+            {
+                "type": "star",
+                "text": "remove git dependency"
+            },
+            {
+                "type": "star",
+                "text": "reserved session"
+            },
+            {
+                "type": "star",
+                "text": "new edit page design structure"
+            },
+            {
+                "type": "star",
+                "text": "new add proxy modal design"
+            }
+        ]
+    },
+    {
+        "ver": "1.74.626",
+        "changes": [
+            {
+                "type": "star",
+                "text": "add experimental cluster mode under '--cluster' flag in cmd"
+            },
+            {
+                "type": "star",
+                "text": "add race request option"
+            },
+            {
+                "type": "star",
+                "text": "add new rule action 'retry port'"
+            },
+            {
+                "type": "bug",
+                "text": "fix selection of mobile peers"
+            }
+        ]
+    },
+    {
+        "ver": "1.72.729",
+        "changes": []
+    },
+    {
+        "ver": "1.72.569",
+        "changes": [
+            {
+                "type": "star",
+                "text": "improve log performance"
+            },
+            {
+                "type": "star",
+                "text": "fix exe link on windows"
+            }
+        ]
+    },
+    {
+        "ver": "1.72.187",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added install script for Linux/MacOs installs"
+            },
+            {
+                "type": "star",
+                "text": "added option to create many ports from allocated ips"
+            }
+        ]
+    },
+    {
+        "ver": "1.71.813",
+        "changes": [
+            {
+                "type": "star",
+                "text": "published to npm"
+            },
+            {
+                "type": "star",
+                "text": "added 'how to use' page"
+            },
+            {
+                "type": "star",
+                "text": "improved onboarding flow"
+            }
+        ]
+    },
+    {
+        "ver": "1.70.851",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed upagrade issue from previous version"
+            }
+        ]
+    },
+    {
+        "ver": "1.70.725",
+        "changes": [
+            {
+                "type": "star",
+                "text": "new navbar layout"
+            },
+            {
+                "type": "star",
+                "text": "upgradable .exe version"
+            },
+            {
+                "type": "star",
+                "text": "improved ssl sniffing performance"
+            }
+        ]
+    },
+    {
+        "ver": "1.70.323",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "bug fixes and ui improvments"
+            }
+        ]
+    },
+    {
+        "ver": "1.70.145",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added option to view vip IP pool"
+            },
+            {
+                "type": "star",
+                "text": "added option to select specific vip per port"
+            },
+            {
+                "type": "bug",
+                "text": "fixed login bug"
+            },
+            {
+                "type": "bug",
+                "text": "fixed debug log info"
+            }
+        ]
+    },
+    {
+        "ver": "1.69.565",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added new onboarding flow"
+            },
+            {
+                "type": "star",
+                "text": "added rotating User agent and cookies"
+            },
+            {
+                "type": "bug",
+                "text": "fixed multiple bugs and UI issues"
+            }
+        ]
+    },
+    {
+        "ver": "1.68.880",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added export proxies list as CSV file"
+            },
+            {
+                "type": "bug",
+                "text": "fixed x-lpm-session header"
+            }
+        ]
+    },
+    {
+        "ver": "1.68.476",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added dynamic presets"
+            },
+            {
+                "type": "star",
+                "text": "added timeout option to improve request performance"
+            },
+            {
+                "type": "bug",
+                "text": "ui and bug fixing"
+            }
+        ]
+    },
+    {
+        "ver": "1.65.923",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added success rate counting"
+            },
+            {
+                "type": "bug",
+                "text": "multiple ui and bug fixing"
+            }
+        ]
+    },
+    {
+        "ver": "1.64.509",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed city selector"
+            }
+        ]
+    },
+    {
+        "ver": "1.64.275",
+        "changes": [
+            {
+                "type": "star",
+                "text": "improve proxy list ui"
+            }
+        ]
+    },
+    {
+        "ver": "1.63.154",
+        "changes": [
+            {
+                "type": "star",
+                "text": "improve stats ui"
+            },
+            {
+                "type": "star",
+                "text": "improve quick-start wizard ui"
+            }
+        ]
+    },
+    {
+        "ver": "1.61.888",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix rule editing in proxy form when rules are undefined"
+            }
+        ]
+    },
+    {
+        "ver": "1.61.772",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix proxy form when rules are set"
+            },
+            {
+                "type": "bug",
+                "text": "fix rule options not remembered in form"
+            },
+            {
+                "type": "star",
+                "text": "add reset rules button in proxy form"
+            },
+            {
+                "type": "star",
+                "text": "add rules form analytics"
+            },
+            {
+                "type": "bug",
+                "text": "fix analytics for input fields"
+            },
+            {
+                "type": "bug",
+                "text": "fix upgrade popup not firing in electron app"
+            }
+        ]
+    },
+    {
+        "ver": "1.61.507",
+        "changes": [
+            {
+                "type": "star",
+                "text": "release status code rule"
+            }
+        ]
+    },
+    {
+        "ver": "1.61.96",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix 1mb limit on proxy configuration size"
+            },
+            {
+                "type": "bug",
+                "text": "fix broken save button in proxy form when rules present"
+            },
+            {
+                "type": "star",
+                "text": "add google analytics events on proxy edit modal"
+            },
+            {
+                "type": "star",
+                "text": "upgrade to new hutil version (fixes port handling in url globs)"
+            },
+            {
+                "type": "star",
+                "text": "allow setting rules per port"
+            }
+        ]
+    },
+    {
+        "ver": "1.59.973",
+        "changes": [
+            {
+                "type": "star",
+                "text": "remove internal browser and show terminal with log in exe"
+            },
+            {
+                "type": "star",
+                "text": "add disable_color flag to disable colors in terminal"
+            }
+        ]
+    },
+    {
+        "ver": "1.58.884",
+        "changes": [
+            {
+                "type": "star",
+                "text": "modify UI"
+            },
+            {
+                "type": "bug",
+                "text": "fix logging bug"
+            }
+        ]
+    },
+    {
+        "ver": "1.58.632",
+        "changes": [
+            {
+                "type": "star",
+                "text": "modify UI"
+            }
+        ]
+    },
+    {
+        "ver": "1.57.967",
+        "changes": [
+            {
+                "type": "star",
+                "text": "add file logging"
+            }
+        ]
+    },
+    {
+        "ver": "1.57.488",
+        "changes": [
+            {
+                "type": "star",
+                "text": "support custom urls for proxy status check"
+            }
+        ]
+    },
+    {
+        "ver": "1.57.189",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix allocated ips"
+            }
+        ]
+    },
+    {
+        "ver": "1.56.937",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix session handling with proxy-authorization header"
+            },
+            {
+                "type": "star",
+                "text": "add x-lpm-session header support"
+            }
+        ]
+    },
+    {
+        "ver": "1.56.648",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix UI create proxy"
+            },
+            {
+                "type": "star",
+                "text": "added certificate setup instructions"
+            }
+        ]
+    },
+    {
+        "ver": "1.56.452",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix typeerror when using rules"
+            }
+        ]
+    },
+    {
+        "ver": "1.55.635",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added back button in stats"
+            },
+            {
+                "type": "star",
+                "text": "windows binary file show dialog on port conflicts"
+            }
+        ]
+    },
+    {
+        "ver": "1.55.53",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed high memory usage on high number of concurrent requests"
+            }
+        ]
+    },
+    {
+        "ver": "1.54.526",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added reset stats button"
+            },
+            {
+                "type": "bug",
+                "text": "fixed memory leak in stats"
+            }
+        ]
+    },
+    {
+        "ver": "1.53.605",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix UI css"
+            }
+        ]
+    },
+    {
+        "ver": "1.52.848",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "add stats feature"
+            }
+        ]
+    },
+    {
+        "ver": "1.52.425",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix google login"
+            }
+        ]
+    },
+    {
+        "ver": "1.52.369",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix upgrade modal"
+            }
+        ]
+    },
+    {
+        "ver": "1.52.241",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix allocated ips selection"
+            }
+        ]
+    },
+    {
+        "ver": "1.52.1",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix login for renamed users"
+            },
+            {
+                "type": "star",
+                "text": "limit minimum values to numeric input fields"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.20",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added support for ip whitelist on each port"
+            },
+            {
+                "type": "star",
+                "text": "added analytics events on buttons and proxies"
+            },
+            {
+                "type": "bug",
+                "text": "fix reverse lookup for http"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.19",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added firewall ports tester in tools"
+            },
+            {
+                "type": "bug",
+                "text": "fix login problem for root users"
+            },
+            {
+                "type": "bug",
+                "text": "fix --iface parameter to accept ip addresses as well as interface names"
+            },
+            {
+                "type": "bug",
+                "text": "fix login for renamed customers"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.18",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added \"--timeout\" parameter"
+            },
+            {
+                "type": "bug",
+                "text": "fix login problem with some users"
+            },
+            {
+                "type": "sparkles",
+                "text": "speed and stability improvements"
+            },
+            {
+                "type": "star",
+                "text": "sessions are initialized on first request"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.17",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix keep default zone if enabled/available"
+            },
+            {
+                "type": "sparkles",
+                "text": "fix correct config proxy zones"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.16",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix memory leak"
+            },
+            {
+                "type": "bug",
+                "text": "fix dropin proxy select available zone, static by default"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.15",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix saving configuration from UI"
+            },
+            {
+                "type": "bug",
+                "text": "fix port conflicts crash"
+            },
+            {
+                "type": "sparkles",
+                "text": "stability improvements"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.14",
+        "changes": [
+            {
+                "type": "bug: fix \"port\"",
+                "text": "\"auto\" when no proxies are running"
+            },
+            {
+                "type": "bug",
+                "text": "fix permission \"asn\" check"
+            },
+            {
+                "type": "sparkles",
+                "text": "stability improvements"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.13",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix high cpu usage after multple UI reloads"
+            },
+            {
+                "type": "star: added \"port\"",
+                "text": "\"auto\" option support to POST /api/proxies - auto selects next available port"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.12",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "fix manager crash on socks ECONNREFUSED ECONNRESET errors"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.11",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "further reduce load on lumtest"
+            },
+            {
+                "type": "sparkles",
+                "text": "reduce rate of /cp/lum_local_conf requests"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.10",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "reduce rate of lumtest requests"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.9",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "reduce rate of proxy check_credentials requests"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.8",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix infinite requests when luminati.io credentials are invalid"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.7",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added --cookie, --no-cookie options"
+            },
+            {
+                "type": "bug",
+                "text": "fix option to set Pool size from allocated IPs"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.6",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added smart rules scripting for zero-fail-rate (alpha)"
+            },
+            {
+                "type": "bug",
+                "text": "fixed Google account login"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.5",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed fatal exception when zone has no passwords"
+            },
+            {
+                "type": "bug",
+                "text": "fixed inability to make POST requests with ssl analyzing"
+            },
+            {
+                "type": "bug",
+                "text": "resolved build failures on node v4"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.4",
+        "changes": [
+            {
+                "type": "star",
+                "text": "update default zone passwords from luminati.io"
+            },
+            {
+                "type": "sparkles",
+                "text": "gather better stack traces during crashes"
+            },
+            {
+                "type": "boom",
+                "text": "force login when luminati.io credentials are out of date"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.2",
+        "changes": [
+            {
+                "type": "star",
+                "text": "zone information is now always up-to-date with luminati.io"
+            },
+            {
+                "type": "bug",
+                "text": "whitelist, recent_ips, and stats no longer show empty lists"
+            },
+            {
+                "type": "bug",
+                "text": "zone password changes no longer old passwords in config files"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.1",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "removed spurious SOCKS error when using dropin proxy"
+            },
+            {
+                "type": "bug",
+                "text": "fixed errors encountered when giving password on the command line"
+            },
+            {
+                "type": "bug",
+                "text": "fixed compile errors on Node versions < 6"
+            }
+        ]
+    },
+    {
+        "ver": "0.10.0",
+        "changes": [
+            {
+                "type": "star",
+                "text": "made --dropin flag on by default"
+            },
+            {
+                "type": "sparkles",
+                "text": "apply proxy defaults late to avoid polluting configs with defaults"
+            },
+            {
+                "type": "boom",
+                "text": "report exception message when prereq check fails"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.75",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "avoid login error when customer=undefined"
+            },
+            {
+                "type": "bug",
+                "text": "enable login to work correctly when using --no-config"
+            },
+            {
+                "type": "bug",
+                "text": "ensure that proxies are correctly initialized in put/post"
+            },
+            {
+                "type": "boom",
+                "text": "remove inaccurate/confusing parameter reporting in UI"
+            },
+            {
+                "type": "sparkles",
+                "text": "slow down rate of requests to lumtest.com to reduce load"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.74",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed issue with automating upgrading"
+            },
+            {
+                "type": "star",
+                "text": "made automatically saved config files shorter"
+            },
+            {
+                "type": "bug",
+                "text": "removed login issues when using --password on the command line"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.73",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed --dropin to work correctly when credentials given on command line"
+            },
+            {
+                "type": "star",
+                "text": "made handling of command-line arguments work reliably"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.72",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed event listener leak"
+            },
+            {
+                "type": "bug",
+                "text": "fixed usage of stringify in error reports"
+            },
+            {
+                "type": "star",
+                "text": "added additional analytics events"
+            },
+            {
+                "type": "star",
+                "text": "report location of config file during startup"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.69",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "added analytics events for understanding crashes"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.67",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "update API doc"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.66",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix API usage"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.65",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix startup on win"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.64",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added feature to set pool from allocated IPs"
+            },
+            {
+                "type": "star",
+                "text": "added feature to save history in external DB"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.63",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "tests failed with Node 5"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.62",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "move --resolve (manager level) to --reverse_lookup_file (proxy level)"
+            },
+            {
+                "type": "sparkles",
+                "text": "added --reverse_lookup_dns and --reverse_lookup_values options"
+            },
+            {
+                "type": "sparkles",
+                "text": "show allocated IPs for static plans"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.61",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "update REST api docs"
+            },
+            {
+                "type": "sparkles",
+                "text": "improve app stability"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.60",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "SOCKS now works with sticky_ip"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.59",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "use es6-shim"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.58",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "use indexOf instead of include to support old browsers"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.57",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "More correct usage message for docker users"
+            },
+            {
+                "type": "sparkles",
+                "text": "Add warning for proxy with history and no debug info"
+            },
+            {
+                "type": "bug",
+                "text": "History now show all pages"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improve presets description, and make it more clear"
+            },
+            {
+                "type": "star",
+                "text": "Show session info for single session proxies"
+            },
+            {
+                "type": "star",
+                "text": "Random single session now support refresh_sessions, max_requests & session_duration"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.56",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improve app stability"
+            },
+            {
+                "type": "bug",
+                "text": "Remove empty country from the UI"
+            },
+            {
+                "type": "bug",
+                "text": "Allow editing of proxies with socks and multiply properly using dialog"
+            },
+            {
+                "type": "sparkles",
+                "text": "Add ability to dismiss upgrade (you can do upgrade from dropdown menu)"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.55",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Explicit any country was not working properly"
+            },
+            {
+                "type": "bug",
+                "text": "Add countries that have no cities/states into UI"
+            },
+            {
+                "type": "sparkles",
+                "text": "Warn when keep_alive value is outside effective range 0-60"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added alert for SSL connection to IP URLs"
+            },
+            {
+                "type": "sparkles",
+                "text": "Handle 404 URLs"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.54",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Allow setting max requests from the UI"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.53",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Allow windows and other OS to handle the large CSV file properly"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.52",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix bug in loading of countries to UI"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.51",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "simplify handling of cities options in the UI"
+            },
+            {
+                "type": "bug",
+                "text": "Handle city names with spaces properly"
+            },
+            {
+                "type": "bug",
+                "text": "Treat zones with no plans proprly"
+            },
+            {
+                "type": "sparkles",
+                "text": "presets now show the values they set as disabled"
+            },
+            {
+                "type": "boom",
+                "text": "Clean up unused endpoint (/api/block)"
+            },
+            {
+                "type": "bug",
+                "text": "Treat resolve false as no resolve file and not as auto resolve"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.50",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Support short_username for shorter credentials headers"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.49",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improve db handling"
+            },
+            {
+                "type": "sparkles",
+                "text": "Remove unnecesary warnings"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.48",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improve proxy settings UI by presets"
+            },
+            {
+                "type": "sparkles",
+                "text": "show sticky sessions in the pool dialog"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improve session editing (in form and inline)"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.47",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Detect config errors when saving config from UI"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI improvements"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.46",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Allow defining multiple identical ports using the multiply property"
+            },
+            {
+                "type": "sparkles",
+                "text": "Link to FAX from inside the app"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.45",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Obtain session info using protocol defined by --secure_proxy"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.44",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Proxy field descriptions displayed wrong"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.43",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Upgrade notification will display correctly"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.42",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "proxy API prevent port conflicts when saving proxy"
+            },
+            {
+                "type": "boom",
+                "text": "API changes move POST /delete to DELETE /proxies"
+            },
+            {
+                "type": "bug",
+                "text": "Upgrade message when no newer version is available"
+            },
+            {
+                "type": "sparkles",
+                "text": "Link to changelog in upgrade message"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.41",
+        "changes": [
+            {
+                "type": "star",
+                "text": "make keep_alive support single session"
+            },
+            {
+                "type": "sparkles",
+                "text": "get last version using cdn"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.40",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "make --session visible in UI and CLI"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.39",
+        "changes": [
+            {
+                "type": "star",
+                "text": "sticky_ip sessions now support keep_alive, max_requests and session_duration"
+            },
+            {
+                "type": "sparkles",
+                "text": "proxy inline form will prevent port conflicts when saving proxy"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.38",
+        "changes": [
+            {
+                "type": "star",
+                "text": "FAQ now contain REST api documentation"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.37",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "drop in mode proxy use sticky_ip sessions and not pool sessions"
+            },
+            {
+                "type": "bug",
+                "text": "do not show alerts for lumtest.com requests"
+            },
+            {
+                "type": "bug",
+                "text": "avoid crashing when there is a new host for collecting stats"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.36",
+        "changes": [
+            {
+                "type": "star",
+                "text": "refresh_sessions for sequential pools will only refresh the used session, and not all"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.35",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Proxy settings dialog will prevent port conflicts when saving proxy"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.34",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "refresh_sessions now refresh sticky_ip sessions properly"
+            },
+            {
+                "type": "sparkles",
+                "text": "export history to CSV"
+            },
+            {
+                "type": "star",
+                "text": "Reintroducing direct_include/direct_exclude"
+            },
+            {
+                "type": "sparkles",
+                "text": "use pagination in proxies"
+            },
+            {
+                "type": "sparkles",
+                "text": "use pagination in pool"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.32",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "show history details below instead of modal"
+            },
+            {
+                "type": "star",
+                "text": "support stopping a running daemon using --stop-daemon"
+            },
+            {
+                "type": "sparkles",
+                "text": "use pagination in history details"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.31",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Shuffle proxy hosts before using them, to spread traffic"
+            },
+            {
+                "type": "bug",
+                "text": "Avoid checking proper installation of optional dependencies"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.30",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Auto generate random seed for proxies, to avoid multiple instances share the same session"
+            },
+            {
+                "type": "star",
+                "text": "allow specifing seed for proxies to make them share the same IPs"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.29",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "use autocomplete for 'city' field in inline edit"
+            },
+            {
+                "type": "bug",
+                "text": "History can now be filtered by context"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.28",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "use autocomplete for 'city' field in proxy edit form"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.25",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "lock UI during upgrade"
+            },
+            {
+                "type": "sparkles",
+                "text": "use select for zone field in inline edit"
+            },
+            {
+                "type": "sparkles",
+                "text": "update tooltips"
+            },
+            {
+                "type": "bug",
+                "text": "show working URL for admin in case iface is used"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.24",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Maintain HTTP header order and casing"
+            },
+            {
+                "type": "sparkles",
+                "text": "move 'add' and 'duplicate' buttons on top of the table"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.23",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "prevent memory leak warning for large pool_size"
+            },
+            {
+                "type": "sparkles",
+                "text": "prevent edit field if zone has no permissions for it"
+            },
+            {
+                "type": "sparkles",
+                "text": "improve layout of proxies table"
+            },
+            {
+                "type": "sparkles",
+                "text": "do not show not relevant errors"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.22",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "register IP in zone whitelist during login"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.21",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "login/logout issues"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.20",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix cases with Google sign-in with non-configured proxies"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.19",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "show proxy status details in next line"
+            },
+            {
+                "type": "star",
+                "text": "history now includes all requests made by proxy-manager for that proxy"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.18",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "`--direct_include` and `--direct_exclude` options have been removed; use `--bypass_proxy` instead (was restored on version 0.9.33)"
+            },
+            {
+                "type": "sparkles",
+                "text": "Use a drop-down to select the State/Province/Region in the proxies table, instead of free form text"
+            },
+            {
+                "type": "bug",
+                "text": "fix bug in saving history setting in UI"
+            },
+            {
+                "type": "bug",
+                "text": "fix request alerts on headers"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.16",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "use HTML tooltip for proxy status icon"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.15",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "show proxy status details in popup"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.14",
+        "changes": [
+            {
+                "type": "star",
+                "text": "add X-Hola-Context header, that will not be passed over outside the manager, but will be added to the response and history"
+            },
+            {
+                "type": "sparkles",
+                "text": "improve checks for proxy saving"
+            },
+            {
+                "type": "sparkles",
+                "text": "visual changes for proxies table"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.13",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "handle gracefully old data table that do not exists"
+            },
+            {
+                "type": "sparkles",
+                "text": "delete zones from local DB after logout"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.12",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improve tests"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.11",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "visual changes for login screen"
+            },
+            {
+                "type": "bug",
+                "text": "fix freezes of /proxies page"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.10",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improve upgrade process"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.7",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix upgrade for Windows"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.6",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "remove experimental React version"
+            },
+            {
+                "type": "bug",
+                "text": "close HTTPS connection after \"Refresh session\" clicked to allow software to connect to new residential IP"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.5",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Maintain the letter casing of the header names"
+            },
+            {
+                "type": "star",
+                "text": "improve upgrade process"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.4",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Luminati Proxy Manager will now refuse to run on older versions of Node.js"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.3",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "delete credentials from config after logout"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.2",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Allow installation for node 4 & 5 to allow upgrades to continue to work"
+            }
+        ]
+    },
+    {
+        "ver": "0.9.1",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Dropping support for node 4 & 5, please upgrade to node 6 or above"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.38",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Use encoded creds instead of plain-text for Google OAuth login"
+            },
+            {
+                "type": "sparkles",
+                "text": "Move refresh and delete buttons to the top"
+            },
+            {
+                "type": "sparkles",
+                "text": "Update columns icon"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.37",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Avoid crush if proxies have been deleted, while request comes in"
+            },
+            {
+                "type": "sparkles",
+                "text": "check proxy before saving to config file"
+            },
+            {
+                "type": "boom",
+                "text": "Force login in order to perform management operations through the UI"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.36",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix 25 null_response now filter by domain as well"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.35",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "delete proxies after logout"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.34",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved proxy edit form"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.33",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "allow to select city w/o selected state"
+            },
+            {
+                "type": "boom",
+                "text": "delete credentials from config and stop proxies after log-out"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.32",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Replace text inputs for city and state by comboboxes"
+            },
+            {
+                "type": "sparkles",
+                "text": "Hide irrelevant fields"
+            },
+            {
+                "type": "star",
+                "text": "Proxy status UI and API"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.31",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Separate \"Default\" and \"Any\" options for country"
+            },
+            {
+                "type": "sparkles",
+                "text": "Hide pool dialog for proxies that have no pool"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.30",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved proxy edit form"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.29",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved stability and reduces memory"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.28",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improve email login"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.27",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added warning on default zone change"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.26",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Remove statistics"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.25",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improve tests"
+            },
+            {
+                "type": "sparkles",
+                "text": "improve SSL load time"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.24",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Google login to luminati"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.23",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "history bug fix"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.22",
+        "changes": [
+            {
+                "type": "star",
+                "text": "improved login message"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.21",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "drop-in proxy was changed to be disabled by default, and enabled only by the dropin cli argument or config value"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.20",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix pool_size 0 behavior and load proxy bug"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.19",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "you can now login with Luminati.io credentials"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.18",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Removed core-dump support, can still be used when installed on the machine independently"
+            },
+            {
+                "type": "boom",
+                "text": "Setting max_requests, keep_alive or session_duration no longer automatically enable pool behaviors, you have to explicitly specify pool_size"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.17",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Fixed laggy behavior of the proxies page when it has been open for a long time"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.16",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "bypass_proxy bug fix"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.15",
+        "changes": [
+            {
+                "type": "star",
+                "text": "max_requests now support range - where each session gets a random max_request value in the range"
+            },
+            {
+                "type": "sparkles",
+                "text": "UI now allow define ranges for session_duration"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.14",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Remove support for country specific super proxy (will use super proxy from any country if already configured for a specific country)"
+            },
+            {
+                "type": "boom",
+                "text": "Credential will be rechecked every hour and after every proxy modification"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.13",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Support core dump on crush using optional dependency in [core-dump](https://www.npmjs.com/package/core-dump) - removed on v0.8.18"
+            },
+            {
+                "type": "bug",
+                "text": "History bug fix"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.12",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Settings page replaced with login flow"
+            },
+            {
+                "type": "boom",
+                "text": "Removed /api/status API"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.11",
+        "changes": [
+            {
+                "type": "star",
+                "text": "History can now be configured at the proxy level"
+            },
+            {
+                "type": "sparkles",
+                "text": "Warnings on saving proxy if there are any small issues with the settings"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.10",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "IP resolution file is now to be edited from the tools tab"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.9",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Configuration file is now to be edited from the tools tab"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.5",
+        "changes": [
+            {
+                "type": "star",
+                "text": "cache super-proxy IPs between runs in local DB"
+            },
+            {
+                "type": "boom",
+                "text": "/api/create endpoint was removed, the same functionality can be done   using a POST request to /api/proxies"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved tests"
+            }
+        ]
+    },
+    {
+        "ver": "0.8.4",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix SOCKS port handling in arguments and clone using UI"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.39",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "The web UI can now be run in normal and guest modes as well as in root mode (default)"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved tests"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved proxy error message"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.38",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Handle password that contain special characters properly"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.37",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Column list in proxies overview is now configurable"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.34",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added warning when enabling history with not SSL analyzing"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added history alert for IP urls"
+            },
+            {
+                "type": "sparkles",
+                "text": "Add uninstall/install instructions to node upgrade notice"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.33",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Specifying --socks port will not longer create conflict on the drop-in proxy"
+            },
+            {
+                "type": "star",
+                "text": "Notify on Auto IP resolution and warn about missing IP resolution when using SOCKs (#18)"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.32",
+        "changes": [
+            {
+                "type": "star",
+                "text": "notification about recommended version of node (6+)"
+            },
+            {
+                "type": "bug",
+                "text": "obtain proxy peer IP & country for https requests from headers"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.31",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "secure_proxy can not be configured per proxy (like all other parameters) with command line giving advantage only over defaults settings"
+            },
+            {
+                "type": "star",
+                "text": "ssl analyzing can now be turned on/off individually for each proxy"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.30",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Proxies with unavailable network interfaces no longer cause errors"
+            },
+            {
+                "type": "bug",
+                "text": "Default values for binary options are now working correctly"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.29",
+        "changes": [
+            {
+                "type": "star",
+                "text": "User can now view IPs for accessing each proxy from outside of localhost"
+            },
+            {
+                "type": "star",
+                "text": "History backup archives are being removed after a month"
+            },
+            {
+                "type": "bug",
+                "text": "Kilobyte is now counted as 1000 bytes instead of 1024"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.28",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Request history archives can now be viewed along with the newer records"
+            },
+            {
+                "type": "bug",
+                "text": "History no longer crushes in case requests completes come before history initiation is complete"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.25",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Display and save the Proxy Peer IP in the history"
+            },
+            {
+                "type": "star",
+                "text": "Added bypass_proxy regexp for accessing assets directly"
+            },
+            {
+                "type": "star",
+                "text": "deamon mode using pm2"
+            },
+            {
+                "type": "sparkles",
+                "text": "Removed per-proxy local statistics to avoid discrepancies with the global statistics"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.24",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Archived request logs can now be viewed via the UI"
+            },
+            {
+                "type": "sparkles",
+                "text": "Displaying extra arguments in --no-config mode only"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.23",
+        "changes": [
+            {
+                "type": "star",
+                "text": "IP resolution file can now be edited from within the UI"
+            },
+            {
+                "type": "bug",
+                "text": "\"Delaying pool for 10 seconds\" messages were shown even when the problem had been already resolved as well as after the application had been terminated"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.22",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Session info was not displayed"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.21",
+        "changes": [
+            {
+                "type": "star",
+                "text": "iOS certificate instructions in the FAQ"
+            },
+            {
+                "type": "bug",
+                "text": "Empty proxy settings are no longer stored in the configuration file"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.20",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Moving the allow_proxy_auth from performance to IP policy"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improve debug log"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.19",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Credentials UI now works when using --no-config"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.18",
+        "changes": [
+            {
+                "type": "bug: :boom",
+                "text": "Socks interface now listen only on selected interface"
+            },
+            {
+                "type": "bug",
+                "text": "Do not initiate and use more sessions then pool_size if refresh is hit multiple times"
+            },
+            {
+                "type": "star",
+                "text": "Logs now contain timestamp information"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.17",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Semiautomatic upgrade fixed for Windows"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.16",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Default zone can now be changed"
+            },
+            {
+                "type": "bug",
+                "text": "Proxies info is now correctly updated on credentials change"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.15",
+        "changes": [
+            {
+                "type": "star",
+                "text": "The application can now be updated semiautomatically via the UI"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.14",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Quick start wizard for beginner users"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.13",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Statistics on sessions from IP pool are now available"
+            },
+            {
+                "type": "bug",
+                "text": "Various minor bugs fixed"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.12",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Quicker credentials check"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.11",
+        "changes": [
+            {
+                "type": "star",
+                "text": "IP pool for a given local proxy can now be viewed"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.10",
+        "changes": [
+            {
+                "type": "star",
+                "text": "FAQ section added"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.9",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Sessions can now be refreshed from the UI/Rest without removing or changing proxy settings"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.7",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Restarting is fixed under Windows"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.6",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Graceful shutdown from the UI and automatic restart on configuration change"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.5",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Configuration can be edited from within the UI"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.4",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI Preselect available port for new proxy"
+            },
+            {
+                "type": "star",
+                "text": "nodejs API now does not have to be bound to a specific port"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.3",
+        "changes": [
+            {
+                "type": "star",
+                "text": "History now stores body of each request"
+            },
+            {
+                "type": "star",
+                "text": "Requests from history can now be modified and replayed"
+            },
+            {
+                "type": "star",
+                "text": "Resettable statistics on local proxies"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.2",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Allow SSL connections/analyzing to insecure domains"
+            },
+            {
+                "type": "bug",
+                "text": "do not parse password as numbers even if format fit"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.1",
+        "changes": [
+            {
+                "type": "star",
+                "text": "PhantomJS is now an optional dependency"
+            }
+        ]
+    },
+    {
+        "ver": "0.7.0",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Major changes to the UI"
+            },
+            {
+                "type": "star",
+                "text": "Adding `keep_alive` support that keeps unused pool sessions alive"
+            }
+        ]
+    },
+    {
+        "ver": "0.6.0",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "session_timeout was replaced by session_init_timeout, and its usints have been changed from milliseconds to seconds"
+            }
+        ]
+    },
+    {
+        "ver": "0.5.2",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "SOCKS Interface can now be configured using UI and config files for each proxy"
+            }
+        ]
+    },
+    {
+        "ver": "0.5.0",
+        "changes": [
+            {
+                "type": "boom: NodeJS api has changed its require method",
+                "text": "from `require('luminati-proxy')` to `require('luminati-proxy').Luminati`"
+            }
+        ]
+    },
+    {
+        "ver": "0.4.25",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Null response for HTTPS connect requests return error code 501"
+            }
+        ]
+    },
+    {
+        "ver": "0.4.24",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Drop-in mode is now on by default"
+            }
+        ]
+    },
+    {
+        "ver": "0.4.22",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "The rest api `/api/proxies` the `timeout` parameter was replaced by `idle_timeout`"
+            },
+            {
+                "type": "boom",
+                "text": "The cli & config parameter `timeout` was replaced by the `request_timeout`"
+            }
+        ]
+    },
+    {
+        "ver": "0.2.0",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "Default proxy port was changed from `23000` to `24000`"
+            }
+        ]
+    }
+]

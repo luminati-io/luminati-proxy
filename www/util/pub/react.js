@@ -1,5 +1,12 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint node:true, react:true*/
+var define;
+var is_node = typeof module=='object' && module.exports;
+if (is_node)
+    define = require('../../../util/require_node.js').define(module, '..');
+else
+    define = self.define;
+
 define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
     '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js',
     'react-bootstrap', '/util/setdb.js', '/util/etask.js', '/util/match.js',

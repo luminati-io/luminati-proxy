@@ -12,7 +12,7 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import {withRouter} from 'react-router-dom';
 
-const Add_proxy = withRouter(class Add_proxy extends Pure_component {
+const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     constructor(props){
         super(props);
         this.presets_opt = Object.keys(presets).map(p=>{
@@ -29,16 +29,26 @@ const Add_proxy = withRouter(class Add_proxy extends Pure_component {
         };
     }
     componentWillMount(){
-        this.setdb_on('head.consts', consts=>{
-            if (!consts)
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
                 return;
-            const zones = (consts.proxy.zone.values||[]).filter(z=>{
-                const plan = z.plans && z.plans.slice(-1)[0] || {};
-                return !plan.archive && !plan.disable;
+            this.setdb_on('head.consts', consts=>{
+                if (consts)
+                    this.prepare(consts, settings);
             });
-            this.setState({consts, zones});
         });
     }
+    // XXX krzysztof: clean up zones logic
+    prepare = (consts, settings)=>{
+        const zones = (consts.proxy.zone.values||[]).filter(z=>{
+            const plan = z.plans && z.plans.slice(-1)[0] || {};
+            return !plan.archive && !plan.disable;
+        });
+        let def;
+        if (zones[0] && !zones[0].value && (def = settings.zone||zones[0].key))
+            zones[0] = {key: `Default (${def})`, value: ''};
+        this.setState({consts, zones, def});
+    };
     persist(){
         const preset = this.state.preset;
         let form;
@@ -46,7 +56,7 @@ const Add_proxy = withRouter(class Add_proxy extends Pure_component {
         {
             form = {
                 last_preset_applied: preset,
-                zone: this.state.zone||this.state.consts.proxy.zone.def,
+                zone: this.state.zone||this.state.def,
                 proxy_type: 'persist',
                 max_requests: 0,
                 session_duration: 0,
@@ -304,4 +314,4 @@ const Footer = props=>{
     return <button onClick={save_clicked} className={classes}>Save</button>;
 };
 
-export default Add_proxy;
+export default Proxy_add;

@@ -271,6 +271,7 @@
       "bin/pub/img/warning.svg",
       "bin/pub/img/zones.svg",
       "bin/pub/img/zone_icon.png",
+      "changelog.json",
       "index.js",
       "lib/cities.js",
       "lib/cluster_mode.js",
@@ -289,7 +290,6 @@
       "lib/ssl.js",
       "lib/username.js",
       "lib/util.js",
-      "src/pub/add_proxy.js",
       "src/pub/app.js",
       "src/pub/app.less",
       "src/pub/chrome_widgets.js",
@@ -305,9 +305,10 @@
       "src/pub/logs.js",
       "src/pub/nav.js",
       "src/pub/notif_center.js",
-      "src/pub/no_proxies.js",
       "src/pub/overview.js",
       "src/pub/proxies.js",
+      "src/pub/proxy_add.js",
+      "src/pub/proxy_blank.js",
       "src/pub/proxy_edit.js",
       "src/pub/proxy_fields.js",
       "src/pub/proxy_tester.js",
@@ -319,7 +320,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "64f9a5abf5080ec3afae963706ee5cad"
+    "md5": "ba3cad65290434d39519379d881e80d2"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -360,5 +361,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.96.18"
+  "version": "1.96.336"
 }

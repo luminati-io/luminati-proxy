@@ -1,14 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Add_proxy from './add_proxy.js';
+import Proxy_add from './proxy_add.js';
 import $ from 'jquery';
 
 const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
 
-const No_proxies = ()=>(
+const Proxy_blank = ()=>(
     <div>
-      <Add_proxy/>
+      <Proxy_add/>
       <div className="no_proxies">
         <button onClick={open_modal}
           className="btn btn_lpm btn_lpm_big btn_add_port">
@@ -18,4 +18,4 @@ const No_proxies = ()=>(
     </div>
 );
 
-export default No_proxies;
+export default Proxy_blank;

@@ -1,5 +1,12 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint node:true, react:true*/
+var define;
+var is_node = typeof module=='object' && module.exports;
+if (is_node)
+    define = require('../../../util/require_node.js').define(module, '..');
+else
+    define = self.define;
+
 define(['react', '/util/etask.js', '/util/setdb.js'], (React, etask, setdb)=>{
 
 const LONG_CB_MS = 100;

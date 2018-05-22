@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.96.18",
+        "version": "1.96.336",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -431,6 +431,10 @@
                 "disable_color": {
                     "type": "boolean",
                     "description": "Disable colors in log"
+                },
+                "logs": {
+                    "type": "boolean",
+                    "description": "Enable logs for all proxies"
                 }
             }
         },

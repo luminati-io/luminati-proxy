@@ -12,8 +12,8 @@ import etask from 'hutil/util/etask';
 import {bytes_format, get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
-import Add_proxy from './add_proxy.js';
-import No_proxies from './no_proxies.js';
+import Proxy_add from './proxy_add.js';
+import Proxy_blank from './proxy_blank.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
     Tooltip, Modal_dialog} from './common.js';
 import {If} from '/www/util/pub/react.js';
@@ -624,7 +624,7 @@ class Proxies extends Pure_component {
     update_selected_columns(new_columns){
         this.setState({selected_cols: new_columns});
     }
-    add_proxy(){ $('#add_new_proxy_modal').modal('show'); }
+    proxy_add = ()=>{ $('#add_new_proxy_modal').modal('show'); };
     paginate(page=-1){
         page = page>-1 ? page : this.state.cur_page;
         const pages = Math.ceil(
@@ -649,7 +649,7 @@ class Proxies extends Pure_component {
         if (!this.state.countries)
             return null;
         if (this.state.loaded&&!this.state.filtered_proxies.length)
-            return <No_proxies/>;
+            return <Proxy_blank/>;
         return (
             <div className="panel proxies_panel">
               <div className="panel_heading">
@@ -657,7 +657,7 @@ class Proxies extends Pure_component {
                   Proxies
                   <Tooltip title="Add new proxy">
                     <button className="btn btn_lpm btn_lpm_small add_proxy_btn"
-                      onClick={this.add_proxy.bind(this)}>
+                      onClick={this.proxy_add}>
                       New proxy
                       <i className="glyphicon glyphicon-plus"/>
                     </button>
@@ -710,7 +710,7 @@ class Proxies extends Pure_component {
                     bottom/>
                 </div>
               </If>
-              <Add_proxy/>
+              <Proxy_add/>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns.bind(this)}/>
             </div>

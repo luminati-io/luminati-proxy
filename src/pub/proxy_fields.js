@@ -245,12 +245,6 @@ export const tabs = {
         label: 'Debugging',
         tooltip: 'Improve the info you receive from the Proxy Manager',
         fields: {
-            history: {
-                label: 'Enable logs',
-                tooltip: `Last 1K requests are automatically logged for easy
-                    debugging. Enable Logs to save all requests`,
-                ext: true,
-            },
             ssl: {
                 label: 'Enable SSL logs',
                 tooltip: `Enable SSL Logs in order to save HTTTPs requests`,

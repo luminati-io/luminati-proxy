@@ -64,12 +64,15 @@ class Upgrade extends Pure_component {
             return null;
         const disabled = upgrading||upgrade_error||!ver_node.satisfied&&
             !electron;
+        const changelog_url = 'https://github.com/luminati-io/luminati-proxy/'
+        +'blob/master/CHANGELOG.md';
         return (
             <div className="warning warning_upgrade">
               <div className="warning_icon"/>
               <div>
                 A new version <strong>{this.state.ver_last.version} </strong>
-                is available.
+                is available. Full list of changes is
+                available <a href={changelog_url} target="_blank">here</a>.
               </div>
               <div className="buttons buttons_upgrade">
                 <button className="btn btn_lpm btn_upgrade"

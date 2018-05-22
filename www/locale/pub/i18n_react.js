@@ -1,5 +1,12 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint node:true, react:true*/
+var define;
+var is_node = typeof module=='object' && module.exports;
+if (is_node)
+    define = require('../../../util/require_node.js').define(module, '..');
+else
+    define = self.define;
+
 define(['lodash', 'react', 'react-dom', '/www/util/pub/pure_component.js',
     '/util/setdb.js', '/util/storage.js', '/www/util/pub/urlp.js'],
     (_, React, ReactDOM, Pure_component, setdb, storage, zurlp)=>{
