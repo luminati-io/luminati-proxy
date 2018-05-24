@@ -280,6 +280,7 @@
       "lib/find_iface.js",
       "lib/hash.js",
       "lib/hutil-loader.js",
+      "lib/locations.js",
       "lib/log.js",
       "lib/lpm.js",
       "lib/luminati.js",
@@ -320,7 +321,7 @@
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "ba3cad65290434d39519379d881e80d2"
+    "md5": "a0630b6ff16ebeb1843b450946a6428e"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -361,5 +362,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.96.336"
+  "version": "1.96.621"
 }

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.96.621 Stable
+- :bug: lpm_install.sh: fix shasum for debian based systems
+
 ## 1.96.336 Stable
 - :star: added global settings page
 - :bug: fixed countries list for global shared zones

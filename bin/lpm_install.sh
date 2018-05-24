@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.96.336"
+VERSION="1.96.621"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -91,7 +91,8 @@ escape_json()
 {
     local strip_nl=${1//$'\n'/\\n}
     local strip_tabs=${strip_nl//$'\t'/\ }
-    RS=$strip_tabs
+    local strip_quotes=${strip_tabs//$'"'/\ }
+    RS=$strip_quotes
 }
 
 usage()
@@ -259,7 +260,7 @@ check_linux_distr()
 
 perr()
 {
-    local name=$1 note="$2" ts=$(date +"%s")
+    local name=$1 note="$2" ts=$(date +"%s") ret=0
     escape_json "$note"
     zerr "PERR $name"
     local note=$RS url="${PERR_URL}/?id=lpm_sh_${name}"
@@ -270,16 +271,20 @@ perr()
     if ((NO_PERR)); then
         return 0
     fi
-    if is_cmd_defined "curl"; then
-        curl -s -X POST "$url" --data "$data" \
-            -H "Content-Type: application/json" > /dev/null
-    elif is_cmd_defined "wget"; then
-        wget -S --header "Content-Type: application/json" \
-             -O /dev/null -o /dev/null --post-data="$data" \
-             --quiet $url > /dev/null
-    else
-        echo "no transport to send perr"
-    fi
+    for ((i=0; i<NETWORK_RETRY; i++)); do
+        if is_cmd_defined "curl"; then
+            curl -s -X POST "$url" --data "$data" \
+                -H "Content-Type: application/json" > /dev/null
+        elif is_cmd_defined "wget"; then
+            wget -S --header "Content-Type: application/json" \
+                 -O /dev/null -o /dev/null --post-data="$data" \
+                 --quiet $url > /dev/null
+        else
+            echo "no transport to send perr"
+        fi
+        ret=$?
+        if ((!ret)); then break; fi
+    done
 }
 
 sys_install()
@@ -303,7 +308,11 @@ sys_install()
 install_shasum(){
     # hack for centos nave installation
     if ! is_cmd_defined "shasum"; then
-        sys_install "perl-Digest-SHA"
+        if ! is_cmd_defined "apt-get"; then
+            sys_install "perl-Digest-SHA"
+        else
+            sys_install "libdigest-sha-perl"
+        fi
     fi
 }
 
@@ -667,6 +676,7 @@ on_exit()
     fi
     if ((!exit_code)); then
         perr "exit_ok" $exit_code
+        perr "exit_ok_report" "$LOG"
     else
         perr "exit_error" $exit_code
         if ((NETWORK_ERROR)); then

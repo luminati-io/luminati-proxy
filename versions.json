@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.96.621",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "lpm_install.sh: fix shasum for debian based systems"
+            }
+        ]
+    },
+    {
         "ver": "1.96.336",
         "type": "stable",
         "changes": [

@@ -7,8 +7,9 @@ import setdb from 'hutil/util/setdb';
 import Stats from './stats.js';
 import Har_viewer from './har_viewer';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
+import semver from 'semver';
+import {Tooltip} from './common.js';
 
 class Overview extends Pure_component {
     componentDidMount(){
@@ -48,13 +49,22 @@ class Upgrade extends Pure_component {
         this.state = {};
     }
     componentWillMount(){
+        this.setdb_on('head.version', version=>this.setState({version}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
         this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
         this.setdb_on('head.upgrading', upgrading=>this.setState({upgrading}));
         this.setdb_on('head.upgrade_error', upgrade_error=>
             this.setState({upgrade_error}));
     }
-    upgrade(){ $('#upgrade_modal').modal(); }
+    upgrade = ()=>{ $('#upgrade_modal').modal(); };
+    new_versions = ()=>{
+        const ver_cur = this.state.version;
+        if (!ver_cur)
+            return [];
+        const changelog = this.state.ver_last.versions
+            .filter(v=>semver.lt(ver_cur, v.ver));
+        return changelog;
+    };
     render(){
         const {upgrading, upgrade_error, ver_last, ver_node} = this.state;
         const is_upgradable = ver_last&&ver_last.newer;
@@ -66,28 +76,43 @@ class Upgrade extends Pure_component {
             !electron;
         const changelog_url = 'https://github.com/luminati-io/luminati-proxy/'
         +'blob/master/CHANGELOG.md';
+        const versions = this.new_versions();
+        const changes = versions.reduce((acc, ver)=>{
+            return acc.concat(ver.changes);
+        }, []);
+        let tooltip = '';
+        if (changes.length)
+        {
+            const list = changes.map(c=>`<li>${c.text}</li>`).join('\n');
+            tooltip = `Changes: <ul>${list}</ul>`;
+        }
+        const major = versions.some(v=>v.type=='dev');
+        const upgrade_type = major ? 'major' : 'minor';
         return (
+            <Tooltip title={tooltip} placement="bottom">
             <div className="warning warning_upgrade">
               <div className="warning_icon"/>
               <div>
-                A new version <strong>{this.state.ver_last.version} </strong>
-                is available. Full list of changes is
-                available <a href={changelog_url} target="_blank">here</a>.
+                A new <strong>{upgrade_type}</strong> version <strong>
+                {this.state.ver_last.version} </strong>
+                is available. You are <strong>{versions.length}
+                </strong> releases behind the newest version.
               </div>
               <div className="buttons buttons_upgrade">
                 <button className="btn btn_lpm btn_upgrade"
-                  onClick={this.upgrade.bind(this)} disabled={disabled}>
+                  onClick={this.upgrade} disabled={disabled}>
                   {upgrading ? 'Upgrading...' :
                       (upgrade_error ? 'Error' : 'Upgrade')}
                 </button>
               </div>
-              <If when={ver_node&&!ver_node.satisfied&&!electron}>
+              {ver_node&&!ver_node.satisfied&&!electron&&
                 <div>
                   To upgrade Luminati Proxy Manager, you need to update Node.js
                   to version {this.state.ver_node.recommended}.
                 </div>
-              </If>
+              }
             </div>
+            </Tooltip>
         );
     }
 }

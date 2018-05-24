@@ -7,11 +7,12 @@ if (is_node)
 else
     define = self.define;
 
-define(['virt_jquery_all', 'react', 'react-dom', 'react-router-dom',
+define(['virt_jquery_all', 'lodash', 'react', 'react-dom', 'react-router-dom',
     '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js',
     'react-bootstrap', '/util/setdb.js', '/util/etask.js', '/util/match.js',
-    '/www/locale/pub/i18n_react.js'], ($, React, ReactDOM, RouterDOM, url,
-    ajax, Pure_component, RB, setdb, etask, match, {T})=>{
+    '/util/country.js', '/www/locale/pub/i18n_react.js'], ($, _, React,
+    ReactDOM, RouterDOM, url, ajax, Pure_component, RB, setdb, etask, match,
+    country, {T})=>{
 
 const E = {};
 const {Modal, Button, Alert} = RB;
@@ -354,6 +355,8 @@ class Alerts extends Pure_component {
         setdb.set('alerts', alerts);
     }
 }
+['success', 'warning', 'danger', 'info'].forEach(type=>Alerts[type] =
+    (children, opt)=>Alerts.push(children, {type, ...opt}));
 E.Alerts = Alerts;
 
 class Confirm extends Pure_component {
@@ -402,6 +405,128 @@ class Confirm extends Pure_component {
     }
 }
 E.Confirm = Confirm;
+
+class Phone_number_input extends Pure_component {
+    constructor(props){
+        super(props);
+        this.countries = _.map(country.list,
+            (label, value)=>this.get_country(value)).filter(c=>c);
+        this.state = {is_select_open: false, body: ''};
+        let number, parsed;
+        if (number = props.value)
+        {
+            if (parsed = this.parse_number(number))
+            {
+                this.state.country = this.get_country(parsed.country);
+                this.state.body = parsed.body;
+            }
+        }
+        const user_country = setdb.get('login.user.country');
+        if (!this.state.country && user_country)
+            this.state.country = this.get_country(user_country);
+        this.on_change = this.on_change.bind(this);
+        this.on_blur = this.on_blur.bind(this);
+        this.open_select = this.open_select.bind(this);
+        this.input_ref = this.input_ref.bind(this);
+    }
+    componentWillReceiveProps(next_props){
+        let number, parsed;
+        if (number = next_props.value)
+        {
+            if (parsed = this.parse_number(number))
+            {
+                this.setState({country: this.get_country(parsed.country),
+                    body: parsed.body});
+            }
+        }
+    }
+    parse_number(number){
+        for (let c in country.dialing_code_list)
+        {
+            const code = country.dialing_code_list[c];
+            if (number.startsWith('+'+code))
+            {
+                const body = number.substr(code.length+1);
+                return {country: c, code, body: body.trim()};
+            }
+        }
+    }
+    get_country(c){
+        const code = country.dialing_code_list[c];
+        if (code)
+            return {value: c, label: country.list[c], code};
+    }
+    open_select(){
+        this.setState({is_select_open: true});
+        $(document).one('mousedown', e=>{
+            if ($(e.target).closest(this.flag_container).length)
+                return;
+            this.setState({is_select_open: false});
+        });
+    }
+    get_event(){
+        const {country, body} = this.state;
+        return {value: `+${country.code} ${body}`};
+    }
+    select_country(c){
+        this.setState({body: '', country: c, is_select_open: false}, ()=>{
+            if (c && this.props.onChange)
+                this.props.onChange(this.get_event());
+            this.input.focus();
+        });
+    }
+    on_change(e){
+        this.setState({body: e.target.value}, ()=>{
+            if (this.state.country && this.props.onChange)
+                this.props.onChange(this.get_event());
+        });
+    }
+    on_blur(e){
+        if (this.state.country && this.props.onBlur)
+            this.props.onBlur(this.get_event());
+    }
+    input_ref(el){
+        this.input = el;
+        if (this.props.input_ref)
+            this.props.input_ref(el);
+    }
+    render(){
+        let {is_select_open, country, body} = this.state;
+        country = country||this.get_country('US');
+        const countries = is_select_open && this.countries.map((c, i)=>{
+            return (
+                <li key={c.value} onClick={()=>this.select_country(c)}>
+                  <span className="f19">
+                    <span className={'flag '+c.value.toLowerCase()}/>
+                  </span>
+                  {c.label}
+                  <i>+{c.code}</i>
+                </li>
+            );
+        });
+        const input_class = 'form-control '+(this.props.className||'');
+        return (
+            <div className="phone_number_input">
+              <div className="flag_container"
+                ref={el=>this.flag_container = el}>
+                <div className="selected_flag f19" onClick={this.open_select}
+                  title={country.label+": +"+country.code}>
+                  <span className={'flag '+country.value.toLowerCase()}/>
+                  <div className="arrow"></div>
+                </div>
+                <If when={is_select_open}>
+                  <ul className="country_list">{countries}</ul>
+                </If>
+              </div>
+              <input type="tel" className={input_class}
+                ref={this.input_ref}
+                placeholder="(201) 555-5555" value={body}
+                onChange={this.on_change} onBlur={this.on_blur}/>
+            </div>
+        );
+    }
+}
+E.Phone_number_input = Phone_number_input;
 
 return E;
 
