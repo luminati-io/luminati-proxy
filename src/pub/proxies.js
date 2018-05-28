@@ -15,7 +15,7 @@ import $ from 'jquery';
 import Proxy_add from './proxy_add.js';
 import Proxy_blank from './proxy_blank.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip, Modal_dialog} from './common.js';
+    Tooltip, Modal_dialog, Tooltip_bytes} from './common.js';
 import {If} from '/www/util/pub/react.js';
 import {withRouter} from 'react-router-dom';
 
@@ -351,11 +351,6 @@ const columns = [
         type: 'text',
     },
     {
-        key: 'direct_exclude',
-        title: 'Direct exclude',
-        type: 'text',
-    },
-    {
         key: 'success_rate',
         title: 'Success',
         tooltip: 'The ratio of successful requests out of total requests. A '
@@ -369,7 +364,7 @@ const columns = [
     {
         key: 'in_bw',
         title: 'BW up',
-        render: ({proxy})=>bytes_format(proxy.in_bw||0)||'—',
+        render: ({proxy})=>Tooltip_bytes({bytes: proxy.in_bw}),
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -379,7 +374,7 @@ const columns = [
     {
         key: 'out_bw',
         title: 'BW down',
-        render: ({proxy})=>bytes_format(proxy.out_bw||0)||'—',
+        render: ({proxy})=>Tooltip_bytes({bytes: proxy.out_bw}),
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'

@@ -9,13 +9,13 @@ import setdb from 'hutil/util/setdb';
 import etask from 'hutil/util/etask';
 import ajax from 'hutil/util/ajax';
 import zescape from 'hutil/util/escape';
-import {bytes_format} from './util.js';
 import $ from 'jquery';
-import {status_codes} from './util.js';
+import {status_codes, bytes_format} from './util.js';
 import Waypoint from 'react-waypoint';
 import {Toolbar_button, Tooltip, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
 import Preview from './har_preview.js';
+import {Tooltip_bytes} from './common.js';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
@@ -689,7 +689,7 @@ const Cell_value = ({col, req})=>{
     else if (col=='Proxy port')
         return <Tooltip_and_value val={req.details.port}/>;
     else if (col=='Bandwidth')
-        return <Tooltip_and_value val={bytes_format(req.details.bw)}/>;
+        return <Tooltip_bytes chrome_style bytes={req.details.bw}/>;
     else if (col=='Time')
         return <Tooltip_and_value val={req.time+' ms'}/>;
     else if (col=='Peer proxy')

@@ -212,7 +212,6 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         color: hsl(0, 0%, 20%);
         padding: 5px 8px;
         line-height: 14px;
-        display: flex;
         align-items: center;
         -webkit-filter: drop-shadow(0 1px 2px hsla(0, 0%, 0%, 0.3));
         border: 1px solid hsla(0, 0%, 0%, 0.1);
@@ -233,6 +232,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         .tooltip-inner { top: 4px; }
     }
 }
+.tooltip.wide .tooltip-inner { max-width: 600px; }
 .tooltip.top .tooltip-arrow { border-top-color: @tooltip; }
 .tooltip.bottom .tooltip-arrow { border-bottom-color: @tooltip; }
 .pointer { cursor: pointer; }
@@ -927,6 +927,11 @@ span.icon_link {
     .desc { margin: 10px 0; }
     .modal-footer {
         button.ok { margin-right: 0; }
+    }
+    .email_field {
+        display: flex;
+        align-items: center;
+        span { width: 330px; }
     }
 }
 .overview_page {

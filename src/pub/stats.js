@@ -6,7 +6,7 @@ import etask from 'hutil/util/etask';
 import date from 'hutil/util/date';
 import ajax from 'hutil/util/ajax';
 import zurl from 'hutil/util/url';
-import {Modal, Circle_li as Li} from './common.js';
+import {Modal, Circle_li as Li, Tooltip_bytes} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
@@ -101,9 +101,9 @@ const Row = withRouter(class Row extends Pure_component {
         return (
             <tr onClick={this.click}>
               <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
-              <td><Cell title={bytes_format(stat.out_bw)||'—'}/></td>
-              <td><Cell title={bytes_format(stat.in_bw)||'—'}/></td>
-              <td><Cell title={stat.reqs||'—'}/></td>
+              <td><Tooltip_bytes chrome_style bytes={stat.out_bw}/></td>
+              <td><Tooltip_bytes chrome_style bytes={stat.in_bw}/></td>
+              <td><Cell>{stat.reqs||'—'}</Cell></td>
             </tr>
         );
     }
@@ -114,7 +114,7 @@ const Key_cell = ({title, warning, row_key})=>{
         enabled and there are connections on HTTPS protocol detected`;
     return (
         <td>
-          <Cell row_key={row_key} title={title}/>
+          <Cell row_key={row_key}>{title}</Cell>
           <If when={warning}>
             <Tooltip title={warning_tooltip}>
               <div className="ic_warning"/>
@@ -124,20 +124,20 @@ const Key_cell = ({title, warning, row_key})=>{
     );
 };
 
-const Cell = ({row_key, title})=>{
+const Cell = ({row_key, title, children})=>{
     if (row_key=='status_code')
     {
         return (
             <Tooltip title={title+' '+status_codes[title]}>
-              <div className="disp_value">{title}</div>
+              <div className="disp_value">{children}</div>
             </Tooltip>
         );
     }
     else
     {
         return (
-            <Tooltip title={title}>
-              <div className="disp_value">{title}</div>
+            <Tooltip title={title||children}>
+              <div className="disp_value">{children}</div>
             </Tooltip>
         );
     }

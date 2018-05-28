@@ -1,12 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, es6:true*/
 
-export const bytes_format = (bytes, precision)=>{
+export const bytes_format = (bytes, number)=>{
     if (!bytes||isNaN(parseFloat(bytes))||!isFinite(bytes))
         return '';
-    let number = Math.floor(Math.log(bytes)/Math.log(1000));
-    if (typeof precision==='undefined')
-        precision = number ? 2 : 0;
+    number = number!=undefined ?
+        number : Math.floor(Math.log(bytes)/Math.log(1000));
+    const precision = number ? 2 : 0;
     let number_format = Intl.NumberFormat('en-US',
         {maximumFractionDigits: precision});
     return number_format.format(bytes/Math.pow(1000, Math.floor(number)))+' '

@@ -1,5 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.97.122 Development Latest
+- :star: new database with locations and ASNs
+- :star: removed option "direct_exclude"
+- :star: recent statistics are synced with dashboard in control panel
+- :bug: fixed memory leak for waterfall
+
 ## 1.96.621 Stable
 - :bug: lpm_install.sh: fix shasum for debian based systems
 

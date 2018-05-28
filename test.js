@@ -766,7 +766,6 @@ describe('proxy', ()=>{
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
             t('raw', {raw: true});
             t('direct_include', {direct_include: '.*'}, {direct: true});
-            t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
                 {session: 'seed_1'});
@@ -1206,11 +1205,15 @@ describe('manager', ()=>{
             const zone_gen = {password: ['pass2']};
             const zones = {static: assign({}, zone_static),
                 gen: assign({}, zone_gen)};
-            const t2 = (name, config, expected, _defaults = {zone: 'static'})=>
+            const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                .query({customer: 'testc1', proxy: pkg.version})
-                .reply(200, {_defaults}) && t(name, _.set(config,
-                    'cli.customer', 'testc1'), expected);
+                    .query({customer: 'testc1', proxy: pkg.version})
+                    .reply(200, {_defaults});
+                t(name, _.set(config, 'cli.customer', 'testc1'), expected);
+            };
             t2('no defaults', {config: {proxies: [simple_proxy]}}, [assign({},
                 simple_proxy, {zone: 'static'})]);
             t2('invalid', {config: {_defaults: {zone: 'foo'},
@@ -1304,6 +1307,9 @@ describe('manager', ()=>{
                 {zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2'},
             ];
             it('get', ()=>etask(function*(){
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
                     .reply(200, zone_resp);
@@ -1313,6 +1319,9 @@ describe('manager', ()=>{
                 assert_has(body, zone_expected, 'zones');
             }));
             it('get with config', ()=>etask(function*(){
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
                     .reply(200, zone_resp);
@@ -1329,6 +1338,9 @@ describe('manager', ()=>{
                     {zone: 'a', perm: 'abc', plans: 'plan',
                         password: undefined}
                 ];
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer, proxy: pkg.version})
                     .reply(200, no_pwd_resp);
@@ -1443,6 +1455,9 @@ describe('manager', ()=>{
         });
         describe('user credentials', ()=>{
             it('success', ()=>etask(function*(){
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
@@ -1468,6 +1483,9 @@ describe('manager', ()=>{
             }));
             it('update defaults', ()=>etask(function*(){
                 let updated = {_defaults: {customer: 'updated'}};
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .query({customer: 'updated'}).reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, updated);
@@ -2178,7 +2196,6 @@ describe('lpm_proxy', ()=>{
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
             t('raw', {raw: true});
             t('direct_include', {direct_include: '.*'}, {direct: true});
-            t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
                 {session: 'seed_1'});

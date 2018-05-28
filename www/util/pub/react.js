@@ -411,15 +411,12 @@ class Phone_number_input extends Pure_component {
         super(props);
         this.countries = _.map(country.list,
             (label, value)=>this.get_country(value)).filter(c=>c);
-        this.state = {is_select_open: false, body: ''};
+        this.state = {is_select_open: false, body: '', filter: ''};
         let number, parsed;
-        if (number = props.value)
+        if ((number = props.value) && (parsed = this.parse_number(number)))
         {
-            if (parsed = this.parse_number(number))
-            {
-                this.state.country = this.get_country(parsed.country);
-                this.state.body = parsed.body;
-            }
+            this.state.country = this.get_country(parsed.country);
+            this.state.body = parsed.body;
         }
         const user_country = setdb.get('login.user.country');
         if (!this.state.country && user_country)
@@ -441,6 +438,17 @@ class Phone_number_input extends Pure_component {
         }
     }
     parse_number(number){
+        let cur_country, cur_code;
+        if (this.state.country)
+        {
+            cur_country = this.state.country.value;
+            cur_code = this.state.country.code;
+        }
+        if (cur_country && number.startsWith('+'+cur_code))
+        {
+            const body = number.substr(cur_code.length+1);
+            return {country: cur_country, code: cur_code, body: body.trim()};
+        }
         for (let c in country.dialing_code_list)
         {
             const code = country.dialing_code_list[c];
@@ -458,11 +466,28 @@ class Phone_number_input extends Pure_component {
     }
     open_select(){
         this.setState({is_select_open: true});
+        this.start_search();
         $(document).one('mousedown', e=>{
-            if ($(e.target).closest(this.flag_container).length)
+            if ($(e.target).closest(this.country_list).length)
                 return;
             this.setState({is_select_open: false});
+            this.stop_search();
         });
+    }
+    start_search(){
+        this.stop_search();
+        $(document).on('keydown', this.search_listener = e=>{
+            let filter = this.state.filter;
+            if (e.which==8)
+                filter = filter.slice(0, filter.length-1);
+            else if (e.which>=65 && e.which<=120)
+                filter = filter+e.key;
+            this.setState({filter: filter.toLowerCase()});
+        });
+    }
+    stop_search(){
+        this.setState({filter: ''});
+        $(document).off('keydown', this.search_listener);
     }
     get_event(){
         const {country, body} = this.state;
@@ -476,7 +501,10 @@ class Phone_number_input extends Pure_component {
         });
     }
     on_change(e){
-        this.setState({body: e.target.value}, ()=>{
+        let value = e.target.value;
+        if (value[0]=='0')
+            value = '(0)'+value.slice(1).replace(/[()]/g, '');
+        this.setState({body: value}, ()=>{
             if (this.state.country && this.props.onChange)
                 this.props.onChange(this.get_event());
         });
@@ -491,9 +519,18 @@ class Phone_number_input extends Pure_component {
             this.props.input_ref(el);
     }
     render(){
-        let {is_select_open, country, body} = this.state;
+        let {is_select_open, country, body, filter} = this.state;
         country = country||this.get_country('US');
-        const countries = is_select_open && this.countries.map((c, i)=>{
+        const countries = is_select_open && this.countries.filter(c=>{
+            if (!filter)
+                return true;
+            if (c.value.toLowerCase()==filter)
+                return true;
+            if (country.value==c.value)
+                return true;
+            if (c.label.split(' ').some(l=>l.toLowerCase().startsWith(filter)))
+                return true;
+        }).map(c=>{
             return (
                 <li key={c.value} onClick={()=>this.select_country(c)}>
                   <span className="f19">
@@ -507,21 +544,25 @@ class Phone_number_input extends Pure_component {
         const input_class = 'form-control '+(this.props.className||'');
         return (
             <div className="phone_number_input">
-              <div className="flag_container"
-                ref={el=>this.flag_container = el}>
+              <div className="flag_container">
                 <div className="selected_flag f19" onClick={this.open_select}
                   title={country.label+": +"+country.code}>
                   <span className={'flag '+country.value.toLowerCase()}/>
-                  <div className="arrow"></div>
+                  <span className="selected_code">+{country.code}</span>
+                  <span className="arrow"></span>
                 </div>
                 <If when={is_select_open}>
-                  <ul className="country_list">{countries}</ul>
+                  <ul className="country_list"
+                    ref={el=>this.country_list = el}>
+                    {countries}
+                  </ul>
                 </If>
               </div>
               <input type="tel" className={input_class}
                 ref={this.input_ref}
                 placeholder="(201) 555-5555" value={body}
-                onChange={this.on_change} onBlur={this.on_blur}/>
+                onChange={this.on_change} onBlur={this.on_blur}
+                style={{paddingLeft: 53+country.code.length*8}}/>
             </div>
         );
     }

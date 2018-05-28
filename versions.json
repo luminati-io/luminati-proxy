@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.97.122",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "new database with locations and ASNs"
+            },
+            {
+                "type": "star",
+                "text": "removed option \"direct_exclude\""
+            },
+            {
+                "type": "star",
+                "text": "recent statistics are synced with dashboard in control panel"
+            },
+            {
+                "type": "bug",
+                "text": "fixed memory leak for waterfall"
+            }
+        ]
+    },
+    {
         "ver": "1.96.621",
         "type": "stable",
         "changes": [

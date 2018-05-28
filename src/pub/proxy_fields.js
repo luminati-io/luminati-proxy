@@ -331,12 +331,6 @@ export const tabs = {
                     through super proxy directly (not through peers)`,
                 before_save: before_save.regex,
             },
-            direct_exclude: {
-                label: `URL regex for not super proxy`,
-                tooltip: `Insert URL pattern for which requests will NOT be
-                    passed through super proxy`,
-                before_save: before_save.regex,
-            },
             allow_proxy_auth: {
                 label: 'Allow request authentication',
                 tooltip: `Pass auth data per request (use lpm like

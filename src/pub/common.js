@@ -11,6 +11,8 @@ import EventEmitter from 'events';
 import {If} from '/www/util/pub/react.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
+import {bytes_format} from './util.js';
+import * as Chrome from './chrome_widgets.js';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -115,6 +117,19 @@ export class Modal extends React.Component {
         );
     }
 }
+
+export const Tooltip_bytes = ({bytes, chrome_style})=>{
+    bytes = bytes||0;
+    const tooltip = [0, 1, 2, 3]
+        .map(n=>`<div>${bytes_format(bytes, n)}</div>`)
+        .join('');
+    const T = chrome_style ? Chrome.Tooltip : Tooltip;
+    return (
+        <T title={bytes ? tooltip : ''}>
+          <div className="disp_value">{bytes_format(bytes)||'—'}</div>
+        </T>
+    );
+};
 
 const Footer_default = props=>(
     <div className="default_footer">

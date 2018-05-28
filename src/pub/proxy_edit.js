@@ -195,13 +195,13 @@ const Index = withRouter(class Index extends Pure_component {
             return !!plan.vip;
         if (field_name=='country'&&plan.ip_alloc_preset=='shared_block')
             return true;
+        if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
+            return permissions.includes(field_name);
         if (field_name=='country'&&(plan.type=='static'||
             ['domain', 'domain_p'].includes(plan.vips_type)))
         {
             return false;
         }
-        if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
-            return permissions.includes(field_name);
         if (field_name=='carrier')
             return permissions.includes('asn');
         return true;
@@ -258,6 +258,10 @@ const Index = withRouter(class Index extends Pure_component {
         }
         else if (!Array.isArray(form.city))
             form.city = [];
+        if (form.asn && !Array.isArray(form.asn))
+            form.asn = [{id: ''+form.asn, label: ''+form.asn}];
+        else if (!Array.isArray(form.asn))
+            form.asn = [];
         if (!this.original_form)
             this.original_form = form;
         form.country = (form.country||'').toLowerCase();
@@ -428,6 +432,10 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.city = save_form.city[0].id;
         else
             save_form.city = '';
+        if (save_form.asn.length)
+            save_form.asn = Number(save_form.asn[0].id);
+        else
+            save_form.asn = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
         delete save_form.preset;
@@ -750,7 +758,13 @@ class Targeting extends Pure_component {
         this.set_field = setdb.get('head.proxy_edit.set_field');
     }
     componentDidMount(){
-        this.setdb_on('head.locations', locations=>this.setState({locations}));
+        this.setdb_on('head.locations', locations=>{
+            if (!locations)
+                return;
+            const asns = Object.keys(locations.asns)
+                .map(a=>({id: a, label: a}));
+            this.setState({locations, asns});
+        });
     }
     init_carriers(){
         const subject = 'Add new carrier option';
@@ -806,34 +820,41 @@ class Targeting extends Pure_component {
     }
     allowed_countries(){
         let res = this.state.locations.countries.map(c=>
-            ({key: c.country_name, value: c.country_id}));
+            ({key: c.country_name, value: c.country_id, mob: c.mob}));
         const curr_plan = this.props.get_curr_plan();
         if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
                 this.state.locations.shared_countries.includes(r.value));
         }
+        if (curr_plan&&curr_plan.mobile)
+            res = res.filter(r=>r.mob);
         return [this.def_value, ...res];
     }
-    country_changed(){
+    country_changed = ()=>{
         this.set_field('city', []);
         this.set_field('state', '');
-    }
+    };
     states(){
         const country = this.props.form.country;
         if (!country||country=='*')
             return [];
-        const res = this.state.locations.regions[country].map(r=>
-            ({key: r.region_name, value: r.region_id}));
+        const curr_plan = this.props.get_curr_plan();
+        const res = this.state.locations.regions[country]
+            .filter(r=>!curr_plan||!curr_plan.mobile||r.mob)
+            .map(r=>({key: r.region_name, value: r.region_id}));
         return [this.def_value, ...res];
     }
-    state_changed(){ this.set_field('city', []); }
+    state_changed = ()=>this.set_field('city', []);
     cities(){
         const {country, state} = this.props.form;
         let res;
         if (!country)
             return [];
-        res = this.state.locations.cities.filter(c=>c.country_id==country);
+        const curr_plan = this.props.get_curr_plan();
+        res = this.state.locations.cities
+            .filter(c=>c.country_id==country)
+            .filter(c=>!curr_plan||!curr_plan.mobile||c.mob);
         if (state)
             res = res.filter(c=>c.region_id==state);
         const regions = this.states();
@@ -844,10 +865,10 @@ class Targeting extends Pure_component {
         });
         return res;
     }
-    city_changed(e){
+    city_changed = e=>{
         if (e&&e.length)
             this.set_field('state', e[0].region);
-    }
+    };
     render(){
         if (!this.state.locations)
             return null;
@@ -872,12 +893,12 @@ class Targeting extends Pure_component {
               }
               <Config type="select" id="country"
                 data={this.allowed_countries()}
-                on_change={this.country_changed.bind(this)}/>
+                on_change={this.country_changed}/>
               <Config type="select" id="state" data={this.states()}
-                on_change={this.state_changed.bind(this)}/>
+                on_change={this.state_changed}/>
               <Config type="typeahead" id="city" data={this.cities()}
-                on_change={this.city_changed.bind(this)}/>
-              <Config type="number" id="asn"
+                on_change={this.city_changed}/>
+              <Config type="typeahead" id="asn" data={this.state.asns}
                 disabled={this.props.form.carrier}/>
               <Config type="select" id="carrier" data={this.carriers}
                 note={this.carriers_note} disabled={this.props.form.asn}/>
@@ -1415,7 +1436,6 @@ const General = provider({tab_id: 'general'})(props=>{
           <Config type="text" id="null_response"/>
           <Config type="text" id="bypass_proxy"/>
           <Config type="text" id="direct_include"/>
-          <Config type="text" id="direct_exclude"/>
           <Config type="select" id="allow_proxy_auth"
             data={props.default_opt('allow_proxy_auth')}/>
           <Config type="select" id="iface"

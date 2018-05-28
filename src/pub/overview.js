@@ -89,7 +89,7 @@ class Upgrade extends Pure_component {
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
         return (
-            <Tooltip title={tooltip} placement="bottom">
+            <Tooltip className="wide" title={tooltip} placement="bottom">
             <div className="warning warning_upgrade">
               <div className="warning_icon"/>
               <div>
