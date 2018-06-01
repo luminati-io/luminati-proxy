@@ -408,6 +408,7 @@ input[type=checkbox] {
         background-color: @first_odd;
         border-color: @first_odd;
     }
+    &:focus { color: white; }
 }
 .btn_lpm.disabled {
     background-color: @grey;
@@ -1310,6 +1311,21 @@ span.icon_link {
 }
 .tracer {
     padding: 0 15px;
+    .request {
+        .fields {
+            display: flex;
+            .field {
+                margin: 0 5px;
+                &:first-child { margin-left: 0; }
+                &:last-child { margin-right: 0; }
+                &.url { flex: auto }
+            }
+        }
+        .go_btn_wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+    }
 }
 .proxy_tester {
     height: 100%;

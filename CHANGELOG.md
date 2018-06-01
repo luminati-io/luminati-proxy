@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.97.739 Stable
+- :bug: fixed selecting Carrier in Targeting
+
 ## 1.97.727 Development Latest
 - :bug: fixed RegExp for url in Rules
 - :bug: fixed memory leaks

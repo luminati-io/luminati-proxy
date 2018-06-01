@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.97.739",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed selecting Carrier in Targeting"
+            }
+        ]
+    },
+    {
         "ver": "1.97.727",
         "type": "dev",
         "changes": [

@@ -903,7 +903,8 @@ class Targeting extends Pure_component {
               <Config type="typeahead" id="asn" data={this.state.asns}
                 disabled={this.props.form.carrier}/>
               <Config type="select" id="carrier" data={this.carriers}
-                note={this.carriers_note} disabled={this.props.form.asn}/>
+                note={this.carriers_note}
+                disabled={this.props.form.asn&&this.props.form.asn.length}/>
             </div>
         );
     }
