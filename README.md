@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.97.122/luminati-proxy-manager-v1.97.122-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.97.727/luminati-proxy-manager-v1.97.727-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -200,11 +200,11 @@ Options:
   --www                    HTTP port for browser admin UI       [default: 22999]
   --ws                     websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
-                               [string] [default: "/home/maximk/.luminati.json"]
+                               [string] [default: "~/.luminati.json"]
   --database               Database file containing logs and cached values
-                            [string] [default: "/home/maximk/.luminati.sqlite3"]
+                            [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
-                                [string] [default: "/home/maximk/.luminati.jar"]
+                                [string] [default: "~/.luminati.jar"]
   --mode                   Defines a set of permissible operations within the
                            UI/API                     [string] [default: "root"]
   --dropin                 Create dropin mode proxy port (default: 22225)

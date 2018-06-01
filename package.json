@@ -317,11 +317,12 @@
       "src/pub/schema.js",
       "src/pub/settings.js",
       "src/pub/stats.js",
+      "src/pub/tracer.js",
       "src/pub/util.js",
       "test.js",
       "webpack.config.js"
     ],
-    "md5": "5d01d221772160e24f47a2ac82d6f11c"
+    "md5": "1add67b398ec533ba7bd34f830881ae0"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -337,10 +338,6 @@
     {
       "name": "Krzysztof Fudali",
       "email": "krzysztof@luminati.io"
-    },
-    {
-      "name": "Maxim Kovalov",
-      "email": "maximk@luminati.io"
     }
   ],
   "optionalDependencies": {
@@ -362,5 +359,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.97.122"
+  "version": "1.97.727"
 }

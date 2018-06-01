@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.97.122-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.97.727-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -167,11 +167,11 @@ Options:
   --www                    HTTP port for browser admin UI       [default: 22999]
   --ws                     Websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
-                               [string] [default: "/home/maximk/.luminati.json"]
+                               [string] [default: "~/.luminati.json"]
   --database               Database file containing logs and cached values
-                            [string] [default: "/home/maximk/.luminati.sqlite3"]
+                            [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
-                                [string] [default: "/home/maximk/.luminati.jar"]
+                                [string] [default: "~/.luminati.jar"]
   --mode                   Defines a set of permissible operations within the
                            UI/API                     [string] [default: "root"]
   --dropin                 Create dropin mode proxy port (default: 22225)

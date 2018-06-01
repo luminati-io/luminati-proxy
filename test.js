@@ -952,8 +952,8 @@ describe('proxy', ()=>{
         {
             rules = rules||{post: [{res: [{action: {ban_ip: '60min',
             retry: true}, head: true, status: {arg, type: 'in'}}],
-            url: 'lumtest.com/**'}], pre: [{browser: 'firefox',
-            url: 'lumtest.com/**'}]};
+            url: 'lumtest.com'}], pre: [{browser: 'firefox',
+            url: 'lumtest.com'}]};
             l = yield lum({rules});
             let old_req = l._request;
             let retry_count = 0;

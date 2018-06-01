@@ -66,7 +66,7 @@ const Enable_ssl_modal = ({enable_ssl})=>(
     <Modal id="enable_ssl_modal" title="Enable SSL analyzing for all proxies"
       click_ok={enable_ssl} className="enable_ssl_modal">
       <p className="cert_info">
-        You will also need to add certificate file to browsers.
+        You will also need to add a certificate file to browsers.
         Gathering stats for HTTPS requests requires setting a certificate key.
       </p>
       <div className="instructions">

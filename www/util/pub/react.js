@@ -12,10 +12,11 @@ define(['virt_jquery_all', 'lodash', 'react', 'react-dom', 'react-router-dom',
     'react-bootstrap', '/util/setdb.js', '/util/etask.js', '/util/match.js',
     '/util/country.js', '/www/locale/pub/i18n_react.js'], ($, _, React,
     ReactDOM, RouterDOM, url, ajax, Pure_component, RB, setdb, etask, match,
-    country, {T})=>{
+    country, i18n)=>{
 
 const E = {};
 const {Modal, Button, Alert} = RB;
+const {T} = i18n;
 
 const Foreach = ({children, data})=>data.map((d, i)=>children(d, i));
 E.Foreach = Foreach;
@@ -333,7 +334,12 @@ class Alerts extends Pure_component {
     componentWillMount(){
         this.setdb_on('alerts', alerts=>this.setState({alerts: alerts||[]}));
     }
-    render(){ return this.state.alerts.map(a=><Alert key={a.key} {...a}/>); }
+    render(){
+        return (
+            <div className="alerts_container">
+              {this.state.alerts.map(a=><Alert key={a.key} {...a}/>)}
+            </div>);
+    }
     static key = 0;
     static push(children, opt){
         opt = opt||{};
@@ -568,6 +574,30 @@ class Phone_number_input extends Pure_component {
     }
 }
 E.Phone_number_input = Phone_number_input;
+
+class Clipboard extends Pure_component {
+    constructor(props){
+        super(props);
+        Clipboard.copy = this.copy.bind(this);
+        this.set_textarea = this.set_textarea.bind(this);
+    }
+    set_textarea(element){ this.textarea = element; }
+    copy(text){
+        this.textarea.value = text;
+        const area = $(this.textarea);
+        area.select();
+        try {
+            document.execCommand('copy');
+            return true;
+        }
+        catch(e){ return void console.log('Oops, unable to copy'); }
+    }
+    render(){
+        return (
+            <textarea ref={this.set_textarea} className="copy_fake_area"/>);
+    }
+}
+E.Clipboard = Clipboard;
 
 return E;
 

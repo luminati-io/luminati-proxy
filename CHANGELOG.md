@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.97.727 Development Latest
+- :bug: fixed RegExp for url in Rules
+- :bug: fixed memory leaks
+
 ## 1.97.122 Development Latest
 - :star: new database with locations and ASNs
 - :star: removed option "direct_exclude"

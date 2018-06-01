@@ -13,6 +13,7 @@ import Login from './login.js';
 import Overview from './overview.js';
 import Config from './config.js';
 import Settings from './settings.js';
+import Tracer from './tracer.js';
 import {Logs, Dock_logs} from './logs.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -111,6 +112,7 @@ const Page = ()=>(
           <Route path="/howto" exact component={Howto}/>
           <Route path="/logs" exact component={Logs}/>
           <Route path="/proxy_tester" exact component={Proxy_tester}/>
+          <Route path="/tracer" exact component={Tracer}/>
           <Route path="/config" exact component={Config}/>
           <Route path="/settings" exact component={Settings}/>
           <Route path="/" component={Overview}/>

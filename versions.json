@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.97.727",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed RegExp for url in Rules"
+            },
+            {
+                "type": "bug",
+                "text": "fixed memory leaks"
+            }
+        ]
+    },
+    {
         "ver": "1.97.122",
         "type": "dev",
         "changes": [
