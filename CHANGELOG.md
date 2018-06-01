@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.97.753 
+
 ## 1.97.739 Stable
 - :bug: fixed selecting Carrier in Targeting
 

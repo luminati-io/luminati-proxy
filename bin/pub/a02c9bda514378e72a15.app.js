@@ -40263,24 +40263,26 @@ var Request = function (_Pure_component2) {
                             case 0:
                                 _this$state = _this.state, url = _this$state.url, zone = _this$state.zone, country = _this$state.country;
                                 data = { url: url, zone: zone, country: country };
-                                _context.next = 4;
+
+                                data.zone = data.zone || _this.state.def_zone;
+                                _context.next = 5;
                                 return window.fetch('/api/trace', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify(data)
                                 });
 
-                            case 4:
+                            case 5:
                                 raw_trace = _context.sent;
-                                _context.next = 7;
+                                _context.next = 8;
                                 return raw_trace.json();
 
-                            case 7:
+                            case 8:
                                 json = _context.sent;
 
                                 console.log(json);
 
-                            case 9:
+                            case 10:
                             case 'end':
                                 return _context.stop();
                         }
@@ -40297,9 +40299,10 @@ var Request = function (_Pure_component2) {
 
             this.setdb_on('head.locations', function (locations) {
                 if (!locations) return;
-                var countries = locations.countries.map(function (c) {
+                var def_c = { key: 'Any', value: '' };
+                var countries = [def_c].concat(locations.countries.map(function (c) {
                     return { key: c.country_name, value: c.country_id };
-                });
+                }));
                 _this4.setState({ countries: countries });
             });
             this.setdb_on('head.consts', function (consts) {
@@ -40312,7 +40315,7 @@ var Request = function (_Pure_component2) {
                     if (!plans || !plans.length) return null;
                     return (0, _extends3.default)({}, z, { plan: plans.slice(-1)[0] });
                 }).filter(Boolean);
-                _this4.setState({ zones: zones });
+                _this4.setState({ zones: zones, def_zone: consts.proxy.zone.def });
             });
         }
     }, {

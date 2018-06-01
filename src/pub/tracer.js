@@ -24,8 +24,9 @@ class Request extends Pure_component {
         this.setdb_on('head.locations', locations=>{
             if (!locations)
                 return;
-            const countries = locations.countries.map(c=>
-                ({key: c.country_name, value: c.country_id}));
+            const def_c = {key: 'Any', value: ''};
+            const countries = [def_c].concat(locations.countries.map(c=>
+                ({key: c.country_name, value: c.country_id})));
             this.setState({countries});
         });
         this.setdb_on('head.consts', consts=>{
@@ -38,7 +39,7 @@ class Request extends Pure_component {
                     return null;
                 return {...z, plan: plans.slice(-1)[0]};
             }).filter(Boolean);
-            this.setState({zones});
+            this.setState({zones, def_zone: consts.proxy.zone.def});
         });
     }
     url_changed = value=>this.setState({url: value});
@@ -49,6 +50,7 @@ class Request extends Pure_component {
         this.etask(function*(){
             const {url, zone, country} = _this.state;
             const data = {url, zone, country};
+            data.zone = data.zone||_this.state.def_zone;
             const raw_trace = yield window.fetch('/api/trace', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
