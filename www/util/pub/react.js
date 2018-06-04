@@ -599,6 +599,10 @@ class Clipboard extends Pure_component {
 }
 E.Clipboard = Clipboard;
 
+const Raw_text = props=>props.children.split('\n')
+    .map((line, i)=><div key={i}>{line}</div>);
+E.Raw_text = Raw_text;
+
 return E;
 
 });

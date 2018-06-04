@@ -1,8 +1,23 @@
 [
     {
+        "ver": "1.98.63",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added sending success rate info to luminati.io"
+            }
+        ]
+    },
+    {
         "ver": "1.97.753",
-        "type": "stable/dev",
-        "changes": []
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed memory leaks"
+            }
+        ]
     },
     {
         "ver": "1.97.739",

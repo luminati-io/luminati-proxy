@@ -275,7 +275,7 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _reactBootstrapTypeahead = __webpack_require__(291);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _chrome_widgets = __webpack_require__(190);
 
@@ -547,7 +547,9 @@ var Loader = exports.Loader = function Loader(_ref2) {
 };
 
 var Loader_small = exports.Loader_small = function Loader_small(_ref3) {
-    var show = _ref3.show;
+    var show = _ref3.show,
+        _ref3$msg = _ref3.msg,
+        msg = _ref3$msg === undefined ? 'Saving...' : _ref3$msg;
     return _react2.default.createElement(
         'div',
         { className: (0, _classnames2.default)('loader_small', { hide: !show }) },
@@ -555,7 +557,7 @@ var Loader_small = exports.Loader_small = function Loader_small(_ref3) {
         _react2.default.createElement(
             'div',
             { className: 'saving_label' },
-            'Saving...'
+            msg
         )
     );
 };
@@ -2639,9 +2641,7 @@ return Etask; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 /***/ }),
 /* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2960,6 +2960,8 @@ for (var k in presets) {
 }exports.presets = presets;
 
 /***/ }),
+/* 30 */,
+/* 31 */,
 /* 32 */,
 /* 33 */,
 /* 34 */,
@@ -3989,6 +3991,17 @@ if (is_node) ;
     }(Pure_component);
 
     E.Clipboard = Clipboard;
+
+    var Raw_text = function Raw_text(props) {
+        return props.children.split('\n').map(function (line, i) {
+            return React.createElement(
+                'div',
+                { key: i },
+                line
+            );
+        });
+    };
+    E.Raw_text = Raw_text;
 
     return E;
 }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
@@ -8512,7 +8525,7 @@ var _jquery = __webpack_require__(10);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _reactWaypoint = __webpack_require__(701);
 
@@ -13349,7 +13362,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _pure_component = __webpack_require__(16);
 
@@ -15358,7 +15371,7 @@ var _har_viewer = __webpack_require__(191);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var util = _interopRequireWildcard(_util);
 
@@ -17108,7 +17121,7 @@ module.exports = __webpack_require__(420);
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof = __webpack_require__(239);
-var ITERATOR = __webpack_require__(29)('iterator');
+var ITERATOR = __webpack_require__(30)('iterator');
 var Iterators = __webpack_require__(66);
 module.exports = __webpack_require__(18).isIterable = function (it) {
   var O = Object(it);
@@ -31830,7 +31843,7 @@ var _instructions2 = _interopRequireDefault(_instructions);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _setdb = __webpack_require__(24);
 
@@ -34268,7 +34281,7 @@ var _react3 = __webpack_require__(38);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34510,7 +34523,7 @@ var _jquery = __webpack_require__(10);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _pure_component = __webpack_require__(16);
 
@@ -35039,7 +35052,7 @@ var _etask = __webpack_require__(27);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _ajax = __webpack_require__(25);
 
@@ -36355,7 +36368,7 @@ var _etask = __webpack_require__(27);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _lodash = __webpack_require__(37);
 
@@ -37832,7 +37845,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 var _etask = __webpack_require__(27);
 
@@ -39685,7 +39698,7 @@ var _jquery = __webpack_require__(10);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(31);
+var _util = __webpack_require__(29);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40155,10 +40168,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _extends2 = __webpack_require__(6);
-
-var _extends3 = _interopRequireDefault(_extends2);
-
 var _objectWithoutProperties2 = __webpack_require__(7);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
@@ -40166,6 +40175,10 @@ var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2
 var _regenerator = __webpack_require__(21);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _extends2 = __webpack_require__(6);
+
+var _extends3 = _interopRequireDefault(_extends2);
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -40193,6 +40206,8 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _common = __webpack_require__(17);
 
+var _util = __webpack_require__(29);
+
 var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
@@ -40213,74 +40228,40 @@ var Tracer = function (_Pure_component) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Tracer.__proto__ || Object.getPrototypeOf(Tracer)).call.apply(_ref, [this].concat(args))), _this2), _this2.title = 'Test affiliate links', _this2.subtitle = 'Trace links and see all the redirections', _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
-    }
-
-    (0, _createClass3.default)(Tracer, [{
-        key: 'render',
-        value: function render() {
-            return _react2.default.createElement(
-                'div',
-                { className: 'tracer' },
-                _react2.default.createElement(_common.Nav, { title: this.title, subtitle: this.subtitle }),
-                _react2.default.createElement(Request, null)
-            );
-        }
-    }]);
-    return Tracer;
-}(_pure_component2.default);
-
-exports.default = Tracer;
-
-var Request = function (_Pure_component2) {
-    (0, _inherits3.default)(Request, _Pure_component2);
-
-    function Request() {
-        var _ref2;
-
-        var _temp2, _this3, _ret2;
-
-        (0, _classCallCheck3.default)(this, Request);
-
-        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            args[_key2] = arguments[_key2];
-        }
-
-        return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Request.__proto__ || Object.getPrototypeOf(Request)).call.apply(_ref2, [this].concat(args))), _this3), _this3.state = { url: '', zone: '', country: '' }, _this3.url_changed = function (value) {
-            return _this3.setState({ url: value });
-        }, _this3.zone_changed = function (zone) {
-            return _this3.setState({ zone: zone });
-        }, _this3.country_changed = function (country) {
-            return _this3.setState({ country: country });
-        }, _this3.go_clicked = function () {
-            var _this = _this3;
-            _this3.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                var _this$state, url, zone, country, data, raw_trace, json;
-
+        return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Tracer.__proto__ || Object.getPrototypeOf(Tracer)).call.apply(_ref, [this].concat(args))), _this2), _this2.state = { loading: false, err: false }, _this2.title = 'Test affiliate links', _this2.subtitle = 'Trace links and see all the redirections', _this2.set_result = function (res) {
+            return _this2.setState(res);
+        }, _this2.execute = function (url, zone, country) {
+            _this2.setState({ log: null, err: false, loading: true });
+            var data = { url: url, zone: zone, country: country };
+            var _this = _this2;
+            _this2.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                var raw_trace, json;
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                _this$state = _this.state, url = _this$state.url, zone = _this$state.zone, country = _this$state.country;
-                                data = { url: url, zone: zone, country: country };
-
-                                data.zone = data.zone || _this.state.def_zone;
-                                _context.next = 5;
+                                this.on('uncaught', function (e) {
+                                    _this.setState({ loading: false });
+                                    console.log(e);
+                                });
+                                _this.ws.addEventListener('message', _this.on_message);
+                                _context.next = 4;
                                 return window.fetch('/api/trace', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify(data)
                                 });
 
-                            case 5:
+                            case 4:
                                 raw_trace = _context.sent;
-                                _context.next = 8;
+                                _context.next = 7;
                                 return raw_trace.json();
 
-                            case 8:
+                            case 7:
                                 json = _context.sent;
 
-                                console.log(json);
+                                _this.ws.removeEventListener('message', _this.on_message);
+                                _this.setState((0, _extends3.default)({}, json, { loading: false }));
 
                             case 10:
                             case 'end':
@@ -40289,13 +40270,118 @@ var Request = function (_Pure_component2) {
                     }
                 }, _callee, this);
             }));
-        }, _temp2), (0, _possibleConstructorReturn3.default)(_this3, _ret2);
+        }, _this2.on_message = function (event) {
+            var res = JSON.parse(event.data);
+            _this2.setState({ log: res.log, next_url: res.loading });
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
+    }
+
+    (0, _createClass3.default)(Tracer, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this3 = this;
+
+            this.setdb_on('head.ws', function (ws) {
+                if (!ws || _this3.ws) return;
+                _this3.ws = ws;
+            });
+        }
+    }, {
+        key: 'willUnmount',
+        value: function willUnmount() {
+            if (this.ws) this.ws.removeEventListener('message', this.on_message);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'tracer' },
+                _react2.default.createElement(_common.Nav, { title: this.title, subtitle: this.subtitle }),
+                _react2.default.createElement(Request, { execute: this.execute, set_result: this.set_result,
+                    loading: this.state.loading }),
+                _react2.default.createElement(Result, { log: this.state.log, loading: this.state.loading,
+                    next_url: this.state.next_url })
+            );
+        }
+    }]);
+    return Tracer;
+}(_pure_component2.default);
+
+exports.default = Tracer;
+
+
+var Result = function Result(_ref2) {
+    var log = _ref2.log,
+        loading = _ref2.loading,
+        next_url = _ref2.next_url;
+
+    if (!log) return null;
+    return _react2.default.createElement(
+        'div',
+        { className: 'results instructions' },
+        _react2.default.createElement(
+            'ol',
+            null,
+            log.map(function (l) {
+                return _react2.default.createElement(Result_row, { key: l.url, url: l.url, code: l.code });
+            }),
+            next_url && loading && _react2.default.createElement(Result_row, { url: next_url })
+        ),
+        loading && _react2.default.createElement(_common.Loader_small, { show: true, msg: 'Loading...' })
+    );
+};
+
+var Result_row = function Result_row(_ref3) {
+    var url = _ref3.url,
+        code = _ref3.code;
+    return _react2.default.createElement(
+        _common.Circle_li,
+        null,
+        url + ' ',
+        code && _react2.default.createElement(
+            _common.Tooltip,
+            { title: code + ' - ' + _util.status_codes[code] },
+            _react2.default.createElement(
+                'strong',
+                null,
+                '(',
+                code,
+                ')'
+            )
+        )
+    );
+};
+
+var Request = function (_Pure_component2) {
+    (0, _inherits3.default)(Request, _Pure_component2);
+
+    function Request() {
+        var _ref4;
+
+        var _temp2, _this4, _ret2;
+
+        (0, _classCallCheck3.default)(this, Request);
+
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        return _ret2 = (_temp2 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref4 = Request.__proto__ || Object.getPrototypeOf(Request)).call.apply(_ref4, [this].concat(args))), _this4), _this4.def_url = 'http://luminati.io', _this4.state = { url: _this4.def_url, zone: '', country: '', err: false }, _this4.url_changed = function (value) {
+            return _this4.setState({ url: value });
+        }, _this4.zone_changed = function (zone) {
+            return _this4.setState({ zone: zone });
+        }, _this4.country_changed = function (country) {
+            return _this4.setState({ country: country });
+        }, _this4.go_clicked = function () {
+            _this4.props.execute(_this4.state.url, _this4.state.zone || _this4.state.def_zone, _this4.state.country);
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this4, _ret2);
     }
 
     (0, _createClass3.default)(Request, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this4 = this;
+            var _this5 = this;
 
             this.setdb_on('head.locations', function (locations) {
                 if (!locations) return;
@@ -40303,19 +40389,19 @@ var Request = function (_Pure_component2) {
                 var countries = [def_c].concat(locations.countries.map(function (c) {
                     return { key: c.country_name, value: c.country_id };
                 }));
-                _this4.setState({ countries: countries });
+                _this5.setState({ countries: countries });
             });
             this.setdb_on('head.consts', function (consts) {
                 if (!consts) return;
-                var zones = consts.proxy.zone.values.map(function (_ref3) {
-                    var plans = _ref3.plans,
-                        z = (0, _objectWithoutProperties3.default)(_ref3, ['plans']);
+                var zones = consts.proxy.zone.values.map(function (_ref5) {
+                    var plans = _ref5.plans,
+                        z = (0, _objectWithoutProperties3.default)(_ref5, ['plans']);
 
                     if (!z.value) return z;
                     if (!plans || !plans.length) return null;
                     return (0, _extends3.default)({}, z, { plan: plans.slice(-1)[0] });
                 }).filter(Boolean);
-                _this4.setState({ zones: zones, def_zone: consts.proxy.zone.def });
+                _this5.setState({ zones: zones, def_zone: consts.proxy.zone.def });
             });
         }
     }, {
@@ -40332,45 +40418,51 @@ var Request = function (_Pure_component2) {
                         Field,
                         { title: 'Zone' },
                         _react2.default.createElement(_common.Select, { val: this.state.zone, data: this.state.zones,
-                            on_change_wrapper: this.zone_changed })
+                            on_change_wrapper: this.zone_changed,
+                            disabled: this.props.loading })
                     ),
                     _react2.default.createElement(
                         Field,
                         { title: 'Country' },
                         _react2.default.createElement(_common.Select, { val: this.state.country, data: this.state.countries,
-                            on_change_wrapper: this.country_changed })
+                            on_change_wrapper: this.country_changed,
+                            disabled: this.props.loading })
                     ),
                     _react2.default.createElement(
                         Field,
                         { title: 'URL', className: 'url' },
                         _react2.default.createElement(_common.Input, { type: 'text', val: this.state.url,
-                            on_change_wrapper: this.url_changed })
+                            on_change_wrapper: this.url_changed,
+                            disabled: this.props.loading })
                     )
                 ),
-                _react2.default.createElement(Go_button, { on_click: this.go_clicked })
+                _react2.default.createElement(Go_button, { on_click: this.go_clicked,
+                    disabled: this.props.loading })
             );
         }
     }]);
     return Request;
 }(_pure_component2.default);
 
-var Go_button = function Go_button(_ref4) {
-    var on_click = _ref4.on_click;
+var Go_button = function Go_button(_ref6) {
+    var on_click = _ref6.on_click,
+        disabled = _ref6.disabled;
     return _react2.default.createElement(
         'div',
         { className: 'go_btn_wrapper' },
         _react2.default.createElement(
             'button',
-            { onClick: on_click, className: 'btn btn_lpm btn_lpm_primary' },
+            { onClick: on_click, className: 'btn btn_lpm btn_lpm_primary',
+                disabled: disabled },
             'Go'
         )
     );
 };
 
-var Field = function Field(_ref5) {
-    var children = _ref5.children,
-        title = _ref5.title,
-        className = _ref5.className;
+var Field = function Field(_ref7) {
+    var children = _ref7.children,
+        title = _ref7.title,
+        className = _ref7.className;
     return _react2.default.createElement(
         'div',
         { className: (0, _classnames2.default)('field', className) },

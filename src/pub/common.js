@@ -167,10 +167,10 @@ export const Loader = ({show})=>(
     </If>
 );
 
-export const Loader_small = ({show})=>(
+export const Loader_small = ({show, msg='Saving...'})=>(
     <div className={classnames('loader_small', {hide: !show})}>
       <div className="spinner"/>
-      <div className="saving_label">Saving...</div>
+      <div className="saving_label">{msg}</div>
     </div>
 );
 
