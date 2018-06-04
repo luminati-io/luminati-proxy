@@ -44,7 +44,10 @@ export default class Tracer extends Pure_component {
         });
     };
     on_message = event=>{
-        const res = JSON.parse(event.data);
+        const json = JSON.parse(event.data);
+        if (json.type!='tracer')
+            return;
+        const res = json.data;
         this.setState({log: res.log, next_url: res.loading});
     };
     render(){
@@ -67,7 +70,7 @@ const Result = ({log, loading, next_url})=>{
         <div className="results instructions">
           <ol>
             {log.map(l=>(
-              <Result_row key={l.url} url={l.url} code={l.code}/>
+              <Result_row key={l._url} url={l._url} code={l.code}/>
             ))}
             {next_url&&loading&&<Result_row url={next_url}/>}
           </ol>

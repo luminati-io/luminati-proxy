@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.98.91 Development Latest
+- :sparkles: new feature: Test affiliate links
+
 ## 1.98.63 Stable
 - :star: added sending success rate info to luminati.io
 

@@ -66,7 +66,10 @@ class Request extends Pure_component {
         });
     }
     on_message = event=>{
-        const req = JSON.parse(event.data);
+        const json = JSON.parse(event.data);
+        if (json.type!='har_viewer')
+            return;
+        const req = json.data;
         if (this.ws)
             this.ws.removeEventListener('message', this.on_message);
         this.props.update_response(req);

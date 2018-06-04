@@ -73,12 +73,6 @@ const Old_modals = ()=>(
 );
 
 const Nav_left = withRouter(class Nav_left extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('feature.tracer', tracer=>{
-            this.setState({tracer});
-        });
-    }
     render(){
         return (
             <div className="nav_left">
@@ -87,10 +81,8 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
                 <Nav_link to="/howto" name="howto" label="Instructions"/>
                 <Nav_link to="/proxy_tester" name="proxy_tester"
                   label="Proxy tester"/>
-                {this.state.tracer &&
-                  <Nav_link to="/tracer" name="tracer"
-                    label="Test affiliate links"/>
-                }
+                <Nav_link to="/tracer" name="tracer"
+                  label="Test affiliate links"/>
                 <Nav_link to="/logs" name="logs" label="Logs"/>
                 <Nav_link to="/settings" name="general_config"
                   label="General settings"/>

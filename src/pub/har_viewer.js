@@ -434,7 +434,10 @@ class Tables_container extends Pure_component {
         return false;
     };
     on_message = event=>{
-        const req = JSON.parse(event.data);
+        const json = JSON.parse(event.data);
+        if (json.type!='har_viewer')
+            return;
+        const req = json.data;
         this.setState(prev=>({
             stats: {
                 total: prev.stats.total+1,
