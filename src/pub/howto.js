@@ -7,8 +7,8 @@ import prism from 'prismjs';
 import instructions from './instructions.js';
 import {Code, Modal} from './common.js';
 import {ga_event} from './util.js';
-import setdb from 'hutil/util/setdb';
-import etask from 'hutil/util/etask';
+import setdb from '../../util/setdb.js';
+import etask from '../../util/etask.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
 
@@ -79,11 +79,10 @@ class Code_instructions extends Pure_component {
     }
     click_copy(lang){ ga_event('How-to-tab', 'click copy', lang); }
     render(){
-        const Lang_btn_clickable = props=>(
+        const Lang_btn_clickable = props=>
             <span onClick={()=>this.click_lang(props.lang)}>
               <Lang_btn active={this.state.lang==props.lang} {...props}/>
-            </span>
-        );
+            </span>;
         const tutorial_port = window.localStorage.getItem(
             'quickstart-first-proxy')||24000;
         const to_copy = instructions.code(tutorial_port)[this.state.lang];

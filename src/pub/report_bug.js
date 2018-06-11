@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import etask from 'hutil/util/etask';
-import ajax from 'hutil/util/ajax';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
 import React from 'react';
 import {Modal, Loader} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
@@ -41,6 +41,7 @@ class Index extends Pure_component {
         return etask(function*(){
             this.on('uncaught', ()=>{ _this.setState({sending: false}); });
             _this.setState({sending: true});
+            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/report_bug', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -76,12 +77,10 @@ class Index extends Pure_component {
     }
 }
 
-const Thanks_modal = ()=>(
-    <Modal title="Report has been sent" id="thanks_modal"
-      no_cancel_btn>
+const Thanks_modal = ()=>
+    <Modal title="Report has been sent" id="thanks_modal" no_cancel_btn>
       <h4>You issue in being handled! We will be in touch as soon
         as possible.</h4>
-    </Modal>
-);
+    </Modal>;
 
 export default Index;

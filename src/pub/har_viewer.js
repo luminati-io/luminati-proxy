@@ -5,17 +5,16 @@ import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import setdb from 'hutil/util/setdb';
-import etask from 'hutil/util/etask';
-import ajax from 'hutil/util/ajax';
-import zescape from 'hutil/util/escape';
+import setdb from '../../util/setdb.js';
+import ajax from '../../util/ajax.js';
+import zescape from '../../util/escape.js';
 import $ from 'jquery';
 import {status_codes, bytes_format} from './util.js';
 import Waypoint from 'react-waypoint';
 import {Toolbar_button, Tooltip, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
 import Preview from './har_preview.js';
-import {Tooltip_bytes} from './common.js';
+import {Tooltip_bytes, Checkbox} from './common.js';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
@@ -117,8 +116,7 @@ class Har_viewer extends Pure_component {
             return null;
         const width = `calc(100% - ${this.state.tables_width}px`;
         const preview_style = {maxWidth: width, minWidth: width};
-        return (
-            <div id="har_viewer" className="har_viewer chrome">
+        return <div id="har_viewer" className="har_viewer chrome">
               <div className="main_panel vbox" ref={this.set_main_panel_ref}>
                 <Toolbar
                   undock={this.undock}
@@ -153,31 +151,104 @@ class Har_viewer extends Pure_component {
                     offset={this.state.tables_width}/>
                 </div>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
-const Toolbar = ({clear, search_val, on_change_search, type_filter,
-    set_type_filter, proxies, filters, set_filter, master_port, undock,
-    dock_mode})=>
-(
-    <div className="toolbar_container">
-      <div className="toolbar">
-        <Toolbar_button id="clear" tooltip="Clear" on_click={clear}/>
-        {!dock_mode &&
-          <Toolbar_button id="docker" tooltip="Undock into separate window"
-            on_click={undock}/>
-        }
-        <Devider/>
-        <Search_box val={search_val} on_change={on_change_search}/>
-        <Type_filters filter={type_filter} set={set_type_filter}/>
-        <Devider/>
-        <Filters set_filter={set_filter} filters={filters}
-          master_port={master_port}/>
-      </div>
-    </div>
-);
+class Toolbar extends Pure_component {
+    state = {select_visible: false};
+    componentDidMount(){
+        this.setdb_on('har_viewer.select_visible', visible=>
+            this.setState({select_visible: visible}));
+    }
+    render(){
+        const {clear, search_val, on_change_search, type_filter,
+            set_type_filter, filters, set_filter, master_port, undock,
+            dock_mode} = this.props;
+        return <div className="toolbar_container">
+              <Toolbar_row>
+                <Toolbar_button id="clear" tooltip="Clear" on_click={clear}/>
+                {!dock_mode &&
+                  <Toolbar_button id="docker"
+                    tooltip="Undock into separate window" on_click={undock}/>
+                }
+                <Devider/>
+                <Actions/>
+                <Devider/>
+                <Search_box val={search_val} on_change={on_change_search}/>
+                <Type_filters filter={type_filter} set={set_type_filter}/>
+                <Devider/>
+                <Filters set_filter={set_filter} filters={filters}
+                  master_port={master_port}/>
+              </Toolbar_row>
+            </div>;
+    }
+}
+
+const Toolbar_row = ({children})=>
+    <div className="toolbar">
+      {children}
+    </div>;
+
+class Actions extends Pure_component {
+    state = {action: '', any_checked: false};
+    componentDidMount(){
+        this.setdb_on('har_viewer.current_action', action=>
+            action!=undefined&&this.setState({action}));
+        this.setdb_on('har_viewer.checked_list', list=>{
+            if (!list)
+                return;
+            const any_checked = Object.keys(list).filter(o=>list[o]).length;
+            this.setState({any_checked});
+        });
+    }
+    set = e=>setdb.set('har_viewer.current_action', e.target.value);
+    resend = ()=>{
+        const list = setdb.get('har_viewer.checked_list')||[];
+        if (!list.length)
+            return;
+        const uuids = Object.keys(list).filter(o=>list[o]);
+        this.etask(function*(){
+            this.on('uncaught', e=>console.log(e));
+            // XXX krzysztof: switch fetch->ajax
+            yield window.fetch('/api/logs_resend', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({uuids}),
+            });
+        });
+    };
+    cancel = ()=>setdb.set('har_viewer.current_action', '');
+    render(){
+        const resend_classes = classnames('filter',
+            {disabled: !this.state.any_checked});
+        const tooltip = 'Actions that can be performed on a single or multiple'
+        +' requests';
+        return <div className="actions">
+              {this.state.action=='select' &&
+                <div className="filters">
+                  <Tooltip title="Resend requests" placement="bottom">
+                    <div className={resend_classes}
+                      onClick={this.resend}>Resend</div>
+                  </Tooltip>
+                  <Tooltip title="Cancel" placement="bottom">
+                    <div className={classnames('filter')}
+                      onClick={this.cancel}>Cancel</div>
+                  </Tooltip>
+                </div>
+              }
+              <div className="custom_filter">
+                <Tooltip title={tooltip} placement="bottom">
+                  <select value={this.state.action} onChange={this.set}>
+                    <option value="">Actions</option>
+                    <option value="select">Resend requests</option>
+                  </select>
+                </Tooltip>
+                <span className="arrow"/>
+              </div>
+            </div>;
+    }
+}
 
 class Filters extends Pure_component {
     state = {};
@@ -195,74 +266,65 @@ class Filters extends Pure_component {
             {name: 'status_code', default_value: 'All status codes'},
             {name: 'protocol', default_value: 'All protocols'},
         ];
-        return (
-            <div className="filters">
-              {filters.map(f=>(
-                <Filter key={f.name}
-                  vals={this.state.suggestions[f.name+'s']}
-                  val={this.props.filters[f.name]}
-                  set={this.props.set_filter.bind(null, f.name)}
-                  default_value={f.default_value}/>
-              ))}
-            </div>
-        );
+        return <div className="filters">
+          {filters.map(f=>
+            <Filter key={f.name}
+              vals={this.state.suggestions[f.name+'s']}
+              val={this.props.filters[f.name]}
+              set={this.props.set_filter.bind(null, f.name)}
+              default_value={f.default_value}/>
+          )}
+        </div>;
     }
 }
 
-const Filter = ({vals, val, set, default_value})=>(
+const Filter = ({vals, val, set, default_value})=>
     <div className="custom_filter">
       <select value={val} onChange={set}>
         <option value="">{default_value}</option>
-        {vals.map(p=>(
-          <option key={p} value={p}>{p}</option>
-        ))}
+        {vals.map(p=><option key={p} value={p}>{p}</option>)}
       </select>
       <span className="arrow"/>
-    </div>
-);
+    </div>;
 
 const type_filters = [{name: 'XHR', tooltip: 'XHR and fetch'},
     {name: 'JS', tooltip: 'Scripts'}, {name: 'CSS', tooltip: 'Stylesheets'},
     {name: 'Img', tooltip: 'Images'}, {name: 'Media', tooltip: 'Media'},
     {name: 'Font', tooltip: 'Fonts'}, {name: 'Other', tooltip: 'Other'}];
-const Type_filters = ({filter, set})=>(
+const Type_filters = ({filter, set})=>
     <div className="filters">
       <Type_filter name="All" on_click={set.bind(null, 'All')} cur={filter}
         tooltip="All types"/>
       <Devider/>
-      {type_filters.map(f=>(
+      {type_filters.map(f=>
         <Type_filter on_click={set.bind(null, f.name)} key={f.name}
           name={f.name} cur={filter} tooltip={f.tooltip}/>
-      ))}
-    </div>
-);
+      )}
+    </div>;
 
-const Type_filter = ({name, cur, tooltip, on_click})=>(
+const Type_filter = ({name, cur, tooltip, on_click})=>
     <Tooltip title={tooltip} placement="bottom">
       <div className={classnames('filter', {active: cur==name})}
         onClick={on_click}>{name}</div>
-    </Tooltip>
-);
+    </Tooltip>;
 
-const Search_box = ({val, on_change})=>(
+const Search_box = ({val, on_change})=>
     <div className="search_box">
       <input value={val}
         onChange={on_change}
         type="text"
         placeholder="Filter"/>
-    </div>
-);
+    </div>;
 
 const Tables_resizer = ({show, offset, start_moving})=>{
     if (!show)
         return null;
-    return (
-        <div className="data_grid_resizer" style={{left: offset-2}}
-          onMouseDown={start_moving}/>
-    );
+    return <div className="data_grid_resizer" style={{left: offset-2}}
+      onMouseDown={start_moving}/>;
 };
 
-const cols = [
+const table_cols = [
+    {title: 'select', hidden: true, fixed: 27},
     {title: 'Name', sort_by: 'url', data: 'request.url'},
     {title: 'Proxy port', sort_by: 'port', data: 'details.port'},
     {title: 'Status', sort_by: 'status_code', data: 'response.status'},
@@ -272,7 +334,7 @@ const cols = [
         data: 'details.proxy_peer'},
     {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
 ];
-const Tables_container = with_resizable_cols(cols,
+const Tables_container = with_resizable_cols(table_cols,
 class Tables_container extends Pure_component {
     uri = '/api/logs';
     batch_size = 30;
@@ -290,10 +352,22 @@ class Tables_container extends Pure_component {
         {
             this.set_new_params();
         }
+        if (prev_props.cur_preview!=this.props.cur_preview)
+            this.props.resize_columns();
     }
     componentDidMount(){
         window.addEventListener('resize', this.props.resize_columns);
         this.setdb_on('head.har_viewer.reset_reqs', ()=>{
+            setdb.set('har_viewer.checked_list', []);
+            this.loaded.to = 0;
+            this.setState({
+                reqs: [],
+                stats: {total: 0, sum_out: 0, sum_in: 0},
+            });
+        });
+        this.setdb_on('head.har_viewer.refresh', refresh=>{
+            if (!refresh)
+                return;
             this.loaded.to = 0;
             this.setState({
                 reqs: [],
@@ -316,6 +390,14 @@ class Tables_container extends Pure_component {
             this.ws = ws;
             this.ws.addEventListener('message', this.on_message);
         });
+        this.setdb_on('har_viewer.current_action', action=>{
+            if (action==undefined)
+                return;
+            if (action=='select')
+                this.props.show_column(0);
+            else
+                this.props.hide_column(0);
+        });
     }
     willUnmount(){
         window.removeEventListener('resize', this.props.resize_columns);
@@ -323,10 +405,14 @@ class Tables_container extends Pure_component {
             this.ws.removeEventListener('message', this.on_message);
         setdb.set('head.har_viewer.reqs', []);
         setdb.set('head.har_viewer.stats', null);
+        setdb.set('har_viewer', null);
     }
     fetch_missing_data = pos=>{
-        if (this.state.stats&&this.state.reqs.length==this.state.stats.total)
+        if (this.state.stats&&this.state.stats.total&&
+            this.state.reqs.length==this.state.stats.total)
+        {
             return;
+        }
         if (pos=='bottom')
             this.get_data({skip: this.loaded.to});
     };
@@ -368,7 +454,7 @@ class Tables_container extends Pure_component {
             const url = zescape.uri(_this.uri, params);
             const res = yield ajax.json({url});
             const reqs = res.log.entries;
-            const new_reqs = [...(opt.replace ? [] : _this.state.reqs),
+            const new_reqs = [...opt.replace ? [] : _this.state.reqs,
                 ...reqs];
             setdb.set('head.har_viewer.reqs', new_reqs);
             _this.loaded.to = opt.skip+reqs.length;
@@ -397,7 +483,7 @@ class Tables_container extends Pure_component {
     };
     on_focus = ()=>this.setState({focused: true});
     on_blur = ()=>this.setState({focused: false});
-    is_hidden = (request)=>{
+    is_hidden = request=>{
         const cur_port = request.details.port;
         if (this.port&&cur_port!=this.port)
             return true;
@@ -435,8 +521,11 @@ class Tables_container extends Pure_component {
     };
     on_message = event=>{
         const json = JSON.parse(event.data);
-        if (json.type!='har_viewer')
+        if (json.type!='har_viewer'||!json.data.request.url||
+            json.data.request.url.match(/lumtest\.com\/myip\.json/))
+        {
             return;
+        }
         const req = json.data;
         this.setState(prev=>({
             stats: {
@@ -478,20 +567,20 @@ class Tables_container extends Pure_component {
     };
     render(){
         const style = {};
-        if (!!this.props.cur_preview)
+        if (this.props.cur_preview)
         {
             style.flex = `0 0 ${this.props.width}px`;
             style.width = this.props.width;
             style.maxWidth = this.props.width;
         }
-        return (
-            <div className="tables_container vbox"
+        return <div className="tables_container vbox"
               tabIndex="-1"
               style={style}
               onFocus={this.on_focus}
               onBlur={this.on_blur}>
               <div className="reqs_container">
                 <Header_container cols={this.props.cols}
+                  reqs={this.state.reqs}
                   sort={this.set_sort}
                   sorted={this.state.sorted}
                   only_name={!!this.props.cur_preview}/>
@@ -504,8 +593,7 @@ class Tables_container extends Pure_component {
               </div>
               <Summary_bar stats={this.state.stats}
                 sub_stats={this.state.sub_stats}/>
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -528,52 +616,83 @@ class Summary_bar extends Pure_component {
             text = `${sub_total} / ${total} requests | ${sub_sum_out} /
             ${sum_out} sent | ${sub_sum_in} / ${sum_in} received`;
         }
-        return (
-            <div className="summary_bar">
+        return <div className="summary_bar">
               <span>
                 <Tooltip title={text}>{text}</Tooltip>
               </span>
-            </div>
-        );
+            </div>;
     }
 }
 
-const Header_container = ({cols, only_name, sorted, sort})=>{
-    if (!cols)
-        return null;
-    if (only_name)
-        cols = cols.slice(0, 1);
-    return (
-        <div className="header_container">
-          <table>
-            <colgroup>
-              {cols.map((c, idx)=>(
-                <col key={c.title}
-                  style={{width: only_name||idx==cols.length-1 ?
-                    'auto' : c.width}}/>
-              ))}
-            </colgroup>
-            <tbody>
-              <tr>
-                {cols.map(c=>(
-                  <th key={c.title} onClick={()=>sort(c.sort_by)}>
-                    <div>{c.title}</div>
-                    <Sort_icon show={c.sort_by==sorted.field}
-                      dir={sorted.dir}/>
-                  </th>
-                ))}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-    );
-};
+class Header_container extends Pure_component {
+    state = {checked_all: false};
+    componentDidMount(){
+        this.setdb_on('har_viewer.checked_all', checked_all=>{
+            if (checked_all==undefined)
+                return;
+            this.setState({checked_all});
+        });
+    }
+    toggle_all = ()=>{
+        const checked_all = this.state.checked_all;
+        this.setState({checked_all: !checked_all});
+        const uuids = this.props.reqs.map(r=>r.uuid);
+        uuids.forEach(id=>
+            setdb.set('har_viewer.checked_list.'+id, !checked_all));
+        setdb.emit_path('har_viewer.checked_list');
+    };
+    click = col=>{
+        if (col.fixed)
+            this.toggle_all();
+        else
+            this.props.sort(col.sort_by);
+    };
+    render(){
+        let {cols, only_name, sorted} = this.props;
+        if (!cols)
+            return null;
+        if (only_name)
+            cols = [cols[1]];
+
+        return <div className="header_container">
+              <table>
+                <colgroup>
+                  {cols.map((c, idx)=>
+                    <col key={c.title}
+                      style={{width: only_name||idx==cols.length-1 ?
+                        'auto' : c.width}}/>
+                  )}
+                </colgroup>
+                <tbody>
+                  <tr>
+                    {cols.map(c=>
+                      <th key={c.title} onClick={()=>this.click(c)}>
+                        <div>
+                          {c.title=='select' &&
+                            <Checkbox checked={this.state.checked_all}/>}
+                          {c.title!='select' && c.title}
+                        </div>
+                        <Sort_icon show={c.sort_by==sorted.field}
+                          dir={sorted.dir}/>
+                      </th>
+                    )}
+                  </tr>
+                </tbody>
+              </table>
+            </div>;
+    }
+}
 
 class Data_container extends Pure_component {
+    state = {checked_all: false};
     componentDidMount(){
         this.setdb_on('head.har_viewer.dc_top', ()=>{
             if (this.dc)
                 this.dc.scrollTop = 0;
+        });
+        this.setdb_on('har_viewer.checked_all', checked_all=>{
+            if (checked_all!=undefined)
+                this.setState({checked_all});
         });
     }
     set_dc_ref = ref=>{ this.dc = ref; };
@@ -586,32 +705,26 @@ class Data_container extends Pure_component {
         cols = (cols||[]).map((c, idx)=>{
             if (!preview_mode)
                 return c;
-            if (preview_mode&&idx==0)
+            if (preview_mode&&idx==1)
                 return {...c, width: 'auto'};
             return {...c, width: 0};
         });
-        return (
-            <div ref={this.set_dc_ref} className="data_container">
+        return <div ref={this.set_dc_ref} className="data_container">
               <table>
                 <colgroup>
-                  {cols.map((c, idx)=>(
+                  {cols.map((c, idx)=>
                     <col key={c.title}
                       style={{width: !preview_mode&&idx==cols.length-1 ?
                         'auto': c.width}}/>
-                  ))}
+                  )}
                 </colgroup>
-                <Data_rows reqs={reqs}
-                  cols={cols}
-                  open_preview={open_preview}
+                <Data_rows reqs={reqs} cols={cols} open_preview={open_preview}
                   cur_preview={cur_preview}
-                  focused={focused}/>
+                  checked_all={this.state.checked_all} focused={focused}/>
               </table>
-              <Waypoint
-                key={reqs.length}
-                scrollableAncestor={this.dc}
+              <Waypoint key={reqs.length} scrollableAncestor={this.dc}
                 onEnter={this.handle_viewpoint_enter}/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -619,22 +732,22 @@ class Data_rows extends React.Component {
     shouldComponentUpdate(next_props){
         return next_props.reqs!=this.props.reqs ||
             next_props.cur_preview!=this.props.cur_preview ||
-            next_props.focused!=this.props.focused;
+            next_props.focused!=this.props.focused||
+            next_props.checked_all!=this.props.checked_all;
     }
     render(){
-        return (
-            <tbody>
-              {this.props.reqs.map(r=>(
+        return <tbody>
+              {this.props.reqs.map(r=>
                 <Data_row cols={this.props.cols} key={r.uuid}
                   open_preview={this.props.open_preview}
                   cur_preview={this.props.cur_preview}
+                  checked_all={this.props.checked_all}
                   focused={this.props.focused} req={r}/>
-              ))}
+              )}
               <tr className="filler">
                 {this.props.cols.map(c=><td key={c.title}/>)}
               </tr>
-            </tbody>
-        );
+            </tbody>;
     }
 }
 
@@ -646,7 +759,10 @@ class Data_row extends React.Component {
             next_props.req.uuid;
         const selection_changed = selected!=will_selected;
         const focused_changed = this.props.focused!=next_props.focused;
-        return selection_changed||focused_changed&&selected;
+        const checked_all_changed = this.props.checked_all!=
+            next_props.checked_all;
+        return selection_changed||focused_changed&&selected||
+            checked_all_changed;
     }
     render(){
         const {cur_preview, open_preview, cols, focused, req} = this.props;
@@ -656,60 +772,92 @@ class Data_row extends React.Component {
             focused: selected&&focused,
             error: !req.details.success,
         });
-        return (
-            <tr className={classes}>
-              {cols.map(c=>(
-                <td key={c.title} onClick={()=>open_preview(req)}>
-                  <Cell_value col={c.title} req={req}/>
+        return <tr className={classes}>
+              {cols.map((c, idx)=>
+                <td key={c.title} onClick={()=>idx!=0&&open_preview(req)}>
+                  <Cell_value col={c.title} req={req}
+                    checked_all={this.props.checked_all}/>
                 </td>
-              ))}
-            </tr>
-        );
+              )}
+            </tr>;
     }
 }
 
-const Cell_value = ({col, req})=>{
-    if (col=='Name')
-    {
-        return (
-            <Tooltip title={req.request.url}>
-              <div>
-                <div className="icon script"/>
-                <div className="disp_value">{req.request.url}</div>
-              </div>
-            </Tooltip>
-        );
+class Cell_value extends React.Component {
+    render(){
+        const {col, req} = this.props;
+        if (col=='select')
+        {
+            return <Select_cell uuid={req.uuid}
+              checked_all={this.props.checked_all}/>;
+        }
+        if (col=='Name')
+        {
+            return <Tooltip title={req.request.url}>
+                  <div className="col_name">
+                    <div>
+                      <div className="icon script"/>
+                      <div className="disp_value">{req.request.url}</div>
+                    </div>
+                  </div>
+                </Tooltip>;
+        }
+        else if (col=='Status')
+        {
+            const status = status_codes[req.response.status];
+            return <Tooltip title={req.response.status+' '+status}>
+                  <div className="disp_value">{req.response.status}</div>
+                </Tooltip>;
+        }
+        else if (col=='Proxy port')
+            return <Tooltip_and_value val={req.details.port}/>;
+        else if (col=='Bandwidth')
+            return <Tooltip_bytes chrome_style bytes={req.details.bw}/>;
+        else if (col=='Time')
+            return <Tooltip_and_value val={req.time+' ms'}/>;
+        else if (col=='Peer proxy')
+            return <Tooltip_and_value val={req.details.proxy_peer}/>;
+        else if (col=='Date')
+        {
+            const local = moment(new Date(req.startedDateTime)).format(
+                'YYYY-MM-DD HH:mm:ss');
+            return <Tooltip_and_value val={local}/>;
+        }
+        return col;
     }
-    else if (col=='Status')
-    {
-        const status = status_codes[req.response.status];
-        return (
-            <Tooltip title={req.response.status+' '+status}>
-              <div className="disp_value">{req.response.status}</div>
-            </Tooltip>
-        );
-    }
-    else if (col=='Proxy port')
-        return <Tooltip_and_value val={req.details.port}/>;
-    else if (col=='Bandwidth')
-        return <Tooltip_bytes chrome_style bytes={req.details.bw}/>;
-    else if (col=='Time')
-        return <Tooltip_and_value val={req.time+' ms'}/>;
-    else if (col=='Peer proxy')
-        return <Tooltip_and_value val={req.details.proxy_peer}/>;
-    else if (col=='Date')
-    {
-        const local = moment(new Date(req.startedDateTime)).format(
-            'YYYY-MM-DD HH:mm:ss');
-        return <Tooltip_and_value val={local}/>;
-    }
-    return col;
-};
+}
 
-const Tooltip_and_value = ({val})=>(
+class Select_cell extends React.Component {
+    state = {checked: false};
+    shouldComponentUpdate(next_props, next_state){
+        return next_state.checked!=this.state.checked||
+            next_props.checked_all!=this.props.checked_all;
+    }
+    componentDidMount(){
+        this.checked_listener = setdb.on(
+            'har_viewer.checked_list.'+this.props.uuid, checked=>{
+                if (checked==undefined)
+                    return;
+                this.setState({checked});
+            });
+    }
+    componentWillUnmount(){
+        setdb.off(this.checked_listener);
+    }
+    toggle = ()=>{
+        setdb.set('har_viewer.checked_list.'+this.props.uuid,
+            !this.state.checked);
+        setdb.emit_path('har_viewer.checked_list');
+    };
+    render(){
+        return <Checkbox checked={this.state.checked||this.props.checked_all}
+          on_change={this.toggle}/>;
+    }
+}
+
+const Tooltip_and_value = ({val})=>
     <Tooltip title={val}>
       <div className="disp_value">{val}</div>
-    </Tooltip>
-);
+    </Tooltip>;
 
 export default Har_viewer;

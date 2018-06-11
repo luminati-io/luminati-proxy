@@ -2,8 +2,8 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Proxies from './proxies.js';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
 import Stats from './stats.js';
 import Har_viewer from './har_viewer';
 import Pure_component from '../../www/util/pub/pure_component.js';

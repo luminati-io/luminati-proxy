@@ -9,6 +9,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import classnames from 'classnames';
 import moment from 'moment';
+import $ from 'jquery';
 
 class Preview extends Pure_component {
     panes = [
@@ -52,12 +53,11 @@ class Preview extends Pure_component {
     }
 }
 
-const Pane = ({id, idx, width, on_click, active})=>(
+const Pane = ({id, idx, width, on_click, active})=>
     <div onClick={()=>on_click(idx)} style={{width}}
       className={classnames('pane', id, {active})}>
       <span>{id}</span>
-    </div>
-);
+    </div>;
 
 const Pane_slider = ({panes, cur_pane})=>{
     const slider_class = classnames('pane_slider');
@@ -95,11 +95,10 @@ class Pane_response extends Pure_component {
     }
 }
 
-const No_response_data = ()=>(
+const No_response_data = ()=>
     <div className="empty_view">
       <div>This request has no response data available.</div>
-    </div>
-);
+    </div>;
 
 class Codemirror_wrapper extends Pure_component {
     componentDidMount(){
@@ -177,6 +176,9 @@ const Status_value = ({value})=>{
 };
 
 class Pane_timing extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.recent_stats', stats=>this.setState({stats})); }
     render(){
         const {timings, time, startedDateTime} = this.props.req;
         const sections = ['Resource Scheduling', 'Request/Response'];
@@ -229,6 +231,10 @@ class Pane_timing extends Pure_component {
                     </Timing_header>
                   ))}
                   <Timing_footer total={time}/>
+                  {this.props.req.request.url.endsWith('443') &&
+                    this.state.stats && this.state.stats.ssl_enable &&
+                    <Enable_https/>
+                  }
                 </tbody>
               </table>
             </div>
@@ -245,7 +251,7 @@ const Timing_header = ({title, children})=>[
     ...children,
 ];
 
-const Timing_row = ({title, id, left, right, time})=>(
+const Timing_row = ({title, id, left, right, time})=>
     <tr className="timing_row">
       <td>{title}</td>
       <td>
@@ -255,27 +261,41 @@ const Timing_row = ({title, id, left, right, time})=>(
         </div>
       </td>
       <td><div className="timing_bar_title">{time} ms</div></td>
-    </tr>
-);
+    </tr>;
 
 const network_explanation_url = 'https://developers.google.com/web/tools/'
 +'chrome-devtools/network-performance/reference#timing-explanation';
-const Timing_footer = ({total})=>(
-    <tr className="timing_footer">
+const Timing_footer = ({total})=>
+    <tr className="footer_link">
       <td colSpan="1">
-        <a className="devtools_link"
-          role="link"
-          tabIndex="0"
-          target="_blank"
-          href={network_explanation_url}
+        <a className="devtools_link" role="link" tabIndex="0" target="_blank"
+          rel="noopener noreferrer" href={network_explanation_url}
           style={{display: 'inline', cursor: 'pointer'}}>
           Explanation
         </a>
       </td>
       <td></td>
       <td>{total} ms</td>
-    </tr>
-);
+    </tr>;
+
+class Enable_https extends Pure_component {
+    click = ()=>$('#enable_ssl_modal').modal();
+    render(){
+        return (
+            <tr className="footer_link">
+              <td colSpan="2">
+                <a className="devtools_link" role="link" tabIndex="0"
+                  target="_blank" rel="noopener noreferrer"
+                  onClick={this.click}
+                  style={{display: 'inline', cursor: 'pointer'}}>
+                  Enable HTTPS logging
+                </a> to view this timeline
+              </td>
+              <td></td>
+            </tr>
+        );
+    }
+}
 
 const is_json_str = str=>{
     let resp;
@@ -297,12 +317,11 @@ class Pane_preview extends Pure_component {
     }
 }
 
-const Img_viewer = ({img})=>(
+const Img_viewer = ({img})=>
     <div className="img_viewer">
       <div className="image">
         <img src={img}/>
       </div>
-    </div>
-);
+    </div>;
 
 export default Preview;

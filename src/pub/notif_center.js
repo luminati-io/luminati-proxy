@@ -3,8 +3,8 @@
 import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import etask from 'hutil/util/etask';
-import ajax from 'hutil/util/ajax';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
 import {Modal} from './common.js';
 import $ from 'jquery';
 import {ga_event} from './util.js';
@@ -45,6 +45,7 @@ class Notif_center extends Pure_component {
         this.etask(function*(){
             const updated = _this.state.notifs.filter(n=>n.status=='new')
             .map(u=>({id: u._id, status: 'read'}));
+            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/update_notifs', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -63,6 +64,7 @@ class Notif_center extends Pure_component {
     message_clicked(message){
         ga_event('notif-center', 'notif-clicked', message.title);
         this.etask(function*(){
+            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/update_notifs', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -104,21 +106,18 @@ class Notif_center extends Pure_component {
     }
 }
 
-const Circle_icon = ({number})=>(
+const Circle_icon = ({number})=>
     <If when={number}>
       <div className="circle_wrapper">
         <div className="circle">{number}</div>
       </div>
-    </If>
-);
+    </If>;
 
-const No_new_messages = ()=>(
-    <h4 className="no_messages">You have no new messages.</h4>
-);
+const No_new_messages = ()=>
+    <h4 className="no_messages">You have no new messages.</h4>;
 
-const No_messages = ()=>(
-    <h4 className="no_messages">You don't have any messages yet.</h4>
-);
+const No_messages = ()=>
+    <h4 className="no_messages">You don't have any messages yet.</h4>;
 
 const Messages = ({notifs, on_click})=>{
     const new_messages = notifs.filter(n=>n.status=='new').length;
@@ -146,7 +145,6 @@ const Message = ({title, message, status, clickable, on_click})=>{
         </div>
     );
 };
-
 
 class Modal_portal extends Pure_component {
     render(){

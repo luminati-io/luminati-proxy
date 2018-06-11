@@ -124,14 +124,14 @@ export const tabs = {
             min_req_time: {
                 label: 'Minimum request time',
                 placeholder: '500',
-                tooltip: `Any request time above the given value in milliseconds
-                    will trigger the action`
+                tooltip: `Any request time above the given value in
+                    milliseconds will trigger the action`
             },
             max_req_time: {
                 label: 'Maximum request time',
                 placeholder: '500',
-                tooltip: `Any request time below the given value in milliseconds
-                    will trigger the action`
+                tooltip: `Any request time below the given value in
+                    milliseconds will trigger the action`
             },
             trigger_url_regex: {
                 label: 'Apply only on specific domains (optional)',

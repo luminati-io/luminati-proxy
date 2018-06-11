@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import ajax from 'hutil/util/ajax';
-import etask from 'hutil/util/etask';
+import ajax from '../../util/ajax.js';
+import etask from '../../util/etask.js';
 import classnames from 'classnames';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {Nav, Modal, Link_icon} from './common.js';
@@ -48,6 +48,7 @@ class Config extends Pure_component {
         const _this = this;
         this.etask(function*(){
             const check_url = '/api/config_check';
+            // XXX krzysztof: switch fetch->ajax
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -78,6 +79,7 @@ class Config extends Pure_component {
         const _this = this;
         this.etask(function*(){
             const save_url = '/api/config';
+            // XXX krzysztof: switch fetch->ajax
             yield window.fetch(save_url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

@@ -2,13 +2,13 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
-import zescape from 'hutil/util/escape';
-import csv from 'hutil/util/csv';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
+import zescape from '../../util/escape.js';
+import csv from '../../util/csv.js';
+import etask from '../../util/etask.js';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
-import etask from 'hutil/util/etask';
 import {bytes_format, get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
@@ -846,6 +846,7 @@ class Actions extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
+            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/proxy_dup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

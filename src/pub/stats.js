@@ -1,20 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {ga_event, bytes_format} from './util.js';
-import etask from 'hutil/util/etask';
-import date from 'hutil/util/date';
-import ajax from 'hutil/util/ajax';
-import zurl from 'hutil/util/url';
-import {Modal, Circle_li as Li, Tooltip_bytes} from './common.js';
+import {ga_event, status_codes} from './util.js';
+import ajax from '../../util/ajax.js';
+import {Tooltip_bytes} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react.js';
 import $ from 'jquery';
 import {withRouter} from 'react-router-dom';
-import classnames from 'classnames';
 import {Tooltip, Toolbar_button, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
-import {status_codes} from './util.js';
 
 class Stats extends Pure_component {
     state = {
@@ -33,16 +27,10 @@ class Stats extends Pure_component {
         e.stopPropagation();
         $('#enable_ssl_modal').modal();
     };
-    enable_ssl = ()=>{
-        this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
-            yield ajax({url: '/api/enable_ssl', method: 'POST'});
-        });
-    };
     show_reset_dialog = ()=>this.setState({show_reset: true});
     render(){
-        return [
-            <div key="1" className="chrome stats_panel">
+        return (
+            <div className="chrome stats_panel">
               <div className="main_panel">
                 <Toolbar stats={this.state.stats}/>
                 <Stat_table stats={this.state.stats}
@@ -55,41 +43,15 @@ class Stats extends Pure_component {
                 <Summary_bar enable_ssl_click={this.enable_ssl_click}
                   show={this.state.stats.ssl_enable}/>
               </div>
-            </div>,
-            <Enable_ssl_modal key="2" enable_ssl={this.enable_ssl}/>,
-        ];
+            </div>
+        );
     }
 }
 
-const faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
-const Enable_ssl_modal = ({enable_ssl})=>(
-    <Modal id="enable_ssl_modal" title="Enable SSL analyzing for all proxies"
-      click_ok={enable_ssl} className="enable_ssl_modal">
-      <p className="cert_info">
-        You will also need to add a certificate file to browsers.
-        Gathering stats for HTTPS requests requires setting a certificate key.
-      </p>
-      <div className="instructions">
-        <ol>
-          <Li>Download our free certificate key
-            <a href="/ssl" target="_blank" download> here</a>
-          </Li>
-          <Li>
-            Add the certificate to your browser. You can find more detailed
-            instructions <a className="link" href={faq_cert_url}
-              rel="noopener noreferrer" target="_blank">here</a>
-          </Li>
-          <Li>Refresh the page</Li>
-        </ol>
-      </div>
-    </Modal>
-);
-
-const Empty_row = ()=>(
+const Empty_row = ()=>
     <tr className="empty_row">
       <td>—</td><td>—</td><td>—</td><td>—</td>
-    </tr>
-);
+    </tr>;
 
 const Row = withRouter(class Row extends Pure_component {
     click = ()=>{
@@ -115,11 +77,11 @@ const Key_cell = ({title, warning, row_key})=>{
     return (
         <td>
           <Cell row_key={row_key}>{title}</Cell>
-          <If when={warning}>
+          {warning &&
             <Tooltip title={warning_tooltip}>
               <div className="ic_warning"/>
             </Tooltip>
-          </If>
+          }
         </td>
     );
 };
@@ -133,14 +95,11 @@ const Cell = ({row_key, title, children})=>{
             </Tooltip>
         );
     }
-    else
-    {
-        return (
-            <Tooltip title={title||children}>
-              <div className="disp_value">{children}</div>
-            </Tooltip>
-        );
-    }
+    return (
+        <Tooltip title={title||children}>
+          <div className="disp_value">{children}</div>
+        </Tooltip>
+    );
 };
 
 const Stat_table = with_resizable_cols([{id: 'key'}, {id: 'out_bw'},
@@ -149,7 +108,7 @@ class Stat_table extends Pure_component {
     state = {sorting: {col: 0, dir: 1}};
     sort = col=>{
         const cur_sorting = this.state.sorting;
-        const dir = cur_sorting.col==col ?  -1*cur_sorting.dir : 1;
+        const dir = cur_sorting.col==col ? -1*cur_sorting.dir : 1;
         this.setState({sorting: {dir, col}});
     };
     render(){
@@ -167,13 +126,11 @@ class Stat_table extends Pure_component {
     }
 });
 
-const Header_container = ({title, cols, sorting, sort})=>(
+const Header_container = ({title, cols, sorting, sort})=>
     <div className="header_container">
       <table>
         <colgroup>
-          {(cols||[]).map((c, idx)=>(
-            <col key={idx} style={{width: c.width}}/>
-          ))}
+          {(cols||[]).map((c, idx)=><col key={idx} style={{width: c.width}}/>)}
         </colgroup>
         <tbody>
           <tr>
@@ -184,17 +141,17 @@ const Header_container = ({title, cols, sorting, sort})=>(
           </tr>
         </tbody>
       </table>
-    </div>
-);
+    </div>;
 
-const Header = ({sort, sorting, id, label})=>(
+const Header = ({sort, sorting, id, label})=>
     <th onClick={()=>sort(id)}>
       <div>{label}</div>
       <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
-    </th>
-);
+    </th>;
 
 const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
+    if (!cols)
+        return null;
     const sorted = stats.slice().sort((a, b)=>{
         const field = cols[sorting.col].id;
         const val_a = a[field];
@@ -206,16 +163,16 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
         <div className="data_container">
           <table>
             <colgroup>
-              {(cols||[]).map((c, idx)=>(
+              {(cols||[]).map((c, idx)=>
                 <col key={idx} style={{width: c.width}}/>
-              ))}
+              )}
             </colgroup>
             <tbody>
-              <If when={!sorted.length}><Empty_row/></If>
-              {sorted.map(s=>(
+              {!sorted.length && <Empty_row/>}
+              {sorted.map(s=>
                 <Row stat={s} key={s.key} row_key={row_key} logs={logs}
                   warning={ssl_warning&&s.key=='https'}/>
-              ))}
+              )}
               <tr className="filler">
                 <td></td>
                 <td></td>
@@ -248,7 +205,6 @@ const Summary_bar = ({enable_ssl_click, show})=>{
 class Toolbar extends Pure_component {
     clear = ()=>{
         ga_event('stats panel', 'click', 'reset btn');
-        const _this = this;
         this.etask(function*(){
             yield ajax({url: '/api/recent_stats/reset'});
         });

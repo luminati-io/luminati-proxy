@@ -8,16 +8,15 @@ let check_compat = require('./check_compat.js');
 if (!check_compat.is_env_compat())
     process.exit();
 
-const hutil = require('hutil');
-const file = hutil.file;
+const file = require('../util/file.js');
+const etask = require('../util/etask.js');
+const zerr = require('../util/zerr.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const sudo_prompt = require('sudo-prompt');
-const etask = hutil.etask;
-const zerr = hutil.zerr;
 const is_win = process.platform == 'win32';
 const proc_name = 'luminati-proxy-manager';
 const daemon_startup_os = ['ubuntu', 'centos', 'redhat', 'gentoo', 'systemd',

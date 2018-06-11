@@ -68,7 +68,6 @@
     "font-awesome": "4.7.0",
     "flag-icon-css": "2.8.0",
     "http-shutdown": "1.1.0",
-    "hutil": "0.2.3",
     "json-stable-stringify": "1.0.1",
     "json2csv": "3.7.3",
     "lodash": "4.17.2",
@@ -321,9 +320,10 @@
       "src/pub/tracer.js",
       "src/pub/util.js",
       "test.js",
+      "util/config.js",
       "webpack.config.js"
     ],
-    "md5": "8669bcc382aa0defa88b990770388d64"
+    "md5": "2301ad634323531e509eee4ea07abc97"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -342,8 +342,6 @@
     }
   ],
   "optionalDependencies": {
-    "phantomjs-prebuilt": "2.1.14",
-    "webshot": "0.18.0",
     "posix": "4.1.1",
     "heapdump": "0.3.9"
   },
@@ -360,5 +358,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.98.91"
+  "version": "1.99.64"
 }

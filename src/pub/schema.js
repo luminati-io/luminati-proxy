@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import zurl from 'hutil/util/url';
+import zurl from '../../util/url.js';
 import classnames from 'classnames';
 import {If} from '/www/util/pub/react.js';
 import {Tooltip} from './common.js';

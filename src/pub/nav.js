@@ -2,19 +2,18 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import ajax from 'hutil/util/ajax';
-import etask from 'hutil/util/etask';
-import setdb from 'hutil/util/setdb';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
 import classnames from 'classnames';
 import {Tooltip, Modal} from './common.js';
 import Schema from './schema.js';
 import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
 import $ from 'jquery';
-import {If} from '/www/util/pub/react.js';
 import {Route, withRouter, Link} from 'react-router-dom';
 
-const Nav = ()=>(
+const Nav = ()=>
     <div className="nav">
       <Nav_top/>
       <Nav_left/>
@@ -22,10 +21,9 @@ const Nav = ()=>(
       <Upgrade_modal/>
       <Shutdown_modal/>
       <Old_modals/>
-    </div>
-);
+    </div>;
 
-const Old_modals = ()=>(
+const Old_modals = ()=>
     <div>
       <div id="restarting" className="modal fade" role="dialog">
         <div className="modal-dialog">
@@ -69,8 +67,7 @@ const Old_modals = ()=>(
           </div>
         </div>
       </div>
-    </div>
-);
+    </div>;
 
 const Nav_left = withRouter(class Nav_left extends Pure_component {
     render(){
@@ -96,23 +93,20 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
     }
 });
 
-const Nav_link = ({label, to, name})=>(
+const Nav_link = ({label, to, name})=>
     <Route path={to} exact>
       {({match})=>
         <Nav_link_inner label={label} to={to} name={name} match={match}/>}
-    </Route>
+    </Route>;
 
-);
-
-const Nav_link_inner = ({label, to, name, match})=>(
+const Nav_link_inner = ({label, to, name, match})=>
     <Link to={to}>
       <div className={classnames('menu_item', {active: match})}>
         <Tooltip title={label} placement="right">
           <div className={classnames('icon', name)}/>
         </Tooltip>
       </div>
-    </Link>
-);
+    </Link>;
 
 class Nav_top extends Pure_component {
     constructor(props){
@@ -134,7 +128,7 @@ class Nav_top extends Pure_component {
     }
 }
 
-const Footer = ()=>(
+const Footer = ()=>
     <div className="footer">
       <div>
         <a href="http://luminati.io/faq#proxy"
@@ -153,18 +147,16 @@ const Footer = ()=>(
           API
         </a>
       </div>
-    </div>
-);
+    </div>;
 
 const Logo = withRouter(()=><Link to="/overview" className="logo"/>);
 
-const Nav_right = ()=>(
+const Nav_right = ()=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
       <div className="notif_icon"><Notif/></div>
       <Dropdown/>
-    </div>
-);
+    </div>;
 
 const show_reload = function(){
     $('#restarting').modal({
@@ -259,11 +251,11 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
                 <span className="caret"/>
               </a>
               <ul className="dropdown-menu dropdown-menu-right">
-                <If when={is_upgradable}>
+                {is_upgradable &&
                   <li>
                     <a onClick={this.upgrade.bind(this)}>Upgrade</a>
                   </li>
-                </If>
+                }
                 <li>
                   <a onClick={this.open_report_bug.bind(this)}>
                     Report a bug</a>

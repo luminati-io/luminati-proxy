@@ -10,9 +10,9 @@ else
 define(['virt_jquery_all', 'lodash', 'react', 'react-dom', 'react-router-dom',
     '/util/url.js', '/util/ajax.js', '/www/util/pub/pure_component.js',
     'react-bootstrap', '/util/setdb.js', '/util/etask.js', '/util/match.js',
-    '/util/country.js', '/www/locale/pub/i18n_react.js'], ($, _, React,
-    ReactDOM, RouterDOM, url, ajax, Pure_component, RB, setdb, etask, match,
-    country, i18n)=>{
+    '/util/country.js', '/util/date.js', '/www/locale/pub/i18n_react.js'],
+    ($, _, React, ReactDOM, RouterDOM, url, ajax, Pure_component, RB, setdb,
+    etask, match, country, date, i18n)=>{
 
 const E = {};
 const {Modal, Button, Alert} = RB;
@@ -300,7 +300,7 @@ class Nav_hook extends Pure_component {
         this.timeout&&clearTimeout(this.timeout);
         this.observer = this.timeout = null;
     }
-    render(){return this.props.children;}
+    render(){ return this.props.children; }
 }
 E.Nav_hook = RouterDOM.withRouter(Nav_hook);
 
@@ -308,7 +308,7 @@ E.Nav_hook = RouterDOM.withRouter(Nav_hook);
 // XXX viktor: since most of the React components swallow events
 const Tooltip = props=>{
     const {tip} = props;
-    if(!tip)
+    if (!tip)
         return props.children;
     const is_react_child =
         typeof React.Children.only(props.children).type == 'function';
@@ -552,7 +552,7 @@ class Phone_number_input extends Pure_component {
             <div className="phone_number_input">
               <div className="flag_container">
                 <div className="selected_flag f19" onClick={this.open_select}
-                  title={country.label+": +"+country.code}>
+                  title={country.label+': +'+country.code}>
                   <span className={'flag '+country.value.toLowerCase()}/>
                   <span className="selected_code">+{country.code}</span>
                   <span className="arrow"></span>
@@ -599,9 +599,369 @@ class Clipboard extends Pure_component {
 }
 E.Clipboard = Clipboard;
 
+class Copy_tooltip extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {copied: false};
+        this.clr_copy = this.clr_copy.bind(this);
+        this.copy = this.copy.bind(this);
+    }
+    clr_copy(){ this.setState({copied: false}); }
+    copy(){
+        let text = this.props.text;
+        if (typeof text == 'function')
+            text = text();
+        if (!text || !Clipboard.copy(text))
+            return this.props.on_fail&&this.props.on_fail();
+        this.setState({copied: true});
+        if (this.props.on_copy)
+            this.props.on_copy();
+    }
+    render(){
+        const p = this.props;
+        const click_msg = p.click_msg || <T>Click to copy</T>;
+        const copied_msg = p.copied_msg || <T>Copied!</T>;
+        return (
+            <Tooltip key={this.state.copied} {...p.tooltip_props}
+              tooltip_props={{style: {whiteSpace: 'nowrap'}}}
+              tip={this.state.copied ? copied_msg : click_msg}>
+              <span className="copy_hover_area" onClick={this.copy}
+                onMouseOut={this.clr_copy}>
+                {p.children}</span>
+            </Tooltip>);
+    }
+}
+E.Copy_tooltip = Copy_tooltip;
+
 const Raw_text = props=>props.children.split('\n')
     .map((line, i)=><div key={i}>{line}</div>);
 E.Raw_text = Raw_text;
+
+const clean_phonenum = phone_number=>phone_number.replace(/[^+\d]/g, '');
+
+class Phone_number_form extends Pure_component {
+    constructor(props){
+        super(props);
+        const {phone_number} = props;
+        this.state = {phone_number};
+    }
+    get_clear_phonenum(){
+        if (this.state.phone_number)
+            return clean_phonenum(this.state.phone_number);
+    }
+    validate_phone(){
+        this.setState({is_phone_valid: /^(\+|00)[1-9][0-9]{3,14}$/
+            .test(this.get_clear_phonenum())});
+    }
+    on_phone_change(event){
+        this.setState({phone_number: event.value});
+        if (this.props.on_change)
+            this.props.on_change(event.value);
+    }
+    phone_ref(inp){
+        this.etask(function*(){
+            yield etask.sleep(1000);
+            if (inp)
+                inp.focus();
+        });
+    }
+    on_fail(error){
+        this.setState({error: error||'An error occured'}); }
+    submit_phone(event){
+        event.preventDefault();
+        const phone_number = this.state.phone_number;
+        if (!phone_number)
+            return;
+        const {customer} = this.props;
+        const _this = this;
+        this.etask(function*(){
+            _this.props.wait_et(this);
+            let res;
+            try {
+                res = yield ajax({method: 'POST', url: '/users/submit_phone',
+                    qs: {customer}, json: 1, data: {phone_number}});
+            } catch(e){ return void _this.on_fail(); }
+            if (res && res.invalid_phone_number)
+            {
+                return _this.on_fail('International format expected, '
+                    +'e.g +1-012-345-6789');
+            }
+            if (!res)
+                return void _this.on_fail();
+            _this.props.on_submit(phone_number, res.need_verify);
+        });
+    }
+    render(){
+        const {phone_number, error} = this.state;
+        return (
+            <form onSubmit={event=>this.submit_phone(event)}
+              className={'phone_number_form '+(error ? 'invalid' : '')}>
+              <label><T>Enter your phone number</T></label>
+              <Phone_number_input value={phone_number}
+                input_ref={pnum=>this.phone_ref(pnum)}
+                onChange={e=>this.on_phone_change(e)}/>
+              <button className={'lum_btn '
+                  +(this.get_clear_phonenum() ? '' : 'disabled')}
+                type="submit">
+                <T>Submit</T>
+              </button>
+              {error && <label className="invalid"><T>{error}</T></label>}
+            </form>
+        );
+    }
+}
+E.Phone_number_form = Phone_number_form;
+
+class Verification_code_form extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {code: {}, disable_code_resend: true};
+        this.code_refs = {};
+        this.code_format = [0, 1, 2, '-', 3, 4, 5];
+    }
+    componentDidMount(){
+        let _this = this;
+        this.etask(function*(){
+            yield etask.sleep(500);
+            if (_this.code_refs[0])
+                _this.code_refs[0].focus();
+            yield etask.sleep(10000);
+            _this.setState({disable_code_resend: false});
+        });
+    }
+    on_fail(error){
+        this.setState({error: error||'An error occured', code: {}}, ()=>{
+            setTimeout(()=>this.code_refs[0].focus(), 200); });
+    }
+    set_code_ref(i, inp){
+        this.code_refs[i] = inp; }
+    on_code_change(i, e){
+        let ch = e.target.value;
+        ch = ch[ch.length-1];
+        this.setState(prev_state=>{
+            return {code: Object.assign({}, prev_state.code, {[i]: ch})};
+        }, ()=>{
+            if (!ch)
+                return;
+            const next_ref = this.code_refs[i+1];
+            if (next_ref)
+                next_ref.focus();
+            else
+                this.submit_code();
+        });
+    }
+    on_code_key_down(i, e){
+        if (e.keyCode!=8 || this.state.code[i])
+            return;
+        const next_ref = this.code_refs[i-1];
+        if (next_ref)
+            next_ref.focus();
+    }
+    submit_code(event){
+        if (event)
+            event.preventDefault();
+        let code = '';
+        for (let i of this.code_format)
+        {
+            if (typeof i=='string')
+                code += i;
+            else if (!this.state.code[i])
+                return this.code_refs[i].focus();
+            else
+                code += this.state.code[i];
+        }
+        const {customer} = this.props;
+        const _this = this;
+        this.etask(function*(){
+            _this.props.wait_et(this);
+            let res;
+            try {
+                res = yield ajax({method: 'POST', slow: 15*date.ms.SEC,
+                    url: '/users/verify_phone', qs: {customer}, json: 1,
+                    data: {code}});
+            } catch(e){ return _this.on_fail(); }
+            if (res && res.wrong_code)
+                return _this.on_fail('The code you entered was incorrect');
+            if (!res || !res.ok)
+                return _this.on_fail();
+            _this.props.on_verify();
+        });
+    }
+    resend_code(){
+        if (this.state.disable_code_resend)
+            return;
+        this.setState({disable_code_resend: true});
+        const {customer} = this.props;
+        const _this = this;
+        this.etask(function*(){
+            yield ajax({method: 'POST', slow: 15*date.ms.SEC,
+                url: '/users/resend_phone_verification_code',
+                qs: {customer}, json: 1, no_throw: 1});
+            yield etask.sleep(30*date.ms.SEC);
+            _this.setState({disable_code_resend: false});
+        });
+    }
+    change_phone_number(){
+        this.setState({code: {}});
+        if (this.props.on_change_phone_number)
+            this.props.on_change_phone_number();
+    }
+    render(){
+        const {disable_code_resend, error, code} = this.state;
+        const inputs = this.code_format.map(i=>{
+            if (typeof i=='string')
+                return <span key={i} className="dash">–</span>;
+            return (
+                <input type="text" key={i} autoFocus={i==0} value={code[i]||''}
+                  ref={pnum=>this.set_code_ref(i, pnum)}
+                  onChange={e=>this.on_code_change(i, e)}
+                  onKeyDown={e=>this.on_code_key_down(i, e)}/>
+            );
+        });
+        return (
+            <form onSubmit={event=>this.submit_code(event)}
+              className={'verification_code_form '+(error ? 'invalid' : '')}>
+              <label><T>Enter the code you received</T></label>
+              {inputs}
+              <input type="submit" className="hide"/>
+              {error && <label className="invalid"><T>{error}</T></label>}
+              <div className="phone_signup_links">
+                <a onClick={()=>this.change_phone_number()}
+                  className="btn btn-link">
+                  Change phone number</a>
+                |
+                <a onClick={()=>this.resend_code()}
+                  className={'btn btn-link '+
+                    (disable_code_resend ? 'disabled' : '')}>
+                  Resend code</a>
+              </div>
+            </form>
+        );
+    }
+}
+E.Verification_code_form = Verification_code_form;
+
+class Phone_number_modal extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {waiting: 0};
+        _.bindAll(this, ['on_phone_change', 'on_phone_submit',
+            'on_phone_verified']);
+    }
+    componentDidMount(){
+        let _this = this;
+        this.setdb_on('phone_number_modal', props=>{
+            this.setState({
+                waiting: 0,
+                submited_phone: false,
+                verified_phone: false,
+                ...props,
+            }, s=>etask(function*(){
+                if (s.phone_number)
+                {
+                    const res = yield _this.submit_phone(s.phone_number);
+                    if (res)
+                        _this.on_phone_submit(s.phone_number, res.need_verify);
+                }
+            }));
+        }, {init: false});
+    }
+    submit_phone(phone_number){
+        const {customer} = this.state;
+        const _this = this;
+        return this.etask(function*(){
+            _this.wait_et(this);
+            let res;
+            try {
+                res = yield ajax({method: 'POST', url: '/users/submit_phone',
+                    qs: {customer: customer.customer_name}, json: 1,
+                    data: {phone_number}});
+            } catch(e){ return false; }
+            if (res && res.need_verify)
+                return {need_verify: true};
+            return res && res.ok;
+        });
+    }
+    wait_et(et){
+        this.setState(prev_state=>({waiting: prev_state.waiting+1}));
+        et.finally(()=>
+            this.setState(prev_state=>({waiting: prev_state.waiting-1})));
+    }
+    on_phone_submit(phone_number, need_verify){
+        this.setState({submited_phone: phone_number});
+        if (!need_verify)
+            this.state.confirm({phone_number});
+    }
+    on_phone_change(phone_number){
+        this.setState({phone_number});
+    }
+    on_phone_verified(){
+        this.state.confirm({phone_number: this.state.phone_number});
+    }
+    render(){
+        let {show, cancel, customer, title, waiting} = this.state;
+        let body;
+        if (!customer)
+            body = null;
+        else if (this.state.submited_phone)
+        {
+            let on_change_phone = ()=>this.setState({submited_phone: false});
+            body = <Verification_code_form customer={customer.customer_name}
+                on_verify={this.on_phone_verified}
+                wait_et={et=>this.wait_et(et)}
+                on_change_phone_number={on_change_phone}/>;
+        }
+        else if (!this.state.verified_phone)
+        {
+            body = <Phone_number_form customer={customer.customer_name}
+                phone_number={this.state.phone_number||customer.phone}
+                wait_et={et=>this.wait_et(et)}
+                on_change={this.on_phone_change}
+                on_submit={this.on_phone_submit}/>;
+        }
+        return <Modal show={show} onHide={cancel}
+              dialogClassName={'phone_number_modal '+
+                (waiting ? 'phone_number_modal_waiting' : '')}>
+              <Modal.Header closeButton>
+                <Modal.Title>
+                  <T>{title||'Verify your phone number'}</T>
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className="waiting"></div>
+                <div className="hide_on_waiting">{body}</div>
+              </Modal.Body>
+            </Modal>;
+    }
+    static verify(customer, phone_number){
+        if (arguments.length==1)
+            phone_number = customer.phone;
+        const verified_phones = customer.verified_phones||[];
+        if (phone_number && verified_phones.some(phone=>
+            clean_phonenum(phone)==clean_phonenum(phone_number)))
+        {
+            return {phone_number};
+        }
+        return etask(function*(){
+            if (setdb.get('phone_number_modal.show'))
+                setdb.get('phone_number_modal.cancel')();
+            const close = ()=>setdb.set('phone_number_modal', {show: false});
+            setdb.set('phone_number_modal', {show: true, phone_number,
+                customer,
+                confirm: res=>{
+                    this.return(res);
+                    close();
+                },
+                cancel: ()=>{
+                    this.return(false);
+                    close();
+                },
+            });
+            return yield this.wait();
+        });
+    }
+}
+E.Phone_number_modal = Phone_number_modal;
 
 return E;
 

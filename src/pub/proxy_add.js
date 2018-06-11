@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import etask from 'hutil/util/etask';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
@@ -89,6 +89,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                     port = p.port+1;
             });
             form.port = port;
+            // XXX krzysztof: switch fetch->ajax
             const raw_update = yield window.fetch('/api/proxies', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -199,7 +200,7 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>
     const on_change_list = val=>{
         on_field_change('ips_list')(val);
         try {
-            const parsed = JSON.parse(val.replace(/'/g, '\"'));
+            const parsed = JSON.parse(val.replace(/'/g, '"'));
             if (!Array.isArray(parsed))
                 throw {message: 'Proxies list has to be an array'};
             if (!parsed.length)
@@ -267,14 +268,13 @@ const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
     </div>
 );
 
-const Nav_tabs = ({change_tab, cur_tab})=>(
+const Nav_tabs = ({change_tab, cur_tab})=>
     <div className="nav_tabs tabs">
       <Tab on_click={change_tab} title="Luminati" id="proxy_lum"
         cur_tab={cur_tab}/>
       <Tab on_click={change_tab} title="External" id="proxy_ext"
         cur_tab={cur_tab}/>
-    </div>
-);
+    </div>;
 
 const Tab = ({id, on_click, title, cur_tab})=>{
     const active = cur_tab==id;
@@ -288,7 +288,7 @@ const Tab = ({id, on_click, title, cur_tab})=>{
     );
 };
 
-const Field = props=>(
+const Field = props=>
     <div className="field">
       <div className="field_header">
         <div className={classnames('icon', props.icon_class)}/>
@@ -299,8 +299,7 @@ const Field = props=>(
             <option key={i} value={o.value}>{o.key}</option>
         ))}
       </select>
-    </div>
-);
+    </div>;
 
 const Footer = props=>{
     const save_clicked = ()=>{

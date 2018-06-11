@@ -5,15 +5,15 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import $ from 'jquery';
 import _ from 'lodash';
-import etask from 'hutil/util/etask';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
+import zurl from '../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Form_controller, Checkbox,
     Tooltip, Pagination_panel, Loader_small, Note,
     Labeled_controller} from './common.js';
 import Har_viewer from './har_viewer.js';
 import * as util from './util.js';
-import zurl from 'hutil/util/url';
 import {Netmask} from 'netmask';
 import {getContext, withContext} from 'recompose';
 import PropTypes from 'prop-types';
@@ -354,6 +354,7 @@ const Index = withRouter(class Index extends Pure_component {
                 _this.saving = false;
                 $('#save_proxy_errors').modal('show');
             });
+            // XXX krzysztof: switch fetch->ajax
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -374,6 +375,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (warnings.length)
                 _this.setState({warnings});
             const update_url = '/api/proxies/'+_this.port;
+            // XXX krzysztof: switch fetch->ajax
             const raw_update = yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -1217,9 +1219,8 @@ const Rule = withRouter(class Rule extends Pure_component {
     }
 });
 
-const Btn_rule_del = ({on_click})=>(
-    <div className="btn_rule_del" onClick={on_click}/>
-);
+const Btn_rule_del = ({on_click})=>
+    <div className="btn_rule_del" onClick={on_click}/>;
 
 class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -1387,13 +1388,12 @@ const Rotation = provider({tab_id: 'rotation'})(props=>{
     );
 });
 
-const Debug = provider({tab_id: 'debug'})(props=>(
+const Debug = provider({tab_id: 'debug'})(props=>
     <div>
       <Config type="select" id="ssl" data={props.default_opt('ssl')}/>
       <Config type="select" id="log" data={props.proxy.log.values}/>
       <Config type="select" id="debug" data={props.proxy.debug.values}/>
-    </div>
-));
+    </div>);
 
 const General = provider({tab_id: 'general'})(props=>{
     const set_field = setdb.get('head.proxy_edit.set_field');

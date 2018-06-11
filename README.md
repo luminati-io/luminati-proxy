@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.98.91/luminati-proxy-manager-v1.98.91-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.99.64/luminati-proxy-manager-v1.99.64-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -341,7 +341,7 @@ proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
 ### Generators
 ```js
 'use strict';
-const etask = require('hutil').etask;
+const etask = require('./util/etask.js');
 const Luminati = require('luminati-proxy').Luminati;
 
 etask(function*(){

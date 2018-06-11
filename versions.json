@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.99.64",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "removed hutil from dependency"
+            },
+            {
+                "type": "star",
+                "text": "added small cities for targeting"
+            },
+            {
+                "type": "star",
+                "text": "new feature in logs: select and resend"
+            }
+        ]
+    },
+    {
         "ver": "1.98.91",
         "type": "dev",
         "changes": [

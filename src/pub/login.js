@@ -6,9 +6,9 @@ import {If} from '/www/util/pub/react.js';
 import classnames from 'classnames';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import $ from 'jquery';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
-import zurl from 'hutil/util/url';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
+import zurl from '../../util/url.js';
 import {Loader} from './common.js';
 import {withRouter} from 'react-router-dom';
 
@@ -82,6 +82,8 @@ const Login = withRouter(class Login extends Pure_component {
             setdb.set('head.settings', settings);
             const consts = yield ajax.json({url: '/api/consts'});
             setdb.set('head.consts', consts);
+            const zones = yield ajax.json({url: '/api/zones'});
+            setdb.set('head.zones', zones);
             _this.props.history.push('/overview');
         });
     }
@@ -126,7 +128,7 @@ const parse_arguments = (settings={argv: ''})=>
     settings.argv.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
     .split('|||');
 
-const Messages = ({error_message, settings, ver_node})=>(
+const Messages = ({error_message, settings, ver_node})=>
     <div>
       <If when={settings&&settings.argv}>
         <div className="warning">
@@ -141,8 +143,7 @@ const Messages = ({error_message, settings, ver_node})=>(
         </div>
       </If>
       <Node_message ver_node={ver_node}/>
-    </div>
-);
+    </div>;
 
 const Node_message = ({ver_node})=>{
     if (!ver_node || ver_node.is_electron || ver_node.satisfied)
@@ -174,11 +175,10 @@ const Node_message = ({ver_node})=>{
     );
 };
 
-const Header = ()=>(
+const Header = ()=>
     <div className="login_header">
       <h3>Login with your Luminati account</h3>
-    </div>
-);
+    </div>;
 
 const Form = ({user_customers, save_user, update_password, update_username,
     select_customer, password, username})=>
@@ -214,12 +214,11 @@ const Form = ({user_customers, save_user, update_password, update_username,
         );
 };
 
-const Typeahead_wrapper = ({data, disabled, on_change, val})=>(
+const Typeahead_wrapper = ({data, disabled, on_change, val})=>
     <Typeahead options={data} maxResults={10}
       minLength={0} disabled={disabled} selectHintOnEnter
       filterBy={(option, text)=>option.indexOf(text)==0}
-      onChange={on_change} selected={val}/>
-);
+      onChange={on_change} selected={val}/>;
 
 class Customers_form extends Pure_component {
     constructor(props){

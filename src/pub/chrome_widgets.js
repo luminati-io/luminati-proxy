@@ -4,15 +4,15 @@ import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import * as Common from './common.js';
 import classnames from 'classnames';
+import _ from 'lodash';
 
-export const Toolbar_button = ({id, tooltip, on_click})=>(
+export const Toolbar_button = ({id, tooltip, on_click})=>
     <Tooltip title={tooltip} placement={'bottom'}>
       <div className={classnames('toolbar_item toolbar_button', id)}
         onClick={on_click}>
         <span className={id}/>
       </div>
-    </Tooltip>
-);
+    </Tooltip>;
 
 export const Tooltip = props=>
     <Common.Tooltip className="har_tooltip" {...props}/>;
@@ -21,6 +21,7 @@ export const Devider = ()=><div className="devider"/>;
 
 export const with_resizable_cols = (cols, Table)=>{
     class Resizable extends Pure_component {
+        cols = _.cloneDeep(cols);
         min_width = 22;
         moving_col = null;
         style = {position: 'relative', display: 'flex', flex: 'auto'};
@@ -36,12 +37,34 @@ export const with_resizable_cols = (cols, Table)=>{
             window.document.removeEventListener('mouseup', this.on_mouse_up);
         }
         set_ref = ref=>{ this.ref = ref; };
+        show_column = idx=>{
+            this.cols[idx].hidden = false;
+            this.resize_columns();
+        };
+        hide_column = idx=>{
+            this.cols[idx].hidden = true;
+            this.resize_columns();
+        };
         resize_columns = ()=>{
             const total_width = this.ref.offsetWidth;
-            const width = total_width/cols.length;
-            const next_cols = cols.map((c, idx)=>({...c, width,
-                offset: width*idx}));
-            this.setState({cols: next_cols});
+            const resizable_cols = this.cols.filter(c=>!c.hidden&&!c.fixed);
+            const total_fixed = this.cols.reduce((acc, c)=>
+                acc+(!c.hidden&&c.fixed||0), 0);
+            const width = (total_width-total_fixed)/resizable_cols.length;
+            const next_cols = this.cols.reduce((acc, c, idx)=>{
+                const w = !c.fixed&&width||!c.hidden&&c.fixed||0;
+                return {
+                    cols: [...acc.cols, {
+                        ...c,
+                        width: w,
+                        offset: acc.offset,
+                        border: acc.border,
+                    }],
+                    offset: acc.offset+w,
+                    border: !!w,
+                };
+            }, {cols: [], offset: 0, border: true});
+            this.setState({cols: next_cols.cols});
         };
         start_moving = (e, idx)=>{
             if (e.nativeEvent.which!=1)
@@ -90,15 +113,15 @@ export const with_resizable_cols = (cols, Table)=>{
             this.setState({moving: false});
         };
         render(){
-            return (
-                <div style={this.style} ref={this.set_ref}
+            return <div style={this.style} ref={this.set_ref}
                   className={classnames({moving: this.state.moving})}>
                   <Table {...this.props} cols={this.state.cols}
-                    resize_columns={this.resize_columns}/>
+                    resize_columns={this.resize_columns}
+                    show_column={this.show_column}
+                    hide_column={this.hide_column}/>
                   <Grid_resizers show start_moving={this.start_moving}
                     cols={this.state.cols}/>
-                </div>
-            );
+                </div>;
         }
     }
     return Resizable;
@@ -107,15 +130,14 @@ export const with_resizable_cols = (cols, Table)=>{
 const Grid_resizers = ({cols, start_moving, show})=>{
     if (!show||!cols)
         return null;
-    return (
-        <div>
-          {cols.slice(0, -1).map((c, idx)=>(
-            <div key={c.title||idx} style={{left: c.width+c.offset-2}}
-              onMouseDown={e=>start_moving(e, idx)}
-              className="data_grid_resizer"/>
-          ))}
-        </div>
-    );
+    return <div>
+          {cols.slice(0, -1).map((c, idx)=>
+            !c.fixed &&
+              <div key={c.title||idx} style={{left: c.width+c.offset-2}}
+                onMouseDown={e=>start_moving(e, idx)}
+                className="data_grid_resizer"/>
+          )}
+        </div>;
 };
 
 export const Sort_icon = ({show, dir})=>{

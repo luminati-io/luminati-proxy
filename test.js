@@ -12,13 +12,12 @@ const os = require('os');
 const fs = require('fs');
 const socks = require('@luminati-io/socksv5');
 const ssl = require('./lib/ssl.js');
-const hutil = require('hutil');
 const request = require('request');
 const nock = require('nock');
 const lolex = require('lolex');
-const etask = hutil.etask;
-const restore_case = hutil.http_hdr.restore_case;
-const qw = hutil.string.qw;
+const etask = require('./util/etask.js');
+const restore_case = require('./util/http_hdr.js').restore_case;
+const qw = require('./util/string.js').qw;
 const assign = Object.assign;
 const luminati = require('./index.js');
 const Luminati = luminati.Luminati;
@@ -931,13 +930,10 @@ describe('proxy', ()=>{
                     history_aggregator: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(400);
-                yield l.session_mgr.update_all_sessions();
-                yield etask.sleep(400);
-                assert.equal(history.length, 3);
+                assert.equal(history.length, 2);
                 assert_has(history, [
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
-                    {context: 'SESSION INFO'},
                 ]);
             }));
         });
@@ -1295,59 +1291,6 @@ describe('manager', ()=>{
                     {customer, password}}, only_explicit: true});
                 const body = yield json('api/recent_ips');
                 assert_has(body, {opt: expect_opt});
-            }));
-        });
-        describe('zones', ()=>{
-            let zone_resp = {_defaults: {zones: {
-                a: {perm: 'abc', plans: 'plan', password: ['pwd1']},
-                b: {perm: 'xyz', plans: 'plan9', password: ['pwd2']}
-            }}};
-            let zone_expected = [
-                {zone: 'a', perm: 'abc', plans: 'plan', password: 'pwd1'},
-                {zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2'},
-            ];
-            it('get', ()=>etask(function*(){
-                nock('https://luminati-china.io').get('/').reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_stats')
-                    .reply(200, {});
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
-                    .reply(200, zone_resp);
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/zones');
-                assert_has(body, zone_expected, 'zones');
-            }));
-            it('get with config', ()=>etask(function*(){
-                nock('https://luminati-china.io').get('/').reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_stats')
-                    .reply(200, {});
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
-                    .reply(200, zone_resp);
-                app = yield app_with_config({config: {_defaults:
-                    {customer, password}}, only_explicit: true});
-                const body = yield json('api/zones');
-                assert_has(body, zone_expected, 'zones');
-            }));
-            it('get zone without passwords', ()=>etask(function*(){
-                let no_pwd_resp = {_defaults: {zones: {
-                    a: {perm: 'abc', plans: 'plan'},
-                }}};
-                let no_pwd_expected = [
-                    {zone: 'a', perm: 'abc', plans: 'plan',
-                        password: undefined}
-                ];
-                nock('https://luminati-china.io').get('/').reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_stats')
-                    .reply(200, {});
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
-                    .reply(200, no_pwd_resp);
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/zones');
-                assert_has(body, no_pwd_expected, 'zones');
             }));
         });
         describe('proxies', ()=>{

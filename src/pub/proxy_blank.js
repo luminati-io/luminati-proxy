@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
 
-const Proxy_blank = ()=>(
+const Proxy_blank = ()=>
     <div>
       <Proxy_add/>
       <div className="no_proxies">
@@ -15,7 +15,6 @@ const Proxy_blank = ()=>(
           Start
         </button>
       </div>
-    </div>
-);
+    </div>;
 
 export default Proxy_blank;

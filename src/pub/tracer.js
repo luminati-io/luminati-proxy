@@ -3,12 +3,12 @@
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {Input, Select, Loader, Nav, Loader_small, Tooltip,
-    Circle_li as Li} from './common.js';
+    Circle_li as Li, Modal_dialog, Warning} from './common.js';
 import {status_codes} from './util.js';
 import classnames from 'classnames';
 
 export default class Tracer extends Pure_component {
-    state = {loading: false, err: false};
+    state = {loading: false};
     title = 'Test affiliate links';
     subtitle = 'Trace links and see all the redirections';
     componentDidMount(){
@@ -24,7 +24,12 @@ export default class Tracer extends Pure_component {
     }
     set_result = res=>this.setState(res);
     execute = (url, zone, country)=>{
-        this.setState({log: null, err: false, loading: true});
+        if (!/^https?:\/\//.test(url))
+        {
+            return void this.setState({log: null,
+                errors: 'It is not a valid URL to test'});
+        }
+        this.setState({log: null, loading: true});
         const data = {url, zone, country};
         const _this = this;
         this.etask(function*(){
@@ -33,6 +38,7 @@ export default class Tracer extends Pure_component {
                 console.log(e);
             });
             _this.ws.addEventListener('message', _this.on_message);
+            // XXX krzysztof: switch fetch->ajax
             const raw_trace = yield window.fetch('/api/trace', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -50,6 +56,7 @@ export default class Tracer extends Pure_component {
         const res = json.data;
         this.setState({log: res.log, next_url: res.loading});
     };
+    dismiss_errors = ()=>this.setState({errors: undefined});
     render(){
         return (
             <div className="tracer">
@@ -58,6 +65,10 @@ export default class Tracer extends Pure_component {
                 loading={this.state.loading}/>
               <Result log={this.state.log} loading={this.state.loading}
                 next_url={this.state.next_url}/>
+              <Modal_dialog title="Error" open={this.state.errors}
+                ok_clicked={this.dismiss_errors} no_cancel_btn>
+                <Warning text={this.state.errors}/>
+              </Modal_dialog>
             </div>
         );
     }
@@ -79,7 +90,7 @@ const Result = ({log, loading, next_url})=>{
     );
 };
 
-const Result_row = ({url, code})=>(
+const Result_row = ({url, code})=>
     <Li>
       {url+' '}
       {code &&
@@ -87,12 +98,11 @@ const Result_row = ({url, code})=>(
           <strong>({code})</strong>
         </Tooltip>
       }
-    </Li>
-);
+    </Li>;
 
 class Request extends Pure_component {
     def_url = 'http://luminati.io';
-    state = {url: this.def_url, zone: '', country: '', err: false};
+    state = {url: this.def_url, zone: '', country: ''};
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -102,30 +112,55 @@ class Request extends Pure_component {
                 ({key: c.country_name, value: c.country_id})));
             this.setState({countries});
         });
-        this.setdb_on('head.consts', consts=>{
-            if (!consts)
+        this.setdb_on('head.zones', data=>{
+            if (!data)
                 return;
-            const zones = consts.proxy.zone.values.map(({plans, ...z})=>{
-                if (!z.value)
-                    return z;
-                if (!plans||!plans.length)
-                    return null;
-                return {...z, plan: plans.slice(-1)[0]};
-            }).filter(Boolean);
-            this.setState({zones, def_zone: consts.proxy.zone.def});
+            const def_z = {key: `Default (${data.def})`, value: ''};
+            const zones = data.zones.map(z=>
+                ({key: z.name, value: z.name, ...z}));
+            zones.unshift(def_z);
+            this.setState({zones, def_zone: data.def});
         });
     }
     url_changed = value=>this.setState({url: value});
-    zone_changed = zone=>this.setState({zone});
+    zone_changed = zone=>{
+        const countries_disabled = this.countries_disabled(zone);
+        const diff = {zone, countries_disabled};
+        if (countries_disabled)
+            diff.country = '';
+        this.setState(diff);
+    };
     country_changed = country=>this.setState({country});
     go_clicked = ()=>{
         this.props.execute(this.state.url,
             this.state.zone||this.state.def_zone,
             this.state.country);
     };
+    countries = ()=>{
+        return this.state.countries;
+    };
+    countries_disabled = (zone_name)=>{
+        const zone = this.state.zones.find(z=>z.name==zone_name)||
+            this.state.zones.find(z=>z.name==this.state.def_zone);
+        if (zone.plan.type=='static')
+            return true;
+        if (zone.plan.ip_alloc_preset=='shared_block')
+            return false;
+        const permissions = zone.perm.split(' ')||[];
+        if (permissions.includes('country'))
+            return false;
+        if (zone.plan.type=='static'||
+            ['domain', 'domain_p'].includes(zone.plan.vips_type))
+        {
+            return true;
+        }
+        return false;
+    };
     render(){
         if (!this.state.countries||!this.state.zones)
             return <Loader show/>;
+        const countries_disabled = this.props.loading||
+            this.state.countries_disabled;
         return (
             <div className="panel no_border request">
               <div className="fields">
@@ -135,9 +170,9 @@ class Request extends Pure_component {
                     disabled={this.props.loading}/>
                 </Field>
                 <Field title="Country">
-                  <Select val={this.state.country} data={this.state.countries}
+                  <Select val={this.state.country} data={this.countries()}
                     on_change_wrapper={this.country_changed}
-                    disabled={this.props.loading}/>
+                    disabled={countries_disabled}/>
                 </Field>
                 <Field title="URL" className="url">
                   <Input type="text" val={this.state.url}
@@ -152,16 +187,14 @@ class Request extends Pure_component {
     }
 }
 
-const Go_button = ({on_click, disabled})=>(
+const Go_button = ({on_click, disabled})=>
     <div className="go_btn_wrapper">
       <button onClick={on_click} className="btn btn_lpm btn_lpm_primary"
         disabled={disabled}>Go</button>
-    </div>
-);
+    </div>;
 
-const Field = ({children, title, className})=>(
+const Field = ({children, title, className})=>
     <div className={classnames('field', className)}>
       <div className="title">{title}</div>
       {children}
-    </div>
-);
+    </div>;

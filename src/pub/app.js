@@ -3,8 +3,8 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
 import _ from 'lodash';
-import setdb from 'hutil/util/setdb';
-import ajax from 'hutil/util/ajax';
+import setdb from '../../util/setdb.js';
+import ajax from '../../util/ajax.js';
 import Proxy_edit from './proxy_edit.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
@@ -15,6 +15,7 @@ import Config from './config.js';
 import Settings from './settings.js';
 import Tracer from './tracer.js';
 import {Logs, Dock_logs} from './logs.js';
+import {Enable_ssl_modal} from './common.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
@@ -70,6 +71,10 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.consts', consts);
         });
         this.etask(function*(){
+            const zones = yield ajax.json({url: '/api/zones'});
+            setdb.set('head.zones', zones);
+        });
+        this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
             const data = yield ajax.json({url: '/api/mode'});
             const run_config = data.run_config;
@@ -90,6 +95,7 @@ const App = withRouter(class App extends Pure_component {
     render(){
         return (
             <div className="page_wrapper">
+              <Enable_ssl_modal/>
               <Switch>
                 <Route path="/login" exact component={Login}/>
                 <Route path="/dock_logs" exact component={Dock_logs}/>
@@ -100,7 +106,7 @@ const App = withRouter(class App extends Pure_component {
     }
 });
 
-const Page = ()=>(
+const Page = ()=>
     <div>
       <Nav/>
       <div className="page_body">
@@ -118,13 +124,11 @@ const Page = ()=>(
           <Route path="/" component={Overview}/>
         </Switch>
       </div>
-    </div>
-);
+    </div>;
 
-const Root = ()=>(
+const Root = ()=>
     <BrowserRouter>
       <App/>
-    </BrowserRouter>
-);
+    </BrowserRouter>;
 
 ReactDOM.render(<Root/>, document.getElementById('react_root'));

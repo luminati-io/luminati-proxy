@@ -2,15 +2,15 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const Manager = require('../lib/manager.js');
-const hutil = require('hutil');
-const etask = hutil.etask;
-const zerr = hutil.zerr;
+const file = require('../util/file.js');
+const etask = require('../util/etask.js');
+const zerr = require('../util/zerr.js');
+const qw = require('../util/string.js').qw;
+const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
 const version = require('../package.json').version;
 const analytics = require('universal-analytics');
 const _ = require('lodash');
-const file = require('hutil').file;
-const qw = require('hutil').string.qw;
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
@@ -95,7 +95,7 @@ E.write_status_file = (status, error = null, config = null, reason = null)=>{
     if (error)
         error = zerr.e2s(error);
     Object.assign(E.lpm_status, {
-        last_updated: hutil.date(),
+        last_updated: zdate(),
         status,
         reason,
         error,
@@ -272,8 +272,8 @@ E.init_status = ()=>{
         status: 'initializing',
         config: null,
         error: null,
-        create_date: hutil.date(),
-        update_date: hutil.date(),
+        create_date: zdate(),
+        update_date: zdate(),
         customer_name: null,
         version,
     };

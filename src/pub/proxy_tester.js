@@ -5,12 +5,12 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
 import classnames from 'classnames';
-import etask from 'hutil/util/etask';
-import {ga_event} from './util.js';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
-import zurl from 'hutil/util/url';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
+import zurl from '../../util/url.js';
 import {If} from '/www/util/pub/react.js';
+import {ga_event} from './util.js';
 import JSON_viewer from './json_viewer.js';
 import Preview from './har_preview.js';
 
@@ -137,6 +137,7 @@ class Request extends Pure_component {
                 _this.setState({show_loader: false});
                 ga_event('proxy-tester-tab', 'unexpected error', e.message);
             });
+            // XXX krzysztof: switch fetch->ajax
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -223,15 +224,14 @@ const Field = ({type, update, name, params, ...props})=>{
     );
 };
 
-const Headers = ({headers, clicked_remove, clicked_add, update})=>(
+const Headers = ({headers, clicked_remove, clicked_add, update})=>
     <div className="headers">
       {headers.map((h, i)=>
         <New_header_params clicked_remove={clicked_remove}
           last={i+1==headers.length} clicked_add={clicked_add} header={h}
           key={h.idx} update={update}/>
       )}
-    </div>
-);
+    </div>;
 
 const New_header_params = ({clicked_add, clicked_remove, update, header,
     last})=>
@@ -259,11 +259,10 @@ const New_header_params = ({clicked_add, clicked_remove, update, header,
     );
 };
 
-const Add_icon = ({click})=>(
+const Add_icon = ({click})=>
     <span className="link icon_link top right add_header"
       onClick={click}>
       <i className="glyphicon glyphicon-plus"/>
-    </span>
-);
+    </span>;
 
 export default Proxy_tester;

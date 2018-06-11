@@ -4,7 +4,8 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
 import classnames from 'classnames';
 import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
-import setdb from 'hutil/util/setdb';
+import setdb from '../../util/setdb.js';
+import ajax from '../../util/ajax.js';
 import _ from 'lodash';
 
 export default class Settings extends Pure_component {
@@ -59,6 +60,7 @@ class Form extends Pure_component {
                 console.log(e);
                 _this.setState({saving: false});
             });
+            // XXX krzysztof: switch fetch->ajax
             const raw = yield window.fetch('/api/settings', {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -66,6 +68,8 @@ class Form extends Pure_component {
             });
             const settings = yield raw.json();
             setdb.set('head.settings', settings);
+            const zones = yield ajax.json({url: '/api/zones'});
+            setdb.set('head.zones', zones);
             _this.setState({saving: false});
         });
     };
