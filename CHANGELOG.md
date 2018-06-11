@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.99.64 Development Latest
+## 1.99.85 Development Latest
 - :star: removed hutil from dependency
 - :star: added small cities for targeting
 - :star: new feature in logs: select and resend

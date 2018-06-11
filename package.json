@@ -97,7 +97,11 @@
     "json-object-stream": "0.1.1",
     "socket-pair": "1.0.3",
     "ws": "5.1.1",
-    "diacritic": "0.0.2"
+    "diacritic": "0.0.2",
+    "underscore": "1.8.3",
+    "node-getopt": "0.2.3",
+    "rimraf": "2.5.2",
+    "log-buffer": "0.0.3"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -358,5 +362,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.99.64"
+  "version": "1.99.85"
 }
