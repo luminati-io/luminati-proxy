@@ -9,8 +9,8 @@ import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
-import {Modal, Loader, Warnings, Link_icon, Form_controller, Checkbox,
-    Tooltip, Pagination_panel, Loader_small, Note,
+import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
+    Pagination_panel, Loader_small, Note,
     Labeled_controller} from './common.js';
 import Har_viewer from './har_viewer.js';
 import * as util from './util.js';
@@ -40,15 +40,13 @@ const validators = {
         {
             if (req)
                 return min;
-            else
-                return undefined;
+            return undefined;
         }
         else if (val < min)
             return min;
         else if (val > max)
             return max;
-        else
-            return val;
+        return val;
     },
     ips_list: val=>{
         val = val.replace(/\s/g, '');
@@ -74,7 +72,6 @@ const Index = withRouter(class Index extends Pure_component {
     componentDidMount(){
         if (!setdb.get('head.proxies_running'))
         {
-            const _this = this;
             this.etask(function*(){
                 const proxies_running = yield ajax.json(
                     {url: '/api/proxies_running'});
@@ -160,15 +157,6 @@ const Index = withRouter(class Index extends Pure_component {
         {
             ga_event('edit zone', value);
             return;
-        }
-        let tab_label;
-        for (let t in tabs)
-        {
-            if (Object.keys(tabs[t].fields).includes(id))
-            {
-                tab_label = tabs[t].label;
-                break;
-            }
         }
         ga_event('edit '+id, value, {single: true});
     }
@@ -308,7 +296,7 @@ const Index = withRouter(class Index extends Pure_component {
         }
         return result;
     };
-    apply_rules = (form)=>{
+    apply_rules = form=>{
         if (form.rules&&form.rules.post)
         {
             const rules = form.rules.post.map(this.rule_map_to_form);
@@ -316,7 +304,7 @@ const Index = withRouter(class Index extends Pure_component {
         }
     };
     default_opt = option=>{
-        const default_label = !!this.state.defaults[option] ? 'Yes' : 'No';
+        const default_label = this.state.defaults[option] ? 'Yes' : 'No';
         return [
             {key: 'No', value: false},
             {key: 'Default ('+default_label+')', value: ''},
@@ -376,7 +364,7 @@ const Index = withRouter(class Index extends Pure_component {
                 _this.setState({warnings});
             const update_url = '/api/proxies/'+_this.port;
             // XXX krzysztof: switch fetch->ajax
-            const raw_update = yield window.fetch(update_url, {
+            yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: data}),
@@ -430,8 +418,10 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.reverse_lookup_values = '';
         delete save_form.reverse_lookup;
         if (save_form.whitelist_ips)
+        {
             save_form.whitelist_ips = save_form.whitelist_ips.split(',')
-        .filter(Boolean);
+                .filter(Boolean);
+        }
         if (save_form.city.length)
             save_form.city = save_form.city[0].id;
         else
@@ -448,8 +438,6 @@ const Index = withRouter(class Index extends Pure_component {
         if (save_form.session_random)
             save_form.session = true;
         delete save_form.session_random;
-        if (!save_form.socks)
-            save_form.socks = null;
         return save_form;
     };
     get_curr_plan = ()=>{
@@ -601,9 +589,9 @@ const Field = ({disabled, tooltip, ...props})=>{
           <div className="field">
             <select value={props.value} disabled={disabled}
               onChange={e=>props.on_change(e.target.value)}>
-              {options.map(o=>(
+              {options.map(o=>
                 <option key={o.key} value={o.value}>{o.key}</option>
-              ))}
+              )}
             </select>
           </div>
         </Tooltip>
@@ -617,7 +605,6 @@ class Nav_tabs extends Pure_component {
             this.setState({tab}));
     }
     render(){
-        const {form, errors} = this.props;
         // XXX krzysztof: remove ...props
         return (
             <div className="nav_tabs">
@@ -678,9 +665,9 @@ const Tab_icon = props=>{
 
 const Config = getContext({provide: PropTypes.object})(
 class Config extends Pure_component {
+    state = {};
     set_field = setdb.get('head.proxy_edit.set_field');
     is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
-    state = {};
     on_blur = ({target: {value}})=>{
         if (this.props.validator)
             this.set_field(this.props.id, this.props.validator(value));
@@ -692,7 +679,8 @@ class Config extends Pure_component {
         this.set_field(curr_id, value);
     };
     componentDidMount(){
-        this.setdb_on('head.proxy_edit.form.'+this.props.id, val=>{
+        const val_id = this.props.val_id ? this.props.val_id : this.props.id;
+        this.setdb_on('head.proxy_edit.form.'+val_id, val=>{
             this.setState({val, show: true});
         });
     }
@@ -823,8 +811,8 @@ class Targeting extends Pure_component {
         ];
     }
     allowed_countries(){
-        let res = this.state.locations.countries.map(c=>
-            ({key: c.country_name, value: c.country_id, mob: c.mob}));
+        let res = this.state.locations.countries.map(c=>({
+            key: c.country_name, value: c.country_id, mob: c.mob}));
         const curr_plan = this.props.get_curr_plan();
         if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
         {
@@ -904,9 +892,11 @@ class Targeting extends Pure_component {
                 on_change={this.city_changed}/>
               <Config type="typeahead" id="asn" data={this.state.asns}
                 disabled={this.props.form.carrier}/>
-              <Config type="select" id="carrier" data={this.carriers}
-                note={this.carriers_note}
-                disabled={this.props.form.asn&&this.props.form.asn.length}/>
+              {curr_plan.mobile &&
+                <Config type="select" id="carrier" data={this.carriers}
+                  note={this.carriers_note}
+                  disabled={this.props.form.asn&&this.props.form.asn.length}/>
+              }
             </div>
         );
     }
@@ -944,11 +934,10 @@ class Speed extends Pure_component {
         let pool_size_note;
         if (this.props.support.pool_size&&render_modal)
         {
-            pool_size_note = (
+            pool_size_note =
                 <a className="link" onClick={()=>this.open_modal()}>
                   {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
-                </a>
-            );
+                </a>;
         }
         return (
             <div>
@@ -994,8 +983,7 @@ class Rules extends Pure_component {
             rules: prev.rules.map(r=>{
                 if (r.id!=rule.rule_id)
                     return r;
-                else
-                    return {...r, [rule.field]: rule.value};
+                return {...r, [rule.field]: rule.value};
             }),
         }), this.rules_update);
     };
@@ -1041,7 +1029,7 @@ class Rules extends Pure_component {
                     action_type: rule.action,
                     trigger_type: rule.trigger_type,
                 }],
-                url: (rule.trigger_url_regex||'**'),
+                url: rule.trigger_url_regex||'**',
             };
         }
         if (rule.trigger_type=='status')
@@ -1075,9 +1063,9 @@ class Rules extends Pure_component {
     render(){
         return (
             <div>
-              {this.state.rules.map(r=>(
+              {this.state.rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}/>
-              ))}
+              )}
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
                 onClick={this.rule_add}>
                 New rule
@@ -1420,6 +1408,7 @@ const General = provider({tab_id: 'general'})(props=>{
     return (
         <div>
           <Config type="number" id="port"/>
+          <Config type="number" id="socks" disabled={true} val_id="port"/>
           <Config type="text" id="password"/>
           <Config type="number" id="multiply" min="1"
             disabled={!props.support.multiply}/>
@@ -1433,7 +1422,6 @@ const General = provider({tab_id: 'general'})(props=>{
               on_change={multiply_changed}
               data={props.default_opt('multiply_vips')}/>
           }
-          <Config type="number" id="socks" min="0"/>
           <Config type="select" id="secure_proxy"
             data={props.default_opt('secure_proxy')}/>
           <Config type="text" id="null_response"/>

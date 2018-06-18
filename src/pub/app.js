@@ -1,8 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap-datepicker/dist/css/bootstrap-datepicker3.css';
-import _ from 'lodash';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import Proxy_edit from './proxy_edit.js';
@@ -19,10 +16,8 @@ import {Enable_ssl_modal} from './common.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
-import $ from 'jquery';
-import 'jquery';
 import 'bootstrap';
-import 'bootstrap-datepicker';
+import 'bootstrap/dist/css/bootstrap.css';
 import './app.less';
 import 'es6-shim';
 import Pure_component from '../../www/util/pub/pure_component.js';
@@ -75,9 +70,12 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.zones', zones);
         });
         this.etask(function*(){
+            const warnings = yield ajax.json({url: '/api/warnings'});
+            setdb.set('head.warnings', warnings.warnings);
+        });
+        this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
             const data = yield ajax.json({url: '/api/mode'});
-            const run_config = data.run_config;
             if (data.logged_in)
             {
                 if (_this.props.location.pathname!='/login')

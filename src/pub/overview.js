@@ -2,8 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Proxies from './proxies.js';
-import ajax from '../../util/ajax.js';
-import setdb from '../../util/setdb.js';
 import Stats from './stats.js';
 import Har_viewer from './har_viewer';
 import Pure_component from '../../www/util/pub/pure_component.js';
@@ -21,9 +19,11 @@ class Overview extends Pure_component {
         const master_port = this.props.match.params.master_port;
         const title = master_port ?
             `Overview of multiplied proxy port - ${master_port}` : 'Overview';
-        return (
-            <div className="overview_page">
-              <Upgrade/>
+        return <div className="overview_page">
+              <div className="warnings">
+                <Upgrade/>
+                <Warnings/>
+              </div>
               <div className="proxies nav_header">
                 <h3>{title}</h3>
               </div>
@@ -38,16 +38,31 @@ class Overview extends Pure_component {
               <div className="logs_wrapper">
                 <Har_viewer master_port={master_port}/>
               </div>
-            </div>
-        );
+            </div>;
+    }
+}
+
+class Warnings extends Pure_component {
+    state = {warnings: []};
+    componentDidMount(){
+        this.setdb_on('head.warnings', warnings=>{
+            warnings&&this.setState({warnings});
+        });
+    }
+    render(){
+        if (!this.state.warnings.length)
+            return null;
+        return <div className="warning">
+              <div className="warning_icon"/>
+              {this.state.warnings.map(w=>
+                <div key={w.msg}>{w.msg}</div>
+              )}
+            </div>;
     }
 }
 
 class Upgrade extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
+    state = {};
     componentWillMount(){
         this.setdb_on('head.version', version=>this.setState({version}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
@@ -74,8 +89,6 @@ class Upgrade extends Pure_component {
             return null;
         const disabled = upgrading||upgrade_error||!ver_node.satisfied&&
             !electron;
-        const changelog_url = 'https://github.com/luminati-io/luminati-proxy/'
-        +'blob/master/CHANGELOG.md';
         const versions = this.new_versions();
         const changes = versions.reduce((acc, ver)=>{
             return acc.concat(ver.changes);
@@ -88,9 +101,8 @@ class Upgrade extends Pure_component {
         }
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
-        return (
-            <Tooltip className="wide" title={tooltip} placement="bottom">
-            <div className="warning warning_upgrade">
+        return <Tooltip className="wide" title={tooltip} placement="bottom">
+            <div className="warning">
               <div className="warning_icon"/>
               <div>
                 A new <strong>{upgrade_type}</strong> version <strong>
@@ -102,7 +114,7 @@ class Upgrade extends Pure_component {
                 <button className="btn btn_lpm btn_upgrade"
                   onClick={this.upgrade} disabled={disabled}>
                   {upgrading ? 'Upgrading...' :
-                      (upgrade_error ? 'Error' : 'Upgrade')}
+                      upgrade_error ? 'Error' : 'Upgrade'}
                 </button>
               </div>
               {ver_node&&!ver_node.satisfied&&!electron&&
@@ -112,8 +124,7 @@ class Upgrade extends Pure_component {
                 </div>
               }
             </div>
-            </Tooltip>
-        );
+            </Tooltip>;
     }
 }
 

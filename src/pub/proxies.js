@@ -190,14 +190,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'socks',
-        title: 'SOCKS port',
-        type: 'number',
-        tooltip: 'Routing of SOCKS5 requests. Enable SOCKS5 port in proxy '
-            +'configuration page',
-        ext: true,
-    },
-    {
         key: 'zone',
         title: 'Zone',
         type: 'options',

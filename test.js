@@ -711,7 +711,7 @@ describe('proxy', ()=>{
                     t('https sniffing by path', 'echo\\.json',
                         'https://lumtest.com/myip',
                         'https://lumtest.com/echo.json', true);
-                    t('https sniffing by domain', 'lumtest\.com',
+                    t('https sniffing by domain', 'lumtest.com',
                         'https://httpsbin.org/ip',
                         'http://lumtest.com/myip',
                         true);
@@ -787,7 +787,7 @@ describe('proxy', ()=>{
         describe('socks', ()=>{
             const t = (name, _url)=>it(name, etask._fn(function*(_this){
                 _this.timeout(30000);
-                l = yield lum({socks: 25000});
+                l = yield lum({port: 25000});
                 let res = yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
                         proxyHost: '127.0.0.1',
@@ -1133,41 +1133,6 @@ describe('manager', ()=>{
             qw`--no-config --customer usr --password abc --token t --zone z`,
             qw`--no-config --customer usr --password abc --token t --zone z`);
     });
-    describe('socks', ()=>{
-        const t = (name, _url)=>it(name, etask._fn(function*(_this){
-            _this.timeout(30000);
-            const url_path = url.parse(_url).path;
-            let args = [
-                '--socks', `25000:${Manager.default.port}`,
-                '--socks', `26000:${Manager.default.port}`,
-                '--port', 24000,
-            ];
-            app = yield app_with_args(args);
-            let res1 = yield etask.nfn_apply(request, [{
-                agent: new socks.HttpAgent({
-                    proxyHost: '127.0.0.1',
-                    proxyPort: 25000,
-                    auths: [socks.auth.None()],
-                }),
-                url: _url,
-            }]);
-            let body1 = JSON.parse(res1.body);
-            assert.ok(body1.url.includes(url_path),
-                'body url matches expected url');
-            let res2 = yield etask.nfn_apply(request, [{
-                agent: new socks.HttpAgent({
-                    proxyHost: '127.0.0.1',
-                    proxyPort: 26000,
-                    auths: [socks.auth.None()],
-                }),
-                url: _url,
-            }]);
-            let body2 = JSON.parse(res2.body);
-            assert.ok(body2.url.includes(url_path),
-                'body url matches expected url');
-        }));
-        t('http', 'http://lumtest.com/echo.json');
-    });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
         function*(_this){
@@ -1306,7 +1271,10 @@ describe('manager', ()=>{
             });
             describe('post', ()=>{
                 it('normal non-persist', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001, proxy_type: 'non-persist'};
+                    let sample_proxy = {
+                        port: 24001,
+                        proxy_type: 'non-persist',
+                    };
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies', 'post',
@@ -1378,11 +1346,10 @@ describe('manager', ()=>{
                     assert_has(res, [res_proxy], 'proxies');
                 }));
                 it('conflict', ()=>etask(function*(){
-                    let proxy = {port: 24000};
                     let proxies = [{port: 24000}, {port: 24001}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield api_json('api/proxies/24001',
-                        {method: 'put', body: {proxy}});
+                        {method: 'put', body: {proxy: {port: 24000}}});
                     assert.equal(res.statusCode, 400);
                     assert_has(res.body, {errors: []}, 'proxies');
                 }));
@@ -1482,10 +1449,6 @@ describe('manager', ()=>{
         t('conflict proxy port', [
             {port: 24024},
             {port: 24024},
-        ]);
-        t('conflict socks port', [
-            {port: 24000, socks: 25000},
-            {port: 24001, socks: 25000},
         ]);
         t('conflict with www', [{port: Manager.default.www}]);
     });
@@ -1652,21 +1615,10 @@ describe('lpm_proxy', ()=>{
         yield l.start();
         return l;
     });
-    let l, waiting;
-    const repeat =(n, action)=>{
-        while (n--)
-            action();
-    };
-    const release = n=>repeat(n||1, ()=>waiting.shift()());
-    const hold_request = (next, req)=>{
-        if (req.url!=test_url)
-            return next();
-        waiting.push(next);
-    };
+    let l;
     beforeEach(()=>{
         proxy.history = [];
         proxy.full_history = [];
-        waiting = [];
         ping.history = [];
     });
     afterEach(()=>etask(function*(){
@@ -2086,7 +2038,7 @@ describe('lpm_proxy', ()=>{
             t('https sniffing by path', 'echo\\.json',
                 'https://lumtest.com/myip',
                 'https://lumtest.com/echo.json', true);
-            t('https sniffing by domain', 'lumtest\.com',
+            t('https sniffing by domain', 'lumtest.com',
                 'https://httpsbin.org/ip',
                 'http://lumtest.com/myip',
                 true);

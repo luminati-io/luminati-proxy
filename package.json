@@ -116,7 +116,6 @@
     "babel-plugin-transform-object-rest-spread": "6.23.0",
     "babel-plugin-transform-runtime": "6.23.0",
     "bootstrap": "3.3.7",
-    "bootstrap-datepicker": "1.6.4",
     "codemirror": "5.21.0",
     "css-loader": "0.28.4",
     "electron": "1.7.1",
@@ -327,7 +326,7 @@
       "util/config.js",
       "webpack.config.js"
     ],
-    "md5": "2301ad634323531e509eee4ea07abc97"
+    "md5": "f27cac003487a6bd002635c0896039f4"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -362,5 +361,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.99.85"
+  "version": "1.99.679"
 }

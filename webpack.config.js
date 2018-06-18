@@ -8,8 +8,6 @@ module.exports = {
         app: './app.js',
         vendor: ['jquery', 'lodash', 'moment',
             'bootstrap', 'bootstrap/dist/css/bootstrap.css',
-            'bootstrap-datepicker', 'bootstrap-datepicker/dist/css/bootstrap-'
-                +'datepicker3.css',
             'codemirror/lib/codemirror', 'codemirror/lib/codemirror.css',
             'codemirror/mode/javascript/javascript',
             'react', 'react-dom', 'react-bootstrap',

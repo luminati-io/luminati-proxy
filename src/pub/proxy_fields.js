@@ -31,21 +31,22 @@ export const tabs = {
             },
             asn: {
                 label: <span>
-                    ASN (
+                    ISP/ASN (
                     <a
                       className="link"
                       href="http://bgp.potaroo.net/cidr/autnums.html"
                       target="_blank" rel="noopener noreferrer">
-                      ASN list
+                      list
                     </a>)
                     </span>,
-                tooltip: `ASN uniquely identifies each network on the internet.
-                    Target exit nodes (IPs) on a specific ASN`,
+                tooltip: `Select specific Internet Service Provider (ISP), or
+                    Autonomous System Number (ASN)`,
                 placeholder: 'ASN code e.g. 42793'
             },
             carrier: {
-                label: 'Carrier',
-                tooltip: 'Network provider company name',
+                label: 'Mobile service provider',
+                tooltip: `Choose the mobile service provider for your proxy
+                    exit node`,
             },
         },
     },
@@ -117,8 +118,8 @@ export const tabs = {
             },
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
-                placeholder:`i.e. (captcha|robot)`,
-                tooltip:`A string(regular expression) to be scanned in the
+                placeholder: `i.e. (captcha|robot)`,
+                tooltip: `A string(regular expression) to be scanned in the
                     body of the response`
             },
             min_req_time: {
@@ -135,7 +136,7 @@ export const tabs = {
             },
             trigger_url_regex: {
                 label: 'Apply only on specific domains (optional)',
-                placeholder:`i.e. example.com`,
+                placeholder: `i.e. example.com`,
                 tooltip: `enable trigger to certain urls`
             },
             status_code: {
@@ -144,7 +145,7 @@ export const tabs = {
             },
             status_custom: {
                 label: 'Custom status code (regex)',
-                placeholder:`i.e. (2..|3..|404)`,
+                placeholder: `i.e. (2..|3..|404)`,
                 tooltip: `A string(regular expression) to be scanned in the
                     head of the response`
             },
@@ -271,6 +272,12 @@ export const tabs = {
                     proxy configuration`,
                 ext: true,
             },
+            socks: {
+                label: 'SOCKS 5 port',
+                tooltip: `SOCKS 5 port is the same as proxy port and is
+                    automatically created.`,
+                ext: true,
+            },
             password: {
                 label: 'Zone password',
                 tooltip: `Zone password as it appears in your zones page in
@@ -296,12 +303,6 @@ export const tabs = {
                 label: 'Multiply proxy port per gIP',
                 tooltip: `Create proxy port for every selected gIP from pool
                     of available gIPS in your zone`
-            },
-            socks: {
-                label: 'SOCKS 5 port',
-                tooltip: `In addition to current proxy port, creates a separate
-                    port with a SOCKS5 server (add SOCKS port number)`,
-                ext: true,
             },
             secure_proxy: {
                 label: 'SSL to super proxy',

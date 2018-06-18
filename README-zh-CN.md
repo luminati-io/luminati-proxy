@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.99.85-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.99.679-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -87,7 +87,6 @@ Options:
                                                                         [number]
   --history                Logs                       [boolean] [default: false]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --socks                  SOCKS5 port                                  [number]
   --log                    Log level                 [string] [default: "error"]
   --iface                  Interface or IP to listen on
                                                    [string] [default: "0.0.0.0"]

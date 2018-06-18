@@ -521,11 +521,8 @@ class Tables_container extends Pure_component {
     };
     on_message = event=>{
         const json = JSON.parse(event.data);
-        if (json.type!='har_viewer'||!json.data.request.url||
-            json.data.request.url.match(/lumtest\.com\/myip\.json/))
-        {
+        if (json.type!='har_viewer')
             return;
-        }
         const req = json.data;
         this.setState(prev=>({
             stats: {

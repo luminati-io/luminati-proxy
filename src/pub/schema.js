@@ -2,7 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import zurl from '../../util/url.js';
 import classnames from 'classnames';
 import {If} from '/www/util/pub/react.js';
 import {Tooltip} from './common.js';
@@ -28,7 +27,7 @@ const tooltips = {
         </ul>`,
     port_numbers: `Defined proxy ports in Luminati Proxy Manager`,
     lpm: `Luminati Proxy Manager - open-source proxy service that holds
-        valuble features, such as:
+        valuable features, such as:
         <ul>
           <li>IP rotation control</li>
           <li>auto retry</li>
@@ -44,10 +43,10 @@ const tooltips = {
         <ul>
           <li>Residential IP - provided through cable modem, DSL or wireless
             router</li>
-          <li>Datacetner IP (static)</li>
+          <li>Datacenter IP (static)</li>
           <li>Mobile IP - based on a 3G or 4G cellular network</li>
         </ul>`,
-    destination: `The target website that the crawler is collcting data from`,
+    destination: `The target website that the crawler is collecting data from`,
 };
 
 class Schema extends Pure_component {
@@ -71,9 +70,7 @@ class Schema extends Pure_component {
         });
     }
     render(){
-        const port = this.state.form&&this.state.form.port;
-        return (
-            <span className="schema_component">
+        return <span className="schema_component">
               <div className="line"/>
               <Layer id="crawler" no_arr>
                 Crawler
@@ -95,8 +92,7 @@ class Schema extends Pure_component {
                 Peer
               </Layer>
               <Layer id="destination">Destination</Layer>
-            </span>
-        );
+            </span>;
     }
 }
 
@@ -159,8 +155,7 @@ const Flag = ({proxy={}})=>{
         country = proxy.country;
     if (country&&country!='any'&&country!='*')
         return <span className={'flag-icon flag-icon-'+country}/>;
-    else
-        return <img className="globe" src="/img/flag_any_country.svg"/>;
+    return <img className="globe" src="/img/flag_any_country.svg"/>;
 };
 
 export default Schema;

@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.99.85/luminati-proxy-manager-v1.99.85-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.99.679/luminati-proxy-manager-v1.99.679-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -120,7 +120,6 @@ Options:
                                                                         [number]
   --history                Logs                       [boolean] [default: false]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --socks                  SOCKS5 port                                  [number]
   --log                    Log level                 [string] [default: "error"]
   --iface                  Interface or IP to listen on
                                                    [string] [default: "0.0.0.0"]

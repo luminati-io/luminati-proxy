@@ -69,6 +69,8 @@ function ajax(opt){
         var err_obj = new Error(error);
         err_obj.hola_info = {data_type: data_type, url: url,
             status: xhr.status};
+        err_obj.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
+            xhr.getResponseHeader('X-Hola-Error');
         throw err_obj;
     }, function(data){
         var t = Date.now()-t0;
