@@ -1,6 +1,7 @@
 Luminati Proxy manager - Change Log
 
-## 1.99.679 
+## 1.99.679 Development Latest
+- :star: changed SOCKS 5 port to be the same as main proxy port
 
 ## 1.99.85 Development Latest
 - :star: removed hutil from dependency
