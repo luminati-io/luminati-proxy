@@ -2,7 +2,12 @@
     {
         "ver": "1.99.679",
         "type": "stable/dev",
-        "changes": []
+        "changes": [
+            {
+                "type": "star",
+                "text": "changed SOCKS 5 port to be the same as main proxy port"
+            }
+        ]
     },
     {
         "ver": "1.99.85",
