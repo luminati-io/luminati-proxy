@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.99.679/luminati-proxy-manager-v1.99.679-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.100.85/luminati-proxy-manager-v1.100.85-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -215,7 +215,7 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --request_stats_limit    Maximum request stats to keep         [default: 5000]
+  --request_stats_limit    Maximum request stats to keep         [default: 1000]
   --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]

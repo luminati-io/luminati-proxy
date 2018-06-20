@@ -1281,11 +1281,33 @@ span.icon_link {
                 &:first-child { margin-left: 0; }
                 &:last-child { margin-right: 0; }
                 &.url { flex: auto }
+                .title {
+                    margin-bottom: 3px;
+                    margin-left: 2px;
+                }
             }
         }
         .go_btn_wrapper {
             text-align: center;
             margin-top: 10px;
+        }
+    }
+    .live_preview {
+        position: relative;
+        display: inline-block;
+        margin-top: 30px;
+        padding: 10px;
+        border: solid 1px #ddd;
+        width: 822px;
+        height: 622px;
+        .loader_wrapper {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            .mask { display: none; }
+            .loader { position: absolute; }
         }
     }
 }

@@ -459,7 +459,7 @@ if (E.is_win)
         E.is_dir('D:/cygwin') ? 'D:/cygwin' : null;
 }
 E.cyg2unix = path=>{
-    if (!E.is_win)
+    if (!E.is_win || !E.cygwin_root)
         return path;
     // /cygdrive/X/yyy --> X:/yyy
     path = path.replace(/^\/cygdrive\/(.)(\/(.*))?$/, '$1:/$3');

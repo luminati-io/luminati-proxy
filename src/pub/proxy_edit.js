@@ -810,7 +810,7 @@ class Targeting extends Pure_component {
             {value: 'zain', key: 'Zain'}
         ];
     }
-    allowed_countries(){
+    allowed_countries = ()=>{
         let res = this.state.locations.countries.map(c=>({
             key: c.country_name, value: c.country_id, mob: c.mob}));
         const curr_plan = this.props.get_curr_plan();
@@ -822,23 +822,23 @@ class Targeting extends Pure_component {
         if (curr_plan&&curr_plan.mobile)
             res = res.filter(r=>r.mob);
         return [this.def_value, ...res];
-    }
+    };
     country_changed = ()=>{
         this.set_field('city', []);
         this.set_field('state', '');
     };
-    states(){
+    states = ()=>{
         const country = this.props.form.country;
         if (!country||country=='*')
             return [];
         const curr_plan = this.props.get_curr_plan();
-        const res = this.state.locations.regions[country]
+        const res = (this.state.locations.regions[country]||[])
             .filter(r=>!curr_plan||!curr_plan.mobile||r.mob)
             .map(r=>({key: r.region_name, value: r.region_id}));
         return [this.def_value, ...res];
-    }
+    };
     state_changed = ()=>this.set_field('city', []);
-    cities(){
+    cities = ()=>{
         const {country, state} = this.props.form;
         let res;
         if (!country)
@@ -856,7 +856,7 @@ class Targeting extends Pure_component {
                 region: region.value};
         });
         return res;
-    }
+    };
     city_changed = e=>{
         if (e&&e.length)
             this.set_field('state', e[0].region);
@@ -868,8 +868,7 @@ class Targeting extends Pure_component {
         const show_dc_note = curr_plan&&curr_plan.type=='static';
         const show_vips_note = curr_plan&&
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
-        return (
-            <div>
+        return <div>
               {(show_dc_note || show_vips_note) &&
                 <Note>
                   {show_dc_note &&
@@ -892,13 +891,10 @@ class Targeting extends Pure_component {
                 on_change={this.city_changed}/>
               <Config type="typeahead" id="asn" data={this.state.asns}
                 disabled={this.props.form.carrier}/>
-              {curr_plan.mobile &&
-                <Config type="select" id="carrier" data={this.carriers}
-                  note={this.carriers_note}
-                  disabled={this.props.form.asn&&this.props.form.asn.length}/>
-              }
-            </div>
-        );
+              <Config type="select" id="carrier" data={this.carriers}
+                note={this.carriers_note}
+                disabled={this.props.form.asn&&this.props.form.asn.length}/>
+            </div>;
     }
 });
 
@@ -939,8 +935,7 @@ class Speed extends Pure_component {
                   {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
                 </a>;
         }
-        return (
-            <div>
+        return <div>
               <Config type="select" id="dns" data={this.dns_options}/>
               <Config type="number" id="pool_size" min="0"
                 note={pool_size_note} disabled={pool_size_disabled}/>
@@ -958,8 +953,7 @@ class Speed extends Pure_component {
               {this.props.form.reverse_lookup=='values' &&
                 <Config type="textarea" id="reverse_lookup_values"/>
               }
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -1061,8 +1055,7 @@ class Rules extends Pure_component {
         this.set_field('rules', rules);
     };
     render(){
-        return (
-            <div>
+        return <div>
               {this.state.rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}/>
               )}
@@ -1071,8 +1064,7 @@ class Rules extends Pure_component {
                 New rule
                 <i className="glyphicon glyphicon-plus"/>
               </button>
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -1154,8 +1146,7 @@ const Rule = withRouter(class Rule extends Pure_component {
     };
     render(){
         const rule = this.props.rule;
-        return (
-            <div className="rule_wrapper">
+        return <div className="rule_wrapper">
               <Btn_rule_del
                 on_click={()=>this.props.rule_del(this.props.rule.id)}/>
               <Rule_config id="trigger_type" type="select"
@@ -1202,8 +1193,7 @@ const Rule = withRouter(class Rule extends Pure_component {
                 <Rule_config id="ban_ip_custom" type="number" sufix="minutes"
                   rule={this.props.rule}/>
               }
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -1312,8 +1302,7 @@ class Alloc_modal extends Pure_component {
         }
         else
             title = 'Select the '+type_label+' ('+this.props.zone+')';
-        return (
-            <Modal id="allocated_ips" className="allocated_ips_modal"
+        return <Modal id="allocated_ips" className="allocated_ips_modal"
               title={title} no_cancel_btn>
               <Pagination_panel
                 entries={this.state.available_list}
@@ -1343,15 +1332,13 @@ class Alloc_modal extends Pure_component {
                 <Link_icon tooltip="Select all"
                   on_click={this.select_all.bind(this)} id="check"/>
               </Pagination_panel>
-            </Modal>
-        );
+            </Modal>;
     }
 }
 
 const Rotation = provider({tab_id: 'rotation'})(props=>{
     const {support, form, proxy} = props;
-    return (
-        <div>
+    return <div>
           <Config type="text" id="ip"/>
           <Config type="text" id="vip"/>
           <Config type="select" id="pool_type" data={proxy.pool_type.values}
@@ -1372,8 +1359,7 @@ const Rotation = provider({tab_id: 'rotation'})(props=>{
           <Config type="double_number" id="session_duration"
             disabled={!support.session_duration}/>
           <Config type="text" id="seed" disabled={!support.seed}/>
-        </div>
-    );
+        </div>;
 });
 
 const Debug = provider({tab_id: 'debug'})(props=>
@@ -1405,8 +1391,7 @@ const General = provider({tab_id: 'general'})(props=>{
         type = 'ips';
     else if (curr_plan&&!!curr_plan.vip)
         type = 'vips';
-    return (
-        <div>
+    return <div>
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
           <Config type="text" id="password"/>
@@ -1431,8 +1416,7 @@ const General = provider({tab_id: 'general'})(props=>{
             data={props.default_opt('allow_proxy_auth')}/>
           <Config type="select" id="iface"
             data={props.proxy.iface.values}/>
-        </div>
-    );
+        </div>;
 });
 
 export default Index;

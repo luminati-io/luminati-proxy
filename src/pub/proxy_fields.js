@@ -44,9 +44,8 @@ export const tabs = {
                 placeholder: 'ASN code e.g. 42793'
             },
             carrier: {
-                label: 'Mobile service provider',
-                tooltip: `Choose the mobile service provider for your proxy
-                    exit node`,
+                label: 'Carrier',
+                tooltip: 'Network provider company name',
             },
         },
     },

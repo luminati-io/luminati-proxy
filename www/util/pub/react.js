@@ -28,6 +28,9 @@ const If = ({children, when})=>{
 };
 E.If = If;
 
+const Wrap = props=>props.children;
+E.Wrap = Wrap;
+
 const Responsive = ({children, when, mobile, no_mobile})=>{
     const is_mobile = $(window).width()<=480;
     if (when=='mobile'&&is_mobile||when=='!mobile'&&!is_mobile)
@@ -372,42 +375,45 @@ class Confirm extends Pure_component {
     }
     componentWillMount(){ this.setdb_on('confirm', this.setState.bind(this)); }
     render(){
-        let {show, confirm, cancel, title, content} = this.state;
-        return <Modal show={show} onHide={cancel}>
+        let {show, confirm, cancel, title, content, only_yes, confirm_label,
+            cancel_label, are_you_sure} = this.state;
+        return <Modal show={show} onHide={only_yes ? confirm : cancel}>
               <Modal.Header closeButton>
                 <Modal.Title>{title}
                   <br/>
-                  <T>Are you sure?</T>
+                  {!are_you_sure ? null : <T>Are you sure?</T>}
                 </Modal.Title>
               </Modal.Header>
               <Modal.Body>{content}</Modal.Body>
-              <Modal.Footer>
+              <Modal.Footer>{only_yes ? null :
                 <Button onClick={cancel}>
-                  <T>Cancel</T></Button>
-                <Button onClick={confirm}>
-                  <T>Yes</T></Button>
+                  {cancel_label||<T>Cancel</T>}</Button>}
+                <Button bsStyle="primary" onClick={confirm}>
+                  {confirm_label||(only_yes ? <T>OK</T> : <T>Yes</T>)}</Button>
               </Modal.Footer>
             </Modal>;
     }
     static modal(props){
-        return etask([function()
-    {
-        if (setdb.get('confirm.show'))
-            setdb.get('confirm.cancel')();
-        const close = ()=>setdb.set('confirm', {show: false});
-        setdb.set('confirm', {show: true,
-            confirm: ()=>{
-                this.return(true);
-                close();
-            },
-            cancel: ()=>{
-                this.return(false);
-                close();
-            },
-            ...props
+        return etask(function(){
+            if (setdb.get('confirm.show'))
+                setdb.get('confirm.cancel')();
+            const close = ()=>setdb.set('confirm', {show: false});
+            const defaults = {title: '', content: '', only_yes: false,
+                confirm_label: '', cancel_label: '', are_you_sure: true};
+            setdb.set('confirm', {show: true,
+                confirm: ()=>{
+                    this.return(true);
+                    close();
+                },
+                cancel: ()=>{
+                    this.return(false);
+                    close();
+                },
+                ...defaults,
+                ...props
+            });
+            return this.wait();
         });
-        return this.wait();
-    }]);
     }
 }
 E.Confirm = Confirm;

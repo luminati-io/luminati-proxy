@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.100.85 Development Latest
+- :star: added taking screenshots in 'Test affiliate links'
+- :sparkles: move logs to luminati_proxy_manager dir
+
 ## 1.99.679 Development Latest
 - :star: changed SOCKS 5 port to be the same as main proxy port
 

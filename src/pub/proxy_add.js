@@ -6,10 +6,9 @@ import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, Textarea, Input} from './common.js';
+import {Modal, Loader, Textarea} from './common.js';
 import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react.js';
 import {withRouter} from 'react-router-dom';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
@@ -90,7 +89,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             });
             form.port = port;
             // XXX krzysztof: switch fetch->ajax
-            const raw_update = yield window.fetch('/api/proxies', {
+            yield window.fetch('/api/proxies', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: form}),
@@ -107,11 +106,11 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             });
             _this.setState({show_loader: true});
             const port = yield _this.persist();
-            const proxies = setdb.get('head.proxies');
-            yield proxies.update();
+            const proxies = yield ajax.json({url: '/api/proxies_running'});
             $('#add_new_proxy_modal').modal('hide');
-            _this.setState({show_loader: false});
             yield etask.sleep(500);
+            _this.setState({show_loader: false});
+            setdb.set('head.proxies_running', proxies);
             window.localStorage.setItem('quickstart-first-proxy', port);
             if (opt.redirect)
             {
@@ -150,36 +149,30 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     render(){
         const disabled = this.state.cur_tab=='proxy_ext'&&
             !this.state.valid_json;
-        const Footer_wrapper = (
-            <Footer save_clicked={this.save.bind(this)} disabled={disabled}/>
-        );
+        const Footer_wrapper = <Footer save_clicked={this.save.bind(this)}
+          disabled={disabled}/>;
         if (!this.state.zones)
             return null;
         let content;
         if (this.state.cur_tab=='proxy_lum')
         {
-            content = (
-                <Lum_proxy
+            content = <Lum_proxy
                   zone={this.state.zone}
                   zones={this.state.zones}
                   on_field_change={this.field_changed.bind(this)}
                   preset={this.state.preset}
                   rule_clicked={this.rule_clicked.bind(this)}
                   advanced_clicked={this.advanced_clicked.bind(this)}
-                  presets_opt={this.presets_opt}/>
-            );
+                  presets_opt={this.presets_opt}/>;
         }
         else if (this.state.cur_tab=='proxy_ext')
         {
-            content = (
-                <Ext_proxy
+            content = <Ext_proxy
                   parse_error={this.state.parse_error}
                   ips_list={this.state.ips_list}
-                  on_field_change={this.field_changed.bind(this)}/>
-            );
+                  on_field_change={this.field_changed.bind(this)}/>;
         }
-        return (
-            <div className="lpm">
+        return <div className="lpm">
               <Loader show={this.state.show_loader}/>
               <Modal id="add_new_proxy_modal" no_header no_close
                 footer={Footer_wrapper} className="add_proxy_modal">
@@ -187,13 +180,11 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                   cur_tab={this.state.cur_tab}/>
                 {content}
               </Modal>
-            </div>
-        );
+            </div>;
     }
 });
 
-const Ext_proxy = ({ips_list, on_field_change, parse_error})=>
-{
+const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
     const json_example = '[\'1.1.1.2\', \'username:password@1.2.3.4:8888\']';
     const placeholder = 'List of IPs to the external proxies in the following '
         +'format: [username:password@]ip[:port], example:\n'+json_example;
@@ -219,8 +210,7 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>
             on_field_change('valid_json')(false);
         }
     };
-    return (
-        <div className="ext_proxy">
+    return <div className="ext_proxy">
           <Textarea rows={6} val={ips_list}
             placeholder={placeholder}
             on_change_wrapper={on_change_list}/>
@@ -228,13 +218,11 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>
               <strong>Example: </strong>{json_example}
           </div>
           <div className="json_error">{parse_error}</div>
-        </div>
-    );
+        </div>;
 };
 
 const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
     presets_opt, advanced_clicked})=>
-(
     <div className="lum_proxy">
       <div className="fields_wrapper">
         <div className="fields">
@@ -255,18 +243,17 @@ const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
         <div className="header">{presets[preset].title}</div>
         <div className="desc">{presets[preset].subtitle}</div>
         <ul>
-        {(presets[preset].rules||[]).map(r=>(
+        {(presets[preset].rules||[]).map(r=>
           <li key={r.field}>
             <a className="link"
               onClick={()=>rule_clicked(r.field)}>
               {r.label}</a>
           </li>
-        ))}
+        )}
         </ul>
         <a onClick={advanced_clicked} className="link">Advanced options</a>
       </div>
-    </div>
-);
+    </div>;
 
 const Nav_tabs = ({change_tab, cur_tab})=>
     <div className="nav_tabs tabs">
@@ -279,13 +266,11 @@ const Nav_tabs = ({change_tab, cur_tab})=>
 const Tab = ({id, on_click, title, cur_tab})=>{
     const active = cur_tab==id;
     const btn_class = classnames('btn_tab', {active});
-    return (
-        <div onClick={()=>on_click(id)} className={btn_class}>
+    return <div onClick={()=>on_click(id)} className={btn_class}>
           <div className={classnames('icon', id)}/>
           <div className="title">{title}</div>
           <div className="arrow"/>
-        </div>
-    );
+        </div>;
 };
 
 const Field = props=>
@@ -295,9 +280,8 @@ const Field = props=>
         <h4>{props.title}</h4>
       </div>
       <select onChange={e=>props.on_change(e.target.value)} value={props.val}>
-        {props.options.map((o, i)=>(
-            <option key={i} value={o.value}>{o.key}</option>
-        ))}
+        {props.options.map((o, i)=>
+          <option key={i} value={o.value}>{o.key}</option>)}
       </select>
     </div>;
 

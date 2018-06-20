@@ -4,7 +4,6 @@
 
 // XXX marka: use let instead of const because we will re-require it
 let check_compat = require('./check_compat.js');
-
 if (!check_compat.is_env_compat())
     process.exit();
 
@@ -17,25 +16,30 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const sudo_prompt = require('sudo-prompt');
+require('log-buffer')(1);
+
 const is_win = process.platform == 'win32';
-const proc_name = 'luminati-proxy-manager';
+const proc_name = 'luminati_proxy_manager';
 const daemon_startup_os = ['ubuntu', 'centos', 'redhat', 'gentoo', 'systemd',
     'darwin', 'amazon'];
+let log_file = 'lum_main.log';
 let log_dir = is_win ? path.resolve(os.homedir(), proc_name)
     : `/var/log/${proc_name}`;
 
 try {
     if (!fs.accessSync(log_dir), fs.constants.W_OK)
-        throw new Error('no access to log dir');
-    file.mkdirp_e(log_dir);
-} catch (e){
+        throw new Error(`no access to ${log_dir}`);
+} catch(e){
     log_dir = path.resolve(os.homedir(), proc_name);
-    file.mkdirp_e(log_dir);
 }
+file.mkdirp_e(log_dir);
+process.env.LPM_LOG_FILE = log_file;
+process.env.LPM_LOG_DIR = log_dir;
+zerr.notice(`Set log to: ${log_dir}/${log_file}`);
+require('../lib/log.js')('', 'info');
 
 const pm2_cmd = (command, opt)=>etask(function*pm2_cmd(){
-    this.on('uncaught', err=>console.error('PM2 CMD: Uncaught exception:', err,
-        err.stack));
+    this.on('uncaught', e=>zerr('PM2 CMD: Uncaught exception: '+zerr.e2s(e)));
     yield etask.nfn_apply(pm2, '.connect', []);
     if (!Array.isArray(opt))
         opt = [opt];
@@ -66,12 +70,13 @@ let dopt = args.filter(arg=>arg.includes('daemon')||arg=='-d')
 const daemon_start_opt = {
     name: proc_name,
     script: process.argv[1],
-    output: path.resolve(log_dir, 'lpm-out.log'),
-    error: path.resolve(log_dir, 'lpm-error.log'),
+    'merge-logs': false,
+    output: '/dev/null',
+    error: '/dev/null',
     autorestart: true,
     killTimeout: 5000,
     restartDelay: 5000,
-    args: args.filter(arg=>arg!='-d' && !arg.includes('daemon'))
+    args: args.filter(arg=>arg!='-d' && !arg.includes('daemon')),
 };
 if (dopt.start)
     return pm2_cmd('start', daemon_start_opt);
@@ -89,10 +94,8 @@ if (dopt.startup)
         child_process.execSync(pm2_bin+' save');
         return;
     } catch(e){
-        console.log('Failed to install startup script automatically, ',
-            'try running:');
-        console.log(e.stdout.toString('utf-8'));
-        console.log(pm2_bin+" save");
+        zerr.warn('Failed to install startup script automatically, '
+            +`try run:\n${e.stdout.toString('utf-8')}\n${pm2_bin} save`);
         return;
     }
 }
@@ -119,7 +122,7 @@ let start_on_child_exit = ()=>{
 
 let create_child = ()=>{
     child = child_process.fork(path.resolve(__dirname, 'lum_main.js'), args,
-        {stdio: 'inherit'});
+        {stdio: 'inherit', env: process.env});
     child.on('message', msg_handler);
     child.on('exit', shutdown_on_child_exit);
 };
@@ -135,13 +138,13 @@ let upgrade = cb=>{
             cb(e);
         if (e)
         {
-            console.error('Error during upgrade: '+e);
+            zerr('Error during upgrade: '+zerr.e2s(e));
             if (!is_win)
-                console.error(`Look at ${log_file} for more details`);
+                zerr(`Look at ${log_file} for more details`);
             return;
         }
         if (stderr)
-            console.error('NPM stderr: '+stderr);
+            zerr('NPM stderr: '+stderr);
         delete require.cache[require.resolve('./check_compat.js')];
         check_compat = require('./check_compat.js');
         if (!check_compat.is_env_compat())
@@ -169,10 +172,10 @@ if (args.some(arg=>arg=='--upgrade'))
     upgrade(e=>{
         if (e)
         {
-            console.error(`Error during upgrade: ${e}`);
+            zerr(`Error during upgrade: ${zerr.e2s(e)}`);
             process.exit();
         }
-        console.error('Upgrade completed successfully.');
+        zerr('Upgrade completed successfully.');
         create_child();
     });
 }

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.100.85",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added taking screenshots in 'Test affiliate links'"
+            },
+            {
+                "type": "sparkles",
+                "text": "move logs to luminati_proxy_manager dir"
+            }
+        ]
+    },
+    {
         "ver": "1.99.679",
         "type": "dev",
         "changes": [

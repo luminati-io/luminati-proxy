@@ -2,6 +2,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const Manager = require('../lib/manager.js');
+const Tracer = require('../lib/tracer.js');
 const file = require('../util/file.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
@@ -157,6 +158,7 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
         console.log(`Shutdown, reason is ${reason}`, error.stack);
     if (cluster_mode.is_enabled())
         cluster_mode.uninit();
+    file.rm_rf_e(Tracer.screenshot_dir);
     E.write_status_file('shutdown', error, E.manager&&E.manager._total_conf,
         reason);
 };

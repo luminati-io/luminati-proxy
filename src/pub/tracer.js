@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import Proxy_blank from './proxy_blank.js';
 import {Input, Select, Loader, Nav, Loader_small, Tooltip,
     Circle_li as Li, Modal_dialog, Warning} from './common.js';
 import {status_codes} from './util.js';
@@ -23,14 +24,15 @@ export default class Tracer extends Pure_component {
             this.ws.removeEventListener('message', this.on_message);
     }
     set_result = res=>this.setState(res);
-    execute = (url, zone, country)=>{
+    execute = (url, port)=>{
         if (!/^https?:\/\//.test(url))
         {
-            return void this.setState({log: null,
+            return void this.setState({log: null, filename: null,
                 errors: 'It is not a valid URL to test'});
         }
-        this.setState({log: null, loading: true});
-        const data = {url, zone, country};
+        this.setState({log: null, filename: null, loading: true,
+            tracing_url: null, traced: false});
+        const data = {url, port};
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
@@ -54,7 +56,7 @@ export default class Tracer extends Pure_component {
         if (json.type!='tracer')
             return;
         const res = json.data;
-        this.setState({log: res.log, next_url: res.loading});
+        this.setState(res);
     };
     dismiss_errors = ()=>this.setState({errors: undefined});
     render(){
@@ -64,7 +66,9 @@ export default class Tracer extends Pure_component {
               <Request execute={this.execute} set_result={this.set_result}
                 loading={this.state.loading}/>
               <Result log={this.state.log} loading={this.state.loading}
-                next_url={this.state.next_url}/>
+                tracing_url={this.state.tracing_url}
+                loading_page={this.state.loading_page}
+                traced={this.state.traced} filename={this.state.filename}/>
               <Modal_dialog title="Error" open={this.state.errors}
                 ok_clicked={this.dismiss_errors} no_cancel_btn>
                 <Warning text={this.state.errors}/>
@@ -74,20 +78,26 @@ export default class Tracer extends Pure_component {
     }
 }
 
-const Result = ({log, loading, next_url})=>{
+const Result = ({log, loading, tracing_url, filename, loading_page, traced})=>{
     if (!log)
         return null;
-    return (
-        <div className="results instructions">
-          <ol>
-            {log.map(l=>(
-              <Result_row key={l._url} url={l._url} code={l.code}/>
-            ))}
-            {next_url&&loading&&<Result_row url={next_url}/>}
-          </ol>
-          {loading&&<Loader_small show msg="Loading..."/>}
-        </div>
-    );
+    return <div>
+          <div className="results instructions">
+            <ol>
+              {log.map(l=>
+                <Result_row key={l.url} url={l.url} code={l.code}/>
+              )}
+              {tracing_url && loading && <Result_row url={tracing_url}/>}
+            </ol>
+            {tracing_url && loading && <Loader_small show msg="Loading..."/>}
+          </div>
+          {traced &&
+            <div className="live_preview">
+              <Loader show={loading}/>
+              {filename && <img src={`api/tmp/${filename}`}/>}
+            </div>
+          }
+        </div>;
 };
 
 const Result_row = ({url, code})=>
@@ -101,78 +111,32 @@ const Result_row = ({url, code})=>
     </Li>;
 
 class Request extends Pure_component {
-    def_url = 'http://luminati.io';
-    state = {url: this.def_url, zone: '', country: ''};
+    def_url = 'http://lumtest.com/myip.json';
+    state = {url: this.def_url, port: ''};
     componentDidMount(){
-        this.setdb_on('head.locations', locations=>{
-            if (!locations)
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies)
                 return;
-            const def_c = {key: 'Any', value: ''};
-            const countries = [def_c].concat(locations.countries.map(c=>
-                ({key: c.country_name, value: c.country_id})));
-            this.setState({countries});
-        });
-        this.setdb_on('head.zones', data=>{
-            if (!data)
-                return;
-            const def_z = {key: `Default (${data.def})`, value: ''};
-            const zones = data.zones.map(z=>
-                ({key: z.name, value: z.name, ...z}));
-            zones.unshift(def_z);
-            this.setState({zones, def_zone: data.def});
+            const ports = proxies.map(p=>({key: p.port, value: p.port}));
+            const port = ports[0]&&ports[0].key;
+            this.setState({ports, port});
         });
     }
     url_changed = value=>this.setState({url: value});
-    zone_changed = zone=>{
-        const countries_disabled = this.countries_disabled(zone);
-        const diff = {zone, countries_disabled};
-        if (countries_disabled)
-            diff.country = '';
-        this.setState(diff);
-    };
-    country_changed = country=>this.setState({country});
-    go_clicked = ()=>{
-        this.props.execute(this.state.url,
-            this.state.zone||this.state.def_zone,
-            this.state.country);
-    };
-    countries = ()=>{
-        return this.state.countries;
-    };
-    countries_disabled = (zone_name)=>{
-        const zone = this.state.zones.find(z=>z.name==zone_name)||
-            this.state.zones.find(z=>z.name==this.state.def_zone);
-        if (zone.plan.type=='static')
-            return true;
-        if (zone.plan.ip_alloc_preset=='shared_block')
-            return false;
-        const permissions = zone.perm.split(' ')||[];
-        if (permissions.includes('country'))
-            return false;
-        if (zone.plan.type=='static'||
-            ['domain', 'domain_p'].includes(zone.plan.vips_type))
-        {
-            return true;
-        }
-        return false;
-    };
+    port_changed = port=>this.setState({port});
+    go_clicked = ()=>this.props.execute(this.state.url, this.state.port);
     render(){
-        if (!this.state.countries||!this.state.zones)
+        if (!this.state.ports)
             return <Loader show/>;
-        const countries_disabled = this.props.loading||
-            this.state.countries_disabled;
+        if (!this.state.ports.length)
+            return <Proxy_blank/>;
         return (
             <div className="panel no_border request">
               <div className="fields">
-                <Field title="Zone">
-                  <Select val={this.state.zone} data={this.state.zones}
-                    on_change_wrapper={this.zone_changed}
+                <Field title="Proxy port">
+                  <Select val={this.state.port} data={this.state.ports}
+                    on_change_wrapper={this.port_changed}
                     disabled={this.props.loading}/>
-                </Field>
-                <Field title="Country">
-                  <Select val={this.state.country} data={this.countries()}
-                    on_change_wrapper={this.country_changed}
-                    disabled={countries_disabled}/>
                 </Field>
                 <Field title="URL" className="url">
                   <Input type="text" val={this.state.url}

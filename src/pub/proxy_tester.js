@@ -5,13 +5,9 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
 import classnames from 'classnames';
-import etask from '../../util/etask.js';
-import ajax from '../../util/ajax.js';
-import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {If} from '/www/util/pub/react.js';
 import {ga_event} from './util.js';
-import JSON_viewer from './json_viewer.js';
 import Preview from './har_preview.js';
 
 class Proxy_tester extends Pure_component {
@@ -85,20 +81,16 @@ class Request extends Pure_component {
     remove_header = idx=>{
         ga_event('proxy-tester-tab', 'remove header');
         if (this.state.headers.length==1)
-            this.setState({headers: [this.first_header]});
-        else
-        {
-            this.setState(prev_state=>
-                ({headers: prev_state.headers.filter(h=>h.idx!=idx)}));
-        }
+            return this.setState({headers: [this.first_header]});
+        this.setState(prev_state=>(
+            {headers: prev_state.headers.filter(h=>h.idx!=idx)}));
     };
     update_header = (idx, field, value)=>{
         this.setState(prev_state=>({
             headers: prev_state.headers.map(h=>{
                 if (h.idx!=idx)
                     return h;
-                else
-                    return {...h, [field]: value};
+                return {...h, [field]: value};
             }),
         }));
     };
@@ -123,8 +115,7 @@ class Request extends Pure_component {
             headers: this.state.headers.reduce((acc, el)=>{
                 if (!el.header)
                     return acc;
-                else
-                    return {...acc, [el.header]: el.value};
+                return {...acc, [el.header]: el.value};
             }, {}),
             method: this.state.params.method,
             url: this.state.params.url,
@@ -156,7 +147,7 @@ class Request extends Pure_component {
                 ga_event('proxy-tester-tab', 'response successful');
         });
     };
-    render() {
+    render(){
         return (
             <div className="panel no_border request">
               <Loader show={this.state.show_loader}/>
@@ -164,7 +155,7 @@ class Request extends Pure_component {
                 title="Warnings:" no_cancel_btn>
                 <Warnings warnings={this.state.warnings}/>
               </Modal>
-              <div className="panel_body">
+              <div>
                 <Request_params params={this.state.params}
                   update={this.update_params}
                   proxies={this.state.proxies}/>
