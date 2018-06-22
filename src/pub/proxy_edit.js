@@ -474,8 +474,7 @@ const Index = withRouter(class Index extends Pure_component {
         const port = this.props.match.params.port;
         const show_main_window = this.state.consts&&this.state.defaults&&
             this.state.proxies;
-        return (
-            <div className="proxy_edit">
+        return <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
@@ -510,8 +509,7 @@ const Index = withRouter(class Index extends Pure_component {
               </Modal>
               <Alloc_modal type={type} form={this.state.form} support={support}
                 zone={this.state.form.zone||default_zone}/>
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -569,23 +567,20 @@ class Nav extends Pure_component {
         +(presets[preset].rules&&
         '<ul>'+presets[preset].rules.map(r=>`<li>${r.label}</li>`).join('')
         +'</ul>');
-        return (
-            <div className="nav">
+        return <div className="nav">
               <Field on_change={this.update_zone} options={this.props.zones}
                 tooltip="Zone" value={this.props.form.zone}
                 disabled={this.props.disabled}/>
               <Field on_change={this.update_preset} tooltip={preset_tooltip}
                 options={presets_opt} value={preset}
                 disabled={this.props.disabled}/>
-            </div>
-        );
+            </div>;
     }
 }
 
 const Field = ({disabled, tooltip, ...props})=>{
     const options = props.options||[];
-    return (
-        <Tooltip title={tooltip} placement="bottom">
+    return <Tooltip title={tooltip} placement="bottom">
           <div className="field">
             <select value={props.value} disabled={disabled}
               onChange={e=>props.on_change(e.target.value)}>
@@ -594,8 +589,7 @@ const Field = ({disabled, tooltip, ...props})=>{
               )}
             </select>
           </div>
-        </Tooltip>
-    );
+        </Tooltip>;
 };
 
 class Nav_tabs extends Pure_component {
@@ -606,8 +600,7 @@ class Nav_tabs extends Pure_component {
     }
     render(){
         // XXX krzysztof: remove ...props
-        return (
-            <div className="nav_tabs">
+        return <div className="nav_tabs">
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="logs"/>
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="target"/>
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="speed"/>
@@ -616,8 +609,7 @@ class Nav_tabs extends Pure_component {
                 id="rotation"/>
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="debug"/>
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="general"/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -637,8 +629,7 @@ const Tab_btn = props=>{
         }).length;
     }
     const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
-    return (
-        <Tooltip title={tabs[props.id].tooltip}>
+    return <Tooltip title={tabs[props.id].tooltip}>
           <div onClick={()=>setdb.set('head.proxy_edit.tab', props.id)}
             className={btn_class}>
             <Tab_icon id={props.id} changes={changes}
@@ -646,21 +637,18 @@ const Tab_btn = props=>{
             <div className="title">{tabs[props.id].label}</div>
             <div className="arrow"/>
           </div>
-        </Tooltip>
-    );
+        </Tooltip>;
 };
 
 const Tab_icon = props=>{
     const circle_class = classnames('circle_wrapper', {
         active: props.error||props.changes, error: props.error});
     const content = props.error ? '!' : props.changes;
-    return (
-        <div className={classnames('icon', props.id)}>
+    return <div className={classnames('icon', props.id)}>
           <div className={circle_class}>
             <div className="circle">{content}</div>
           </div>
-        </div>
-    );
+        </div>;
 };
 
 const Config = getContext({provide: PropTypes.object})(
@@ -691,8 +679,7 @@ class Config extends Pure_component {
             return null;
         const id = this.props.id;
         const tab_id = this.props.provide.tab_id;
-        return (
-            <Labeled_controller
+        return <Labeled_controller
               id={id}
               sufix={this.props.sufix}
               data={this.props.data}
@@ -707,8 +694,7 @@ class Config extends Pure_component {
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
-              tooltip={tabs[tab_id].fields[id].tooltip}/>
-        );
+              tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
 });
 
@@ -723,8 +709,7 @@ class Rule_config extends Pure_component {
     render(){
         const id = this.props.id;
         const tab_id = this.props.provide.tab_id;
-        return (
-            <Labeled_controller
+        return <Labeled_controller
               id={id}
               sufix={this.props.sufix}
               data={this.props.data}
@@ -738,8 +723,7 @@ class Rule_config extends Pure_component {
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
-              tooltip={tabs[tab_id].fields[id].tooltip}/>
-        );
+              tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
 });
 

@@ -9,7 +9,7 @@ import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
-import {bytes_format, get_static_country} from './util.js';
+import {get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import Proxy_add from './proxy_add.js';
@@ -24,14 +24,12 @@ let country_names = {};
 const Targeting_cell = ({proxy})=>{
     const flag_with_title = (country, title)=>{
         let country_name = country_names[country];
-        return (
-            <Tooltip title={country_name}>
+        return <Tooltip title={country_name}>
               <span>
                 <span className={'flag-icon flag-icon-'+country}/>
                 {title}
               </span>
-            </Tooltip>
-        );
+            </Tooltip>;
     };
     const static_country = get_static_country(proxy);
     if (static_country&&static_country!='any'&&static_country!='*')
@@ -39,11 +37,9 @@ const Targeting_cell = ({proxy})=>{
     let val = proxy.country;
     if (!val||val=='any'||val=='*')
     {
-        return (
-            <Tooltip title="Any">
+        return <Tooltip title="Any">
               <img src="/img/flag_any_country.svg"/>
-            </Tooltip>
-        );
+            </Tooltip>;
     }
     val = val.toUpperCase();
     const state = proxy.state&&proxy.state.toUpperCase();
@@ -59,23 +55,19 @@ const Status_cell = ({proxy, status, status_details})=>{
     const details = status_details && status_details.map(d=>d.msg).join(',');
     if (!status)
     {
-        return (
-            <Tooltip title="Status of this proxy is being tested">
-              Testing</Tooltip>
-        );
+        return <Tooltip title="Status of this proxy is being tested">
+            Testing</Tooltip>;
     }
     else if (status=='error')
         return <Tooltip title={details}>Error</Tooltip>;
     else if (status=='ok'&&details)
     {
-        return (
-            <Tooltip title={details}>
+        return <Tooltip title={details}>
               <span>
                 OK
                 <div className="ic_warning"/>
               </span>
-            </Tooltip>
-        );
+            </Tooltip>;
     }
     else if (status=='ok'&&!details)
         return <Tooltip title="This proxy works correctly">OK</Tooltip>;
@@ -84,8 +76,7 @@ const Status_cell = ({proxy, status, status_details})=>{
 const Boolean_cell = ({proxy, col})=>{
     if (proxy[col]===true)
         return <img src="/img/ic_checkmark.svg"/>;
-    else
-        return <img src="/img/ic_off.svg"/>;
+    return <img src="/img/ic_off.svg"/>;
 };
 
 const Session_cell = ({proxy})=>{
@@ -427,31 +418,27 @@ class Columns_modal extends Pure_component {
             .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
     }
     render(){
-        const header = (
-            <div className="header_buttons">
+        const header = <div className="header_buttons">
               <button onClick={this.select_all.bind(this)}
                 className="btn btn_lpm">Check all</button>
               <button onClick={this.select_none.bind(this)}
                 className="btn btn_lpm">Uncheck all</button>
               <button onClick={this.select_default.bind(this)}
                 className="btn btn_lpm">Default</button>
-            </div>
-        );
-        return (
-            <Modal id="edit_columns" custom_header={header}
+            </div>;
+        return <Modal id="edit_columns" custom_header={header}
               click_ok={this.click_ok.bind(this)}
               cancel_clicked={this.click_cancel.bind(this)}>
               <div className="row columns">
-                {columns.filter(col=>!col.sticky).map(col=>(
+                {columns.filter(col=>!col.sticky).map(col=>
                   <div key={col.key} className="col-md-6">
                     <Checkbox text={col.title} value={col.key}
                       on_change={this.on_change.bind(this)}
                       checked={!!this.state.selected_cols[col.key]}/>
                   </div>
-                ))}
+                )}
               </div>
-            </Modal>
-        );
+            </Modal>;
     }
 }
 
@@ -467,7 +454,7 @@ const save_pagination = (table, opt={})=>{
 
 const get_pagination = table=>{
     const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    return {items: 10, page: 0, ...(curr[table]||{})};
+    return {items: 10, page: 0, ...curr[table]||{}};
 };
 
 class Proxies extends Pure_component {
@@ -520,8 +507,7 @@ class Proxies extends Pure_component {
         return proxies.filter(p=>{
             if (mp)
                 return ''+p.port==mp||''+p.master_port==mp;
-            else
-                return p.proxy_type!='duplicate';
+            return p.proxy_type!='duplicate';
         });
     }
     prepare_proxies(proxies){
@@ -637,8 +623,7 @@ class Proxies extends Pure_component {
             return null;
         if (this.state.loaded&&!this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        return (
-            <div className="panel proxies_panel">
+        return <div className="panel proxies_panel">
               <div className="panel_heading">
                 <h2>
                   Proxies
@@ -666,12 +651,12 @@ class Proxies extends Pure_component {
                       <thead>
                         <tr>
                           <th className="head_actions">Actions</th>
-                          {cols.map(col=>(
+                          {cols.map(col=>
                             <th key={col.key} className={'col_'+col.key}>
                               <Tooltip title={col.tooltip}>
                                 {col.title}</Tooltip>
                             </th>
-                          ))}
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -700,22 +685,19 @@ class Proxies extends Pure_component {
               <Proxy_add/>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns.bind(this)}/>
-            </div>
-        );
+            </div>;
     }
 }
 
 const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
     page_change, edit_columns, download_csv, top, update_items_per_page})=>
-(
     <Pagination_panel entries={entries} items_per_page={items_per_page}
       cur_page={cur_page} page_change={page_change} top={top} bottom={bottom}
       update_items_per_page={update_items_per_page}>
         <Link_icon tooltip="Edit columns" on_click={edit_columns} id="filter"/>
         <Link_icon tooltip="Download all proxy ports as CSV"
           on_click={download_csv} id="download"/>
-    </Pagination_panel>
-);
+    </Pagination_panel>;
 
 const Proxy_row = withRouter(class Proxy_row extends Pure_component {
     constructor(props){
@@ -768,17 +750,16 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
     }
     render(){
         const proxy = this.props.proxy;
-        const cell_class = col=> classnames(col.key.replace(/\./g, '_'), {
+        const cell_class = col=>classnames(col.key.replace(/\./g, '_'), {
             default_cursor: this.props.proxy.proxy_type!='persist',
         });
         const row_class = classnames('proxy_row',
             {default: proxy.port==22225});
-        return (
-            <tr className={row_class}>
+        return <tr className={row_class}>
               <Actions proxy={proxy}
                 get_status={this.get_status.bind(this)}
                 update_proxies={this.props.update_proxies}/>
-              {this.props.cols.map(col=>(
+              {this.props.cols.map(col=>
                 <Cell
                   key={col.key}
                   proxy={proxy}
@@ -788,9 +769,8 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
                   master_port={this.props.master_port}
                   on_click={this.edit.bind(this)}
                   className={cell_class(col)}/>
-              ))}
-            </tr>
-        );
+              )}
+            </tr>;
     }
 });
 
@@ -851,8 +831,7 @@ class Actions extends Pure_component {
         const persist = this.props.proxy.proxy_type=='persist';
         const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
-        return (
-            <td className="proxies_actions">
+        return <td className="proxies_actions">
               <Action_icon id="trash"
                 on_click={this.open_delete_dialog.bind(this)}
                 tooltip="Delete" invisible={!persist}/>
@@ -866,8 +845,7 @@ class Actions extends Pure_component {
                 open={this.state.open_delete_dialog}
                 ok_clicked={this.delete_proxy.bind(this)}
                 cancel_clicked={this.close_delete_dialog.bind(this)}/>
-            </td>
-        );
+            </td>;
     }
 }
 
@@ -877,10 +855,8 @@ const Action_icon = ({on_click, disabled, invisible, id, tooltip,
     const classes = classnames('action_icon', {disabled, invisible});
     if (disabled)
         tooltip = tooltip_disabled;
-    return (
-        <Link_icon tooltip={tooltip} on_click={on_click} id={id}
-          classes={classes} invisible={invisible} disabled={disabled}/>
-    );
+    return <Link_icon tooltip={tooltip} on_click={on_click} id={id}
+          classes={classes} invisible={invisible} disabled={disabled}/>;
 };
 
 export default Proxies;

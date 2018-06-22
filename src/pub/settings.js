@@ -2,21 +2,17 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import classnames from 'classnames';
 import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import _ from 'lodash';
 
 export default class Settings extends Pure_component {
     render(){
-        return (
-            <div className="settings">
+        return <div className="settings">
               <Nav title="General settings"
                 subtitle="Global configuration of Luminati Proxy Manager"/>
               <Form/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -82,8 +78,7 @@ class Form extends Pure_component {
                 const plan = z.plans && z.plans.slice(-1)[0] || {};
                 return !plan.archive && !plan.disable;
             }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
-        return (
-            <div className="settings_form">
+        return <div className="settings_form">
               <Loader show={!this.state.consts}/>
               <Labeled_controller val={this.state.settings.zone} type="select"
                 on_change_wrapper={this.zone_change} label="Default zone"
@@ -92,7 +87,6 @@ class Form extends Pure_component {
                 data={this.logs_opt} on_change_wrapper={this.logs_change}
                 label="Enable logs" tooltip={this.tooltips.logs}/>
               <Loader_small show={this.state.saving}/>
-            </div>
-        );
+            </div>;
     }
 }

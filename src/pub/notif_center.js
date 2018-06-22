@@ -1,10 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import regeneratorRuntime from 'regenerator-runtime';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import etask from '../../util/etask.js';
-import ajax from '../../util/ajax.js';
 import {Modal} from './common.js';
 import $ from 'jquery';
 import {ga_event} from './util.js';
@@ -80,8 +77,7 @@ class Notif_center extends Pure_component {
     }
     render(){
         const number = this.state.notifs.filter(n=>n.status=='new').length;
-        return (
-            <div className="notif">
+        return <div className="notif">
               <Modal_portal>
                 <div className="notif_modal">
                   <Modal id="notif_modal" title="Messages:"
@@ -101,8 +97,7 @@ class Notif_center extends Pure_component {
               <div onClick={this.open.bind(this)} className="icon">
                 <Circle_icon number={number}/>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -121,29 +116,25 @@ const No_messages = ()=>
 
 const Messages = ({notifs, on_click})=>{
     const new_messages = notifs.filter(n=>n.status=='new').length;
-    return (
-        <div>
+    return <div>
           <If when={!new_messages}>
             <No_new_messages/>
           </If>
-          {notifs.map(m=>(
+          {notifs.map(m=>
             <Message on_click={()=>on_click(m)} clickable={!!m.code}
               key={m.msg_id} {...m}/>
-          ))}
-        </div>
-    );
+          )}
+        </div>;
 };
 
 const Message = ({title, message, status, clickable, on_click})=>{
     const classes = classnames('message', {unread: status=='new', clickable});
     if (status=='new')
         title = 'NEW! '+title;
-    return (
-        <div onClick={on_click} className={classes}>
+    return <div onClick={on_click} className={classes}>
           <div className="subject">{title}</div>
           <div className="text">{message}</div>
-        </div>
-    );
+        </div>;
 };
 
 class Modal_portal extends Pure_component {

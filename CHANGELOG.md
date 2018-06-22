@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.100.333 Stable
+- :bug: added handling TCP errors
+
 ## 1.100.316 Stable
 - :bug: fixed providing ASN manually
 - :star: improved Timeline in logs: waterfall and other rules are visible

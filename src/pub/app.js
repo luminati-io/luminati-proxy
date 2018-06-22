@@ -91,16 +91,14 @@ const App = withRouter(class App extends Pure_component {
         });
     }
     render(){
-        return (
-            <div className="page_wrapper">
+        return <div className="page_wrapper">
               <Enable_ssl_modal/>
               <Switch>
                 <Route path="/login" exact component={Login}/>
                 <Route path="/dock_logs" exact component={Dock_logs}/>
                 <Route path="/" component={Page}/>
               </Switch>
-            </div>
-        );
+            </div>;
     }
 });
 

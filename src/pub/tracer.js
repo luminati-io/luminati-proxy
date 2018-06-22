@@ -60,8 +60,7 @@ export default class Tracer extends Pure_component {
     };
     dismiss_errors = ()=>this.setState({errors: undefined});
     render(){
-        return (
-            <div className="tracer">
+        return <div className="tracer">
               <Nav title={this.title} subtitle={this.subtitle}/>
               <Request execute={this.execute} set_result={this.set_result}
                 loading={this.state.loading}/>
@@ -73,8 +72,7 @@ export default class Tracer extends Pure_component {
                 ok_clicked={this.dismiss_errors} no_cancel_btn>
                 <Warning text={this.state.errors}/>
               </Modal_dialog>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -130,8 +128,7 @@ class Request extends Pure_component {
             return <Loader show/>;
         if (!this.state.ports.length)
             return <Proxy_blank/>;
-        return (
-            <div className="panel no_border request">
+        return <div className="panel no_border request">
               <div className="fields">
                 <Field title="Proxy port">
                   <Select val={this.state.port} data={this.state.ports}
@@ -146,8 +143,7 @@ class Request extends Pure_component {
               </div>
               <Go_button on_click={this.go_clicked}
                 disabled={this.props.loading}/>
-            </div>
-        );
+            </div>;
     }
 }
 

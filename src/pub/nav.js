@@ -71,8 +71,7 @@ const Old_modals = ()=>
 
 const Nav_left = withRouter(class Nav_left extends Pure_component {
     render(){
-        return (
-            <div className="nav_left">
+        return <div className="nav_left">
               <div className="menu">
                 <Nav_link to="/overview" name="overview" label="Overview"/>
                 <Nav_link to="/howto" name="howto" label="Instructions"/>
@@ -88,8 +87,7 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
               </div>
               <div className="menu_filler"/>
               <Footer/>
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -117,14 +115,12 @@ class Nav_top extends Pure_component {
         this.setdb_on('head.version', ver=>this.setState({ver})); }
     render(){
         const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
-        return (
-            <div className="nav_top">
+        return <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
                 <div><Logo/></div>
               </Tooltip>
               <Nav_right/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -191,11 +187,9 @@ class Upgrade_modal extends Pure_component {
         });
     }
     render(){
-        return (
-            <Modal id="upgrade_modal"
+        return <Modal id="upgrade_modal"
               click_ok={this.confirm.bind(this)}
-              title="The application will be upgraded and restarted"/>
-        );
+              title="The application will be upgraded and restarted"/>;
     }
 }
 
@@ -212,11 +206,9 @@ class Shutdown_modal extends Pure_component {
         });
     }
     render(){
-        return (
-            <Modal id="shutdown_modal"
+        return <Modal id="shutdown_modal"
               click_ok={this.confirm.bind(this)}
-              title="Are you sure you want to shut down the local proxies?"/>
-        );
+              title="Are you sure you want to shut down the local proxies?"/>;
     }
 }
 
@@ -243,8 +235,7 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
         if (!this.state.settings)
             return null;
         const is_upgradable = this.state.ver_last&&this.state.ver_last.newer;
-        return (
-            <div className="dropdown">
+        return <div className="dropdown">
               <a className="link dropdown-toggle"
                 data-toggle="dropdown">
                 {this.state.settings.customer}
@@ -267,8 +258,7 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
                   <a onClick={this.shutdown.bind(this)}>Shut down</a>
                 </li>
               </ul>
-            </div>
-        );
+            </div>;
     }
 });
 

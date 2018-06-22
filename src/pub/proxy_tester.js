@@ -17,14 +17,12 @@ class Proxy_tester extends Pure_component {
     update_response = response=>this.setState({response});
     clear_response = ()=>this.setState({response: undefined});
     render(){
-        return (
-            <div className="proxy_tester vbox">
+        return <div className="proxy_tester vbox">
               <Nav title={this.title} subtitle={this.subtitle}/>
               <Request update_response={this.update_response}/>
               <Preview cur_preview={this.state.response}
                 close_preview={this.clear_response}/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -148,8 +146,7 @@ class Request extends Pure_component {
         });
     };
     render(){
-        return (
-            <div className="panel no_border request">
+        return <div className="panel no_border request">
               <Loader show={this.state.show_loader}/>
               <Modal className="warnings_modal" id="warnings_modal"
                 title="Warnings:" no_cancel_btn>
@@ -168,23 +165,20 @@ class Request extends Pure_component {
                     className="btn btn_lpm btn_lpm_primary">Go</button>
                 </div>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
 const Request_params = ({params, update, proxies})=>{
     proxies = (proxies||[]).map(p=>({key: p.port, value: p.port}));
     const methods = [{key: 'GET', value: 'GET'}, {key: 'POST', value: 'POST'}];
-    return (
-        <div className="request_params">
+    return <div className="request_params">
           <Field params={params} update={update} name="proxy" type="select"
             data={proxies}/>
           <Field params={params} update={update} name="url" type="text"/>
           <Field params={params} update={update} name="method" type="select"
             data={methods}/>
-        </div>
-    );
+        </div>;
 };
 
 const Field = ({type, update, name, params, ...props})=>{
@@ -229,8 +223,7 @@ const New_header_params = ({clicked_add, clicked_remove, update, header,
 {
     const input_changed = field=>value=>{
         update(header.idx, field, value); };
-    return (
-        <div className="header_line">
+    return <div className="header_line">
           <Input val={header.header}
             on_change_wrapper={input_changed('header')}
             type="text" placeholder="Header" className="header_input"/>
@@ -246,8 +239,7 @@ const New_header_params = ({clicked_add, clicked_remove, update, header,
               <Add_icon click={clicked_add}/>
             </If>
           </div>
-        </div>
-    );
+        </div>;
 };
 
 const Add_icon = ({click})=>

@@ -1,7 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import etask from '../../util/etask.js';
-import ajax from '../../util/ajax.js';
 import React from 'react';
 import {Modal, Loader} from './common.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
@@ -20,18 +19,18 @@ class Index extends Pure_component {
     click_cancel = ()=>this.setState({desc: ''});
     detect_browser = ()=>{
         let browser = 'unknown';
-        if ((!!window.opr && !!window.opr.addons) || !!window.opera ||
+        if (window.opr && window.opr.addons || window.opera ||
             navigator.userAgent.indexOf(' OPR/')>=0)
         {
             browser = 'opera';
         }
         else if (typeof InstallTrigger!=='undefined')
             browser = 'firefox';
-        else if (/*@cc_on!@*/false || !!document.documentMode)
+        else if (document.documentMode)
             browser = 'IE';
-        else if (!!window.StyleMedia)
+        else if (window.StyleMedia)
             browser = 'Edge';
-        else if (!!window.chrome && !!window.chrome.webstore)
+        else if (window.chrome && window.chrome.webstore)
             browser = 'chrome';
         return browser;
     };
@@ -53,8 +52,7 @@ class Index extends Pure_component {
         });
     };
     render(){
-        return (
-            <div className="report_bug">
+        return <div className="report_bug">
               <Loader show={this.state.sending}/>
               <Modal title="Report a bug" id="report_bug_modal"
                 ok_btn_title="Report"
@@ -72,8 +70,7 @@ class Index extends Pure_component {
                 </div>
               </Modal>
               <Thanks_modal/>
-            </div>
-        );
+            </div>;
     }
 }
 

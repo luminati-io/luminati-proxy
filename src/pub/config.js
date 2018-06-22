@@ -39,7 +39,7 @@ class Config extends Pure_component {
     set_textarea(el){ this.textarea = el; }
     set_editable(editable){
         this.setState({editable});
-        this.cm.setOption('readOnly', editable ?  false : 'nocursor');
+        this.cm.setOption('readOnly', editable ? false : 'nocursor');
     }
     check(){
         if (!this.state.changed)
@@ -93,7 +93,7 @@ class Config extends Pure_component {
     download(){
         ga_event('configuration', 'click download');
         const blob = new Blob([this.cm.doc.getValue()],
-            {type: "text/plain;charset=utf-8"});
+            {type: 'text/plain;charset=utf-8'});
         filesaver.saveAs(blob, `${this.state.settings.customer}_config.json`);
     }
     click_edit(){
@@ -109,8 +109,7 @@ class Config extends Pure_component {
     render(){
         const panel_class = classnames('panel code_panel flex_auto vbox', {
             editable: this.state.editable});
-        return (
-            <div className="config vbox">
+        return <div className="config vbox">
               <Nav title={this.title} subtitle={this.subtitle}
                 warning={this.state.warning}/>
               <div className={panel_class}>
@@ -125,8 +124,7 @@ class Config extends Pure_component {
                 </div>
               </div>
               <Conf_modal click_ok={this.save.bind(this)}/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -134,38 +132,29 @@ const Nav_buttons = props=>{
     const save_class = classnames({disabled: !props.changed});
     if (props.editable)
     {
-        return (
-            <div className="nav_buttons">
+        return <div className="nav_buttons">
               <Link_icon tooltip="Cancel" on_click={props.click_cancel}
                 id="remove"/>
               <Link_icon tooltip="Save" on_click={props.click_save}
                 classes={save_class} id="ok"/>
-            </div>
-        );
+            </div>;
     }
-    else
-    {
-        return (
-            <div className="nav_buttons">
-              <Link_icon tooltip="Edit config" on_click={props.click_edit}
-                id="pencil"/>
-              <Link_icon tooltip="Download as JSON"
-                on_click={props.click_download} id="download"/>
-            </div>
-        );
-    }
+    return <div className="nav_buttons">
+          <Link_icon tooltip="Edit config" on_click={props.click_edit}
+            id="pencil"/>
+          <Link_icon tooltip="Download as JSON"
+            on_click={props.click_download} id="download"/>
+        </div>;
 };
 
 const Conf_modal = props=>{
     const content = `Editing the configuration manually may result in your
         proxies working incorrectly. Do you still want to modify the
         configuration file?`;
-    return (
-        <Modal title="Are you sure?" id="conf_confirmation_modal"
+    return <Modal title="Are you sure?" id="conf_confirmation_modal"
           click_ok={props.click_ok}>
           <p>{content}</p>
-        </Modal>
-    );
+        </Modal>;
 };
 
 export default Config;

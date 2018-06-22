@@ -187,14 +187,12 @@ export const Warning = props=>
 export const Loader = ({show})=>{
     if (!show)
         return null;
-    return (
-        <div className="loader_wrapper">
+    return <div className="loader_wrapper">
           <div className="mask"/>
           <div className="loader">
             <div className="spinner"/>
           </div>
-        </div>
-    );
+        </div>;
 };
 
 export const Loader_small = ({show, msg='Saving...'})=>
@@ -225,24 +223,20 @@ export class Code extends Pure_component {
         } catch(e){ console.log('Oops, unable to copy'); }
     }
     render(){
-        return (
-            <code ref={this.set_ref.bind(this)}>
+        return <code ref={this.set_ref.bind(this)}>
               <span className="source">{this.props.children}</span>
               <textarea style={{position: 'fixed', top: '-1000px'}}/>
               <button onClick={this.copy.bind(this)} data-container="body"
                 className="btn btn_lpm btn_lpm_small btn_copy">
                 Copy</button>
-            </code>
-        );
+            </code>;
     }
 }
 
 export const Textarea = props=>{
-    return (
-        <textarea value={props.val} rows={props.rows||3}
+    return <textarea value={props.val} rows={props.rows||3}
           placeholder={props.placeholder}
-          onChange={e=>props.on_change_wrapper(e.target.value)}/>
-    );
+          onChange={e=>props.on_change_wrapper(e.target.value)}/>;
 };
 
 export const Select = props=>{
@@ -254,22 +248,19 @@ export const Select = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val);
     };
-    return (
-        <select value={''+props.val}
+    return <select value={''+props.val}
           onChange={e=>update(e.target.value)} disabled={props.disabled}>
           {(props.data||[]).map((c, i)=>
             <option key={i} value={c.value}>{c.key}</option>
           )}
-        </select>
-    );
+        </select>;
 };
 
 const Double_number = props=>{
     const vals = (''+props.val).split(':');
     const update = (start, end)=>{
         props.on_change_wrapper([start||0, end].join(':')); };
-    return (
-        <span className="double_field">
+    return <span className="double_field">
           <Input {...props} val={vals[0]||''} id={props.id+'_start'}
             type="number" disabled={props.disabled}
             on_change_wrapper={val=>update(val, vals[1])}/>
@@ -277,8 +268,7 @@ const Double_number = props=>{
           <Input {...props} val={vals[1]||''} id={props.id+'_end'}
             type="number" disabled={props.disabled}
             on_change_wrapper={val=>update(vals[0], val)}/>
-        </span>
-    );
+        </span>;
 };
 
 const Typeahead_wrapper = props=>
@@ -327,12 +317,10 @@ export const Input = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val, props.id);
     };
-    return (
-        <input type={props.type} value={props.val} disabled={props.disabled}
+    return <input type={props.type} value={props.val} disabled={props.disabled}
           onChange={e=>update(e.target.value)} className={props.className}
           min={props.min} max={props.max} placeholder={props.placeholder}
-          onBlur={props.on_blur}/>
-    );
+          onBlur={props.on_blur}/>;
 };
 
 export const Checkbox = props=>

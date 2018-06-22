@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.100.333",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "added handling TCP errors"
+            }
+        ]
+    },
+    {
         "ver": "1.100.316",
         "type": "stable",
         "changes": [

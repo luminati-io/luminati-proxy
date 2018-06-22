@@ -113,8 +113,7 @@ const Proxy_port_layer = ({proxies, form})=>{
 };
 
 const Layer = ({id, no_btn, no_arr, class_names, children})=>{
-    return (
-        <div className={classnames('layer', id, class_names)}>
+    return <div className={classnames('layer', id, class_names)}>
           <Tooltip placement="bottom" title={tooltips[id]}>
             <span>
               <If when={!no_btn}>
@@ -126,8 +125,7 @@ const Layer = ({id, no_btn, no_arr, class_names, children})=>{
               </If>
             </span>
           </Tooltip>
-        </div>
-    );
+        </div>;
 };
 
 const Peer = ({proxies, form})=>{
