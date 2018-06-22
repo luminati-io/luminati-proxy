@@ -20,13 +20,19 @@ class Preview extends Pure_component {
     ];
     state = {cur_pane: 0};
     select_pane = id=>{ this.setState({cur_pane: id}); };
+    componentDidMount(){
+        this.setdb_on('har_viewer.set_pane', pane=>{
+            if (pane===undefined)
+                return;
+            this.setState({cur_pane: pane});
+        });
+    }
     render(){
         if (!this.props.cur_preview)
             return null;
         const Pane_content = this.panes[this.state.cur_pane].comp;
         const req = this.props.cur_preview;
-        return (
-            <div style={this.props.style} className="har_preview chrome">
+        return <div style={this.props.style} className="har_preview chrome">
               <div className="tabbed_pane_header">
                 <div className="left_pane">
                   <div onClick={this.props.close_preview}
@@ -36,11 +42,11 @@ class Preview extends Pure_component {
                   </div>
                 </div>
                 <div className="right_panes">
-                  {this.panes.map((p, idx)=>(
+                  {this.panes.map((p, idx)=>
                     <Pane key={p.id} width={p.width} id={p.id} idx={idx}
                       on_click={this.select_pane}
                       active={this.state.cur_pane==idx}/>
-                  ))}
+                  )}
                   <Pane_slider panes={this.panes}
                     cur_pane={this.state.cur_pane}/>
                 </div>
@@ -48,8 +54,7 @@ class Preview extends Pure_component {
               <div className="tabbed_pane_content">
                 <Pane_content key={req.uuid} req={req}/>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -74,15 +79,13 @@ class Pane_headers extends Pure_component {
         const {req} = this.props;
         const general_entries = [{name: 'Request URL', value: req.request.url},
             {name: 'Status Code', value: req.response.status}];
-        return (
-            <ol className="tree_outline">
+        return <ol className="tree_outline">
               <Preview_section title="General" pairs={general_entries}/>
               <Preview_section title="Response headers"
                 pairs={req.response.headers}/>
               <Preview_section title="Request headers"
                 pairs={req.request.headers}/>
-             </ol>
-        );
+             </ol>;
     }
 }
 
@@ -123,11 +126,9 @@ class Codemirror_wrapper extends Pure_component {
     }
     set_textarea = ref=>{ this.textarea = ref; };
     render(){
-        return (
-            <div className="codemirror_wrapper">
+        return <div className="codemirror_wrapper">
               <textarea ref={this.set_textarea}/>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -143,9 +144,9 @@ class Preview_section extends Pure_component {
             </li>,
             <ol key="ol"
               className={classnames('children', {open: this.state.open})}>
-              {this.props.pairs.map(p=>(
+              {this.props.pairs.map(p=>
                 <Header_pair key={p.name} name={p.name} value={p.value}/>
-              ))}
+              )}
             </ol>
         ];
     }
@@ -154,12 +155,10 @@ class Preview_section extends Pure_component {
 const Header_pair = ({name, value})=>{
     if (name=='Status Code')
         value = <Status_value value={value}/>;
-    return (
-        <li className="treeitem">
+    return <li className="treeitem">
           <div className="header_name">{name}: </div>
           <div className="header_value">{value}</div>
-        </li>
-    );
+        </li>;
 };
 
 const Status_value = ({value})=>{
@@ -168,11 +167,9 @@ const Status_value = ({value})=>{
     const red = /4|5../.test(value);
     const classes = classnames('small_icon', 'status', {
         green, yellow, red});
-    return (
-        <div className="status_wrapper">
+    return <div className="status_wrapper">
           <div className={classes}/>{value}
-        </div>
-    );
+        </div>;
 };
 
 class Pane_timing extends Pure_component {
@@ -180,17 +177,40 @@ class Pane_timing extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.recent_stats', stats=>this.setState({stats})); }
     render(){
-        const {timings, time, startedDateTime} = this.props.req;
+        const {startedDateTime} = this.props.req;
+        const started_at = moment(new Date(startedDateTime)).format(
+            'YYYY-MM-DD HH:mm:ss');
+        return <div className="timing_view_wrapper">
+              <div className="timeline_info">Started at {started_at}</div>
+              <ol className="tree_outline">
+                {this.props.req.details.timeline.map((timeline, idx)=>
+                  <Single_timeline key={idx} timeline={timeline}
+                    time={this.props.req.time} req={this.props.req}/>
+                )}
+              </ol>
+              <div className="timeline_info total">
+                Total: {this.props.req.time} ms</div>
+              {this.props.req.request.url.endsWith('443') &&
+                this.state.stats && this.state.stats.ssl_enable &&
+                <Enable_https/>
+              }
+            </div>;
+    }
+}
+
+class Single_timeline extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
         const sections = ['Resource Scheduling', 'Request/Response'];
         const perc = [
             {label: 'Queueing', id: 'blocked', section: 0},
-            {label: 'Request sent', id: 'send', section: 1},
             {label: 'Waiting (TTFB)', id: 'wait', section: 1},
             {label: 'Content Download', id: 'receive', section: 1},
         ].reduce((acc, el)=>{
-            const cur_time = timings[el.id];
+            const cur_time = this.props.timeline[el.id];
             const left = acc.offset;
-            const dur = Number((cur_time/time).toFixed(4));
+            const dur = Number((cur_time/this.props.time).toFixed(4));
             const right = 1-acc.offset-dur;
             return {offset: acc.offset+dur, data: [...acc.data,
                 {...el, left: `${left*100}%`, right: `${right*100}%`}]};
@@ -206,39 +226,34 @@ class Pane_timing extends Pure_component {
                 ],
             };
         }, {last_section: -1, data: []}).data;
-        const started_at = moment(new Date(startedDateTime)).format(
-            'YYYY-MM-DD HH:mm:ss');
-        return (
-            <div className="timing_view_wrapper">
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent', {open: this.state.open})}>
+              {this.props.timeline.port}
+            </li>,
+            <ol key="ol" className={children_classes}>
               <table>
                 <colgroup>
                   <col className="labels"/>
                   <col className="bars"/>
                   <col className="duration"/>
                 </colgroup>
-                <thead className="network_timing_start">
-                  <tr>
-                    <td colSpan="2">Started at {started_at}</td>
-                  </tr>
-                </thead>
                 <tbody>
-                  {perc.map((s, i)=>(
+                  {perc.map((s, i)=>
                     <Timing_header key={i} title={sections[s[0].section]}>
-                    {s.map(p=>(
+                    {s.map(p=>
                       <Timing_row title={p.label} id={p.id} left={p.left}
-                        key={p.id} right={p.right} time={timings[p.id]}/>
-                      ))}
+                        key={p.id} right={p.right}
+                        time={this.props.timeline[p.id]}/>
+                      )}
                     </Timing_header>
-                  ))}
-                  <Timing_footer total={time}/>
-                  {this.props.req.request.url.endsWith('443') &&
-                    this.state.stats && this.state.stats.ssl_enable &&
-                    <Enable_https/>
-                  }
+                  )}
                 </tbody>
               </table>
-            </div>
-        );
+            </ol>
+        ];
     }
 }
 
@@ -263,26 +278,10 @@ const Timing_row = ({title, id, left, right, time})=>
       <td><div className="timing_bar_title">{time} ms</div></td>
     </tr>;
 
-const network_explanation_url = 'https://developers.google.com/web/tools/'
-+'chrome-devtools/network-performance/reference#timing-explanation';
-const Timing_footer = ({total})=>
-    <tr className="footer_link">
-      <td colSpan="1">
-        <a className="devtools_link" role="link" tabIndex="0" target="_blank"
-          rel="noopener noreferrer" href={network_explanation_url}
-          style={{display: 'inline', cursor: 'pointer'}}>
-          Explanation
-        </a>
-      </td>
-      <td></td>
-      <td>{total} ms</td>
-    </tr>;
-
 class Enable_https extends Pure_component {
     click = ()=>$('#enable_ssl_modal').modal();
     render(){
-        return (
-            <tr className="footer_link">
+        return <tr className="footer_link">
               <td colSpan="2">
                 <a className="devtools_link" role="link" tabIndex="0"
                   target="_blank" rel="noopener noreferrer"
@@ -292,8 +291,7 @@ class Enable_https extends Pure_component {
                 </a> to view this timeline
               </td>
               <td></td>
-            </tr>
-        );
+            </tr>;
     }
 }
 

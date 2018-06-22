@@ -781,8 +781,11 @@ class Data_row extends React.Component {
 }
 
 class Cell_value extends React.Component {
+    go_to_timeline = e=>{
+        setdb.emit('har_viewer.set_pane', 3);
+    };
     render(){
-        const {col, req} = this.props;
+        const {col, req, req: {details: {timeline}}} = this.props;
         if (col=='select')
         {
             return <Select_cell uuid={req.uuid}
@@ -790,14 +793,22 @@ class Cell_value extends React.Component {
         }
         if (col=='Name')
         {
-            return <Tooltip title={req.request.url}>
-                  <div className="col_name">
-                    <div>
-                      <div className="icon script"/>
+            const rule_tip = 'At least one rule has been applied to this'
+            +' request. Click to see more details';
+            return <div className="col_name">
+                  <div>
+                    <div className="icon script"/>
+                    {timeline && timeline.length>1 &&
+                      <Tooltip title={rule_tip}>
+                        <div onClick={this.go_to_timeline}
+                          className="small_icon rules"/>
+                      </Tooltip>
+                    }
+                    <Tooltip title={req.request.url}>
                       <div className="disp_value">{req.request.url}</div>
-                    </div>
+                    </Tooltip>
                   </div>
-                </Tooltip>;
+                </div>;
         }
         else if (col=='Status')
         {

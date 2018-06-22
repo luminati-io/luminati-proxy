@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.100.316",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed providing ASN manually"
+            },
+            {
+                "type": "star",
+                "text": "improved Timeline in logs: waterfall and other rules are visible"
+            }
+        ]
+    },
+    {
         "ver": "1.100.85",
         "type": "dev",
         "changes": [

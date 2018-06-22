@@ -28,6 +28,7 @@ const If = ({children, when})=>{
 };
 E.If = If;
 
+// XXX saarya: replace Wrap with <> fragment from react 16.2
 const Wrap = props=>props.children;
 E.Wrap = Wrap;
 

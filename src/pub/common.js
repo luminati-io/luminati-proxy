@@ -284,7 +284,8 @@ const Double_number = props=>{
 const Typeahead_wrapper = props=>
     <Typeahead options={props.data} maxResults={10}
       minLength={1} disabled={props.disabled} selectHintOnEnter
-      onChange={props.on_change_wrapper} selected={props.val}/>;
+      onChange={props.on_change_wrapper} selected={props.val}
+      onInputChange={props.on_input_change}/>;
 
 export const Form_controller = props=>{
     const type = props.type;

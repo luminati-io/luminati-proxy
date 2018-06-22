@@ -1889,6 +1889,12 @@ span.icon_link {
             &.yellow { --spritesheet-position: 50px 50px; }
             &.red { --spritesheet-position: 0 30px; }
         }
+        &.rules {
+            margin-right: 3px;
+            margin-top: 4px;
+            float: left;
+            --spritesheet-position: 0px 50px;
+        }
     }
     .small_icon_mask {
         width: 10px;
@@ -2325,6 +2331,43 @@ span.icon_link {
                 padding-bottom: 5px;
                 border-bottom: solid 1px #e0e0e0;
                 &:last-child { border-bottom: none; }
+                &.children {
+                    padding-left: 10px;
+                    display: none;
+                    &.open { display: block; }
+                    li.treeitem {
+                        -webkit-user-select: none;
+                        user-select: none;
+                        cursor: default;
+                        margin-left: 10px;
+                        margin-top: 1px;
+                        min-height: 12px;
+                        user-select: text;
+                        -webkit-user-select: text;
+                        .header_name {
+                            color: rgb(33%, 33%, 33%);
+                            display: inline-block;
+                            margin-right: 0.25em;
+                            font-weight: bold;
+                            vertical-align: top;
+                            white-space: pre-wrap;
+                        }
+                        .header_value {
+                            display: inline-block;
+                            margin-right: 1em;
+                            white-space: pre-wrap;
+                            word-break: break-all;
+                            margin-top: 1px;
+                            font-size: 11px !important;
+                            font-family: dejavu sans mono, monospace;
+                            .status_wrapper {
+                                display: flex;
+                                align-items: center;
+                            }
+                        }
+                    }
+                    &.timeline { padding-right: 16px; }
+                }
             }
             .parent {
                 font-weight: bold;
@@ -2348,42 +2391,6 @@ span.icon_link {
                     -webkit-mask-position: 0 0;
                 }
                 &.open:before { -webkit-mask-position: -16px 0; }
-            }
-            ol.children {
-                padding-left: 10px;
-                display: none;
-                &.open { display: block; }
-                li.treeitem {
-                    -webkit-user-select: none;
-                    user-select: none;
-                    cursor: default;
-                    margin-left: 10px;
-                    margin-top: 1px;
-                    min-height: 12px;
-                    user-select: text;
-                    -webkit-user-select: text;
-                    .header_name {
-                        color: rgb(33%, 33%, 33%);
-                        display: inline-block;
-                        margin-right: 0.25em;
-                        font-weight: bold;
-                        vertical-align: top;
-                        white-space: pre-wrap;
-                    }
-                    .header_value {
-                        display: inline-block;
-                        margin-right: 1em;
-                        white-space: pre-wrap;
-                        word-break: break-all;
-                        margin-top: 1px;
-                        font-size: 11px !important;
-                        font-family: dejavu sans mono, monospace;
-                        .status_wrapper {
-                            display: flex;
-                            align-items: center;
-                        }
-                    }
-                }
             }
         }
         .codemirror_wrapper {
@@ -2411,7 +2418,6 @@ span.icon_link {
         }
         .timing_view_wrapper {
             width: 100%;
-            margin: 6px 16px;
             color: rgb(30%, 30%, 30%);
             table {
                 width: 100%;
@@ -2459,6 +2465,14 @@ span.icon_link {
                         font-weight: bold;
                         text-align: right;
                     }
+                }
+            }
+            .timeline_info {
+                margin: 5px 10px;
+                &.total {
+                    margin-right: 16px;
+                    float: right;
+                    font-weight: 600;
                 }
             }
         }

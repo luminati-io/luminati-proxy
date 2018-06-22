@@ -672,6 +672,8 @@ class Config extends Pure_component {
         if (this.props.validator)
             this.set_field(this.props.id, this.props.validator(value));
     };
+    on_input_change = val=>this.set_field(this.props.id,
+        [{id: val, label: val}]);
     on_change_wrapper = (value, _id)=>{
         const curr_id = _id||this.props.id;
         if (this.props.on_change)
@@ -695,6 +697,7 @@ class Config extends Pure_component {
               sufix={this.props.sufix}
               data={this.props.data}
               type={this.props.type}
+              on_input_change={this.on_input_change}
               on_change_wrapper={this.on_change_wrapper}
               val={this.state.val===undefined ? '' : this.state.val}
               disabled={this.props.disabled || !this.is_valid_field(id)}

@@ -29,8 +29,7 @@ class Stats extends Pure_component {
     };
     show_reset_dialog = ()=>this.setState({show_reset: true});
     render(){
-        return (
-            <div className="chrome stats_panel">
+        return <div className="chrome stats_panel">
               <div className="main_panel">
                 <Toolbar stats={this.state.stats}/>
                 <Stat_table stats={this.state.stats}
@@ -43,8 +42,7 @@ class Stats extends Pure_component {
                 <Summary_bar enable_ssl_click={this.enable_ssl_click}
                   show={this.state.stats.ssl_enable}/>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -60,46 +58,38 @@ const Row = withRouter(class Row extends Pure_component {
     };
     render(){
         const {stat, row_key, warning} = this.props;
-        return (
-            <tr onClick={this.click}>
+        return <tr onClick={this.click}>
               <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
               <td><Tooltip_bytes chrome_style bytes={stat.out_bw}/></td>
               <td><Tooltip_bytes chrome_style bytes={stat.in_bw}/></td>
               <td><Cell>{stat.reqs||'—'}</Cell></td>
-            </tr>
-        );
+            </tr>;
     }
 });
 
 const Key_cell = ({title, warning, row_key})=>{
     const warning_tooltip = `Some of your proxy ports don't have SSL analyzing
         enabled and there are connections on HTTPS protocol detected`;
-    return (
-        <td>
+    return <td>
           <Cell row_key={row_key}>{title}</Cell>
           {warning &&
             <Tooltip title={warning_tooltip}>
               <div className="ic_warning"/>
             </Tooltip>
           }
-        </td>
-    );
+        </td>;
 };
 
 const Cell = ({row_key, title, children})=>{
     if (row_key=='status_code')
     {
-        return (
-            <Tooltip title={title+' '+status_codes[title]}>
+        return <Tooltip title={title+' '+status_codes[title]}>
               <div className="disp_value">{children}</div>
-            </Tooltip>
-        );
+            </Tooltip>;
     }
-    return (
-        <Tooltip title={title||children}>
+    return <Tooltip title={title||children}>
           <div className="disp_value">{children}</div>
-        </Tooltip>
-    );
+        </Tooltip>;
 };
 
 const Stat_table = with_resizable_cols([{id: 'key'}, {id: 'out_bw'},
@@ -114,15 +104,13 @@ class Stat_table extends Pure_component {
     render(){
         const {title, stats, row_key, logs, ssl_warning, cols} = this.props;
         const cur_stats = stats[row_key]||[];
-        return (
-            <div className="tables_container vbox">
+        return <div className="tables_container vbox">
               <Header_container title={title} cols={cols}
                 sorting={this.state.sorting} sort={this.sort}/>
               <Data_container stats={cur_stats} row_key={row_key} logs={logs}
                 ssl_warning={ssl_warning} cols={cols}
                 sorting={this.state.sorting}/>
-            </div>
-        );
+            </div>;
     }
 });
 
@@ -159,8 +147,7 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
         let res = val_a>val_b;
         return sorting.dir==-1 ? res : !res;
     });
-    return (
-        <div className="data_container">
+    return <div className="data_container">
           <table>
             <colgroup>
               {(cols||[]).map((c, idx)=>
@@ -181,8 +168,7 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
               </tr>
             </tbody>
           </table>
-        </div>
-    );
+        </div>;
 };
 
 const Summary_bar = ({enable_ssl_click, show})=>{
@@ -191,15 +177,13 @@ const Summary_bar = ({enable_ssl_click, show})=>{
     const tooltip = `Enable HTTPS analyzing for all your proxies. You will also
         need to install SSL certificate. It allows you to use rules and logs
         for HTTPS requests`;
-    return (
-        <div className="summary_bar">
+    return <div className="summary_bar">
           <a className="link enable_https" onClick={enable_ssl_click}>
             <Tooltip title={tooltip}>
               Enable HTTPS request logging and debugging
             </Tooltip>
           </a>
-        </div>
-    );
+        </div>;
 };
 
 class Toolbar extends Pure_component {
@@ -210,8 +194,7 @@ class Toolbar extends Pure_component {
         });
     };
     render(){
-        return (
-            <div className="toolbar_container">
+        return <div className="toolbar_container">
               <div className="toolbar">
                 <Toolbar_button id="clear" tooltip="Clear"
                   on_click={this.clear}/>
@@ -219,8 +202,7 @@ class Toolbar extends Pure_component {
                 <Success_ratio total={this.props.stats.total}
                   success={this.props.stats.success}/>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -230,8 +212,7 @@ const Success_ratio = ({total=0, success=0})=>{
         requests, where successful requests are calculated as 2xx,
         3xx or 404 HTTP status codes`;
     const val_tooltip = `total: ${total}, success: ${success}`;
-    return (
-        <div className="overall_success_ratio">
+    return <div className="overall_success_ratio">
           <div className="success_title">
             <Tooltip title={tooltip}>Success rate:</Tooltip>
           </div>
@@ -240,8 +221,7 @@ const Success_ratio = ({total=0, success=0})=>{
               {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}
             </Tooltip>
           </div>
-        </div>
-    );
+        </div>;
 };
 
 export default Stats;

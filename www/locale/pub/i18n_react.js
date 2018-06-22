@@ -48,27 +48,19 @@ const t = key=>{
 class T extends Pure_component {
     constructor(props){
         super(props);
-        this.key = _.isString(this.props.children) ?
-            (props.children||'').replace(/\s+/g, ' ') : '';
-        this.state = {text: this.key, translation: {}};
+        this.state = {};
     }
     componentDidMount(){
-        if (this.key)
-        {
-            this.setdb_on('i18n.translation', translation=>
-                this.setState({text: get_translation(translation, this.key)})
-            );
-        } else {
-            this.setdb_on('i18n.translation', translation=>
-                this.setState({translation}));
-        }
+        this.setdb_on('i18n.translation', translation=>
+            this.setState({translation}));
     }
     render(){
-        if (this.key )
-            return this.state.text;
-        if (typeof this.props.children=='function')
-            return this.props.children(key=>
-                get_translation(this.state.translation, key));
+        const {translation} = this.state;
+        const {children} = this.props;
+        if (typeof children=='function')
+            return children(key=>get_translation(translation, key));
+        if (_.isString(children))
+            return get_translation(translation, children.replace(/\s+/g, ' '));
         console.error('<T> must receive text to translate or a translate '
             +'function. Received: ', this.props.children);
         return null;

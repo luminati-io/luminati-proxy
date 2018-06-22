@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.100.316 Stable
+- :bug: fixed providing ASN manually
+- :star: improved Timeline in logs: waterfall and other rules are visible
+
 ## 1.100.85 Development Latest
 - :star: added taking screenshots in 'Test affiliate links'
 - :sparkles: move logs to luminati_proxy_manager dir

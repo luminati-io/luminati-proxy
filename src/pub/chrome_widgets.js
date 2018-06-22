@@ -21,11 +21,11 @@ export const Devider = ()=><div className="devider"/>;
 
 export const with_resizable_cols = (cols, Table)=>{
     class Resizable extends Pure_component {
+        state = {};
         cols = _.cloneDeep(cols);
         min_width = 22;
         moving_col = null;
         style = {position: 'relative', display: 'flex', flex: 'auto'};
-        state = {};
         componentDidMount(){
             this.resize_columns();
             window.document.addEventListener('mousemove', this.on_mouse_move);
@@ -119,7 +119,8 @@ export const with_resizable_cols = (cols, Table)=>{
                     resize_columns={this.resize_columns}
                     show_column={this.show_column}
                     hide_column={this.hide_column}/>
-                  <Grid_resizers show start_moving={this.start_moving}
+                  <Grid_resizers show={!this.props.cur_preview}
+                    start_moving={this.start_moving}
                     cols={this.state.cols}/>
                 </div>;
         }
