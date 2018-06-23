@@ -660,8 +660,10 @@ class Config extends Pure_component {
         if (this.props.validator)
             this.set_field(this.props.id, this.props.validator(value));
     };
-    on_input_change = val=>this.set_field(this.props.id,
-        [{id: val, label: val}]);
+    on_input_change = val=>{
+        if (this.props.update_on_input)
+            this.set_field(this.props.id, [{id: val, label: val}]);
+    };
     on_change_wrapper = (value, _id)=>{
         const curr_id = _id||this.props.id;
         if (this.props.on_change)
@@ -877,7 +879,7 @@ class Targeting extends Pure_component {
               <Config type="typeahead" id="city" data={this.cities()}
                 on_change={this.city_changed}/>
               <Config type="typeahead" id="asn" data={this.state.asns}
-                disabled={this.props.form.carrier}/>
+                disabled={this.props.form.carrier} update_on_input/>
               <Config type="select" id="carrier" data={this.carriers}
                 note={this.carriers_note}
                 disabled={this.props.form.asn&&this.props.form.asn.length}/>

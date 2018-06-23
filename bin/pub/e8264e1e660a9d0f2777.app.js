@@ -17768,7 +17768,7 @@ var Config = (0, _recompose.getContext)({ provide: _propTypes2.default.object })
 
             if (_this7.props.validator) _this7.set_field(_this7.props.id, _this7.props.validator(value));
         }, _this7.on_input_change = function (val) {
-            return _this7.set_field(_this7.props.id, [{ id: val, label: val }]);
+            if (_this7.props.update_on_input) _this7.set_field(_this7.props.id, [{ id: val, label: val }]);
         }, _this7.on_change_wrapper = function (value, _id) {
             var curr_id = _id || _this7.props.id;
             if (_this7.props.on_change) _this7.props.on_change(value);
@@ -18014,7 +18014,7 @@ var Targeting = provider({ tab_id: 'target' })(function (_Pure_component6) {
                 _react2.default.createElement(Config, { type: 'typeahead', id: 'city', data: this.cities(),
                     on_change: this.city_changed }),
                 _react2.default.createElement(Config, { type: 'typeahead', id: 'asn', data: this.state.asns,
-                    disabled: this.props.form.carrier }),
+                    disabled: this.props.form.carrier, update_on_input: true }),
                 _react2.default.createElement(Config, { type: 'select', id: 'carrier', data: this.carriers,
                     note: this.carriers_note,
                     disabled: this.props.form.asn && this.props.form.asn.length })

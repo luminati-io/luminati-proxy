@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.100.341 Stable
+- :bug: fixed city selection in targeting options
+
 ## 1.100.333 Stable
 - :bug: added handling TCP errors
 
