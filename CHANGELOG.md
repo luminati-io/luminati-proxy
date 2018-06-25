@@ -1,6 +1,10 @@
 Luminati Proxy manager - Change Log
 
-## 1.100.410 
+## 1.100.496 Stable
+- :bug: Fixed Test Affiliate redirections
+
+## 1.100.410 Development Latest
+- :bug: Fixed installation script node version dependency
 
 ## 1.100.341 Stable
 - :bug: fixed city selection in targeting options

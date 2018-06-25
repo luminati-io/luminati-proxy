@@ -2,11 +2,13 @@
 'use strict'; /*jslint node:true*/
 
 const E = exports;
+// XXX vladislavl: possible take from package.json 'engines'
+const node_support_ver = /^v([7-9]|[1-9][0-9])\./;
 
 E.is_env_compat = ()=>{
-    if (!Object.values)
+    if (!node_support_ver.test(process.version))
     {
-        console.log('Luminati proxy manager requires Node.js v7\n'
+        console.log('Luminati proxy manager min requires Node.js v7\n'
             +'Please upgrade your Node using nvm or nave, or visit nodejs.org '
             +'and download a newer version.\nAfter that run the following '
             +'command to reinstall Luminati Proxy Manager:\nnpm uninstall -g '

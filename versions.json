@@ -1,8 +1,23 @@
 [
     {
+        "ver": "1.100.496",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Test Affiliate redirections"
+            }
+        ]
+    },
+    {
         "ver": "1.100.410",
-        "type": "stable/dev",
-        "changes": []
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed installation script node version dependency"
+            }
+        ]
     },
     {
         "ver": "1.100.341",

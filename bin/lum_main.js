@@ -89,7 +89,7 @@ E.write_ua_file = ()=>{
     try {
         file.write_e(E.ua_filename, JSON.stringify(E.last_ev));
         E.last_ev = null;
-    } catch(e){ }
+    } catch(e){ zerr.notice(`Fail to write ua file: ${zerr.e2s(e)}`); }
 };
 
 E.write_status_file = (status, error = null, config = null, reason = null)=>{
@@ -103,9 +103,8 @@ E.write_status_file = (status, error = null, config = null, reason = null)=>{
         config,
         customer_name: config&&config._defaults&&config._defaults.customer
     });
-    try {
-        file.write_e(E.status_filename, JSON.stringify(E.lpm_status));
-    } catch(e){ }
+    try { file.write_e(E.status_filename, JSON.stringify(E.lpm_status)); }
+    catch(e){ zerr.notice(`Fail to write status file: ${zerr.e2s(e)}`); }
 };
 
 E.read_status_file = ()=>{
@@ -127,24 +126,17 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
         return;
     E.shutdowning = true;
     E.shutdown_timeout = setTimeout(()=>{
-        if (E.shutdowning)
-        {
-            if (E.manager)
-                E.manager._log.crit('Forcing exit after 3 sec');
-            else
-                console.error('Forcing exit after 3 sec');
-            E.uninit();
-            process.exit(1);
-        }
+        if (!E.shutdowning)
+            return;
+        zerr.crit('Forcing exit after 3 sec');
+        E.uninit();
+        process.exit(1);
     }, shutdown_timeout);
     E.write_ua_file();
     E.write_status_file('shutdowning', error, E.manager&&E.manager._total_conf,
         reason);
     if (E.manager)
     {
-        E.manager._log.info(`Shutdown, reason is ${reason}`);
-        if (error)
-            E.manager._log.error('%s %s', reason, error);
         let stop_manager = ()=>{
             E.manager.stop(reason, true);
             E.manager = null;
@@ -154,8 +146,10 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
         else
             ua.event('manager', 'stop', reason, stop_manager);
     }
+    if (error)
+        zerr(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
     else
-        console.log(`Shutdown, reason is ${reason}`, error.stack);
+        zerr.info(`Shutdown, reason is ${reason}`);
     if (cluster_mode.is_enabled())
         cluster_mode.uninit();
     file.rm_rf_e(Tracer.screenshot_dir);
@@ -167,14 +161,12 @@ E.handle_signal = (sig, err)=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
     // XXX maximk: find origin and catch it there
     // XXX maximk: fix process fail on oveload
-    if (err && (err.message||'').includes('SQLITE'))
+    if (err)
     {
-        E.manager._log.crit(errstr);
-        E.manager.perr('sqlite', {error: errstr});
-        return;
+        zerr.crit(errstr);
+        if ((err.message||'').includes('SQLITE') && E.manager)
+            return void E.manager.perr('sqlite', {error: errstr});
     }
-    if (err&&E.manager)
-        E.manager._log.crit(errstr);
     if (err&&E.manager&&!E.manager.argv.no_usage_stats)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
@@ -200,7 +192,7 @@ E.run = run_config=>{
         process.exit();
     })
     .on('error', (e, fatal)=>{
-        console.log(e.raw ? e.message : 'Unhandled error: '+e);
+        zerr(e.raw ? e.message : 'Unhandled error: '+e);
         let handle_fatal = ()=>{
             if (fatal)
                 E.manager.stop();
@@ -248,13 +240,10 @@ E.handle_shutdown = msg=>{
 };
 
 E.handle_msg = msg=>{
-    let cmd = msg.command||msg.cmd;
-    switch (cmd)
+    switch (msg.command||msg.cmd)
     {
-    case 'upgrade_finished':
-        E.handle_upgrade_finished(msg); break;
-    case 'shutdown':
-        E.handle_shutdown(msg); break;
+    case 'upgrade_finished': E.handle_upgrade_finished(msg); break;
+    case 'shutdown': E.handle_shutdown(msg); break;
     }
 };
 
@@ -321,13 +310,12 @@ E.init = ()=>{
         E.start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
     E.enable_cluster = process.argv.includes('--cluster');
     E.enable_cluster_sticky = process.argv.includes('--cluster-sticky');
-    if (E.enable_cluster)
-    {
-        cluster_mode.init({
-            force_stop_delay: shutdown_timeout,
-            sticky: E.enable_cluster_sticky
-        });
-    }
+    if (!E.enable_cluster)
+        return;
+    cluster_mode.init({
+        force_stop_delay: shutdown_timeout,
+        sticky: E.enable_cluster_sticky
+    });
 };
 
 E.uninit = ()=>{
