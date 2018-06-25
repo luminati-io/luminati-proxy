@@ -39312,7 +39312,7 @@ var columns = [{
     title: 'BW up',
     render: function render(_ref9) {
         var proxy = _ref9.proxy;
-        return (0, _common.Tooltip_bytes)({ bytes: proxy.in_bw });
+        return (0, _common.Tooltip_bytes)({ bytes: proxy.out_bw });
     },
     sticky: true,
     ext: true,
@@ -39323,7 +39323,7 @@ var columns = [{
     title: 'BW down',
     render: function render(_ref10) {
         var proxy = _ref10.proxy;
-        return (0, _common.Tooltip_bytes)({ bytes: proxy.out_bw });
+        return (0, _common.Tooltip_bytes)({ bytes: proxy.in_bw });
     },
     sticky: true,
     ext: true,

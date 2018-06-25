@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.100.537",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed BW up and BW down in proxies list"
+            },
+            {
+                "type": "bug",
+                "text": "Stopped logging small issues to the console"
+            }
+        ]
+    },
+    {
         "ver": "1.100.496",
         "type": "stable",
         "changes": [

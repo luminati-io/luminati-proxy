@@ -347,7 +347,7 @@ const columns = [
     {
         key: 'in_bw',
         title: 'BW up',
-        render: ({proxy})=>Tooltip_bytes({bytes: proxy.in_bw}),
+        render: ({proxy})=>Tooltip_bytes({bytes: proxy.out_bw}),
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -357,7 +357,7 @@ const columns = [
     {
         key: 'out_bw',
         title: 'BW down',
-        render: ({proxy})=>Tooltip_bytes({bytes: proxy.out_bw}),
+        render: ({proxy})=>Tooltip_bytes({bytes: proxy.in_bw}),
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
