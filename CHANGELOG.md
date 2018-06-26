@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.100.623 
+- :bug: Fixed initializing web sockets
+
 ## 1.100.537 Stable
 - :bug: Fixed BW up and BW down in proxies list
 - :bug: Stopped logging small issues to the console
