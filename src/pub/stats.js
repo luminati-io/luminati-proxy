@@ -80,14 +80,14 @@ const Key_cell = ({title, warning, row_key})=>{
         </td>;
 };
 
-const Cell = ({row_key, title, children})=>{
+const Cell = ({row_key, children})=>{
     if (row_key=='status_code')
     {
-        return <Tooltip title={title+' '+status_codes[title]}>
+        return <Tooltip title={children+' '+status_codes[children]}>
               <div className="disp_value">{children}</div>
             </Tooltip>;
     }
-    return <Tooltip title={title||children}>
+    return <Tooltip title={children}>
           <div className="disp_value">{children}</div>
         </Tooltip>;
 };

@@ -4,7 +4,7 @@ import 'prismjs/themes/prism.css';
 import React from 'react';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code} from './common.js';
+import {Code, Tooltip} from './common.js';
 import {ga_event} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
@@ -32,9 +32,11 @@ class Howto extends Pure_component {
                 <div className="panel_inner">
                   <div className="nav_tabs tabs">
                     <Tab id="code" title="Code"
+                      tooltip="Examples how to use LPM programatically"
                       on_click={this.choose_click.bind(this)}
                       cur_tab={this.state.option}/>
                     <Tab id="browser" title="Browser"
+                      tooltip="Examples how to inegrate LPM with the browser"
                       on_click={this.choose_click.bind(this)}
                       cur_tab={this.state.option}/>
                   </div>
@@ -45,14 +47,16 @@ class Howto extends Pure_component {
     }
 }
 
-const Tab = ({id, on_click, title, cur_tab})=>{
+const Tab = ({id, on_click, title, cur_tab, tooltip})=>{
     const active = cur_tab==id;
     const btn_class = classnames('btn_tab', {active});
-    return <div onClick={()=>on_click(id)} className={btn_class}>
-          <div className={classnames('icon', id)}/>
-          <div className="title">{title}</div>
-          <div className="arrow"/>
-        </div>;
+    return <Tooltip title={tooltip}>
+          <div onClick={()=>on_click(id)} className={btn_class}>
+            <div className={classnames('icon', id)}/>
+            <div className="title">{title}</div>
+            <div className="arrow"/>
+          </div>
+        </Tooltip>;
 };
 
 const Lang_btn = props=>{

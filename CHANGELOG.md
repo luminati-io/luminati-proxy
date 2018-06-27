@@ -1,6 +1,11 @@
 Luminati Proxy manager - Change Log
 
-## 1.100.623 
+## 1.100.731 Stable
+- :bug: Fixed memory leaks
+- :star: Improved performance
+- :bug: Fixed web access security issue
+
+## 1.100.623 Stable
 - :bug: Fixed initializing web sockets
 
 ## 1.100.537 Stable

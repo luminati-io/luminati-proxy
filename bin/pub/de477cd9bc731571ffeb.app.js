@@ -32663,9 +32663,11 @@ var Howto = function (_Pure_component) {
               'div',
               { className: 'nav_tabs tabs' },
               _react2.default.createElement(Tab, { id: 'code', title: 'Code',
+                tooltip: 'Examples how to use LPM programatically',
                 on_click: this.choose_click.bind(this),
                 cur_tab: this.state.option }),
               _react2.default.createElement(Tab, { id: 'browser', title: 'Browser',
+                tooltip: 'Examples how to inegrate LPM with the browser',
                 on_click: this.choose_click.bind(this),
                 cur_tab: this.state.option })
             ),
@@ -32686,22 +32688,27 @@ var Tab = function Tab(_ref2) {
   var id = _ref2.id,
       on_click = _ref2.on_click,
       title = _ref2.title,
-      cur_tab = _ref2.cur_tab;
+      cur_tab = _ref2.cur_tab,
+      tooltip = _ref2.tooltip;
 
   var active = cur_tab == id;
   var btn_class = (0, _classnames2.default)('btn_tab', { active: active });
   return _react2.default.createElement(
-    'div',
-    { onClick: function onClick() {
-        return on_click(id);
-      }, className: btn_class },
-    _react2.default.createElement('div', { className: (0, _classnames2.default)('icon', id) }),
+    _common.Tooltip,
+    { title: tooltip },
     _react2.default.createElement(
       'div',
-      { className: 'title' },
-      title
-    ),
-    _react2.default.createElement('div', { className: 'arrow' })
+      { onClick: function onClick() {
+          return on_click(id);
+        }, className: btn_class },
+      _react2.default.createElement('div', { className: (0, _classnames2.default)('icon', id) }),
+      _react2.default.createElement(
+        'div',
+        { className: 'title' },
+        title
+      ),
+      _react2.default.createElement('div', { className: 'arrow' })
+    )
   );
 };
 
@@ -34866,14 +34873,18 @@ var Dropdown = (0, _reactRouterDom.withRouter)(function (_Pure_component5) {
     value: function render() {
       if (!this.state.settings) return null;
       var is_upgradable = this.state.ver_last && this.state.ver_last.newer;
+      var tip = 'You are currently logged in as\n        ' + this.state.settings.customer;
       return _react2.default.createElement(
         'div',
         { className: 'dropdown' },
         _react2.default.createElement(
           'a',
-          { className: 'link dropdown-toggle',
-            'data-toggle': 'dropdown' },
-          this.state.settings.customer,
+          { className: 'link dropdown-toggle', 'data-toggle': 'dropdown' },
+          _react2.default.createElement(
+            _common.Tooltip,
+            { placement: 'left', title: tip },
+            this.state.settings.customer
+          ),
           _react2.default.createElement('span', { className: 'caret' })
         ),
         _react2.default.createElement(
@@ -37233,6 +37244,7 @@ var Notif_center = function (_Pure_component) {
             var number = this.state.notifs.filter(function (n) {
                 return n.status == 'new';
             }).length;
+            var tip = 'Notification center: you will receive updates on new' + ' features in LPM here';
             return _react2.default.createElement(
                 'div',
                 { className: 'notif' },
@@ -37265,9 +37277,13 @@ var Notif_center = function (_Pure_component) {
                     )
                 ),
                 _react2.default.createElement(
-                    'div',
-                    { onClick: this.open.bind(this), className: 'icon' },
-                    _react2.default.createElement(Circle_icon, { number: number })
+                    _common.Tooltip,
+                    { title: tip, placement: 'bottom' },
+                    _react2.default.createElement(
+                        'div',
+                        { onClick: this.open.bind(this), className: 'icon' },
+                        _react2.default.createElement(Circle_icon, { number: number })
+                    )
                 )
             );
         }
@@ -37845,10 +37861,14 @@ var Request = function (_Pure_component2) {
                         'div',
                         { className: 'footer_buttons' },
                         _react2.default.createElement(
-                            'button',
-                            { onClick: this.go,
-                                className: 'btn btn_lpm btn_lpm_primary' },
-                            'Go'
+                            _common.Tooltip,
+                            { title: 'Send a test request' },
+                            _react2.default.createElement(
+                                'button',
+                                { onClick: this.go,
+                                    className: 'btn btn_lpm btn_lpm_primary' },
+                                'Go'
+                            )
                         )
                     )
                 )
@@ -37867,14 +37887,17 @@ var Request_params = function Request_params(_ref3) {
         return { key: p.port, value: p.port };
     });
     var methods = [{ key: 'GET', value: 'GET' }, { key: 'POST', value: 'POST' }];
+    var method_tip = 'Method of a test request. Leave GET if you don\'t know\n    what to choose';
     return _react2.default.createElement(
         'div',
         { className: 'request_params' },
         _react2.default.createElement(Field, { params: params, update: update, name: 'proxy', type: 'select',
-            data: proxies }),
-        _react2.default.createElement(Field, { params: params, update: update, name: 'url', type: 'text' }),
+            data: proxies,
+            tooltip: 'Choose a proxy port that will be used for this test' }),
+        _react2.default.createElement(Field, { params: params, update: update, name: 'url', type: 'text',
+            tooltip: 'URL that Proxy Tester will use to send a test request' }),
         _react2.default.createElement(Field, { params: params, update: update, name: 'method', type: 'select',
-            data: methods })
+            data: methods, tooltip: method_tip })
     );
 };
 
@@ -37883,7 +37906,8 @@ var Field = function Field(_ref4) {
         update = _ref4.update,
         name = _ref4.name,
         params = _ref4.params,
-        props = (0, _objectWithoutProperties3.default)(_ref4, ['type', 'update', 'name', 'params']);
+        tooltip = _ref4.tooltip,
+        props = (0, _objectWithoutProperties3.default)(_ref4, ['type', 'update', 'name', 'params', 'tooltip']);
 
     var fields = { proxy: 'Proxy port', url: 'URL', method: 'Method' };
     var on_change_wrapper = function on_change_wrapper(val) {
@@ -37897,19 +37921,23 @@ var Field = function Field(_ref4) {
     if (type == 'select') Comp = _common.Select;else Comp = _common.Input;
     var title = fields[name];
     return _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)('field', name) },
+        _common.Tooltip,
+        { title: tooltip },
         _react2.default.createElement(
-            _react3.If,
-            { when: title },
+            'div',
+            { className: (0, _classnames2.default)('field', name) },
             _react2.default.createElement(
-                'div',
-                { className: 'title' },
-                fields[name]
-            )
-        ),
-        _react2.default.createElement(Comp, (0, _extends6.default)({ on_change_wrapper: on_change_wrapper, type: type,
-            val: params[name] }, props, { on_blur: on_blur }))
+                _react3.If,
+                { when: title },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'title' },
+                    fields[name]
+                )
+            ),
+            _react2.default.createElement(Comp, (0, _extends6.default)({ on_change_wrapper: on_change_wrapper, type: type,
+                val: params[name] }, props, { on_blur: on_blur }))
+        )
     );
 };
 
@@ -37929,54 +37957,102 @@ var Headers = function Headers(_ref5) {
     );
 };
 
-var New_header_params = function New_header_params(_ref6) {
-    var clicked_add = _ref6.clicked_add,
-        clicked_remove = _ref6.clicked_remove,
-        update = _ref6.update,
-        header = _ref6.header,
-        last = _ref6.last;
+var New_header_params = function (_Pure_component3) {
+    (0, _inherits3.default)(New_header_params, _Pure_component3);
 
-    var input_changed = function input_changed(field) {
-        return function (value) {
-            update(header.idx, field, value);
-        };
-    };
-    return _react2.default.createElement(
-        'div',
-        { className: 'header_line' },
-        _react2.default.createElement(_common.Input, { val: header.header,
-            on_change_wrapper: input_changed('header'),
-            type: 'text', placeholder: 'Header', className: 'header_input' }),
-        _react2.default.createElement(_common.Input, { val: header.value,
-            on_change_wrapper: input_changed('value'),
-            type: 'text', placeholder: 'Value', className: 'value_input' }),
-        _react2.default.createElement(
-            'div',
-            { className: 'action_icons' },
-            _react2.default.createElement(
-                'span',
-                { className: 'link icon_link top',
-                    onClick: function onClick() {
-                        return clicked_remove(header.idx);
-                    } },
-                _react2.default.createElement('i', { className: 'glyphicon glyphicon-trash' })
-            ),
-            _react2.default.createElement(
-                _react3.If,
-                { when: last },
-                _react2.default.createElement(Add_icon, { click: clicked_add })
-            )
-        )
-    );
-};
+    function New_header_params() {
+        var _ref6;
+
+        var _temp3, _this5, _ret3;
+
+        (0, _classCallCheck3.default)(this, New_header_params);
+
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+        }
+
+        return _ret3 = (_temp3 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = New_header_params.__proto__ || Object.getPrototypeOf(New_header_params)).call.apply(_ref6, [this].concat(args))), _this5), _this5.input_changed = function (field) {
+            return function (value) {
+                return _this5.props.update(_this5.props.header.idx, field, value);
+            };
+        }, _this5.header_tip = 'Header name that will be sent along with the request', _this5.value_tip = 'Value of the header that will be sent along with the request', _temp3), (0, _possibleConstructorReturn3.default)(_this5, _ret3);
+    }
+
+    (0, _createClass3.default)(New_header_params, [{
+        key: 'render',
+        value: function render() {
+            var _props = this.props,
+                clicked_add = _props.clicked_add,
+                clicked_remove = _props.clicked_remove,
+                header = _props.header,
+                last = _props.last;
+
+            return _react2.default.createElement(
+                'div',
+                { className: 'header_line' },
+                _react2.default.createElement(
+                    _common.Tooltip,
+                    { title: this.header_tip },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'header_input' },
+                        _react2.default.createElement(_common.Input, { val: header.header, type: 'text', placeholder: 'Header',
+                            on_change_wrapper: this.input_changed('header') })
+                    )
+                ),
+                _react2.default.createElement(
+                    _common.Tooltip,
+                    { title: this.value_tip },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'value_input' },
+                        _react2.default.createElement(_common.Input, { val: header.value, type: 'text', placeholder: 'Value',
+                            on_change_wrapper: this.input_changed('value') })
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'action_icons' },
+                    _react2.default.createElement(Remove_icon, { click: function click() {
+                            return clicked_remove(header.idx);
+                        } }),
+                    _react2.default.createElement(
+                        _react3.If,
+                        { when: last },
+                        _react2.default.createElement(Add_icon, { click: clicked_add })
+                    )
+                )
+            );
+        }
+    }]);
+    return New_header_params;
+}(_pure_component2.default);
 
 var Add_icon = function Add_icon(_ref7) {
     var click = _ref7.click;
     return _react2.default.createElement(
-        'span',
-        { className: 'link icon_link top right add_header',
-            onClick: click },
-        _react2.default.createElement('i', { className: 'glyphicon glyphicon-plus' })
+        _common.Tooltip,
+        { title: 'Add header' },
+        _react2.default.createElement(
+            'span',
+            { className: 'link icon_link top right add_header',
+                onClick: click },
+            _react2.default.createElement('i', { className: 'glyphicon glyphicon-plus' })
+        )
+    );
+};
+
+var Remove_icon = function Remove_icon(_ref8) {
+    var click = _ref8.click;
+    return _react2.default.createElement(
+        _common.Tooltip,
+        { title: 'Remove header' },
+        _react2.default.createElement(
+            'span',
+            { className: 'link icon_link top',
+                onClick: click },
+            _react2.default.createElement('i', { className: 'glyphicon glyphicon-trash' })
+        )
     );
 };
 
@@ -39087,8 +39163,20 @@ var Session_cell = function Session_cell(_ref4) {
 var Type_cell = function Type_cell(_ref5) {
     var proxy = _ref5.proxy;
 
-    if (proxy.ext_proxies) return 'External';
-    return 'Luminati';
+    var val = void 0,
+        tip = void 0;
+    if (proxy.ext_proxies) {
+        val = 'External';
+        tip = 'Proxy port configured with external IP and credentials';
+    } else {
+        val = 'Luminati';
+        tip = 'Proxy port using your Luminati account';
+    }
+    return _react2.default.createElement(
+        _common.Tooltip,
+        { title: tip },
+        val
+    );
 };
 
 var Last_req_cell = function Last_req_cell(_ref6) {
@@ -39125,6 +39213,17 @@ var Success_rate_cell = function Success_rate_cell(_ref8) {
         _common.Tooltip,
         { title: title },
         val
+    );
+};
+
+var Reqs_cell = function Reqs_cell(_ref9) {
+    var proxy = _ref9.proxy;
+
+    var reqs = proxy.reqs || 0;
+    return _react2.default.createElement(
+        _common.Tooltip,
+        { title: reqs + ' requests sent through this proxy port' },
+        reqs
     );
 };
 
@@ -39310,8 +39409,8 @@ var columns = [{
 }, {
     key: 'in_bw',
     title: 'BW up',
-    render: function render(_ref9) {
-        var proxy = _ref9.proxy;
+    render: function render(_ref10) {
+        var proxy = _ref10.proxy;
         return (0, _common.Tooltip_bytes)({ bytes: proxy.out_bw });
     },
     sticky: true,
@@ -39321,8 +39420,8 @@ var columns = [{
 }, {
     key: 'out_bw',
     title: 'BW down',
-    render: function render(_ref10) {
-        var proxy = _ref10.proxy;
+    render: function render(_ref11) {
+        var proxy = _ref11.proxy;
         return (0, _common.Tooltip_bytes)({ bytes: proxy.in_bw });
     },
     sticky: true,
@@ -39333,10 +39432,7 @@ var columns = [{
     key: 'reqs',
     title: 'Requests',
     sticky: true,
-    render: function render(_ref11) {
-        var proxy = _ref11.proxy;
-        return proxy.reqs || '0';
-    },
+    render: Reqs_cell,
     ext: true,
     tooltip: 'Number of all requests sent from this proxy port',
     dynamic: true
@@ -40589,13 +40685,12 @@ var Key_cell = function Key_cell(_ref3) {
 
 var Cell = function Cell(_ref4) {
   var row_key = _ref4.row_key,
-      title = _ref4.title,
       children = _ref4.children;
 
   if (row_key == 'status_code') {
     return _react2.default.createElement(
       _chrome_widgets.Tooltip,
-      { title: title + ' ' + _util.status_codes[title] },
+      { title: children + ' ' + _util.status_codes[children] },
       _react2.default.createElement(
         'div',
         { className: 'disp_value' },
@@ -40605,7 +40700,7 @@ var Cell = function Cell(_ref4) {
   }
   return _react2.default.createElement(
     _chrome_widgets.Tooltip,
-    { title: title || children },
+    { title: children },
     _react2.default.createElement(
       'div',
       { className: 'disp_value' },
@@ -42890,6 +42985,8 @@ var Request = function (_Pure_component2) {
         value: function render() {
             if (!this.state.ports) return _react2.default.createElement(_common.Loader, { show: true });
             if (!this.state.ports.length) return _react2.default.createElement(_proxy_blank2.default, null);
+            var port_tip = 'Choose a proxy port that will be used for this\n        test.';
+            var url_tip = 'URL that will be used as a starting point. Following\n        requests will be done based on \'Location\' header of the response.';
             return _react2.default.createElement(
                 'div',
                 { className: 'panel no_border request' },
@@ -42898,14 +42995,14 @@ var Request = function (_Pure_component2) {
                     { className: 'fields' },
                     _react2.default.createElement(
                         Field,
-                        { title: 'Proxy port' },
+                        { title: 'Proxy port', tooltip: port_tip },
                         _react2.default.createElement(_common.Select, { val: this.state.port, data: this.state.ports,
                             on_change_wrapper: this.port_changed,
                             disabled: this.props.loading })
                     ),
                     _react2.default.createElement(
                         Field,
-                        { title: 'URL', className: 'url' },
+                        { title: 'URL', className: 'url', tooltip: url_tip },
                         _react2.default.createElement(_common.Input, { type: 'text', val: this.state.url,
                             on_change_wrapper: this.url_changed,
                             disabled: this.props.loading })
@@ -42926,10 +43023,14 @@ var Go_button = function Go_button(_ref5) {
         'div',
         { className: 'go_btn_wrapper' },
         _react2.default.createElement(
-            'button',
-            { onClick: on_click, className: 'btn btn_lpm btn_lpm_primary',
-                disabled: disabled },
-            'Go'
+            _common.Tooltip,
+            { title: 'Start testing redirections' },
+            _react2.default.createElement(
+                'button',
+                { onClick: on_click, className: 'btn btn_lpm btn_lpm_primary',
+                    disabled: disabled },
+                'Go'
+            )
         )
     );
 };
@@ -42937,16 +43038,21 @@ var Go_button = function Go_button(_ref5) {
 var Field = function Field(_ref6) {
     var children = _ref6.children,
         title = _ref6.title,
-        className = _ref6.className;
+        className = _ref6.className,
+        tooltip = _ref6.tooltip;
     return _react2.default.createElement(
-        'div',
-        { className: (0, _classnames2.default)('field', className) },
+        _common.Tooltip,
+        { title: tooltip },
         _react2.default.createElement(
             'div',
-            { className: 'title' },
-            title
-        ),
-        children
+            { className: (0, _classnames2.default)('field', className) },
+            _react2.default.createElement(
+                'div',
+                { className: 'title' },
+                title
+            ),
+            children
+        )
     );
 };
 

@@ -235,12 +235,15 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
         if (!this.state.settings)
             return null;
         const is_upgradable = this.state.ver_last&&this.state.ver_last.newer;
+        const tip = `You are currently logged in as
+        ${this.state.settings.customer}`;
         return <div className="dropdown">
-              <a className="link dropdown-toggle"
-                data-toggle="dropdown">
-                {this.state.settings.customer}
-                <span className="caret"/>
-              </a>
+                <a className="link dropdown-toggle" data-toggle="dropdown">
+              <Tooltip placement="left" title={tip}>
+                  {this.state.settings.customer}
+              </Tooltip>
+                  <span className="caret"/>
+                </a>
               <ul className="dropdown-menu dropdown-menu-right">
                 {is_upgradable &&
                   <li>

@@ -128,14 +128,18 @@ class Request extends Pure_component {
             return <Loader show/>;
         if (!this.state.ports.length)
             return <Proxy_blank/>;
+        const port_tip = `Choose a proxy port that will be used for this
+        test.`;
+        const url_tip = `URL that will be used as a starting point. Following
+        requests will be done based on 'Location' header of the response.`;
         return <div className="panel no_border request">
               <div className="fields">
-                <Field title="Proxy port">
+                <Field title="Proxy port" tooltip={port_tip}>
                   <Select val={this.state.port} data={this.state.ports}
                     on_change_wrapper={this.port_changed}
                     disabled={this.props.loading}/>
                 </Field>
-                <Field title="URL" className="url">
+                <Field title="URL" className="url" tooltip={url_tip}>
                   <Input type="text" val={this.state.url}
                     on_change_wrapper={this.url_changed}
                     disabled={this.props.loading}/>
@@ -149,12 +153,16 @@ class Request extends Pure_component {
 
 const Go_button = ({on_click, disabled})=>
     <div className="go_btn_wrapper">
-      <button onClick={on_click} className="btn btn_lpm btn_lpm_primary"
-        disabled={disabled}>Go</button>
+      <Tooltip title="Start testing redirections">
+        <button onClick={on_click} className="btn btn_lpm btn_lpm_primary"
+          disabled={disabled}>Go</button>
+      </Tooltip>
     </div>;
 
-const Field = ({children, title, className})=>
-    <div className={classnames('field', className)}>
-      <div className="title">{title}</div>
-      {children}
-    </div>;
+const Field = ({children, title, className, tooltip})=>
+    <Tooltip title={tooltip}>
+      <div className={classnames('field', className)}>
+        <div className="title">{title}</div>
+        {children}
+      </div>
+    </Tooltip>;

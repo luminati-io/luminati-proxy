@@ -1,7 +1,25 @@
 [
     {
+        "ver": "1.100.731",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed memory leaks"
+            },
+            {
+                "type": "star",
+                "text": "Improved performance"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed web access security issue"
+            }
+        ]
+    },
+    {
         "ver": "1.100.623",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",

@@ -3,7 +3,8 @@
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {Input, Select, Loader, Modal, Warnings, Nav} from './common.js';
+import {Input, Select, Loader, Modal, Warnings, Nav,
+    Tooltip} from './common.js';
 import classnames from 'classnames';
 import zurl from '../../util/url.js';
 import {If} from '/www/util/pub/react.js';
@@ -161,8 +162,10 @@ class Request extends Pure_component {
                   clicked_add={this.add_header}
                   update={this.update_header}/>
                 <div className="footer_buttons">
-                  <button onClick={this.go}
-                    className="btn btn_lpm btn_lpm_primary">Go</button>
+                  <Tooltip title="Send a test request">
+                    <button onClick={this.go}
+                      className="btn btn_lpm btn_lpm_primary">Go</button>
+                  </Tooltip>
                 </div>
               </div>
             </div>;
@@ -172,16 +175,20 @@ class Request extends Pure_component {
 const Request_params = ({params, update, proxies})=>{
     proxies = (proxies||[]).map(p=>({key: p.port, value: p.port}));
     const methods = [{key: 'GET', value: 'GET'}, {key: 'POST', value: 'POST'}];
+    const method_tip = `Method of a test request. Leave GET if you don't know
+    what to choose`;
     return <div className="request_params">
           <Field params={params} update={update} name="proxy" type="select"
-            data={proxies}/>
-          <Field params={params} update={update} name="url" type="text"/>
+            data={proxies}
+            tooltip="Choose a proxy port that will be used for this test"/>
+          <Field params={params} update={update} name="url" type="text"
+            tooltip="URL that Proxy Tester will use to send a test request"/>
           <Field params={params} update={update} name="method" type="select"
-            data={methods}/>
+            data={methods} tooltip={method_tip}/>
         </div>;
 };
 
-const Field = ({type, update, name, params, ...props})=>{
+const Field = ({type, update, name, params, tooltip, ...props})=>{
     const fields = {proxy: 'Proxy port', url: 'URL', method: 'Method'};
     const on_change_wrapper = val=>{
         if (name!='url')
@@ -198,15 +205,15 @@ const Field = ({type, update, name, params, ...props})=>{
     else
         Comp = Input;
     const title = fields[name];
-    return (
-        <div className={classnames('field', name)}>
-          <If when={title}>
-            <div className="title">{fields[name]}</div>
-          </If>
-          <Comp on_change_wrapper={on_change_wrapper} type={type}
-            val={params[name]} {...props} on_blur={on_blur}/>
-        </div>
-    );
+    return <Tooltip title={tooltip}>
+          <div className={classnames('field', name)}>
+            <If when={title}>
+              <div className="title">{fields[name]}</div>
+            </If>
+            <Comp on_change_wrapper={on_change_wrapper} type={type}
+              val={params[name]} {...props} on_blur={on_blur}/>
+          </div>
+        </Tooltip>;
 };
 
 const Headers = ({headers, clicked_remove, clicked_add, update})=>
@@ -218,34 +225,50 @@ const Headers = ({headers, clicked_remove, clicked_add, update})=>
       )}
     </div>;
 
-const New_header_params = ({clicked_add, clicked_remove, update, header,
-    last})=>
-{
-    const input_changed = field=>value=>{
-        update(header.idx, field, value); };
-    return <div className="header_line">
-          <Input val={header.header}
-            on_change_wrapper={input_changed('header')}
-            type="text" placeholder="Header" className="header_input"/>
-          <Input val={header.value}
-            on_change_wrapper={input_changed('value')}
-            type="text" placeholder="Value" className="value_input"/>
-          <div className="action_icons">
-            <span className="link icon_link top"
-              onClick={()=>clicked_remove(header.idx)}>
-              <i className="glyphicon glyphicon-trash"/>
-            </span>
-            <If when={last}>
-              <Add_icon click={clicked_add}/>
-            </If>
-          </div>
-        </div>;
-};
+class New_header_params extends Pure_component {
+    input_changed = field=>value=>
+        this.props.update(this.props.header.idx, field, value);
+    header_tip = `Header name that will be sent along with the request`;
+    value_tip = `Value of the header that will be sent along with the request`;
+    render(){
+        const {clicked_add, clicked_remove, header, last} = this.props;
+        return <div className="header_line">
+              <Tooltip title={this.header_tip}>
+                <div className="header_input">
+                  <Input val={header.header} type="text" placeholder="Header"
+                    on_change_wrapper={this.input_changed('header')}/>
+                </div>
+              </Tooltip>
+              <Tooltip title={this.value_tip}>
+                <div className="value_input">
+                  <Input val={header.value} type="text" placeholder="Value"
+                    on_change_wrapper={this.input_changed('value')}/>
+                </div>
+              </Tooltip>
+              <div className="action_icons">
+                <Remove_icon click={()=>clicked_remove(header.idx)}/>
+                <If when={last}>
+                  <Add_icon click={clicked_add}/>
+                </If>
+              </div>
+            </div>;
+    }
+}
 
 const Add_icon = ({click})=>
-    <span className="link icon_link top right add_header"
-      onClick={click}>
-      <i className="glyphicon glyphicon-plus"/>
-    </span>;
+    <Tooltip title="Add header">
+      <span className="link icon_link top right add_header"
+        onClick={click}>
+        <i className="glyphicon glyphicon-plus"/>
+      </span>
+    </Tooltip>;
+
+const Remove_icon = ({click})=>
+    <Tooltip title="Remove header">
+      <span className="link icon_link top"
+        onClick={click}>
+        <i className="glyphicon glyphicon-trash"/>
+      </span>
+    </Tooltip>;
 
 export default Proxy_tester;

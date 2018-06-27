@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.100.623",
+        "version": "1.100.731",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -357,6 +357,13 @@
                 "www": {
                     "type": "integer",
                     "description": "HTTP port for browser admin UI"
+                },
+                "www_whitelist_ips": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Whitelist ip list for granting access to browser admin UI"
                 },
                 "ws": {
                     "type": "integer",

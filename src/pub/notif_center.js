@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Modal} from './common.js';
+import {Modal, Tooltip} from './common.js';
 import $ from 'jquery';
 import {ga_event} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
@@ -77,6 +77,8 @@ class Notif_center extends Pure_component {
     }
     render(){
         const number = this.state.notifs.filter(n=>n.status=='new').length;
+        const tip = 'Notification center: you will receive updates on new'
+        +' features in LPM here';
         return <div className="notif">
               <Modal_portal>
                 <div className="notif_modal">
@@ -94,9 +96,11 @@ class Notif_center extends Pure_component {
                   </Modal>
                 </div>
               </Modal_portal>
-              <div onClick={this.open.bind(this)} className="icon">
-                <Circle_icon number={number}/>
-              </div>
+              <Tooltip title={tip} placement="bottom">
+                <div onClick={this.open.bind(this)} className="icon">
+                  <Circle_icon number={number}/>
+                </div>
+              </Tooltip>
             </div>;
     }
 }

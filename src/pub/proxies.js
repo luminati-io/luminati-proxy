@@ -87,9 +87,18 @@ const Session_cell = ({proxy})=>{
 };
 
 const Type_cell = ({proxy})=>{
+    let val, tip;
     if (proxy.ext_proxies)
-        return 'External';
-    return 'Luminati';
+    {
+        val = 'External';
+        tip = 'Proxy port configured with external IP and credentials';
+    }
+    else
+    {
+        val = 'Luminati';
+        tip = 'Proxy port using your Luminati account';
+    }
+    return <Tooltip title={tip}>{val}</Tooltip>;
 };
 
 const Last_req_cell = ({proxy})=>{
@@ -114,6 +123,12 @@ const Success_rate_cell = ({proxy})=>{
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
     const title = `total: ${proxy.reqs}, success: ${proxy.success}`;
     return <Tooltip title={title}>{val}</Tooltip>;
+};
+
+const Reqs_cell = ({proxy})=>{
+    const reqs = proxy.reqs||0;
+    return <Tooltip title={`${reqs} requests sent through this proxy port`}>
+        {reqs}</Tooltip>;
 };
 
 const columns = [
@@ -368,7 +383,7 @@ const columns = [
         key: 'reqs',
         title: 'Requests',
         sticky: true,
-        render: ({proxy})=>proxy.reqs||'0',
+        render: Reqs_cell,
         ext: true,
         tooltip: 'Number of all requests sent from this proxy port',
         dynamic: true,
