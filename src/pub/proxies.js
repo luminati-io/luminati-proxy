@@ -16,7 +16,6 @@ import Proxy_add from './proxy_add.js';
 import Proxy_blank from './proxy_blank.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
     Tooltip, Modal_dialog, Tooltip_bytes} from './common.js';
-import {If} from '/www/util/pub/react.js';
 import {withRouter} from 'react-router-dom';
 
 let country_names = {};
@@ -651,7 +650,7 @@ class Proxies extends Pure_component {
                   </Tooltip>
                 </h2>
               </div>
-              <If when={this.state.loaded&&displayed_proxies.length}>
+              {this.state.loaded && displayed_proxies.length &&
                 <div className="panel_body with_table">
                   <Proxies_pagination entries={this.state.filtered_proxies}
                     cur_page={this.state.cur_page}
@@ -665,7 +664,11 @@ class Proxies extends Pure_component {
                     <table className="table table-hover">
                       <thead>
                         <tr>
-                          <th className="head_actions">Actions</th>
+                          <th className="head_actions">
+                            <Tooltip title="Delete/duplicate/refresh sessions">
+                              Actions
+                            </Tooltip>
+                          </th>
                           {cols.map(col=>
                             <th key={col.key} className={'col_'+col.key}>
                               <Tooltip title={col.tooltip}>
@@ -696,7 +699,7 @@ class Proxies extends Pure_component {
                     download_csv={this.download_csv.bind(this)}
                     bottom/>
                 </div>
-              </If>
+              }
               <Proxy_add/>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns.bind(this)}/>

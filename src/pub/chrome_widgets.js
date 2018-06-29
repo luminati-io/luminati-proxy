@@ -6,12 +6,12 @@ import * as Common from './common.js';
 import classnames from 'classnames';
 import _ from 'lodash';
 
-export const Toolbar_button = ({id, tooltip, on_click})=>
+export const Toolbar_button = ({id, tooltip, on_click, active, href})=>
     <Tooltip title={tooltip} placement={'bottom'}>
-      <div className={classnames('toolbar_item toolbar_button', id)}
-        onClick={on_click}>
+      <a className={classnames('toolbar_item toolbar_button', id, {active})}
+        onClick={on_click||(()=>null)} href={href}>
         <span className={id}/>
-      </div>
+      </a>
     </Tooltip>;
 
 export const Tooltip = props=>

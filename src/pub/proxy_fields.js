@@ -11,7 +11,11 @@ const before_save = {
 };
 
 export const tabs = {
-    logs: {fields: [], label: 'Logs'},
+    logs: {
+        fields: [],
+        label: 'Logs',
+        tooltip: 'Logs of requests sent through this proxy port',
+    },
     target: {
         label: 'Targeting',
         tooltip: 'Select specific targeting for your proxy exit node',
@@ -263,7 +267,8 @@ export const tabs = {
     },
     general: {
         label: 'General',
-        tooltip: '',
+        tooltip: `General configuration such as port number, password and
+            bypasing`,
         fields: {
             port: {
                 label: 'Proxy port',

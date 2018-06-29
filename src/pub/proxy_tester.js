@@ -7,7 +7,6 @@ import {Input, Select, Loader, Modal, Warnings, Nav,
     Tooltip} from './common.js';
 import classnames from 'classnames';
 import zurl from '../../util/url.js';
-import {If} from '/www/util/pub/react.js';
 import {ga_event} from './util.js';
 import Preview from './har_preview.js';
 
@@ -105,7 +104,7 @@ class Request extends Pure_component {
         {
             ga_event('proxy-tester-tab', 'no proxy chosen');
             this.setState({warnings:
-                [{msg: 'You need to choose a proxy first'}]});
+                [{msg: 'You need to choose a proxy port first'}]});
             $('#warnings_modal').modal();
             return;
         }
@@ -207,9 +206,7 @@ const Field = ({type, update, name, params, tooltip, ...props})=>{
     const title = fields[name];
     return <Tooltip title={tooltip}>
           <div className={classnames('field', name)}>
-            <If when={title}>
-              <div className="title">{fields[name]}</div>
-            </If>
+            {title && <div className="title">{fields[name]}</div>}
             <Comp on_change_wrapper={on_change_wrapper} type={type}
               val={params[name]} {...props} on_blur={on_blur}/>
           </div>
@@ -247,9 +244,7 @@ class New_header_params extends Pure_component {
               </Tooltip>
               <div className="action_icons">
                 <Remove_icon click={()=>clicked_remove(header.idx)}/>
-                <If when={last}>
-                  <Add_icon click={clicked_add}/>
-                </If>
+                {last && <Add_icon click={clicked_add}/>}
               </div>
             </div>;
     }

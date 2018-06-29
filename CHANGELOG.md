@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.101.34 Development Latest
+- :star: Refreshing IPs/gIPs from LPM
+- :star: UI improvements and additional tooltips
+
 ## 1.100.731 Stable
 - :bug: Fixed memory leaks
 - :star: Improved performance

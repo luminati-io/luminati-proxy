@@ -156,11 +156,13 @@ class Har_viewer extends Pure_component {
 }
 
 class Toolbar extends Pure_component {
-    state = {select_visible: false};
+    state = {select_visible: false, filters_visible: false};
     componentDidMount(){
         this.setdb_on('har_viewer.select_visible', visible=>
             this.setState({select_visible: visible}));
     }
+    toggle_filters = ()=>
+        this.setState({filters_visible: !this.state.filters_visible});
     render(){
         const {clear, search_val, on_change_search, type_filter,
             set_type_filter, filters, set_filter, master_port, undock,
@@ -172,15 +174,23 @@ class Toolbar extends Pure_component {
                   <Toolbar_button id="docker"
                     tooltip="Undock into separate window" on_click={undock}/>
                 }
+                <Toolbar_button id="filters" tooltip="Show/hide filters"
+                  on_click={this.toggle_filters}
+                  active={this.state.filters_visible}/>
+                <Toolbar_button id="download" tooltip="Export as HAR file"
+                  href="/api/logs_har"/>
                 <Devider/>
                 <Actions/>
-                <Devider/>
-                <Search_box val={search_val} on_change={on_change_search}/>
-                <Type_filters filter={type_filter} set={set_type_filter}/>
-                <Devider/>
-                <Filters set_filter={set_filter} filters={filters}
-                  master_port={master_port}/>
               </Toolbar_row>
+              {this.state.filters_visible &&
+                <Toolbar_row>
+                  <Search_box val={search_val} on_change={on_change_search}/>
+                  <Type_filters filter={type_filter} set={set_type_filter}/>
+                  <Devider/>
+                  <Filters set_filter={set_filter} filters={filters}
+                    master_port={master_port}/>
+                </Toolbar_row>
+              }
             </div>;
     }
 }
@@ -261,14 +271,27 @@ class Filters extends Pure_component {
         if (!this.state.suggestions)
             return null;
         const filters = [
-            {name: 'port', default_value: this.props.master_port ?
-                `Multiplied ${this.props.master_port}` : 'All proxy ports'},
-            {name: 'status_code', default_value: 'All status codes'},
-            {name: 'protocol', default_value: 'All protocols'},
+            {
+                name: 'port',
+                default_value: this.props.master_port ?
+                    `Multiplied ${this.props.master_port}` : 'All proxy ports',
+                tooltip: 'Filter requests by ports',
+            },
+            {
+                name: 'status_code',
+                default_value: 'All status codes',
+                tooltip: 'Filter requests by status codes',
+            },
+            {
+                name: 'protocol',
+                default_value: 'All protocols',
+                tooltip: 'Filter requests by protocols',
+            },
         ];
         return <div className="filters">
           {filters.map(f=>
             <Filter key={f.name}
+              tooltip={f.tooltip}
               vals={this.state.suggestions[f.name+'s']}
               val={this.props.filters[f.name]}
               set={this.props.set_filter.bind(null, f.name)}
@@ -278,14 +301,16 @@ class Filters extends Pure_component {
     }
 }
 
-const Filter = ({vals, val, set, default_value})=>
+const Filter = ({vals, val, set, default_value, tooltip})=>
+    <Tooltip title={tooltip} placement="bottom">
     <div className="custom_filter">
       <select value={val} onChange={set}>
         <option value="">{default_value}</option>
         {vals.map(p=><option key={p} value={p}>{p}</option>)}
       </select>
       <span className="arrow"/>
-    </div>;
+    </div>
+    </Tooltip>;
 
 const type_filters = [{name: 'XHR', tooltip: 'XHR and fetch'},
     {name: 'JS', tooltip: 'Scripts'}, {name: 'CSS', tooltip: 'Stylesheets'},
@@ -324,10 +349,12 @@ const Tables_resizer = ({show, offset, start_moving})=>{
 };
 
 const table_cols = [
-    {title: 'select', hidden: true, fixed: 27},
-    {title: 'Name', sort_by: 'url', data: 'request.url'},
+    {title: 'select', hidden: true, fixed: 27, tooltip: 'Select/unselect all'},
+    {title: 'Name', sort_by: 'url', data: 'request.url',
+        tooltip: 'Request url'},
     {title: 'Proxy port', sort_by: 'port', data: 'details.port'},
-    {title: 'Status', sort_by: 'status_code', data: 'response.status'},
+    {title: 'Status', sort_by: 'status_code', data: 'response.status',
+        tooltip: 'Status code'},
     {title: 'Bandwidth', sort_by: 'bw', data: 'details.bw'},
     {title: 'Time', sort_by: 'elapsed', data: 'time'},
     {title: 'Peer proxy', sort_by: 'proxy_peer',
@@ -663,15 +690,17 @@ class Header_container extends Pure_component {
                 <tbody>
                   <tr>
                     {cols.map(c=>
-                      <th key={c.title} onClick={()=>this.click(c)}>
-                        <div>
-                          {c.title=='select' &&
-                            <Checkbox checked={this.state.checked_all}/>}
-                          {c.title!='select' && c.title}
-                        </div>
-                        <Sort_icon show={c.sort_by==sorted.field}
-                          dir={sorted.dir}/>
-                      </th>
+                      <Tooltip key={c.title} title={c.tooltip||c.title}>
+                        <th key={c.title} onClick={()=>this.click(c)}>
+                          <div>
+                            {c.title=='select' &&
+                              <Checkbox checked={this.state.checked_all}/>}
+                            {c.title!='select' && c.title}
+                          </div>
+                          <Sort_icon show={c.sort_by==sorted.field}
+                            dir={sorted.dir}/>
+                        </th>
+                      </Tooltip>
                     )}
                   </tr>
                 </tbody>

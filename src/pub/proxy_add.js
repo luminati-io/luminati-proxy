@@ -6,7 +6,7 @@ import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, Textarea} from './common.js';
+import {Modal, Loader, Textarea, Tooltip} from './common.js';
 import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
@@ -223,67 +223,81 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 
 const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
     presets_opt, advanced_clicked})=>
-    <div className="lum_proxy">
-      <div className="fields_wrapper">
-        <div className="fields">
-          <Field
-            icon_class="zone_icon"
-            val={zone}
-            options={zones} title="Zone"
-            on_change={on_field_change('zone')}/>
-          <Field
-            icon_class="preset_icon"
-            val={preset}
-            options={presets_opt}
-            title="Preset configuration"
-            on_change={on_field_change('preset')}/>
-        </div>
-      </div>
-      <div className="preview">
-        <div className="header">{presets[preset].title}</div>
-        <div className="desc">{presets[preset].subtitle}</div>
-        <ul>
-        {(presets[preset].rules||[]).map(r=>
-          <li key={r.field}>
-            <a className="link"
-              onClick={()=>rule_clicked(r.field)}>
-              {r.label}</a>
-          </li>
-        )}
-        </ul>
-        <a onClick={advanced_clicked} className="link">Advanced options</a>
-      </div>
-    </div>;
+{
+    const preset_tip = `Presets is a set of preconfigured configurations
+    for specific purposes`;
+    const zone_tip = `Zone that will be used by this proxy port`;
+    const rule_tip = `Click to save a proxy port and move to this
+    configuration`;
+    return <div className="lum_proxy">
+          <div className="fields_wrapper">
+            <div className="fields">
+              <Field icon_class="zone_icon" val={zone} options={zones}
+                title="Zone" on_change={on_field_change('zone')}
+                tooltip={zone_tip}/>
+              <Field icon_class="preset_icon" val={preset}
+                options={presets_opt} title="Preset configuration"
+                on_change={on_field_change('preset')} tooltip={preset_tip}/>
+            </div>
+          </div>
+          <div className="preview">
+            <div className="header">{presets[preset].title}</div>
+            <div className="desc">{presets[preset].subtitle}</div>
+            <ul>
+            {(presets[preset].rules||[]).map(r=>
+              <li key={r.field}>
+                <Tooltip title={rule_tip}>
+                  <a className="link" onClick={()=>rule_clicked(r.field)}>
+                    {r.label}</a>
+                </Tooltip>
+              </li>
+            )}
+            </ul>
+            <Tooltip
+              title="Creates a proxy port and moves to the configuration page">
+              <a onClick={advanced_clicked} className="link">
+                Advanced options</a>
+            </Tooltip>
+          </div>
+        </div>;
+};
 
 const Nav_tabs = ({change_tab, cur_tab})=>
     <div className="nav_tabs tabs">
       <Tab on_click={change_tab} title="Luminati" id="proxy_lum"
-        cur_tab={cur_tab}/>
+        cur_tab={cur_tab}
+        tooltip="Proxy port using your Luminati account"/>
       <Tab on_click={change_tab} title="External" id="proxy_ext"
-        cur_tab={cur_tab}/>
+        cur_tab={cur_tab}
+        tooltip="Proxy port configured with external IP and credentials"/>
     </div>;
 
-const Tab = ({id, on_click, title, cur_tab})=>{
+const Tab = ({id, on_click, title, cur_tab, tooltip})=>{
     const active = cur_tab==id;
     const btn_class = classnames('btn_tab', {active});
-    return <div onClick={()=>on_click(id)} className={btn_class}>
-          <div className={classnames('icon', id)}/>
-          <div className="title">{title}</div>
-          <div className="arrow"/>
-        </div>;
+    return <Tooltip title={tooltip}>
+          <div onClick={()=>on_click(id)} className={btn_class}>
+            <div className={classnames('icon', id)}/>
+            <div className="title">{title}</div>
+            <div className="arrow"/>
+          </div>
+        </Tooltip>;
 };
 
 const Field = props=>
-    <div className="field">
-      <div className="field_header">
-        <div className={classnames('icon', props.icon_class)}/>
-        <h4>{props.title}</h4>
+    <Tooltip title={props.tooltip}>
+      <div className="field">
+        <div className="field_header">
+          <div className={classnames('icon', props.icon_class)}/>
+          <h4>{props.title}</h4>
+        </div>
+        <select onChange={e=>props.on_change(e.target.value)}
+          value={props.val}>
+          {props.options.map((o, i)=>
+            <option key={i} value={o.value}>{o.key}</option>)}
+        </select>
       </div>
-      <select onChange={e=>props.on_change(e.target.value)} value={props.val}>
-        {props.options.map((o, i)=>
-          <option key={i} value={o.value}>{o.key}</option>)}
-      </select>
-    </div>;
+    </Tooltip>;
 
 const Footer = props=>{
     const save_clicked = ()=>{

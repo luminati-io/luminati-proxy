@@ -1966,7 +1966,9 @@ span.icon_link {
             min-width: 28px;
             background: transparent;
             border-radius: 0;
+            cursor: default;
             &:hover { span { background-color: #333; } }
+            &.active { span { background-color: #2196f3; } }
             &.close_logs { float: right; }
             span {
                 display: inline-block;
@@ -1982,6 +1984,8 @@ span.icon_link {
                 &.close_logs { --spritesheet-position: 140px 0; }
                 &.resend { --spritesheet-position: 59px 1px; }
                 &.remove { --spritesheet-position: 83px 25px; }
+                &.filters { --spritesheet-position: -56px 119px; }
+                &.download { --spritesheet-position: 26px 145px; }
             }
         }
         .devider {
@@ -2002,7 +2006,7 @@ span.icon_link {
                 color: rgb(48, 57, 66);
                 font-family: Roboto, Ubuntu, Arial, sans-serif;
                 font-weight: normal;
-                box-shadow: 0 0 0 1px #e0e0e0;
+                &:hover { box-shadow: 0 0 0 1px #e0e0e0; }
                 &:focus { box-shadow: 0 0 0 1px #03a9f4; }
             }
         }

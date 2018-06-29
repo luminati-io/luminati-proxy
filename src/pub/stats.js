@@ -32,11 +32,11 @@ class Stats extends Pure_component {
         return <div className="chrome stats_panel">
               <div className="main_panel">
                 <Toolbar stats={this.state.stats}/>
-                <Stat_table stats={this.state.stats}
+                <Stat_table stats={this.state.stats} tooltip="Status code"
                   row_key="status_code" logs="code" title="Code"/>
-                <Stat_table stats={this.state.stats}
+                <Stat_table stats={this.state.stats} tooltip="Domain name"
                   row_key="hostname" logs="domain" title="Domain"/>
-                <Stat_table stats={this.state.stats}
+                <Stat_table stats={this.state.stats} tooltip="Protocol"
                   ssl_warning={this.state.stats.ssl_warning}
                   row_key="protocol" logs="protocol" title="Protocol"/>
                 <Summary_bar enable_ssl_click={this.enable_ssl_click}
@@ -106,6 +106,7 @@ class Stat_table extends Pure_component {
         const cur_stats = stats[row_key]||[];
         return <div className="tables_container vbox">
               <Header_container title={title} cols={cols}
+                tooltip={this.props.tooltip}
                 sorting={this.state.sorting} sort={this.sort}/>
               <Data_container stats={cur_stats} row_key={row_key} logs={logs}
                 ssl_warning={ssl_warning} cols={cols}
@@ -114,7 +115,7 @@ class Stat_table extends Pure_component {
     }
 });
 
-const Header_container = ({title, cols, sorting, sort})=>
+const Header_container = ({title, cols, sorting, sort, tooltip})=>
     <div className="header_container">
       <table>
         <colgroup>
@@ -122,20 +123,26 @@ const Header_container = ({title, cols, sorting, sort})=>
         </colgroup>
         <tbody>
           <tr>
-            <Header sort={sort} id={0} label={title} sorting={sorting}/>
-            <Header sort={sort} id={1} label="BW up" sorting={sorting}/>
-            <Header sort={sort} id={2} label="BW down" sorting={sorting}/>
-            <Header sort={sort} id={3} label="Requests" sorting={sorting}/>
+            <Header sort={sort} id={0} label={title} sorting={sorting}
+              tooltip={tooltip}/>
+            <Header sort={sort} id={1} label="BW up" sorting={sorting}
+              tooltip="Outgoing bandwidth"/>
+            <Header sort={sort} id={2} label="BW down" sorting={sorting}
+              tooltip="Incoming bandwidth"/>
+            <Header sort={sort} id={3} label="Requests" sorting={sorting}
+              tooltip="Number of sent requests"/>
           </tr>
         </tbody>
       </table>
     </div>;
 
-const Header = ({sort, sorting, id, label})=>
-    <th onClick={()=>sort(id)}>
-      <div>{label}</div>
-      <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
-    </th>;
+const Header = ({sort, sorting, id, label, tooltip})=>
+    <Tooltip title={tooltip}>
+      <th onClick={()=>sort(id)}>
+        <div>{label}</div>
+        <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
+      </th>
+    </Tooltip>;
 
 const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
     if (!cols)

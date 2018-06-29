@@ -68,7 +68,7 @@ function ajax(opt){
             return {error: error, message: xhr.responseText};
         var err_obj = new Error(error);
         err_obj.hola_info = {data_type: data_type, url: url,
-            status: xhr.status};
+            status: xhr.status, response_text: xhr.responseText};
         err_obj.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err_obj;

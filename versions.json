@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.101.34",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Refreshing IPs/gIPs from LPM"
+            },
+            {
+                "type": "star",
+                "text": "UI improvements and additional tooltips"
+            }
+        ]
+    },
+    {
         "ver": "1.100.731",
         "type": "stable",
         "changes": [

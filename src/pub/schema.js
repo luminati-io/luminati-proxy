@@ -3,7 +3,6 @@
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
 import classnames from 'classnames';
-import {If} from '/www/util/pub/react.js';
 import {Tooltip} from './common.js';
 import {get_static_country} from './util.js';
 
@@ -116,13 +115,9 @@ const Layer = ({id, no_btn, no_arr, class_names, children})=>{
     return <div className={classnames('layer', id, class_names)}>
           <Tooltip placement="bottom" title={tooltips[id]}>
             <span>
-              <If when={!no_btn}>
-                <If when={!no_arr}><div className="arr"/></If>
-                <div className="layer_btn">{children}</div>
-              </If>
-              <If when={no_btn}>
-                {children}
-              </If>
+              {!no_btn && !no_arr && <div className="arr"/>}
+              {!no_btn && <div className="layer_btn">{children}</div>}
+              {no_btn && children}
             </span>
           </Tooltip>
         </div>;

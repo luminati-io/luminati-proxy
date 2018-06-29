@@ -6,7 +6,6 @@ import {Modal, Tooltip} from './common.js';
 import $ from 'jquery';
 import {ga_event} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react.js';
 import classnames from 'classnames';
 
 class Notif_center extends Pure_component {
@@ -85,13 +84,11 @@ class Notif_center extends Pure_component {
                   <Modal id="notif_modal" title="Messages:"
                     no_cancel_btn>
                     <div className="notifs">
-                      <If when={!this.state.notifs.length}>
-                        <No_messages/>
-                      </If>
-                      <If when={this.state.notifs.length}>
+                      {!this.state.notifs.length && <No_messages/>}
+                      {this.state.notifs.length &&
                         <Messages notifs={this.state.notifs}
                           on_click={this.message_clicked.bind(this)}/>
-                      </If>
+                      }
                     </div>
                   </Modal>
                 </div>
@@ -105,12 +102,13 @@ class Notif_center extends Pure_component {
     }
 }
 
-const Circle_icon = ({number})=>
-    <If when={number}>
-      <div className="circle_wrapper">
-        <div className="circle">{number}</div>
-      </div>
-    </If>;
+const Circle_icon = ({number})=>{
+    if (!number)
+        return null;
+    return <div className="circle_wrapper">
+          <div className="circle">{number}</div>
+        </div>;
+};
 
 const No_new_messages = ()=>
     <h4 className="no_messages">You have no new messages.</h4>;
@@ -121,9 +119,7 @@ const No_messages = ()=>
 const Messages = ({notifs, on_click})=>{
     const new_messages = notifs.filter(n=>n.status=='new').length;
     return <div>
-          <If when={!new_messages}>
-            <No_new_messages/>
-          </If>
+          {!new_messages && <No_new_messages/>}
           {notifs.map(m=>
             <Message on_click={()=>on_click(m)} clickable={!!m.code}
               key={m.msg_id} {...m}/>

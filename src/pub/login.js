@@ -2,7 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
@@ -124,18 +123,18 @@ const parse_arguments = (settings={argv: ''})=>
 
 const Messages = ({error_message, settings, ver_node})=>
     <div>
-      <If when={settings&&settings.argv}>
+      {settings && settings.argv &&
         <div className="warning">
           <div className="warning_icon"/>
           The application is running with the following arguments:
           {parse_arguments(settings).map(a=><strong key={a}>{a}</strong>)}
         </div>
-      </If>
-      <If when={error_message}>
+      }
+      {error_message &&
         <div className="warning error settings-alert">
           <div dangerouslySetInnerHTML={{__html: error_message}}/>
         </div>
-      </If>
+      }
       <Node_message ver_node={ver_node}/>
     </div>;
 

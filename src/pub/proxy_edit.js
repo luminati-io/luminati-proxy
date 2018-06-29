@@ -481,25 +481,17 @@ const Index = withRouter(class Index extends Pure_component {
                   <h3>Proxy on port {this.port}</h3>
                   <Loader_small show={this.state.saving}/>
                 </div>
-                <Nav
-                  zones={zones}
-                  default_zone={default_zone}
+                <Nav zones={zones} default_zone={default_zone}
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_preset={this.apply_preset.bind(this)}/>
-                <Nav_tabs
-                  form={this.state.form}
-                  errors={this.state.errors}/>
+                <Nav_tabs form={this.state.form} errors={this.state.errors}/>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
-                <Main_window
-                  show={show_main_window}
-                  tab={tab}
-                  port={port}
+                <Main_window show={show_main_window} tab={tab} port={port}
                   proxy={this.state.consts&&this.state.consts.proxy}
                   defaults={this.state.defaults}
-                  form={this.state.form}
-                  support={support}
+                  form={this.state.form} support={support}
                   default_opt={this.default_opt}
                   get_curr_plan={this.get_curr_plan}/>
               </div>
@@ -672,9 +664,8 @@ class Config extends Pure_component {
     };
     componentDidMount(){
         const val_id = this.props.val_id ? this.props.val_id : this.props.id;
-        this.setdb_on('head.proxy_edit.form.'+val_id, val=>{
-            this.setState({val, show: true});
-        });
+        this.setdb_on('head.proxy_edit.form.'+val_id, val=>
+            this.setState({val, show: true}));
     }
     render(){
         if (!this.state.show)
@@ -1202,9 +1193,12 @@ class Alloc_modal extends Pure_component {
             this.setState({available_list: []}));
         this.setdb_on('head.proxy_edit.tab', tab=>
             this.setState({curr_tab: tab}));
-        $('#allocated_ips').on('show.bs.modal', this.load.bind(this));
+        this.setdb_on('head.proxies_running', proxies=>
+            proxies&&this.setState({proxies}));
+        $('#allocated_ips').on('show.bs.modal', this.load);
     }
-    load(){
+    close = ()=>$('#allocated_ips').modal('hide');
+    load = ()=>{
         if (this.state.available_list.length)
             return;
         this.loading(true);
@@ -1228,11 +1222,20 @@ class Alloc_modal extends Pure_component {
                 available_list = res.ips;
             else
                 available_list = res;
-            _this.setState({available_list, cur_page: 0}, _this.paginate);
+            _this.setState({available_list, cur_page: 0},
+                _this.sync_selected_vals);
             _this.loading(false);
         });
-    }
-    paginate(page=-1){
+    };
+    sync_selected_vals = ()=>{
+        const curr_vals = this.props.form[this.props.type];
+        const new_vals = curr_vals.filter(v=>
+            this.state.available_list.includes(v));
+        this.set_field(this.props.type, new_vals);
+        this.update_multiply_and_pool_size(new_vals.length);
+        this.paginate();
+    };
+    paginate = (page=-1)=>{
         page = page>-1 ? page : this.state.cur_page;
         const pages = Math.ceil(
             this.state.available_list.length/this.state.items_per_page);
@@ -1241,11 +1244,11 @@ class Alloc_modal extends Pure_component {
             cur_page*this.state.items_per_page,
             (cur_page+1)*this.state.items_per_page);
         this.setState({displayed_list, cur_page});
-    }
-    loading(loading){
+    };
+    loading = loading=>{
         setdb.set('head.proxy_edit.loading', loading);
         this.setState({loading});
-    }
+    };
     checked = row=>(this.props.form[this.props.type]||[]).includes(row);
     reset = ()=>{
         this.set_field(this.props.type, []);
@@ -1265,11 +1268,74 @@ class Alloc_modal extends Pure_component {
         this.set_field(type, new_alloc);
         this.update_multiply_and_pool_size(new_alloc.length);
     };
-    select_all(){
+    select_all = ()=>{
         this.set_field(this.props.type, this.state.available_list);
         this.update_multiply_and_pool_size(this.state.available_list.length);
-    }
-    update_multiply_and_pool_size(size){
+    };
+    refresh = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            this.on('uncaught', e=>{
+                console.log(e);
+                _this.loading(false);
+            });
+            _this.loading(true);
+            const data = {zone: _this.props.zone};
+            let url;
+            if (_this.props.type=='ips')
+            {
+                data.ips = _this.props.form.ips.map(zurl.ip2num).join(' ');
+                url = '/api/refresh_ips';
+            }
+            else
+            {
+                data.vips = _this.props.form.vips;
+                url = '/api/refresh_vips';
+            }
+            const res = yield ajax.json({method: 'POST', url, data});
+            if (res.error||!res.ips&&!res.vips)
+            {
+                console.log(`error: ${res.error}`);
+                return;
+            }
+            const new_vals = _this.props.type=='ips' ?
+                res.ips.map(i=>i.ip) : res.vips.map(v=>v.vip);
+            const map = _this.map_vals(_this.state.available_list, new_vals);
+            const new_ips = _this.props.form.ips.map(val=>map[val]);
+            const new_vips = _this.props.form.vips.map(val=>map[val]);
+            _this.setState({available_list: new_vals}, _this.paginate);
+            _this.set_field('ips', new_ips);
+            _this.set_field('vips', new_vips);
+            yield _this.update_other_proxies(map);
+            _this.loading(false);
+        });
+    };
+    update_other_proxies = map=>{
+        const _this = this;
+        return this.etask(function*(){
+            const proxies_to_update = _this.state.proxies.filter(p=>
+                p.zone==_this.props.zone&&p.port!=_this.props.form.port);
+            for (let i=0; i<proxies_to_update.length; i++)
+            {
+                const proxy = proxies_to_update[i];
+                const new_vals = proxy[_this.props.type].map(v=>map[v]);
+                const data = {port: proxy.port, [_this.props.type]: new_vals};
+                yield ajax({method: 'POST', url: '/api/update_ips', data});
+            }
+        });
+    };
+    map_vals = (old_vals, new_vals)=>{
+        if (old_vals.length!=new_vals.length)
+        {
+            console.log('error ips/vips length mismatch');
+            return;
+        }
+        const map = {};
+        for (let i=0; i<old_vals.length; i++)
+            map[old_vals[i]] = new_vals[i];
+        return map;
+    };
+    update_multiply_and_pool_size = size=>{
         if (!this.props.form.multiply_ips && !this.props.form.multiply_vips)
             this.set_field('pool_size', size);
         else
@@ -1277,10 +1343,10 @@ class Alloc_modal extends Pure_component {
             this.set_field('pool_size', 1);
             this.set_field('multiply', size);
         }
-    }
-    update_items_per_page(items_per_page){
-        this.setState({items_per_page}, ()=>this.paginate(0)); }
-    page_change(page){ this.paginate(page-1); }
+    };
+    update_items_per_page = items_per_page=>
+        this.setState({items_per_page}, ()=>this.paginate(0));
+    page_change = page=>this.paginate(page-1);
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
         let title;
@@ -1291,19 +1357,24 @@ class Alloc_modal extends Pure_component {
         }
         else
             title = 'Select the '+type_label+' ('+this.props.zone+')';
+        const Footer = <div className="default_footer">
+              <button onClick={this.refresh} className="btn btn_lpm">
+                Refresh</button>
+              <button onClick={this.close}
+                className="btn btn_lpm btn_lpm_primary">OK</button>
+            </div>;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
-              title={title} no_cancel_btn>
+              title={title} footer={Footer}>
               <Pagination_panel
                 entries={this.state.available_list}
                 items_per_page={this.state.items_per_page}
                 cur_page={this.state.cur_page}
-                page_change={this.page_change.bind(this)}
-                top
-                update_items_per_page={this.update_items_per_page.bind(this)}>
+                page_change={this.page_change} top
+                update_items_per_page={this.update_items_per_page}>
                 <Link_icon tooltip="Unselect all"
                   on_click={this.reset} id="unchecked"/>
-                <Link_icon tooltip="Select all"
-                  on_click={this.select_all.bind(this)} id="check"/>
+                <Link_icon tooltip="Select all" on_click={this.select_all}
+                  id="check"/>
               </Pagination_panel>
               {this.state.displayed_list.map(row=>
                 <Checkbox on_change={this.toggle} key={row}
@@ -1313,9 +1384,8 @@ class Alloc_modal extends Pure_component {
                 entries={this.state.available_list}
                 items_per_page={this.state.items_per_page}
                 cur_page={this.state.cur_page}
-                page_change={this.page_change.bind(this)}
-                bottom
-                update_items_per_page={this.update_items_per_page.bind(this)}>
+                page_change={this.page_change} bottom
+                update_items_per_page={this.update_items_per_page}>
                 <Link_icon tooltip="Unselect all"
                   on_click={this.reset} id="unchecked"/>
                 <Link_icon tooltip="Select all"
