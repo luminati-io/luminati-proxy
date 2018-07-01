@@ -197,8 +197,8 @@ Options:
                                                                         [number]
   --disable_color          Disable colors in log      [boolean] [default: false]
   --www                    HTTP port for browser admin UI       [default: 22999]
-  --www_whitelist_ips      Whitelist IPs to access browser admin UI. Unless
-                           specified all IPs will be blacklisted. [string] 
+  --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
+                           [default:"127.0.0.1"] 
   --ws                     websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
