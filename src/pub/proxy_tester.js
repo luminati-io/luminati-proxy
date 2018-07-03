@@ -54,23 +54,9 @@ class Request extends Pure_component {
                 });
             });
         });
-        this.setdb_on('head.ws', ws=>{
-            if (!ws||this.ws)
-                return;
-            this.ws = ws;
-        });
     }
-    on_message = event=>{
-        const json = JSON.parse(event.data);
-        if (json.type!='har_viewer')
-            return;
-        const req = json.data;
-        if (this.ws)
-            this.ws.removeEventListener('message', this.on_message);
-        this.props.update_response(req);
-    };
     add_header = ()=>{
-        ga_event('proxy-tester-tab', 'add header');
+        ga_event('proxy_tester', 'add header');
         this.setState(prev_state=>({
             headers: [...prev_state.headers, {idx: prev_state.max_idx+1,
                 header: '', value: ''}],
@@ -78,7 +64,7 @@ class Request extends Pure_component {
         }));
     };
     remove_header = idx=>{
-        ga_event('proxy-tester-tab', 'remove header');
+        ga_event('proxy_tester', 'remove header');
         if (this.state.headers.length==1)
             return this.setState({headers: [this.first_header]});
         this.setState(prev_state=>(
@@ -98,18 +84,16 @@ class Request extends Pure_component {
             params: {...prev_state.params, [field]: value}}));
     };
     go = ()=>{
-        ga_event('proxy-tester-tab', 'run test');
-        this.ws.addEventListener('message', this.on_message);
-        this.last_port = this.state.params.proxy;
+        ga_event('proxy_tester', 'run test');
         if (!this.state.params.proxy)
         {
-            ga_event('proxy-tester-tab', 'no proxy chosen');
+            ga_event('proxy_tester', 'no proxy chosen');
             this.setState({warnings:
                 [{msg: 'You need to choose a proxy port first'}]});
             $('#warnings_modal').modal();
             return;
         }
-        const check_url = '/api/test/'+this.state.params.proxy;
+        const url = '/api/test/'+this.state.params.proxy;
         const data = {
             headers: this.state.headers.reduce((acc, el)=>{
                 if (!el.header)
@@ -125,20 +109,22 @@ class Request extends Pure_component {
             this.on('uncaught', e=>{
                 console.error(e);
                 _this.setState({show_loader: false});
-                ga_event('proxy-tester-tab', 'unexpected error', e.message);
+                ga_event('proxy_tester', 'unexpected error', e.message);
             });
-            const check = yield ajax.json({method: 'POST', url: check_url,
-                data});
+            const resp = yield ajax.json({method: 'POST', url, data});
             _this.setState({show_loader: false});
-            if (check.error)
+            if (resp.error)
             {
-                _this.setState({warnings: [{msg: check.error}]});
+                _this.setState({warnings: [{msg: resp.error}]});
                 $('#warnings_modal').modal();
-                ga_event('proxy-tester-tab', 'response has errors',
-                    check.error);
+                ga_event('proxy_tester', 'response has errors',
+                    resp.error);
             }
             else
-                ga_event('proxy-tester-tab', 'response successful');
+            {
+                ga_event('proxy_tester', 'response successful');
+                _this.props.update_response(resp);
+            }
         });
     };
     render(){
@@ -187,12 +173,12 @@ const Field = ({type, update, name, params, tooltip, ...props})=>{
     const fields = {proxy: 'Proxy port', url: 'URL', method: 'Method'};
     const on_change_wrapper = val=>{
         if (name!='url')
-            ga_event('proxy-tester-tab', 'edit '+name);
+            ga_event('proxy_tester', 'edit '+name);
         update(name, val);
     };
     const on_blur = ()=>{
         if (name=='url')
-            ga_event('proxy-tester-tab', 'edit url');
+            ga_event('proxy_tester', 'edit url');
     };
     let Comp;
     if (type=='select')

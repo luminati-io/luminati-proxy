@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.101.384",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed managing history db"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed Proxy Tester when sending concurrent requests"
+            },
+            {
+                "type": "star",
+                "text": "Improved Test Affiliate tab"
+            }
+        ]
+    },
+    {
         "ver": "1.101.324",
         "type": "dev",
         "changes": [

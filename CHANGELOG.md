@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.101.384 Stable
+- :bug: Fixed managing history db
+- :bug: Fixed Proxy Tester when sending concurrent requests
+- :star: Improved Test Affiliate tab
+
 ## 1.101.324 Development Latest
 - :star: Added button to open a modal with IPs/gIPs
 - :star: New tab in proxy configuration: Headers

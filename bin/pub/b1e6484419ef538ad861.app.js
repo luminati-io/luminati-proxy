@@ -34428,14 +34428,8 @@ var Request = function (_Pure_component2) {
             headers: [_this3.first_header],
             max_idx: 0,
             params: { url: 'http://lumtest.com/myip.json', method: 'GET' }
-        }, _this3.state = (0, _extends6.default)({}, _this3.default_state, { show_loader: false }), _this3.on_message = function (event) {
-            var json = JSON.parse(event.data);
-            if (json.type != 'har_viewer') return;
-            var req = json.data;
-            if (_this3.ws) _this3.ws.removeEventListener('message', _this3.on_message);
-            _this3.props.update_response(req);
-        }, _this3.add_header = function () {
-            (0, _util.ga_event)('proxy-tester-tab', 'add header');
+        }, _this3.state = (0, _extends6.default)({}, _this3.default_state, { show_loader: false }), _this3.add_header = function () {
+            (0, _util.ga_event)('proxy_tester', 'add header');
             _this3.setState(function (prev_state) {
                 return {
                     headers: [].concat((0, _toConsumableArray3.default)(prev_state.headers), [{ idx: prev_state.max_idx + 1,
@@ -34444,7 +34438,7 @@ var Request = function (_Pure_component2) {
                 };
             });
         }, _this3.remove_header = function (idx) {
-            (0, _util.ga_event)('proxy-tester-tab', 'remove header');
+            (0, _util.ga_event)('proxy_tester', 'remove header');
             if (_this3.state.headers.length == 1) return _this3.setState({ headers: [_this3.first_header] });
             _this3.setState(function (prev_state) {
                 return { headers: prev_state.headers.filter(function (h) {
@@ -34466,16 +34460,14 @@ var Request = function (_Pure_component2) {
                     params: (0, _extends6.default)({}, prev_state.params, (0, _defineProperty3.default)({}, field, value)) };
             });
         }, _this3.go = function () {
-            (0, _util.ga_event)('proxy-tester-tab', 'run test');
-            _this3.ws.addEventListener('message', _this3.on_message);
-            _this3.last_port = _this3.state.params.proxy;
+            (0, _util.ga_event)('proxy_tester', 'run test');
             if (!_this3.state.params.proxy) {
-                (0, _util.ga_event)('proxy-tester-tab', 'no proxy chosen');
+                (0, _util.ga_event)('proxy_tester', 'no proxy chosen');
                 _this3.setState({ warnings: [{ msg: 'You need to choose a proxy port first' }] });
                 (0, _jquery2.default)('#warnings_modal').modal();
                 return;
             }
-            var check_url = '/api/test/' + _this3.state.params.proxy;
+            var url = '/api/test/' + _this3.state.params.proxy;
             var data = {
                 headers: _this3.state.headers.reduce(function (acc, el) {
                     if (!el.header) return acc;
@@ -34487,7 +34479,7 @@ var Request = function (_Pure_component2) {
             _this3.setState({ show_loader: true });
             var _this = _this3;
             _this3.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                var check;
+                var resp;
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
@@ -34495,21 +34487,23 @@ var Request = function (_Pure_component2) {
                                 this.on('uncaught', function (e) {
                                     console.error(e);
                                     _this.setState({ show_loader: false });
-                                    (0, _util.ga_event)('proxy-tester-tab', 'unexpected error', e.message);
+                                    (0, _util.ga_event)('proxy_tester', 'unexpected error', e.message);
                                 });
                                 _context.next = 3;
-                                return _ajax2.default.json({ method: 'POST', url: check_url,
-                                    data: data });
+                                return _ajax2.default.json({ method: 'POST', url: url, data: data });
 
                             case 3:
-                                check = _context.sent;
+                                resp = _context.sent;
 
                                 _this.setState({ show_loader: false });
-                                if (check.error) {
-                                    _this.setState({ warnings: [{ msg: check.error }] });
+                                if (resp.error) {
+                                    _this.setState({ warnings: [{ msg: resp.error }] });
                                     (0, _jquery2.default)('#warnings_modal').modal();
-                                    (0, _util.ga_event)('proxy-tester-tab', 'response has errors', check.error);
-                                } else (0, _util.ga_event)('proxy-tester-tab', 'response successful');
+                                    (0, _util.ga_event)('proxy_tester', 'response has errors', resp.error);
+                                } else {
+                                    (0, _util.ga_event)('proxy_tester', 'response successful');
+                                    _this.props.update_response(resp);
+                                }
 
                             case 6:
                             case 'end':
@@ -34542,10 +34536,6 @@ var Request = function (_Pure_component2) {
                                 proxy: port || def_port, method: method, url: url }) };
                     });
                 });
-            });
-            this.setdb_on('head.ws', function (ws) {
-                if (!ws || _this4.ws) return;
-                _this4.ws = ws;
             });
         }
     }, {
@@ -34625,11 +34615,11 @@ var Field = function Field(_ref4) {
 
     var fields = { proxy: 'Proxy port', url: 'URL', method: 'Method' };
     var on_change_wrapper = function on_change_wrapper(val) {
-        if (name != 'url') (0, _util.ga_event)('proxy-tester-tab', 'edit ' + name);
+        if (name != 'url') (0, _util.ga_event)('proxy_tester', 'edit ' + name);
         update(name, val);
     };
     var on_blur = function on_blur() {
-        if (name == 'url') (0, _util.ga_event)('proxy-tester-tab', 'edit url');
+        if (name == 'url') (0, _util.ga_event)('proxy_tester', 'edit url');
     };
     var Comp = void 0;
     if (type == 'select') Comp = _common.Select;else Comp = _common.Input;
