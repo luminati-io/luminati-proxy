@@ -23,6 +23,7 @@ import 'es6-shim';
 import Pure_component from '../../www/util/pub/pure_component.js';
 
 window.setdb = setdb;
+setdb.setMaxListeners(30);
 
 const App = withRouter(class App extends Pure_component {
     componentDidMount(){

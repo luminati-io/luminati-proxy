@@ -248,6 +248,7 @@
       "bin/pub/img/proxy_ext.svg",
       "bin/pub/img/proxy_lum.svg",
       "bin/pub/img/refresh.svg",
+      "bin/pub/img/request_headers.svg",
       "bin/pub/img/resource_document_icon_small.png",
       "bin/pub/img/rotation.svg",
       "bin/pub/img/rules.svg",
@@ -327,7 +328,7 @@
       "util/config.js",
       "webpack.config.js"
     ],
-    "md5": "e14454ef91f32187cb7db755918392c7"
+    "md5": "4d2eb348d97416908f3575e53ff0c19c"
   },
   "main": "index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -362,5 +363,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.101.34"
+  "version": "1.101.324"
 }

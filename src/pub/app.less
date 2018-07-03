@@ -751,6 +751,7 @@ span.icon_link {
         .icon.rules { background-image: url(/img/rules.svg); }
         .icon.rotation { background-image: url(/img/rotation.svg); }
         .icon.debug { background-image: url(/img/debug.svg); }
+        .icon.headers { background-image: url(/img/request_headers.svg); }
         .icon.general { background-image: url(/img/general.svg); }
         .icon.proxy_ext { background-image: url(/img/proxy_ext.svg); }
         .icon.proxy_lum { background-image: url(/img/proxy_lum.svg); }
@@ -839,6 +840,7 @@ span.icon_link {
         &.speed .desc { width: 195px; }
         &.rotation .desc { width: 125px; }
         &.debug .desc { width: 120px; }
+        &.headers .desc { width: 145px; }
         &.general .desc { width: 195px; }
         &.rules {
             .desc { width: 200px; }
@@ -862,6 +864,29 @@ span.icon_link {
                 width: 90px;
                 margin-left: 0;
                 i { left: 4px; }
+            }
+        }
+        &.headers {
+            .field_row.headers {
+                position: absolute;
+                align-items: baseline;
+                input[type=text] {
+                    margin-right: 9px;
+                    width: 100px;
+                }
+                .list {
+                    .single_header {
+                        width: 365px;
+                        display: flex;
+                        align-items: center;
+                        padding: 3px;
+                    }
+                }
+            }
+            .desc { padding-right: 0; }
+            .action_icons {
+                width: 45px;
+                flex-shrink: 0;
             }
         }
         .header {
@@ -1986,6 +2011,7 @@ span.icon_link {
                 &.remove { --spritesheet-position: 83px 25px; }
                 &.filters { --spritesheet-position: -56px 119px; }
                 &.download { --spritesheet-position: 26px 145px; }
+                &.actions { --spritesheet-position: 81px 120px; }
             }
         }
         .devider {

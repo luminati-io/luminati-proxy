@@ -4,8 +4,9 @@ import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {Input, Select, Loader, Modal, Warnings, Nav,
-    Tooltip} from './common.js';
+    Tooltip, Add_icon, Remove_icon} from './common.js';
 import classnames from 'classnames';
+import ajax from '../../util/ajax.js';
 import zurl from '../../util/url.js';
 import {ga_event} from './util.js';
 import Preview from './har_preview.js';
@@ -109,7 +110,7 @@ class Request extends Pure_component {
             return;
         }
         const check_url = '/api/test/'+this.state.params.proxy;
-        const body = {
+        const data = {
             headers: this.state.headers.reduce((acc, el)=>{
                 if (!el.header)
                     return acc;
@@ -126,20 +127,15 @@ class Request extends Pure_component {
                 _this.setState({show_loader: false});
                 ga_event('proxy-tester-tab', 'unexpected error', e.message);
             });
-            // XXX krzysztof: switch fetch->ajax
-            const raw_check = yield window.fetch(check_url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(body),
-            });
-            const json_check = yield raw_check.json();
+            const check = yield ajax.json({method: 'POST', url: check_url,
+                data});
             _this.setState({show_loader: false});
-            if (json_check.error)
+            if (check.error)
             {
-                _this.setState({warnings: [{msg: json_check.error}]});
+                _this.setState({warnings: [{msg: check.error}]});
                 $('#warnings_modal').modal();
                 ga_event('proxy-tester-tab', 'response has errors',
-                    json_check.error);
+                    check.error);
             }
             else
                 ga_event('proxy-tester-tab', 'response successful');
@@ -243,27 +239,12 @@ class New_header_params extends Pure_component {
                 </div>
               </Tooltip>
               <div className="action_icons">
-                <Remove_icon click={()=>clicked_remove(header.idx)}/>
-                {last && <Add_icon click={clicked_add}/>}
+                <Remove_icon tooltip="Remove header"
+                  click={()=>clicked_remove(header.idx)}/>
+                {last && <Add_icon tooltip="Add header" click={clicked_add}/>}
               </div>
             </div>;
     }
 }
-
-const Add_icon = ({click})=>
-    <Tooltip title="Add header">
-      <span className="link icon_link top right add_header"
-        onClick={click}>
-        <i className="glyphicon glyphicon-plus"/>
-      </span>
-    </Tooltip>;
-
-const Remove_icon = ({click})=>
-    <Tooltip title="Remove header">
-      <span className="link icon_link top"
-        onClick={click}>
-        <i className="glyphicon glyphicon-trash"/>
-      </span>
-    </Tooltip>;
 
 export default Proxy_tester;

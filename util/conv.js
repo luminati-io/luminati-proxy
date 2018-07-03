@@ -42,7 +42,7 @@ define(['/util/util.js'], function(zutil){
 var E = {};
 
 var has_map = typeof Map=='function' && Map.prototype.get && Map.prototype.set;
-has_map = 0; // XXX alexey: unit-test and remove
+has_map = 0; // XXX: unit-test and remove
 E.cache_str_map_fn = function(fn){
     var cache = new Map();
     return function(s){
@@ -233,7 +233,7 @@ E.format_per = function(per){
 //     name: declared name or null
 //     args: array of declared argument names
 //     body: function body excluding the outermost braces
-// XXX alexey: when necessary, add support for comments inside argument list,
+// XXX: when necessary, add support for comments inside argument list,
 // arrow functions, generator functions, rest parameters, default parameters,
 // destructuring parameters
 E.parse_function = function(f){

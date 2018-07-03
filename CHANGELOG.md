@@ -1,5 +1,22 @@
 Luminati Proxy manager - Change Log
 
+## 1.101.324 Development Latest
+- :star: Added button to open a modal with IPs/gIPs
+- :star: New tab in proxy configuration: Headers
+- :star: Refreshing IPs/gIPs from LPM
+- :bug: Fixed memory leaks
+- :star: Improved performance
+- :bug: Fixed web access security issue
+- :bug: Fixed BW up and BW down in proxies list
+- :star: improved Timeline in logs: waterfall and other rules are visible
+- :star: added taking screenshots in 'Test affiliate links'
+- :sparkles: move logs to luminati_proxy_manager dir
+- :star: changed SOCKS 5 port to be the same as main proxy port
+- :bug: fixed countries list for global shared zones
+- :bug: fixed dialog on port conflict in electron app
+- :bug: no version in exe name (for resident tasks)
+- :star: HAR viewer improvements
+
 ## 1.101.34 Development Latest
 - :star: Refreshing IPs/gIPs from LPM
 - :star: UI improvements and additional tooltips

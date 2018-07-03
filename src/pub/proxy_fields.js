@@ -265,6 +265,28 @@ export const tabs = {
             },
         },
     },
+    headers: {
+        label: 'Headers',
+        tooltip: `Set default headers that are sent with each request from this
+            proxy port`,
+        fields: {
+            user_agent: {
+                label: 'User-Agent',
+                tooltip: `Choose a User-Agent header that will be used for
+                    sending requests`,
+            },
+            random_user_agent: {
+                label: 'Random User-Agent',
+                tooltip: 'Set a random User-Agent header for each request',
+            },
+            override_headers: {
+                label: 'Override headers',
+                tooltip: `If you use a browser or other software then requests
+                    may already have defined a few headers for you. Enabling
+                    this option will allow for overriding those headers`,
+            },
+        },
+    },
     general: {
         label: 'General',
         tooltip: `General configuration such as port number, password and

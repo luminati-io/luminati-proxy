@@ -89,8 +89,16 @@ function ajax(opt){
 
 ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
     E[m.toLowerCase()] = function(url, opt){
-        return ajax(assign({method: m, json: 1},
-            typeof url=='string' ? {url: url} : url, opt));
+        url = typeof url=='string' ? {url: url} : url;
+        opt = assign({method: m, json: 1}, url, opt);
+        if (!{get: 1, delete: 1}[opt.method.toLowerCase()]
+            && opt.data!=null && typeof opt.data!='string')
+        {
+            opt.content_type = opt.content_type||'application/json';
+            if (opt.content_type.startsWith('application/json'))
+                opt.data = JSON.stringify(opt.data);
+        }
+        return ajax(opt);
     };
 });
 

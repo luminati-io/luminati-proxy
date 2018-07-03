@@ -156,13 +156,19 @@ class Har_viewer extends Pure_component {
 }
 
 class Toolbar extends Pure_component {
-    state = {select_visible: false, filters_visible: false};
+    state = {select_visible: false, filters_visible: false,
+        actions_visible: false};
     componentDidMount(){
         this.setdb_on('har_viewer.select_visible', visible=>
             this.setState({select_visible: visible}));
+        this.setdb_on('har_viewer.select_mode', actions_visible=>
+            this.setState({actions_visible}));
     }
     toggle_filters = ()=>
         this.setState({filters_visible: !this.state.filters_visible});
+    toggle_actions = ()=>{
+        setdb.set('har_viewer.select_mode', !this.state.actions_visible);
+    };
     render(){
         const {clear, search_val, on_change_search, type_filter,
             set_type_filter, filters, set_filter, master_port, undock,
@@ -179,9 +185,15 @@ class Toolbar extends Pure_component {
                   active={this.state.filters_visible}/>
                 <Toolbar_button id="download" tooltip="Export as HAR file"
                   href="/api/logs_har"/>
-                <Devider/>
-                <Actions/>
+                <Toolbar_button id="actions" on_click={this.toggle_actions}
+                  active={this.state.actions_visible}
+                  tooltip="Show/hide additional actions"/>
               </Toolbar_row>
+              {this.state.actions_visible &&
+                <Toolbar_row>
+                  <Actions/>
+                </Toolbar_row>
+              }
               {this.state.filters_visible &&
                 <Toolbar_row>
                   <Search_box val={search_val} on_change={on_change_search}/>
@@ -201,10 +213,8 @@ const Toolbar_row = ({children})=>
     </div>;
 
 class Actions extends Pure_component {
-    state = {action: '', any_checked: false};
+    state = {any_checked: false};
     componentDidMount(){
-        this.setdb_on('har_viewer.current_action', action=>
-            action!=undefined&&this.setState({action}));
         this.setdb_on('har_viewer.checked_list', list=>{
             if (!list)
                 return;
@@ -212,7 +222,6 @@ class Actions extends Pure_component {
             this.setState({any_checked});
         });
     }
-    set = e=>setdb.set('har_viewer.current_action', e.target.value);
     resend = ()=>{
         const list = setdb.get('har_viewer.checked_list')||[];
         if (!list.length)
@@ -228,34 +237,16 @@ class Actions extends Pure_component {
             });
         });
     };
-    cancel = ()=>setdb.set('har_viewer.current_action', '');
     render(){
         const resend_classes = classnames('filter',
             {disabled: !this.state.any_checked});
-        const tooltip = 'Actions that can be performed on a single or multiple'
-        +' requests';
         return <div className="actions">
-              {this.state.action=='select' &&
                 <div className="filters">
                   <Tooltip title="Resend requests" placement="bottom">
                     <div className={resend_classes}
                       onClick={this.resend}>Resend</div>
                   </Tooltip>
-                  <Tooltip title="Cancel" placement="bottom">
-                    <div className={classnames('filter')}
-                      onClick={this.cancel}>Cancel</div>
-                  </Tooltip>
                 </div>
-              }
-              <div className="custom_filter">
-                <Tooltip title={tooltip} placement="bottom">
-                  <select value={this.state.action} onChange={this.set}>
-                    <option value="">Actions</option>
-                    <option value="select">Resend requests</option>
-                  </select>
-                </Tooltip>
-                <span className="arrow"/>
-              </div>
             </div>;
     }
 }
@@ -417,10 +408,10 @@ class Tables_container extends Pure_component {
             this.ws = ws;
             this.ws.addEventListener('message', this.on_message);
         });
-        this.setdb_on('har_viewer.current_action', action=>{
-            if (action==undefined)
+        this.setdb_on('har_viewer.select_mode', select=>{
+            if (select==undefined)
                 return;
-            if (action=='select')
+            if (select)
                 this.props.show_column(0);
             else
                 this.props.hide_column(0);
@@ -658,11 +649,19 @@ class Header_container extends Pure_component {
         });
     }
     toggle_all = ()=>{
-        const checked_all = this.state.checked_all;
-        this.setState({checked_all: !checked_all});
+        const checked_all = !this.state.checked_all;
+        this.setState({checked_all});
         const uuids = this.props.reqs.map(r=>r.uuid);
-        uuids.forEach(id=>
-            setdb.set('har_viewer.checked_list.'+id, !checked_all));
+        if (checked_all)
+        {
+            uuids.forEach(id=>
+                setdb.set('har_viewer.checked_list.'+id, true));
+        }
+        else
+        {
+            Object.keys(setdb.get('har_viewer').checked_list).forEach(id=>
+                setdb.set('har_viewer.checked_list.'+id, false));
+        }
         setdb.emit_path('har_viewer.checked_list');
     };
     click = col=>{

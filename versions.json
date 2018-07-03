@@ -1,5 +1,71 @@
 [
     {
+        "ver": "1.101.324",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added button to open a modal with IPs/gIPs"
+            },
+            {
+                "type": "star",
+                "text": "New tab in proxy configuration: Headers"
+            },
+            {
+                "type": "star",
+                "text": "Refreshing IPs/gIPs from LPM"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed memory leaks"
+            },
+            {
+                "type": "star",
+                "text": "Improved performance"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed web access security issue"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed BW up and BW down in proxies list"
+            },
+            {
+                "type": "star",
+                "text": "improved Timeline in logs: waterfall and other rules are visible"
+            },
+            {
+                "type": "star",
+                "text": "added taking screenshots in 'Test affiliate links'"
+            },
+            {
+                "type": "sparkles",
+                "text": "move logs to luminati_proxy_manager dir"
+            },
+            {
+                "type": "star",
+                "text": "changed SOCKS 5 port to be the same as main proxy port"
+            },
+            {
+                "type": "bug",
+                "text": "fixed countries list for global shared zones"
+            },
+            {
+                "type": "bug",
+                "text": "fixed dialog on port conflict in electron app"
+            },
+            {
+                "type": "bug",
+                "text": "no version in exe name (for resident tasks)"
+            },
+            {
+                "type": "star",
+                "text": "HAR viewer improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.101.34",
         "type": "dev",
         "changes": [

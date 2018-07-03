@@ -10,8 +10,8 @@ import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
-    Pagination_panel, Loader_small, Note,
-    Labeled_controller} from './common.js';
+    Pagination_panel, Loader_small, Note, Input,
+    Labeled_controller, Remove_icon, Add_icon} from './common.js';
 import Har_viewer from './har_viewer.js';
 import * as util from './util.js';
 import {Netmask} from 'netmask';
@@ -213,6 +213,8 @@ const Index = withRouter(class Index extends Pure_component {
             form.preset = preset;
             form.last_preset_applied = preset;
             presets[preset].set(form);
+            const disabled_fields = presets[preset].disabled||{};
+            setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         }
         this.apply_rules(form);
         if (form.session===true)
@@ -258,6 +260,8 @@ const Index = withRouter(class Index extends Pure_component {
         form.state = (form.state||'').toLowerCase();
         this.setState({form});
         setdb.set('head.proxy_edit.form', form);
+        for (let i in form)
+            setdb.emit('head.proxy_edit.form.'+i, form[i]);
     }
     rule_map_to_form = (rule, id)=>{
         const result = {id};
@@ -381,6 +385,7 @@ const Index = withRouter(class Index extends Pure_component {
     };
     prepare_to_save = ()=>{
         const save_form = Object.assign({}, this.state.form);
+        delete save_form.zones;
         for (let field in save_form)
         {
             let before_save;
@@ -438,6 +443,8 @@ const Index = withRouter(class Index extends Pure_component {
         if (save_form.session_random)
             save_form.session = true;
         delete save_form.session_random;
+        if (save_form.headers)
+            save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
         return save_form;
     };
     get_curr_plan = ()=>{
@@ -452,6 +459,7 @@ const Index = withRouter(class Index extends Pure_component {
     };
     render(){
         const tab = this.state.tab;
+        // XXX krzysztof: transform support into disabled_fields
         const support = presets && this.state.form.preset &&
             presets[this.state.form.preset].support||{};
         let zones = this.state.consts&&
@@ -516,6 +524,7 @@ const Main_window = ({show, tab, ...props})=>{
     case 'rules': Comp = Rules; break;
     case 'rotation': Comp = Rotation; break;
     case 'debug': Comp = Debug; break;
+    case 'headers': Comp = Headers; break;
     case 'general': Comp = General; break;
     case 'logs':
     default: Comp = Har_viewer;
@@ -534,6 +543,8 @@ class Nav extends Pure_component {
     };
     update_preset = val=>{
         this.props.on_change_preset(this.props.form, val);
+        const disabled_fields = presets[val].disabled||{};
+        setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this._reset_fields();
         ga_event('edit preset', val);
     };
@@ -600,6 +611,7 @@ class Nav_tabs extends Pure_component {
               <Tab_btn {...this.props} curr_tab={this.state.tab}
                 id="rotation"/>
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="debug"/>
+              <Tab_btn {...this.props} curr_tab={this.state.tab} id="headers"/>
               <Tab_btn {...this.props} curr_tab={this.state.tab} id="general"/>
             </div>;
     }
@@ -620,6 +632,8 @@ const Tab_btn = props=>{
             return tab_fields.includes(f) && val && !is_empty_arr;
         }).length;
     }
+    if (props.id=='headers')
+        changes = changes+(props.form.headers||[]).length;
     const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
     return <Tooltip title={tabs[props.id].tooltip}>
           <div onClick={()=>setdb.set('head.proxy_edit.tab', props.id)}
@@ -645,7 +659,7 @@ const Tab_icon = props=>{
 
 const Config = getContext({provide: PropTypes.object})(
 class Config extends Pure_component {
-    state = {};
+    state = {disabled_fields: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
     on_blur = ({target: {value}})=>{
@@ -666,12 +680,16 @@ class Config extends Pure_component {
         const val_id = this.props.val_id ? this.props.val_id : this.props.id;
         this.setdb_on('head.proxy_edit.form.'+val_id, val=>
             this.setState({val, show: true}));
+        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
+            disabled_fields&&this.setState({disabled_fields}));
     }
     render(){
         if (!this.state.show)
             return null;
         const id = this.props.id;
         const tab_id = this.props.provide.tab_id;
+        const disabled = this.props.disabled||!this.is_valid_field(id)||
+            this.state.disabled_fields[id];
         return <Labeled_controller
               id={id}
               sufix={this.props.sufix}
@@ -680,7 +698,7 @@ class Config extends Pure_component {
               on_input_change={this.on_input_change}
               on_change_wrapper={this.on_change_wrapper}
               val={this.state.val===undefined ? '' : this.state.val}
-              disabled={this.props.disabled || !this.is_valid_field(id)}
+              disabled={disabled}
               min={this.props.min}
               max={this.props.max}
               note={this.props.note}
@@ -877,6 +895,83 @@ class Targeting extends Pure_component {
             </div>;
     }
 });
+
+const Headers = provider({tab_id: 'headers'})(
+class Headers extends Pure_component {
+    first_header = {name: '', value: ''};
+    state = {headers: [this.first_header]};
+    boolean_opt = [{key: 'No (Default)', value: ''},
+      {key: 'Yes', value: 'true'}];
+    set_field = setdb.get('head.proxy_edit.set_field');
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.form.headers', headers=>{
+            if (headers&&headers.length)
+                this.setState({headers});
+            else
+                this.setState({headers: [this.first_header]});
+        });
+    }
+    add = ()=>this.set_field('headers', [
+        ...this.state.headers, {name: '', value: ''}]);
+    remove = idx=>{
+        let new_headers = [
+            ...this.state.headers.slice(0, idx),
+            ...this.state.headers.slice(idx+1),
+        ];
+        if (!new_headers.length)
+            new_headers = [this.first_header];
+        this.set_field('headers', new_headers);
+    };
+    update = idx=>name=>value=>this.set_field('headers',
+        this.state.headers.map((h, i)=>{
+            if (i!=idx)
+                return h;
+            return {...h, [name]: value};
+        }));
+    random_user_agent_changed = val=>{
+        if (val)
+            this.set_field('user_agent', '');
+    };
+    render(){
+        return <div>
+              <Config type="select" id="user_agent" data={util.user_agents}
+                disabled={this.props.form.random_user_agent}/>
+              <Config type="select" id="random_user_agent"
+                on_change={this.random_user_agent_changed}
+                data={this.boolean_opt}/>
+              <Config type="select" id="override_headers"
+                data={this.boolean_opt}/>
+              <div className="field_row headers">
+                <div className="desc">
+                  <Tooltip title="Custom headers">
+                    <span>Headers</span>
+                  </Tooltip>
+                </div>
+                <div className="list">
+                  {this.state.headers.map((h, i)=>
+                    <Header last={i+1==this.state.headers.length} key={i}
+                      name={h.name} value={h.value} update={this.update(i)}
+                      remove_clicked={this.remove}
+                      add_clicked={this.add} idx={i}/>
+                  )}
+                </div>
+              </div>
+            </div>;
+    }
+});
+
+const Header = ({name, value, idx, add_clicked, remove_clicked, last,
+    update})=>
+    <div className="single_header">
+      <div className="desc">Name</div>
+      <Input type="text" val={name} on_change_wrapper={update('name')}/>
+      <div className="desc">Value</div>
+      <Input type="text" val={value} on_change_wrapper={update('value')}/>
+      <div className="action_icons">
+        <Remove_icon tooltip="Remove header" click={()=>remove_clicked(idx)}/>
+        {last && <Add_icon tooltip="Add header" click={add_clicked}/>}
+      </div>
+    </div>;
 
 const Speed = provider({tab_id: 'speed'})(
 class Speed extends Pure_component {
@@ -1450,20 +1545,25 @@ const General = provider({tab_id: 'general'})(props=>{
         type = 'ips';
     else if (curr_plan&&!!curr_plan.vip)
         type = 'vips';
+    const note_ips = props.form.multiply_ips ?
+        <a className="link" onClick={open_modal}>Select IPs</a> : null;
+    const note_vips = props.form.multiply_vips ?
+        <a className="link" onClick={open_modal}>Select gIPs</a> : null;
+    const mul_disabled = !props.support.multiply||props.form.multiply_ips||
+        props.form.multiply_vips;
     return <div>
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
           <Config type="text" id="password"/>
-          <Config type="number" id="multiply" min="1"
-            disabled={!props.support.multiply}/>
+          <Config type="number" id="multiply" min="1" disabled={mul_disabled}/>
           {type=='ips' &&
             <Config type="select" id="multiply_ips"
-              on_change={multiply_changed}
+              on_change={multiply_changed} note={note_ips}
               data={props.default_opt('multiply_ips')}/>
           }
           {type=='vips' &&
             <Config type="select" id="multiply_vips"
-              on_change={multiply_changed}
+              on_change={multiply_changed} note={note_vips}
               data={props.default_opt('multiply_vips')}/>
           }
           <Config type="select" id="secure_proxy"

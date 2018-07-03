@@ -258,7 +258,7 @@ E.zexit = function(args){
     // workaround for process.zon override issue
     if (process.zon && process.zon.main)
     {
-        // XXX alexey: expose constants via zutil module
+        // XXX: expose constants via zutil module
         var LCRIT = 2;
         var LCONSOLE = 0x100;
         var emb_zutil = process.binding('zutil');

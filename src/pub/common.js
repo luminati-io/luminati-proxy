@@ -447,3 +447,17 @@ export const Circle_li = props=>
       </div>
       <div className="single_instruction">{props.children}</div>
     </li>;
+
+export const Add_icon = ({click, tooltip})=>
+    <Tooltip title={tooltip}>
+      <span className="link icon_link top right add_header" onClick={click}>
+        <i className="glyphicon glyphicon-plus"/>
+      </span>
+    </Tooltip>;
+
+export const Remove_icon = ({click, tooltip})=>
+    <Tooltip title={tooltip}>
+      <span className="link icon_link top" onClick={click}>
+        <i className="glyphicon glyphicon-trash"/>
+      </span>
+    </Tooltip>;

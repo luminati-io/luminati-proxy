@@ -204,7 +204,7 @@ E.match = function(filter, value, opt){
     return E.match_fn(filter, opt)(value, opt && opt.extra); };
 
 E.cmp_norm = function(cmp){ return cmp>0 ? 1 : cmp<0 ? -1 : 0; };
-// XXX alexey: move to util.js, change name to non-string-related
+// XXX: move to util.js, change name to non-string-related
 E.strcmp = function(a, b){ return a>b ? 1 : a<b ? -1 : 0; };
 E.strverscmp = function(a, b){
     var _a, _b, diff, skip_digit = 0;
