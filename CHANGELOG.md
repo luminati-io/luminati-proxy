@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.101.406 
+
 ## 1.101.384 Stable
 - :bug: Fixed managing history db
 - :bug: Fixed Proxy Tester when sending concurrent requests
