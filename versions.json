@@ -1,8 +1,36 @@
 [
     {
+        "ver": "1.101.871",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added \"Refresh IP\" Rule"
+            },
+            {
+                "type": "star",
+                "text": "Forwarding for google domains"
+            },
+            {
+                "type": "sparkles",
+                "text": "Whitelist block page instructions"
+            },
+            {
+                "type": "sparkles",
+                "text": "\"Admin Whitelisted IPs\" option available in General Settings"
+            }
+
+        ]
+    },
+    {
         "ver": "1.101.406",
-        "type": "stable/dev",
-        "changes": []
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Avoid lowercasing headers for proxied requests"
+            }
+        ]
     },
     {
         "ver": "1.101.384",

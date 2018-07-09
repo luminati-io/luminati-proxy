@@ -5,6 +5,7 @@ import React from 'react';
 import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import {Netmask} from 'netmask';
 
 export default class Settings extends Pure_component {
     render(){
@@ -15,6 +16,20 @@ export default class Settings extends Pure_component {
             </div>;
     }
 }
+
+// XXX krzysztof: merge with validators in proxy_edit
+const normalizers = {
+    ips_list: val=>{
+        val = val.replace(/\s/g, '');
+        const ips = val.split(',');
+        const res = [];
+        ips.forEach(ip=>{
+            try { res.push(new Netmask(ip).base); }
+            catch(e){ console.log('incorrect ip format'); }
+        });
+        return res.join(',');
+    },
+};
 
 class Form extends Pure_component {
     state = {saving: false};
@@ -29,11 +44,21 @@ class Form extends Pure_component {
         zone: `Default zone will be used automatically if you don't specify
             any specific zone. This value can be overriden in each proxy port
             settings`,
+        whitelist_ips: `List of IPs that are allowed to access web UI
+            (including all API endpoints at http://localhost:22999/api) and
+            make changes. can also include ranges of ips like so 0.0.0.0/0.
+            Default value is 127.0.0.1, which means that remote access from
+            any other IP is blocked unless list of IPs are added in this
+            field.`,
     };
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
-            if (settings && !this.state.settings)
-                this.setState({settings});
+            if (!settings||this.state.settings)
+                return;
+            const s = {...settings};
+            s.www_whitelist_ips = s.www_whitelist_ips&&
+                s.www_whitelist_ips.join(',')||'';
+            this.setState({settings: s});
         });
         this.setdb_on('head.consts', consts=>{
             if (consts)
@@ -48,6 +73,15 @@ class Form extends Pure_component {
         this.setState(prev=>({settings: {...prev.settings, logs: val}}),
             this.save);
     };
+    whitelist_ips_change = val=>{
+        this.setState(prev=>({
+            settings: {...prev.settings, www_whitelist_ips: val}}));
+    };
+    whitelist_ips_blur = ({target: {value}})=>{
+        const val = normalizers.ips_list(value);
+        this.setState(prev=>({
+            settings: {...prev.settings, www_whitelist_ips: val}}), this.save);
+    };
     save = ()=>{
         this.setState({saving: true});
         const _this = this;
@@ -56,11 +90,12 @@ class Form extends Pure_component {
                 console.log(e);
                 _this.setState({saving: false});
             });
+            const body = {..._this.state.settings};
             // XXX krzysztof: switch fetch->ajax
             const raw = yield window.fetch('/api/settings', {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(_this.state.settings),
+                body: JSON.stringify(body),
             });
             const settings = yield raw.json();
             setdb.set('head.settings', settings);
@@ -86,6 +121,12 @@ class Form extends Pure_component {
               <Labeled_controller val={this.state.settings.logs} type="select"
                 data={this.logs_opt} on_change_wrapper={this.logs_change}
                 label="Enable logs" tooltip={this.tooltips.logs}/>
+              <Labeled_controller val={this.state.settings.www_whitelist_ips}
+                type="text" on_change_wrapper={this.whitelist_ips_change}
+                label="Admin whitelisted IPs"
+                placeholder="e.g. 1.1.1.1, 2.2.2.2"
+                on_blur={this.whitelist_ips_blur}
+                tooltip={this.tooltips.whitelist_ips}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

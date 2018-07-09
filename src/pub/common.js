@@ -195,11 +195,21 @@ export const Loader = ({show})=>{
         </div>;
 };
 
-export const Loader_small = ({show, msg='Saving...'})=>
-    <div className={classnames('loader_small', {hide: !show})}>
-      <div className="spinner"/>
-      <div className="saving_label">{msg}</div>
-    </div>;
+export const Loader_small = ({show, saving, loading_msg='Saving...',
+    std_msg='', std_tooltip})=>
+{
+    saving = show||saving;
+    const msg = saving ? loading_msg : std_msg;
+    const tooltip = saving ? '' : std_tooltip;
+    return <div className="loader_small">
+          <div className={classnames('spinner', {show: saving})}/>
+          <div className={classnames('saving_label', {saving})}>
+            <Tooltip title={tooltip}>
+              {msg}
+            </Tooltip>
+          </div>
+        </div>;
+};
 
 export class Code extends Pure_component {
     componentDidMount(){
@@ -461,3 +471,17 @@ export const Remove_icon = ({click, tooltip})=>
         <i className="glyphicon glyphicon-trash"/>
       </span>
     </Tooltip>;
+
+export class Logo extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.version', ver=>this.setState({ver})); }
+    render(){
+        return <div className="nav_top">
+              <a href="https://luminati.io/cp" rel="noopener noreferrer"
+                target="_blank" className="logo_big"/>
+              <div className="version">V{this.state.ver}</div>
+            </div>;
+    }
+}
+

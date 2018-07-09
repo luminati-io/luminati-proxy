@@ -249,11 +249,6 @@ export const tabs = {
         label: 'Debugging',
         tooltip: 'Improve the info you receive from the Proxy Manager',
         fields: {
-            ssl: {
-                label: 'Enable SSL logs',
-                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
-                ext: true,
-            },
             log: {
                 label: 'Log level',
                 tooltip: `Decide which data to show in logs`,
@@ -308,6 +303,11 @@ export const tabs = {
                 label: 'Zone password',
                 tooltip: `Zone password as it appears in your zones page in
                     your Luminati's control panel http://luminati.io/cp/zones`,
+            },
+            ssl: {
+                label: 'Enable SSL logs',
+                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
+                ext: true,
             },
             iface: {
                 label: 'Interface',

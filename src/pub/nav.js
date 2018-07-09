@@ -70,9 +70,14 @@ const Old_modals = ()=>
     </div>;
 
 const Nav_left = withRouter(class Nav_left extends Pure_component {
+    state = {lock: false};
+    componentDidMount(){
+        this.setdb_on('head.lock_navigation', lock=>
+            lock!==undefined&&this.setState({lock}));
+    }
     render(){
         return <div className="nav_left">
-              <div className="menu">
+              <div className={classnames('menu', {lock: this.state.lock})}>
                 <Nav_link to="/overview" name="overview" label="Overview"/>
                 <Nav_link to="/howto" name="howto" label="Instructions"/>
                 <Nav_link to="/proxy_tester" name="proxy_tester"
@@ -107,17 +112,17 @@ const Nav_link_inner = ({label, to, name, match})=>
     </Link>;
 
 class Nav_top extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {ver: ''};
+    state = {ver: '', lock: false};
+    componentDidMount(){
+        this.setdb_on('head.lock_navigation', lock=>
+            lock!==undefined&&this.setState({lock}));
+        this.setdb_on('head.version', ver=>this.setState({ver}));
     }
-    componentWillMount(){
-        this.setdb_on('head.version', ver=>this.setState({ver})); }
     render(){
         const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
         return <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
-                <div><Logo/></div>
+                <div><Logo lock={this.state.lock}/></div>
               </Tooltip>
               <Nav_right/>
             </div>;
@@ -145,7 +150,8 @@ const Footer = ()=>
       </div>
     </div>;
 
-const Logo = withRouter(()=><Link to="/overview" className="logo"/>);
+const Logo = withRouter(({lock})=>
+    <Link to="/overview" className={classnames('logo', {lock})}/>);
 
 const Nav_right = ()=>
     <div className="nav_top_right">

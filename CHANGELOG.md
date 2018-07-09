@@ -1,6 +1,13 @@
 Luminati Proxy manager - Change Log
 
-## 1.101.406 
+## 1.101.871 Development Latest
+- :star: Added "Refresh IP" Rule
+- :star: Forwarding for google domains
+- :sparkles: Whitelist block page instructions
+- :sparkles: "Admin Whitelisted IPs" option available in General Settings
+
+## 1.101.406 Stable
+- :bug: Avoid lowercasing headers for proxied requests
 
 ## 1.101.384 Stable
 - :bug: Fixed managing history db

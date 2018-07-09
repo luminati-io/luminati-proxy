@@ -89,7 +89,22 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
     border-radius: 2px;
     margin-right: 2px;
 }
-.lum_login {
+.whitelist_ips {
+    .whitelist_header {
+        h3 { font-size: 30px; }
+        margin-bottom: 30px;
+        margin-top: 30px;
+        text-align: center;
+    }
+    .steps {
+        max-width: 1000px;
+        margin: auto;
+        margin-top: 50px;
+        h3 { font-size: 17px; }
+        .instructions { margin: 15px 10px; }
+    }
+}
+.lum_login, .whitelist_ips {
     padding-top: 70px;
     .nav_top {
         background-color: white;
@@ -496,16 +511,26 @@ span.icon_link {
     }
 }
 .loader_small {
+    cursor: default;
     display: flex;
     align-items: center;
+    margin-top: 5px;
     .spinner {
         background-image: url(/img/loader.gif);
         width: 30px;
         height: 30px;
         background-size: contain;
         margin-left: 10px;
+        visibility: hidden;
+        &.show { visibility: visible; }
     }
-    .saving_label { margin-left: 5px; }
+    .saving_label {
+        margin-left: 5px;
+        &:not(.saving) {
+            text-decoration: underline;
+            color: grey;
+        }
+    }
 }
 .loader_wrapper {
     position: fixed;
@@ -1335,6 +1360,7 @@ span.icon_link {
             .loader { position: absolute; }
         }
     }
+    .single_instruction { overflow-wrap: break-word; }
 }
 .proxy_tester {
     height: 100%;
@@ -1635,6 +1661,13 @@ span.icon_link {
         .config { background-image: url('img/tools.svg'); }
         .general_config { background-image: url('img/config.svg'); }
         .faq { background-image: url('img/faq.svg'); }
+        &.lock {
+            pointer-events: none;
+            .menu_item {
+                opacity: 0.4;
+                cursor: default;
+            }
+        }
     }
     .menu_filler {
         background-color: @x_light;
@@ -1671,6 +1704,11 @@ span.icon_link {
         background-repeat: no-repeat;
         background-size: 40px;
         cursor: pointer;
+        &.lock {
+            pointer-events: none;
+            opacity: 0.4;
+            cursor: default;
+        }
     }
     .nav_top_right {
         flex: 1;

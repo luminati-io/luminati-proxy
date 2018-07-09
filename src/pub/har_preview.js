@@ -164,7 +164,7 @@ const Header_pair = ({name, value})=>{
 const Status_value = ({value})=>{
     const green = /2../.test(value);
     const yellow = /3../.test(value);
-    const red = /4|5../.test(value);
+    const red = /(4|5)../.test(value);
     const classes = classnames('small_icon', 'status', {
         green, yellow, red});
     return <div className="status_wrapper">
@@ -205,8 +205,8 @@ class Single_timeline extends Pure_component {
         const sections = ['Resource Scheduling', 'Request/Response'];
         const perc = [
             {label: 'Queueing', id: 'blocked', section: 0},
-            {label: 'Waiting (TTFB)', id: 'wait', section: 1},
-            {label: 'Content Download', id: 'receive', section: 1},
+            {label: 'Connected', id: 'wait', section: 1},
+            {label: 'Response', id: 'receive', section: 1},
         ].reduce((acc, el)=>{
             const cur_time = this.props.timeline[el.id];
             const left = acc.offset;

@@ -285,13 +285,8 @@ E.uninit_traps = ()=>{
         handler));
 };
 
-E.init_cmd = ()=>{
-    process.on('message', E.handle_msg);
-};
-
-E.uninit_cmd = ()=>{
-    process.removeListener('message', E.handle_msg);
-};
+E.init_cmd = ()=>{ process.on('message', E.handle_msg); };
+E.uninit_cmd = ()=>{ process.removeListener('message', E.handle_msg); };
 
 E.init = ()=>{
     if (E.initialized)

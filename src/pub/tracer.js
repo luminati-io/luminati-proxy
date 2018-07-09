@@ -87,7 +87,9 @@ const Result = ({log, loading, tracing_url, filename, loading_page, traced})=>{
               )}
               {tracing_url && loading && <Result_row url={tracing_url}/>}
             </ol>
-            {tracing_url && loading && <Loader_small show msg="Loading..."/>}
+            {tracing_url && loading && <Loader_small show
+                loading_msg="Loading..."/>
+            }
           </div>
           {traced &&
             <div className="live_preview">

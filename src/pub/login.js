@@ -6,7 +6,7 @@ import {Typeahead} from 'react-bootstrap-typeahead';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
-import {Loader} from './common.js';
+import {Loader, Logo} from './common.js';
 import {withRouter} from 'react-router-dom';
 
 const Login = withRouter(class Login extends Pure_component {
@@ -103,19 +103,6 @@ const Login = withRouter(class Login extends Pure_component {
             </div>;
     }
 });
-
-class Logo extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('head.version', ver=>this.setState({ver})); }
-    render(){
-        return <div className="nav_top">
-              <a href="https://luminati.io/cp" rel="noopener noreferrer"
-                target="_blank" className="logo_big"/>
-              <div className="version">V{this.state.ver}</div>
-            </div>;
-    }
-}
 
 const parse_arguments = (settings={argv: ''})=>
     settings.argv.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')

@@ -1,8 +1,8 @@
 {
   "author": "Luminati Networks Ltd <lpm@luminati.io> (https://luminati.io/)",
   "bin": {
-    "luminati": "bin/luminati.js",
-    "luminati-proxy": "bin/luminati.js"
+    "luminati": "bin/index.js",
+    "luminati-proxy": "bin/index.js"
   },
   "config": {
     "unsafe-perm": true
@@ -162,8 +162,14 @@
       "bin/ca.crt",
       "bin/ca.key",
       "bin/check_compat.js",
+      "bin/index.js",
       "bin/luminati.js",
+      "bin/lum_common.js",
+      "bin/lum_electron.js",
+      "bin/lum_electron_index.js",
       "bin/lum_main.js",
+      "bin/lum_node.js",
+      "bin/lum_node_index.js",
       "bin/pub/favicon.ico",
       "bin/pub/font/lato_bold.woff2",
       "bin/pub/font/lato_regular.woff2",
@@ -324,13 +330,16 @@
       "src/pub/stats.js",
       "src/pub/tracer.js",
       "src/pub/util.js",
+      "src/pub/whitelist_ips.js",
       "test.js",
       "util/config.js",
+      "util/lpm_config.js",
+      "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "e9d07f73f42d5f3a1ac7b8ed2c9eaa03"
+    "md5": "693063b7c30729000ba9c10407499674"
   },
-  "main": "index.js",
+  "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
   "contributors": [
     {
@@ -358,10 +367,10 @@
   },
   "scripts": {
     "electron": "electron .",
-    "start": "bin/luminati.js",
+    "start": "bin/index.js",
     "test": "./node_modules/mocha/bin/mocha",
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.101.406"
+  "version": "1.101.871"
 }

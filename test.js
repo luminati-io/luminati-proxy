@@ -19,9 +19,10 @@ const etask = require('./util/etask.js');
 const restore_case = require('./util/http_hdr.js').restore_case;
 const qw = require('./util/string.js').qw;
 const assign = Object.assign;
-const luminati = require('./index.js');
-const Luminati = luminati.Luminati;
-const Manager = luminati.Manager;
+const lpm_config = require('./util/lpm_config.js');
+const lpm_util = require('./util/lpm_util.js');
+const Luminati = require('./lib/luminati.js');
+const Manager = require('./lib/manager.js');
 const pkg = require('./package.json');
 const username = require('./lib/username.js');
 const customer = 'abc';
@@ -321,7 +322,7 @@ describe('proxy', ()=>{
                 yield l.test();
                 assert.equal(proxy.history.length, 1);
                 assert.equal(proxy.history[0].headers['x-hola-agent'],
-                    'proxy='+luminati.version+' node='+process.version
+                    'proxy='+lpm_config.version+' node='+process.version
                         +' platform='+process.platform);
             }));
             it('not added when accessing site directly', ()=>etask(function*(){
@@ -944,8 +945,7 @@ describe('proxy', ()=>{
             assert.ok(l.rules);
         }));
         const t = (name, arg, rules = false, c = 0)=>it(name,
-            etask._fn(function*(_this)
-        {
+        etask._fn(function*(_this){
             rules = rules||{post: [{res: [{action: {ban_ip: '60min',
             retry: true}, head: true, status: {arg, type: 'in'}}],
             url: 'lumtest.com'}], pre: [{browser: 'firefox',
@@ -1051,8 +1051,8 @@ describe('manager', ()=>{
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
                 args.push('--no-cookie');
         }
-        manager = new Manager(args, {bypass_credentials_check: true,
-            skip_ga: true});
+        manager = new Manager(lpm_util.init_args(args),
+            {bypass_credentials_check: true, skip_ga: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
@@ -1122,7 +1122,7 @@ describe('manager', ()=>{
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('get_params', ()=>{
         const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
-            let mgr = new Manager(_args, {skip_ga: true});
+            let mgr = new Manager(lpm_util.init_args(_args), {skip_ga: true});
             assert.deepEqual(expected, mgr.get_params());
         }));
         t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
@@ -1216,26 +1216,6 @@ describe('manager', ()=>{
                 app = yield app_with_args();
                 const body = yield json('api/version');
                 assert.equal(body.version, pkg.version);
-            }));
-        });
-        describe('whitelist', ()=>{
-            Manager.prototype.json = mock_json(200);
-            const expect_opt = {
-                url: 'https://luminati-china.io/api/get_whitelist?zones=*',
-                headers: {'x-hola-auth': `lum-customer-${customer}`
-                    +`-zone-static-key-${password}`},
-            };
-            it('get', ()=>etask(function*(){
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/whitelist');
-                assert_has(body, {opt: expect_opt});
-            }));
-            it('get with config', ()=>etask(function*(){
-                app = yield app_with_config({config: {_defaults:
-                    {customer, password}}, only_explicit: true});
-                const body = yield json('api/whitelist');
-                assert_has(body, {opt: expect_opt});
             }));
         });
         describe('recent_ips', ()=>{

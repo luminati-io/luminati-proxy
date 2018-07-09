@@ -19,7 +19,6 @@ let _info_bkp = console.info;
 console.info = function(){};
 const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
-const BrowserWindow = electron.BrowserWindow;
 const etask = require('./util/etask.js');
 const zerr = require('./util/zerr.js');
 const tasklist = require('tasklist');
@@ -163,11 +162,6 @@ let run = run_config=>{
     manager.on('www_ready', url=>{
         if (!manager.argv.no_usage_stats)
             ua.event('manager', 'www_ready', url).send();
-        if (0)
-        {
-        wnd = wnd || new BrowserWindow({width: 1024, height: 768});
-        wnd.loadURL(url);
-        }
         opn(url);
     })
     .on('upgrade', cb=>{
@@ -237,4 +231,3 @@ app.on('ready', run);
 process.on('SIGINT', quit);
 process.on('SIGTERM', quit);
 process.on('uncaughtException', quit);
-

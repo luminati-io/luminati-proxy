@@ -19,6 +19,7 @@ import {getContext, withContext} from 'recompose';
 import PropTypes from 'prop-types';
 import {withRouter} from 'react-router-dom';
 import {tabs, all_fields} from './proxy_fields.js';
+import filesaver from 'file-saver';
 
 const presets = util.presets;
 const provider = provide=>withContext({provide: PropTypes.object},
@@ -68,16 +69,15 @@ const Index = withRouter(class Index extends Pure_component {
         this.debounced_save = _.debounce(this.save, 500);
         setdb.set('head.proxy_edit.set_field', this.set_field);
         setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
+        setdb.set('head.proxy_edit.goto_field', this.goto_field);
     }
     componentDidMount(){
-        if (!setdb.get('head.proxies_running'))
-        {
-            this.etask(function*(){
-                const proxies_running = yield ajax.json(
-                    {url: '/api/proxies_running'});
-                setdb.set('head.proxies_running', proxies_running);
-            });
-        }
+        setdb.set('head.proxies_running', null);
+        this.etask(function*(){
+            const proxies_running = yield ajax.json(
+                {url: '/api/proxies_running'});
+            setdb.set('head.proxies_running', proxies_running);
+        });
         this.setdb_on('head.proxies_running', proxies=>{
             if (!proxies||this.state.proxies)
                 return;
@@ -326,6 +326,7 @@ const Index = withRouter(class Index extends Pure_component {
             setdb.set('head.proxies_running', proxies);
         });
     };
+    lock_nav = lock=>setdb.set('head.lock_navigation', lock);
     save = ()=>{
         if (this.saving)
         {
@@ -335,14 +336,14 @@ const Index = withRouter(class Index extends Pure_component {
         const data = this.prepare_to_save();
         const check_url = '/api/proxy_check/'+this.port;
         this.saving = true;
-        this.setState({saving: true});
+        this.setState({saving: true}, ()=>this.lock_nav(true));
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
                 ga_event('save failed', e.message);
                 _this.setState({error_list: [{msg: 'Something went wrong'}],
-                    saving: false});
+                    saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
                 $('#save_proxy_errors').modal('show');
             });
@@ -359,7 +360,7 @@ const Index = withRouter(class Index extends Pure_component {
             {
                 ga_event('save failed', JSON.stringify(errors));
                 $('#save_proxy_errors').modal('show');
-                _this.setState({saving: false});
+                _this.setState({saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
                 return;
             }
@@ -373,7 +374,7 @@ const Index = withRouter(class Index extends Pure_component {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: data}),
             });
-            _this.setState({saving: false});
+            _this.setState({saving: false}, ()=>_this.lock_nav(false));
             _this.saving = false;
             if (_this.resave)
             {
@@ -487,7 +488,9 @@ const Index = withRouter(class Index extends Pure_component {
               <div className="nav_wrapper">
                 <div className="nav_header">
                   <h3>Proxy on port {this.port}</h3>
-                  <Loader_small show={this.state.saving}/>
+                  <Loader_small saving={this.state.saving}
+                    std_msg="All changes saved in LPM"
+                    std_tooltip="All changes are automatically saved to LPM"/>
                 </div>
                 <Nav zones={zones} default_zone={default_zone}
                   disabled={!!this.state.form.ext_proxies}
@@ -1035,6 +1038,7 @@ class Speed extends Pure_component {
 const Rules = provider({tab_id: 'rules'})(
 class Rules extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
+    goto_field = setdb.get('head.proxy_edit.goto_field');
     state = {rules: [{id: 0}], max_id: 0};
     componentDidMount(){
         this.setdb_on('head.proxy_edit.form', form=>this.setState({form}));
@@ -1073,8 +1077,11 @@ class Rules extends Pure_component {
     };
     rule_prepare = rule=>{
         const action_raw = {};
-        if (['retry', 'retry_port', 'ban_ip'].includes(rule.action))
+        if (['retry', 'retry_port', 'ban_ip', 'refresh_ip'].includes(
+            rule.action))
+        {
             action_raw.retry = true;
+        }
         if (rule.action=='retry' && rule.retry_number)
             action_raw.retry = rule.retry_number;
         else if (rule.action=='retry_port')
@@ -1086,6 +1093,8 @@ class Rules extends Pure_component {
             else
                 action_raw.ban_ip = rule.ban_ip_custom+'min';
         }
+        else if (rule.action=='refresh_ip')
+            action_raw.refresh_ip = true;
         else if (rule.action=='save_to_pool')
             action_raw.reserve_session = true;
         let result = null;
@@ -1129,8 +1138,17 @@ class Rules extends Pure_component {
             rules = null;
         this.set_field('rules', rules);
     };
+    goto_ssl = ()=>this.goto_field('ssl');
     render(){
         return <div>
+              {!this.props.form.ssl &&
+                <Note>
+                  <span><strong>Warning: </strong></span>
+                  <span>we can't apply rules to HTTPS requests unless </span>
+                  <a onClick={this.goto_ssl} className="link">SSL proxy</a>
+                  <span> is turned on</span>
+                </Note>
+              }
               {this.state.rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}/>
               )}
@@ -1139,9 +1157,38 @@ class Rules extends Pure_component {
                 New rule
                 <i className="glyphicon glyphicon-plus"/>
               </button>
+              <Ips_lists/>
             </div>;
     }
 });
+
+class Ips_lists extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.form.port', port=>
+            port&&this.setState({port}));
+    }
+    banned_ips = ()=>this.download_data('banlist');
+    reserved_ips = ()=>this.download_data('reserved');
+    download_data = type=>{
+        const _this = this;
+        this.etask(function*(){
+            const data = yield ajax.json({
+                url: `/api/${type}/${_this.state.port}`});
+            const blob = new Blob([data.ips],
+                {type: 'text/plain;charset=utf-8'});
+            filesaver.saveAs(blob, `${type}_${_this.state.port}.json`);
+        });
+    };
+    render(){
+        return <div>
+              <div><a onClick={this.banned_ips} className="link">
+                Download banned IPs</a></div>
+              <div><a onClick={this.reserved_ips} className="link">
+                Download reserved IPs</a></div>
+            </div>;
+    }
+}
 
 const Rule = withRouter(class Rule extends Pure_component {
     state = {ports: []};
@@ -1158,6 +1205,7 @@ const Rule = withRouter(class Rule extends Pure_component {
         {key: 'Retry with new proxy port (Waterfall)',
             value: 'retry_port'},
         {key: 'Ban IP', value: 'ban_ip'},
+        {key: 'Refresh IP', value: 'refresh_ip'},
         {key: 'Save IP to reserved pool', value: 'save_to_pool'},
     ];
     ban_options = [
@@ -1409,7 +1457,8 @@ class Alloc_modal extends Pure_component {
         const _this = this;
         return this.etask(function*(){
             const proxies_to_update = _this.state.proxies.filter(p=>
-                p.zone==_this.props.zone&&p.port!=_this.props.form.port);
+                p.zone==_this.props.zone&&p.port!=_this.props.form.port&&
+                p.proxy_type=='persist');
             for (let i=0; i<proxies_to_update.length; i++)
             {
                 const proxy = proxies_to_update[i];
@@ -1518,7 +1567,6 @@ const Rotation = provider({tab_id: 'rotation'})(props=>{
 
 const Debug = provider({tab_id: 'debug'})(props=>
     <div>
-      <Config type="select" id="ssl" data={props.default_opt('ssl')}/>
       <Config type="select" id="log" data={props.proxy.log.values}/>
       <Config type="select" id="debug" data={props.proxy.debug.values}/>
     </div>);
@@ -1555,6 +1603,7 @@ const General = provider({tab_id: 'general'})(props=>{
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
           <Config type="text" id="password"/>
+          <Config type="select" id="ssl" data={props.default_opt('ssl')}/>
           <Config type="number" id="multiply" min="1" disabled={mul_disabled}/>
           {type=='ips' &&
             <Config type="select" id="multiply_ips"

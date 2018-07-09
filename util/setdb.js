@@ -70,7 +70,7 @@ E.clear = function(){
 };
 
 E.debug = function(){
-    window.setdb = E.state;
+    window.setdb = E;
 };
 
 return E;

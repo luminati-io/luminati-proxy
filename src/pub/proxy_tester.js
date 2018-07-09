@@ -111,7 +111,8 @@ class Request extends Pure_component {
                 _this.setState({show_loader: false});
                 ga_event('proxy_tester', 'unexpected error', e.message);
             });
-            const resp = yield ajax.json({method: 'POST', url, data});
+            const resp = yield ajax.json({method: 'POST', url, data,
+                timeout: 60000});
             _this.setState({show_loader: false});
             if (resp.error)
             {
