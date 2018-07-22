@@ -199,6 +199,7 @@ Options:
   --www                    HTTP port for browser admin UI       [default: 22999]
   --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
                            [default:"127.0.0.1"] 
+                           [example: --www_whitelist_ips "212.17.0.1"]
   --ws                     websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
@@ -248,6 +249,12 @@ Make sure to forward appropriate ports. Proxy manager uses by default 22999
 for the web console and the api, 22555 for dropin and 24000 for first
 configurable proxy.
 
+- To run docker with cli option see the below example:
+```
+docker run luminati/luminati-proxy luminati --www_whitelist_ips "172.17.0.1" --ssl true
+```
+U can add many more options to this run.
+
 #### Docker with predefined config file
 To use lpm's config file, docker volumes can be used:
 https://docs.docker.com/storage/volumes/
@@ -258,7 +265,7 @@ Following this instructions will make your docker runs with specific config file
 ```sh
 docker volume create lpm-vol
 ```
-- Inspect the recently creaed volume
+- Inspect the recently created volume
 ```sh
 docker inspect lpm-vol
 ```
