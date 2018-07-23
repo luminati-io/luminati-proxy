@@ -39,7 +39,9 @@ Or
 curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 ### Linux/MacOS - Manual install
-- Install Node.js 6 or above ([nodejs.org](https://nodejs.org/en/download/))
+- Install Node.js 8 ([nodejs.org](https://nodejs.org/en/download/))
+  Node.js version for the proxy manager should be any v 8.X.X.
+  The Proxy Manager will not work properly with later node versions. 
 - Make sure npm version is 4.6.1 or higher
   - if not, run: `sudo npm install -g npm@4.6.1`
 - Install Luminati Proxy from the terminal prompt:
