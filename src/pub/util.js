@@ -394,6 +394,58 @@ const presets = {
             random_user_agent: true,
         },
     },
+    shop: {
+        title: 'Online shopping',
+        subtitle: `Scrape data from shopping websites. This preset is
+            configured for product pages but can be freely modified for any
+            other use-cases`,
+        chceck: opt=>true,
+        set: opt=>{
+            opt.dns = 'remote';
+            opt.random_user_agent = true;
+            opt.ssl = true;
+            opt.rules = opt.rules||{};
+            opt.rules.post = opt.rules.post||[];
+            if (opt.rules.post.find(r=>
+                r.res[0]&&r.res[0].action&&r.res[0].action.process))
+            {
+                return;
+            }
+            opt.rules.post.push({
+                res: [{
+                    action: {
+                        process: {
+                            title: `$('#productTitle').text()`,
+                            price: `$('#price_inside_buybox').text().trim()`,
+                            bullets: `$('#featurebullets_feature_div li span')`
+                                +`.map(function(){ return $(this).text() })`
+                                +`.get()`,
+                        },
+                    },
+                    action_type: 'process',
+                    head: true,
+                    trigger_type: 'url'
+                }],
+                url: 'luminati.io|dp\\/[A-Z0-9]{10}',
+            });
+        },
+        clean: opt=>{
+            opt.dns = '';
+            opt.random_user_agent = false;
+            if (!opt.rules||!opt.rules.post)
+                return;
+            opt.rules.post = opt.rules.post.filter(r=>
+                !r.res[0]||!r.res[0].action||!r.res[0].action.process);
+        },
+        rules: [
+            {field: 'dns', label: `sets DNS to resolve remotely`},
+            {field: 'random_user_agent', label: `generates random User-Agent
+                for each request`},
+            {field: 'trigger_type', label: `creates an explanatory rule for
+                post-processing each request to scrape data you need`},
+            {field: 'ssl', label: `enables SSL analyzing`},
+        ],
+    },
     custom: {
         title: 'Custom',
         subtitle: `Manually adjust all settings to your needs For advanced

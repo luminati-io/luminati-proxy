@@ -101,8 +101,12 @@ E.longcb = function(ms){
     cb_set();
 };
 E.perf = function(enable){
-    perf_enable = enable;
-    cb_set();
+    if (arguments.length)
+    {
+        perf_enable = enable;
+        cb_set();
+    }
+    return perf_enable;
 };
 E.longcb(+env.LONGCB);
 E.perf(+env.ETASK_PERF);

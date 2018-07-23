@@ -304,9 +304,10 @@ const Filter = ({vals, val, set, default_value, tooltip})=>
     </Tooltip>;
 
 const type_filters = [{name: 'XHR', tooltip: 'XHR and fetch'},
-    {name: 'JS', tooltip: 'Scripts'}, {name: 'CSS', tooltip: 'Stylesheets'},
-    {name: 'Img', tooltip: 'Images'}, {name: 'Media', tooltip: 'Media'},
-    {name: 'Font', tooltip: 'Fonts'}, {name: 'Other', tooltip: 'Other'}];
+    {name: 'HTML', tooltip: 'HTML'}, {name: 'JS', tooltip: 'Scripts'},
+    {name: 'CSS', tooltip: 'Stylesheets'}, {name: 'Img', tooltip: 'Images'},
+    {name: 'Media', tooltip: 'Media'}, {name: 'Font', tooltip: 'Fonts'},
+    {name: 'Other', tooltip: 'Other'}];
 const Type_filters = ({filter, set})=>
     <div className="filters">
       <Type_filter name="All" on_click={set.bind(null, 'All')} cur={filter}
@@ -893,7 +894,7 @@ class Select_cell extends React.Component {
 
 const Tooltip_and_value = ({val})=>
     <Tooltip title={val}>
-      <div className="disp_value">{val}</div>
+      <div className="disp_value">{val||'—'}</div>
     </Tooltip>;
 
 export default Har_viewer;

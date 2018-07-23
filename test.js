@@ -931,11 +931,11 @@ describe('proxy', ()=>{
                     history_aggregator: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(400);
-                assert.equal(history.length, 2);
                 assert_has(history, [
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
                 ]);
+                assert.equal(history.length, 2);
             }));
         });
     });

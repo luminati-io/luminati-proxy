@@ -348,8 +348,15 @@ h4 { margin: 0; }
         right: 0;
     }
 }
+.json_input_wrapper {
+    height: auto !important;
+    padding-left: 5px !important;
+    padding-right: 10px !important;
+    max-width: 600px;
+    &.error { border-color: @error_dark; }
+}
 select, input[type=number], input[type=text], input[type=password],
-input[type=email], textarea {
+input[type=email], textarea, .json_input_wrapper {
     width: 100%;
     height: 32px;
     background-color: white;
@@ -2527,13 +2534,6 @@ span.icon_link {
                         }
                     }
                 }
-                .footer_link {
-                    td { border-top: 10px solid transparent; }
-                    td:last-child {
-                        font-weight: bold;
-                        text-align: right;
-                    }
-                }
             }
             .timeline_info {
                 margin: 5px 10px;
@@ -2543,10 +2543,9 @@ span.icon_link {
                     font-weight: 600;
                 }
             }
+            .footer_link { margin: 20px 10px; }
         }
-        .pane_preview {
-            padding: 4px 8px;
-        }
+        .pane_preview { padding: 4px 8px; }
     }
 }
 .json_viewer {

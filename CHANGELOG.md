@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.102.979 
+- :star: Added "U-Mobile" carrier in targeting options
+- :star: Added fast IPs pool
+- :sparkles: Closing inactive sockets in order to avoid memory leaks
+
 ## 1.101.871 Development Latest
 - :star: Added "Refresh IP" Rule
 - :star: Forwarding for google domains

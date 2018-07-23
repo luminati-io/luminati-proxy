@@ -24,8 +24,13 @@ const normalizers = {
         const ips = val.split(',');
         const res = [];
         ips.forEach(ip=>{
-            try { res.push(new Netmask(ip).base); }
-            catch(e){ console.log('incorrect ip format'); }
+            try {
+                const netmask = new Netmask(ip);
+                let to_add = netmask.base;
+                if (netmask.bitmask!=32)
+                    to_add += '/'+netmask.bitmask;
+                res.push(to_add);
+            } catch(e){ console.log('incorrect ip format'); }
         });
         return res.join(',');
     },

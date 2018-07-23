@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.101.871"
+VERSION="1.102.979"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -156,9 +156,13 @@ zerr(){ LOG="$LOG$1\n"; }
 
 run_cmd()
 {
-    local cmd=$1 force_log=$2
+    local cmd=$1 force_log=$2 err2out=$3
     echo -n > $LOGFILE
-    eval "$cmd" 2>$LOGFILE > /dev/null
+    if ((err2out)); then
+        eval "$cmd" 2>&1>$LOGFILE>/dev/null;
+    else
+        eval "$cmd" 2>$LOGFILE>/dev/null;
+    fi
     local ret=$?
     local error=$(tail -n 10 $LOGFILE | base64 2>&1)
     error=${error/$'\n'/ }
@@ -180,10 +184,10 @@ run_cmd()
 
 retry_cmd()
 {
-    local cmd=$1 force_log=$2 ret=0
+    local cmd=$1 force_log=$2 err2out=$3 ret=0
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "retry_cmd $cmd $i"
-        run_cmd "$cmd" $force_log
+        run_cmd "$cmd" $force_log $err2out
         ret=$?
         if ((!ret)); then break; fi
     done
@@ -192,17 +196,17 @@ retry_cmd()
 
 sudo_cmd()
 {
-    local cmd=$1 force_log=$2
-    run_cmd "$SUDO_CMD $cmd" $force_log
+    local cmd=$1 force_log=$2 err2out=$3
+    run_cmd "$SUDO_CMD $cmd" $force_log $err2out
     return $?
 }
 
 retry_sudo_cmd()
 {
-    local cmd=$1 force_log=$2 ret=0
+    local cmd=$1 force_log=$2 err2out=$3 ret=0
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "retry_sudo_cmd $cmd $i"
-        sudo_cmd "$cmd" $force_log
+        sudo_cmd "$cmd" $force_log $err2out
         ret=$?
         if ((!ret)); then break; fi
     done
@@ -581,11 +585,11 @@ lpm_install()
 {
     perr "install" "lpm"
     echo "installing Luminati proxy manager"
-    local cmd="npm install -g --unsafe-perm @luminati-io/luminati-proxy > /dev/null"
+    local cmd="npm install -g --unsafe-perm --loglevel error @luminati-io/luminati-proxy"
     if ((USE_NVM)); then
-        retry_cmd "$cmd"
+        retry_cmd "$cmd" 0 1
     else
-        retry_sudo_cmd "$cmd"
+        retry_sudo_cmd "$cmd" 0 1
     fi
     if (($?)); then
         echo "Luminati failed to install from npm"

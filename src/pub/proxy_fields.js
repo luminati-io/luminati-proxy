@@ -138,7 +138,7 @@ export const tabs = {
                     milliseconds will trigger the action`
             },
             trigger_url_regex: {
-                label: 'Apply only on specific domains (optional)',
+                label: 'Apply only for specific URLs (optional)',
                 placeholder: `i.e. example.com`,
                 tooltip: `enable trigger to certain urls`
             },
@@ -156,6 +156,12 @@ export const tabs = {
                 label: 'Action type',
                 tooltip: `The action to be executed when rule is met`,
             },
+            fast_pool_size: {
+                label: 'Fast pool size',
+                tooltip: `System will store fast IPs up to the selected pool
+                    size number. Once pool size is reached, the system will
+                    use IPs from the fast IPs pool to route requests`,
+            },
             retry_number: {
                 label: 'Number of retries',
                 tooltip: 'maximum number of retries to execute'
@@ -169,6 +175,7 @@ export const tabs = {
                 tooltip: 'will remove the IP for a defined amount of time'
             },
             ban_ip_custom: {label: 'Custom duration'},
+            process: {label: 'Processing rule'},
         },
     },
     rotation: {

@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.102.979",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added \"U-Mobile\" carrier in targeting options"
+            },
+            {
+                "type": "star",
+                "text": "Added fast IPs pool"
+            },
+            {
+                "type": "sparkles",
+                "text": "Closing inactive sockets in order to avoid memory leaks"
+            }
+        ]
+    },
+    {
         "ver": "1.101.871",
         "type": "dev",
         "changes": [

@@ -643,12 +643,4 @@ E.compile_schedule = function(expr){
         return false;
     };
 };
-E.is_office_online = function(d){
-    d = E.get(d, 1);
-    // XXX evgenii: offset should be 2H for winter time
-    var offset = 3*60;
-    d.setMinutes(d.getMinutes()+offset);
-    var h = d.getUTCHours(), dw = d.getUTCDay();
-    return h<19 && h>8 && dw!=5 && dw!=6;
-};
 return E; }); }());

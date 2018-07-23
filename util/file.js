@@ -346,10 +346,14 @@ function errno_wrapper(func, ret){
         return ret;
     }
 }
-E.find_e = (dir, opt)=>{
+function find_cb(dir, cb, opt){
     opt = opt||{};
-    let ret = [];
     let exclude = opt.exclude, match = opt.match, strip = opt.strip;
+    function proc(f){
+        if (match && !match.test(f))
+            return;
+        cb(f);
+    }
     E.readdir_e(dir).forEach(f=>{
         let name = E.normalize(dir+'/'+f);
         let stripped = strip ? name.replace(strip, '') : name;
@@ -358,16 +362,21 @@ E.find_e = (dir, opt)=>{
         if (E.is_dir(name))
         {
             if (opt.dirs)
-                ret.push(stripped);
+                proc(stripped);
             if (!opt.follow_symlinks && E.is_symlink(name))
                 return;
-            ret.push.apply(ret, E.find(name, opt));
+            find_cb(name, cb, opt);
         }
         else
-            ret.push(stripped);
+            proc(stripped);
     });
-    if (match)
-        ret = ret.filter(f=>match.test(f));
+}
+E.find_e = (dir, opt)=>{
+    opt = opt||{};
+    if (opt.cb)
+        return find_cb(dir, opt.cb, opt);
+    let ret = [];
+    find_cb(dir, f=>ret.push(f), opt);
     return ret;
 };
 E.realpath_e = path=>fs.realpathSync(path);

@@ -7,6 +7,7 @@ const swagger = require('../lib/swagger.json');
 const pkg = require('../package.json');
 const file = require('./file.js');
 const string = require('./string.js');
+const date = require('./date.js');
 const qw = string.qw;
 const assign = Object.assign;
 
@@ -57,6 +58,7 @@ conf.luminati_default = {
     proxy_retry: 2,
     proxy_switch: 2,
     api: 'https://luminati-china.io',
+    socket_inactivity_timeout: date.ms.MIN,
 };
 conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     max_requests: 50,

@@ -292,12 +292,16 @@ const Index = withRouter(class Index extends Pure_component {
         result.action = res.action_type;
         result.retry_port = res.action.retry_port;
         result.retry_number = res.action.retry;
+        if (res.action.fast_pool_session)
+            result.fast_pool_size = res.action.fast_pool_size;
         if (res.action.ban_ip)
         {
             result.ban_ip_duration = 'custom';
             const minutes = res.action.ban_ip.match(/\d+/);
             result.ban_ip_custom = Number(minutes&&minutes[0]);
         }
+        if (res.action.process)
+            result.process = JSON.stringify(res.action.process, null, '\t');
         return result;
     };
     apply_rules = form=>{
@@ -808,7 +812,8 @@ class Targeting extends Pure_component {
             {value: 'vodafone', key: 'Vodafone'},
             {value: 'verizon', key: 'Verizon'},
             {value: 'vivo', key: 'Vivo'},
-            {value: 'zain', key: 'Zain'}
+            {value: 'zain', key: 'Zain'},
+            {value: 'umobile', key: 'U-Mobile'},
         ];
     }
     allowed_countries = ()=>{
@@ -1097,6 +1102,16 @@ class Rules extends Pure_component {
             action_raw.refresh_ip = true;
         else if (rule.action=='save_to_pool')
             action_raw.reserve_session = true;
+        else if (rule.action=='save_to_fast_pool')
+        {
+            action_raw.fast_pool_session = true;
+            action_raw.fast_pool_size = rule.fast_pool_size;
+        }
+        else if (rule.action=='process')
+        {
+            try { action_raw.process = JSON.parse(rule.process); }
+            catch(e){ console.log('wrong json'); }
+        }
         let result = null;
         if (rule.trigger_type)
         {
@@ -1194,6 +1209,7 @@ const Rule = withRouter(class Rule extends Pure_component {
     state = {ports: []};
     trigger_types = [
         {key: 'i.e. Status code', value: ''},
+        {key: 'URL', value: 'url'},
         {key: 'Status code', value: 'status'},
         {key: 'HTML body element', value: 'body'},
         {key: 'Minimum request time', value: 'min_req_time'},
@@ -1207,6 +1223,8 @@ const Rule = withRouter(class Rule extends Pure_component {
         {key: 'Ban IP', value: 'ban_ip'},
         {key: 'Refresh IP', value: 'refresh_ip'},
         {key: 'Save IP to reserved pool', value: 'save_to_pool'},
+        {key: 'Save IP to fast pool', value: 'save_to_fast_pool'},
+        {key: 'Process data', value: 'process'},
     ];
     ban_options = [
         {key: '10 minutes', value: '10min'},
@@ -1247,7 +1265,14 @@ const Rule = withRouter(class Rule extends Pure_component {
         if (val!='min_req_time')
             this.set_rule_field('min_req_time', '');
         if (val!='max_req_time')
+        {
             this.set_rule_field('max_req_time', '');
+            if (this.props.rule.action=='save_to_fast_pool')
+            {
+                this.set_rule_field('action', '');
+                this.set_rule_field('fast_pool_size', '');
+            }
+        }
         if (!val)
             this.set_rule_field('trigger_url_regex', '');
     };
@@ -1269,6 +1294,8 @@ const Rule = withRouter(class Rule extends Pure_component {
     };
     render(){
         const rule = this.props.rule;
+        const action_types = this.action_types.filter(at=>
+            at.value!='save_to_fast_pool'||rule.trigger_type=='max_req_time');
         return <div className="rule_wrapper">
               <Btn_rule_del
                 on_click={()=>this.props.rule_del(this.props.rule.id)}/>
@@ -1298,7 +1325,7 @@ const Rule = withRouter(class Rule extends Pure_component {
               }
               <Rule_config id="trigger_url_regex" type="text"
                 rule={this.props.rule}/>
-              <Rule_config id="action" type="select" data={this.action_types}
+              <Rule_config id="action" type="select" data={action_types}
                 on_change={this.action_changed} rule={this.props.rule}/>
               {this.props.rule.action=='retry' &&
                 <Rule_config id="retry_number" type="number" min="0" max="20"
@@ -1312,10 +1339,17 @@ const Rule = withRouter(class Rule extends Pure_component {
                 <Rule_config id="ban_ip_duration" type="select"
                   data={this.ban_options} rule={this.props.rule}/>
               }
+              {this.props.rule.action=='save_to_fast_pool' &&
+                <Rule_config id="fast_pool_size" type="number" min="1"
+                  max="50" validator={validators.number(1, 50)}
+                  rule={this.props.rule}/>
+              }
               {this.props.rule.ban_ip_duration=='custom' &&
                 <Rule_config id="ban_ip_custom" type="number" sufix="minutes"
                   rule={this.props.rule}/>
               }
+              {this.props.rule.action=='process' &&
+                <Rule_config id="process" type="json" rule={this.props.rule}/>}
             </div>;
     }
 });

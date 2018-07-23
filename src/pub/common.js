@@ -10,6 +10,9 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {bytes_format} from './util.js';
 import * as Chrome from './chrome_widgets.js';
+import codemirror from 'codemirror/lib/codemirror';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/lib/codemirror.css';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -297,8 +300,37 @@ export const Form_controller = props=>{
         return <Typeahead_wrapper {...props}/>;
     else if (type=='textarea')
         return <Textarea {...props}/>;
+    else if (type=='json')
+        return <Json {...props}/>;
     return <Input {...props}/>;
 };
+
+export class Json extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript'});
+        this.cm.on('change', this.on_cm_change);
+        this.cm.setSize('100%', '100%');
+        this.cm.doc.setValue(this.props.val);
+    }
+    on_cm_change = cm=>{
+        const new_val = cm.doc.getValue();
+        let correct = true;
+        try { JSON.parse(new_val); }
+        catch(e){ correct = false; }
+        if (correct)
+            this.props.on_change_wrapper(new_val);
+        this.setState({correct});
+    };
+    set_ref = ref=>{ this.textarea = ref; };
+    render(){
+        const classes = classnames('json_input_wrapper',
+            {error: !this.state.correct});
+        return <div className={classes}>
+              <textarea ref={this.set_ref}/>
+            </div>;
+    }
+}
 
 export const Note = props=>
     <div className="note">

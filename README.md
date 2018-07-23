@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.101.871/luminati-proxy-manager-v1.101.871-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.102.979/luminati-proxy-manager-v1.102.979-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -198,8 +198,8 @@ Options:
   --disable_color          Disable colors in log      [boolean] [default: false]
   --www                    HTTP port for browser admin UI       [default: 22999]
   --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
-                           [default:"127.0.0.1"] 
-                           [example: --www_whitelist_ips "212.17.0.1"]
+                           [default:"127.0.0.1"]
+			   [example: --www_whitelist_ips "212.17.0.1"]
   --ws                     websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
@@ -241,7 +241,7 @@ A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy
 ```sh
 docker pull luminati/luminati-proxy
 
-docker run luminati/luminati-proxy
+docker run luminati/luminati-proxy luminati
 
 docker run luminati/luminati-proxy luminati --version
 ```
@@ -250,10 +250,10 @@ for the web console and the api, 22555 for dropin and 24000 for first
 configurable proxy.
 
 - To run docker with cli option see the below example:
-```
+```sh
 docker run luminati/luminati-proxy luminati --www_whitelist_ips "172.17.0.1" --ssl true
 ```
-U can add many more options to this run.
+You can add many more options to this run.
 
 #### Docker with predefined config file
 To use lpm's config file, docker volumes can be used:

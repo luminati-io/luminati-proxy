@@ -92,8 +92,11 @@ class Pane_headers extends Pure_component {
 class Pane_response extends Pure_component {
     render(){
         const content_type = this.props.req.details.content_type;
-        if (!content_type||['xhr', 'css', 'js', 'font'].includes(content_type))
+        if (!content_type||['xhr', 'css', 'js', 'font', 'html'].includes(
+            content_type))
+        {
             return <Codemirror_wrapper req={this.props.req}/>;
+        }
         return <No_response_data/>;
     }
 }
@@ -110,7 +113,10 @@ class Codemirror_wrapper extends Pure_component {
             lineNumbers: true,
         });
         this.cm.setSize('100%', '100%');
-        this.cm.doc.setValue(this.props.req.response.content.text);
+        let text = this.props.req.response.content.text;
+        try { text = JSON.stringify(JSON.parse(text), null, '\t'); }
+        catch(e){}
+        this.cm.doc.setValue(text);
         this.set_ct();
     }
     componentDidUpdate(){
@@ -122,6 +128,8 @@ class Codemirror_wrapper extends Pure_component {
         let mode;
         if (!content_type||content_type=='xhr')
             mode = 'javascript';
+        if (content_type=='html')
+            mode = 'htmlmixed';
         this.cm.setOption('mode', mode);
     }
     set_textarea = ref=>{ this.textarea = ref; };
@@ -281,17 +289,14 @@ const Timing_row = ({title, id, left, right, time})=>
 class Enable_https extends Pure_component {
     click = ()=>$('#enable_ssl_modal').modal();
     render(){
-        return <tr className="footer_link">
-              <td colSpan="2">
-                <a className="devtools_link" role="link" tabIndex="0"
-                  target="_blank" rel="noopener noreferrer"
-                  onClick={this.click}
-                  style={{display: 'inline', cursor: 'pointer'}}>
-                  Enable HTTPS logging
-                </a> to view this timeline
-              </td>
-              <td></td>
-            </tr>;
+        return <div className="footer_link">
+              <a className="devtools_link" role="link" tabIndex="0"
+                target="_blank" rel="noopener noreferrer"
+                onClick={this.click}
+                style={{display: 'inline', cursor: 'pointer'}}>
+                Enable HTTPS logging
+              </a> to view this timeline
+            </div>;
     }
 }
 
@@ -311,6 +316,8 @@ class Pane_preview extends Pure_component {
             return <JSON_viewer json={json}/>;
         if (content_type=='img')
             return <Img_viewer img={this.props.req.request.url}/>;
+        if (content_type=='html')
+            return <Codemirror_wrapper req={this.props.req}/>;
         return <div className="pane_preview"></div>;
     }
 }

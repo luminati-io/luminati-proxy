@@ -7,27 +7,26 @@ import $ from 'jquery';
 import {ga_event} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
+import semver from 'semver';
 
 class Notif_center extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {loaded: false, notifs: []};
-    }
-    componentWillMount(){
-        this.setdb_on('head.version', ver=>this.setState({ver}));
-        this.setdb_on('head.consts', consts=>{
-            if (!consts||!consts.notifs)
-                return;
-            const notifs = consts.notifs.filter(
-                n=>!n.version||this.state.ver>=n.version);
-            this.setState({notifs, loaded: true});
-        });
-    }
+    state = {loaded: false, notifs: []};
     componentDidMount(){
         const _this = this;
         $('#notif_modal').on('hidden.bs.modal', ()=>{
             _this.mark_read_local(); });
+        this.setdb_on('head.version', ver=>this.setState({ver},
+            this.set_notifs));
+        this.setdb_on('head.consts', consts=>this.setState({consts},
+            this.set_notifs));
     }
+    set_notifs = ()=>{
+        if (!this.state.ver||!this.state.consts||!this.state.consts.notifs)
+            return;
+        const notifs = this.state.consts.notifs.filter(
+            n=>!n.version||semver.lt(n.version, this.state.ver));
+        this.setState({notifs, loaded: true});
+    };
     mark_read_local(){
         const all_read = this.state.notifs.map(n=>{
             if (n.status=='new')
@@ -85,7 +84,7 @@ class Notif_center extends Pure_component {
                     no_cancel_btn>
                     <div className="notifs">
                       {!this.state.notifs.length && <No_messages/>}
-                      {this.state.notifs.length &&
+                      {!!this.state.notifs.length &&
                         <Messages notifs={this.state.notifs}
                           on_click={this.message_clicked.bind(this)}/>
                       }
