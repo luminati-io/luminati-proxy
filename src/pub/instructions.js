@@ -1,17 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Code} from './common.js';
+import {Code, Circle_li as Li} from './common.js';
 
 const E = {};
-const Li = props=>(
-    <li>
-      <div className="circle_wrapper">
-        <div className="circle"></div>
-      </div>
-      <div className="single_instruction">{props.children}</div>
-    </li>
-);
 
 E.code = (proxy=24000)=>({
     shell: `curl --proxy 127.0.0.1:${proxy} "http://lumtest.com/myip.json"`,
@@ -106,8 +98,7 @@ $agent->proxy(['http', 'https'], "http://127.0.0.1:${proxy}");
 print $agent->get('http://lumtest.com/myip.json')->content();`,
 });
 E.browser = (proxy=24000)=>({
-    chrome_win: (
-        <ol>
+    chrome_win: <ol>
           <Li>Click the Chrome menu on the browser toolbar.</Li>
           <Li>Select <code>Settings</code></Li>
           <Li>Click <code>Advanced settings</code></Li>
@@ -125,10 +116,8 @@ E.browser = (proxy=24000)=>({
             <Code>{proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
-        </ol>
-    ),
-    chrome_mac: (
-        <ol>
+        </ol>,
+    chrome_mac: <ol>
           <Li>Click the Chrome menu on the browser toolbar.</Li>
           <Li>Select <code>Settings</code></Li>
           <Li>Click <code>Show advanced settings</code></Li>
@@ -146,10 +135,8 @@ E.browser = (proxy=24000)=>({
             <Code>{proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code>.</Li>
-        </ol>
-    ),
-    ie: (
-        <ol>
+        </ol>,
+    ie: <ol>
           <Li>Click the Tools button, and then click Internet options.</Li>
           <Li>Click the Connections tab.</Li>
           <Li>Click <code>LAN settings</code></Li>
@@ -164,10 +151,8 @@ E.browser = (proxy=24000)=>({
             <Code>{proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
-        </ol>
-    ),
-    firefox: (
-        <ol>
+        </ol>,
+    firefox: <ol>
           <Li>In main menu, click on <code>Options</code></Li>
           <Li>Click the <code>General</code> tab and scroll down to
             <code>Network Proxy</code>.</Li>
@@ -185,10 +170,8 @@ E.browser = (proxy=24000)=>({
           <Li>Tick <code>Use this proxy server for all protocols</code>
             checkbox.</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
-        </ol>
-    ),
-    safari: (
-        <ol>
+        </ol>,
+    safari: <ol>
           <Li>
             Pull down the Safari menu and select <code>Preferences</code></Li>
           <Li>Click on the <code>Advanced</code> icon.</Li>
@@ -206,8 +189,7 @@ E.browser = (proxy=24000)=>({
             <Code>{proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
-        </ol>
-    ),
+        </ol>,
 });
 
 export default E;

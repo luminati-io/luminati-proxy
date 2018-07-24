@@ -2,10 +2,9 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import zurl from 'hutil/util/url';
 import classnames from 'classnames';
-import {If} from '/www/util/pub/react.js';
-import {Tooltip, get_static_country} from './common.js';
+import {Tooltip} from './common.js';
+import {get_static_country} from './util.js';
 
 const tooltips = {
     crawler: `Your crawler or bot that systematically browses the web. Connect
@@ -27,7 +26,7 @@ const tooltips = {
         </ul>`,
     port_numbers: `Defined proxy ports in Luminati Proxy Manager`,
     lpm: `Luminati Proxy Manager - open-source proxy service that holds
-        valuble features, such as:
+        valuable features, such as:
         <ul>
           <li>IP rotation control</li>
           <li>auto retry</li>
@@ -43,10 +42,10 @@ const tooltips = {
         <ul>
           <li>Residential IP - provided through cable modem, DSL or wireless
             router</li>
-          <li>Datacetner IP (static)</li>
+          <li>Datacenter IP (static)</li>
           <li>Mobile IP - based on a 3G or 4G cellular network</li>
         </ul>`,
-    destination: `The target website that the crawler is collcting data from`,
+    destination: `The target website that the crawler is collecting data from`,
 };
 
 class Schema extends Pure_component {
@@ -55,13 +54,13 @@ class Schema extends Pure_component {
         this.state = {form: {}, proxies: []};
     }
     componentDidMount(){
-        this.setdb_on('head.edit_proxy.form', (form={})=>{
+        this.setdb_on('head.proxy_edit.form', (form={})=>{
             this.setState({form: {...form}});
         });
-        this.setdb_on('head.edit_proxy.form.port', port=>{
+        this.setdb_on('head.proxy_edit.form.port', port=>{
             this.setState({form: {port}});
         });
-        this.setdb_on('head.edit_proxy.form.country', country=>{
+        this.setdb_on('head.proxy_edit.form.country', country=>{
             this.setState({form: {country}});
         });
         this.setdb_on('head.proxies_running', proxies=>{
@@ -70,9 +69,7 @@ class Schema extends Pure_component {
         });
     }
     render(){
-        const port = this.state.form&&this.state.form.port;
-        return (
-            <span className="schema_component">
+        return <span className="schema_component">
               <div className="line"/>
               <Layer id="crawler" no_arr>
                 Crawler
@@ -94,8 +91,7 @@ class Schema extends Pure_component {
                 Peer
               </Layer>
               <Layer id="destination">Destination</Layer>
-            </span>
-        );
+            </span>;
     }
 }
 
@@ -116,21 +112,15 @@ const Proxy_port_layer = ({proxies, form})=>{
 };
 
 const Layer = ({id, no_btn, no_arr, class_names, children})=>{
-    return (
-        <div className={classnames('layer', id, class_names)}>
+    return <div className={classnames('layer', id, class_names)}>
           <Tooltip placement="bottom" title={tooltips[id]}>
             <span>
-              <If when={!no_btn}>
-                <If when={!no_arr}><div className="arr"/></If>
-                <div className="layer_btn">{children}</div>
-              </If>
-              <If when={no_btn}>
-                {children}
-              </If>
+              {!no_btn && !no_arr && <div className="arr"/>}
+              {!no_btn && <div className="layer_btn">{children}</div>}
+              {no_btn && children}
             </span>
           </Tooltip>
-        </div>
-    );
+        </div>;
 };
 
 const Peer = ({proxies, form})=>{
@@ -158,8 +148,7 @@ const Flag = ({proxy={}})=>{
         country = proxy.country;
     if (country&&country!='any'&&country!='*')
         return <span className={'flag-icon flag-icon-'+country}/>;
-    else
-        return <img className="globe" src="/img/flag_any_country.svg"/>;
+    return <img className="globe" src="/img/flag_any_country.svg"/>;
 };
 
 export default Schema;

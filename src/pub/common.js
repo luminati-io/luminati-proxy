@@ -4,18 +4,21 @@ import $ from 'jquery';
 import classnames from 'classnames';
 import React from 'react';
 import {Pagination} from 'react-bootstrap';
-import etask from 'hutil/util/etask';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
-import EventEmitter from 'events';
-import {If} from '/www/util/pub/react.js';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
+import {Typeahead} from 'react-bootstrap-typeahead';
+import {bytes_format} from './util.js';
+import * as Chrome from './chrome_widgets.js';
+import codemirror from 'codemirror/lib/codemirror';
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/lib/codemirror.css';
 
-class Modal_dialog extends React.Component {
+export class Modal_dialog extends React.Component {
     componentDidMount(){
         const _this = this;
         $(this.ref).on('hide.bs.modal', function(){
-            _this.props.cancel_clicked();
+            _this.props.cancel_clicked && _this.props.cancel_clicked();
         });
     }
     componentWillReceiveProps(new_props){
@@ -28,8 +31,7 @@ class Modal_dialog extends React.Component {
     }
     set_ref(e){ this.ref = e; }
     render(){
-        return (
-            <div tabIndex="-1"
+        return <div tabIndex="-1"
               ref={this.set_ref.bind(this)}
               className={classnames('modal', 'fade', this.props.className)}>
               <div className="modal-dialog">
@@ -40,19 +42,20 @@ class Modal_dialog extends React.Component {
                     <h4 className="modal-title">{this.props.title}</h4>
                   </div>
                   {this.props.children &&
-                    <div className="modal-body">{this.props.children}</div>}
+                    <div className="modal-body">{this.props.children}</div>
+                  }
                   <div className="modal-footer">
                     <Footer_default ok_clicked={this.props.ok_clicked}
-                      cancel_clicked={this.props.cancel_clicked}/>
+                      cancel_clicked={this.props.cancel_clicked}
+                      no_cancel_btn={this.props.no_cancel_btn}/>
                   </div>
                 </div>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
-class Modal extends React.Component {
+export class Modal extends React.Component {
     click_cancel(){
         if (this.props.cancel_clicked)
             this.props.cancel_clicked();
@@ -74,18 +77,16 @@ class Modal extends React.Component {
         let footer = null;
         if (!this.props.no_footer)
         {
-            footer = this.props.footer || (
+            footer = this.props.footer ||
                 <Footer_default cancel_clicked={this.click_cancel.bind(this)}
                   ok_clicked={this.click_ok.bind(this)}
                   ok_btn_title={this.props.ok_btn_title}
                   ok_btn_classes={this.props.ok_btn_classes}
-                  no_cancel_btn={this.props.no_cancel_btn}/>
-            );
+                  no_cancel_btn={this.props.no_cancel_btn}/>;
         }
         const header_classes = classnames('modal-header',
             {no_header: this.props.no_header});
-        return (
-            <div id={this.props.id} tabIndex="-1"
+        return <div id={this.props.id} tabIndex="-1"
               className={classnames('modal', 'fade', this.props.className)}>
               <div className="modal-dialog">
                 <div className="modal-content">
@@ -96,13 +97,10 @@ class Modal extends React.Component {
                           onClick={this.on_dismiss.bind(this)}>
                       </button>
                     }
-                    <If
-                      when={!this.props.no_header&&!this.props.custom_header}>
+                    {!this.props.no_header && !this.props.custom_header &&
                       <h4 className="modal-title">{this.props.title}</h4>
-                    </If>
-                    <If when={this.props.custom_header}>
-                      {this.props.custom_header}
-                    </If>
+                    }
+                    {this.props.custom_header && this.props.custom_header}
                   </div>
                   {this.props.children &&
                     <div className="modal-body">{this.props.children}</div>
@@ -110,56 +108,113 @@ class Modal extends React.Component {
                   <div className="modal-footer">{footer}</div>
                 </div>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 
-const Warnings = props=>(
-    <div>
-      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
-    </div>
-);
+export class Enable_ssl_modal extends Pure_component {
+    state = {loading: false};
+    faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
+    enable_ssl = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            this.on('uncaught', e=>console.log(e));
+            _this.setState({loading: true});
+            yield ajax({url: '/api/enable_ssl', method: 'POST'});
+            _this.setState({loading: false});
+        });
+    };
+    render(){
+        return [
+            <Loader key="1" show={this.state.loading}/>,
+            <Modal key="2" id={this.props.id||'enable_ssl_modal'}
+              title="Enable SSL analyzing for all proxies"
+              click_ok={this.enable_ssl} className="enable_ssl_modal">
+              <p className="cert_info">
+                You will also need to add a certificate file to browsers.
+                Gathering stats for HTTPS requests requires setting a
+                certificate key.
+              </p>
+              <div className="instructions">
+                <ol>
+                  <Circle_li>Download our free certificate key
+                    <a href="/ssl" target="_blank" download> here</a>
+                  </Circle_li>
+                  <Circle_li>
+                    Add the certificate to your browser.
+                    You can find more detailed
+                    instructions <a className="link" href={this.faq_cert_url}
+                      rel="noopener noreferrer" target="_blank">here</a>
+                  </Circle_li>
+                  <Circle_li>Refresh the page</Circle_li>
+                </ol>
+              </div>
+            </Modal>,
+        ];
+    }
+}
 
-const Warning = props=>(
-    <div className="warning">
-      <div className="warning_icon"/>
-      <div className="text">{props.text}</div>
-    </div>
-);
+export const Tooltip_bytes = ({bytes, chrome_style})=>{
+    bytes = bytes||0;
+    const tooltip = [0, 1, 2, 3]
+        .map(n=>`<div>${bytes_format(bytes, n)}</div>`)
+        .join('');
+    const T = chrome_style ? Chrome.Tooltip : Tooltip;
+    return <T title={bytes ? tooltip : ''}>
+          <div className="disp_value">{bytes_format(bytes)||'—'}</div>
+        </T>;
+};
 
-
-const Footer_default = props=>(
+const Footer_default = props=>
     <div className="default_footer">
-      <If when={!props.no_cancel_btn}>
+      {!props.no_cancel_btn &&
         <button onClick={props.cancel_clicked} className="btn btn_lpm cancel">
           Cancel</button>
-      </If>
+      }
       <button onClick={props.ok_clicked}
         className={props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok'}>
         {props.ok_btn_title||'OK'}</button>
-    </div>
-);
+    </div>;
 
-const Loader = ({show})=>(
-    <If when={show}>
-      <div className="loader_wrapper">
-        <div className="mask"/>
-        <div className="loader">
-          <div className="spinner"/>
-        </div>
-      </div>
-    </If>
-);
+export const Warnings = props=>
+    <div>
+      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
+    </div>;
 
-const Loader_small = ({show})=>(
-    <div className={classnames('loader_small', {hide: !show})}>
-      <div className="spinner"/>
-      <div className="saving_label">Saving...</div>
-    </div>
-);
+export const Warning = props=>
+    <div className="warning">
+      <div className="warning_icon"/>
+      <div className="text">{props.text}</div>
+    </div>;
 
-class Code extends Pure_component {
+export const Loader = ({show})=>{
+    if (!show)
+        return null;
+    return <div className="loader_wrapper">
+          <div className="mask"/>
+          <div className="loader">
+            <div className="spinner"/>
+          </div>
+        </div>;
+};
+
+export const Loader_small = ({show, saving, loading_msg='Saving...',
+    std_msg='', std_tooltip})=>
+{
+    saving = show||saving;
+    const msg = saving ? loading_msg : std_msg;
+    const tooltip = saving ? '' : std_tooltip;
+    return <div className="loader_small">
+          <div className={classnames('spinner', {show: saving})}/>
+          <div className={classnames('saving_label', {saving})}>
+            <Tooltip title={tooltip}>
+              {msg}
+            </Tooltip>
+          </div>
+        </div>;
+};
+
+export class Code extends Pure_component {
     componentDidMount(){
         $(this.ref).find('.btn_copy').tooltip('show')
         .attr('title', 'Copy to clipboard').tooltip('fixTitle');
@@ -178,31 +233,26 @@ class Code extends Pure_component {
             .tooltip('fixTitle')
             .tooltip('show').attr('title', 'Copy to clipboard')
             .tooltip('fixTitle');
-        }
-        catch(e){ console.log('Oops, unable to copy'); }
+        } catch(e){ console.log('Oops, unable to copy'); }
     }
     render(){
-        return (
-            <code ref={this.set_ref.bind(this)}>
+        return <code ref={this.set_ref.bind(this)}>
               <span className="source">{this.props.children}</span>
               <textarea style={{position: 'fixed', top: '-1000px'}}/>
               <button onClick={this.copy.bind(this)} data-container="body"
                 className="btn btn_lpm btn_lpm_small btn_copy">
                 Copy</button>
-            </code>
-        );
+            </code>;
     }
 }
 
-const Textarea = props=>{
-    return (
-        <textarea value={props.val} rows={props.rows||3}
+export const Textarea = props=>{
+    return <textarea value={props.val} rows={props.rows||3}
           placeholder={props.placeholder}
-          onChange={e=>props.on_change_wrapper(e.target.value)}/>
-    );
+          onChange={e=>props.on_change_wrapper(e.target.value)}/>;
 };
 
-const Select = props=>{
+export const Select = props=>{
     const update = val=>{
         if (val=='true')
             val = true;
@@ -211,48 +261,125 @@ const Select = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val);
     };
-    return (
-        <select value={''+props.val}
+    return <select value={''+props.val}
           onChange={e=>update(e.target.value)} disabled={props.disabled}>
-          {(props.data||[]).map((c, i)=>(
+          {(props.data||[]).map((c, i)=>
             <option key={i} value={c.value}>{c.key}</option>
-          ))}
-        </select>
-    );
+          )}
+        </select>;
 };
 
-const Input = props=>{
+const Double_number = props=>{
+    const vals = (''+props.val).split(':');
+    const update = (start, end)=>{
+        props.on_change_wrapper([start||0, end].join(':')); };
+    return <span className="double_field">
+          <Input {...props} val={vals[0]||''} id={props.id+'_start'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(val, vals[1])}/>
+          <span className="devider">:</span>
+          <Input {...props} val={vals[1]||''} id={props.id+'_end'}
+            type="number" disabled={props.disabled}
+            on_change_wrapper={val=>update(vals[0], val)}/>
+        </span>;
+};
+
+const Typeahead_wrapper = props=>
+    <Typeahead options={props.data} maxResults={10}
+      minLength={1} disabled={props.disabled} selectHintOnEnter
+      onChange={props.on_change_wrapper} selected={props.val}
+      onInputChange={props.on_input_change}/>;
+
+export const Form_controller = props=>{
+    const type = props.type;
+    if (type=='select')
+        return <Select {...props}/>;
+    else if (type=='double_number')
+        return <Double_number {...props}/>;
+    else if (type=='typeahead')
+        return <Typeahead_wrapper {...props}/>;
+    else if (type=='textarea')
+        return <Textarea {...props}/>;
+    else if (type=='json')
+        return <Json {...props}/>;
+    return <Input {...props}/>;
+};
+
+export class Json extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript'});
+        this.cm.on('change', this.on_cm_change);
+        this.cm.setSize('100%', '100%');
+        this.cm.doc.setValue(this.props.val);
+    }
+    on_cm_change = cm=>{
+        const new_val = cm.doc.getValue();
+        let correct = true;
+        try { JSON.parse(new_val); }
+        catch(e){ correct = false; }
+        if (correct)
+            this.props.on_change_wrapper(new_val);
+        this.setState({correct});
+    };
+    set_ref = ref=>{ this.textarea = ref; };
+    render(){
+        const classes = classnames('json_input_wrapper',
+            {error: !this.state.correct});
+        return <div className={classes}>
+              <textarea ref={this.set_ref}/>
+            </div>;
+    }
+}
+
+export const Note = props=>
+    <div className="note">
+      <span>{props.children}</span>
+    </div>;
+
+export const Labeled_controller = ({label, tooltip, disabled, note, sufix,
+    ...props})=>
+    <div className={classnames('field_row', {disabled, note})}>
+      <div className="desc">
+        <Tooltip title={tooltip}>{label}</Tooltip>
+      </div>
+      <div className="field">
+        <div className="inline_field">
+          <Form_controller disabled={disabled} {...props}/>
+          {sufix && <span className="sufix">{sufix}</span>}
+        </div>
+        {note && <Note>{note}</Note>}
+      </div>
+    </div>;
+
+export const Input = props=>{
     const update = val=>{
         if (props.type=='number' && val)
             val = Number(val);
         if (props.on_change_wrapper)
             props.on_change_wrapper(val, props.id);
     };
-    return (
-        <input type={props.type} value={props.val} disabled={props.disabled}
+    return <input type={props.type} value={props.val} disabled={props.disabled}
           onChange={e=>update(e.target.value)} className={props.className}
           min={props.min} max={props.max} placeholder={props.placeholder}
-          onBlur={props.on_blur}/>
-    );
+          onBlur={props.on_blur}/>;
 };
 
-const Checkbox = props=>(
+export const Checkbox = props=>
   <div className="form-check">
     <label className="form-check-label">
       <input className="form-check-input" type="checkbox" value={props.value}
         onChange={e=>props.on_change(e)} checked={props.checked}/>
         {props.text}
     </label>
-  </div>
-);
+  </div>;
 
-const Nav = ({title, subtitle, warning})=>(
+export const Nav = ({title, subtitle, warning})=>
     <div className="nav_header">
       <h3>{title}</h3>
       <div className="subtitle">{subtitle}</div>
       <Warning_msg warning={warning}/>
-    </div>
-);
+    </div>;
 
 const Warning_msg = ({warning})=>{
     if (!warning)
@@ -260,8 +387,9 @@ const Warning_msg = ({warning})=>{
     return <Warning text={warning}/>;
 };
 
-const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
-    children, top, bottom, update_items_per_page, max_buttons, total})=>
+export const Pagination_panel = ({entries, items_per_page, cur_page,
+    page_change, children, top, bottom, update_items_per_page, max_buttons,
+    total})=>
 {
     total = total||entries&&entries.length||0;
     let pagination = null;
@@ -271,12 +399,10 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
         let pages = Math.ceil(total/items_per_page);
         if (cur_page+1<pages)
             next = 'Next';
-        pagination = (
-            <Pagination next={next} boundaryLinks
-              activePage={cur_page+1}
-              bsSize="small" onSelect={page_change}
-              items={pages} maxButtons={max_buttons||5}/>
-        );
+        pagination = <Pagination next={next} boundaryLinks
+            activePage={cur_page+1}
+            bsSize="small" onSelect={page_change}
+            items={pages} maxButtons={max_buttons||5}/>;
     }
     let buttons = null;
     if (top)
@@ -285,8 +411,7 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
         key: v, value: v}));
     const from = Math.min(cur_page*items_per_page+1, total);
     const to = Math.min((cur_page+1)*items_per_page, total);
-    return (
-        <div className={classnames('pagination_panel', {top, bottom})}>
+    return <div className={classnames('pagination_panel', {top, bottom})}>
           {pagination}
           <div className="numbers">
             <strong>{from}-{to}</strong> of <strong>{total}</strong>
@@ -294,11 +419,10 @@ const Pagination_panel = ({entries, items_per_page, cur_page, page_change,
           <Select val={items_per_page} data={display_options}
             on_change_wrapper={update_items_per_page}/>
           {buttons}
-        </div>
-    );
+        </div>;
 };
 
-class Tooltip extends Pure_component {
+export class Tooltip extends Pure_component {
     componentDidMount(){
         if (!this.ref)
             return;
@@ -342,7 +466,7 @@ class Tooltip extends Pure_component {
     }
 }
 
-const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
+export const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
     small})=>
 {
     if (invisible)
@@ -350,389 +474,46 @@ const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
     if (disabled||invisible)
         on_click = ()=>null;
     classes = classnames(classes, {small});
-    return (
-        <Tooltip title={tooltip} key={id}>
+    return <Tooltip title={tooltip} key={id}>
           <span className={classnames('link', 'icon_link', classes)}
             onClick={on_click}>
             <i className={classnames('glyphicon', 'glyphicon-'+id)}/>
           </span>
-        </Tooltip>
-    );
+        </Tooltip>;
 };
 
-const presets = {
-    sequential: {
-        default: true,
-        title: 'Sequential session IP pool',
-        subtitle: `Sequential pool of pre-established of sessions (IPs). For
-            running groups of requests sharing the same IP to a target site.
-            Use refresh_sessions max_requests & session_duration to control
-            session (IP) switching`,
-        check: function(opt){ return opt.pool_size &&
-            (!opt.pool_type || opt.pool_type=='sequential'); },
-        set: opt=>{
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-        ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
-        },
-    },
-    session_long: {
-        title: 'Long single session (IP)',
-        subtitle: `All requests share the same long session (IP). For
-            connecting a browser to Luminati, maintaining the same IP for as
-            long as possible`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
-            && opt.session===true && opt.keep_alive; },
-        set: opt=>{
-            opt.pool_size = 0;
-            opt.keep_alive = opt.keep_alive||50;
-            opt.pool_type = null;
-            opt.sticky_ip = false;
-            opt.session = true;
-            opt.seed = false;
-        },
-        clean: opt=>{
-            opt.keep_alive = 0;
-            opt.session = '';
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 50 seconds`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `enables 'Random Session'`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
-        ],
-        support: {
-            keep_alive: true,
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
-        },
-    },
-    session: {
-        title: 'Single session (IP)',
-        subtitle: `All requests share the same active session (IP). For
-            connecting a single app/browser that does not need to maintain IP
-            on idle times`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
-            && opt.session===true && !opt.keep_alive; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.pool_type = null;
-            opt.sticky_ip = false;
-            opt.session = true;
-            opt.seed = false;
-        },
-        clean: opt=>{
-            opt.session = '';
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 0 seconds`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `enables 'Random Session'`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
-        ],
-        support: {
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
-        },
-    },
-    sticky_ip: {
-        title: 'Session (IP) per machine',
-        subtitle: `Each requesting machine will have its own session (IP).
-            For connecting several computers to a single Luminati Proxy
-            Manager, each of them having its own single session (IP)`,
-        check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.pool_type = null;
-            opt.sticky_ip = true;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.sticky_ip = null;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `enables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-            {field: 'multiply', label: `disables 'Multiply' option`},
-        ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            seed: true,
-        },
-    },
-    round_robin: {
-        title: 'Round-robin (IP) pool',
-        subtitle: `Round-robin pool of pre-established sessions (IPs). For
-            spreading requests across large number of IPs. Tweak pool_size,
-            max_requests & proxy_count to optimize performance`,
-        check: function(opt){ return opt.pool_size
-            && opt.pool_type=='round-robin' && !opt.multiply; },
-        set: opt=>{
-            opt.pool_size = opt.pool_size||1;
-            opt.pool_type = 'round-robin';
-            opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
-        },
-        clean: opt=>{
-            opt.pool_size = 1;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `round-robin pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-            {field: 'multiply', label: `disables 'Multiply' options`},
-        ],
-        support: {
-            pool_size: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            seed: true,
-        },
-    },
-    high_performance: {
-        title: 'High performance',
-        subtitle: 'Maximum request speed',
-        check: opt=>true,
-        set: opt=>{
-            opt.pool_size = 50;
-            opt.keep_alive = 40;
-            opt.pool_type = 'round-robin';
-            opt.seed = false;
-            opt.proxy_count = 20;
-            opt.session_duration = 0;
-            opt.session_random = false;
-            opt.use_proxy_cache = false;
-            opt.race_reqs = 2;
-        },
-        clean: opt=>{
-            opt.pool_size = 1;
-            opt.keep_alive = 0;
-            opt.proxy_count = '';
-            opt.race_reqs = '';
-            opt.use_proxy_cache = true;
-        },
-        rules: [
-            {field: 'pool_size', label: "sets 'Pool size' to 50"},
-            {field: 'keep_alive', label: "sets 'Keep-alive' to 40"},
-            {field: 'pool_type', label: "round-robin pool type"},
-            {field: 'seed', label: "disables 'Session ID Seed'"},
-        ],
-        support: {max_requests: true, multiply: true},
-    },
-    rnd_usr_agent_and_cookie_header: {
-        title: 'Random User-Agent and cookie headers',
-        subtitle: 'Rotate User-Agent and cookie on each request',
-        check: opt=>true,
-        set: opt=>{
-            opt.session = '';
-            opt.sticky_ip = false;
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = 0;
-            opt.session_duration = 0;
-            opt.seed = false;
-            opt.rules = opt.rules||{};
-            opt.rules.pre = [{
-                alphabet: 'wertyuiop;lkjhgfdQWERTYUJBVCF5467',
-                header: true,
-                name: 'cookie',
-                prefix: 'v=',
-                random: 'string',
-                size: 8,
-                suffix: 'end of cookie',
-                url: '**'
-            },
-            {
-                arg: [
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246',
-                'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36',
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9',
-                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.111 Safari/537.36',
-                'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1',
-                'Mozilla/5.0 (X11; Linux x86_64; rv:2.0b4) Gecko/20100818 Firefox/4.0b4',
-                'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36',
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.38 Safari/537.36',
-                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36',
-                'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'],
-                header: true,
-                name: 'User-Agent',
-                random: 'list',
-                url: '**'
-            }];
-            opt.rules.post = opt.rules.post||[];
-        },
-        clean: opt=>{ },
-        support: {
-            multiply: true,
-            max_requests: true,
-        },
-    },
-    custom: {
-        title: 'Custom',
-        subtitle: `Manually adjust all settings to your needs For advanced
-            use cases`,
-        check: function(opt){ return true; },
-        set: function(opt){},
-        clean: opt=>{
-            opt.session = '';
-            opt.sticky_ip = null;
-            opt.pool_size = 1;
-            opt.pool_type = null;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-            opt.seed = '';
-        },
-        support: {
-            session: true,
-            sticky_ip: true,
-            pool_size: true,
-            pool_type: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
-        },
-    },
-};
-for (let k in presets)
-    presets[k].key = k;
+export const Circle_li = props=>
+    <li>
+      <div className="circle_wrapper">
+        <div className="circle"/>
+      </div>
+      <div className="single_instruction">{props.children}</div>
+    </li>;
 
-const emitter = new EventEmitter();
+export const Add_icon = ({click, tooltip})=>
+    <Tooltip title={tooltip}>
+      <span className="link icon_link top right add_header" onClick={click}>
+        <i className="glyphicon glyphicon-plus"/>
+      </span>
+    </Tooltip>;
 
-const is_electron = window.process && window.process.versions.electron;
+export const Remove_icon = ({click, tooltip})=>
+    <Tooltip title={tooltip}>
+      <span className="link icon_link top" onClick={click}>
+        <i className="glyphicon glyphicon-trash"/>
+      </span>
+    </Tooltip>;
 
-const get_static_country = proxy=>{
-    if (!proxy||!proxy.zone||!proxy.zones)
-        return false;
-    const zone = proxy.zones[proxy.zone];
-    if (!zone)
-        return false;
-    const plan = zone.plans[zone.plans.length-1];
-    if (plan.type=='static')
-        return plan.country||'any';
-    if (['domain', 'domain_p'].includes(plan.vips_type))
-        return plan.vip_country||'any';
-    return false;
-};
+export class Logo extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.version', ver=>this.setState({ver})); }
+    render(){
+        return <div className="nav_top">
+              <a href="https://luminati.io/cp" rel="noopener noreferrer"
+                target="_blank" className="logo_big"/>
+              <div className="version">V{this.state.ver}</div>
+            </div>;
+    }
+}
 
-const save_pagination = (table, opt={})=>{
-    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    curr[table] = curr[table]||{};
-    if (opt.page)
-        curr[table].page = opt.page;
-    if (opt.items)
-        curr[table].items = opt.items;
-    window.localStorage.setItem('pagination', JSON.stringify(curr));
-};
-
-const get_pagination = table=>{
-    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    return {items: 10, page: 0, ...(curr[table]||{})};
-};
-
-const status_codes = {
-    200: 'OK',
-    201: 'Created',
-    202: 'Accepted',
-    203: 'Non-Authoritative Information',
-    204: 'No Content',
-    205: 'Reset Content',
-    206: 'Partial Content',
-    300: 'Multiple Choices',
-    301: 'Moved Permanently',
-    302: 'Found',
-    303: 'See Other',
-    304: 'Not Modified',
-    305: 'Use Proxy',
-    307: 'Temporary Redirect',
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    402: 'Payment Required',
-    403: 'Forbidden',
-    404: 'Not Found',
-    405: 'Method Not Allowed',
-    406: 'Not Acceptable',
-    407: 'Proxy Authentication Required',
-    408: 'Request Timeout',
-    409: 'Conflict',
-    410: 'Gone',
-    411: 'Length Required',
-    412: 'Precondition Failed',
-    413: 'Request Entity Too Large',
-    414: 'Request-URI Too Long',
-    415: 'Unsupported Media Type',
-    416: 'Requested Range Not Satisfiable',
-    417: 'Expectation Failed',
-    500: 'Internal Server Error',
-    501: 'Not Implemented',
-    502: 'Bad Gateway',
-    503: 'Service Unavailable',
-    504: 'Gateway Timeout',
-    505: 'HTTP Version Not Supported',
-};
-
-const is_json_str = str=>{
-    let resp;
-    try { resp = JSON.parse(str); }
-    catch(e){ return false; }
-    return resp;
-};
-
-export {Code, Modal, Loader, Select, Input, Warnings, Warning, Nav,
-    Checkbox, presets, emitter, Pagination_panel, Link_icon, Tooltip,
-    Textarea, get_static_country, Loader_small, is_electron, status_codes,
-    Modal_dialog, save_pagination, get_pagination, is_json_str};

@@ -27,7 +27,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.94.520/luminati-proxy-manager-v1.94.520-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.102.979/luminati-proxy-manager-v1.102.979-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -39,7 +39,9 @@ Or
 curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 ### Linux/MacOS - Manual install
-- Install Node.js 6 or above ([nodejs.org](https://nodejs.org/en/download/))
+- Install Node.js 8 ([nodejs.org](https://nodejs.org/en/download/))
+  Node.js version for the proxy manager should be any v 8.X.X.
+  The Proxy Manager will not work properly with later node versions. 
 - Make sure npm version is 4.6.1 or higher
   - if not, run: `sudo npm install -g npm@4.6.1`
 - Install Luminati Proxy from the terminal prompt:
@@ -120,7 +122,6 @@ Options:
                                                                         [number]
   --history                Logs                       [boolean] [default: false]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --socks                  SOCKS5 port                                  [number]
   --log                    Log level                 [string] [default: "error"]
   --iface                  Interface or IP to listen on
                                                    [string] [default: "0.0.0.0"]
@@ -198,13 +199,16 @@ Options:
                                                                         [number]
   --disable_color          Disable colors in log      [boolean] [default: false]
   --www                    HTTP port for browser admin UI       [default: 22999]
+  --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
+                           [default:"127.0.0.1"]
+			   [example: --www_whitelist_ips "212.17.0.1"]
   --ws                     websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
-                               [string] [default: "/home/maximk/.luminati.json"]
+                               [string] [default: "~/.luminati.json"]
   --database               Database file containing logs and cached values
-                            [string] [default: "/home/maximk/.luminati.sqlite3"]
+                            [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
-                                [string] [default: "/home/maximk/.luminati.jar"]
+                                [string] [default: "~/.luminati.jar"]
   --mode                   Defines a set of permissible operations within the
                            UI/API                     [string] [default: "root"]
   --dropin                 Create dropin mode proxy port (default: 22225)
@@ -216,7 +220,7 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --request_stats_limit    Maximum request stats to keep         [default: 5000]
+  --request_stats_limit    Maximum request stats to keep         [default: 1000]
   --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
@@ -239,13 +243,19 @@ A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy
 ```sh
 docker pull luminati/luminati-proxy
 
-docker run luminati/luminati-proxy
+docker run luminati/luminati-proxy luminati
 
 docker run luminati/luminati-proxy luminati --version
 ```
 Make sure to forward appropriate ports. Proxy manager uses by default 22999
 for the web console and the api, 22555 for dropin and 24000 for first
 configurable proxy.
+
+- To run docker with cli option see the below example:
+```sh
+docker run luminati/luminati-proxy luminati --www_whitelist_ips "172.17.0.1" --ssl true
+```
+You can add many more options to this run.
 
 #### Docker with predefined config file
 To use lpm's config file, docker volumes can be used:
@@ -257,7 +267,7 @@ Following this instructions will make your docker runs with specific config file
 ```sh
 docker volume create lpm-vol
 ```
-- Inspect the recently creaed volume
+- Inspect the recently created volume
 ```sh
 docker inspect lpm-vol
 ```
@@ -305,7 +315,7 @@ Or contact [support@luminati.io](mailto:support@luminati.io).
 
 Working documentation of the API can be found inside the app.
 
-A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json)
+A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json)
 
 ## Node.js API
 
@@ -341,7 +351,7 @@ proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
 ### Generators
 ```js
 'use strict';
-const etask = require('hutil').etask;
+const etask = require('./util/etask.js');
 const Luminati = require('luminati-proxy').Luminati;
 
 etask(function*(){

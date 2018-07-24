@@ -7,12 +7,7 @@ module.exports = {
     entry: {
         app: './app.js',
         vendor: ['jquery', 'lodash', 'moment',
-            'angular', 'angular-sanitize', 'angular-ui-bootstrap',
-            '@uirouter/angularjs', 'angular-google-analytics',
             'bootstrap', 'bootstrap/dist/css/bootstrap.css',
-            'bootstrap-datepicker', 'bootstrap-datepicker/dist/css/bootstrap-'
-                +'datepicker3.css',
-            'ui-select', 'ui-select/dist/select.css',
             'codemirror/lib/codemirror', 'codemirror/lib/codemirror.css',
             'codemirror/mode/javascript/javascript',
             'react', 'react-dom', 'react-bootstrap',
@@ -48,8 +43,9 @@ module.exports = {
                 use: ['hutil-loader', 'babel-loader'],
             },
             {
-                test: /hutil/,
+                test: /util/,
                 parser: {node: false, commonjs: false},
+                exclude: [/www[\\\/].+\.js$/, /node_modules/],
                 use: ['hutil-loader'],
             },
             {test: /\.css$/, use: ['style-loader', 'css-loader']},
@@ -70,7 +66,7 @@ module.exports = {
     resolve: {
         modules: [__dirname, 'node_modules'],
         alias: {
-            '/util': 'hutil/util/',
+            '/util': 'util/',
             jquery: 'jquery/src/jquery.js',
             virt_jquery_all: 'jquery/src/jquery.js',
             '/www': 'www/',
