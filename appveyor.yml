@@ -24,4 +24,4 @@ build: off
 notifications:
   - provider: Email
     to:
-      - maximk@hola.org
+      - romank@luminati.io

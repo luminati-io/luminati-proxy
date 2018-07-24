@@ -2,39 +2,28 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import ajax from 'hutil/util/ajax';
-import etask from 'hutil/util/etask';
-import setdb from 'hutil/util/setdb';
+import etask from '../../util/etask.js';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
 import classnames from 'classnames';
 import {Tooltip, Modal} from './common.js';
 import Schema from './schema.js';
 import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
 import $ from 'jquery';
-import {If} from '/www/util/pub/react.js';
 import {Route, withRouter, Link} from 'react-router-dom';
 
-// XXX krzysztof: get rid of this object
-const sections = [
-    {name: 'overview', title: 'Overview', navbar: true},
-    {name: 'howto', title: 'Instructions', navbar: true},
-    {name: 'proxy_tester', title: 'Proxy Tester', navbar: true, react: true},
-    {name: 'logs', title: 'Logs', navbar: true},
-    {name: 'config', title: 'Configuration', navbar: true},
-];
-
-const Nav = ()=>(
-    <div className="lpm nav">
+const Nav = ()=>
+    <div className="nav">
       <Nav_top/>
       <Nav_left/>
       <Report_bug_modal/>
       <Upgrade_modal/>
       <Shutdown_modal/>
       <Old_modals/>
-    </div>
-);
+    </div>;
 
-const Old_modals = ()=>(
+const Old_modals = ()=>
     <div>
       <div id="restarting" className="modal fade" role="dialog">
         <div className="modal-dialog">
@@ -78,64 +67,69 @@ const Old_modals = ()=>(
           </div>
         </div>
       </div>
-    </div>
-);
+    </div>;
 
-const Nav_left = ()=>(
-    <div className="nav_left">
-      <div className="menu">
-        {sections.map(s=>(
-          <Nav_link
-            to={'/'+s.name}
-            key={s.name}
-            name={s.name}
-            label={s.title}/>
-        ))}
-      </div>
-      <div className="menu_filler"/>
-      <Footer/>
-    </div>
-);
+const Nav_left = withRouter(class Nav_left extends Pure_component {
+    state = {lock: false};
+    componentDidMount(){
+        this.setdb_on('head.lock_navigation', lock=>
+            lock!==undefined&&this.setState({lock}));
+    }
+    render(){
+        return <div className="nav_left">
+              <div className={classnames('menu', {lock: this.state.lock})}>
+                <Nav_link to="/overview" name="overview" label="Overview"/>
+                <Nav_link to="/howto" name="howto" label="Instructions"/>
+                <Nav_link to="/proxy_tester" name="proxy_tester"
+                  label="Proxy tester"/>
+                <Nav_link to="/tracer" name="tracer"
+                  label="Test affiliate links"/>
+                <Nav_link to="/logs" name="logs" label="Logs"/>
+                <Nav_link to="/settings" name="general_config"
+                  label="General settings"/>
+                <Nav_link to="/config" name="config"
+                  label="Manual configuration"/>
+              </div>
+              <div className="menu_filler"/>
+              <Footer/>
+            </div>;
+    }
+});
 
-const Nav_link = ({label, to, name})=>(
+const Nav_link = ({label, to, name})=>
     <Route path={to} exact>
       {({match})=>
         <Nav_link_inner label={label} to={to} name={name} match={match}/>}
-    </Route>
+    </Route>;
 
-);
-
-const Nav_link_inner = ({label, to, name, match})=>(
+const Nav_link_inner = ({label, to, name, match})=>
     <Link to={to}>
       <div className={classnames('menu_item', {active: match})}>
         <Tooltip title={label} placement="right">
           <div className={classnames('icon', name)}/>
         </Tooltip>
       </div>
-    </Link>
-);
+    </Link>;
 
 class Nav_top extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {ver: ''};
+    state = {ver: '', lock: false};
+    componentDidMount(){
+        this.setdb_on('head.lock_navigation', lock=>
+            lock!==undefined&&this.setState({lock}));
+        this.setdb_on('head.version', ver=>this.setState({ver}));
     }
-    componentWillMount(){
-        this.setdb_on('head.version', ver=>this.setState({ver})); }
     render(){
         const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
-        return (
-            <div className="lpm nav_top">
+        return <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
-                <div><Logo/></div>
+                <div><Logo lock={this.state.lock}/></div>
               </Tooltip>
               <Nav_right/>
-            </div>
-        );
+            </div>;
     }
 }
 
-const Footer = ()=>(
+const Footer = ()=>
     <div className="footer">
       <div>
         <a href="http://luminati.io/faq#proxy"
@@ -149,23 +143,22 @@ const Footer = ()=>(
           Contact</a>
       </div>
       <div>
-        <a href="http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy"
+        <a href="http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy"
           className="link">
           API
         </a>
       </div>
-    </div>
-);
+    </div>;
 
-const Logo = withRouter(()=><Link to="/overview" className="logo"/>);
+const Logo = withRouter(({lock})=>
+    <Link to="/overview" className={classnames('logo', {lock})}/>);
 
-const Nav_right = ()=>(
+const Nav_right = ()=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
       <div className="notif_icon"><Notif/></div>
       <Dropdown/>
-    </div>
-);
+    </div>;
 
 const show_reload = function(){
     $('#restarting').modal({
@@ -200,11 +193,9 @@ class Upgrade_modal extends Pure_component {
         });
     }
     render(){
-        return (
-            <Modal id="upgrade_modal"
+        return <Modal id="upgrade_modal"
               click_ok={this.confirm.bind(this)}
-              title="The application will be upgraded and restarted"/>
-        );
+              title="The application will be upgraded and restarted"/>;
     }
 }
 
@@ -221,11 +212,9 @@ class Shutdown_modal extends Pure_component {
         });
     }
     render(){
-        return (
-            <Modal id="shutdown_modal"
+        return <Modal id="shutdown_modal"
               click_ok={this.confirm.bind(this)}
-              title="Are you sure you want to shut down the local proxies?"/>
-        );
+              title="Are you sure you want to shut down the local proxies?"/>;
     }
 }
 
@@ -252,19 +241,21 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
         if (!this.state.settings)
             return null;
         const is_upgradable = this.state.ver_last&&this.state.ver_last.newer;
-        return (
-            <div className="dropdown">
-              <a className="link dropdown-toggle"
-                data-toggle="dropdown">
-                {this.state.settings.customer}
-                <span className="caret"/>
-              </a>
+        const tip = `You are currently logged in as
+        ${this.state.settings.customer}`;
+        return <div className="dropdown">
+                <a className="link dropdown-toggle" data-toggle="dropdown">
+              <Tooltip placement="left" title={tip}>
+                  {this.state.settings.customer}
+              </Tooltip>
+                  <span className="caret"/>
+                </a>
               <ul className="dropdown-menu dropdown-menu-right">
-                <If when={is_upgradable}>
+                {is_upgradable &&
                   <li>
                     <a onClick={this.upgrade.bind(this)}>Upgrade</a>
                   </li>
-                </If>
+                }
                 <li>
                   <a onClick={this.open_report_bug.bind(this)}>
                     Report a bug</a>
@@ -276,8 +267,7 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
                   <a onClick={this.shutdown.bind(this)}>Shut down</a>
                 </li>
               </ul>
-            </div>
-        );
+            </div>;
     }
 });
 

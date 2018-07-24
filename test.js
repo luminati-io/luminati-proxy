@@ -12,17 +12,17 @@ const os = require('os');
 const fs = require('fs');
 const socks = require('@luminati-io/socksv5');
 const ssl = require('./lib/ssl.js');
-const hutil = require('hutil');
 const request = require('request');
 const nock = require('nock');
 const lolex = require('lolex');
-const etask = hutil.etask;
-const restore_case = hutil.http_hdr.restore_case;
-const qw = hutil.string.qw;
+const etask = require('./util/etask.js');
+const restore_case = require('./util/http_hdr.js').restore_case;
+const qw = require('./util/string.js').qw;
 const assign = Object.assign;
-const luminati = require('./index.js');
-const Luminati = luminati.Luminati;
-const Manager = luminati.Manager;
+const lpm_config = require('./util/lpm_config.js');
+const lpm_util = require('./util/lpm_util.js');
+const Luminati = require('./lib/luminati.js');
+const Manager = require('./lib/manager.js');
 const pkg = require('./package.json');
 const username = require('./lib/username.js');
 const customer = 'abc';
@@ -322,7 +322,7 @@ describe('proxy', ()=>{
                 yield l.test();
                 assert.equal(proxy.history.length, 1);
                 assert.equal(proxy.history[0].headers['x-hola-agent'],
-                    'proxy='+luminati.version+' node='+process.version
+                    'proxy='+lpm_config.version+' node='+process.version
                         +' platform='+process.platform);
             }));
             it('not added when accessing site directly', ()=>etask(function*(){
@@ -712,7 +712,7 @@ describe('proxy', ()=>{
                     t('https sniffing by path', 'echo\\.json',
                         'https://lumtest.com/myip',
                         'https://lumtest.com/echo.json', true);
-                    t('https sniffing by domain', 'lumtest\.com',
+                    t('https sniffing by domain', 'lumtest.com',
                         'https://httpsbin.org/ip',
                         'http://lumtest.com/myip',
                         true);
@@ -766,7 +766,6 @@ describe('proxy', ()=>{
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
             t('raw', {raw: true});
             t('direct_include', {direct_include: '.*'}, {direct: true});
-            t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
                 {session: 'seed_1'});
@@ -789,7 +788,7 @@ describe('proxy', ()=>{
         describe('socks', ()=>{
             const t = (name, _url)=>it(name, etask._fn(function*(_this){
                 _this.timeout(30000);
-                l = yield lum({socks: 25000});
+                l = yield lum({port: 25000});
                 let res = yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
                         proxyHost: '127.0.0.1',
@@ -932,14 +931,11 @@ describe('proxy', ()=>{
                     history_aggregator: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(400);
-                yield l.session_mgr.update_all_sessions();
-                yield etask.sleep(400);
-                assert.equal(history.length, 3);
                 assert_has(history, [
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
-                    {context: 'SESSION INFO'},
                 ]);
+                assert.equal(history.length, 2);
             }));
         });
     });
@@ -949,12 +945,11 @@ describe('proxy', ()=>{
             assert.ok(l.rules);
         }));
         const t = (name, arg, rules = false, c = 0)=>it(name,
-            etask._fn(function*(_this)
-        {
+        etask._fn(function*(_this){
             rules = rules||{post: [{res: [{action: {ban_ip: '60min',
             retry: true}, head: true, status: {arg, type: 'in'}}],
-            url: 'lumtest.com/**'}], pre: [{browser: 'firefox',
-            url: 'lumtest.com/**'}]};
+            url: 'lumtest.com'}], pre: [{browser: 'firefox',
+            url: 'lumtest.com'}]};
             l = yield lum({rules});
             let old_req = l._request;
             let retry_count = 0;
@@ -1056,8 +1051,8 @@ describe('manager', ()=>{
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
                 args.push('--no-cookie');
         }
-        manager = new Manager(args, {bypass_credentials_check: true,
-            skip_ga: true});
+        manager = new Manager(lpm_util.init_args(args),
+            {bypass_credentials_check: true, skip_ga: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
         let admin = 'http://127.0.0.1:'+www;
@@ -1127,7 +1122,7 @@ describe('manager', ()=>{
     afterEach(()=>temp_files.forEach(f=>f.done()));
     describe('get_params', ()=>{
         const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
-            let mgr = new Manager(_args, {skip_ga: true});
+            let mgr = new Manager(lpm_util.init_args(_args), {skip_ga: true});
             assert.deepEqual(expected, mgr.get_params());
         }));
         t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
@@ -1137,41 +1132,6 @@ describe('manager', ()=>{
         t('credentials with no-config',
             qw`--no-config --customer usr --password abc --token t --zone z`,
             qw`--no-config --customer usr --password abc --token t --zone z`);
-    });
-    describe('socks', ()=>{
-        const t = (name, _url)=>it(name, etask._fn(function*(_this){
-            _this.timeout(30000);
-            const url_path = url.parse(_url).path;
-            let args = [
-                '--socks', `25000:${Manager.default.port}`,
-                '--socks', `26000:${Manager.default.port}`,
-                '--port', 24000,
-            ];
-            app = yield app_with_args(args);
-            let res1 = yield etask.nfn_apply(request, [{
-                agent: new socks.HttpAgent({
-                    proxyHost: '127.0.0.1',
-                    proxyPort: 25000,
-                    auths: [socks.auth.None()],
-                }),
-                url: _url,
-            }]);
-            let body1 = JSON.parse(res1.body);
-            assert.ok(body1.url.includes(url_path),
-                'body url matches expected url');
-            let res2 = yield etask.nfn_apply(request, [{
-                agent: new socks.HttpAgent({
-                    proxyHost: '127.0.0.1',
-                    proxyPort: 26000,
-                    auths: [socks.auth.None()],
-                }),
-                url: _url,
-            }]);
-            let body2 = JSON.parse(res2.body);
-            assert.ok(body2.url.includes(url_path),
-                'body url matches expected url');
-        }));
-        t('http', 'http://lumtest.com/echo.json');
     });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
@@ -1206,11 +1166,15 @@ describe('manager', ()=>{
             const zone_gen = {password: ['pass2']};
             const zones = {static: assign({}, zone_static),
                 gen: assign({}, zone_gen)};
-            const t2 = (name, config, expected, _defaults = {zone: 'static'})=>
+            const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                .query({customer: 'testc1', proxy: pkg.version})
-                .reply(200, {_defaults}) && t(name, _.set(config,
-                    'cli.customer', 'testc1'), expected);
+                    .query({customer: 'testc1', proxy: pkg.version})
+                    .reply(200, {_defaults});
+                t(name, _.set(config, 'cli.customer', 'testc1'), expected);
+            };
             t2('no defaults', {config: {proxies: [simple_proxy]}}, [assign({},
                 simple_proxy, {zone: 'static'})]);
             t2('invalid', {config: {_defaults: {zone: 'foo'},
@@ -1254,26 +1218,6 @@ describe('manager', ()=>{
                 assert.equal(body.version, pkg.version);
             }));
         });
-        describe('whitelist', ()=>{
-            Manager.prototype.json = mock_json(200);
-            const expect_opt = {
-                url: 'https://luminati-china.io/api/get_whitelist?zones=*',
-                headers: {'x-hola-auth': `lum-customer-${customer}`
-                    +`-zone-static-key-${password}`},
-            };
-            it('get', ()=>etask(function*(){
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/whitelist');
-                assert_has(body, {opt: expect_opt});
-            }));
-            it('get with config', ()=>etask(function*(){
-                app = yield app_with_config({config: {_defaults:
-                    {customer, password}}, only_explicit: true});
-                const body = yield json('api/whitelist');
-                assert_has(body, {opt: expect_opt});
-            }));
-        });
         describe('recent_ips', ()=>{
             Manager.prototype.json = mock_json(200);
             const expect_opt = {
@@ -1294,50 +1238,6 @@ describe('manager', ()=>{
                 assert_has(body, {opt: expect_opt});
             }));
         });
-        describe('zones', ()=>{
-            let zone_resp = {_defaults: {zones: {
-                a: {perm: 'abc', plans: 'plan', password: ['pwd1']},
-                b: {perm: 'xyz', plans: 'plan9', password: ['pwd2']}
-            }}};
-            let zone_expected = [
-                {zone: 'a', perm: 'abc', plans: 'plan', password: 'pwd1'},
-                {zone: 'b', perm: 'xyz', plans: 'plan9', password: 'pwd2'},
-            ];
-            it('get', ()=>etask(function*(){
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
-                    .reply(200, zone_resp);
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/zones');
-                assert_has(body, zone_expected, 'zones');
-            }));
-            it('get with config', ()=>etask(function*(){
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
-                    .reply(200, zone_resp);
-                app = yield app_with_config({config: {_defaults:
-                    {customer, password}}, only_explicit: true});
-                const body = yield json('api/zones');
-                assert_has(body, zone_expected, 'zones');
-            }));
-            it('get zone without passwords', ()=>etask(function*(){
-                let no_pwd_resp = {_defaults: {zones: {
-                    a: {perm: 'abc', plans: 'plan'},
-                }}};
-                let no_pwd_expected = [
-                    {zone: 'a', perm: 'abc', plans: 'plan',
-                        password: undefined}
-                ];
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer, proxy: pkg.version})
-                    .reply(200, no_pwd_resp);
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/zones');
-                assert_has(body, no_pwd_expected, 'zones');
-            }));
-        });
         describe('proxies', ()=>{
             describe('get', ()=>{
                 it('normal', ()=>etask(function*(){
@@ -1351,7 +1251,10 @@ describe('manager', ()=>{
             });
             describe('post', ()=>{
                 it('normal non-persist', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001, proxy_type: 'non-persist'};
+                    let sample_proxy = {
+                        port: 24001,
+                        proxy_type: 'non-persist',
+                    };
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield json('api/proxies', 'post',
@@ -1423,11 +1326,10 @@ describe('manager', ()=>{
                     assert_has(res, [res_proxy], 'proxies');
                 }));
                 it('conflict', ()=>etask(function*(){
-                    let proxy = {port: 24000};
                     let proxies = [{port: 24000}, {port: 24001}];
                     app = yield app_with_proxies(proxies, {mode: 'root'});
                     let res = yield api_json('api/proxies/24001',
-                        {method: 'put', body: {proxy}});
+                        {method: 'put', body: {proxy: {port: 24000}}});
                     assert.equal(res.statusCode, 400);
                     assert_has(res.body, {errors: []}, 'proxies');
                 }));
@@ -1443,6 +1345,9 @@ describe('manager', ()=>{
         });
         describe('user credentials', ()=>{
             it('success', ()=>etask(function*(){
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
@@ -1468,6 +1373,9 @@ describe('manager', ()=>{
             }));
             it('update defaults', ()=>etask(function*(){
                 let updated = {_defaults: {customer: 'updated'}};
+                nock('https://luminati-china.io').get('/').reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .query({customer: 'updated'}).reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, updated);
@@ -1521,10 +1429,6 @@ describe('manager', ()=>{
         t('conflict proxy port', [
             {port: 24024},
             {port: 24024},
-        ]);
-        t('conflict socks port', [
-            {port: 24000, socks: 25000},
-            {port: 24001, socks: 25000},
         ]);
         t('conflict with www', [{port: Manager.default.www}]);
     });
@@ -1691,21 +1595,10 @@ describe('lpm_proxy', ()=>{
         yield l.start();
         return l;
     });
-    let l, waiting;
-    const repeat =(n, action)=>{
-        while (n--)
-            action();
-    };
-    const release = n=>repeat(n||1, ()=>waiting.shift()());
-    const hold_request = (next, req)=>{
-        if (req.url!=test_url)
-            return next();
-        waiting.push(next);
-    };
+    let l;
     beforeEach(()=>{
         proxy.history = [];
         proxy.full_history = [];
-        waiting = [];
         ping.history = [];
     });
     afterEach(()=>etask(function*(){
@@ -2125,7 +2018,7 @@ describe('lpm_proxy', ()=>{
             t('https sniffing by path', 'echo\\.json',
                 'https://lumtest.com/myip',
                 'https://lumtest.com/echo.json', true);
-            t('https sniffing by domain', 'lumtest\.com',
+            t('https sniffing by domain', 'lumtest.com',
                 'https://httpsbin.org/ip',
                 'http://lumtest.com/myip',
                 true);
@@ -2178,7 +2071,6 @@ describe('lpm_proxy', ()=>{
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
             t('raw', {raw: true});
             t('direct_include', {direct_include: '.*'}, {direct: true});
-            t('direct_exclude', {direct_exclude: 'no-match'}, {direct: true});
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
                 {session: 'seed_1'});

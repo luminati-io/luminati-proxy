@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.94.794"
+VERSION="1.102.979"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -21,7 +21,7 @@ INSTALL_NPM=0
 INSTALL_CURL=0
 INSTALL_BREW=0
 USE_NVM=0
-NODE_VER='9.4.0'
+NODE_VER='8.11.3'
 NPM_VER='5.6.0'
 NETWORK_RETRY=3
 NETWORK_ERROR=0
@@ -31,7 +31,7 @@ OS=""
 OS_MAC=0
 OS_LINUX=0
 ASSUME_YES=0
-SUDO_CMD="sudo -i"
+SUDO_CMD="sudo -i -E env \"PATH=$PATH\" \"SHELL=/bin/bash\""
 NVM_DIR="$HOME/.nvm"
 LOGFILE="/tmp/lpm_install_$RID.log"
 LOG=""
@@ -91,7 +91,8 @@ escape_json()
 {
     local strip_nl=${1//$'\n'/\\n}
     local strip_tabs=${strip_nl//$'\t'/\ }
-    RS=$strip_tabs
+    local strip_quotes=${strip_tabs//$'"'/\ }
+    RS=$strip_quotes
 }
 
 usage()
@@ -155,29 +156,38 @@ zerr(){ LOG="$LOG$1\n"; }
 
 run_cmd()
 {
-    local cmd=$1 force_log=$2
+    local cmd=$1 force_log=$2 err2out=$3
     echo -n > $LOGFILE
-    eval "$cmd" 2>$LOGFILE > /dev/null
+    if ((err2out)); then
+        eval "$cmd" 2>&1>$LOGFILE>/dev/null;
+    else
+        eval "$cmd" 2>$LOGFILE>/dev/null;
+    fi
     local ret=$?
     local error=$(tail -n 10 $LOGFILE | base64 2>&1)
     error=${error/$'\n'/ }
     if ((!ret&&!force_log)); then
         error=""
     fi
+    local cmd_log=""
     if ((!ret)); then
-        zerr "CMD $cmd: OK $error"
+        cmd_log="CMD $cmd: OK $error"
     else
-        zerr "CMD $cmd: FAIL($ret) $error"
+        cmd_log="CMD $cmd: FAIL($ret) $error"
+    fi
+    zerr "$cmd_log"
+    if ((PRINT_PERR)); then
+        echo "$cmd_log"
     fi
     return $ret;
 }
 
 retry_cmd()
 {
-    local cmd=$1 force_log=$2 ret=0
+    local cmd=$1 force_log=$2 err2out=$3 ret=0
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "retry_cmd $cmd $i"
-        run_cmd "$1 $2"
+        run_cmd "$cmd" $force_log $err2out
         ret=$?
         if ((!ret)); then break; fi
     done
@@ -186,17 +196,17 @@ retry_cmd()
 
 sudo_cmd()
 {
-    local cmd=$1 force_log=$2
-    run_cmd "$SUDO_CMD $cmd" $2
+    local cmd=$1 force_log=$2 err2out=$3
+    run_cmd "$SUDO_CMD $cmd" $force_log $err2out
     return $?
 }
 
 retry_sudo_cmd()
 {
-    local cmd=$1 force_log=$2 ret=0
+    local cmd=$1 force_log=$2 err2out=$3 ret=0
     for ((i=0; i<NETWORK_RETRY; i++)); do
         zerr "retry_sudo_cmd $cmd $i"
-        sudo_cmd "$1 $2"
+        sudo_cmd "$cmd" $force_log $err2out
         ret=$?
         if ((!ret)); then break; fi
     done
@@ -254,7 +264,7 @@ check_linux_distr()
 
 perr()
 {
-    local name=$1 note="$2" ts=$(date +"%s")
+    local name=$1 note="$2" ts=$(date +"%s") ret=0
     escape_json "$note"
     zerr "PERR $name"
     local note=$RS url="${PERR_URL}/?id=lpm_sh_${name}"
@@ -265,16 +275,20 @@ perr()
     if ((NO_PERR)); then
         return 0
     fi
-    if is_cmd_defined "curl"; then
-        curl -s -X POST "$url" --data "$data" \
-            -H "Content-Type: application/json" > /dev/null
-    elif is_cmd_defined "wget"; then
-        wget -S --header "Content-Type: application/json" \
-             -O /dev/null -o /dev/null --post-data="$data" \
-             --quiet $url > /dev/null
-    else
-        echo "no transport to send perr"
-    fi
+    for ((i=0; i<NETWORK_RETRY; i++)); do
+        if is_cmd_defined "curl"; then
+            curl -s -X POST "$url" --data "$data" \
+                -H "Content-Type: application/json" > /dev/null
+        elif is_cmd_defined "wget"; then
+            wget -S --header "Content-Type: application/json" \
+                 -O /dev/null -o /dev/null --post-data="$data" \
+                 --quiet $url > /dev/null
+        else
+            echo "no transport to send perr"
+        fi
+        ret=$?
+        if ((!ret)); then break; fi
+    done
 }
 
 sys_install()
@@ -293,13 +307,16 @@ sys_install()
         fi
         retry_sudo_cmd "${pkg_mng} ${pkg}"
     fi
-    retry_sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
 }
 
 install_shasum(){
     # hack for centos nave installation
     if ! is_cmd_defined "shasum"; then
-        sys_install "perl-Digest-SHA"
+        if ! is_cmd_defined "apt-get"; then
+            sys_install "perl-Digest-SHA"
+        else
+            sys_install "libdigest-sha-perl"
+        fi
     fi
 }
 
@@ -330,7 +347,7 @@ check_wget()
         perr "check_no_wget"
         INSTALL_WGET=1
     else
-        zerr "found_curl: $(wget --version | head -n 1 2>/dev/null)"
+        zerr "check_wget: $(wget --version | head -n 1 2>/dev/null)"
     fi
 }
 
@@ -361,14 +378,15 @@ check_node()
     echo "checking nodejs..."
     if is_cmd_defined "node"; then
         local node_ver=$(node -v)
+        zerr "check_node: $node_ver"
         echo "node ${node_ver} is installed"
-        if ! [[ "$node_ver" =~ ^(v[6-9]\.|v[1-9][0-9]+\.) ]]; then
-            echo "minimum required node version is 6"
+        if ! [[ "$node_ver" =~ ^(v[7-9]\.|v[1-9][0-9]+\.) ]]; then
+            echo "minimum required node version is 7"
             perr "check_node_bad_version" "$node_ver"
             UPDATE_NODE=1
         fi
         if [[ "$node_ver" =~ ^(v[1-9][0-9]+\.) ]]; then
-            echo "maximum required node version is 9"
+            echo "maximum supported node version is 9"
             perr "check_node_bad_version" "$node_ver"
             UPDATE_NODE=1
         fi
@@ -387,6 +405,7 @@ check_npm()
         perr "check_no_npm"
     else
         local npm_ver=$(npm -v)
+        zerr "check_npm: $npm_ver"
         if [[ "$npm_ver" =~ ^([3,7-9]\.|[1-9][0-9]+\.) ]]; then
             UPDATE_NPM=1
             perr "check_npm_bad_version" "$npm_ver"
@@ -402,7 +421,7 @@ check_curl()
         perr 'check_no_curl'
         INSTALL_CURL=1
     else
-        zerr "found_curl: $(curl --version | head -n 1 2>/dev/null)"
+        zerr "check_curl: $(curl --version | head -n 1 2>/dev/null)"
     fi
 }
 
@@ -429,7 +448,7 @@ install_nave_node()
     perr "install_nave_node"
     sudo_cmd "rm -rf ~/.nave/cache/$NODE_VER"
     sudo_cmd "rm -rf /root/.nave/cache/v$NODE_VER"
-    retry_sudo_cmd "SHELL=/bin/bash nave usemain $NODE_VER" 1
+    retry_sudo_cmd "nave usemain $NODE_VER" 1
     if ! is_cmd_defined "node"; then
         perr "install_error_node"
         echo 'could not install node'
@@ -474,9 +493,9 @@ install_curl()
 
 install_build_tools()
 {
-    echo "installing build tools"
-    perr "install_build_tools"
-    if ((!OS_MAC)); then
+    if ((!OS_MAC)) && is_cmd_defined "apt-get"; then
+        echo "installing build tools"
+        perr "install_build_tools"
         sys_install "build-essential"
         sys_install "base-devel"
     fi
@@ -537,44 +556,45 @@ deps_install()
 
 lpm_clean()
 {
-    echo "cleaning lpm related node packages"
+    echo "cleaning lpm related node packages and npm cache"
     local lib_path="$(npm prefix -g)/lib"
-    local install_cmd=(
+    local clean_cmd=(
         "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
         "rm -rf $lib_path/node_modules/{@luminati-io,sqlite3,luminati-proxy}"
+        "rm -rf $HOME/.npm"
+        "mkdir -p $HOME/.npm/_cacache"
+        "mkdir -p $HOME/.npm/_logs"
+        "npm cache clean --force"
+        "npm cache verify"
     )
-    for cmd in "${install_cmd[@]}"; do
+    for cmd in "${clean_cmd[@]}"; do
         if ((USE_NVM)); then
-            run_cmd "$install_cmd"
+            run_cmd "$cmd"
         else
-            sudo_cmd "$install_cmd"
+            sudo_cmd "$cmd"
         fi
     done
     if ((!USE_NVM)); then
-        echo "cleaning node cache"
-        sudo_cmd "rm -rf $HOME/.npm /root/.npm"
+        sudo_cmd "rm -rf /root/.npm"
         echo "removing luminati links"
         sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
-        run_cmd "mkdir -p $HOME/.npm/_cacache"
-        run_cmd "mkdir -p $HOME/.npm/_logs"
     fi
 }
 
 lpm_install()
 {
-    echo "installing Luminati proxy manager"
     perr "install" "lpm"
-    lpm_clean
-    local cmd="npm install -g --unsafe-perm @luminati-io/luminati-proxy > /dev/null"
+    echo "installing Luminati proxy manager"
+    local cmd="npm install -g --unsafe-perm --loglevel error @luminati-io/luminati-proxy"
     if ((USE_NVM)); then
-        retry_cmd "$cmd"
+        retry_cmd "$cmd" 0 1
     else
-        retry_sudo_cmd "$cmd"
+        retry_sudo_cmd "$cmd" 0 1
     fi
     if (($?)); then
         echo "Luminati failed to install from npm"
         perr "install_error_lpm"
-        exit $?
+        exit 1
     fi
     if ((!USE_NVM)); then
         if ((LUM)); then
@@ -643,6 +663,7 @@ setup()
     fi
     zerr "deps_install"
     deps_install
+    lpm_clean
     lpm_install
     check_install
     perr "complete"
@@ -659,6 +680,7 @@ on_exit()
     fi
     if ((!exit_code)); then
         perr "exit_ok" $exit_code
+        perr "exit_ok_report" "$LOG"
     else
         perr "exit_error" $exit_code
         if ((NETWORK_ERROR)); then

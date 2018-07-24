@@ -1,5 +1,12 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint node:true, react:true*/
+var define;
+var is_node = typeof module=='object' && module.exports;
+if (is_node)
+    define = require('../../../util/require_node.js').define(module, '..');
+else
+    define = self.define;
+
 define(['react', '/util/etask.js', '/util/setdb.js'], (React, etask, setdb)=>{
 
 const LONG_CB_MS = 100;
@@ -34,7 +41,7 @@ class Pure_component extends React.PureComponent {
                 this.comp_name, t1-t0);
         }
     }
-    setdb_on(path, cb){ this.listeners[path] = setdb.on(path, cb); }
+    setdb_on(path, cb, opt){ this.listeners[path] = setdb.on(path, cb, opt); }
     etask(sp){
         if (!this.sp)
             this.sp = etask('Component', function*(){ yield this.wait(); });

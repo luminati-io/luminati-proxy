@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.94.794",
+        "version": "1.102.979",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -354,14 +354,16 @@
         "manager": {
             "type": "object",
             "properties": {
-                "socks": {
-                    "type": "string",
-                    "pattern": "^\\d+(:\\d+)$",
-                    "description": "SOCKS5 port"
-                },
                 "www": {
                     "type": "integer",
                     "description": "HTTP port for browser admin UI"
+                },
+                "www_whitelist_ips": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Whitelist ip list for granting access to browser admin UI"
                 },
                 "ws": {
                     "type": "integer",
@@ -431,6 +433,10 @@
                 "disable_color": {
                     "type": "boolean",
                     "description": "Disable colors in log"
+                },
+                "logs": {
+                    "type": "boolean",
+                    "description": "Enable logs for all proxies"
                 }
             }
         },
@@ -456,10 +462,6 @@
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
-                },
-                "socks": {
-                    "type": "integer",
-                    "description": "SOCKS5 port"
                 },
                 "log": {
                     "type": "string",

@@ -2,14 +2,11 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {If} from '/www/util/pub/react.js';
-import classnames from 'classnames';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import $ from 'jquery';
-import ajax from 'hutil/util/ajax';
-import setdb from 'hutil/util/setdb';
-import zurl from 'hutil/util/url';
-import {Loader} from './common.js';
+import ajax from '../../util/ajax.js';
+import setdb from '../../util/setdb.js';
+import zurl from '../../util/url.js';
+import {Loader, Logo} from './common.js';
 import {withRouter} from 'react-router-dom';
 
 const Login = withRouter(class Login extends Pure_component {
@@ -82,12 +79,13 @@ const Login = withRouter(class Login extends Pure_component {
             setdb.set('head.settings', settings);
             const consts = yield ajax.json({url: '/api/consts'});
             setdb.set('head.consts', consts);
+            const zones = yield ajax.json({url: '/api/zones'});
+            setdb.set('head.zones', zones);
             _this.props.history.push('/overview');
         });
     }
     render(){
-        return (
-            <div className="lpm lum_login">
+        return <div className="lum_login">
               <Logo/>
               <Messages error_message={this.state.error_message}
                 settings={this.state.settings}
@@ -102,53 +100,35 @@ const Login = withRouter(class Login extends Pure_component {
                 update_password={this.update_password.bind(this)}
                 update_username={this.update_username.bind(this)}
                 select_customer={this.select_customer.bind(this)}/>
-            </div>
-        );
+            </div>;
     }
 });
-
-class Logo extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('head.version', ver=>this.setState({ver})); }
-    render(){
-        return (
-            <div className="nav_top">
-              <a href="https://luminati.io/cp" rel="noopener noreferrer"
-                target="_blank" className="logo_big"/>
-              <div className="version">V{this.state.ver}</div>
-            </div>
-        );
-    }
-}
 
 const parse_arguments = (settings={argv: ''})=>
     settings.argv.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
     .split('|||');
 
-const Messages = ({error_message, settings, ver_node})=>(
+const Messages = ({error_message, settings, ver_node})=>
     <div>
-      <If when={settings&&settings.argv}>
+      {settings && settings.argv &&
         <div className="warning">
           <div className="warning_icon"/>
           The application is running with the following arguments:
           {parse_arguments(settings).map(a=><strong key={a}>{a}</strong>)}
         </div>
-      </If>
-      <If when={error_message}>
+      }
+      {error_message &&
         <div className="warning error settings-alert">
           <div dangerouslySetInnerHTML={{__html: error_message}}/>
         </div>
-      </If>
+      }
       <Node_message ver_node={ver_node}/>
-    </div>
-);
+    </div>;
 
 const Node_message = ({ver_node})=>{
     if (!ver_node || ver_node.is_electron || ver_node.satisfied)
         return null;
-    return (
-        <div className="warning settings-alert">
+    return <div className="warning settings-alert">
           <div className="warning_icon"/>
           <div>
             <div>
@@ -170,15 +150,13 @@ const Node_message = ({ver_node})=>{
             <pre className="top-margin">
               npm install -g @luminati-io/luminati-proxy</pre>
           </div>
-        </div>
-    );
+        </div>;
 };
 
-const Header = ()=>(
+const Header = ()=>
     <div className="login_header">
       <h3>Login with your Luminati account</h3>
-    </div>
-);
+    </div>;
 
 const Form = ({user_customers, save_user, update_password, update_username,
     select_customer, password, username})=>
@@ -189,37 +167,32 @@ const Form = ({user_customers, save_user, update_password, update_username,
     +'https%3A%2F%2Fluminati.io%2Fcp%2Flum_local_google&scope=https%3A%2F%2F'
     +'www.googleapis.com%2Fauth%2Fuserinfo.email&prompt=select_account';
     const google_click = e=>{
-        const google = $(e);
         const l = window.location;
         const href = google_login_url+'&state='+encodeURIComponent(
             l.protocol+'//'+l.hostname+':'+(l.port||80)+'?api_version=3');
         window.location = href;
     };
     if (user_customers)
-        return (
-            <Customers_form
+    {
+        return <Customers_form
               user_customers={user_customers}
               save_user={save_user}
-              select_customer={select_customer}/>
-        );
-    else
-        return (
-            <First_form
-              password={password}
-              username={username}
-              google_click={google_click}
-              save_user={save_user}
-              update_password={update_password}
-              update_username={update_username}/>
-        );
+              select_customer={select_customer}/>;
+    }
+    return <First_form
+          password={password}
+          username={username}
+          google_click={google_click}
+          save_user={save_user}
+          update_password={update_password}
+          update_username={update_username}/>;
 };
 
-const Typeahead_wrapper = ({data, disabled, on_change, val})=>(
+const Typeahead_wrapper = ({data, disabled, on_change, val})=>
     <Typeahead options={data} maxResults={10}
       minLength={0} disabled={disabled} selectHintOnEnter
       filterBy={(option, text)=>option.indexOf(text)==0}
-      onChange={on_change} selected={val}/>
-);
+      onChange={on_change} selected={val}/>;
 
 class Customers_form extends Pure_component {
     constructor(props){
@@ -231,8 +204,7 @@ class Customers_form extends Pure_component {
         this.props.select_customer(e&&e[0]);
     }
     render(){
-        return (
-            <div className="row customers_form">
+        return <div className="row customers_form">
               <div className="warning choose_customer">
                 Please choose a customer.</div>
               <div className="form-group">
@@ -248,8 +220,7 @@ class Customers_form extends Pure_component {
                 disabled={this.props.saving_user}>
                 {this.props.saving_user ? 'Logging in...' : 'Log in'}
               </button>
-            </div>
-        );
+            </div>;
     }
 }
 
@@ -260,8 +231,7 @@ class First_form extends Pure_component {
     };
     render(){
         const {google_click, saving_user, password, username} = this.props;
-        return (
-            <div className="login_form">
+        return <div className="login_form">
               <div>
                 <div className="row">
                   <div className="col col_google col-sm-6">
@@ -310,8 +280,7 @@ class First_form extends Pure_component {
                   </div>
                 </div>
               </div>
-            </div>
-        );
+            </div>;
     }
 }
 

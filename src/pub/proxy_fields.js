@@ -11,7 +11,11 @@ const before_save = {
 };
 
 export const tabs = {
-    logs: {fields: [], label: 'Logs'},
+    logs: {
+        fields: [],
+        label: 'Logs',
+        tooltip: 'Logs of requests sent through this proxy port',
+    },
     target: {
         label: 'Targeting',
         tooltip: 'Select specific targeting for your proxy exit node',
@@ -31,16 +35,16 @@ export const tabs = {
             },
             asn: {
                 label: <span>
-                    ASN (
+                    ISP/ASN (
                     <a
                       className="link"
                       href="http://bgp.potaroo.net/cidr/autnums.html"
                       target="_blank" rel="noopener noreferrer">
-                      ASN list
+                      list
                     </a>)
                     </span>,
-                tooltip: `ASN uniquely identifies each network on the internet.
-                    Target exit nodes (IPs) on a specific ASN`,
+                tooltip: `Select specific Internet Service Provider (ISP), or
+                    Autonomous System Number (ASN)`,
                 placeholder: 'ASN code e.g. 42793'
             },
             carrier: {
@@ -117,25 +121,25 @@ export const tabs = {
             },
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
-                placeholder:`i.e. (captcha|robot)`,
-                tooltip:`A string(regular expression) to be scanned in the
+                placeholder: `i.e. (captcha|robot)`,
+                tooltip: `A string(regular expression) to be scanned in the
                     body of the response`
             },
             min_req_time: {
                 label: 'Minimum request time',
                 placeholder: '500',
-                tooltip: `Any request time above the given value in milliseconds
-                    will trigger the action`
+                tooltip: `Any request time above the given value in
+                    milliseconds will trigger the action`
             },
             max_req_time: {
                 label: 'Maximum request time',
                 placeholder: '500',
-                tooltip: `Any request time below the given value in milliseconds
-                    will trigger the action`
+                tooltip: `Any request time below the given value in
+                    milliseconds will trigger the action`
             },
             trigger_url_regex: {
-                label: 'Apply only on specific domains (optional)',
-                placeholder:`i.e. example.com`,
+                label: 'Apply only for specific URLs (optional)',
+                placeholder: `i.e. example.com`,
                 tooltip: `enable trigger to certain urls`
             },
             status_code: {
@@ -144,13 +148,19 @@ export const tabs = {
             },
             status_custom: {
                 label: 'Custom status code (regex)',
-                placeholder:`i.e. (2..|3..|404)`,
+                placeholder: `i.e. (2..|3..|404)`,
                 tooltip: `A string(regular expression) to be scanned in the
                     head of the response`
             },
             action: {
                 label: 'Action type',
                 tooltip: `The action to be executed when rule is met`,
+            },
+            fast_pool_size: {
+                label: 'Fast pool size',
+                tooltip: `System will store fast IPs up to the selected pool
+                    size number. Once pool size is reached, the system will
+                    use IPs from the fast IPs pool to route requests`,
             },
             retry_number: {
                 label: 'Number of retries',
@@ -165,6 +175,7 @@ export const tabs = {
                 tooltip: 'will remove the IP for a defined amount of time'
             },
             ban_ip_custom: {label: 'Custom duration'},
+            process: {label: 'Processing rule'},
         },
     },
     rotation: {
@@ -245,17 +256,6 @@ export const tabs = {
         label: 'Debugging',
         tooltip: 'Improve the info you receive from the Proxy Manager',
         fields: {
-            history: {
-                label: 'Enable logs',
-                tooltip: `Last 1K requests are automatically logged for easy
-                    debugging. Enable Logs to save all requests`,
-                ext: true,
-            },
-            ssl: {
-                label: 'Enable SSL logs',
-                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
-                ext: true,
-            },
             log: {
                 label: 'Log level',
                 tooltip: `Decide which data to show in logs`,
@@ -267,9 +267,32 @@ export const tabs = {
             },
         },
     },
+    headers: {
+        label: 'Headers',
+        tooltip: `Set default headers that are sent with each request from this
+            proxy port`,
+        fields: {
+            user_agent: {
+                label: 'User-Agent',
+                tooltip: `Choose a User-Agent header that will be used for
+                    sending requests`,
+            },
+            random_user_agent: {
+                label: 'Random User-Agent',
+                tooltip: 'Set a random User-Agent header for each request',
+            },
+            override_headers: {
+                label: 'Override headers',
+                tooltip: `If you use a browser or other software then requests
+                    may already have defined a few headers for you. Enabling
+                    this option will allow for overriding those headers`,
+            },
+        },
+    },
     general: {
         label: 'General',
-        tooltip: '',
+        tooltip: `General configuration such as port number, password and
+            bypasing`,
         fields: {
             port: {
                 label: 'Proxy port',
@@ -277,10 +300,21 @@ export const tabs = {
                     proxy configuration`,
                 ext: true,
             },
+            socks: {
+                label: 'SOCKS 5 port',
+                tooltip: `SOCKS 5 port is the same as proxy port and is
+                    automatically created.`,
+                ext: true,
+            },
             password: {
                 label: 'Zone password',
                 tooltip: `Zone password as it appears in your zones page in
                     your Luminati's control panel http://luminati.io/cp/zones`,
+            },
+            ssl: {
+                label: 'Enable SSL logs',
+                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
+                ext: true,
             },
             iface: {
                 label: 'Interface',
@@ -302,12 +336,6 @@ export const tabs = {
                 label: 'Multiply proxy port per gIP',
                 tooltip: `Create proxy port for every selected gIP from pool
                     of available gIPS in your zone`
-            },
-            socks: {
-                label: 'SOCKS 5 port',
-                tooltip: `In addition to current proxy port, creates a separate
-                    port with a SOCKS5 server (add SOCKS port number)`,
-                ext: true,
             },
             secure_proxy: {
                 label: 'SSL to super proxy',
@@ -335,12 +363,6 @@ export const tabs = {
                 label: `URL regex for super proxy`,
                 tooltip: `Insert URL pattern for which requests will be passed
                     through super proxy directly (not through peers)`,
-                before_save: before_save.regex,
-            },
-            direct_exclude: {
-                label: `URL regex for not super proxy`,
-                tooltip: `Insert URL pattern for which requests will NOT be
-                    passed through super proxy`,
                 before_save: before_save.regex,
             },
             allow_proxy_auth: {

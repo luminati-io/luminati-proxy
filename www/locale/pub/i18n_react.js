@@ -1,5 +1,12 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint react:true*/
+'use strict'; /*jslint node:true, react:true*/
+var define;
+var is_node = typeof module=='object' && module.exports;
+if (is_node)
+    define = require('../../../util/require_node.js').define(module, '..');
+else
+    define = self.define;
+
 define(['lodash', 'react', 'react-dom', '/www/util/pub/pure_component.js',
     '/util/setdb.js', '/util/storage.js', '/www/util/pub/urlp.js'],
     (_, React, ReactDOM, Pure_component, setdb, storage, zurlp)=>{
@@ -41,27 +48,19 @@ const t = key=>{
 class T extends Pure_component {
     constructor(props){
         super(props);
-        this.key = _.isString(this.props.children) ?
-            (props.children||'').replace(/\s+/g, ' ') : '';
-        this.state = {text: this.key, translation: {}};
+        this.state = {};
     }
     componentDidMount(){
-        if (this.key)
-        {
-            this.setdb_on('i18n.translation', translation=>
-                this.setState({text: get_translation(translation, this.key)})
-            );
-        } else {
-            this.setdb_on('i18n.translation', translation=>
-                this.setState({translation}));
-        }
+        this.setdb_on('i18n.translation', translation=>
+            this.setState({translation}));
     }
     render(){
-        if (this.key )
-            return this.state.text;
-        if (typeof this.props.children=='function')
-            return this.props.children(key=>
-                get_translation(this.state.translation, key));
+        const {translation} = this.state;
+        const {children} = this.props;
+        if (typeof children=='function')
+            return children(key=>get_translation(translation, key));
+        if (_.isString(children))
+            return get_translation(translation, children.replace(/\s+/g, ' '));
         console.error('<T> must receive text to translate or a translate '
             +'function. Received: ', this.props.children);
         return null;

@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.94.794-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.102.979-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -87,7 +87,6 @@ Options:
                                                                         [number]
   --history                Logs                       [boolean] [default: false]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --socks                  SOCKS5 port                                  [number]
   --log                    Log level                 [string] [default: "error"]
   --iface                  Interface or IP to listen on
                                                    [string] [default: "0.0.0.0"]
@@ -167,11 +166,11 @@ Options:
   --www                    HTTP port for browser admin UI       [default: 22999]
   --ws                     Websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
-                               [string] [default: "/home/maximk/.luminati.json"]
+                               [string] [default: "~/.luminati.json"]
   --database               Database file containing logs and cached values
-                            [string] [default: "/home/maximk/.luminati.sqlite3"]
+                            [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
-                                [string] [default: "/home/maximk/.luminati.jar"]
+                                [string] [default: "~/.luminati.jar"]
   --mode                   Defines a set of permissible operations within the
                            UI/API                     [string] [default: "root"]
   --dropin                 Create dropin mode proxy port (default: 22225)
@@ -183,7 +182,7 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --request_stats_limit    Maximum request stats to keep         [default: 5000]
+  --request_stats_limit    Maximum request stats to keep         [default: 1000]
   --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
@@ -227,7 +226,7 @@ docker run luminati/luminati-proxy luminati --version
 
 API的解说文件能在APP里找着
 
-详细解释能在 [这里](http://petstore.swagger.io/?url=https://cdn.rawgit.com/luminati-io/luminati-proxy/master/lib/swagger.json) 找到
+详细解释能在 [这里](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json) 找到
 
 ## Node.js API
 
@@ -263,7 +262,7 @@ proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
 ### Generators
 ```js
 'use strict';
-const etask = require('hutil').etask;
+const etask = require('./util/etask.js');
 const Luminati = require('luminati-proxy').Luminati;
 
 etask(function*(){
