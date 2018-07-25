@@ -27,10 +27,10 @@ export default class Tracer extends Pure_component {
     execute = (url, port)=>{
         if (!/^https?:\/\//.test(url))
         {
-            return void this.setState({log: null, filename: null,
+            return void this.setState({redirects: null, filename: null,
                 errors: 'It is not a valid URL to test'});
         }
-        this.setState({log: null, filename: null, loading: true,
+        this.setState({redirects: null, filename: null, loading: true,
             tracing_url: null, traced: false});
         const data = {url, port};
         const _this = this;
@@ -64,7 +64,8 @@ export default class Tracer extends Pure_component {
               <Nav title={this.title} subtitle={this.subtitle}/>
               <Request execute={this.execute} set_result={this.set_result}
                 loading={this.state.loading}/>
-              <Result log={this.state.log} loading={this.state.loading}
+              <Result redirects={this.state.redirects}
+                loading={this.state.loading}
                 tracing_url={this.state.tracing_url}
                 loading_page={this.state.loading_page}
                 traced={this.state.traced} filename={this.state.filename}/>
@@ -76,13 +77,15 @@ export default class Tracer extends Pure_component {
     }
 }
 
-const Result = ({log, loading, tracing_url, filename, loading_page, traced})=>{
-    if (!log)
+const Result = ({redirects, loading, tracing_url, filename, loading_page,
+    traced})=>
+{
+    if (!redirects)
         return null;
     return <div>
           <div className="results instructions">
             <ol>
-              {log.map(l=>
+              {redirects.map(l=>
                 <Result_row key={l.url} url={l.url} code={l.code}/>
               )}
               {tracing_url && loading && <Result_row url={tracing_url}/>}
@@ -112,7 +115,7 @@ const Result_row = ({url, code})=>
 
 class Request extends Pure_component {
     def_url = 'http://lumtest.com/myip.json';
-    state = {url: this.def_url, port: ''};
+    state = {url: this.def_url, port: '', uid: ''};
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>{
             if (!proxies)
@@ -124,6 +127,7 @@ class Request extends Pure_component {
     }
     url_changed = value=>this.setState({url: value});
     port_changed = port=>this.setState({port});
+    uid_changed = uid=>this.setState({uid});
     go_clicked = ()=>this.props.execute(this.state.url, this.state.port);
     render(){
         if (!this.state.ports)
@@ -134,6 +138,9 @@ class Request extends Pure_component {
         test.`;
         const url_tip = `URL that will be used as a starting point. Following
         requests will be done based on 'Location' header of the response.`;
+        const uid_tip = `Add unique tracking parameter for future analysis.
+        This parameter can be used for deducting the test requests from
+        statistics or billing calculations in your own systems`;
         return <div className="panel no_border request">
               <div className="fields">
                 <Field title="Proxy port" tooltip={port_tip}>
@@ -144,6 +151,12 @@ class Request extends Pure_component {
                 <Field title="URL" className="url" tooltip={url_tip}>
                   <Input type="text" val={this.state.url}
                     on_change_wrapper={this.url_changed}
+                    disabled={this.props.loading}/>
+                </Field>
+                <Field title="Unique tracking parameter (optional)"
+                  tooltip={uid_tip} className="uid">
+                  <Input type="text" val={this.state.uid}
+                    on_change_wrapper={this.uid_changed}
                     disabled={this.props.loading}/>
                 </Field>
               </div>

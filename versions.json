@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.103.296",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix mem leak via hanging events"
+            }
+        ]
+    },
+    {
         "ver": "1.102.979",
         "type": "stable/dev",
         "changes": [

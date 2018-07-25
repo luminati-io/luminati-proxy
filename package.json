@@ -102,8 +102,8 @@
     "node-getopt": "0.2.3",
     "rimraf": "2.5.2",
     "log-buffer": "0.0.3",
-    "puppeteer": "1.5.0",
-    "cheerio": "1.0.0-rc.2"
+    "cheerio": "1.0.0-rc.2",
+    "nightmare": "3.0.1"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -335,7 +335,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "5f6b3c78be639c20f69753f973118ab7"
+    "md5": "ea986470b151a124bb90fb9108c45508"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -370,5 +370,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.102.979"
+  "version": "1.103.296"
 }
