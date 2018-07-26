@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.103.508",
+        "version": "REPLACE_VERSION",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -250,47 +250,98 @@
                 }
             }
         },
-        "/proxies/{port}/ban_ip":{
-            "post": {
-                "description": "On a pecific port ban an IP for a certain amount of time",
-            "tags": [
-                "Proxy"
-            ],
-            "parameters":[
-                   {
-                       "name": "port",
-                       "in": "path",
-                       "description": "Existing proxy port",
-                       "required": true,
-                       "type": "integer"
+        "/proxies/{port}/link_test.json": {
+            "get": {
+                "description": "Link Tester API. See all the redirections for a given URL",
+                "tags": ["Proxy", "Link", "Tester"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
                     },
                     {
-                       "name": "banip",
-                       "in": "body",
-                       "required": true,
-                       "description": "Specify the ip to ban and for how long in minutes",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "ip": {"type": "string"},
-                                "min":{"type": "integer"}
-                              }
-                          }
-                     }
-             ],
-             "responses": {
-                 "200": {
-                        "description": "Successful response"
-                 }
-             }
-          }
+                        "name": "url",
+                        "in": "query",
+                        "description": "Target URL that needs to be tested",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "description": "Choose your exit country for your requests",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "description": "Specific state in a given country",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "The city from which IP will be allocated",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "user_agent",
+                        "in": "query",
+                        "description": "content of the User-Agent header",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "headers",
+                        "in": "query",
+                        "description": "desription of any other headers that will be sent along with the requests",
+                        "required": false,
+                        "type": "json"
+                    }
+                ]
+            }
+        },
+        "/proxies/{port}/ban_ip": {
+            "post": {
+                "description": "On a specific port ban an IP for a certain amount of time",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                     },
+                     {
+                        "name": "banip",
+                        "in": "body",
+                        "required": true,
+                        "description": "Specify the ip to ban and for how long in minutes",
+                         "schema": {
+                             "type": "object",
+                             "properties": {
+                                 "ip": {"type": "string"},
+                                 "min": {"type": "integer"}
+                               }
+                           }
+                      }
+                ],
+                "responses": {
+                    "200": {"description": "Successful response"}
+                }
+            }
         },
         "/refresh_sessions/{port}": {
             "post": {
                 "description": "Switch luminati sessions to new sessions (get new IPs)",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "port",
@@ -310,9 +361,7 @@
         "/proxy_status/{port}": {
             "get": {
                 "description": "Return the status of the proxy",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "port",
