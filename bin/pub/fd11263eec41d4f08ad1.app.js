@@ -722,19 +722,26 @@ var Select = exports.Select = function Select(props) {
         if (val == 'true') val = true;else if (val == 'false') val = false;
         if (props.on_change_wrapper) props.on_change_wrapper(val);
     };
+    var conf = props.data.find(function (c) {
+        return c.value == props.val;
+    });
     return _react2.default.createElement(
-        'select',
-        { value: '' + props.val,
-            onChange: function onChange(e) {
-                return update(e.target.value);
-            }, disabled: props.disabled },
-        (props.data || []).map(function (c, i) {
-            return _react2.default.createElement(
-                'option',
-                { key: i, value: c.value },
-                c.key
-            );
-        })
+        Tooltip,
+        { key: props.val, title: conf && conf.tooltip || '' },
+        _react2.default.createElement(
+            'select',
+            { value: '' + props.val,
+                onChange: function onChange(e) {
+                    return update(e.target.value);
+                }, disabled: props.disabled },
+            (props.data || []).map(function (c, i) {
+                return _react2.default.createElement(
+                    'option',
+                    { key: i, value: c.value },
+                    c.key
+                );
+            })
+        )
     );
 };
 
@@ -18415,7 +18422,7 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component11) {
             args[_key8] = arguments[_key8];
         }
 
-        return _ret8 = (_temp8 = (_this22 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Rule.__proto__ || Object.getPrototypeOf(Rule)).call.apply(_ref14, [this].concat(args))), _this22), _this22.state = { ports: [] }, _this22.trigger_types = [{ key: 'i.e. Status code', value: '' }, { key: 'URL', value: 'url' }, { key: 'Status code', value: 'status' }, { key: 'HTML body element', value: 'body' }, { key: 'Minimum request time', value: 'min_req_time' }, { key: 'Maximum request time', value: 'max_req_time' }], _this22.action_types = [{ key: 'i.e. Retry with new IP', value: '' }, { key: 'Retry with new IP', value: 'retry' }, { key: 'Retry with new proxy port (Waterfall)',
+        return _ret8 = (_temp8 = (_this22 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Rule.__proto__ || Object.getPrototypeOf(Rule)).call.apply(_ref14, [this].concat(args))), _this22), _this22.state = { ports: [] }, _this22.trigger_types = [{ key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type' }, { key: 'URL', value: 'url', tooltip: 'URL' }, { key: 'Status code', value: 'status' }, { key: 'HTML body element', value: 'body' }, { key: 'Minimum request time', value: 'min_req_time' }, { key: 'Maximum request time', value: 'max_req_time' }], _this22.action_types = [{ key: 'i.e. Retry with new IP', value: '' }, { key: 'Retry with new IP', value: 'retry' }, { key: 'Retry with new proxy port (Waterfall)',
             value: 'retry_port' }, { key: 'Ban IP', value: 'ban_ip' }, { key: 'Refresh IP', value: 'refresh_ip' }, { key: 'Save IP to reserved pool', value: 'save_to_pool' }, { key: 'Save IP to fast pool', value: 'save_to_fast_pool' }, { key: 'Process data', value: 'process' }], _this22.ban_options = [{ key: '10 minutes', value: '10min' }, { key: '20 minutes', value: '20min' }, { key: '30 minutes', value: '30min' }, { key: '40 minutes', value: '40min' }, { key: '50 minutes', value: '50min' }, { key: 'Custom', value: 'custom' }], _this22.status_types = ['i.e. 200 - Succeeded requests', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
             return { key: s, value: s };
         }), _this22.set_rule_field = function (field, value) {

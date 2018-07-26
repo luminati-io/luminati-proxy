@@ -1,9 +1,12 @@
 Luminati Proxy manager - Change Log
 
-## 1.103.296 
+## 1.103.508 Stable
+- :star: added Link Tester API
+
+## 1.103.296 Stable
 - :bug: Fix mem leak via hanging events
 
-## 1.102.979 
+## 1.102.979 Stable
 - :star: Added "U-Mobile" carrier in targeting options
 - :star: Added fast IPs pool
 - :sparkles: Closing inactive sockets in order to avoid memory leaks

@@ -261,12 +261,15 @@ export const Select = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val);
     };
-    return <select value={''+props.val}
-          onChange={e=>update(e.target.value)} disabled={props.disabled}>
-          {(props.data||[]).map((c, i)=>
-            <option key={i} value={c.value}>{c.key}</option>
-          )}
-        </select>;
+    const conf = props.data.find(c=>c.value==props.val);
+    return <Tooltip key={props.val} title={conf&&conf.tooltip||''}>
+          <select value={''+props.val}
+            onChange={e=>update(e.target.value)} disabled={props.disabled}>
+            {(props.data||[]).map((c, i)=>
+              <option key={i} value={c.value}>{c.key}</option>
+            )}
+          </select>
+        </Tooltip>;
 };
 
 const Double_number = props=>{

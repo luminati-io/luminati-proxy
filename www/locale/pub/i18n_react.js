@@ -7,9 +7,9 @@ if (is_node)
 else
     define = self.define;
 
-define(['lodash', 'react', 'react-dom', '/www/util/pub/pure_component.js',
+define(['react', 'react-dom', '/www/util/pub/pure_component.js',
     '/util/setdb.js', '/util/storage.js', '/www/util/pub/urlp.js'],
-    (_, React, ReactDOM, Pure_component, setdb, storage, zurlp)=>{
+    (React, ReactDOM, Pure_component, setdb, storage, zurlp)=>{
 
 // XXX saarya: change key once angular is removed
 const storage_key = 'NG_TRANSLATE_LANG_KEY';
@@ -59,7 +59,7 @@ class T extends Pure_component {
         const {children} = this.props;
         if (typeof children=='function')
             return children(key=>get_translation(translation, key));
-        if (_.isString(children))
+        if (typeof children=='string')
             return get_translation(translation, children.replace(/\s+/g, ' '));
         console.error('<T> must receive text to translate or a translate '
             +'function. Received: ', this.props.children);

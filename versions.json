@@ -1,7 +1,17 @@
 [
     {
+        "ver": "1.103.508",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "added Link Tester API"
+            }
+        ]
+    },
+    {
         "ver": "1.103.296",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",
@@ -11,7 +21,7 @@
     },
     {
         "ver": "1.102.979",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "star",

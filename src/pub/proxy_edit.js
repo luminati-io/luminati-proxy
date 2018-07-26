@@ -1208,8 +1208,8 @@ class Ips_lists extends Pure_component {
 const Rule = withRouter(class Rule extends Pure_component {
     state = {ports: []};
     trigger_types = [
-        {key: 'i.e. Status code', value: ''},
-        {key: 'URL', value: 'url'},
+        {key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type'},
+        {key: 'URL', value: 'url', tooltip: 'URL'},
         {key: 'Status code', value: 'status'},
         {key: 'HTML body element', value: 'body'},
         {key: 'Minimum request time', value: 'min_req_time'},
