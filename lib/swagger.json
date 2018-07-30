@@ -10,15 +10,9 @@
     },
     "host": "127.0.0.1:22999",
     "basePath": "/api",
-    "schemes": [
-        "http"
-    ],
-    "consumes": [
-        "application/json"
-    ],
-    "produces": [
-        "application/json# Describe your paths here"
-    ],
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
     "paths": {
         "/swagger": {
             "get": {
@@ -293,14 +287,14 @@
                     {
                         "name": "user_agent",
                         "in": "query",
-                        "description": "content of the User-Agent header",
+                        "description": "Content of the User-Agent header",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "headers",
                         "in": "query",
-                        "description": "desription of any other headers that will be sent along with the requests",
+                        "description": "Desription of any other headers that will be sent along with the requests",
                         "required": false,
                         "type": "json"
                     }
@@ -409,9 +403,7 @@
                         "schema": {
                             "type": "object",
                             "properties": {
-                                "status": {
-                                    "type": "string"
-                                }
+                                "status": {"type": "string"}
                             }
                         }
                     }
@@ -733,9 +725,7 @@
                 },
                 "whitelist_ips": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "Whitelist ip list for granting access to proxy"
                 },
                 "race_reqs": {
