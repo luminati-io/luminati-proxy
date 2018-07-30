@@ -272,14 +272,14 @@
                     {
                         "name": "country",
                         "in": "query",
-                        "description": "Choose your exit country for your requests",
+                        "description": "Target country in ISO 3166-1 alpha-2 format, e.g 'us' for United States",
                         "required": false,
                         "type": "string"
                     },
                     {
                         "name": "state",
                         "in": "query",
-                        "description": "Specific state in a given country",
+                        "description": "Target state, e.g 'ny' for New York",
                         "required": false,
                         "type": "string"
                     },
