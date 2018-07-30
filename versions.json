@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.103.790",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added regexp generator"
+            }
+        ]
+    },
+    {
         "ver": "1.103.508",
         "type": "stable",
         "changes": [

@@ -132,6 +132,8 @@ export const get_static_country = proxy=>{
     if (!zone)
         return false;
     const plan = zone.plans[zone.plans.length-1];
+    if (!plan)
+        return false;
     if (plan.type=='static')
         return plan.country||'any';
     if (['domain', 'domain_p'].includes(plan.vips_type))
@@ -478,3 +480,10 @@ const presets = {
 for (let k in presets)
     presets[k].key = k;
 export {presets};
+
+export const swagger_url = 'http://petstore.swagger.io/?url=https://'
++'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/'
++'swagger.json#/Proxy';
+
+export const swagger_link_tester_url = swagger_url
++'/get_proxies__port__link_test_json';

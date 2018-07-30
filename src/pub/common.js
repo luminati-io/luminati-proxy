@@ -8,7 +8,7 @@ import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import {bytes_format} from './util.js';
+import {bytes_format, ga_event} from './util.js';
 import * as Chrome from './chrome_widgets.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
@@ -305,6 +305,8 @@ export const Form_controller = props=>{
         return <Textarea {...props}/>;
     else if (type=='json')
         return <Json {...props}/>;
+    else if (type=='regex')
+        return <Regex {...props}/>;
     return <Input {...props}/>;
 };
 
@@ -367,6 +369,68 @@ export const Input = props=>{
           min={props.min} max={props.max} placeholder={props.placeholder}
           onBlur={props.on_blur}/>;
 };
+
+export class Regex extends Pure_component {
+    state = {recognized: false, checked: {}, focused: false};
+    formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'];
+    componentDidMount(){
+        this.recognize_regexp();
+    }
+    componentDidUpdate(prev_props){
+        if (prev_props.val!=this.props.val)
+            this.recognize_regexp();
+    }
+    recognize_regexp = ()=>{
+        const m = (this.props.val||'').match(/\\\.\((.+)\)\$/);
+        if (m&&m[1])
+        {
+            const checked = m[1].split('|').reduce(
+                (acc, e)=>({...acc, [e]: true}), {});
+            this.setState({recognized: true, checked});
+        }
+        else
+            this.setState({recognized: false, checked: {}});
+    };
+    toggle = f=>{
+        ga_event('proxy_edit', 'regexp_generator clicked', f);
+        this.setState(prev=>
+            ({checked: {...prev.checked, [f]: !prev.checked[f]}}),
+            this.gen_regexp);
+    };
+    gen_regexp = ()=>{
+        const formats = Object.keys(this.state.checked)
+            .filter(f=>this.state.checked[f]).join('|');
+        if (formats)
+            this.props.on_change_wrapper(`\\.(${formats})$`, this.props.id);
+        else
+            this.props.on_change_wrapper('', this.props.id);
+    };
+    classes = f=>{
+        const active = this.state.recognized&&this.state.checked[f];
+        return classnames('check', {active});
+    };
+    on_focus = ()=>this.setState({focused: true});
+    on_blur = ()=>this.setState({focused: false});
+    render(){
+        const {type, ...props} = this.props;
+        const tip_box_classes = classnames('tip_box',
+            {active: this.state.focused});
+        return <div tabIndex="1" className="regex_field"
+            onFocus={this.on_focus} onBlur={this.on_blur}>
+              <Input type="text" {...props}/>
+              <div className="tip_box_wrapper">
+                <div className={tip_box_classes}>
+                  <div className="checks">
+                    {this.formats.map(f=>
+                      <div key={f} onClick={this.toggle.bind(null, f)}
+                        className={this.classes(f)}>.{f}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>;
+    }
+}
 
 export const Checkbox = props=>
   <div className="form-check">

@@ -7,6 +7,7 @@ import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import classnames from 'classnames';
 import {Tooltip, Modal} from './common.js';
+import {swagger_url} from './util.js';
 import Schema from './schema.js';
 import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
@@ -143,10 +144,7 @@ const Footer = ()=>
           Contact</a>
       </div>
       <div>
-        <a href="http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy"
-          className="link">
-          API
-        </a>
+        <a href={swagger_url} className="link">API</a>
       </div>
     </div>;
 

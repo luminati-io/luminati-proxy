@@ -85,6 +85,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
     padding-left: 50px;
     padding-top: 60px;
 }
+.api_link { margin-left: 3px; }
 .flag-icon {
     border-radius: 2px;
     margin-right: 2px;
@@ -970,6 +971,54 @@ span.icon_link {
             text-align: center;
         }
     }
+    .regex_field {
+        position: relative;
+        outline: none;
+        &:hover .tip_box { visibility: visible; }
+        .tip_box_wrapper {
+            position: absolute;
+            top: 0;
+            left: 170px;
+            height: 36px;
+            width: 300px;
+        }
+        .tip_box {
+            position: absolute;
+            left: 10px;
+            height: 32px;
+            border-radius: 4px;
+            border: solid 1px @first_color;
+            padding: 3px 5px;
+            visibility: hidden;
+            &.active { visibility: visible; }
+            .checks { display: flex; }
+            .check {
+                cursor: pointer;
+                margin: auto 2px;
+                line-height: 1.3;
+                padding: 3px;
+                background: transparent;
+                text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
+                border-radius: 6px;
+                overflow: hidden;
+                &.active:not(.disabled), &:hover:not(.disabled) {
+                    color: white;
+                    text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
+                }
+                &.active {
+                    background: rgba(0, 0, 0, 0.3);
+                }
+                &:hover:not(.active) {
+                    background: rgba(0, 0, 0, 0.2);
+                }
+                &.disabled {
+                    opacity: 0.5;
+                    &:hover, &.active { background: transparent; }
+                    cursor: default;
+                }
+            }
+        }
+    }
 }
 .report_bug {
     .desc { margin: 10px 0; }
@@ -1495,7 +1544,6 @@ span.icon_link {
         }
     }
     .btn_lang { margin: 0 2px; }
-    .api_link { margin-left: 3px; }
 }
 .instructions {
     margin-left: 10px;

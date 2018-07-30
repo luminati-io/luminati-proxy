@@ -5,16 +5,16 @@ import React from 'react';
 import prism from 'prismjs';
 import instructions from './instructions.js';
 import {Code, Tooltip} from './common.js';
-import {ga_event} from './util.js';
+import {ga_event, swagger_url} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
 
 class Howto extends Pure_component {
     state = {option: 'code'};
-    choose_click(option){
+    choose_click = option=>{
         this.setState({option});
         ga_event('How-to-tab', 'select code/browser', option);
-    }
+    };
     render(){
         let cur_title;
         if (this.state.option)
@@ -33,11 +33,11 @@ class Howto extends Pure_component {
                   <div className="nav_tabs tabs">
                     <Tab id="code" title="Code"
                       tooltip="Examples how to use LPM programatically"
-                      on_click={this.choose_click.bind(this)}
+                      on_click={this.choose_click}
                       cur_tab={this.state.option}/>
                     <Tab id="browser" title="Browser"
                       tooltip="Examples how to inegrate LPM with the browser"
-                      on_click={this.choose_click.bind(this)}
+                      on_click={this.choose_click}
                       cur_tab={this.state.option}/>
                   </div>
                   <Instructions>{this.props.children}</Instructions>
@@ -67,14 +67,11 @@ const Lang_btn = props=>{
 
 class Code_instructions extends Pure_component {
     state = {lang: 'shell'};
-    swagger_url = 'http://petstore.swagger.io/?url=https://'
-    +'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/'
-    +'swagger.json#/Proxy';
-    click_lang(lang){
+    click_lang = lang=>{
         this.setState({lang});
         ga_event('How-to-tab', 'select option', lang);
-    }
-    click_copy(lang){ ga_event('How-to-tab', 'click copy', lang); }
+    };
+    click_copy = lang=>ga_event('How-to-tab', 'click copy', lang);
     render(){
         const Lang_btn_clickable = props=>
             <span onClick={()=>this.click_lang(props.lang)}>
@@ -107,29 +104,25 @@ class Code_instructions extends Pure_component {
               </div>
               <div>
                 View available API endpoints
-                <a className="link api_link" href={this.swagger_url}>here</a>
+                <a className="link api_link" href={swagger_url}>here</a>
               </div>
             </div>;
     }
 }
 
 class Browser_instructions extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {browser: 'chrome_win'};
-        this.port = window.localStorage.getItem(
-            'quickstart-first-proxy')||24000;
-    }
-    browser_changed(e){
+    state = {browser: 'chrome_win'};
+    port = window.localStorage.getItem('quickstart-first-proxy')||24000;
+    browser_changed = e=>{
         const browser = e.target.value;
         this.setState({browser});
         ga_event('How-to-tab', 'select option', browser);
-    }
+    };
     render(){
         return <div className="browser_instructions">
               <div className="header_well">
                 <p>Choose browser</p>
-                <select onChange={this.browser_changed.bind(this)}>
+                <select onChange={this.browser_changed}>
                   <option value="chrome_win">Chrome Windows</option>
                   <option value="chrome_mac">Chrome Mac</option>
                   <option value="ie">Internet Explorer</option>

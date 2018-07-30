@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "REPLACE_VERSION",
+        "version": "1.103.790",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -294,9 +294,9 @@
                     {
                         "name": "headers",
                         "in": "query",
-                        "description": "Desription of any other headers that will be sent along with the requests",
+                        "description": "Desription of any other headers that will be sent along with the requests\n\nExample:\nencodueURIComponent(JSON.strinigify({'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}))",
                         "required": false,
-                        "type": "json"
+                        "type": "string"
                     }
                 ],
                 "responses": {

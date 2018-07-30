@@ -814,6 +814,10 @@ class Targeting extends Pure_component {
             {value: 'vivo', key: 'Vivo'},
             {value: 'zain', key: 'Zain'},
             {value: 'umobile', key: 'U-Mobile'},
+            {value: 'proximus', label: 'Proximus'},
+            {value: 'tele2', label: 'Tele2'},
+            {value: 'mobitel', label: 'Mobitel'},
+            {value: 'o2', label: 'O2'},
         ];
     }
     allowed_countries = ()=>{
@@ -1208,22 +1212,47 @@ class Ips_lists extends Pure_component {
 const Rule = withRouter(class Rule extends Pure_component {
     state = {ports: []};
     trigger_types = [
-        {key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type'},
-        {key: 'URL', value: 'url', tooltip: 'URL'},
-        {key: 'Status code', value: 'status'},
-        {key: 'HTML body element', value: 'body'},
-        {key: 'Minimum request time', value: 'min_req_time'},
-        {key: 'Maximum request time', value: 'max_req_time'},
+        {key: 'i.e. Status code', value: '', tooltip: `Choose a trigger type.
+            For each request the system will check if the trigger is matching
+            the response`},
+        {key: 'URL', value: 'url', tooltip: `Trigger will be pulled for all
+            requests to the selected URL`},
+        {key: 'Status code', value: 'status', tooltip: `Trigger will be pulled
+            for all the requests that returns the matching status code`},
+        {key: 'HTML body element', value: 'body', tooltip: `Trigger will be
+            pulled when the response <body> contain the selected string`},
+        {key: 'Minimum request time', value: 'min_req_time',
+            tooltip: `Trigger will be pulled when the request time is above
+                the selected value`},
+        {key: 'Maximum request time', value: 'max_req_time',
+            tooltip: `Trigger will be pulled when the request time is below
+            the selected value`},
     ];
     action_types = [
-        {key: 'i.e. Retry with new IP', value: ''},
-        {key: 'Retry with new IP', value: 'retry'},
-        {key: 'Retry with new proxy port (Waterfall)',
-            value: 'retry_port'},
-        {key: 'Ban IP', value: 'ban_ip'},
-        {key: 'Refresh IP', value: 'refresh_ip'},
-        {key: 'Save IP to reserved pool', value: 'save_to_pool'},
-        {key: 'Save IP to fast pool', value: 'save_to_fast_pool'},
+        {key: 'i.e. Retry with new IP', value: '',
+            tooltip: `Select an action. Once the trigger rule is met the
+                selected action is executed automatically.`},
+        {key: 'Retry with new IP', value: 'retry',
+            tooltip: `System will send the exact same request again with
+                newly refreshed IP`},
+        {key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
+            tooltip: `System will send another request using different port
+                from your port list. This can allow cost optimization by
+                escalating the request between different types of networks
+                according to the port configuration.`},
+        {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
+            amount of time. usually used for failed request.`},
+        {key: 'Refresh IP', value: 'refresh_ip',
+            tooltip: `Refresh the current Data Center IP with new allocated IP.
+                this action contain additional charges. View the cost of
+                IP refreshing in your zones page http://luminati.io/cp/zones`},
+        {key: 'Save IP to reserved pool', value: 'save_to_pool',
+            tooltip: `Save the current IP to a pool of reserved IPs.
+                you can then download all the IPs at a later time.`},
+        {key: 'Save IP to fast pool', value: 'save_to_fast_pool',
+            tooltip: `Save the current IP to fast IP pool to increase
+                the speed of your requests. You will need to specify the
+                size of this pool.`},
         {key: 'Process data', value: 'process'},
     ];
     ban_options = [
@@ -1292,6 +1321,12 @@ const Rule = withRouter(class Rule extends Pure_component {
         if (val!='Custom')
             this.set_rule_field('status_custom', '');
     };
+    goto_tester = ()=>{
+        this.props.history.push({pathname: `/proxy_tester`, state: {
+            url: 'https://luminati.io/lpm/templates/product',
+            port: this.props.match.params.port,
+        }});
+    };
     render(){
         const rule = this.props.rule;
         const action_types = this.action_types.filter(at=>
@@ -1349,7 +1384,16 @@ const Rule = withRouter(class Rule extends Pure_component {
                   rule={this.props.rule}/>
               }
               {this.props.rule.action=='process' &&
-                <Rule_config id="process" type="json" rule={this.props.rule}/>}
+                <div>
+                  <Rule_config id="process" type="json"
+                    rule={this.props.rule}/>
+                  <div className="field_row">
+                    Test data processing in
+                    <a onClick={this.goto_tester} className="link api_link">
+                      proxy tester</a>
+                  </div>
+                </div>
+              }
             </div>;
     }
 });
@@ -1651,9 +1695,9 @@ const General = provider({tab_id: 'general'})(props=>{
           }
           <Config type="select" id="secure_proxy"
             data={props.default_opt('secure_proxy')}/>
-          <Config type="text" id="null_response"/>
-          <Config type="text" id="bypass_proxy"/>
-          <Config type="text" id="direct_include"/>
+          <Config type="regex" id="null_response"/>
+          <Config type="regex" id="bypass_proxy"/>
+          <Config type="regex" id="direct_include"/>
           <Config type="select" id="allow_proxy_auth"
             data={props.default_opt('allow_proxy_auth')}/>
           <Config type="select" id="iface"

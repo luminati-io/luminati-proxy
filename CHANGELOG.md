@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.103.790 
+- :sparkles: Added regexp generator
+
 ## 1.103.508 Stable
 - :star: added Link Tester API
 

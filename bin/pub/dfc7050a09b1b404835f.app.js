@@ -207,15 +207,19 @@ if (is_node) ;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.Logo = exports.Remove_icon = exports.Add_icon = exports.Circle_li = exports.Link_icon = exports.Tooltip = exports.Pagination_panel = exports.Nav = exports.Checkbox = exports.Input = exports.Labeled_controller = exports.Note = exports.Json = exports.Form_controller = exports.Select = exports.Textarea = exports.Code = exports.Loader_small = exports.Loader = exports.Warning = exports.Warnings = exports.Tooltip_bytes = exports.Enable_ssl_modal = exports.Modal = exports.Modal_dialog = undefined;
+exports.Logo = exports.Remove_icon = exports.Add_icon = exports.Circle_li = exports.Link_icon = exports.Tooltip = exports.Pagination_panel = exports.Nav = exports.Checkbox = exports.Regex = exports.Input = exports.Labeled_controller = exports.Note = exports.Json = exports.Form_controller = exports.Select = exports.Textarea = exports.Code = exports.Loader_small = exports.Loader = exports.Warning = exports.Warnings = exports.Tooltip_bytes = exports.Enable_ssl_modal = exports.Modal = exports.Modal_dialog = undefined;
+
+var _defineProperty2 = __webpack_require__(46);
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
 var _objectWithoutProperties2 = __webpack_require__(7);
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
 
-var _extends2 = __webpack_require__(6);
+var _extends4 = __webpack_require__(6);
 
-var _extends3 = _interopRequireDefault(_extends2);
+var _extends5 = _interopRequireDefault(_extends4);
 
 var _regenerator = __webpack_require__(21);
 
@@ -255,7 +259,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -265,19 +269,19 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _reactBootstrapTypeahead = __webpack_require__(280);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _chrome_widgets = __webpack_require__(179);
 
 var Chrome = _interopRequireWildcard(_chrome_widgets);
 
-var _codemirror = __webpack_require__(44);
+var _codemirror = __webpack_require__(45);
 
 var _codemirror2 = _interopRequireDefault(_codemirror);
 
 __webpack_require__(84);
 
-__webpack_require__(120);
+__webpack_require__(119);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -753,7 +757,7 @@ var Double_number = function Double_number(props) {
     return _react2.default.createElement(
         'span',
         { className: 'double_field' },
-        _react2.default.createElement(Input, (0, _extends3.default)({}, props, { val: vals[0] || '', id: props.id + '_start',
+        _react2.default.createElement(Input, (0, _extends5.default)({}, props, { val: vals[0] || '', id: props.id + '_start',
             type: 'number', disabled: props.disabled,
             on_change_wrapper: function on_change_wrapper(val) {
                 return update(val, vals[1]);
@@ -763,7 +767,7 @@ var Double_number = function Double_number(props) {
             { className: 'devider' },
             ':'
         ),
-        _react2.default.createElement(Input, (0, _extends3.default)({}, props, { val: vals[1] || '', id: props.id + '_end',
+        _react2.default.createElement(Input, (0, _extends5.default)({}, props, { val: vals[1] || '', id: props.id + '_end',
             type: 'number', disabled: props.disabled,
             on_change_wrapper: function on_change_wrapper(val) {
                 return update(vals[0], val);
@@ -780,7 +784,7 @@ var Typeahead_wrapper = function Typeahead_wrapper(props) {
 
 var Form_controller = exports.Form_controller = function Form_controller(props) {
     var type = props.type;
-    if (type == 'select') return _react2.default.createElement(Select, props);else if (type == 'double_number') return _react2.default.createElement(Double_number, props);else if (type == 'typeahead') return _react2.default.createElement(Typeahead_wrapper, props);else if (type == 'textarea') return _react2.default.createElement(Textarea, props);else if (type == 'json') return _react2.default.createElement(Json, props);
+    if (type == 'select') return _react2.default.createElement(Select, props);else if (type == 'double_number') return _react2.default.createElement(Double_number, props);else if (type == 'typeahead') return _react2.default.createElement(Typeahead_wrapper, props);else if (type == 'textarea') return _react2.default.createElement(Textarea, props);else if (type == 'json') return _react2.default.createElement(Json, props);else if (type == 'regex') return _react2.default.createElement(Regex, props);
     return _react2.default.createElement(Input, props);
 };
 
@@ -872,7 +876,7 @@ var Labeled_controller = function Labeled_controller(_ref6) {
             _react2.default.createElement(
                 'div',
                 { className: 'inline_field' },
-                _react2.default.createElement(Form_controller, (0, _extends3.default)({ disabled: disabled }, props)),
+                _react2.default.createElement(Form_controller, (0, _extends5.default)({ disabled: disabled }, props)),
                 sufix && _react2.default.createElement(
                     'span',
                     { className: 'sufix' },
@@ -902,6 +906,100 @@ var Input = exports.Input = function Input(props) {
         onBlur: props.on_blur });
 };
 
+var Regex = exports.Regex = function (_Pure_component4) {
+    (0, _inherits3.default)(Regex, _Pure_component4);
+
+    function Regex() {
+        var _ref7;
+
+        var _temp3, _this7, _ret3;
+
+        (0, _classCallCheck3.default)(this, Regex);
+
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+        }
+
+        return _ret3 = (_temp3 = (_this7 = (0, _possibleConstructorReturn3.default)(this, (_ref7 = Regex.__proto__ || Object.getPrototypeOf(Regex)).call.apply(_ref7, [this].concat(args))), _this7), _this7.state = { recognized: false, checked: {}, focused: false }, _this7.formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'], _this7.recognize_regexp = function () {
+            var m = (_this7.props.val || '').match(/\\\.\((.+)\)\$/);
+            if (m && m[1]) {
+                var checked = m[1].split('|').reduce(function (acc, e) {
+                    return (0, _extends5.default)({}, acc, (0, _defineProperty3.default)({}, e, true));
+                }, {});
+                _this7.setState({ recognized: true, checked: checked });
+            } else _this7.setState({ recognized: false, checked: {} });
+        }, _this7.toggle = function (f) {
+            (0, _util.ga_event)('proxy_edit', 'regexp_generator clicked', f);
+            _this7.setState(function (prev) {
+                return { checked: (0, _extends5.default)({}, prev.checked, (0, _defineProperty3.default)({}, f, !prev.checked[f])) };
+            }, _this7.gen_regexp);
+        }, _this7.gen_regexp = function () {
+            var formats = Object.keys(_this7.state.checked).filter(function (f) {
+                return _this7.state.checked[f];
+            }).join('|');
+            if (formats) _this7.props.on_change_wrapper('\\.(' + formats + ')$', _this7.props.id);else _this7.props.on_change_wrapper('', _this7.props.id);
+        }, _this7.classes = function (f) {
+            var active = _this7.state.recognized && _this7.state.checked[f];
+            return (0, _classnames2.default)('check', { active: active });
+        }, _this7.on_focus = function () {
+            return _this7.setState({ focused: true });
+        }, _this7.on_blur = function () {
+            return _this7.setState({ focused: false });
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this7, _ret3);
+    }
+
+    (0, _createClass3.default)(Regex, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            this.recognize_regexp();
+        }
+    }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate(prev_props) {
+            if (prev_props.val != this.props.val) this.recognize_regexp();
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this8 = this;
+
+            var _props = this.props,
+                type = _props.type,
+                props = (0, _objectWithoutProperties3.default)(_props, ['type']);
+
+            var tip_box_classes = (0, _classnames2.default)('tip_box', { active: this.state.focused });
+            return _react2.default.createElement(
+                'div',
+                { tabIndex: '1', className: 'regex_field',
+                    onFocus: this.on_focus, onBlur: this.on_blur },
+                _react2.default.createElement(Input, (0, _extends5.default)({ type: 'text' }, props)),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'tip_box_wrapper' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: tip_box_classes },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'checks' },
+                            this.formats.map(function (f) {
+                                return _react2.default.createElement(
+                                    'div',
+                                    { key: f, onClick: _this8.toggle.bind(null, f),
+                                        className: _this8.classes(f) },
+                                    '.',
+                                    f
+                                );
+                            })
+                        )
+                    )
+                )
+            );
+        }
+    }]);
+    return Regex;
+}(_pure_component2.default);
+
 var Checkbox = exports.Checkbox = function Checkbox(props) {
     return _react2.default.createElement(
         'div',
@@ -918,10 +1016,10 @@ var Checkbox = exports.Checkbox = function Checkbox(props) {
     );
 };
 
-var Nav = exports.Nav = function Nav(_ref7) {
-    var title = _ref7.title,
-        subtitle = _ref7.subtitle,
-        warning = _ref7.warning;
+var Nav = exports.Nav = function Nav(_ref8) {
+    var title = _ref8.title,
+        subtitle = _ref8.subtitle,
+        warning = _ref8.warning;
     return _react2.default.createElement(
         'div',
         { className: 'nav_header' },
@@ -939,24 +1037,24 @@ var Nav = exports.Nav = function Nav(_ref7) {
     );
 };
 
-var Warning_msg = function Warning_msg(_ref8) {
-    var warning = _ref8.warning;
+var Warning_msg = function Warning_msg(_ref9) {
+    var warning = _ref9.warning;
 
     if (!warning) return null;
     return _react2.default.createElement(Warning, { text: warning });
 };
 
-var Pagination_panel = exports.Pagination_panel = function Pagination_panel(_ref9) {
-    var entries = _ref9.entries,
-        items_per_page = _ref9.items_per_page,
-        cur_page = _ref9.cur_page,
-        page_change = _ref9.page_change,
-        children = _ref9.children,
-        top = _ref9.top,
-        bottom = _ref9.bottom,
-        update_items_per_page = _ref9.update_items_per_page,
-        max_buttons = _ref9.max_buttons,
-        total = _ref9.total;
+var Pagination_panel = exports.Pagination_panel = function Pagination_panel(_ref10) {
+    var entries = _ref10.entries,
+        items_per_page = _ref10.items_per_page,
+        cur_page = _ref10.cur_page,
+        page_change = _ref10.page_change,
+        children = _ref10.children,
+        top = _ref10.top,
+        bottom = _ref10.bottom,
+        update_items_per_page = _ref10.update_items_per_page,
+        max_buttons = _ref10.max_buttons,
+        total = _ref10.total;
 
     total = total || entries && entries.length || 0;
     var pagination = null;
@@ -1008,8 +1106,8 @@ var Pagination_panel = exports.Pagination_panel = function Pagination_panel(_ref
     );
 };
 
-var Tooltip = exports.Tooltip = function (_Pure_component4) {
-    (0, _inherits3.default)(Tooltip, _Pure_component4);
+var Tooltip = exports.Tooltip = function (_Pure_component5) {
+    (0, _inherits3.default)(Tooltip, _Pure_component5);
 
     function Tooltip() {
         (0, _classCallCheck3.default)(this, Tooltip);
@@ -1068,14 +1166,14 @@ var Tooltip = exports.Tooltip = function (_Pure_component4) {
     return Tooltip;
 }(_pure_component2.default);
 
-var Link_icon = exports.Link_icon = function Link_icon(_ref10) {
-    var tooltip = _ref10.tooltip,
-        on_click = _ref10.on_click,
-        id = _ref10.id,
-        classes = _ref10.classes,
-        disabled = _ref10.disabled,
-        invisible = _ref10.invisible,
-        small = _ref10.small;
+var Link_icon = exports.Link_icon = function Link_icon(_ref11) {
+    var tooltip = _ref11.tooltip,
+        on_click = _ref11.on_click,
+        id = _ref11.id,
+        classes = _ref11.classes,
+        disabled = _ref11.disabled,
+        invisible = _ref11.invisible,
+        small = _ref11.small;
 
     if (invisible) tooltip = '';
     if (disabled || invisible) on_click = function on_click() {
@@ -1111,9 +1209,9 @@ var Circle_li = exports.Circle_li = function Circle_li(props) {
     );
 };
 
-var Add_icon = exports.Add_icon = function Add_icon(_ref11) {
-    var click = _ref11.click,
-        tooltip = _ref11.tooltip;
+var Add_icon = exports.Add_icon = function Add_icon(_ref12) {
+    var click = _ref12.click,
+        tooltip = _ref12.tooltip;
     return _react2.default.createElement(
         Tooltip,
         { title: tooltip },
@@ -1125,9 +1223,9 @@ var Add_icon = exports.Add_icon = function Add_icon(_ref11) {
     );
 };
 
-var Remove_icon = exports.Remove_icon = function Remove_icon(_ref12) {
-    var click = _ref12.click,
-        tooltip = _ref12.tooltip;
+var Remove_icon = exports.Remove_icon = function Remove_icon(_ref13) {
+    var click = _ref13.click,
+        tooltip = _ref13.tooltip;
     return _react2.default.createElement(
         Tooltip,
         { title: tooltip },
@@ -1139,30 +1237,30 @@ var Remove_icon = exports.Remove_icon = function Remove_icon(_ref12) {
     );
 };
 
-var Logo = exports.Logo = function (_Pure_component5) {
-    (0, _inherits3.default)(Logo, _Pure_component5);
+var Logo = exports.Logo = function (_Pure_component6) {
+    (0, _inherits3.default)(Logo, _Pure_component6);
 
     function Logo() {
-        var _ref13;
+        var _ref14;
 
-        var _temp3, _this8, _ret3;
+        var _temp4, _this10, _ret4;
 
         (0, _classCallCheck3.default)(this, Logo);
 
-        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-            args[_key3] = arguments[_key3];
+        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
         }
 
-        return _ret3 = (_temp3 = (_this8 = (0, _possibleConstructorReturn3.default)(this, (_ref13 = Logo.__proto__ || Object.getPrototypeOf(Logo)).call.apply(_ref13, [this].concat(args))), _this8), _this8.state = {}, _temp3), (0, _possibleConstructorReturn3.default)(_this8, _ret3);
+        return _ret4 = (_temp4 = (_this10 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Logo.__proto__ || Object.getPrototypeOf(Logo)).call.apply(_ref14, [this].concat(args))), _this10), _this10.state = {}, _temp4), (0, _possibleConstructorReturn3.default)(_this10, _ret4);
     }
 
     (0, _createClass3.default)(Logo, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this9 = this;
+            var _this11 = this;
 
             this.setdb_on('head.version', function (ver) {
-                return _this9.setState({ ver: ver });
+                return _this11.setState({ ver: ver });
             });
         }
     }, {
@@ -1201,119 +1299,6 @@ module.exports = __webpack_require__(189);
 /* 24 */,
 /* 25 */,
 /* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
-var module;
-// LICENSE_CODE ZON ISC
-'use strict'; /*zlint node, br*/
-(function(){
-
-var is_node_ff = typeof module=='object' && module.exports;
-if (!is_node_ff)
-    ;
-else
-    ;
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(36), __webpack_require__(232), __webpack_require__(95),
-    __webpack_require__(399), __webpack_require__(201)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, etask, date, zescape, zerr, events){
-var E = ajax;
-var assign = Object.assign;
-E.events = new events.EventEmitter();
-E.json = function(opt){ return ajax(assign({}, opt, {json: 1})); };
-E.abort = function(ajax){ ajax.goto('abort'); };
-// XXX arik: need test
-function ajax(opt){
-    var timeout = opt.timeout||20*date.ms.SEC, slow = opt.slow||2*date.ms.SEC;
-    var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs);
-    var url = zescape.uri(opt.url, qs), perr = opt.perr;
-    // opt.type is deprecated
-    var method = opt.method||opt.type||'GET';
-    var data_type = opt.json ? 'json' : 'text';
-    var t0 = Date.now();
-    var xhr;
-    zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
-    return etask([function(){
-        var ajopt = {dataType: data_type, type: method, url: url,
-            data: data, timeout: timeout, xhrFields: {}};
-        if (opt.headers)
-            ajopt.headers = opt.headers;
-        if (opt.content_type)
-            ajopt.contentType = opt.content_type;
-        if (opt.with_credentials)
-            ajopt.xhrFields.withCredentials = true;
-        if (opt.onprogress)
-            ajopt.xhrFields.onprogress = opt.onprogress;
-        if (opt.onuploadprogress)
-        {
-            ajopt.xhr = function(){
-                var xhr = $.ajaxSettings.xhr();
-                xhr.upload.onprogress = opt.onuploadprogress;
-                return xhr;
-            };
-        }
-        if (opt.multipart)
-        {
-            ajopt.contentType = false;
-            ajopt.processData = false;
-            delete ajopt.dataType;
-        }
-        return xhr = $.ajax(ajopt);
-    }, function catch$(err){
-        zerr('ajax('+data_type+') failed url '+url+' data '+
-            zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
-            xhr.statusText+'\nresponseText: '+
-            (xhr.responseText||'').substr(0, 200));
-        if (retry)
-            return this.return(ajax(assign({}, opt, {retry: retry-1})));
-        if (xhr.statusText=='timeout')
-            E.events.emit('timeout', this);
-        var error = xhr.statusText||'no_status';
-        if (opt.ret_err_code && xhr.statusText && xhr.status)
-            error = xhr.status+' - '+error;
-        if (opt.no_throw)
-            return {error: error, message: xhr.responseText};
-        var err_obj = new Error(error);
-        err_obj.hola_info = {data_type: data_type, url: url,
-            status: xhr.status, response_text: xhr.responseText};
-        err_obj.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
-            xhr.getResponseHeader('X-Hola-Error');
-        throw err_obj;
-    }, function(data){
-        var t = Date.now()-t0;
-        zerr[t>slow ? 'err' : 'debug'](
-            'ajax('+data_type+') '+(t>slow ? 'SLOW ' : 'ok ')+t+'ms url '+url);
-        if (t>slow && perr)
-            perr({id: 'be_ajax_slow', info: t+'ms '+url});
-        if (E.do_op)
-            E.do_op(data&&data.do_op);
-        return this.return(data);
-    }, function abort(){
-        // reachable only via E.abort
-        xhr.abort();
-    }]);
-}
-
-['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
-    E[m.toLowerCase()] = function(url, opt){
-        url = typeof url=='string' ? {url: url} : url;
-        opt = assign({method: m, json: 1}, url, opt);
-        if (!{get: 1, delete: 1}[opt.method.toLowerCase()]
-            && opt.data!=null && typeof opt.data!='string')
-        {
-            opt.content_type = opt.content_type||'application/json';
-            if (opt.content_type.startsWith('application/json'))
-                opt.data = JSON.stringify(opt.data);
-        }
-        return ajax(opt);
-    };
-});
-
-return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
-
-
-/***/ }),
-/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1451,6 +1436,7 @@ var get_static_country = exports.get_static_country = function get_static_countr
     var zone = proxy.zones[proxy.zone];
     if (!zone) return false;
     var plan = zone.plans[zone.plans.length - 1];
+    if (!plan) return false;
     if (plan.type == 'static') return plan.country || 'any';
     if (['domain', 'domain_p'].includes(plan.vips_type)) return plan.vip_country || 'any';
     return false;
@@ -1747,6 +1733,122 @@ var presets = {
 for (var k in presets) {
     presets[k].key = k;
 }exports.presets = presets;
+var swagger_url = exports.swagger_url = 'http://petstore.swagger.io/?url=https://' + 'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/' + 'swagger.json#/Proxy';
+
+var swagger_link_tester_url = exports.swagger_link_tester_url = swagger_url + '/get_proxies__port__link_test_json';
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
+var module;
+// LICENSE_CODE ZON ISC
+'use strict'; /*zlint node, br*/
+(function(){
+
+var is_node_ff = typeof module=='object' && module.exports;
+if (!is_node_ff)
+    ;
+else
+    ;
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(36), __webpack_require__(232), __webpack_require__(95),
+    __webpack_require__(399), __webpack_require__(201)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, etask, date, zescape, zerr, events){
+var E = ajax;
+var assign = Object.assign;
+E.events = new events.EventEmitter();
+E.json = function(opt){ return ajax(assign({}, opt, {json: 1})); };
+E.abort = function(ajax){ ajax.goto('abort'); };
+// XXX arik: need test
+function ajax(opt){
+    var timeout = opt.timeout||20*date.ms.SEC, slow = opt.slow||2*date.ms.SEC;
+    var retry = opt.retry, data = opt.data, qs = zescape.qs(opt.qs);
+    var url = zescape.uri(opt.url, qs), perr = opt.perr;
+    // opt.type is deprecated
+    var method = opt.method||opt.type||'GET';
+    var data_type = opt.json ? 'json' : 'text';
+    var t0 = Date.now();
+    var xhr;
+    zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
+    return etask([function(){
+        var ajopt = {dataType: data_type, type: method, url: url,
+            data: data, timeout: timeout, xhrFields: {}};
+        if (opt.headers)
+            ajopt.headers = opt.headers;
+        if (opt.content_type)
+            ajopt.contentType = opt.content_type;
+        if (opt.with_credentials)
+            ajopt.xhrFields.withCredentials = true;
+        if (opt.onprogress)
+            ajopt.xhrFields.onprogress = opt.onprogress;
+        if (opt.onuploadprogress)
+        {
+            ajopt.xhr = function(){
+                var xhr = $.ajaxSettings.xhr();
+                xhr.upload.onprogress = opt.onuploadprogress;
+                return xhr;
+            };
+        }
+        if (opt.multipart)
+        {
+            ajopt.contentType = false;
+            ajopt.processData = false;
+            delete ajopt.dataType;
+        }
+        return xhr = $.ajax(ajopt);
+    }, function catch$(err){
+        zerr('ajax('+data_type+') failed url '+url+' data '+
+            zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
+            xhr.statusText+'\nresponseText: '+
+            (xhr.responseText||'').substr(0, 200));
+        if (retry)
+            return this.return(ajax(assign({}, opt, {retry: retry-1})));
+        if (xhr.statusText=='timeout')
+            E.events.emit('timeout', this);
+        var error = xhr.statusText||'no_status';
+        if (opt.ret_err_code && xhr.statusText && xhr.status)
+            error = xhr.status+' - '+error;
+        if (opt.no_throw)
+            return {error: error, message: xhr.responseText};
+        var err_obj = new Error(error);
+        err_obj.hola_info = {data_type: data_type, url: url,
+            status: xhr.status, response_text: xhr.responseText};
+        err_obj.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
+            xhr.getResponseHeader('X-Hola-Error');
+        throw err_obj;
+    }, function(data){
+        var t = Date.now()-t0;
+        zerr[t>slow ? 'err' : 'debug'](
+            'ajax('+data_type+') '+(t>slow ? 'SLOW ' : 'ok ')+t+'ms url '+url);
+        if (t>slow && perr)
+            perr({id: 'be_ajax_slow', info: t+'ms '+url});
+        if (E.do_op)
+            E.do_op(data&&data.do_op);
+        return this.return(data);
+    }, function abort(){
+        // reachable only via E.abort
+        xhr.abort();
+    }]);
+}
+
+['GET', 'POST', 'PUT', 'DELETE'].forEach(function(m){
+    E[m.toLowerCase()] = function(url, opt){
+        url = typeof url=='string' ? {url: url} : url;
+        opt = assign({method: m, json: 1}, url, opt);
+        if (!{get: 1, delete: 1}[opt.method.toLowerCase()]
+            && opt.data!=null && typeof opt.data!='string')
+        {
+            opt.content_type = opt.content_type||'application/json';
+            if (opt.content_type.startsWith('application/json'))
+                opt.data = JSON.stringify(opt.data);
+        }
+        return ajax(opt);
+    };
+});
+
+return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
+
 
 /***/ }),
 /* 28 */,
@@ -1944,7 +2046,7 @@ if (typeof assert!='function')
     assert = function(){}; // XXX romank: add proper assert
 // XXX yuval: /util/events.js -> events when node 6 (support prependListener)
 // is here
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(398), __webpack_require__(153), __webpack_require__(231)], __WEBPACK_AMD_DEFINE_RESULT__ = function(events, array, zutil){
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(398), __webpack_require__(152), __webpack_require__(231)], __WEBPACK_AMD_DEFINE_RESULT__ = function(events, array, zutil){
 var E = Etask;
 var etask = Etask;
 var env = process.env, assign = Object.assign;
@@ -3422,51 +3524,7 @@ return Etask; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 
 /***/ }),
-/* 37 */,
-/* 38 */,
-/* 39 */,
-/* 40 */,
-/* 41 */,
-/* 42 */,
-/* 43 */
-/***/ (function(module, exports) {
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return value != null && (type == 'object' || type == 'function');
-}
-
-module.exports = isObject;
-
-
-/***/ }),
-/* 44 */,
-/* 45 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3525,14 +3583,88 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 46 */,
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */,
+/* 42 */,
+/* 43 */,
+/* 44 */
+/***/ (function(module, exports) {
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return value != null && (type == 'object' || type == 'function');
+}
+
+module.exports = isObject;
+
+
+/***/ }),
+/* 45 */,
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _defineProperty = __webpack_require__(190);
+
+var _defineProperty2 = _interopRequireDefault(_defineProperty);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function (obj, key, value) {
+  if (key in obj) {
+    (0, _defineProperty2.default)(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+/***/ }),
 /* 47 */,
 /* 48 */,
 /* 49 */,
 /* 50 */,
 /* 51 */,
 /* 52 */,
-/* 53 */
+/* 53 */,
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Symbol = __webpack_require__(82),
@@ -3567,7 +3699,7 @@ module.exports = baseGetTag;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 /**
@@ -3602,7 +3734,7 @@ module.exports = isObjectLike;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseIsNative = __webpack_require__(550),
@@ -3625,7 +3757,7 @@ module.exports = getNative;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3660,7 +3792,7 @@ var _getInputText2 = __webpack_require__(628);
 
 var _getInputText3 = _interopRequireDefault(_getInputText2);
 
-var _getOptionLabel2 = __webpack_require__(116);
+var _getOptionLabel2 = __webpack_require__(115);
 
 var _getOptionLabel3 = _interopRequireDefault(_getOptionLabel2);
 
@@ -3676,11 +3808,11 @@ var _scrollIntoViewIfNeeded2 = __webpack_require__(631);
 
 var _scrollIntoViewIfNeeded3 = _interopRequireDefault(_scrollIntoViewIfNeeded2);
 
-var _stripDiacritics2 = __webpack_require__(118);
+var _stripDiacritics2 = __webpack_require__(117);
 
 var _stripDiacritics3 = _interopRequireDefault(_stripDiacritics2);
 
-var _warn2 = __webpack_require__(57);
+var _warn2 = __webpack_require__(58);
 
 var _warn3 = _interopRequireDefault(_warn2);
 
@@ -3702,7 +3834,7 @@ exports.warn = _warn3.default;
 /* eslint-enable object-curly-spacing */
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3745,36 +3877,6 @@ function warn(falseToWarn, message) {
 function _resetWarned() {
   warned = {};
 }
-
-/***/ }),
-/* 58 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-
-var _defineProperty = __webpack_require__(190);
-
-var _defineProperty2 = _interopRequireDefault(_defineProperty);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function (obj, key, value) {
-  if (key in obj) {
-    (0, _defineProperty2.default)(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-};
 
 /***/ }),
 /* 59 */,
@@ -3841,7 +3943,7 @@ module.exports = Symbol;
 /* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isSymbol = __webpack_require__(109);
+var isSymbol = __webpack_require__(108);
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0;
@@ -4276,7 +4378,702 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 /***/ }),
 /* 96 */,
 /* 97 */,
-/* 98 */
+/* 98 */,
+/* 99 */,
+/* 100 */,
+/* 101 */,
+/* 102 */,
+/* 103 */,
+/* 104 */,
+/* 105 */,
+/* 106 */,
+/* 107 */,
+/* 108 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseGetTag = __webpack_require__(54),
+    isObjectLike = __webpack_require__(55);
+
+/** `Object#toString` result references. */
+var symbolTag = '[object Symbol]';
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && baseGetTag(value) == symbolTag);
+}
+
+module.exports = isSymbol;
+
+
+/***/ }),
+/* 109 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var listCacheClear = __webpack_require__(540),
+    listCacheDelete = __webpack_require__(541),
+    listCacheGet = __webpack_require__(542),
+    listCacheHas = __webpack_require__(543),
+    listCacheSet = __webpack_require__(544);
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries == null ? 0 : entries.length;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+module.exports = ListCache;
+
+
+/***/ }),
+/* 110 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var eq = __webpack_require__(111);
+
+/**
+ * Gets the index at which the `key` is found in `array` of key-value pairs.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} key The key to search for.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function assocIndexOf(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+
+module.exports = assocIndexOf;
+
+
+/***/ }),
+/* 111 */
+/***/ (function(module, exports) {
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
+
+module.exports = eq;
+
+
+/***/ }),
+/* 112 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var getNative = __webpack_require__(56);
+
+/* Built-in method references that are verified to be native. */
+var nativeCreate = getNative(Object, 'create');
+
+module.exports = nativeCreate;
+
+
+/***/ }),
+/* 113 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isKeyable = __webpack_require__(562);
+
+/**
+ * Gets the data for `map`.
+ *
+ * @private
+ * @param {Object} map The map to query.
+ * @param {string} key The reference key.
+ * @returns {*} Returns the map data.
+ */
+function getMapData(map, key) {
+  var data = map.__data__;
+  return isKeyable(key)
+    ? data[typeof key == 'string' ? 'string' : 'hash']
+    : data.map;
+}
+
+module.exports = getMapData;
+
+
+/***/ }),
+/* 114 */
+/***/ (function(module, exports) {
+
+/** Used as references for various `Number` constants. */
+var MAX_SAFE_INTEGER = 9007199254740991;
+
+/** Used to detect unsigned integer values. */
+var reIsUint = /^(?:0|[1-9]\d*)$/;
+
+/**
+ * Checks if `value` is a valid array-like index.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
+ * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
+ */
+function isIndex(value, length) {
+  length = length == null ? MAX_SAFE_INTEGER : length;
+  return !!length &&
+    (typeof value == 'number' || reIsUint.test(value)) &&
+    (value > -1 && value % 1 == 0 && value < length);
+}
+
+module.exports = isIndex;
+
+
+/***/ }),
+/* 115 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _invariant = __webpack_require__(22);
+
+var _invariant2 = _interopRequireDefault(_invariant);
+
+var _isPlainObject = __webpack_require__(298);
+
+var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Retrieves the display string from an option. Options can be the string
+ * themselves, or an object with a defined display string. Anything else throws
+ * an error.
+ */
+function getOptionLabel(option, labelKey) {
+  var optionLabel = void 0;
+
+  if (typeof option === 'string') {
+    optionLabel = option;
+  }
+
+  if (typeof labelKey === 'function') {
+    // This overwrites string options, but we assume the consumer wants to do
+    // something custom if `labelKey` is a function.
+    optionLabel = labelKey(option);
+  } else if (typeof labelKey === 'string' && (0, _isPlainObject2.default)(option)) {
+    optionLabel = option[labelKey];
+  }
+
+  !(typeof optionLabel === 'string') ? process.env.NODE_ENV !== 'production' ? (0, _invariant2.default)(false, 'One or more options does not have a valid label string. Check the ' + '`labelKey` prop to ensure that it matches the correct option key and ' + 'provides a string for filtering and display.') : (0, _invariant2.default)(false) : void 0;
+
+  return optionLabel;
+}
+
+exports.default = getOptionLabel;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
+
+/***/ }),
+/* 116 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isArray = __webpack_require__(34),
+    isKey = __webpack_require__(176),
+    stringToPath = __webpack_require__(610),
+    toString = __webpack_require__(297);
+
+/**
+ * Casts `value` to a path array if it's not one.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @param {Object} [object] The object to query keys on.
+ * @returns {Array} Returns the cast property path array.
+ */
+function castPath(value, object) {
+  if (isArray(value)) {
+    return value;
+  }
+  return isKey(value, object) ? [value] : stringToPath(toString(value));
+}
+
+module.exports = castPath;
+
+
+/***/ }),
+/* 117 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = stripDiacritics;
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Taken from: http://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript/18391901#18391901
+ */
+
+/* eslint-disable max-len */
+var map = [{ 'base': 'A', 'letters': 'A\u24B6\uFF21\xC0\xC1\xC2\u1EA6\u1EA4\u1EAA\u1EA8\xC3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\xC4\u01DE\u1EA2\xC5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F' }, { 'base': 'AA', 'letters': '\uA732' }, { 'base': 'AE', 'letters': '\xC6\u01FC\u01E2' }, { 'base': 'AO', 'letters': '\uA734' }, { 'base': 'AU', 'letters': '\uA736' }, { 'base': 'AV', 'letters': '\uA738\uA73A' }, { 'base': 'AY', 'letters': '\uA73C' }, { 'base': 'B', 'letters': 'B\u24B7\uFF22\u1E02\u1E04\u1E06\u0243\u0182\u0181' }, { 'base': 'C', 'letters': 'C\u24B8\uFF23\u0106\u0108\u010A\u010C\xC7\u1E08\u0187\u023B\uA73E' }, { 'base': 'D', 'letters': 'D\u24B9\uFF24\u1E0A\u010E\u1E0C\u1E10\u1E12\u1E0E\u0110\u018B\u018A\u0189\uA779\xD0' }, { 'base': 'DZ', 'letters': '\u01F1\u01C4' }, { 'base': 'Dz', 'letters': '\u01F2\u01C5' }, { 'base': 'E', 'letters': 'E\u24BA\uFF25\xC8\xC9\xCA\u1EC0\u1EBE\u1EC4\u1EC2\u1EBC\u0112\u1E14\u1E16\u0114\u0116\xCB\u1EBA\u011A\u0204\u0206\u1EB8\u1EC6\u0228\u1E1C\u0118\u1E18\u1E1A\u0190\u018E' }, { 'base': 'F', 'letters': 'F\u24BB\uFF26\u1E1E\u0191\uA77B' }, { 'base': 'G', 'letters': 'G\u24BC\uFF27\u01F4\u011C\u1E20\u011E\u0120\u01E6\u0122\u01E4\u0193\uA7A0\uA77D\uA77E' }, { 'base': 'H', 'letters': 'H\u24BD\uFF28\u0124\u1E22\u1E26\u021E\u1E24\u1E28\u1E2A\u0126\u2C67\u2C75\uA78D' }, { 'base': 'I', 'letters': 'I\u24BE\uFF29\xCC\xCD\xCE\u0128\u012A\u012C\u0130\xCF\u1E2E\u1EC8\u01CF\u0208\u020A\u1ECA\u012E\u1E2C\u0197' }, { 'base': 'J', 'letters': 'J\u24BF\uFF2A\u0134\u0248' }, { 'base': 'K', 'letters': 'K\u24C0\uFF2B\u1E30\u01E8\u1E32\u0136\u1E34\u0198\u2C69\uA740\uA742\uA744\uA7A2' }, { 'base': 'L', 'letters': 'L\u24C1\uFF2C\u013F\u0139\u013D\u1E36\u1E38\u013B\u1E3C\u1E3A\u0141\u023D\u2C62\u2C60\uA748\uA746\uA780' }, { 'base': 'LJ', 'letters': '\u01C7' }, { 'base': 'Lj', 'letters': '\u01C8' }, { 'base': 'M', 'letters': 'M\u24C2\uFF2D\u1E3E\u1E40\u1E42\u2C6E\u019C' }, { 'base': 'N', 'letters': 'N\u24C3\uFF2E\u01F8\u0143\xD1\u1E44\u0147\u1E46\u0145\u1E4A\u1E48\u0220\u019D\uA790\uA7A4' }, { 'base': 'NJ', 'letters': '\u01CA' }, { 'base': 'Nj', 'letters': '\u01CB' }, { 'base': 'O', 'letters': 'O\u24C4\uFF2F\xD2\xD3\xD4\u1ED2\u1ED0\u1ED6\u1ED4\xD5\u1E4C\u022C\u1E4E\u014C\u1E50\u1E52\u014E\u022E\u0230\xD6\u022A\u1ECE\u0150\u01D1\u020C\u020E\u01A0\u1EDC\u1EDA\u1EE0\u1EDE\u1EE2\u1ECC\u1ED8\u01EA\u01EC\xD8\u01FE\u0186\u019F\uA74A\uA74C' }, { 'base': 'OI', 'letters': '\u01A2' }, { 'base': 'OO', 'letters': '\uA74E' }, { 'base': 'OU', 'letters': '\u0222' }, { 'base': 'OE', 'letters': '\x8C\u0152' }, { 'base': 'oe', 'letters': '\x9C\u0153' }, { 'base': 'P', 'letters': 'P\u24C5\uFF30\u1E54\u1E56\u01A4\u2C63\uA750\uA752\uA754' }, { 'base': 'Q', 'letters': 'Q\u24C6\uFF31\uA756\uA758\u024A' }, { 'base': 'R', 'letters': 'R\u24C7\uFF32\u0154\u1E58\u0158\u0210\u0212\u1E5A\u1E5C\u0156\u1E5E\u024C\u2C64\uA75A\uA7A6\uA782' }, { 'base': 'S', 'letters': 'S\u24C8\uFF33\u1E9E\u015A\u1E64\u015C\u1E60\u0160\u1E66\u1E62\u1E68\u0218\u015E\u2C7E\uA7A8\uA784' }, { 'base': 'T', 'letters': 'T\u24C9\uFF34\u1E6A\u0164\u1E6C\u021A\u0162\u1E70\u1E6E\u0166\u01AC\u01AE\u023E\uA786' }, { 'base': 'TZ', 'letters': '\uA728' }, { 'base': 'U', 'letters': 'U\u24CA\uFF35\xD9\xDA\xDB\u0168\u1E78\u016A\u1E7A\u016C\xDC\u01DB\u01D7\u01D5\u01D9\u1EE6\u016E\u0170\u01D3\u0214\u0216\u01AF\u1EEA\u1EE8\u1EEE\u1EEC\u1EF0\u1EE4\u1E72\u0172\u1E76\u1E74\u0244' }, { 'base': 'V', 'letters': 'V\u24CB\uFF36\u1E7C\u1E7E\u01B2\uA75E\u0245' }, { 'base': 'VY', 'letters': '\uA760' }, { 'base': 'W', 'letters': 'W\u24CC\uFF37\u1E80\u1E82\u0174\u1E86\u1E84\u1E88\u2C72' }, { 'base': 'X', 'letters': 'X\u24CD\uFF38\u1E8A\u1E8C' }, { 'base': 'Y', 'letters': 'Y\u24CE\uFF39\u1EF2\xDD\u0176\u1EF8\u0232\u1E8E\u0178\u1EF6\u1EF4\u01B3\u024E\u1EFE' }, { 'base': 'Z', 'letters': 'Z\u24CF\uFF3A\u0179\u1E90\u017B\u017D\u1E92\u1E94\u01B5\u0224\u2C7F\u2C6B\uA762' }, { 'base': 'a', 'letters': 'a\u24D0\uFF41\u1E9A\xE0\xE1\xE2\u1EA7\u1EA5\u1EAB\u1EA9\xE3\u0101\u0103\u1EB1\u1EAF\u1EB5\u1EB3\u0227\u01E1\xE4\u01DF\u1EA3\xE5\u01FB\u01CE\u0201\u0203\u1EA1\u1EAD\u1EB7\u1E01\u0105\u2C65\u0250' }, { 'base': 'aa', 'letters': '\uA733' }, { 'base': 'ae', 'letters': '\xE6\u01FD\u01E3' }, { 'base': 'ao', 'letters': '\uA735' }, { 'base': 'au', 'letters': '\uA737' }, { 'base': 'av', 'letters': '\uA739\uA73B' }, { 'base': 'ay', 'letters': '\uA73D' }, { 'base': 'b', 'letters': 'b\u24D1\uFF42\u1E03\u1E05\u1E07\u0180\u0183\u0253' }, { 'base': 'c', 'letters': 'c\u24D2\uFF43\u0107\u0109\u010B\u010D\xE7\u1E09\u0188\u023C\uA73F\u2184' }, { 'base': 'd', 'letters': 'd\u24D3\uFF44\u1E0B\u010F\u1E0D\u1E11\u1E13\u1E0F\u0111\u018C\u0256\u0257\uA77A' }, { 'base': 'dz', 'letters': '\u01F3\u01C6' }, { 'base': 'e', 'letters': 'e\u24D4\uFF45\xE8\xE9\xEA\u1EC1\u1EBF\u1EC5\u1EC3\u1EBD\u0113\u1E15\u1E17\u0115\u0117\xEB\u1EBB\u011B\u0205\u0207\u1EB9\u1EC7\u0229\u1E1D\u0119\u1E19\u1E1B\u0247\u025B\u01DD' }, { 'base': 'f', 'letters': 'f\u24D5\uFF46\u1E1F\u0192\uA77C' }, { 'base': 'g', 'letters': 'g\u24D6\uFF47\u01F5\u011D\u1E21\u011F\u0121\u01E7\u0123\u01E5\u0260\uA7A1\u1D79\uA77F' }, { 'base': 'h', 'letters': 'h\u24D7\uFF48\u0125\u1E23\u1E27\u021F\u1E25\u1E29\u1E2B\u1E96\u0127\u2C68\u2C76\u0265' }, { 'base': 'hv', 'letters': '\u0195' }, { 'base': 'i', 'letters': 'i\u24D8\uFF49\xEC\xED\xEE\u0129\u012B\u012D\xEF\u1E2F\u1EC9\u01D0\u0209\u020B\u1ECB\u012F\u1E2D\u0268\u0131' }, { 'base': 'j', 'letters': 'j\u24D9\uFF4A\u0135\u01F0\u0249' }, { 'base': 'k', 'letters': 'k\u24DA\uFF4B\u1E31\u01E9\u1E33\u0137\u1E35\u0199\u2C6A\uA741\uA743\uA745\uA7A3' }, { 'base': 'l', 'letters': 'l\u24DB\uFF4C\u0140\u013A\u013E\u1E37\u1E39\u013C\u1E3D\u1E3B\u017F\u0142\u019A\u026B\u2C61\uA749\uA781\uA747' }, { 'base': 'lj', 'letters': '\u01C9' }, { 'base': 'm', 'letters': 'm\u24DC\uFF4D\u1E3F\u1E41\u1E43\u0271\u026F' }, { 'base': 'n', 'letters': 'n\u24DD\uFF4E\u01F9\u0144\xF1\u1E45\u0148\u1E47\u0146\u1E4B\u1E49\u019E\u0272\u0149\uA791\uA7A5' }, { 'base': 'nj', 'letters': '\u01CC' }, { 'base': 'o', 'letters': 'o\u24DE\uFF4F\xF2\xF3\xF4\u1ED3\u1ED1\u1ED7\u1ED5\xF5\u1E4D\u022D\u1E4F\u014D\u1E51\u1E53\u014F\u022F\u0231\xF6\u022B\u1ECF\u0151\u01D2\u020D\u020F\u01A1\u1EDD\u1EDB\u1EE1\u1EDF\u1EE3\u1ECD\u1ED9\u01EB\u01ED\xF8\u01FF\u0254\uA74B\uA74D\u0275' }, { 'base': 'oi', 'letters': '\u01A3' }, { 'base': 'ou', 'letters': '\u0223' }, { 'base': 'oo', 'letters': '\uA74F' }, { 'base': 'p', 'letters': 'p\u24DF\uFF50\u1E55\u1E57\u01A5\u1D7D\uA751\uA753\uA755' }, { 'base': 'q', 'letters': 'q\u24E0\uFF51\u024B\uA757\uA759' }, { 'base': 'r', 'letters': 'r\u24E1\uFF52\u0155\u1E59\u0159\u0211\u0213\u1E5B\u1E5D\u0157\u1E5F\u024D\u027D\uA75B\uA7A7\uA783' }, { 'base': 's', 'letters': 's\u24E2\uFF53\xDF\u015B\u1E65\u015D\u1E61\u0161\u1E67\u1E63\u1E69\u0219\u015F\u023F\uA7A9\uA785\u1E9B' }, { 'base': 't', 'letters': 't\u24E3\uFF54\u1E6B\u1E97\u0165\u1E6D\u021B\u0163\u1E71\u1E6F\u0167\u01AD\u0288\u2C66\uA787' }, { 'base': 'tz', 'letters': '\uA729' }, { 'base': 'u', 'letters': 'u\u24E4\uFF55\xF9\xFA\xFB\u0169\u1E79\u016B\u1E7B\u016D\xFC\u01DC\u01D8\u01D6\u01DA\u1EE7\u016F\u0171\u01D4\u0215\u0217\u01B0\u1EEB\u1EE9\u1EEF\u1EED\u1EF1\u1EE5\u1E73\u0173\u1E77\u1E75\u0289' }, { 'base': 'v', 'letters': 'v\u24E5\uFF56\u1E7D\u1E7F\u028B\uA75F\u028C' }, { 'base': 'vy', 'letters': '\uA761' }, { 'base': 'w', 'letters': 'w\u24E6\uFF57\u1E81\u1E83\u0175\u1E87\u1E85\u1E98\u1E89\u2C73' }, { 'base': 'x', 'letters': 'x\u24E7\uFF58\u1E8B\u1E8D' }, { 'base': 'y', 'letters': 'y\u24E8\uFF59\u1EF3\xFD\u0177\u1EF9\u0233\u1E8F\xFF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF' }, { 'base': 'z', 'letters': 'z\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763' }];
+/* eslint-enable max-len */
+
+var diacriticsMap = {};
+for (var ii = 0; ii < map.length; ii++) {
+  var letters = map[ii].letters;
+  for (var jj = 0; jj < letters.length; jj++) {
+    diacriticsMap[letters[jj]] = map[ii].base;
+  }
+}
+
+// "what?" version ... http://jsperf.com/diacritics/12
+function stripDiacritics(str) {
+  return str.replace(/[^\u0000-\u007E]/g, function (a) {
+    return diacriticsMap[a] || a;
+  });
+}
+
+/***/ }),
+/* 118 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * KeyCode
+ *
+ * Map of common (non-printable) keycodes for the `keydown` and `keyup` events.
+ * Note that `keypress` handles things differently and may not return the same
+ * values.
+ */
+module.exports = {
+  BACKSPACE: 8,
+  TAB: 9,
+  RETURN: 13,
+  ESC: 27,
+  SPACE: 32,
+  LEFT: 37,
+  UP: 38,
+  RIGHT: 39,
+  DOWN: 40
+};
+
+/***/ }),
+/* 119 */,
+/* 120 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createLocation; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return locationsAreEqual; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(309);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(310);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PathUtils__ = __webpack_require__(88);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+
+
+
+
+var createLocation = function createLocation(path, state, key, currentLocation) {
+  var location = void 0;
+  if (typeof path === 'string') {
+    // Two-arg form: push(path, state)
+    location = Object(__WEBPACK_IMPORTED_MODULE_2__PathUtils__["d" /* parsePath */])(path);
+    location.state = state;
+  } else {
+    // One-arg form: push(location)
+    location = _extends({}, path);
+
+    if (location.pathname === undefined) location.pathname = '';
+
+    if (location.search) {
+      if (location.search.charAt(0) !== '?') location.search = '?' + location.search;
+    } else {
+      location.search = '';
+    }
+
+    if (location.hash) {
+      if (location.hash.charAt(0) !== '#') location.hash = '#' + location.hash;
+    } else {
+      location.hash = '';
+    }
+
+    if (state !== undefined && location.state === undefined) location.state = state;
+  }
+
+  try {
+    location.pathname = decodeURI(location.pathname);
+  } catch (e) {
+    if (e instanceof URIError) {
+      throw new URIError('Pathname "' + location.pathname + '" could not be decoded. ' + 'This is likely caused by an invalid percent-encoding.');
+    } else {
+      throw e;
+    }
+  }
+
+  if (key) location.key = key;
+
+  if (currentLocation) {
+    // Resolve incomplete/relative pathname relative to current location.
+    if (!location.pathname) {
+      location.pathname = currentLocation.pathname;
+    } else if (location.pathname.charAt(0) !== '/') {
+      location.pathname = Object(__WEBPACK_IMPORTED_MODULE_0_resolve_pathname__["default"])(location.pathname, currentLocation.pathname);
+    }
+  } else {
+    // When there is no prior location and pathname is empty, set it to /
+    if (!location.pathname) {
+      location.pathname = '/';
+    }
+  }
+
+  return location;
+};
+
+var locationsAreEqual = function locationsAreEqual(a, b) {
+  return a.pathname === b.pathname && a.search === b.search && a.hash === b.hash && a.key === b.key && Object(__WEBPACK_IMPORTED_MODULE_1_value_equal__["default"])(a.state, b.state);
+};
+
+/***/ }),
+/* 121 */,
+/* 122 */,
+/* 123 */,
+/* 124 */,
+/* 125 */,
+/* 126 */,
+/* 127 */,
+/* 128 */,
+/* 129 */,
+/* 130 */,
+/* 131 */,
+/* 132 */,
+/* 133 */,
+/* 134 */,
+/* 135 */,
+/* 136 */,
+/* 137 */,
+/* 138 */,
+/* 139 */,
+/* 140 */,
+/* 141 */,
+/* 142 */,
+/* 143 */,
+/* 144 */,
+/* 145 */,
+/* 146 */,
+/* 147 */,
+/* 148 */,
+/* 149 */,
+/* 150 */,
+/* 151 */,
+/* 152 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
+var module;
+// LICENSE_CODE ZON ISC
+'use strict'; /*jslint node:true, browser:true*/
+(function(){
+
+var is_node_ff = typeof module=='object' && module.exports;
+if (!is_node_ff)
+    ;
+else
+    ;
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function(){
+var E = {};
+
+var proto_slice = Array.prototype.slice;
+E.copy = function(a){
+    switch (a.length)
+    {
+    case 0: return [];
+    case 1: return [a[0]];
+    case 2: return [a[0], a[1]];
+    case 3: return [a[0], a[1], a[2]];
+    case 4: return [a[0], a[1], a[2], a[3]];
+    case 5: return [a[0], a[1], a[2], a[3], a[4]];
+    default: return proto_slice.call(a);
+    }
+};
+
+E.push = function(a){
+    for (var i=1; i<arguments.length; i++)
+    {
+        var arg = arguments[i];
+        if (Array.isArray(arg))
+            a.push.apply(a, arg);
+        else
+            a.push(arg);
+    }
+    return a.length;
+};
+E.unshift = function(a){
+    for (var i=arguments.length-1; i>0; i--)
+    {
+        var arg = arguments[i];
+        if (Array.isArray(arg))
+            a.unshift.apply(a, arg);
+        else
+            a.unshift(arg);
+    }
+    return a.length;
+};
+
+E.slice = function(args, from, to){
+    return Array.prototype.slice.call(args, from, to); };
+
+E.compact = function(a){ return E.compact_self(a.slice()); };
+E.compact_self = function(a){
+    var i, j, n = a.length;
+    for (i=0; i<n && a[i]; i++);
+    if (i==n)
+        return a;
+    for (j=i; i<n; i++)
+    {
+        if (!a[i])
+            continue;
+        a[j++] = a[i];
+    }
+    a.length = j;
+    return a;
+};
+
+// same as _.flatten(a, true)
+E.flatten_shallow = function(a){ return Array.prototype.concat.apply([], a); };
+E.flatten = function(a){
+    var _a = [], i;
+    for (i=0; i<a.length; i++)
+    {
+        if (Array.isArray(a[i]))
+            Array.prototype.push.apply(_a, E.flatten(a[i]));
+        else
+            _a.push(a[i]);
+    }
+    return _a;
+};
+E.unique = function(a){
+    var _a = [];
+    for (var i=0; i<a.length; i++)
+    {
+        if (!_a.includes(a[i]))
+            _a.push(a[i]);
+    }
+    return _a;
+};
+E.to_nl = function(a, sep){
+    if (!a || !a.length)
+        return '';
+    if (sep===undefined)
+        sep = '\n';
+    return a.join(sep)+sep;
+};
+E.sed = function(a, regex, replace){
+    var _a = new Array(a.length), i;
+    for (i=0; i<a.length; i++)
+        _a[i] = a[i].replace(regex, replace);
+    return _a;
+};
+E.grep = function(a, regex, replace){
+    var _a = [], i;
+    for (i=0; i<a.length; i++)
+    {
+        // don't use regex.test() since with //g sticky tag it does not reset
+        if (a[i].search(regex)<0)
+            continue;
+        if (replace!==undefined)
+            _a.push(a[i].replace(regex, replace));
+        else
+            _a.push(a[i]);
+    }
+    return _a;
+};
+
+E.rm_elm = function(a, elm){
+    var i = a.indexOf(elm);
+    if (i<0)
+        return;
+    a.splice(i, 1);
+    return elm;
+};
+
+E.rm_elm_tail = function(a, elm){
+    var i = a.length-1;
+    if (elm===a[i]) // fast-path
+    {
+        a.pop();
+        return elm;
+    }
+    if ((i = a.lastIndexOf(elm, i-1))<0)
+        return;
+    a.splice(i, 1);
+    return elm;
+};
+
+E.add_elm = function(a, elm){
+    if (a.includes(elm))
+        return;
+    a.push(elm);
+    return elm;
+};
+
+E.split_every = function(a, n){
+    var ret = [];
+    for (var i=0; i<a.length; i+=n)
+        ret.push(a.slice(i, i+n));
+    return ret;
+};
+
+E.split_at = function(a, delim){
+    var ret = [];
+    delim = delim||'';
+    for (var i=0; i<a.length; i++)
+    {
+        var chunk = [];
+        for (; i<a.length && a[i]!=delim; i++)
+            chunk.push(a[i]);
+        if (chunk.length)
+            ret.push(chunk);
+    }
+    return ret;
+};
+
+E.rotate = function(a, n){
+    if (a && a.length>1 && (n = n%a.length))
+        E.unshift(a, a.splice(n));
+    return a;
+};
+
+E.move = function(a, from, to, n){
+    return Array.prototype.splice.apply(a, [to, n]
+        .concat(a.slice(from, from+n)));
+};
+
+E.to_array = function(v){ return Array.isArray(v) ? v : v==null ? [] : [v]; };
+
+var proto = {};
+proto.sed = function(regex, replace){
+    return E.sed(this, regex, replace); };
+proto.grep = function(regex, replace){
+    return E.grep(this, regex, replace); };
+proto.to_nl = function(sep){ return E.to_nl(this, sep); };
+proto.push_a = function(){
+    return E.push.apply(null, [this].concat(Array.from(arguments))); };
+proto.unshift_a = function(){
+    return E.unshift.apply(null, [this].concat(Array.from(arguments))); };
+var installed;
+E.prototype_install = function(){
+    if (installed)
+        return;
+    installed = true;
+    for (var i in proto)
+    {
+        Object.defineProperty(Array.prototype, i,
+            {value: proto[i], configurable: true, enumerable: false,
+            writable: true});
+    }
+};
+E.prototype_uninstall = function(){
+    if (!installed)
+        return;
+    installed = false;
+    // XXX sergey: store orig proto, then load it back
+    for (var i in proto)
+        delete Array.prototype[i];
+};
+return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
+
+
+/***/ }),
+/* 153 */,
+/* 154 */,
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -4723,701 +5520,6 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 
 /***/ }),
-/* 99 */,
-/* 100 */,
-/* 101 */,
-/* 102 */,
-/* 103 */,
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseGetTag = __webpack_require__(53),
-    isObjectLike = __webpack_require__(54);
-
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike(value) && baseGetTag(value) == symbolTag);
-}
-
-module.exports = isSymbol;
-
-
-/***/ }),
-/* 110 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var listCacheClear = __webpack_require__(540),
-    listCacheDelete = __webpack_require__(541),
-    listCacheGet = __webpack_require__(542),
-    listCacheHas = __webpack_require__(543),
-    listCacheSet = __webpack_require__(544);
-
-/**
- * Creates an list cache object.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function ListCache(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
-
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-
-// Add methods to `ListCache`.
-ListCache.prototype.clear = listCacheClear;
-ListCache.prototype['delete'] = listCacheDelete;
-ListCache.prototype.get = listCacheGet;
-ListCache.prototype.has = listCacheHas;
-ListCache.prototype.set = listCacheSet;
-
-module.exports = ListCache;
-
-
-/***/ }),
-/* 111 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var eq = __webpack_require__(112);
-
-/**
- * Gets the index at which the `key` is found in `array` of key-value pairs.
- *
- * @private
- * @param {Array} array The array to inspect.
- * @param {*} key The key to search for.
- * @returns {number} Returns the index of the matched value, else `-1`.
- */
-function assocIndexOf(array, key) {
-  var length = array.length;
-  while (length--) {
-    if (eq(array[length][0], key)) {
-      return length;
-    }
-  }
-  return -1;
-}
-
-module.exports = assocIndexOf;
-
-
-/***/ }),
-/* 112 */
-/***/ (function(module, exports) {
-
-/**
- * Performs a
- * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * comparison between two values to determine if they are equivalent.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- * @example
- *
- * var object = { 'a': 1 };
- * var other = { 'a': 1 };
- *
- * _.eq(object, object);
- * // => true
- *
- * _.eq(object, other);
- * // => false
- *
- * _.eq('a', 'a');
- * // => true
- *
- * _.eq('a', Object('a'));
- * // => false
- *
- * _.eq(NaN, NaN);
- * // => true
- */
-function eq(value, other) {
-  return value === other || (value !== value && other !== other);
-}
-
-module.exports = eq;
-
-
-/***/ }),
-/* 113 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var getNative = __webpack_require__(55);
-
-/* Built-in method references that are verified to be native. */
-var nativeCreate = getNative(Object, 'create');
-
-module.exports = nativeCreate;
-
-
-/***/ }),
-/* 114 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isKeyable = __webpack_require__(562);
-
-/**
- * Gets the data for `map`.
- *
- * @private
- * @param {Object} map The map to query.
- * @param {string} key The reference key.
- * @returns {*} Returns the map data.
- */
-function getMapData(map, key) {
-  var data = map.__data__;
-  return isKeyable(key)
-    ? data[typeof key == 'string' ? 'string' : 'hash']
-    : data.map;
-}
-
-module.exports = getMapData;
-
-
-/***/ }),
-/* 115 */
-/***/ (function(module, exports) {
-
-/** Used as references for various `Number` constants. */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^(?:0|[1-9]\d*)$/;
-
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex(value, length) {
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return !!length &&
-    (typeof value == 'number' || reIsUint.test(value)) &&
-    (value > -1 && value % 1 == 0 && value < length);
-}
-
-module.exports = isIndex;
-
-
-/***/ }),
-/* 116 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _invariant = __webpack_require__(22);
-
-var _invariant2 = _interopRequireDefault(_invariant);
-
-var _isPlainObject = __webpack_require__(298);
-
-var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Retrieves the display string from an option. Options can be the string
- * themselves, or an object with a defined display string. Anything else throws
- * an error.
- */
-function getOptionLabel(option, labelKey) {
-  var optionLabel = void 0;
-
-  if (typeof option === 'string') {
-    optionLabel = option;
-  }
-
-  if (typeof labelKey === 'function') {
-    // This overwrites string options, but we assume the consumer wants to do
-    // something custom if `labelKey` is a function.
-    optionLabel = labelKey(option);
-  } else if (typeof labelKey === 'string' && (0, _isPlainObject2.default)(option)) {
-    optionLabel = option[labelKey];
-  }
-
-  !(typeof optionLabel === 'string') ? process.env.NODE_ENV !== 'production' ? (0, _invariant2.default)(false, 'One or more options does not have a valid label string. Check the ' + '`labelKey` prop to ensure that it matches the correct option key and ' + 'provides a string for filtering and display.') : (0, _invariant2.default)(false) : void 0;
-
-  return optionLabel;
-}
-
-exports.default = getOptionLabel;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
-
-/***/ }),
-/* 117 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var isArray = __webpack_require__(34),
-    isKey = __webpack_require__(176),
-    stringToPath = __webpack_require__(610),
-    toString = __webpack_require__(297);
-
-/**
- * Casts `value` to a path array if it's not one.
- *
- * @private
- * @param {*} value The value to inspect.
- * @param {Object} [object] The object to query keys on.
- * @returns {Array} Returns the cast property path array.
- */
-function castPath(value, object) {
-  if (isArray(value)) {
-    return value;
-  }
-  return isKey(value, object) ? [value] : stringToPath(toString(value));
-}
-
-module.exports = castPath;
-
-
-/***/ }),
-/* 118 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = stripDiacritics;
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Taken from: http://stackoverflow.com/questions/990904/remove-accents-diacritics-in-a-string-in-javascript/18391901#18391901
- */
-
-/* eslint-disable max-len */
-var map = [{ 'base': 'A', 'letters': 'A\u24B6\uFF21\xC0\xC1\xC2\u1EA6\u1EA4\u1EAA\u1EA8\xC3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\xC4\u01DE\u1EA2\xC5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F' }, { 'base': 'AA', 'letters': '\uA732' }, { 'base': 'AE', 'letters': '\xC6\u01FC\u01E2' }, { 'base': 'AO', 'letters': '\uA734' }, { 'base': 'AU', 'letters': '\uA736' }, { 'base': 'AV', 'letters': '\uA738\uA73A' }, { 'base': 'AY', 'letters': '\uA73C' }, { 'base': 'B', 'letters': 'B\u24B7\uFF22\u1E02\u1E04\u1E06\u0243\u0182\u0181' }, { 'base': 'C', 'letters': 'C\u24B8\uFF23\u0106\u0108\u010A\u010C\xC7\u1E08\u0187\u023B\uA73E' }, { 'base': 'D', 'letters': 'D\u24B9\uFF24\u1E0A\u010E\u1E0C\u1E10\u1E12\u1E0E\u0110\u018B\u018A\u0189\uA779\xD0' }, { 'base': 'DZ', 'letters': '\u01F1\u01C4' }, { 'base': 'Dz', 'letters': '\u01F2\u01C5' }, { 'base': 'E', 'letters': 'E\u24BA\uFF25\xC8\xC9\xCA\u1EC0\u1EBE\u1EC4\u1EC2\u1EBC\u0112\u1E14\u1E16\u0114\u0116\xCB\u1EBA\u011A\u0204\u0206\u1EB8\u1EC6\u0228\u1E1C\u0118\u1E18\u1E1A\u0190\u018E' }, { 'base': 'F', 'letters': 'F\u24BB\uFF26\u1E1E\u0191\uA77B' }, { 'base': 'G', 'letters': 'G\u24BC\uFF27\u01F4\u011C\u1E20\u011E\u0120\u01E6\u0122\u01E4\u0193\uA7A0\uA77D\uA77E' }, { 'base': 'H', 'letters': 'H\u24BD\uFF28\u0124\u1E22\u1E26\u021E\u1E24\u1E28\u1E2A\u0126\u2C67\u2C75\uA78D' }, { 'base': 'I', 'letters': 'I\u24BE\uFF29\xCC\xCD\xCE\u0128\u012A\u012C\u0130\xCF\u1E2E\u1EC8\u01CF\u0208\u020A\u1ECA\u012E\u1E2C\u0197' }, { 'base': 'J', 'letters': 'J\u24BF\uFF2A\u0134\u0248' }, { 'base': 'K', 'letters': 'K\u24C0\uFF2B\u1E30\u01E8\u1E32\u0136\u1E34\u0198\u2C69\uA740\uA742\uA744\uA7A2' }, { 'base': 'L', 'letters': 'L\u24C1\uFF2C\u013F\u0139\u013D\u1E36\u1E38\u013B\u1E3C\u1E3A\u0141\u023D\u2C62\u2C60\uA748\uA746\uA780' }, { 'base': 'LJ', 'letters': '\u01C7' }, { 'base': 'Lj', 'letters': '\u01C8' }, { 'base': 'M', 'letters': 'M\u24C2\uFF2D\u1E3E\u1E40\u1E42\u2C6E\u019C' }, { 'base': 'N', 'letters': 'N\u24C3\uFF2E\u01F8\u0143\xD1\u1E44\u0147\u1E46\u0145\u1E4A\u1E48\u0220\u019D\uA790\uA7A4' }, { 'base': 'NJ', 'letters': '\u01CA' }, { 'base': 'Nj', 'letters': '\u01CB' }, { 'base': 'O', 'letters': 'O\u24C4\uFF2F\xD2\xD3\xD4\u1ED2\u1ED0\u1ED6\u1ED4\xD5\u1E4C\u022C\u1E4E\u014C\u1E50\u1E52\u014E\u022E\u0230\xD6\u022A\u1ECE\u0150\u01D1\u020C\u020E\u01A0\u1EDC\u1EDA\u1EE0\u1EDE\u1EE2\u1ECC\u1ED8\u01EA\u01EC\xD8\u01FE\u0186\u019F\uA74A\uA74C' }, { 'base': 'OI', 'letters': '\u01A2' }, { 'base': 'OO', 'letters': '\uA74E' }, { 'base': 'OU', 'letters': '\u0222' }, { 'base': 'OE', 'letters': '\x8C\u0152' }, { 'base': 'oe', 'letters': '\x9C\u0153' }, { 'base': 'P', 'letters': 'P\u24C5\uFF30\u1E54\u1E56\u01A4\u2C63\uA750\uA752\uA754' }, { 'base': 'Q', 'letters': 'Q\u24C6\uFF31\uA756\uA758\u024A' }, { 'base': 'R', 'letters': 'R\u24C7\uFF32\u0154\u1E58\u0158\u0210\u0212\u1E5A\u1E5C\u0156\u1E5E\u024C\u2C64\uA75A\uA7A6\uA782' }, { 'base': 'S', 'letters': 'S\u24C8\uFF33\u1E9E\u015A\u1E64\u015C\u1E60\u0160\u1E66\u1E62\u1E68\u0218\u015E\u2C7E\uA7A8\uA784' }, { 'base': 'T', 'letters': 'T\u24C9\uFF34\u1E6A\u0164\u1E6C\u021A\u0162\u1E70\u1E6E\u0166\u01AC\u01AE\u023E\uA786' }, { 'base': 'TZ', 'letters': '\uA728' }, { 'base': 'U', 'letters': 'U\u24CA\uFF35\xD9\xDA\xDB\u0168\u1E78\u016A\u1E7A\u016C\xDC\u01DB\u01D7\u01D5\u01D9\u1EE6\u016E\u0170\u01D3\u0214\u0216\u01AF\u1EEA\u1EE8\u1EEE\u1EEC\u1EF0\u1EE4\u1E72\u0172\u1E76\u1E74\u0244' }, { 'base': 'V', 'letters': 'V\u24CB\uFF36\u1E7C\u1E7E\u01B2\uA75E\u0245' }, { 'base': 'VY', 'letters': '\uA760' }, { 'base': 'W', 'letters': 'W\u24CC\uFF37\u1E80\u1E82\u0174\u1E86\u1E84\u1E88\u2C72' }, { 'base': 'X', 'letters': 'X\u24CD\uFF38\u1E8A\u1E8C' }, { 'base': 'Y', 'letters': 'Y\u24CE\uFF39\u1EF2\xDD\u0176\u1EF8\u0232\u1E8E\u0178\u1EF6\u1EF4\u01B3\u024E\u1EFE' }, { 'base': 'Z', 'letters': 'Z\u24CF\uFF3A\u0179\u1E90\u017B\u017D\u1E92\u1E94\u01B5\u0224\u2C7F\u2C6B\uA762' }, { 'base': 'a', 'letters': 'a\u24D0\uFF41\u1E9A\xE0\xE1\xE2\u1EA7\u1EA5\u1EAB\u1EA9\xE3\u0101\u0103\u1EB1\u1EAF\u1EB5\u1EB3\u0227\u01E1\xE4\u01DF\u1EA3\xE5\u01FB\u01CE\u0201\u0203\u1EA1\u1EAD\u1EB7\u1E01\u0105\u2C65\u0250' }, { 'base': 'aa', 'letters': '\uA733' }, { 'base': 'ae', 'letters': '\xE6\u01FD\u01E3' }, { 'base': 'ao', 'letters': '\uA735' }, { 'base': 'au', 'letters': '\uA737' }, { 'base': 'av', 'letters': '\uA739\uA73B' }, { 'base': 'ay', 'letters': '\uA73D' }, { 'base': 'b', 'letters': 'b\u24D1\uFF42\u1E03\u1E05\u1E07\u0180\u0183\u0253' }, { 'base': 'c', 'letters': 'c\u24D2\uFF43\u0107\u0109\u010B\u010D\xE7\u1E09\u0188\u023C\uA73F\u2184' }, { 'base': 'd', 'letters': 'd\u24D3\uFF44\u1E0B\u010F\u1E0D\u1E11\u1E13\u1E0F\u0111\u018C\u0256\u0257\uA77A' }, { 'base': 'dz', 'letters': '\u01F3\u01C6' }, { 'base': 'e', 'letters': 'e\u24D4\uFF45\xE8\xE9\xEA\u1EC1\u1EBF\u1EC5\u1EC3\u1EBD\u0113\u1E15\u1E17\u0115\u0117\xEB\u1EBB\u011B\u0205\u0207\u1EB9\u1EC7\u0229\u1E1D\u0119\u1E19\u1E1B\u0247\u025B\u01DD' }, { 'base': 'f', 'letters': 'f\u24D5\uFF46\u1E1F\u0192\uA77C' }, { 'base': 'g', 'letters': 'g\u24D6\uFF47\u01F5\u011D\u1E21\u011F\u0121\u01E7\u0123\u01E5\u0260\uA7A1\u1D79\uA77F' }, { 'base': 'h', 'letters': 'h\u24D7\uFF48\u0125\u1E23\u1E27\u021F\u1E25\u1E29\u1E2B\u1E96\u0127\u2C68\u2C76\u0265' }, { 'base': 'hv', 'letters': '\u0195' }, { 'base': 'i', 'letters': 'i\u24D8\uFF49\xEC\xED\xEE\u0129\u012B\u012D\xEF\u1E2F\u1EC9\u01D0\u0209\u020B\u1ECB\u012F\u1E2D\u0268\u0131' }, { 'base': 'j', 'letters': 'j\u24D9\uFF4A\u0135\u01F0\u0249' }, { 'base': 'k', 'letters': 'k\u24DA\uFF4B\u1E31\u01E9\u1E33\u0137\u1E35\u0199\u2C6A\uA741\uA743\uA745\uA7A3' }, { 'base': 'l', 'letters': 'l\u24DB\uFF4C\u0140\u013A\u013E\u1E37\u1E39\u013C\u1E3D\u1E3B\u017F\u0142\u019A\u026B\u2C61\uA749\uA781\uA747' }, { 'base': 'lj', 'letters': '\u01C9' }, { 'base': 'm', 'letters': 'm\u24DC\uFF4D\u1E3F\u1E41\u1E43\u0271\u026F' }, { 'base': 'n', 'letters': 'n\u24DD\uFF4E\u01F9\u0144\xF1\u1E45\u0148\u1E47\u0146\u1E4B\u1E49\u019E\u0272\u0149\uA791\uA7A5' }, { 'base': 'nj', 'letters': '\u01CC' }, { 'base': 'o', 'letters': 'o\u24DE\uFF4F\xF2\xF3\xF4\u1ED3\u1ED1\u1ED7\u1ED5\xF5\u1E4D\u022D\u1E4F\u014D\u1E51\u1E53\u014F\u022F\u0231\xF6\u022B\u1ECF\u0151\u01D2\u020D\u020F\u01A1\u1EDD\u1EDB\u1EE1\u1EDF\u1EE3\u1ECD\u1ED9\u01EB\u01ED\xF8\u01FF\u0254\uA74B\uA74D\u0275' }, { 'base': 'oi', 'letters': '\u01A3' }, { 'base': 'ou', 'letters': '\u0223' }, { 'base': 'oo', 'letters': '\uA74F' }, { 'base': 'p', 'letters': 'p\u24DF\uFF50\u1E55\u1E57\u01A5\u1D7D\uA751\uA753\uA755' }, { 'base': 'q', 'letters': 'q\u24E0\uFF51\u024B\uA757\uA759' }, { 'base': 'r', 'letters': 'r\u24E1\uFF52\u0155\u1E59\u0159\u0211\u0213\u1E5B\u1E5D\u0157\u1E5F\u024D\u027D\uA75B\uA7A7\uA783' }, { 'base': 's', 'letters': 's\u24E2\uFF53\xDF\u015B\u1E65\u015D\u1E61\u0161\u1E67\u1E63\u1E69\u0219\u015F\u023F\uA7A9\uA785\u1E9B' }, { 'base': 't', 'letters': 't\u24E3\uFF54\u1E6B\u1E97\u0165\u1E6D\u021B\u0163\u1E71\u1E6F\u0167\u01AD\u0288\u2C66\uA787' }, { 'base': 'tz', 'letters': '\uA729' }, { 'base': 'u', 'letters': 'u\u24E4\uFF55\xF9\xFA\xFB\u0169\u1E79\u016B\u1E7B\u016D\xFC\u01DC\u01D8\u01D6\u01DA\u1EE7\u016F\u0171\u01D4\u0215\u0217\u01B0\u1EEB\u1EE9\u1EEF\u1EED\u1EF1\u1EE5\u1E73\u0173\u1E77\u1E75\u0289' }, { 'base': 'v', 'letters': 'v\u24E5\uFF56\u1E7D\u1E7F\u028B\uA75F\u028C' }, { 'base': 'vy', 'letters': '\uA761' }, { 'base': 'w', 'letters': 'w\u24E6\uFF57\u1E81\u1E83\u0175\u1E87\u1E85\u1E98\u1E89\u2C73' }, { 'base': 'x', 'letters': 'x\u24E7\uFF58\u1E8B\u1E8D' }, { 'base': 'y', 'letters': 'y\u24E8\uFF59\u1EF3\xFD\u0177\u1EF9\u0233\u1E8F\xFF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF' }, { 'base': 'z', 'letters': 'z\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763' }];
-/* eslint-enable max-len */
-
-var diacriticsMap = {};
-for (var ii = 0; ii < map.length; ii++) {
-  var letters = map[ii].letters;
-  for (var jj = 0; jj < letters.length; jj++) {
-    diacriticsMap[letters[jj]] = map[ii].base;
-  }
-}
-
-// "what?" version ... http://jsperf.com/diacritics/12
-function stripDiacritics(str) {
-  return str.replace(/[^\u0000-\u007E]/g, function (a) {
-    return diacriticsMap[a] || a;
-  });
-}
-
-/***/ }),
-/* 119 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * KeyCode
- *
- * Map of common (non-printable) keycodes for the `keydown` and `keyup` events.
- * Note that `keypress` handles things differently and may not return the same
- * values.
- */
-module.exports = {
-  BACKSPACE: 8,
-  TAB: 9,
-  RETURN: 13,
-  ESC: 27,
-  SPACE: 32,
-  LEFT: 37,
-  UP: 38,
-  RIGHT: 39,
-  DOWN: 40
-};
-
-/***/ }),
-/* 120 */,
-/* 121 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createLocation; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return locationsAreEqual; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(309);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(310);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PathUtils__ = __webpack_require__(88);
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-
-
-
-
-var createLocation = function createLocation(path, state, key, currentLocation) {
-  var location = void 0;
-  if (typeof path === 'string') {
-    // Two-arg form: push(path, state)
-    location = Object(__WEBPACK_IMPORTED_MODULE_2__PathUtils__["d" /* parsePath */])(path);
-    location.state = state;
-  } else {
-    // One-arg form: push(location)
-    location = _extends({}, path);
-
-    if (location.pathname === undefined) location.pathname = '';
-
-    if (location.search) {
-      if (location.search.charAt(0) !== '?') location.search = '?' + location.search;
-    } else {
-      location.search = '';
-    }
-
-    if (location.hash) {
-      if (location.hash.charAt(0) !== '#') location.hash = '#' + location.hash;
-    } else {
-      location.hash = '';
-    }
-
-    if (state !== undefined && location.state === undefined) location.state = state;
-  }
-
-  try {
-    location.pathname = decodeURI(location.pathname);
-  } catch (e) {
-    if (e instanceof URIError) {
-      throw new URIError('Pathname "' + location.pathname + '" could not be decoded. ' + 'This is likely caused by an invalid percent-encoding.');
-    } else {
-      throw e;
-    }
-  }
-
-  if (key) location.key = key;
-
-  if (currentLocation) {
-    // Resolve incomplete/relative pathname relative to current location.
-    if (!location.pathname) {
-      location.pathname = currentLocation.pathname;
-    } else if (location.pathname.charAt(0) !== '/') {
-      location.pathname = Object(__WEBPACK_IMPORTED_MODULE_0_resolve_pathname__["default"])(location.pathname, currentLocation.pathname);
-    }
-  } else {
-    // When there is no prior location and pathname is empty, set it to /
-    if (!location.pathname) {
-      location.pathname = '/';
-    }
-  }
-
-  return location;
-};
-
-var locationsAreEqual = function locationsAreEqual(a, b) {
-  return a.pathname === b.pathname && a.search === b.search && a.hash === b.hash && a.key === b.key && Object(__WEBPACK_IMPORTED_MODULE_1_value_equal__["default"])(a.state, b.state);
-};
-
-/***/ }),
-/* 122 */,
-/* 123 */,
-/* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */,
-/* 140 */,
-/* 141 */,
-/* 142 */,
-/* 143 */,
-/* 144 */,
-/* 145 */,
-/* 146 */,
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */,
-/* 153 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
-var module;
-// LICENSE_CODE ZON ISC
-'use strict'; /*jslint node:true, browser:true*/
-(function(){
-
-var is_node_ff = typeof module=='object' && module.exports;
-if (!is_node_ff)
-    ;
-else
-    ;
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function(){
-var E = {};
-
-var proto_slice = Array.prototype.slice;
-E.copy = function(a){
-    switch (a.length)
-    {
-    case 0: return [];
-    case 1: return [a[0]];
-    case 2: return [a[0], a[1]];
-    case 3: return [a[0], a[1], a[2]];
-    case 4: return [a[0], a[1], a[2], a[3]];
-    case 5: return [a[0], a[1], a[2], a[3], a[4]];
-    default: return proto_slice.call(a);
-    }
-};
-
-E.push = function(a){
-    for (var i=1; i<arguments.length; i++)
-    {
-        var arg = arguments[i];
-        if (Array.isArray(arg))
-            a.push.apply(a, arg);
-        else
-            a.push(arg);
-    }
-    return a.length;
-};
-E.unshift = function(a){
-    for (var i=arguments.length-1; i>0; i--)
-    {
-        var arg = arguments[i];
-        if (Array.isArray(arg))
-            a.unshift.apply(a, arg);
-        else
-            a.unshift(arg);
-    }
-    return a.length;
-};
-
-E.slice = function(args, from, to){
-    return Array.prototype.slice.call(args, from, to); };
-
-E.compact = function(a){ return E.compact_self(a.slice()); };
-E.compact_self = function(a){
-    var i, j, n = a.length;
-    for (i=0; i<n && a[i]; i++);
-    if (i==n)
-        return a;
-    for (j=i; i<n; i++)
-    {
-        if (!a[i])
-            continue;
-        a[j++] = a[i];
-    }
-    a.length = j;
-    return a;
-};
-
-// same as _.flatten(a, true)
-E.flatten_shallow = function(a){ return Array.prototype.concat.apply([], a); };
-E.flatten = function(a){
-    var _a = [], i;
-    for (i=0; i<a.length; i++)
-    {
-        if (Array.isArray(a[i]))
-            Array.prototype.push.apply(_a, E.flatten(a[i]));
-        else
-            _a.push(a[i]);
-    }
-    return _a;
-};
-E.unique = function(a){
-    var _a = [];
-    for (var i=0; i<a.length; i++)
-    {
-        if (!_a.includes(a[i]))
-            _a.push(a[i]);
-    }
-    return _a;
-};
-E.to_nl = function(a, sep){
-    if (!a || !a.length)
-        return '';
-    if (sep===undefined)
-        sep = '\n';
-    return a.join(sep)+sep;
-};
-E.sed = function(a, regex, replace){
-    var _a = new Array(a.length), i;
-    for (i=0; i<a.length; i++)
-        _a[i] = a[i].replace(regex, replace);
-    return _a;
-};
-E.grep = function(a, regex, replace){
-    var _a = [], i;
-    for (i=0; i<a.length; i++)
-    {
-        // don't use regex.test() since with //g sticky tag it does not reset
-        if (a[i].search(regex)<0)
-            continue;
-        if (replace!==undefined)
-            _a.push(a[i].replace(regex, replace));
-        else
-            _a.push(a[i]);
-    }
-    return _a;
-};
-
-E.rm_elm = function(a, elm){
-    var i = a.indexOf(elm);
-    if (i<0)
-        return;
-    a.splice(i, 1);
-    return elm;
-};
-
-E.rm_elm_tail = function(a, elm){
-    var i = a.length-1;
-    if (elm===a[i]) // fast-path
-    {
-        a.pop();
-        return elm;
-    }
-    if ((i = a.lastIndexOf(elm, i-1))<0)
-        return;
-    a.splice(i, 1);
-    return elm;
-};
-
-E.add_elm = function(a, elm){
-    if (a.includes(elm))
-        return;
-    a.push(elm);
-    return elm;
-};
-
-E.split_every = function(a, n){
-    var ret = [];
-    for (var i=0; i<a.length; i+=n)
-        ret.push(a.slice(i, i+n));
-    return ret;
-};
-
-E.split_at = function(a, delim){
-    var ret = [];
-    delim = delim||'';
-    for (var i=0; i<a.length; i++)
-    {
-        var chunk = [];
-        for (; i<a.length && a[i]!=delim; i++)
-            chunk.push(a[i]);
-        if (chunk.length)
-            ret.push(chunk);
-    }
-    return ret;
-};
-
-E.rotate = function(a, n){
-    if (a && a.length>1 && (n = n%a.length))
-        E.unshift(a, a.splice(n));
-    return a;
-};
-
-E.move = function(a, from, to, n){
-    return Array.prototype.splice.apply(a, [to, n]
-        .concat(a.slice(from, from+n)));
-};
-
-E.to_array = function(v){ return Array.isArray(v) ? v : v==null ? [] : [v]; };
-
-var proto = {};
-proto.sed = function(regex, replace){
-    return E.sed(this, regex, replace); };
-proto.grep = function(regex, replace){
-    return E.grep(this, regex, replace); };
-proto.to_nl = function(sep){ return E.to_nl(this, sep); };
-proto.push_a = function(){
-    return E.push.apply(null, [this].concat(Array.from(arguments))); };
-proto.unshift_a = function(){
-    return E.unshift.apply(null, [this].concat(Array.from(arguments))); };
-var installed;
-E.prototype_install = function(){
-    if (installed)
-        return;
-    installed = true;
-    for (var i in proto)
-    {
-        Object.defineProperty(Array.prototype, i,
-            {value: proto[i], configurable: true, enumerable: false,
-            writable: true});
-    }
-};
-E.prototype_uninstall = function(){
-    if (!installed)
-        return;
-    installed = false;
-    // XXX sergey: store orig proto, then load it back
-    for (var i in proto)
-        delete Array.prototype[i];
-};
-return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
-
-
-/***/ }),
-/* 154 */,
-/* 155 */,
 /* 156 */,
 /* 157 */,
 /* 158 */,
@@ -5472,8 +5574,8 @@ module.exports = isEqual;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseIsEqualDeep = __webpack_require__(539),
-    isObject = __webpack_require__(43),
-    isObjectLike = __webpack_require__(54);
+    isObject = __webpack_require__(44),
+    isObjectLike = __webpack_require__(55);
 
 /**
  * The base implementation of `_.isEqual` which supports partial comparisons
@@ -5506,7 +5608,7 @@ module.exports = baseIsEqual;
 /* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(55),
+var getNative = __webpack_require__(56),
     root = __webpack_require__(33);
 
 /* Built-in method references that are verified to be native. */
@@ -5519,8 +5621,8 @@ module.exports = Map;
 /* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(53),
-    isObject = __webpack_require__(43);
+var baseGetTag = __webpack_require__(54),
+    isObject = __webpack_require__(44);
 
 /** `Object#toString` result references. */
 var asyncTag = '[object AsyncFunction]',
@@ -5644,7 +5746,7 @@ module.exports = keys;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseIsArguments = __webpack_require__(577),
-    isObjectLike = __webpack_require__(54);
+    isObjectLike = __webpack_require__(55);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -5788,7 +5890,7 @@ module.exports = noop;
 /* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castPath = __webpack_require__(117),
+var castPath = __webpack_require__(116),
     toKey = __webpack_require__(83);
 
 /**
@@ -5819,7 +5921,7 @@ module.exports = baseGet;
 /***/ (function(module, exports, __webpack_require__) {
 
 var isArray = __webpack_require__(34),
-    isSymbol = __webpack_require__(109);
+    isSymbol = __webpack_require__(108);
 
 /** Used to match property names within property paths. */
 var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
@@ -6238,7 +6340,7 @@ var _toConsumableArray2 = __webpack_require__(69);
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 
-var _defineProperty2 = __webpack_require__(58);
+var _defineProperty2 = __webpack_require__(46);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -6290,7 +6392,7 @@ var _setdb = __webpack_require__(35);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -6302,7 +6404,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _reactWaypoint = __webpack_require__(664);
 
@@ -8621,7 +8723,7 @@ else
     node_util = require('util');
     ;
 }
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(153)], __WEBPACK_AMD_DEFINE_RESULT__ = function(array){
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(152)], __WEBPACK_AMD_DEFINE_RESULT__ = function(array){
 var E = {};
 
 E._is_mocha = undefined;
@@ -10140,7 +10242,7 @@ var _typeaheadContainer = __webpack_require__(653);
 
 var _typeaheadContainer2 = _interopRequireDefault(_typeaheadContainer);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -10318,7 +10420,7 @@ exports.default = (0, _typeaheadContainer2.default)(Typeahead);
 /* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(110),
+var ListCache = __webpack_require__(109),
     stackClear = __webpack_require__(545),
     stackDelete = __webpack_require__(546),
     stackGet = __webpack_require__(547),
@@ -10635,7 +10737,7 @@ var _reactDom = __webpack_require__(14);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _ownerDocument = __webpack_require__(51);
+var _ownerDocument = __webpack_require__(52);
 
 var _ownerDocument2 = _interopRequireDefault(_ownerDocument);
 
@@ -10760,7 +10862,7 @@ var _tokenContainer = __webpack_require__(295);
 
 var _tokenContainer2 = _interopRequireDefault(_tokenContainer);
 
-var _keyCode = __webpack_require__(119);
+var _keyCode = __webpack_require__(118);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -10899,9 +11001,9 @@ var _reactOnclickoutside = __webpack_require__(296);
 
 var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
-var _keyCode = __webpack_require__(119);
+var _keyCode = __webpack_require__(118);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -11387,9 +11489,9 @@ module.exports = toString;
 /* 298 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(53),
+var baseGetTag = __webpack_require__(54),
     getPrototype = __webpack_require__(600),
-    isObjectLike = __webpack_require__(54);
+    isObjectLike = __webpack_require__(55);
 
 /** `Object#toString` result references. */
 var objectTag = '[object Object]';
@@ -11455,7 +11557,7 @@ module.exports = isPlainObject;
 /* 299 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(43);
+var isObject = __webpack_require__(44);
 
 /**
  * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -11569,7 +11671,7 @@ module.exports = identity;
 /* 303 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(55);
+var getNative = __webpack_require__(56);
 
 var defineProperty = (function() {
   try {
@@ -11771,7 +11873,7 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _reactDom = __webpack_require__(14);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -11938,11 +12040,11 @@ var _json_viewer = __webpack_require__(671);
 
 var _json_viewer2 = _interopRequireDefault(_json_viewer);
 
-var _codemirror = __webpack_require__(44);
+var _codemirror = __webpack_require__(45);
 
 var _codemirror2 = _interopRequireDefault(_codemirror);
 
-__webpack_require__(120);
+__webpack_require__(119);
 
 __webpack_require__(84);
 
@@ -14547,7 +14649,7 @@ var _regenerator = __webpack_require__(21);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _defineProperty2 = __webpack_require__(58);
+var _defineProperty2 = __webpack_require__(46);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -14571,7 +14673,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -14593,13 +14695,13 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15132,7 +15234,7 @@ var _regenerator = __webpack_require__(21);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _defineProperty2 = __webpack_require__(58);
+var _defineProperty2 = __webpack_require__(46);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -15160,7 +15262,7 @@ var _setdb = __webpack_require__(35);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -15216,7 +15318,7 @@ var _reactDom = __webpack_require__(14);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 __webpack_require__(319);
 
@@ -15619,7 +15721,7 @@ module.exports = function defineProperty(it, key, desc) {
 
 var $export = __webpack_require__(30);
 // 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
-$export($export.S + $export.F * !__webpack_require__(47), 'Object', { defineProperty: __webpack_require__(38).f });
+$export($export.S + $export.F * !__webpack_require__(48), 'Object', { defineProperty: __webpack_require__(39).f });
 
 
 /***/ }),
@@ -15957,7 +16059,7 @@ else
         var version = require('./version.js').version;
     }
 }
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(153), __webpack_require__(232), __webpack_require__(231),
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(152), __webpack_require__(232), __webpack_require__(231),
     __webpack_require__(400), __webpack_require__(401), __webpack_require__(95)], __WEBPACK_AMD_DEFINE_RESULT__ = function(array, date, zutil, sprintf, rate_limit, zescape){
 var E, _zerr;
 var env = process.env;
@@ -16787,7 +16889,7 @@ var _regenerator = __webpack_require__(21);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _defineProperty2 = __webpack_require__(58);
+var _defineProperty2 = __webpack_require__(46);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -16839,7 +16941,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -16847,7 +16949,7 @@ var _setdb = __webpack_require__(35);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _url = __webpack_require__(98);
+var _url = __webpack_require__(155);
 
 var _url2 = _interopRequireDefault(_url);
 
@@ -16857,7 +16959,7 @@ var _har_viewer = __webpack_require__(180);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var util = _interopRequireWildcard(_util);
 
@@ -16869,7 +16971,7 @@ var _propTypes = __webpack_require__(4);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 var _proxy_fields = __webpack_require__(705);
 
@@ -17916,7 +18018,7 @@ var Targeting = provider({ tab_id: 'target' })(function (_Pure_component6) {
                 { className: 'link', href: mailto },
                 'More carriers'
             );
-            this.carriers = [{ value: '', key: 'None' }, { value: 'a1', key: 'A1 Austria' }, { value: 'aircel', key: 'Aircel' }, { value: 'airtel', key: 'Airtel' }, { value: 'att', key: 'AT&T' }, { value: 'vimpelcom', key: 'Beeline Russia' }, { value: 'celcom', key: 'Celcom' }, { value: 'chinamobile', key: 'China Mobile' }, { value: 'claro', key: 'Claro' }, { value: 'comcast', key: 'Comcast' }, { value: 'cox', key: 'Cox' }, { value: 'dt', key: 'Deutsche Telekom' }, { value: 'digi', key: 'Digi Malaysia' }, { value: 'docomo', key: 'Docomo' }, { value: 'dtac', key: 'DTAC Trinet' }, { value: 'etisalat', key: 'Etisalat' }, { value: 'idea', key: 'Idea India' }, { value: 'kyivstar', key: 'Kyivstar' }, { value: 'meo', key: 'MEO Portugal' }, { value: 'megafont', key: 'Megafon Russia' }, { value: 'mtn', key: 'MTN - Mahanager Telephone' }, { value: 'mtnza', key: 'MTN South Africa' }, { value: 'mts', key: 'MTS Russia' }, { value: 'optus', key: 'Optus' }, { value: 'orange', key: 'Orange' }, { value: 'qwest', key: 'Qwest' }, { value: 'reliance_jio', key: 'Reliance Jio' }, { value: 'robi', key: 'Robi' }, { value: 'sprint', key: 'Sprint' }, { value: 'telefonica', key: 'Telefonica' }, { value: 'telstra', key: 'Telstra' }, { value: 'tmobile', key: 'T-Mobile' }, { value: 'tigo', key: 'Tigo' }, { value: 'tim', key: 'TIM (Telecom Italia)' }, { value: 'vodacomza', key: 'Vodacom South Africa' }, { value: 'vodafone', key: 'Vodafone' }, { value: 'verizon', key: 'Verizon' }, { value: 'vivo', key: 'Vivo' }, { value: 'zain', key: 'Zain' }, { value: 'umobile', key: 'U-Mobile' }];
+            this.carriers = [{ value: '', key: 'None' }, { value: 'a1', key: 'A1 Austria' }, { value: 'aircel', key: 'Aircel' }, { value: 'airtel', key: 'Airtel' }, { value: 'att', key: 'AT&T' }, { value: 'vimpelcom', key: 'Beeline Russia' }, { value: 'celcom', key: 'Celcom' }, { value: 'chinamobile', key: 'China Mobile' }, { value: 'claro', key: 'Claro' }, { value: 'comcast', key: 'Comcast' }, { value: 'cox', key: 'Cox' }, { value: 'dt', key: 'Deutsche Telekom' }, { value: 'digi', key: 'Digi Malaysia' }, { value: 'docomo', key: 'Docomo' }, { value: 'dtac', key: 'DTAC Trinet' }, { value: 'etisalat', key: 'Etisalat' }, { value: 'idea', key: 'Idea India' }, { value: 'kyivstar', key: 'Kyivstar' }, { value: 'meo', key: 'MEO Portugal' }, { value: 'megafont', key: 'Megafon Russia' }, { value: 'mtn', key: 'MTN - Mahanager Telephone' }, { value: 'mtnza', key: 'MTN South Africa' }, { value: 'mts', key: 'MTS Russia' }, { value: 'optus', key: 'Optus' }, { value: 'orange', key: 'Orange' }, { value: 'qwest', key: 'Qwest' }, { value: 'reliance_jio', key: 'Reliance Jio' }, { value: 'robi', key: 'Robi' }, { value: 'sprint', key: 'Sprint' }, { value: 'telefonica', key: 'Telefonica' }, { value: 'telstra', key: 'Telstra' }, { value: 'tmobile', key: 'T-Mobile' }, { value: 'tigo', key: 'Tigo' }, { value: 'tim', key: 'TIM (Telecom Italia)' }, { value: 'vodacomza', key: 'Vodacom South Africa' }, { value: 'vodafone', key: 'Vodafone' }, { value: 'verizon', key: 'Verizon' }, { value: 'vivo', key: 'Vivo' }, { value: 'zain', key: 'Zain' }, { value: 'umobile', key: 'U-Mobile' }, { value: 'proximus', label: 'Proximus' }, { value: 'tele2', label: 'Tele2' }, { value: 'mobitel', label: 'Mobitel' }, { value: 'o2', label: 'O2' }];
         }
     }, {
         key: 'render',
@@ -18422,8 +18524,15 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component11) {
             args[_key8] = arguments[_key8];
         }
 
-        return _ret8 = (_temp8 = (_this22 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Rule.__proto__ || Object.getPrototypeOf(Rule)).call.apply(_ref14, [this].concat(args))), _this22), _this22.state = { ports: [] }, _this22.trigger_types = [{ key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type' }, { key: 'URL', value: 'url', tooltip: 'URL' }, { key: 'Status code', value: 'status' }, { key: 'HTML body element', value: 'body' }, { key: 'Minimum request time', value: 'min_req_time' }, { key: 'Maximum request time', value: 'max_req_time' }], _this22.action_types = [{ key: 'i.e. Retry with new IP', value: '' }, { key: 'Retry with new IP', value: 'retry' }, { key: 'Retry with new proxy port (Waterfall)',
-            value: 'retry_port' }, { key: 'Ban IP', value: 'ban_ip' }, { key: 'Refresh IP', value: 'refresh_ip' }, { key: 'Save IP to reserved pool', value: 'save_to_pool' }, { key: 'Save IP to fast pool', value: 'save_to_fast_pool' }, { key: 'Process data', value: 'process' }], _this22.ban_options = [{ key: '10 minutes', value: '10min' }, { key: '20 minutes', value: '20min' }, { key: '30 minutes', value: '30min' }, { key: '40 minutes', value: '40min' }, { key: '50 minutes', value: '50min' }, { key: 'Custom', value: 'custom' }], _this22.status_types = ['i.e. 200 - Succeeded requests', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
+        return _ret8 = (_temp8 = (_this22 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Rule.__proto__ || Object.getPrototypeOf(Rule)).call.apply(_ref14, [this].concat(args))), _this22), _this22.state = { ports: [] }, _this22.trigger_types = [{ key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type.\n            For each request the system will check if the trigger is matching\n            the response' }, { key: 'URL', value: 'url', tooltip: 'Trigger will be pulled for all\n            requests to the selected URL' }, { key: 'Status code', value: 'status', tooltip: 'Trigger will be pulled\n            for all the requests that returns the matching status code' }, { key: 'HTML body element', value: 'body', tooltip: 'Trigger will be\n            pulled when the response <body> contain the selected string' }, { key: 'Minimum request time', value: 'min_req_time',
+            tooltip: 'Trigger will be pulled when the request time is above\n                the selected value' }, { key: 'Maximum request time', value: 'max_req_time',
+            tooltip: 'Trigger will be pulled when the request time is below\n            the selected value' }], _this22.action_types = [{ key: 'i.e. Retry with new IP', value: '',
+            tooltip: 'Select an action. Once the trigger rule is met the\n                selected action is executed automatically.' }, { key: 'Retry with new IP', value: 'retry',
+            tooltip: 'System will send the exact same request again with\n                newly refreshed IP' }, { key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
+            tooltip: 'System will send another request using different port\n                from your port list. This can allow cost optimization by\n                escalating the request between different types of networks\n                according to the port configuration.' }, { key: 'Ban IP', value: 'ban_ip', tooltip: 'Will ban the IP for custom\n            amount of time. usually used for failed request.' }, { key: 'Refresh IP', value: 'refresh_ip',
+            tooltip: 'Refresh the current Data Center IP with new allocated IP.\n                this action contain additional charges. View the cost of\n                IP refreshing in your zones page http://luminati.io/cp/zones' }, { key: 'Save IP to reserved pool', value: 'save_to_pool',
+            tooltip: 'Save the current IP to a pool of reserved IPs.\n                you can then download all the IPs at a later time.' }, { key: 'Save IP to fast pool', value: 'save_to_fast_pool',
+            tooltip: 'Save the current IP to fast IP pool to increase\n                the speed of your requests. You will need to specify the\n                size of this pool.' }, { key: 'Process data', value: 'process' }], _this22.ban_options = [{ key: '10 minutes', value: '10min' }, { key: '20 minutes', value: '20min' }, { key: '30 minutes', value: '30min' }, { key: '40 minutes', value: '40min' }, { key: '50 minutes', value: '50min' }, { key: 'Custom', value: 'custom' }], _this22.status_types = ['i.e. 200 - Succeeded requests', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
             return { key: s, value: s };
         }), _this22.set_rule_field = function (field, value) {
             _setdb2.default.emit('head.proxy_edit.update_rule', { rule_id: _this22.props.rule.id,
@@ -18454,6 +18563,11 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component11) {
             }
         }, _this22.status_changed = function (val) {
             if (val != 'Custom') _this22.set_rule_field('status_custom', '');
+        }, _this22.goto_tester = function () {
+            _this22.props.history.push({ pathname: '/proxy_tester', state: {
+                    url: 'https://luminati.io/lpm/templates/product',
+                    port: _this22.props.match.params.port
+                } });
         }, _temp8), (0, _possibleConstructorReturn3.default)(_this22, _ret8);
     }
 
@@ -18517,7 +18631,22 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component11) {
                     rule: this.props.rule }),
                 this.props.rule.ban_ip_duration == 'custom' && _react2.default.createElement(Rule_config, { id: 'ban_ip_custom', type: 'number', sufix: 'minutes',
                     rule: this.props.rule }),
-                this.props.rule.action == 'process' && _react2.default.createElement(Rule_config, { id: 'process', type: 'json', rule: this.props.rule })
+                this.props.rule.action == 'process' && _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(Rule_config, { id: 'process', type: 'json',
+                        rule: this.props.rule }),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'field_row' },
+                        'Test data processing in',
+                        _react2.default.createElement(
+                            'a',
+                            { onClick: this.goto_tester, className: 'link api_link' },
+                            'proxy tester'
+                        )
+                    )
+                )
             );
         }
     }]);
@@ -18926,9 +19055,9 @@ var General = provider({ tab_id: 'general' })(function (props) {
             data: props.default_opt('multiply_vips') }),
         _react2.default.createElement(Config, { type: 'select', id: 'secure_proxy',
             data: props.default_opt('secure_proxy') }),
-        _react2.default.createElement(Config, { type: 'text', id: 'null_response' }),
-        _react2.default.createElement(Config, { type: 'text', id: 'bypass_proxy' }),
-        _react2.default.createElement(Config, { type: 'text', id: 'direct_include' }),
+        _react2.default.createElement(Config, { type: 'regex', id: 'null_response' }),
+        _react2.default.createElement(Config, { type: 'regex', id: 'bypass_proxy' }),
+        _react2.default.createElement(Config, { type: 'regex', id: 'direct_include' }),
         _react2.default.createElement(Config, { type: 'select', id: 'allow_proxy_auth',
             data: props.default_opt('allow_proxy_auth') }),
         _react2.default.createElement(Config, { type: 'select', id: 'iface',
@@ -19011,7 +19140,7 @@ module.exports = { "default": __webpack_require__(411), __esModule: true };
 /* 411 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(133);
+__webpack_require__(132);
 __webpack_require__(92);
 module.exports = __webpack_require__(412);
 
@@ -19042,7 +19171,7 @@ module.exports = { "default": __webpack_require__(414), __esModule: true };
 /* 414 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(133);
+__webpack_require__(132);
 __webpack_require__(92);
 module.exports = __webpack_require__(415);
 
@@ -19051,7 +19180,7 @@ module.exports = __webpack_require__(415);
 /* 415 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var anObject = __webpack_require__(46);
+var anObject = __webpack_require__(47);
 var get = __webpack_require__(234);
 module.exports = __webpack_require__(18).getIterator = function (it) {
   var iterFn = get(it);
@@ -19157,8 +19286,8 @@ module.exports = function getOwnPropertyDescriptor(it, key) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-var toIObject = __webpack_require__(39);
-var $getOwnPropertyDescriptor = __webpack_require__(136).f;
+var toIObject = __webpack_require__(40);
+var $getOwnPropertyDescriptor = __webpack_require__(135).f;
 
 __webpack_require__(236)('getOwnPropertyDescriptor', function () {
   return function getOwnPropertyDescriptor(it, key) {
@@ -19301,7 +19430,7 @@ exports.default = (0, _asyncContainer2.default)(_Typeahead2.default);
 /* 533 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(43),
+var isObject = __webpack_require__(44),
     now = __webpack_require__(534),
     toNumber = __webpack_require__(535);
 
@@ -19524,8 +19653,8 @@ module.exports = now;
 /* 535 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(43),
-    isSymbol = __webpack_require__(109);
+var isObject = __webpack_require__(44),
+    isSymbol = __webpack_require__(108);
 
 /** Used as references for various `Number` constants. */
 var NAN = 0 / 0;
@@ -19709,7 +19838,7 @@ var _Portal = __webpack_require__(590);
 
 var _Portal2 = _interopRequireDefault(_Portal);
 
-var _componentOrElement = __webpack_require__(52);
+var _componentOrElement = __webpack_require__(53);
 
 var _componentOrElement2 = _interopRequireDefault(_componentOrElement);
 
@@ -20027,7 +20156,7 @@ module.exports = listCacheClear;
 /* 541 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(111);
+var assocIndexOf = __webpack_require__(110);
 
 /** Used for built-in method references. */
 var arrayProto = Array.prototype;
@@ -20068,7 +20197,7 @@ module.exports = listCacheDelete;
 /* 542 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(111);
+var assocIndexOf = __webpack_require__(110);
 
 /**
  * Gets the list cache value for `key`.
@@ -20093,7 +20222,7 @@ module.exports = listCacheGet;
 /* 543 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(111);
+var assocIndexOf = __webpack_require__(110);
 
 /**
  * Checks if a list cache value for `key` exists.
@@ -20115,7 +20244,7 @@ module.exports = listCacheHas;
 /* 544 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(111);
+var assocIndexOf = __webpack_require__(110);
 
 /**
  * Sets the list cache `key` to `value`.
@@ -20147,7 +20276,7 @@ module.exports = listCacheSet;
 /* 545 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(110);
+var ListCache = __webpack_require__(109);
 
 /**
  * Removes all key-value entries from the stack.
@@ -20232,7 +20361,7 @@ module.exports = stackHas;
 /* 549 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(110),
+var ListCache = __webpack_require__(109),
     Map = __webpack_require__(167),
     MapCache = __webpack_require__(169);
 
@@ -20274,7 +20403,7 @@ module.exports = stackSet;
 
 var isFunction = __webpack_require__(168),
     isMasked = __webpack_require__(551),
-    isObject = __webpack_require__(43),
+    isObject = __webpack_require__(44),
     toSource = __webpack_require__(285);
 
 /**
@@ -20383,7 +20512,7 @@ module.exports = getValue;
 /***/ (function(module, exports, __webpack_require__) {
 
 var Hash = __webpack_require__(555),
-    ListCache = __webpack_require__(110),
+    ListCache = __webpack_require__(109),
     Map = __webpack_require__(167);
 
 /**
@@ -20447,7 +20576,7 @@ module.exports = Hash;
 /* 556 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(113);
+var nativeCreate = __webpack_require__(112);
 
 /**
  * Removes all key-value entries from the hash.
@@ -20491,7 +20620,7 @@ module.exports = hashDelete;
 /* 558 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(113);
+var nativeCreate = __webpack_require__(112);
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -20527,7 +20656,7 @@ module.exports = hashGet;
 /* 559 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(113);
+var nativeCreate = __webpack_require__(112);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -20556,7 +20685,7 @@ module.exports = hashHas;
 /* 560 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(113);
+var nativeCreate = __webpack_require__(112);
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -20585,7 +20714,7 @@ module.exports = hashSet;
 /* 561 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(114);
+var getMapData = __webpack_require__(113);
 
 /**
  * Removes `key` and its value from the map.
@@ -20630,7 +20759,7 @@ module.exports = isKeyable;
 /* 563 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(114);
+var getMapData = __webpack_require__(113);
 
 /**
  * Gets the map value for `key`.
@@ -20652,7 +20781,7 @@ module.exports = mapCacheGet;
 /* 564 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(114);
+var getMapData = __webpack_require__(113);
 
 /**
  * Checks if a map value for `key` exists.
@@ -20674,7 +20803,7 @@ module.exports = mapCacheHas;
 /* 565 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(114);
+var getMapData = __webpack_require__(113);
 
 /**
  * Sets the map `key` to `value`.
@@ -20801,7 +20930,7 @@ module.exports = cacheHas;
 
 var Symbol = __webpack_require__(82),
     Uint8Array = __webpack_require__(571),
-    eq = __webpack_require__(112),
+    eq = __webpack_require__(111),
     equalArrays = __webpack_require__(286),
     mapToArray = __webpack_require__(572),
     setToArray = __webpack_require__(573);
@@ -21076,7 +21205,7 @@ var baseTimes = __webpack_require__(576),
     isArguments = __webpack_require__(171),
     isArray = __webpack_require__(34),
     isBuffer = __webpack_require__(288),
-    isIndex = __webpack_require__(115),
+    isIndex = __webpack_require__(114),
     isTypedArray = __webpack_require__(289);
 
 /** Used for built-in method references. */
@@ -21153,8 +21282,8 @@ module.exports = baseTimes;
 /* 577 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(53),
-    isObjectLike = __webpack_require__(54);
+var baseGetTag = __webpack_require__(54),
+    isObjectLike = __webpack_require__(55);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
@@ -21201,9 +21330,9 @@ module.exports = stubFalse;
 /* 579 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(53),
+var baseGetTag = __webpack_require__(54),
     isLength = __webpack_require__(172),
-    isObjectLike = __webpack_require__(54);
+    isObjectLike = __webpack_require__(55);
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -21393,7 +21522,7 @@ var DataView = __webpack_require__(586),
     Promise = __webpack_require__(587),
     Set = __webpack_require__(588),
     WeakMap = __webpack_require__(589),
-    baseGetTag = __webpack_require__(53),
+    baseGetTag = __webpack_require__(54),
     toSource = __webpack_require__(285);
 
 /** `Object#toString` result references. */
@@ -21452,7 +21581,7 @@ module.exports = getTag;
 /* 586 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(55),
+var getNative = __webpack_require__(56),
     root = __webpack_require__(33);
 
 /* Built-in method references that are verified to be native. */
@@ -21465,7 +21594,7 @@ module.exports = DataView;
 /* 587 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(55),
+var getNative = __webpack_require__(56),
     root = __webpack_require__(33);
 
 /* Built-in method references that are verified to be native. */
@@ -21478,7 +21607,7 @@ module.exports = Promise;
 /* 588 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(55),
+var getNative = __webpack_require__(56),
     root = __webpack_require__(33);
 
 /* Built-in method references that are verified to be native. */
@@ -21491,7 +21620,7 @@ module.exports = Set;
 /* 589 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(55),
+var getNative = __webpack_require__(56),
     root = __webpack_require__(33);
 
 /* Built-in method references that are verified to be native. */
@@ -21513,7 +21642,7 @@ var _propTypes = __webpack_require__(4);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _componentOrElement = __webpack_require__(52);
+var _componentOrElement = __webpack_require__(53);
 
 var _componentOrElement2 = _interopRequireDefault(_componentOrElement);
 
@@ -21619,7 +21748,7 @@ var _propTypes = __webpack_require__(4);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _componentOrElement = __webpack_require__(52);
+var _componentOrElement = __webpack_require__(53);
 
 var _componentOrElement2 = _interopRequireDefault(_componentOrElement);
 
@@ -21791,7 +21920,7 @@ var _Token = __webpack_require__(294);
 
 var _Token2 = _interopRequireDefault(_Token);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
 var _typeaheadInputContainer = __webpack_require__(632);
 
@@ -22420,7 +22549,7 @@ var _uniqueId = __webpack_require__(597);
 
 var _uniqueId2 = _interopRequireDefault(_uniqueId);
 
-var _getOptionLabel = __webpack_require__(116);
+var _getOptionLabel = __webpack_require__(115);
 
 var _getOptionLabel2 = _interopRequireDefault(_getOptionLabel);
 
@@ -22493,7 +22622,7 @@ module.exports = uniqueId;
 var Symbol = __webpack_require__(82),
     arrayMap = __webpack_require__(599),
     isArray = __webpack_require__(34),
-    isSymbol = __webpack_require__(109);
+    isSymbol = __webpack_require__(108);
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0;
@@ -22596,11 +22725,11 @@ var _some = __webpack_require__(603);
 
 var _some2 = _interopRequireDefault(_some);
 
-var _stripDiacritics = __webpack_require__(118);
+var _stripDiacritics = __webpack_require__(117);
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
-var _warn = __webpack_require__(57);
+var _warn = __webpack_require__(58);
 
 var _warn2 = _interopRequireDefault(_warn);
 
@@ -22675,9 +22804,9 @@ function defaultFilterBy(option, state, props) {
 /* 602 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(53),
+var baseGetTag = __webpack_require__(54),
     isArray = __webpack_require__(34),
-    isObjectLike = __webpack_require__(54);
+    isObjectLike = __webpack_require__(55);
 
 /** `Object#toString` result references. */
 var stringTag = '[object String]';
@@ -23173,10 +23302,10 @@ module.exports = baseHasIn;
 /* 614 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castPath = __webpack_require__(117),
+var castPath = __webpack_require__(116),
     isArguments = __webpack_require__(171),
     isArray = __webpack_require__(34),
-    isIndex = __webpack_require__(115),
+    isIndex = __webpack_require__(114),
     isLength = __webpack_require__(172),
     toKey = __webpack_require__(83);
 
@@ -23459,10 +23588,10 @@ module.exports = createBaseEach;
 /* 624 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(112),
+var eq = __webpack_require__(111),
     isArrayLike = __webpack_require__(173),
-    isIndex = __webpack_require__(115),
-    isObject = __webpack_require__(43);
+    isIndex = __webpack_require__(114),
+    isObject = __webpack_require__(44);
 
 /**
  * Checks if the given arguments are from an iteratee call.
@@ -23549,11 +23678,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getOptionLabel = __webpack_require__(116);
+var _getOptionLabel = __webpack_require__(115);
 
 var _getOptionLabel2 = _interopRequireDefault(_getOptionLabel);
 
-var _stripDiacritics = __webpack_require__(118);
+var _stripDiacritics = __webpack_require__(117);
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
@@ -23616,7 +23745,7 @@ var _head = __webpack_require__(177);
 
 var _head2 = _interopRequireDefault(_head);
 
-var _getOptionLabel = __webpack_require__(116);
+var _getOptionLabel = __webpack_require__(115);
 
 var _getOptionLabel2 = _interopRequireDefault(_getOptionLabel);
 
@@ -23754,9 +23883,9 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactDom = __webpack_require__(14);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
-var _keyCode = __webpack_require__(119);
+var _keyCode = __webpack_require__(118);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23963,7 +24092,7 @@ var _MenuItem = __webpack_require__(178);
 
 var _MenuItem2 = _interopRequireDefault(_MenuItem);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24140,7 +24269,7 @@ module.exports = basePick;
 
 var baseGet = __webpack_require__(175),
     baseSet = __webpack_require__(637),
-    castPath = __webpack_require__(117);
+    castPath = __webpack_require__(116);
 
 /**
  * The base implementation of  `_.pickBy` without support for iteratee shorthands.
@@ -24175,9 +24304,9 @@ module.exports = basePickBy;
 /***/ (function(module, exports, __webpack_require__) {
 
 var assignValue = __webpack_require__(638),
-    castPath = __webpack_require__(117),
-    isIndex = __webpack_require__(115),
-    isObject = __webpack_require__(43),
+    castPath = __webpack_require__(116),
+    isIndex = __webpack_require__(114),
+    isObject = __webpack_require__(44),
     toKey = __webpack_require__(83);
 
 /**
@@ -24228,7 +24357,7 @@ module.exports = baseSet;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseAssignValue = __webpack_require__(639),
-    eq = __webpack_require__(112);
+    eq = __webpack_require__(111);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -24651,7 +24780,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _stripDiacritics = __webpack_require__(118);
+var _stripDiacritics = __webpack_require__(117);
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
@@ -24833,9 +24962,9 @@ var _deprecated2 = _interopRequireDefault(_deprecated);
 
 var _propTypes3 = __webpack_require__(654);
 
-var _utils = __webpack_require__(56);
+var _utils = __webpack_require__(57);
 
-var _keyCode = __webpack_require__(119);
+var _keyCode = __webpack_require__(118);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25513,7 +25642,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = caseSensitiveType;
 
-var _warn = __webpack_require__(57);
+var _warn = __webpack_require__(58);
 
 var _warn2 = _interopRequireDefault(_warn);
 
@@ -25569,7 +25698,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = highlightOnlyResultType;
 
-var _warn = __webpack_require__(57);
+var _warn = __webpack_require__(58);
 
 var _warn2 = _interopRequireDefault(_warn);
 
@@ -25594,7 +25723,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = ignoreDiacriticsType;
 
-var _warn = __webpack_require__(57);
+var _warn = __webpack_require__(58);
 
 var _warn2 = _interopRequireDefault(_warn);
 
@@ -25623,7 +25752,7 @@ var _isPlainObject = __webpack_require__(298);
 
 var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
-var _warn = __webpack_require__(57);
+var _warn = __webpack_require__(58);
 
 var _warn2 = _interopRequireDefault(_warn);
 
@@ -25660,7 +25789,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = labelKeyType;
 
-var _warn = __webpack_require__(57);
+var _warn = __webpack_require__(58);
 
 var _warn2 = _interopRequireDefault(_warn);
 
@@ -26843,7 +26972,7 @@ exports.default = Viewer_wrapper;
 
 (function(mod) {
   if (true) // CommonJS
-    mod(__webpack_require__(44), __webpack_require__(673), __webpack_require__(84), __webpack_require__(674));
+    mod(__webpack_require__(45), __webpack_require__(673), __webpack_require__(84), __webpack_require__(674));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../lib/codemirror", "../xml/xml", "../javascript/javascript", "../css/css"], mod);
   else // Plain browser env
@@ -27001,7 +27130,7 @@ exports.default = Viewer_wrapper;
 
 (function(mod) {
   if (true) // CommonJS
-    mod(__webpack_require__(44));
+    mod(__webpack_require__(45));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../lib/codemirror"], mod);
   else // Plain browser env
@@ -27401,7 +27530,7 @@ if (!CodeMirror.mimeModes.hasOwnProperty("text/html"))
 
 (function(mod) {
   if (true) // CommonJS
-    mod(__webpack_require__(44));
+    mod(__webpack_require__(45));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../lib/codemirror"], mod);
   else // Plain browser env
@@ -31227,7 +31356,7 @@ Redirect.contextTypes = {
 /* unused harmony reexport createHashHistory */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__createMemoryHistory__ = __webpack_require__(697);
 /* unused harmony reexport createMemoryHistory */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__LocationUtils__ = __webpack_require__(121);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__LocationUtils__ = __webpack_require__(120);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return __WEBPACK_IMPORTED_MODULE_3__LocationUtils__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_3__LocationUtils__["b"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PathUtils__ = __webpack_require__(88);
@@ -31252,7 +31381,7 @@ Redirect.contextTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(121);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(120);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(187);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(315);
@@ -31556,7 +31685,7 @@ var createBrowserHistory = function createBrowserHistory() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(121);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(120);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(88);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(187);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(315);
@@ -31876,7 +32005,7 @@ var createHashHistory = function createHashHistory() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PathUtils__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(121);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(120);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__createTransitionManager__ = __webpack_require__(187);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -32464,8 +32593,7 @@ var before_save = {
                     'ISP/ASN (',
                     _react2.default.createElement(
                         'a',
-                        {
-                            className: 'link',
+                        { className: 'link',
                             href: 'http://bgp.potaroo.net/cidr/autnums.html',
                             target: '_blank', rel: 'noopener noreferrer' },
                         'list'
@@ -32829,7 +32957,7 @@ var _instructions2 = _interopRequireDefault(_instructions);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _pure_component = __webpack_require__(16);
 
@@ -32855,16 +32983,13 @@ var Howto = function (_Pure_component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Howto.__proto__ || Object.getPrototypeOf(Howto)).call.apply(_ref, [this].concat(args))), _this), _this.state = { option: 'code' }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Howto.__proto__ || Object.getPrototypeOf(Howto)).call.apply(_ref, [this].concat(args))), _this), _this.state = { option: 'code' }, _this.choose_click = function (option) {
+      _this.setState({ option: option });
+      (0, _util.ga_event)('How-to-tab', 'select code/browser', option);
+    }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
   }
 
   (0, _createClass3.default)(Howto, [{
-    key: 'choose_click',
-    value: function choose_click(option) {
-      this.setState({ option: option });
-      (0, _util.ga_event)('How-to-tab', 'select code/browser', option);
-    }
-  }, {
     key: 'render',
     value: function render() {
       var cur_title = void 0;
@@ -32897,11 +33022,11 @@ var Howto = function (_Pure_component) {
               { className: 'nav_tabs tabs' },
               _react2.default.createElement(Tab, { id: 'code', title: 'Code',
                 tooltip: 'Examples how to use LPM programatically',
-                on_click: this.choose_click.bind(this),
+                on_click: this.choose_click,
                 cur_tab: this.state.option }),
               _react2.default.createElement(Tab, { id: 'browser', title: 'Browser',
                 tooltip: 'Examples how to inegrate LPM with the browser',
-                on_click: this.choose_click.bind(this),
+                on_click: this.choose_click,
                 cur_tab: this.state.option })
             ),
             _react2.default.createElement(
@@ -32968,21 +33093,15 @@ var Code_instructions = function (_Pure_component2) {
       args[_key2] = arguments[_key2];
     }
 
-    return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Code_instructions.__proto__ || Object.getPrototypeOf(Code_instructions)).call.apply(_ref3, [this].concat(args))), _this2), _this2.state = { lang: 'shell' }, _this2.swagger_url = 'http://petstore.swagger.io/?url=https://' + 'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/' + 'swagger.json#/Proxy', _temp2), (0, _possibleConstructorReturn3.default)(_this2, _ret2);
+    return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Code_instructions.__proto__ || Object.getPrototypeOf(Code_instructions)).call.apply(_ref3, [this].concat(args))), _this2), _this2.state = { lang: 'shell' }, _this2.click_lang = function (lang) {
+      _this2.setState({ lang: lang });
+      (0, _util.ga_event)('How-to-tab', 'select option', lang);
+    }, _this2.click_copy = function (lang) {
+      return (0, _util.ga_event)('How-to-tab', 'click copy', lang);
+    }, _temp2), (0, _possibleConstructorReturn3.default)(_this2, _ret2);
   }
 
   (0, _createClass3.default)(Code_instructions, [{
-    key: 'click_lang',
-    value: function click_lang(lang) {
-      this.setState({ lang: lang });
-      (0, _util.ga_event)('How-to-tab', 'select option', lang);
-    }
-  }, {
-    key: 'click_copy',
-    value: function click_copy(lang) {
-      (0, _util.ga_event)('How-to-tab', 'click copy', lang);
-    }
-  }, {
     key: 'render',
     value: function render() {
       var _this3 = this;
@@ -33040,7 +33159,7 @@ var Code_instructions = function (_Pure_component2) {
           'View available API endpoints',
           _react2.default.createElement(
             'a',
-            { className: 'link api_link', href: this.swagger_url },
+            { className: 'link api_link', href: _util.swagger_url },
             'here'
           )
         )
@@ -33053,24 +33172,25 @@ var Code_instructions = function (_Pure_component2) {
 var Browser_instructions = function (_Pure_component3) {
   (0, _inherits3.default)(Browser_instructions, _Pure_component3);
 
-  function Browser_instructions(props) {
+  function Browser_instructions() {
+    var _ref4;
+
+    var _temp3, _this4, _ret3;
+
     (0, _classCallCheck3.default)(this, Browser_instructions);
 
-    var _this4 = (0, _possibleConstructorReturn3.default)(this, (Browser_instructions.__proto__ || Object.getPrototypeOf(Browser_instructions)).call(this, props));
+    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      args[_key3] = arguments[_key3];
+    }
 
-    _this4.state = { browser: 'chrome_win' };
-    _this4.port = window.localStorage.getItem('quickstart-first-proxy') || 24000;
-    return _this4;
+    return _ret3 = (_temp3 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref4 = Browser_instructions.__proto__ || Object.getPrototypeOf(Browser_instructions)).call.apply(_ref4, [this].concat(args))), _this4), _this4.state = { browser: 'chrome_win' }, _this4.port = window.localStorage.getItem('quickstart-first-proxy') || 24000, _this4.browser_changed = function (e) {
+      var browser = e.target.value;
+      _this4.setState({ browser: browser });
+      (0, _util.ga_event)('How-to-tab', 'select option', browser);
+    }, _temp3), (0, _possibleConstructorReturn3.default)(_this4, _ret3);
   }
 
   (0, _createClass3.default)(Browser_instructions, [{
-    key: 'browser_changed',
-    value: function browser_changed(e) {
-      var browser = e.target.value;
-      this.setState({ browser: browser });
-      (0, _util.ga_event)('How-to-tab', 'select option', browser);
-    }
-  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -33086,7 +33206,7 @@ var Browser_instructions = function (_Pure_component3) {
           ),
           _react2.default.createElement(
             'select',
-            { onChange: this.browser_changed.bind(this) },
+            { onChange: this.browser_changed },
             _react2.default.createElement(
               'option',
               { value: 'chrome_win' },
@@ -34595,7 +34715,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -34608,6 +34728,8 @@ var _classnames = __webpack_require__(5);
 var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(17);
+
+var _util = __webpack_require__(26);
 
 var _schema = __webpack_require__(714);
 
@@ -34625,7 +34747,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34900,8 +35022,7 @@ var Footer = function Footer() {
       null,
       _react2.default.createElement(
         'a',
-        { href: 'http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json#/Proxy',
-          className: 'link' },
+        { href: _util.swagger_url, className: 'link' },
         'API'
       )
     )
@@ -35245,7 +35366,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35463,7 +35584,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _pure_component = __webpack_require__(16);
 
@@ -35936,7 +36057,7 @@ var _regenerator = __webpack_require__(21);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _defineProperty2 = __webpack_require__(58);
+var _defineProperty2 = __webpack_require__(46);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -35982,19 +36103,17 @@ var _classnames = __webpack_require__(5);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _url = __webpack_require__(98);
-
-var _url2 = _interopRequireDefault(_url);
-
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _har_preview = __webpack_require__(306);
 
 var _har_preview2 = _interopRequireDefault(_har_preview);
+
+var _reactRouterDom = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36035,7 +36154,7 @@ var Proxy_tester = function (_Pure_component) {
     return Proxy_tester;
 }(_pure_component2.default);
 
-var Request = function (_Pure_component2) {
+var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
     (0, _inherits3.default)(Request, _Pure_component2);
 
     function Request() {
@@ -36146,21 +36265,17 @@ var Request = function (_Pure_component2) {
         value: function componentDidMount() {
             var _this4 = this;
 
-            setTimeout(function () {
-                var url_o = _url2.default.parse(document.location.href);
-                var qs_o = _url2.default.qs_parse((url_o.search || '').substr(1));
-                var url = qs_o.url || _this4.state.params.url;
-                var method = qs_o.method || _this4.state.params.method;
-                var port = qs_o.port || _this4.state.params.port;
-                _this4.setdb_on('head.proxies_running', function (proxies) {
-                    if (!proxies || !proxies.length) return;
-                    _this4.setState({ proxies: proxies });
-                    _this4.setState(function (prev_state) {
-                        var def_port = proxies[0].port;
-                        _this4.default_state.params.proxy = def_port;
-                        return { params: (0, _extends6.default)({}, prev_state.params, {
-                                proxy: port || def_port, method: method, url: url }) };
-                    });
+            var params = this.props.history.location.state || {};
+            var url = params.url || this.state.params.url;
+            var port = params.port || this.state.params.port;
+            this.setdb_on('head.proxies_running', function (proxies) {
+                if (!proxies || !proxies.length) return;
+                _this4.setState({ proxies: proxies });
+                _this4.setState(function (prev_state) {
+                    var def_port = proxies[0].port;
+                    _this4.default_state.params.proxy = def_port;
+                    return { params: (0, _extends6.default)({}, prev_state.params, { proxy: port || def_port,
+                            url: url }) };
                 });
             });
         }
@@ -36206,7 +36321,7 @@ var Request = function (_Pure_component2) {
         }
     }]);
     return Request;
-}(_pure_component2.default);
+}(_pure_component2.default));
 
 var Request_params = function Request_params(_ref3) {
     var params = _ref3.params,
@@ -36395,7 +36510,7 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _reactBootstrapTypeahead = __webpack_require__(280);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -36403,13 +36518,13 @@ var _setdb = __webpack_require__(35);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _url = __webpack_require__(98);
+var _url = __webpack_require__(155);
 
 var _url2 = _interopRequireDefault(_url);
 
 var _common = __webpack_require__(17);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -37233,7 +37348,7 @@ var _extends4 = __webpack_require__(6);
 
 var _extends5 = _interopRequireDefault(_extends4);
 
-var _defineProperty2 = __webpack_require__(58);
+var _defineProperty2 = __webpack_require__(46);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -37261,7 +37376,7 @@ var _pure_component = __webpack_require__(16);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -37289,7 +37404,7 @@ var _fileSaver = __webpack_require__(188);
 
 var _fileSaver2 = _interopRequireDefault(_fileSaver);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _lodash = __webpack_require__(63);
 
@@ -37309,7 +37424,7 @@ var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
 var _common = __webpack_require__(17);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38713,9 +38828,9 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -38729,7 +38844,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
 var _chrome_widgets = __webpack_require__(179);
 
@@ -39237,7 +39352,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -39255,13 +39370,13 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _common = __webpack_require__(17);
 
-var _codemirror = __webpack_require__(44);
+var _codemirror = __webpack_require__(45);
 
 var _codemirror2 = _interopRequireDefault(_codemirror);
 
 __webpack_require__(84);
 
-__webpack_require__(120);
+__webpack_require__(119);
 
 var _fileSaver = __webpack_require__(188);
 
@@ -39271,7 +39386,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -39589,7 +39704,7 @@ var _setdb = __webpack_require__(35);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _ajax = __webpack_require__(26);
+var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -39834,7 +39949,7 @@ var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
 var _common = __webpack_require__(17);
 
-var _util = __webpack_require__(27);
+var _util = __webpack_require__(26);
 
 var _classnames = __webpack_require__(5);
 
@@ -39938,6 +40053,17 @@ var Tracer = function (_Pure_component) {
                 _react2.default.createElement(_common.Nav, { title: this.title, subtitle: this.subtitle }),
                 _react2.default.createElement(Request, { execute: this.execute, set_result: this.set_result,
                     loading: this.state.loading }),
+                _react2.default.createElement(
+                    'div',
+                    null,
+                    'View the documentation of the API endpoint',
+                    _react2.default.createElement(
+                        'a',
+                        { className: 'link api_link', href: _util.swagger_link_tester_url,
+                            target: '_blank', rel: 'noopener noreferrer' },
+                        'here'
+                    )
+                ),
                 _react2.default.createElement(Result, { redirects: this.state.redirects,
                     loading: this.state.loading,
                     tracing_url: this.state.tracing_url,
@@ -40325,9 +40451,9 @@ var _har_viewer = __webpack_require__(180);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _reactRouterDom = __webpack_require__(45);
+var _reactRouterDom = __webpack_require__(37);
 
-var _url = __webpack_require__(98);
+var _url = __webpack_require__(155);
 
 var _url2 = _interopRequireDefault(_url);
 
@@ -40409,7 +40535,7 @@ exports = module.exports = __webpack_require__(85)(undefined);
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n/* start LPM */\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel select {\n  float: right;\n  width: auto;\n  height: 24px;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 19px 0 4px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #E0E9EE;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.pagination_panel {\n  width: 100%;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #004d74;\n  position: relative;\n  left: 29px;\n  top: 0;\n  border-radius: 50%;\n}\n.nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.debug {\n  background-image: url(/img/debug.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  height: 100%;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.debug .desc {\n  width: 120px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .field {\n  flex: 1;\n  align-items: center;\n}\n.proxy_edit .main_window .field .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .field .double_field input {\n  width: 79px;\n}\n.proxy_edit .main_window .field .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #E0E9EE;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #E0E9EE;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #E0E9EE;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: center;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  margin-right: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  text-align: center;\n  margin-top: 10px;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  text-align: center;\n  margin-top: 10px;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.howto .api_link {\n  margin-left: 3px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper {\n  display: flex;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header {\n  position: absolute;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 40px;\n  top: 1px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field select {\n  margin-top: 35px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 16px;\n  padding-right: 6px;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n/* start LPM */\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel select {\n  float: right;\n  width: auto;\n  height: 24px;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 19px 0 4px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #E0E9EE;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.pagination_panel {\n  width: 100%;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .circle_wrapper {\n  display: none;\n  width: 12px;\n  height: 12px;\n  background-color: #004d74;\n  position: relative;\n  left: 29px;\n  top: 0;\n  border-radius: 50%;\n}\n.nav_tabs .btn_tab .circle_wrapper.active {\n  display: block;\n}\n.nav_tabs .btn_tab .circle_wrapper.error {\n  background-color: #ef6153;\n}\n.nav_tabs .btn_tab .circle_wrapper .circle {\n  color: white;\n  font-size: 9px;\n  line-height: 0;\n  position: relative;\n  top: 6px;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.debug {\n  background-image: url(/img/debug.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  height: 100%;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.debug .desc {\n  width: 120px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .field {\n  flex: 1;\n  align-items: center;\n}\n.proxy_edit .main_window .field .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .field .double_field input {\n  width: 79px;\n}\n.proxy_edit .main_window .field .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  position: relative;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box_wrapper {\n  position: absolute;\n  top: 0;\n  left: 170px;\n  height: 36px;\n  width: 300px;\n}\n.proxy_edit .regex_field .tip_box {\n  position: absolute;\n  left: 10px;\n  height: 32px;\n  border-radius: 4px;\n  border: solid 1px #004d74;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #E0E9EE;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #E0E9EE;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #E0E9EE;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: center;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  margin-right: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  text-align: center;\n  margin-top: 10px;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  text-align: center;\n  margin-top: 10px;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper {\n  display: flex;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header {\n  position: absolute;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 40px;\n  top: 1px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field select {\n  margin-top: 35px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 16px;\n  padding-right: 6px;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
 
 // exports
 

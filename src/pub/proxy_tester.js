@@ -7,9 +7,9 @@ import {Input, Select, Loader, Modal, Warnings, Nav,
     Tooltip, Add_icon, Remove_icon} from './common.js';
 import classnames from 'classnames';
 import ajax from '../../util/ajax.js';
-import zurl from '../../util/url.js';
 import {ga_event} from './util.js';
 import Preview from './har_preview.js';
+import {withRouter} from 'react-router-dom';
 
 class Proxy_tester extends Pure_component {
     state = {};
@@ -27,7 +27,7 @@ class Proxy_tester extends Pure_component {
     }
 }
 
-class Request extends Pure_component {
+const Request = withRouter(class Request extends Pure_component {
     first_header = {idx: 0, header: '', value: ''};
     default_state = {
         headers: [this.first_header],
@@ -36,22 +36,18 @@ class Request extends Pure_component {
     };
     state = {...this.default_state, show_loader: false};
     componentDidMount(){
-        setTimeout(()=>{
-            const url_o = zurl.parse(document.location.href);
-            const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
-            const url = qs_o.url||this.state.params.url;
-            const method = qs_o.method||this.state.params.method;
-            const port = qs_o.port||this.state.params.port;
-            this.setdb_on('head.proxies_running', proxies=>{
-                if (!proxies||!proxies.length)
-                    return;
-                this.setState({proxies});
-                this.setState(prev_state=>{
-                    const def_port = proxies[0].port;
-                    this.default_state.params.proxy = def_port;
-                    return {params: {...prev_state.params,
-                        proxy: port||def_port, method, url}};
-                });
+        const params = this.props.history.location.state||{};
+        const url = params.url||this.state.params.url;
+        const port = params.port||this.state.params.port;
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies||!proxies.length)
+                return;
+            this.setState({proxies});
+            this.setState(prev_state=>{
+                const def_port = proxies[0].port;
+                this.default_state.params.proxy = def_port;
+                return {params: {...prev_state.params, proxy: port||def_port,
+                    url}};
             });
         });
     }
@@ -152,7 +148,7 @@ class Request extends Pure_component {
               </div>
             </div>;
     }
-}
+});
 
 const Request_params = ({params, update, proxies})=>{
     proxies = (proxies||[]).map(p=>({key: p.port, value: p.port}));

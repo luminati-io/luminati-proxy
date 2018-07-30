@@ -36,8 +36,7 @@ export const tabs = {
             asn: {
                 label: <span>
                     ISP/ASN (
-                    <a
-                      className="link"
+                    <a className="link"
                       href="http://bgp.potaroo.net/cidr/autnums.html"
                       target="_blank" rel="noopener noreferrer">
                       list

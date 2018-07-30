@@ -5,7 +5,7 @@ import Pure_component from '../../www/util/pub/pure_component.js';
 import Proxy_blank from './proxy_blank.js';
 import {Input, Select, Loader, Nav, Loader_small, Tooltip,
     Circle_li as Li, Modal_dialog, Warning} from './common.js';
-import {status_codes} from './util.js';
+import {status_codes, swagger_link_tester_url} from './util.js';
 import classnames from 'classnames';
 
 export default class Tracer extends Pure_component {
@@ -64,6 +64,11 @@ export default class Tracer extends Pure_component {
               <Nav title={this.title} subtitle={this.subtitle}/>
               <Request execute={this.execute} set_result={this.set_result}
                 loading={this.state.loading}/>
+              <div>
+                View the documentation of the API endpoint
+                <a className="link api_link" href={swagger_link_tester_url}
+                  target="_blank" rel="noopener noreferrer">here</a>
+              </div>
               <Result redirects={this.state.redirects}
                 loading={this.state.loading}
                 tracing_url={this.state.tracing_url}
