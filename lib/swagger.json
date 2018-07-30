@@ -253,7 +253,7 @@
         "/proxies/{port}/link_test.json": {
             "get": {
                 "description": "Link Tester API. See all the redirections for a given URL",
-                "tags": ["Proxy", "Link", "Tester"],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "port",
@@ -304,7 +304,27 @@
                         "required": false,
                         "type": "json"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "redirects": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "url": {"type": "string"},
+                                            "code": {"type": "integer"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/proxies/{port}/ban_ip": {
