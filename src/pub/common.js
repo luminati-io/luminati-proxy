@@ -371,7 +371,7 @@ export const Input = props=>{
 };
 
 export class Regex extends Pure_component {
-    state = {recognized: false, checked: {}, focused: false};
+    state = {recognized: false, checked: {}};
     formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'];
     componentDidMount(){
         this.recognize_regexp();
@@ -409,25 +409,28 @@ export class Regex extends Pure_component {
         const active = this.state.recognized&&this.state.checked[f];
         return classnames('check', {active});
     };
-    on_focus = ()=>this.setState({focused: true});
-    on_blur = ()=>this.setState({focused: false});
+    tip = f=>{
+        if (this.state.checked[f])
+            return `Remove file format ${f} from regex`;
+        return `Add file format ${f} to regex`;
+    };
     render(){
         const {type, ...props} = this.props;
-        const tip_box_classes = classnames('tip_box',
-            {active: this.state.focused});
+        const tip_box_classes = classnames('tip_box', 'active');
         return <div tabIndex="1" className="regex_field"
             onFocus={this.on_focus} onBlur={this.on_blur}>
-              <Input type="text" {...props}/>
-              <div className="tip_box_wrapper">
-                <div className={tip_box_classes}>
-                  <div className="checks">
-                    {this.formats.map(f=>
-                      <div key={f} onClick={this.toggle.bind(null, f)}
+              <div className={tip_box_classes}>
+                <div className="checks">
+                  {this.formats.map(f=>
+                    <Tooltip key={f+!!this.state.checked[f]}
+                      title={this.tip(f)}>
+                      <div onClick={this.toggle.bind(null, f)}
                         className={this.classes(f)}>.{f}</div>
-                    )}
-                  </div>
+                    </Tooltip>
+                  )}
                 </div>
               </div>
+              <Input className="regex" type="text" {...props}/>
             </div>;
     }
 }

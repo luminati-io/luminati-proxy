@@ -331,23 +331,6 @@ const columns = [
         type: 'options',
     },
     {
-        key: 'null_response',
-        title: 'NULL response',
-        type: 'text',
-        ext: true,
-    },
-    {
-        key: 'bypass_proxy',
-        title: 'Bypass proxy',
-        type: 'text',
-        ext: true,
-    },
-    {
-        key: 'direct_include',
-        title: 'Direct include',
-        type: 'text',
-    },
-    {
         key: 'success_rate',
         title: 'Success',
         tooltip: 'The ratio of successful requests out of total requests. A '

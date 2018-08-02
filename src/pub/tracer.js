@@ -24,7 +24,7 @@ export default class Tracer extends Pure_component {
             this.ws.removeEventListener('message', this.on_message);
     }
     set_result = res=>this.setState(res);
-    execute = (url, port)=>{
+    execute = ({url, port, uid})=>{
         if (!/^https?:\/\//.test(url))
         {
             return void this.setState({redirects: null, filename: null,
@@ -32,7 +32,7 @@ export default class Tracer extends Pure_component {
         }
         this.setState({redirects: null, filename: null, loading: true,
             tracing_url: null, traced: false});
-        const data = {url, port};
+        const data = {url, port, uid};
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
@@ -133,7 +133,7 @@ class Request extends Pure_component {
     url_changed = value=>this.setState({url: value});
     port_changed = port=>this.setState({port});
     uid_changed = uid=>this.setState({uid});
-    go_clicked = ()=>this.props.execute(this.state.url, this.state.port);
+    go_clicked = ()=>this.props.execute(this.state);
     render(){
         if (!this.state.ports)
             return <Loader show/>;
@@ -143,9 +143,8 @@ class Request extends Pure_component {
         test.`;
         const url_tip = `URL that will be used as a starting point. Following
         requests will be done based on 'Location' header of the response.`;
-        const uid_tip = `Add unique tracking parameter for future analysis.
-        This parameter can be used for deducting the test requests from
-        statistics or billing calculations in your own systems`;
+        const uid_tip = `Add unique tracking parameter inside a request header.
+        It can be used for your future analysis.`;
         return <div className="panel no_border request">
               <div className="fields">
                 <Field title="Proxy port" tooltip={port_tip}>
@@ -158,8 +157,8 @@ class Request extends Pure_component {
                     on_change_wrapper={this.url_changed}
                     disabled={this.props.loading}/>
                 </Field>
-                <Field title="Unique tracking parameter (optional)"
-                  tooltip={uid_tip} className="uid">
+                <Field title="X-Unique-Id header (optional)" tooltip={uid_tip}
+                  className="uid">
                   <Input type="text" val={this.state.uid}
                     on_change_wrapper={this.uid_changed}
                     disabled={this.props.loading}/>

@@ -31,7 +31,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.103.790-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.104.180-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -145,13 +145,6 @@ Options:
   --max_requests           Maximum requests per session   [string] [default: 50]
   --session_duration       Maximum duration of session (seconds)        [string]
   --throttle               Throttle requests above given number         [number]
-  --null_response          URL regex pattern for null response          [string]
-  --bypass_proxy           URL regex for bypassing the proxy manager and send
-                           directly to host                             [string]
-  --direct_include         URL regex for requests to be sent directly from super
-                           proxy                                        [string]
-  --exclude_include        URL regex for requests to not be sent directly from
-                           super proxy                                  [string]
   --rules                  Proxy request rules                         [default:
   {"post":[{"res":[{"action":{"req_status_cnt":true,"req_status_success":true,"r
   etry":false},"head":true,"status":{"arg":"([23]..|404)","type":"=~"}},{"action

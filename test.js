@@ -4,7 +4,6 @@ const _ = require('lodash');
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
-const sinon = require('sinon');
 const net = require('net');
 const url = require('url');
 const path = require('path');
@@ -82,6 +81,10 @@ const mock_json = status=>{
         return {status, body: {opt, mock: true}};
     };
 };
+
+const pre_rule = (type, regex)=>({
+    rules: {pre: [{action: type, url: regex||'.*'}]},
+});
 
 const http_proxy = port=>etask(function*(){
     const proxy = {history: [], full_history: []};
@@ -326,7 +329,7 @@ describe('proxy', ()=>{
                         +' platform='+process.platform);
             }));
             it('not added when accessing site directly', ()=>etask(function*(){
-                l = yield lum({bypass_proxy: '.*'});
+                l = yield lum(pre_rule('bypass_proxy'));
                 let res = yield l.test(ping.http.url);
                 assert.ok(!res.body.headers['x-hola-agent']);
             }));
@@ -355,8 +358,7 @@ describe('proxy', ()=>{
                 assert.equal(history.length, 1);
                 assert.equal(history[0].context, context);
             }));
-            t('null response', ()=>ping.http.url, {null_response: '.*'});
-            t('bypass proxy', ()=>ping.http.url, {bypass_proxy: '.*'},
+            t('bypass proxy', ()=>ping.http.url, pre_rule('bypass_proxy'),
                 ()=>ping.history[0]);
             t('http', ()=>test_url, {}, ()=>proxy.history[0]);
             t('https sniffing', ()=>ping.https.url,
@@ -372,7 +374,7 @@ describe('proxy', ()=>{
                     'X-bizzare-Letter-cAsE': 'test',
                 };
                 l = yield lum(opt);
-                const res = yield l.test({url: _url(), headers: headers});
+                const res = yield l.test({url: _url(), headers});
                 const site_headers = _.omit(res.body.headers,
                     qw`proxy-authorization x-hola-agent`);
                 assert_has(site_headers, headers, 'value');
@@ -382,11 +384,12 @@ describe('proxy', ()=>{
             t('http', ()=>test_url);
             t('https', ()=>ping.https.url, {ssl: false});
             t('https sniffing', ()=>ping.https.url, {insecure: true});
-            t('bypass http', ()=>ping.http.url, {bypass_proxy: '.*'});
-            t('bypass https', ()=>ping.https.url,
-                {bypass_proxy: '.*', ssl: false});
+            t('bypass http', ()=>ping.http.url, pre_rule('bypass_proxy'));
+            t('bypass https', ()=>ping.https.url, Object.assign(
+                pre_rule('bypass_proxy'), {ssl: false}));
             t('bypass https sniffing', ()=>ping.https.url+'?match',
-                {bypass_proxy: 'match', insecure: true});
+                Object.assign(pre_rule('bypass_proxy', 'match'),
+                {insecure: true}));
         });
     });
     it('Listening without specifing port', ()=>etask(function*(){
@@ -681,76 +684,10 @@ describe('proxy', ()=>{
                 // t(2);
             });
         });
-        const match_test = _url=>etask(function*(){
-            yield etask.sleep(10);
-            let before = proxy.history.length;
-            let res = yield l.test(_url);
-            yield etask.sleep(10);
-            let after = proxy.history.length;
-            return {before, after, res};
-        });
-        describe('null_response', ()=>{
-            const t =
-                (name, null_response, no_match_url, match_url, _ssl, code)=>it(
-                    name, etask._fn(function*(_this){
-                        _this.timeout(8000);
-                        l = yield lum({
-                            null_response: null_response,
-                            ssl: _ssl,
-                            insecure: _ssl,
-                        });
-                        let no_match = yield match_test(no_match_url);
-                        let match = yield match_test(match_url);
-                        assert.notEqual(no_match.after, no_match.before);
-                        assert.equal(match.after, match.before);
-                        assert.equal(match.res.statusCode, 200);
-                        assert.equal(match.res.statusMessage, 'NULL');
-                        assert.equal(match.res.body, undefined);
-                    }));
-                    t('http', 'echo\\.json', 'http://lumtest.com/myip',
-                        'http://lumtest.com/echo.json');
-                    t('https sniffing by path', 'echo\\.json',
-                        'https://lumtest.com/myip',
-                        'https://lumtest.com/echo.json', true);
-                    t('https sniffing by domain', 'lumtest.com',
-                        'https://httpsbin.org/ip',
-                        'http://lumtest.com/myip',
-                        true);
-                    it('https connect', ()=>etask(function*(){
-                        l = yield lum({null_response: 'match'});
-                        try {
-                            yield l.test('https://match.com');
-                        } catch(e){
-                            assert.ok(/statusCode=501/.test(e.message));
-                        }
-                        yield l.test();
-                        assert.ok(proxy.history.length>0);
-                    }));
-                }
-            );
-        xdescribe('bypass_proxy', ()=>{
-            const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
-            function*(){
-                l = yield lum(assign({bypass_proxy: 'match'},
-                    opt));
-                yield l.test();
-                let missmatch = yield match_test(no_match_url());
-                let match = yield match_test(match_url());
-                assert.equal(match.after, match.before);
-                assert.notEqual(missmatch.after, missmatch.before);
-            }));
-            t('http', ()=>ping.http.url+'match',
-                ()=>ping.http.url+'n-o--m-a-t-c-h');
-            t('https sniffing', ()=>ping.https.url+'match',
-                ()=>ping.https.url+'n-o--m-a-t-c-h',
-                {insecure: true, ssl: true});
-            it('https connect', ()=>'https://match.com/', ()=>ping.https.url,
-                {insecure: true});
-        });
         describe('luminati params', ()=>{
             const t = (name, target, expected)=>it(name, ()=>etask(function*(){
                 expected = expected||target;
-                l = yield lum(assign({}, target, {}));
+                l = yield lum(target);
                 const res = yield l.test();
                 assert_has(res.body.auth, expected);
             }));
@@ -765,7 +702,7 @@ describe('proxy', ()=>{
             t('debug', {debug: 'none'});
             t('request_timeout', {request_timeout: 10}, {timeout: 10});
             t('raw', {raw: true});
-            t('direct_include', {direct_include: '.*'}, {direct: true});
+            t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});
             t('session using seed', {session: true, seed: 'seed'},
                 {session: 'seed_1'});
@@ -908,20 +845,21 @@ describe('proxy', ()=>{
                 url: ping.http.url,
                 method: 'GET',
                 super_proxy: null,
-            }), {bypass_proxy: '.*'});
+            }), pre_rule('bypass_proxy'));
             t('bypass https', ()=>ping.https.url, ()=>({
                 port: 24000,
                 url: ping.https.url,
                 method: 'CONNECT',
                 super_proxy: null,
-            }), {bypass_proxy: '.*', insecure: true, ssl: false});
+            }), Object.assign(pre_rule('bypass_proxy'),
+                {insecure: true, ssl: false}));
             t('null_response', ()=>ping.http.url, ()=>({
                 port: 24000,
                 status_code: 200,
                 status_message: 'NULL',
                 super_proxy: null,
                 content_size: 0,
-            }), {null_response: '.*'});
+            }), pre_rule('null_response'));
             it('pool', etask._fn(function*(_this){
                 const one_each_aggregator = data=>{
                     if (!history.some(_.matches({context: data.context})))
@@ -946,10 +884,12 @@ describe('proxy', ()=>{
         }));
         const t = (name, arg, rules = false, c = 0)=>it(name,
         etask._fn(function*(_this){
-            rules = rules||{post: [{res: [{action: {ban_ip: '60min',
-            retry: true}, head: true, status: {arg, type: 'in'}}],
-            url: 'lumtest.com'}], pre: [{browser: 'firefox',
-            url: 'lumtest.com'}]};
+            rules = rules||{post: [{res: [{
+                    action: {ban_ip: '60min', retry: true},
+                    head: true,
+                    status: {arg, type: 'in'},
+                }], url: 'lumtest.com'}],
+            };
             l = yield lum({rules});
             let old_req = l._request;
             let retry_count = 0;
@@ -1463,633 +1403,3 @@ describe('util', ()=>{
         });
     });
 });
-
-const lpm = require('./lib/lpm.js');
-
-describe('Lsession', ()=>{
-    const {Lsession} = lpm;
-    describe('calculate username', ()=>{
-        const t = (name, obj, res)=>it(name, ()=>{
-            let sess = new Lsession(obj);
-            let uname = sess.calculate_username();
-            assert.equal(uname, res);
-        });
-        t('general', {zone: 'test_zone', customer: 'test_customer'},
-            'lum-customer-test_customer-zone-test_zone');
-        t('omit password', {zone: 'test_zone', customer: 'test_customer',
-            'password': '123'}, 'lum-customer-test_customer-zone-test_zone');
-    });
-    describe('should expire', ()=>{});
-});
-
-describe('Lreverse_lookup', ()=>{
-    const {Lreverse_lookup} = lpm;
-    describe('parse_values', ()=>{
-       const t = (name, vals, expect)=>it(name, ()=>{
-           assert.deepEqual(Lreverse_lookup.parse_vals(vals), expect);
-       });
-       t('no values', [], {});
-       t('one value', ['1.1.1.1 test.com'], {'1.1.1.1': 'test.com'});
-       t('one value with comment', ['1.1.1.1 test.com #I am a comment'],
-           {'1.1.1.1': 'test.com'});
-       t('too match domains', ['1.1.1.1 test.com test2.com'], {});
-       let many_vals = ['1.1.1.1 test.com', '1.2.3.4 test2.com',
-           '192.43.54.123 test3.com'];
-       let many_vals_expect = {'1.1.1.1': 'test.com', '1.2.3.4': 'test2.com',
-           '192.43.54.123': 'test3.com'};
-       t('many values', many_vals, many_vals_expect);
-    });
-});
-
-describe('Lhttp_server', ()=>{
-    it('should accept http requests', ()=>{});
-});
-
-describe('Lhttps_sever', ()=>{
-    it('should accept https requests', ()=>{});
-});
-
-describe('session pool', ()=>{
-    const {Lround_robin_pool, Lseq_pool} = lpm;
-    describe('populate', ()=>{
-        let itm_constr, pool_cls, pool_size, pool;
-        beforeEach(()=>{
-            itm_constr = sinon.stub().returns({});
-            if (pool_size)
-                pool = new pool_cls(itm_constr, pool_size);
-            else
-                pool = new pool_cls(itm_constr);
-        });
-        let t = name=>it(`${name} ${pool_size}`, ()=>etask(function*(){
-            assert.ok(!pool.ready);
-            yield pool.populate();
-            assert.equal(pool.size, pool.itms.length);
-            assert.ok(pool.ready);
-            assert.ok(!pool.populate_sp);
-            assert.equal(itm_constr.callCount, pool.size);
-        }));
-        pool_cls = Lround_robin_pool;
-        pool_size = 5;
-        t('round-robin');
-        pool_size = 1;
-        t('round-robin');
-        pool_size = 3;
-        t('round-robin');
-        pool_cls = Lseq_pool;
-        pool_size = 1;
-        t('sequential');
-    });
-    describe('next', ()=>{
-        let pool, pool_cls = Lround_robin_pool;
-        beforeEach(()=>{
-            pool = new pool_cls(()=>{});
-            pool.ready = true;
-        });
-        let t = (name, itms, itrs, expected)=>it(name, ()=>{
-            pool.size = itms.length;
-            pool.itms = itms.slice(0);
-            let res = [];
-            for (var i=0; i<itrs; i++)
-                res.push(pool.next());
-            assert.equal(expected, res.join('-'));
-        });
-        let itms = [1, 2, 3];
-        t('round-robin 5', itms, 6, '1-2-3-1-2-3');
-        t('round-robin 7', itms, 7, '1-2-3-1-2-3-1');
-        t('round-robin 1', itms, 1, '1');
-        t('round-robin 2', itms, 2, '1-2');
-        itms = [4];
-        t('sequential 4', itms, 4, '4-4-4-4');
-        t('sequential 8', itms, 8, '4-4-4-4-4-4-4-4');
-    });
-});
-
-describe('lpm_proxy', ()=>{
-    const {Lserver} = lpm;
-    const test_url = 'http://lumtest.com/test';
-    const lum = opt=>etask(function*(){
-        opt = opt||{};
-        if (opt.ssl===true)
-            opt.ssl = assign({requestCert: false}, ssl());
-        opt = assign({
-            proxy: '127.0.0.1',
-            proxy_port: proxy.port,
-            customer: customer,
-            password: password,
-            log: 'NONE',
-            port: 24000,
-        }, opt);
-        const l = new Lserver(opt);
-        l.test = etask._fn(function*lpm_proxy_lum_test(_this, req_opt){
-            if (typeof req_opt=='string')
-                req_opt = {url: req_opt};
-            req_opt = assign({
-                url: test_url,
-                json: true,
-                rejectUnauthorized: false,
-                proxy: `http://127.0.0.1:${opt.port||24000}`
-            }, req_opt);
-            return yield etask.nfn_apply(request,
-                [req_opt]);
-        });
-        yield l.start();
-        return l;
-    });
-    let l;
-    beforeEach(()=>{
-        proxy.history = [];
-        proxy.full_history = [];
-        ping.history = [];
-    });
-    afterEach(()=>etask(function*(){
-        if (!l)
-            return;
-        yield l.stop(true);
-        l.destroy();
-        l = null;
-    }));
-    describe('sanity', ()=>{
-        const t = (name, req, opt)=>it(name, ()=>etask(
-        function*lpm_proxy_sanity_test(){
-            proxy.fake = false;
-            req = req();
-            l = yield lum(opt);
-            let res = yield l.test(req);
-            assert.equal(ping.history.length, 1);
-            let expected = {statusCode: 200, statusMessage: 'PONG'};
-            if (req.body)
-                assign(expected, {body: req.body});
-            assert_has(res, expected, 'res');
-        }));
-        t('http', ()=>ping.http.url);
-        t('http post', ()=>{
-            return {url: ping.http.url, method: 'POST', body: 'test body'};
-        });
-        t('https', ()=>ping.https.url, {ssl: false});
-        t('https post', ()=>{
-            return {url: ping.https.url, method: 'POST', body: 'test body'};
-        }, {ssl: false});
-        t('https sniffing', ()=>ping.https.url, {insecure: true});
-        t('https sniffing post', ()=>{
-            return {url: ping.https.url, method: 'POST', body: 'test body'};
-        }, {insecure: true});
-    });
-    describe('headers', ()=>{
-        describe('X-Hola-Agent', ()=>{
-            it('added to super proxy request', ()=>etask(
-            function*lpm_proxy_headers_x_hola_agent(){
-                l = yield lum();
-                yield l.test();
-                assert.equal(proxy.history.length, 1);
-                assert.equal(proxy.history[0].headers['x-hola-agent'],
-                    'proxy='+lpm.version+' node='+process.version
-                        +' platform='+process.platform);
-            }));
-            it('not added when accessing site directly', ()=>etask(
-            function*lpm_proxy_headers_x_hola_agent_direct(){
-                l = yield lum({bypass_proxy: '.*'});
-                let res = yield l.test(ping.http.url);
-                assert.ok(!res.body.headers['x-hola-agent']);
-            }));
-        });
-        xdescribe('X-Hola-Context', ()=>{
-            let history;
-            const aggregator = data=>history.push(data);
-            const t = (name, _url, opt, target, skip_res)=>it(name, ()=>etask(
-            function*lpm_proxy_headers_x_hola_context(){
-                const context = 'context-1';
-                history = [];
-                l = yield lum(assign({history: true, history_aggregator:
-                    aggregator}, opt));
-                let res = yield l.test({
-                    url: _url(),
-                    headers: {'x-hola-context': context},
-                });
-                if (!skip_res)
-                    assert.equal(res.headers['x-hola-context'], context);
-                if (target)
-                {
-                    const target_req = target();
-                    assert.equal(target_req['x-hola-context'], undefined);
-                }
-                yield etask.sleep(400);
-                assert.equal(history.length, 1);
-                assert.equal(history[0].context, context);
-            }));
-            t('null response', ()=>ping.http.url, {null_response: '.*'});
-            t('bypass proxy', ()=>ping.http.url, {bypass_proxy: '.*'},
-                ()=>ping.history[0]);
-            t('http', ()=>test_url, {}, ()=>proxy.history[0]);
-            t('https sniffing', ()=>ping.https.url,
-                {insecure: true, ssl: true}, ()=>proxy.history[0]);
-            t('https connect', ()=>ping.https.url, {insecure: true, ssl: true},
-                ()=>proxy.history[0]);
-        });
-        xdescribe('keep letter caseing and order', ()=>{
-            const t = (name, _url, opt)=>it(name, ()=>etask(function*(){
-                const headers = {
-                    'Keep-Alive': 'Close',
-                    'X-Just-Testing': 'value',
-                    'X-bizzare-Letter-cAsE': 'test',
-                };
-                l = yield lum(opt);
-                const res = yield l.test({url: _url(), headers: headers});
-                const site_headers = _.omit(res.body.headers,
-                    qw`proxy-authorization x-hola-agent`);
-                assert_has(site_headers, headers, 'value');
-                assert_has(Object.keys(site_headers), Object.keys(headers),
-                    'order');
-            }));
-            t('http', ()=>test_url);
-            t('https', ()=>ping.https.url, {ssl: false});
-            t('https sniffing', ()=>ping.https.url, {insecure: true});
-            t('bypass http', ()=>ping.http.url, {bypass_proxy: '.*'});
-            t('bypass https', ()=>ping.https.url,
-                {bypass_proxy: '.*', ssl: false});
-            t('bypass https sniffing', ()=>ping.https.url+'?match',
-                {bypass_proxy: 'match', insecure: true});
-        });
-    });
-    it('Listening without specifing port', ()=>etask(function*(){
-        l = yield lum({port: false});
-        yield l.test();
-        assert.equal(proxy.history.length, 1);
-    }));
-    describe('options', ()=>{
-        describe('passthrough (allow_proxy_auth)', ()=>{
-            it('disabled', ()=>etask(
-            function*lpm_proxy_options_passthrough_disabled(){
-                l = yield lum({pool_size: 3, allow_proxy_auth: false});
-                const res = yield l.test({headers: {
-                    'proxy-authorization': 'Basic '+
-                        (new Buffer('lum-customer-user-zone-zzz:pass'))
-                        .toString('base64'),
-                }});
-                // XXX maximk: adapt to lpm
-                // assert.ok(l.session_mgr.sessions);
-                assert.equal(proxy.history.length, 1);
-                assert.equal(proxy.full_history.length, 1);
-                assert.equal(res.body.auth.customer, customer);
-                assert.equal(res.body.auth.password, password);
-                assert.equal(res.body.auth.zone, 'static');
-            }));
-            it('enabled', ()=>etask(
-            function*lpm_proxy_options_passthrough_enabled(){
-                l = yield lum({pool_size: 3});
-                const res = yield l.test({headers: {
-                    'proxy-authorization': 'Basic '+
-                        (new Buffer('lum-customer-user-zone-zzz:pass'))
-                        .toString('base64'),
-                }});
-                // XXX maximk: adapt to lpm
-                // assert.ok(!l.sessions);
-                assert.equal(proxy.history.length, 1);
-                assert.equal(res.body.auth.customer, 'user');
-                assert.equal(res.body.auth.password, 'pass');
-                assert.equal(res.body.auth.zone, 'zzz');
-            }));
-        });
-        describe('short_username', ()=>{
-            const t = (name, user, short, expected)=>it(name, ()=>etask(
-            function*(){
-                l = yield lum({short_username: short});
-                const res = yield l.test({headers: {
-                    'proxy-authorization': 'Basic '+
-                        (new Buffer(user+':pass'))
-                        .toString('base64'),
-                }});
-                let m = res.body.headers['proxy-authorization']
-                    .match(/^Basic (.*)/);
-                let h = new Buffer(m[1], 'base64').toString('ascii');
-                let parts = h.split(':');
-                assert_has(res.body.auth, expected);
-                if (short)
-                    assert.ok(parts[0].length <= user.length);
-                else
-                    assert.ok(parts[0].length >= user.length);
-            }));
-            t(
-                'short notation',
-                'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
-                true,
-                {
-                    customer: 'ttt',
-                    zone: 'zzz',
-                    direct: true,
-                    session: 'sss',
-                    timeout: '5',
-                    debug: 'full',
-                    country: 'us',
-                    state: 'fl',
-                    city: 'miami',
-                }
-            );
-            t(
-                'long notation',
-                'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
-                false,
-                {
-                    customer: 'ttt',
-                    zone: 'zzz',
-                    direct: true,
-                    session: 'sss',
-                    timeout: '5',
-                    debug: 'full',
-                    country: 'us',
-                    state: 'fl',
-                    city: 'miami',
-                }
-            );
-        });
-        xdescribe('pool', ()=>{
-            describe('pool_size', ()=>{
-                const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
-                    l = yield lum({pool_size, pool_type: 'round-robin'});
-                    yield l.test();
-                    assert.equal(proxy.history.length, 1);
-                    assert.equal(proxy.history[0].url, test_url);
-                    assert.equal(proxy.full_history.length, 1);
-                    assert.equal(l.session_mgr.sessions.sessions.length,
-                        pool_size);
-                    let sessions = {};
-                    for (let i=0; i<pool_size; i++)
-                    {
-                        let s = l.session_mgr.sessions.sessions[i];
-                        assert.equal(s.host, '127.0.0.1');
-                        assert.ok(!sessions[s.session]);
-                        sessions[s.session] = true;
-                    }
-                }));
-                t(1);
-                t(3);
-                t(10);
-            });
-            describe('max_requests', ()=>{
-                describe('range', ()=>{
-                    const pool = 50;
-                    const t=(name, start, end)=>it(name, ()=>etask(function*(){
-                        l = yield lum({max_requests: start+':'+end,
-                            pool_size: pool});
-                        yield l.session_mgr.refresh_sessions();
-                        let max_requests = l.session_mgr.sessions.sessions
-                            .map(s=>s.max_requests);
-                        let count = {};
-                        max_requests.forEach(m=>{
-                            if (!start || !end)
-                                assert.equal(m, start || end);
-                            else
-                                assert.ok(start<=m && m<=end);
-                            count[m] = count[m] ? count[m]+1 : 1;
-                        });
-                        if (start && end && start!=end)
-                        {
-                            for (let c in count)
-                                assert.notEqual(count[c], pool);
-                        }
-                    }));
-                    t('valid', 60, 70);
-                    t('same', 50, 50);
-                    t('only end', '', 30);
-                    t('only start', 15, '');
-                });
-                it('disabled', ()=>etask(function*(){
-                    l = yield lum({max_requests: '0'});
-                    assert.equal(l.session_mgr.max_requests, 0);
-                }));
-
-                const test_call = ()=>etask(function*(){
-                    const res = yield l.test();
-                    assert.ok(res.body);
-                    assert.ok(res.body.auth);
-                    return res.body.auth.session;
-                });
-
-                const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(10000);
-                    const trials = 3, pool_size = opt.pool_size || 1;
-                    l = yield lum(opt);
-                    let sessions = [];
-                    for (let tr=0; tr<trials; tr++)
-                    {
-                        sessions[tr] = [];
-                        if (opt.pool_type=='round-robin')
-                        {
-                            for (let req=0; req<opt.max_requests; req++)
-                            {
-                                for (let s=0; s<pool_size; s++)
-                                {
-                                    sessions[tr][s] = sessions[tr][s]||[];
-                                    sessions[tr][s][req] = yield test_call();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (let s=0; s<pool_size; s++)
-                            {
-                                sessions[tr][s] = [];
-                                for (let req=0; req<opt.max_requests; req++)
-                                    sessions[tr][s][req] = yield test_call();
-                            }
-                        }
-                    }
-                    let used = [];
-                    for (let tr=0; tr<trials; tr++)
-                    {
-                        for (let s=0; s<pool_size; s++)
-                        {
-                            let id = sessions[tr][s][0];
-                            used.forEach(u=>assert.notEqual(id, u));
-                            used.push(id);
-                            sessions[tr][s].forEach(
-                                req=>assert.equal(req, id));
-                        }
-                    }
-                }));
-                t('1, round-robin pool', {max_requests: 1, pool_size: 1,
-                    pool_type: 'round-robin'});
-                t('2, round-robin pool', {max_requests: 2, pool_size: 2,
-                    pool_type: 'round-robin'});
-                t('5, round-robin pool', {max_requests: 5, pool_size: 5,
-                    pool_type: 'round-robin'});
-                t('10, round-robin pool', {max_requests: 10, pool_size: 10,
-                    pool_type: 'round-robin'});
-                t('1, sequential pool', {max_requests: 1, pool_size: 1});
-                t('2, sequential pool', {max_requests: 2, pool_size: 2});
-                t('5, sequential pool', {max_requests: 5, pool_size: 5});
-                t('10, sequential pool', {max_requests: 10, pool_size: 10});
-                t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
-                t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
-                t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
-                t('10, sticky_ip', {max_requests: 10, sticky_ip: true});
-                t('1, session using seed', {max_requests: 1, session: true});
-                t('2, session using seed', {max_requests: 2, session: true});
-                t('5, session using seed', {max_requests: 5, session: true});
-                t('10, session using seed', {max_requests: 10, session: true});
-            });
-            describe('keep_alive', ()=>{
-                const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(6000);
-                    l = yield lum(assign({keep_alive: 1}, opt)); // actual 1sec
-                    yield l.test();
-                    const s_f = proxy.full_history.length;
-                    const s_h = proxy.history.length;
-                    yield etask.sleep(500);
-                    assert.equal(proxy.full_history.length, 0 + s_f);
-                    assert.equal(proxy.history.length, 0 + s_h);
-                    yield l.test();
-                    assert.equal(proxy.full_history.length, 1 + s_f);
-                    assert.equal(proxy.history.length, 1 + s_h);
-                    yield etask.sleep(1500);
-                    assert.equal(proxy.full_history.length, 2 + s_f);
-                    assert.equal(proxy.history.length, 1 + s_h);
-                }));
-
-                t('pool', {pool_size: 1});
-                t('sticky_ip', {sticky_ip: true});
-                t('session explicit', {session: 'test'});
-                t('session using seed', {session: true, seed: 'seed'});
-            });
-            describe('session_duration', ()=>{
-                const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(4000);
-                    l = yield lum(assign({session_duration: 1}, // actual 1sec
-                        opt));
-                    const start = Date.now();
-                    const initial = yield l.test();
-                    const results = [];
-                    let interval = setInterval(etask._fn(function*(){
-                        const time = Date.now();
-                        const _res = yield l.test();
-                        if (interval)
-                            results.push({time: time, res: _res});
-                    }), 100);
-                    etask.sleep(1500);
-                    clearInterval(interval);
-                    interval = null;
-                    results.forEach(r=>{
-                        if (r.time - start < 1000)
-                        {
-                            assert.equal(initial.body.auth.session,
-                                r.res.body.auth.session);
-                        }
-                        else
-                        {
-                            assert.notEqual(initial.body.auth.session,
-                                r.res.body.auth.session);
-                        }
-                    });
-                }));
-                t('pool', {pool_size: 1});
-                t('sticky_ip', {sticky_ip: true});
-                t('session using seed', {session: true, seed: 'seed'});
-            });
-        });
-        const match_test = _url=>etask(function*(){
-            yield etask.sleep(10);
-            let before = proxy.history.length;
-            let res = yield l.test(_url);
-            yield etask.sleep(10);
-            let after = proxy.history.length;
-            return {before, after, res};
-        });
-        describe('null_response', ()=>{
-            const t =
-            (name, null_response, no_match_url, match_url, _ssl, code)=>it(
-                name,
-                etask._fn(function*(_this){
-                    _this.timeout(8000);
-                    l = yield lum({
-                        null_response: null_response,
-                        ssl: _ssl,
-                        insecure: _ssl,
-                    });
-                    let no_match = yield match_test(no_match_url);
-                    let match = yield match_test(match_url);
-                    assert.notEqual(no_match.after, no_match.before);
-                    assert.equal(match.after, match.before);
-                    assert.equal(match.res.statusCode, 200);
-                    assert.equal(match.res.statusMessage, 'NULL');
-                    assert.equal(match.res.body, undefined);
-                })
-            );
-            t('http', 'echo\\.json', 'http://lumtest.com/myip',
-                'http://lumtest.com/echo.json');
-            t('https sniffing by path', 'echo\\.json',
-                'https://lumtest.com/myip',
-                'https://lumtest.com/echo.json', true);
-            t('https sniffing by domain', 'lumtest.com',
-                'https://httpsbin.org/ip',
-                'http://lumtest.com/myip',
-                true);
-            it('https connect', ()=>etask(function*(){
-                l = yield lum({null_response: 'match'});
-                try {
-                    yield l.test('https://match.com');
-                } catch(e){
-                    assert.ok(/statusCode=501/.test(e.message));
-                }
-                yield l.test();
-                assert.ok(proxy.history.length>0);
-            }));
-        });
-        xdescribe('bypass_proxy', ()=>{
-            const t = (name, match_url, no_match_url, opt)=>it(name, ()=>etask(
-            function*(){
-                l = yield lum(assign({bypass_proxy: 'match'},
-                    opt));
-                yield l.test();
-                let missmatch = yield match_test(no_match_url());
-                let match = yield match_test(match_url());
-                assert.equal(match.after, match.before);
-                assert.notEqual(missmatch.after, missmatch.before);
-            }));
-            t('http', ()=>ping.http.url+'match',
-                ()=>ping.http.url+'n-o--m-a-t-c-h');
-            t('https sniffing', ()=>ping.https.url+'match',
-                ()=>ping.https.url+'n-o--m-a-t-c-h',
-                {insecure: true, ssl: true});
-            t('https connect', ()=>'https://match.com/', ()=>ping.https.url,
-                {insecure: true});
-        });
-        xdescribe('luminati params', ()=>{
-            const t = (name, target, expected)=>it(name, ()=>etask(function*(){
-                expected = expected||target;
-                l = yield lum(assign({}, target, {}));
-                const res = yield l.test();
-                assert_has(res.body.auth, expected);
-            }));
-            t('auth', {customer: 'a', password: 'p'});
-            t('zone', {zone: 'abc'});
-            t('country', {country: 'il'});
-            t('city', {country: 'us', state: 'ny', city: 'newyork'});
-            t('static', {zone: 'static', ip: '127.0.0.1'});
-            t('ASN', {zone: 'asn', asn: 28133});
-            t('mobile', {zone: 'mobile', mobile: 'true'});
-            t('DNS', {dns: 'local'});
-            t('debug', {debug: 'none'});
-            t('request_timeout', {request_timeout: 10}, {timeout: 10});
-            t('raw', {raw: true});
-            t('direct_include', {direct_include: '.*'}, {direct: true});
-            t('session explicit', {session: 'test_session'});
-            t('session using seed', {session: true, seed: 'seed'},
-                {session: 'seed_1'});
-            describe('lower case and spaces', ()=>{
-                t('long', {state: 'NY', city: 'New York'},
-                    {state: 'ny', city: 'newyork'});
-                t('short',
-                    {state: 'NY', city: 'New York', short_username: true},
-                    {state: 'ny', city: 'newyork'});
-            });
-            it('explicit any', ()=>etask(function*(){
-                const any_auth = {country: '*', state: '*', city: '*'};
-                l = yield lum(any_auth);
-                const res = yield l.test();
-                const auth_keys = Object.keys(res.body.auth);
-                Object.keys(any_auth).forEach(k=>
-                    assert.ok(!auth_keys.includes(k)));
-            }));
-        });
-    });
-});
-

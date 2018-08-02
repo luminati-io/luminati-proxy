@@ -52,10 +52,12 @@ class Warnings extends Pure_component {
     render(){
         if (!this.state.warnings.length)
             return null;
-        return <div className="warning">
-              <div className="warning_icon"/>
+        return <div>
               {this.state.warnings.map(w=>
-                <div key={w.msg}>{w.msg}</div>
+                <div key={w.msg} className="warning">
+                  <div className="warning_icon"/>
+                    <div key={w.msg}>{w.msg}</div>
+                </div>
               )}
             </div>;
     }

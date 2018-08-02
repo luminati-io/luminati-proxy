@@ -2,14 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 
-const before_save = {
-    regex: val=>{
-        try { new RegExp(val); }
-        catch(e){ val = null; }
-        return val;
-    },
-};
-
 export const tabs = {
     logs: {
         fields: [],
@@ -31,7 +23,7 @@ export const tabs = {
             city: {
                 label: 'City',
                 tooltip: 'The city from which IP will be allocated',
-                placeholder: 'Type in city name'
+                placeholder: 'Type in city name',
             },
             asn: {
                 label: <span>
@@ -44,7 +36,7 @@ export const tabs = {
                     </span>,
                 tooltip: `Select specific Internet Service Provider (ISP), or
                     Autonomous System Number (ASN)`,
-                placeholder: 'ASN code e.g. 42793'
+                placeholder: 'ASN code e.g. 42793',
             },
             carrier: {
                 label: 'Carrier',
@@ -122,34 +114,37 @@ export const tabs = {
                 label: 'String to be scanned in body (Regex)',
                 placeholder: `i.e. (captcha|robot)`,
                 tooltip: `A string(regular expression) to be scanned in the
-                    body of the response`
+                    body of the response`,
             },
             min_req_time: {
                 label: 'Minimum request time',
                 placeholder: '500',
                 tooltip: `Any request time above the given value in
-                    milliseconds will trigger the action`
+                    milliseconds will trigger the action`,
             },
             max_req_time: {
                 label: 'Maximum request time',
                 placeholder: '500',
                 tooltip: `Any request time below the given value in
-                    milliseconds will trigger the action`
+                    milliseconds will trigger the action`,
             },
             trigger_url_regex: {
-                label: 'Apply only for specific URLs (optional)',
+                label: `(optional) Regex to apply only for specific URLs. Type
+                    regex manually or generate clicking on formats above the
+                    input`,
                 placeholder: `i.e. example.com`,
-                tooltip: `enable trigger to certain urls`
+                tooltip: `Enable trigger to certain URLs. You can type regex
+                    manually or `,
             },
             status_code: {
                 label: 'Status code string to be scanned',
-                tooltip: `status code to be scanned in the response headers`
+                tooltip: `Status code to be scanned in the response headers`,
             },
             status_custom: {
                 label: 'Custom status code (regex)',
                 placeholder: `i.e. (2..|3..|404)`,
                 tooltip: `A string(regular expression) to be scanned in the
-                    head of the response`
+                    head of the response`,
             },
             action: {
                 label: 'Action type',
@@ -163,15 +158,16 @@ export const tabs = {
             },
             retry_number: {
                 label: 'Number of retries',
-                tooltip: 'maximum number of retries to execute'
+                tooltip: 'maximum number of retries to execute',
+                placeholder: `e.g. '5'`,
             },
             retry_port: {
                 label: 'Retry using a different port',
-                tooltip: 'Make additional request using a different port'
+                tooltip: 'Make additional request using a different port',
             },
             ban_ip_duration: {
                 label: 'Ban IP for',
-                tooltip: 'will remove the IP for a defined amount of time'
+                tooltip: 'will remove the IP for a defined amount of time',
             },
             ban_ip_custom: {label: 'Custom duration'},
             process: {label: 'Processing rule'},
@@ -187,14 +183,14 @@ export const tabs = {
                     all requests are executed using specific Data Center IP.
                     to view the pool of your IPs take a look at 'pool size'
                     option`,
-                placeholder: 'insert IP value from your pool'
+                placeholder: 'insert IP value from your pool',
             },
             vip: {
                 label: 'gIP',
                 tooltip: `Choose specific gIP to ensure all requests are
                     executed using specific gIP. to view the pool of your gIPs
                     take a look at 'pool size' option`,
-                placeholder: 'insert gIP id'
+                placeholder: 'insert gIP id',
             },
             pool_type: {
                 label: 'Pool type',
@@ -223,6 +219,7 @@ export const tabs = {
                 label: 'Explicit session',
                 tooltip: `Insert session ID to maintain the same ip
                     for as long as possible.`,
+                placeholder: `e.g. session-1234`,
             },
             sticky_ip: {
                 label: 'Sticky IP',
@@ -246,8 +243,11 @@ export const tabs = {
             },
             seed: {
                 label: 'Session ID seed',
-                tooltip: `Seed used for random number generator in random
-                    sessions`,
+                tooltip: `A string that will be used to maintain unified
+                    session structure. Each new session will be attached with
+                    a serial number starting from 1. (e.g. session seed 'test'
+                    will have the following sessions: test-1, test-2 ..)`,
+                placeholder: `e.g. test_session`,
             }
         },
     },
@@ -329,40 +329,18 @@ export const tabs = {
             multiply_ips: {
                 label: 'Multiply proxy port per IP',
                 tooltip: `Create proxy port for every selected IP from the
-                    pool`
+                    pool`,
             },
             multiply_vips: {
                 label: 'Multiply proxy port per gIP',
                 tooltip: `Create proxy port for every selected gIP from pool
-                    of available gIPS in your zone`
+                    of available gIPS in your zone`,
             },
             secure_proxy: {
                 label: 'SSL to super proxy',
                 tooltip: `Encrypt requests sent to super proxy to avoid
                     detection on DNS`,
                 ext: true,
-            },
-            null_response: {
-                label: 'URL regex for null response',
-                tooltip: `on this url pattern, lpm will return a "null
-                    response" without proxying (useful when users don't want
-                    to make a request, but a browser expects 200 response)`,
-                ext: true,
-                before_save: before_save.regex,
-            },
-            bypass_proxy: {
-                label: `URL regex for bypassing`,
-                tooltip: `Insert URL pattern for which requests will be passed
-                    directly to target site without any proxy
-                    (super proxy or peer)`,
-                ext: true,
-                before_save: before_save.regex,
-            },
-            direct_include: {
-                label: `URL regex for super proxy`,
-                tooltip: `Insert URL pattern for which requests will be passed
-                    through super proxy directly (not through peers)`,
-                before_save: before_save.regex,
             },
             allow_proxy_auth: {
                 label: 'Allow request authentication',

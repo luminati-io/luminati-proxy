@@ -401,6 +401,10 @@ input[type=checkbox] {
     position: relative;
     top: 1px;
 }
+input.regex {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
 .btn_lpm {
     padding-left: 11px;
     padding-right: 11px;
@@ -972,22 +976,16 @@ span.icon_link {
         }
     }
     .regex_field {
-        position: relative;
         outline: none;
         &:hover .tip_box { visibility: visible; }
-        .tip_box_wrapper {
-            position: absolute;
-            top: 0;
-            left: 170px;
-            height: 36px;
-            width: 300px;
-        }
         .tip_box {
-            position: absolute;
-            left: 10px;
+            color: #8e8e8e;
             height: 32px;
-            border-radius: 4px;
-            border: solid 1px @first_color;
+            border-bottom: none;
+            border: solid 1px @grey;
+            border-bottom: none;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
             padding: 3px 5px;
             visibility: hidden;
             &.active { visibility: visible; }

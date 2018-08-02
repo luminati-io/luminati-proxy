@@ -1,5 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.104.180 Development Latest
+- :star: Fixed memory leak (when Rule with HTML body is set)
+- :star: Moved 'Regexp for null response' config into Rules tab
+- :star: Moved 'Regexp for bypass proxy' config into Rules tab
+- :star: Moved 'Regexp for super proxy' config into Rules tab
+
 ## 1.103.790 
 - :sparkles: Added regexp generator
 

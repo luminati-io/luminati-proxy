@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.104.180",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Fixed memory leak (when Rule with HTML body is set)"
+            },
+            {
+                "type": "star",
+                "text": "Moved 'Regexp for null response' config into Rules tab"
+            },
+            {
+                "type": "star",
+                "text": "Moved 'Regexp for bypass proxy' config into Rules tab"
+            },
+            {
+                "type": "star",
+                "text": "Moved 'Regexp for super proxy' config into Rules tab"
+            }
+        ]
+    },
+    {
         "ver": "1.103.790",
         "type": "stable/dev",
         "changes": [

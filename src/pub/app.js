@@ -2,7 +2,7 @@
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import Proxy_edit from './proxy_edit.js';
+import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
 import Proxy_tester from './proxy_tester.js';
