@@ -4,6 +4,18 @@ require('./config.js');
 const HTTPParser = process.binding('http_parser').HTTPParser;
 const E = exports;
 
+E.capitalize = function(headers){
+    let res = {};
+    for (let header in headers)
+    {
+        let new_header = header.split('-').map(word=>{
+            return word.length ? word[0].toUpperCase()+word.substr(1) : '';
+        }).join('-');
+        res[new_header] = headers[header];
+    }
+    return res;
+};
+
 // original_raw should be the untransformed value of rawHeaders from the
 // Node.js HTTP request or response
 E.restore_case = function(headers, original_raw){

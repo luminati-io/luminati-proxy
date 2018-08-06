@@ -77,8 +77,13 @@ const Pane_slider = ({panes, cur_pane})=>{
 class Pane_headers extends Pure_component {
     render(){
         const {req} = this.props;
-        const general_entries = [{name: 'Request URL', value: req.request.url},
-            {name: 'Status Code', value: req.response.status}];
+        const general_entries = [
+            {name: 'Request URL', value: req.request.url},
+            {name: 'Status Code', value: req.response.status},
+            {name: 'Super Proxy', value: req.details.super_proxy},
+            {name: 'Username', value: req.details.username},
+            {name: 'Sent from', value: req.details.remote_address},
+        ];
         return <ol className="tree_outline">
               <Preview_section title="General" pairs={general_entries}/>
               <Preview_section title="Response headers"

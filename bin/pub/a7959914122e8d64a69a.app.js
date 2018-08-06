@@ -1779,6 +1779,7 @@ var presets = {
         set: function set(opt) {
             opt.dns = 'remote';
             opt.random_user_agent = true;
+            opt.override_headers = true;
             opt.ssl = true;
             opt.rules = opt.rules || {};
             opt.rules.post = opt.rules.post || [];
@@ -12284,7 +12285,7 @@ var tabs = exports.tabs = {
             },
             proxy_switch: {
                 label: 'Switch super proxy on failure',
-                tooltip: 'Number of failed requests(status 403, 429, 502, 503)\n                    to switch to different super proxy'
+                tooltip: 'Number of failed requests (status 403, 429, 502, 503)\n                    to switch to different super proxy'
             },
             throttle: {
                 label: 'Throttle requests',
@@ -12293,7 +12294,7 @@ var tabs = exports.tabs = {
             },
             reverse_lookup: {
                 label: 'Reverse resolve',
-                tooltip: 'resolve DNS from IP to url',
+                tooltip: 'Resolve DNS from IP to url',
                 ext: true
             },
             reverse_lookup_file: {
@@ -12410,7 +12411,7 @@ var tabs = exports.tabs = {
             },
             sticky_ip: {
                 label: 'Sticky IP',
-                tooltip: 'When connecting to remote lpm server stick sessions\n                    to each computer. each connected computer will receive\n                    unique session',
+                tooltip: 'When connecting to remote LPM server stick sessions\n                    to each computer. each connected computer will receive\n                    unique session',
                 ext: true
             },
             max_requests: {
@@ -12483,7 +12484,7 @@ var tabs = exports.tabs = {
             },
             ssl: {
                 label: 'Enable SSL logs',
-                tooltip: 'Enable SSL Logs in order to save HTTTPs requests',
+                tooltip: 'Enable SSL Logs in order to save HTTPs requests',
                 ext: true
             },
             iface: {
@@ -12511,7 +12512,7 @@ var tabs = exports.tabs = {
             },
             allow_proxy_auth: {
                 label: 'Allow request authentication',
-                tooltip: 'Pass auth data per request (use lpm like\n                    api)'
+                tooltip: 'Pass auth data per request (use LPM like API)'
             }
         }
     }
@@ -12718,7 +12719,7 @@ var Pane_headers = function (_Pure_component2) {
         value: function render() {
             var req = this.props.req;
 
-            var general_entries = [{ name: 'Request URL', value: req.request.url }, { name: 'Status Code', value: req.response.status }];
+            var general_entries = [{ name: 'Request URL', value: req.request.url }, { name: 'Status Code', value: req.response.status }, { name: 'Super Proxy', value: req.details.super_proxy }, { name: 'Username', value: req.details.username }, { name: 'Sent from', value: req.details.remote_address }];
             return _react2.default.createElement(
                 'ol',
                 { className: 'tree_outline' },

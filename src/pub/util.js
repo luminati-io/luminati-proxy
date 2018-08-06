@@ -405,6 +405,7 @@ const presets = {
         set: opt=>{
             opt.dns = 'remote';
             opt.random_user_agent = true;
+            opt.override_headers = true;
             opt.ssl = true;
             opt.rules = opt.rules||{};
             opt.rules.post = opt.rules.post||[];

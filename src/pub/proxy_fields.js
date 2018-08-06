@@ -76,7 +76,7 @@ export const tabs = {
             },
             proxy_switch: {
                 label: 'Switch super proxy on failure',
-                tooltip: `Number of failed requests(status 403, 429, 502, 503)
+                tooltip: `Number of failed requests (status 403, 429, 502, 503)
                     to switch to different super proxy`,
             },
             throttle: {
@@ -87,7 +87,7 @@ export const tabs = {
             },
             reverse_lookup: {
                 label: 'Reverse resolve',
-                tooltip: 'resolve DNS from IP to url',
+                tooltip: 'Resolve DNS from IP to url',
                 ext: true,
             },
             reverse_lookup_file: {
@@ -223,7 +223,7 @@ export const tabs = {
             },
             sticky_ip: {
                 label: 'Sticky IP',
-                tooltip: `When connecting to remote lpm server stick sessions
+                tooltip: `When connecting to remote LPM server stick sessions
                     to each computer. each connected computer will receive
                     unique session`,
                 ext: true,
@@ -312,7 +312,7 @@ export const tabs = {
             },
             ssl: {
                 label: 'Enable SSL logs',
-                tooltip: `Enable SSL Logs in order to save HTTTPs requests`,
+                tooltip: `Enable SSL Logs in order to save HTTPs requests`,
                 ext: true,
             },
             iface: {
@@ -344,8 +344,7 @@ export const tabs = {
             },
             allow_proxy_auth: {
                 label: 'Allow request authentication',
-                tooltip: `Pass auth data per request (use lpm like
-                    api)`,
+                tooltip: `Pass auth data per request (use LPM like API)`,
             },
         },
     },

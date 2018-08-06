@@ -1,10 +1,24 @@
 [
     {
+        "ver": "1.104.371",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed daemon mode"
+            },
+            {
+                "type": "star",
+                "text": "Added an IP of the request sender to the logs"
+            }
+        ]
+    },
+    {
         "ver": "1.104.180",
         "type": "dev",
         "changes": [
             {
-                "type": "star",
+                "type": "bug",
                 "text": "Fixed memory leak (when Rule with HTML body is set)"
             },
             {
