@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.104.480 Stable
+## 1.104.508 Stable
 - :bug: Fixed disappearing proxy ports
 - :star: Added PID of the request to the logs
 

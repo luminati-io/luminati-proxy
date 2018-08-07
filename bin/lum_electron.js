@@ -72,8 +72,9 @@ auto_updater.on('error', ()=>{});
 auto_updater.on('update-available', e=>etask(function*(){
     const changelog_url = 'https://github.com/luminati-io/luminati-proxy/blob/'
     +'master/CHANGELOG.md';
-    console.log(`Update version ${e.version} is available. Full list of
-        changes is available here: ${changelog_url}`);
+    const update_msg = `Update version ${e.version} is available. Full list of`
+    +` changes is available here: ${changelog_url}`;
+    console.log(update_msg);
     if (!can_upgrade)
     {
         let res = yield show_message({type: 'info',
