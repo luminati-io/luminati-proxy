@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.104.480",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed disappearing proxy ports"
+            },
+            {
+                "type": "star",
+                "text": "Added PID of the request to the logs"
+            }
+        ]
+    },
+    {
         "ver": "1.104.371",
         "type": "stable",
         "changes": [

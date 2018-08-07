@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.104.480 Stable
+- :bug: Fixed disappearing proxy ports
+- :star: Added PID of the request to the logs
+
 ## 1.104.371 Stable
 - :bug: Fixed daemon mode
 - :star: Added an IP of the request sender to the logs
