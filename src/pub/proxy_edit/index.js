@@ -10,21 +10,20 @@ import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
-    Pagination_panel, Loader_small, Note, Input,
-    Labeled_controller, Remove_icon, Add_icon} from '../common.js';
-import {validators} from './common.js';
-import {tabs, all_fields} from '../proxy_fields.js';
+    Pagination_panel, Loader_small} from '../common.js';
+import {tabs, all_fields} from './fields.js';
 import Har_viewer from '../har_viewer.js';
 import * as util from '../util.js';
-import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import Rules from './rules.js';
-import PropTypes from 'prop-types';
+import Targeting from './targeting.js';
+import General from './general.js';
+import Debug from './debug.js';
+import Rotation from './rotation.js';
+import Speed from './speed.js';
+import Headers from './headers.js';
 
 const presets = util.presets;
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
-
 const event_tracker = {};
 const ga_event = (action, label, opt={})=>{
     const id = action+label;
@@ -69,8 +68,6 @@ const Index = withRouter(class Index extends Pure_component {
         this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
         this.setdb_on('head.proxy_edit.loading', loading=>
             this.setState({loading}));
-        this.setdb_on('head.proxy_edit.tab', (tab='logs')=>
-            this.setState({tab}));
         let state;
         if ((state = this.props.location.state)&&state.field)
             this.goto_field(state.field);
@@ -101,7 +98,11 @@ const Index = withRouter(class Index extends Pure_component {
             }
         }
         if (tab)
-            setdb.set('head.proxy_edit.tab', tab);
+        {
+            const port = this.props.match.params.port;
+            const pathname = `/proxy/${port}/${tab}`;
+            this.props.history.push({pathname});
+        }
     };
     guess_preset(form){
         let res;
@@ -277,13 +278,26 @@ const Index = withRouter(class Index extends Pure_component {
         }
         if (res.action.process)
             result.process = JSON.stringify(res.action.process, null, '\t');
+        if (res.action.email)
+        {
+            result.send_email = true;
+            result.email = res.action.email;
+        }
         return result;
     };
-    pre_rule_map_to_form = rule=>({
-        trigger_url_regex: rule.url,
-        action: rule.action,
-        trigger_type: rule.trigger_type,
-    });
+    pre_rule_map_to_form = rule=>{
+        const res = {
+            trigger_url_regex: rule.url,
+            action: rule.action,
+            trigger_type: rule.trigger_type,
+        };
+        if (rule.email)
+        {
+            res.send_email = true;
+            res.email = rule.email;
+        }
+        return res;
+    };
     apply_rules = ({rules})=>{
         if (!rules)
             return;
@@ -291,14 +305,6 @@ const Index = withRouter(class Index extends Pure_component {
         const pre = (rules.pre||[]).map(this.pre_rule_map_to_form);
         const _rules = [].concat(post, pre).map((r, i)=>({...r, id: i}));
         setdb.set('head.proxy_edit.rules', _rules);
-    };
-    default_opt = option=>{
-        const default_label = this.state.defaults[option] ? 'Yes' : 'No';
-        return [
-            {key: 'No', value: false},
-            {key: 'Default ('+default_label+')', value: ''},
-            {key: 'Yes', value: true},
-        ];
     };
     set_errors = _errors=>{
         const errors = _errors.reduce((acc, e)=>
@@ -444,10 +450,6 @@ const Index = withRouter(class Index extends Pure_component {
         return curr_plan;
     };
     render(){
-        const tab = this.state.tab;
-        // XXX krzysztof: transform support into disabled_fields
-        const support = presets && this.state.form.preset &&
-            presets[this.state.form.preset].support||{};
         let zones = this.state.consts&&
             this.state.consts.proxy.zone.values||[];
         zones = zones.filter(z=>{
@@ -468,6 +470,7 @@ const Index = withRouter(class Index extends Pure_component {
         const port = this.props.match.params.port;
         const show_main_window = this.state.consts&&this.state.defaults&&
             this.state.proxies;
+        const tab = this.props.match.params.tab||'logs';
         return <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
@@ -481,31 +484,30 @@ const Index = withRouter(class Index extends Pure_component {
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_preset={this.apply_preset.bind(this)}/>
-                <Nav_tabs form={this.state.form} errors={this.state.errors}/>
+                <Nav_tabs/>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
-                <Main_window show={show_main_window} tab={tab} port={port}
+                <Main_window show={show_main_window} port={port}
                   proxy={this.state.consts&&this.state.consts.proxy}
                   defaults={this.state.defaults}
-                  form={this.state.form} support={support}
-                  default_opt={this.default_opt}
+                  form={this.state.form}
                   get_curr_plan={this.get_curr_plan}/>
               </div>
               <Modal className="warnings_modal" id="save_proxy_errors"
                 title="Errors:" no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
-              <Alloc_modal type={type} form={this.state.form} support={support}
-                zone={this.state.form.zone||default_zone}/>
+              <Alloc_modal type={type} form={this.state.form}
+                zone={this.state.form.zone||default_zone} tab={tab}/>
             </div>;
     }
 });
 
-const Main_window = ({show, tab, ...props})=>{
+const Main_window = withRouter(({show, match, ...props})=>{
     if (!show)
         return null;
     let Comp;
-    switch (tab)
+    switch (match.params.tab)
     {
     case 'target': Comp = Targeting; break;
     case 'speed': Comp = Speed; break;
@@ -518,7 +520,7 @@ const Main_window = ({show, tab, ...props})=>{
     default: Comp = Har_viewer;
     }
     return <Comp {...props}/>;
-};
+});
 
 class Nav extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -583,420 +585,36 @@ const Field = ({disabled, tooltip, ...props})=>{
         </Tooltip>;
 };
 
-class Nav_tabs extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('head.proxy_edit.tab', (tab='logs')=>
-            this.setState({tab}));
-    }
-    render(){
-        // XXX krzysztof: remove ...props
-        return <div className="nav_tabs">
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="logs"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="target"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="speed"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="rules"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab}
-                id="rotation"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="debug"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="headers"/>
-              <Tab_btn {...this.props} curr_tab={this.state.tab} id="general"/>
-            </div>;
-    }
-}
-
-const Tab_btn = props=>{
-    const btn_class = classnames('btn_tab',
-        {active: props.curr_tab==props.id});
-    const tab_fields = Object.keys(tabs[props.id].fields||{});
-    let changes;
-    if (props.id=='rules')
-        changes = _.get(props, 'form.rules.post.length');
-    else
-    {
-        changes = Object.keys(props.form).filter(f=>{
-            const val = props.form[f];
-            const is_empty_arr = Array.isArray(val) && !val[0];
-            return tab_fields.includes(f) && val && !is_empty_arr;
-        }).length;
-    }
-    if (props.id=='headers')
-        changes = changes+(props.form.headers||[]).length;
-    const errors = Object.keys(props.errors).filter(f=>tab_fields.includes(f));
-    return <Tooltip title={tabs[props.id].tooltip}>
-          <div onClick={()=>setdb.set('head.proxy_edit.tab', props.id)}
-            className={btn_class}>
-            <Tab_icon id={props.id} changes={changes}
-              error={errors.length}/>
-            <div className="title">{tabs[props.id].label}</div>
-            <div className="arrow"/>
-          </div>
-        </Tooltip>;
-};
-
-const Tab_icon = props=>{
-    const circle_class = classnames('circle_wrapper', {
-        active: props.error||props.changes, error: props.error});
-    const content = props.error ? '!' : props.changes;
-    return <div className={classnames('icon', props.id)}>
-          <div className={circle_class}>
-            <div className="circle">{content}</div>
-          </div>
-        </div>;
-};
-
-const Config = getContext({provide: PropTypes.object})(
-class Config extends Pure_component {
-    state = {disabled_fields: {}};
-    set_field = setdb.get('head.proxy_edit.set_field');
-    is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
-    on_blur = ({target: {value}})=>{
-        if (this.props.validator)
-            this.set_field(this.props.id, this.props.validator(value));
-    };
-    on_input_change = val=>{
-        if (this.props.update_on_input)
-            this.set_field(this.props.id, [{id: val, label: val}]);
-    };
-    on_change_wrapper = (value, _id)=>{
-        const curr_id = _id||this.props.id;
-        if (this.props.on_change)
-            this.props.on_change(value);
-        this.set_field(curr_id, value);
-    };
-    componentDidMount(){
-        const val_id = this.props.val_id ? this.props.val_id : this.props.id;
-        this.setdb_on('head.proxy_edit.form.'+val_id, val=>
-            this.setState({val, show: true}));
-        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
-            disabled_fields&&this.setState({disabled_fields}));
-    }
-    render(){
-        if (!this.state.show)
-            return null;
-        const id = this.props.id;
-        const tab_id = this.props.provide.tab_id;
-        const disabled = this.props.disabled||!this.is_valid_field(id)||
-            this.state.disabled_fields[id];
-        return <Labeled_controller
-              id={id}
-              sufix={this.props.sufix}
-              data={this.props.data}
-              type={this.props.type}
-              on_input_change={this.on_input_change}
-              on_change_wrapper={this.on_change_wrapper}
-              val={this.state.val===undefined ? '' : this.state.val}
-              disabled={disabled}
-              min={this.props.min}
-              max={this.props.max}
-              note={this.props.note}
-              placeholder={tabs[tab_id].fields[id].placeholder||''}
-              on_blur={this.on_blur}
-              label={tabs[tab_id].fields[id].label}
-              tooltip={tabs[tab_id].fields[id].tooltip}/>;
-    }
-});
-
-// XXX krzysztof: move to targeting.js
-const Targeting = provider({tab_id: 'target'})(
-class Targeting extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-        this.def_value = {key: 'Any (default)', value: ''};
-        this.init_carriers();
-        this.set_field = setdb.get('head.proxy_edit.set_field');
-    }
-    componentDidMount(){
-        this.setdb_on('head.locations', locations=>{
-            if (!locations)
-                return;
-            const asns = Object.keys(locations.asns)
-                .map(a=>({id: a, label: a}));
-            this.setState({locations, asns});
-        });
-    }
-    init_carriers(){
-        const subject = 'Add new carrier option';
-        const n = '%0D%0A';
-        const body = `Hi,${n}${n}Didn't find the carrier you're looking for?`
-        +`${n}${n}Write here the carrier's name: __________${n}${n}We will add`
-        +` it in less than 2 business days!`;
-        const mail = 'lumext@luminati.io';
-        const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
-        this.carriers_note = <a className="link" href={mailto}>
-            More carriers</a>;
-        this.carriers = [
-            {value: '', key: 'None'},
-            {value: 'a1', key: 'A1 Austria'},
-            {value: 'aircel', key: 'Aircel'},
-            {value: 'airtel', key: 'Airtel'},
-            {value: 'att', key: 'AT&T'},
-            {value: 'vimpelcom', key: 'Beeline Russia'},
-            {value: 'celcom', key: 'Celcom'},
-            {value: 'chinamobile', key: 'China Mobile'},
-            {value: 'claro', key: 'Claro'},
-            {value: 'comcast', key: 'Comcast'},
-            {value: 'cox', key: 'Cox'},
-            {value: 'dt', key: 'Deutsche Telekom'},
-            {value: 'digi', key: 'Digi Malaysia'},
-            {value: 'docomo', key: 'Docomo'},
-            {value: 'dtac', key: 'DTAC Trinet'},
-            {value: 'etisalat', key: 'Etisalat'},
-            {value: 'idea', key: 'Idea India'},
-            {value: 'kyivstar', key: 'Kyivstar'},
-            {value: 'meo', key: 'MEO Portugal'},
-            {value: 'megafont', key: 'Megafon Russia'},
-            {value: 'mtn', key: 'MTN - Mahanager Telephone'},
-            {value: 'mtnza', key: 'MTN South Africa'},
-            {value: 'mts', key: 'MTS Russia'},
-            {value: 'optus', key: 'Optus'},
-            {value: 'orange', key: 'Orange'},
-            {value: 'qwest', key: 'Qwest'},
-            {value: 'reliance_jio', key: 'Reliance Jio'},
-            {value: 'robi', key: 'Robi'},
-            {value: 'sprint', key: 'Sprint'},
-            {value: 'telefonica', key: 'Telefonica'},
-            {value: 'telstra', key: 'Telstra'},
-            {value: 'tmobile', key: 'T-Mobile'},
-            {value: 'tigo', key: 'Tigo'},
-            {value: 'tim', key: 'TIM (Telecom Italia)'},
-            {value: 'vodacomza', key: 'Vodacom South Africa'},
-            {value: 'vodafone', key: 'Vodafone'},
-            {value: 'verizon', key: 'Verizon'},
-            {value: 'vivo', key: 'Vivo'},
-            {value: 'zain', key: 'Zain'},
-            {value: 'umobile', key: 'U-Mobile'},
-            {value: 'proximus', label: 'Proximus'},
-            {value: 'tele2', label: 'Tele2'},
-            {value: 'mobitel', label: 'Mobitel'},
-            {value: 'o2', label: 'O2'},
-            {value: 'bsnl', label: 'BSNL'},
-         ];
-    }
-    allowed_countries = ()=>{
-        let res = this.state.locations.countries.map(c=>({
-            key: c.country_name, value: c.country_id, mob: c.mob}));
-        const curr_plan = this.props.get_curr_plan();
-        if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
-        {
-            res = res.filter(r=>
-                this.state.locations.shared_countries.includes(r.value));
-        }
-        if (curr_plan&&curr_plan.mobile)
-            res = res.filter(r=>r.mob);
-        return [this.def_value, ...res];
-    };
-    country_changed = ()=>{
-        this.set_field('city', []);
-        this.set_field('state', '');
-    };
-    states = ()=>{
-        const country = this.props.form.country;
-        if (!country||country=='*')
-            return [];
-        const curr_plan = this.props.get_curr_plan();
-        const res = (this.state.locations.regions[country]||[])
-        .filter(r=>!curr_plan||!curr_plan.mobile||r.mob)
-        .map(r=>({key: r.region_name, value: r.region_id}));
-        return [this.def_value, ...res];
-    };
-    state_changed = ()=>this.set_field('city', []);
-    cities = ()=>{
-        const {country, state} = this.props.form;
-        let res;
-        if (!country)
-            return [];
-        const curr_plan = this.props.get_curr_plan();
-        res = this.state.locations.cities
-        .filter(c=>c.country_id==country)
-        .filter(c=>!curr_plan||!curr_plan.mobile||c.mob);
-        if (state)
-            res = res.filter(c=>c.region_id==state);
-        const regions = this.states();
-        res = res.map(c=>{
-            const region = regions.filter(r=>r.value==c.region_id)[0];
-            return {label: c.city_name+' ('+region.value+')', id: c.city_name,
-                region: region.value};
-        });
-        return res;
-    };
-    city_changed = e=>{
-        if (e&&e.length)
-            this.set_field('state', e[0].region);
-    };
-    render(){
-        if (!this.state.locations)
-            return null;
-        const curr_plan = this.props.get_curr_plan();
-        const show_dc_note = curr_plan&&curr_plan.type=='static';
-        const show_vips_note = curr_plan&&
-            (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
-        return <div>
-              {(show_dc_note || show_vips_note) &&
-                <Note>
-                  {show_dc_note &&
-                    <span>To change Data Center country visit your </span>
-                  }
-                  {show_vips_note &&
-                    <span>To change Exclusive gIP country visit your </span>
-                  }
-                  <a className="link" target="_blank" rel="noopener noreferrer"
-                    href="https://luminati.io/cp/zones">zone page</a>
-                  <span> and change your zone plan.</span>
-                </Note>
-              }
-              <Config type="select" id="country"
-                data={this.allowed_countries()}
-                on_change={this.country_changed}/>
-              <Config type="select" id="state" data={this.states()}
-                on_change={this.state_changed}/>
-              <Config type="typeahead" id="city" data={this.cities()}
-                on_change={this.city_changed}/>
-              <Config type="typeahead" id="asn" data={this.state.asns}
-                disabled={this.props.form.carrier} update_on_input/>
-              <Config type="select" id="carrier" data={this.carriers}
-                note={this.carriers_note}
-                disabled={this.props.form.asn&&this.props.form.asn.length}/>
-            </div>;
-    }
-});
-
-// XXX krzysztof: move to headers.js
-const Headers = provider({tab_id: 'headers'})(
-class Headers extends Pure_component {
-    first_header = {name: '', value: ''};
-    state = {headers: [this.first_header]};
-    boolean_opt = [{key: 'No (Default)', value: ''},
-      {key: 'Yes', value: 'true'}];
-    set_field = setdb.get('head.proxy_edit.set_field');
-    componentDidMount(){
-        this.setdb_on('head.proxy_edit.form.headers', headers=>{
-            if (headers&&headers.length)
-                this.setState({headers});
-            else
-                this.setState({headers: [this.first_header]});
-        });
-    }
-    add = ()=>this.set_field('headers', [
-        ...this.state.headers, {name: '', value: ''}]);
-    remove = idx=>{
-        let new_headers = [
-            ...this.state.headers.slice(0, idx),
-            ...this.state.headers.slice(idx+1),
-        ];
-        if (!new_headers.length)
-            new_headers = [this.first_header];
-        this.set_field('headers', new_headers);
-    };
-    update = idx=>name=>value=>this.set_field('headers',
-        this.state.headers.map((h, i)=>{
-            if (i!=idx)
-                return h;
-            return {...h, [name]: value};
-        }));
-    random_user_agent_changed = val=>{
-        if (val)
-            this.set_field('user_agent', '');
-    };
-    render(){
-        return <div>
-              <Config type="select" id="user_agent" data={util.user_agents}
-                disabled={this.props.form.random_user_agent}/>
-              <Config type="select" id="random_user_agent"
-                on_change={this.random_user_agent_changed}
-                data={this.boolean_opt}/>
-              <Config type="select" id="override_headers"
-                data={this.boolean_opt}/>
-              <div className="field_row headers">
-                <div className="desc">
-                  <Tooltip title="Custom headers">
-                    <span>Headers</span>
-                  </Tooltip>
-                </div>
-                <div className="list">
-                  {this.state.headers.map((h, i)=>
-                    <Header last={i+1==this.state.headers.length} key={i}
-                      name={h.name} value={h.value} update={this.update(i)}
-                      remove_clicked={this.remove}
-                      add_clicked={this.add} idx={i}/>
-                  )}
-                </div>
-              </div>
-            </div>;
-    }
-});
-
-const Header = ({name, value, idx, add_clicked, remove_clicked, last,
-    update})=>
-    <div className="single_header">
-      <div className="desc">Name</div>
-      <Input type="text" val={name} on_change_wrapper={update('name')}/>
-      <div className="desc">Value</div>
-      <Input type="text" val={value} on_change_wrapper={update('value')}/>
-      <div className="action_icons">
-        <Remove_icon tooltip="Remove header" click={()=>remove_clicked(idx)}/>
-        {last && <Add_icon tooltip="Add header" click={add_clicked}/>}
-      </div>
+const Nav_tabs = ()=>
+    <div className="nav_tabs">
+      <Tab_btn id="logs"/>
+      <Tab_btn id="target"/>
+      <Tab_btn id="speed"/>
+      <Tab_btn id="rules"/>
+      <Tab_btn id="rotation"/>
+      <Tab_btn id="debug"/>
+      <Tab_btn id="headers"/>
+      <Tab_btn id="general"/>
     </div>;
 
-// XXX krzysztof: move to speed.js
-const Speed = provider({tab_id: 'speed'})(
-class Speed extends Pure_component {
-    constructor(props){
-        super(props);
-        this.dns_options = [
-            {key: 'Local (default) - resolved by the super proxy',
-                value: 'local'},
-            {key: 'Remote - resolved by peer', value: 'remote'},
-        ];
-        this.reverse_lookup_options = [{key: 'No', value: ''},
-            {key: 'DNS', value: 'dns'}, {key: 'File', value: 'file'},
-            {key: 'Values', value: 'values'}];
-    }
-    open_modal(){ $('#allocated_ips').modal('show'); }
-    get_type(){
-        const curr_plan = this.props.get_curr_plan();
-        let type;
-        if (curr_plan&&curr_plan.type=='static')
-            type = 'ips';
-        else if (curr_plan&&!!curr_plan.vip)
-            type = 'vips';
-        return type;
-    }
+const Tab_btn = withRouter(class Tab_btn extends Pure_component {
+    state = {};
+    click = ()=>{
+        const port = this.props.match.params.port;
+        const pathname = `/proxy/${port}/${this.props.id}`;
+        this.props.history.push({pathname});
+    };
     render(){
-        const {form, support} = this.props;
-        const pool_size_disabled = !support.pool_size ||
-            form.ips.length || form.vips.length;
-        const type = this.get_type();
-        const render_modal = ['ips', 'vips'].includes(type);
-        let pool_size_note;
-        if (this.props.support.pool_size&&render_modal)
-        {
-            pool_size_note =
-                <a className="link" onClick={()=>this.open_modal()}>
-                  {'set from allocated '+(type=='ips' ? 'IPs' : 'vIPs')}
-                </a>;
-        }
-        return <div>
-              <Config type="select" id="dns" data={this.dns_options}/>
-              <Config type="number" id="pool_size" min="0"
-                note={pool_size_note} disabled={pool_size_disabled}/>
-              <Config type="number" id="request_timeout" sufix="seconds"
-                min="0"/>
-              <Config type="number" id="race_reqs" min="1" max="3"/>
-              <Config type="number" id="proxy_count" min="1"/>
-              <Config type="number" id="proxy_switch" min="0"/>
-              <Config type="number" id="throttle" min="0"/>
-              <Config type="select" id="reverse_lookup"
-                data={this.reverse_lookup_options}/>
-              {this.props.form.reverse_lookup=='file' &&
-                <Config type="text" id="reverse_lookup_file"/>
-              }
-              {this.props.form.reverse_lookup=='values' &&
-                <Config type="textarea" id="reverse_lookup_values"/>
-              }
-            </div>;
+        const cur_tab = this.props.match.params.tab;
+        const active = cur_tab==this.props.id||!cur_tab&&this.props.id=='logs';
+        const btn_class = classnames('btn_tab', {active});
+        return <Tooltip title={tabs[this.props.id].tooltip}>
+              <div onClick={this.click} className={btn_class}>
+                <div className={classnames('icon', this.props.id)}/>
+                <div className="title">{tabs[this.props.id].label}</div>
+                <div className="arrow"/>
+              </div>
+            </Tooltip>;
     }
 });
 
@@ -1011,8 +629,6 @@ class Alloc_modal extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.proxy_edit.zone_name', zone_name=>
             this.setState({available_list: []}));
-        this.setdb_on('head.proxy_edit.tab', tab=>
-            this.setState({curr_tab: tab}));
         this.setdb_on('head.proxies_running', proxies=>
             proxies&&this.setState({proxies}));
         $('#allocated_ips').on('show.bs.modal', this.load);
@@ -1171,7 +787,7 @@ class Alloc_modal extends Pure_component {
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
         let title;
-        if (this.state.curr_tab=='general')
+        if (this.props.tab=='general')
         {
             title = 'Select the '+type_label+' to multiply ('
             +this.props.zone+')';
@@ -1215,93 +831,5 @@ class Alloc_modal extends Pure_component {
             </Modal>;
     }
 }
-
-// XXX krzysztof: move to rotation.js
-const Rotation = provider({tab_id: 'rotation'})(props=>{
-    const {support, form, proxy} = props;
-    return <div>
-          <Config type="text" id="ip"/>
-          <Config type="text" id="vip"/>
-          <Config type="select" id="pool_type" data={proxy.pool_type.values}
-            disabled={!support.pool_type}/>
-          <Config type="number" id="keep_alive" min="0"
-            disabled={!support.keep_alive}/>
-          <Config type="text" id="whitelist_ips"
-            validator={validators.ips_list}/>
-          <Config type="select" id="session_random"
-            data={props.default_opt('session_random')}/>
-          <Config type="text" id="session"
-            disabled={form.session_random&&!support.session}/>
-          <Config type="select" id="sticky_ip"
-            data={props.default_opt('sticky_ip')}
-            disabled={!support.sticky_ip}/>
-          <Config type="double_number" id="max_requests"
-            disabled={!support.max_requests}/>
-          <Config type="double_number" id="session_duration"
-            disabled={!support.session_duration}/>
-          <Config type="text" id="seed" disabled={!support.seed}/>
-        </div>;
-});
-
-// XXX krzysztof: move to debug.js
-const Debug = provider({tab_id: 'debug'})(props=>
-    <div>
-      <Config type="select" id="log" data={props.proxy.log.values}/>
-      <Config type="select" id="debug" data={props.proxy.debug.values}/>
-    </div>);
-
-// XXX krzysztof: move to general.js
-const General = provider({tab_id: 'general'})(props=>{
-    const set_field = setdb.get('head.proxy_edit.set_field');
-    const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
-    const multiply_changed = val=>{
-        const size = Math.max(props.form.ips.length, props.form.vips.length);
-        if (val)
-        {
-            set_field('pool_size', 1);
-            set_field('multiply', size);
-            open_modal();
-            return;
-        }
-        set_field('pool_size', size);
-        set_field('multiply', 1);
-    };
-    // XXX krzysztof: cleanup type
-    const curr_plan = props.get_curr_plan();
-    let type;
-    if (curr_plan&&curr_plan.type=='static')
-        type = 'ips';
-    else if (curr_plan&&!!curr_plan.vip)
-        type = 'vips';
-    const note_ips = props.form.multiply_ips ?
-        <a className="link" onClick={open_modal}>Select IPs</a> : null;
-    const note_vips = props.form.multiply_vips ?
-        <a className="link" onClick={open_modal}>Select gIPs</a> : null;
-    const mul_disabled = !props.support.multiply||props.form.multiply_ips||
-        props.form.multiply_vips;
-    return <div>
-          <Config type="number" id="port"/>
-          <Config type="number" id="socks" disabled={true} val_id="port"/>
-          <Config type="text" id="password"/>
-          <Config type="select" id="ssl" data={props.default_opt('ssl')}/>
-          <Config type="number" id="multiply" min="1" disabled={mul_disabled}/>
-          {type=='ips' &&
-            <Config type="select" id="multiply_ips"
-              on_change={multiply_changed} note={note_ips}
-              data={props.default_opt('multiply_ips')}/>
-          }
-          {type=='vips' &&
-            <Config type="select" id="multiply_vips"
-              on_change={multiply_changed} note={note_vips}
-              data={props.default_opt('multiply_vips')}/>
-          }
-          <Config type="select" id="secure_proxy"
-            data={props.default_opt('secure_proxy')}/>
-          <Config type="select" id="allow_proxy_auth"
-            data={props.default_opt('allow_proxy_auth')}/>
-          <Config type="select" id="iface"
-            data={props.proxy.iface.values}/>
-        </div>;
-});
 
 export default Index;

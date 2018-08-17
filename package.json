@@ -103,7 +103,6 @@
     "rimraf": "2.5.2",
     "log-buffer": "0.0.3",
     "cheerio": "1.0.0-rc.2",
-    "puppeteer": "1.5.0",
     "nightmare": "3.0.1",
     "prompt-sync": "4.1.6"
   },
@@ -320,9 +319,15 @@
       "src/pub/proxy_add.js",
       "src/pub/proxy_blank.js",
       "src/pub/proxy_edit/common.js",
+      "src/pub/proxy_edit/debug.js",
+      "src/pub/proxy_edit/fields.js",
+      "src/pub/proxy_edit/general.js",
+      "src/pub/proxy_edit/headers.js",
       "src/pub/proxy_edit/index.js",
+      "src/pub/proxy_edit/rotation.js",
       "src/pub/proxy_edit/rules.js",
-      "src/pub/proxy_fields.js",
+      "src/pub/proxy_edit/speed.js",
+      "src/pub/proxy_edit/targeting.js",
       "src/pub/proxy_tester.js",
       "src/pub/report_bug.js",
       "src/pub/schema.js",
@@ -337,7 +342,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "fc4573e9a1eb9301d9dae2713b2a19be"
+    "md5": "722bee93e9e88e6fb423923315ee5a64"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -372,5 +377,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.104.508"
+  "version": "1.105.395"
 }

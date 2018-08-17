@@ -9,9 +9,9 @@ import $ from 'jquery';
 class Index extends Pure_component {
     state = {desc: '', email: '', sending: false};
     componentDidMount(){
-        this.setdb_on('head.settings', settings=>{
-            if (settings&&settings.email)
-                this.setState({email: settings.email});
+        this.setdb_on('head.consts', consts=>{
+            if (consts&&consts.logins&&consts.logins.length==1)
+                this.setState({email: consts.logins[0]});
         });
     }
     desc_changed = e=>this.setState({desc: e.target.value});

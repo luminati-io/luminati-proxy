@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.105.395 Development Latest
+- :star: Added mail notifications in the Rules module
+- :star: Added support for choosing a country of Super Proxy
+- :bug: Solved inconsistency in the presets
+
 ## 1.104.508 Stable
 - :bug: Fixed disappearing proxy ports
 - :star: Added PID of the request to the logs

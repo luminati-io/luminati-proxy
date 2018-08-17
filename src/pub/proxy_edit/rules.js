@@ -8,7 +8,7 @@ import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note} from '../common.js';
 import {validators} from './common.js';
-import {tabs} from '../proxy_fields.js';
+import {tabs} from './fields.js';
 import PropTypes from 'prop-types';
 import filesaver from 'file-saver';
 const provider = provide=>withContext({provide: PropTypes.object},
@@ -163,6 +163,8 @@ class Rules extends Pure_component {
             try { action_raw.process = JSON.parse(rule.process); }
             catch(e){ console.log('wrong json'); }
         }
+        if (rule.email)
+            action_raw.email = rule.email;
         let result = null;
         if (rule.trigger_type)
         {
@@ -192,11 +194,16 @@ class Rules extends Pure_component {
             result.res[0].max_req_time = rule.max_req_time+'ms';
         return result;
     };
-    pre_rule_prepare = rule=>({
-        url: rule.trigger_url_regex||'**',
-        action: rule.action,
-        trigger_type: rule.trigger_type,
-    });
+    pre_rule_prepare = rule=>{
+        const res = {
+            url: rule.trigger_url_regex||'**',
+            action: rule.action,
+            trigger_type: rule.trigger_type,
+        };
+        if (rule.email)
+            res.email = rule.email;
+        return res;
+    };
     rules_update = ()=>{
         setdb.set('head.proxy_edit.rules', this.state.rules);
         const post = this.state.rules.filter(is_post_rule)
@@ -235,7 +242,6 @@ class Rules extends Pure_component {
                 New rule
                 <i className="glyphicon glyphicon-plus"/>
               </button>
-              <Ips_lists/>
             </div>;
     }
 });
@@ -307,6 +313,10 @@ const Rule = withRouter(class Rule extends Pure_component {
             .map(p=>({key: p.port, value: p.port}));
             this.setState({ports});
         });
+        this.setdb_on('head.consts', consts=>{
+            if (consts&&consts.logins)
+                this.setState({logins: consts.logins});
+        });
     }
     set_rule_field = (field, value)=>{
         setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
@@ -355,6 +365,13 @@ const Rule = withRouter(class Rule extends Pure_component {
         if (val!='Custom')
             this.set_rule_field('status_custom', '');
     };
+    send_email_changed = val=>{
+        if (!val)
+            return this.set_rule_field('email', '');
+        if (!this.state.logins)
+            return;
+        return this.set_rule_field('email', this.state.logins[0]);
+    };
     goto_tester = ()=>{
         this.props.history.push({pathname: `/proxy_tester`, state: {
             url: 'https://luminati.io/lpm/templates/product',
@@ -369,67 +386,75 @@ const Rule = withRouter(class Rule extends Pure_component {
         .filter(at=>rule.trigger_type=='url'&&at.only_url||
             rule.trigger_type!='url'&&!at.only_url));
         return <div className="rule_wrapper">
-              <Btn_rule_del
-                on_click={()=>this.props.rule_del(this.props.rule.id)}/>
+              <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
               <Rule_config id="trigger_type" type="select"
                 data={trigger_types} on_change={this.trigger_change}
-                rule={this.props.rule}/>
+                rule={rule}/>
               {rule.trigger_type=='body' &&
-                <Rule_config id="body_regex" type="text"
-                  rule={this.props.rule}/>
-              }
+                <Rule_config id="body_regex" type="text" rule={rule}/>}
               {rule.trigger_type=='min_req_time' &&
                 <Rule_config id="min_req_time" type="number"
-                  sufix="milliseconds" rule={this.props.rule}/>
+                  sufix="milliseconds" rule={rule}/>
               }
               {rule.trigger_type=='max_req_time' &&
                 <Rule_config id="max_req_time" type="number"
-                  sufix="milliseconds" rule={this.props.rule}/>
+                  sufix="milliseconds" rule={rule}/>
               }
               {rule.trigger_type=='status' &&
                 <Rule_config id="status_code" type="select"
                   data={status_types} on_change={this.status_changed}
-                  rule={this.props.rule}/>
+                  rule={rule}/>
               }
               {rule.status_code=='Custom' &&
-                <Rule_config id="status_custom" type="text"
-                  rule={this.props.rule}/>
+                <Rule_config id="status_custom" type="text" rule={rule}/>}
+              {rule.trigger_type &&
+                <Rule_config id="trigger_url_regex" type="regex" rule={rule}/>}
+              {rule.trigger_type &&
+                <Rule_config id="action" type="select" data={_action_types}
+                  on_change={this.action_changed} rule={rule}/>
               }
-              <Rule_config id="trigger_url_regex" type="regex"
-                rule={this.props.rule}/>
-              <Rule_config id="action" type="select" data={_action_types}
-                on_change={this.action_changed} rule={this.props.rule}/>
-              {this.props.rule.action=='retry' &&
+              {rule.action=='retry' &&
                 <Rule_config id="retry_number" type="number" min="0" max="20"
-                  validator={validators.number(0, 20)} rule={this.props.rule}/>
+                  validator={validators.number(0, 20)} rule={rule}/>
               }
-              {this.props.rule.action=='retry_port' &&
+              {rule.action=='retry_port' &&
                 <Rule_config id="retry_port" type="select"
-                  data={this.state.ports} rule={this.props.rule}/>
+                  data={this.state.ports} rule={rule}/>
               }
-              {this.props.rule.action=='ban_ip' &&
+              {rule.action=='ban_ip' &&
                 <Rule_config id="ban_ip_duration" type="select"
-                  data={ban_options} rule={this.props.rule}/>
+                  data={ban_options} rule={rule}/>
               }
-              {this.props.rule.action=='save_to_fast_pool' &&
+              {rule.action=='save_to_fast_pool' &&
                 <Rule_config id="fast_pool_size" type="number" min="1"
-                  max="50" validator={validators.number(1, 50)}
-                  rule={this.props.rule}/>
+                  max="50" validator={validators.number(1, 50)} rule={rule}/>
               }
-              {this.props.rule.ban_ip_duration=='custom' &&
+              {rule.ban_ip_duration=='custom' &&
                 <Rule_config id="ban_ip_custom" type="number" sufix="minutes"
-                  rule={this.props.rule}/>
+                  rule={rule}/>
               }
-              {this.props.rule.action=='process' &&
+              {rule.action=='process' &&
                 <div>
-                  <Rule_config id="process" type="json"
-                    rule={this.props.rule}/>
+                  <Rule_config id="process" type="json" rule={rule}/>
                   <div className="field_row">
                     Test data processing in
                     <a onClick={this.goto_tester} className="link api_link">
                       proxy tester</a>
                   </div>
                 </div>
+              }
+              {rule.action &&
+                <Rule_config id="send_email" type="yes_no" rule={rule}
+                  on_change={this.send_email_changed}/>
+              }
+              {rule.send_email && this.state.logins &&
+                this.state.logins.length==1 &&
+                <Rule_config id="email" type="text" rule={rule} disabled/>
+              }
+              {rule.send_email && this.state.logins &&
+                this.state.logins.length>1 &&
+                <Rule_config id="email" type="select" rule={rule}
+                  data={this.state.logins.map(l=>({key: l, value: l}))}/>
               }
             </div>;
     }

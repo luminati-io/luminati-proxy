@@ -38,11 +38,6 @@ const normalizers = {
 
 class Form extends Pure_component {
     state = {saving: false};
-    logs_opt = [
-        {key: 'No', value: false},
-        {key: 'Default (No)', value: ''},
-        {key: 'Yes', value: true},
-    ];
     tooltips = {
         logs: `Last 1K requests are automatically logged for easy debugging.
             Enable Logs to save all requests`,
@@ -123,8 +118,8 @@ class Form extends Pure_component {
               <Labeled_controller val={this.state.settings.zone} type="select"
                 on_change_wrapper={this.zone_change} label="Default zone"
                 tooltip={this.tooltips.zone} data={zone_opt}/>
-              <Labeled_controller val={this.state.settings.logs} type="select"
-                data={this.logs_opt} on_change_wrapper={this.logs_change}
+              <Labeled_controller val={this.state.settings.logs} type="yes_no"
+                on_change_wrapper={this.logs_change}
                 label="Enable logs" tooltip={this.tooltips.logs}/>
               <Labeled_controller val={this.state.settings.www_whitelist_ips}
                 type="text" on_change_wrapper={this.whitelist_ips_change}

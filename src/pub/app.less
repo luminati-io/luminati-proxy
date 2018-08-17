@@ -754,26 +754,6 @@ span.icon_link {
             top: 5px;
             background-size: contain;
         }
-        .circle_wrapper {
-            display: none;
-            width: 12px;
-            height: 12px;
-            background-color: @first_color;
-            position: relative;
-            left: 29px;
-            top: 0;
-            border-radius: 50%;
-            &.active { display: block; }
-            &.error { background-color: @error; }
-            .circle {
-                color: white;
-                font-size: 9px;
-                line-height: 0;
-                position: relative;
-                top: 6px;
-                font-weight: bold;
-            }
-        }
         .title {
             position: absolute;
             top: 29px;
@@ -964,7 +944,7 @@ span.icon_link {
             align-items: center;
             .sufix { margin-left: 10px; }
             .double_field {
-                input { width: 79px; }
+                input { width: 109px; }
                 .devider { margin: 0 5px; }
             }
         }
@@ -976,6 +956,7 @@ span.icon_link {
         }
     }
     .regex_field {
+        width: 100%;
         outline: none;
         &:hover .tip_box { visibility: visible; }
         .tip_box {

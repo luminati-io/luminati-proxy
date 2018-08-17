@@ -124,9 +124,8 @@ const Page = ()=>
       <div className="page_body">
         <Switch>
           <Route path="/overview" exact component={Overview}/>
-          <Route path="/overview/:master_port" exact
-            component={Overview}/>
-          <Route path="/proxy/:port" exact component={Proxy_edit}/>
+          <Route path="/overview/:master_port" exact component={Overview}/>
+          <Route path="/proxy/:port/:tab?" exact component={Proxy_edit}/>
           <Route path="/howto" exact component={Howto}/>
           <Route path="/logs" exact component={Logs}/>
           <Route path="/proxy_tester" exact component={Proxy_tester}/>

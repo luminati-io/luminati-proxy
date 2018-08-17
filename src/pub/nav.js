@@ -133,11 +133,8 @@ class Nav_top extends Pure_component {
 const Footer = ()=>
     <div className="footer">
       <div>
-        <a href="http://luminati.io/faq#proxy"
-          rel="noopener noreferrer" target="_blank"
-          className="link">
-          FAQ
-        </a>
+        <a href="http://luminati.io/faq#proxy" rel="noopener noreferrer"
+          target="_blank" className="link">FAQ</a>
       </div>
       <div>
         <a href="mailto:lpm@luminati.io" className="link">

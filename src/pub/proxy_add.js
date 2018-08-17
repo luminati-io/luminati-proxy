@@ -117,10 +117,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 const state_opt = {};
                 if (opt.field)
                     state_opt.field = opt.field;
-                _this.props.history.push({
-                    pathname: `/proxy/${port}`,
-                    state: state_opt,
-                });
+                _this.props.history.push({pathname: `/proxy/${port}`,
+                    state: state_opt});
             }
         });
     }

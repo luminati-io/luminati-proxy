@@ -272,6 +272,20 @@ export const Select = props=>{
         </Tooltip>;
 };
 
+class Yes_no extends Pure_component {
+    options = ()=>{
+        const default_label = this.props.default ? 'Yes' : 'No';
+        return [
+            {key: 'No', value: false},
+            {key: 'Default ('+default_label+')', value: ''},
+            {key: 'Yes', value: true},
+        ];
+    };
+    render(){
+        return <Select {...this.props} data={this.options()}/>;
+    }
+}
+
 const Double_number = props=>{
     const vals = (''+props.val).split(':');
     const update = (start, end)=>{
@@ -307,6 +321,8 @@ export const Form_controller = props=>{
         return <Json {...props}/>;
     else if (type=='regex')
         return <Regex {...props}/>;
+    else if (type=='yes_no')
+        return <Yes_no {...props}/>;
     return <Input {...props}/>;
 };
 
@@ -415,7 +431,6 @@ export class Regex extends Pure_component {
         return `Add file format ${f} to regex`;
     };
     render(){
-        const {type, ...props} = this.props;
         const tip_box_classes = classnames('tip_box', 'active');
         return <div tabIndex="1" className="regex_field"
             onFocus={this.on_focus} onBlur={this.on_blur}>
@@ -430,7 +445,7 @@ export class Regex extends Pure_component {
                   )}
                 </div>
               </div>
-              <Input className="regex" type="text" {...props}/>
+              <Input className="regex" {...this.props} type="text"/>
             </div>;
     }
 }

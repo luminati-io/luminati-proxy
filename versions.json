@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.105.395",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added mail notifications in the Rules module"
+            },
+            {
+                "type": "star",
+                "text": "Added support for choosing a country of Super Proxy"
+            },
+            {
+                "type": "bug",
+                "text": "Solved inconsistency in the presets"
+            }
+        ]
+    },
+    {
         "ver": "1.104.508",
         "type": "stable",
         "changes": [

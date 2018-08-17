@@ -48,6 +48,14 @@ export const tabs = {
         label: 'Request speed',
         tooltip: 'Control the speed of your request to improve performance',
         fields: {
+            proxy: {
+                label: `Super Proxy's location`,
+                tooltip: `For shorter latency to the Super Proxies you can
+                    choose the location. Please note that this does not
+                    restrict the IPs chosen country but will simply improve
+                    performances by using Super Proxies which have shorter
+                    roundtrips relative to your current location.`,
+            },
             dns: {
                 label: 'DNS lookup',
                 tooltip: 'Location of DNS resolve',
@@ -129,12 +137,11 @@ export const tabs = {
                     milliseconds will trigger the action`,
             },
             trigger_url_regex: {
-                label: `(optional) Regex to apply only for specific URLs. Type
-                    regex manually or generate clicking on formats above the
-                    input`,
+                label: `Optional regex to apply only for specific URLs`,
                 placeholder: `i.e. example.com`,
-                tooltip: `Enable trigger to certain URLs. You can type regex
-                    manually or `,
+                tooltip: `Enable trigger only for certain URLs. You can type
+                    regex manually or generate it by clicking on formats above
+                    the input`,
             },
             status_code: {
                 label: 'Status code string to be scanned',
@@ -171,6 +178,12 @@ export const tabs = {
             },
             ban_ip_custom: {label: 'Custom duration'},
             process: {label: 'Processing rule'},
+            send_email: {
+                label: 'Send email',
+                tooltip: `Every time the rule is triggered and executed the
+                    email notification will be sent to the provided address`,
+            },
+            email: {label: 'Email address'},
         },
     },
     rotation: {
@@ -181,14 +194,14 @@ export const tabs = {
                 label: 'Data center IP',
                 tooltip: `Choose specific data center IP. to ensure
                     all requests are executed using specific Data Center IP.
-                    to view the pool of your IPs take a look at 'pool size'
+                    To view the pool of your IPs take a look at 'pool size'
                     option`,
                 placeholder: 'insert IP value from your pool',
             },
             vip: {
                 label: 'gIP',
                 tooltip: `Choose specific gIP to ensure all requests are
-                    executed using specific gIP. to view the pool of your gIPs
+                    executed using specific gIP. To view the pool of your gIPs
                     take a look at 'pool size' option`,
                 placeholder: 'insert gIP id',
             },
@@ -199,8 +212,7 @@ export const tabs = {
             },
             keep_alive: {
                 label: 'Keep-alive',
-                tooltip: `Chosen number of sec to ping ip and keep it
-                    connected. depending on peer availability.`,
+                tooltip: `LPM will ping an IP to keep the session alive`,
                 ext: true,
             },
             whitelist_ips: {
@@ -212,20 +224,21 @@ export const tabs = {
             },
             session_random: {
                 label: 'Random session',
-                tooltip: `Switch session ID on each request`,
+                tooltip: `Each session is generated randomly. Disable it if you
+                    want to define sessions manually`,
                 ext: true,
             },
             session: {
                 label: 'Explicit session',
-                tooltip: `Insert session ID to maintain the same ip
-                    for as long as possible.`,
+                tooltip: `Insert session ID to maintain the same ip for as long
+                    as possible.`,
                 placeholder: `e.g. session-1234`,
             },
             sticky_ip: {
                 label: 'Sticky IP',
                 tooltip: `When connecting to remote LPM server stick sessions
-                    to each computer. each connected computer will receive
-                    unique session`,
+                    to each computer. Each connected computer will receive
+                    a unique session`,
                 ext: true,
             },
             max_requests: {
@@ -237,8 +250,8 @@ export const tabs = {
                 ext: true,
             },
             session_duration: {
-                label: 'Session duration (seconds)',
-                tooltip: `Change session after fixed number of seconds`,
+                label: 'Session duration',
+                tooltip: `Change session every fixed number of seconds`,
                 ext: true,
             },
             seed: {

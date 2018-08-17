@@ -205,7 +205,7 @@ EventEmitter.prototype.eventNames = function eventNames(){
     return Object.keys(this._events).filter(function(e){
         return _this._events[e]!==null;
     });
-}
+};
 
 //
 // Expose the module.

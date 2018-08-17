@@ -145,38 +145,34 @@ const presets = {
     sequential: {
         default: true,
         title: 'Sequential session IP pool',
-        subtitle: `Sequential pool of pre-established of sessions (IPs). For
+        subtitle: `Sequential pool of pre-established sessions (IPs). For
             running groups of requests sharing the same IP to a target site.
-            Use refresh_sessions max_requests & session_duration to control
-            session (IP) switching`,
+            Use 'Max requests' and 'Session duration' to control session (IP)
+            switching`,
         check: function(opt){ return opt.pool_size &&
             (!opt.pool_type || opt.pool_type=='sequential'); },
         set: opt=>{
             opt.pool_size = 1;
             opt.pool_type = 'sequential';
-            opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
+            opt.keep_alive = 45;
+            opt.session = true;
         },
         clean: opt=>{
             opt.pool_size = 0;
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.seed = '';
         },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `sequential pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
         ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
+        disabled: {
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_size: true,
+            pool_type: true,
             seed: true,
         },
     },
@@ -185,36 +181,29 @@ const presets = {
         subtitle: `All requests share the same long session (IP). For
             connecting a browser to Luminati, maintaining the same IP for as
             long as possible`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ipo
+        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
             && opt.session===true && opt.keep_alive; },
         set: opt=>{
             opt.pool_size = 0;
-            opt.keep_alive = opt.keep_alive||50;
+            opt.keep_alive = 45;
             opt.pool_type = null;
-            opt.sticky_ip = false;
             opt.session = true;
-            opt.seed = false;
         },
         clean: opt=>{
             opt.keep_alive = 0;
-            opt.session = '';
             opt.session_duration = 0;
             opt.max_requests = 0;
-            opt.seed = '';
         },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 50 seconds`},
             {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `enables 'Random Session'`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
         ],
-        support: {
-            keep_alive: true,
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
+        disabled: {
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_type: true,
+            seed: true,
         },
     },
     session: {
@@ -228,28 +217,23 @@ const presets = {
             opt.pool_size = 0;
             opt.keep_alive = 0;
             opt.pool_type = null;
-            opt.sticky_ip = false;
             opt.session = true;
-            opt.seed = false;
         },
         clean: opt=>{
-            opt.session = '';
             opt.session_duration = 0;
             opt.max_requests = 0;
-            opt.seed = '';
         },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 0 seconds`},
             {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `enables 'Random Session'`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
         ],
-        support: {
-            multiply: true,
-            session_duration: true,
-            max_requests: true,
+        disabled: {
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_type: true,
+            seed: true,
+            keep_alive: true,
         },
     },
     sticky_ip: {
@@ -265,24 +249,27 @@ const presets = {
             opt.session = '';
         },
         clean: opt=>{
-            opt.sticky_ip = null;
+            opt.sticky_ip = '';
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.seed = '';
         },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 0`},
             {field: 'pool_type', label: `sequential pool type`},
             {field: 'sticky_ip', label: `enables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
-            {field: 'multiply', label: `disables 'Multiply' option`},
+            {field: 'multiply', label: `disables 'Multiply' options`},
         ],
-        support: {
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
+        disabled: {
+            multiply: true,
+            multiply_ips: true,
+            multiply_vips: true,
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_type: true,
             seed: true,
+            pool_size: true,
         },
     },
     round_robin: {
@@ -296,29 +283,27 @@ const presets = {
             opt.pool_size = opt.pool_size||1;
             opt.pool_type = 'round-robin';
             opt.keep_alive = opt.keep_alive||45;
-            opt.sticky_ip = null;
-            opt.session = '';
+            opt.session = true;
         },
         clean: opt=>{
             opt.pool_size = 1;
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.seed = '';
         },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `round-robin pool type`},
-            {field: 'keep_alive', label: `sets Keep-alive to 45 seconds`},
-            {field: 'sticky_ip', label: `disables 'Sticky Ip'`},
-            {field: 'session', label: `disables 'Random Session'`},
             {field: 'multiply', label: `disables 'Multiply' options`},
         ],
-        support: {
-            pool_size: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
+        disabled: {
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            multiply: true,
+            multiply_ips: true,
+            multiply_vips: true,
+            pool_type: true,
             seed: true,
         },
     },
@@ -328,14 +313,13 @@ const presets = {
         check: opt=>true,
         set: opt=>{
             opt.pool_size = 50;
-            opt.keep_alive = 40;
+            opt.keep_alive = 45;
             opt.pool_type = 'round-robin';
-            opt.seed = false;
             opt.proxy_count = 20;
             opt.session_duration = 0;
-            opt.session_random = false;
             opt.use_proxy_cache = false;
             opt.race_reqs = 2;
+            opt.session = true;
         },
         clean: opt=>{
             opt.pool_size = 1;
@@ -344,26 +328,30 @@ const presets = {
             opt.race_reqs = '';
             opt.use_proxy_cache = true;
         },
+        disabled: {
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_type: true,
+            seed: true,
+            keep_alive: true,
+            pool_size: true,
+        },
         rules: [
             {field: 'pool_size', label: `sets 'Pool size' to 50`},
-            {field: 'keep_alive', label: `sets 'Keep-alive' to 40`},
             {field: 'pool_type', label: `round-robin pool type`},
-            {field: 'seed', label: `disables 'Session ID Seed'`},
         ],
-        support: {max_requests: true, multiply: true},
     },
     rnd_usr_agent_and_cookie_header: {
         title: 'Random User-Agent and cookie headers',
         subtitle: 'Rotate User-Agent and cookie on each request',
         check: opt=>true,
         set: opt=>{
-            opt.session = '';
-            opt.sticky_ip = false;
+            opt.session = true;
             opt.pool_size = 1;
             opt.pool_type = 'sequential';
             opt.keep_alive = 0;
             opt.session_duration = 0;
-            opt.seed = false;
             opt.random_user_agent = true;
             opt.rules = opt.rules||{};
             opt.rules.pre = [{
@@ -388,12 +376,15 @@ const presets = {
             opt.rules.pre = [];
             opt.random_user_agent = '';
         },
-        support: {
-            multiply: true,
-            max_requests: true,
-        },
         disabled: {
             random_user_agent: true,
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_type: true,
+            seed: true,
+            keep_alive: true,
+            pool_size: true,
         },
     },
     shop: {
@@ -403,6 +394,7 @@ const presets = {
             other use-cases`,
         chceck: opt=>true,
         set: opt=>{
+            opt.session = true;
             opt.dns = 'remote';
             opt.random_user_agent = true;
             opt.override_headers = true;
@@ -440,6 +432,13 @@ const presets = {
             opt.rules.post = opt.rules.post.filter(r=>
                 !r.res[0]||!r.res[0].action||!r.res[0].action.process);
         },
+        disabled: {
+            random_user_agent: true,
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            seed: true,
+        },
         rules: [
             {field: 'dns', label: `sets DNS to resolve remotely`},
             {field: 'random_user_agent', label: `generates random User-Agent
@@ -457,24 +456,12 @@ const presets = {
         set: function(opt){},
         clean: opt=>{
             opt.session = '';
-            opt.sticky_ip = null;
             opt.pool_size = 1;
             opt.pool_type = null;
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.seed = '';
-        },
-        support: {
-            session: true,
-            sticky_ip: true,
-            pool_size: true,
-            pool_type: true,
-            keep_alive: true,
-            max_requests: true,
-            session_duration: true,
-            multiply: true,
-            seed: true,
         },
     },
 };

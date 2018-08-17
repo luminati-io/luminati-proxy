@@ -904,7 +904,7 @@ describe('proxy', ()=>{
             return r;
         }));
         t('should retry when status match', '200 - Succeeded requests', null,
-            20);
+            5);
         t('should ignore rule when status does not match', null,
             '404 - Succeeded requests', 0);
         t('should prioritize', null, {post: [{res:
@@ -912,7 +912,7 @@ describe('proxy', ()=>{
             head: true, status: {arg: '200', type: 'in'}}],
             url: 'lumtest.com/test'}, {res: [{action:
             {ban_ip: '60min', retry: true}, head: true, status: {arg: '200',
-            type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 20);
+            type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 5);
     });
     describe('reserve session', ()=>{
         let history;

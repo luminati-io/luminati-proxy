@@ -1,8 +1,8 @@
 [{
     "schema": {
         "schema_info": {
-            "hash": "TEXT",
-            "version": "TEXT",
+            "hash": {"type": "TEXT"},
+            "version": {"type": "TEXT"},
             "timestamp": {"type": "INTEGER", "default": "CURRENT_TIMESTAMP"}
         },
         "request": {
@@ -38,12 +38,6 @@
         "proxy_hosts": {
             "proxy": {"type": "TEXT", "index": true},
             "host": {"type": "TEXT", "index": true}
-        },
-        "zone": {
-            "zone": "TEXT",
-            "perm": "TEXT",
-            "ips": "TEXT",
-            "plans": "TEXT"
         },
         "usage": {
             "port_id": {"type": "INTEGER", "multi_index": ["port_id",
