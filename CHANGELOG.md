@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.105.672 Stable
+- :bug: Fixed taking screenshot in Link Tester on windows
+- :bug: Added the note to status codes and timings in the logs when SSL analyzing is off
+
 ## 1.105.395 Development Latest
 - :star: Added mail notifications in the Rules module
 - :star: Added support for choosing a country of Super Proxy

@@ -175,11 +175,12 @@ const Header_pair = ({name, value})=>{
 };
 
 const Status_value = ({value})=>{
+    const info = value=='unknown';
     const green = /2../.test(value);
     const yellow = /3../.test(value);
     const red = /(4|5)../.test(value);
     const classes = classnames('small_icon', 'status', {
-        green, yellow, red});
+        info, green, yellow, red});
     return <div className="status_wrapper">
           <div className={classes}/>{value}
         </div>;

@@ -810,9 +810,7 @@ class Data_row extends React.Component {
 }
 
 class Cell_value extends React.Component {
-    go_to_timeline = e=>{
-        setdb.emit('har_viewer.set_pane', 3);
-    };
+    go_to_timeline = e=>setdb.emit('har_viewer.set_pane', 3);;
     render(){
         const {col, req, req: {details: {timeline}}} = this.props;
         if (col=='select')
@@ -840,18 +838,13 @@ class Cell_value extends React.Component {
                 </div>;
         }
         else if (col=='Status')
-        {
-            const status = status_codes[req.response.status];
-            return <Tooltip title={req.response.status+' '+status}>
-                  <div className="disp_value">{req.response.status}</div>
-                </Tooltip>;
-        }
+            return <Status_code_cell status={req.response.status}/>;
         else if (col=='Proxy port')
             return <Tooltip_and_value val={req.details.port}/>;
         else if (col=='Bandwidth')
             return <Tooltip_bytes chrome_style bytes={req.details.bw}/>;
         else if (col=='Time')
-            return <Tooltip_and_value val={req.time+' ms'}/>;
+            return <Time_cell time={req.time} url={req.request.url}/>;
         else if (col=='Peer proxy')
             return <Tooltip_and_value val={req.details.proxy_peer}/>;
         else if (col=='Date')
@@ -863,6 +856,29 @@ class Cell_value extends React.Component {
         return col;
     }
 }
+
+const Status_code_cell = ({status})=>{
+    const desc = status_codes[status];
+    return <Tooltip title={`${status} - ${desc}`}>
+          <div className="disp_value">
+            {status}
+            {status=='unknown' && <div className="small_icon status info"/>}
+          </div>
+        </Tooltip>;
+};
+
+const Time_cell = ({time, url})=>{
+    if (!url.endsWith(':443')||!time)
+        return <Tooltip_and_value val={time&&time+' ms'}/>;
+    const tip = `This timing might not be accurate if the remote server held
+        the connection open. Enable SSL analyzing to fix this`;
+    return <Tooltip title={tip}>
+          <div className="disp_value">
+            {time+' ms'}
+            {url.endsWith(':443') && <div className="small_icon status info"/>}
+          </div>
+        </Tooltip>;
+};
 
 class Select_cell extends React.Component {
     state = {checked: false};
@@ -892,8 +908,8 @@ class Select_cell extends React.Component {
     }
 }
 
-const Tooltip_and_value = ({val})=>
-    <Tooltip title={val}>
+const Tooltip_and_value = ({val, tip})=>
+    <Tooltip title={tip||val}>
       <div className="disp_value">{val||'—'}</div>
     </Tooltip>;
 

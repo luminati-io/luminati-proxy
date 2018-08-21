@@ -183,7 +183,12 @@ export const tabs = {
                 tooltip: `Every time the rule is triggered and executed the
                     email notification will be sent to the provided address`,
             },
-            email: {label: 'Email address'},
+            email: {
+                label: 'Email address',
+                tooltip: `Notifications will be sent to this email address.
+                    If you want to use another email you can add it to the
+                    list in control panel by going to the link below`,
+            },
         },
     },
     rotation: {
@@ -213,13 +218,6 @@ export const tabs = {
             keep_alive: {
                 label: 'Keep-alive',
                 tooltip: `LPM will ping an IP to keep the session alive`,
-                ext: true,
-            },
-            whitelist_ips: {
-                label: 'Whitelist IP access',
-                tooltip: `Grant proxy access to specific IPs. only those
-                    IPs will be able to send requests to this proxy port`,
-                placeholder: `e.g. 1.1.1.1,23.23.23.23`,
                 ext: true,
             },
             session_random: {
@@ -306,6 +304,14 @@ export const tabs = {
         tooltip: `General configuration such as port number, password and
             bypasing`,
         fields: {
+            internal_name: {
+                label: 'Internal name',
+                tooltip: `You can choose a name for this proxy port. If the
+                    name is passed it will be shown in the dropdowns across
+                    whole LPM. It doesn't change any behavior of the proxy
+                    port`,
+                ext: true,
+            },
             port: {
                 label: 'Proxy port',
                 tooltip: `The port number that will be used for the current
@@ -322,6 +328,13 @@ export const tabs = {
                 label: 'Zone password',
                 tooltip: `Zone password as it appears in your zones page in
                     your Luminati's control panel http://luminati.io/cp/zones`,
+            },
+            whitelist_ips: {
+                label: 'Whitelist IP access',
+                tooltip: `Grant proxy access to specific IPs. only those
+                    IPs will be able to send requests to this proxy port`,
+                placeholder: `e.g. 1.1.1.1,23.23.23.23`,
+                ext: true,
             },
             ssl: {
                 label: 'Enable SSL logs',

@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {validators, Config} from './common.js';
+import {Config} from './common.js';
 import {withContext} from 'recompose';
 import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
@@ -14,8 +14,6 @@ export default provider({tab_id: 'rotation'})(props=>{
           <Config type="text" id="vip"/>
           <Config type="select" id="pool_type" data={proxy.pool_type.values}/>
           <Config type="number" id="keep_alive" min="0" sufix="seconds"/>
-          <Config type="text" id="whitelist_ips"
-            validator={validators.ips_list}/>
           <Config type="double_number" id="max_requests"/>
           <Config type="double_number" id="session_duration" sufix="seconds"/>
           <Config type="yes_no" id="sticky_ip"/>

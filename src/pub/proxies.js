@@ -132,6 +132,15 @@ const Reqs_cell = ({proxy})=>{
 
 const columns = [
     {
+        key: 'internal_name',
+        title: 'Internal name',
+        tooltip: `An internal name is used for proxy ports to be easily \
+            distinguished. Those don't change any proxy behavior and it's only
+            cosmetic`,
+        ext: true,
+        calc_show: proxies=>proxies.some(p=>p.config.internal_name),
+    },
+    {
         key: 'port',
         title: 'Proxy port',
         sticky: true,
@@ -309,6 +318,11 @@ const columns = [
         ext: true,
     },
     {
+        key: 'proxy',
+        title: 'Super Proxy',
+        type: 'text'
+    },
+    {
         key: 'proxy_switch',
         title: 'Autoswitch super proxy on failure',
         type: 'number',
@@ -382,55 +396,51 @@ const columns = [
 ];
 
 class Columns_modal extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {selected_cols: []};
-    }
+    state = {selected_cols: []};
     componentDidMount(){
         const selected_cols = this.props.selected_cols.reduce((acc, e)=>
             Object.assign(acc, {[e]: true}), {});
         this.setState({selected_cols, saved_cols: selected_cols});
     }
-    on_change({target: {value}}){
+    on_change = ({target: {value}})=>{
         this.setState(prev=>({selected_cols: {
             ...prev.selected_cols,
             [value]: !prev.selected_cols[value],
         }}));
-    }
-    click_ok(){
+    };
+    click_ok = ()=>{
         const new_columns = Object.keys(this.state.selected_cols).filter(c=>
             this.state.selected_cols[c]);
         this.props.update_selected_cols(new_columns);
         window.localStorage.setItem('columns', JSON.stringify(
             this.state.selected_cols));
-    }
-    click_cancel(){ this.setState({selected_cols: this.state.saved_cols}); }
-    select_all(){
+    };
+    click_cancel = ()=>this.setState({selected_cols: this.state.saved_cols});
+    select_all = ()=>{
         this.setState({selected_cols: columns.filter(c=>!c.sticky)
             .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
-    }
-    select_none(){ this.setState({selected_cols: {}}); }
-    select_default(){
+    };
+    select_none = ()=>this.setState({selected_cols: {}});
+    select_default = ()=>{
         this.setState({selected_cols: columns.filter(c=>!c.sticky&&c.default)
             .reduce((acc, e)=>Object.assign(acc, {[e.key]: true}), {})});
-    }
+    };
     render(){
         const header = <div className="header_buttons">
-              <button onClick={this.select_all.bind(this)}
-                className="btn btn_lpm">Check all</button>
-              <button onClick={this.select_none.bind(this)}
-                className="btn btn_lpm">Uncheck all</button>
-              <button onClick={this.select_default.bind(this)}
-                className="btn btn_lpm">Default</button>
+              <button onClick={this.select_all} className="btn btn_lpm">
+                Check all</button>
+              <button onClick={this.select_none} className="btn btn_lpm">
+                Uncheck all</button>
+              <button onClick={this.select_default} className="btn btn_lpm">
+                Default</button>
             </div>;
         return <Modal id="edit_columns" custom_header={header}
-              click_ok={this.click_ok.bind(this)}
-              cancel_clicked={this.click_cancel.bind(this)}>
+              click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
               <div className="row columns">
                 {columns.filter(col=>!col.sticky).map(col=>
                   <div key={col.key} className="col-md-6">
                     <Checkbox text={col.title} value={col.key}
-                      on_change={this.on_change.bind(this)}
+                      on_change={this.on_change}
                       checked={!!this.state.selected_cols[col.key]}/>
                   </div>
                 )}
@@ -471,7 +481,7 @@ class Proxies extends Pure_component {
             displayed_proxies: [],
             loaded: false,
         };
-        setdb.set('head.proxies.update', this.update.bind(this));
+        setdb.set('head.proxies.update', this.update);
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>{
@@ -490,7 +500,7 @@ class Proxies extends Pure_component {
             country_names = countries;
             this.setState({countries});
         });
-        window.setTimeout(this.req_status.bind(this));
+        window.setTimeout(this.req_status);
     }
     componentWillReceiveProps(props){
         if (props.master_port!=this.props.master_port)
@@ -500,14 +510,14 @@ class Proxies extends Pure_component {
             this.setState({filtered_proxies}, this.paginate);
         }
     }
-    filter_proxies(proxies, mp){
+    filter_proxies = (proxies, mp)=>{
         return proxies.filter(p=>{
             if (mp)
                 return ''+p.port==mp||''+p.master_port==mp;
             return p.proxy_type!='duplicate';
         });
-    }
-    prepare_proxies(proxies){
+    };
+    prepare_proxies = proxies=>{
         proxies.sort(function(a, b){ return a.port>b.port ? 1 : -1; });
         for (let i=0; i<proxies.length; i++)
         {
@@ -517,12 +527,12 @@ class Proxies extends Pure_component {
             cur._status_details = cur._status_details||[];
         }
         return proxies;
-    }
-    update_items_per_page(items_per_page){
+    };
+    update_items_per_page = items_per_page=>{
         this.setState({items_per_page}, ()=>this.paginate(0));
         save_pagination('proxies', {items: items_per_page});
-    }
-    req_status(){
+    };
+    req_status = ()=>{
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
@@ -579,23 +589,22 @@ class Proxies extends Pure_component {
             yield etask.sleep(1000);
             _this.req_status();
         });
-    }
-    update(){
+    };
+    update = ()=>{
         this.etask(function*(){
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             setdb.set('head.proxies_running', proxies);
         });
-    }
-    download_csv(){
+    };
+    download_csv = ()=>{
         const data = this.state.proxies.map(p=>['127.0.0.1:'+p.port]);
         filesaver.saveAs(csv.to_blob(data), 'proxies.csv');
-    }
-    edit_columns(){ $('#edit_columns').modal('show'); }
-    update_selected_columns(new_columns){
+    };
+    edit_columns = ()=>$('#edit_columns').modal('show');
+    update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
-    }
     proxy_add = ()=>{ $('#add_new_proxy_modal').modal('show'); };
-    paginate(page=-1){
+    paginate = (page=-1)=>{
         page = page>-1 ? page : this.state.cur_page;
         const pages = Math.ceil(
             this.state.filtered_proxies.length/this.state.items_per_page);
@@ -603,18 +612,16 @@ class Proxies extends Pure_component {
         const displayed_proxies = this.state.filtered_proxies.slice(
             cur_page*this.state.items_per_page,
             (cur_page+1)*this.state.items_per_page);
-        this.setState({
-            displayed_proxies,
-            cur_page,
-        });
-    }
-    page_change(page){
+        this.setState({displayed_proxies, cur_page});
+    };
+    page_change = page=>{
         this.paginate(page-1);
         save_pagination('proxies', {page});
-    }
+    };
     render(){
         const cols = columns.filter(col=>
-            this.state.selected_cols.includes(col.key)||col.sticky);
+            this.state.selected_cols.includes(col.key)||col.sticky||
+            col.calc_show&&col.calc_show(this.state.filtered_proxies));
         const displayed_proxies = this.state.displayed_proxies;
         if (!this.state.countries)
             return null;
@@ -638,10 +645,10 @@ class Proxies extends Pure_component {
                   <Proxies_pagination entries={this.state.filtered_proxies}
                     cur_page={this.state.cur_page}
                     items_per_page={this.state.items_per_page}
-                    page_change={this.page_change.bind(this)}
-                    edit_columns={this.edit_columns.bind(this)}
-                    update_items_per_page={this.update_items_per_page.bind(this)}
-                    download_csv={this.download_csv.bind(this)}
+                    page_change={this.page_change}
+                    edit_columns={this.edit_columns}
+                    update_items_per_page={this.update_items_per_page}
+                    download_csv={this.download_csv}
                     top/>
                   <div className="proxies_table_wrapper">
                     <table className="table table-hover">
@@ -662,13 +669,9 @@ class Proxies extends Pure_component {
                       </thead>
                       <tbody>
                         {displayed_proxies.map(proxy=>
-                          <Proxy_row
-                            key={proxy.port}
-                            go={this.state.go}
-                            update_proxies={this.update.bind(this)}
-                            proxy={proxy}
-                            cols={cols}
-                            master_port={this.props.master_port}/>
+                          <Proxy_row key={proxy.port} go={this.state.go}
+                            update_proxies={this.update} proxy={proxy}
+                            cols={cols} master_port={this.props.master_port}/>
                         )}
                       </tbody>
                     </table>
@@ -676,16 +679,16 @@ class Proxies extends Pure_component {
                   <Proxies_pagination entries={this.state.filtered_proxies}
                     cur_page={this.state.cur_page}
                     items_per_page={this.state.items_per_page}
-                    page_change={this.page_change.bind(this)}
-                    edit_columns={this.edit_columns.bind(this)}
-                    update_items_per_page={this.update_items_per_page.bind(this)}
-                    download_csv={this.download_csv.bind(this)}
+                    page_change={this.page_change}
+                    edit_columns={this.edit_columns}
+                    update_items_per_page={this.update_items_per_page}
+                    download_csv={this.download_csv}
                     bottom/>
                 </div>
               }
               <Proxy_add/>
               <Columns_modal selected_cols={this.state.selected_cols}
-                update_selected_cols={this.update_selected_columns.bind(this)}/>
+                update_selected_cols={this.update_selected_columns}/>
             </div>;
     }
 }
@@ -701,12 +704,9 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
     </Pagination_panel>;
 
 const Proxy_row = withRouter(class Proxy_row extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {status: this.props.proxy._status};
-    }
+    state = {status: this.props.proxy._status};
     componentDidMount(){ this.get_status(); }
-    get_status(opt={}){
+    get_status = (opt={})=>{
         const {proxy} = this.props;
         const _this = this;
         return this.etask(function*(){
@@ -737,8 +737,8 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
                 _this.setState({status: 'error', status_details: errors});
             }
         });
-    }
-    edit(){
+    };
+    edit = ()=>{
         if (this.props.proxy.proxy_type!='persist')
             return;
         if (!this.props.master_port && this.props.proxy.multiply &&
@@ -748,27 +748,22 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
         }
         else
             this.props.history.push(`/proxy/${this.props.proxy.port}`);
-    }
+    };
     render(){
         const proxy = this.props.proxy;
-        const cell_class = col=>classnames(col.key.replace(/\./g, '_'), {
-            default_cursor: this.props.proxy.proxy_type!='persist',
-        });
+        const cell_class = col=>classnames(col.key.replace(/\./g, '_'),
+            {default_cursor: this.props.proxy.proxy_type!='persist'});
         const row_class = classnames('proxy_row',
             {default: proxy.port==22225});
         return <tr className={row_class}>
               <Actions proxy={proxy}
-                get_status={this.get_status.bind(this)}
+                get_status={this.get_status}
                 update_proxies={this.props.update_proxies}/>
               {this.props.cols.map(col=>
-                <Cell
-                  key={col.key}
-                  proxy={proxy}
-                  col={col}
+                <Cell key={col.key} proxy={proxy} col={col}
                   status={this.state.status}
                   status_details={this.state.status_details}
-                  master_port={this.props.master_port}
-                  on_click={this.edit.bind(this)}
+                  master_port={this.props.master_port} on_click={this.edit}
                   className={cell_class(col)}/>
               )}
             </tr>;
@@ -796,9 +791,9 @@ class Cell extends React.Component {
 
 class Actions extends Pure_component {
     state = {open_delete_dialog: false};
-    open_delete_dialog = ()=>{ this.setState({open_delete_dialog: true}); };
-    close_delete_dialog = ()=>{ this.setState({open_delete_dialog: false}); };
-    delete_proxy(){
+    open_delete_dialog = ()=>this.setState({open_delete_dialog: true});
+    close_delete_dialog = ()=>this.setState({open_delete_dialog: false});
+    delete_proxy = ()=>{
         const _this = this;
         this.etask(function*(){
             yield ajax.json({url: '/api/proxies/'+_this.props.proxy.port,
@@ -806,16 +801,16 @@ class Actions extends Pure_component {
             yield _this.props.update_proxies();
             _this.close_delete_dialog();
         });
-    }
-    refresh_sessions(){
+    };
+    refresh_sessions = ()=>{
         const _this = this;
         this.etask(function*(){
             const url = '/api/refresh_sessions/'+_this.props.proxy.port;
             yield ajax.json({url, method: 'POST'});
             yield _this.props.get_status({force: true});
         });
-    }
-    duplicate(){
+    };
+    duplicate = ()=>{
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
@@ -827,25 +822,24 @@ class Actions extends Pure_component {
             });
             yield _this.props.update_proxies();
         });
-    }
+    };
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
         const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
         return <td className="proxies_actions">
               <Action_icon id="trash"
-                on_click={this.open_delete_dialog.bind(this)}
+                on_click={this.open_delete_dialog}
                 tooltip="Delete" invisible={!persist}/>
-              <Action_icon id="duplicate" on_click={this.duplicate.bind(this)}
-                tooltip="Duplicate proxy port"
-                invisible={!persist}/>
+              <Action_icon id="duplicate" on_click={this.duplicate}
+                tooltip="Duplicate proxy port" invisible={!persist}/>
               <Action_icon id="refresh"
-                on_click={this.refresh_sessions.bind(this)}
+                on_click={this.refresh_sessions}
                 tooltip="Refresh Sessions"/>
               <Modal_dialog title={delete_title}
                 open={this.state.open_delete_dialog}
-                ok_clicked={this.delete_proxy.bind(this)}
-                cancel_clicked={this.close_delete_dialog.bind(this)}/>
+                ok_clicked={this.delete_proxy}
+                cancel_clicked={this.close_delete_dialog}/>
             </td>;
     }
 }

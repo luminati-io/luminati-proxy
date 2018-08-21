@@ -6,7 +6,7 @@ import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
-import {Labeled_controller, Note} from '../common.js';
+import {Labeled_controller, Note, with_proxy_ports} from '../common.js';
 import {validators} from './common.js';
 import {tabs} from './fields.js';
 import PropTypes from 'prop-types';
@@ -235,7 +235,8 @@ class Rules extends Pure_component {
                 </Note>
               }
               {this.state.rules.map(r=>
-                <Rule key={r.id} rule={r} rule_del={this.rule_del}/>
+                <Rule key={r.id} rule={r} rule_del={this.rule_del}
+                   www={this.state.www}/>
               )}
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
                 onClick={this.rule_add}>
@@ -303,19 +304,16 @@ class Ips_lists extends Pure_component {
     }
 }
 
-const Rule = withRouter(class Rule extends Pure_component {
+const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
     state = {ports: []};
     componentDidMount(){
-        this.setdb_on('head.proxies_running', proxies=>{
-            const cur_port = this.props.match.params.port;
-            const ports = (proxies||[])
-            .filter(p=>p.port!=cur_port)
-            .map(p=>({key: p.port, value: p.port}));
-            this.setState({ports});
-        });
         this.setdb_on('head.consts', consts=>{
             if (consts&&consts.logins)
                 this.setState({logins: consts.logins});
+        });
+        this.setdb_on('head.defaults', defaults=>{
+            if (defaults&&defaults.www_api)
+                this.setState({www: defaults.www_api});
         });
     }
     set_rule_field = (field, value)=>{
@@ -351,10 +349,7 @@ const Rule = withRouter(class Rule extends Pure_component {
     };
     action_changed = val=>{
         if (val=='retry_port')
-        {
-            const def_port = this.state.ports.length&&this.state.ports[0].key;
-            this.set_rule_field(val, def_port||'');
-        }
+            this.set_rule_field(val, this.props.def_port||'');
         if (val!='ban_ip')
         {
             this.set_rule_field('ban_ip_duration', '');
@@ -385,6 +380,8 @@ const Rule = withRouter(class Rule extends Pure_component {
             rule.trigger_type=='max_req_time')
         .filter(at=>rule.trigger_type=='url'&&at.only_url||
             rule.trigger_type!='url'&&!at.only_url));
+        const ports = this.props.ports_opt.filter(p=>
+            p.value!=this.props.match.params.port);
         return <div className="rule_wrapper">
               <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
               <Rule_config id="trigger_type" type="select"
@@ -418,8 +415,8 @@ const Rule = withRouter(class Rule extends Pure_component {
                   validator={validators.number(0, 20)} rule={rule}/>
               }
               {rule.action=='retry_port' &&
-                <Rule_config id="retry_port" type="select"
-                  data={this.state.ports} rule={rule}/>
+                <Rule_config id="retry_port" type="select" data={ports}
+                  rule={rule}/>
               }
               {rule.action=='ban_ip' &&
                 <Rule_config id="ban_ip_duration" type="select"
@@ -454,11 +451,19 @@ const Rule = withRouter(class Rule extends Pure_component {
               {rule.send_email && this.state.logins &&
                 this.state.logins.length>1 &&
                 <Rule_config id="email" type="select" rule={rule}
-                  data={this.state.logins.map(l=>({key: l, value: l}))}/>
+                  data={this.state.logins.map(l=>({key: l, value: l}))}
+                  note={<Email_note www={this.state.www}/>}/>
               }
             </div>;
     }
-});
+}));
 
-const Btn_rule_del = ({on_click})=>
-    <div className="btn_rule_del" onClick={on_click}/>;
+const Email_note = ({www})=><div>
+      <span>You can manage the list of available emails </span>
+      <a target="_blank" rel="noopener noreferrer" href={`${www}/cp/settings`}>
+        here</a>
+    </div>;
+
+const Btn_rule_del = ({on_click})=><Note>
+      <div className="btn_rule_del" onClick={on_click}/>
+    </Note>;

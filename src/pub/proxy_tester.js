@@ -3,12 +3,13 @@
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {Input, Select, Loader, Modal, Warnings, Nav,
+import {Input, Select, Loader, Modal, Warnings, Nav, with_proxy_ports,
     Tooltip, Add_icon, Remove_icon} from './common.js';
 import classnames from 'classnames';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
 import Preview from './har_preview.js';
+import Proxy_blank from './proxy_blank.js';
 import {withRouter} from 'react-router-dom';
 
 class Proxy_tester extends Pure_component {
@@ -27,29 +28,20 @@ class Proxy_tester extends Pure_component {
     }
 }
 
-const Request = withRouter(class Request extends Pure_component {
+const Request = with_proxy_ports(withRouter(
+class Request extends Pure_component {
     first_header = {idx: 0, header: '', value: ''};
-    default_state = {
+    state = {
         headers: [this.first_header],
         max_idx: 0,
         params: {url: 'http://lumtest.com/myip.json', method: 'GET'},
+        show_loader: false,
     };
-    state = {...this.default_state, show_loader: false};
     componentDidMount(){
         const params = this.props.history.location.state||{};
         const url = params.url||this.state.params.url;
-        const port = params.port||this.state.params.port;
-        this.setdb_on('head.proxies_running', proxies=>{
-            if (!proxies||!proxies.length)
-                return;
-            this.setState({proxies});
-            this.setState(prev_state=>{
-                const def_port = proxies[0].port;
-                this.default_state.params.proxy = def_port;
-                return {params: {...prev_state.params, proxy: port||def_port,
-                    url}};
-            });
-        });
+        const port = params.port;
+        this.setState({params: {url, port}});
     }
     add_header = ()=>{
         ga_event('proxy_tester', 'add header');
@@ -81,15 +73,8 @@ const Request = withRouter(class Request extends Pure_component {
     };
     go = ()=>{
         ga_event('proxy_tester', 'run test');
-        if (!this.state.params.proxy)
-        {
-            ga_event('proxy_tester', 'no proxy chosen');
-            this.setState({warnings:
-                [{msg: 'You need to choose a proxy port first'}]});
-            $('#warnings_modal').modal();
-            return;
-        }
-        const url = '/api/test/'+this.state.params.proxy;
+        const port = this.state.params.port||this.props.def_port;
+        const url = '/api/test/'+port;
         const data = {
             headers: this.state.headers.reduce((acc, el)=>{
                 if (!el.header)
@@ -125,6 +110,8 @@ const Request = withRouter(class Request extends Pure_component {
         });
     };
     render(){
+        if (!this.props.ports.length)
+            return <Proxy_blank/>;
         return <div className="panel no_border request">
               <Loader show={this.state.show_loader}/>
               <Modal className="warnings_modal" id="warnings_modal"
@@ -134,7 +121,7 @@ const Request = withRouter(class Request extends Pure_component {
               <div>
                 <Request_params params={this.state.params}
                   update={this.update_params}
-                  proxies={this.state.proxies}/>
+                  port_select={this.props.port_select}/>
                 <Headers headers={this.state.headers}
                   clicked_remove={this.remove_header}
                   clicked_add={this.add_header}
@@ -148,17 +135,24 @@ const Request = withRouter(class Request extends Pure_component {
               </div>
             </div>;
     }
-});
+}));
 
-const Request_params = ({params, update, proxies})=>{
-    proxies = (proxies||[]).map(p=>({key: p.port, value: p.port}));
+const Request_params = ({port_select, params, update})=>{
     const methods = [{key: 'GET', value: 'GET'}, {key: 'POST', value: 'POST'}];
     const method_tip = `Method of a test request. Leave GET if you don't know
     what to choose`;
+    const port_changed = port=>{
+        ga_event('proxy_tester', 'edit port', port);
+        update('port', port);
+    };
+    const Port_select = port_select;
     return <div className="request_params">
-          <Field params={params} update={update} name="proxy" type="select"
-            data={proxies}
-            tooltip="Choose a proxy port that will be used for this test"/>
+          <Tooltip title="Choose a proxy port that will be used for this test">
+            <div className={classnames('field', 'proxy')}>
+              <div className="title">Proxy port</div>
+              <Port_select val={params.port} on_change={port_changed}/>
+            </div>
+          </Tooltip>
           <Field params={params} update={update} name="url" type="text"
             tooltip="URL that Proxy Tester will use to send a test request"/>
           <Field params={params} update={update} name="method" type="select"
@@ -166,8 +160,10 @@ const Request_params = ({params, update, proxies})=>{
         </div>;
 };
 
+// XXX krzysztof: Refactor it the same as link tester, field should take
+// children. This is too generic and complex
 const Field = ({type, update, name, params, tooltip, ...props})=>{
-    const fields = {proxy: 'Proxy port', url: 'URL', method: 'Method'};
+    const fields = {port: 'Proxy port', url: 'URL', method: 'Method'};
     const on_change_wrapper = val=>{
         if (name!='url')
             ga_event('proxy_tester', 'edit '+name);

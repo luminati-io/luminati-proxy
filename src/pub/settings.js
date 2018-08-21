@@ -3,9 +3,9 @@
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
 import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
+import {normalizers} from './util.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import {Netmask} from 'netmask';
 
 export default class Settings extends Pure_component {
     render(){
@@ -16,25 +16,6 @@ export default class Settings extends Pure_component {
             </div>;
     }
 }
-
-// XXX krzysztof: merge with validators in proxy_edit
-const normalizers = {
-    ips_list: val=>{
-        val = val.replace(/\s/g, '');
-        const ips = val.split(',');
-        const res = [];
-        ips.forEach(ip=>{
-            try {
-                const netmask = new Netmask(ip);
-                let to_add = netmask.base;
-                if (netmask.bitmask!=32)
-                    to_add += '/'+netmask.bitmask;
-                res.push(to_add);
-            } catch(e){ console.log('incorrect ip format'); }
-        });
-        return res.join(',');
-    },
-};
 
 class Form extends Pure_component {
     state = {saving: false};

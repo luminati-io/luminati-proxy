@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.105.672",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed taking screenshot in Link Tester on windows"
+            },
+            {
+                "type": "bug",
+                "text": "Added the note to status codes and timings in the logs when SSL analyzing is off"
+            }
+        ]
+    },
+    {
         "ver": "1.105.395",
         "type": "dev",
         "changes": [

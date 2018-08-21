@@ -50,10 +50,13 @@ class Config extends Pure_component {
             this.set_field(this.props.id, [{id: val, label: val}]);
     };
     on_change_wrapper = (value, _id)=>{
+        const opt = {};
+        if (this.props.save_on_blur)
+            opt.skip_save = true;
         const curr_id = _id||this.props.id;
         if (this.props.on_change)
             this.props.on_change(value);
-        this.set_field(curr_id, value);
+        this.set_field(curr_id, value, opt);
     };
     componentDidMount(){
         const val_id = this.props.val_id ? this.props.val_id : this.props.id;

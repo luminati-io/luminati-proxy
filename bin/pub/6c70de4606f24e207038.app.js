@@ -20,7 +20,7 @@ webpackJsonp([1],[
 
 exports.__esModule = true;
 
-var _defineProperty = __webpack_require__(193);
+var _defineProperty = __webpack_require__(194);
 
 var _defineProperty2 = _interopRequireDefault(_defineProperty);
 
@@ -87,7 +87,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var is_node = (typeof module === 'undefined' ? 'undefined' : (0, _typeof3.default)(module)) == 'object' && module.exports;
 if (is_node) ;
 
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0), __webpack_require__(38), __webpack_require__(25)], __WEBPACK_AMD_DEFINE_RESULT__ = function (React, _etask, setdb) {
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0), __webpack_require__(38), __webpack_require__(26)], __WEBPACK_AMD_DEFINE_RESULT__ = function (React, _etask, setdb) {
 
     var LONG_CB_MS = 100;
 
@@ -206,7 +206,7 @@ if (is_node) ;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.Logo = exports.Remove_icon = exports.Add_icon = exports.Circle_li = exports.Link_icon = exports.Tooltip = exports.Pagination_panel = exports.Nav = exports.Checkbox = exports.Regex = exports.Input = exports.Labeled_controller = exports.Note = exports.Json = exports.Form_controller = exports.Select = exports.Textarea = exports.Code = exports.Loader_small = exports.Loader = exports.Warning = exports.Warnings = exports.Tooltip_bytes = exports.Enable_ssl_modal = exports.Modal = exports.Modal_dialog = undefined;
+exports.Logo = exports.Remove_icon = exports.Add_icon = exports.Circle_li = exports.Link_icon = exports.Tooltip = exports.Pagination_panel = exports.Nav = exports.Checkbox = exports.Regex = exports.Input = exports.Labeled_controller = exports.Note = exports.Json = exports.Form_controller = exports.Select = exports.with_proxy_ports = exports.Textarea = exports.Code = exports.Loader_small = exports.Loader = exports.Warning = exports.Warnings = exports.Tooltip_bytes = exports.Enable_ssl_modal = exports.Modal = exports.Modal_dialog = undefined;
 
 var _defineProperty2 = __webpack_require__(37);
 
@@ -252,7 +252,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactBootstrap = __webpack_require__(240);
+var _reactBootstrap = __webpack_require__(241);
 
 var _etask = __webpack_require__(38);
 
@@ -266,9 +266,9 @@ var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _reactBootstrapTypeahead = __webpack_require__(283);
+var _reactBootstrapTypeahead = __webpack_require__(284);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _chrome_widgets = __webpack_require__(181);
 
@@ -720,12 +720,74 @@ var Textarea = exports.Textarea = function Textarea(props) {
         } });
 };
 
+var with_proxy_ports = exports.with_proxy_ports = function with_proxy_ports(Component) {
+    var port_select = function port_select(data) {
+        return function port_select_inner(props) {
+            return _react2.default.createElement(Select, { val: props.val,
+                data: data, on_change_wrapper: props.on_change,
+                disabled: props.disabled });
+        };
+    };
+
+    var With_proxy_ports = function (_Pure_component3) {
+        (0, _inherits3.default)(With_proxy_ports, _Pure_component3);
+
+        function With_proxy_ports() {
+            var _ref5;
+
+            var _temp2, _this6, _ret2;
+
+            (0, _classCallCheck3.default)(this, With_proxy_ports);
+
+            for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                args[_key2] = arguments[_key2];
+            }
+
+            return _ret2 = (_temp2 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = With_proxy_ports.__proto__ || Object.getPrototypeOf(With_proxy_ports)).call.apply(_ref5, [this].concat(args))), _this6), _this6.state = {}, _this6.port_select = port_select([]), _temp2), (0, _possibleConstructorReturn3.default)(_this6, _ret2);
+        }
+
+        (0, _createClass3.default)(With_proxy_ports, [{
+            key: 'componentDidMount',
+            value: function componentDidMount() {
+                var _this7 = this;
+
+                this.setdb_on('head.proxies_running', function (proxies) {
+                    if (!proxies) return;
+                    var ports = proxies.map(function (p) {
+                        return p.port;
+                    });
+                    var ports_opt = proxies.map(function (p) {
+                        var name = p.internal_name ? ' (' + p.internal_name + ')' : '';
+                        var key = p.port + name;
+                        return { key: key, value: p.port };
+                    });
+                    var def_port = ports[0];
+                    _this7.port_select = port_select(ports_opt);
+                    _this7.setState({ ports: ports, ports_opt: ports_opt, def_port: def_port,
+                        ports_loaded: true });
+                });
+            }
+        }, {
+            key: 'render',
+            value: function render() {
+                if (!this.state.ports_loaded) return _react2.default.createElement(Loader, { show: true });
+                return _react2.default.createElement(Component, (0, _extends5.default)({}, this.props, { port_select: this.port_select,
+                    def_port: this.state.def_port, ports: this.state.ports,
+                    ports_opt: this.state.ports_opt }));
+            }
+        }]);
+        return With_proxy_ports;
+    }(_pure_component2.default);
+
+    return With_proxy_ports;
+};
+
 var Select = exports.Select = function Select(props) {
     var update = function update(val) {
         if (val == 'true') val = true;else if (val == 'false') val = false;
         if (props.on_change_wrapper) props.on_change_wrapper(val);
     };
-    var conf = props.data.find(function (c) {
+    var conf = (props.data || []).find(function (c) {
         return c.value == props.val;
     });
     return _react2.default.createElement(
@@ -748,24 +810,24 @@ var Select = exports.Select = function Select(props) {
     );
 };
 
-var Yes_no = function (_Pure_component3) {
-    (0, _inherits3.default)(Yes_no, _Pure_component3);
+var Yes_no = function (_Pure_component4) {
+    (0, _inherits3.default)(Yes_no, _Pure_component4);
 
     function Yes_no() {
-        var _ref5;
+        var _ref6;
 
-        var _temp2, _this6, _ret2;
+        var _temp3, _this8, _ret3;
 
         (0, _classCallCheck3.default)(this, Yes_no);
 
-        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            args[_key2] = arguments[_key2];
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
         }
 
-        return _ret2 = (_temp2 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Yes_no.__proto__ || Object.getPrototypeOf(Yes_no)).call.apply(_ref5, [this].concat(args))), _this6), _this6.options = function () {
-            var default_label = _this6.props.default ? 'Yes' : 'No';
+        return _ret3 = (_temp3 = (_this8 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Yes_no.__proto__ || Object.getPrototypeOf(Yes_no)).call.apply(_ref6, [this].concat(args))), _this8), _this8.options = function () {
+            var default_label = _this8.props.default ? 'Yes' : 'No';
             return [{ key: 'No', value: false }, { key: 'Default (' + default_label + ')', value: '' }, { key: 'Yes', value: true }];
-        }, _temp2), (0, _possibleConstructorReturn3.default)(_this6, _ret2);
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this8, _ret3);
     }
 
     (0, _createClass3.default)(Yes_no, [{
@@ -816,21 +878,21 @@ var Form_controller = exports.Form_controller = function Form_controller(props) 
     return _react2.default.createElement(Input, props);
 };
 
-var Json = exports.Json = function (_Pure_component4) {
-    (0, _inherits3.default)(Json, _Pure_component4);
+var Json = exports.Json = function (_Pure_component5) {
+    (0, _inherits3.default)(Json, _Pure_component5);
 
     function Json() {
-        var _ref6;
+        var _ref7;
 
-        var _temp3, _this7, _ret3;
+        var _temp4, _this9, _ret4;
 
         (0, _classCallCheck3.default)(this, Json);
 
-        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-            args[_key3] = arguments[_key3];
+        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+            args[_key4] = arguments[_key4];
         }
 
-        return _ret3 = (_temp3 = (_this7 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Json.__proto__ || Object.getPrototypeOf(Json)).call.apply(_ref6, [this].concat(args))), _this7), _this7.state = {}, _this7.on_cm_change = function (cm) {
+        return _ret4 = (_temp4 = (_this9 = (0, _possibleConstructorReturn3.default)(this, (_ref7 = Json.__proto__ || Object.getPrototypeOf(Json)).call.apply(_ref7, [this].concat(args))), _this9), _this9.state = {}, _this9.on_cm_change = function (cm) {
             var new_val = cm.doc.getValue();
             var correct = true;
             try {
@@ -838,11 +900,11 @@ var Json = exports.Json = function (_Pure_component4) {
             } catch (e) {
                 correct = false;
             }
-            if (correct) _this7.props.on_change_wrapper(new_val);
-            _this7.setState({ correct: correct });
-        }, _this7.set_ref = function (ref) {
-            _this7.textarea = ref;
-        }, _temp3), (0, _possibleConstructorReturn3.default)(_this7, _ret3);
+            if (correct) _this9.props.on_change_wrapper(new_val);
+            _this9.setState({ correct: correct });
+        }, _this9.set_ref = function (ref) {
+            _this9.textarea = ref;
+        }, _temp4), (0, _possibleConstructorReturn3.default)(_this9, _ret4);
     }
 
     (0, _createClass3.default)(Json, [{
@@ -879,13 +941,13 @@ var Note = exports.Note = function Note(props) {
     );
 };
 
-var Labeled_controller = function Labeled_controller(_ref7) {
-    var label = _ref7.label,
-        tooltip = _ref7.tooltip,
-        disabled = _ref7.disabled,
-        note = _ref7.note,
-        sufix = _ref7.sufix,
-        props = (0, _objectWithoutProperties3.default)(_ref7, ['label', 'tooltip', 'disabled', 'note', 'sufix']);
+var Labeled_controller = function Labeled_controller(_ref8) {
+    var label = _ref8.label,
+        tooltip = _ref8.tooltip,
+        disabled = _ref8.disabled,
+        note = _ref8.note,
+        sufix = _ref8.sufix,
+        props = (0, _objectWithoutProperties3.default)(_ref8, ['label', 'tooltip', 'disabled', 'note', 'sufix']);
     return _react2.default.createElement(
         'div',
         { className: (0, _classnames2.default)('field_row', { disabled: disabled, note: note }) },
@@ -934,45 +996,45 @@ var Input = exports.Input = function Input(props) {
         onBlur: props.on_blur });
 };
 
-var Regex = exports.Regex = function (_Pure_component5) {
-    (0, _inherits3.default)(Regex, _Pure_component5);
+var Regex = exports.Regex = function (_Pure_component6) {
+    (0, _inherits3.default)(Regex, _Pure_component6);
 
     function Regex() {
-        var _ref8;
+        var _ref9;
 
-        var _temp4, _this8, _ret4;
+        var _temp5, _this10, _ret5;
 
         (0, _classCallCheck3.default)(this, Regex);
 
-        for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-            args[_key4] = arguments[_key4];
+        for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+            args[_key5] = arguments[_key5];
         }
 
-        return _ret4 = (_temp4 = (_this8 = (0, _possibleConstructorReturn3.default)(this, (_ref8 = Regex.__proto__ || Object.getPrototypeOf(Regex)).call.apply(_ref8, [this].concat(args))), _this8), _this8.state = { recognized: false, checked: {} }, _this8.formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'], _this8.recognize_regexp = function () {
-            var m = (_this8.props.val || '').match(/\\\.\((.+)\)\$/);
+        return _ret5 = (_temp5 = (_this10 = (0, _possibleConstructorReturn3.default)(this, (_ref9 = Regex.__proto__ || Object.getPrototypeOf(Regex)).call.apply(_ref9, [this].concat(args))), _this10), _this10.state = { recognized: false, checked: {} }, _this10.formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'], _this10.recognize_regexp = function () {
+            var m = (_this10.props.val || '').match(/\\\.\((.+)\)\$/);
             if (m && m[1]) {
                 var checked = m[1].split('|').reduce(function (acc, e) {
                     return (0, _extends5.default)({}, acc, (0, _defineProperty3.default)({}, e, true));
                 }, {});
-                _this8.setState({ recognized: true, checked: checked });
-            } else _this8.setState({ recognized: false, checked: {} });
-        }, _this8.toggle = function (f) {
+                _this10.setState({ recognized: true, checked: checked });
+            } else _this10.setState({ recognized: false, checked: {} });
+        }, _this10.toggle = function (f) {
             (0, _util.ga_event)('proxy_edit', 'regexp_generator clicked', f);
-            _this8.setState(function (prev) {
+            _this10.setState(function (prev) {
                 return { checked: (0, _extends5.default)({}, prev.checked, (0, _defineProperty3.default)({}, f, !prev.checked[f])) };
-            }, _this8.gen_regexp);
-        }, _this8.gen_regexp = function () {
-            var formats = Object.keys(_this8.state.checked).filter(function (f) {
-                return _this8.state.checked[f];
+            }, _this10.gen_regexp);
+        }, _this10.gen_regexp = function () {
+            var formats = Object.keys(_this10.state.checked).filter(function (f) {
+                return _this10.state.checked[f];
             }).join('|');
-            if (formats) _this8.props.on_change_wrapper('\\.(' + formats + ')$', _this8.props.id);else _this8.props.on_change_wrapper('', _this8.props.id);
-        }, _this8.classes = function (f) {
-            var active = _this8.state.recognized && _this8.state.checked[f];
+            if (formats) _this10.props.on_change_wrapper('\\.(' + formats + ')$', _this10.props.id);else _this10.props.on_change_wrapper('', _this10.props.id);
+        }, _this10.classes = function (f) {
+            var active = _this10.state.recognized && _this10.state.checked[f];
             return (0, _classnames2.default)('check', { active: active });
-        }, _this8.tip = function (f) {
-            if (_this8.state.checked[f]) return 'Remove file format ' + f + ' from regex';
+        }, _this10.tip = function (f) {
+            if (_this10.state.checked[f]) return 'Remove file format ' + f + ' from regex';
             return 'Add file format ' + f + ' to regex';
-        }, _temp4), (0, _possibleConstructorReturn3.default)(_this8, _ret4);
+        }, _temp5), (0, _possibleConstructorReturn3.default)(_this10, _ret5);
     }
 
     (0, _createClass3.default)(Regex, [{
@@ -988,7 +1050,7 @@ var Regex = exports.Regex = function (_Pure_component5) {
     }, {
         key: 'render',
         value: function render() {
-            var _this9 = this;
+            var _this11 = this;
 
             var tip_box_classes = (0, _classnames2.default)('tip_box', 'active');
             return _react2.default.createElement(
@@ -1004,12 +1066,12 @@ var Regex = exports.Regex = function (_Pure_component5) {
                         this.formats.map(function (f) {
                             return _react2.default.createElement(
                                 Tooltip,
-                                { key: f + !!_this9.state.checked[f],
-                                    title: _this9.tip(f) },
+                                { key: f + !!_this11.state.checked[f],
+                                    title: _this11.tip(f) },
                                 _react2.default.createElement(
                                     'div',
-                                    { onClick: _this9.toggle.bind(null, f),
-                                        className: _this9.classes(f) },
+                                    { onClick: _this11.toggle.bind(null, f),
+                                        className: _this11.classes(f) },
                                     '.',
                                     f
                                 )
@@ -1040,10 +1102,10 @@ var Checkbox = exports.Checkbox = function Checkbox(props) {
     );
 };
 
-var Nav = exports.Nav = function Nav(_ref9) {
-    var title = _ref9.title,
-        subtitle = _ref9.subtitle,
-        warning = _ref9.warning;
+var Nav = exports.Nav = function Nav(_ref10) {
+    var title = _ref10.title,
+        subtitle = _ref10.subtitle,
+        warning = _ref10.warning;
     return _react2.default.createElement(
         'div',
         { className: 'nav_header' },
@@ -1061,24 +1123,24 @@ var Nav = exports.Nav = function Nav(_ref9) {
     );
 };
 
-var Warning_msg = function Warning_msg(_ref10) {
-    var warning = _ref10.warning;
+var Warning_msg = function Warning_msg(_ref11) {
+    var warning = _ref11.warning;
 
     if (!warning) return null;
     return _react2.default.createElement(Warning, { text: warning });
 };
 
-var Pagination_panel = exports.Pagination_panel = function Pagination_panel(_ref11) {
-    var entries = _ref11.entries,
-        items_per_page = _ref11.items_per_page,
-        cur_page = _ref11.cur_page,
-        page_change = _ref11.page_change,
-        children = _ref11.children,
-        top = _ref11.top,
-        bottom = _ref11.bottom,
-        update_items_per_page = _ref11.update_items_per_page,
-        max_buttons = _ref11.max_buttons,
-        total = _ref11.total;
+var Pagination_panel = exports.Pagination_panel = function Pagination_panel(_ref12) {
+    var entries = _ref12.entries,
+        items_per_page = _ref12.items_per_page,
+        cur_page = _ref12.cur_page,
+        page_change = _ref12.page_change,
+        children = _ref12.children,
+        top = _ref12.top,
+        bottom = _ref12.bottom,
+        update_items_per_page = _ref12.update_items_per_page,
+        max_buttons = _ref12.max_buttons,
+        total = _ref12.total;
 
     total = total || entries && entries.length || 0;
     var pagination = null;
@@ -1130,8 +1192,8 @@ var Pagination_panel = exports.Pagination_panel = function Pagination_panel(_ref
     );
 };
 
-var Tooltip = exports.Tooltip = function (_Pure_component6) {
-    (0, _inherits3.default)(Tooltip, _Pure_component6);
+var Tooltip = exports.Tooltip = function (_Pure_component7) {
+    (0, _inherits3.default)(Tooltip, _Pure_component7);
 
     function Tooltip() {
         (0, _classCallCheck3.default)(this, Tooltip);
@@ -1190,14 +1252,14 @@ var Tooltip = exports.Tooltip = function (_Pure_component6) {
     return Tooltip;
 }(_pure_component2.default);
 
-var Link_icon = exports.Link_icon = function Link_icon(_ref12) {
-    var tooltip = _ref12.tooltip,
-        on_click = _ref12.on_click,
-        id = _ref12.id,
-        classes = _ref12.classes,
-        disabled = _ref12.disabled,
-        invisible = _ref12.invisible,
-        small = _ref12.small;
+var Link_icon = exports.Link_icon = function Link_icon(_ref13) {
+    var tooltip = _ref13.tooltip,
+        on_click = _ref13.on_click,
+        id = _ref13.id,
+        classes = _ref13.classes,
+        disabled = _ref13.disabled,
+        invisible = _ref13.invisible,
+        small = _ref13.small;
 
     if (invisible) tooltip = '';
     if (disabled || invisible) on_click = function on_click() {
@@ -1233,9 +1295,9 @@ var Circle_li = exports.Circle_li = function Circle_li(props) {
     );
 };
 
-var Add_icon = exports.Add_icon = function Add_icon(_ref13) {
-    var click = _ref13.click,
-        tooltip = _ref13.tooltip;
+var Add_icon = exports.Add_icon = function Add_icon(_ref14) {
+    var click = _ref14.click,
+        tooltip = _ref14.tooltip;
     return _react2.default.createElement(
         Tooltip,
         { title: tooltip },
@@ -1247,9 +1309,9 @@ var Add_icon = exports.Add_icon = function Add_icon(_ref13) {
     );
 };
 
-var Remove_icon = exports.Remove_icon = function Remove_icon(_ref14) {
-    var click = _ref14.click,
-        tooltip = _ref14.tooltip;
+var Remove_icon = exports.Remove_icon = function Remove_icon(_ref15) {
+    var click = _ref15.click,
+        tooltip = _ref15.tooltip;
     return _react2.default.createElement(
         Tooltip,
         { title: tooltip },
@@ -1261,30 +1323,30 @@ var Remove_icon = exports.Remove_icon = function Remove_icon(_ref14) {
     );
 };
 
-var Logo = exports.Logo = function (_Pure_component7) {
-    (0, _inherits3.default)(Logo, _Pure_component7);
+var Logo = exports.Logo = function (_Pure_component8) {
+    (0, _inherits3.default)(Logo, _Pure_component8);
 
     function Logo() {
-        var _ref15;
+        var _ref16;
 
-        var _temp5, _this11, _ret5;
+        var _temp6, _this13, _ret6;
 
         (0, _classCallCheck3.default)(this, Logo);
 
-        for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-            args[_key5] = arguments[_key5];
+        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
         }
 
-        return _ret5 = (_temp5 = (_this11 = (0, _possibleConstructorReturn3.default)(this, (_ref15 = Logo.__proto__ || Object.getPrototypeOf(Logo)).call.apply(_ref15, [this].concat(args))), _this11), _this11.state = {}, _temp5), (0, _possibleConstructorReturn3.default)(_this11, _ret5);
+        return _ret6 = (_temp6 = (_this13 = (0, _possibleConstructorReturn3.default)(this, (_ref16 = Logo.__proto__ || Object.getPrototypeOf(Logo)).call.apply(_ref16, [this].concat(args))), _this13), _this13.state = {}, _temp6), (0, _possibleConstructorReturn3.default)(_this13, _ret6);
     }
 
     (0, _createClass3.default)(Logo, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this12 = this;
+            var _this14 = this;
 
             this.setdb_on('head.version', function (ver) {
-                return _this12.setState({ ver: ver });
+                return _this14.setState({ ver: ver });
             });
         }
     }, {
@@ -1312,7 +1374,7 @@ var Logo = exports.Logo = function (_Pure_component7) {
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(192);
+module.exports = __webpack_require__(193);
 
 
 /***/ }),
@@ -1321,107 +1383,19 @@ module.exports = __webpack_require__(192);
 /* 21 */,
 /* 22 */,
 /* 23 */,
-/* 24 */,
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
-var module;
-// LICENSE_CODE ZON
-'use strict'; /*jslint node:true, browser:true, es6:true*/
-(function(){
-
-var is_node_ff = typeof module=='object' && module.exports;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
-if (is_rn)
-{
-}
-else if (!is_node_ff)
-    ;
-else
-    ;
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(66), __webpack_require__(204)], __WEBPACK_AMD_DEFINE_FACTORY__ = ((_, EventEmitter)=>{
-
-const RECURSIVE = '.';
-
-const E = new EventEmitter();
-E.state = {};
-
-E.on = (path, fn, opt)=>{
-    opt = _.assign({recursive: false, init: true}, opt);
-    EventEmitter.prototype.on.call(E, path, fn);
-    if (opt.recursive)
-        EventEmitter.prototype.on.call(E, RECURSIVE+path, fn);
-    if (opt.init)
-        fn(E.get(path));
-    return {path, fn, recursive: opt.recursive};
-};
-
-E.off = listener=>{
-    EventEmitter.prototype.removeListener.call(E, listener.path, listener.fn);
-    if (listener.recursive)
-    {
-        EventEmitter.prototype.removeListener
-            .call(E, RECURSIVE+listener.path, listener.fn);
-    }
-};
-
-E.get = path=>_.get(E.state, path);
-
-E.set = (path, curr, opt)=>{
-    opt = _.assign({force_emit: false}, opt);
-    if (!opt.force_emit && _.get(E.state, path)===curr)
-        return;
-    _.set(E.state, path, curr);
-    E.emit_path(path);
-    // XXX colin/ilgiz: add recurisve notify when using recursive flag
-};
-
-E.delete = path=>E.set(path, undefined);
-
-E.emit_path = path=>{
-    E.emit(path, _.get(E.state, path));
-    path = path.split('.');
-    while (path.length>1)
-    {
-        path.pop();
-        let p = path.join('.');
-        E.emit(RECURSIVE+p, _.get(E.state, p));
-    }
-};
-
-E.clear = function(){
-    this.removeAllListeners();
-    this.state = {};
-};
-
-E.debug = function(){
-    window.setdb = E;
-};
-
-return E;
-
-}),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
-
-
-/***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+// LICENSE_CODE ZON ISC
+ /*jslint browser:true, es6:true*/
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.normalizers = exports.swagger_link_tester_url = exports.swagger_url = exports.presets = exports.get_static_country = exports.status_codes = exports.user_agents = exports.ga_event = exports.bytes_format = undefined;
 
-var _module;
-// LICENSE_CODE ZON ISC
-'use strict'; /*jslint browser:true, es6:true*/
+var _netmask = __webpack_require__(310);
 
 var bytes_format = exports.bytes_format = function bytes_format(bytes, number) {
     if (!bytes || isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '';
@@ -1429,9 +1403,7 @@ var bytes_format = exports.bytes_format = function bytes_format(bytes, number) {
     var precision = number ? 2 : 0;
     var number_format = Intl.NumberFormat('en-US', { maximumFractionDigits: precision });
     return number_format.format(bytes / Math.pow(1000, Math.floor(number))) + ' ' + ['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
-};
-
-var ga_event = exports.ga_event = function ga_event(category, action, label) {
+};var ga_event = exports.ga_event = function ga_event(category, action, label) {
     if (!window.ga) return;
     window.ga('send', 'event', category, action, label);
 };
@@ -1502,6 +1474,7 @@ var user_agents = exports.user_agents = [{
 }];
 
 var status_codes = exports.status_codes = {
+    unknown: 'Status code of this request could not be parsed. Enable SSL\n        analyzing to fix this',
     200: 'OK',
     201: 'Created',
     202: 'Accepted',
@@ -1853,6 +1826,114 @@ var swagger_url = exports.swagger_url = 'http://petstore.swagger.io/?url=https:/
 
 var swagger_link_tester_url = exports.swagger_link_tester_url = swagger_url + '/get_proxies__port__link_test_json';
 
+// XXX krzysztof: merge with validators in proxy_edit
+var normalizers = exports.normalizers = {
+    ips_list: function ips_list(val) {
+        val = val.replace(/\s/g, '');
+        var ips = val.split(',');
+        var res = [];
+        ips.forEach(function (ip) {
+            try {
+                var netmask = new _netmask.Netmask(ip);
+                var to_add = netmask.base;
+                if (netmask.bitmask != 32) to_add += '/' + netmask.bitmask;
+                res.push(to_add);
+            } catch (e) {
+                console.log('incorrect ip format');
+            }
+        });
+        return res.join(',');
+    }
+};
+
+/***/ }),
+/* 25 */,
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
+var module;
+// LICENSE_CODE ZON
+'use strict'; /*jslint node:true, browser:true, es6:true*/
+(function(){
+
+var is_node_ff = typeof module=='object' && module.exports;
+var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
+    (typeof navigator=='object' && navigator.product=='ReactNative');
+if (is_rn)
+{
+}
+else if (!is_node_ff)
+    ;
+else
+    ;
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(66), __webpack_require__(205)], __WEBPACK_AMD_DEFINE_FACTORY__ = ((_, EventEmitter)=>{
+
+const RECURSIVE = '.';
+
+const E = new EventEmitter();
+E.state = {};
+
+E.on = (path, fn, opt)=>{
+    opt = _.assign({recursive: false, init: true}, opt);
+    EventEmitter.prototype.on.call(E, path, fn);
+    if (opt.recursive)
+        EventEmitter.prototype.on.call(E, RECURSIVE+path, fn);
+    if (opt.init)
+        fn(E.get(path));
+    return {path, fn, recursive: opt.recursive};
+};
+
+E.off = listener=>{
+    EventEmitter.prototype.removeListener.call(E, listener.path, listener.fn);
+    if (listener.recursive)
+    {
+        EventEmitter.prototype.removeListener
+            .call(E, RECURSIVE+listener.path, listener.fn);
+    }
+};
+
+E.get = path=>_.get(E.state, path);
+
+E.set = (path, curr, opt)=>{
+    opt = _.assign({force_emit: false}, opt);
+    if (!opt.force_emit && _.get(E.state, path)===curr)
+        return;
+    _.set(E.state, path, curr);
+    E.emit_path(path);
+    // XXX colin/ilgiz: add recurisve notify when using recursive flag
+};
+
+E.delete = path=>E.set(path, undefined);
+
+E.emit_path = path=>{
+    E.emit(path, _.get(E.state, path));
+    path = path.split('.');
+    while (path.length>1)
+    {
+        path.pop();
+        let p = path.join('.');
+        E.emit(RECURSIVE+p, _.get(E.state, p));
+    }
+};
+
+E.clear = function(){
+    this.removeAllListeners();
+    this.state = {};
+};
+
+E.debug = function(){
+    window.setdb = E;
+};
+
+return E;
+
+}),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
+
+
 /***/ }),
 /* 27 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -1868,8 +1949,8 @@ if (!is_node_ff)
     ;
 else
     ;
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(38), __webpack_require__(235), __webpack_require__(97),
-    __webpack_require__(402), __webpack_require__(204)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, etask, date, zescape, zerr, events){
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(38), __webpack_require__(236), __webpack_require__(97),
+    __webpack_require__(402), __webpack_require__(205)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, etask, date, zescape, zerr, events){
 var E = ajax;
 var assign = Object.assign;
 E.events = new events.EventEmitter();
@@ -1976,7 +2057,7 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 /* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var freeGlobal = __webpack_require__(285);
+var freeGlobal = __webpack_require__(286);
 
 /** Detect free variable `self`. */
 var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
@@ -2029,7 +2110,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BrowserRouter", function() { return __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HashRouter__ = __webpack_require__(680);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "HashRouter", function() { return __WEBPACK_IMPORTED_MODULE_1__HashRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Link__ = __webpack_require__(313);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Link__ = __webpack_require__(315);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Link", function() { return __WEBPACK_IMPORTED_MODULE_2__Link__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__ = __webpack_require__(682);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MemoryRouter", function() { return __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__["a"]; });
@@ -2039,7 +2120,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Prompt", function() { return __WEBPACK_IMPORTED_MODULE_5__Prompt__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Redirect__ = __webpack_require__(690);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Redirect", function() { return __WEBPACK_IMPORTED_MODULE_6__Redirect__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(314);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(316);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Route", function() { return __WEBPACK_IMPORTED_MODULE_7__Route__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Router__ = __webpack_require__(187);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Router", function() { return __WEBPACK_IMPORTED_MODULE_8__Router__["a"]; });
@@ -2087,7 +2168,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 exports.__esModule = true;
 
-var _defineProperty = __webpack_require__(193);
+var _defineProperty = __webpack_require__(194);
 
 var _defineProperty2 = _interopRequireDefault(_defineProperty);
 
@@ -2165,7 +2246,7 @@ if (typeof assert!='function')
     assert = function(){}; // XXX romank: add proper assert
 // XXX yuval: /util/events.js -> events when node 6 (support prependListener)
 // is here
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(401), __webpack_require__(154), __webpack_require__(234)], __WEBPACK_AMD_DEFINE_RESULT__ = function(events, array, zutil){
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(401), __webpack_require__(154), __webpack_require__(235)], __WEBPACK_AMD_DEFINE_RESULT__ = function(events, array, zutil){
 var E = Etask;
 var etask = Etask;
 var env = process.env, assign = Object.assign;
@@ -3651,7 +3732,7 @@ return Etask; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 exports.__esModule = true;
 
-var _from = __webpack_require__(236);
+var _from = __webpack_require__(237);
 
 var _from2 = _interopRequireDefault(_from);
 
@@ -3763,7 +3844,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fbjs_lib_shallowEqual__ = __webpack_require__(159);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_fbjs_lib_shallowEqual___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_fbjs_lib_shallowEqual__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(317);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(319);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_change_emitter__ = __webpack_require__(704);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_change_emitter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_change_emitter__);
@@ -5052,9 +5133,9 @@ var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _netmask = __webpack_require__(318);
+var _netmask = __webpack_require__(310);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -5118,9 +5199,11 @@ var Config = exports.Config = (0, _recompose.getContext)({ provide: _propTypes2.
         }, _this.on_input_change = function (val) {
             if (_this.props.update_on_input) _this.set_field(_this.props.id, [{ id: val, label: val }]);
         }, _this.on_change_wrapper = function (value, _id) {
+            var opt = {};
+            if (_this.props.save_on_blur) opt.skip_save = true;
             var curr_id = _id || _this.props.id;
             if (_this.props.on_change) _this.props.on_change(value);
-            _this.set_field(curr_id, value);
+            _this.set_field(curr_id, value, opt);
         }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
     }
 
@@ -5877,7 +5960,7 @@ var _invariant = __webpack_require__(22);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
-var _isPlainObject = __webpack_require__(301);
+var _isPlainObject = __webpack_require__(302);
 
 var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
@@ -5918,7 +6001,7 @@ exports.default = getOptionLabel;
 var isArray = __webpack_require__(35),
     isKey = __webpack_require__(178),
     stringToPath = __webpack_require__(613),
-    toString = __webpack_require__(300);
+    toString = __webpack_require__(301);
 
 /**
  * Casts `value` to a path array if it's not one.
@@ -6018,8 +6101,8 @@ module.exports = {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createLocation; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return locationsAreEqual; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(310);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(311);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(312);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(313);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PathUtils__ = __webpack_require__(90);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -7274,7 +7357,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _menuItemContainer = __webpack_require__(308);
+var _menuItemContainer = __webpack_require__(309);
 
 var _menuItemContainer2 = _interopRequireDefault(_menuItemContainer);
 
@@ -7780,7 +7863,10 @@ var tabs = exports.tabs = {
                 label: 'Send email',
                 tooltip: 'Every time the rule is triggered and executed the\n                    email notification will be sent to the provided address'
             },
-            email: { label: 'Email address' }
+            email: {
+                label: 'Email address',
+                tooltip: 'Notifications will be sent to this email address.\n                    If you want to use another email you can add it to the\n                    list in control panel by going to the link below'
+            }
         }
     },
     rotation: {
@@ -7805,12 +7891,6 @@ var tabs = exports.tabs = {
             keep_alive: {
                 label: 'Keep-alive',
                 tooltip: 'LPM will ping an IP to keep the session alive',
-                ext: true
-            },
-            whitelist_ips: {
-                label: 'Whitelist IP access',
-                tooltip: 'Grant proxy access to specific IPs. only those\n                    IPs will be able to send requests to this proxy port',
-                placeholder: 'e.g. 1.1.1.1,23.23.23.23',
                 ext: true
             },
             session_random: {
@@ -7882,6 +7962,11 @@ var tabs = exports.tabs = {
         label: 'General',
         tooltip: 'General configuration such as port number, password and\n            bypasing',
         fields: {
+            internal_name: {
+                label: 'Internal name',
+                tooltip: 'You can choose a name for this proxy port. If the\n                    name is passed it will be shown in the dropdowns across\n                    whole LPM. It doesn\'t change any behavior of the proxy\n                    port',
+                ext: true
+            },
             port: {
                 label: 'Proxy port',
                 tooltip: 'The port number that will be used for the current\n                    proxy configuration',
@@ -7895,6 +7980,12 @@ var tabs = exports.tabs = {
             password: {
                 label: 'Zone password',
                 tooltip: 'Zone password as it appears in your zones page in\n                    your Luminati\'s control panel http://luminati.io/cp/zones'
+            },
+            whitelist_ips: {
+                label: 'Whitelist IP access',
+                tooltip: 'Grant proxy access to specific IPs. only those\n                    IPs will be able to send requests to this proxy port',
+                placeholder: 'e.g. 1.1.1.1,23.23.23.23',
+                ext: true
             },
             ssl: {
                 label: 'Enable SSL logs',
@@ -8000,7 +8091,7 @@ var _classnames = __webpack_require__(6);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -8016,7 +8107,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _reactWaypoint = __webpack_require__(667);
 
@@ -8024,7 +8115,7 @@ var _reactWaypoint2 = _interopRequireDefault(_reactWaypoint);
 
 var _chrome_widgets = __webpack_require__(181);
 
-var _har_preview = __webpack_require__(309);
+var _har_preview = __webpack_require__(311);
 
 var _har_preview2 = _interopRequireDefault(_har_preview);
 
@@ -9163,7 +9254,7 @@ var Cell_value = function (_React$Component3) {
         }
 
         return _ret8 = (_temp8 = (_this23 = (0, _possibleConstructorReturn3.default)(this, (_ref16 = Cell_value.__proto__ || Object.getPrototypeOf(Cell_value)).call.apply(_ref16, [this].concat(args))), _this23), _this23.go_to_timeline = function (e) {
-            _setdb2.default.emit('har_viewer.set_pane', 3);
+            return _setdb2.default.emit('har_viewer.set_pane', 3);
         }, _temp8), (0, _possibleConstructorReturn3.default)(_this23, _ret8);
     }
 
@@ -9205,18 +9296,7 @@ var Cell_value = function (_React$Component3) {
                         )
                     )
                 );
-            } else if (col == 'Status') {
-                var status = _util.status_codes[req.response.status];
-                return _react2.default.createElement(
-                    _chrome_widgets.Tooltip,
-                    { title: req.response.status + ' ' + status },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'disp_value' },
-                        req.response.status
-                    )
-                );
-            } else if (col == 'Proxy port') return _react2.default.createElement(Tooltip_and_value, { val: req.details.port });else if (col == 'Bandwidth') return _react2.default.createElement(_common.Tooltip_bytes, { chrome_style: true, bytes: req.details.bw });else if (col == 'Time') return _react2.default.createElement(Tooltip_and_value, { val: req.time + ' ms' });else if (col == 'Peer proxy') return _react2.default.createElement(Tooltip_and_value, { val: req.details.proxy_peer });else if (col == 'Date') {
+            } else if (col == 'Status') return _react2.default.createElement(Status_code_cell, { status: req.response.status });else if (col == 'Proxy port') return _react2.default.createElement(Tooltip_and_value, { val: req.details.port });else if (col == 'Bandwidth') return _react2.default.createElement(_common.Tooltip_bytes, { chrome_style: true, bytes: req.details.bw });else if (col == 'Time') return _react2.default.createElement(Time_cell, { time: req.time, url: req.request.url });else if (col == 'Peer proxy') return _react2.default.createElement(Tooltip_and_value, { val: req.details.proxy_peer });else if (col == 'Date') {
                 var local = (0, _moment2.default)(new Date(req.startedDateTime)).format('YYYY-MM-DD HH:mm:ss');
                 return _react2.default.createElement(Tooltip_and_value, { val: local });
             }
@@ -9226,11 +9306,45 @@ var Cell_value = function (_React$Component3) {
     return Cell_value;
 }(_react2.default.Component);
 
+var Status_code_cell = function Status_code_cell(_ref17) {
+    var status = _ref17.status;
+
+    var desc = _util.status_codes[status];
+    return _react2.default.createElement(
+        _chrome_widgets.Tooltip,
+        { title: status + ' - ' + desc },
+        _react2.default.createElement(
+            'div',
+            { className: 'disp_value' },
+            status,
+            status == 'unknown' && _react2.default.createElement('div', { className: 'small_icon status info' })
+        )
+    );
+};
+
+var Time_cell = function Time_cell(_ref18) {
+    var time = _ref18.time,
+        url = _ref18.url;
+
+    if (!url.endsWith(':443') || !time) return _react2.default.createElement(Tooltip_and_value, { val: time && time + ' ms' });
+    var tip = 'This timing might not be accurate if the remote server held\n        the connection open. Enable SSL analyzing to fix this';
+    return _react2.default.createElement(
+        _chrome_widgets.Tooltip,
+        { title: tip },
+        _react2.default.createElement(
+            'div',
+            { className: 'disp_value' },
+            time + ' ms',
+            url.endsWith(':443') && _react2.default.createElement('div', { className: 'small_icon status info' })
+        )
+    );
+};
+
 var Select_cell = function (_React$Component4) {
     (0, _inherits3.default)(Select_cell, _React$Component4);
 
     function Select_cell() {
-        var _ref17;
+        var _ref19;
 
         var _temp9, _this24, _ret9;
 
@@ -9240,7 +9354,7 @@ var Select_cell = function (_React$Component4) {
             args[_key9] = arguments[_key9];
         }
 
-        return _ret9 = (_temp9 = (_this24 = (0, _possibleConstructorReturn3.default)(this, (_ref17 = Select_cell.__proto__ || Object.getPrototypeOf(Select_cell)).call.apply(_ref17, [this].concat(args))), _this24), _this24.state = { checked: false }, _this24.toggle = function () {
+        return _ret9 = (_temp9 = (_this24 = (0, _possibleConstructorReturn3.default)(this, (_ref19 = Select_cell.__proto__ || Object.getPrototypeOf(Select_cell)).call.apply(_ref19, [this].concat(args))), _this24), _this24.state = { checked: false }, _this24.toggle = function () {
             _setdb2.default.set('har_viewer.checked_list.' + _this24.props.uuid, !_this24.state.checked);
             _setdb2.default.emit_path('har_viewer.checked_list');
         }, _temp9), (0, _possibleConstructorReturn3.default)(_this24, _ret9);
@@ -9276,11 +9390,12 @@ var Select_cell = function (_React$Component4) {
     return Select_cell;
 }(_react2.default.Component);
 
-var Tooltip_and_value = function Tooltip_and_value(_ref18) {
-    var val = _ref18.val;
+var Tooltip_and_value = function Tooltip_and_value(_ref20) {
+    var val = _ref20.val,
+        tip = _ref20.tip;
     return _react2.default.createElement(
         _chrome_widgets.Tooltip,
-        { title: val },
+        { title: tip || val },
         _react2.default.createElement(
             'div',
             { className: 'disp_value' },
@@ -9304,11 +9419,11 @@ exports.locationsAreEqual = exports.createLocation = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _resolvePathname = __webpack_require__(310);
+var _resolvePathname = __webpack_require__(312);
 
 var _resolvePathname2 = _interopRequireDefault(_resolvePathname);
 
-var _valueEqual = __webpack_require__(311);
+var _valueEqual = __webpack_require__(313);
 
 var _valueEqual2 = _interopRequireDefault(_valueEqual);
 
@@ -9955,14 +10070,69 @@ if (typeof module !== "undefined" && module.exports) {
 
 
 /***/ }),
-/* 192 */,
-/* 193 */
+/* 192 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// LICENSE_CODE ZON ISC
+ /*jslint react:true, es6:true*/
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _proxy_add = __webpack_require__(321);
+
+var _proxy_add2 = _interopRequireDefault(_proxy_add);
+
+var _common = __webpack_require__(16);
+
+var _jquery = __webpack_require__(11);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var open_modal = function open_modal() {
+  (0, _jquery2.default)('#add_new_proxy_modal').modal();
+};
+
+var Proxy_blank = function Proxy_blank() {
+  return _react2.default.createElement(
+    'div',
+    null,
+    _react2.default.createElement(_proxy_add2.default, null),
+    _react2.default.createElement(
+      'div',
+      { className: 'no_proxies' },
+      _react2.default.createElement(
+        _common.Tooltip,
+        { title: 'Click to create your first proxy port' },
+        _react2.default.createElement(
+          'button',
+          { onClick: open_modal,
+            className: 'btn btn_lpm btn_lpm_big btn_add_port' },
+          'Start'
+        )
+      )
+    )
+  );
+};
+
+exports.default = Proxy_blank;
+
+/***/ }),
+/* 193 */,
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = { "default": __webpack_require__(328), __esModule: true };
 
 /***/ }),
-/* 194 */,
 /* 195 */,
 /* 196 */,
 /* 197 */,
@@ -9972,7 +10142,8 @@ module.exports = { "default": __webpack_require__(328), __esModule: true };
 /* 201 */,
 /* 202 */,
 /* 203 */,
-/* 204 */
+/* 204 */,
+/* 205 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -10280,7 +10451,6 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 205 */,
 /* 206 */,
 /* 207 */,
 /* 208 */,
@@ -10309,7 +10479,8 @@ function isUndefined(arg) {
 /* 231 */,
 /* 232 */,
 /* 233 */,
-/* 234 */
+/* 234 */,
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -10775,7 +10946,7 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 
 /***/ }),
-/* 235 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -11430,10 +11601,10 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 
 /***/ }),
-/* 236 */,
 /* 237 */,
 /* 238 */,
-/* 239 */
+/* 239 */,
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // most Object methods by ES6 should accept primitives
@@ -11449,7 +11620,6 @@ module.exports = function (KEY, exec) {
 
 
 /***/ }),
-/* 240 */,
 /* 241 */,
 /* 242 */,
 /* 243 */,
@@ -11492,7 +11662,8 @@ module.exports = function (KEY, exec) {
 /* 280 */,
 /* 281 */,
 /* 282 */,
-/* 283 */
+/* 283 */,
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11507,7 +11678,7 @@ var _AsyncTypeahead2 = __webpack_require__(535);
 
 var _AsyncTypeahead3 = _interopRequireDefault(_AsyncTypeahead2);
 
-var _Menu2 = __webpack_require__(307);
+var _Menu2 = __webpack_require__(308);
 
 var _Menu3 = _interopRequireDefault(_Menu2);
 
@@ -11515,23 +11686,23 @@ var _MenuItem2 = __webpack_require__(180);
 
 var _MenuItem3 = _interopRequireDefault(_MenuItem2);
 
-var _Token2 = __webpack_require__(297);
+var _Token2 = __webpack_require__(298);
 
 var _Token3 = _interopRequireDefault(_Token2);
 
-var _Typeahead2 = __webpack_require__(286);
+var _Typeahead2 = __webpack_require__(287);
 
 var _Typeahead3 = _interopRequireDefault(_Typeahead2);
 
-var _asyncContainer2 = __webpack_require__(284);
+var _asyncContainer2 = __webpack_require__(285);
 
 var _asyncContainer3 = _interopRequireDefault(_asyncContainer2);
 
-var _menuItemContainer2 = __webpack_require__(308);
+var _menuItemContainer2 = __webpack_require__(309);
 
 var _menuItemContainer3 = _interopRequireDefault(_menuItemContainer2);
 
-var _tokenContainer2 = __webpack_require__(298);
+var _tokenContainer2 = __webpack_require__(299);
 
 var _tokenContainer3 = _interopRequireDefault(_tokenContainer2);
 
@@ -11555,7 +11726,7 @@ exports.tokenContainer = _tokenContainer3.default;
 /* eslint-enable object-curly-spacing */
 
 /***/ }),
-/* 284 */
+/* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11805,7 +11976,7 @@ var asyncContainer = function asyncContainer(Typeahead) {
 exports.default = asyncContainer;
 
 /***/ }),
-/* 285 */
+/* 286 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
@@ -11816,7 +11987,7 @@ module.exports = freeGlobal;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(67)))
 
 /***/ }),
-/* 286 */
+/* 287 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12029,7 +12200,7 @@ var Typeahead = function (_React$Component) {
 exports.default = (0, _typeaheadContainer2.default)(Typeahead);
 
 /***/ }),
-/* 287 */
+/* 288 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ListCache = __webpack_require__(111),
@@ -12062,7 +12233,7 @@ module.exports = Stack;
 
 
 /***/ }),
-/* 288 */
+/* 289 */
 /***/ (function(module, exports) {
 
 /** Used for built-in method references. */
@@ -12094,11 +12265,11 @@ module.exports = toSource;
 
 
 /***/ }),
-/* 289 */
+/* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var SetCache = __webpack_require__(569),
-    arraySome = __webpack_require__(290),
+    arraySome = __webpack_require__(291),
     cacheHas = __webpack_require__(572);
 
 /** Used to compose bitmasks for value comparisons. */
@@ -12183,7 +12354,7 @@ module.exports = equalArrays;
 
 
 /***/ }),
-/* 290 */
+/* 291 */
 /***/ (function(module, exports) {
 
 /**
@@ -12212,7 +12383,7 @@ module.exports = arraySome;
 
 
 /***/ }),
-/* 291 */
+/* 292 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(34),
@@ -12257,7 +12428,7 @@ module.exports = isBuffer;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(95)(module)))
 
 /***/ }),
-/* 292 */
+/* 293 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseIsTypedArray = __webpack_require__(582),
@@ -12290,7 +12461,7 @@ module.exports = isTypedArray;
 
 
 /***/ }),
-/* 293 */
+/* 294 */
 /***/ (function(module, exports) {
 
 /**
@@ -12311,7 +12482,7 @@ module.exports = overArg;
 
 
 /***/ }),
-/* 294 */
+/* 295 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12333,7 +12504,7 @@ function getContainer(container, defaultContainer) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 295 */
+/* 296 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12358,7 +12529,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 module.exports = exports['default'];
 
 /***/ }),
-/* 296 */
+/* 297 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12436,7 +12607,7 @@ ClearButton.defaultProps = {
 exports.default = ClearButton;
 
 /***/ }),
-/* 297 */
+/* 298 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12466,11 +12637,11 @@ var _propTypes = __webpack_require__(4);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _ClearButton = __webpack_require__(296);
+var _ClearButton = __webpack_require__(297);
 
 var _ClearButton2 = _interopRequireDefault(_ClearButton);
 
-var _tokenContainer = __webpack_require__(298);
+var _tokenContainer = __webpack_require__(299);
 
 var _tokenContainer2 = _interopRequireDefault(_tokenContainer);
 
@@ -12591,7 +12762,7 @@ Token.defaultProps = {
 exports.default = (0, _tokenContainer2.default)(Token);
 
 /***/ }),
-/* 298 */
+/* 299 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12609,7 +12780,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactOnclickoutside = __webpack_require__(299);
+var _reactOnclickoutside = __webpack_require__(300);
 
 var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
@@ -12704,7 +12875,7 @@ var tokenContainer = function tokenContainer(Component) {
 exports.default = tokenContainer;
 
 /***/ }),
-/* 299 */
+/* 300 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13064,7 +13235,7 @@ function onClickOutsideHOC(WrappedComponent, config) {
 
 
 /***/ }),
-/* 300 */
+/* 301 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseToString = __webpack_require__(601);
@@ -13098,7 +13269,7 @@ module.exports = toString;
 
 
 /***/ }),
-/* 301 */
+/* 302 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseGetTag = __webpack_require__(56),
@@ -13166,7 +13337,7 @@ module.exports = isPlainObject;
 
 
 /***/ }),
-/* 302 */
+/* 303 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(46);
@@ -13187,7 +13358,7 @@ module.exports = isStrictComparable;
 
 
 /***/ }),
-/* 303 */
+/* 304 */
 /***/ (function(module, exports) {
 
 /**
@@ -13213,7 +13384,7 @@ module.exports = matchesStrictComparable;
 
 
 /***/ }),
-/* 304 */
+/* 305 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseHasIn = __webpack_require__(616),
@@ -13253,7 +13424,7 @@ module.exports = hasIn;
 
 
 /***/ }),
-/* 305 */
+/* 306 */
 /***/ (function(module, exports) {
 
 /**
@@ -13280,7 +13451,7 @@ module.exports = identity;
 
 
 /***/ }),
-/* 306 */
+/* 307 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getNative = __webpack_require__(58);
@@ -13297,7 +13468,7 @@ module.exports = defineProperty;
 
 
 /***/ }),
-/* 307 */
+/* 308 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13461,7 +13632,7 @@ Menu.defaultProps = {
 exports.default = Menu;
 
 /***/ }),
-/* 308 */
+/* 309 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13605,7 +13776,159 @@ var menuItemContainer = function menuItemContainer(Component) {
 exports.default = menuItemContainer;
 
 /***/ }),
-/* 309 */
+/* 310 */
+/***/ (function(module, exports) {
+
+// Generated by CoffeeScript 1.10.0
+(function() {
+  var Netmask, ip2long, long2ip;
+
+  long2ip = function(long) {
+    var a, b, c, d;
+    a = (long & (0xff << 24)) >>> 24;
+    b = (long & (0xff << 16)) >>> 16;
+    c = (long & (0xff << 8)) >>> 8;
+    d = long & 0xff;
+    return [a, b, c, d].join('.');
+  };
+
+  ip2long = function(ip) {
+    var b, byte, i, j, len;
+    b = (ip + '').split('.');
+    if (b.length === 0 || b.length > 4) {
+      throw new Error('Invalid IP');
+    }
+    for (i = j = 0, len = b.length; j < len; i = ++j) {
+      byte = b[i];
+      if (isNaN(parseInt(byte, 10))) {
+        throw new Error("Invalid byte: " + byte);
+      }
+      if (byte < 0 || byte > 255) {
+        throw new Error("Invalid byte: " + byte);
+      }
+    }
+    return ((b[0] || 0) << 24 | (b[1] || 0) << 16 | (b[2] || 0) << 8 | (b[3] || 0)) >>> 0;
+  };
+
+  Netmask = (function() {
+    function Netmask(net, mask) {
+      var error, error1, error2, i, j, ref;
+      if (typeof net !== 'string') {
+        throw new Error("Missing `net' parameter");
+      }
+      if (!mask) {
+        ref = net.split('/', 2), net = ref[0], mask = ref[1];
+      }
+      if (!mask) {
+        switch (net.split('.').length) {
+          case 1:
+            mask = 8;
+            break;
+          case 2:
+            mask = 16;
+            break;
+          case 3:
+            mask = 24;
+            break;
+          case 4:
+            mask = 32;
+            break;
+          default:
+            throw new Error("Invalid net address: " + net);
+        }
+      }
+      if (typeof mask === 'string' && mask.indexOf('.') > -1) {
+        try {
+          this.maskLong = ip2long(mask);
+        } catch (error1) {
+          error = error1;
+          throw new Error("Invalid mask: " + mask);
+        }
+        for (i = j = 32; j >= 0; i = --j) {
+          if (this.maskLong === (0xffffffff << (32 - i)) >>> 0) {
+            this.bitmask = i;
+            break;
+          }
+        }
+      } else if (mask) {
+        this.bitmask = parseInt(mask, 10);
+        this.maskLong = 0;
+        if (this.bitmask > 0) {
+          this.maskLong = (0xffffffff << (32 - this.bitmask)) >>> 0;
+        }
+      } else {
+        throw new Error("Invalid mask: empty");
+      }
+      try {
+        this.netLong = (ip2long(net) & this.maskLong) >>> 0;
+      } catch (error2) {
+        error = error2;
+        throw new Error("Invalid net address: " + net);
+      }
+      if (!(this.bitmask <= 32)) {
+        throw new Error("Invalid mask for ip4: " + mask);
+      }
+      this.size = Math.pow(2, 32 - this.bitmask);
+      this.base = long2ip(this.netLong);
+      this.mask = long2ip(this.maskLong);
+      this.hostmask = long2ip(~this.maskLong);
+      this.first = this.bitmask <= 30 ? long2ip(this.netLong + 1) : this.base;
+      this.last = this.bitmask <= 30 ? long2ip(this.netLong + this.size - 2) : long2ip(this.netLong + this.size - 1);
+      this.broadcast = this.bitmask <= 30 ? long2ip(this.netLong + this.size - 1) : void 0;
+    }
+
+    Netmask.prototype.contains = function(ip) {
+      if (typeof ip === 'string' && (ip.indexOf('/') > 0 || ip.split('.').length !== 4)) {
+        ip = new Netmask(ip);
+      }
+      if (ip instanceof Netmask) {
+        return this.contains(ip.base) && this.contains(ip.broadcast || ip.last);
+      } else {
+        return (ip2long(ip) & this.maskLong) >>> 0 === (this.netLong & this.maskLong) >>> 0;
+      }
+    };
+
+    Netmask.prototype.next = function(count) {
+      if (count == null) {
+        count = 1;
+      }
+      return new Netmask(long2ip(this.netLong + (this.size * count)), this.mask);
+    };
+
+    Netmask.prototype.forEach = function(fn) {
+      var index, j, k, len, long, range, ref, ref1, results, results1;
+      range = (function() {
+        results = [];
+        for (var j = ref = ip2long(this.first), ref1 = ip2long(this.last); ref <= ref1 ? j <= ref1 : j >= ref1; ref <= ref1 ? j++ : j--){ results.push(j); }
+        return results;
+      }).apply(this);
+      results1 = [];
+      for (index = k = 0, len = range.length; k < len; index = ++k) {
+        long = range[index];
+        results1.push(fn(long2ip(long), long, index));
+      }
+      return results1;
+    };
+
+    Netmask.prototype.toString = function() {
+      return this.base + "/" + this.bitmask;
+    };
+
+    return Netmask;
+
+  })();
+
+  exports.ip2long = ip2long;
+
+  exports.long2ip = long2ip;
+
+  exports.Netmask = Netmask;
+
+}).call(this);
+
+
+/***/ }),
+/* 311 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13979,11 +14302,12 @@ var Header_pair = function Header_pair(_ref6) {
 var Status_value = function Status_value(_ref7) {
     var value = _ref7.value;
 
+    var info = value == 'unknown';
     var green = /2../.test(value);
     var yellow = /3../.test(value);
     var red = /(4|5)../.test(value);
     var classes = (0, _classnames2.default)('small_icon', 'status', {
-        green: green, yellow: yellow, red: red });
+        info: info, green: green, yellow: yellow, red: red });
     return _react2.default.createElement(
         'div',
         { className: 'status_wrapper' },
@@ -14287,7 +14611,7 @@ var Img_viewer = function Img_viewer(_ref13) {
 exports.default = Preview;
 
 /***/ }),
-/* 310 */
+/* 312 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14364,7 +14688,7 @@ function resolvePathname(to) {
 /* harmony default export */ __webpack_exports__["default"] = (resolvePathname);
 
 /***/ }),
-/* 311 */
+/* 313 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14409,7 +14733,7 @@ function valueEqual(a, b) {
 /* harmony default export */ __webpack_exports__["default"] = (valueEqual);
 
 /***/ }),
-/* 312 */
+/* 314 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14470,7 +14794,7 @@ var isExtraneousPopstateEvent = exports.isExtraneousPopstateEvent = function isE
 };
 
 /***/ }),
-/* 313 */
+/* 315 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14580,18 +14904,18 @@ Link.contextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Link);
 
 /***/ }),
-/* 314 */
+/* 316 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__ = __webpack_require__(315);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__ = __webpack_require__(317);
 // Written in this round about way for babel-transform-imports
 
 
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__["a" /* default */]);
 
 /***/ }),
-/* 315 */
+/* 317 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14740,7 +15064,7 @@ Route.childContextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Route);
 
 /***/ }),
-/* 316 */
+/* 318 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14806,7 +15130,7 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 };
 
 /***/ }),
-/* 317 */
+/* 319 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -14884,159 +15208,7 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 
 
 /***/ }),
-/* 318 */
-/***/ (function(module, exports) {
-
-// Generated by CoffeeScript 1.10.0
-(function() {
-  var Netmask, ip2long, long2ip;
-
-  long2ip = function(long) {
-    var a, b, c, d;
-    a = (long & (0xff << 24)) >>> 24;
-    b = (long & (0xff << 16)) >>> 16;
-    c = (long & (0xff << 8)) >>> 8;
-    d = long & 0xff;
-    return [a, b, c, d].join('.');
-  };
-
-  ip2long = function(ip) {
-    var b, byte, i, j, len;
-    b = (ip + '').split('.');
-    if (b.length === 0 || b.length > 4) {
-      throw new Error('Invalid IP');
-    }
-    for (i = j = 0, len = b.length; j < len; i = ++j) {
-      byte = b[i];
-      if (isNaN(parseInt(byte, 10))) {
-        throw new Error("Invalid byte: " + byte);
-      }
-      if (byte < 0 || byte > 255) {
-        throw new Error("Invalid byte: " + byte);
-      }
-    }
-    return ((b[0] || 0) << 24 | (b[1] || 0) << 16 | (b[2] || 0) << 8 | (b[3] || 0)) >>> 0;
-  };
-
-  Netmask = (function() {
-    function Netmask(net, mask) {
-      var error, error1, error2, i, j, ref;
-      if (typeof net !== 'string') {
-        throw new Error("Missing `net' parameter");
-      }
-      if (!mask) {
-        ref = net.split('/', 2), net = ref[0], mask = ref[1];
-      }
-      if (!mask) {
-        switch (net.split('.').length) {
-          case 1:
-            mask = 8;
-            break;
-          case 2:
-            mask = 16;
-            break;
-          case 3:
-            mask = 24;
-            break;
-          case 4:
-            mask = 32;
-            break;
-          default:
-            throw new Error("Invalid net address: " + net);
-        }
-      }
-      if (typeof mask === 'string' && mask.indexOf('.') > -1) {
-        try {
-          this.maskLong = ip2long(mask);
-        } catch (error1) {
-          error = error1;
-          throw new Error("Invalid mask: " + mask);
-        }
-        for (i = j = 32; j >= 0; i = --j) {
-          if (this.maskLong === (0xffffffff << (32 - i)) >>> 0) {
-            this.bitmask = i;
-            break;
-          }
-        }
-      } else if (mask) {
-        this.bitmask = parseInt(mask, 10);
-        this.maskLong = 0;
-        if (this.bitmask > 0) {
-          this.maskLong = (0xffffffff << (32 - this.bitmask)) >>> 0;
-        }
-      } else {
-        throw new Error("Invalid mask: empty");
-      }
-      try {
-        this.netLong = (ip2long(net) & this.maskLong) >>> 0;
-      } catch (error2) {
-        error = error2;
-        throw new Error("Invalid net address: " + net);
-      }
-      if (!(this.bitmask <= 32)) {
-        throw new Error("Invalid mask for ip4: " + mask);
-      }
-      this.size = Math.pow(2, 32 - this.bitmask);
-      this.base = long2ip(this.netLong);
-      this.mask = long2ip(this.maskLong);
-      this.hostmask = long2ip(~this.maskLong);
-      this.first = this.bitmask <= 30 ? long2ip(this.netLong + 1) : this.base;
-      this.last = this.bitmask <= 30 ? long2ip(this.netLong + this.size - 2) : long2ip(this.netLong + this.size - 1);
-      this.broadcast = this.bitmask <= 30 ? long2ip(this.netLong + this.size - 1) : void 0;
-    }
-
-    Netmask.prototype.contains = function(ip) {
-      if (typeof ip === 'string' && (ip.indexOf('/') > 0 || ip.split('.').length !== 4)) {
-        ip = new Netmask(ip);
-      }
-      if (ip instanceof Netmask) {
-        return this.contains(ip.base) && this.contains(ip.broadcast || ip.last);
-      } else {
-        return (ip2long(ip) & this.maskLong) >>> 0 === (this.netLong & this.maskLong) >>> 0;
-      }
-    };
-
-    Netmask.prototype.next = function(count) {
-      if (count == null) {
-        count = 1;
-      }
-      return new Netmask(long2ip(this.netLong + (this.size * count)), this.mask);
-    };
-
-    Netmask.prototype.forEach = function(fn) {
-      var index, j, k, len, long, range, ref, ref1, results, results1;
-      range = (function() {
-        results = [];
-        for (var j = ref = ip2long(this.first), ref1 = ip2long(this.last); ref <= ref1 ? j <= ref1 : j >= ref1; ref <= ref1 ? j++ : j--){ results.push(j); }
-        return results;
-      }).apply(this);
-      results1 = [];
-      for (index = k = 0, len = range.length; k < len; index = ++k) {
-        long = range[index];
-        results1.push(fn(long2ip(long), long, index));
-      }
-      return results1;
-    };
-
-    Netmask.prototype.toString = function() {
-      return this.base + "/" + this.bitmask;
-    };
-
-    return Netmask;
-
-  })();
-
-  exports.ip2long = ip2long;
-
-  exports.long2ip = long2ip;
-
-  exports.Netmask = Netmask;
-
-}).call(this);
-
-
-/***/ }),
-/* 319 */
+/* 320 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
@@ -16246,7 +16418,7 @@ function prerelease(version, loose) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
 
 /***/ }),
-/* 320 */
+/* 321 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16289,7 +16461,7 @@ var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -16307,7 +16479,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _pure_component = __webpack_require__(14);
 
@@ -16773,62 +16945,6 @@ var Footer = function Footer(props) {
 exports.default = Proxy_add;
 
 /***/ }),
-/* 321 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// LICENSE_CODE ZON ISC
- /*jslint react:true, es6:true*/
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _proxy_add = __webpack_require__(320);
-
-var _proxy_add2 = _interopRequireDefault(_proxy_add);
-
-var _common = __webpack_require__(16);
-
-var _jquery = __webpack_require__(11);
-
-var _jquery2 = _interopRequireDefault(_jquery);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var open_modal = function open_modal() {
-  (0, _jquery2.default)('#add_new_proxy_modal').modal();
-};
-
-var Proxy_blank = function Proxy_blank() {
-  return _react2.default.createElement(
-    'div',
-    null,
-    _react2.default.createElement(_proxy_add2.default, null),
-    _react2.default.createElement(
-      'div',
-      { className: 'no_proxies' },
-      _react2.default.createElement(
-        _common.Tooltip,
-        { title: 'Click to create your first proxy port' },
-        _react2.default.createElement(
-          'button',
-          { onClick: open_modal,
-            className: 'btn btn_lpm btn_lpm_big btn_add_port' },
-          'Start'
-        )
-      )
-    )
-  );
-};
-
-exports.default = Proxy_blank;
-
-/***/ }),
 /* 322 */,
 /* 323 */,
 /* 324 */,
@@ -16868,7 +16984,7 @@ var _inherits2 = __webpack_require__(3);
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -17668,7 +17784,7 @@ else
         var version = require('./version.js').version;
     }
 }
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(154), __webpack_require__(235), __webpack_require__(234),
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(154), __webpack_require__(236), __webpack_require__(235),
     __webpack_require__(403), __webpack_require__(404), __webpack_require__(97)], __WEBPACK_AMD_DEFINE_RESULT__ = function(array, date, zutil, sprintf, rate_limit, zescape){
 var E, _zerr;
 var env = process.env;
@@ -18554,7 +18670,7 @@ var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -18570,7 +18686,7 @@ var _har_viewer = __webpack_require__(183);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var util = _interopRequireWildcard(_util);
 
@@ -18671,10 +18787,12 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
         };
 
         _this2.set_field = function (field_name, value) {
+            var opt = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
             _this2.setState(function (prev_state) {
                 var new_form = (0, _extends4.default)({}, prev_state.form, (0, _defineProperty3.default)({}, field_name, value));
                 return { form: new_form };
-            }, _this2.debounced_save);
+            }, opt.skip_save ? undefined : _this2.debounced_save);
             _setdb2.default.set('head.proxy_edit.form.' + field_name, value);
             _this2.send_ga(field_name, value);
         };
@@ -18809,14 +18927,14 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 return;
             }
             var data = _this2.prepare_to_save();
-            var check_url = '/api/proxy_check/' + _this2.port;
+            var check_url = '/api/proxy_check/' + _this2.props.match.params.port;
             _this2.saving = true;
             _this2.setState({ saving: true }, function () {
                 return _this2.lock_nav(true);
             });
             var _this = _this2;
             _this2.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-                var raw_check, json_check, errors, warnings, update_url;
+                var raw_check, json_check, errors, warnings, update_url, port, tab;
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -18871,7 +18989,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                                 });
 
                                 if (warnings.length) _this.setState({ warnings: warnings });
-                                update_url = '/api/proxies/' + _this.port;
+                                update_url = '/api/proxies/' + _this.props.match.params.port;
                                 // XXX krzysztof: switch fetch->ajax
 
                                 _context2.next = 20;
@@ -18886,13 +19004,19 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                                     return _this.lock_nav(false);
                                 });
                                 _this.saving = false;
+                                if (_this.props.match.params.port != _this.state.form.port) {
+                                    port = _this.state.form.port;
+                                    tab = _this.props.match.params.tab;
+
+                                    _this.props.history.push({ pathname: '/proxy/' + port + '/' + tab });
+                                }
                                 if (_this.resave) {
                                     _this.resave = false;
                                     _this.save();
                                 }
                                 _this.update_proxies();
 
-                            case 24:
+                            case 25:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -18992,9 +19116,9 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             }));
             this.setdb_on('head.proxies_running', function (proxies) {
                 if (!proxies || _this3.state.proxies) return;
-                _this3.port = _this3.props.match.params.port;
+                var port = _this3.props.match.params.port;
                 var proxy = proxies.filter(function (p) {
-                    return p.port == _this3.port;
+                    return p.port == port;
                 })[0].config;
                 var form = Object.assign({}, proxy);
                 var preset = _this3.guess_preset(form);
@@ -19122,8 +19246,6 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             var curr_plan = this.state.consts && this.get_curr_plan();
             var type = void 0;
             if (curr_plan && curr_plan.type == 'static') type = 'ips';else if (curr_plan && !!curr_plan.vip) type = 'vips';
-            var port = this.props.match.params.port;
-            var show_main_window = this.state.consts && this.state.defaults && this.state.proxies;
             var tab = this.props.match.params.tab || 'logs';
             return _react2.default.createElement(
                 'div',
@@ -19135,12 +19257,8 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'nav_header' },
-                        _react2.default.createElement(
-                            'h3',
-                            null,
-                            'Proxy on port ',
-                            this.port
-                        ),
+                        _react2.default.createElement(Port_title, { port: this.props.match.params.port,
+                            name: this.state.form.internal_name }),
                         _react2.default.createElement(_common.Loader_small, { saving: this.state.saving,
                             std_msg: 'All changes saved in LPM',
                             std_tooltip: 'All changes are automatically saved to LPM' })
@@ -19154,7 +19272,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 _react2.default.createElement(
                     'div',
                     { className: (0, _classnames3.default)('main_window', (0, _defineProperty3.default)({}, tab, true)) },
-                    _react2.default.createElement(Main_window, { show: show_main_window, port: port,
+                    this.state.consts && this.state.defaults && this.state.proxies && _react2.default.createElement(Main_window, {
                         proxy: this.state.consts && this.state.consts.proxy,
                         defaults: this.state.defaults,
                         form: this.state.form,
@@ -19174,14 +19292,25 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
     return Index;
 }(_pure_component2.default));
 
-var Main_window = (0, _reactRouterDom.withRouter)(function (_ref4) {
-    var show = _ref4.show,
-        match = _ref4.match,
-        props = (0, _objectWithoutProperties3.default)(_ref4, ['show', 'match']);
+var Port_title = function Port_title(_ref4) {
+    var port = _ref4.port,
+        name = _ref4.name;
 
-    if (!show) return null;
+    if (name) port = port + (' (' + name + ')');
+    return _react2.default.createElement(
+        'h3',
+        null,
+        'Proxy on port ',
+        port
+    );
+};
+
+var Main_window = (0, _reactRouterDom.withRouter)(function (_ref5) {
+    var tab = _ref5.match.params.tab,
+        props = (0, _objectWithoutProperties3.default)(_ref5, ['match']);
+
     var Comp = void 0;
-    switch (match.params.tab) {
+    switch (tab) {
         case 'target':
             Comp = _targeting2.default;break;
         case 'speed':
@@ -19207,7 +19336,7 @@ var Nav = function (_Pure_component2) {
     (0, _inherits3.default)(Nav, _Pure_component2);
 
     function Nav() {
-        var _ref5;
+        var _ref6;
 
         var _temp, _this4, _ret;
 
@@ -19217,7 +19346,7 @@ var Nav = function (_Pure_component2) {
             args[_key] = arguments[_key];
         }
 
-        return _ret = (_temp = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Nav.__proto__ || Object.getPrototypeOf(Nav)).call.apply(_ref5, [this].concat(args))), _this4), _this4.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this4._reset_fields = function () {
+        return _ret = (_temp = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Nav.__proto__ || Object.getPrototypeOf(Nav)).call.apply(_ref6, [this].concat(args))), _this4), _this4.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this4._reset_fields = function () {
             _this4.set_field('ips', []);
             _this4.set_field('vips', []);
             _this4.set_field('multiply_ips', false);
@@ -19269,10 +19398,10 @@ var Nav = function (_Pure_component2) {
     return Nav;
 }(_pure_component2.default);
 
-var Field = function Field(_ref6) {
-    var disabled = _ref6.disabled,
-        tooltip = _ref6.tooltip,
-        props = (0, _objectWithoutProperties3.default)(_ref6, ['disabled', 'tooltip']);
+var Field = function Field(_ref7) {
+    var disabled = _ref7.disabled,
+        tooltip = _ref7.tooltip,
+        props = (0, _objectWithoutProperties3.default)(_ref7, ['disabled', 'tooltip']);
 
     var options = props.options || [];
     return _react2.default.createElement(
@@ -19305,8 +19434,8 @@ var Nav_tabs = function Nav_tabs() {
         { className: 'nav_tabs' },
         _react2.default.createElement(Tab_btn, { id: 'logs' }),
         _react2.default.createElement(Tab_btn, { id: 'target' }),
-        _react2.default.createElement(Tab_btn, { id: 'speed' }),
         _react2.default.createElement(Tab_btn, { id: 'rules' }),
+        _react2.default.createElement(Tab_btn, { id: 'speed' }),
         _react2.default.createElement(Tab_btn, { id: 'rotation' }),
         _react2.default.createElement(Tab_btn, { id: 'debug' }),
         _react2.default.createElement(Tab_btn, { id: 'headers' }),
@@ -19318,7 +19447,7 @@ var Tab_btn = (0, _reactRouterDom.withRouter)(function (_Pure_component3) {
     (0, _inherits3.default)(Tab_btn, _Pure_component3);
 
     function Tab_btn() {
-        var _ref7;
+        var _ref8;
 
         var _temp2, _this5, _ret2;
 
@@ -19328,7 +19457,7 @@ var Tab_btn = (0, _reactRouterDom.withRouter)(function (_Pure_component3) {
             args[_key2] = arguments[_key2];
         }
 
-        return _ret2 = (_temp2 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref7 = Tab_btn.__proto__ || Object.getPrototypeOf(Tab_btn)).call.apply(_ref7, [this].concat(args))), _this5), _this5.state = {}, _this5.click = function () {
+        return _ret2 = (_temp2 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref8 = Tab_btn.__proto__ || Object.getPrototypeOf(Tab_btn)).call.apply(_ref8, [this].concat(args))), _this5), _this5.state = {}, _this5.click = function () {
             var port = _this5.props.match.params.port;
             var pathname = '/proxy/' + port + '/' + _this5.props.id;
             _this5.props.history.push({ pathname: pathname });
@@ -19365,7 +19494,7 @@ var Alloc_modal = function (_Pure_component4) {
     (0, _inherits3.default)(Alloc_modal, _Pure_component4);
 
     function Alloc_modal() {
-        var _ref8;
+        var _ref9;
 
         var _temp3, _this6, _ret3;
 
@@ -19375,7 +19504,7 @@ var Alloc_modal = function (_Pure_component4) {
             args[_key3] = arguments[_key3];
         }
 
-        return _ret3 = (_temp3 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref8 = Alloc_modal.__proto__ || Object.getPrototypeOf(Alloc_modal)).call.apply(_ref8, [this].concat(args))), _this6), _this6.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this6.state = {
+        return _ret3 = (_temp3 = (_this6 = (0, _possibleConstructorReturn3.default)(this, (_ref9 = Alloc_modal.__proto__ || Object.getPrototypeOf(Alloc_modal)).call.apply(_ref9, [this].concat(args))), _this6), _this6.set_field = _setdb2.default.get('head.proxy_edit.set_field'), _this6.state = {
             available_list: [],
             displayed_list: [],
             cur_page: 0,
@@ -19752,7 +19881,7 @@ module.exports = __webpack_require__(415);
 /* 415 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var classof = __webpack_require__(238);
+var classof = __webpack_require__(239);
 var ITERATOR = __webpack_require__(29)('iterator');
 var Iterators = __webpack_require__(65);
 module.exports = __webpack_require__(19).isIterable = function (it) {
@@ -19784,7 +19913,7 @@ module.exports = __webpack_require__(418);
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(49);
-var get = __webpack_require__(237);
+var get = __webpack_require__(238);
 module.exports = __webpack_require__(19).getIterator = function (it) {
   var iterFn = get(it);
   if (typeof iterFn != 'function') throw TypeError(it + ' is not iterable!');
@@ -19858,9 +19987,9 @@ module.exports = __webpack_require__(19).Object.getPrototypeOf;
 
 // 19.1.2.9 Object.getPrototypeOf(O)
 var toObject = __webpack_require__(93);
-var $getPrototypeOf = __webpack_require__(202);
+var $getPrototypeOf = __webpack_require__(203);
 
-__webpack_require__(239)('getPrototypeOf', function () {
+__webpack_require__(240)('getPrototypeOf', function () {
   return function getPrototypeOf(it) {
     return $getPrototypeOf(toObject(it));
   };
@@ -19892,7 +20021,7 @@ module.exports = function getOwnPropertyDescriptor(it, key) {
 var toIObject = __webpack_require__(42);
 var $getOwnPropertyDescriptor = __webpack_require__(137).f;
 
-__webpack_require__(239)('getOwnPropertyDescriptor', function () {
+__webpack_require__(240)('getOwnPropertyDescriptor', function () {
   return function getOwnPropertyDescriptor(it, key) {
     return $getOwnPropertyDescriptor(toIObject(it), key);
   };
@@ -20017,11 +20146,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _asyncContainer = __webpack_require__(284);
+var _asyncContainer = __webpack_require__(285);
 
 var _asyncContainer2 = _interopRequireDefault(_asyncContainer);
 
-var _Typeahead = __webpack_require__(286);
+var _Typeahead = __webpack_require__(287);
 
 var _Typeahead2 = _interopRequireDefault(_Typeahead);
 
@@ -20646,14 +20775,14 @@ exports.default = Overlay;
 /* 542 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Stack = __webpack_require__(287),
-    equalArrays = __webpack_require__(289),
+var Stack = __webpack_require__(288),
+    equalArrays = __webpack_require__(290),
     equalByTag = __webpack_require__(573),
     equalObjects = __webpack_require__(577),
     getTag = __webpack_require__(588),
     isArray = __webpack_require__(35),
-    isBuffer = __webpack_require__(291),
-    isTypedArray = __webpack_require__(292);
+    isBuffer = __webpack_require__(292),
+    isTypedArray = __webpack_require__(293);
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1;
@@ -21007,7 +21136,7 @@ module.exports = stackSet;
 var isFunction = __webpack_require__(170),
     isMasked = __webpack_require__(554),
     isObject = __webpack_require__(46),
-    toSource = __webpack_require__(288);
+    toSource = __webpack_require__(289);
 
 /**
  * Used to match `RegExp`
@@ -21534,7 +21663,7 @@ module.exports = cacheHas;
 var Symbol = __webpack_require__(84),
     Uint8Array = __webpack_require__(574),
     eq = __webpack_require__(113),
-    equalArrays = __webpack_require__(289),
+    equalArrays = __webpack_require__(290),
     mapToArray = __webpack_require__(575),
     setToArray = __webpack_require__(576);
 
@@ -21807,9 +21936,9 @@ module.exports = equalObjects;
 var baseTimes = __webpack_require__(579),
     isArguments = __webpack_require__(173),
     isArray = __webpack_require__(35),
-    isBuffer = __webpack_require__(291),
+    isBuffer = __webpack_require__(292),
     isIndex = __webpack_require__(116),
-    isTypedArray = __webpack_require__(292);
+    isTypedArray = __webpack_require__(293);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -22019,7 +22148,7 @@ module.exports = baseUnary;
 /* 584 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(module) {var freeGlobal = __webpack_require__(285);
+/* WEBPACK VAR INJECTION */(function(module) {var freeGlobal = __webpack_require__(286);
 
 /** Detect free variable `exports`. */
 var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
@@ -22108,7 +22237,7 @@ module.exports = isPrototype;
 /* 587 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var overArg = __webpack_require__(293);
+var overArg = __webpack_require__(294);
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeKeys = overArg(Object.keys, Object);
@@ -22126,7 +22255,7 @@ var DataView = __webpack_require__(589),
     Set = __webpack_require__(591),
     WeakMap = __webpack_require__(592),
     baseGetTag = __webpack_require__(56),
-    toSource = __webpack_require__(288);
+    toSource = __webpack_require__(289);
 
 /** `Object#toString` result references. */
 var mapTag = '[object Map]',
@@ -22257,11 +22386,11 @@ var _reactDom = __webpack_require__(17);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _getContainer = __webpack_require__(294);
+var _getContainer = __webpack_require__(295);
 
 var _getContainer2 = _interopRequireDefault(_getContainer);
 
-var _ownerDocument = __webpack_require__(295);
+var _ownerDocument = __webpack_require__(296);
 
 var _ownerDocument2 = _interopRequireDefault(_ownerDocument);
 
@@ -22363,11 +22492,11 @@ var _reactDom = __webpack_require__(17);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _getContainer = __webpack_require__(294);
+var _getContainer = __webpack_require__(295);
 
 var _getContainer2 = _interopRequireDefault(_getContainer);
 
-var _ownerDocument = __webpack_require__(295);
+var _ownerDocument = __webpack_require__(296);
 
 var _ownerDocument2 = _interopRequireDefault(_ownerDocument);
 
@@ -22507,7 +22636,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _ClearButton = __webpack_require__(296);
+var _ClearButton = __webpack_require__(297);
 
 var _ClearButton2 = _interopRequireDefault(_ClearButton);
 
@@ -22519,7 +22648,7 @@ var _HintedInput = __webpack_require__(597);
 
 var _HintedInput2 = _interopRequireDefault(_HintedInput);
 
-var _Token = __webpack_require__(297);
+var _Token = __webpack_require__(298);
 
 var _Token2 = _interopRequireDefault(_Token);
 
@@ -23188,7 +23317,7 @@ exports.default = addCustomOption;
 /* 600 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toString = __webpack_require__(300);
+var toString = __webpack_require__(301);
 
 /** Used to generate unique IDs. */
 var idCounter = 0;
@@ -23292,7 +23421,7 @@ module.exports = arrayMap;
 /* 603 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var overArg = __webpack_require__(293);
+var overArg = __webpack_require__(294);
 
 /** Built-in value references. */
 var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -23443,7 +23572,7 @@ module.exports = isString;
 /* 606 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arraySome = __webpack_require__(290),
+var arraySome = __webpack_require__(291),
     baseIteratee = __webpack_require__(607),
     baseSome = __webpack_require__(621),
     isArray = __webpack_require__(35),
@@ -23502,7 +23631,7 @@ module.exports = some;
 
 var baseMatches = __webpack_require__(608),
     baseMatchesProperty = __webpack_require__(611),
-    identity = __webpack_require__(305),
+    identity = __webpack_require__(306),
     isArray = __webpack_require__(35),
     property = __webpack_require__(618);
 
@@ -23539,7 +23668,7 @@ module.exports = baseIteratee;
 
 var baseIsMatch = __webpack_require__(609),
     getMatchData = __webpack_require__(610),
-    matchesStrictComparable = __webpack_require__(303);
+    matchesStrictComparable = __webpack_require__(304);
 
 /**
  * The base implementation of `_.matches` which doesn't clone `source`.
@@ -23565,7 +23694,7 @@ module.exports = baseMatches;
 /* 609 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Stack = __webpack_require__(287),
+var Stack = __webpack_require__(288),
     baseIsEqual = __webpack_require__(168);
 
 /** Used to compose bitmasks for value comparisons. */
@@ -23633,7 +23762,7 @@ module.exports = baseIsMatch;
 /* 610 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isStrictComparable = __webpack_require__(302),
+var isStrictComparable = __webpack_require__(303),
     keys = __webpack_require__(172);
 
 /**
@@ -23665,10 +23794,10 @@ module.exports = getMatchData;
 
 var baseIsEqual = __webpack_require__(168),
     get = __webpack_require__(612),
-    hasIn = __webpack_require__(304),
+    hasIn = __webpack_require__(305),
     isKey = __webpack_require__(178),
-    isStrictComparable = __webpack_require__(302),
-    matchesStrictComparable = __webpack_require__(303),
+    isStrictComparable = __webpack_require__(303),
+    matchesStrictComparable = __webpack_require__(304),
     toKey = __webpack_require__(85);
 
 /** Used to compose bitmasks for value comparisons. */
@@ -24687,7 +24816,7 @@ var _Highlighter = __webpack_require__(654);
 
 var _Highlighter2 = _interopRequireDefault(_Highlighter);
 
-var _Menu = __webpack_require__(307);
+var _Menu = __webpack_require__(308);
 
 var _Menu2 = _interopRequireDefault(_Menu);
 
@@ -24845,7 +24974,7 @@ module.exports = pick;
 /***/ (function(module, exports, __webpack_require__) {
 
 var basePickBy = __webpack_require__(639),
-    hasIn = __webpack_require__(304);
+    hasIn = __webpack_require__(305);
 
 /**
  * The base implementation of `_.pick` without support for individual
@@ -24993,7 +25122,7 @@ module.exports = assignValue;
 /* 642 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var defineProperty = __webpack_require__(306);
+var defineProperty = __webpack_require__(307);
 
 /**
  * The base implementation of `assignValue` and `assignMergeValue` without
@@ -25260,8 +25389,8 @@ module.exports = setToString;
 /***/ (function(module, exports, __webpack_require__) {
 
 var constant = __webpack_require__(652),
-    defineProperty = __webpack_require__(306),
-    identity = __webpack_require__(305);
+    defineProperty = __webpack_require__(307),
+    identity = __webpack_require__(306);
 
 /**
  * The base implementation of `setToString` without support for hot loop shorting.
@@ -25551,7 +25680,7 @@ var _propTypes = __webpack_require__(4);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _reactOnclickoutside = __webpack_require__(299);
+var _reactOnclickoutside = __webpack_require__(300);
 
 var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
@@ -25559,7 +25688,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _deprecated = __webpack_require__(265);
+var _deprecated = __webpack_require__(266);
 
 var _deprecated2 = _interopRequireDefault(_deprecated);
 
@@ -26351,7 +26480,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = inputPropsType;
 
-var _isPlainObject = __webpack_require__(301);
+var _isPlainObject = __webpack_require__(302);
 
 var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
 
@@ -29051,7 +29180,7 @@ var _createTransitionManager = __webpack_require__(186);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
-var _DOMUtils = __webpack_require__(312);
+var _DOMUtils = __webpack_require__(314);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -29428,7 +29557,7 @@ var _createTransitionManager = __webpack_require__(186);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
-var _DOMUtils = __webpack_require__(312);
+var _DOMUtils = __webpack_require__(314);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -29994,8 +30123,8 @@ exports.default = createMemoryHistory;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Route__ = __webpack_require__(314);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(313);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Route__ = __webpack_require__(316);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(315);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -30767,7 +30896,7 @@ Redirect.contextTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(122);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(90);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(190);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(316);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(318);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -31071,7 +31200,7 @@ var createBrowserHistory = function createBrowserHistory() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(122);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(90);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(190);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(316);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(318);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
@@ -31878,9 +32007,9 @@ Switch.propTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(317);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(319);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(315);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(317);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -31970,7 +32099,7 @@ var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -32178,7 +32307,8 @@ exports.default = provider({ tab_id: 'rules' })(function (_Pure_component) {
                     )
                 ),
                 this.state.rules.map(function (r) {
-                    return _react2.default.createElement(Rule, { key: r.id, rule: r, rule_del: _this4.rule_del });
+                    return _react2.default.createElement(Rule, { key: r.id, rule: r, rule_del: _this4.rule_del,
+                        www: _this4.state.www });
                 }),
                 _react2.default.createElement(
                     'button',
@@ -32325,7 +32455,7 @@ var Ips_lists = function (_Pure_component3) {
     return Ips_lists;
 }(_pure_component2.default);
 
-var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component4) {
+var Rule = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(function (_Pure_component4) {
     (0, _inherits3.default)(Rule, _Pure_component4);
 
     function Rule() {
@@ -32361,10 +32491,7 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component4) {
             }
             if (!val) _this8.set_rule_field('trigger_url_regex', '');
         }, _this8.action_changed = function (val) {
-            if (val == 'retry_port') {
-                var def_port = _this8.state.ports.length && _this8.state.ports[0].key;
-                _this8.set_rule_field(val, def_port || '');
-            }
+            if (val == 'retry_port') _this8.set_rule_field(val, _this8.props.def_port || '');
             if (val != 'ban_ip') {
                 _this8.set_rule_field('ban_ip_duration', '');
                 _this8.set_rule_field('ban_ip_custom', '');
@@ -32388,17 +32515,11 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component4) {
         value: function componentDidMount() {
             var _this9 = this;
 
-            this.setdb_on('head.proxies_running', function (proxies) {
-                var cur_port = _this9.props.match.params.port;
-                var ports = (proxies || []).filter(function (p) {
-                    return p.port != cur_port;
-                }).map(function (p) {
-                    return { key: p.port, value: p.port };
-                });
-                _this9.setState({ ports: ports });
-            });
             this.setdb_on('head.consts', function (consts) {
                 if (consts && consts.logins) _this9.setState({ logins: consts.logins });
+            });
+            this.setdb_on('head.defaults', function (defaults) {
+                if (defaults && defaults.www_api) _this9.setState({ www: defaults.www_api });
             });
         }
     }, {
@@ -32412,6 +32533,9 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component4) {
             }).filter(function (at) {
                 return rule.trigger_type == 'url' && at.only_url || rule.trigger_type != 'url' && !at.only_url;
             }));
+            var ports = this.props.ports_opt.filter(function (p) {
+                return p.value != _this10.props.match.params.port;
+            });
             return _react2.default.createElement(
                 'div',
                 { className: 'rule_wrapper' },
@@ -32435,8 +32559,8 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component4) {
                     on_change: this.action_changed, rule: rule }),
                 rule.action == 'retry' && _react2.default.createElement(Rule_config, { id: 'retry_number', type: 'number', min: '0', max: '20',
                     validator: _common2.validators.number(0, 20), rule: rule }),
-                rule.action == 'retry_port' && _react2.default.createElement(Rule_config, { id: 'retry_port', type: 'select',
-                    data: this.state.ports, rule: rule }),
+                rule.action == 'retry_port' && _react2.default.createElement(Rule_config, { id: 'retry_port', type: 'select', data: ports,
+                    rule: rule }),
                 rule.action == 'ban_ip' && _react2.default.createElement(Rule_config, { id: 'ban_ip_duration', type: 'select',
                     data: ban_options, rule: rule }),
                 rule.action == 'save_to_fast_pool' && _react2.default.createElement(Rule_config, { id: 'fast_pool_size', type: 'number', min: '1',
@@ -32464,16 +32588,39 @@ var Rule = (0, _reactRouterDom.withRouter)(function (_Pure_component4) {
                 rule.send_email && this.state.logins && this.state.logins.length > 1 && _react2.default.createElement(Rule_config, { id: 'email', type: 'select', rule: rule,
                     data: this.state.logins.map(function (l) {
                         return { key: l, value: l };
-                    }) })
+                    }),
+                    note: _react2.default.createElement(Email_note, { www: this.state.www }) })
             );
         }
     }]);
     return Rule;
-}(_pure_component2.default));
+}(_pure_component2.default)));
 
-var Btn_rule_del = function Btn_rule_del(_ref5) {
-    var on_click = _ref5.on_click;
-    return _react2.default.createElement('div', { className: 'btn_rule_del', onClick: on_click });
+var Email_note = function Email_note(_ref5) {
+    var www = _ref5.www;
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+            'span',
+            null,
+            'You can manage the list of available emails '
+        ),
+        _react2.default.createElement(
+            'a',
+            { target: '_blank', rel: 'noopener noreferrer', href: www + '/cp/settings' },
+            'here'
+        )
+    );
+};
+
+var Btn_rule_del = function Btn_rule_del(_ref6) {
+    var on_click = _ref6.on_click;
+    return _react2.default.createElement(
+        _common.Note,
+        null,
+        _react2.default.createElement('div', { className: 'btn_rule_del', onClick: on_click })
+    );
 };
 
 /***/ }),
@@ -32674,7 +32821,7 @@ var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -32871,11 +33018,13 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
 var _common = __webpack_require__(61);
+
+var _util = __webpack_require__(24);
 
 var _recompose = __webpack_require__(48);
 
@@ -32889,9 +33038,7 @@ var provider = function provider(provide) {
     return (0, _recompose.withContext)({ provide: _propTypes2.default.object }, function () {
         return { provide: provide };
     });
-};
-
-exports.default = provider({ tab_id: 'general' })(function (props) {
+};exports.default = provider({ tab_id: 'general' })(function (props) {
     var set_field = _setdb2.default.get('head.proxy_edit.set_field');
     var open_modal = function open_modal() {
         (0, _jquery2.default)('#allocated_ips').modal('show');
@@ -32925,9 +33072,12 @@ exports.default = provider({ tab_id: 'general' })(function (props) {
     return _react2.default.createElement(
         'div',
         null,
+        _react2.default.createElement(_common.Config, { type: 'text', id: 'internal_name' }),
         _react2.default.createElement(_common.Config, { type: 'number', id: 'port' }),
         _react2.default.createElement(_common.Config, { type: 'number', id: 'socks', disabled: true, val_id: 'port' }),
         _react2.default.createElement(_common.Config, { type: 'text', id: 'password' }),
+        _react2.default.createElement(_common.Config, { type: 'text', id: 'whitelist_ips', save_on_blur: true,
+            validator: _util.normalizers.ips_list }),
         _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'ssl' }),
         _react2.default.createElement(_common.Config, { type: 'number', id: 'multiply', min: '1', disabled: mul_disabled }),
         type == 'ips' && _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'multiply_ips',
@@ -32990,7 +33140,7 @@ exports.default = provider({ tab_id: 'debug' })(function (props) {
  /*jslint react:true, es6:true*/
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _react = __webpack_require__(0);
@@ -33008,31 +33158,29 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var provider = function provider(provide) {
-  return (0, _recompose.withContext)({ provide: _propTypes2.default.object }, function () {
-    return { provide: provide };
-  });
+    return (0, _recompose.withContext)({ provide: _propTypes2.default.object }, function () {
+        return { provide: provide };
+    });
 };
 
 exports.default = provider({ tab_id: 'rotation' })(function (props) {
-  var form = props.form,
-      proxy = props.proxy;
+    var form = props.form,
+        proxy = props.proxy;
 
-  return _react2.default.createElement(
-    'div',
-    null,
-    _react2.default.createElement(_common.Config, { type: 'text', id: 'ip' }),
-    _react2.default.createElement(_common.Config, { type: 'text', id: 'vip' }),
-    _react2.default.createElement(_common.Config, { type: 'select', id: 'pool_type', data: proxy.pool_type.values }),
-    _react2.default.createElement(_common.Config, { type: 'number', id: 'keep_alive', min: '0', sufix: 'seconds' }),
-    _react2.default.createElement(_common.Config, { type: 'text', id: 'whitelist_ips',
-      validator: _common.validators.ips_list }),
-    _react2.default.createElement(_common.Config, { type: 'double_number', id: 'max_requests' }),
-    _react2.default.createElement(_common.Config, { type: 'double_number', id: 'session_duration', sufix: 'seconds' }),
-    _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'sticky_ip' }),
-    _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'session_random', disabled: form.sticky_ip }),
-    !form.session_random && !form.sticky_ip && _react2.default.createElement(_common.Config, { type: 'text', id: 'session' }),
-    _react2.default.createElement(_common.Config, { type: 'text', id: 'seed' })
-  );
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(_common.Config, { type: 'text', id: 'ip' }),
+        _react2.default.createElement(_common.Config, { type: 'text', id: 'vip' }),
+        _react2.default.createElement(_common.Config, { type: 'select', id: 'pool_type', data: proxy.pool_type.values }),
+        _react2.default.createElement(_common.Config, { type: 'number', id: 'keep_alive', min: '0', sufix: 'seconds' }),
+        _react2.default.createElement(_common.Config, { type: 'double_number', id: 'max_requests' }),
+        _react2.default.createElement(_common.Config, { type: 'double_number', id: 'session_duration', sufix: 'seconds' }),
+        _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'sticky_ip' }),
+        _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'session_random', disabled: form.sticky_ip }),
+        !form.session_random && !form.sticky_ip && _react2.default.createElement(_common.Config, { type: 'text', id: 'session' }),
+        _react2.default.createElement(_common.Config, { type: 'text', id: 'seed' })
+    );
 });
 
 /***/ }),
@@ -33233,7 +33381,7 @@ var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -33241,7 +33389,7 @@ var _common = __webpack_require__(61);
 
 var _common2 = __webpack_require__(16);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var util = _interopRequireWildcard(_util);
 
@@ -33433,7 +33581,7 @@ var _instructions2 = _interopRequireDefault(_instructions);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _pure_component = __webpack_require__(14);
 
@@ -35195,7 +35343,7 @@ var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -35205,7 +35353,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _schema = __webpack_require__(722);
 
@@ -35841,7 +35989,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36059,7 +36207,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _pure_component = __webpack_require__(14);
 
@@ -36069,7 +36217,7 @@ var _classnames = __webpack_require__(6);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _semver = __webpack_require__(319);
+var _semver = __webpack_require__(320);
 
 var _semver2 = _interopRequireDefault(_semver);
 
@@ -36536,13 +36684,13 @@ var _defineProperty2 = __webpack_require__(37);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
-var _toConsumableArray2 = __webpack_require__(39);
-
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-
 var _extends5 = __webpack_require__(5);
 
 var _extends6 = _interopRequireDefault(_extends5);
+
+var _toConsumableArray2 = __webpack_require__(39);
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -36582,11 +36730,15 @@ var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
-var _har_preview = __webpack_require__(309);
+var _har_preview = __webpack_require__(311);
 
 var _har_preview2 = _interopRequireDefault(_har_preview);
+
+var _proxy_blank = __webpack_require__(192);
+
+var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
 var _reactRouterDom = __webpack_require__(36);
 
@@ -36629,7 +36781,7 @@ var Proxy_tester = function (_Pure_component) {
     return Proxy_tester;
 }(_pure_component2.default);
 
-var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
+var Request = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(function (_Pure_component2) {
     (0, _inherits3.default)(Request, _Pure_component2);
 
     function Request() {
@@ -36643,11 +36795,12 @@ var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
             args[_key2] = arguments[_key2];
         }
 
-        return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Request.__proto__ || Object.getPrototypeOf(Request)).call.apply(_ref2, [this].concat(args))), _this3), _this3.first_header = { idx: 0, header: '', value: '' }, _this3.default_state = {
+        return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Request.__proto__ || Object.getPrototypeOf(Request)).call.apply(_ref2, [this].concat(args))), _this3), _this3.first_header = { idx: 0, header: '', value: '' }, _this3.state = {
             headers: [_this3.first_header],
             max_idx: 0,
-            params: { url: 'http://lumtest.com/myip.json', method: 'GET' }
-        }, _this3.state = (0, _extends6.default)({}, _this3.default_state, { show_loader: false }), _this3.add_header = function () {
+            params: { url: 'http://lumtest.com/myip.json', method: 'GET' },
+            show_loader: false
+        }, _this3.add_header = function () {
             (0, _util.ga_event)('proxy_tester', 'add header');
             _this3.setState(function (prev_state) {
                 return {
@@ -36680,13 +36833,8 @@ var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
             });
         }, _this3.go = function () {
             (0, _util.ga_event)('proxy_tester', 'run test');
-            if (!_this3.state.params.proxy) {
-                (0, _util.ga_event)('proxy_tester', 'no proxy chosen');
-                _this3.setState({ warnings: [{ msg: 'You need to choose a proxy port first' }] });
-                (0, _jquery2.default)('#warnings_modal').modal();
-                return;
-            }
-            var url = '/api/test/' + _this3.state.params.proxy;
+            var port = _this3.state.params.port || _this3.props.def_port;
+            var url = '/api/test/' + port;
             var data = {
                 headers: _this3.state.headers.reduce(function (acc, el) {
                     if (!el.header) return acc;
@@ -36738,25 +36886,15 @@ var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
     (0, _createClass3.default)(Request, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this4 = this;
-
             var params = this.props.history.location.state || {};
             var url = params.url || this.state.params.url;
-            var port = params.port || this.state.params.port;
-            this.setdb_on('head.proxies_running', function (proxies) {
-                if (!proxies || !proxies.length) return;
-                _this4.setState({ proxies: proxies });
-                _this4.setState(function (prev_state) {
-                    var def_port = proxies[0].port;
-                    _this4.default_state.params.proxy = def_port;
-                    return { params: (0, _extends6.default)({}, prev_state.params, { proxy: port || def_port,
-                            url: url }) };
-                });
-            });
+            var port = params.port;
+            this.setState({ params: { url: url, port: port } });
         }
     }, {
         key: 'render',
         value: function render() {
+            if (!this.props.ports.length) return _react2.default.createElement(_proxy_blank2.default, null);
             return _react2.default.createElement(
                 'div',
                 { className: 'panel no_border request' },
@@ -36772,7 +36910,7 @@ var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
                     null,
                     _react2.default.createElement(Request_params, { params: this.state.params,
                         update: this.update_params,
-                        proxies: this.state.proxies }),
+                        port_select: this.props.port_select }),
                     _react2.default.createElement(Headers, { headers: this.state.headers,
                         clicked_remove: this.remove_header,
                         clicked_add: this.add_header,
@@ -36796,24 +36934,37 @@ var Request = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
         }
     }]);
     return Request;
-}(_pure_component2.default));
+}(_pure_component2.default)));
 
 var Request_params = function Request_params(_ref3) {
-    var params = _ref3.params,
-        update = _ref3.update,
-        proxies = _ref3.proxies;
+    var port_select = _ref3.port_select,
+        params = _ref3.params,
+        update = _ref3.update;
 
-    proxies = (proxies || []).map(function (p) {
-        return { key: p.port, value: p.port };
-    });
     var methods = [{ key: 'GET', value: 'GET' }, { key: 'POST', value: 'POST' }];
     var method_tip = 'Method of a test request. Leave GET if you don\'t know\n    what to choose';
+    var port_changed = function port_changed(port) {
+        (0, _util.ga_event)('proxy_tester', 'edit port', port);
+        update('port', port);
+    };
+    var Port_select = port_select;
     return _react2.default.createElement(
         'div',
         { className: 'request_params' },
-        _react2.default.createElement(Field, { params: params, update: update, name: 'proxy', type: 'select',
-            data: proxies,
-            tooltip: 'Choose a proxy port that will be used for this test' }),
+        _react2.default.createElement(
+            _common.Tooltip,
+            { title: 'Choose a proxy port that will be used for this test' },
+            _react2.default.createElement(
+                'div',
+                { className: (0, _classnames2.default)('field', 'proxy') },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'title' },
+                    'Proxy port'
+                ),
+                _react2.default.createElement(Port_select, { val: params.port, on_change: port_changed })
+            )
+        ),
         _react2.default.createElement(Field, { params: params, update: update, name: 'url', type: 'text',
             tooltip: 'URL that Proxy Tester will use to send a test request' }),
         _react2.default.createElement(Field, { params: params, update: update, name: 'method', type: 'select',
@@ -36821,6 +36972,8 @@ var Request_params = function Request_params(_ref3) {
     );
 };
 
+// XXX krzysztof: Refactor it the same as link tester, field should take
+// children. This is too generic and complex
 var Field = function Field(_ref4) {
     var type = _ref4.type,
         update = _ref4.update,
@@ -36829,7 +36982,7 @@ var Field = function Field(_ref4) {
         tooltip = _ref4.tooltip,
         props = (0, _objectWithoutProperties3.default)(_ref4, ['type', 'update', 'name', 'params', 'tooltip']);
 
-    var fields = { proxy: 'Proxy port', url: 'URL', method: 'Method' };
+    var fields = { port: 'Proxy port', url: 'URL', method: 'Method' };
     var on_change_wrapper = function on_change_wrapper(val) {
         if (name != 'url') (0, _util.ga_event)('proxy_tester', 'edit ' + name);
         update(name, val);
@@ -36879,7 +37032,7 @@ var New_header_params = function (_Pure_component3) {
     function New_header_params() {
         var _ref6;
 
-        var _temp3, _this5, _ret3;
+        var _temp3, _this4, _ret3;
 
         (0, _classCallCheck3.default)(this, New_header_params);
 
@@ -36887,11 +37040,11 @@ var New_header_params = function (_Pure_component3) {
             args[_key3] = arguments[_key3];
         }
 
-        return _ret3 = (_temp3 = (_this5 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = New_header_params.__proto__ || Object.getPrototypeOf(New_header_params)).call.apply(_ref6, [this].concat(args))), _this5), _this5.input_changed = function (field) {
+        return _ret3 = (_temp3 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = New_header_params.__proto__ || Object.getPrototypeOf(New_header_params)).call.apply(_ref6, [this].concat(args))), _this4), _this4.input_changed = function (field) {
             return function (value) {
-                return _this5.props.update(_this5.props.header.idx, field, value);
+                return _this4.props.update(_this4.props.header.idx, field, value);
             };
-        }, _this5.header_tip = 'Header name that will be sent along with the request', _this5.value_tip = 'Value of the header that will be sent along with the request', _temp3), (0, _possibleConstructorReturn3.default)(_this5, _ret3);
+        }, _this4.header_tip = 'Header name that will be sent along with the request', _this4.value_tip = 'Value of the header that will be sent along with the request', _temp3), (0, _possibleConstructorReturn3.default)(_this4, _ret3);
     }
 
     (0, _createClass3.default)(New_header_params, [{
@@ -36983,13 +37136,13 @@ var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _reactBootstrapTypeahead = __webpack_require__(283);
+var _reactBootstrapTypeahead = __webpack_require__(284);
 
 var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -37547,7 +37700,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _semver = __webpack_require__(319);
+var _semver = __webpack_require__(320);
 
 var _semver2 = _interopRequireDefault(_semver);
 
@@ -37823,13 +37976,13 @@ var _regenerator = __webpack_require__(18);
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var _extends4 = __webpack_require__(5);
-
-var _extends5 = _interopRequireDefault(_extends4);
-
 var _defineProperty2 = __webpack_require__(37);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _extends4 = __webpack_require__(5);
+
+var _extends5 = _interopRequireDefault(_extends4);
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -37859,7 +38012,7 @@ var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(25);
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -37883,7 +38036,7 @@ var _fileSaver = __webpack_require__(191);
 
 var _fileSaver2 = _interopRequireDefault(_fileSaver);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _lodash = __webpack_require__(66);
 
@@ -37893,11 +38046,11 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _proxy_add = __webpack_require__(320);
+var _proxy_add = __webpack_require__(321);
 
 var _proxy_add2 = _interopRequireDefault(_proxy_add);
 
-var _proxy_blank = __webpack_require__(321);
+var _proxy_blank = __webpack_require__(192);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
@@ -38060,6 +38213,16 @@ var Reqs_cell = function Reqs_cell(_ref9) {
 };
 
 var columns = [{
+    key: 'internal_name',
+    title: 'Internal name',
+    tooltip: 'An internal name is used for proxy ports to be easily             distinguished. Those don\'t change any proxy behavior and it\'s only\n            cosmetic',
+    ext: true,
+    calc_show: function calc_show(proxies) {
+        return proxies.some(function (p) {
+            return p.config.internal_name;
+        });
+    }
+}, {
     key: 'port',
     title: 'Proxy port',
     sticky: true,
@@ -38199,6 +38362,10 @@ var columns = [{
     type: 'options',
     ext: true
 }, {
+    key: 'proxy',
+    title: 'Super Proxy',
+    type: 'text'
+}, {
     key: 'proxy_switch',
     title: 'Autoswitch super proxy on failure',
     type: 'number'
@@ -38267,13 +38434,46 @@ var columns = [{
 var Columns_modal = function (_Pure_component) {
     (0, _inherits3.default)(Columns_modal, _Pure_component);
 
-    function Columns_modal(props) {
+    function Columns_modal() {
+        var _ref12;
+
+        var _temp, _this2, _ret;
+
         (0, _classCallCheck3.default)(this, Columns_modal);
 
-        var _this2 = (0, _possibleConstructorReturn3.default)(this, (Columns_modal.__proto__ || Object.getPrototypeOf(Columns_modal)).call(this, props));
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
 
-        _this2.state = { selected_cols: [] };
-        return _this2;
+        return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref12 = Columns_modal.__proto__ || Object.getPrototypeOf(Columns_modal)).call.apply(_ref12, [this].concat(args))), _this2), _this2.state = { selected_cols: [] }, _this2.on_change = function (_ref13) {
+            var value = _ref13.target.value;
+
+            _this2.setState(function (prev) {
+                return { selected_cols: (0, _extends5.default)({}, prev.selected_cols, (0, _defineProperty3.default)({}, value, !prev.selected_cols[value])) };
+            });
+        }, _this2.click_ok = function () {
+            var new_columns = Object.keys(_this2.state.selected_cols).filter(function (c) {
+                return _this2.state.selected_cols[c];
+            });
+            _this2.props.update_selected_cols(new_columns);
+            window.localStorage.setItem('columns', JSON.stringify(_this2.state.selected_cols));
+        }, _this2.click_cancel = function () {
+            return _this2.setState({ selected_cols: _this2.state.saved_cols });
+        }, _this2.select_all = function () {
+            _this2.setState({ selected_cols: columns.filter(function (c) {
+                    return !c.sticky;
+                }).reduce(function (acc, e) {
+                    return Object.assign(acc, (0, _defineProperty3.default)({}, e.key, true));
+                }, {}) });
+        }, _this2.select_none = function () {
+            return _this2.setState({ selected_cols: {} });
+        }, _this2.select_default = function () {
+            _this2.setState({ selected_cols: columns.filter(function (c) {
+                    return !c.sticky && c.default;
+                }).reduce(function (acc, e) {
+                    return Object.assign(acc, (0, _defineProperty3.default)({}, e.key, true));
+                }, {}) });
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
     }
 
     (0, _createClass3.default)(Columns_modal, [{
@@ -38285,85 +38485,33 @@ var Columns_modal = function (_Pure_component) {
             this.setState({ selected_cols: selected_cols, saved_cols: selected_cols });
         }
     }, {
-        key: 'on_change',
-        value: function on_change(_ref12) {
-            var value = _ref12.target.value;
-
-            this.setState(function (prev) {
-                return { selected_cols: (0, _extends5.default)({}, prev.selected_cols, (0, _defineProperty3.default)({}, value, !prev.selected_cols[value])) };
-            });
-        }
-    }, {
-        key: 'click_ok',
-        value: function click_ok() {
-            var _this3 = this;
-
-            var new_columns = Object.keys(this.state.selected_cols).filter(function (c) {
-                return _this3.state.selected_cols[c];
-            });
-            this.props.update_selected_cols(new_columns);
-            window.localStorage.setItem('columns', JSON.stringify(this.state.selected_cols));
-        }
-    }, {
-        key: 'click_cancel',
-        value: function click_cancel() {
-            this.setState({ selected_cols: this.state.saved_cols });
-        }
-    }, {
-        key: 'select_all',
-        value: function select_all() {
-            this.setState({ selected_cols: columns.filter(function (c) {
-                    return !c.sticky;
-                }).reduce(function (acc, e) {
-                    return Object.assign(acc, (0, _defineProperty3.default)({}, e.key, true));
-                }, {}) });
-        }
-    }, {
-        key: 'select_none',
-        value: function select_none() {
-            this.setState({ selected_cols: {} });
-        }
-    }, {
-        key: 'select_default',
-        value: function select_default() {
-            this.setState({ selected_cols: columns.filter(function (c) {
-                    return !c.sticky && c.default;
-                }).reduce(function (acc, e) {
-                    return Object.assign(acc, (0, _defineProperty3.default)({}, e.key, true));
-                }, {}) });
-        }
-    }, {
         key: 'render',
         value: function render() {
-            var _this4 = this;
+            var _this3 = this;
 
             var header = _react2.default.createElement(
                 'div',
                 { className: 'header_buttons' },
                 _react2.default.createElement(
                     'button',
-                    { onClick: this.select_all.bind(this),
-                        className: 'btn btn_lpm' },
+                    { onClick: this.select_all, className: 'btn btn_lpm' },
                     'Check all'
                 ),
                 _react2.default.createElement(
                     'button',
-                    { onClick: this.select_none.bind(this),
-                        className: 'btn btn_lpm' },
+                    { onClick: this.select_none, className: 'btn btn_lpm' },
                     'Uncheck all'
                 ),
                 _react2.default.createElement(
                     'button',
-                    { onClick: this.select_default.bind(this),
-                        className: 'btn btn_lpm' },
+                    { onClick: this.select_default, className: 'btn btn_lpm' },
                     'Default'
                 )
             );
             return _react2.default.createElement(
                 _common.Modal,
                 { id: 'edit_columns', custom_header: header,
-                    click_ok: this.click_ok.bind(this),
-                    cancel_clicked: this.click_cancel.bind(this) },
+                    click_ok: this.click_ok, cancel_clicked: this.click_cancel },
                 _react2.default.createElement(
                     'div',
                     { className: 'row columns' },
@@ -38374,8 +38522,8 @@ var Columns_modal = function (_Pure_component) {
                             'div',
                             { key: col.key, className: 'col-md-6' },
                             _react2.default.createElement(_common.Checkbox, { text: col.title, value: col.key,
-                                on_change: _this4.on_change.bind(_this4),
-                                checked: !!_this4.state.selected_cols[col.key] })
+                                on_change: _this3.on_change,
+                                checked: !!_this3.state.selected_cols[col.key] })
                         );
                     })
                 )
@@ -38406,73 +38554,16 @@ var Proxies = function (_Pure_component2) {
     function Proxies(props) {
         (0, _classCallCheck3.default)(this, Proxies);
 
-        var _this5 = (0, _possibleConstructorReturn3.default)(this, (Proxies.__proto__ || Object.getPrototypeOf(Proxies)).call(this, props));
+        var _this4 = (0, _possibleConstructorReturn3.default)(this, (Proxies.__proto__ || Object.getPrototypeOf(Proxies)).call(this, props));
 
-        _this5.proxy_add = function () {
-            (0, _jquery2.default)('#add_new_proxy_modal').modal('show');
-        };
-
-        var from_storage = JSON.parse(window.localStorage.getItem('columns')) || {};
-        from_storage = Object.keys(from_storage).filter(function (c) {
-            return from_storage[c];
-        });
-        var default_cols = columns.filter(function (c) {
-            return c.default;
-        }).map(function (col) {
-            return col.key;
-        });
-        var pagination = get_pagination('proxies');
-        _this5.state = {
-            selected_cols: from_storage.length && from_storage || default_cols,
-            items_per_page: pagination.items,
-            cur_page: 0,
-            proxies: [],
-            filtered_proxies: [],
-            displayed_proxies: [],
-            loaded: false
-        };
-        _setdb2.default.set('head.proxies.update', _this5.update.bind(_this5));
-        return _this5;
-    }
-
-    (0, _createClass3.default)(Proxies, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            var _this6 = this;
-
-            this.setdb_on('head.proxies_running', function (proxies) {
-                if (!proxies) return;
-                proxies = _this6.prepare_proxies(proxies || []);
-                var filtered_proxies = _this6.filter_proxies(proxies, _this6.props.master_port);
-                _this6.setState({ proxies: proxies, filtered_proxies: filtered_proxies, loaded: true }, _this6.paginate);
-            });
-            this.setdb_on('head.locations', function (locations) {
-                if (!locations) return;
-                var countries = locations.countries_by_code;
-                country_names = countries;
-                _this6.setState({ countries: countries });
-            });
-            window.setTimeout(this.req_status.bind(this));
-        }
-    }, {
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(props) {
-            if (props.master_port != this.props.master_port) {
-                var filtered_proxies = this.filter_proxies(this.state.proxies, props.master_port);
-                this.setState({ filtered_proxies: filtered_proxies }, this.paginate);
-            }
-        }
-    }, {
-        key: 'filter_proxies',
-        value: function filter_proxies(proxies, mp) {
+        _this4.filter_proxies = function (proxies, mp) {
             return proxies.filter(function (p) {
                 if (mp) return '' + p.port == mp || '' + p.master_port == mp;
                 return p.proxy_type != 'duplicate';
             });
-        }
-    }, {
-        key: 'prepare_proxies',
-        value: function prepare_proxies(proxies) {
+        };
+
+        _this4.prepare_proxies = function (proxies) {
             proxies.sort(function (a, b) {
                 return a.port > b.port ? 1 : -1;
             });
@@ -38482,22 +38573,18 @@ var Proxies = function (_Pure_component2) {
                 cur._status_details = cur._status_details || [];
             }
             return proxies;
-        }
-    }, {
-        key: 'update_items_per_page',
-        value: function update_items_per_page(items_per_page) {
-            var _this7 = this;
+        };
 
-            this.setState({ items_per_page: items_per_page }, function () {
-                return _this7.paginate(0);
+        _this4.update_items_per_page = function (items_per_page) {
+            _this4.setState({ items_per_page: items_per_page }, function () {
+                return _this4.paginate(0);
             });
             save_pagination('proxies', { items: items_per_page });
-        }
-    }, {
-        key: 'req_status',
-        value: function req_status() {
-            var _this = this;
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+        };
+
+        _this4.req_status = function () {
+            var _this = _this4;
+            _this4.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                 var params, url, stats;
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
@@ -38598,11 +38685,10 @@ var Proxies = function (_Pure_component2) {
                     }
                 }, _callee, this);
             }));
-        }
-    }, {
-        key: 'update',
-        value: function update() {
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+        };
+
+        _this4.update = function () {
+            _this4.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
                 var proxies;
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -38623,52 +38709,99 @@ var Proxies = function (_Pure_component2) {
                     }
                 }, _callee2, this);
             }));
-        }
-    }, {
-        key: 'download_csv',
-        value: function download_csv() {
-            var data = this.state.proxies.map(function (p) {
+        };
+
+        _this4.download_csv = function () {
+            var data = _this4.state.proxies.map(function (p) {
                 return ['127.0.0.1:' + p.port];
             });
             _fileSaver2.default.saveAs(_csv2.default.to_blob(data), 'proxies.csv');
-        }
-    }, {
-        key: 'edit_columns',
-        value: function edit_columns() {
-            (0, _jquery2.default)('#edit_columns').modal('show');
-        }
-    }, {
-        key: 'update_selected_columns',
-        value: function update_selected_columns(new_columns) {
-            this.setState({ selected_cols: new_columns });
-        }
-    }, {
-        key: 'paginate',
-        value: function paginate() {
+        };
+
+        _this4.edit_columns = function () {
+            return (0, _jquery2.default)('#edit_columns').modal('show');
+        };
+
+        _this4.update_selected_columns = function (new_columns) {
+            return _this4.setState({ selected_cols: new_columns });
+        };
+
+        _this4.proxy_add = function () {
+            (0, _jquery2.default)('#add_new_proxy_modal').modal('show');
+        };
+
+        _this4.paginate = function () {
             var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : -1;
 
-            page = page > -1 ? page : this.state.cur_page;
-            var pages = Math.ceil(this.state.filtered_proxies.length / this.state.items_per_page);
+            page = page > -1 ? page : _this4.state.cur_page;
+            var pages = Math.ceil(_this4.state.filtered_proxies.length / _this4.state.items_per_page);
             var cur_page = Math.min(pages, page);
-            var displayed_proxies = this.state.filtered_proxies.slice(cur_page * this.state.items_per_page, (cur_page + 1) * this.state.items_per_page);
-            this.setState({
-                displayed_proxies: displayed_proxies,
-                cur_page: cur_page
+            var displayed_proxies = _this4.state.filtered_proxies.slice(cur_page * _this4.state.items_per_page, (cur_page + 1) * _this4.state.items_per_page);
+            _this4.setState({ displayed_proxies: displayed_proxies, cur_page: cur_page });
+        };
+
+        _this4.page_change = function (page) {
+            _this4.paginate(page - 1);
+            save_pagination('proxies', { page: page });
+        };
+
+        var from_storage = JSON.parse(window.localStorage.getItem('columns')) || {};
+        from_storage = Object.keys(from_storage).filter(function (c) {
+            return from_storage[c];
+        });
+        var default_cols = columns.filter(function (c) {
+            return c.default;
+        }).map(function (col) {
+            return col.key;
+        });
+        var pagination = get_pagination('proxies');
+        _this4.state = {
+            selected_cols: from_storage.length && from_storage || default_cols,
+            items_per_page: pagination.items,
+            cur_page: 0,
+            proxies: [],
+            filtered_proxies: [],
+            displayed_proxies: [],
+            loaded: false
+        };
+        _setdb2.default.set('head.proxies.update', _this4.update);
+        return _this4;
+    }
+
+    (0, _createClass3.default)(Proxies, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this5 = this;
+
+            this.setdb_on('head.proxies_running', function (proxies) {
+                if (!proxies) return;
+                proxies = _this5.prepare_proxies(proxies || []);
+                var filtered_proxies = _this5.filter_proxies(proxies, _this5.props.master_port);
+                _this5.setState({ proxies: proxies, filtered_proxies: filtered_proxies, loaded: true }, _this5.paginate);
             });
+            this.setdb_on('head.locations', function (locations) {
+                if (!locations) return;
+                var countries = locations.countries_by_code;
+                country_names = countries;
+                _this5.setState({ countries: countries });
+            });
+            window.setTimeout(this.req_status);
         }
     }, {
-        key: 'page_change',
-        value: function page_change(page) {
-            this.paginate(page - 1);
-            save_pagination('proxies', { page: page });
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(props) {
+            if (props.master_port != this.props.master_port) {
+                var filtered_proxies = this.filter_proxies(this.state.proxies, props.master_port);
+                this.setState({ filtered_proxies: filtered_proxies }, this.paginate);
+            }
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this8 = this;
+            var _this6 = this;
 
             var cols = columns.filter(function (col) {
-                return _this8.state.selected_cols.includes(col.key) || col.sticky;
+                return _this6.state.selected_cols.includes(col.key) || col.sticky || col.calc_show && col.calc_show(_this6.state.filtered_proxies);
             });
             var displayed_proxies = this.state.displayed_proxies;
             if (!this.state.countries) return null;
@@ -38702,10 +38835,10 @@ var Proxies = function (_Pure_component2) {
                     _react2.default.createElement(Proxies_pagination, { entries: this.state.filtered_proxies,
                         cur_page: this.state.cur_page,
                         items_per_page: this.state.items_per_page,
-                        page_change: this.page_change.bind(this),
-                        edit_columns: this.edit_columns.bind(this),
-                        update_items_per_page: this.update_items_per_page.bind(this),
-                        download_csv: this.download_csv.bind(this),
+                        page_change: this.page_change,
+                        edit_columns: this.edit_columns,
+                        update_items_per_page: this.update_items_per_page,
+                        download_csv: this.download_csv,
                         top: true }),
                     _react2.default.createElement(
                         'div',
@@ -38745,13 +38878,9 @@ var Proxies = function (_Pure_component2) {
                                 'tbody',
                                 null,
                                 displayed_proxies.map(function (proxy) {
-                                    return _react2.default.createElement(Proxy_row, {
-                                        key: proxy.port,
-                                        go: _this8.state.go,
-                                        update_proxies: _this8.update.bind(_this8),
-                                        proxy: proxy,
-                                        cols: cols,
-                                        master_port: _this8.props.master_port });
+                                    return _react2.default.createElement(Proxy_row, { key: proxy.port, go: _this6.state.go,
+                                        update_proxies: _this6.update, proxy: proxy,
+                                        cols: cols, master_port: _this6.props.master_port });
                                 })
                             )
                         )
@@ -38759,31 +38888,31 @@ var Proxies = function (_Pure_component2) {
                     _react2.default.createElement(Proxies_pagination, { entries: this.state.filtered_proxies,
                         cur_page: this.state.cur_page,
                         items_per_page: this.state.items_per_page,
-                        page_change: this.page_change.bind(this),
-                        edit_columns: this.edit_columns.bind(this),
-                        update_items_per_page: this.update_items_per_page.bind(this),
-                        download_csv: this.download_csv.bind(this),
+                        page_change: this.page_change,
+                        edit_columns: this.edit_columns,
+                        update_items_per_page: this.update_items_per_page,
+                        download_csv: this.download_csv,
                         bottom: true })
                 ),
                 _react2.default.createElement(_proxy_add2.default, null),
                 _react2.default.createElement(Columns_modal, { selected_cols: this.state.selected_cols,
-                    update_selected_cols: this.update_selected_columns.bind(this) })
+                    update_selected_cols: this.update_selected_columns })
             );
         }
     }]);
     return Proxies;
 }(_pure_component2.default);
 
-var Proxies_pagination = function Proxies_pagination(_ref13) {
-    var entries = _ref13.entries,
-        items_per_page = _ref13.items_per_page,
-        cur_page = _ref13.cur_page,
-        bottom = _ref13.bottom,
-        page_change = _ref13.page_change,
-        edit_columns = _ref13.edit_columns,
-        download_csv = _ref13.download_csv,
-        top = _ref13.top,
-        update_items_per_page = _ref13.update_items_per_page;
+var Proxies_pagination = function Proxies_pagination(_ref14) {
+    var entries = _ref14.entries,
+        items_per_page = _ref14.items_per_page,
+        cur_page = _ref14.cur_page,
+        bottom = _ref14.bottom,
+        page_change = _ref14.page_change,
+        edit_columns = _ref14.edit_columns,
+        download_csv = _ref14.download_csv,
+        top = _ref14.top,
+        update_items_per_page = _ref14.update_items_per_page;
     return _react2.default.createElement(
         _common.Pagination_panel,
         { entries: entries, items_per_page: items_per_page,
@@ -38798,28 +38927,23 @@ var Proxies_pagination = function Proxies_pagination(_ref13) {
 var Proxy_row = (0, _reactRouterDom.withRouter)(function (_Pure_component3) {
     (0, _inherits3.default)(Proxy_row, _Pure_component3);
 
-    function Proxy_row(props) {
+    function Proxy_row() {
+        var _ref15;
+
+        var _temp2, _this7, _ret2;
+
         (0, _classCallCheck3.default)(this, Proxy_row);
 
-        var _this9 = (0, _possibleConstructorReturn3.default)(this, (Proxy_row.__proto__ || Object.getPrototypeOf(Proxy_row)).call(this, props));
-
-        _this9.state = { status: _this9.props.proxy._status };
-        return _this9;
-    }
-
-    (0, _createClass3.default)(Proxy_row, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            this.get_status();
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
         }
-    }, {
-        key: 'get_status',
-        value: function get_status() {
-            var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-            var proxy = this.props.proxy;
 
-            var _this = this;
-            return this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+        return _ret2 = (_temp2 = (_this7 = (0, _possibleConstructorReturn3.default)(this, (_ref15 = Proxy_row.__proto__ || Object.getPrototypeOf(Proxy_row)).call.apply(_ref15, [this].concat(args))), _this7), _this7.state = { status: _this7.props.proxy._status }, _this7.get_status = function () {
+            var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+            var proxy = _this7.props.proxy;
+
+            var _this = _this7;
+            return _this7.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
                 var params, uri, url, res, errors;
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -38862,42 +38986,40 @@ var Proxy_row = (0, _reactRouterDom.withRouter)(function (_Pure_component3) {
                     }
                 }, _callee3, this);
             }));
-        }
-    }, {
-        key: 'edit',
-        value: function edit() {
-            if (this.props.proxy.proxy_type != 'persist') return;
-            if (!this.props.master_port && this.props.proxy.multiply && this.props.proxy.multiply > 1) {
-                this.props.history.push('/overview/' + this.props.proxy.port);
-            } else this.props.history.push('/proxy/' + this.props.proxy.port);
+        }, _this7.edit = function () {
+            if (_this7.props.proxy.proxy_type != 'persist') return;
+            if (!_this7.props.master_port && _this7.props.proxy.multiply && _this7.props.proxy.multiply > 1) {
+                _this7.props.history.push('/overview/' + _this7.props.proxy.port);
+            } else _this7.props.history.push('/proxy/' + _this7.props.proxy.port);
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this7, _ret2);
+    }
+
+    (0, _createClass3.default)(Proxy_row, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            this.get_status();
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this10 = this;
+            var _this8 = this;
 
             var proxy = this.props.proxy;
             var cell_class = function cell_class(col) {
-                return (0, _classnames2.default)(col.key.replace(/\./g, '_'), {
-                    default_cursor: _this10.props.proxy.proxy_type != 'persist'
-                });
+                return (0, _classnames2.default)(col.key.replace(/\./g, '_'), { default_cursor: _this8.props.proxy.proxy_type != 'persist' });
             };
             var row_class = (0, _classnames2.default)('proxy_row', { default: proxy.port == 22225 });
             return _react2.default.createElement(
                 'tr',
                 { className: row_class },
                 _react2.default.createElement(Actions, { proxy: proxy,
-                    get_status: this.get_status.bind(this),
+                    get_status: this.get_status,
                     update_proxies: this.props.update_proxies }),
                 this.props.cols.map(function (col) {
-                    return _react2.default.createElement(Cell, {
-                        key: col.key,
-                        proxy: proxy,
-                        col: col,
-                        status: _this10.state.status,
-                        status_details: _this10.state.status_details,
-                        master_port: _this10.props.master_port,
-                        on_click: _this10.edit.bind(_this10),
+                    return _react2.default.createElement(Cell, { key: col.key, proxy: proxy, col: col,
+                        status: _this8.state.status,
+                        status_details: _this8.state.status_details,
+                        master_port: _this8.props.master_port, on_click: _this8.edit,
                         className: cell_class(col) });
                 })
             );
@@ -38950,28 +39072,23 @@ var Actions = function (_Pure_component4) {
     (0, _inherits3.default)(Actions, _Pure_component4);
 
     function Actions() {
-        var _ref14;
+        var _ref16;
 
-        var _temp, _this12, _ret;
+        var _temp3, _this10, _ret3;
 
         (0, _classCallCheck3.default)(this, Actions);
 
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
         }
 
-        return _ret = (_temp = (_this12 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Actions.__proto__ || Object.getPrototypeOf(Actions)).call.apply(_ref14, [this].concat(args))), _this12), _this12.state = { open_delete_dialog: false }, _this12.open_delete_dialog = function () {
-            _this12.setState({ open_delete_dialog: true });
-        }, _this12.close_delete_dialog = function () {
-            _this12.setState({ open_delete_dialog: false });
-        }, _temp), (0, _possibleConstructorReturn3.default)(_this12, _ret);
-    }
-
-    (0, _createClass3.default)(Actions, [{
-        key: 'delete_proxy',
-        value: function delete_proxy() {
-            var _this = this;
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
+        return _ret3 = (_temp3 = (_this10 = (0, _possibleConstructorReturn3.default)(this, (_ref16 = Actions.__proto__ || Object.getPrototypeOf(Actions)).call.apply(_ref16, [this].concat(args))), _this10), _this10.state = { open_delete_dialog: false }, _this10.open_delete_dialog = function () {
+            return _this10.setState({ open_delete_dialog: true });
+        }, _this10.close_delete_dialog = function () {
+            return _this10.setState({ open_delete_dialog: false });
+        }, _this10.delete_proxy = function () {
+            var _this = _this10;
+            _this10.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
                 return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
@@ -38994,12 +39111,9 @@ var Actions = function (_Pure_component4) {
                     }
                 }, _callee4, this);
             }));
-        }
-    }, {
-        key: 'refresh_sessions',
-        value: function refresh_sessions() {
-            var _this = this;
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
+        }, _this10.refresh_sessions = function () {
+            var _this = _this10;
+            _this10.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
                 var url;
                 return _regenerator2.default.wrap(function _callee5$(_context5) {
                     while (1) {
@@ -39020,12 +39134,9 @@ var Actions = function (_Pure_component4) {
                     }
                 }, _callee5, this);
             }));
-        }
-    }, {
-        key: 'duplicate',
-        value: function duplicate() {
-            var _this = this;
-            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee6() {
+        }, _this10.duplicate = function () {
+            var _this = _this10;
+            _this10.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee6() {
                 return _regenerator2.default.wrap(function _callee6$(_context6) {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
@@ -39052,8 +39163,10 @@ var Actions = function (_Pure_component4) {
                     }
                 }, _callee6, this);
             }));
-        }
-    }, {
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this10, _ret3);
+    }
+
+    (0, _createClass3.default)(Actions, [{
         key: 'render',
         value: function render() {
             var persist = this.props.proxy.proxy_type == 'persist';
@@ -39062,31 +39175,30 @@ var Actions = function (_Pure_component4) {
                 'td',
                 { className: 'proxies_actions' },
                 _react2.default.createElement(Action_icon, { id: 'trash',
-                    on_click: this.open_delete_dialog.bind(this),
+                    on_click: this.open_delete_dialog,
                     tooltip: 'Delete', invisible: !persist }),
-                _react2.default.createElement(Action_icon, { id: 'duplicate', on_click: this.duplicate.bind(this),
-                    tooltip: 'Duplicate proxy port',
-                    invisible: !persist }),
+                _react2.default.createElement(Action_icon, { id: 'duplicate', on_click: this.duplicate,
+                    tooltip: 'Duplicate proxy port', invisible: !persist }),
                 _react2.default.createElement(Action_icon, { id: 'refresh',
-                    on_click: this.refresh_sessions.bind(this),
+                    on_click: this.refresh_sessions,
                     tooltip: 'Refresh Sessions' }),
                 _react2.default.createElement(_common.Modal_dialog, { title: delete_title,
                     open: this.state.open_delete_dialog,
-                    ok_clicked: this.delete_proxy.bind(this),
-                    cancel_clicked: this.close_delete_dialog.bind(this) })
+                    ok_clicked: this.delete_proxy,
+                    cancel_clicked: this.close_delete_dialog })
             );
         }
     }]);
     return Actions;
 }(_pure_component2.default);
 
-var Action_icon = function Action_icon(_ref15) {
-    var on_click = _ref15.on_click,
-        disabled = _ref15.disabled,
-        invisible = _ref15.invisible,
-        id = _ref15.id,
-        tooltip = _ref15.tooltip,
-        tooltip_disabled = _ref15.tooltip_disabled;
+var Action_icon = function Action_icon(_ref17) {
+    var on_click = _ref17.on_click,
+        disabled = _ref17.disabled,
+        invisible = _ref17.invisible,
+        id = _ref17.id,
+        tooltip = _ref17.tooltip,
+        tooltip_disabled = _ref17.tooltip_disabled;
 
     var classes = (0, _classnames2.default)('action_icon', { disabled: disabled, invisible: invisible });
     if (disabled) tooltip = tooltip_disabled;
@@ -39293,7 +39405,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _ajax = __webpack_require__(27);
 
@@ -39851,7 +39963,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40165,15 +40277,15 @@ var _react2 = _interopRequireDefault(_react);
 
 var _common = __webpack_require__(16);
 
-var _setdb = __webpack_require__(25);
+var _util = __webpack_require__(24);
+
+var _setdb = __webpack_require__(26);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
 var _ajax = __webpack_require__(27);
 
 var _ajax2 = _interopRequireDefault(_ajax);
-
-var _netmask = __webpack_require__(318);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40200,28 +40312,7 @@ var Settings = function (_Pure_component) {
     return Settings;
 }(_pure_component2.default);
 
-// XXX krzysztof: merge with validators in proxy_edit
-
-
 exports.default = Settings;
-var normalizers = {
-    ips_list: function ips_list(val) {
-        val = val.replace(/\s/g, '');
-        var ips = val.split(',');
-        var res = [];
-        ips.forEach(function (ip) {
-            try {
-                var netmask = new _netmask.Netmask(ip);
-                var to_add = netmask.base;
-                if (netmask.bitmask != 32) to_add += '/' + netmask.bitmask;
-                res.push(to_add);
-            } catch (e) {
-                console.log('incorrect ip format');
-            }
-        });
-        return res.join(',');
-    }
-};
 
 var Form = function (_Pure_component2) {
     (0, _inherits3.default)(Form, _Pure_component2);
@@ -40257,7 +40348,7 @@ var Form = function (_Pure_component2) {
         }, _this3.whitelist_ips_blur = function (_ref2) {
             var value = _ref2.target.value;
 
-            var val = normalizers.ips_list(value);
+            var val = _util.normalizers.ips_list(value);
             _this3.setState(function (prev) {
                 return {
                     settings: (0, _extends3.default)({}, prev.settings, { www_whitelist_ips: val }) };
@@ -40408,13 +40499,13 @@ var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _proxy_blank = __webpack_require__(321);
+var _proxy_blank = __webpack_require__(192);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(26);
+var _util = __webpack_require__(24);
 
 var _classnames = __webpack_require__(6);
 
@@ -40438,7 +40529,7 @@ var Tracer = function (_Pure_component) {
 
         return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Tracer.__proto__ || Object.getPrototypeOf(Tracer)).call.apply(_ref, [this].concat(args))), _this2), _this2.state = { loading: false }, _this2.title = 'Test affiliate links', _this2.subtitle = 'Trace links and see all the redirections', _this2.set_result = function (res) {
             return _this2.setState(res);
-        }, _this2.execute = function (_ref2) {
+        }, _this2.execute = function (_ref2, def_port) {
             var url = _ref2.url,
                 port = _ref2.port,
                 uid = _ref2.uid;
@@ -40449,7 +40540,7 @@ var Tracer = function (_Pure_component) {
             }
             _this2.setState({ redirects: null, filename: null, loading: true,
                 tracing_url: null, traced: false });
-            var data = { url: url, port: port, uid: uid };
+            var data = { url: url, port: port || def_port, uid: uid };
             var _this = _this2;
             _this2.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                 var raw_trace, json;
@@ -40609,7 +40700,7 @@ var Result_row = function Result_row(_ref4) {
     );
 };
 
-var Request = function (_Pure_component2) {
+var Request = (0, _common.with_proxy_ports)(function (_Pure_component2) {
     (0, _inherits3.default)(Request, _Pure_component2);
 
     function Request() {
@@ -40630,32 +40721,18 @@ var Request = function (_Pure_component2) {
         }, _this4.uid_changed = function (uid) {
             return _this4.setState({ uid: uid });
         }, _this4.go_clicked = function () {
-            return _this4.props.execute(_this4.state);
+            return _this4.props.execute(_this4.state, _this4.props.def_port);
         }, _temp2), (0, _possibleConstructorReturn3.default)(_this4, _ret2);
     }
 
     (0, _createClass3.default)(Request, [{
-        key: 'componentDidMount',
-        value: function componentDidMount() {
-            var _this5 = this;
-
-            this.setdb_on('head.proxies_running', function (proxies) {
-                if (!proxies) return;
-                var ports = proxies.map(function (p) {
-                    return { key: p.port, value: p.port };
-                });
-                var port = ports[0] && ports[0].key;
-                _this5.setState({ ports: ports, port: port });
-            });
-        }
-    }, {
         key: 'render',
         value: function render() {
-            if (!this.state.ports) return _react2.default.createElement(_common.Loader, { show: true });
-            if (!this.state.ports.length) return _react2.default.createElement(_proxy_blank2.default, null);
-            var port_tip = 'Choose a proxy port that will be used for this\n        test.';
-            var url_tip = 'URL that will be used as a starting point. Following\n        requests will be done based on \'Location\' header of the response.';
-            var uid_tip = 'Add unique tracking parameter inside a request header.\n        It can be used for your future analysis.';
+            if (!this.props.ports.length) return _react2.default.createElement(_proxy_blank2.default, null);
+            var port_tip = 'Choose a proxy port that will be used for this\n            test.';
+            var url_tip = 'URL that will be used as a starting point. Following\n            requests will be done based on \'Location\' header of the response.';
+            var uid_tip = 'Add unique tracking parameter inside a request header.\n            It can be used for your future analysis.';
+            var Port_select = this.props.port_select;
             return _react2.default.createElement(
                 'div',
                 { className: 'panel no_border request' },
@@ -40665,8 +40742,8 @@ var Request = function (_Pure_component2) {
                     _react2.default.createElement(
                         Field,
                         { title: 'Proxy port', tooltip: port_tip },
-                        _react2.default.createElement(_common.Select, { val: this.state.port, data: this.state.ports,
-                            on_change_wrapper: this.port_changed,
+                        _react2.default.createElement(Port_select, { val: this.state.port,
+                            on_change: this.port_changed,
                             disabled: this.props.loading })
                     ),
                     _react2.default.createElement(
@@ -40691,7 +40768,7 @@ var Request = function (_Pure_component2) {
         }
     }]);
     return Request;
-}(_pure_component2.default);
+}(_pure_component2.default));
 
 var Go_button = function Go_button(_ref6) {
     var on_click = _ref6.on_click,
@@ -41004,7 +41081,7 @@ exports = module.exports = __webpack_require__(87)(undefined);
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n/* start LPM */\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel select {\n  float: right;\n  width: auto;\n  height: 24px;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 19px 0 4px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\ninput.regex {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #E0E9EE;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.pagination_panel {\n  width: 100%;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.debug {\n  background-image: url(/img/debug.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  height: 100%;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.debug .desc {\n  width: 120px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .field {\n  flex: 1;\n  align-items: center;\n}\n.proxy_edit .main_window .field .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .field .double_field input {\n  width: 109px;\n}\n.proxy_edit .main_window .field .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  width: 100%;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box {\n  color: #8e8e8e;\n  height: 32px;\n  border: solid 1px #ccdbe3;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #E0E9EE;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #E0E9EE;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #E0E9EE;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: center;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  margin-right: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  text-align: center;\n  margin-top: 10px;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  text-align: center;\n  margin-top: 10px;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper {\n  display: flex;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header {\n  position: absolute;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 40px;\n  top: 1px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field select {\n  margin-top: 35px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 16px;\n  padding-right: 6px;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n/* start LPM */\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel select {\n  float: right;\n  width: auto;\n  height: 24px;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 19px 0 4px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  width: 100%;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\ninput.regex {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: solid 1px #E0E9EE;\n  border-radius: 4px;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #E0E9EE;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.pagination_panel {\n  width: 100%;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.debug {\n  background-image: url(/img/debug.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  height: 100%;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.debug .desc {\n  width: 120px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #E0E9EE;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .field {\n  flex: 1;\n  align-items: center;\n}\n.proxy_edit .main_window .field .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .field .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .field .double_field input {\n  width: 109px;\n}\n.proxy_edit .main_window .field .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  width: 100%;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box {\n  color: #8e8e8e;\n  height: 32px;\n  border: solid 1px #ccdbe3;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .stats_panel .overall_success_ratio .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #E0E9EE;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row .internal_name {\n  width: 1px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #E0E9EE;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #E0E9EE;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #E0E9EE;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: center;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  margin-right: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  text-align: center;\n  margin-top: 10px;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  text-align: center;\n  margin-top: 10px;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper {\n  display: flex;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header {\n  position: absolute;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .icon {\n  position: absolute;\n  width: 26px;\n  height: 26px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 20px;\n  letter-spacing: 0.5px;\n  position: relative;\n  left: 40px;\n  top: 1px;\n}\n.add_proxy_modal.modal .modal-content .fields_wrapper .fields .field select {\n  margin-top: 35px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  margin-top: 15px;\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content ul {\n  padding-left: 0;\n}\n.add_proxy_modal.modal .modal-content ul li {\n  list-style: none;\n}\n.add_proxy_modal.modal .modal-content ul li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 16px;\n  padding-right: 6px;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.status.info {\n  --spritesheet-position: 10px 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .disp_value .small_icon.info {\n  display: inline-block;\n  margin-left: 4px;\n  margin-bottom: 0;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
 
 // exports
 

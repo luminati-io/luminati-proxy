@@ -3,7 +3,8 @@
 import React from 'react';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import {Config} from './common.js';
+import {validators, Config} from './common.js';
+import {normalizers} from '../util.js';
 import {withContext} from 'recompose';
 import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
@@ -37,9 +38,12 @@ export default provider({tab_id: 'general'})(props=>{
         <a className="link" onClick={open_modal}>Select gIPs</a> : null;
     const mul_disabled = props.form.multiply_ips||props.form.multiply_vips;
     return <div>
+          <Config type="text" id="internal_name"/>
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
           <Config type="text" id="password"/>
+          <Config type="text" id="whitelist_ips" save_on_blur
+            validator={normalizers.ips_list}/>
           <Config type="yes_no" id="ssl"/>
           <Config type="number" id="multiply" min="1" disabled={mul_disabled}/>
           {type=='ips' &&

@@ -1,5 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, es6:true*/
+import {Netmask} from 'netmask';
 
 export const bytes_format = (bytes, number)=>{
     if (!bytes||isNaN(parseFloat(bytes))||!isFinite(bytes))
@@ -85,6 +86,8 @@ export const user_agents = [{
 }];
 
 export const status_codes = {
+    unknown: `Status code of this request could not be parsed. Enable SSL
+        analyzing to fix this`,
     200: 'OK',
     201: 'Created',
     202: 'Accepted',
@@ -475,3 +478,23 @@ export const swagger_url = 'http://petstore.swagger.io/?url=https://'
 
 export const swagger_link_tester_url = swagger_url
 +'/get_proxies__port__link_test_json';
+
+// XXX krzysztof: merge with validators in proxy_edit
+export const normalizers = {
+    ips_list: val=>{
+        val = val.replace(/\s/g, '');
+        const ips = val.split(',');
+        const res = [];
+        ips.forEach(ip=>{
+            try {
+                const netmask = new Netmask(ip);
+                let to_add = netmask.base;
+                if (netmask.bitmask!=32)
+                    to_add += '/'+netmask.bitmask;
+                res.push(to_add);
+            } catch(e){ console.log('incorrect ip format'); }
+        });
+        return res.join(',');
+    },
+};
+

@@ -1139,6 +1139,7 @@ span.icon_link {
                 left: 5px;
                 text-overflow: initial;
             }
+            .internal_name { width: 1px; }
             &:hover .proxies_actions .action_icon { visibility: visible; }
             .action_icon {
                 visibility: hidden;
@@ -1986,6 +1987,7 @@ span.icon_link {
             &.green { --spritesheet-position: -20px 50px; }
             &.yellow { --spritesheet-position: 50px 50px; }
             &.red { --spritesheet-position: 0 30px; }
+            &.info { --spritesheet-position: 10px 30px; }
         }
         &.rules {
             margin-right: 3px;
@@ -2284,6 +2286,11 @@ span.icon_link {
                         display: inline;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        .small_icon.info {
+                            display: inline-block;
+                            margin-left: 4px;
+                            margin-bottom: 0;
+                        }
                     }
                     .icon {
                         width: 16px;

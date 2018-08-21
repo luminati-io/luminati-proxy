@@ -3,8 +3,8 @@
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import Proxy_blank from './proxy_blank.js';
-import {Input, Select, Loader, Nav, Loader_small, Tooltip,
-    Circle_li as Li, Modal_dialog, Warning} from './common.js';
+import {Input, Loader, Nav, Loader_small, Tooltip, Circle_li as Li,
+    Modal_dialog, Warning, with_proxy_ports} from './common.js';
 import {status_codes, swagger_link_tester_url} from './util.js';
 import classnames from 'classnames';
 
@@ -24,7 +24,7 @@ export default class Tracer extends Pure_component {
             this.ws.removeEventListener('message', this.on_message);
     }
     set_result = res=>this.setState(res);
-    execute = ({url, port, uid})=>{
+    execute = ({url, port, uid}, def_port)=>{
         if (!/^https?:\/\//.test(url))
         {
             return void this.setState({redirects: null, filename: null,
@@ -32,7 +32,7 @@ export default class Tracer extends Pure_component {
         }
         this.setState({redirects: null, filename: null, loading: true,
             tracing_url: null, traced: false});
-        const data = {url, port, uid};
+        const data = {url, port: port||def_port, uid};
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
@@ -96,8 +96,7 @@ const Result = ({redirects, loading, tracing_url, filename, loading_page,
               {tracing_url && loading && <Result_row url={tracing_url}/>}
             </ol>
             {tracing_url && loading && <Loader_small show
-                loading_msg="Loading..."/>
-            }
+                loading_msg="Loading..."/>}
           </div>
           {traced &&
             <div className="live_preview">
@@ -118,38 +117,28 @@ const Result_row = ({url, code})=>
       }
     </Li>;
 
-class Request extends Pure_component {
+const Request = with_proxy_ports(class Request extends Pure_component {
     def_url = 'http://lumtest.com/myip.json';
     state = {url: this.def_url, port: '', uid: ''};
-    componentDidMount(){
-        this.setdb_on('head.proxies_running', proxies=>{
-            if (!proxies)
-                return;
-            const ports = proxies.map(p=>({key: p.port, value: p.port}));
-            const port = ports[0]&&ports[0].key;
-            this.setState({ports, port});
-        });
-    }
     url_changed = value=>this.setState({url: value});
     port_changed = port=>this.setState({port});
     uid_changed = uid=>this.setState({uid});
-    go_clicked = ()=>this.props.execute(this.state);
+    go_clicked = ()=>this.props.execute(this.state, this.props.def_port);
     render(){
-        if (!this.state.ports)
-            return <Loader show/>;
-        if (!this.state.ports.length)
+        if (!this.props.ports.length)
             return <Proxy_blank/>;
         const port_tip = `Choose a proxy port that will be used for this
-        test.`;
+            test.`;
         const url_tip = `URL that will be used as a starting point. Following
-        requests will be done based on 'Location' header of the response.`;
+            requests will be done based on 'Location' header of the response.`;
         const uid_tip = `Add unique tracking parameter inside a request header.
-        It can be used for your future analysis.`;
+            It can be used for your future analysis.`;
+        const Port_select = this.props.port_select;
         return <div className="panel no_border request">
               <div className="fields">
                 <Field title="Proxy port" tooltip={port_tip}>
-                  <Select val={this.state.port} data={this.state.ports}
-                    on_change_wrapper={this.port_changed}
+                  <Port_select val={this.state.port}
+                    on_change={this.port_changed}
                     disabled={this.props.loading}/>
                 </Field>
                 <Field title="URL" className="url" tooltip={url_tip}>
@@ -168,7 +157,7 @@ class Request extends Pure_component {
                 disabled={this.props.loading}/>
             </div>;
     }
-}
+});
 
 const Go_button = ({on_click, disabled})=>
     <div className="go_btn_wrapper">

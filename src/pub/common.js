@@ -252,6 +252,43 @@ export const Textarea = props=>{
           onChange={e=>props.on_change_wrapper(e.target.value)}/>;
 };
 
+export const with_proxy_ports = Component=>{
+    const port_select = data=>function port_select_inner(props){
+        return <Select val={props.val}
+              data={data} on_change_wrapper={props.on_change}
+              disabled={props.disabled}/>;
+    };
+    class With_proxy_ports extends Pure_component {
+        state = {};
+        port_select = port_select([]);
+        componentDidMount(){
+            this.setdb_on('head.proxies_running', proxies=>{
+                if (!proxies)
+                    return;
+                const ports = proxies.map(p=>p.port);
+                const ports_opt = proxies.map(p=>{
+                    const name = p.internal_name ?
+                        ` (${p.internal_name})` : '';
+                    const key = p.port+name;
+                    return {key, value: p.port};
+                });
+                const def_port = ports[0];
+                this.port_select = port_select(ports_opt);
+                this.setState({ports, ports_opt, def_port,
+                    ports_loaded: true});
+            });
+        }
+        render(){
+            if (!this.state.ports_loaded)
+                return <Loader show/>;
+            return <Component {...this.props} port_select={this.port_select}
+                  def_port={this.state.def_port} ports={this.state.ports}
+                  ports_opt={this.state.ports_opt}/>;
+        }
+    }
+    return With_proxy_ports;
+};
+
 export const Select = props=>{
     const update = val=>{
         if (val=='true')
@@ -261,7 +298,7 @@ export const Select = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val);
     };
-    const conf = props.data.find(c=>c.value==props.val);
+    const conf = (props.data||[]).find(c=>c.value==props.val);
     return <Tooltip key={props.val} title={conf&&conf.tooltip||''}>
           <select value={''+props.val}
             onChange={e=>update(e.target.value)} disabled={props.disabled}>
@@ -409,8 +446,8 @@ export class Regex extends Pure_component {
     };
     toggle = f=>{
         ga_event('proxy_edit', 'regexp_generator clicked', f);
-        this.setState(prev=>
-            ({checked: {...prev.checked, [f]: !prev.checked[f]}}),
+        this.setState(
+            prev=>({checked: {...prev.checked, [f]: !prev.checked[f]}}),
             this.gen_regexp);
     };
     gen_regexp = ()=>{
@@ -601,4 +638,3 @@ export class Logo extends Pure_component {
             </div>;
     }
 }
-

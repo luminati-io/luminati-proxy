@@ -54,8 +54,8 @@ const Index = withRouter(class Index extends Pure_component {
         this.setdb_on('head.proxies_running', proxies=>{
             if (!proxies||this.state.proxies)
                 return;
-            this.port = this.props.match.params.port;
-            const proxy = proxies.filter(p=>p.port==this.port)[0].config;
+            const port = this.props.match.params.port;
+            const proxy = proxies.filter(p=>p.port==port)[0].config;
             const form = Object.assign({}, proxy);
             const preset = this.guess_preset(form);
             this.apply_preset(form, preset);
@@ -119,11 +119,11 @@ const Index = withRouter(class Index extends Pure_component {
             res = form.last_preset_applied;
         return res;
     }
-    set_field = (field_name, value)=>{
+    set_field = (field_name, value, opt={})=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
             return {form: new_form};
-        }, this.debounced_save);
+        }, opt.skip_save ? undefined : this.debounced_save);
         setdb.set('head.proxy_edit.form.'+field_name, value);
         this.send_ga(field_name, value);
     };
@@ -325,7 +325,7 @@ const Index = withRouter(class Index extends Pure_component {
             return;
         }
         const data = this.prepare_to_save();
-        const check_url = '/api/proxy_check/'+this.port;
+        const check_url = '/api/proxy_check/'+this.props.match.params.port;
         this.saving = true;
         this.setState({saving: true}, ()=>this.lock_nav(true));
         const _this = this;
@@ -358,7 +358,7 @@ const Index = withRouter(class Index extends Pure_component {
             const warnings = json_check.filter(w=>w.lvl=='warn');
             if (warnings.length)
                 _this.setState({warnings});
-            const update_url = '/api/proxies/'+_this.port;
+            const update_url = '/api/proxies/'+_this.props.match.params.port;
             // XXX krzysztof: switch fetch->ajax
             yield window.fetch(update_url, {
                 method: 'PUT',
@@ -367,6 +367,12 @@ const Index = withRouter(class Index extends Pure_component {
             });
             _this.setState({saving: false}, ()=>_this.lock_nav(false));
             _this.saving = false;
+            if (_this.props.match.params.port!=_this.state.form.port)
+            {
+                const port = _this.state.form.port;
+                const tab = _this.props.match.params.tab;
+                _this.props.history.push({pathname: `/proxy/${port}/${tab}`});
+            }
             if (_this.resave)
             {
                 _this.resave = false;
@@ -467,15 +473,13 @@ const Index = withRouter(class Index extends Pure_component {
             type = 'ips';
         else if (curr_plan&&!!curr_plan.vip)
             type = 'vips';
-        const port = this.props.match.params.port;
-        const show_main_window = this.state.consts&&this.state.defaults&&
-            this.state.proxies;
         const tab = this.props.match.params.tab||'logs';
         return <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
-                  <h3>Proxy on port {this.port}</h3>
+                  <Port_title port={this.props.match.params.port}
+                    name={this.state.form.internal_name}/>
                   <Loader_small saving={this.state.saving}
                     std_msg="All changes saved in LPM"
                     std_tooltip="All changes are automatically saved to LPM"/>
@@ -487,11 +491,14 @@ const Index = withRouter(class Index extends Pure_component {
                 <Nav_tabs/>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
-                <Main_window show={show_main_window} port={port}
-                  proxy={this.state.consts&&this.state.consts.proxy}
-                  defaults={this.state.defaults}
-                  form={this.state.form}
-                  get_curr_plan={this.get_curr_plan}/>
+                {this.state.consts && this.state.defaults &&
+                    this.state.proxies &&
+                  <Main_window
+                    proxy={this.state.consts&&this.state.consts.proxy}
+                    defaults={this.state.defaults}
+                    form={this.state.form}
+                    get_curr_plan={this.get_curr_plan}/>
+                }
               </div>
               <Modal className="warnings_modal" id="save_proxy_errors"
                 title="Errors:" no_cancel_btn>
@@ -503,11 +510,15 @@ const Index = withRouter(class Index extends Pure_component {
     }
 });
 
-const Main_window = withRouter(({show, match, ...props})=>{
-    if (!show)
-        return null;
+const Port_title = ({port, name})=>{
+    if (name)
+        port = port+` (${name})`;
+    return <h3>Proxy on port {port}</h3>;
+};
+
+const Main_window = withRouter(({match: {params: {tab}}, ...props})=>{
     let Comp;
-    switch (match.params.tab)
+    switch (tab)
     {
     case 'target': Comp = Targeting; break;
     case 'speed': Comp = Speed; break;
@@ -589,8 +600,8 @@ const Nav_tabs = ()=>
     <div className="nav_tabs">
       <Tab_btn id="logs"/>
       <Tab_btn id="target"/>
-      <Tab_btn id="speed"/>
       <Tab_btn id="rules"/>
+      <Tab_btn id="speed"/>
       <Tab_btn id="rotation"/>
       <Tab_btn id="debug"/>
       <Tab_btn id="headers"/>
