@@ -18,7 +18,6 @@ const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
 const sudo_prompt = require('sudo-prompt');
-require('log-buffer')(1);
 
 class Lum_node_index extends Lum_common {
     pm2_cmd(command, opt){ return etask(function*pm2_cmd(){

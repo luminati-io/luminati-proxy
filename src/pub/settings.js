@@ -2,26 +2,25 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
+import _ from 'lodash';
 import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
 import {normalizers} from './util.js';
+import {Select, Input, Tooltip} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import React_select from 'react-select/lib/Creatable';
 
-export default class Settings extends Pure_component {
-    render(){
-        return <div className="settings">
-              <Nav title="General settings"
-                subtitle="Global configuration of Luminati Proxy Manager"/>
-              <Form/>
-            </div>;
-    }
+export default function Settings(){
+    return <div className="settings">
+          <Nav title="General settings"
+            subtitle="Global configuration of Luminati Proxy Manager"/>
+          <Form/>
+        </div>;
 }
 
 class Form extends Pure_component {
     state = {saving: false};
     tooltips = {
-        logs: `Last 1K requests are automatically logged for easy debugging.
-            Enable Logs to save all requests`,
         zone: `Default zone will be used automatically if you don't specify
             any specific zone. This value can be overriden in each proxy port
             settings`,
@@ -31,7 +30,16 @@ class Form extends Pure_component {
             Default value is 127.0.0.1, which means that remote access from
             any other IP is blocked unless list of IPs are added in this
             field.`,
+        request_stats: `Enable saving statistics to database`,
+        logs_type: `Specify how many requests you want to keep in database. The
+            limit may be set as a number or maximum database size. Set to 0 to
+            disable saving logs to database`,
     };
+    logs_metric_opts = [
+        {key: 'requests', value: 'requests'},
+        {key: 'megabytes', value: 'megabytes'},
+    ];
+    default_values = {requests: 1000, megabytes: 1024};
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings||this.state.settings)
@@ -39,6 +47,8 @@ class Form extends Pure_component {
             const s = {...settings};
             s.www_whitelist_ips = s.www_whitelist_ips&&
                 s.www_whitelist_ips.join(',')||'';
+            s.logs_metric = s.logs.metric;
+            s.logs_value = s.logs.value;
             this.setState({settings: s});
         });
         this.setdb_on('head.consts', consts=>{
@@ -50,10 +60,6 @@ class Form extends Pure_component {
         this.setState(prev=>({settings: {...prev.settings, zone: val}}),
             this.save);
     };
-    logs_change = val=>{
-        this.setState(prev=>({settings: {...prev.settings, logs: val}}),
-            this.save);
-    };
     whitelist_ips_change = val=>{
         this.setState(prev=>({
             settings: {...prev.settings, www_whitelist_ips: val}}));
@@ -62,6 +68,21 @@ class Form extends Pure_component {
         const val = normalizers.ips_list(value);
         this.setState(prev=>({
             settings: {...prev.settings, www_whitelist_ips: val}}), this.save);
+    };
+    logs_metric_changed = val=>{
+        this.setState(prev=>({settings: {
+            ...prev.settings,
+            logs_metric: val,
+            logs_value: this.default_values[val],
+        }}), this.save);
+    };
+    logs_value_changed = val=>{
+        this.setState(prev=>({settings: {...prev.settings, logs_value: val}}),
+            this.debounced_save);
+    };
+    request_stats_changed = val=>{
+        this.setState(prev=>({
+            settings: {...prev.settings, request_stats: val}}), this.save);
     };
     save = ()=>{
         this.setState({saving: true});
@@ -72,6 +93,7 @@ class Form extends Pure_component {
                 _this.setState({saving: false});
             });
             const body = {..._this.state.settings};
+            body.logs = {metric: body.logs_metric, value: body.logs_value};
             // XXX krzysztof: switch fetch->ajax
             const raw = yield window.fetch('/api/settings', {
                 method: 'PUT',
@@ -85,30 +107,84 @@ class Form extends Pure_component {
             _this.setState({saving: false});
         });
     };
+    debounced_save = _.debounce(this.save, 1000);
     render(){
         if (!this.state.settings)
             return null;
         // XXX krzysztof: clean up zones logic
         const zone_opt = this.state.consts && this.state.consts.proxy.zone
-            .values.filter(z=>{
-                const plan = z.plans && z.plans.slice(-1)[0] || {};
-                return !plan.archive && !plan.disable;
-            }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
+        .values.filter(z=>{
+            const plan = z.plans && z.plans.slice(-1)[0] || {};
+            return !plan.archive && !plan.disable;
+        }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
         return <div className="settings_form">
               <Loader show={!this.state.consts}/>
               <Labeled_controller val={this.state.settings.zone} type="select"
                 on_change_wrapper={this.zone_change} label="Default zone"
                 tooltip={this.tooltips.zone} data={zone_opt}/>
-              <Labeled_controller val={this.state.settings.logs} type="yes_no"
-                on_change_wrapper={this.logs_change}
-                label="Enable logs" tooltip={this.tooltips.logs}/>
               <Labeled_controller val={this.state.settings.www_whitelist_ips}
                 type="text" on_change_wrapper={this.whitelist_ips_change}
                 label="Admin whitelisted IPs"
                 placeholder="e.g. 1.1.1.1, 2.2.2.2"
                 on_blur={this.whitelist_ips_blur}
                 tooltip={this.tooltips.whitelist_ips}/>
+              <Labeled_controller val={this.state.settings.request_stats}
+                type="yes_no" on_change_wrapper={this.request_stats_changed}
+                label="Enable recent stats" default
+                tooltip={this.tooltips.request_stats}/>
+              <div className="field_row">
+                <div className="desc">
+                  <Tooltip title={this.tooltips.logs_type}>
+                    Enable logs for</Tooltip>
+                </div>
+                <div className="field">
+                  <div className="inline_field">
+                    <div className="double_field">
+                      <Input val={this.state.settings.logs_value}
+                        on_change_wrapper={this.logs_value_changed}
+                        type="number"/>
+                      <Select val={this.state.settings.logs_metric}
+                        on_change_wrapper={this.logs_metric_changed}
+                        data={this.logs_metric_opts}/>
+                    </div>
+                    <div className="note" style={{position: 'absolute'}}>
+                      <strong>Note: </strong>
+                      Set to 0 to disable logs entirely
+                    </div>
+                  </div>
+                </div>
+              </div>
               <Loader_small show={this.state.saving}/>
             </div>;
+    }
+}
+
+// XXX krzysztof: copied from react_util.js - try to import the whole file
+const format_num = n=>n&&n.toLocaleString({useGrouping: true})||n;
+class Select_number extends Pure_component {
+    label_to_option = ({label})=>{
+        const num = +label;
+        return {value: num, label: format_num(num)};
+    };
+    value_to_option = value=>value!=null && {value, label: format_num(+value)};
+    render(){
+        const p = this.props;
+        const options = p.opt.map(this.value_to_option);
+        const validation = s=>{
+            if (s.label&&s.label.match(/^[0-9,.]+$/))
+            {
+                if (p.update_on_input)
+                    p.on_change(+s.label);
+                return true;
+            }
+        };
+        return <React_select className={p.className}
+            value={this.value_to_option(p.value)} onChange={p.on_change}
+            simpleValue autoBlur clearable={false} options={options}
+            isValidNewOption={validation} promptTextCreator={l=>l}
+            newOptionCreator={this.label_to_option} pageSize={9}
+            shouldKeyDownEventCreateNewOption={()=>false}
+            placeholder={p.placeholder} disabled={p.disabled}
+            onSelectResetsInput={!p.update_on_input}/>;
     }
 }

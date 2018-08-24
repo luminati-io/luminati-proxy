@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.105.672/luminati-proxy-manager-v1.105.672-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.106.0/luminati-proxy-manager-v1.106.0-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -123,7 +123,6 @@ Options:
                            port and save it in the configuration file.  [string]
   --multiply               Multiply the port definition given number of times
                                                                         [number]
-  --history                Logs                       [boolean] [default: false]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
   --log                    Log level                 [string] [default: "error"]
   --iface                  Interface or IP to listen on
@@ -216,7 +215,6 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --request_stats_limit    Maximum request stats to keep         [default: 1000]
   --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]

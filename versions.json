@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.106.0",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improvements in database management, more control over how many requests to keep"
+            },
+            {
+                "type": "bug",
+                "text": "Bug fixes in Link Affiliate Tester"
+            }
+        ]
+    },
+    {
         "ver": "1.105.672",
         "type": "stable",
         "changes": [

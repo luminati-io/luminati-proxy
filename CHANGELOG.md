@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.106.0 Stable
+- :star: Improvements in database management, more control over how many requests to keep
+- :bug: Bug fixes in Link Affiliate Tester
+
 ## 1.105.672 Stable
 - :bug: Fixed taking screenshot in Link Tester on windows
 - :bug: Added the note to status codes and timings in the logs when SSL analyzing is off

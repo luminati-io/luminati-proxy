@@ -25,6 +25,7 @@ export default class Tracer extends Pure_component {
     }
     set_result = res=>this.setState(res);
     execute = ({url, port, uid}, def_port)=>{
+        url = url.trim();
         if (!/^https?:\/\//.test(url))
         {
             return void this.setState({redirects: null, filename: null,

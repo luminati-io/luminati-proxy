@@ -145,7 +145,8 @@
     "webpack": "3.4.0",
     "recompose": "0.26.0",
     "prop-types": "15.6.0",
-    "react-waypoint": "8.0.1"
+    "react-waypoint": "8.0.1",
+    "react-select": "2.0.0"
   },
   "engines": {
     "node": ">=7.5",
@@ -342,7 +343,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "42b11fc39d809fe379fc5d8bb089fbfd"
+    "md5": "7b4692805065d9f1519f20eebf50d680"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -377,5 +378,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.105.672"
+  "version": "1.106.0"
 }

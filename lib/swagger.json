@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.105.672",
+        "version": "1.106.0",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -479,10 +479,6 @@
                     "type": "boolean",
                     "description": "Enable requests statistics"
                 },
-                "request_stats_limit": {
-                    "type": "integer",
-                    "description": "Maximum request stats to keep"
-                },
                 "beta_features": {
                     "type": "boolean",
                     "description": "Enable beta features"
@@ -515,10 +511,6 @@
                 "multiply": {
                     "type": "integer",
                     "description": "Multiply the port definition given number of times"
-                },
-                "history": {
-                    "type": "boolean",
-                    "description": "Logs"
                 },
                 "ssl": {
                     "type": "boolean",

@@ -341,8 +341,7 @@ describe('proxy', ()=>{
             function*(){
                 const context = 'context-1';
                 history = [];
-                l = yield lum(assign({history: true, history_aggregator:
-                    aggregator}, opt));
+                l = yield lum(assign({history_aggregator: aggregator}, opt));
                 let res = yield l.test({
                     url: _url(),
                     headers: {'x-hola-context': context},
@@ -865,7 +864,7 @@ describe('proxy', ()=>{
                     if (!history.some(_.matches({context: data.context})))
                         history.push(data);
                 };
-                l = yield lum({pool_size: 1, keep_alive: 0.01, history: true,
+                l = yield lum({pool_size: 1, keep_alive: 0.01,
                     history_aggregator: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(400);
@@ -923,9 +922,8 @@ describe('proxy', ()=>{
                 false}, head: true, status: {arg: '200', type: 'in'}}],
                 url: '**'}]};
             history = [];
-            l = yield lum({history: true, history_aggregator: aggregator,
-                rules, session: true, max_requests: 1,
-                reserved_keep_alive: 2});
+            l = yield lum({history_aggregator: aggregator, rules,
+                session: true, max_requests: 1, reserved_keep_alive: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);

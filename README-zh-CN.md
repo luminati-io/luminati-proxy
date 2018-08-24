@@ -29,7 +29,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.105.672-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.106.0-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -83,7 +83,6 @@ Options:
                            port and save it in the configuration file.  [string]
   --multiply               Multiply the port definition given number of times
                                                                         [number]
-  --history                Logs                       [boolean] [default: false]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
   --log                    Log level                 [string] [default: "error"]
   --iface                  Interface or IP to listen on
@@ -173,7 +172,6 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --request_stats_limit    Maximum request stats to keep         [default: 1000]
   --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
