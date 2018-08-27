@@ -177,6 +177,7 @@ const presets = {
             pool_size: true,
             pool_type: true,
             seed: true,
+            keep_alive: true,
         },
     },
     session_long: {
@@ -207,6 +208,7 @@ const presets = {
             session: true,
             pool_type: true,
             seed: true,
+            keep_alive: true,
         },
     },
     session: {
@@ -250,6 +252,7 @@ const presets = {
             opt.pool_type = null;
             opt.sticky_ip = true;
             opt.session = '';
+            opt.keep_alive = 45;
         },
         clean: opt=>{
             opt.sticky_ip = '';
@@ -273,6 +276,7 @@ const presets = {
             pool_type: true,
             seed: true,
             pool_size: true,
+            keep_alive: true,
         },
     },
     round_robin: {
@@ -283,9 +287,9 @@ const presets = {
         check: function(opt){ return opt.pool_size
             && opt.pool_type=='round-robin' && !opt.multiply; },
         set: opt=>{
-            opt.pool_size = opt.pool_size||1;
+            opt.pool_size = 0;
             opt.pool_type = 'round-robin';
-            opt.keep_alive = opt.keep_alive||45;
+            opt.keep_alive = 45;
             opt.session = true;
         },
         clean: opt=>{
@@ -308,6 +312,7 @@ const presets = {
             multiply_vips: true,
             pool_type: true,
             seed: true,
+            keep_alive: true,
         },
     },
     high_performance: {

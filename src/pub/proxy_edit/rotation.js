@@ -13,7 +13,8 @@ export default provider({tab_id: 'rotation'})(props=>{
           <Config type="text" id="ip"/>
           <Config type="text" id="vip"/>
           <Config type="select" id="pool_type" data={proxy.pool_type.values}/>
-          <Config type="number" id="keep_alive" min="0" sufix="seconds"/>
+          <Config type="select_number" id="keep_alive" sufix="seconds"
+            data={[0, 45]}/>
           <Config type="double_number" id="max_requests"/>
           <Config type="double_number" id="session_duration" sufix="seconds"/>
           <Config type="yes_no" id="sticky_ip"/>

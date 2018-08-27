@@ -334,12 +334,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'request_timeout',
-        title: 'Request timeout (sec)',
-        type: 'number',
-        ext: true,
-    },
-    {
         key: 'debug',
         title: 'Debug info',
         type: 'options',

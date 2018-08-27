@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.106.0",
+        "version": "1.106.128",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -641,14 +641,6 @@
                     "type": "string",
                     "pattern": "^(none|full)?$",
                     "description": "Luminati request debug info"
-                },
-                "timeout": {
-                    "type": "integer",
-                    "description": "Overall request timeout (seconds)"
-                },
-                "request_timeout": {
-                    "type": "integer",
-                    "description": "Timeout for request on the super proxy (seconds)"
                 },
                 "allow_proxy_auth": {
                     "type": "boolean",

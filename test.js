@@ -454,7 +454,6 @@ describe('proxy', ()=>{
                     zone: 'zzz',
                     direct: true,
                     session: 'sss',
-                    timeout: '5',
                     debug: 'full',
                     country: 'us',
                     state: 'fl',
@@ -470,7 +469,6 @@ describe('proxy', ()=>{
                     zone: 'zzz',
                     direct: true,
                     session: 'sss',
-                    timeout: '5',
                     debug: 'full',
                     country: 'us',
                     state: 'fl',
@@ -542,7 +540,7 @@ describe('proxy', ()=>{
                 });
 
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(10000);
+                    _this.timeout(12000);
                     const trials = 3, pool_size = opt.pool_size || 1;
                     l = yield lum(opt);
                     let sessions = [];
@@ -699,7 +697,6 @@ describe('proxy', ()=>{
             t('mobile', {zone: 'mobile', mobile: 'true'});
             t('DNS', {dns: 'local'});
             t('debug', {debug: 'none'});
-            t('request_timeout', {request_timeout: 10}, {timeout: 10});
             t('raw', {raw: true});
             t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});
@@ -758,7 +755,7 @@ describe('proxy', ()=>{
             }));
             t(1);
             t(3);
-            t(10);
+            t(5);
         });
         describe('refresh_sessions', ()=>{
             const test_session = session=>etask(function*(){

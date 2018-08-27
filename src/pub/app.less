@@ -405,6 +405,10 @@ input.regex {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+.select_number {
+    width: 100%;
+    min-width: 120px;
+}
 .btn_lpm {
     padding-left: 11px;
     padding-right: 11px;
@@ -699,7 +703,10 @@ span.icon_link {
     }
 }
 .rbt {
-    &.open { width: 100%; }
+    &.open {
+        width: 100%;
+        &.clearfix:before { content: none; }
+    }
     .rbt-input {
         padding: 1px 25px 1px 10px;
         color: @first_color;
@@ -915,7 +922,7 @@ span.icon_link {
         .field_row {
             padding: 3px;
             display: flex;
-            align-items: center;
+            align-items: baseline;
             .info_icon {
                 display: inline-block;
                 position: relative;
@@ -1351,13 +1358,13 @@ span.icon_link {
     .settings_form {
         .field_row {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             margin-bottom: 5px;
             .desc { margin-right: 5px; }
-            .double_field {
-                display: flex;
-                *:first-child { margin-right: 5px; }
-                *:last-child { margin-left: 5px; }
+            .double_field { display: flex; }
+            .double_field>* {
+                &:first-child { margin-right: 5px; }
+                &:last-child { margin-left: 5px; }
             }
         }
     }

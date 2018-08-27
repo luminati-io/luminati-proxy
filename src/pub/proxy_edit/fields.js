@@ -66,12 +66,6 @@ export const tabs = {
                     - must have keep_alive to work properly`,
                 ext: true,
             },
-            request_timeout: {
-                label: 'Timeout for requests',
-                tooltip: `Kill requests to proxy and try new one if
-                    timeout is exceeded`,
-                ext: true,
-            },
             race_reqs: {
                 label: 'Parallel race requests',
                 tooltip: `Sends multiple requests in parallel via different
@@ -349,7 +343,7 @@ export const tabs = {
             },
             multiply: {
                 label: 'Multiply proxy port',
-                tooltip: `Create multiple identical porxy ports`,
+                tooltip: `Create multiple identical proxy ports`,
                 ext: true,
             },
             multiply_ips: {

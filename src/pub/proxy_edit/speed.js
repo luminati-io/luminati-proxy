@@ -69,8 +69,6 @@ class Speed extends Pure_component {
               <Config type="select" id="dns" data={this.dns_options}/>
               <Config type="number" id="pool_size" min="0"
                 note={pool_size_note} disabled={pool_size_disabled}/>
-              <Config type="number" id="request_timeout" sufix="seconds"
-                min="0"/>
               <Config type="number" id="race_reqs" min="1" max="3"/>
               <Config type="number" id="proxy_count" min="1"/>
               <Config type="number" id="proxy_switch" min="0"/>

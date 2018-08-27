@@ -100,6 +100,7 @@ class Config extends Pure_component {
               on_blur={this.on_blur}
               label={tabs[tab_id].fields[id].label}
               default={_default}
+              range={this.props.range}
               tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
 });

@@ -1,6 +1,11 @@
 [
     {
         "ver": "1.106.0",
+        "type": "stable/dev",
+        "changes": []
+    },
+    {
+        "ver": "1.106.0",
         "type": "stable",
         "changes": [
             {

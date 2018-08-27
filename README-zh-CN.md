@@ -29,7 +29,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.106.0-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.106.128-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -124,9 +124,6 @@ Options:
   --reverse_lookup_file    Process reverse lookup via file              [string]
   --reverse_lookup_values  Process reverse lookup via value              [array]
   --debug                  Luminati request debug info                  [string]
-  --timeout                Overall request timeout (seconds)            [number]
-  --request_timeout        Timeout for request on the super proxy (seconds)
-                                                                        [number]
   --allow_proxy_auth       Allow Luminati authentication per request
                                                        [boolean] [default: true]
   --session                Luminati session for all proxy requests      [string]

@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.106.0/luminati-proxy-manager-v1.106.0-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.106.128/luminati-proxy-manager-v1.106.128-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -49,6 +49,14 @@ sudo npm install -g @luminati-io/luminati-proxy
 If the command is returning an error try installing using --unsafe-perm flag
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm
+```
+If you are trying to install the Proxy Manager from china on Mac/Linux please run the following command first to make sure npm is installing with allowed registry:
+```sh
+ npm config set registry https://registry.npm.taobao.org
+```
+After this command ran successfully install using:
+```sh
+sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm=true --allow-root
 ```
 ### Upgrade
 - Use npm to upgrade
@@ -164,9 +172,6 @@ Options:
   --reverse_lookup_file    Process reverse lookup via file              [string]
   --reverse_lookup_values  Process reverse lookup via value              [array]
   --debug                  Luminati request debug info                  [string]
-  --timeout                Overall request timeout (seconds)            [number]
-  --request_timeout        Timeout for request on the super proxy (seconds)
-                                                                        [number]
   --allow_proxy_auth       Allow Luminati authentication per request
                                                        [boolean] [default: true]
   --session                Luminati session for all proxy requests      [string]

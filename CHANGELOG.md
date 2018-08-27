@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.106.0 
+
 ## 1.106.0 Stable
 - :star: Improvements in database management, more control over how many requests to keep
 - :bug: Bug fixes in Link Affiliate Tester

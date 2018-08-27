@@ -3,7 +3,7 @@
 import React from 'react';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import {validators, Config} from './common.js';
+import {Config} from './common.js';
 import {normalizers} from '../util.js';
 import {withContext} from 'recompose';
 import PropTypes from 'prop-types';
@@ -45,7 +45,8 @@ export default provider({tab_id: 'general'})(props=>{
           <Config type="text" id="whitelist_ips" save_on_blur
             validator={normalizers.ips_list}/>
           <Config type="yes_no" id="ssl"/>
-          <Config type="number" id="multiply" min="1" disabled={mul_disabled}/>
+          <Config type="select_number" id="multiply" disabled={mul_disabled}
+            range="medium"/>
           {type=='ips' &&
             <Config type="yes_no" id="multiply_ips"
               on_change={multiply_changed} note={note_ips}/>

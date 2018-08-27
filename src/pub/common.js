@@ -13,6 +13,7 @@ import * as Chrome from './chrome_widgets.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
+import React_select from 'react-select/lib/Creatable';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -323,6 +324,70 @@ class Yes_no extends Pure_component {
     }
 }
 
+export class Select_number extends Pure_component {
+    styles = {
+        option: (base, state)=>{
+            return {
+                ...base,
+                padding: '2px 12px',
+                'background-color': state.isFocused ? '#f5f5f5' : 'white',
+                color: '#004d74',
+            };
+        },
+        control: (base, state)=>{
+            return {
+                display: 'flex',
+                height: 32,
+                'border-radius': 3,
+                border: 'solid 1px',
+                'border-color': state.isFocused ? '#004d74' : '#ccdbe3',
+            };
+        },
+        singleValue: (base, state)=>({
+            ...base,
+            color: '#004d74',
+        }),
+    };
+    label_to_option = ({label})=>{
+        const num = +label;
+        return {value: num, label: this.format_num(num)};
+    };
+    format_num = n=>n&&n.toLocaleString({useGrouping: true})||n;
+    value_to_option = value=>
+        value!=null && {value, label: this.format_num(+value)};
+    validation = s=>!!s&&Number(s)==s;
+    opt_from_range = ()=>{
+        let res;
+        if (this.props.range=='medium')
+            res = [1, 10, 100, 1000];
+        else
+            res = [];
+        if (this.props.allow_zero)
+            res.unshift(0);
+        return res;
+    };
+    on_change = e=>{
+        this.props.on_change_wrapper(e && +e.value || '');
+    };
+    render(){
+        const data = this.props.range ?
+            this.opt_from_range() : this.props.data;
+        const options = data.map(this.value_to_option);
+        return <React_select styles={this.styles} className="select_number"
+            isClearable noOptionsMessage={()=>'You can use only numbers here'}
+            classNamePrefix="react_select"
+            value={this.value_to_option(this.props.val)}
+            onChange={this.on_change}
+            simpleValue autoBlur options={options}
+            isValidNewOption={this.validation} promptTextCreator={l=>l}
+            newOptionCreator={this.label_to_option} pageSize={9}
+            shouldKeyDownEventCreateNewOption={()=>true}
+            placeholder={this.props.placeholder}
+            isDisabled={this.props.disabled}
+            onSelectResetsInput={!this.props.update_on_input}/>;
+    }
+}
+
 const Double_number = props=>{
     const vals = (''+props.val).split(':');
     const update = (start, end)=>{
@@ -360,6 +425,8 @@ export const Form_controller = props=>{
         return <Regex {...props}/>;
     else if (type=='yes_no')
         return <Yes_no {...props}/>;
+    else if (type=='select_number')
+        return <Select_number {...props}/>;
     return <Input {...props}/>;
 };
 

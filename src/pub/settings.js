@@ -2,13 +2,12 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import _ from 'lodash';
-import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
+import {Labeled_controller, Nav, Loader, Loader_small,
+    Select_number} from './common.js';
 import {normalizers} from './util.js';
-import {Select, Input, Tooltip} from './common.js';
+import {Select, Tooltip} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import React_select from 'react-select/lib/Creatable';
 
 export default function Settings(){
     return <div className="settings">
@@ -39,7 +38,6 @@ class Form extends Pure_component {
         {key: 'requests', value: 'requests'},
         {key: 'megabytes', value: 'megabytes'},
     ];
-    default_values = {requests: 1000, megabytes: 1024};
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings||this.state.settings)
@@ -73,12 +71,12 @@ class Form extends Pure_component {
         this.setState(prev=>({settings: {
             ...prev.settings,
             logs_metric: val,
-            logs_value: this.default_values[val],
+            logs_value: 1000,
         }}), this.save);
     };
     logs_value_changed = val=>{
-        this.setState(prev=>({settings: {...prev.settings, logs_value: val}}),
-            this.debounced_save);
+        this.setState(prev=>({settings: {...prev.settings, logs_value: +val}}),
+            this.save);
     };
     request_stats_changed = val=>{
         this.setState(prev=>({
@@ -107,7 +105,6 @@ class Form extends Pure_component {
             _this.setState({saving: false});
         });
     };
-    debounced_save = _.debounce(this.save, 1000);
     render(){
         if (!this.state.settings)
             return null;
@@ -117,6 +114,8 @@ class Form extends Pure_component {
             const plan = z.plans && z.plans.slice(-1)[0] || {};
             return !plan.archive && !plan.disable;
         }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
+        const note = this.state.settings.logs_value ?
+            'Set to 0 to disable logs entirely' : 'Logs are disabled';
         return <div className="settings_form">
               <Loader show={!this.state.consts}/>
               <Labeled_controller val={this.state.settings.zone} type="select"
@@ -140,51 +139,21 @@ class Form extends Pure_component {
                 <div className="field">
                   <div className="inline_field">
                     <div className="double_field">
-                      <Input val={this.state.settings.logs_value}
-                        on_change_wrapper={this.logs_value_changed}
-                        type="number"/>
+                      <Select_number val={this.state.settings.logs_value}
+                        data={[0, 100, 1000, 10000]}
+                        on_change_wrapper={this.logs_value_changed}/>
                       <Select val={this.state.settings.logs_metric}
                         on_change_wrapper={this.logs_metric_changed}
                         data={this.logs_metric_opts}/>
                     </div>
-                    <div className="note" style={{position: 'absolute'}}>
+                    <div className="note">
                       <strong>Note: </strong>
-                      Set to 0 to disable logs entirely
+                      {note}
                     </div>
                   </div>
                 </div>
               </div>
               <Loader_small show={this.state.saving}/>
             </div>;
-    }
-}
-
-// XXX krzysztof: copied from react_util.js - try to import the whole file
-const format_num = n=>n&&n.toLocaleString({useGrouping: true})||n;
-class Select_number extends Pure_component {
-    label_to_option = ({label})=>{
-        const num = +label;
-        return {value: num, label: format_num(num)};
-    };
-    value_to_option = value=>value!=null && {value, label: format_num(+value)};
-    render(){
-        const p = this.props;
-        const options = p.opt.map(this.value_to_option);
-        const validation = s=>{
-            if (s.label&&s.label.match(/^[0-9,.]+$/))
-            {
-                if (p.update_on_input)
-                    p.on_change(+s.label);
-                return true;
-            }
-        };
-        return <React_select className={p.className}
-            value={this.value_to_option(p.value)} onChange={p.on_change}
-            simpleValue autoBlur clearable={false} options={options}
-            isValidNewOption={validation} promptTextCreator={l=>l}
-            newOptionCreator={this.label_to_option} pageSize={9}
-            shouldKeyDownEventCreateNewOption={()=>false}
-            placeholder={p.placeholder} disabled={p.disabled}
-            onSelectResetsInput={!p.update_on_input}/>;
     }
 }

@@ -60,6 +60,8 @@ const carriers = [
     {value: 'free', label: 'Free'},
     {value: 'sfr', label: 'SFR'},
     {value: 'mobiltel', label: 'Mobiltel'},
+    {value: 'sunrise', label: 'Sunrise Communications'},
+    {value: 'digicel', label: 'Digicel'},
 ];
 
 const carriers_note = (()=>{
