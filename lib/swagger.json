@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.106.128",
+        "version": "1.106.222",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -262,6 +262,13 @@
                         "description": "Target URL that needs to be tested",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "screenshot",
+                        "in": "query",
+                        "description": "Flag determining if to take a screenshot of the final page",
+                        "required": false,
+                        "type": "boolean"
                     },
                     {
                         "name": "country",

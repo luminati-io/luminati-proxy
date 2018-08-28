@@ -21101,8 +21101,8 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             var permissions = details && details.perm.split(' ') || [];
             var plan = details && details.plans[details.plans.length - 1] || {};
             if (field_name == 'vip') return !!plan.vip;
-            if (field_name == 'country' && plan.type == 'static') return false;
             if (field_name == 'country' && plan.ip_alloc_preset == 'shared_block') return true;
+            if (field_name == 'country' && plan.type == 'static') return false;
             if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name)) return permissions.includes(field_name);
             if (field_name == 'country' && (plan.type == 'static' || ['domain', 'domain_p'].includes(plan.vips_type))) {
                 return false;
@@ -38938,7 +38938,7 @@ exports.default = provider({ tab_id: 'rules' })(function (_Pure_component) {
             if (['retry', 'retry_port', 'ban_ip', 'refresh_ip'].includes(rule.action)) {
                 action_raw.retry = true;
             }
-            if (rule.action == 'retry' && rule.retry_number) action_raw.retry = rule.retry_number;else if (rule.action == 'retry_port') action_raw.retry_port = rule.retry_port;else if (rule.action == 'ban_ip') {
+            if (rule.action == 'retry' && rule.retry_number) action_raw.retry = rule.retry_number;else if (rule.action == 'retry_port') action_raw.retry_port = Number(rule.retry_port);else if (rule.action == 'ban_ip') {
                 if (rule.ban_ip_duration != 'custom') action_raw.ban_ip = rule.ban_ip_duration || '10min';else action_raw.ban_ip = rule.ban_ip_custom + 'min';
             } else if (rule.action == 'refresh_ip') action_raw.refresh_ip = true;else if (rule.action == 'save_to_pool') action_raw.reserve_session = true;else if (rule.action == 'save_to_fast_pool') {
                 action_raw.fast_pool_session = true;
@@ -39229,7 +39229,12 @@ var Rule = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(functio
             }
             if (!val) _this8.set_rule_field('trigger_url_regex', '');
         }, _this8.action_changed = function (val) {
-            if (val == 'retry_port') _this8.set_rule_field(val, _this8.props.def_port || '');
+            if (val == 'retry_port') {
+                var def_port = _this8.props.ports_opt.filter(function (p) {
+                    return p.value != _this8.props.match.params.port;
+                })[0];
+                _this8.set_rule_field(val, def_port && def_port.value || '');
+            }
             if (val != 'ban_ip') {
                 _this8.set_rule_field('ban_ip_duration', '');
                 _this8.set_rule_field('ban_ip_custom', '');
@@ -39581,7 +39586,7 @@ var provider = function provider(provide) {
     });
 };
 
-var carriers = [{ value: '', key: 'None' }, { value: 'a1', key: 'A1 Austria' }, { value: 'aircel', key: 'Aircel' }, { value: 'airtel', key: 'Airtel' }, { value: 'att', key: 'AT&T' }, { value: 'vimpelcom', key: 'Beeline Russia' }, { value: 'celcom', key: 'Celcom' }, { value: 'chinamobile', key: 'China Mobile' }, { value: 'claro', key: 'Claro' }, { value: 'comcast', key: 'Comcast' }, { value: 'cox', key: 'Cox' }, { value: 'dt', key: 'Deutsche Telekom' }, { value: 'digi', key: 'Digi Malaysia' }, { value: 'docomo', key: 'Docomo' }, { value: 'dtac', key: 'DTAC Trinet' }, { value: 'etisalat', key: 'Etisalat' }, { value: 'idea', key: 'Idea India' }, { value: 'kyivstar', key: 'Kyivstar' }, { value: 'meo', key: 'MEO Portugal' }, { value: 'megafont', key: 'Megafon Russia' }, { value: 'mtn', key: 'MTN - Mahanager Telephone' }, { value: 'mtnza', key: 'MTN South Africa' }, { value: 'mts', key: 'MTS Russia' }, { value: 'optus', key: 'Optus' }, { value: 'orange', key: 'Orange' }, { value: 'qwest', key: 'Qwest' }, { value: 'reliance_jio', key: 'Reliance Jio' }, { value: 'robi', key: 'Robi' }, { value: 'sprint', key: 'Sprint' }, { value: 'telefonica', key: 'Telefonica' }, { value: 'telstra', key: 'Telstra' }, { value: 'tmobile', key: 'T-Mobile' }, { value: 'tigo', key: 'Tigo' }, { value: 'tim', key: 'TIM (Telecom Italia)' }, { value: 'vodacomza', key: 'Vodacom South Africa' }, { value: 'vodafone', key: 'Vodafone' }, { value: 'verizon', key: 'Verizon' }, { value: 'vivo', key: 'Vivo' }, { value: 'zain', key: 'Zain' }, { value: 'umobile', key: 'U-Mobile' }, { value: 'proximus', label: 'Proximus' }, { value: 'tele2', label: 'Tele2' }, { value: 'mobitel', label: 'Mobitel' }, { value: 'o2', label: 'O2' }, { value: 'bsnl', label: 'BSNL' }, { value: 'bouygues', label: 'Bouygues Telecom' }, { value: 'free', label: 'Free' }, { value: 'sfr', label: 'SFR' }, { value: 'mobiltel', label: 'Mobiltel' }, { value: 'sunrise', label: 'Sunrise Communications' }, { value: 'digicel', label: 'Digicel' }];
+var carriers = [{ value: '', key: 'None' }, { value: 'a1', key: 'A1 Austria' }, { value: 'aircel', key: 'Aircel' }, { value: 'airtel', key: 'Airtel' }, { value: 'att', key: 'AT&T' }, { value: 'vimpelcom', key: 'Beeline Russia' }, { value: 'celcom', key: 'Celcom' }, { value: 'chinamobile', key: 'China Mobile' }, { value: 'claro', key: 'Claro' }, { value: 'comcast', key: 'Comcast' }, { value: 'cox', key: 'Cox' }, { value: 'dt', key: 'Deutsche Telekom' }, { value: 'digi', key: 'Digi Malaysia' }, { value: 'docomo', key: 'Docomo' }, { value: 'dtac', key: 'DTAC Trinet' }, { value: 'etisalat', key: 'Etisalat' }, { value: 'idea', key: 'Idea India' }, { value: 'kyivstar', key: 'Kyivstar' }, { value: 'meo', key: 'MEO Portugal' }, { value: 'megafont', key: 'Megafon Russia' }, { value: 'mtn', key: 'MTN - Mahanager Telephone' }, { value: 'mtnza', key: 'MTN South Africa' }, { value: 'mts', key: 'MTS Russia' }, { value: 'optus', key: 'Optus' }, { value: 'orange', key: 'Orange' }, { value: 'qwest', key: 'Qwest' }, { value: 'reliance_jio', key: 'Reliance Jio' }, { value: 'robi', key: 'Robi' }, { value: 'sprint', key: 'Sprint' }, { value: 'telefonica', key: 'Telefonica' }, { value: 'telstra', key: 'Telstra' }, { value: 'tmobile', key: 'T-Mobile' }, { value: 'tigo', key: 'Tigo' }, { value: 'tim', key: 'TIM (Telecom Italia)' }, { value: 'vodacomza', key: 'Vodacom South Africa' }, { value: 'vodafone', key: 'Vodafone' }, { value: 'verizon', key: 'Verizon' }, { value: 'vivo', key: 'Vivo' }, { value: 'zain', key: 'Zain' }, { value: 'umobile', key: 'U-Mobile' }, { value: 'proximus', key: 'Proximus' }, { value: 'tele2', key: 'Tele2' }, { value: 'mobitel', key: 'Mobitel' }, { value: 'o2', key: 'O2' }, { value: 'bsnl', key: 'BSNL' }, { value: 'bouygues', key: 'Bouygues Telecom' }, { value: 'free', key: 'Free' }, { value: 'sfr', key: 'SFR' }, { value: 'mobiltel', key: 'Mobiltel' }, { value: 'sunrise', key: 'Sunrise Communications' }, { value: 'digicel', key: 'Digicel' }];
 
 var carriers_note = function () {
     var subject = 'Add new carrier option';
@@ -41641,6 +41646,11 @@ E.browser = function () {
             _react2.default.createElement(
                 _common.Circle_li,
                 null,
+                'Check the "Bypass proxy server for local addresses" checkbox'
+            ),
+            _react2.default.createElement(
+                _common.Circle_li,
+                null,
                 'Save changes by pressing ',
                 _react2.default.createElement(
                     'code',
@@ -41923,6 +41933,17 @@ E.browser = function () {
                     'Use this proxy server for all protocols'
                 ),
                 'checkbox.'
+            ),
+            _react2.default.createElement(
+                _common.Circle_li,
+                null,
+                'Add ',
+                _react2.default.createElement(
+                    'code',
+                    null,
+                    'localhost,127.0.0.1'
+                ),
+                ' to "No proxy for:" text area.'
             ),
             _react2.default.createElement(
                 _common.Circle_li,
@@ -42742,13 +42763,18 @@ var tooltips = {
 var Schema = function (_Pure_component) {
     (0, _inherits3.default)(Schema, _Pure_component);
 
-    function Schema(props) {
+    function Schema() {
+        var _ref;
+
+        var _temp, _this, _ret;
+
         (0, _classCallCheck3.default)(this, Schema);
 
-        var _this = (0, _possibleConstructorReturn3.default)(this, (Schema.__proto__ || Object.getPrototypeOf(Schema)).call(this, props));
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
 
-        _this.state = { form: {}, proxies: [] };
-        return _this;
+        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Schema.__proto__ || Object.getPrototypeOf(Schema)).call.apply(_ref, [this].concat(args))), _this), _this.state = { form: {}, proxies: [] }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
     }
 
     (0, _createClass3.default)(Schema, [{
@@ -42761,11 +42787,21 @@ var Schema = function (_Pure_component) {
 
                 _this2.setState({ form: (0, _extends3.default)({}, form) });
             });
+            this.setdb_on('head.proxy_edit.form.zone', function (zone) {
+                if (zone === undefined) return;
+                _this2.setState(function (prev) {
+                    return { form: (0, _extends3.default)({}, prev.form, { zone: zone }) };
+                });
+            });
             this.setdb_on('head.proxy_edit.form.port', function (port) {
-                _this2.setState({ form: { port: port } });
+                _this2.setState(function (prev) {
+                    return { form: (0, _extends3.default)({}, prev.form, { port: port }) };
+                });
             });
             this.setdb_on('head.proxy_edit.form.country', function (country) {
-                _this2.setState({ form: { country: country } });
+                _this2.setState(function (prev) {
+                    return { form: (0, _extends3.default)({}, prev.form, { country: country }) };
+                });
             });
             this.setdb_on('head.proxies_running', function (proxies) {
                 if (proxies) _this2.setState({ proxies: proxies });
@@ -42824,9 +42860,9 @@ var Schema = function (_Pure_component) {
     return Schema;
 }(_pure_component2.default);
 
-var Proxy_port_layer = function Proxy_port_layer(_ref) {
-    var proxies = _ref.proxies,
-        form = _ref.form;
+var Proxy_port_layer = function Proxy_port_layer(_ref2) {
+    var proxies = _ref2.proxies,
+        form = _ref2.form;
 
     var label = void 0;
     if (form.port) label = 'Proxy port ' + form.port;else if (!proxies.length) label = 'Proxy port';else if (proxies.length == 1) label = 'Proxy port ' + proxies[0].port;else {
@@ -42839,12 +42875,12 @@ var Proxy_port_layer = function Proxy_port_layer(_ref) {
     );
 };
 
-var Layer = function Layer(_ref2) {
-    var id = _ref2.id,
-        no_btn = _ref2.no_btn,
-        no_arr = _ref2.no_arr,
-        class_names = _ref2.class_names,
-        children = _ref2.children;
+var Layer = function Layer(_ref3) {
+    var id = _ref3.id,
+        no_btn = _ref3.no_btn,
+        no_arr = _ref3.no_arr,
+        class_names = _ref3.class_names,
+        children = _ref3.children;
 
     return _react2.default.createElement(
         'div',
@@ -42867,9 +42903,9 @@ var Layer = function Layer(_ref2) {
     );
 };
 
-var Peer = function Peer(_ref3) {
-    var proxies = _ref3.proxies,
-        form = _ref3.form;
+var Peer = function Peer(_ref4) {
+    var proxies = _ref4.proxies,
+        form = _ref4.form;
 
     if (form.port) return _react2.default.createElement(Flag, { proxy: form });else if (!proxies.length) return _react2.default.createElement(Flag, null);
     var countries = proxies.map(function (proxy) {
@@ -42883,9 +42919,9 @@ var Peer = function Peer(_ref3) {
     return _react2.default.createElement(Flag, { proxy: proxies[0] });
 };
 
-var Flag = function Flag(_ref4) {
-    var _ref4$proxy = _ref4.proxy,
-        proxy = _ref4$proxy === undefined ? {} : _ref4$proxy;
+var Flag = function Flag(_ref5) {
+    var _ref5$proxy = _ref5.proxy,
+        proxy = _ref5$proxy === undefined ? {} : _ref5$proxy;
 
     var country = (0, _util.get_static_country)(proxy);
     if (!country || country == 'any' || country == '*') country = proxy.country;

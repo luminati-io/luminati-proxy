@@ -1,8 +1,31 @@
 [
     {
-        "ver": "1.106.0",
-        "type": "stable/dev",
-        "changes": []
+        "ver": "1.106.222",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix waterfall rule"
+            },
+            {
+                "type": "bug",
+                "text": "Fix UI of Targeting tab"
+            },
+            {
+                "type": "star",
+                "text": "Added 'screenshot' param to Link Tester"
+            }
+        ]
+    },
+    {
+        "ver": "1.106.128",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix memory and unfinished async tasks leaks"
+            }
+        ]
     },
     {
         "ver": "1.106.0",

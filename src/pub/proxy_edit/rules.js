@@ -141,7 +141,7 @@ class Rules extends Pure_component {
         if (rule.action=='retry' && rule.retry_number)
             action_raw.retry = rule.retry_number;
         else if (rule.action=='retry_port')
-            action_raw.retry_port = rule.retry_port;
+            action_raw.retry_port = Number(rule.retry_port);
         else if (rule.action=='ban_ip')
         {
             if (rule.ban_ip_duration!='custom')
@@ -349,7 +349,11 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
     };
     action_changed = val=>{
         if (val=='retry_port')
-            this.set_rule_field(val, this.props.def_port||'');
+        {
+            const def_port = this.props.ports_opt.filter(p=>
+                p.value!=this.props.match.params.port)[0];
+            this.set_rule_field(val, def_port&&def_port.value||'');
+        }
         if (val!='ban_ip')
         {
             this.set_rule_field('ban_ip_duration', '');

@@ -1,6 +1,12 @@
 Luminati Proxy manager - Change Log
 
-## 1.106.0 
+## 1.106.222 Stable
+- :bug: Fix waterfall rule
+- :bug: Fix UI of Targeting tab
+- :star: Added 'screenshot' param to Link Tester
+
+## 1.106.128 Development Latest
+- :bug: Fix memory and unfinished async tasks leaks
 
 ## 1.106.0 Stable
 - :star: Improvements in database management, more control over how many requests to keep

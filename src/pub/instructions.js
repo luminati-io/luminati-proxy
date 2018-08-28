@@ -115,6 +115,7 @@ E.browser = (proxy=24000)=>({
             Enter <code>Port</code>:
             <Code>{proxy}</Code>
           </Li>
+          <Li>Check the "Bypass proxy server for local addresses" checkbox</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
         </ol>,
     chrome_mac: <ol>
@@ -169,6 +170,8 @@ E.browser = (proxy=24000)=>({
           </Li>
           <Li>Tick <code>Use this proxy server for all protocols</code>
             checkbox.</Li>
+          <Li>Add <code>localhost,127.0.0.1</code> to "No proxy for:" text
+            area.</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
         </ol>,
     safari: <ol>
