@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.106.262",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix wrong async logging initialization"
+            }
+        ]
+    },
+    {
         "ver": "1.106.222",
         "type": "stable",
         "changes": [

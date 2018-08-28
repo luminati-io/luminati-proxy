@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.106.262 Stable
+- :bug: Fix wrong async logging initialization
+
 ## 1.106.222 Stable
 - :bug: Fix waterfall rule
 - :bug: Fix UI of Targeting tab

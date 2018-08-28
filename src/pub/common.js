@@ -340,12 +340,14 @@ export class Select_number extends Pure_component {
                 height: 32,
                 'border-radius': 3,
                 border: 'solid 1px',
-                'border-color': state.isFocused ? '#004d74' : '#ccdbe3',
+                'border-color': state.isFocused ? '#004d74' :
+                    state.isDisabled ? '#e0e9ee' : '#ccdbe3',
+                'background-color': state.isDisabled ? '#f5f5f5;' : 'white',
             };
         },
         singleValue: (base, state)=>({
             ...base,
-            color: '#004d74',
+            color: state.isDisabled ? '#8e8e8e' : '#004d74',
         }),
     };
     label_to_option = ({label})=>{

@@ -188,7 +188,7 @@ const presets = {
         check: function(opt){ return !opt.pool_size && !opt.sticky_ip
             && opt.session===true && opt.keep_alive; },
         set: opt=>{
-            opt.pool_size = 0;
+            opt.pool_size = 1;
             opt.keep_alive = 45;
             opt.pool_type = null;
             opt.session = true;
@@ -209,6 +209,9 @@ const presets = {
             pool_type: true,
             seed: true,
             keep_alive: true,
+            pool_size: true,
+            max_requests: true,
+            session_duration: true,
         },
     },
     session: {
@@ -361,6 +364,7 @@ const presets = {
             opt.keep_alive = 0;
             opt.session_duration = 0;
             opt.random_user_agent = true;
+            opt.override_headers = true;
             opt.rules = opt.rules||{};
             opt.rules.pre = [{
                 alphabet: 'wertyuiop;lkjhgfdQWERTYUJBVCF5467',
@@ -383,6 +387,7 @@ const presets = {
         clean: opt=>{
             opt.rules.pre = [];
             opt.random_user_agent = '';
+            opt.override_headers = false;
         },
         disabled: {
             random_user_agent: true,
@@ -393,6 +398,7 @@ const presets = {
             seed: true,
             keep_alive: true,
             pool_size: true,
+            override_headers: true,
         },
     },
     shop: {

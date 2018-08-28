@@ -16,7 +16,7 @@ class Lum {
         process.env.LPM_LOG_FILE = `${this.proc_name}.log`;
         process.env.LPM_LOG_DIR = lpm_config.work_dir;
         require('../lib/log.js')('', this.argv.log);
-        zerr.info([
+        zerr.notice([
             `\nTag: ${config.ZON_VERSION}`,
             `Build date: ${config.CONFIG_BUILD_DATE}`,
             `Make flags: ${config.CONFIG_MAKEFLAGS}`,

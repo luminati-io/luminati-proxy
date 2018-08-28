@@ -373,6 +373,8 @@ input[type=email], textarea, .json_input_wrapper {
         outline: none;
         border: solid 1px @first_color;
     }
+    &::placeholder { color: #8e8e8e; }
+    &[disabled], &[disabled]::placeholder { color: #8e8e8e; }
 }
 input[disabled], select[disabled] {
     background-color: @light_grey;
@@ -385,6 +387,7 @@ textarea {
 select {
     background: url(/img/down.svg) no-repeat;
     background-position: right 10px center;
+    &[disabled] { color: #8e8e8e; }
 }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
