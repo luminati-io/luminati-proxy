@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.106.377 Stable
+- :star: Link Tester improvements
+- :bug: Fix bypass requests mem leak
+
 ## 1.106.262 Stable
 - :bug: Fix wrong async logging initialization
 

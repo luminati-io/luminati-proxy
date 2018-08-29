@@ -57,6 +57,7 @@ const Index = withRouter(class Index extends Pure_component {
             const port = this.props.match.params.port;
             const proxy = proxies.filter(p=>p.port==port)[0].config;
             const form = Object.assign({}, proxy);
+            // XXX krzysztof: no need to guess preset
             const preset = this.guess_preset(form);
             this.apply_preset(form, preset);
             this.setState({proxies}, this.delayed_loader());
@@ -104,21 +105,7 @@ const Index = withRouter(class Index extends Pure_component {
             this.props.history.push({pathname});
         }
     };
-    guess_preset(form){
-        let res;
-        for (let p in presets)
-        {
-            const preset = presets[p];
-            if (preset.check(form))
-            {
-                res = p;
-                break;
-            }
-        }
-        if (form.last_preset_applied && presets[form.last_preset_applied])
-            res = form.last_preset_applied;
-        return res;
-    }
+    guess_preset(form){ return form.last_preset_applied; }
     set_field = (field_name, value, opt={})=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};

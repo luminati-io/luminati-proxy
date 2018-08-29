@@ -45,7 +45,6 @@ conf.luminati_default = {
     proxy: conf.default_superproxy_domain,
     proxy_port: 22225,
     proxy_count: 1,
-    allow_proxy_auth: true,
     pool_type: 'sequential',
     sticky_ip: false,
     insecure: false,

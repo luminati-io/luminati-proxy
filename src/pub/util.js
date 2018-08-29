@@ -145,48 +145,12 @@ export const get_static_country = proxy=>{
 };
 
 const presets = {
-    sequential: {
-        default: true,
-        title: 'Sequential session IP pool',
-        subtitle: `Sequential pool of pre-established sessions (IPs). For
-            running groups of requests sharing the same IP to a target site.
-            Use 'Max requests' and 'Session duration' to control session (IP)
-            switching`,
-        check: function(opt){ return opt.pool_size &&
-            (!opt.pool_type || opt.pool_type=='sequential'); },
-        set: opt=>{
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = 45;
-            opt.session = true;
-        },
-        clean: opt=>{
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `sequential pool type`},
-        ],
-        disabled: {
-            sticky_ip: true,
-            session_random: true,
-            session: true,
-            pool_size: true,
-            pool_type: true,
-            seed: true,
-            keep_alive: true,
-        },
-    },
     session_long: {
+        default: true,
         title: 'Long single session (IP)',
         subtitle: `All requests share the same long session (IP). For
             connecting a browser to Luminati, maintaining the same IP for as
             long as possible`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
-            && opt.session===true && opt.keep_alive; },
         set: opt=>{
             opt.pool_size = 1;
             opt.keep_alive = 45;
@@ -214,42 +178,11 @@ const presets = {
             session_duration: true,
         },
     },
-    session: {
-        title: 'Single session (IP)',
-        subtitle: `All requests share the same active session (IP). For
-            connecting a single app/browser that does not need to maintain IP
-            on idle times`,
-        check: function(opt){ return !opt.pool_size && !opt.sticky_ip
-            && opt.session===true && !opt.keep_alive; },
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.pool_type = null;
-            opt.session = true;
-        },
-        clean: opt=>{
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-        },
-        rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'pool_type', label: `sequential pool type`},
-        ],
-        disabled: {
-            sticky_ip: true,
-            session_random: true,
-            session: true,
-            pool_type: true,
-            seed: true,
-            keep_alive: true,
-        },
-    },
     sticky_ip: {
         title: 'Session (IP) per machine',
         subtitle: `Each requesting machine will have its own session (IP).
             For connecting several computers to a single Luminati Proxy
             Manager, each of them having its own single session (IP)`,
-        check: function(opt){ return !opt.pool_size && opt.sticky_ip; },
         set: function(opt){
             opt.pool_size = 0;
             opt.pool_type = null;
@@ -287,8 +220,6 @@ const presets = {
         subtitle: `Round-robin pool of pre-established sessions (IPs). For
             spreading requests across large number of IPs. Tweak pool_size,
             max_requests & proxy_count to optimize performance`,
-        check: function(opt){ return opt.pool_size
-            && opt.pool_type=='round-robin' && !opt.multiply; },
         set: opt=>{
             opt.pool_size = 0;
             opt.pool_type = 'round-robin';
@@ -321,7 +252,6 @@ const presets = {
     high_performance: {
         title: 'High performance',
         subtitle: 'Maximum request speed',
-        check: opt=>true,
         set: opt=>{
             opt.pool_size = 50;
             opt.keep_alive = 45;
@@ -356,7 +286,6 @@ const presets = {
     rnd_usr_agent_and_cookie_header: {
         title: 'Random User-Agent and cookie headers',
         subtitle: 'Rotate User-Agent and cookie on each request',
-        check: opt=>true,
         set: opt=>{
             opt.session = true;
             opt.pool_size = 1;
@@ -466,7 +395,6 @@ const presets = {
         title: 'Custom',
         subtitle: `Manually adjust all settings to your needs For advanced
             use cases`,
-        check: function(opt){ return true; },
         set: function(opt){},
         clean: opt=>{
             opt.session = '';

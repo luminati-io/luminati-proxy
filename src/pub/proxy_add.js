@@ -22,7 +22,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         });
         this.state = {
             zone: '',
-            preset: 'sequential',
+            preset: 'session_long',
             show_loader: false,
             cur_tab: 'proxy_lum',
         };

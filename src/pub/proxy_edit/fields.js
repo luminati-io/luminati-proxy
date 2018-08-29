@@ -362,10 +362,6 @@ export const tabs = {
                     detection on DNS`,
                 ext: true,
             },
-            allow_proxy_auth: {
-                label: 'Allow request authentication',
-                tooltip: `Pass auth data per request (use LPM like API)`,
-            },
         },
     },
 };

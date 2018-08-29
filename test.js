@@ -397,22 +397,8 @@ describe('proxy', ()=>{
         assert.equal(proxy.history.length, 1);
     }));
     describe('options', ()=>{
-        describe('passthrough (allow_proxy_auth)', ()=>{
-            it('disabled', ()=>etask(function*(){
-                l = yield lum({pool_size: 3, allow_proxy_auth: false});
-                const res = yield l.test({headers: {
-                    'proxy-authorization': 'Basic '+
-                        (new Buffer('lum-customer-user-zone-zzz:pass'))
-                        .toString('base64'),
-                }});
-                assert.ok(l.session_mgr.sessions);
-                assert.equal(proxy.history.length, 1);
-                assert.equal(proxy.full_history.length, 1);
-                assert.equal(res.body.auth.customer, customer);
-                assert.equal(res.body.auth.password, password);
-                assert.equal(res.body.auth.zone, 'static');
-            }));
-            it('enabled', ()=>etask(function*(){
+        describe('passthrough', ()=>{
+            it('authentication passed', ()=>etask(function*(){
                 l = yield lum({pool_size: 3});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
@@ -619,7 +605,6 @@ describe('proxy', ()=>{
                     assert.equal(proxy.full_history.length, 2 + s_f);
                     assert.equal(proxy.history.length, 1 + s_h);
                 }));
-
                 t('pool', {pool_size: 1});
                 t('sticky_ip', {sticky_ip: true});
                 t('session explicit', {session: 'test'});
@@ -655,7 +640,6 @@ describe('proxy', ()=>{
                         }
                     });
                 }));
-
                 t('pool', {pool_size: 1});
                 t('sticky_ip', {sticky_ip: true});
                 t('session using seed', {session: true, seed: 'seed'});
@@ -763,7 +747,6 @@ describe('proxy', ()=>{
                 let auth = res.body.auth;
                 assert.ok(session.test(auth.session));
             });
-
             const t1 = (name, opt, before, after)=>it(name, ()=>etask(
             function*(){
                 l = yield lum(opt);
@@ -771,14 +754,12 @@ describe('proxy', ()=>{
                 yield l.session_mgr.refresh_sessions();
                 yield test_session(after);
             }));
-
             t1('pool', {pool_size: 1}, /24000_[0-9a-f]+_1/,
                 /24000_[0-9a-f]+_2/);
             t1('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_[0-9a-f]+_1/,
                 /24000_127_0_0_1_[0-9a-f]+_2/);
             t1('session using seed', {session: true, seed: 'seed'},
                 /seed_1/, /seed_2/);
-
             const t2 = (name, opt, test)=>it(name, ()=>etask(function*(){
                 l = yield lum(opt);
                 assert.ok(!l.sessions);
@@ -788,7 +769,6 @@ describe('proxy', ()=>{
                 let after =l.session_mgr.sessions.sessions.map(s=>s.session);
                 test(pre, after);
             }));
-
             t2('round-robin', {pool_size: 3, pool_type: 'round-robin'},
                 (pre, after)=>after.forEach(a=>pre.forEach(
                     p=>assert.notEqual(p, a))));
@@ -947,12 +927,10 @@ describe('proxy', ()=>{
 });
 describe('manager', ()=>{
     let app, temp_files;
-
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
         return i ? args[i] : null;
     };
-
     const app_with_args = (args, only_explicit)=>etask(function*(){
         let manager;
         this.finally(()=>{
@@ -1043,7 +1021,6 @@ describe('manager', ()=>{
         assert.equal(res.statusCode, 200);
         return res.body;
     });
-
     afterEach(()=>etask(function*(){
         if (!app)
             return;
@@ -1076,7 +1053,6 @@ describe('manager', ()=>{
             let proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
         }));
-
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
@@ -1095,7 +1071,6 @@ describe('manager', ()=>{
         t('main + config files', {config: simple_proxy,
             files: multiple_proxies}, [].concat([assign({}, simple_proxy,
             {proxy_type: 'persist'})], multiple_proxies));
-
         describe('default zone', ()=>{
             const zone_static = {password: ['pass1']};
             const zone_gen = {password: ['pass2']};
@@ -1132,7 +1107,6 @@ describe('manager', ()=>{
             let proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
         }));
-
         t('off', ['--no-dropin'], []);
     });
     describe('api', ()=>{
@@ -1327,7 +1301,7 @@ describe('manager', ()=>{
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(qw`--customer mock_user --port 24000
-                    --request_stats --ssl false --allow_proxy_auth false`);
+                    --request_stats --ssl false`);
                 yield etask.nfn_apply(request, [{
                     proxy: 'http://127.0.0.1:24000',
                     url: 'http://linkedin.com/',

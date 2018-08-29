@@ -292,11 +292,6 @@ const columns = [
         render: Session_cell,
     },
     {
-        key: 'allow_proxy_auth',
-        title: 'Request authentication',
-        render: Boolean_cell,
-    },
-    {
         key: 'proxy_count',
         title: 'Mininum super proxies',
         type: 'number',

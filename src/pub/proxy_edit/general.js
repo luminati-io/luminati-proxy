@@ -56,7 +56,6 @@ export default provider({tab_id: 'general'})(props=>{
               on_change={multiply_changed} note={note_vips}/>
           }
           <Config type="yes_no" id="secure_proxy"/>
-          <Config type="yes_no" id="allow_proxy_auth"/>
           <Config type="select" id="iface" data={props.proxy.iface.values}/>
         </div>;
 });

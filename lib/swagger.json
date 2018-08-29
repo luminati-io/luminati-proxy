@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.106.262",
+        "version": "1.106.377",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -267,6 +267,13 @@
                         "name": "screenshot",
                         "in": "query",
                         "description": "Flag determining if to take a screenshot of the final page",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "name": "html",
+                        "in": "query",
+                        "description": "Flag determining if to include the full html body of the final page",
                         "required": false,
                         "type": "boolean"
                     },
@@ -648,10 +655,6 @@
                     "type": "string",
                     "pattern": "^(none|full)?$",
                     "description": "Luminati request debug info"
-                },
-                "allow_proxy_auth": {
-                    "type": "boolean",
-                    "description": "Allow Luminati authentication per request"
                 },
                 "session": {
                     "type": "string",

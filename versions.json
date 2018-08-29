@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.106.377",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Link Tester improvements"
+            },
+            {
+                "type": "bug",
+                "text": "Fix bypass requests mem leak"
+            }
+        ]
+    },
+    {
         "ver": "1.106.262",
         "type": "stable",
         "changes": [

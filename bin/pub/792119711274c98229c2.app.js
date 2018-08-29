@@ -1617,42 +1617,10 @@ var get_static_country = exports.get_static_country = function get_static_countr
 };
 
 var presets = {
-    sequential: {
-        default: true,
-        title: 'Sequential session IP pool',
-        subtitle: 'Sequential pool of pre-established sessions (IPs). For\n            running groups of requests sharing the same IP to a target site.\n            Use \'Max requests\' and \'Session duration\' to control session (IP)\n            switching',
-        check: function check(opt) {
-            return opt.pool_size && (!opt.pool_type || opt.pool_type == 'sequential');
-        },
-        set: function set(opt) {
-            opt.pool_size = 1;
-            opt.pool_type = 'sequential';
-            opt.keep_alive = 45;
-            opt.session = true;
-        },
-        clean: function clean(opt) {
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-        },
-        rules: [{ field: 'pool_size', label: 'sets \'Pool size\' to 1' }, { field: 'pool_type', label: 'sequential pool type' }],
-        disabled: {
-            sticky_ip: true,
-            session_random: true,
-            session: true,
-            pool_size: true,
-            pool_type: true,
-            seed: true,
-            keep_alive: true
-        }
-    },
     session_long: {
+        default: true,
         title: 'Long single session (IP)',
         subtitle: 'All requests share the same long session (IP). For\n            connecting a browser to Luminati, maintaining the same IP for as\n            long as possible',
-        check: function check(opt) {
-            return !opt.pool_size && !opt.sticky_ip && opt.session === true && opt.keep_alive;
-        },
         set: function set(opt) {
             opt.pool_size = 1;
             opt.keep_alive = 45;
@@ -1677,38 +1645,9 @@ var presets = {
             session_duration: true
         }
     },
-    session: {
-        title: 'Single session (IP)',
-        subtitle: 'All requests share the same active session (IP). For\n            connecting a single app/browser that does not need to maintain IP\n            on idle times',
-        check: function check(opt) {
-            return !opt.pool_size && !opt.sticky_ip && opt.session === true && !opt.keep_alive;
-        },
-        set: function set(opt) {
-            opt.pool_size = 0;
-            opt.keep_alive = 0;
-            opt.pool_type = null;
-            opt.session = true;
-        },
-        clean: function clean(opt) {
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-        },
-        rules: [{ field: 'pool_size', label: 'sets \'Pool size\' to 0' }, { field: 'pool_type', label: 'sequential pool type' }],
-        disabled: {
-            sticky_ip: true,
-            session_random: true,
-            session: true,
-            pool_type: true,
-            seed: true,
-            keep_alive: true
-        }
-    },
     sticky_ip: {
         title: 'Session (IP) per machine',
         subtitle: 'Each requesting machine will have its own session (IP).\n            For connecting several computers to a single Luminati Proxy\n            Manager, each of them having its own single session (IP)',
-        check: function check(opt) {
-            return !opt.pool_size && opt.sticky_ip;
-        },
         set: function set(opt) {
             opt.pool_size = 0;
             opt.pool_type = null;
@@ -1739,9 +1678,6 @@ var presets = {
     round_robin: {
         title: 'Round-robin (IP) pool',
         subtitle: 'Round-robin pool of pre-established sessions (IPs). For\n            spreading requests across large number of IPs. Tweak pool_size,\n            max_requests & proxy_count to optimize performance',
-        check: function check(opt) {
-            return opt.pool_size && opt.pool_type == 'round-robin' && !opt.multiply;
-        },
         set: function set(opt) {
             opt.pool_size = 0;
             opt.pool_type = 'round-robin';
@@ -1770,9 +1706,6 @@ var presets = {
     high_performance: {
         title: 'High performance',
         subtitle: 'Maximum request speed',
-        check: function check(opt) {
-            return true;
-        },
         set: function set(opt) {
             opt.pool_size = 50;
             opt.keep_alive = 45;
@@ -1804,9 +1737,6 @@ var presets = {
     rnd_usr_agent_and_cookie_header: {
         title: 'Random User-Agent and cookie headers',
         subtitle: 'Rotate User-Agent and cookie on each request',
-        check: function check(opt) {
-            return true;
-        },
         set: function set(opt) {
             opt.session = true;
             opt.pool_size = 1;
@@ -1905,9 +1835,6 @@ var presets = {
     custom: {
         title: 'Custom',
         subtitle: 'Manually adjust all settings to your needs For advanced\n            use cases',
-        check: function check(opt) {
-            return true;
-        },
         set: function set(opt) {},
         clean: function clean(opt) {
             opt.session = '';
@@ -8766,10 +8693,6 @@ var tabs = exports.tabs = {
                 label: 'SSL to super proxy',
                 tooltip: 'Encrypt requests sent to super proxy to avoid\n                    detection on DNS',
                 ext: true
-            },
-            allow_proxy_auth: {
-                label: 'Allow request authentication',
-                tooltip: 'Pass auth data per request (use LPM like API)'
             }
         }
     }
@@ -18816,7 +18739,7 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
         });
         _this2.state = {
             zone: '',
-            preset: 'sequential',
+            preset: 'session_long',
             show_loader: false,
             cur_tab: 'proxy_lum'
         };
@@ -21415,6 +21338,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                     return p.port == port;
                 })[0].config;
                 var form = Object.assign({}, proxy);
+                // XXX krzysztof: no need to guess preset
                 var preset = _this3.guess_preset(form);
                 _this3.apply_preset(form, preset);
                 _this3.setState({ proxies: proxies }, _this3.delayed_loader());
@@ -21458,16 +21382,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
     }, {
         key: 'guess_preset',
         value: function guess_preset(form) {
-            var res = void 0;
-            for (var p in presets) {
-                var preset = presets[p];
-                if (preset.check(form)) {
-                    res = p;
-                    break;
-                }
-            }
-            if (form.last_preset_applied && presets[form.last_preset_applied]) res = form.last_preset_applied;
-            return res;
+            return form.last_preset_applied;
         }
     }, {
         key: 'send_ga',
@@ -39836,7 +39751,6 @@ var provider = function provider(provide) {
         type == 'vips' && _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'multiply_vips',
             on_change: multiply_changed, note: note_vips }),
         _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'secure_proxy' }),
-        _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'allow_proxy_auth' }),
         _react2.default.createElement(_common.Config, { type: 'select', id: 'iface', data: props.proxy.iface.values })
     );
 });
@@ -45121,10 +45035,6 @@ var columns = [{
     key: 'session',
     title: 'Session',
     render: Session_cell
-}, {
-    key: 'allow_proxy_auth',
-    title: 'Request authentication',
-    render: Boolean_cell
 }, {
     key: 'proxy_count',
     title: 'Mininum super proxies',
