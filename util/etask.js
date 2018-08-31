@@ -81,7 +81,10 @@ function _cb_post(et, ctx){
     if (perf_enable)
     {
         var name = et.get_name();
-        var perf = E.perf_stat[name]||(E.perf_stat[name] = {ms: 0, n: 0});
+        var perf = E.perf_stat[name] ||
+            (E.perf_stat[name] = {ms: 0, n: 0, max: 0});
+        if (perf.max<ms)
+            perf.max = ms;
         perf.ms += ms;
         perf.n++;
     }

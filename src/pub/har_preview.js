@@ -82,6 +82,7 @@ class Pane_headers extends Pure_component {
             {name: 'Status Code', value: req.response.status},
             {name: 'Super Proxy', value: req.details.super_proxy},
             {name: 'Username', value: req.details.username},
+            {name: 'Password', value: req.details.password},
             {name: 'Sent from', value: req.details.remote_address},
         ];
         return <ol className="tree_outline">

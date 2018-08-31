@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.106.377/luminati-proxy-manager-v1.106.377-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.106.519/luminati-proxy-manager-v1.106.519-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -185,17 +185,10 @@ Options:
   --max_requests           Maximum requests per session   [string] [default: 50]
   --session_duration       Maximum duration of session (seconds)        [string]
   --throttle               Throttle requests above given number         [number]
-  --rules                  Proxy request rules                         [default:
-  {"post":[{"res":[{"action":{"req_status_cnt":true,"req_status_success":true,"r
-  etry":false},"head":true,"status":{"arg":"([23]..|404)","type":"=~"}},{"action
-  ":{"req_status_cnt":true,"req_status_success":false,"retry":false},"head":true
-  ,"status":{"arg":"([23]..|404)","type":"!~"}}],"url":"**","tag":"req_status"}]
-                                                                              }]
   --whitelist_ips          Whitelist ip list for granting access to proxy
                                                            [array] [default: []]
   --race_reqs              Race several requests at once and choose fastest
                                                                         [number]
-  --disable_color          Disable colors in log      [boolean] [default: false]
   --www                    HTTP port for browser admin UI       [default: 22999]
   --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
                            [default:"127.0.0.1"]
@@ -218,7 +211,6 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
   --no-www                 Disable local web

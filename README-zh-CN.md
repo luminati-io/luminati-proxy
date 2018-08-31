@@ -29,7 +29,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.106.377-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.106.519-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 6+版 (最好用x
@@ -137,17 +137,10 @@ Options:
   --max_requests           Maximum requests per session   [string] [default: 50]
   --session_duration       Maximum duration of session (seconds)        [string]
   --throttle               Throttle requests above given number         [number]
-  --rules                  Proxy request rules                         [default:
-  {"post":[{"res":[{"action":{"req_status_cnt":true,"req_status_success":true,"r
-  etry":false},"head":true,"status":{"arg":"([23]..|404)","type":"=~"}},{"action
-  ":{"req_status_cnt":true,"req_status_success":false,"retry":false},"head":true
-  ,"status":{"arg":"([23]..|404)","type":"!~"}}],"url":"**","tag":"req_status"}]
-                                                                              }]
   --whitelist_ips          Whitelist ip list for granting access to proxy
                                                            [array] [default: []]
   --race_reqs              Race several requests at once and choose fastest
                                                                         [number]
-  --disable_color          Disable colors in log      [boolean] [default: false]
   --www                    HTTP port for browser admin UI       [default: 22999]
   --ws                     Websocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
@@ -167,7 +160,6 @@ Options:
                            luminati.io                                  [string]
   --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
-  --beta_features          Enable beta features       [boolean] [default: false]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
   --no-www                 Disable local web

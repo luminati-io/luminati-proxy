@@ -341,7 +341,7 @@ describe('proxy', ()=>{
             function*(){
                 const context = 'context-1';
                 history = [];
-                l = yield lum(assign({history_aggregator: aggregator}, opt));
+                l = yield lum(assign({handle_usage: aggregator}, opt));
                 let res = yield l.test({
                     url: _url(),
                     headers: {'x-hola-context': context},
@@ -792,7 +792,7 @@ describe('proxy', ()=>{
                 ping.headers = ping.headers||{};
                 ping.headers.connection = 'close';
                 l = yield lum(assign({history: true,
-                    history_aggregator: aggregator}, opt));
+                    handle_usage: aggregator}, opt));
                 assert.equal(history.length, 0);
                 let res = yield l.test(_url());
                 yield etask.sleep(400);
@@ -842,7 +842,7 @@ describe('proxy', ()=>{
                         history.push(data);
                 };
                 l = yield lum({pool_size: 1, keep_alive: 0.01,
-                    history_aggregator: one_each_aggregator});
+                    handle_usage: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(400);
                 assert_has(history, [
@@ -899,7 +899,7 @@ describe('proxy', ()=>{
                 false}, head: true, status: {arg: '200', type: 'in'}}],
                 url: '**'}]};
             history = [];
-            l = yield lum({history_aggregator: aggregator, rules,
+            l = yield lum({handle_usage: aggregator, rules,
                 session: true, max_requests: 1, reserved_keep_alive: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
@@ -1085,8 +1085,6 @@ describe('manager', ()=>{
                     .reply(200, {_defaults});
                 t(name, _.set(config, 'cli.customer', 'testc1'), expected);
             };
-            t2('no defaults', {config: {proxies: [simple_proxy]}}, [assign({},
-                simple_proxy, {zone: 'static'})]);
             t2('invalid', {config: {_defaults: {zone: 'foo'},
                 proxies: [simple_proxy]}}, [assign({}, simple_proxy,
                 {zone: 'static'})], {zone: 'static', zones});

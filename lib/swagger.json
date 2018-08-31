@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.106.377",
+        "version": "1.106.519",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -493,17 +493,9 @@
                     "type": "boolean",
                     "description": "Enable requests statistics"
                 },
-                "beta_features": {
-                    "type": "boolean",
-                    "description": "Enable beta features"
-                },
                 "test_url": {
                     "type": "string",
                     "description": "A url for testing proxy"
-                },
-                "disable_color": {
-                    "type": "boolean",
-                    "description": "Disable colors in log"
                 },
                 "logs": {
                     "type": "boolean",
@@ -709,10 +701,6 @@
                 "race_reqs": {
                     "type": "integer",
                     "description": "Race several requests at once and choose fastest"
-                },
-                "disable_color": {
-                    "type": "boolean",
-                    "description": "Disable colors in log"
                 }
             }
         }

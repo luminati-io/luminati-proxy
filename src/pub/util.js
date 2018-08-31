@@ -154,16 +154,11 @@ const presets = {
         set: opt=>{
             opt.pool_size = 1;
             opt.keep_alive = 45;
-            opt.pool_type = null;
             opt.session = true;
         },
-        clean: opt=>{
-            opt.keep_alive = 0;
-            opt.session_duration = 0;
-            opt.max_requests = 0;
-        },
+        clean: opt=>{},
         rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
+            {field: 'pool_size', label: `sets 'Pool size' to 1`},
             {field: 'pool_type', label: `sequential pool type`},
         ],
         disabled: {
@@ -185,7 +180,6 @@ const presets = {
             Manager, each of them having its own single session (IP)`,
         set: function(opt){
             opt.pool_size = 0;
-            opt.pool_type = null;
             opt.sticky_ip = true;
             opt.session = '';
             opt.keep_alive = 45;
@@ -381,6 +375,7 @@ const presets = {
             session_random: true,
             session: true,
             seed: true,
+            ssl: true,
         },
         rules: [
             {field: 'dns', label: `sets DNS to resolve remotely`},
@@ -393,7 +388,7 @@ const presets = {
     },
     custom: {
         title: 'Custom',
-        subtitle: `Manually adjust all settings to your needs For advanced
+        subtitle: `Manually adjust all settings to your needs for advanced
             use cases`,
         set: function(opt){},
         clean: opt=>{

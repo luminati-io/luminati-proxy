@@ -57,9 +57,7 @@ const Index = withRouter(class Index extends Pure_component {
             const port = this.props.match.params.port;
             const proxy = proxies.filter(p=>p.port==port)[0].config;
             const form = Object.assign({}, proxy);
-            // XXX krzysztof: no need to guess preset
-            const preset = this.guess_preset(form);
-            this.apply_preset(form, preset);
+            this.apply_preset(form, form.last_preset_applied);
             this.setState({proxies}, this.delayed_loader());
         });
         this.setdb_on('head.consts', consts=>
@@ -105,7 +103,6 @@ const Index = withRouter(class Index extends Pure_component {
             this.props.history.push({pathname});
         }
     };
-    guess_preset(form){ return form.last_preset_applied; }
     set_field = (field_name, value, opt={})=>{
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
@@ -158,7 +155,7 @@ const Index = withRouter(class Index extends Pure_component {
             return permissions.includes('asn');
         return true;
     };
-    apply_preset(_form, preset){
+    apply_preset = (_form, preset)=>{
         const form = Object.assign({}, _form);
         const last_preset = form.last_preset_applied ?
             presets[form.last_preset_applied] : null;
@@ -224,7 +221,7 @@ const Index = withRouter(class Index extends Pure_component {
         setdb.set('head.proxy_edit.form', form);
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
-    }
+    };
     // XXX krzysztof: move this logic to rules module
     post_rule_map_to_form = rule=>{
         const result = {};
@@ -474,7 +471,7 @@ const Index = withRouter(class Index extends Pure_component {
                 <Nav zones={zones} default_zone={default_zone}
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
-                  on_change_preset={this.apply_preset.bind(this)}/>
+                  on_change_preset={this.apply_preset}/>
                 <Nav_tabs/>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>

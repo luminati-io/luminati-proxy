@@ -15,6 +15,7 @@ import {Toolbar_button, Tooltip, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
+import {withRouter} from 'react-router-dom';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
@@ -255,7 +256,7 @@ class Filters extends Pure_component {
     state = {};
     componentDidMount(){
         this.setdb_on('head.logs_suggestions', suggestions=>{
-            this.setState({suggestions});
+            suggestions && this.setState({suggestions});
         });
     }
     render(){
@@ -353,7 +354,7 @@ const table_cols = [
         data: 'details.proxy_peer'},
     {title: 'Date', sort_by: 'timestamp', data: 'details.timestamp'},
 ];
-const Tables_container = with_resizable_cols(table_cols,
+const Tables_container = withRouter(with_resizable_cols(table_cols,
 class Tables_container extends Pure_component {
     uri = '/api/logs';
     batch_size = 30;
@@ -439,6 +440,8 @@ class Tables_container extends Pure_component {
         const params = opt;
         params.limit = opt.limit||this.batch_size;
         params.skip = opt.skip||0;
+        if (this.props.match.params.port)
+            params.port = this.props.match.params.port;
         if (this.props.master_port)
         {
             const proxies = setdb.get('head.proxies_running');
@@ -504,7 +507,8 @@ class Tables_container extends Pure_component {
     on_blur = ()=>this.setState({focused: false});
     is_hidden = request=>{
         const cur_port = request.details.port;
-        if (this.port&&cur_port!=this.port)
+        const port = this.props.match.params.port;
+        if (port&&cur_port!=port)
             return true;
         if (this.port_range&&
             (cur_port<this.port_range.from||cur_port>this.port_range.to))
@@ -611,7 +615,7 @@ class Tables_container extends Pure_component {
                 sub_stats={this.state.sub_stats}/>
             </div>;
     }
-});
+}));
 
 class Summary_bar extends Pure_component {
     render(){

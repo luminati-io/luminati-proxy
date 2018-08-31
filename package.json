@@ -95,7 +95,6 @@
     "uuid": "3.2.1",
     "compression": "1.7.2",
     "json-object-stream": "0.1.1",
-    "socket-pair": "1.0.3",
     "ws": "5.1.1",
     "diacritic": "0.0.2",
     "underscore": "1.8.3",
@@ -283,8 +282,6 @@
       "bin/pub/img/zone_icon.png",
       "changelog.json",
       "lib/cities.js",
-      "lib/cluster_mode.js",
-      "lib/cluster_route.js",
       "lib/db_history.json",
       "lib/find_iface.js",
       "lib/hash.js",
@@ -343,7 +340,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "ad0ac18957d3133035a6a01751d219aa"
+    "md5": "555c7080375b476f08fd337f9dc4694e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -378,5 +375,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.106.377"
+  "version": "1.106.519"
 }

@@ -17,7 +17,6 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const ua = analytics('UA-60520689-2');
-const cluster_mode = require('../lib/cluster_mode.js');
 const E = module.exports = {};
 const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
@@ -150,8 +149,6 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
         zerr(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
     else
         zerr.info(`Shutdown, reason is ${reason}`);
-    if (cluster_mode.is_enabled())
-        cluster_mode.uninit();
     file.rm_rf_e(Tracer.screenshot_dir);
     E.write_status_file('shutdown', error, E.manager&&E.manager._total_conf,
         reason);
@@ -304,19 +301,9 @@ E.init = argv=>{
     E.init_traps();
     if (process.env.DEBUG_ETASKS)
         E.start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
-    E.enable_cluster = process.argv.cluster;
-    E.enable_cluster_sticky = process.argv['cluster-sticky'];
-    if (!E.enable_cluster)
-        return;
-    cluster_mode.init({
-        force_stop_delay: shutdown_timeout,
-        sticky: E.enable_cluster_sticky
-    });
 };
 
 E.uninit = ()=>{
-    if (E.enable_cluster)
-        cluster_mode.uninit();
     E.uninit_ua();
     E.uninit_status();
     E.uninit_traps();

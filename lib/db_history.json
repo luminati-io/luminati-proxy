@@ -32,6 +32,62 @@
             "in_bw": {"type": "INTEGER"},
             "out_bw": {"type": "INTEGER"},
             "content_type": {"type": "TEXT", "index": true},
+            "remote_address": {"type": "TEXT"},
+            "password": {"type": "TEXT"}
+        },
+        "proxy_hosts": {
+            "proxy": {"type": "TEXT", "index": true},
+            "host": {"type": "TEXT", "index": true}
+        },
+        "usage": {
+            "port_id": {"type": "INTEGER", "multi_index": ["port_id",
+                "status_code", "hostname", "protocol"]},
+            "reqs": {"type": "INTEGER"},
+            "in_bw": {"type": "INTEGER"},
+            "out_bw": {"type": "INTEGER"},
+            "status_code": {"type": "TEXT"},
+            "hostname": {"type": "TEXT"},
+            "protocol": {"type": "TEXT"},
+            "success": {"type": "INTEGER"}
+        }
+    },
+    "add": {
+        "request": ["password"]
+    }
+}, {
+    "schema": {
+        "schema_info": {
+            "hash": {"type": "TEXT"},
+            "version": {"type": "TEXT"},
+            "timestamp": {"type": "INTEGER", "default": "CURRENT_TIMESTAMP"}
+        },
+        "request": {
+            "port": {"type": "INTEGER", "index": true},
+            "uuid": {"type": "INTEGER PRIMARY KEY", "index": true},
+            "url": {"type": "TEXT", "index": true},
+            "method": {"type": "TEXT", "index": true},
+            "request_headers": {"type": "TEXT"},
+            "request_body": {"type": "TEXT"},
+            "response_headers": {"type": "TEXT"},
+            "response_body": {"type": "TEXT"},
+            "status_code": {"type": "INTEGER", "index": true},
+            "status_message": {"type": "TEXT", "index": true},
+            "timestamp": {"type": "INTEGER", "index": true},
+            "elapsed": {"type": "INTEGER", "index": true},
+            "response_time": {"type": "INTEGER", "index": true},
+            "proxy_peer": {"type": "TEXT", "index": true},
+            "country": {"type": "TEXT", "index": true},
+            "timeline": {"type": "TEXT"},
+            "super_proxy": {"type": "TEXT"},
+            "username": {"type": "TEXT"},
+            "content_size": {"type": "INTEGER", "index": true},
+            "context": {"type": "TEXT", "index": true},
+            "protocol": {"type": "TEXT", "index": true},
+            "hostname": {"type": "TEXT", "index": true},
+            "success": {"type": "INTEGER"},
+            "in_bw": {"type": "INTEGER"},
+            "out_bw": {"type": "INTEGER"},
+            "content_type": {"type": "TEXT", "index": true},
             "remote_address": {"type": "TEXT"}
         },
         "proxy_hosts": {

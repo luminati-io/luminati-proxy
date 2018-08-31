@@ -361,9 +361,9 @@ export class Select_number extends Pure_component {
     opt_from_range = ()=>{
         let res;
         if (this.props.range=='medium')
-            res = [1, 10, 100, 1000];
+            res = [0, 1, 10, 100, 1000];
         else
-            res = [];
+            res = [0, 1, 3, 5, 10, 20];
         if (this.props.allow_zero)
             res.unshift(0);
         return res;
@@ -372,8 +372,8 @@ export class Select_number extends Pure_component {
         this.props.on_change_wrapper(e && +e.value || '');
     };
     render(){
-        const data = this.props.range ?
-            this.opt_from_range() : this.props.data;
+        const data = this.props.data ?
+            this.props.data : this.opt_from_range();
         const options = data.map(this.value_to_option);
         return <React_select styles={this.styles} className="select_number"
             isClearable noOptionsMessage={()=>'You can use only numbers here'}
@@ -390,21 +390,6 @@ export class Select_number extends Pure_component {
     }
 }
 
-const Double_number = props=>{
-    const vals = (''+props.val).split(':');
-    const update = (start, end)=>{
-        props.on_change_wrapper([start||0, end].join(':')); };
-    return <span className="double_field">
-          <Input {...props} val={vals[0]||''} id={props.id+'_start'}
-            type="number" disabled={props.disabled}
-            on_change_wrapper={val=>update(val, vals[1])}/>
-          <span className="devider">:</span>
-          <Input {...props} val={vals[1]||''} id={props.id+'_end'}
-            type="number" disabled={props.disabled}
-            on_change_wrapper={val=>update(vals[0], val)}/>
-        </span>;
-};
-
 const Typeahead_wrapper = props=>
     <Typeahead options={props.data} maxResults={10}
       minLength={1} disabled={props.disabled} selectHintOnEnter
@@ -415,8 +400,6 @@ export const Form_controller = props=>{
     const type = props.type;
     if (type=='select')
         return <Select {...props}/>;
-    else if (type=='double_number')
-        return <Double_number {...props}/>;
     else if (type=='typeahead')
         return <Typeahead_wrapper {...props}/>;
     else if (type=='textarea')
