@@ -282,8 +282,7 @@ class Filters extends Pure_component {
         ];
         return <div className="filters">
           {filters.map(f=>
-            <Filter key={f.name}
-              tooltip={f.tooltip}
+            <Filter key={f.name} tooltip={f.tooltip}
               vals={this.state.suggestions[f.name+'s']}
               val={this.props.filters[f.name]}
               set={this.props.set_filter.bind(null, f.name)}
@@ -295,13 +294,13 @@ class Filters extends Pure_component {
 
 const Filter = ({vals, val, set, default_value, tooltip})=>
     <Tooltip title={tooltip} placement="bottom">
-    <div className="custom_filter">
-      <select value={val} onChange={set}>
-        <option value="">{default_value}</option>
-        {vals.map(p=><option key={p} value={p}>{p}</option>)}
-      </select>
-      <span className="arrow"/>
-    </div>
+      <div className="custom_filter">
+        <select value={val} onChange={set}>
+          <option value="">{default_value}</option>
+          {vals.map(p=><option key={p} value={p}>{p}</option>)}
+        </select>
+        <span className="arrow"/>
+      </div>
     </Tooltip>;
 
 const type_filters = [{name: 'XHR', tooltip: 'XHR and fetch'},

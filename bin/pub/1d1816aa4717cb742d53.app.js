@@ -9197,8 +9197,7 @@ var Filters = function (_Pure_component4) {
                 'div',
                 { className: 'filters' },
                 filters.map(function (f) {
-                    return _react2.default.createElement(Filter, { key: f.name,
-                        tooltip: f.tooltip,
+                    return _react2.default.createElement(Filter, { key: f.name, tooltip: f.tooltip,
                         vals: _this10.state.suggestions[f.name + 's'],
                         val: _this10.props.filters[f.name],
                         set: _this10.props.set_filter.bind(null, f.name),
