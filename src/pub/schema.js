@@ -69,8 +69,14 @@ class Schema extends Pure_component {
             if (proxies)
                 this.setState({proxies});
         });
+        this.setdb_on('head.zones', zones=>{
+            if (zones)
+                this.setState({zones});
+        });
     }
     render(){
+        if (!this.state.zones)
+            return null;
         return <span className="schema_component">
               <div className="line"/>
               <Layer id="crawler" no_arr>
@@ -89,7 +95,8 @@ class Schema extends Pure_component {
               </Layer>
               <Layer no_btn id="port_numbers">Port 80, 443</Layer>
               <Layer id="peer">
-                <Peer proxies={this.state.proxies} form={this.state.form}/>
+                <Peer proxies={this.state.proxies} form={this.state.form}
+                  zones={this.state.zones}/>
                 Peer
               </Layer>
               <Layer id="destination">Destination</Layer>
@@ -125,13 +132,13 @@ const Layer = ({id, no_btn, no_arr, class_names, children})=>{
         </div>;
 };
 
-const Peer = ({proxies, form})=>{
+const Peer = ({proxies, form, zones})=>{
     if (form.port)
-        return <Flag proxy={form}/>;
+        return <Flag zones={zones} proxy={form}/>;
     else if (!proxies.length)
-        return <Flag/>;
+        return <Flag zones={zones}/>;
     let countries = proxies.map(proxy=>{
-        let country = get_static_country(proxy);
+        let country = get_static_country(proxy, zones);
         if (!country||country=='any'||country=='*')
             country = proxy.country;
         if (!country||country=='any'||country=='*')
@@ -139,13 +146,13 @@ const Peer = ({proxies, form})=>{
         return country;
     });
     countries = [...new Set(countries)];
-    if (countries.length > 1)
-        return <Flag/>;
-    return <Flag proxy={proxies[0]}/>;
+    if (countries.length>1)
+        return <Flag zones={zones}/>;
+    return <Flag proxy={proxies[0]} zones={zones}/>;
 };
 
-const Flag = ({proxy={}})=>{
-    let country = get_static_country(proxy);
+const Flag = ({proxy={}, zones})=>{
+    let country = get_static_country(proxy, zones);
     if (!country||country=='any'||country=='*')
         country = proxy.country;
     if (country&&country!='any'&&country!='*')

@@ -128,19 +128,18 @@ export const status_codes = {
     505: 'HTTP Version Not Supported',
 };
 
-export const get_static_country = proxy=>{
-    if (!proxy||!proxy.zone||!proxy.zones)
+export const get_static_country = (proxy, zones)=>{
+    if (!proxy||!proxy.zone||!zones||!zones.zones)
         return false;
-    const zone = proxy.zones[proxy.zone];
+    const zone = zones.zones.find(z=>z.name==proxy.zone);
     if (!zone)
         return false;
-    const plan = zone.plans[zone.plans.length-1];
-    if (!plan)
+    if (!zone.plan)
         return false;
-    if (plan.type=='static')
-        return plan.country||'any';
-    if (['domain', 'domain_p'].includes(plan.vips_type))
-        return plan.vip_country||'any';
+    if (zone.plan.type=='static')
+        return zone.plan.country||'any';
+    if (['domain', 'domain_p'].includes(zone.plan.vips_type))
+        return zone.plan.vip_country||'any';
     return false;
 };
 

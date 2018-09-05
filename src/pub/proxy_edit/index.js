@@ -367,7 +367,6 @@ const Index = withRouter(class Index extends Pure_component {
     };
     prepare_to_save = ()=>{
         const save_form = Object.assign({}, this.state.form);
-        delete save_form.zones;
         for (let field in save_form)
         {
             let before_save;
@@ -432,6 +431,7 @@ const Index = withRouter(class Index extends Pure_component {
     get_curr_plan = ()=>{
         const zone_name = this.state.form.zone||
             this.state.consts.proxy.zone.def;
+        // XXX krzysztof: use /api/zones instead od consts
         const zones = this.state.consts.proxy.zone.values;
         const curr_zone = zones.filter(p=>p.key==zone_name);
         let curr_plan;

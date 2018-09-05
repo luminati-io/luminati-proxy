@@ -37,7 +37,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             });
         });
     }
-    // XXX krzysztof: clean up zones logic
+    // XXX krzysztof: clean up zones and plans logic; use /api/zones
     prepare = (consts, settings)=>{
         const zones = (consts.proxy.zone.values||[]).filter(z=>{
             const plan = z.plans && z.plans.slice(-1)[0] || {};

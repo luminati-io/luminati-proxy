@@ -38,7 +38,7 @@ E.read_e = (filename, opt)=>{
     return fs.readFileSync(filename, opt);
 };
 E.fread_cb_e = (fd, pos, cb)=>{
-    let res, buf = new Buffer(E.read_buf_size);
+    let res, buf = Buffer.alloc(E.read_buf_size);
     while (res = fs.readSync(fd, buf, 0, buf.length, pos))
     {
         if (cb(buf.slice(0, res), pos))
@@ -55,7 +55,7 @@ E.read_cb_e = (filename, pos, cb)=>{
 E.fread_line_cb_e = (fd, cb, opt)=>{
     opt = assign({encoding: 'utf8', buf_size: E.read_buf_size}, opt);
     cb = cb||(()=>false);
-    let read, buf = new Buffer(opt.buf_size);
+    let read, buf = Buffer.alloc(opt.buf_size);
     let strbuf = '', lf_idx, decoder = new StringDecoder(opt.encoding);
     while (read = fs.readSync(fd, buf, 0, buf.length))
     {

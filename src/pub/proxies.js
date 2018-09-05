@@ -20,7 +20,7 @@ import {withRouter} from 'react-router-dom';
 
 let country_names = {};
 
-const Targeting_cell = ({proxy})=>{
+const Targeting_cell = ({proxy, zones})=>{
     const flag_with_title = (country, title)=>{
         let country_name = country_names[country];
         return <Tooltip title={country_name}>
@@ -30,7 +30,7 @@ const Targeting_cell = ({proxy})=>{
               </span>
             </Tooltip>;
     };
-    const static_country = get_static_country(proxy);
+    const static_country = get_static_country(proxy, zones);
     if (static_country&&static_country!='any'&&static_country!='*')
         return flag_with_title(static_country, static_country.toUpperCase());
     let val = proxy.country;
@@ -489,6 +489,11 @@ class Proxies extends Pure_component {
             country_names = countries;
             this.setState({countries});
         });
+        this.setdb_on('head.zones', zones=>{
+            if (!zones)
+                return;
+            this.setState({zones});
+        });
         window.setTimeout(this.req_status);
     }
     componentWillReceiveProps(props){
@@ -612,6 +617,8 @@ class Proxies extends Pure_component {
             this.state.selected_cols.includes(col.key)||col.sticky||
             col.calc_show&&col.calc_show(this.state.filtered_proxies));
         const displayed_proxies = this.state.displayed_proxies;
+        if (!this.state.zones)
+            return null;
         if (!this.state.countries)
             return null;
         if (this.state.loaded&&!this.state.filtered_proxies.length)
@@ -660,7 +667,8 @@ class Proxies extends Pure_component {
                         {displayed_proxies.map(proxy=>
                           <Proxy_row key={proxy.port} go={this.state.go}
                             update_proxies={this.update} proxy={proxy}
-                            cols={cols} master_port={this.props.master_port}/>
+                            cols={cols} master_port={this.props.master_port}
+                            zones={this.state.zones}/>
                         )}
                       </tbody>
                     </table>
@@ -750,7 +758,7 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
                 update_proxies={this.props.update_proxies}/>
               {this.props.cols.map(col=>
                 <Cell key={col.key} proxy={proxy} col={col}
-                  status={this.state.status}
+                  status={this.state.status} zones={this.props.zones}
                   status_details={this.state.status_details}
                   master_port={this.props.master_port} on_click={this.edit}
                   className={cell_class(col)}/>
@@ -763,14 +771,14 @@ class Cell extends React.Component {
     shouldComponentUpdate(){ return !!this.props.col.dynamic; }
     render(){
         const {proxy, col, master_port, status, status_details, on_click,
-            className} = this.props;
+            zones, className} = this.props;
         let val;
         if (!col.ext && proxy.ext_proxies)
             val = '—';
         else if (col.render)
         {
             val = col.render({proxy, col: col.key, master_port, status,
-                status_details})||null;
+                status_details, zones})||null;
         }
         else
             val = _.get(proxy, col.key)||null;

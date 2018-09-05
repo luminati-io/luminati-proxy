@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.106.873",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Stability and performance improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.106.784",
         "type": "stable",
         "changes": [

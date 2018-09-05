@@ -800,6 +800,7 @@ class Data_row extends React.Component {
             selected,
             focused: selected&&focused,
             error: !req.details.success,
+            status_check: req.details.context=='STATUS CHECK',
         });
         return <tr className={classes}>
               {cols.map((c, idx)=>
@@ -813,7 +814,6 @@ class Data_row extends React.Component {
 }
 
 class Cell_value extends React.Component {
-    go_to_timeline = e=>setdb.emit('har_viewer.set_pane', 3);;
     render(){
         const {col, req, req: {details: {timeline}}} = this.props;
         if (col=='select')
@@ -822,24 +822,7 @@ class Cell_value extends React.Component {
               checked_all={this.props.checked_all}/>;
         }
         if (col=='Name')
-        {
-            const rule_tip = 'At least one rule has been applied to this'
-            +' request. Click to see more details';
-            return <div className="col_name">
-                  <div>
-                    <div className="icon script"/>
-                    {timeline && timeline.length>1 &&
-                      <Tooltip title={rule_tip}>
-                        <div onClick={this.go_to_timeline}
-                          className="small_icon rules"/>
-                      </Tooltip>
-                    }
-                    <Tooltip title={req.request.url}>
-                      <div className="disp_value">{req.request.url}</div>
-                    </Tooltip>
-                  </div>
-                </div>;
-        }
+            return <Name_cell req={req} timeline={timeline}/>;
         else if (col=='Status')
             return <Status_code_cell status={req.response.status}/>;
         else if (col=='Proxy port')
@@ -857,6 +840,33 @@ class Cell_value extends React.Component {
             return <Tooltip_and_value val={local}/>;
         }
         return col;
+    }
+}
+
+class Name_cell extends Pure_component {
+    go_to_timeline = e=>setdb.emit('har_viewer.set_pane', 3);
+    render(){
+        const {req, timeline} = this.props;
+        const rule_tip = 'At least one rule has been applied to this'
+        +' request. Click to see more details';
+        const status_check = req.details.context=='STATUS CHECK';
+        return <div className="col_name">
+              <div>
+                <div className="icon script"/>
+                {timeline && timeline.length>1 &&
+                  <Tooltip title={rule_tip}>
+                    <div onClick={this.go_to_timeline}
+                      className="small_icon rules"/>
+                  </Tooltip>
+                }
+                <Tooltip title={req.request.url}>
+                  <div className="disp_value">
+                    {status_check && 'status check'}
+                    {!status_check && req.request.url}
+                  </div>
+                </Tooltip>
+              </div>
+            </div>;
     }
 }
 
