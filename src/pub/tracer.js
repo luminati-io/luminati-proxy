@@ -36,10 +36,11 @@ export default class Tracer extends Pure_component {
         const data = {url, port: port||def_port, uid};
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
+            this.on('finally', e=>{
+                _this.ws.removeEventListener('message', _this.on_message);
                 _this.setState({loading: false});
-                console.log(e);
             });
+            this.on('uncaught', e=>console.log(e));
             _this.ws.addEventListener('message', _this.on_message);
             // XXX krzysztof: switch fetch->ajax
             const raw_trace = yield window.fetch('/api/trace', {
@@ -48,8 +49,7 @@ export default class Tracer extends Pure_component {
                 body: JSON.stringify(data),
             });
             const json = yield raw_trace.json();
-            _this.ws.removeEventListener('message', _this.on_message);
-            _this.setState({...json, loading: false});
+            _this.setState({...json});
         });
     };
     on_message = event=>{

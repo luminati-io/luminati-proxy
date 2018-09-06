@@ -6,27 +6,25 @@ import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, Textarea, Tooltip} from './common.js';
+import {Modal, Loader, Textarea, Tooltip, Warnings} from './common.js';
 import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
-    constructor(props){
-        super(props);
-        this.presets_opt = Object.keys(presets).map(p=>{
-            let key = presets[p].title;
-            if (presets[p].default)
-                key = `Default (${key})`;
-            return {key, value: p};
-        });
-        this.state = {
-            zone: '',
-            preset: 'session_long',
-            show_loader: false,
-            cur_tab: 'proxy_lum',
-        };
-    }
+    presets_opt = Object.keys(presets).map(p=>{
+        let key = presets[p].title;
+        if (presets[p].default)
+            key = `Default (${key})`;
+        return {key, value: p};
+    });
+    state = {
+        zone: '',
+        preset: 'session_long',
+        show_loader: false,
+        cur_tab: 'proxy_lum',
+        error_list: [],
+    };
     componentWillMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings)
@@ -48,7 +46,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             zones[0] = {key: `Default (${def})`, value: ''};
         this.setState({consts, zones, def});
     };
-    persist(){
+    persist = ()=>{
         const preset = this.state.preset;
         let form;
         if (this.state.cur_tab=='proxy_lum')
@@ -57,11 +55,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 last_preset_applied: preset,
                 zone: this.state.zone||this.state.def,
                 proxy_type: 'persist',
-                max_requests: 0,
-                session_duration: 0,
-                ips: [],
-                vips: [],
-                whitelist_ips: [],
             };
             const zone = this.state.zones.filter(z=>z.key==form.zone)[0]||{};
             form.password = zone.password;
@@ -89,36 +82,46 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             });
             form.port = port;
             // XXX krzysztof: switch fetch->ajax
-            yield window.fetch('/api/proxies', {
+            const raw_resp = yield window.fetch('/api/proxies', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: form}),
             });
+            const resp = yield raw_resp.json();
+            if (resp.errors)
+                return resp;
             ga_event('add-new-port', 'successfully saved');
-            return port;
+            return {port};
         });
-    }
+    };
     save(opt={}){
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
-            });
+            this.on('uncaught', e=>{ console.log(e); });
             _this.setState({show_loader: true});
-            const port = yield _this.persist();
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            const resp = yield _this.persist();
+            if (resp.errors)
+            {
+                _this.setState({error_list: resp.errors});
+                $('#add_proxy_errors').modal('show');
+            }
             $('#add_new_proxy_modal').modal('hide');
             yield etask.sleep(500);
             _this.setState({show_loader: false});
-            setdb.set('head.proxies_running', proxies);
-            window.localStorage.setItem('quickstart-first-proxy', port);
-            if (opt.redirect)
+            if (!resp.errors)
             {
-                const state_opt = {};
-                if (opt.field)
-                    state_opt.field = opt.field;
-                _this.props.history.push({pathname: `/proxy/${port}`,
-                    state: state_opt});
+                const proxies = yield ajax.json({url: '/api/proxies_running'});
+                setdb.set('head.proxies_running', proxies);
+                window.localStorage.setItem('quickstart-first-proxy',
+                    resp.port);
+                if (opt.redirect)
+                {
+                    const state_opt = {};
+                    if (opt.field)
+                        state_opt.field = opt.field;
+                    _this.props.history.push({pathname: `/proxy/${resp.port}`,
+                        state: state_opt});
+                }
             }
         });
     }
@@ -177,6 +180,10 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 <Nav_tabs change_tab={this.change_tab.bind(this)}
                   cur_tab={this.state.cur_tab}/>
                 {content}
+              </Modal>
+              <Modal className="warnings_modal" id="add_proxy_errors"
+                title="Errors:" no_cancel_btn>
+                <Warnings warnings={this.state.error_list}/>
               </Modal>
             </div>;
     }

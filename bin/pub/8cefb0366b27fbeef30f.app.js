@@ -18642,13 +18642,13 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _regenerator = __webpack_require__(18);
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
 var _defineProperty2 = __webpack_require__(39);
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _regenerator = __webpack_require__(18);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
 
 var _classCallCheck2 = __webpack_require__(1);
 
@@ -18705,12 +18705,28 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
     (0, _inherits3.default)(Proxy_add, _Pure_component);
 
-    function Proxy_add(props) {
+    function Proxy_add() {
+        var _ref;
+
+        var _temp, _this2, _ret;
+
         (0, _classCallCheck3.default)(this, Proxy_add);
 
-        var _this2 = (0, _possibleConstructorReturn3.default)(this, (Proxy_add.__proto__ || Object.getPrototypeOf(Proxy_add)).call(this, props));
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
 
-        _this2.prepare = function (consts, settings) {
+        return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Proxy_add.__proto__ || Object.getPrototypeOf(Proxy_add)).call.apply(_ref, [this].concat(args))), _this2), _this2.presets_opt = Object.keys(_util.presets).map(function (p) {
+            var key = _util.presets[p].title;
+            if (_util.presets[p].default) key = 'Default (' + key + ')';
+            return { key: key, value: p };
+        }), _this2.state = {
+            zone: '',
+            preset: 'session_long',
+            show_loader: false,
+            cur_tab: 'proxy_lum',
+            error_list: []
+        }, _this2.prepare = function (consts, settings) {
             var zones = (consts.proxy.zone.values || []).filter(function (z) {
                 var plan = z.plans && z.plans.slice(-1)[0] || {};
                 return !plan.archive && !plan.disable;
@@ -18718,62 +18734,16 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             var def = void 0;
             if (zones[0] && !zones[0].value && (def = settings.zone || zones[0].key)) zones[0] = { key: 'Default (' + def + ')', value: '' };
             _this2.setState({ consts: consts, zones: zones, def: def });
-        };
-
-        _this2.field_changed = function (id) {
-            return function (value) {
-                _this2.setState((0, _defineProperty3.default)({}, id, value));
-                if (id == 'zone') (0, _util.ga_event)('add-new-port', 'zone selected', value);else if (id == 'preset') {
-                    (0, _util.ga_event)('add-new-port', 'preset selected', _this2.state.preset + '_' + value);
-                }
-            };
-        };
-
-        _this2.presets_opt = Object.keys(_util.presets).map(function (p) {
-            var key = _util.presets[p].title;
-            if (_util.presets[p].default) key = 'Default (' + key + ')';
-            return { key: key, value: p };
-        });
-        _this2.state = {
-            zone: '',
-            preset: 'session_long',
-            show_loader: false,
-            cur_tab: 'proxy_lum'
-        };
-        return _this2;
-    }
-
-    (0, _createClass3.default)(Proxy_add, [{
-        key: 'componentWillMount',
-        value: function componentWillMount() {
-            var _this3 = this;
-
-            this.setdb_on('head.settings', function (settings) {
-                if (!settings) return;
-                _this3.setdb_on('head.consts', function (consts) {
-                    if (consts) _this3.prepare(consts, settings);
-                });
-            });
-        }
-        // XXX krzysztof: clean up zones and plans logic; use /api/zones
-
-    }, {
-        key: 'persist',
-        value: function persist() {
-            var preset = this.state.preset;
+        }, _this2.persist = function () {
+            var preset = _this2.state.preset;
             var form = void 0;
-            if (this.state.cur_tab == 'proxy_lum') {
+            if (_this2.state.cur_tab == 'proxy_lum') {
                 form = {
                     last_preset_applied: preset,
-                    zone: this.state.zone || this.state.def,
-                    proxy_type: 'persist',
-                    max_requests: 0,
-                    session_duration: 0,
-                    ips: [],
-                    vips: [],
-                    whitelist_ips: []
+                    zone: _this2.state.zone || _this2.state.def,
+                    proxy_type: 'persist'
                 };
-                var zone = this.state.zones.filter(function (z) {
+                var zone = _this2.state.zones.filter(function (z) {
                     return z.key == form.zone;
                 })[0] || {};
                 form.password = zone.password;
@@ -18781,12 +18751,12 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             } else {
                 form = {
                     proxy_type: 'persist',
-                    ext_proxies: this.state.parsed_ips_list
+                    ext_proxies: _this2.state.parsed_ips_list
                 };
             }
-            var _this = this;
+            var _this = _this2;
             return (0, _etask2.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                var proxies, port;
+                var proxies, port, raw_resp, resp;
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
@@ -18816,17 +18786,55 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                                 });
 
                             case 9:
-                                (0, _util.ga_event)('add-new-port', 'successfully saved');
-                                return _context.abrupt('return', port);
+                                raw_resp = _context.sent;
+                                _context.next = 12;
+                                return raw_resp.json();
 
-                            case 11:
+                            case 12:
+                                resp = _context.sent;
+
+                                if (!resp.errors) {
+                                    _context.next = 15;
+                                    break;
+                                }
+
+                                return _context.abrupt('return', resp);
+
+                            case 15:
+                                (0, _util.ga_event)('add-new-port', 'successfully saved');
+                                return _context.abrupt('return', { port: port });
+
+                            case 17:
                             case 'end':
                                 return _context.stop();
                         }
                     }
                 }, _callee, this);
             }));
+        }, _this2.field_changed = function (id) {
+            return function (value) {
+                _this2.setState((0, _defineProperty3.default)({}, id, value));
+                if (id == 'zone') (0, _util.ga_event)('add-new-port', 'zone selected', value);else if (id == 'preset') {
+                    (0, _util.ga_event)('add-new-port', 'preset selected', _this2.state.preset + '_' + value);
+                }
+            };
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
+    }
+
+    (0, _createClass3.default)(Proxy_add, [{
+        key: 'componentWillMount',
+        value: function componentWillMount() {
+            var _this3 = this;
+
+            this.setdb_on('head.settings', function (settings) {
+                if (!settings) return;
+                _this3.setdb_on('head.consts', function (consts) {
+                    if (consts) _this3.prepare(consts, settings);
+                });
+            });
         }
+        // XXX krzysztof: clean up zones and plans logic; use /api/zones
+
     }, {
         key: 'save',
         value: function save() {
@@ -18834,7 +18842,7 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
 
             var _this = this;
             this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-                var port, proxies, state_opt;
+                var resp, proxies, state_opt;
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -18847,30 +18855,41 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                                 return _this.persist();
 
                             case 4:
-                                port = _context2.sent;
-                                _context2.next = 7;
-                                return _ajax2.default.json({ url: '/api/proxies_running' });
+                                resp = _context2.sent;
 
-                            case 7:
-                                proxies = _context2.sent;
-
+                                if (resp.errors) {
+                                    _this.setState({ error_list: resp.errors });
+                                    (0, _jquery2.default)('#add_proxy_errors').modal('show');
+                                }
                                 (0, _jquery2.default)('#add_new_proxy_modal').modal('hide');
-                                _context2.next = 11;
+                                _context2.next = 9;
                                 return _etask2.default.sleep(500);
 
-                            case 11:
+                            case 9:
                                 _this.setState({ show_loader: false });
+
+                                if (resp.errors) {
+                                    _context2.next = 17;
+                                    break;
+                                }
+
+                                _context2.next = 13;
+                                return _ajax2.default.json({ url: '/api/proxies_running' });
+
+                            case 13:
+                                proxies = _context2.sent;
+
                                 _setdb2.default.set('head.proxies_running', proxies);
-                                window.localStorage.setItem('quickstart-first-proxy', port);
+                                window.localStorage.setItem('quickstart-first-proxy', resp.port);
                                 if (opt.redirect) {
                                     state_opt = {};
 
                                     if (opt.field) state_opt.field = opt.field;
-                                    _this.props.history.push({ pathname: '/proxy/' + port,
+                                    _this.props.history.push({ pathname: '/proxy/' + resp.port,
                                         state: state_opt });
                                 }
 
-                            case 15:
+                            case 17:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -18930,6 +18949,12 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                     _react2.default.createElement(Nav_tabs, { change_tab: this.change_tab.bind(this),
                         cur_tab: this.state.cur_tab }),
                     content
+                ),
+                _react2.default.createElement(
+                    _common.Modal,
+                    { className: 'warnings_modal', id: 'add_proxy_errors',
+                        title: 'Errors:', no_cancel_btn: true },
+                    _react2.default.createElement(_common.Warnings, { warnings: this.state.error_list })
                 )
             );
         }
@@ -18937,10 +18962,10 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
     return Proxy_add;
 }(_pure_component2.default));
 
-var Ext_proxy = function Ext_proxy(_ref) {
-    var ips_list = _ref.ips_list,
-        on_field_change = _ref.on_field_change,
-        parse_error = _ref.parse_error;
+var Ext_proxy = function Ext_proxy(_ref2) {
+    var ips_list = _ref2.ips_list,
+        on_field_change = _ref2.on_field_change,
+        parse_error = _ref2.parse_error;
 
     var json_example = '[\'1.1.1.2\', \'username:password@1.2.3.4:8888\']';
     var placeholder = 'List of IPs to the external proxies in the following ' + 'format: [username:password@]ip[:port], example:\n' + json_example;
@@ -18986,14 +19011,14 @@ var Ext_proxy = function Ext_proxy(_ref) {
     );
 };
 
-var Lum_proxy = function Lum_proxy(_ref2) {
-    var zone = _ref2.zone,
-        zones = _ref2.zones,
-        on_field_change = _ref2.on_field_change,
-        preset = _ref2.preset,
-        rule_clicked = _ref2.rule_clicked,
-        presets_opt = _ref2.presets_opt,
-        advanced_clicked = _ref2.advanced_clicked;
+var Lum_proxy = function Lum_proxy(_ref3) {
+    var zone = _ref3.zone,
+        zones = _ref3.zones,
+        on_field_change = _ref3.on_field_change,
+        preset = _ref3.preset,
+        rule_clicked = _ref3.rule_clicked,
+        presets_opt = _ref3.presets_opt,
+        advanced_clicked = _ref3.advanced_clicked;
 
     var preset_tip = 'Presets is a set of preconfigured configurations\n    for specific purposes';
     var zone_tip = 'Zone that will be used by this proxy port';
@@ -19063,9 +19088,9 @@ var Lum_proxy = function Lum_proxy(_ref2) {
     );
 };
 
-var Nav_tabs = function Nav_tabs(_ref3) {
-    var change_tab = _ref3.change_tab,
-        cur_tab = _ref3.cur_tab;
+var Nav_tabs = function Nav_tabs(_ref4) {
+    var change_tab = _ref4.change_tab,
+        cur_tab = _ref4.cur_tab;
     return _react2.default.createElement(
         'div',
         { className: 'nav_tabs tabs' },
@@ -19078,12 +19103,12 @@ var Nav_tabs = function Nav_tabs(_ref3) {
     );
 };
 
-var Tab = function Tab(_ref4) {
-    var id = _ref4.id,
-        on_click = _ref4.on_click,
-        title = _ref4.title,
-        cur_tab = _ref4.cur_tab,
-        tooltip = _ref4.tooltip;
+var Tab = function Tab(_ref5) {
+    var id = _ref5.id,
+        on_click = _ref5.on_click,
+        title = _ref5.title,
+        cur_tab = _ref5.cur_tab,
+        tooltip = _ref5.tooltip;
 
     var active = cur_tab == id;
     var btn_class = (0, _classnames2.default)('btn_tab', { active: active });
@@ -47284,29 +47309,31 @@ var Tracer = function (_Pure_component) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                this.on('uncaught', function (e) {
+                                this.on('finally', function (e) {
+                                    _this.ws.removeEventListener('message', _this.on_message);
                                     _this.setState({ loading: false });
-                                    console.log(e);
+                                });
+                                this.on('uncaught', function (e) {
+                                    return console.log(e);
                                 });
                                 _this.ws.addEventListener('message', _this.on_message);
                                 // XXX krzysztof: switch fetch->ajax
-                                _context.next = 4;
+                                _context.next = 5;
                                 return window.fetch('/api/trace', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify(data)
                                 });
 
-                            case 4:
+                            case 5:
                                 raw_trace = _context.sent;
-                                _context.next = 7;
+                                _context.next = 8;
                                 return raw_trace.json();
 
-                            case 7:
+                            case 8:
                                 json = _context.sent;
 
-                                _this.ws.removeEventListener('message', _this.on_message);
-                                _this.setState((0, _extends3.default)({}, json, { loading: false }));
+                                _this.setState((0, _extends3.default)({}, json));
 
                             case 10:
                             case 'end':
