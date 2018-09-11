@@ -18751,7 +18751,9 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             } else {
                 form = {
                     proxy_type: 'persist',
-                    ext_proxies: _this2.state.parsed_ips_list
+                    ext_proxies: _this2.state.parsed_ips_list,
+                    // XXX krzysztof: move it to backend session: true
+                    session: true
                 };
             }
             var _this = _this2;
@@ -21402,8 +21404,9 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 var port = _this3.props.match.params.port;
                 var proxy = proxies.filter(function (p) {
                     return p.port == port;
-                })[0].config;
-                var form = Object.assign({}, proxy);
+                })[0];
+                if (!proxy) _this3.props.history.push('/overview');
+                var form = Object.assign({}, proxy.config);
                 _this3.apply_preset(form, form.last_preset_applied);
                 _this3.setState({ proxies: proxies }, _this3.delayed_loader());
             });
