@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.107.348 Stable
+- :star: HAR viewer improved
+- :star: dropin port can be disabled in config
+
 ## 1.107.220 Stable
 - :bug: Bug fixes
 

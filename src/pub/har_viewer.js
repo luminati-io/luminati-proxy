@@ -225,7 +225,7 @@ class Actions extends Pure_component {
     }
     resend = ()=>{
         const list = setdb.get('har_viewer.checked_list')||[];
-        if (!list.length)
+        if (!Object.keys(list).length)
             return;
         const uuids = Object.keys(list).filter(o=>list[o]);
         this.etask(function*(){
@@ -468,16 +468,29 @@ class Tables_container extends Pure_component {
         return params;
     };
     get_data = (opt={})=>{
+        if (this.sql_loading)
+            return;
         const params = this.get_params(opt);
         const _this = this;
+        this.sql_loading = true;
         this.etask(function*(){
+            this.on('finally', ()=>{
+                _this.sql_loading = false;
+                loader.end();
+            });
             loader.start();
             const url = zescape.uri(_this.uri, params);
             const res = yield ajax.json({url});
             const reqs = res.log.entries;
-            const new_reqs = [...opt.replace ? [] : _this.state.reqs,
-                ...reqs];
-            setdb.set('head.har_viewer.reqs', new_reqs);
+            const new_reqs = [...opt.replace ? [] : _this.state.reqs, ...reqs];
+            const uuids = new Set();
+            const new_reqs_unique = new_reqs.filter(r=>{
+                if (uuids.has(r.uuid))
+                    return false;
+                uuids.add(r.uuid);
+                return true;
+            });
+            setdb.set('head.har_viewer.reqs', new_reqs_unique);
             _this.loaded.to = opt.skip+reqs.length;
             const stats = {total: res.total, sum_out: res.sum_out,
                 sum_in: res.sum_in};
@@ -487,16 +500,19 @@ class Tables_container extends Pure_component {
                 setdb.set('head.har_viewer.sub_stats', stats);
             else if (_this.state.sub_stats)
                 setdb.set('head.har_viewer.sub_stats', null);
-            loader.end();
         });
     };
     set_new_params = ()=>{
+        if (this.sql_loading)
+            return;
         this.loaded.to = 0;
         setdb.emit_path('head.har_viewer.dc_top');
         this.get_data({replace: true});
     };
     set_new_params_debounced = _.debounce(this.set_new_params, 400);
     set_sort = field=>{
+        if (this.sql_loading)
+            return;
         let dir = 1;
         if (this.state.sorted.field==field)
             dir = -1*this.state.sorted.dir;
@@ -543,12 +559,33 @@ class Tables_container extends Pure_component {
     };
     on_message = event=>{
         const json = JSON.parse(event.data);
-        if (json.type!='har_viewer')
-            return;
-        const req = json.data;
+        if (json.type=='har_viewer')
+            this.on_request_message(json.data);
+        else if (json.type=='har_viewer_start')
+            this.on_request_started_message(json.data);
+        else if (json.type=='har_viewer_abort')
+            this.on_request_aborted_message(json.data);
+    };
+    on_request_aborted_message = uuid=>{
+        const new_reqs = this.state.reqs.filter(r=>r.uuid!=uuid);
+        const delta = new_reqs.length!=this.state.reqs.length ? -1 : 0;
+        this.setState(prev=>({
+            reqs: new_reqs,
+            stats: {
+                ...prev.stats,
+                total: prev.stats.total+delta,
+            },
+        }));
+    };
+    on_request_started_message = req=>{
+        req.pending = true;
+        this.on_request_message(req);
+    };
+    on_request_message = req=>{
+        // XXX krzysztof: reduce updating state from 3x to 1x
         this.setState(prev=>({
             stats: {
-                total: prev.stats.total+1,
+                total: prev.stats.total+(req.pending ? 1 : 0),
                 sum_out: prev.stats.sum_out+req.details.out_bw,
                 sum_in: prev.stats.sum_in+req.details.in_bw,
             },
@@ -561,7 +598,14 @@ class Tables_container extends Pure_component {
         const new_size = Math.max(this.state.reqs.length, this.batch_size);
         if (new_size>this.state.reqs.length)
             this.loaded.to = this.loaded.to+1;
-        const new_reqs = [...this.state.reqs, req].sort((a, b)=>{
+        const new_reqs_set = {};
+        [...this.state.reqs, req].forEach(r=>{
+            if (!new_reqs_set[r.uuid])
+                return new_reqs_set[r.uuid] = r;
+            if (new_reqs_set[r.uuid].pending)
+                new_reqs_set[r.uuid] = r;
+        });
+        const new_reqs = Object.values(new_reqs_set).sort((a, b)=>{
             const val_a = _.get(a, sorted_field);
             const val_b = _.get(b, sorted_field);
             if (val_a==val_b)
@@ -569,6 +613,7 @@ class Tables_container extends Pure_component {
             return val_a > val_b ? -1*dir : dir;
         }).slice(0, new_size);
         this.setState({reqs: new_reqs});
+        // XXX krzysztof: improve logic for stats and substats
         if (this.state.sub_stats)
         {
             this.setState(prev=>({
@@ -790,8 +835,9 @@ class Data_row extends React.Component {
         const focused_changed = this.props.focused!=next_props.focused;
         const checked_all_changed = this.props.checked_all!=
             next_props.checked_all;
+        const pending_changed = this.props.req.pending!=next_props.req.pending;
         return selection_changed||focused_changed&&selected||
-            checked_all_changed;
+            checked_all_changed||pending_changed;
     }
     render(){
         const {cur_preview, open_preview, cols, focused, req} = this.props;
@@ -799,8 +845,8 @@ class Data_row extends React.Component {
         const classes = classnames({
             selected,
             focused: selected&&focused,
-            error: !req.details.success,
-            status_check: req.details.context=='STATUS CHECK',
+            error: !req.details.success&&!req.pending,
+            pending: !!req.pending,
         });
         return <tr className={classes}>
               {cols.map((c, idx)=>
@@ -813,6 +859,16 @@ class Data_row extends React.Component {
     }
 }
 
+const maybe_pending = Component=>function pies(props){
+    if (props.pending)
+    {
+        return <Tooltip title="The request is still loading">
+              <div className="disp_value">pending</div>
+            </Tooltip>;
+    }
+    return <Component {...props}/>;
+};
+
 class Cell_value extends React.Component {
     render(){
         const {col, req, req: {details: {timeline}}} = this.props;
@@ -824,19 +880,28 @@ class Cell_value extends React.Component {
         if (col=='Name')
             return <Name_cell req={req} timeline={timeline}/>;
         else if (col=='Status')
-            return <Status_code_cell status={req.response.status}/>;
+        {
+            return <Status_code_cell status={req.response.status}
+                  pending={!!req.pending}/>;
+        }
         else if (col=='Proxy port')
             return <Tooltip_and_value val={req.details.port}/>;
         else if (col=='Bandwidth')
             return <Tooltip_bytes chrome_style bytes={req.details.bw}/>;
         else if (col=='Time')
-            return <Time_cell time={req.time} url={req.request.url}/>;
+        {
+            return <Time_cell time={req.time} url={req.request.url}
+                  pending={!!req.pending}/>;
+        }
         else if (col=='Peer proxy')
-            return <Tooltip_and_value val={req.details.proxy_peer}/>;
+        {
+            return <Tooltip_and_value val={req.details.proxy_peer}
+                  pending={!!req.pending}/>;
+        }
         else if (col=='Date')
         {
-            const local = moment(new Date(req.startedDateTime)).format(
-                'YYYY-MM-DD HH:mm:ss');
+            const local = moment(new Date(req.startedDateTime||
+                req.details.timestamp)).format('YYYY-MM-DD HH:mm:ss');
             return <Tooltip_and_value val={local}/>;
         }
         return col;
@@ -870,7 +935,7 @@ class Name_cell extends Pure_component {
     }
 }
 
-const Status_code_cell = ({status})=>{
+const Status_code_cell = maybe_pending(({status})=>{
     const desc = status_codes[status];
     return <Tooltip title={`${status} - ${desc}`}>
           <div className="disp_value">
@@ -878,9 +943,9 @@ const Status_code_cell = ({status})=>{
             {status=='unknown' && <div className="small_icon status info"/>}
           </div>
         </Tooltip>;
-};
+});
 
-const Time_cell = ({time, url})=>{
+const Time_cell = maybe_pending(({time, url})=>{
     if (!url.endsWith(':443')||!time)
         return <Tooltip_and_value val={time&&time+' ms'}/>;
     const tip = `This timing might not be accurate if the remote server held
@@ -891,7 +956,7 @@ const Time_cell = ({time, url})=>{
             {url.endsWith(':443') && <div className="small_icon status info"/>}
           </div>
         </Tooltip>;
-};
+});
 
 class Select_cell extends React.Component {
     state = {checked: false};
@@ -921,9 +986,10 @@ class Select_cell extends React.Component {
     }
 }
 
-const Tooltip_and_value = ({val, tip})=>
+const Tooltip_and_value = maybe_pending(({val, tip})=>
     <Tooltip title={tip||val}>
       <div className="disp_value">{val||'—'}</div>
-    </Tooltip>;
+    </Tooltip>
+);
 
 export default Har_viewer;

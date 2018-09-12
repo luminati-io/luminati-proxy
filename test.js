@@ -1295,6 +1295,7 @@ describe('manager', ()=>{
         describe('recent_stats', ()=>{
             const t = (name, expected)=>
             it(name, etask._fn(function*(_this){
+                _this.timeout(6000);
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
@@ -1305,7 +1306,7 @@ describe('manager', ()=>{
                     url: 'http://linkedin.com/',
                     strictSSL: false,
                 }]);
-                yield etask.sleep(400);
+                yield etask.sleep(0);
                 const res = yield api_json(`api/recent_stats`);
                 assert_has(res.body, expected);
             }));
@@ -1323,7 +1324,8 @@ describe('manager', ()=>{
             });
         });
     });
-    describe('crash on load error', ()=>{
+    // XXX krzysztof: make it the other way
+    xdescribe('crash on load error', ()=>{
         const t = (name, proxies)=>it(name, ()=>etask(function*(){
             try {
                 app = yield app_with_proxies(proxies);

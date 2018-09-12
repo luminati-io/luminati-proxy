@@ -7,7 +7,7 @@
         },
         "request": {
             "port": {"type": "INTEGER", "index": true},
-            "uuid": {"type": "INTEGER PRIMARY KEY", "index": true},
+            "uuid": {"type": "TEXT", "index": true},
             "url": {"type": "TEXT", "index": true},
             "method": {"type": "TEXT", "index": true},
             "request_headers": {"type": "TEXT"},

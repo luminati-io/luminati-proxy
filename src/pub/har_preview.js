@@ -79,12 +79,13 @@ class Pane_headers extends Pure_component {
         const {req} = this.props;
         const general_entries = [
             {name: 'Request URL', value: req.request.url},
-            {name: 'Status Code', value: req.response.status},
-            {name: 'Super Proxy', value: req.details.super_proxy},
+            {name: 'Status code', value: req.response.status},
+            {name: 'Super proxy IP', value: req.details.super_proxy},
+            {name: 'Peer proxy IP', value: req.details.proxy_peer},
             {name: 'Username', value: req.details.username},
             {name: 'Password', value: req.details.password},
             {name: 'Sent from', value: req.details.remote_address},
-        ];
+        ].filter(e=>e.value!==undefined);
         return <ol className="tree_outline">
               <Preview_section title="General" pairs={general_entries}/>
               <Preview_section title="Response headers"
@@ -119,7 +120,7 @@ class Codemirror_wrapper extends Pure_component {
             lineNumbers: true,
         });
         this.cm.setSize('100%', '100%');
-        let text = this.props.req.response.content.text;
+        let text = this.props.req.response.content.text||'';
         try { text = JSON.stringify(JSON.parse(text), null, '\t'); }
         catch(e){}
         this.cm.doc.setValue(text);
@@ -150,6 +151,8 @@ class Preview_section extends Pure_component {
     state = {open: true};
     toggle = ()=>this.setState(prev=>({open: !prev.open}));
     render(){
+        if (!this.props.pairs||!this.props.pairs.length)
+            return null;
         return [
             <li key="li" onClick={this.toggle}
               className={classnames('parent', {open: this.state.open})}>
@@ -167,7 +170,7 @@ class Preview_section extends Pure_component {
 }
 
 const Header_pair = ({name, value})=>{
-    if (name=='Status Code')
+    if (name=='Status code')
         value = <Status_value value={value}/>;
     return <li className="treeitem">
           <div className="header_name">{name}: </div>

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.107.348",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "HAR viewer improved"
+            },
+            {
+                "type": "star",
+                "text": "dropin port can be disabled in config"
+            }
+        ]
+    },
+    {
         "ver": "1.107.220",
         "type": "stable",
         "changes": [
