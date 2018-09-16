@@ -1301,6 +1301,7 @@ describe('manager', ()=>{
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(qw`--customer mock_user --port 24000
                     --request_stats --ssl false`);
+                app.manager.loki.stats_clear();
                 yield etask.nfn_apply(request, [{
                     proxy: 'http://127.0.0.1:24000',
                     url: 'http://linkedin.com/',

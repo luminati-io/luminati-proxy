@@ -61,6 +61,8 @@ conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
         '.luminati.json'.substr(conf.is_win ? 1 : 0)),
     database: path.resolve(os.homedir(),
         '.luminati.sqlite3'.substr(conf.is_win ? 1 : 0)),
+    loki: path.resolve(os.homedir(),
+        '.luminati.db'.substr(conf.is_win ? 1 : 0)),
     cookie: path.resolve(os.homedir(),
         '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
     mode: 'root',

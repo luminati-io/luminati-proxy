@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.107.348/luminati-proxy-manager-v1.107.348-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.107.580/luminati-proxy-manager-v1.107.580-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -96,6 +96,12 @@ and configure your proxies.
 After logging in, you will see that the default configuration for the Luminati
 proxy includes a "dropin" proxy running on port 22225. This mode is explained
 in detail below.
+
+### Run as daemon
+To run the proxy manager in the background:
+```sh
+luminati --daemon
+```
 
 ### Dropin replacement for existing super-proxies
 

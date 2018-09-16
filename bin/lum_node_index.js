@@ -106,6 +106,7 @@ class Lum_node_index extends Lum_common {
         const cmd = lpm_config.is_win ? npm_cmd :
             `bash -c "${npm_cmd} > ${log_file} 2>&1"`;
         const opt = {name: 'Luminati Proxy Manager'};
+        zerr.notice('Upgrading proxy manager');
         sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
             if (cb)
                 cb(e);
@@ -149,7 +150,7 @@ class Lum_node_index extends Lum_common {
                 zerr(`Error during upgrade: ${zerr.e2s(e)}`);
                 process.exit();
             }
-            zerr('Upgrade completed successfully.');
+            zerr.notice('Upgrade completed successfully');
             this.create_child();
         });
     }

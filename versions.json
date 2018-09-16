@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.107.580",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed support of 25 port in SOCKS5 connections"
+            },
+            {
+                "type": "star",
+                "text": "Stats optimizations"
+            }
+        ]
+    },
+    {
         "ver": "1.107.348",
         "type": "stable",
         "changes": [

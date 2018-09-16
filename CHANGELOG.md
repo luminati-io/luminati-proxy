@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.107.580 Stable
+- :bug: Fixed support of 25 port in SOCKS5 connections
+- :star: Stats optimizations
+
 ## 1.107.348 Stable
 - :star: HAR viewer improved
 - :star: dropin port can be disabled in config
