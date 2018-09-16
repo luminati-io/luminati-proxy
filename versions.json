@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.107.599",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "SOCKS5 improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.107.580",
         "type": "stable",
         "changes": [

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.107.599 Stable
+- :bug: SOCKS5 improvements
+
 ## 1.107.580 Stable
 - :bug: Fixed support of 25 port in SOCKS5 connections
 - :star: Stats optimizations
