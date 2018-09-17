@@ -283,6 +283,7 @@
       "bin/pub/img/zone_icon.png",
       "changelog.json",
       "lib/cities.js",
+      "lib/context.js",
       "lib/db_history.json",
       "lib/find_iface.js",
       "lib/hash.js",
@@ -294,8 +295,12 @@
       "lib/manager.js",
       "lib/md5_util.js",
       "lib/perr.js",
+      "lib/router.js",
+      "lib/rules.js",
+      "lib/sessions.js",
       "lib/socks.js",
       "lib/ssl.js",
+      "lib/timeline.js",
       "lib/tracer.js",
       "lib/username.js",
       "lib/util.js",
@@ -342,7 +347,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "ee6f5d899b55e2a07f743512523d8bfd"
+    "md5": "0f0db95c59675eccdd27df522a9f3c07"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -377,5 +382,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.107.599"
+  "version": "1.107.671"
 }

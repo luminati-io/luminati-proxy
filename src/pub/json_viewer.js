@@ -16,7 +16,7 @@ const Viewer_wrapper = ({json})=>
 const Children = ({val, expanded})=>{
     if (has_children(val)&&expanded)
     {
-        return <ol className="children">
+        return <ol className="tree_children">
               {Object.entries(val).map(e=>
                 <Pair key={e[0]} label={e[0]} val={e[1]}/>
               )}

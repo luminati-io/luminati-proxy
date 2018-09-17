@@ -92,6 +92,8 @@ class Pane_headers extends Pure_component {
                 pairs={req.response.headers}/>
               <Preview_section title="Request headers"
                 pairs={req.request.headers}/>
+              <Body_section title="Request body"
+                body={req.request.postData&&req.request.postData.text}/>
              </ol>;
     }
 }
@@ -147,6 +149,28 @@ class Codemirror_wrapper extends Pure_component {
     }
 }
 
+class Body_section extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        if (!this.props.body)
+            return null;
+        let body;
+        try { body = JSON.parse(this.props.body); }
+        catch(e){ return null; }
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', {open: this.state.open})}>
+              {this.props.title}
+            </li>,
+            <ol key="ol"
+              className={classnames('children', {open: this.state.open})}>
+              <JSON_viewer json={body}/>
+            </ol>
+        ];
+    }
+}
+
 class Preview_section extends Pure_component {
     state = {open: true};
     toggle = ()=>this.setState(prev=>({open: !prev.open}));
@@ -155,7 +179,7 @@ class Preview_section extends Pure_component {
             return null;
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent', {open: this.state.open})}>
+              className={classnames('parent_title', {open: this.state.open})}>
               {this.props.title}
               {!this.state.open ? ` (${this.props.pairs.length})` : ''}
             </li>,
@@ -248,7 +272,7 @@ class Single_timeline extends Pure_component {
             {open: this.state.open});
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent', {open: this.state.open})}>
+              className={classnames('parent_title', {open: this.state.open})}>
               {this.props.timeline.port}
             </li>,
             <ol key="ol" className={children_classes}>

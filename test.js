@@ -904,7 +904,7 @@ describe('proxy', ()=>{
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);
-            for (var i=0; i<5; i++)
+            for (let i=0; i<5; i++)
             {
                 yield l.test();
                 yield etask.sleep(100);

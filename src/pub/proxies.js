@@ -701,10 +701,13 @@ const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
     </Pagination_panel>;
 
 const Proxy_row = withRouter(class Proxy_row extends Pure_component {
-    state = {status: this.props.proxy._status};
+    state = {status: this.props.proxy._status,
+        status_details: this.props.proxy._status_details};
     componentDidMount(){ this.get_status(); }
     get_status = (opt={})=>{
         const {proxy} = this.props;
+        if (!opt.force&&proxy._status=='ok')
+            return;
         const _this = this;
         return this.etask(function*(){
             this.on('uncaught', e=>{
@@ -730,9 +733,13 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
             else
             {
                 let errors = res.status_details.filter(s=>s.lvl=='err');
-                errors = errors.length ? errors : [{msg: res.status}];
-                _this.setState({status: 'error', status_details: errors});
+                res.status_details = errors.length ? errors : [{msg: res.status}];
+                res.status = 'error';
+                _this.setState({status: res.status,
+                    status_details: res.status_details});
             }
+            proxy._status = res.status;
+            proxy._status_details = res.status_details;
         });
     };
     edit = ()=>{
@@ -753,8 +760,7 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
         const row_class = classnames('proxy_row',
             {default: proxy.port==22225});
         return <tr className={row_class}>
-              <Actions proxy={proxy}
-                get_status={this.get_status}
+              <Actions proxy={proxy} get_status={this.get_status}
                 update_proxies={this.props.update_proxies}/>
               {this.props.cols.map(col=>
                 <Cell key={col.key} proxy={proxy} col={col}

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.107.671 Stable
+- :star: UI performance optimizations
+
 ## 1.107.599 Stable
 - :bug: SOCKS5 improvements
 

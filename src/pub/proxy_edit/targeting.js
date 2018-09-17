@@ -149,6 +149,8 @@ class Targeting extends Pure_component {
         const show_dc_note = curr_plan&&curr_plan.type=='static';
         const show_vips_note = curr_plan&&
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
+        const carrier_disabled = !!this.props.form.asn&&
+            !!this.props.form.asn.length;
         return <div>
               {(show_dc_note || show_vips_note) &&
                 <Note>
@@ -169,10 +171,9 @@ class Targeting extends Pure_component {
               <Config type="typeahead" id="city" data={this.cities()}
                 on_change={this.city_changed}/>
               <Config type="typeahead" id="asn" data={this.state.asns}
-                disabled={this.props.form.carrier} update_on_input/>
+                disabled={!!this.props.form.carrier} update_on_input/>
               <Config type="select" id="carrier" data={carriers}
-                note={carriers_note}
-                disabled={this.props.form.asn&&this.props.form.asn.length}/>
+                note={carriers_note} disabled={carrier_disabled}/>
             </div>;
     }
 });
