@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.107.683",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed rules with a status code regex"
+            },
+            {
+                "type": "sparkles",
+                "text": "Better labels for request time rules"
+            }
+        ]
+    },
+    {
         "ver": "1.107.671",
         "type": "stable",
         "changes": [

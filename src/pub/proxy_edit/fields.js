@@ -119,13 +119,13 @@ export const tabs = {
                     body of the response`,
             },
             min_req_time: {
-                label: 'Minimum request time',
+                label: 'Request time more than',
                 placeholder: '500',
                 tooltip: `Any request time above the given value in
                     milliseconds will trigger the action`,
             },
             max_req_time: {
-                label: 'Maximum request time',
+                label: 'Request time less than',
                 placeholder: '500',
                 tooltip: `Any request time below the given value in
                     milliseconds will trigger the action`,

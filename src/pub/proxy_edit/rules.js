@@ -24,10 +24,10 @@ const trigger_types = [
         for all the requests that returns the matching status code`},
     {key: 'HTML body element', value: 'body', tooltip: `Trigger will be
         pulled when the response <body> contain the selected string`},
-    {key: 'Minimum request time', value: 'min_req_time', tooltip: `Trigger will
-        be pulled when the request time is above the selected value`},
-    {key: 'Maximum request time', value: 'max_req_time', tooltip: `Trigger
-        will be pulled when the request time is below the selected value`},
+    {key: 'Request time more than', value: 'min_req_time',
+        tooltip: `Triggers when the request time is above the selected value`},
+    {key: 'Request time less than', value: 'max_req_time',
+        tooltip: `Triggers when the request time is below the selected value`},
 ];
 
 const default_action = {key: 'Choose an action type', value: '',
@@ -180,11 +180,13 @@ class Rules extends Pure_component {
         }
         if (rule.trigger_type=='status')
         {
-            let rule_status = rule.status_code=='Custom' ?
-                rule.status_custom : rule.status_code;
+            let is_custom = rule.status_code=='Custom';
+            let rule_status = is_custom ? rule.status_custom :
+                rule.status_code;
             rule_status = rule_status||'';
-            result.res[0].status = {type: 'in', arg: rule_status};
-            result.res[0].status_custom = rule.status_code=='Custom';
+            result.res[0].status =
+                {type: is_custom ? '=~' : 'in', arg: rule_status};
+            result.res[0].status_custom = is_custom;
         }
         else if (rule.trigger_type=='body'&&rule.body_regex)
             result.res[0].body = {type: '=~', arg: rule.body_regex};

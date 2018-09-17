@@ -8465,12 +8465,12 @@ var tabs = exports.tabs = {
                 tooltip: 'A string(regular expression) to be scanned in the\n                    body of the response'
             },
             min_req_time: {
-                label: 'Minimum request time',
+                label: 'Request time more than',
                 placeholder: '500',
                 tooltip: 'Any request time above the given value in\n                    milliseconds will trigger the action'
             },
             max_req_time: {
-                label: 'Maximum request time',
+                label: 'Request time less than',
                 placeholder: '500',
                 tooltip: 'Any request time below the given value in\n                    milliseconds will trigger the action'
             },
@@ -38921,7 +38921,9 @@ var provider = function provider(provide) {
     });
 };
 
-var trigger_types = [{ key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type.\n        For each request the system will check if the trigger is matching\n        the response' }, { key: 'URL', value: 'url', tooltip: 'Trigger will be pulled for all\n        requests to the selected URL' }, { key: 'Status code', value: 'status', tooltip: 'Trigger will be pulled\n        for all the requests that returns the matching status code' }, { key: 'HTML body element', value: 'body', tooltip: 'Trigger will be\n        pulled when the response <body> contain the selected string' }, { key: 'Minimum request time', value: 'min_req_time', tooltip: 'Trigger will\n        be pulled when the request time is above the selected value' }, { key: 'Maximum request time', value: 'max_req_time', tooltip: 'Trigger\n        will be pulled when the request time is below the selected value' }];
+var trigger_types = [{ key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type.\n        For each request the system will check if the trigger is matching\n        the response' }, { key: 'URL', value: 'url', tooltip: 'Trigger will be pulled for all\n        requests to the selected URL' }, { key: 'Status code', value: 'status', tooltip: 'Trigger will be pulled\n        for all the requests that returns the matching status code' }, { key: 'HTML body element', value: 'body', tooltip: 'Trigger will be\n        pulled when the response <body> contain the selected string' }, { key: 'Request time more than', value: 'min_req_time',
+    tooltip: 'Triggers when the request time is above the selected value' }, { key: 'Request time less than', value: 'max_req_time',
+    tooltip: 'Triggers when the request time is below the selected value' }];
 
 var default_action = { key: 'Choose an action type', value: '',
     tooltip: 'Select an action.  Once the trigger rule is met the selected\n    action is executed automatically.' };
@@ -39018,10 +39020,11 @@ exports.default = provider({ tab_id: 'rules' })(function (_Pure_component) {
                 };
             }
             if (rule.trigger_type == 'status') {
-                var rule_status = rule.status_code == 'Custom' ? rule.status_custom : rule.status_code;
+                var is_custom = rule.status_code == 'Custom';
+                var rule_status = is_custom ? rule.status_custom : rule.status_code;
                 rule_status = rule_status || '';
-                result.res[0].status = { type: 'in', arg: rule_status };
-                result.res[0].status_custom = rule.status_code == 'Custom';
+                result.res[0].status = { type: is_custom ? '=~' : 'in', arg: rule_status };
+                result.res[0].status_custom = is_custom;
             } else if (rule.trigger_type == 'body' && rule.body_regex) result.res[0].body = { type: '=~', arg: rule.body_regex };else if (rule.trigger_type == 'min_req_time' && rule.min_req_time) result.res[0].min_req_time = rule.min_req_time + 'ms';else if (rule.trigger_type == 'max_req_time' && rule.max_req_time) result.res[0].max_req_time = rule.max_req_time + 'ms';
             return result;
         }, _this2.pre_rule_prepare = function (rule) {
