@@ -1,6 +1,6 @@
 [
     {
-        "ver": "1.107.683",
+        "ver": "1.107.727",
         "type": "stable",
         "changes": [
             {
@@ -10,6 +10,10 @@
             {
                 "type": "sparkles",
                 "text": "Better labels for request time rules"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed reading legacy config file"
             }
         ]
     },

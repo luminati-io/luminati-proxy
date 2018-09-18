@@ -1,8 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.107.683 Stable
+## 1.107.727 Stable
 - :bug: Fixed rules with a status code regex
 - :sparkles: Better labels for request time rules
+- :bug: Fixed reading legacy config file
 
 ## 1.107.671 Stable
 - :star: UI performance optimizations

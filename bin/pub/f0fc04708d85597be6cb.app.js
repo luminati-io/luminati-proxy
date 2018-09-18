@@ -21522,7 +21522,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 })[0];
                 if (!proxy) _this3.props.history.push('/overview');
                 var form = Object.assign({}, proxy.config);
-                _this3.apply_preset(form, form.last_preset_applied);
+                _this3.apply_preset(form, form.last_preset_applied || 'session_long');
                 _this3.setState({ proxies: proxies }, _this3.delayed_loader());
             });
             this.setdb_on('head.consts', function (consts) {

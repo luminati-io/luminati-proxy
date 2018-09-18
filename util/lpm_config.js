@@ -52,6 +52,7 @@ conf.luminati_default = {
     proxy_switch: 2,
     api: 'https://luminati-china.io',
     socket_inactivity_timeout: date.ms.MIN,
+    last_preset_applied: 'session_long',
 };
 conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     www: 22999,

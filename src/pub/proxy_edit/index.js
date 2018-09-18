@@ -59,7 +59,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (!proxy)
                 this.props.history.push('/overview');
             const form = Object.assign({}, proxy.config);
-            this.apply_preset(form, form.last_preset_applied);
+            this.apply_preset(form, form.last_preset_applied||'session_long');
             this.setState({proxies}, this.delayed_loader());
         });
         this.setdb_on('head.consts', consts=>
