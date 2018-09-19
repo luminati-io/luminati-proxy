@@ -5,7 +5,55 @@ const _ = require('lodash');
 const yargs = require('yargs');
 const pkg = require('../package.json');
 const lpm_config = require('./lpm_config.js');
+const zerr = require('../util/zerr.js');
 const E = module.exports;
+
+const parse_env_params = (env, fields)=>{
+    const params = {};
+    for (const [field, value] of Object.entries(fields))
+    {
+        const key = 'LPM_'+field.toUpperCase();
+        if (env[key])
+        {
+            switch (value.type)
+            {
+            case 'string':
+                if (value.pattern &&
+                    !(new RegExp(value.pattern)).test(env[key]))
+                {
+                    return zerr.zexit(key+' wrong value pattern '+
+                        value.pattern);
+                }
+                params[field] = env[key];
+                break;
+            case 'integer':
+                params[field] = Number.parseInt(env[key]);
+                if (!Number.isInteger(params[field]))
+                    return zerr.zexit(key+' not a number '+env[key]);
+                break;
+            case 'boolean':
+                if (!['0', '1', 'false', 'true'].includes(env[key]))
+                    return zerr.zexit(key+' wrong boolean value '+env[key]);
+                params[field] = ['1', 'true'].includes(env[key]);
+                break;
+            case 'array':
+                params[field] = env[key].split(';');
+                if (!env[key] || !params[field] || !params[field].length)
+                    return zerr.zexit(key+' wrong array value '+env[key]);
+                break;
+            case 'object':
+                try {
+                    params[field] = JSON.parse(env[key]);
+                } catch(e){
+                    return zerr.zexit(key+' wrong object value '+env[key]);
+                }
+                break;
+            }
+        }
+    }
+    return params;
+};
+E.t = {parse_env_params};
 
 E.init_args = args=>{
     const added_descriptions = {
@@ -22,12 +70,14 @@ E.init_args = args=>{
         usage.unshift('  docker run luminati/luminati-proxy '
             +'[docker port redirections]');
     }
+    const defaults = Object.assign({}, lpm_config.manager_default,
+        parse_env_params(process.env, lpm_config.proxy_fields));
     args = (args||process.argv.slice(2)).map(String);
     const argv = yargs(args).usage(usage.join(' \n'))
     .options(lpm_config.proxy_fields)
     .describe(added_descriptions)
     .number(lpm_config.numeric_fields)
-    .default(lpm_config.manager_default)
+    .default(defaults)
     .help('h')
     .alias({'help': ['h', '?'], port: 'p', daemon: 'd', 'version': 'v'})
     .version(()=>`luminati-proxy version: ${pkg.version}`).argv;

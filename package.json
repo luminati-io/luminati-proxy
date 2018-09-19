@@ -347,7 +347,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "a88e2660a5113c56b79fa5e77457522f"
+    "md5": "795204d27fd0de1633e74f32ff792f85"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -382,5 +382,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.107.727"
+  "version": "1.107.802"
 }

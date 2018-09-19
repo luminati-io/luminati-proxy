@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.107.802",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "SSL stability improvements"
+            },
+            {
+                "type": "bug",
+                "text": "Bug fixes"
+            }
+        ]
+    },
+    {
         "ver": "1.107.727",
         "type": "stable",
         "changes": [

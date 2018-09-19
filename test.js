@@ -18,6 +18,8 @@ const etask = require('./util/etask.js');
 const restore_case = require('./util/http_hdr.js').restore_case;
 const qw = require('./util/string.js').qw;
 const assign = Object.assign;
+const zerr = require('./util/zerr.js');
+const sinon = require('sinon');
 const lpm_config = require('./util/lpm_config.js');
 const lpm_util = require('./util/lpm_util.js');
 const Luminati = require('./lib/luminati.js');
@@ -1371,5 +1373,41 @@ describe('util', ()=>{
             let rand_range = util.param_rand_range('2:4', 100);
             assert.ok(rand_range>=200 && rand_range<=400);
         });
+    });
+    it('parse_env_params', ()=>{
+        const t = (env, params, result, error)=>{
+            if (error)
+            {
+                const spy = sinon.stub(zerr, 'zexit',
+                    err=>assert.equal(err, error));
+                lpm_util.t.parse_env_params(env, params);
+                spy.restore();
+            }
+            else
+            {
+                assert.deepEqual(lpm_util.t.parse_env_params(env, params),
+                    result);
+            }
+        };
+        t({}, {port: {type: 'integer'}}, {});
+        t({LPM_PORT: '11123'}, {port: {type: 'integer'}}, {port: 11123});
+        t({LPM_PORT: 'asdasdasd'}, {port: {type: 'integer'}}, {},
+            'LPM_PORT not a number asdasdasd');
+        t({LPM_IP: '127.0.0.1'}, {ip: {type: 'string'}}, {ip: '127.0.0.1'});
+        t({LPM_IP: '127.0.0.1'}, {ip: {type: 'string',
+            pattern: '^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$'}}, {ip: '127.0.0.1'});
+        t({LPM_IP: 'notIp'}, {ip: {type: 'string',
+            pattern: '^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$'}}, {},
+            'LPM_IP wrong value pattern ^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$');
+        t({LPM_IPS: '127.0.0.1'}, {ips: {type: 'array'}},
+            {ips: ['127.0.0.1']});
+        t({LPM_IPS: '127.0.0.1;192.168.1.1'}, {ips: {type: 'array'}},
+            {ips: ['127.0.0.1', '192.168.1.1']});
+        t({LPM_IPS: ''}, {ips: {type: 'array'}}, {},
+            'LPM_IPS wrong array value ');
+        t({LPM_OBJECT: '[asdasd'}, {object: {type: 'object'}}, {},
+            'LPM_OBJECT wrong object value [asdasd');
+        t({LPM_OBJECT: '{"test": [1,2,3]}'}, {object: {type: 'object'}}, {
+            object: {test: [1, 2, 3]}});
     });
 });
