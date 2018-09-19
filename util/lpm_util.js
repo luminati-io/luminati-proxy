@@ -13,42 +13,32 @@ const parse_env_params = (env, fields)=>{
     for (const [field, value] of Object.entries(fields))
     {
         const key = 'LPM_'+field.toUpperCase();
-        if (env[key])
+        if (!env[key])
+            continue;
+        switch (value.type)
         {
-            switch (value.type)
-            {
-            case 'string':
-                if (value.pattern &&
-                    !(new RegExp(value.pattern)).test(env[key]))
-                {
-                    return zerr.zexit(key+' wrong value pattern '+
-                        value.pattern);
-                }
-                params[field] = env[key];
-                break;
-            case 'integer':
-                params[field] = Number.parseInt(env[key]);
-                if (!Number.isInteger(params[field]))
-                    return zerr.zexit(key+' not a number '+env[key]);
-                break;
-            case 'boolean':
-                if (!['0', '1', 'false', 'true'].includes(env[key]))
-                    return zerr.zexit(key+' wrong boolean value '+env[key]);
-                params[field] = ['1', 'true'].includes(env[key]);
-                break;
-            case 'array':
-                params[field] = env[key].split(';');
-                if (!env[key] || !params[field] || !params[field].length)
-                    return zerr.zexit(key+' wrong array value '+env[key]);
-                break;
-            case 'object':
-                try {
-                    params[field] = JSON.parse(env[key]);
-                } catch(e){
-                    return zerr.zexit(key+' wrong object value '+env[key]);
-                }
-                break;
-            }
+        case 'string':
+            if (value.pattern && !(new RegExp(value.pattern)).test(env[key]))
+                zerr.zexit(key+' wrong value pattern '+value.pattern);
+            params[field] = env[key];
+            break;
+        case 'integer':
+            params[field] = Number.parseInt(env[key]);
+            if (!Number.isInteger(params[field]))
+                zerr.zexit(key+' not a number '+env[key]);
+            break;
+        case 'boolean':
+            if (!['0', '1', 'false', 'true'].includes(env[key]))
+                zerr.zexit(key+' wrong boolean value '+env[key]);
+            params[field] = ['1', 'true'].includes(env[key]);
+            break;
+        case 'array':
+            params[field] = env[key].split(';');
+            break;
+        case 'object':
+            try { params[field] = JSON.parse(env[key]); }
+            catch(e){ zerr.zexit(key+' contains invalid JSON: '+env[key]); }
+            break;
         }
     }
     return params;

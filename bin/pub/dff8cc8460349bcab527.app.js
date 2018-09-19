@@ -21271,6 +21271,8 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 res.send_email = true;
                 res.email = rule.email;
             }
+            if (rule.retry_port) res.retry_port = rule.retry_port;
+            if (rule.min_req_time) res.min_req_time = rule.min_req_time;
             return res;
         };
 
@@ -38922,13 +38924,14 @@ var provider = function provider(provide) {
 };
 
 var trigger_types = [{ key: 'i.e. Status code', value: '', tooltip: 'Choose a trigger type.\n        For each request the system will check if the trigger is matching\n        the response' }, { key: 'URL', value: 'url', tooltip: 'Trigger will be pulled for all\n        requests to the selected URL' }, { key: 'Status code', value: 'status', tooltip: 'Trigger will be pulled\n        for all the requests that returns the matching status code' }, { key: 'HTML body element', value: 'body', tooltip: 'Trigger will be\n        pulled when the response <body> contain the selected string' }, { key: 'Request time more than', value: 'min_req_time',
-    tooltip: 'Triggers when the request time is above the selected value' }, { key: 'Request time less than', value: 'max_req_time',
+    tooltip: 'Triggers when the request time is above the selected value',
+    type: 'pre' }, { key: 'Request time less than', value: 'max_req_time',
     tooltip: 'Triggers when the request time is below the selected value' }];
 
 var default_action = { key: 'Choose an action type', value: '',
     tooltip: 'Select an action.  Once the trigger rule is met the selected\n    action is executed automatically.' };
-var action_types = [{ key: 'Retry with new IP', value: 'retry', tooltip: 'System will send the\n        exact same request again with newly refreshed IP' }, { key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
-    tooltip: 'System will send another request using different port\n        from your port list. This can allow cost optimization by escalating the\n        request between different types of networks according to the port\n        configuration.' }, { key: 'Ban IP', value: 'ban_ip', tooltip: 'Will ban the IP for custom\n        amount of time. usually used for failed request.' }, { key: 'Refresh IP', value: 'refresh_ip', tooltip: 'Refresh the current\n        Data Center IP with new allocated IP. This action contain\n        additional charges. View the cost of IP refreshing in your zones\n        page http://luminati.io/cp/zones' }, { key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: 'Save\n        the current IP to a pool of reserved IPs.  you can then download all\n        the IPs at a later time.' }, { key: 'Save IP to fast pool', value: 'save_to_fast_pool', tooltip: 'Save\n        the current IP to fast IP pool to increase the speed of your requests.\n        You will need to specify the size of this pool.' }, { key: 'Null response', value: 'null_response', tooltip: 'LPM will return a\n        "null response" without proxying. It is useful when users do not want\n        to make a request, but a browser expects 200 response.', type: 'pre',
+var action_types = [{ key: 'Retry with new IP', value: 'retry', tooltip: 'System will send the\n        exact same request again with newly refreshed IP', min_req_time: true }, { key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
+    tooltip: 'System will send another request using different port\n        from your port list. This can allow cost optimization by escalating the\n        request between different types of networks according to the port\n        configuration.', min_req_time: true }, { key: 'Ban IP', value: 'ban_ip', tooltip: 'Will ban the IP for custom\n        amount of time. usually used for failed request.' }, { key: 'Refresh IP', value: 'refresh_ip', tooltip: 'Refresh the current\n        Data Center IP with new allocated IP. This action contain\n        additional charges. View the cost of IP refreshing in your zones\n        page http://luminati.io/cp/zones' }, { key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: 'Save\n        the current IP to a pool of reserved IPs.  you can then download all\n        the IPs at a later time.' }, { key: 'Save IP to fast pool', value: 'save_to_fast_pool', tooltip: 'Save\n        the current IP to fast IP pool to increase the speed of your requests.\n        You will need to specify the size of this pool.' }, { key: 'Null response', value: 'null_response', tooltip: 'LPM will return a\n        "null response" without proxying. It is useful when users do not want\n        to make a request, but a browser expects 200 response.', type: 'pre',
     only_url: true }, { key: 'Bypass proxy', value: 'bypass_proxy', tooltip: 'Requests will be\n        passed directly to target site without any proxy (super proxy or\n        peer).', type: 'pre', only_url: true }, { key: 'Direct super proxy', value: 'direct', tooltip: 'Requests will be\n        passed through super proxy (not through peers)', type: 'pre',
     only_url: true }, { key: 'Process data', value: 'process', only_url: true }];
 
@@ -38937,8 +38940,13 @@ var pre_actions = action_types.filter(function (a) {
 }).map(function (a) {
     return a.value;
 });
+var pre_trigger_types = trigger_types.filter(function (tt) {
+    return tt.type == 'pre';
+}).map(function (tt) {
+    return tt.value;
+});
 var is_pre_rule = function is_pre_rule(rule) {
-    return pre_actions.includes(rule.action);
+    return pre_actions.includes(rule.action) || pre_trigger_types.includes(rule.trigger_type);
 };
 var is_post_rule = function is_post_rule(rule) {
     return !is_pre_rule(rule);
@@ -39034,6 +39042,8 @@ exports.default = provider({ tab_id: 'rules' })(function (_Pure_component) {
                 trigger_type: rule.trigger_type
             };
             if (rule.email) res.email = rule.email;
+            if (rule.action == 'retry_port') res.retry_port = rule.retry_port;
+            if (rule.min_req_time) res.min_req_time = rule.min_req_time;
             return res;
         }, _this2.rules_update = function () {
             _setdb2.default.set('head.proxy_edit.rules', _this2.state.rules);
@@ -39332,7 +39342,9 @@ var Rule = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(functio
                 return at.value != 'save_to_fast_pool' || rule.trigger_type == 'max_req_time';
             }).filter(function (at) {
                 return rule.trigger_type == 'url' && at.only_url || rule.trigger_type != 'url' && !at.only_url;
-            }));
+            })).filter(function (at) {
+                return rule.trigger_type != 'min_req_time' || at.min_req_time;
+            });
             var ports = this.props.ports_opt.filter(function (p) {
                 return p.value != _this10.props.match.params.port;
             });

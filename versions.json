@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.107.868",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Bug fixes"
+            },
+            {
+                "type": "sparkles",
+                "text": "Rule: 'request time more than' improved"
+            }
+        ]
+    },
+    {
         "ver": "1.107.808",
         "type": "stable",
         "changes": [

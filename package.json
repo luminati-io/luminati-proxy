@@ -297,7 +297,7 @@
       "lib/perr.js",
       "lib/router.js",
       "lib/rules.js",
-      "lib/sessions.js",
+      "lib/session.js",
       "lib/socks.js",
       "lib/ssl.js",
       "lib/timeline.js",
@@ -347,7 +347,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "ae43f39d7374c1a3a3e55a9c587a6ea2"
+    "md5": "40612fa1c6ff7d8f8aa71f17c1f75189"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -382,5 +382,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.107.808"
+  "version": "1.107.868"
 }

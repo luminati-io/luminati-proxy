@@ -282,6 +282,10 @@ const Index = withRouter(class Index extends Pure_component {
             res.send_email = true;
             res.email = rule.email;
         }
+        if (rule.retry_port)
+            res.retry_port = rule.retry_port;
+        if (rule.min_req_time)
+            res.min_req_time = rule.min_req_time;
         return res;
     };
     apply_rules = ({rules})=>{

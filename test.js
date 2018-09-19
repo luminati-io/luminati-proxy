@@ -1381,6 +1381,7 @@ describe('util', ()=>{
                 const spy = sinon.stub(zerr, 'zexit',
                     err=>assert.equal(err, error));
                 lpm_util.t.parse_env_params(env, params);
+                assert(spy.called);
                 spy.restore();
             }
             else
@@ -1403,10 +1404,8 @@ describe('util', ()=>{
             {ips: ['127.0.0.1']});
         t({LPM_IPS: '127.0.0.1;192.168.1.1'}, {ips: {type: 'array'}},
             {ips: ['127.0.0.1', '192.168.1.1']});
-        t({LPM_IPS: ''}, {ips: {type: 'array'}}, {},
-            'LPM_IPS wrong array value ');
         t({LPM_OBJECT: '[asdasd'}, {object: {type: 'object'}}, {},
-            'LPM_OBJECT wrong object value [asdasd');
+            'LPM_OBJECT contains invalid JSON: [asdasd');
         t({LPM_OBJECT: '{"test": [1,2,3]}'}, {object: {type: 'object'}}, {
             object: {test: [1, 2, 3]}});
     });

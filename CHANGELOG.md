@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.107.868 Stable
+- :bug: Bug fixes
+- :sparkles: Rule: 'request time more than' improved
+
 ## 1.107.808 Stable
 - :bug: Fix windows installation
 

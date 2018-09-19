@@ -25,7 +25,8 @@ const trigger_types = [
     {key: 'HTML body element', value: 'body', tooltip: `Trigger will be
         pulled when the response <body> contain the selected string`},
     {key: 'Request time more than', value: 'min_req_time',
-        tooltip: `Triggers when the request time is above the selected value`},
+        tooltip: `Triggers when the request time is above the selected value`,
+        type: 'pre'},
     {key: 'Request time less than', value: 'max_req_time',
         tooltip: `Triggers when the request time is below the selected value`},
 ];
@@ -35,12 +36,12 @@ const default_action = {key: 'Choose an action type', value: '',
     action is executed automatically.`};
 const action_types = [
     {key: 'Retry with new IP', value: 'retry', tooltip: `System will send the
-        exact same request again with newly refreshed IP`},
+        exact same request again with newly refreshed IP`, min_req_time: true},
     {key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
         tooltip: `System will send another request using different port
         from your port list. This can allow cost optimization by escalating the
         request between different types of networks according to the port
-        configuration.`},
+        configuration.`, min_req_time: true},
     {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
         amount of time. usually used for failed request.`},
     {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
@@ -67,7 +68,10 @@ const action_types = [
 ];
 
 const pre_actions = action_types.filter(a=>a.type=='pre').map(a=>a.value);
-const is_pre_rule = rule=>pre_actions.includes(rule.action);
+const pre_trigger_types = trigger_types.filter(tt=>tt.type=='pre')
+.map(tt=>tt.value);
+const is_pre_rule = rule=>pre_actions.includes(rule.action)||
+    pre_trigger_types.includes(rule.trigger_type);
 const is_post_rule = rule=>!is_pre_rule(rule);
 
 const status_types = [
@@ -204,6 +208,10 @@ class Rules extends Pure_component {
         };
         if (rule.email)
             res.email = rule.email;
+        if (rule.action=='retry_port')
+            res.retry_port = rule.retry_port;
+        if (rule.min_req_time)
+            res.min_req_time = rule.min_req_time;
         return res;
     };
     rules_update = ()=>{
@@ -385,7 +393,9 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
         .filter(at=>at.value!='save_to_fast_pool'||
             rule.trigger_type=='max_req_time')
         .filter(at=>rule.trigger_type=='url'&&at.only_url||
-            rule.trigger_type!='url'&&!at.only_url));
+            rule.trigger_type!='url'&&!at.only_url))
+        .filter(at=>rule.trigger_type!='min_req_time'||
+            at.min_req_time);
         const ports = this.props.ports_opt.filter(p=>
             p.value!=this.props.match.params.port);
         return <div className="rule_wrapper">
