@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.107.808 Stable
+- :bug: Fix windows installation
+
 ## 1.107.802 Stable
 - :sparkles: SSL stability improvements
 - :bug: Bug fixes

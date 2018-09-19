@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.107.808",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix windows installation"
+            }
+        ]
+    },
+    {
         "ver": "1.107.802",
         "type": "stable",
         "changes": [

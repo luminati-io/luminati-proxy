@@ -779,7 +779,7 @@ class Cell extends React.Component {
         const {proxy, col, master_port, status, status_details, on_click,
             zones, className} = this.props;
         let val;
-        if (!col.ext && proxy.ext_proxies)
+        if (!col.ext&&proxy.ext_proxies)
             val = '—';
         else if (col.render)
         {
