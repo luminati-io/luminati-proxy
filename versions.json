@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.108.6",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Logs speed optimization"
+            }
+        ]
+    },
+    {
         "ver": "1.107.868",
         "type": "stable",
         "changes": [

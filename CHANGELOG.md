@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.108.6 Development Latest
+- :sparkles: Logs speed optimization
+
 ## 1.107.868 Stable
 - :bug: Bug fixes
 - :sparkles: Rule: 'request time more than' improved

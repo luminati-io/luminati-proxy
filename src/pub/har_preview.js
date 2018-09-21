@@ -155,9 +155,10 @@ class Body_section extends Pure_component {
     render(){
         if (!this.props.body)
             return null;
-        let body;
-        try { body = JSON.parse(this.props.body); }
-        catch(e){ return null; }
+        let json;
+        let raw_body;
+        try { json = JSON.parse(this.props.body); }
+        catch(e){ raw_body = this.props.body; }
         return [
             <li key="li" onClick={this.toggle}
               className={classnames('parent_title', {open: this.state.open})}>
@@ -165,7 +166,8 @@ class Body_section extends Pure_component {
             </li>,
             <ol key="ol"
               className={classnames('children', {open: this.state.open})}>
-              <JSON_viewer json={body}/>
+              {!!json && <JSON_viewer json={json}/>}
+              {!!raw_body && <Header_pair name="p" value={raw_body}/>}
             </ol>
         ];
     }
