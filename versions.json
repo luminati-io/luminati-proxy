@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.108.119",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated dependencies"
+            },
+            {
+                "type": "star",
+                "text": "New rule: switch proxy port based on URL"
+            }
+        ]
+    },
+    {
         "ver": "1.108.6",
         "type": "dev",
         "changes": [

@@ -22,6 +22,7 @@ class Lum {
             `Make flags: ${config.CONFIG_MAKEFLAGS}`,
             `Os version: ${os.platform()} ${os.arch()} ${os.release()}`,
             `Host name: ${os.hostname()}`,
+            this.argv.print_work_dir ? `Work dir: ${lpm_config.work_dir}` : ''
         ].join('\n'));
     }
 }

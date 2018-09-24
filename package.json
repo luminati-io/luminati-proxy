@@ -78,7 +78,7 @@
     "request-stats": "2.0.1",
     "semver": "5.3.0",
     "@luminati-io/socksv5": "0.0.7",
-    "sqlite3": "3.1.13",
+    "sqlite3": "4.0.2",
     "sudo-prompt": "6.2.1",
     "taskkill": "2.0.0",
     "tasklist": "3.1.0",
@@ -344,10 +344,11 @@
       "test.js",
       "util/config.js",
       "util/lpm_config.js",
+      "util/lpm_file.js",
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "9838ba850137540bb11e04dd4ba03e80"
+    "md5": "700f2c08ed75c4e8bb15fbdc5d297489"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -382,5 +383,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.108.6"
+  "version": "1.108.119"
 }

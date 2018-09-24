@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.108.119 Stable
+- :star: Updated dependencies
+- :star: New rule: switch proxy port based on URL
+
 ## 1.108.6 Development Latest
 - :sparkles: Logs speed optimization
 

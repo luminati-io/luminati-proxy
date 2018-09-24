@@ -166,6 +166,11 @@ export const tabs = {
                 label: 'Retry using a different port',
                 tooltip: 'Make additional request using a different port',
             },
+            switch_port: {
+                label: 'Switch port that will be used to make the request',
+                tooltip: `By using this action you can split your traffic
+                    between ports`,
+            },
             ban_ip_duration: {
                 label: 'Ban IP for',
                 tooltip: 'will remove the IP for a defined amount of time',

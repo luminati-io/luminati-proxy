@@ -22,6 +22,7 @@ const zerr = require('./util/zerr.js');
 const sinon = require('sinon');
 const lpm_config = require('./util/lpm_config.js');
 const lpm_util = require('./util/lpm_util.js');
+const lpm_file = require('./util/lpm_file.js');
 const Luminati = require('./lib/luminati.js');
 const Manager = require('./lib/manager.js');
 const pkg = require('./package.json');
@@ -1408,5 +1409,33 @@ describe('util', ()=>{
             'LPM_OBJECT contains invalid JSON: [asdasd');
         t({LPM_OBJECT: '{"test": [1,2,3]}'}, {object: {type: 'object'}}, {
             object: {test: [1, 2, 3]}});
+    });
+    it('get_file_path', ()=>{
+        const test_files = [
+            ['test1.file'],
+            ['test2.file', 'test2.file.backup'],
+            ['test3.file', 'test3.file.0', 'test3.file.1'],
+            ['test4.file', 'test4.file.0', 'test4.file.backup']];
+        const create_file = filename=>fs.writeFileSync(
+            path.resolve(os.homedir(), filename));
+        const remove_file = filename=>{
+            fs.unlinkSync(path.resolve(lpm_file.work_dir, filename));
+        };
+        const t = files=>{
+            for (const file of files)
+                create_file(file);
+            lpm_file.get_file_path(files[0]);
+            for (const file of files)
+            {
+                assert.equal(fs.existsSync(path.resolve(os.homedir(), file)),
+                    false);
+                assert.equal(fs.existsSync(path.resolve(
+                    lpm_file.work_dir, file)), true);
+            }
+            for (const file of files)
+                remove_file(file);
+        };
+        for (const files of test_files)
+            t(files);
     });
 });

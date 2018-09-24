@@ -1,11 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const _ = require('lodash');
-const path = require('path');
-const os = require('os');
 const swagger = require('../lib/swagger.json');
+const lpm_file = require('./lpm_file.js');
 const pkg = require('../package.json');
-const file = require('./file.js');
 const string = require('./string.js');
 const date = require('./date.js');
 const qw = string.qw;
@@ -17,7 +15,7 @@ const prop_by_type = (def, type)=>_.toPairs(def.properties)
 const conf = {
     version: pkg.version,
     is_win: process.platform == 'win32',
-    work_dir: path.resolve(os.homedir(), 'luminati_proxy_manager'),
+    work_dir: lpm_file.work_dir,
     is_electron: process.versions && !!process.versions.electron,
     proxy_fields: assign({}, swagger.definitions.proxy.properties,
         swagger.definitions.manager.properties),
@@ -58,13 +56,13 @@ conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     www: 22999,
     www_whitelist_ips: [],
     ws: 22998,
-    config: path.resolve(os.homedir(),
+    config: lpm_file.get_file_path(
         '.luminati.json'.substr(conf.is_win ? 1 : 0)),
-    database: path.resolve(os.homedir(),
+    database: lpm_file.get_file_path(
         '.luminati.sqlite3'.substr(conf.is_win ? 1 : 0)),
-    loki: path.resolve(os.homedir(),
+    loki: lpm_file.get_file_path(
         '.luminati.db'.substr(conf.is_win ? 1 : 0)),
-    cookie: path.resolve(os.homedir(),
+    cookie: lpm_file.get_file_path(
         '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
     mode: 'root',
     dropin: true,
@@ -76,8 +74,5 @@ conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     proxy_creds_check: true,
     use_proxy_cache: true,
 });
-
-try { file.mkdirp_e(conf.work_dir); }
-catch(e){ conf.work_dir = path.resolve(os.homedir()); }
 
 assign(module.exports, conf);

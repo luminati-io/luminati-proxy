@@ -7,14 +7,13 @@ const file = require('../util/file.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const lpm_util = require('../util/lpm_util.js');
+const lpm_file = require('../util/lpm_file.js');
 const qw = require('../util/string.js').qw;
 const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
 const version = require('../package.json').version;
 const analytics = require('universal-analytics');
 const _ = require('lodash');
-const os = require('os');
-const path = require('path');
 const crypto = require('crypto');
 const ua = analytics('UA-60520689-2');
 const E = module.exports = {};
@@ -22,7 +21,7 @@ const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
 
 const gen_filename = name=>{
-    return path.resolve(os.homedir(),
+    return lpm_file.get_file_path(
         `.luminati_${name}.json`.substr(is_win ? 1 : 0));
 };
 let prev_ua_event = ua.event.bind(ua);
