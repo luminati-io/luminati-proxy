@@ -15,6 +15,7 @@ const version = require('../package.json').version;
 const analytics = require('universal-analytics');
 const _ = require('lodash');
 const crypto = require('crypto');
+const ps_list = require('ps-list');
 const ua = analytics('UA-60520689-2');
 const E = module.exports = {};
 const is_win = process.platform=='win32';
@@ -174,6 +175,30 @@ E.handle_signal = (sig, err)=>{
         E.shutdown(errstr, true, err);
 };
 
+let _show_port_conflict = (addr, port)=>etask(function*(){
+    let tasks;
+    try { tasks = yield ps_list(); }
+    catch(e){ process.exit(); }
+    tasks = tasks.filter(t=>t.name.includes('node') &&
+        /.*lum_node\.js.*/.test(t.cmd) && t.ppid!=process.pid &&
+        t.pid!=process.pid);
+    if (!tasks.length)
+        return E.manager.stop();
+    zerr.notice(`There is already an application running on ${addr}:${port}\n`+
+        'Trying to kill it and restart.');
+    for (const t of tasks)
+        process.kill(t.ppid, 'SIGTERM');
+    E.manager.restart();
+});
+
+let conflict_shown;
+let show_port_conflict = (addr, port)=>{
+    if (conflict_shown)
+        return;
+    conflict_shown = true;
+    _show_port_conflict(addr, port);
+};
+
 E.run = (argv, run_config)=>{
     E.read_status_file();
     E.write_status_file('initializing', null,
@@ -190,6 +215,9 @@ E.run = (argv, run_config)=>{
     .on('error', (e, fatal)=>{
         zerr(e.raw ? e.message : 'Unhandled error: '+e);
         let handle_fatal = ()=>{
+            let err;
+            if (err = (e.message||'').match(/((?:\d{1,3}\.?){4}):(\d+)$/))
+                return show_port_conflict(err[1], err[2]);
             if (fatal)
                 E.manager.stop();
         };

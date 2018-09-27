@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.108.119"
+VERSION="1.108.399"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -21,8 +21,8 @@ INSTALL_NPM=0
 INSTALL_CURL=0
 INSTALL_BREW=0
 USE_NVM=0
-NODE_VER='8.11.3'
-NPM_VER='4.6.1'
+NODE_VER='10.11.0'
+NPM_VER='6.4.1'
 NETWORK_RETRY=3
 NETWORK_ERROR=0
 UPDATE_NODE=0
@@ -380,13 +380,8 @@ check_node()
         local node_ver=$(node -v)
         zerr "check_node: $node_ver"
         echo "node ${node_ver} is installed"
-        if ! [[ "$node_ver" =~ ^(v[7-9]\.|v[1-9][0-9]+\.) ]]; then
-            echo "minimum required node version is 7"
-            perr "check_node_bad_version" "$node_ver"
-            UPDATE_NODE=1
-        fi
-        if [[ "$node_ver" =~ ^(v[1-9][0-9]+\.) ]]; then
-            echo "maximum supported node version is 9"
+        if ! [[ "$node_ver" =~ ^(v[1-9]\.|v[0-9][0-9]+\.) ]]; then
+            echo "minimum required node version is 10"
             perr "check_node_bad_version" "$node_ver"
             UPDATE_NODE=1
         fi

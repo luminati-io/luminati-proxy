@@ -104,7 +104,8 @@
     "puppeteer": "1.8.0",
     "nightmare": "3.0.1",
     "prompt-sync": "4.1.6",
-    "lokijs": "1.5.5"
+    "lokijs": "1.5.5",
+    "ps-list": "5.0.0"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -149,7 +150,7 @@
     "react-select": "2.0.0"
   },
   "engines": {
-    "node": ">=7.5",
+    "node": ">=10.0",
     "npm": "4.6.1"
   },
   "homepage": "https://luminati.io/",
@@ -295,6 +296,7 @@
       "lib/manager.js",
       "lib/md5_util.js",
       "lib/perr.js",
+      "lib/req_process.js",
       "lib/router.js",
       "lib/rules.js",
       "lib/session.js",
@@ -348,7 +350,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "700f2c08ed75c4e8bb15fbdc5d297489"
+    "md5": "6a84fb15b41f2930a1cce70b506d3d0d"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -367,11 +369,12 @@
     }
   ],
   "optionalDependencies": {
-    "posix": "4.1.1",
-    "heapdump": "0.3.9"
+    "heapdump": "0.3.9",
+    "posix": "4.1.2",
+    "sinon": "1.17.7"
   },
   "preferGlobal": true,
-  "recomendedNode": ">=7.5",
+  "recomendedNode": ">=10.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/luminati-io/luminati-proxy.git"
@@ -383,5 +386,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.108.119"
+  "version": "1.108.399"
 }

@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.108.119/luminati-proxy-manager-v1.108.119-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.108.399/luminati-proxy-manager-v1.108.399-setup.exe)
 
 ### Linux/MacOs - Install script
 - Run the setup script to install
@@ -37,11 +37,10 @@ Or
 curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```
 ### Linux/MacOS - Manual install
-- Install Node.js 8 ([nodejs.org](https://nodejs.org/en/download/))
-  Node.js version for the proxy manager should be any v 8.X.X.
-  The Proxy Manager will not work properly with later node versions. 
-- Make sure npm version is 4.6.1 or higher
-  - if not, run: `sudo npm install -g npm@4.6.1`
+- Install Node.js 10 ([nodejs.org](https://nodejs.org/en/download/))
+  Node.js version for the proxy manager should be any v 10.X.X.
+- Make sure npm version is 6.4.1 or higher
+  - if not, run: `sudo npm install -g npm@6.4.1`
 - Install Luminati Proxy from the terminal prompt:
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
@@ -125,6 +124,15 @@ see <a href="https://luminati.io/cp/api_example?manager=all&group=active">the
 API Example page in your Luminati.io account</a>.
 
 ### Complete list of command line options
+
+All command line options below are also available also as ENV variables.
+Example:
+```sh
+cli: --port 22900 , env: LPM_PORT=22900
+cli: --ssl true , env: LPM_SSL=true
+cli: --log "error" , env: LPM_LOG=error
+```
+
 ```sh
 luminati --help
 Usage:

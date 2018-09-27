@@ -237,7 +237,8 @@ beforeEach(()=>{
     proxy.fake = true;
     proxy.connection = null;
 });
-after(()=>etask(function*after(){
+after('after all', ()=>etask._fn(function*after(_this){
+    _this.timeout(3000);
     if (proxy)
         yield proxy.stop();
     proxy = null;
@@ -283,14 +284,13 @@ describe('proxy', ()=>{
             return next();
         waiting.push(next);
     };
-
     beforeEach(()=>{
         proxy.history = [];
         proxy.full_history = [];
         waiting = [];
         ping.history = [];
     });
-    afterEach(()=>etask(function*(){
+    afterEach('after each', ()=>etask(function*(){
         if (!l)
             return;
         yield l.stop(true);
@@ -786,7 +786,7 @@ describe('proxy', ()=>{
             before(()=>clock = lolex.install({shouldAdvanceTime: true,
                 advanceTimeDelta: 10, toFake: qw`setTimeout clearTimeout
                 setInterval clearInterval setImmediate clearImmediate`}));
-            after(()=>clock.uninstall());
+            after('after history aggregation', ()=>clock.uninstall());
             let history;
             const aggregator = data=>history.push(data);
             beforeEach(()=>history = []);
@@ -1024,7 +1024,7 @@ describe('manager', ()=>{
         assert.equal(res.statusCode, 200);
         return res.body;
     });
-    afterEach(()=>etask(function*(){
+    afterEach('after manager', ()=>etask(function*(){
         if (!app)
             return;
         yield app.manager.stop(true);
@@ -1034,7 +1034,7 @@ describe('manager', ()=>{
         app = null;
     }));
     beforeEach(()=>temp_files = []);
-    afterEach(()=>temp_files.forEach(f=>f.done()));
+    afterEach('after manager 2', ()=>temp_files.forEach(f=>f.done()));
     describe('get_params', ()=>{
         const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
             let mgr = new Manager(lpm_util.init_args(_args), {skip_ga: true});

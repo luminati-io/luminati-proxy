@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.108.399 Development Latest
+- :star: Migration to node 10.X
+- :star: Performance improvements
+
 ## 1.108.119 Stable
 - :star: Updated dependencies
 - :star: New rule: switch proxy port based on URL

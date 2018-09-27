@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.108.399",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Migration to node 10.X"
+            },
+            {
+                "type": "star",
+                "text": "Performance improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.108.119",
         "type": "stable",
         "changes": [
