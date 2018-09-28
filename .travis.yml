@@ -1,12 +1,11 @@
 language: node_js
+before_install: if [[ `npm -v` != 4* ]]; then npm i -g npm@4; fi
 node_js:
 #  - node
-  - '6'
-  - '5'
-  - '4'
+  - '8'
 os:
   - linux
   - osx
 notifications:
   email:
-    - lee@hola.org
+    - romank@luminatio.io

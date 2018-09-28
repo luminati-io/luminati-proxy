@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: sketchtool 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>7DC3B4F2-AD20-442E-A20A-F224367EBB6D</title>
+    <desc>Created with sketchtool.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Luminati-PM" transform="translate(-181.000000, -267.000000)">
+            <g id="states" transform="translate(181.000000, 232.000000)">
+                <g id="warning" transform="translate(0.000000, 35.000000)">
+                    <path d="M17.26,9.49 C17.26,13.91 13.68,17.49 9.26,17.49 C4.84,17.49 1.26,13.91 1.26,9.49 C1.26,5.07 4.84,1.49 9.26,1.49 C13.68,1.49 17.26,5.07 17.26,9.49" id="Fill-149" fill="#D8393B"></path>
+                    <path d="M9,18 C4.58,18 1,14.42 1,10 C1,5.58 4.58,2 9,2 C13.42,2 9,6.54013672 9,10.9601367 C9,15.3801367 13.42,18 9,18 Z" id="Fill-82" fill="#FFFFFF" opacity="0.147384511"></path>
+                    <text id="!" font-family="NotoSans-Bold, Noto Sans" font-size="12" font-weight="bold" fill="#FFFFFF">
+                        <tspan x="6.8499" y="13.6982031">!</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

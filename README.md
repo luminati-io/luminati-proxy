@@ -1,6 +1,5 @@
 # Luminati Proxy manager
 
-[![Build Status](https://travis-ci.org/luminati-io/luminati-proxy.png)](https://travis-ci.org/luminati-io/luminati-proxy)
 [![dependencies Status](https://david-dm.org/luminati-io/luminati-proxy/status.svg)](https://david-dm.org/luminati-io/luminati-proxy)
 [![devDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/dev-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=dev)
 [![optionalDependencies Status](https://david-dm.org/luminati-io/luminati-proxy/optional-status.svg)](https://david-dm.org/luminati-io/luminati-proxy?type=optional)
@@ -11,6 +10,8 @@ With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IP
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
+<em>Read this in [中文](https://luminati-china.io/static/lpm/README-zh-CN.html).</em>
+
 ## Features
 - Highly scalable
 - Connection pool for faster response time
@@ -18,37 +19,64 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 - Statistics
 - Automatically rotate IP every X requests
 - Load balancing using multiple Super Proxies
-- SSL sniffing (using a self-signed certificate)
+- SSL analyzing (using a self-signed certificate)
 - SOCKSv5 proxy
 
 ## Installation
 
-###Requirements
-Software requirements for Luminati proxy manager are:
-
-- Git from version 1.7+
-- Node.js from version 4+ (recommended 6)
-
 ### Windows
-- Install [Git](https://git-scm.com/download/win)
-- Install [Node.js](https://nodejs.org/en/download/)
-- Install Luminati Proxy from Window's command prompt:
-```sh
-npm install -g luminati-io/luminati-proxy
-```
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.108.399/luminati-proxy-manager-v1.108.399-setup.exe)
 
-### Linux/MacOS
-- Install Node.js 4 or above (preferably using
-  [nave](https://github.com/isaacs/nave))
+### Linux/MacOs - Install script
+- Run the setup script to install
+```sh
+wget -qO- https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
+```
+Or
+```sh
+curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
+```
+### Linux/MacOS - Manual install
+- Install Node.js 10 ([nodejs.org](https://nodejs.org/en/download/))
+  Node.js version for the proxy manager should be any v 10.X.X.
+- Make sure npm version is 6.4.1 or higher
+  - if not, run: `sudo npm install -g npm@6.4.1`
 - Install Luminati Proxy from the terminal prompt:
 ```sh
-$ sudo npm install -g luminati-io/luminati-proxy
+sudo npm install -g @luminati-io/luminati-proxy
+```
+If the command is returning an error try installing using --unsafe-perm flag
+```sh
+sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm
+```
+If you are trying to install the Proxy Manager from china on Mac/Linux please run the following command first to make sure npm is installing with allowed registry:
+```sh
+ npm config set registry https://registry.npm.taobao.org
+```
+After this command ran successfully install using:
+```sh
+sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm=true --allow-root
 ```
 ### Upgrade
 - Use npm to upgrade
 ```sh
-$ sudo npm install -g luminati-io/luminati-proxy
+sudo npm install -g @luminati-io/luminati-proxy
 ```
+Or use the cli command:
+```sh
+luminati --upgrade
+```
+
+
+### Specific Version
+- To install a specific proxy manager version, choose a version from
+ [releases](https://github.com/luminati-io/luminati-proxy/releases)
+
+- Run (VERSION_NUMBER is the version you've chosen (example: 1.75.355)):
+```sh
+sudo npm install -g @luminati-io/luminati-proxy@VERSION_NUMBER
+```
+
 ### Release Notes
 
 You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every version
@@ -58,81 +86,157 @@ You can review the [CHANGELOG.md](CHANGELOG.md) for list of changes in every ver
 ### First run
 After running the app for the first time:
 ```sh
-$ luminati
+luminati
 ```
 Point your browser to the app admin UI
 [http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
 and configure your proxies.
 
-### Complete list of command line options
+After logging in, you will see that the default configuration for the Luminati
+proxy includes a "dropin" proxy running on port 22225. This mode is explained
+in detail below.
+
+### Run as daemon
+To run the proxy manager in the background:
 ```sh
-$ luminati --help
-Usage: luminati [options] config1 config2 ...
+luminati --daemon
+```
+
+### Dropin replacement for existing super-proxies
+
+Luminati Proxy comes with a "dropin mode" which behaves exactly like the
+existing super-proxies. When running a proxy in dropin mode, you do not need to
+log in via the administrative UI in order to make requests through your
+proxies. Rather, the proxy username and password are provided with each request
+to the proxy server. This mode is enabled by default, and you can use this mode
+as an easy replacement when migrating from the regular super-proxy to the
+Luminati Proxy Manager.
+
+Dropin mode is enabled by default. To disable the dropin proxy, use the flag
+`--no-dropin`:
+
+```sh
+luminati --no-dropin
+```
+
+For full documentation on the API for making requests through the dropin proxy,
+see <a href="https://luminati.io/cp/api_example?manager=all&group=active">the
+API Example page in your Luminati.io account</a>.
+
+### Complete list of command line options
+
+All command line options below are also available also as ENV variables.
+Example:
+```sh
+cli: --port 22900 , env: LPM_PORT=22900
+cli: --ssl true , env: LPM_SSL=true
+cli: --log "error" , env: LPM_LOG=error
+```
+
+```sh
+luminati --help
+Usage:
+  luminati [options] config1 config2 ...
 
 Options:
-  --log                   Log level (none|error|warn|info|verbose|debug|silly)
-                                                              [default: "error"]
-  --customer              Customer                                      [string]
-  --password              Password                                      [string]
-  --proxy                 Super proxy ip or country (us|gb|nl)
-                                        [string] [default: "zproxy.luminati.io"]
-  --proxy_port            Super proxy port                      [default: 22225]
-  --proxy_count           Minimum number of super proxies to use
-                                                           [number] [default: 1]
-  --secure_proxy          Use SSL when accessing super proxy
-                                                      [boolean] [default: false]
-  --sticky_ip             Use same session as much as possible to maintain IP
-                                                      [boolean] [default: false]
-  --keep_alive            Generate request to keep alive every n seconds[number]
-  --zone                  Zone                         [string] [default: "gen"]
-  --country               Country                                       [string]
-  --state                 State                                         [string]
-  --city                  City                                          [string]
-  --asn                   ASN                                           [number]
-  --ip                    Datacenter IP                                 [string]
-  --dns                   DNS resolving (local|remote)
-  --debug                 Luminati request debug info (none|full)
-  --request_timeout       Timeout for request on the super proxy (seconds)
+  --port, -p               Port for the HTTP proxy                      [number]
+  --proxy_type             Decide if to save proxy into the configuration file.
+                           specifing "persist" in "proxy_type" value will create
+                           port and save it in the configuration file.  [string]
+  --multiply               Multiply the port definition given number of times
                                                                         [number]
-  --pool_size             Pool size                        [number] [default: 3]
-  --pool_type             Pool session iteration order (sequential|round-robin)
-                                                         [default: "sequential"]
-  --ssl                   Enable SSL sniffing         [boolean] [default: false]
-  --insecure              Enable SSL connection/sniffing to insecure hosts
+  --ssl                    Enable SSL analyzing       [boolean] [default: false]
+  --log                    Log level                 [string] [default: "error"]
+  --iface                  Interface or IP to listen on
+                                                   [string] [default: "0.0.0.0"]
+  --customer               Luminati customer                            [string]
+  --zone                   Zone                     [string] [default: "static"]
+  --password               Zone password                                [string]
+  --proxy                  Hostname or IP of super proxy
+                                  [string] [default: "zproxy.lum-superproxy.io"]
+  --proxy_port             Super proxy port            [number] [default: 22225]
+  --proxy_count            Minimum number of super proxies to use
+                                                           [number] [default: 1]
+  --secure_proxy           Use SSL when accessing super proxy
                                                       [boolean] [default: false]
-  --max_requests          Requests per session            [number] [default: 50]
-  --session_duration      Maximum duration of session (seconds)
-  --proxy_switch          Automatically switch super proxy on failure
-                                                                    [default: 5]
-  --session_init_timeout  Session establish timeout (seconds)
+  --short_username         Use Shorthand username for super proxy credentials
+                                                      [boolean] [default: false]
+  --proxy_switch           Automatically switch super proxy on failure
                                                            [number] [default: 5]
-  --direct_include        Include pattern for direct requests
-  --direct_exclude        Exclude pattern for direct requests
-  --null_response         URL pattern for null response
-  --bypass_proxy          URL pattern for bypassing the proxy and connect
-                          directly
-  --throttle              Throttle requests above given number          [number]
-  --allow_proxy_auth      Allow Luminati authentication per request
+  --proxy_retry            Automatically retry on super proxy failure
+                                                           [number] [default: 2]
+  --use_proxy_cache        Cache resolved ips of superagents
+                                                       [boolean] [default: true]
+  --insecure               Enable SSL connection/analyzing to insecure hosts
                                                       [boolean] [default: false]
-  --www                   Local web port                        [default: 22999]
-  --no-www                Disable local web
-  --socks                 SOCKS5 port
-  --history               Log history                 [boolean] [default: false]
-  --database              Database path         [default: "~/.luminati.sqlite3"]
-  --resolve               Reverse DNS lookup file
-  --config                Config file containing proxy definitions
-                                                   [default: "~/.luminati.json"]
-  --no-config             Working without a config file
-  --iface                 Interface or ip to listen on (lo|eth0|...)
-                                                            [default: "0.0.0.0"]
-  --no_dropin             Disable drop-in mode for migrating
+  --country                Country                                      [string]
+  --state                  State                                        [string]
+  --city                   City                                         [string]
+  --asn                    ASN                                          [number]
+  --ip                     Datacenter IP                                [string]
+  --vip                    VIP                                          [number]
+  --ext_proxies            A list of proxies from external vendors. Format:
+                           [username:password@]ip[:port]                 [array]
+  --ext_proxy_username     default username for external vendor ips     [string]
+  --ext_proxy_password     default password for external vendor ips     [string]
+  --ext_proxy_port         default port for external vendor ips         [number]
+  --dns                    DNS resolving                                [string]
+  --reverse_lookup_dns     Process reverse lookup via DNS
                                                       [boolean] [default: false]
-  -h, --help              Show help                                    [boolean]
-  --version               Show version number                          [boolean]
-  -p, --port              Listening port               [number] [default: 24000]
-  -d, --daemon            Start as a daemon
-  --mode                  Mode to run the web UI in (root, normal, or guest)
-                                                               [default: "root"]
+  --reverse_lookup_file    Process reverse lookup via file              [string]
+  --reverse_lookup_values  Process reverse lookup via value              [array]
+  --debug                  Luminati request debug info                  [string]
+  --session                Luminati session for all proxy requests      [string]
+  --sticky_ip              Use session per requesting host to maintain IP per
+                           host                       [boolean] [default: false]
+  --pool_size              Session pool size               [number] [default: 3]
+  --pool_type              Pool session iteration order
+                                                [string] [default: "sequential"]
+  --keep_alive             Generate request to keep session alive after given
+                           idle time (seconds)                          [number]
+  --seed                   Session ID seed used for identifying sessions from
+                           this proxy                                   [string]
+  --max_requests           Maximum requests per session   [string] [default: 50]
+  --session_duration       Maximum duration of session (seconds)        [string]
+  --throttle               Throttle requests above given number         [number]
+  --whitelist_ips          Whitelist ip list for granting access to proxy
+                                                           [array] [default: []]
+  --race_reqs              Race several requests at once and choose fastest
+                                                                        [number]
+  --www                    HTTP port for browser admin UI       [default: 22999]
+  --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
+                           [default:"127.0.0.1"]
+			   [example: --www_whitelist_ips "212.17.0.1"]
+  --ws                     websocket port used for request logs [default: 22998]
+  --config                 Config file containing proxy definitions
+                               [string] [default: "~/.luminati.json"]
+  --database               Database file containing logs and cached values
+                            [string] [default: "~/.luminati.sqlite3"]
+  --cookie                 Cookie Jar file
+                                [string] [default: "~/.luminati.jar"]
+  --mode                   Defines a set of permissible operations within the
+                           UI/API                     [string] [default: "root"]
+  --dropin                 Create dropin mode proxy port (default: 22225)
+                                                       [boolean] [default: true]
+  --dropin_port            Port for dropin mode                 [default: 22225]
+  --no_usage_stats         Disable collection of usage statistics
+                                                      [boolean] [default: false]
+  --token                  A Google authorization token for accessing
+                           luminati.io                                  [string]
+  --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
+  --request_stats          Enable requests statistics  [boolean] [default: true]
+  --test_url               A url for testing proxy
+                              [string] [default: "http://lumtest.com/myip.json"]
+  --no-www                 Disable local web
+  --no-config              Working without a config file
+  --no-cookie              Working without a cookie file
+  --daemon, -d             Start as a daemon
+  --stop-daemon            Stop running daemon
+  --upgrade                Upgrade proxy manager
+  --version, -v            Show version number                         [boolean]
+  --help, -h, -?           Show help                                   [boolean]
+  --api                                   [default: "https://luminati-china.io"]
+
 ```
 
 ### Docker
@@ -140,16 +244,65 @@ Options:
 A docker image can be found on [https://hub.docker.com/r/luminati/luminati-proxy/](https://hub.docker.com/r/luminati/luminati-proxy/)
 
 ```sh
-$ docker pull luminati/luminati-proxy
+docker pull luminati/luminati-proxy
 
-$ docker run luminati/luminati-proxy
+docker run luminati/luminati-proxy luminati
 
-$ docker run luminati/luminati-proxy luminati --version
+docker run luminati/luminati-proxy luminati --version
+```
+Make sure to forward appropriate ports. Proxy manager uses by default 22999
+for the web console and the api, 22555 for dropin and 24000 for first
+configurable proxy.
+
+- To run docker with cli option see the below example:
+```sh
+docker run luminati/luminati-proxy luminati --www_whitelist_ips "172.17.0.1" --ssl true
+```
+You can add many more options to this run.
+
+#### Docker with predefined config file
+To use lpm's config file, docker volumes can be used:
+https://docs.docker.com/storage/volumes/
+
+Following this instructions will make your docker runs with specific config file:
+
+- create volume
+```sh
+docker volume create lpm-vol
+```
+- Inspect the recently created volume
+```sh
+docker inspect lpm-vol
+```
+Should output something like this:
+```sh
+  [
+    {
+        "CreatedAt": "2018-02-01T12:59:58+02:00",
+        "Driver": "local",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker/volumes/lpm-vol/_data",
+        "Name": "lpm-vol",
+        "Options": {},
+        "Scope": "local"
+    }
+  ]
+```
+- Take the mountpoint path /var/lib/docker/volumes/lpmvol/_data and run
+```sh
+cd /var/lib/docker/volumes/lpmvol/_data
+```
+- put .luminati.json to this directory (here also will be the logs and other
+files generated by the container)
+- run docker image and attach this volume:
+```sh
+  docker run --rm --name 'lpm1' --mount source=lpmvol,target=/root
+"luminati/luminati-proxy" luminati
 ```
 
 ### SSL Requests
 
-The --ssl parameter is for SSL sniffing, HTTPS requests can be made without it.
+The --ssl parameter is for SSL analyzing, HTTPS requests can be made without it.
 
 ## Help
 
@@ -160,6 +313,12 @@ If you do not find the answer there, feel free to open an
 [issue on github](issues).
 
 Or contact [support@luminati.io](mailto:support@luminati.io).
+
+## REST API
+
+Working documentation of the API can be found inside the app.
+
+A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json)
 
 ## Node.js API
 
@@ -195,7 +354,7 @@ proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
 ### Generators
 ```js
 'use strict';
-const etask = require('hutil').etask;
+const etask = require('./util/etask.js');
 const Luminati = require('luminati-proxy').Luminati;
 
 etask(function*(){

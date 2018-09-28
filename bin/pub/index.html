@@ -2,76 +2,25 @@
 <html>
   <head>
     <meta charset=utf-8>
-    <title>Luminati Proxy</title>
+    <title>Luminati Proxy Manager</title>
     <meta name=viewport
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-60520689-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <base href=/>
     <link rel="shortcut icon" href=/favicon.ico>
-    <link rel=stylesheet href=/req/bootstrap/dist/css/bootstrap.min.css>
-    <link rel=stylesheet href=/req/bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css>
-    <link rel=stylesheet href=/req/notosans-fontface/css/notosans-fontface.min.css>
-    <link rel=stylesheet href=/req/codemirror/lib/codemirror.css>
-    <style>[ng-cloak] { display: none; }</style>
+    <link rel=stylesheet href=req/notosans-fontface/css/notosans-fontface.css>
+    <link rel=stylesheet href=req/font-awesome/css/font-awesome.css>
+    <link rel=stylesheet href=req/flag-icon-css/css/flag-icon.css>
+    <!-- Hotjar Tracking Code for http://luminati.io -->
   </head>
-  <body ng-cloak ng-controller=root>
-    <div ng-class="{'main-container-qs': quickstart()}">
-      <div class=header>
-        <div class=container>
-          <img src=/img/menu_logo.svg>
-        </div>
-      </div>
-      <div class=container>
-        <div class=navigation>
-          <div class=active>
-            <span ng-if=settings.customer>
-              <a href=/settings>{{settings.customer}}</a>
-              <span class=separator>&nbsp;/&nbsp;</span>
-            </span>
-            <span ng-if=!subsection>
-              {{section.title}}
-            </span>
-            <span ng-if=subsection>
-              <a href=/{{section.name}}>{{section.title}}</a>
-              <span class=separator>&nbsp;/&nbsp;</span>
-              {{subsection}}
-            </span>
-          </div>
-          <div class=items>
-            <span ng-repeat="s in sections">
-              <span ng-if="$index&gt;0" class=separator>&nbsp;|&nbsp;</span>
-              <a ng-if=s!=section||subsection href=/{{s.name}}>{{s.title}}</a>
-              <span ng-if=s==section&&!subsection>{{s.title}}</span>
-            </span>
-          </div>
-        </div>
-        <ng-include src="'/'+section.name+'.html'"></ng-include>
-      </div>
-    </div>
-    <div ng-if=quickstart() class=quickstart>
-      <ng-include src="'/quickstart.html'"></ng-include>
-    </div>
-    <div id=confirmation class="modal fade" role=dialog>
-      <div class=modal-dialog>
-        <div class=modal-content>
-          <div class=modal-header>
-            <button type=button class=close data-dismiss=modal>
-              &times;
-            </button>
-            <h4 class=modal-title>{{confirmation.text}}</h4>
-          </div>
-          <div class=modal-footer>
-            <button type=button class="btn btn-default"
-              data-dismiss=modal>
-              Cancel
-            </button>
-            <button type=button class="btn btn-success"
-              data-dismiss=modal ng-click=confirmation.confirmed()>
-              OK
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script data-main=/config.js src=/req/requirejs/require.js></script>
-  </body>
+  <body>
+    <div id="react_root"></div>
+    <div id=notif_react_modal></div>
+  <script type="text/javascript" src="/7da674c1dd86a4e16b8f.runtime.js"></script><script type="text/javascript" src="/97ef8b010229e03187d4.vendor.js"></script><script type="text/javascript" src="/d5bae9c4644a8f567747.app.js"></script></body>
 </html>
 
