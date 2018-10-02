@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const _ = require('lodash');
+const analytics = require('./lib/analytics.js');
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
@@ -259,7 +260,7 @@ describe('proxy', ()=>{
             password: password,
             log: 'NONE',
             port: 24000,
-        }, opt));
+        }, opt), {send_rule_mail: function(){}, rmt_cfg: {get: ()=>({})}});
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};
@@ -1258,6 +1259,8 @@ describe('manager', ()=>{
                 nock('https://luminati-china.io').get('/').reply(200, {});
                 nock('https://luminati-china.io').post('/update_lpm_stats')
                     .reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_config')
+                    .reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
@@ -1285,6 +1288,8 @@ describe('manager', ()=>{
                 let updated = {_defaults: {customer: 'updated'}};
                 nock('https://luminati-china.io').get('/').reply(200, {});
                 nock('https://luminati-china.io').post('/update_lpm_stats')
+                    .query({customer: 'updated'}).reply(200, {});
+                nock('https://luminati-china.io').post('/update_lpm_config')
                     .query({customer: 'updated'}).reply(200, {});
                 nock('https://luminati-china.io').get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
@@ -1327,6 +1332,17 @@ describe('manager', ()=>{
                 total: 1,
             });
         });
+    });
+    it('disable analytics', ()=>{
+        const ua = analytics.get_ua();
+        const spy = sinon.stub(ua.ua, 'send', ()=>{});
+        analytics.analytics_available = false;
+        ua.send();
+        assert(!spy.called);
+        analytics.analytics_available = true;
+        ua.send();
+        assert(spy.called);
+        spy.restore();
     });
     // XXX krzysztof: make it the other way
     xdescribe('crash on load error', ()=>{

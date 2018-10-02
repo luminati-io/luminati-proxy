@@ -147,7 +147,8 @@
     "recompose": "0.26.0",
     "prop-types": "15.6.0",
     "react-waypoint": "8.0.1",
-    "react-select": "2.0.0"
+    "react-select": "2.0.0",
+    "react-tooltip": "3.8.4"
   },
   "engines": {
     "node": ">=10.0",
@@ -283,6 +284,7 @@
       "bin/pub/img/zones.svg",
       "bin/pub/img/zone_icon.png",
       "changelog.json",
+      "lib/analytics.js",
       "lib/cities.js",
       "lib/context.js",
       "lib/db_history.json",
@@ -350,7 +352,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "6a84fb15b41f2930a1cce70b506d3d0d"
+    "md5": "b03759a537c54dcec653cc4c09ff58d2"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -386,5 +388,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.108.399"
+  "version": "1.108.597"
 }

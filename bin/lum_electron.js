@@ -15,8 +15,8 @@ const zerr = require('../util/zerr.js');
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
-const analytics = require('universal-analytics');
-const ua = analytics('UA-60520689-2');
+const analytics = require('../lib/analytics.js');
+const ua = analytics.get_ua();
 const assign = Object.assign;
 const E = module.exports;
 
@@ -146,6 +146,7 @@ let show_port_conflict = (addr, port)=>{
 };
 
 const _run = (argv, run_config)=>{
+    analytics.analytics_available = !argv.no_usage_stats;
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});
     manager = new Manager(argv, assign({ua}, run_config));

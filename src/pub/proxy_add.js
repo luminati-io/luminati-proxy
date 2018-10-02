@@ -96,7 +96,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             return {port};
         });
     };
-    save(opt={}){
+    save = (opt={})=>{
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{ console.log(e); });
@@ -126,15 +126,15 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 }
             }
         });
-    }
+    };
     rule_clicked(field){
         ga_event('add-new-port', 'rules clicked', field);
         this.save({redirect: true, field});
     }
-    advanced_clicked(){
+    advanced_clicked = ()=>{
         ga_event('add-new-port', 'click save');
         this.save({redirect: true});
-    }
+    };
     field_changed = id=>value=>{
         this.setState({[id]: value});
         if (id=='zone')
@@ -152,8 +152,8 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     render(){
         const disabled = this.state.cur_tab=='proxy_ext'&&
             !this.state.valid_json;
-        const Footer_wrapper = <Footer save_clicked={this.save.bind(this)}
-          disabled={disabled}/>;
+        const Footer_wrapper = <Footer save_clicked={this.save}
+            advanced_clicked={this.advanced_clicked} disabled={disabled}/>;
         if (!this.state.zones)
             return null;
         let content;
@@ -165,7 +165,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                   on_field_change={this.field_changed.bind(this)}
                   preset={this.state.preset}
                   rule_clicked={this.rule_clicked.bind(this)}
-                  advanced_clicked={this.advanced_clicked.bind(this)}
                   presets_opt={this.presets_opt}/>;
         }
         else if (this.state.cur_tab=='proxy_ext')
@@ -229,7 +228,7 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 };
 
 const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
-    presets_opt, advanced_clicked})=>
+    presets_opt})=>
 {
     const preset_tip = `Presets is a set of preconfigured configurations
     for specific purposes`;
@@ -260,11 +259,6 @@ const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
               </li>
             )}
             </ul>
-            <Tooltip
-              title="Creates a proxy port and moves to the configuration page">
-              <a onClick={advanced_clicked} className="link">
-                Advanced options</a>
-            </Tooltip>
           </div>
         </div>;
 };
@@ -292,19 +286,19 @@ const Tab = ({id, on_click, title, cur_tab, tooltip})=>{
 };
 
 const Field = props=>
-    <Tooltip title={props.tooltip}>
-      <div className="field">
-        <div className="field_header">
-          <div className={classnames('icon', props.icon_class)}/>
-          <h4>{props.title}</h4>
-        </div>
+    <div className="field">
+      <div className="field_header">
+        <div className={classnames('icon', props.icon_class)}/>
+        <h4>{props.title}</h4>
+      </div>
+      <Tooltip title={props.tooltip}>
         <select onChange={e=>props.on_change(e.target.value)}
           value={props.val}>
           {props.options.map((o, i)=>
             <option key={i} value={o.value}>{o.key}</option>)}
         </select>
-      </div>
-    </Tooltip>;
+      </Tooltip>
+    </div>;
 
 const Footer = props=>{
     const save_clicked = ()=>{
@@ -315,7 +309,14 @@ const Footer = props=>{
     };
     const classes = classnames('btn', 'btn_lpm', 'btn_lpm_primary',
         {disabled: props.disabled});
-    return <button onClick={save_clicked} className={classes}>Save</button>;
+    const adv_tip = 'Creates a proxy port and moves to the configuration page';
+    return <div className="footer">
+          <Tooltip title={adv_tip}>
+            <a onClick={props.advanced_clicked} className="link"
+              style={{float: 'left'}}>Advanced options</a>
+          </Tooltip>
+          <button onClick={save_clicked} className={classes}>Save</button>
+        </div>;
 };
 
 export default Proxy_add;

@@ -17,29 +17,32 @@ import Proxy_blank from './proxy_blank.js';
 import {Modal, Checkbox, Pagination_panel, Link_icon,
     Tooltip, Modal_dialog, Tooltip_bytes} from './common.js';
 import {withRouter} from 'react-router-dom';
+import ReactTooltip from 'react-tooltip';
 
 let country_names = {};
 
+const flag_with_title = (country, title)=>{
+    const country_name = country_names[country];
+    return <Tooltip title={country_name}>
+          <span>
+            <span className={'flag-icon flag-icon-'+country}/>
+            <span className="lit">{title}</span>
+          </span>
+        </Tooltip>;
+};
+
+const any_flag = <Tooltip title="Any">
+      <img src="/img/flag_any_country.svg" style={{height: 18}}/>
+      <span className="lit" style={{marginLeft: 2}}>Any</span>
+    </Tooltip>;
+
 const Targeting_cell = ({proxy, zones})=>{
-    const flag_with_title = (country, title)=>{
-        let country_name = country_names[country];
-        return <Tooltip title={country_name}>
-              <span>
-                <span className={'flag-icon flag-icon-'+country}/>
-                {title}
-              </span>
-            </Tooltip>;
-    };
     const static_country = get_static_country(proxy, zones);
     if (static_country&&static_country!='any'&&static_country!='*')
         return flag_with_title(static_country, static_country.toUpperCase());
     let val = proxy.country;
     if (!val||val=='any'||val=='*')
-    {
-        return <Tooltip title="Any">
-              <img src="/img/flag_any_country.svg"/>
-            </Tooltip>;
-    }
+        return any_flag;
     val = val.toUpperCase();
     const state = proxy.state&&proxy.state.toUpperCase();
     if (!state)
@@ -130,6 +133,96 @@ const Reqs_cell = ({proxy})=>{
         {reqs}</Tooltip>;
 };
 
+const Zone_cell = ({proxy, zones})=>{
+    const labels = {
+        network_type: {
+            static: 'Datacenter',
+            resident: 'Residential',
+            custom: 'Custom',
+        },
+        ips_types: {
+            shared: 'Shared',
+            dedicated: 'Exclusive / Unlimited domains',
+            selective: 'Exclusive domains',
+        },
+    };
+    // XXX krzysztof: temporarily copied from system.db. make an endpoint to
+    // fetch it in the code
+    const perm = {
+        full: 'country state city g1 cid ip asn carrier pass_ip mobile '+
+            'port_all port_whois',
+        city: 'country state city vip',
+        asn: 'country state asn carrier vip',
+        g1: 'country g1 vip',
+        static: 'country ip route_all route_dedicated',
+        mobile: 'country mobile asn carrier state city vip',
+    };
+    const get_perm = plan=>{
+        let res = 'country vip';
+        if (plan.type=='static')
+            return perm.static;
+        if (plan.mobile)
+            res = perm.mobile;
+        else if (plan.city && plan.asn)
+            res = perm.city+' asn carrier';
+        else if (plan.city)
+            res = perm.city;
+        else if (plan.asn)
+            res = perm.asn;
+        if (plan.vips_type=='domain_p')
+            res += ' vip_all';
+        if (plan.google_search)
+            res += ' google_search';
+        return res;
+    };
+    const {plan} = setdb.get('head').zones.zones.find(z=>z.name==proxy.zone);
+    const perm_list = get_perm(plan).split(' ');
+    const static_country = get_static_country(proxy, zones);
+    let c = any_flag;
+    if (static_country&&static_country!='any'&&static_country!='*')
+        c = flag_with_title(static_country, static_country.toUpperCase());
+    return <div>
+          <ReactTooltip id={''+proxy.port} type="light" effect="solid"
+            delayHide={0} delayShow={0} delayUpdate={0}>
+            <div className="zone_tooltip">
+              <div className="pair">
+                <div className="title">Network type:</div>
+                <div className="val">{labels.network_type[plan.type]}</div>
+              </div>
+              {plan.ips_type!==undefined &&
+                <div className="pair">
+                  <div className="title">IP exclusivity:</div>
+                  <div className="val">{labels.ips_types[plan.ips_type]}</div>
+                </div>
+              }
+              <div className="pair">
+                <div className="title">Country:</div>
+                <div className="val">{c}</div>
+              </div>
+              {plan.ips!==undefined &&
+                <div className="pair">
+                  <div className="title">Number of IPs:</div>
+                  <div className="val">{plan.ips}</div>
+                </div>
+              }
+              {plan.port_ranges &&
+                <div className="pair">
+                  <div className="title">Allowed ports:</div>
+                  <div className="val">{plan.port_ranges}</div>
+                </div>
+              }
+              <div className="pair">
+                <div className="title">Permissions:</div>
+                <div className="val">
+                  {perm_list.map(p=><span key={p} className="lit">{p}</span>)}
+                </div>
+              </div>
+            </div>
+          </ReactTooltip>
+          <span data-tip data-for={''+proxy.port}>{proxy.zone}</span>
+        </div>;
+};
+
 const columns = [
     {
         key: 'internal_name',
@@ -210,6 +303,7 @@ const columns = [
         default: true,
         tooltip: 'Specific Luminati zone configured for this proxy. Switch '
             +'zones in proxy configuration page.',
+        render: Zone_cell,
     },
     {
         key: 'secure_proxy',
@@ -733,7 +827,8 @@ const Proxy_row = withRouter(class Proxy_row extends Pure_component {
             else
             {
                 let errors = res.status_details.filter(s=>s.lvl=='err');
-                res.status_details = errors.length ? errors : [{msg: res.status}];
+                res.status_details = errors.length ?
+                    errors : [{msg: res.status}];
                 res.status = 'error';
                 _this.setState({status: res.status,
                     status_details: res.status_details});

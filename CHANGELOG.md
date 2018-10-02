@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.108.597 Development Latest
+- :star: UI improvements
+
 ## 1.108.399 Development Latest
 - :star: Migration to node 10.X
 - :star: Performance improvements

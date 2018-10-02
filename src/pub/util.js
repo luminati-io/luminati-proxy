@@ -86,8 +86,6 @@ export const user_agents = [{
 }];
 
 export const status_codes = {
-    unknown: `Status code of this request could not be parsed. Enable SSL
-        analyzing to fix this`,
     200: 'OK',
     201: 'Created',
     202: 'Accepted',
@@ -157,8 +155,8 @@ const presets = {
         },
         clean: opt=>{},
         rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `sequential pool type`},
+            {field: 'pool_size', label: `Sets 'Pool size' to 1`},
+            {field: 'pool_type', label: `Sequential pool type`},
         ],
         disabled: {
             sticky_ip: true,
@@ -190,10 +188,10 @@ const presets = {
             opt.session_duration = 0;
         },
         rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 0`},
-            {field: 'pool_type', label: `sequential pool type`},
-            {field: 'sticky_ip', label: `enables 'Sticky Ip'`},
-            {field: 'multiply', label: `disables 'Multiply' options`},
+            {field: 'pool_size', label: `Sets 'Pool size' to 0`},
+            {field: 'pool_type', label: `Sequential pool type`},
+            {field: 'sticky_ip', label: `Enables 'Sticky Ip'`},
+            {field: 'multiply', label: `Disables 'Multiply' options`},
         ],
         disabled: {
             multiply: true,
@@ -226,9 +224,9 @@ const presets = {
             opt.session_duration = 0;
         },
         rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `round-robin pool type`},
-            {field: 'multiply', label: `disables 'Multiply' options`},
+            {field: 'pool_size', label: `Sets 'Pool size' to 1`},
+            {field: 'pool_type', label: `Round-robin pool type`},
+            {field: 'multiply', label: `Disables 'Multiply' options`},
         ],
         disabled: {
             sticky_ip: true,
@@ -272,8 +270,8 @@ const presets = {
             pool_size: true,
         },
         rules: [
-            {field: 'pool_size', label: `sets 'Pool size' to 50`},
-            {field: 'pool_type', label: `round-robin pool type`},
+            {field: 'pool_size', label: `Sets 'Pool size' to 50`},
+            {field: 'pool_type', label: `Round-robin pool type`},
         ],
     },
     rnd_usr_agent_and_cookie_header: {
@@ -377,12 +375,12 @@ const presets = {
             ssl: true,
         },
         rules: [
-            {field: 'dns', label: `sets DNS to resolve remotely`},
-            {field: 'random_user_agent', label: `generates random User-Agent
+            {field: 'dns', label: `Sets DNS to resolve remotely`},
+            {field: 'random_user_agent', label: `Generates random User-Agent
                 for each request`},
-            {field: 'trigger_type', label: `creates an explanatory rule for
+            {field: 'trigger_type', label: `Creates an explanatory rule for
                 post-processing each request to scrape data you need`},
-            {field: 'ssl', label: `enables SSL analyzing`},
+            {field: 'ssl', label: `Enables SSL analyzing`},
         ],
     },
     custom: {

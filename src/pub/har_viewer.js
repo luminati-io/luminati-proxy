@@ -16,6 +16,7 @@ import {Toolbar_button, Tooltip, Devider, Sort_icon,
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
 import {withRouter} from 'react-router-dom';
+import React_tooltip from 'react-tooltip';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
@@ -882,7 +883,7 @@ class Cell_value extends React.Component {
         else if (col=='Status')
         {
             return <Status_code_cell status={req.response.status}
-                  pending={!!req.pending}/>;
+                  pending={!!req.pending} uuid={req.uuid}/>;
         }
         else if (col=='Proxy port')
             return <Tooltip_and_value val={req.details.port}/>;
@@ -935,13 +936,37 @@ class Name_cell extends Pure_component {
     }
 }
 
-const Status_code_cell = maybe_pending(({status})=>{
+const Status_code_cell = maybe_pending(({status, uuid})=>{
+    const enable_ssl_click = e=>{
+        e.stopPropagation();
+        $('#enable_ssl_modal').modal();
+    };
+    if (status=='unknown')
+    {
+        return <div onClick={e=>e.stopPropagation()} className="disp_value">
+              <React_tooltip id={uuid} type="info" effect="solid"
+                delayHide={500} delayShow={0} delayUpdate={500}
+                offset={{top: -5}}>
+                <div>
+                  Status code of this request could not be parsed becasue the
+                  connection is encrypted.
+                </div>
+                <div style={{marginTop: 10}}>
+                  <a onClick={enable_ssl_click} className="link">
+                    Enable SSL analyzing</a>
+                  <span> to see the status codes and other information about
+                    requests</span>
+                </div>
+              </React_tooltip>
+              <div data-tip="React-tooltip" data-for={uuid}>
+                <span>unknown</span>
+                <div className="small_icon status info"/>
+              </div>
+            </div>;
+    }
     const desc = status_codes[status];
-    return <Tooltip title={`${status} - ${desc}`}>
-          <div className="disp_value">
-            {status}
-            {status=='unknown' && <div className="small_icon status info"/>}
-          </div>
+    return <Tooltip title={`${status} ${desc}`}>
+          <div className="disp_value">{status}</div>
         </Tooltip>;
 });
 

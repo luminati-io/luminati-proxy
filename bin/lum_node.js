@@ -12,11 +12,11 @@ const qw = require('../util/string.js').qw;
 const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
 const version = require('../package.json').version;
-const analytics = require('universal-analytics');
 const _ = require('lodash');
 const crypto = require('crypto');
 const ps_list = require('ps-list');
-const ua = analytics('UA-60520689-2');
+const analytics = require('../lib/analytics.js');
+const ua = analytics.get_ua();
 const E = module.exports = {};
 const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
@@ -27,6 +27,8 @@ const gen_filename = name=>{
 };
 let prev_ua_event = ua.event.bind(ua);
 let ua_event_wrapper = (...args)=>{
+    if (!analytics.analytics_available)
+        return;
     let send = true, hash;
     if (!E.last_ev)
     {
@@ -274,7 +276,8 @@ E.handle_msg = msg=>{
     }
 };
 
-E.init_ua = ()=>{
+E.init_ua = argv=>{
+    analytics.analytics_available = !argv.no_usage_stats;
     ua.set('an', 'LPM');
     ua.set('av', `v${version}`);
     E.ua_filename = gen_filename('ua_ev');
@@ -323,7 +326,7 @@ E.init = argv=>{
     E.shutdowning = false;
     E.manager = null;
     E.on_upgrade_finished = null;
-    E.init_ua();
+    E.init_ua(argv);
     E.init_status();
     E.init_traps();
     if (process.env.DEBUG_ETASKS)
