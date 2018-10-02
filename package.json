@@ -70,7 +70,7 @@
     "http-shutdown": "1.1.0",
     "json-stable-stringify": "1.0.1",
     "json2csv": "3.7.3",
-    "lodash": "4.17.2",
+    "lodash": "4.17.11",
     "node-forge": "0.6.46",
     "notosans-fontface": "1.0.1",
     "pm2": "2.10.1",
