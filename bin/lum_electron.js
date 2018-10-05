@@ -91,7 +91,7 @@ auto_updater.on('update-available', e=>etask(function*(){
 
 auto_updater.on('update-downloaded', e=>{
     console.log('Update downloaded');
-    if (manager && manager.argv && !manager.argv.no_usage_stats)
+    if (analytics.enabled)
         ua.event('app', 'update-downloaded');
     upgrade_available = true;
     upgrade(e.version);
@@ -146,16 +146,15 @@ let show_port_conflict = (addr, port)=>{
 };
 
 const _run = (argv, run_config)=>{
-    analytics.analytics_available = !argv.no_usage_stats;
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});
     manager = new Manager(argv, assign({ua}, run_config));
-    if (!manager.argv.no_usage_stats)
+    if (analytics.enabled)
         ua.event('app', 'run');
     auto_updater.logger = manager._log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
-        if (!manager.argv.no_usage_stats)
+        if (analytics.enabled)
             ua.event('manager', 'www_ready', url).send();
         opn(url);
     })
@@ -167,7 +166,7 @@ const _run = (argv, run_config)=>{
             auto_updater.checkForUpdates();
     })
     .on('stop', ()=>{
-        if (manager.argv.no_usage_stats)
+        if (!analytics.enabled)
             process.exit();
         else
             ua.event('manager', 'stop', ()=>process.exit());
@@ -184,7 +183,7 @@ const _run = (argv, run_config)=>{
                 process.exit();
             }
         };
-        if (manager.argv.no_usage_stats)
+        if (!analytics.enabled)
             handle_fatal();
         else
         {
@@ -194,7 +193,7 @@ const _run = (argv, run_config)=>{
         }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
-        if (!manager.argv.no_usage_stats)
+        if (analytics.enabled)
         {
             ua.event('manager', 'config_changed',
                 JSON.stringify(zone_autoupdate));
@@ -211,11 +210,11 @@ const _run = (argv, run_config)=>{
 let quit = err=>{
     if (err)
     {
-        if (!manager||!manager.argv.no_usage_stats)
+        if (!manager||analytics.enabled)
             zerr.perr(err);
         mgr_err('uncaught exception '+zerr.e2s(err));
     }
-    if (manager&&manager.argv.no_usage_stats)
+    if (!analytics.enabled)
         app.quit();
     else
         ua.event('app', 'quit', ()=>app.quit());

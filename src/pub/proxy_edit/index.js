@@ -10,7 +10,9 @@ import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
-    Pagination_panel, Loader_small} from '../common.js';
+    Pagination_panel, Loader_small, Zone_description,
+    Preset_description} from '../common.js';
+import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import Har_viewer from '../har_viewer.js';
 import * as util from '../util.js';
@@ -526,7 +528,11 @@ const Main_window = withRouter(({match: {params: {tab}}, ...props})=>{
 });
 
 class Nav extends Pure_component {
+    state = {};
     set_field = setdb.get('head.proxy_edit.set_field');
+    componentDidMount(){
+        this.setdb_on('head.zones', zones=>zones&&this.setState({zones}));
+    }
     _reset_fields = ()=>{
         this.set_field('ips', []);
         this.set_field('vips', []);
@@ -552,6 +558,8 @@ class Nav extends Pure_component {
         this._reset_fields();
     };
     render(){
+        if (!this.state.zones)
+            return null;
         const presets_opt = Object.keys(presets).map(p=>{
             let key = presets[p].title;
             if (presets[p].default)
@@ -565,27 +573,35 @@ class Nav extends Pure_component {
         +'</ul>');
         return <div className="nav">
               <Field on_change={this.update_zone} options={this.props.zones}
-                tooltip="Zone" value={this.props.form.zone}
-                disabled={this.props.disabled}/>
-              <Field on_change={this.update_preset} tooltip={preset_tooltip}
-                options={presets_opt} value={preset}
-                disabled={this.props.disabled}/>
+                value={this.props.form.zone} disabled={this.props.disabled}
+                id="zone">
+                <div className="zone_tooltip">
+                  <Zone_description zones={this.state.zones}
+                    zone_name={this.props.form.zone}/>
+                </div>
+              </Field>
+              <Field on_change={this.update_preset} options={presets_opt}
+                value={preset} disabled={this.props.disabled} id="preset">
+                <Preset_description preset={preset} rule_clicked={()=>0}/>
+              </Field>
             </div>;
     }
 }
 
-const Field = ({disabled, tooltip, ...props})=>{
+const Field = ({id, disabled, children, ...props})=>{
     const options = props.options||[];
-    return <Tooltip title={tooltip} placement="bottom">
-          <div className="field">
-            <select value={props.value} disabled={disabled}
-              onChange={e=>props.on_change(e.target.value)}>
-              {options.map(o=>
-                <option key={o.key} value={o.value}>{o.key}</option>
-              )}
-            </select>
-          </div>
-        </Tooltip>;
+    return <div className="field">
+          <React_tooltip id={id+'tip'} type="light" effect="solid"
+            place="bottom" delayHide={300} delayUpdate={300}>
+            {children}
+          </React_tooltip>
+          <select data-tip data-for={id+'tip'} value={props.value}
+            disabled={disabled} onChange={e=>props.on_change(e.target.value)}>
+            {options.map(o=>
+              <option key={o.key} value={o.value}>{o.key}</option>
+            )}
+          </select>
+        </div>;
 };
 
 const Nav_tabs = ()=>

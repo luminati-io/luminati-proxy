@@ -35,6 +35,18 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC,
       U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+.proxy_form {
+    max-height: 500px;
+    &.animated {
+        animation-duration: 600ms;
+        -webkit-animation-duration: 600ms;
+    }
+}
+.proxy_created {
+    max-height: 0;
+    visibility: hidden;
+    transition: max-height 250ms ease 450ms, visibility 0ms ease-in 800ms;
+}
 html,
 body {
     line-height: 23px;
@@ -60,15 +72,15 @@ body {
     padding: 0;
     margin-left: 50px;
     a {
-        color: #428bca;
+        color: @link;
         outline: 3px solid transparent;
         border: 1px solid transparent;
         &:hover {
             color: white;
-            background: #428bca;
-            border-color: #428bca;
+            background: @link;
+            border-color: @link;
             text-decoration: none;
-            box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;
+            box-shadow: @link -2px 0 0 1px, @link 2px 0 0 1px;
             border-radius: .15em;
         }
     }
@@ -208,6 +220,8 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
 }
 .__react_component_tooltip {
     cursor: initial !important;
+    white-space: normal;
+    max-width: 400px;
     &.type-info {
         color: #303942;
         background-color: white;
@@ -225,11 +239,21 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         &.place-top {
             &:after {
                 border-top-color: @tooltip;
+                border-top-width: 6px;
                 border-left: 6px solid transparent;
                 border-right: 6px solid transparent;
                 bottom: -6px;
                 margin-left: -6px;
-                border-top-width: 6px;
+            }
+        }
+        &.place-bottom {
+            &:after {
+                border-bottom-color: @tooltip;
+                border-bottom-width: 6px;
+                border-left: 6px solid transparent;
+                border-right: 6px solid transparent;
+                top: -6px;
+                margin-left: -6px;
             }
         }
     }
@@ -505,6 +529,19 @@ input.regex {
     position: relative;
     top: -1px;
     &:hover { color: white; }
+}
+ul.bullets {
+    padding-left: 0;
+    margin-bottom: 0;
+    li {
+        list-style: none;
+        &::before {
+            color: @link;
+            content: "\2022";
+            font-size: 13px;
+            padding-right: 6px;
+        }
+    }
 }
 a.link, button.link {
     cursor: pointer;
@@ -1209,26 +1246,49 @@ span.icon_link {
             }
         }
     }
-    .zone_tooltip {
-        cursor: default !important;
-        .pair {
+}
+.zone_tooltip {
+    ul li { margin: 3px 0; }
+}
+.zone_settings {
+    cursor: default !important;
+    .pair {
+        display: flex;
+        .title {
+            margin-right: 5px;
+            font-weight: 600;
+        }
+        .val {
             display: flex;
-            margin: 5px 0;
-            .title {
-                width: 100px;
-                font-weight: 600;
+            align-items: center;
+            .lit {
+                line-height: 1.9;
+                padding: 0 6px;
+                margin-right: 3px;
+                background-color: #e1e9ed;
+                color: inherit;
+                font-size: 11px;
+                border-radius: 3px;
             }
-            .val {
-                display: flex;
-                .lit {
-                    padding: 1px 3px;
-                    background-color: #e1e9ed;
-                    color: inherit;
-                    font-size: 11px;
-                    border-radius: 3px;
-                    margin-right: 3px;
-                }
-            }
+        }
+    }
+    .perm_icon {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin: 2px 4px 0;
+        background-repeat: no-repeat;
+        background-size: contain;
+        &.country { background-image: url(/img/country.svg); }
+        &.state { background-image: url(/img/state.svg); }
+        &.data_center { background-image: url(/img/data_center.svg); }
+        &.asn { background-image: url(/img/asn.svg); }
+        &.city { background-image: url(/img/city.svg); }
+        &.vip { background-image: url(/img/g_ip.svg); }
+        &.residential { background-image: url(/img/residential.svg); }
+        &.mobile {
+            width: 14px;
+            background-image: url(/img/mobile.svg);
         }
     }
 }
@@ -1668,34 +1728,32 @@ span.icon_link {
             font-size: 13px;
         }
     }
-    .fields {
-        .field {
-            margin-bottom: 25px;
-            &:last-child { margin-bottom: 0; }
-            .field_header {
-                position: absolute;
-                .icon {
-                    position: absolute;
-                    width: 26px;
-                    height: 26px;
-                }
-                .zone_icon { background: url(/img/zone_icon.png); }
-                .preset_icon { background: url(/img/preset_icon.png); }
-                h4 {
-                    color: @first_color;
-                    font-weight: bold;
-                    font-size: 20px;
-                    letter-spacing: 0.5px;
-                    position: relative;
-                    left: 40px;
-                    top: 1px;
-                }
+    .field {
+        display: flex;
+        margin-bottom: 15px;
+        &:last-child { margin-bottom: 0; }
+        .field_header {
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+            .icon {
+                width: 26px;
+                height: 26px;
+                margin-right: 5px;
             }
-            select { margin-top: 35px; }
+            .zone_icon { background: url(/img/zone_icon.png); }
+            .preset_icon { background: url(/img/preset_icon.png); }
+            h4 {
+                color: @first_color;
+                font-weight: bold;
+                font-size: 17px;
+                letter-spacing: 0.5px;
+            }
         }
     }
     .preview {
-        margin-top: 15px;
+        margin-top: -5px;
+        margin-bottom: 20px;
         border: solid 1px @grey;
         padding: 5px 10px;
         border-radius: 4px;
@@ -1710,17 +1768,9 @@ span.icon_link {
             margin-bottom: 12px;
         }
     }
-    ul {
-        padding-left: 0;
-        li {
-            list-style: none;
-            &::before {
-                color: @link;
-                content: "\2022";
-                font-size: 16px;
-                padding-right: 6px;
-            }
-        }
+    .howto.animated {
+        animation-duration: 750ms;
+        -webkit-animation-duration: 750ms;
     }
 }
 .nav_left {

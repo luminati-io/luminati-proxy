@@ -4,6 +4,7 @@
 const _ = require('lodash');
 const yargs = require('yargs');
 const pkg = require('../package.json');
+const analytics = require('../lib/analytics.js');
 const lpm_config = require('./lpm_config.js');
 const zerr = require('../util/zerr.js');
 const E = module.exports;
@@ -100,5 +101,6 @@ E.init_args = args=>{
             acc[curr.name] = curr.value||true;
         return acc;
     }, {});
+    analytics.enabled = !argv.no_usage_stats;
     return argv;
 };

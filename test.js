@@ -1336,10 +1336,10 @@ describe('manager', ()=>{
     it('disable analytics', ()=>{
         const ua = analytics.get_ua();
         const spy = sinon.stub(ua.ua, 'send', ()=>{});
-        analytics.analytics_available = false;
+        analytics.enabled = false;
         ua.send();
         assert(!spy.called);
-        analytics.analytics_available = true;
+        analytics.enabled = true;
         ua.send();
         assert(spy.called);
         spy.restore();

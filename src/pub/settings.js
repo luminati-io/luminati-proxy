@@ -20,9 +20,9 @@ export default function Settings(){
 class Form extends Pure_component {
     state = {saving: false};
     tooltips = {
-        zone: `Default zone will be used automatically if you don't specify
-            any specific zone. This value can be overriden in each proxy port
-            settings`,
+        zone: `Default zone will be used automatically when creating a new
+            port, if you don't specify any specific zone. This value can be
+            overriden in each proxy port settings`,
         whitelist_ips: `List of IPs that are allowed to access web UI
             (including all API endpoints at http://localhost:22999/api) and
             make changes. can also include ranges of ips like so 0.0.0.0/0.

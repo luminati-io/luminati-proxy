@@ -27,8 +27,6 @@ const gen_filename = name=>{
 };
 let prev_ua_event = ua.event.bind(ua);
 let ua_event_wrapper = (...args)=>{
-    if (!analytics.analytics_available)
-        return;
     let send = true, hash;
     if (!E.last_ev)
     {
@@ -142,7 +140,7 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
             E.manager.stop(reason, true);
             E.manager = null;
         };
-        if (E.manager.argv.no_usage_stats||!send_ev)
+        if (!analytics.enabled||!send_ev)
             stop_manager();
         else
             ua.event('manager', 'stop', reason, stop_manager);
@@ -166,7 +164,7 @@ E.handle_signal = (sig, err)=>{
         if ((err.message||'').includes('SQLITE') && E.manager)
             return void E.manager.perr('sqlite', {error: errstr});
     }
-    if (err&&E.manager&&!E.manager.argv.no_usage_stats)
+    if (err&&E.manager&&analytics.enabled)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
             ()=>E.shutdown(errstr, false, err));
@@ -223,7 +221,7 @@ E.run = (argv, run_config)=>{
             if (fatal)
                 E.manager.stop();
         };
-        if (E.manager.argv.no_usage_stats||e.raw)
+        if (!analytics.enabled||e.raw)
             handle_fatal();
         else
         {
@@ -233,7 +231,7 @@ E.run = (argv, run_config)=>{
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         E.write_status_file('changing_config', null, zone_autoupdate);
-        if (!E.manager.argv.no_usage_stats)
+        if (analytics.enabled)
         {
             ua.event('manager', 'config_changed',
                 JSON.stringify(zone_autoupdate));
@@ -277,7 +275,6 @@ E.handle_msg = msg=>{
 };
 
 E.init_ua = argv=>{
-    analytics.analytics_available = !argv.no_usage_stats;
     ua.set('an', 'LPM');
     ua.set('av', `v${version}`);
     E.ua_filename = gen_filename('ua_ev');

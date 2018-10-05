@@ -11,6 +11,7 @@ import Overview from './overview.js';
 import Config from './config.js';
 import Settings from './settings.js';
 import Tracer from './tracer.js';
+import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
 import {Enable_ssl_modal} from './common.js';
@@ -121,6 +122,7 @@ const App = withRouter(class App extends Pure_component {
 const Page = ()=>
     <div>
       <Nav/>
+      <Proxy_add/>
       <div className="page_body">
         <Switch>
           <Route path="/overview" exact component={Overview}/>

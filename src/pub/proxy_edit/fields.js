@@ -50,8 +50,8 @@ export const tabs = {
         fields: {
             proxy: {
                 label: `Super Proxy's location`,
-                tooltip: `For shorter latency to the Super Proxies you can
-                    choose the location. Please note that this does not
+                tooltip: `For shorter latency to the Super Proxy you can
+                    choose its location. Please note that this does not
                     restrict the IPs chosen country but will simply improve
                     performances by using Super Proxies which have shorter
                     roundtrips relative to your current location.`,

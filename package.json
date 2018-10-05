@@ -177,19 +177,22 @@
       "bin/pub/font/lato_regular.woff2",
       "bin/pub/img/add.svg",
       "bin/pub/img/arrow_down.svg",
+      "bin/pub/img/asn.svg",
       "bin/pub/img/attention.svg",
       "bin/pub/img/bell.svg",
       "bin/pub/img/check.svg",
       "bin/pub/img/checker.png",
       "bin/pub/img/check_radio.svg",
+      "bin/pub/img/city.svg",
       "bin/pub/img/columns.svg",
       "bin/pub/img/config.svg",
-      "bin/pub/img/country.png",
+      "bin/pub/img/country.svg",
       "bin/pub/img/create.svg",
       "bin/pub/img/c_download.svg",
       "bin/pub/img/c_download_active.svg",
       "bin/pub/img/c_edit.svg",
       "bin/pub/img/c_edit_active.svg",
+      "bin/pub/img/data_center.svg",
       "bin/pub/img/debug.svg",
       "bin/pub/img/delete.svg",
       "bin/pub/img/down.svg",
@@ -201,6 +204,7 @@
       "bin/pub/img/flag_any_country.svg",
       "bin/pub/img/general.svg",
       "bin/pub/img/google.svg",
+      "bin/pub/img/g_ip.svg",
       "bin/pub/img/history.svg",
       "bin/pub/img/howto.svg",
       "bin/pub/img/icon_chrome.jpg",
@@ -249,6 +253,7 @@
       "bin/pub/img/luminati_logo_2.svg",
       "bin/pub/img/lum_logo_short.svg",
       "bin/pub/img/medium_icons.png",
+      "bin/pub/img/mobile.svg",
       "bin/pub/img/ok_warning.svg",
       "bin/pub/img/pool.svg",
       "bin/pub/img/preset_icon.png",
@@ -257,6 +262,7 @@
       "bin/pub/img/proxy_lum.svg",
       "bin/pub/img/refresh.svg",
       "bin/pub/img/request_headers.svg",
+      "bin/pub/img/residential.svg",
       "bin/pub/img/resource_document_icon_small.png",
       "bin/pub/img/rotation.svg",
       "bin/pub/img/rules.svg",
@@ -264,6 +270,7 @@
       "bin/pub/img/small_icons.png",
       "bin/pub/img/social_btns.svg",
       "bin/pub/img/speed.svg",
+      "bin/pub/img/state.svg",
       "bin/pub/img/stats.svg",
       "bin/pub/img/step_create_active.svg",
       "bin/pub/img/step_create_disabled.svg",
@@ -352,7 +359,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "b03759a537c54dcec653cc4c09ff58d2"
+    "md5": "00bbca910ff458aa0d2b469413f7ec13"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -388,5 +395,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.108.597"
+  "version": "1.108.852"
 }

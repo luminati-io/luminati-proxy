@@ -12,29 +12,12 @@ import filesaver from 'file-saver';
 import {get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
-import Proxy_add from './proxy_add.js';
 import Proxy_blank from './proxy_blank.js';
-import {Modal, Checkbox, Pagination_panel, Link_icon,
-    Tooltip, Modal_dialog, Tooltip_bytes} from './common.js';
+import {Modal, Checkbox, Pagination_panel, Link_icon, any_flag,
+    flag_with_title, Tooltip, Modal_dialog, Tooltip_bytes,
+    Zone_description} from './common.js';
 import {withRouter} from 'react-router-dom';
-import ReactTooltip from 'react-tooltip';
-
-let country_names = {};
-
-const flag_with_title = (country, title)=>{
-    const country_name = country_names[country];
-    return <Tooltip title={country_name}>
-          <span>
-            <span className={'flag-icon flag-icon-'+country}/>
-            <span className="lit">{title}</span>
-          </span>
-        </Tooltip>;
-};
-
-const any_flag = <Tooltip title="Any">
-      <img src="/img/flag_any_country.svg" style={{height: 18}}/>
-      <span className="lit" style={{marginLeft: 2}}>Any</span>
-    </Tooltip>;
+import React_tooltip from 'react-tooltip';
 
 const Targeting_cell = ({proxy, zones})=>{
     const static_country = get_static_country(proxy, zones);
@@ -134,91 +117,13 @@ const Reqs_cell = ({proxy})=>{
 };
 
 const Zone_cell = ({proxy, zones})=>{
-    const labels = {
-        network_type: {
-            static: 'Datacenter',
-            resident: 'Residential',
-            custom: 'Custom',
-        },
-        ips_types: {
-            shared: 'Shared',
-            dedicated: 'Exclusive / Unlimited domains',
-            selective: 'Exclusive domains',
-        },
-    };
-    // XXX krzysztof: temporarily copied from system.db. make an endpoint to
-    // fetch it in the code
-    const perm = {
-        full: 'country state city g1 cid ip asn carrier pass_ip mobile '+
-            'port_all port_whois',
-        city: 'country state city vip',
-        asn: 'country state asn carrier vip',
-        g1: 'country g1 vip',
-        static: 'country ip route_all route_dedicated',
-        mobile: 'country mobile asn carrier state city vip',
-    };
-    const get_perm = plan=>{
-        let res = 'country vip';
-        if (plan.type=='static')
-            return perm.static;
-        if (plan.mobile)
-            res = perm.mobile;
-        else if (plan.city && plan.asn)
-            res = perm.city+' asn carrier';
-        else if (plan.city)
-            res = perm.city;
-        else if (plan.asn)
-            res = perm.asn;
-        if (plan.vips_type=='domain_p')
-            res += ' vip_all';
-        if (plan.google_search)
-            res += ' google_search';
-        return res;
-    };
-    const {plan} = setdb.get('head').zones.zones.find(z=>z.name==proxy.zone);
-    const perm_list = get_perm(plan).split(' ');
-    const static_country = get_static_country(proxy, zones);
-    let c = any_flag;
-    if (static_country&&static_country!='any'&&static_country!='*')
-        c = flag_with_title(static_country, static_country.toUpperCase());
     return <div>
-          <ReactTooltip id={''+proxy.port} type="light" effect="solid"
+          <React_tooltip id={''+proxy.port} type="light" effect="solid"
             delayHide={0} delayShow={0} delayUpdate={0}>
             <div className="zone_tooltip">
-              <div className="pair">
-                <div className="title">Network type:</div>
-                <div className="val">{labels.network_type[plan.type]}</div>
-              </div>
-              {plan.ips_type!==undefined &&
-                <div className="pair">
-                  <div className="title">IP exclusivity:</div>
-                  <div className="val">{labels.ips_types[plan.ips_type]}</div>
-                </div>
-              }
-              <div className="pair">
-                <div className="title">Country:</div>
-                <div className="val">{c}</div>
-              </div>
-              {plan.ips!==undefined &&
-                <div className="pair">
-                  <div className="title">Number of IPs:</div>
-                  <div className="val">{plan.ips}</div>
-                </div>
-              }
-              {plan.port_ranges &&
-                <div className="pair">
-                  <div className="title">Allowed ports:</div>
-                  <div className="val">{plan.port_ranges}</div>
-                </div>
-              }
-              <div className="pair">
-                <div className="title">Permissions:</div>
-                <div className="val">
-                  {perm_list.map(p=><span key={p} className="lit">{p}</span>)}
-                </div>
-              </div>
+              <Zone_description zones={zones} zone_name={proxy.zone}/>
             </div>
-          </ReactTooltip>
+          </React_tooltip>
           <span data-tip data-for={''+proxy.port}>{proxy.zone}</span>
         </div>;
 };
@@ -580,7 +485,6 @@ class Proxies extends Pure_component {
             if (!locations)
                 return;
             const countries = locations.countries_by_code;
-            country_names = countries;
             this.setState({countries});
         });
         this.setdb_on('head.zones', zones=>{
@@ -777,7 +681,6 @@ class Proxies extends Pure_component {
                     bottom/>
                 </div>
               }
-              <Proxy_add/>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns}/>
             </div>;

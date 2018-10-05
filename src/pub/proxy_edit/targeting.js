@@ -62,7 +62,6 @@ const carriers = [
     {value: 'mobiltel', key: 'Mobiltel'},
     {value: 'sunrise', key: 'Sunrise Communications'},
     {value: 'digicel', key: 'Digicel'},
-    {value: 'h3g', key: 'H3G'},
     {value: 'three', key: 'Three'},
 ];
 

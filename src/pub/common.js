@@ -8,7 +8,7 @@ import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
-import {bytes_format, ga_event} from './util.js';
+import {bytes_format, ga_event, get_static_country, presets} from './util.js';
 import * as Chrome from './chrome_widgets.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
@@ -17,9 +17,8 @@ import React_select from 'react-select/lib/Creatable';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
-        const _this = this;
-        $(this.ref).on('hide.bs.modal', function(){
-            _this.props.cancel_clicked && _this.props.cancel_clicked();
+        $(this.ref).on('hide.bs.modal', ()=>{
+            this.props.cancel_clicked && this.props.cancel_clicked();
         });
     }
     componentWillReceiveProps(new_props){
@@ -30,10 +29,9 @@ export class Modal_dialog extends React.Component {
         else
             $(this.ref).modal('hide');
     }
-    set_ref(e){ this.ref = e; }
+    set_ref = e=>{ this.ref = e; };
     render(){
-        return <div tabIndex="-1"
-              ref={this.set_ref.bind(this)}
+        return <div tabIndex="-1" ref={this.set_ref}
               className={classnames('modal', 'fade', this.props.className)}>
               <div className="modal-dialog">
                 <div className="modal-content">
@@ -57,6 +55,11 @@ export class Modal_dialog extends React.Component {
 }
 
 export class Modal extends React.Component {
+    componentDidMount(){
+        $(this.ref).on('hidden.bs.modal', ()=>{
+            this.props.on_hidden && this.props.on_hidden();
+        });
+    }
     click_cancel(){
         if (this.props.cancel_clicked)
             this.props.cancel_clicked();
@@ -70,10 +73,11 @@ export class Modal extends React.Component {
                 yield _this.props.click_ok();
         });
     }
-    on_dismiss(){
+    on_dismiss = ()=>{
         if (this.props.on_dismiss)
             this.props.on_dismiss();
-    }
+    };
+    set_ref = e=>{ this.ref = e; };
     render(){
         let footer = null;
         if (!this.props.no_footer)
@@ -87,15 +91,14 @@ export class Modal extends React.Component {
         }
         const header_classes = classnames('modal-header',
             {no_header: this.props.no_header});
-        return <div id={this.props.id} tabIndex="-1"
+        return <div id={this.props.id} tabIndex="-1" ref={this.set_ref}
               className={classnames('modal', 'fade', this.props.className)}>
               <div className="modal-dialog">
                 <div className="modal-content">
                   <div className={header_classes}>
                     {!this.props.no_close &&
                       <button className="close close_icon" data-dismiss="modal"
-                          aria-label="Close"
-                          onClick={this.on_dismiss.bind(this)}>
+                          aria-label="Close" onClick={this.on_dismiss}>
                       </button>
                     }
                     {!this.props.no_header && !this.props.custom_header &&
@@ -690,3 +693,138 @@ export class Logo extends Pure_component {
             </div>;
     }
 }
+
+export const any_flag = <Tooltip title="Any">
+      <img src="/img/flag_any_country.svg" style={{height: 18}}/>
+      <span className="lit" style={{marginLeft: 2}}>Any</span>
+    </Tooltip>;
+
+export const flag_with_title = (country, title)=>{
+    // XXX krzysztof: add mapping from coutnry code to country name
+    return <Tooltip title={country.toUpperCase()}>
+          <span>
+            <span className={'flag-icon flag-icon-'+country}/>
+            <span className="lit">{title}</span>
+          </span>
+        </Tooltip>;
+};
+
+class Perm_icons extends Pure_component {
+    prem_tooltips = {
+        vip: 'gIP - Group of exclusive residential IPs',
+        residential: 'Residential IPs',
+        country: 'Country resolution',
+        state: 'Residential IPs - State resolution',
+        data_center: 'Data center IPs',
+        asn: 'Residential IPs - "Autonomous System Number" (ASN) resolution',
+        city: 'Residential IPs - City resolution',
+        mobile: 'Mobile IPs',
+    };
+    perm_icons = ['country', 'state', 'asn', 'city', 'vip'];
+    render(){
+        const {perm_list} = this.props;
+        if (!perm_list||!perm_list.length)
+            return <div>no perm</div>;
+        const perm = {};
+        for (let p of perm_list)
+            perm[p] = true;
+        const icons = perm_list.filter(p=>this.perm_icons.includes(p));
+        if (perm.mobile)
+            icons.unshift('mobile');
+        else if (perm.vip)
+            icons.unshift('residential');
+        else if (perm.route_dedicated)
+            icons.unshift('data_center');
+        return <div>{icons.map(perm=>
+              <Tooltip key={perm} title={this.prem_tooltips[perm]}>
+                <div className={'perm_icon '+perm}/>
+              </Tooltip>)}
+            </div>;
+    }
+}
+
+export class Zone_description extends Pure_component {
+    network_types = {
+        static: {
+            label: 'Data center',
+            tooltip: `Static IPs from various data centers located around
+                the globe`,
+        },
+        resident: {
+            label: 'Residential',
+            tooltip: `P2P residential network. Millions of IPs from real
+                devices`,
+        },
+        custom: {
+            label: 'Custom',
+            tooltip: `3G and 4G network from real mobile devices`,
+        },
+    };
+    ips_types = {
+        shared: 'Shared',
+        dedicated: 'Exclusive / Unlimited domains',
+        selective: 'Exclusive domains',
+    };
+    render(){
+        const {zone_name, zones} = this.props;
+        const zone = zones.zones.find(z=>z.name==(zone_name||zones.def));
+        const plan = zone.plan;
+        const static_country = get_static_country({zone: zone_name}, zones);
+        let c = any_flag;
+        if (static_country&&static_country!='any'&&static_country!='*')
+            c = flag_with_title(static_country, static_country.toUpperCase());
+        return <div className="zone_settings">
+              <ul className="bullets">
+                <Zone_bullet atr="Network type"
+                  tip="The network accessible by this zone">
+                  <Tooltip title={this.network_types[plan.type].tooltip}>
+                    {this.network_types[plan.type].label}
+                  </Tooltip>
+                </Zone_bullet>
+                <Zone_bullet show={plan.ips_type!==undefined}
+                  atr="IP exclusivity">
+                  {this.ips_types[plan.ips_type]}
+                </Zone_bullet>
+                <Zone_bullet atr="Country" tip="Allowed country">
+                  {c}</Zone_bullet>
+                <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
+                  {plan.ips}</Zone_bullet>
+                <Zone_bullet atr="Permissions" tip="Set of permissions">
+                  <Perm_icons perm_list={zone.perm.split(' ')}/></Zone_bullet>
+              </ul>
+            </div>;
+    }
+}
+
+const Zone_bullet = ({tip, show, atr, children})=>{
+    if (show===undefined)
+        show = true;
+    if (!show)
+        return null;
+    return <li className="pair">
+          <Tooltip title={tip}><span className="title">{atr}:</span></Tooltip>
+          <span className="val">{children}</span>
+        </li>;
+};
+
+export const Preset_description = ({preset, rule_clicked})=>{
+    if (!preset)
+        return null;
+    const rule_tip = `Click to save a proxy port and move to this
+    configuration`;
+    const desc = presets[preset].subtitle.replace(/ +(?= )/g, '')
+    .replace(/\n /g, '\n');
+    return <div>
+          <div className="desc">{desc}</div>
+          <ul className="bullets">
+            {(presets[preset].rules||[]).map(r=>
+              <li key={r.field}>
+                <Tooltip title={rule_tip}>
+                  <a className="link" onClick={()=>rule_clicked(r.field)}>
+                    {r.label}</a>
+                </Tooltip>
+              </li>
+            )}
+          </ul>
+        </div>;
+};
