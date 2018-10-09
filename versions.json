@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.109.164",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "scrapping data fixed"
+            },
+            {
+                "type": "bug",
+                "text": "fixed installation script"
+            },
+            {
+                "type": "star",
+                "text": "UI improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.108.852",
         "type": "stable",
         "changes": [

@@ -857,12 +857,12 @@ describe('proxy', ()=>{
             }));
         });
     });
-    describe('rules', ()=>{
+    describe('retry', ()=>{
         it('should set rules', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {res: {}}});
             assert.ok(l.rules);
         }));
-        const t = (name, arg, rules = false, c = 0)=>it(name,
+        const t = (name, arg, rules=false, c=0)=>it(name,
         etask._fn(function*(_this){
             rules = rules||{post: [{res: [{
                     action: {ban_ip: '60min', retry: true},
@@ -893,6 +893,26 @@ describe('proxy', ()=>{
             url: 'lumtest.com/test'}, {res: [{action:
             {ban_ip: '60min', retry: true}, head: true, status: {arg: '200',
             type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 5);
+    });
+    describe('rules', ()=>{
+        it('should process data', ()=>etask(function*(){
+            l = yield lum({rules: true, _rules: {res: {}}});
+            const html = `
+              <body>
+                <div>
+                  <p id="price_inside_buybox">$12.99</p>
+                </div>
+              </body>`;
+            const process_rules = {price: `$('#price_inside_buybox').text()`};
+            const req = {ctx: {response: {}}};
+            const _res = {headers: {'content-encoding': 'gzip'}};
+            l.rules.process_response(req, _res, process_rules, html, {});
+            assert.ok(!_res.headers['content-encoding']);
+            assert.equal(_res.headers['content-type'],
+                'application/json; charset=utf-8');
+            const new_body = JSON.parse(req.ctx.response.body.toString());
+            assert.deepEqual(new_body, {price: '$12.99'});
+        }));
     });
     describe('reserve session', ()=>{
         let history;

@@ -892,7 +892,7 @@ class Cell_value extends React.Component {
         else if (col=='Time')
         {
             return <Time_cell time={req.time} url={req.request.url}
-                  pending={!!req.pending}/>;
+                  pending={!!req.pending} uuid={req.uuid}/>;
         }
         else if (col=='Peer proxy')
         {
@@ -944,9 +944,9 @@ const Status_code_cell = maybe_pending(({status, uuid})=>{
     if (status=='unknown')
     {
         return <div onClick={e=>e.stopPropagation()} className="disp_value">
-              <React_tooltip id={uuid} type="info" effect="solid"
-                delayHide={500} delayShow={0} delayUpdate={500}
-                offset={{top: -5}}>
+              <React_tooltip id={'s'+uuid} type="info" effect="solid"
+                delayHide={100} delayShow={0} delayUpdate={500}
+                offset={{top: -10}}>
                 <div>
                   Status code of this request could not be parsed becasue the
                   connection is encrypted.
@@ -958,7 +958,7 @@ const Status_code_cell = maybe_pending(({status, uuid})=>{
                     requests</span>
                 </div>
               </React_tooltip>
-              <div data-tip="React-tooltip" data-for={uuid}>
+              <div data-tip="React-tooltip" data-for={'s'+uuid}>
                 <span>unknown</span>
                 <div className="small_icon status info"/>
               </div>
@@ -970,17 +970,35 @@ const Status_code_cell = maybe_pending(({status, uuid})=>{
         </Tooltip>;
 });
 
-const Time_cell = maybe_pending(({time, url})=>{
+const Time_cell = maybe_pending(({time, url, uuid})=>{
+    const enable_ssl_click = e=>{
+        e.stopPropagation();
+        $('#enable_ssl_modal').modal();
+    };
     if (!url.endsWith(':443')||!time)
         return <Tooltip_and_value val={time&&time+' ms'}/>;
     const tip = `This timing might not be accurate if the remote server held
         the connection open. Enable SSL analyzing to fix this`;
-    return <Tooltip title={tip}>
-          <div className="disp_value">
-            {time+' ms'}
-            {url.endsWith(':443') && <div className="small_icon status info"/>}
+    return <div onClick={e=>e.stopPropagation()} className="disp_value">
+          <React_tooltip id={'t'+uuid} type="info" effect="solid"
+            delayHide={100} delayShow={0} delayUpdate={500}
+            offset={{top: -10}}>
+            <div>
+              Timing of this request could not be parsed becasue the
+              connection is encrypted.
+            </div>
+            <div style={{marginTop: 10}}>
+              <a onClick={enable_ssl_click} className="link">
+                Enable SSL analyzing</a>
+              <span> to see the timing and other information about requests
+              </span>
+            </div>
+          </React_tooltip>
+          <div data-tip="React-tooltip" data-for={'t'+uuid}>
+             {time+' ms'}
+             {url.endsWith(':443') && <div className="small_icon status info"/>}
           </div>
-        </Tooltip>;
+        </div>;
 });
 
 class Select_cell extends React.Component {

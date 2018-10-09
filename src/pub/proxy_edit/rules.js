@@ -15,7 +15,7 @@ const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 
 const trigger_types = [
-    {key: 'i.e. Status code', value: '', tooltip: `Choose a trigger type.
+    {key: '--Select--', value: '', tooltip: `Choose a trigger type.
         For each request the system will check if the trigger is matching
         the response`},
     {key: 'URL', value: 'url', tooltip: `Trigger will be pulled for all
@@ -31,9 +31,9 @@ const trigger_types = [
         tooltip: `Triggers when the request time is below the selected value`},
 ];
 
-const default_action = {key: 'Choose an action type', value: '',
-    tooltip: `Select an action.  Once the trigger rule is met the selected
-    action is executed automatically.`};
+const default_action = {key: '--Select--', value: '', tooltip: `Select an
+    action.  Once the trigger rule is met the selected action is executed
+    automatically.`};
 const action_types = [
     {key: 'Retry with new IP', value: 'retry', tooltip: `System will send the
         exact same request again with newly refreshed IP`,
@@ -80,7 +80,7 @@ const is_pre_rule = rule=>pre_actions.includes(rule.action)||
 const is_post_rule = rule=>!is_pre_rule(rule);
 
 const status_types = [
-    'i.e. 200 - Succeeded requests',
+    '--Select--',
     '200 - Succeeded requests',
     '403 - Forbidden',
     '404 - Not found',

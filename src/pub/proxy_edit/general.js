@@ -41,7 +41,7 @@ export default provider({tab_id: 'general'})(props=>{
           <Config type="text" id="internal_name"/>
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
-          <Config type="text" id="password"/>
+          <Config type="text" id="password" disabled/>
           <Config type="text" id="whitelist_ips" save_on_blur
             validator={normalizers.ips_list}/>
           <Config type="yes_no" id="ssl"/>

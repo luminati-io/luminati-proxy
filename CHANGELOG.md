@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.109.164 Stable
+- :bug: scrapping data fixed
+- :bug: fixed installation script
+- :star: UI improvements
+
 ## 1.108.852 Stable
 - :star: UI improvements
 

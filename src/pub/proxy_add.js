@@ -277,20 +277,24 @@ const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
         return {key: z.name, value: z.name};
     });
     return <div className="lum_proxy">
-          <Field icon_class="zone_icon" val={zone} options={zones_opt}
-            title="Zone" on_change={on_field_change('zone')}
-            tooltip={zone_tip}/>
-          <Preview title={zones_opt.find(z=>z.value==zone).key}>
-            <Zone_description zones={zones} zone_name={zone}/>
-            <a className="link" href="https://luminati.io/cp/zones"
-              target="_blank" rel="noopener noreferrer">Edit zone</a>
-          </Preview>
-          <Field icon_class="preset_icon" val={preset}
-            options={presets_opt} title="Preset configuration"
-            on_change={on_field_change('preset')} tooltip={preset_tip}/>
-          <Preview title={presets_opt.find(p=>p.value==preset).key}>
-            <Preset_description preset={preset} rule_clicked={rule_clicked}/>
-          </Preview>
+          <div className="group">
+            <Field icon_class="zone_icon" val={zone} options={zones_opt}
+              title="Zone" on_change={on_field_change('zone')}
+              tooltip={zone_tip}/>
+            <Preview title={zones_opt.find(z=>z.value==zone).key}>
+              <Zone_description zones={zones} zone_name={zone}/>
+              <a className="link" href="https://luminati.io/cp/zones"
+                target="_blank" rel="noopener noreferrer">Edit zone</a>
+            </Preview>
+          </div>
+          <div className="group">
+            <Field icon_class="preset_icon" val={preset}
+              options={presets_opt} title="Preset configuration"
+              on_change={on_field_change('preset')} tooltip={preset_tip}/>
+            <Preview title={presets_opt.find(p=>p.value==preset).key}>
+              <Preset_description preset={preset} rule_clicked={rule_clicked}/>
+            </Preview>
+          </div>
         </div>;
 };
 
