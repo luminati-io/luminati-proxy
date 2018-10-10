@@ -108,6 +108,9 @@
     },
     "add": {
         "request": ["remote_address"]
+    },
+    "remove": {
+        "request": ["node_latency"]
     }
 }, {
     "schema": {

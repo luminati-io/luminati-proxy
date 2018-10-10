@@ -66,7 +66,8 @@ export class Modal extends React.Component {
         $('#'+this.props.id).modal('hide');
     }
     click_ok(){
-        $('#'+this.props.id).modal('hide');
+        if (!this.props.no_ok_close)
+            $('#'+this.props.id).modal('hide');
         const _this = this;
         etask(function*(){
             if (_this.props.click_ok)
@@ -126,14 +127,16 @@ export class Enable_ssl_modal extends Pure_component {
             _this.setState({loading: true});
             yield ajax({url: '/api/enable_ssl', method: 'POST'});
             _this.setState({loading: false});
+            window.open('/ssl');
         });
     };
     render(){
         return [
             <Loader key="1" show={this.state.loading}/>,
             <Modal key="2" id={this.props.id||'enable_ssl_modal'}
-              title="Enable SSL analyzing for all proxies"
-              click_ok={this.enable_ssl} className="enable_ssl_modal">
+              title="Enable SSL analyzing for all proxies" no_cancel_btn
+              no_ok_close click_ok={this.enable_ssl}
+              ok_btn_title='Download certificate' className="enable_ssl_modal">
               <p className="cert_info">
                 You will also need to add a certificate file to browsers.
                 Gathering stats for HTTPS requests requires setting a
@@ -768,6 +771,8 @@ export class Zone_description extends Pure_component {
     render(){
         const {zone_name, zones} = this.props;
         const zone = zones.zones.find(z=>z.name==(zone_name||zones.def));
+        if (!zone)
+            return <span>This zone is disabled</span>;
         const plan = zone.plan;
         const static_country = get_static_country({zone: zone_name}, zones);
         let c = any_flag;

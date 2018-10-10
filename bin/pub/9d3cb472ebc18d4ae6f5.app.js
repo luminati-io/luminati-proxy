@@ -408,7 +408,7 @@ var Modal = exports.Modal = function (_React$Component2) {
     }, {
         key: 'click_ok',
         value: function click_ok() {
-            (0, _jquery2.default)('#' + this.props.id).modal('hide');
+            if (!this.props.no_ok_close) (0, _jquery2.default)('#' + this.props.id).modal('hide');
             var _this = this;
             (0, _etask2.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
                 return _regenerator2.default.wrap(function _callee$(_context) {
@@ -513,8 +513,9 @@ var Enable_ssl_modal = exports.Enable_ssl_modal = function (_Pure_component) {
 
                             case 4:
                                 _this.setState({ loading: false });
+                                window.open('/ssl');
 
-                            case 5:
+                            case 6:
                             case 'end':
                                 return _context2.stop();
                         }
@@ -530,8 +531,9 @@ var Enable_ssl_modal = exports.Enable_ssl_modal = function (_Pure_component) {
             return [_react2.default.createElement(Loader, { key: '1', show: this.state.loading }), _react2.default.createElement(
                 Modal,
                 { key: '2', id: this.props.id || 'enable_ssl_modal',
-                    title: 'Enable SSL analyzing for all proxies',
-                    click_ok: this.enable_ssl, className: 'enable_ssl_modal' },
+                    title: 'Enable SSL analyzing for all proxies', no_cancel_btn: true,
+                    no_ok_close: true, click_ok: this.enable_ssl,
+                    ok_btn_title: 'Download certificate', className: 'enable_ssl_modal' },
                 _react2.default.createElement(
                     'p',
                     { className: 'cert_info' },
@@ -1613,6 +1615,11 @@ var Zone_description = exports.Zone_description = function (_Pure_component11) {
             var zone = zones.zones.find(function (z) {
                 return z.name == (zone_name || zones.def);
             });
+            if (!zone) return _react2.default.createElement(
+                'span',
+                null,
+                'This zone is disabled'
+            );
             var plan = zone.plan;
             var static_country = (0, _util.get_static_country)({ zone: zone_name }, zones);
             var c = any_flag;
