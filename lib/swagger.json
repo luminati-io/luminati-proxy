@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.109.258",
+        "version": "1.109.493",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -335,7 +335,7 @@
                 }
             }
         },
-        "/proxies/{port}/ban_ip": {
+        "/proxies/{port}/banip": {
             "post": {
                 "description": "On a specific port ban an IP for a certain amount of time",
                 "tags": ["Proxy"],

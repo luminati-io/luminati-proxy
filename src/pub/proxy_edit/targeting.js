@@ -63,6 +63,7 @@ const carriers = [
     {value: 'sunrise', key: 'Sunrise Communications'},
     {value: 'digicel', key: 'Digicel'},
     {value: 'three', key: 'Three'},
+    {value: 'windit', key: 'Wind'},
 ];
 
 const carriers_note = (()=>{

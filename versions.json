@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.109.493",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed socks proxy security issue"
+            }
+        ]
+    },
+    {
         "ver": "1.109.258",
         "type": "stable",
         "changes": [

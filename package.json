@@ -101,8 +101,7 @@
     "rimraf": "2.5.2",
     "log-buffer": "0.0.3",
     "cheerio": "1.0.0-rc.2",
-    "puppeteer": "1.8.0",
-    "nightmare": "3.0.1",
+    "puppeteer": "1.9.0",
     "prompt-sync": "4.1.6",
     "lokijs": "1.5.5",
     "ps-list": "5.0.0"
@@ -359,7 +358,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "10542dd028321780c87cf6f9c7fceb90"
+    "md5": "9388b7607403280f886ea435ec8f9cd9"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -395,5 +394,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.109.258"
+  "version": "1.109.493"
 }
