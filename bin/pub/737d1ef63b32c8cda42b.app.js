@@ -29469,7 +29469,7 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             delete save_form.reverse_lookup;
             if (save_form.whitelist_ips) {
                 save_form.whitelist_ips = save_form.whitelist_ips.split(',').filter(Boolean);
-            }
+            } else save_form.whitelist_ips = [];
             if (save_form.city.length) save_form.city = save_form.city[0].id;else save_form.city = '';
             if (save_form.asn.length) save_form.asn = Number(save_form.asn[0].id);else save_form.asn = '';
             if (!save_form.max_requests) save_form.max_requests = 0;
@@ -57210,7 +57210,8 @@ var Form = function (_Pure_component) {
 
         return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Form.__proto__ || Object.getPrototypeOf(Form)).call.apply(_ref, [this].concat(args))), _this2), _this2.state = { saving: false }, _this2.tooltips = {
             zone: 'Default zone will be used automatically when creating a new\n            port, if you don\'t specify any specific zone. This value can be\n            overriden in each proxy port settings',
-            whitelist_ips: 'List of IPs that are allowed to access web UI\n            (including all API endpoints at http://localhost:22999/api) and\n            make changes. can also include ranges of ips like so 0.0.0.0/0.\n            Default value is 127.0.0.1, which means that remote access from\n            any other IP is blocked unless list of IPs are added in this\n            field.',
+            www_whitelist_ips: 'List of IPs that are allowed to access web UI\n            (including all API endpoints at http://localhost:22999/api) and\n            make changes. can also include ranges of ips like so 0.0.0.0/0.\n            Default value is 127.0.0.1, which means that remote access from\n            any other IP is blocked unless list of IPs are added in this\n            field.',
+            whitelist_ips: 'Default access grant for all proxies. Only those\n            IPs will be able to send requests to all proxies by default. Can\n            be changed per proxy',
             request_stats: 'Enable saving statistics to database',
             logs_type: 'Specify how many requests you want to keep in database. The\n            limit may be set as a number or maximum database size. Set to 0 to\n            disable saving logs to database'
         }, _this2.logs_metric_opts = [{ key: 'requests', value: 'requests' }, { key: 'megabytes', value: 'megabytes' }], _this2.zone_change = function (val) {
@@ -57220,10 +57221,23 @@ var Form = function (_Pure_component) {
         }, _this2.whitelist_ips_change = function (val) {
             _this2.setState(function (prev) {
                 return {
-                    settings: (0, _extends3.default)({}, prev.settings, { www_whitelist_ips: val }) };
+                    settings: (0, _extends3.default)({}, prev.settings, { whitelist_ips: val }) };
             });
         }, _this2.whitelist_ips_blur = function (_ref2) {
             var value = _ref2.target.value;
+
+            var val = _util.normalizers.ips_list(value);
+            _this2.setState(function (prev) {
+                return {
+                    settings: (0, _extends3.default)({}, prev.settings, { whitelist_ips: val }) };
+            }, _this2.save);
+        }, _this2.www_whitelist_ips_change = function (val) {
+            _this2.setState(function (prev) {
+                return {
+                    settings: (0, _extends3.default)({}, prev.settings, { www_whitelist_ips: val }) };
+            });
+        }, _this2.www_whitelist_ips_blur = function (_ref3) {
+            var value = _ref3.target.value;
 
             var val = _util.normalizers.ips_list(value);
             _this2.setState(function (prev) {
@@ -57307,6 +57321,7 @@ var Form = function (_Pure_component) {
                 if (!settings || _this3.state.settings) return;
                 var s = (0, _extends3.default)({}, settings);
                 s.www_whitelist_ips = s.www_whitelist_ips && s.www_whitelist_ips.join(',') || '';
+                s.whitelist_ips = s.whitelist_ips && s.whitelist_ips.join(',') || '';
                 s.logs_metric = s.logs.metric;
                 s.logs_value = s.logs.value;
                 _this3.setState({ settings: s });
@@ -57337,8 +57352,14 @@ var Form = function (_Pure_component) {
                     on_change_wrapper: this.zone_change, label: 'Default zone',
                     tooltip: this.tooltips.zone, data: zone_opt }),
                 _react2.default.createElement(_common.Labeled_controller, { val: this.state.settings.www_whitelist_ips,
-                    type: 'text', on_change_wrapper: this.whitelist_ips_change,
+                    type: 'text', on_change_wrapper: this.www_whitelist_ips_change,
                     label: 'Admin whitelisted IPs',
+                    placeholder: 'e.g. 1.1.1.1, 2.2.2.2',
+                    on_blur: this.www_whitelist_ips_blur,
+                    tooltip: this.tooltips.www_whitelist_ips }),
+                _react2.default.createElement(_common.Labeled_controller, { val: this.state.settings.whitelist_ips,
+                    type: 'text', on_change_wrapper: this.whitelist_ips_change,
+                    label: 'Proxy whitelisted IPs',
                     placeholder: 'e.g. 1.1.1.1, 2.2.2.2',
                     on_blur: this.whitelist_ips_blur,
                     tooltip: this.tooltips.whitelist_ips }),
@@ -58141,8 +58162,8 @@ var Ext_proxy = function Ext_proxy(_ref3) {
         on_field_change = _ref3.on_field_change,
         parse_error = _ref3.parse_error;
 
-    var json_example = '[\'1.1.1.2\', \'username:password@1.2.3.4:8888\']';
-    var placeholder = 'List of IPs to the external proxies in the following ' + 'format: [username:password@]ip[:port], example:\n' + json_example;
+    var json_example = '[\'1.1.1.2\', ' + '\'my_username:my_password@1.2.3.4:8888\']';
+    var placeholder = 'List of IPs to the external proxies in the following ' + 'format: [username:password@]ip[:port]';
     var on_change_list = function on_change_list(val) {
         on_field_change('ips_list')(val);
         try {

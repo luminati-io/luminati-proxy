@@ -21,6 +21,7 @@ const qw = require('./util/string.js').qw;
 const assign = Object.assign;
 const zerr = require('./util/zerr.js');
 const sinon = require('sinon');
+const zsinon = require('./util/sinon.js');
 const lpm_config = require('./util/lpm_config.js');
 const lpm_util = require('./util/lpm_util.js');
 const lpm_file = require('./util/lpm_file.js');
@@ -999,6 +1000,25 @@ describe('proxy', ()=>{
             const new_body = JSON.parse(req.ctx.response.body.toString());
             assert.deepEqual(new_body, {price: '$12.99'});
         }));
+        it('should process data with error', ()=>etask(function*(){
+            l = yield lum({rules: true, _rules: {res: {}}});
+            const html = `
+              <body>
+                <div>
+                  <p id="price_inside_buybox">$12.99</p>
+                </div>
+              </body>`;
+            const process_rules = {price: 'a-b-v'};
+            const req = {ctx: {response: {}}};
+            const _res = {headers: {'content-encoding': 'gzip'}};
+            l.rules.process_response(req, _res, process_rules, html, {});
+            assert.ok(!_res.headers['content-encoding']);
+            assert.equal(_res.headers['content-type'],
+                'application/json; charset=utf-8');
+            const new_body = JSON.parse(req.ctx.response.body.toString());
+            assert.deepEqual(new_body, {price: {context: 'a-b-v',
+                error: 'processing data', message: 'a is not defined'}});
+        }));
         it('check cmp', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {res: {}}});
             const t = (rule, value, expected)=>{
@@ -1029,8 +1049,8 @@ describe('proxy', ()=>{
         }));
         it('check get_time', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {res: {}}});
-            const t = (t, expected)=>{
-                const r = l.rules.get_time(t);
+            const t = (_t, expected)=>{
+                const r = l.rules.get_time(_t);
                 assert.equal(r, expected);
             };
             t(undefined, 0);
@@ -1050,8 +1070,8 @@ describe('proxy', ()=>{
         }));
         it('check _url_regexp', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {res: {}}});
-            const t = (t, s, expected)=>{
-                const r = l.rules._url_regexp(t);
+            const t = (reg, s, expected)=>{
+                const r = l.rules._url_regexp(reg);
                 assert.equal(r.test(s), expected);
             };
             t(undefined, '', true);
@@ -1059,7 +1079,7 @@ describe('proxy', ()=>{
             t('**', '', true);
             t('[-]+', '', false);
             t('[-]+', '--', true);
-            t('//', '', false);
+            t('\\', '', false);
         }));
         it('check _can_retry', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {res: {}}});
@@ -1106,6 +1126,191 @@ describe('proxy', ()=>{
             assert.equal(req.session, 'test');
             assert.ok(retry_stub.called);
         }));
+        it('check check_req_time_range', ()=>etask(function*(){
+            let _date = '2013-08-13 14:00:00';
+            zsinon.clock_set({now: _date});
+            l = yield lum({rules: true, _rules: {res: {}}});
+            const rs_stub = sinon.stub(l.session_mgr,
+                'remove_session_from_pool');
+            let r = l.rules.check_req_time_range({}, {});
+            assert.ok(!r);
+            assert.ok(!rs_stub.called);
+            r = l.rules.check_req_time_range({ctx: {pool_key: 'test',
+                timeline: {req: {create: Date.now() - 40}}}}, {
+                max_req_time: 41});
+            assert.ok(r);
+            assert.ok(!rs_stub.called);
+            r = l.rules.check_req_time_range({ctx: {pool_key: 'test',
+                timeline: {req: {create: Date.now() - 40}}}}, {
+                max_req_time: 39});
+            assert.ok(!r);
+            assert.ok(!rs_stub.called);
+            r = l.rules.check_req_time_range({ctx: {pool_key: 'fast_pool',
+                timeline: {req: {create: Date.now() - 40}}}}, {
+                max_req_time: 39});
+            assert.ok(!r);
+            assert.ok(rs_stub.called);
+            zsinon.clock_restore();
+        }));
+        it('check can_retry', ()=>etask(function*(){
+            l = yield lum({rules: true, _rules: {res: {}}});
+            sinon.stub(l, 'get_other_port').returns(l);
+            let r = l.rules.can_retry({});
+            assert.ok(r);
+            r = l.rules.can_retry({retry: 2});
+            assert.ok(r);
+            r = l.rules.can_retry({retry: 5});
+            assert.ok(!r);
+            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false});
+            assert.ok(!r);
+            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false,
+                retry: true});
+            assert.ok(r);
+            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: true,
+                retry: true});
+            assert.ok(!r);
+        }));
+        it('check post_timeout', ()=>etask(function*(){
+            l = yield lum({rules: {post: [
+                {res: [{timeout: 1}], url: 'test'}]}});
+            sinon.stub(l.rules, 'action').returns(true);
+            const t = (req, expected)=>{
+                const r = l.rules.post_timeout(req, {}, {});
+                assert.equal(r, expected);
+            };
+            t({ctx: {h_context: 'STATUS CHECK'}}, undefined);
+            t({ctx: {}, url: 'invalid'}, undefined);
+            t({ctx: {}, url: 'test.com'}, true);
+        }));
+        it('check post_need_body', ()=>etask(function*(){
+            l = yield lum({rules: {post: [
+                {res: [], url: 'test'}]}});
+            const t = (req, expected)=>{
+                const r = l.rules.post_need_body(req);
+                assert.equal(r, expected);
+            };
+            t({ctx: {url: 'invalid'}}, false);
+            t({ctx: {url: 'test'}}, false);
+            yield l.stop(true);
+            l = yield lum({rules: {post: [
+                {res: [{body: '1'}], url: 'test'}]}});
+            t({ctx: {url: 'test'}}, true);
+        }));
+        it('check post_body', ()=>etask(function*(){
+            l = yield lum({rules: {post: [{res: [{body: 'test',
+                action: {process: true}}], url: 'test'}]}});
+            const t = (req, _res, body, expected)=>{
+                const r = l.rules.post_body(req, {}, {}, _res, body);
+                assert.equal(r, expected);
+            };
+            sinon.stub(l.rules, 'action').returns(true);
+            sinon.stub(l.rules, 'process_response');
+            const cmp_stub = sinon.stub(l.rules, 'cmp')
+                .returns(true);
+            t({ctx: {h_context: 'STATUS CHECK'}});
+            t({ctx: {url: 'test'}}, {headers: {}},
+                '', true);
+            cmp_stub.reset();
+            cmp_stub.onFirstCall(false).returns(true);
+            t({ctx: {url: 'test'}}, {headers: {}},
+                '', true);
+            cmp_stub.returns(false);
+            t({ctx: {url: 'test'}}, {headers: {}},
+                '', false);
+        }));
+        it('check post', ()=>etask(function*(){
+            l = yield lum({rules: {post: [{res: [{trigger_type: 'test',
+                ipban: true, status: {}}], url: 'test'}]}});
+            const t = (req, _res, hdrs_only, expected)=>{
+                const r = l.rules.post(req, {}, {}, _res, hdrs_only);
+                assert.equal(r, expected);
+            };
+            t({ctx: {h_context: 'STATUS CHECK'}});
+            t({ctx: {url: 'invalid'}});
+            t({ctx: {url: 'test'}}, {}, true);
+            const crtr_stub = sinon.stub(l.rules, 'check_req_time_range')
+                .returns(true);
+            sinon.stub(l.rules, 'action').returns(true);
+            t({ctx: {url: 'test'}}, {}, false, true);
+            crtr_stub.returns(false);
+            const bh_stub = sinon.stub(l.banlist, 'has').returns(true);
+            t({ctx: {url: 'test'}}, {hola_headers: {
+                'x-hola-timeline-debug': '1 2 3'}}, false, true);
+            bh_stub.reset();
+            sinon.stub(l.rules, 'cmp').returns(true);
+            t({ctx: {url: 'test'}}, {}, false, true);
+        }));
+        describe('action', ()=>{
+            it('email, reserve_session, fast_pool_session', ()=>
+            etask(function*(){
+                l = yield lum({rules: true});
+                const cr_stub = sinon.stub(l.rules, 'can_retry')
+                    .returns(false);
+                const email_stub = sinon.stub(l, '_send_rule_mail');
+                const rps_stub = sinon.stub(l.session_mgr,
+                    'add_reserve_pool_session');
+                const fps_stub = sinon.stub(l.session_mgr,
+                    'add_fast_pool_session');
+                const r = l.rules.action({ctx: {}}, {}, {}, {}, {email: true,
+                    reserve_session: true, fast_pool_session: true}, {
+                    res: [{}]});
+                assert.ok(!r);
+                assert.ok(cr_stub.called);
+                assert.ok(email_stub.called);
+                assert.ok(rps_stub.called);
+                assert.ok(fps_stub.called);
+            }));
+            it('ban_ip', ()=>etask(function*(){
+                l = yield lum({rules: true});
+                sinon.stub(l.rules, 'can_retry')
+                    .returns(true);
+                sinon.stub(l.rules, 'retry');
+                sinon.stub(l.rules, 'gen_session').returns('test');
+                const add_stub = sinon.stub(l.banlist, 'add').returns('test');
+                const req = {ctx: {}};
+                const r = l.rules.action(req, {}, {}, {hola_headers: {
+                    'x-hola-timeline-debug': '1 2 3'}}, {ban_ip: '1d'});
+                assert.ok(r);
+                assert.ok(add_stub.called);
+                assert.equal(req.session, 'test');
+
+            }));
+            it('refresh_ip', ()=>etask(function*(){
+                l = yield lum({rules: true});
+                sinon.stub(l.rules, 'can_retry')
+                    .returns(true);
+                sinon.stub(l.rules, 'retry');
+                const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
+                const req = {ctx: {}};
+                const r = l.rules.action(req, {}, {}, {hola_headers: {
+                    'x-hola-timeline-debug': '1 2 3'}}, {refresh_ip: true});
+                assert.ok(r);
+                assert.ok(ref_stub.called);
+                assert.equal(l.refresh_task, 'test');
+            }));
+            it('url', ()=>etask(function*(){
+                l = yield lum({rules: true});
+                sinon.stub(l.rules, 'can_retry')
+                    .returns(true);
+                sinon.stub(l.rules, 'retry');
+                const req = {ctx: {}};
+                const r = l.rules.action(req, {}, {}, {headers:
+                    {location: 'test'}}, {url: 'location'});
+                assert.ok(r);
+                assert.equal(req.url, 'test');
+            }));
+            it('session', ()=>etask(function*(){
+                l = yield lum({rules: true});
+                sinon.stub(l.rules, 'can_retry')
+                    .returns(true);
+                sinon.stub(l.rules, 'retry');
+                sinon.stub(l.rules, 'gen_session').returns('test');
+                const req = {ctx: {}};
+                const r = l.rules.action(req, {}, {}, {}, {});
+                assert.ok(r);
+                assert.equal(req.session, 'test');
+            }));
+        });
         describe('pre', ()=>{
             it('action null_response', ()=>etask(function*(){
                 l = yield lum({rules: {res: {}, pre: [

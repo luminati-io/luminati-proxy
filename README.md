@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.109.493/luminati-proxy-manager-v1.109.493-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.109.867/luminati-proxy-manager-v1.109.867-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -141,8 +141,9 @@ Usage:
 Options:
   --port, -p               Port for the HTTP proxy                      [number]
   --proxy_type             Decide if to save proxy into the configuration file.
-                           specifing "persist" in "proxy_type" value will create
-                           port and save it in the configuration file.  [string]
+                           Specifying "persist" in "proxy_type" value will
+                           create port and save it in the configuration file.
+                                                                        [string]
   --multiply               Multiply the port definition given number of times
                                                                         [number]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
@@ -165,7 +166,7 @@ Options:
                                                            [number] [default: 5]
   --proxy_retry            Automatically retry on super proxy failure
                                                            [number] [default: 2]
-  --use_proxy_cache        Cache resolved ips of superagents
+  --use_proxy_cache        Cache resolved ips of super proxies
                                                        [boolean] [default: true]
   --insecure               Enable SSL connection/analyzing to insecure hosts
                                                       [boolean] [default: false]
@@ -173,7 +174,7 @@ Options:
   --state                  State                                        [string]
   --city                   City                                         [string]
   --asn                    ASN                                          [number]
-  --ip                     Datacenter IP                                [string]
+  --ip                     Data center IP                               [string]
   --vip                    VIP                                          [number]
   --ext_proxies            A list of proxies from external vendors. Format:
                            [username:password@]ip[:port]                 [array]
@@ -207,7 +208,7 @@ Options:
   --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
                            [default:"127.0.0.1"]
 			   [example: --www_whitelist_ips "212.17.0.1"]
-  --ws                     websocket port used for request logs [default: 22998]
+  --ws                     WebSocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
   --database               Database file containing logs and cached values

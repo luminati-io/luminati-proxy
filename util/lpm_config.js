@@ -31,7 +31,6 @@ conf.proxy_params = _(swagger.definitions.proxy.properties).pickBy(
 conf.luminati_default = {
     port: 24000,
     zone: 'static',
-    iface: '0.0.0.0',
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
     log: 'error',
@@ -44,7 +43,6 @@ conf.luminati_default = {
     secure_proxy: false,
     short_username: false,
     ssl: false,
-    whitelist_ips: [],
     test_url: 'http://lumtest.com/myip.json',
     proxy_retry: 2,
     proxy_switch: 2,

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.109.493",
+        "version": "1.109.867",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -50,7 +50,7 @@
         },
         "/last_version": {
             "get": {
-                "description": "Returns the latest public version avaliable\n",
+                "description": "Returns the latest public version available\n",
                 "tags": [
                     "Manager"
                 ],
@@ -87,7 +87,7 @@
                                 "current": {
                                     "type": "string"
                                 },
-                                "recomended": {
+                                "recommended": {
                                     "type": "string"
                                 },
                                 "satisfied": {
@@ -172,7 +172,7 @@
                         }
                     },
                     "400": {
-                        "description": "Error responce"
+                        "description": "Error response"
                     }
                 }
             }
@@ -308,7 +308,7 @@
                     {
                         "name": "headers",
                         "in": "query",
-                        "description": "Desription of any other headers that will be sent along with the requests\n\nExample:\nencodueURIComponent(JSON.strinigify({'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}))",
+                        "description": "Description of any other headers that will be sent along with the requests\n\nExample:\nencodeURIComponent(JSON.stringify({'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}))",
                         "required": false,
                         "type": "string"
                     }
@@ -442,7 +442,7 @@
                 },
                 "ws": {
                     "type": "integer",
-                    "description": "websocket port used for request logs"
+                    "description": "WebSocket port used for request logs"
                 },
                 "config": {
                     "type": "string",
@@ -487,7 +487,7 @@
                 },
                 "use_proxy_cache": {
                     "type": "boolean",
-                    "description": "Cache resolved ips of superagents"
+                    "description": "Cache resolved ips of super proxies"
                 },
                 "request_stats": {
                     "type": "boolean",
@@ -500,6 +500,11 @@
                 "logs": {
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
+                },
+                "whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Default for all proxies whitelist ip list for granting access to them"
                 }
             }
         },
@@ -512,7 +517,7 @@
                 },
                 "proxy_type": {
                      "type": "string",
-                     "description": "Decide if to save proxy into the configuration file. specifing \"persist\" in \"proxy_type\" value will create port and save it in the configuration file."
+                     "description": "Decide if to save proxy into the configuration file. Specifying \"persist\" in \"proxy_type\" value will create port and save it in the configuration file."
                 },
                 "multiply": {
                     "type": "integer",
@@ -573,7 +578,7 @@
                 },
                 "use_proxy_cache": {
                     "type": "boolean",
-                    "description": "Cache resolved ips of superagents"
+                    "description": "Cache resolved ips of super proxies"
                 },
                 "insecure": {
                     "type": "boolean",
@@ -598,7 +603,7 @@
                 "ip": {
                     "type": "string",
                     "pattern": "^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$",
-                    "description": "Datacenter IP"
+                    "description": "Data center IP"
                 },
                 "vip": {
                     "type": "integer",

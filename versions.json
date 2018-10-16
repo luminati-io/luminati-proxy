@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.109.867",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "boom",
+                "text": "All proxies will listen on 127.0.0.1 by default, unless specific interface is set or ips whitelist is defined"
+            },
+            {
+                "type": "sparkles",
+                "text": "Add IP address from which log in was performed to whitelist ip list"
+            }
+        ]
+    },
+    {
         "ver": "1.109.493",
         "type": "stable",
         "changes": [

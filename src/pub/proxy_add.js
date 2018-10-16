@@ -229,9 +229,10 @@ const Created_port = ({port})=>{
 };
 
 const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
-    const json_example = '[\'1.1.1.2\', \'username:password@1.2.3.4:8888\']';
+    const json_example = '[\'1.1.1.2\', '
+        +'\'my_username:my_password@1.2.3.4:8888\']';
     const placeholder = 'List of IPs to the external proxies in the following '
-        +'format: [username:password@]ip[:port], example:\n'+json_example;
+        +'format: [username:password@]ip[:port]';
     const on_change_list = val=>{
         on_field_change('ips_list')(val);
         try {

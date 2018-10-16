@@ -23,12 +23,15 @@ class Form extends Pure_component {
         zone: `Default zone will be used automatically when creating a new
             port, if you don't specify any specific zone. This value can be
             overriden in each proxy port settings`,
-        whitelist_ips: `List of IPs that are allowed to access web UI
+        www_whitelist_ips: `List of IPs that are allowed to access web UI
             (including all API endpoints at http://localhost:22999/api) and
             make changes. can also include ranges of ips like so 0.0.0.0/0.
             Default value is 127.0.0.1, which means that remote access from
             any other IP is blocked unless list of IPs are added in this
             field.`,
+        whitelist_ips: `Default access grant for all proxies. Only those
+            IPs will be able to send requests to all proxies by default. Can
+            be changed per proxy`,
         request_stats: `Enable saving statistics to database`,
         logs_type: `Specify how many requests you want to keep in database. The
             limit may be set as a number or maximum database size. Set to 0 to
@@ -45,6 +48,8 @@ class Form extends Pure_component {
             const s = {...settings};
             s.www_whitelist_ips = s.www_whitelist_ips&&
                 s.www_whitelist_ips.join(',')||'';
+            s.whitelist_ips = s.whitelist_ips&&
+                s.whitelist_ips.join(',')||'';
             s.logs_metric = s.logs.metric;
             s.logs_value = s.logs.value;
             this.setState({settings: s});
@@ -60,9 +65,18 @@ class Form extends Pure_component {
     };
     whitelist_ips_change = val=>{
         this.setState(prev=>({
-            settings: {...prev.settings, www_whitelist_ips: val}}));
+            settings: {...prev.settings, whitelist_ips: val}}));
     };
     whitelist_ips_blur = ({target: {value}})=>{
+        const val = normalizers.ips_list(value);
+        this.setState(prev=>({
+            settings: {...prev.settings, whitelist_ips: val}}), this.save);
+    };
+    www_whitelist_ips_change = val=>{
+        this.setState(prev=>({
+            settings: {...prev.settings, www_whitelist_ips: val}}));
+    };
+    www_whitelist_ips_blur = ({target: {value}})=>{
         const val = normalizers.ips_list(value);
         this.setState(prev=>({
             settings: {...prev.settings, www_whitelist_ips: val}}), this.save);
@@ -122,8 +136,14 @@ class Form extends Pure_component {
                 on_change_wrapper={this.zone_change} label="Default zone"
                 tooltip={this.tooltips.zone} data={zone_opt}/>
               <Labeled_controller val={this.state.settings.www_whitelist_ips}
-                type="text" on_change_wrapper={this.whitelist_ips_change}
+                type="text" on_change_wrapper={this.www_whitelist_ips_change}
                 label="Admin whitelisted IPs"
+                placeholder="e.g. 1.1.1.1, 2.2.2.2"
+                on_blur={this.www_whitelist_ips_blur}
+                tooltip={this.tooltips.www_whitelist_ips}/>
+              <Labeled_controller val={this.state.settings.whitelist_ips}
+                type="text" on_change_wrapper={this.whitelist_ips_change}
+                label="Proxy whitelisted IPs"
                 placeholder="e.g. 1.1.1.1, 2.2.2.2"
                 on_blur={this.whitelist_ips_blur}
                 tooltip={this.tooltips.whitelist_ips}/>

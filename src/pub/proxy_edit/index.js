@@ -418,6 +418,8 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.whitelist_ips = save_form.whitelist_ips.split(',')
             .filter(Boolean);
         }
+        else
+            save_form.whitelist_ips = [];
         if (save_form.city.length)
             save_form.city = save_form.city[0].id;
         else
