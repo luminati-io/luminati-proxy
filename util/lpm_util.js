@@ -7,6 +7,8 @@ const pkg = require('../package.json');
 const analytics = require('../lib/analytics.js');
 const lpm_config = require('./lpm_config.js');
 const zerr = require('../util/zerr.js');
+const string = require('../util/string.js');
+const qw = string.qw;
 const E = module.exports;
 
 const parse_env_params = (env, fields)=>{
@@ -82,7 +84,7 @@ E.init_args = args=>{
         .filter(p=>args.includes(`--${p}`)));
     if (args.includes('-p'))
         argv.explicit_opt.port = argv.port;
-    argv.overlay_opt = _.omit(argv.explicit_opt, 'port');
+    argv.overlay_opt = _.omit(argv.explicit_opt, qw`port`);
     argv.daemon_opt = args.filter(arg=>arg.includes('daemon')||arg=='-d')
     .map(arg=>{
         let match;

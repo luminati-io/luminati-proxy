@@ -2074,7 +2074,7 @@ var presets = {
                     action: {
                         process: {
                             title: '$(\'#productTitle\').text()',
-                            price: '$(\'#price_inside_buybox\').text().trim()',
+                            price: '$(\'#priceblock_ourprice\').text().trim()',
                             bullets: '$(\'#featurebullets_feature_div li span\')' + '.map(function(){ return $(this).text() })' + '.get()'
                         }
                     },

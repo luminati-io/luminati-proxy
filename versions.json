@@ -1,7 +1,7 @@
 [
     {
-        "ver": "1.109.867",
-        "type": "stable",
+        "ver": "1.110.246",
+        "type": "dev",
         "changes": [
             {
                 "type": "boom",
@@ -10,6 +10,14 @@
             {
                 "type": "sparkles",
                 "text": "Add IP address from which log in was performed to whitelist ip list"
+            },
+            {
+                "type": "sparkles",
+                "text": "improved performance"
+            },
+            {
+                "type": "bug",
+                "text": "fixed propagating zone's password"
             }
         ]
     },

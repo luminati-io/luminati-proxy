@@ -987,10 +987,10 @@ describe('proxy', ()=>{
             const html = `
               <body>
                 <div>
-                  <p id="price_inside_buybox">$12.99</p>
+                  <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const process_rules = {price: `$('#price_inside_buybox').text()`};
+            const process_rules = {price: `$('#priceblock_ourprice').text()`};
             const req = {ctx: {response: {}}};
             const _res = {headers: {'content-encoding': 'gzip'}};
             l.rules.process_response(req, _res, process_rules, html, {});
@@ -1005,7 +1005,7 @@ describe('proxy', ()=>{
             const html = `
               <body>
                 <div>
-                  <p id="price_inside_buybox">$12.99</p>
+                  <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
             const process_rules = {price: 'a-b-v'};
@@ -1485,7 +1485,7 @@ describe('manager', ()=>{
         return yield app_with_args(args, opt.only_explicit);
     });
     const app_with_proxies = (proxies, cli)=>etask(function*(){
-        return yield app_with_config({config: {proxies}, cli: cli});
+        return yield app_with_config({config: {proxies}, cli});
     });
     const api = (_path, method, data, json)=>etask(function*(){
         const opt = {
@@ -1581,7 +1581,7 @@ describe('manager', ()=>{
                     {gen: {plans: [{disable: 1}]}})});
         });
     });
-    describe('dropin', ()=>{
+    xdescribe('dropin', ()=>{
         const t = (name, args, expected)=>it(name, etask._fn(
         function*(_this){
             _this.timeout(4000);
@@ -1840,6 +1840,34 @@ describe('manager', ()=>{
             {port: 24024},
         ]);
         t('conflict with www', [{port: Manager.default.www}]);
+    });
+    describe('using passwords', ()=>{
+        it('take password from provided zone', etask._fn(function*(_this){
+            _this.timeout(5000);
+            const config = {proxies: []};
+            const _defaults = {zone: 'static', password: 'xyz',
+                zones: {zone1: {password: ['zone1_pass']}}};
+            app = yield app_with_config({config, cli: {mode: 'root'}});
+            nock('https://luminati-china.io').get('/cp/lum_local_conf')
+            .query({customer: 'abc', proxy: pkg.version, token: ''})
+            .reply(200, {_defaults});
+            const res = yield json('api/proxies', 'post',
+                {proxy: {port: 24000, zone: 'zone1'}});
+            assert.equal(res.data.password, 'zone1_pass');
+        }));
+        it('uses password from default zone', etask._fn(function*(_this){
+            _this.timeout(5000);
+            const config = {proxies: []};
+            const _defaults = {zone: 'static', password: 'xyz',
+                zones: {static: {password: ['static_pass']}}};
+            app = yield app_with_config({config, cli: {mode: 'root'}});
+            nock('https://luminati-china.io').get('/cp/lum_local_conf')
+            .query({customer: 'abc', proxy: pkg.version, token: ''})
+            .reply(200, {_defaults});
+            const res = yield json('api/proxies', 'post',
+                {proxy: {port: 24000, zone: 'static'}});
+            assert.equal(res.data.password, 'static_pass');
+        }));
     });
 });
 
