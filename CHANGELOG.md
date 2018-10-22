@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.110.470 Stable
+- :sparkles: improved resolving conflicting proxy ports
+
 ## 1.110.246 Development Latest
 - :boom: All proxies will listen on 127.0.0.1 by default, unless specific interface is set or ips whitelist is defined
 - :sparkles: Add IP address from which log in was performed to whitelist ip list

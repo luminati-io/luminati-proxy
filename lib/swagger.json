@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.110.246",
+        "version": "1.110.470",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -505,6 +505,10 @@
                     "type": "array",
                     "items": {"type": "string"},
                     "description": "Default for all proxies whitelist ip list for granting access to them"
+                },
+                "force": {
+                    "type": "boolean",
+                    "description": "Kill other instances of LPM if there are any"
                 }
             }
         },

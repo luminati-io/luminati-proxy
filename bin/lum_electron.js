@@ -97,7 +97,7 @@ auto_updater.on('update-downloaded', e=>{
     upgrade(e.version);
 });
 
-let _show_port_conflict = (addr, port)=>etask(function*(){
+const _show_port_conflict = (addr, port)=>etask(function*(){
     let tasks;
     try { tasks = yield tasklist(); }
     catch(e){ process.exit(); }

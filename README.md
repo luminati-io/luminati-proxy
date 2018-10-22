@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.110.246/luminati-proxy-manager-v1.110.246-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.110.470/luminati-proxy-manager-v1.110.470-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -207,7 +207,7 @@ Options:
   --www                    HTTP port for browser admin UI       [default: 22999]
   --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
                            [default:"127.0.0.1"]
-			   [example: --www_whitelist_ips "212.17.0.1"]
+                           [example: --www_whitelist_ips "212.17.0.1"]
   --ws                     WebSocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
@@ -234,6 +234,8 @@ Options:
   --daemon, -d             Start as a daemon
   --stop-daemon            Stop running daemon
   --upgrade                Upgrade proxy manager
+  --force                  Force LPM to run and kill other processes if needed
+                                                      [boolean] [default: false]
   --version, -v            Show version number                         [boolean]
   --help, -h, -?           Show help                                   [boolean]
   --api                                   [default: "https://luminati-china.io"]

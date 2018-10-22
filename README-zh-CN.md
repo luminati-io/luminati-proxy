@@ -29,7 +29,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.110.246-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.110.470-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x
@@ -169,6 +169,8 @@ Options:
   --daemon, -d             Start as a daemon
   --stop-daemon            Stop running daemon
   --upgrade                Upgrade proxy manager
+  --force                  Force LPM to run and kill other processes if needed
+                                                      [boolean] [default: false]
   --version, -v            Show version number                         [boolean]
   --help, -h, -?           Show help                                   [boolean]
   --api                                   [default: "https://luminati-china.io"]

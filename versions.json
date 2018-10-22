@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.110.470",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improved resolving conflicting proxy ports"
+            }
+        ]
+    },
+    {
         "ver": "1.110.246",
         "type": "dev",
         "changes": [

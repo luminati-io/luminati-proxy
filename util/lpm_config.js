@@ -71,6 +71,7 @@ conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     reverse_lookup_dns: false,
     proxy_creds_check: true,
     use_proxy_cache: true,
+    force: false,
 });
 
 assign(module.exports, conf);

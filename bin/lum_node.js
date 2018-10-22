@@ -175,7 +175,7 @@ E.handle_signal = (sig, err)=>{
         E.shutdown(errstr, true, err);
 };
 
-let _show_port_conflict = (addr, port)=>etask(function*(){
+const check_running = force=>etask(function*(){
     let tasks;
     try { tasks = yield ps_list(); }
     catch(e){ process.exit(); }
@@ -183,23 +183,20 @@ let _show_port_conflict = (addr, port)=>etask(function*(){
         /.*lum_node\.js.*/.test(t.cmd) && t.ppid!=process.pid &&
         t.pid!=process.pid);
     if (!tasks.length)
-        return E.manager.stop();
-    zerr.notice(`There is already an application running on ${addr}:${port}\n`+
-        'Trying to kill it and restart.');
+        return;
+    zerr.notice('There is already an LPM instance running');
+    if (!force)
+    {
+        zerr.notice('If you want to kill other instances use --force flag');
+        process.exit();
+    }
+    zerr.notice('Trying to kill it and restart.');
     for (const t of tasks)
         process.kill(t.ppid, 'SIGTERM');
-    E.manager.restart();
 });
 
-let conflict_shown;
-let show_port_conflict = (addr, port)=>{
-    if (conflict_shown)
-        return;
-    conflict_shown = true;
-    _show_port_conflict(addr, port);
-};
-
-E.run = (argv, run_config)=>{
+E.run = (argv, run_config)=>etask(function*(){
+    yield check_running(argv.force);
     E.read_status_file();
     E.write_status_file('initializing', null,
         E.manager&&E.manager._total_conf);
@@ -214,10 +211,7 @@ E.run = (argv, run_config)=>{
     })
     .on('error', (e, fatal)=>{
         zerr(e.raw ? e.message : 'Unhandled error: '+e);
-        let handle_fatal = ()=>{
-            let err;
-            if (err = (e.message||'').match(/((?:\d{1,3}\.?){4}):(\d+)$/))
-                return show_port_conflict(err[1], err[2]);
+        const handle_fatal = ()=>{
             if (fatal)
                 E.manager.stop();
         };
@@ -250,7 +244,7 @@ E.run = (argv, run_config)=>{
     }).on('restart', ()=>process.send({command: 'restart'}));
     E.manager.start();
     E.write_status_file('running', null, E.manager&&E.manager._total_conf);
-};
+});
 
 E.handle_upgrade_finished = msg=>{
     if (E.on_upgrade_finished)
