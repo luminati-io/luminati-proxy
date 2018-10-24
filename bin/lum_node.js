@@ -108,16 +108,13 @@ E.write_status_file = (status, error = null, config = null, reason = null)=>{
 
 E.read_status_file = ()=>{
     let status_file;
-    let invalid_start = {'running': 1, 'initializing': 1, 'shutdowning': 1};
+    const invalid_start = {'running': 1, 'initializing': 1, 'shutdowning': 1};
     try { status_file = JSON.parse(file.read_e(E.status_filename)); }
     catch(e){ status_file = {}; }
     if (status_file)
         E.lpm_status = status_file;
     if (status_file && invalid_start[status_file.status])
-    {
-        ua.event('manager', 'crash_sudden', JSON.stringify(status_file));
         zerr.perr('crash_sudden', E.lpm_status);
-    }
 };
 
 E.shutdown = (reason, send_ev = true, error = null)=>{
@@ -156,14 +153,13 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
 
 E.handle_signal = (sig, err)=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
-    // XXX maximk: find origin and catch it there
-    // XXX maximk: fix process fail on oveload
     if (err)
     {
         zerr.crit(errstr);
         if ((err.message||'').includes('SQLITE') && E.manager)
             return void E.manager.perr('sqlite', {error: errstr});
     }
+    // XXX krzysztof: get rid of GA crash events as they are sent to perr
     if (err&&E.manager&&analytics.enabled)
     {
         ua.event('manager', 'crash', `v${version} ${err.stack}`,
@@ -184,7 +180,7 @@ const check_running = force=>etask(function*(){
         t.pid!=process.pid);
     if (!tasks.length)
         return;
-    zerr.notice('There is already an LPM instance running');
+    zerr.notice(`LPM is already running (${tasks[0].pid})`);
     if (!force)
     {
         zerr.notice('If you want to kill other instances use --force flag');

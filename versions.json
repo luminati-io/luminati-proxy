@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.110.576",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "improved resolving conflicting proxy ports on Windows"
+            },
+            {
+                "type": "bug",
+                "text": "Bug fixes"
+            }
+        ]
+    },
+    {
         "ver": "1.110.470",
         "type": "stable",
         "changes": [

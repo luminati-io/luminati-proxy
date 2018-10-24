@@ -97,32 +97,30 @@ auto_updater.on('update-downloaded', e=>{
     upgrade(e.version);
 });
 
-const _show_port_conflict = (addr, port)=>etask(function*(){
+const check_conflicts = ()=>etask(function*(){
     let tasks;
     try { tasks = yield tasklist(); }
     catch(e){ process.exit(); }
     tasks = tasks.filter(t=>t.imageName.includes('Luminati Proxy Manager') &&
         t.pid!=process.pid);
-    let res = dialog.showMessageBox({
+    if (tasks.length<=2)
+        return;
+    const res = dialog.showMessageBox({
         type: 'warning',
         title: 'Address in use',
-        message: `There is already an application running on ${addr}:${port}\n`
-            +(tasks.length ? 'Click OK button to try stopping the '
-            +'offending processes or Cancel to close Luminati Proxy '
-            +'Manager and stop other instances manually.\n\n'
+        message: `LPM is already running (${tasks[0].pid})\n`
+            +'Click OK to stopping the '
+            +'offending processes or Cancel to close LPM.\n\n'
             +'Suspected processes:\n'
             +'PID\t Image Name\t Session Name\t Mem Usage\n'
             +tasks.map(t=>`${t.pid}\t ${t.imageName}\t ${t.sessionName}\t `
-                +`${t.memUsage}`).join('\n') :
-            'Stop other running instances manually then click OK button '
-            +'to restart Luminati Proxy Manager.'),
+                +`${t.memUsage}`).join('\n'),
         buttons: ['Ok', 'Cancel'],
     });
     if (res)
         return app.exit();
     try {
-        if (tasks.length)
-            yield taskkill(tasks.map(t=>t.pid), {tree: true, force: true});
+        yield taskkill(tasks.map(t=>t.pid), {tree: true, force: true});
     } catch(e){
         dialog.showMessageBox({
             type: 'warning',
@@ -137,15 +135,8 @@ const _show_port_conflict = (addr, port)=>etask(function*(){
     restart();
 });
 
-let conflict_shown;
-let show_port_conflict = (addr, port)=>{
-    if (conflict_shown)
-        return;
-    conflict_shown = true;
-    _show_port_conflict(addr, port);
-};
-
-const _run = (argv, run_config)=>{
+const _run = (argv, run_config)=>etask(function*(){
+    yield check_conflicts();
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});
     manager = new Manager(argv, assign({ua}, run_config));
@@ -174,9 +165,6 @@ const _run = (argv, run_config)=>{
     .on('error', (e, fatal)=>{
         let e_msg = e.raw ? e.message : 'Unhandled error: '+e;
         let handle_fatal = ()=>{
-            let err;
-            if (err = (e.message||'').match(/((?:\d{1,3}\.?){4}):(\d+)$/))
-                return show_port_conflict(err[1], err[2]);
             if (fatal)
             {
                 mgr_err(e_msg);
@@ -205,7 +193,7 @@ const _run = (argv, run_config)=>{
         } : {}), 0);
     }));
     manager.start();
-};
+});
 
 let quit = err=>{
     if (err)

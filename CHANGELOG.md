@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.110.576 Development Latest
+- :sparkles: improved resolving conflicting proxy ports on Windows
+- :bug: Bug fixes
+
 ## 1.110.470 Stable
 - :sparkles: improved resolving conflicting proxy ports
 
