@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.110.792",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "added simple command for whitelisting IPs"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed session duration"
+            }
+        ]
+    },
+    {
         "ver": "1.110.576",
         "type": "dev",
         "changes": [

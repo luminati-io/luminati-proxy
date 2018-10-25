@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.110.792 Stable
+- :sparkles: added simple command for whitelisting IPs
+- :bug: Fixed session duration
+
 ## 1.110.576 Development Latest
 - :sparkles: improved resolving conflicting proxy ports on Windows
 - :bug: Bug fixes

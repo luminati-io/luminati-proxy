@@ -2,7 +2,7 @@
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../www/util/pub/pure_component.js';
-import {Logo, Circle_li as Li} from './common.js';
+import {Logo, Circle_li as Li, Code} from './common.js';
 
 export default class Whitelist_ips extends Pure_component {
     state = {};
@@ -30,18 +30,18 @@ const Instruction = ({ip})=>
 
 const Steps = ({ip})=>
     <div className="steps">
-      <h3>How to setup 'Admin whitelisted IPs'?</h3>
+      <h3>How to whitelist your IP?</h3>
       <div className="instructions">
         <ol>
-          <Li>Go to your LPM's admin page while on root server:
-            http://127.0.0.1/config</Li>
-          <Li>Edit the config file and add inside "_defaults" new line
-            "www_whitelist_ips": ["{ip}", ...[more IPs]]</Li>
           <Li>
-            Edit the array in the example to represent all the IPs you
-            wish to whitelist as admin(it can also be IP range e.g. 1.1.1.1/1)
+            Connect to the server where the Proxy Manager is
+            running (using SSH).
           </Li>
-          <Li>Save new configuration.</Li>
+          <Li>
+            In your remote server's terminal, run:
+            <Code>lpm_whitelist_ip {ip}</Code>
+          </Li>
+          <Li>Reload this page. Your IP should already be whitelisted.</Li>
         </ol>
       </div>
       <div>

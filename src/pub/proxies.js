@@ -99,7 +99,7 @@ const Port_cell = ({proxy, master_port})=>{
         val = proxy.port;
     const title = `${proxy.port} is a proxy port that refers to a specific
         virtual location on a computer. You can use it as a virtual proxy to
-        sends requests`;
+        send requests`;
     return <Tooltip title={title}>{val}</Tooltip>;
 };
 

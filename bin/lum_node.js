@@ -20,6 +20,8 @@ const ua = analytics.get_ua();
 const E = module.exports = {};
 const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
+const child_process = require('child_process');
+const os = require('os');
 
 const gen_filename = name=>{
     return lpm_file.get_file_path(
@@ -191,8 +193,34 @@ const check_running = force=>etask(function*(){
         process.kill(t.ppid, 'SIGTERM');
 });
 
+const add_alias_for_whitelist_ips = ()=>{
+   const func =
+        `curl_add_ip(){\n`+
+        `    ENDPOINT="http://127.0.0.1:22999/api/add_whitelist_ip"\n`+
+        `    DATA="ip="$1\n`+
+        `    curl $ENDPOINT -X POST -d $DATA\n`+
+        `}`;
+    const name = 'lpm_whitelist_ip';
+    const cmd = 'curl_add_ip';
+    const bashrc_path = os.homedir()+'/.bashrc';
+    const bashrc = file.read_e(bashrc_path);
+    if (/lpm_whitelist_ip/.test(bashrc)||/curl_add_ip/.test(bashrc))
+    {
+        zerr.notice(`${name} already installed`);
+        return;
+    }
+    zerr.notice(`installing ${name}`);
+    try {
+        const alias = `alias ${name}='${cmd}'`;
+        file.append_e(bashrc_path, func+'\n'+alias);
+        child_process.execSync(func);
+        child_process.execSync(alias);
+    } catch(e){ zerr.warn(`Failed to install ${name}: ${e.message}`); }
+};
+
 E.run = (argv, run_config)=>etask(function*(){
     yield check_running(argv.force);
+    add_alias_for_whitelist_ips();
     E.read_status_file();
     E.write_status_file('initializing', null,
         E.manager&&E.manager._total_conf);

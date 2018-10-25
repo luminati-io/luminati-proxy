@@ -525,55 +525,35 @@ describe('proxy', ()=>{
                     l = yield lum({max_requests: '0'});
                     assert.equal(l.session_mgr.max_requests, 0);
                 }));
-
                 const test_call = ()=>etask(function*(){
                     const res = yield l.test();
                     assert.ok(res.body);
                     assert.ok(res.body.auth);
                     return res.body.auth.session;
                 });
-
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
                     _this.timeout(12000);
-                    const trials = 3, pool_size = opt.pool_size || 1;
+                    const pool_size = opt.pool_size||1;
+                    const max_requests = opt.max_requests;
                     l = yield lum(opt);
-                    let sessions = [];
-                    for (let tr=0; tr<trials; tr++)
+                    const sessions = [];
+                    for (let i=0; i<pool_size; i++)
                     {
-                        sessions[tr] = [];
-                        if (opt.pool_type=='round-robin')
+                        sessions[i] = sessions[i]||[];
+                        for (let j=0; j<max_requests; j++)
                         {
-                            for (let req=0; req<opt.max_requests; req++)
-                            {
-                                for (let s=0; s<pool_size; s++)
-                                {
-                                    sessions[tr][s] = sessions[tr][s]||[];
-                                    sessions[tr][s][req] = yield test_call();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (let s=0; s<pool_size; s++)
-                            {
-                                sessions[tr][s] = [];
-                                for (let req=0; req<opt.max_requests; req++)
-                                    sessions[tr][s][req] = yield test_call();
-                            }
+                            const s = yield test_call();
+                            sessions[i][j] = s;
                         }
                     }
-                    let used = [];
-                    for (let tr=0; tr<trials; tr++)
+                    for (let i=0; i<pool_size; i++)
                     {
-                        for (let s=0; s<pool_size; s++)
-                        {
-                            let id = sessions[tr][s][0];
-                            used.forEach(u=>assert.notEqual(id, u));
-                            used.push(id);
-                            sessions[tr][s].forEach(
-                                req=>assert.equal(req, id));
-                        }
+                        const s = sessions[i][0];
+                        for (let j=1; j<max_requests; j++)
+                            assert.equal(s, sessions[i][j]);
                     }
+                    for (let j=1; j<pool_size; j++)
+                        assert.notEqual(sessions[j-1][0], sessions[j][0]);
                 }));
                 t('1, round-robin pool', {max_requests: 1, pool_size: 1,
                     pool_type: 'round-robin'});
@@ -581,20 +561,15 @@ describe('proxy', ()=>{
                     pool_type: 'round-robin'});
                 t('5, round-robin pool', {max_requests: 5, pool_size: 5,
                     pool_type: 'round-robin'});
-                t('10, round-robin pool', {max_requests: 10, pool_size: 10,
-                    pool_type: 'round-robin'});
                 t('1, sequential pool', {max_requests: 1, pool_size: 1});
                 t('2, sequential pool', {max_requests: 2, pool_size: 2});
                 t('5, sequential pool', {max_requests: 5, pool_size: 5});
-                t('10, sequential pool', {max_requests: 10, pool_size: 10});
                 t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
                 t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
                 t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
-                t('10, sticky_ip', {max_requests: 10, sticky_ip: true});
                 t('1, session using seed', {max_requests: 1, session: true});
                 t('2, session using seed', {max_requests: 2, session: true});
                 t('5, session using seed', {max_requests: 5, session: true});
-                t('10, session using seed', {max_requests: 10, session: true});
             });
             describe('keep_alive', ()=>{
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
@@ -619,38 +594,37 @@ describe('proxy', ()=>{
                 t('session using seed', {session: true, seed: 'seed'});
             });
             describe('session_duration', ()=>{
-                const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(4000);
-                    l = yield lum(assign({session_duration: 1}, // actual 1sec
-                        opt));
-                    const start = Date.now();
-                    const initial = yield l.test();
-                    const results = [];
-                    let interval = setInterval(etask._fn(function*(){
-                        const time = Date.now();
-                        const _res = yield l.test();
-                        if (interval)
-                            results.push({time: time, res: _res});
-                    }), 100);
-                    etask.sleep(1500);
-                    clearInterval(interval);
-                    interval = null;
-                    results.forEach(r=>{
-                        if (r.time - start < 1000)
-                        {
-                            assert.equal(initial.body.auth.session,
-                                r.res.body.auth.session);
-                        }
-                        else
-                        {
-                            assert.notEqual(initial.body.auth.session,
-                                r.res.body.auth.session);
-                        }
-                    });
-                }));
-                t('pool', {pool_size: 1});
-                t('sticky_ip', {sticky_ip: true});
-                t('session using seed', {session: true, seed: 'seed'});
+                describe('change after specified timeout', ()=>{
+                    const t = (name, opt)=>it(name, etask._fn(function*(_this){
+                        _this.timeout(4000);
+                        l = yield lum(assign({session_duration: 1}, opt));
+                        const initial = yield l.test();
+                        yield etask.sleep(1500);
+                        const second = yield l.test();
+                        assert.notEqual(initial.body.auth.session,
+                            second.body.auth.session);
+                    }));
+                    t('pool', {pool_size: 1});
+                    t('sticky_ip', {sticky_ip: true});
+                    t('session using seed', {session: true, seed: 'seed'});
+                });
+                describe('does not change before specified timeout', ()=>{
+                    const t = (name, opt)=>it(name, etask._fn(function*(_this){
+                        _this.timeout(4000);
+                        l = yield lum(assign({session_duration: 1}, opt));
+                        const initial = yield l.test();
+                        yield etask.sleep(500);
+                        const res1 = yield l.test();
+                        const res2 = yield l.test();
+                        assert.equal(initial.body.auth.session,
+                            res1.body.auth.session);
+                        assert.equal(initial.body.auth.session,
+                            res2.body.auth.session);
+                    }));
+                    t('pool', {pool_size: 1});
+                    t('sticky_ip', {sticky_ip: true});
+                    t('session using seed', {session: true, seed: 'seed'});
+                });
             });
             describe('fastest', ()=>{
                 const t = size=>it(''+size, etask._fn(function*(_this){
