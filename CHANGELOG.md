@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.110.824 Stable
+- :bug: Fixed installation script for Mac
+
 ## 1.110.817 Stable
 - :sparkles: added simple command for whitelisting IPs
 - :bug: Fixed session duration

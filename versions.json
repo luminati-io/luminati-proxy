@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.110.824",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed installation script for Mac"
+            }
+        ]
+    },
+    {
         "ver": "1.110.817",
         "type": "stable",
         "changes": [

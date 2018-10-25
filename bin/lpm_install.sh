@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.110.817"
+VERSION="1.110.824"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -27,6 +27,7 @@ NETWORK_RETRY=3
 NETWORK_ERROR=0
 UPDATE_NODE=0
 UPDATE_NPM=0
+UPDATE_NPM_NEWEST=0
 OS=""
 OS_MAC=0
 OS_LINUX=0
@@ -395,6 +396,11 @@ check_node()
 check_npm()
 {
     echo "checking npm..."
+    if ((OS_MAC)); then
+        UPDATE_NPM_NEWEST=1
+        perr "check_npm_mac"
+        return 0
+    fi
     if ! is_cmd_defined 'npm'; then
         INSTALL_NPM=1
         perr "check_no_npm"
@@ -512,6 +518,13 @@ update_npm()
     retry_sudo_cmd "npm install -g npm@$NPM_VER > /dev/null"
 }
 
+update_npm_newest()
+{
+    echo "updating npm to the newest version"
+    perr "update_npm_newest"
+    retry_sudo_cmd "npm install -g npm > /dev/null"
+}
+
 check_env()
 {
     echo "checking deps..."
@@ -545,6 +558,9 @@ deps_install()
     fi
     if ((UPDATE_NPM)); then
         update_npm
+    fi
+    if ((UPDATE_NPM_NEWEST)); then
+        update_npm_newest
     fi
     install_build_tools
 }
