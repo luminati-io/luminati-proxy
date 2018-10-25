@@ -570,6 +570,14 @@ describe('proxy', ()=>{
                 t('1, session using seed', {max_requests: 1, session: true});
                 t('2, session using seed', {max_requests: 2, session: true});
                 t('5, session using seed', {max_requests: 5, session: true});
+                it('no pool size', etask._fn(function*(_this){
+                    _this.timeout(4000);
+                    l = yield lum({max_requests: 1, pool_size: 0,
+                        session: true});
+                    const s1 = yield test_call();
+                    const s2 = yield test_call();
+                    assert.notEqual(s1, s2);
+                }));
             });
             describe('keep_alive', ()=>{
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){

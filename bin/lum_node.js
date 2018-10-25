@@ -159,18 +159,13 @@ E.handle_signal = (sig, err)=>{
     {
         zerr.crit(errstr);
         if ((err.message||'').includes('SQLITE') && E.manager)
-            return void E.manager.perr('sqlite', {error: errstr});
+            return void E.manager.perr('crash_sqlite', {error: errstr});
     }
-    // XXX krzysztof: get rid of GA crash events as they are sent to perr
-    if (err&&E.manager&&analytics.enabled)
-    {
-        ua.event('manager', 'crash', `v${version} ${err.stack}`,
-            ()=>E.shutdown(errstr, false, err));
-        zerr.perr('crash', {error: errstr, reason: sig,
+    etask(function*handle_signal_lum_node(){
+        yield zerr.perr('crash', {error: errstr, reason: sig,
             config: E.manager&&E.manager._total_conf});
-    }
-    else
         E.shutdown(errstr, true, err);
+    });
 };
 
 const check_running = force=>etask(function*(){
@@ -203,7 +198,12 @@ const add_alias_for_whitelist_ips = ()=>{
     const name = 'lpm_whitelist_ip';
     const cmd = 'curl_add_ip';
     const bashrc_path = os.homedir()+'/.bashrc';
-    const bashrc = file.read_e(bashrc_path);
+    let bashrc;
+    try { bashrc = file.read_e(bashrc_path); }
+    catch(e){
+        zerr.notice(`.bashrc not found! alias for whitelisting failed`);
+        return;
+    }
     if (/lpm_whitelist_ip/.test(bashrc)||/curl_add_ip/.test(bashrc))
     {
         zerr.notice(`${name} already installed`);

@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.110.792 Stable
+## 1.110.817 Stable
 - :sparkles: added simple command for whitelisting IPs
 - :bug: Fixed session duration
 
