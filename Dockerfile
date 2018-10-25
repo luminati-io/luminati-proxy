@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:9.4.0
+FROM node:10
 
 RUN npm install -g npm@4.6.1
 
