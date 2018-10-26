@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.110.852"
+VERSION="1.110.864"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -377,11 +377,16 @@ check_nvm()
 check_node()
 {
     echo "checking nodejs..."
+    if ((OS_MAC)); then
+        REINSTALL_NODE_MAC=1
+        perr "check_reinstall_node"
+        return 0
+    fi
     if is_cmd_defined "node"; then
         local node_ver=$(node -v)
         zerr "check_node: $node_ver"
         echo "node ${node_ver} is installed"
-        if ! [[ "$node_ver" =~ ^(v[1-9]\.|v[0-9][0-9]+\.) ]]; then
+        if ! [[ "$node_ver" =~ ^(v10\.|v[0-9][0-9]+\.) ]]; then
             echo "minimum required node version is 10"
             perr "check_node_bad_version" "$node_ver"
             UPDATE_NODE=1
@@ -396,11 +401,6 @@ check_node()
 check_npm()
 {
     echo "checking npm..."
-    if ((OS_MAC)); then
-        REINSTALL_NODE_MAC=1
-        perr "check_reinstall_node"
-        return 0
-    fi
     if ! is_cmd_defined 'npm'; then
         INSTALL_NPM=1
         perr "check_no_npm"
@@ -520,14 +520,7 @@ update_npm()
 
 reinstall_node_mac()
 {
-    echo "downgrading node to 8.11.2"
-    TARGET_VER=$NODE_VER
     NODE_VER='8.11.2'
-    install_nave_node
-    echo "reinstalling npm"
-    retry_sudo_cmd "npm install -g npm > /dev/null"
-    NODE_VER=$TARGET_VER
-    echo "upgrading node to target version $NODE_VER"
     install_nave_node
 }
 
