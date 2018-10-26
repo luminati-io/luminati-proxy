@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.110.824 Stable
+## 1.110.852 Stable
 - :bug: Fixed installation script for Mac
 
 ## 1.110.817 Stable

@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.110.824"
+VERSION="1.110.852"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -27,7 +27,7 @@ NETWORK_RETRY=3
 NETWORK_ERROR=0
 UPDATE_NODE=0
 UPDATE_NPM=0
-UPDATE_NPM_NEWEST=0
+REINSTALL_NODE_MAC=0
 OS=""
 OS_MAC=0
 OS_LINUX=0
@@ -397,8 +397,8 @@ check_npm()
 {
     echo "checking npm..."
     if ((OS_MAC)); then
-        UPDATE_NPM_NEWEST=1
-        perr "check_npm_mac"
+        REINSTALL_NODE_MAC=1
+        perr "check_reinstall_node"
         return 0
     fi
     if ! is_cmd_defined 'npm'; then
@@ -518,11 +518,17 @@ update_npm()
     retry_sudo_cmd "npm install -g npm@$NPM_VER > /dev/null"
 }
 
-update_npm_newest()
+reinstall_node_mac()
 {
-    echo "updating npm to the newest version"
-    perr "update_npm_newest"
+    echo "downgrading node to 8.11.2"
+    TARGET_VER=$NODE_VER
+    NODE_VER='8.11.2'
+    install_nave_node
+    echo "reinstalling npm"
     retry_sudo_cmd "npm install -g npm > /dev/null"
+    NODE_VER=$TARGET_VER
+    echo "upgrading node to target version $NODE_VER"
+    install_nave_node
 }
 
 check_env()
@@ -559,8 +565,8 @@ deps_install()
     if ((UPDATE_NPM)); then
         update_npm
     fi
-    if ((UPDATE_NPM_NEWEST)); then
-        update_npm_newest
+    if ((REINSTALL_NODE_MAC)); then
+        reinstall_node_mac
     fi
     install_build_tools
 }
