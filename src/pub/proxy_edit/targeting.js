@@ -171,9 +171,11 @@ class Targeting extends Pure_component {
               <Config type="typeahead" id="city" data={this.cities()}
                 on_change={this.city_changed}/>
               <Config type="typeahead" id="asn" data={this.state.asns}
-                disabled={!!this.props.form.carrier} update_on_input/>
+                disabled={!!this.props.form.carrier} update_on_input
+                depend_a={this.props.form.zone}/>
               <Config type="select" id="carrier" data={carriers}
-                note={carriers_note} disabled={carrier_disabled}/>
+                note={carriers_note} disabled={carrier_disabled}
+                depend_a={this.props.form.zone}/>
             </div>;
     }
 });

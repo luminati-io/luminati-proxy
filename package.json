@@ -133,11 +133,11 @@
     "mocha": "3.2.0",
     "moment": "2.17.1",
     "nock": "9.0.11",
-    "react": "16.3.2",
+    "react": "16.6.0",
+    "react-dom": "16.6.0",
+    "react-router-dom": "4.3.1",
     "react-bootstrap": "0.31.0",
     "react-bootstrap-typeahead": "2.0.2",
-    "react-dom": "16.1.1",
-    "react-router-dom": "4.2.2",
     "style-loader": "0.18.2",
     "swagger-ui": "2.2.8",
     "url-loader": "0.5.9",
@@ -358,7 +358,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "718e6884e28579ea87a46b43b965806c"
+    "md5": "3a1114b9f54213e05195f32bd967408b"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -394,5 +394,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.110.864"
+  "version": "1.111.73"
 }

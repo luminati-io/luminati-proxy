@@ -14,7 +14,7 @@ import Tracer from './tracer.js';
 import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
-import {Enable_ssl_modal} from './common.js';
+import {Enable_ssl_modal, Error_boundry} from './common.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
@@ -124,18 +124,20 @@ const Page = ()=>
       <Nav/>
       <Proxy_add/>
       <div className="page_body">
-        <Switch>
-          <Route path="/overview" exact component={Overview}/>
-          <Route path="/overview/:master_port" exact component={Overview}/>
-          <Route path="/proxy/:port/:tab?" exact component={Proxy_edit}/>
-          <Route path="/howto" exact component={Howto}/>
-          <Route path="/logs" exact component={Logs}/>
-          <Route path="/proxy_tester" exact component={Proxy_tester}/>
-          <Route path="/tracer" exact component={Tracer}/>
-          <Route path="/config" exact component={Config}/>
-          <Route path="/settings" exact component={Settings}/>
-          <Route path="/" component={Overview}/>
-        </Switch>
+        <Error_boundry>
+          <Switch>
+            <Route path="/overview" exact component={Overview}/>
+            <Route path="/overview/:master_port" exact component={Overview}/>
+            <Route path="/proxy/:port/:tab?" exact component={Proxy_edit}/>
+            <Route path="/howto" exact component={Howto}/>
+            <Route path="/logs" exact component={Logs}/>
+            <Route path="/proxy_tester" exact component={Proxy_tester}/>
+            <Route path="/tracer" exact component={Tracer}/>
+            <Route path="/config" exact component={Config}/>
+            <Route path="/settings" exact component={Settings}/>
+            <Route path="/" component={Overview}/>
+          </Switch>
+        </Error_boundry>
       </div>
     </div>;
 

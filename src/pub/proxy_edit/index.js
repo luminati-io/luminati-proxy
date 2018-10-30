@@ -385,7 +385,7 @@ const Index = withRouter(class Index extends Pure_component {
             {
                 save_form[field] = before_save(save_form[field]);
             }
-            if (!this.is_valid_field(field) || save_form[field]===null)
+            if (!this.is_valid_field(field)||save_form[field]===null)
                 save_form[field] = '';
         }
         const effective = attr=>{
@@ -532,6 +532,7 @@ const Main_window = withRouter(({match: {params: {tab}}, ...props})=>{
 class Nav extends Pure_component {
     state = {};
     set_field = setdb.get('head.proxy_edit.set_field');
+    is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
     componentDidMount(){
         this.setdb_on('head.zones', zones=>zones&&this.setState({zones}));
     }
@@ -552,12 +553,24 @@ class Nav extends Pure_component {
     update_zone = val=>{
         const zone_name = val||this.props.default_zone;
         setdb.set('head.proxy_edit.zone_name', zone_name);
+        this.props.form.zone = zone_name;
         const zone = this.props.zones.filter(z=>z.key==zone_name)[0]||{};
         this.set_field('zone', val);
         this.set_field('password', zone.password);
         if (this.props.form.ips.length || this.props.form.vips.length)
             this.set_field('pool_size', 0);
         this._reset_fields();
+        const save_form = Object.assign({}, this.props.form);
+        for (let field in save_form)
+        {
+            if (!this.is_valid_field(field, zone_name))
+            {
+                let v = '';
+                if (field=='city'||field=='asn')
+                    v = [];
+                this.set_field(field, v);
+            }
+        }
     };
     render(){
         if (!this.state.zones)
@@ -569,10 +582,6 @@ class Nav extends Pure_component {
             return {key, value: p};
         });
         const preset = this.props.form.preset;
-        const preset_tooltip = preset&&presets[preset].subtitle
-        +(presets[preset].rules&&
-        '<ul>'+presets[preset].rules.map(r=>`<li>${r.label}</li>`).join('')
-        +'</ul>');
         return <div className="nav">
               <Field on_change={this.update_zone} options={this.props.zones}
                 value={this.props.form.zone} disabled={this.props.disabled}

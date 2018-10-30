@@ -212,19 +212,16 @@ const presets = {
             spreading requests across large number of IPs. Tweak pool_size,
             max_requests & proxy_count to optimize performance`,
         set: opt=>{
-            opt.pool_size = 0;
             opt.pool_type = 'round-robin';
             opt.keep_alive = 45;
             opt.session = true;
         },
         clean: opt=>{
-            opt.pool_size = 1;
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
         },
         rules: [
-            {field: 'pool_size', label: `Sets 'Pool size' to 1`},
             {field: 'pool_type', label: `Round-robin pool type`},
             {field: 'multiply', label: `Disables 'Multiply' options`},
         ],

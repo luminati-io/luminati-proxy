@@ -117,6 +117,32 @@ export class Modal extends React.Component {
     }
 }
 
+export class Error_boundry extends Pure_component {
+    state = {error: false};
+    static getDerivedStateFromError(error){
+        return {error: true};
+    }
+    componentDidCatch(error, info){
+        this.log_error(error, info);
+    }
+    log_error = (error, info)=>{
+        this.etask(function*(){
+            // XXX krzysztof: switch fetch->ajax
+            yield window.fetch('/api/react_error', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({backtrace: error.stack,
+                    message: error.message, stack: info.componentStack}),
+            });
+        });
+    };
+    render(){
+        if (this.state.error)
+            return <h1>Error</h1>;
+        return this.props.children;
+    }
+}
+
 export class Enable_ssl_modal extends Pure_component {
     state = {loading: false};
     faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
@@ -738,9 +764,9 @@ class Perm_icons extends Pure_component {
             icons.unshift('residential');
         else if (perm.route_dedicated)
             icons.unshift('data_center');
-        return <div>{icons.map(perm=>
-              <Tooltip key={perm} title={this.prem_tooltips[perm]}>
-                <div className={'perm_icon '+perm}/>
+        return <div>{icons.map(_perm=>
+              <Tooltip key={_perm} title={this.prem_tooltips[_perm]}>
+                <div className={'perm_icon '+_perm}/>
               </Tooltip>)}
             </div>;
     }

@@ -60,8 +60,9 @@ class Config extends Pure_component {
     };
     componentDidMount(){
         const val_id = this.props.val_id ? this.props.val_id : this.props.id;
-        this.setdb_on('head.proxy_edit.form.'+val_id, val=>
-            this.setState({val, show: true}));
+        this.setdb_on('head.proxy_edit.form.'+val_id, val=>{
+            this.setState({val, show: true});
+        });
         this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
             disabled_fields&&this.setState({disabled_fields}));
         this.setdb_on('head.defaults', defaults=>
