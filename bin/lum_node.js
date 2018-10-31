@@ -162,8 +162,11 @@ E.handle_signal = (sig, err)=>{
             return void E.manager.perr('crash_sqlite', {error: errstr});
     }
     etask(function*handle_signal_lum_node(){
-        yield zerr.perr('crash', {error: errstr, reason: sig,
-            config: E.manager&&E.manager._total_conf});
+        if (sig!='SIGINT'||err!='SIGINT')
+        {
+            yield zerr.perr('crash', {error: errstr, reason: sig,
+                config: E.manager&&E.manager._total_conf});
+        }
         E.shutdown(errstr, true, err);
     });
 };
