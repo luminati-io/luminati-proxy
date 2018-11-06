@@ -97,45 +97,45 @@ my $agent = LWP::UserAgent->new();
 $agent->proxy(['http', 'https'], "http://127.0.0.1:${proxy}");
 print $agent->get('http://lumtest.com/myip.json')->content();`,
 });
+
+const Last_step = ()=>
+    <Li>You are all set! Open a
+      <a className="link" onClick={()=>window.open()}>new tab</a>
+      and start browsing.</Li>;
+
 E.browser = (proxy=24000)=>({
     chrome_win: <ol>
-          <Li>Click the Chrome menu on the browser toolbar.</Li>
-          <Li>Select <code>Settings</code></Li>
-          <Li>Click <code>Advanced settings</code></Li>
+          <Li>Open <Code>chrome://settings/</Code> in
+            a <a className="link" onClick={()=>window.open()}>new tab</a>.</Li>
+          <Li>Click <code>Advanced</code></Li>
           <Li>In the <code>System</code> section, click
             <code>Open proxy settings</code></Li>
           <Li>Click <code>LAN settings</code></Li>
           <Li>Select the <code>Use a proxy server for your LAN</code> check
             box under <code>Proxy Server</code></Li>
           <Li>
-            Enter <code>Address</code>:
-            <Code>127.0.0.1</Code>
-          </Li>
-          <Li>
-            Enter <code>Port</code>:
-            <Code>{proxy}</Code>
+            Enter <code>Address</code>: <Code>127.0.0.1</Code> and
+            <code>Port</code>: <Code> {proxy}</Code>
           </Li>
           <Li>Check the "Bypass proxy server for local addresses" checkbox</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
+          <Last_step/>
         </ol>,
     chrome_mac: <ol>
-          <Li>Click the Chrome menu on the browser toolbar.</Li>
-          <Li>Select <code>Settings</code></Li>
-          <Li>Click <code>Show advanced settings</code></Li>
+          <Li>Open <Code>chrome://settings/</Code> in
+            a <a className="link" onClick={()=>window.open()}>new tab</a>.</Li>
+          <Li>Click <code>Advanced</code></Li>
           <Li>In the <code>Network</code> section, click
             <code>Change proxy settings</code></Li>
           <Li>System Preferences should start up automatically, with the
             Network window open and Proxies selected.</Li>
           <Li>Choose <code>Web Proxy (HTTP)</code></Li>
           <Li>
-            Enter <code>Web Proxy Server</code>:
-            <Code>127.0.0.1</Code>
-          </Li>
-          <Li>
-            Enter <code>Port</code>:
-            <Code>{proxy}</Code>
+            Enter <code>Address</code>: <Code>127.0.0.1</Code> and
+            <code>Port</code>: <Code> {proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code>.</Li>
+          <Last_step/>
         </ol>,
     ie: <ol>
           <Li>Click the Tools button, and then click Internet options.</Li>
@@ -144,35 +144,30 @@ E.browser = (proxy=24000)=>({
           <Li>Select the <code>Use a proxy server for your LAN</code>
             check box.</Li>
           <Li>
-            Enter <code>Address</code>:
-            <Code>127.0.0.1</Code>
-          </Li>
-          <Li>
-            Enter <code>Port</code>:
-            <Code>{proxy}</Code>
+            Enter <code>Address</code>: <Code>127.0.0.1</Code> and
+            <code>Port</code>: <Code> {proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
+          <Last_step/>
         </ol>,
     firefox: <ol>
-          <Li>In main menu, click on <code>Options</code></Li>
+          <Li>Open <Code>about:preferences</Code> in
+            a <a className="link" onClick={()=>window.open()}>new tab</a>.</Li>
           <Li>Click the <code>General</code> tab and scroll down to
-            <code>Network Proxy</code>.</Li>
+            <code>Network Settings</code>.</Li>
           <Li>Open network settings by clicking <code>Settings...</code>
             button.</Li>
           <Li>Choose <code>Manual proxy configuration</code> radio button.</Li>
           <Li>
-            Enter <code>HTTP Proxy</code>:
-            <Code>127.0.0.1</Code>
-          </Li>
-          <Li>
-            Enter <code>Port</code>:
-            <Code>{proxy}</Code>
+            Enter <code>HTTP Proxy</code>: <Code>127.0.0.1</Code> and
+            <code>Port</code>: <Code> {proxy}</Code>
           </Li>
           <Li>Tick <code>Use this proxy server for all protocols</code>
             checkbox.</Li>
           <Li>Add <code>localhost,127.0.0.1</code> to "No proxy for:" text
             area.</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
+          <Last_step/>
         </ol>,
     safari: <ol>
           <Li>
@@ -184,14 +179,11 @@ E.browser = (proxy=24000)=>({
             Network window open and Proxies selected.</Li>
           <Li>Choose <code>Web Proxy (HTTP)</code></Li>
           <Li>
-            Enter <code>Web Proxy Server</code>:
-            <Code>127.0.0.1</Code>
-          </Li>
-          <Li>
-            Enter <code>Port</code>:
-            <Code>{proxy}</Code>
+            Enter <code>Web Proxy Server</code>: <Code>127.0.0.1</Code> and
+            <code>Port</code>: <Code> {proxy}</Code>
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
+          <Last_step/>
         </ol>,
 });
 

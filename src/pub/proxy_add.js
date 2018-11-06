@@ -131,6 +131,12 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         this.save({redirect: true, field});
     }
     advanced_clicked = ()=>{
+        if (this.state.proxies_running.length==1)
+        {
+            $('#add_new_proxy_modal').modal('hide');
+            this.props.history.push({pathname: '/howto/code'});
+            return;
+        }
         if (this.state.created_port)
         {
             $('#add_new_proxy_modal').modal('hide');

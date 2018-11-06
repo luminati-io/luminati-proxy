@@ -268,7 +268,7 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _reactBootstrapTypeahead = __webpack_require__(299);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _chrome_widgets = __webpack_require__(190);
 
@@ -1809,8 +1809,7 @@ module.exports = __webpack_require__(212);
 /* 19 */,
 /* 20 */,
 /* 21 */,
-/* 22 */,
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1820,7 +1819,7 @@ module.exports = __webpack_require__(212);
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.normalizers = exports.swagger_link_tester_url = exports.swagger_url = exports.presets = exports.get_static_country = exports.status_codes = exports.user_agents = exports.ga_event = exports.bytes_format = undefined;
+exports.detect_browser = exports.normalizers = exports.swagger_link_tester_url = exports.swagger_url = exports.presets = exports.get_static_country = exports.status_codes = exports.user_agents = exports.ga_event = exports.bytes_format = undefined;
 
 var _netmask = __webpack_require__(326);
 
@@ -2204,7 +2203,16 @@ var normalizers = exports.normalizers = {
     }
 };
 
+var detect_browser = exports.detect_browser = function detect_browser() {
+    var browser = 'unknown';
+    if (window.opr && window.opr.addons || window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
+        browser = 'opera';
+    } else if (typeof InstallTrigger !== 'undefined') browser = 'firefox';else if (document.documentMode) browser = 'IE';else if (window.StyleMedia) browser = 'Edge';else if (window.chrome && window.chrome.webstore) browser = 'chrome';
+    return browser;
+};
+
 /***/ }),
+/* 23 */,
 /* 24 */,
 /* 25 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -2447,9 +2455,7 @@ var _createEmotion = Object(__WEBPACK_IMPORTED_MODULE_0_create_emotion__["a" /* 
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(26)))
 
 /***/ }),
-/* 31 */,
-/* 32 */,
-/* 33 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2512,6 +2518,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
+/* 32 */,
+/* 33 */,
 /* 34 */,
 /* 35 */,
 /* 36 */,
@@ -13558,7 +13566,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _reactWaypoint = __webpack_require__(784);
 
@@ -13572,7 +13580,7 @@ var _har_preview2 = _interopRequireDefault(_har_preview);
 
 var _common = __webpack_require__(16);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _reactTooltip = __webpack_require__(194);
 
@@ -23620,7 +23628,7 @@ var Pane_response = function (_Pure_component3) {
         key: 'render',
         value: function render() {
             var content_type = this.props.req.details.content_type;
-            if (!content_type || ['xhr', 'css', 'js', 'font', 'html'].includes(content_type)) {
+            if (!content_type || ['xhr', 'css', 'js', 'font', 'html', 'other'].includes(content_type)) {
                 return _react2.default.createElement(Codemirror_wrapper, { req: this.props.req });
             }
             return _react2.default.createElement(No_response_data, null);
@@ -25977,6 +25985,23 @@ E.code = function () {
         perl: '#!/usr/bin/perl\nuse LWP::UserAgent;\nmy $agent = LWP::UserAgent->new();\n$agent->proxy([\'http\', \'https\'], "http://127.0.0.1:' + proxy + '");\nprint $agent->get(\'http://lumtest.com/myip.json\')->content();'
     };
 };
+
+var Last_step = function Last_step() {
+    return _react2.default.createElement(
+        _common.Circle_li,
+        null,
+        'You are all set! Open a',
+        _react2.default.createElement(
+            'a',
+            { className: 'link', onClick: function onClick() {
+                    return window.open();
+                } },
+            'new tab'
+        ),
+        'and start browsing.'
+    );
+};
+
 E.browser = function () {
     var proxy = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 24000;
     return {
@@ -25986,17 +26011,21 @@ E.browser = function () {
             _react2.default.createElement(
                 _common.Circle_li,
                 null,
-                'Click the Chrome menu on the browser toolbar.'
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Select ',
+                'Open ',
                 _react2.default.createElement(
-                    'code',
+                    _common.Code,
                     null,
-                    'Settings'
-                )
+                    'chrome://settings/'
+                ),
+                ' in a ',
+                _react2.default.createElement(
+                    'a',
+                    { className: 'link', onClick: function onClick() {
+                            return window.open();
+                        } },
+                    'new tab'
+                ),
+                '.'
             ),
             _react2.default.createElement(
                 _common.Circle_li,
@@ -26005,7 +26034,7 @@ E.browser = function () {
                 _react2.default.createElement(
                     'code',
                     null,
-                    'Advanced settings'
+                    'Advanced'
                 )
             ),
             _react2.default.createElement(
@@ -26059,26 +26088,23 @@ E.browser = function () {
                     null,
                     'Address'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
                     '127.0.0.1'
-                )
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Enter ',
+                ),
+                ' and',
                 _react2.default.createElement(
                     'code',
                     null,
                     'Port'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
+                    ' ',
                     proxy
                 )
             ),
@@ -26096,7 +26122,8 @@ E.browser = function () {
                     null,
                     'OK'
                 )
-            )
+            ),
+            _react2.default.createElement(Last_step, null)
         ),
         chrome_mac: _react2.default.createElement(
             'ol',
@@ -26104,17 +26131,21 @@ E.browser = function () {
             _react2.default.createElement(
                 _common.Circle_li,
                 null,
-                'Click the Chrome menu on the browser toolbar.'
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Select ',
+                'Open ',
                 _react2.default.createElement(
-                    'code',
+                    _common.Code,
                     null,
-                    'Settings'
-                )
+                    'chrome://settings/'
+                ),
+                ' in a ',
+                _react2.default.createElement(
+                    'a',
+                    { className: 'link', onClick: function onClick() {
+                            return window.open();
+                        } },
+                    'new tab'
+                ),
+                '.'
             ),
             _react2.default.createElement(
                 _common.Circle_li,
@@ -26123,7 +26154,7 @@ E.browser = function () {
                 _react2.default.createElement(
                     'code',
                     null,
-                    'Show advanced settings'
+                    'Advanced'
                 )
             ),
             _react2.default.createElement(
@@ -26164,28 +26195,25 @@ E.browser = function () {
                 _react2.default.createElement(
                     'code',
                     null,
-                    'Web Proxy Server'
+                    'Address'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
                     '127.0.0.1'
-                )
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Enter ',
+                ),
+                ' and',
                 _react2.default.createElement(
                     'code',
                     null,
                     'Port'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
+                    ' ',
                     proxy
                 )
             ),
@@ -26199,7 +26227,8 @@ E.browser = function () {
                     'OK'
                 ),
                 '.'
-            )
+            ),
+            _react2.default.createElement(Last_step, null)
         ),
         ie: _react2.default.createElement(
             'ol',
@@ -26244,26 +26273,23 @@ E.browser = function () {
                     null,
                     'Address'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
                     '127.0.0.1'
-                )
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Enter ',
+                ),
+                ' and',
                 _react2.default.createElement(
                     'code',
                     null,
                     'Port'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
+                    ' ',
                     proxy
                 )
             ),
@@ -26276,7 +26302,8 @@ E.browser = function () {
                     null,
                     'OK'
                 )
-            )
+            ),
+            _react2.default.createElement(Last_step, null)
         ),
         firefox: _react2.default.createElement(
             'ol',
@@ -26284,12 +26311,21 @@ E.browser = function () {
             _react2.default.createElement(
                 _common.Circle_li,
                 null,
-                'In main menu, click on ',
+                'Open ',
                 _react2.default.createElement(
-                    'code',
+                    _common.Code,
                     null,
-                    'Options'
-                )
+                    'about:preferences'
+                ),
+                ' in a ',
+                _react2.default.createElement(
+                    'a',
+                    { className: 'link', onClick: function onClick() {
+                            return window.open();
+                        } },
+                    'new tab'
+                ),
+                '.'
             ),
             _react2.default.createElement(
                 _common.Circle_li,
@@ -26304,7 +26340,7 @@ E.browser = function () {
                 _react2.default.createElement(
                     'code',
                     null,
-                    'Network Proxy'
+                    'Network Settings'
                 ),
                 '.'
             ),
@@ -26339,26 +26375,23 @@ E.browser = function () {
                     null,
                     'HTTP Proxy'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
                     '127.0.0.1'
-                )
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Enter ',
+                ),
+                ' and',
                 _react2.default.createElement(
                     'code',
                     null,
                     'Port'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
+                    ' ',
                     proxy
                 )
             ),
@@ -26393,7 +26426,8 @@ E.browser = function () {
                     null,
                     'OK'
                 )
-            )
+            ),
+            _react2.default.createElement(Last_step, null)
         ),
         safari: _react2.default.createElement(
             'ol',
@@ -26454,26 +26488,23 @@ E.browser = function () {
                     null,
                     'Web Proxy Server'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
                     '127.0.0.1'
-                )
-            ),
-            _react2.default.createElement(
-                _common.Circle_li,
-                null,
-                'Enter ',
+                ),
+                ' and',
                 _react2.default.createElement(
                     'code',
                     null,
                     'Port'
                 ),
-                ':',
+                ': ',
                 _react2.default.createElement(
                     _common.Code,
                     null,
+                    ' ',
                     proxy
                 )
             ),
@@ -26486,7 +26517,8 @@ E.browser = function () {
                     null,
                     'OK'
                 )
-            )
+            ),
+            _react2.default.createElement(Last_step, null)
         )
     };
 };
@@ -27807,7 +27839,7 @@ var _reactDom = __webpack_require__(13);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 __webpack_require__(360);
 
@@ -28173,7 +28205,7 @@ var Page = function Page() {
                     _react2.default.createElement(_reactRouterDom.Route, { path: '/overview', exact: true, component: _overview2.default }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: '/overview/:master_port', exact: true, component: _overview2.default }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: '/proxy/:port/:tab?', exact: true, component: _index2.default }),
-                    _react2.default.createElement(_reactRouterDom.Route, { path: '/howto', exact: true, component: _howto2.default }),
+                    _react2.default.createElement(_reactRouterDom.Route, { path: '/howto/:option?/:suboption?', exact: true, component: _howto2.default }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: '/logs', exact: true, component: _logs.Logs }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: '/proxy_tester', exact: true, component: _proxy_tester2.default }),
                     _react2.default.createElement(_reactRouterDom.Route, { path: '/tracer', exact: true, component: _tracer2.default }),
@@ -28607,6 +28639,8 @@ E.perr = function(id, info, opt){
     if (perr_pending && perr_pending.length<100)
         perr_pending.push(Array.from(arguments));
 };
+var perr_hooks = [];
+E.add_perr_hook = perr_hooks.push.bind(perr_hooks);
 var perr_dropped = {};
 var perr_orig = E.perr;
 function wrap_perr(perr_fn){
@@ -28625,6 +28659,8 @@ function wrap_perr(perr_fn){
         var rl = rl_hash[id] = rl_hash[id]||{};
         if (pre_send)
             pre_send(id, info, opt);
+        perr_hooks.filter(function(h){ return h.ids.test(id); })
+        .forEach(function(h){ h.fn(id, info, opt); });
         if (opt.rate_limit===false || rate_limit(rl, ms, count))
         {
             if (perr_dropped[id])
@@ -29459,11 +29495,11 @@ var _har_viewer = __webpack_require__(202);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var util = _interopRequireWildcard(_util);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _rules2 = __webpack_require__(824);
 
@@ -30676,7 +30712,7 @@ module.exports = __webpack_require__(453);
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof = __webpack_require__(257);
-var ITERATOR = __webpack_require__(31)('iterator');
+var ITERATOR = __webpack_require__(32)('iterator');
 var Iterators = __webpack_require__(71);
 module.exports = __webpack_require__(18).isIterable = function (it) {
   var O = Object(it);
@@ -51049,7 +51085,7 @@ var _setdb2 = _interopRequireDefault(_setdb);
 
 var _recompose = __webpack_require__(52);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _common = __webpack_require__(16);
 
@@ -52068,7 +52104,7 @@ var _setdb2 = _interopRequireDefault(_setdb);
 
 var _common = __webpack_require__(67);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _recompose = __webpack_require__(52);
 
@@ -52432,7 +52468,7 @@ var _common = __webpack_require__(67);
 
 var _common2 = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var util = _interopRequireWildcard(_util);
 
@@ -52624,7 +52660,7 @@ var _instructions2 = _interopRequireDefault(_instructions);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _pure_component = __webpack_require__(14);
 
@@ -52634,9 +52670,11 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
+var _reactRouterDom = __webpack_require__(31);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Howto = function (_Pure_component) {
+var Howto = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
   (0, _inherits3.default)(Howto, _Pure_component);
 
   function Howto() {
@@ -52650,21 +52688,22 @@ var Howto = function (_Pure_component) {
       args[_key] = arguments[_key];
     }
 
-    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Howto.__proto__ || Object.getPrototypeOf(Howto)).call.apply(_ref, [this].concat(args))), _this), _this.state = { option: 'code' }, _this.choose_click = function (option) {
-      _this.setState({ option: option });
+    return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Howto.__proto__ || Object.getPrototypeOf(Howto)).call.apply(_ref, [this].concat(args))), _this), _this.choose_click = function (option) {
       (0, _util.ga_event)('How-to-tab', 'select code/browser', option);
+      var pathname = '/howto/' + option;
+      _this.props.history.push({ pathname: pathname });
     }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
   }
 
   (0, _createClass3.default)(Howto, [{
     key: 'render',
     value: function render() {
-      var cur_title = void 0;
-      if (this.state.option) cur_title = 'using ' + this.state.option;
+      var option = this.props.match.params.option || 'code';
+      var cur_title = 'using ' + option;
       var Instructions = function Instructions() {
         return null;
       };
-      if (this.state.option == 'browser') Instructions = Browser_instructions;else if (this.state.option == 'code') Instructions = Code_instructions;
+      if (option == 'browser') Instructions = Browser_instructions;else if (option == 'code') Instructions = Code_instructions;
       return _react2.default.createElement(
         'div',
         { className: 'howto' },
@@ -52689,12 +52728,10 @@ var Howto = function (_Pure_component) {
               { className: 'nav_tabs tabs' },
               _react2.default.createElement(Tab, { id: 'code', title: 'Code',
                 tooltip: 'Examples how to use LPM programatically',
-                on_click: this.choose_click,
-                cur_tab: this.state.option }),
+                on_click: this.choose_click, cur_tab: option }),
               _react2.default.createElement(Tab, { id: 'browser', title: 'Browser',
                 tooltip: 'Examples how to inegrate LPM with the browser',
-                on_click: this.choose_click,
-                cur_tab: this.state.option })
+                on_click: this.choose_click, cur_tab: option })
             ),
             _react2.default.createElement(
               Instructions,
@@ -52707,14 +52744,15 @@ var Howto = function (_Pure_component) {
     }
   }]);
   return Howto;
-}(_pure_component2.default);
+}(_pure_component2.default));
 
-var Tab = function Tab(_ref2) {
+var Tab = (0, _reactRouterDom.withRouter)(function (_ref2) {
   var id = _ref2.id,
       on_click = _ref2.on_click,
       title = _ref2.title,
       cur_tab = _ref2.cur_tab,
-      tooltip = _ref2.tooltip;
+      tooltip = _ref2.tooltip,
+      match = _ref2.match;
 
   var active = cur_tab == id;
   var btn_class = (0, _classnames2.default)('btn_tab', { active: active });
@@ -52735,7 +52773,7 @@ var Tab = function Tab(_ref2) {
       _react2.default.createElement('div', { className: 'arrow' })
     )
   );
-};
+});
 
 var Lang_btn = function Lang_btn(props) {
   var class_names = 'btn btn_lpm btn_lpm_small btn_lang' + (props.active ? ' active' : '');
@@ -52746,7 +52784,7 @@ var Lang_btn = function Lang_btn(props) {
   );
 };
 
-var Code_instructions = function (_Pure_component2) {
+var Code_instructions = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
   (0, _inherits3.default)(Code_instructions, _Pure_component2);
 
   function Code_instructions() {
@@ -52760,9 +52798,10 @@ var Code_instructions = function (_Pure_component2) {
       args[_key2] = arguments[_key2];
     }
 
-    return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Code_instructions.__proto__ || Object.getPrototypeOf(Code_instructions)).call.apply(_ref3, [this].concat(args))), _this2), _this2.state = { lang: 'shell' }, _this2.click_lang = function (lang) {
-      _this2.setState({ lang: lang });
+    return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref3 = Code_instructions.__proto__ || Object.getPrototypeOf(Code_instructions)).call.apply(_ref3, [this].concat(args))), _this2), _this2.click_lang = function (lang) {
       (0, _util.ga_event)('How-to-tab', 'select option', lang);
+      var pathname = '/howto/code/' + lang;
+      _this2.props.history.push({ pathname: pathname });
     }, _this2.click_copy = function (lang) {
       return (0, _util.ga_event)('How-to-tab', 'click copy', lang);
     }, _temp2), (0, _possibleConstructorReturn3.default)(_this2, _ret2);
@@ -52773,17 +52812,18 @@ var Code_instructions = function (_Pure_component2) {
     value: function render() {
       var _this3 = this;
 
+      var lang = this.props.match.params.suboption || 'shell';
       var Lang_btn_clickable = function Lang_btn_clickable(props) {
         return _react2.default.createElement(
           'span',
           { onClick: function onClick() {
               return _this3.click_lang(props.lang);
             } },
-          _react2.default.createElement(Lang_btn, (0, _extends3.default)({ active: _this3.state.lang == props.lang }, props))
+          _react2.default.createElement(Lang_btn, (0, _extends3.default)({ active: lang == props.lang }, props))
         );
       };
       var tutorial_port = window.localStorage.getItem('quickstart-first-proxy') || 24000;
-      var to_copy = _instructions2.default.code(tutorial_port)[this.state.lang];
+      var to_copy = _instructions2.default.code(tutorial_port)[lang];
       var code = _prismjs2.default.highlight(to_copy, _prismjs2.default.languages.clike);
       return _react2.default.createElement(
         'div',
@@ -52813,7 +52853,7 @@ var Code_instructions = function (_Pure_component2) {
               _react2.default.createElement(
                 _common.Code,
                 { on_click: function on_click() {
-                    return _this3.click_copy(_this3.state.lang);
+                    return _this3.click_copy(lang);
                   } },
                 _react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: code } })
               )
@@ -52834,9 +52874,9 @@ var Code_instructions = function (_Pure_component2) {
     }
   }]);
   return Code_instructions;
-}(_pure_component2.default);
+}(_pure_component2.default));
 
-var Browser_instructions = function (_Pure_component3) {
+var Browser_instructions = (0, _reactRouterDom.withRouter)(function (_Pure_component3) {
   (0, _inherits3.default)(Browser_instructions, _Pure_component3);
 
   function Browser_instructions() {
@@ -52850,16 +52890,18 @@ var Browser_instructions = function (_Pure_component3) {
       args[_key3] = arguments[_key3];
     }
 
-    return _ret3 = (_temp3 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref4 = Browser_instructions.__proto__ || Object.getPrototypeOf(Browser_instructions)).call.apply(_ref4, [this].concat(args))), _this4), _this4.state = { browser: 'chrome_win' }, _this4.port = window.localStorage.getItem('quickstart-first-proxy') || 24000, _this4.browser_changed = function (e) {
+    return _ret3 = (_temp3 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref4 = Browser_instructions.__proto__ || Object.getPrototypeOf(Browser_instructions)).call.apply(_ref4, [this].concat(args))), _this4), _this4.port = window.localStorage.getItem('quickstart-first-proxy') || 24000, _this4.browser_changed = function (e) {
       var browser = e.target.value;
-      _this4.setState({ browser: browser });
       (0, _util.ga_event)('How-to-tab', 'select option', browser);
+      var pathname = '/howto/browser/' + browser;
+      _this4.props.history.push({ pathname: pathname });
     }, _temp3), (0, _possibleConstructorReturn3.default)(_this4, _ret3);
   }
 
   (0, _createClass3.default)(Browser_instructions, [{
     key: 'render',
     value: function render() {
+      var browser = this.props.match.params.suboption || 'chrome_win';
       return _react2.default.createElement(
         'div',
         { className: 'browser_instructions' },
@@ -52873,7 +52915,7 @@ var Browser_instructions = function (_Pure_component3) {
           ),
           _react2.default.createElement(
             'select',
-            { onChange: this.browser_changed },
+            { value: browser, onChange: this.browser_changed },
             _react2.default.createElement(
               'option',
               { value: 'chrome_win' },
@@ -52907,14 +52949,14 @@ var Browser_instructions = function (_Pure_component3) {
           _react2.default.createElement(
             'div',
             { className: 'instructions' },
-            _instructions2.default.browser(this.port)[this.state.browser]
+            _instructions2.default.browser(this.port)[browser]
           )
         )
       );
     }
   }]);
   return Browser_instructions;
-}(_pure_component2.default);
+}(_pure_component2.default));
 
 exports.default = Howto;
 
@@ -53021,7 +53063,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _schema = __webpack_require__(842);
 
@@ -53039,7 +53081,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53205,7 +53247,7 @@ var Nav_link = function Nav_link(_ref2) {
       name = _ref2.name;
   return _react2.default.createElement(
     _reactRouterDom.Route,
-    { path: to, exact: true },
+    { path: to },
     function (_ref3) {
       var match = _ref3.match;
       return _react2.default.createElement(Nav_link_inner, { label: label, to: to, name: name, match: match });
@@ -53657,7 +53699,7 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53897,7 +53939,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _pure_component = __webpack_require__(14);
 
@@ -54222,6 +54264,8 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
+var _util = __webpack_require__(22);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Index = function (_Pure_component) {
@@ -54244,12 +54288,6 @@ var Index = function (_Pure_component) {
             return _this2.setState({ email: e.target.value });
         }, _this2.click_cancel = function () {
             return _this2.setState({ desc: '' });
-        }, _this2.detect_browser = function () {
-            var browser = 'unknown';
-            if (window.opr && window.opr.addons || window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
-                browser = 'opera';
-            } else if (typeof InstallTrigger !== 'undefined') browser = 'firefox';else if (document.documentMode) browser = 'IE';else if (window.StyleMedia) browser = 'Edge';else if (window.chrome && window.chrome.webstore) browser = 'chrome';
-            return browser;
         }, _this2.click_report = function () {
             var desc = _this2.state.desc;
             var _this = _this2;
@@ -54268,7 +54306,7 @@ var Index = function (_Pure_component) {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ desc: desc, email: _this.state.email,
-                                        browser: _this.detect_browser() })
+                                        browser: (0, _util.detect_browser)() })
                                 });
 
                             case 4:
@@ -54420,7 +54458,7 @@ var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _har_preview = __webpack_require__(348);
 
@@ -54430,7 +54468,7 @@ var _proxy_blank = __webpack_require__(211);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54842,7 +54880,7 @@ var _url2 = _interopRequireDefault(_url);
 
 var _common = __webpack_require__(16);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -55726,7 +55764,7 @@ var _fileSaver = __webpack_require__(210);
 
 var _fileSaver2 = _interopRequireDefault(_fileSaver);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _lodash = __webpack_require__(72);
 
@@ -55742,7 +55780,7 @@ var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
 var _common = __webpack_require__(16);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _reactTooltip = __webpack_require__(194);
 
@@ -57102,7 +57140,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _ajax = __webpack_require__(28);
 
@@ -57118,7 +57156,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _chrome_widgets = __webpack_require__(190);
 
@@ -57660,7 +57698,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -57976,7 +58014,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _setdb = __webpack_require__(25);
 
@@ -58268,7 +58306,7 @@ var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _classnames = __webpack_require__(4);
 
@@ -58638,13 +58676,13 @@ var _classnames2 = _interopRequireDefault(_classnames);
 
 var _common = __webpack_require__(16);
 
-var _util = __webpack_require__(23);
+var _util = __webpack_require__(22);
 
 var _pure_component = __webpack_require__(14);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _prismjs = __webpack_require__(357);
 
@@ -58824,6 +58862,11 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
                 }, _callee2, this);
             }));
         }, _this2.advanced_clicked = function () {
+            if (_this2.state.proxies_running.length == 1) {
+                (0, _jquery2.default)('#add_new_proxy_modal').modal('hide');
+                _this2.props.history.push({ pathname: '/howto/code' });
+                return;
+            }
             if (_this2.state.created_port) {
                 (0, _jquery2.default)('#add_new_proxy_modal').modal('hide');
                 _this2.props.history.push({ pathname: '/proxy/' + _this2.state.created_port });
@@ -59384,7 +59427,7 @@ var _har_viewer = __webpack_require__(202);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _reactRouterDom = __webpack_require__(33);
+var _reactRouterDom = __webpack_require__(31);
 
 var _url = __webpack_require__(164);
 

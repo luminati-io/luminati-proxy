@@ -426,3 +426,20 @@ export const normalizers = {
     },
 };
 
+export const detect_browser = ()=>{
+    let browser = 'unknown';
+    if (window.opr && window.opr.addons || window.opera ||
+        navigator.userAgent.indexOf(' OPR/')>=0)
+    {
+        browser = 'opera';
+    }
+    else if (typeof InstallTrigger!=='undefined')
+        browser = 'firefox';
+    else if (document.documentMode)
+        browser = 'IE';
+    else if (window.StyleMedia)
+        browser = 'Edge';
+    else if (window.chrome && window.chrome.webstore)
+        browser = 'chrome';
+    return browser;
+};

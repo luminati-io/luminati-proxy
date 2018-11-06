@@ -101,8 +101,8 @@ class Pane_headers extends Pure_component {
 class Pane_response extends Pure_component {
     render(){
         const content_type = this.props.req.details.content_type;
-        if (!content_type||['xhr', 'css', 'js', 'font', 'html'].includes(
-            content_type))
+        if (!content_type||['xhr', 'css', 'js', 'font', 'html', 'other']
+            .includes(content_type))
         {
             return <Codemirror_wrapper req={this.props.req}/>;
         }

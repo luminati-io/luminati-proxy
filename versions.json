@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.111.808",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved instructions in Howto section"
+            },
+            {
+                "type": "sparkles",
+                "text": "Support for 'ban IP' rule for 25 port"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed running LPM without UI"
+            }
+        ]
+    },
+    {
         "ver": "1.111.212",
         "type": "stable",
         "changes": [

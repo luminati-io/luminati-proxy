@@ -98,7 +98,7 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
 });
 
 const Nav_link = ({label, to, name})=>
-    <Route path={to} exact>
+    <Route path={to}>
       {({match})=>
         <Nav_link_inner label={label} to={to} name={name} match={match}/>}
     </Route>;

@@ -91,6 +91,8 @@ E.perr = function(id, info, opt){
     if (perr_pending && perr_pending.length<100)
         perr_pending.push(Array.from(arguments));
 };
+var perr_hooks = [];
+E.add_perr_hook = perr_hooks.push.bind(perr_hooks);
 var perr_dropped = {};
 var perr_orig = E.perr;
 function wrap_perr(perr_fn){
@@ -109,6 +111,8 @@ function wrap_perr(perr_fn){
         var rl = rl_hash[id] = rl_hash[id]||{};
         if (pre_send)
             pre_send(id, info, opt);
+        perr_hooks.filter(function(h){ return h.ids.test(id); })
+        .forEach(function(h){ h.fn(id, info, opt); });
         if (opt.rate_limit===false || rate_limit(rl, ms, count))
         {
             if (perr_dropped[id])
