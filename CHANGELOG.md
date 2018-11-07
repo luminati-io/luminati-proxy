@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.111.930 Stable
+- :bug: Bug fixes
+
 ## 1.111.808 Stable
 - :sparkles: Improved instructions in Howto section
 - :sparkles: Support for 'ban IP' rule for 25 port
