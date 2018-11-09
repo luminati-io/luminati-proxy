@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.112.99",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Updated Node and npm in Dockerfile"
+            }
+        ]
+    },
+    {
         "ver": "1.112.2",
         "type": "stable",
         "changes": [

@@ -290,6 +290,7 @@ const Index = withRouter(class Index extends Pure_component {
             res.min_req_time = rule.min_req_time;
         if (rule.port)
             res.switch_port = rule.port;
+        res.retry_number = rule.retry||1;
         return res;
     };
     apply_rules = ({rules})=>{

@@ -2,7 +2,6 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
@@ -10,7 +9,6 @@ import {Labeled_controller, Note, with_proxy_ports} from '../common.js';
 import {validators} from './common.js';
 import {tabs} from './fields.js';
 import PropTypes from 'prop-types';
-import filesaver from 'file-saver';
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 
@@ -219,6 +217,7 @@ class Rules extends Pure_component {
             res.min_req_time = rule.min_req_time;
         if (rule.switch_port)
             res.port = +rule.switch_port;
+        res.retry = rule.retry_number||1;
         return res;
     };
     rules_update = ()=>{
@@ -293,33 +292,14 @@ class Rule_config extends Pure_component {
     }
 });
 
-class Ips_lists extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.setdb_on('head.proxy_edit.form.port', port=>
-            port&&this.setState({port}));
-    }
-    banned_ips = ()=>this.download_data('banlist');
-    reserved_ips = ()=>this.download_data('reserved');
-    download_data = type=>{
-        const _this = this;
-        this.etask(function*(){
-            const data = yield ajax.json({
-                url: `/api/${type}/${_this.state.port}`});
-            const blob = new Blob([data.ips],
-                {type: 'text/plain;charset=utf-8'});
-            filesaver.saveAs(blob, `${type}_${_this.state.port}.json`);
-        });
-    };
-    render(){
-        return <div>
-              <div><a onClick={this.banned_ips} className="link">
-                Download banned IPs</a></div>
-              <div><a onClick={this.reserved_ips} className="link">
-                Download reserved IPs</a></div>
-            </div>;
-    }
-}
+const Ban_ips_note = ({port})=>
+    <span>
+      <span>You can see currently banned IPs by fetching </span>
+      <a href={window.location.origin+'/api/banlist/'+port} target="_blank"
+        className="link" rel="noopener noreferrer">
+        /api/banlist/{port}
+      </a>
+    </span>;
 
 const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
     state = {ports: []};
@@ -403,8 +383,9 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
             rule.trigger_type!='url'&&!at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time'||
             at.min_req_time));
-        const ports = this.props.ports_opt.filter(p=>
-            p.value!=this.props.match.params.port);
+        const current_port = this.props.match.params.port;
+        const ports = this.props.ports_opt.filter(p=>p.value!=current_port);
+        const ban_ips_note = <Ban_ips_note port={current_port}/>;
         return <div className="rule_wrapper">
               <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
               <Rule_config id="trigger_type" type="select"
@@ -447,7 +428,7 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
               }
               {rule.action=='ban_ip' &&
                 <Rule_config id="ban_ip_duration" type="select"
-                  data={ban_options} rule={rule}/>
+                  data={ban_options} rule={rule} note={ban_ips_note}/>
               }
               {rule.action=='save_to_fast_pool' &&
                 <Rule_config id="fast_pool_size" type="number" min="1"

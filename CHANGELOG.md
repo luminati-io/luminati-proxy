@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.112.99 Stable
+- :sparkles: Updated Node and npm in Dockerfile
+
 ## 1.112.2 Stable
 - :sparkles: Improved statistics
 

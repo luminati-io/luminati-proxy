@@ -57,7 +57,7 @@ function ajax(opt){
             zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
             xhr.statusText+'\nresponseText: '+
             (xhr.responseText||'').substr(0, 200));
-        if (retry)
+        if (retry && (!opt.should_retry||opt.should_retry(err, xhr)))
             return this.return(ajax(assign({}, opt, {retry: retry-1})));
         if (xhr.statusText=='timeout')
             E.events.emit('timeout', this);
@@ -65,7 +65,7 @@ function ajax(opt){
         if (opt.ret_err_code && xhr.statusText && xhr.status)
             error = xhr.status+' - '+error;
         if (opt.no_throw)
-            return {error: error, message: xhr.responseText};
+            return {error: error, message: xhr.responseText, xhr: xhr};
         var err_obj = new Error(error);
         err_obj.hola_info = {data_type: data_type, url: url,
             status: xhr.status, response_text: xhr.responseText};

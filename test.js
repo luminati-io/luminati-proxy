@@ -953,7 +953,7 @@ describe('proxy', ()=>{
             return r;
         }));
         t('should retry when status match', '200 - Succeeded requests', null,
-            5);
+            1);
         t('should ignore rule when status does not match', null,
             '404 - Succeeded requests', 0);
         t('should prioritize', null, {post: [{res:
@@ -961,7 +961,7 @@ describe('proxy', ()=>{
             head: true, status: {arg: '200', type: 'in'}}],
             url: 'lumtest.com/test'}, {res: [{action:
             {ban_ip: '60min', retry: true}, head: true, status: {arg: '200',
-            type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 5);
+            type: 'in'}}], url: 'lumtest.com/test', priority: 1}]}, 1);
     });
     describe('rules', ()=>{
         it('should process data', ()=>etask(function*(){
@@ -1139,15 +1139,16 @@ describe('proxy', ()=>{
             sinon.stub(l, 'get_other_port').returns(l);
             let r = l.rules.can_retry({});
             assert.ok(r);
-            r = l.rules.can_retry({retry: 2});
+            r = l.rules.can_retry({retry: 2}, {}, {retry: 5});
             assert.ok(r);
             r = l.rules.can_retry({retry: 5});
             assert.ok(!r);
-            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false});
-            assert.ok(!r);
+            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false,
+                retry: 5});
+            assert.ok(r);
             r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false,
                 retry: true});
-            assert.ok(r);
+            assert.ok(!r);
             r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: true,
                 retry: true});
             assert.ok(!r);
