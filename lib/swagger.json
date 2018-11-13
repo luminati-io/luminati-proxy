@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.112.248",
+        "version": "1.112.498",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -245,7 +245,7 @@
             }
         },
         "/proxies/{port}/link_test.json": {
-            "get": {
+            "post": {
                 "description": "Link Tester API. See all the redirections for a given URL",
                 "tags": ["Proxy"],
                 "parameters": [
@@ -307,10 +307,10 @@
                     },
                     {
                         "name": "headers",
-                        "in": "query",
-                        "description": "Description of any other headers that will be sent along with the requests\n\nExample:\nencodeURIComponent(JSON.stringify({'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}))",
+                        "in": "body",
+                        "description": "Description of any other headers that will be sent along with the requests\n\nExample:\n{'headers': {'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}}",
                         "required": false,
-                        "type": "string"
+                        "type": "object"
                     }
                 ],
                 "responses": {

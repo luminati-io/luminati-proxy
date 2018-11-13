@@ -580,7 +580,7 @@ E.regions = {
     CK: ['Polynesia', 'APAC'],
     CL: ['South America', 'AMER'],
     CM: ['Middle Africa', 'EMEA'],
-    CN: ['Eastern Asia', 'APAC'],
+    CN: ['Asia', 'China'],
     CO: ['South America', 'AMER'],
     CR: ['Central America', 'AMER'],
     CU: ['Caribbean', 'AMER'],

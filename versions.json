@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.112.498",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Further development of 25 port support"
+            }
+        ]
+    },
+    {
         "ver": "1.112.248",
         "type": "stable/dev",
         "changes": []

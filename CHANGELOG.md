@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.112.498 Stable
+- :star: Further development of 25 port support
+
 ## 1.112.248 
 
 ## 1.112.99 Stable
