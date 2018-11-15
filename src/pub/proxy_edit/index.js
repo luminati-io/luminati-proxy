@@ -104,7 +104,7 @@ const Index = withRouter(class Index extends Pure_component {
         {
             const port = this.props.match.params.port;
             const pathname = `/proxy/${port}/${tab}`;
-            this.props.history.push({pathname});
+            this.props.history.push({pathname, state: {field}});
         }
     };
     set_field = (field_name, value, opt={})=>{

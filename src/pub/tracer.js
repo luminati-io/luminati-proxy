@@ -1,14 +1,16 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import etask from '../../util/etask.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import Proxy_blank from './proxy_blank.js';
 import {Input, Loader, Nav, Loader_small, Tooltip, Circle_li as Li,
     Modal_dialog, Warning, with_proxy_ports} from './common.js';
 import {status_codes, swagger_link_tester_url} from './util.js';
 import classnames from 'classnames';
+import {withRouter} from 'react-router-dom';
 
-export default class Tracer extends Pure_component {
+export default withRouter(class Tracer extends Pure_component {
     state = {loading: false};
     title = 'Test affiliate links';
     subtitle = 'Trace links and see all the redirections';
@@ -26,6 +28,7 @@ export default class Tracer extends Pure_component {
     set_result = res=>this.setState(res);
     execute = ({url, port, uid}, def_port)=>{
         url = url.trim();
+        port = port||def_port;
         if (!/^https?:\/\//.test(url))
         {
             return void this.setState({redirects: null, filename: null,
@@ -33,7 +36,6 @@ export default class Tracer extends Pure_component {
         }
         this.setState({redirects: null, filename: null, loading: true,
             tracing_url: null, traced: false});
-        const data = {url, port: port||def_port, uid};
         const _this = this;
         this.etask(function*(){
             this.on('finally', e=>{
@@ -42,14 +44,30 @@ export default class Tracer extends Pure_component {
             });
             this.on('uncaught', e=>console.log(e));
             _this.ws.addEventListener('message', _this.on_message);
-            // XXX krzysztof: switch fetch->ajax
             const raw_trace = yield window.fetch('/api/trace', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data),
+                body: JSON.stringify({url, port, uid}),
             });
-            const json = yield raw_trace.json();
-            _this.setState({...json});
+            if (raw_trace.status==200)
+            {
+                const json = yield raw_trace.json();
+                _this.setState({...json});
+            }
+            else if (raw_trace.status==422)
+            {
+                _this.setState({errors: <Error_ssl_off port={port}
+                    goto_ssl={_this.goto_ssl.bind(_this, port)}/>});
+            }
+        });
+    };
+    goto_ssl = port=>{
+        const _this = this;
+        this.etask(function*(){
+            _this.dismiss_errors();
+            yield etask.sleep(500);
+            _this.props.history.push({pathname: `/proxy/${port}`,
+                state: {field: 'ssl'}});
         });
     };
     on_message = event=>{
@@ -81,7 +99,15 @@ export default class Tracer extends Pure_component {
               </Modal_dialog>
             </div>;
     }
-}
+});
+
+const Error_ssl_off = ({port, goto_ssl})=>
+    <span>
+      <span>Proxy port <strong>{port}</strong> doesn't have SSL </span>
+      <span>analyzing. You can turn it on in </span>
+      <a className="link" onClick={goto_ssl}>General tab</a>
+      <span> in the proxy port configuration page.</span>
+    </span>;
 
 const Result = ({redirects, loading, tracing_url, filename, loading_page,
     traced})=>

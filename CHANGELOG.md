@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.112.742 Stable
+- :star: Improved HAR viewer: showing all the failed requests too
+- :star: Improved usability of Fast Sessions Pool
+
 ## 1.112.498 Stable
 - :star: Further development of 25 port support
 

@@ -618,6 +618,25 @@ span.icon_link {
         }
     }
 }
+@keyframes field_highlight {
+    0% {
+        border: 1px solid white;
+    }
+    50% {
+        border: 1px solid @first_color;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    100% {
+        border: 1px solid white;
+    }
+}
+.field_row.animated {
+    border-radius: 3px;
+    animation: field_highlight 900ms;
+    animation-iteration-count: 3;
+    border: 1px solid white;
+}
 .loader_wrapper {
     position: fixed;
     z-index: 5000;

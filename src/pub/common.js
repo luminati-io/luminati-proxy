@@ -480,8 +480,8 @@ export const Note = props=>
     </div>;
 
 export const Labeled_controller = ({label, tooltip, disabled, note, sufix,
-    ...props})=>
-    <div className={classnames('field_row', {disabled, note})}>
+    animated, ...props})=>
+    <div className={classnames('field_row', {disabled, note, animated})}>
       <div className="desc">
         <Tooltip title={tooltip}>{label}</Tooltip>
       </div>

@@ -221,14 +221,14 @@ class Pane_timing extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.recent_stats', stats=>this.setState({stats})); }
     render(){
-        const {startedDateTime} = this.props.req;
+        const {startedDateTime, details: {rule}} = this.props.req;
         const started_at = moment(new Date(startedDateTime)).format(
             'YYYY-MM-DD HH:mm:ss');
         return <div className="timing_view_wrapper">
               <div className="timeline_info">Started at {started_at}</div>
               <ol className="tree_outline">
                 {this.props.req.details.timeline.map((timeline, idx)=>
-                  <Single_timeline key={idx} timeline={timeline}
+                  <Single_timeline key={idx} timeline={timeline} rule={rule}
                     time={this.props.req.time} req={this.props.req}/>
                 )}
               </ol>
@@ -272,10 +272,13 @@ class Single_timeline extends Pure_component {
         }, {last_section: -1, data: []}).data;
         const children_classes = classnames('children', 'timeline',
             {open: this.state.open});
+        const {rule, timeline} = this.props;
+        const title = this.props.rule ?
+            `${timeline.port} (${rule})` : timeline.port;
         return [
             <li key="li" onClick={this.toggle}
               className={classnames('parent_title', {open: this.state.open})}>
-              {this.props.timeline.port}
+              {title}
             </li>,
             <ol key="ol" className={children_classes}>
               <table>

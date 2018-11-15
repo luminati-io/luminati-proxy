@@ -1234,9 +1234,10 @@ describe('proxy', ()=>{
                     'add_reserve_pool_session');
                 const fps_stub = sinon.stub(l.session_mgr,
                     'add_fast_pool_session');
-                const r = l.rules.action({ctx: {}}, {}, {}, {}, {email: true,
-                    reserve_session: true, fast_pool_session: true}, {
-                    res: [{}]});
+                const r = l.rules.action({ctx: {rule: ()=>null}}, {}, {}, {},
+                    {email: true, reserve_session: true,
+                        fast_pool_session: true},
+                    {res: [{}]}, {type: 'max_req_time', value: '200ms'});
                 assert.ok(!r);
                 assert.ok(cr_stub.called);
                 assert.ok(email_stub.called);

@@ -126,10 +126,10 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             }
         });
     };
-    rule_clicked(field){
+    rule_clicked = field=>{
         ga_event('add-new-port', 'rules clicked', field);
         this.save({redirect: true, field});
-    }
+    };
     advanced_clicked = ()=>{
         if (this.state.proxies_running.length==1)
         {
@@ -179,7 +179,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                   zones={this.state.zones}
                   on_field_change={this.field_changed.bind(this)}
                   preset={this.state.preset}
-                  rule_clicked={this.rule_clicked.bind(this)}
+                  rule_clicked={this.rule_clicked}
                   presets_opt={this.presets_opt}/>;
         }
         else if (this.state.cur_tab=='proxy_ext')

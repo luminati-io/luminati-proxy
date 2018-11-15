@@ -7,6 +7,7 @@ import setdb from '../../../util/setdb.js';
 import {tabs} from './fields.js';
 import {Labeled_controller} from '../common.js';
 import {getContext} from 'recompose';
+import {withRouter} from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 export const validators = {
@@ -36,7 +37,7 @@ export const validators = {
     },
 };
 
-export const Config = getContext({provide: PropTypes.object})(
+export const Config = withRouter(getContext({provide: PropTypes.object})(
 class Config extends Pure_component {
     state = {disabled_fields: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -85,8 +86,13 @@ class Config extends Pure_component {
         const tab_id = this.props.provide.tab_id;
         const disabled = this.props.disabled||!this.is_valid_field(id)||
             this.state.disabled_fields[id];
+        let state;
+        let animated = false;
+        if ((state = this.props.location.state)&&state.field)
+            animated = state.field==id;
         return <Labeled_controller
               id={id}
+              animated={animated}
               sufix={this.props.sufix}
               data={this.props.data}
               type={this.props.type}
@@ -104,4 +110,4 @@ class Config extends Pure_component {
               range={this.props.range}
               tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
-});
+}));

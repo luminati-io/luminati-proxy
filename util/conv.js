@@ -3,8 +3,8 @@
 (function(){
 var define, hash, assert, zerr, vm;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 if (!is_node)
@@ -175,6 +175,7 @@ E.scale_vals = {
         {s: 'G', n: Math.pow(1024, 3)}, {s: 'T', n: Math.pow(1024, 4)},
         {s: 'P', n: Math.pow(1024, 5)}],
 };
+
 E.scaled_number = function(num, opt){
     opt = opt||{};
     var sign = '', per = opt.per, scale = opt.scale;
@@ -215,8 +216,24 @@ E.scaled_number = function(num, opt){
     return sign+str.replace(/((\.\d*[1-9])|\.)0*$/, '$2')
         +(units ? (opt.space ? ' ' : '')+scale.s : '')+_per();
 };
+
 E.scaled_bytes = function(num, opt){
     return E.scaled_number(num, Object.assign({base: 1000}, opt)); };
+
+// XXX colin/sergeyg: format_money_num+format_cost -> fmt_currency
+E.fmt_currency = function(amount, digits, currency_sign){
+    if (amount===undefined)
+        return;
+    if (digits===undefined)
+        digits = 6;
+    if (currency_sign===undefined)
+        currency_sign = '$';
+    var sign = amount<0 ? '-' : '';
+    amount = Math.abs(amount);
+    amount = (+amount).toLocaleString('en-GB', {useGrouping: true,
+        maximumFractionDigits: digits})||amount;
+    return sign+currency_sign+amount;
+};
 
 E.format_per = function(per){
     if (!per)

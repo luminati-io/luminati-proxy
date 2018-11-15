@@ -152,12 +152,22 @@ class Targeting extends Pure_component {
         const carrier_disabled = !!this.props.form.asn&&
             !!this.props.form.asn.length;
         return <div>
-              {(show_dc_note || show_vips_note) &&
+              {(show_dc_note||show_vips_note)&&
                 <Note>
                   {show_dc_note &&
-                    <span>To change Data Center country visit your </span>}
+                    <span>
+                    <div>This port is configured to use Data Center IPs.</div>
+                    <span>To change Data Center country visit your </span>
+                    </span>
+                  }
                   {show_vips_note &&
-                    <span>To change Exclusive gIP country visit your </span>}
+                    <span>
+                    <div>
+                      This port is configured to use exclusive Residential IPs.
+                    </div>
+                    <span> To change Exclusive gIP country visit your </span>
+                    </span>
+                  }
                   <a className="link" target="_blank" rel="noopener noreferrer"
                     href="https://luminati.io/cp/zones">zone page</a>
                   <span> and change your zone plan.</span>

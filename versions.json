@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.112.742",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved HAR viewer: showing all the failed requests too"
+            },
+            {
+                "type": "star",
+                "text": "Improved usability of Fast Sessions Pool"
+            }
+        ]
+    },
+    {
         "ver": "1.112.498",
         "type": "stable",
         "changes": [

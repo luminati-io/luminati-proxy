@@ -292,9 +292,20 @@ class Rule_config extends Pure_component {
     }
 });
 
+const Fast_pool_note = ({port, r})=>{
+    r = r||'**';
+    return <span>
+          <span>Check fast pool sessions by fetching </span>
+          <a href={window.location.origin+'/api/fast/'+port+'?r='+r}
+            target="_blank" className="link" rel="noopener noreferrer">
+            /api/fast/{port}?r={r}
+          </a>
+        </span>;
+};
+
 const Ban_ips_note = ({port})=>
     <span>
-      <span>You can see currently banned IPs by fetching </span>
+      <span>Check currently banned IPs by fetching </span>
       <a href={window.location.origin+'/api/banlist/'+port} target="_blank"
         className="link" rel="noopener noreferrer">
         /api/banlist/{port}
@@ -386,6 +397,8 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
         const current_port = this.props.match.params.port;
         const ports = this.props.ports_opt.filter(p=>p.value!=current_port);
         const ban_ips_note = <Ban_ips_note port={current_port}/>;
+        const fast_pool_note = <Fast_pool_note port={current_port}
+          r={rule.trigger_url_regex}/>;
         return <div className="rule_wrapper">
               <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
               <Rule_config id="trigger_type" type="select"
@@ -432,7 +445,8 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
               }
               {rule.action=='save_to_fast_pool' &&
                 <Rule_config id="fast_pool_size" type="number" min="1"
-                  max="50" validator={validators.number(1, 50)} rule={rule}/>
+                  max="50" validator={validators.number(1, 50)} rule={rule}
+                  note={fast_pool_note}/>
               }
               {rule.ban_ip_duration=='custom' &&
                 <Rule_config id="ban_ip_custom" type="number" sufix="minutes"

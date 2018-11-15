@@ -872,18 +872,18 @@ const maybe_pending = Component=>function pies(props){
 
 class Cell_value extends React.Component {
     render(){
-        const {col, req, req: {details: {timeline}}} = this.props;
+        const {col, req, req: {details: {timeline, rule}}} = this.props;
         if (col=='select')
         {
             return <Select_cell uuid={req.uuid}
               checked_all={this.props.checked_all}/>;
         }
         if (col=='Name')
-            return <Name_cell req={req} timeline={timeline}/>;
+            return <Name_cell req={req} timeline={timeline} rule={rule}/>;
         else if (col=='Status')
         {
             return <Status_code_cell status={req.response.status}
-                  pending={!!req.pending} uuid={req.uuid}/>;
+                  pending={!!req.pending} uuid={req.uuid} req={req}/>;
         }
         else if (col=='Proxy port')
             return <Tooltip_and_value val={req.details.port}/>;
@@ -912,14 +912,14 @@ class Cell_value extends React.Component {
 class Name_cell extends Pure_component {
     go_to_timeline = e=>setdb.emit('har_viewer.set_pane', 3);
     render(){
-        const {req, timeline} = this.props;
+        const {req, timeline, rule} = this.props;
         const rule_tip = 'At least one rule has been applied to this'
         +' request. Click to see more details';
         const status_check = req.details.context=='STATUS CHECK';
         return <div className="col_name">
               <div>
                 <div className="icon script"/>
-                {timeline && timeline.length>1 &&
+                {(timeline && timeline.length>1 || rule) &&
                   <Tooltip title={rule_tip}>
                     <div onClick={this.go_to_timeline}
                       className="small_icon rules"/>
@@ -936,10 +936,17 @@ class Name_cell extends Pure_component {
     }
 }
 
-const Status_code_cell = maybe_pending(({status, uuid})=>{
+const Status_code_cell = maybe_pending(({status, uuid, req})=>{
     const enable_ssl_click = e=>{
         e.stopPropagation();
         $('#enable_ssl_modal').modal();
+    };
+    const get_desc = ()=>{
+        const err_header = req.response.headers.find(
+            r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
+        if (status==502&&err_header)
+            return err_header.value;
+        return status_codes[status];
     };
     if (status=='unknown')
     {
@@ -964,7 +971,7 @@ const Status_code_cell = maybe_pending(({status, uuid})=>{
               </div>
             </div>;
     }
-    const desc = status_codes[status];
+    const desc = get_desc(status);
     return <Tooltip title={`${status} ${desc}`}>
           <div className="disp_value">{status}</div>
         </Tooltip>;
@@ -977,8 +984,6 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
     };
     if (!url.endsWith(':443')||!time)
         return <Tooltip_and_value val={time&&time+' ms'}/>;
-    const tip = `This timing might not be accurate if the remote server held
-        the connection open. Enable SSL analyzing to fix this`;
     return <div onClick={e=>e.stopPropagation()} className="disp_value">
           <React_tooltip id={'t'+uuid} type="info" effect="solid"
             delayHide={100} delayShow={0} delayUpdate={500}
@@ -996,7 +1001,7 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
           </React_tooltip>
           <div data-tip="React-tooltip" data-for={'t'+uuid}>
              {time+' ms'}
-             {url.endsWith(':443') && <div className="small_icon status info"/>}
+             {url.endsWith(':443')&&<div className="small_icon status info"/>}
           </div>
         </div>;
 });
