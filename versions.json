@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.112.820",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "New endpoint on API: adding multiple IPs to banlist"
+            }
+        ]
+    },
+    {
         "ver": "1.112.806",
         "type": "stable",
         "changes": [

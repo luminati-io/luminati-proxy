@@ -1425,8 +1425,6 @@ describe('manager', ()=>{
               args = args.concat(['--customer', customer]);
             if (!get_param(args, '--password'))
               args = args.concat(['--password', password]);
-            if (!get_param(args, '--mode'))
-              args = args.concat(['--mode', 'guest']);
             if (!get_param(args, '--dropin'))
               args = args.concat(['--no-dropin']);
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
@@ -1631,7 +1629,7 @@ describe('manager', ()=>{
                         proxy_type: 'non-persist',
                     };
                     let proxies = [{port: 24000}];
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
                     assert_has(res, {data: sample_proxy}, 'proxies');
@@ -1643,7 +1641,7 @@ describe('manager', ()=>{
                 it('normal persist', ()=>etask(function*(){
                     let sample_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
                     assert_has(res, {data: sample_proxy}, 'proxies');
@@ -1658,7 +1656,7 @@ describe('manager', ()=>{
                     let proxies = [{port: 24000}];
                     let res_proxy = assign({}, {customer, password},
                         sample_proxy);
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
                     assert_has(res, {data: res_proxy}, 'proxies');
@@ -1670,7 +1668,7 @@ describe('manager', ()=>{
                 it('conflict', ()=>etask(function*(){
                     let sample_proxy = {port: 24000};
                     let proxies = [sample_proxy];
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield api_json('api/proxies',
                         {method: 'post', body: {proxy: sample_proxy}});
                     assert.equal(res.statusCode, 400);
@@ -1681,7 +1679,7 @@ describe('manager', ()=>{
                 it('normal', ()=>etask(function*(){
                     let put_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies/24000', 'put',
                         {proxy: put_proxy});
                     assert_has(res, {data: put_proxy});
@@ -1693,7 +1691,7 @@ describe('manager', ()=>{
                     let proxies = [{port: 24000}];
                     let res_proxy = assign({}, {customer, password},
                         put_proxy);
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies/24000', 'put',
                         {proxy: put_proxy});
                     assert_has(res, {data: res_proxy});
@@ -1702,7 +1700,7 @@ describe('manager', ()=>{
                 }));
                 it('conflict', ()=>etask(function*(){
                     let proxies = [{port: 24000}, {port: 24001}];
-                    app = yield app_with_proxies(proxies, {mode: 'root'});
+                    app = yield app_with_proxies(proxies, {});
                     let res = yield api_json('api/proxies/24001',
                         {method: 'put', body: {proxy: {port: 24000}}});
                     assert.equal(res.statusCode, 400);
@@ -1711,7 +1709,7 @@ describe('manager', ()=>{
             });
             describe('delete', ()=>{
                 it('normal', ()=>etask(function*(){
-                    app = yield app_with_args(['--mode', 'root']);
+                    app = yield app_with_args([]);
                     let res = yield api_json('api/proxies/24000',
                         {method: 'delete'});
                     assert.equal(res.statusCode, 204);
@@ -1831,7 +1829,7 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {zone1: {password: ['zone1_pass']}}};
-            app = yield app_with_config({config, cli: {mode: 'root'}});
+            app = yield app_with_config({config, cli: {}});
             nock('https://luminati-china.io').get('/cp/lum_local_conf')
             .query({customer: 'abc', proxy: pkg.version, token: ''})
             .reply(200, {_defaults});
@@ -1844,7 +1842,7 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
-            app = yield app_with_config({config, cli: {mode: 'root'}});
+            app = yield app_with_config({config, cli: {}});
             nock('https://luminati-china.io').get('/cp/lum_local_conf')
             .query({customer: 'abc', proxy: pkg.version, token: ''})
             .reply(200, {_defaults});

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.112.820 Stable
+- :star: New endpoint on API: adding multiple IPs to banlist
+
 ## 1.112.806 Stable
 - :star: Added route_err option
 - :star: UI improvements

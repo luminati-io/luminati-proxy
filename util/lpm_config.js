@@ -62,7 +62,6 @@ conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
         '.luminati.db'.substr(conf.is_win ? 1 : 0)),
     cookie: lpm_file.get_file_path(
         '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
-    mode: 'root',
     dropin: true,
     dropin_port: 22225,
     no_usage_stats: false,

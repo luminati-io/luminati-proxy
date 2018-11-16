@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.112.806",
+        "version": "1.112.820",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -111,9 +111,7 @@
                         "description": "Successful response",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/proxy"
-                            }
+                            "items": {"$ref": "#/definitions/proxy"}
                         }
                     }
                 }
@@ -131,9 +129,7 @@
                         "description": "Successful response",
                         "schema": {
                             "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/proxy"
-                            }
+                            "items": {"$ref": "#/definitions/proxy"}
                         }
                     }
                 }
@@ -348,18 +344,52 @@
                         "type": "integer"
                      },
                      {
-                        "name": "banip",
+                        "name": "ip",
                         "in": "body",
                         "required": true,
-                        "description": "Specify the ip to ban and for how long in minutes",
-                         "schema": {
-                             "type": "object",
-                             "properties": {
-                                 "ip": {"type": "string"},
-                                 "min": {"type": "integer"}
-                               }
-                           }
-                      }
+                        "description": "Ip to ban",
+                        "type": "string"
+                     },
+                     {
+                        "name": "ms",
+                        "in": "body",
+                        "required": false,
+                        "description": "Time in milliseconds",
+                        "type": "integer"
+                     }
+                ],
+                "responses": {
+                    "200": {"description": "Successful response"}
+                }
+            }
+        },
+        "/proxies/{port}/banips": {
+            "post": {
+                "description": "On a specific port ban the list of IPs for a certain amount of time",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                     },
+                     {
+                        "name": "ips",
+                        "in": "body",
+                        "required": true,
+                        "description": "Ip to ban",
+                        "type": "array",
+                        "items": {"type": "string"}
+                     },
+                     {
+                        "name": "ms",
+                        "in": "body",
+                        "required": false,
+                        "description": "Time in milliseconds",
+                        "type": "integer"
+                     }
                 ],
                 "responses": {
                     "200": {"description": "Successful response"}
@@ -435,9 +465,7 @@
                 },
                 "www_whitelist_ips": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "Whitelist ip list for granting access to browser admin UI"
                 },
                 "ws": {
@@ -615,9 +643,7 @@
                 },
                 "ext_proxies": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "A list of proxies from external vendors. Format: [username:password@]ip[:port]"
                 },
                 "ext_proxy_username": {
@@ -647,9 +673,7 @@
                 },
                 "reverse_lookup_values": {
                     "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
+                    "items": {"type": "string"},
                     "description": "Process reverse lookup via value"
                 },
                 "debug": {

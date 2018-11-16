@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.112.806/luminati-proxy-manager-v1.112.806-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.112.820/luminati-proxy-manager-v1.112.820-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -215,8 +215,6 @@ Options:
                             [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
                                 [string] [default: "~/.luminati.jar"]
-  --mode                   Defines a set of permissible operations within the
-                           UI/API                     [string] [default: "root"]
   --dropin                 Create dropin mode proxy port (default: 22225)
                                                        [boolean] [default: true]
   --dropin_port            Port for dropin mode                 [default: 22225]
