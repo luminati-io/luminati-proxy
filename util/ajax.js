@@ -51,7 +51,13 @@ function ajax(opt){
             ajopt.processData = false;
             delete ajopt.dataType;
         }
-        return xhr = $.ajax(ajopt);
+        xhr = $.ajax(ajopt);
+        var _this = this;
+        xhr.done(function(v){
+            _this.continue(v); });
+        xhr.fail(function(_xhr, status_text, err){
+            _this.throw(err instanceof Error ? err : new Error(''+err)); });
+        return this.wait();
     }, function catch$(err){
         zerr('ajax('+data_type+') failed url '+url+' data '+
             zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
@@ -61,17 +67,22 @@ function ajax(opt){
             return this.return(ajax(assign({}, opt, {retry: retry-1})));
         if (xhr.statusText=='timeout')
             E.events.emit('timeout', this);
-        var error = xhr.statusText||'no_status';
-        if (opt.ret_err_code && xhr.statusText && xhr.status)
-            error = xhr.status+' - '+error;
         if (opt.no_throw)
-            return {error: error, message: xhr.responseText, xhr: xhr};
-        var err_obj = new Error(error);
-        err_obj.hola_info = {data_type: data_type, url: url,
+        {
+            return {
+                err: err,
+                status: +xhr.status || 0,
+                data: get_res_data(xhr),
+                xhr: xhr,
+                // legacy
+                error: xhr.statusText||'no_status', message: xhr.responseText,
+            };
+        }
+        err.hola_info = {data_type: data_type, url: url,
             status: xhr.status, response_text: xhr.responseText};
-        err_obj.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
+        err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
-        throw err_obj;
+        throw err;
     }, function(data){
         var t = Date.now()-t0;
         zerr[t>slow ? 'err' : 'debug'](
@@ -101,5 +112,17 @@ function ajax(opt){
         return ajax(opt);
     };
 });
+
+function get_res_data(xhr){
+    if (xhr.responseJSON)
+        return xhr.responseJSON;
+    var content_type = xhr.getResponseHeader('content-type')||'';
+    if (xhr.responseText && content_type.includes('application/json'))
+    {
+        try { return JSON.parse(xhr.responseText); }
+        catch(e) { }
+    }
+    return xhr.responseText||'';
+}
 
 return E; }); }());

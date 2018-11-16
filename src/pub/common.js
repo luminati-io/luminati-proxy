@@ -384,11 +384,11 @@ export class Select_number extends Pure_component {
     };
     label_to_option = ({label})=>{
         const num = +label;
-        return {value: num, label: this.format_num(num)};
+        return {value: num, label: this.fmt_num(num)};
     };
-    format_num = n=>n&&n.toLocaleString({useGrouping: true})||n;
+    fmt_num = n=>n&&n.toLocaleString({useGrouping: true})||n;
     value_to_option = value=>
-        value!=null && {value, label: this.format_num(+value)};
+        value!=null && {value, label: this.fmt_num(+value)};
     validation = s=>!!s&&Number(s)==s;
     opt_from_range = ()=>{
         let res;

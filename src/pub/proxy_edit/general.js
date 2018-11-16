@@ -10,6 +10,12 @@ import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 
+const route_err_opt = [
+    {key: 'Default (pass_dyn)', value: ''},
+    {key: 'pass_dyn', value: 'pass_dyn'},
+    {key: 'block', value: 'block'}
+];
+
 export default provider({tab_id: 'general'})(props=>{
     const set_field = setdb.get('head.proxy_edit.set_field');
     const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
@@ -45,6 +51,7 @@ export default provider({tab_id: 'general'})(props=>{
           <Config type="text" id="whitelist_ips" save_on_blur
             validator={normalizers.ips_list}/>
           <Config type="yes_no" id="ssl"/>
+          <Config type="select" data={route_err_opt} id="route_err"/>
           <Config type="select_number" id="multiply" disabled={mul_disabled}
             range="medium"/>
           {type=='ips' &&

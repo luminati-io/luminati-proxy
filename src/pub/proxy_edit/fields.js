@@ -340,11 +340,12 @@ export const tabs = {
                 tooltip: `Enable SSL Logs in order to save HTTPs requests`,
                 ext: true,
             },
-            iface: {
-                label: 'Interface',
-                tooltip: 'Define a specific network interface on which '
-                    +'the local machine is running',
-                ext: true,
+            route_err: {
+                label: 'Route',
+                tooltip: `<div><b>pass_dyn:</b> If request can't pass via `
+                    +`peer, auto pass via super proxy<br><b>block</b> If `
+                    +`request can't pass via peer, block request and don't `
+                    +`auto send via super proxy</div>`,
             },
             multiply: {
                 label: 'Multiply proxy port',
@@ -365,6 +366,12 @@ export const tabs = {
                 label: 'SSL to super proxy',
                 tooltip: `Encrypt requests sent to super proxy to avoid
                     detection on DNS`,
+                ext: true,
+            },
+            iface: {
+                label: 'Interface',
+                tooltip: 'Define a specific network interface on which '
+                    +'the local machine is running',
                 ext: true,
             },
         },

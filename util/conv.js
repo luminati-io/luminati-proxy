@@ -181,7 +181,7 @@ E.scaled_number = function(num, opt){
     var sign = '', per = opt.per, scale = opt.scale;
     var base = opt.base==1024 ? 1024 : 1000, ratio = opt.ratio||1;
     var units = opt.units===undefined||opt.units;
-    function _per(){ return per ? E.format_per(per) : ''; }
+    function _per(){ return per ? E.fmt_per(per) : ''; }
     if (num<0)
     {
         sign = '-';
@@ -220,12 +220,11 @@ E.scaled_number = function(num, opt){
 E.scaled_bytes = function(num, opt){
     return E.scaled_number(num, Object.assign({base: 1000}, opt)); };
 
-// XXX colin/sergeyg: format_money_num+format_cost -> fmt_currency
 E.fmt_currency = function(amount, digits, currency_sign){
     if (amount===undefined)
         return;
     if (digits===undefined)
-        digits = 6;
+        digits = 2;
     if (currency_sign===undefined)
         currency_sign = '$';
     var sign = amount<0 ? '-' : '';
@@ -235,7 +234,7 @@ E.fmt_currency = function(amount, digits, currency_sign){
     return sign+currency_sign+amount;
 };
 
-E.format_per = function(per){
+E.fmt_per = function(per){
     if (!per)
         return '';
     switch (per)

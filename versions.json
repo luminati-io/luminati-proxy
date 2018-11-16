@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.112.806",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added route_err option"
+            },
+            {
+                "type": "star",
+                "text": "UI improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.112.742",
         "type": "stable",
         "changes": [

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.112.806 Stable
+- :star: Added route_err option
+- :star: UI improvements
+
 ## 1.112.742 Stable
 - :star: Improved HAR viewer: showing all the failed requests too
 - :star: Improved usability of Fast Sessions Pool

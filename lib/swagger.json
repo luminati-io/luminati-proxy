@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.112.742",
+        "version": "1.112.806",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -710,6 +710,10 @@
                 "race_reqs": {
                     "type": "integer",
                     "description": "Race several requests at once and choose fastest"
+                },
+                "route_err": {
+                    "type": "string",
+                    "description": "Block or allow requests to be automatically sent through super proxy on error"
                 }
             }
         }

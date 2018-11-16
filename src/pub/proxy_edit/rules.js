@@ -240,6 +240,7 @@ class Rules extends Pure_component {
         this.set_field('rules', rules);
     };
     goto_ssl = ()=>this.goto_field('ssl');
+    goto_debug = ()=>this.goto_field('debug');
     render(){
         return <div>
               {!this.props.form.ssl &&
@@ -248,6 +249,14 @@ class Rules extends Pure_component {
                   <span>we can't apply rules to HTTPS requests unless </span>
                   <a onClick={this.goto_ssl} className="link">SSL proxy</a>
                   <span> is turned on</span>
+                </Note>
+              }
+              {this.props.form.debug=='none' &&
+                <Note>
+                  <span><strong>Warning: </strong></span>
+                  <span>some rules may not work correctly without </span>
+                  <a onClick={this.goto_debug} className="link">
+                    Request debug info</a>
                 </Note>
               }
               {this.state.rules.map(r=>

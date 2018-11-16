@@ -103,8 +103,8 @@ export default withRouter(class Tracer extends Pure_component {
 
 const Error_ssl_off = ({port, goto_ssl})=>
     <span>
-      <span>Proxy port <strong>{port}</strong> doesn't have SSL </span>
-      <span>analyzing. You can turn it on in </span>
+      <span>Running Link Tester on proxy port <strong>{port}</strong> requires
+        enabling SSL analyzing in </span>
       <a className="link" onClick={goto_ssl}>General tab</a>
       <span> in the proxy port configuration page.</span>
     </span>;
