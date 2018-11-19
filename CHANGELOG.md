@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.113.30 Stable
+- :bug: Fixed multilevel waterfall Rule
+
 ## 1.112.820 Stable
 - :star: New endpoint on API: adding multiple IPs to banlist
 

@@ -1152,6 +1152,9 @@ describe('proxy', ()=>{
             r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: true,
                 retry: true});
             assert.ok(!r);
+            r = l.rules.can_retry({retry: 1}, {},
+                {retry_port: 24001, retry: true});
+            assert.ok(r);
         }));
         it('check post_timeout', ()=>etask(function*(){
             l = yield lum({rules: {post: [

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.113.30",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed multilevel waterfall Rule"
+            }
+        ]
+    },
+    {
         "ver": "1.112.820",
         "type": "stable",
         "changes": [
