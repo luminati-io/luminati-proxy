@@ -1,6 +1,5 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, es6:true*/
-import {Netmask} from 'netmask';
 
 export const bytes_format = (bytes, number)=>{
     if (!bytes||isNaN(parseFloat(bytes))||!isFinite(bytes))
@@ -215,15 +214,22 @@ const presets = {
             opt.pool_type = 'round-robin';
             opt.keep_alive = 45;
             opt.session = true;
+            opt.max_requests = 1;
+            opt.pool_size = 1;
         },
         clean: opt=>{
             opt.keep_alive = 0;
             opt.max_requests = 0;
             opt.session_duration = 0;
+            opt.pool_size = 0;
         },
         rules: [
-            {field: 'pool_type', label: `Round-robin pool type`},
             {field: 'multiply', label: `Disables 'Multiply' options`},
+            {field: 'pool_type', label: `Round-robin pool type`},
+            {field: 'pool_size', label: `Sets 'Pool size' requests to 1. It
+                makes sense to choose any other positive number`},
+            {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
+                sense to choose any other positive number`},
         ],
         disabled: {
             sticky_ip: true,
@@ -406,25 +412,6 @@ export const swagger_url = 'http://petstore.swagger.io/?url=https://'
 
 export const swagger_link_tester_url = swagger_url
 +'/get_proxies__port__link_test_json';
-
-// XXX krzysztof: merge with validators in proxy_edit
-export const normalizers = {
-    ips_list: val=>{
-        val = val.replace(/\s/g, '');
-        const ips = val.split(',');
-        const res = [];
-        ips.forEach(ip=>{
-            try {
-                const netmask = new Netmask(ip);
-                let to_add = netmask.base;
-                if (netmask.bitmask!=32)
-                    to_add += '/'+netmask.bitmask;
-                res.push(to_add);
-            } catch(e){ console.log('incorrect ip format'); }
-        });
-        return res.join(',');
-    },
-};
 
 export const detect_browser = ()=>{
     let browser = 'unknown';

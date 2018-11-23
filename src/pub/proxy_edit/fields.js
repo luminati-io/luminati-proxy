@@ -173,7 +173,8 @@ export const tabs = {
             },
             ban_ip_duration: {
                 label: 'Ban IP for',
-                tooltip: 'will remove the IP for a defined amount of time',
+                tooltip: `Ban the IP for a defined amount of time. Choose 0 to
+                    ban pernamentaly`,
             },
             ban_ip_custom: {label: 'Custom duration'},
             process: {label: 'Processing rule'},
@@ -261,21 +262,6 @@ export const tabs = {
             }
         },
     },
-    debug: {
-        label: 'Debugging',
-        tooltip: 'Improve the info you receive from the Proxy Manager',
-        fields: {
-            log: {
-                label: 'Log level',
-                tooltip: `Decide which data to show in logs`,
-                ext: true,
-            },
-            debug: {
-                label: 'Luminati request debug info',
-                tooltip: `Send debug info on every request`,
-            },
-        },
-    },
     headers: {
         label: 'Headers',
         tooltip: `Set default headers that are sent with each request from this
@@ -330,8 +316,10 @@ export const tabs = {
             },
             whitelist_ips: {
                 label: 'Whitelist IP access',
-                tooltip: `Grant proxy access to specific IPs. only those
-                    IPs will be able to send requests to this proxy port`,
+                tooltip: `Grant proxy access to specific IPs. Only those
+                    IPs will be able to send requests to this proxy port.
+                    Setting this field will override the 'General settings'|
+                    'Proxy whitelisted IPs' for this port.`,
                 placeholder: `e.g. 1.1.1.1,23.23.23.23`,
                 ext: true,
             },
@@ -373,6 +361,20 @@ export const tabs = {
                 tooltip: 'Define a specific network interface on which '
                     +'the local machine is running',
                 ext: true,
+            },
+            log: {
+                label: 'Log level',
+                tooltip: `Level of the logs in the console. Decide how much
+                    debug information you want to see.`,
+                ext: true,
+            },
+            debug: {
+                label: 'Luminati request debug info',
+                tooltip: `Attach additional headers in the response of each
+                    request with debug info such as Peer IP or timeline of the
+                    request. You can resign from it to save bandwidth (very
+                    little) or if the additional headers are breaking your
+                    operations`,
             },
         },
     },

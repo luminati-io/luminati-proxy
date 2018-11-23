@@ -2,12 +2,12 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import {Labeled_controller, Nav, Loader, Loader_small,
+import {Labeled_controller, Nav, Loader, Loader_small, Select, Tooltip,
     Select_number} from './common.js';
-import {normalizers} from './util.js';
-import {Select, Tooltip} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import {ga_event} from './util.js';
+import _ from 'lodash';
 
 export default function Settings(){
     return <div className="settings">
@@ -60,53 +60,71 @@ class Form extends Pure_component {
         });
     }
     zone_change = val=>{
+        ga_event('settings', 'change_field', 'zone');
         this.setState(prev=>({settings: {...prev.settings, zone: val}}),
-            this.save);
+            this.debounced_save);
     };
     whitelist_ips_change = val=>{
-        this.setState(prev=>({
-            settings: {...prev.settings, whitelist_ips: val}}));
-    };
-    whitelist_ips_blur = ({target: {value}})=>{
-        const val = normalizers.ips_list(value);
-        this.setState(prev=>({
-            settings: {...prev.settings, whitelist_ips: val}}), this.save);
+        ga_event('settings', 'change_field', 'whitelist_ips');
+        this.setState(
+            prev=>({settings: {...prev.settings, whitelist_ips: val}}),
+            this.debounced_save);
     };
     www_whitelist_ips_change = val=>{
-        this.setState(prev=>({
-            settings: {...prev.settings, www_whitelist_ips: val}}));
-    };
-    www_whitelist_ips_blur = ({target: {value}})=>{
-        const val = normalizers.ips_list(value);
-        this.setState(prev=>({
-            settings: {...prev.settings, www_whitelist_ips: val}}), this.save);
+        ga_event('settings', 'change_field', 'www_whitelist_ips');
+        this.setState(
+            prev=>({settings: {...prev.settings, www_whitelist_ips: val}}),
+            this.debounced_save);
     };
     logs_metric_changed = val=>{
+        ga_event('settings', 'change_field', 'logs_metric');
         this.setState(prev=>({settings: {
             ...prev.settings,
             logs_metric: val,
             logs_value: 1000,
-        }}), this.save);
+        }}), this.debounced_save);
     };
     logs_value_changed = val=>{
+        ga_event('settings', 'change_field', 'logs_value');
         this.setState(prev=>({settings: {...prev.settings, logs_value: +val}}),
-            this.save);
+            this.debounced_save);
     };
     request_stats_changed = val=>{
-        this.setState(prev=>({
-            settings: {...prev.settings, request_stats: val}}), this.save);
+        ga_event('settings', 'change_field', 'request_stats');
+        this.setState(
+            prev=>({settings: {...prev.settings, request_stats: val}}),
+            this.debounced_save);
     };
+    lock_nav = lock=>setdb.set('head.lock_navigation', lock);
     save = ()=>{
+        if (this.saving)
+        {
+            this.resave = true;
+            return;
+        }
+        ga_event('settings', 'save', 'start');
+        this.lock_nav(true);
         this.setState({saving: true});
+        this.saving = true;
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
+                ga_event('settings', 'save', 'failed');
+            });
+            this.on('finally', ()=>{
                 _this.setState({saving: false});
+                _this.saving = false;
+                _this.lock_nav(false);
+                ga_event('settings', 'save', 'successful');
+                if (_this.resave)
+                {
+                    _this.resave = false;
+                    _this.save();
+                }
             });
             const body = {..._this.state.settings};
             body.logs = {metric: body.logs_metric, value: body.logs_value};
-            // XXX krzysztof: switch fetch->ajax
             const raw = yield window.fetch('/api/settings', {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -116,9 +134,9 @@ class Form extends Pure_component {
             setdb.set('head.settings', settings);
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
-            _this.setState({saving: false});
         });
     };
+    debounced_save = _.debounce(this.save, 500);
     render(){
         if (!this.state.settings)
             return null;
@@ -136,16 +154,12 @@ class Form extends Pure_component {
                 on_change_wrapper={this.zone_change} label="Default zone"
                 tooltip={this.tooltips.zone} data={zone_opt}/>
               <Labeled_controller val={this.state.settings.www_whitelist_ips}
-                type="text" on_change_wrapper={this.www_whitelist_ips_change}
-                label="Admin whitelisted IPs"
-                placeholder="e.g. 1.1.1.1, 2.2.2.2"
-                on_blur={this.www_whitelist_ips_blur}
+                type="pins" label="Admin whitelisted IPs"
+                on_change_wrapper={this.www_whitelist_ips_change}
                 tooltip={this.tooltips.www_whitelist_ips}/>
               <Labeled_controller val={this.state.settings.whitelist_ips}
-                type="text" on_change_wrapper={this.whitelist_ips_change}
-                label="Proxy whitelisted IPs"
-                placeholder="e.g. 1.1.1.1, 2.2.2.2"
-                on_blur={this.whitelist_ips_blur}
+                type="pins" label="Proxy whitelisted IPs"
+                on_change_wrapper={this.whitelist_ips_change}
                 tooltip={this.tooltips.whitelist_ips}/>
               <Labeled_controller val={this.state.settings.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}

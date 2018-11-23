@@ -101,7 +101,7 @@ E.inet_addr = function(ip){
         return null;
     if (parts[1]>255 || parts[2]>255 || parts[3]>255 || parts[4]>255)
         return null; // not an IP address
-    return ((parts[1]<<24)+(parts[2]<<16)+(parts[3]<<8)+(parts[4]|0))>>>0;
+    return (parts[1]<<24)+(parts[2]<<16)+(parts[3]<<8)+(parts[4]|0)>>>0;
 };
 
 function flags_to_str_once(flags, conv){
@@ -122,9 +122,9 @@ function flags_to_str_once(flags, conv){
     Object.defineProperty(conv, '__conv_to_str',
         {enumerable: false, writable: true});
     conv.__conv_to_str = func;
-    func.err = function(flags, conv){
-        zerr.perr('flags_str_invalid', 'flags '+flags+' '
-            +JSON.stringify(conv).slice(0, 30));
+    func.err = function(_flags, _conv){
+        zerr.perr('flags_str_invalid', 'flags '+_flags+' '
+            +JSON.stringify(_conv).slice(0, 30));
     };
     return conv.__conv_to_str(flags, conv);
 }
@@ -155,9 +155,9 @@ function flags_from_str_once(s, conv){
     Object.defineProperty(conv, '__conv_from_str',
         {enumerable: false, writable: true});
     conv.__conv_from_str = func;
-    func.err = function(s, conv){
-        zerr.perr('flags_str_invalid', 'flags '+s+' '
-            +JSON.stringify(conv).slice(0, 30));
+    func.err = function(_s, _conv){
+        zerr.perr('flags_str_invalid', 'flags '+_s+' '
+            +JSON.stringify(_conv).slice(0, 30));
     };
     return conv.__conv_from_str(s, conv);
 }

@@ -82,12 +82,6 @@ const to_body = req=>({
     headers: restore_case(req.headers, req.rawHeaders),
 });
 
-const mock_json = status=>{
-    return opt=>{
-        return {status, body: {opt, mock: true}};
-    };
-};
-
 const pre_rule = (type, regex)=>({
     rules: {pre: [{action: type, url: regex||'.*'}]},
 });
@@ -1237,8 +1231,8 @@ describe('proxy', ()=>{
                     'add_reserve_pool_session');
                 const fps_stub = sinon.stub(l.session_mgr,
                     'add_fast_pool_session');
-                const r = l.rules.action({ctx: {rule: ()=>null}}, {}, {}, {},
-                    {email: true, reserve_session: true,
+                const r = l.rules.action({ctx: {set_rule: ()=>null}}, {}, {},
+                    {}, {email: true, reserve_session: true,
                         fast_pool_session: true},
                     {res: [{}]}, {type: 'max_req_time', value: '200ms'});
                 assert.ok(!r);
@@ -1592,26 +1586,6 @@ describe('manager', ()=>{
                 app = yield app_with_args();
                 const body = yield json('api/version');
                 assert.equal(body.version, pkg.version);
-            }));
-        });
-        describe('recent_ips', ()=>{
-            Manager.prototype.json = mock_json(200);
-            const expect_opt = {
-                url: 'https://luminati-china.io/api/get_recent_ips?zones=*',
-                headers: {'x-hola-auth': `lum-customer-${customer}`
-                    +`-zone-static-key-${password}`},
-            };
-            it('get', ()=>etask(function*(){
-                app = yield app_with_args(
-                    qw`--customer ${customer} --password ${password}`);
-                const body = yield json('api/recent_ips');
-                assert_has(body, {opt: expect_opt});
-            }));
-            it('get with config', ()=>etask(function*(){
-                app = yield app_with_config({config: {_defaults:
-                    {customer, password}}, only_explicit: true});
-                const body = yield json('api/recent_ips');
-                assert_has(body, {opt: expect_opt});
             }));
         });
         describe('proxies', ()=>{

@@ -51,22 +51,6 @@ const Empty_row = ()=>
       <td>—</td><td>—</td><td>—</td><td>—</td>
     </tr>;
 
-const Row = withRouter(class Row extends Pure_component {
-    click = ()=>{
-        const url = `/logs?${this.props.logs}=${this.props.stat.key}`;
-        this.props.history.push(url);
-    };
-    render(){
-        const {stat, row_key, warning} = this.props;
-        return <tr onClick={this.click}>
-              <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
-              <td><Tooltip_bytes chrome_style bytes={stat.out_bw}/></td>
-              <td><Tooltip_bytes chrome_style bytes={stat.in_bw}/></td>
-              <td><Cell>{stat.reqs||'—'}</Cell></td>
-            </tr>;
-    }
-});
-
 const Key_cell = ({title, warning, row_key})=>{
     const warning_tooltip = `Some of your proxy ports don't have SSL analyzing
         enabled and there are connections on HTTPS protocol detected`;
@@ -178,6 +162,22 @@ const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
         </div>;
 };
 
+const Row = withRouter(class Row extends Pure_component {
+    click = ()=>{
+        const url = `/logs?${this.props.logs}=${this.props.stat.key}`;
+        this.props.history.push(url);
+    };
+    render(){
+        const {stat, row_key, warning} = this.props;
+        return <tr onClick={this.click}>
+              <Key_cell row_key={row_key} title={stat.key} warning={warning}/>
+              <td><Tooltip_bytes chrome_style bytes={stat.out_bw}/></td>
+              <td><Tooltip_bytes chrome_style bytes={stat.in_bw}/></td>
+              <td><Cell>{stat.reqs||'—'}</Cell></td>
+            </tr>;
+    }
+});
+
 const Summary_bar = ({enable_ssl_click, show})=>{
     if (!show)
         return null;
@@ -219,7 +219,7 @@ const Success_ratio = ({total=0, success=0})=>{
         requests, where successful requests are calculated as 2xx,
         3xx or 404 HTTP status codes`;
     const val_tooltip = `total: ${total}, success: ${success}`;
-    return <div className="overall_success_ratio">
+    return <div className="title_wrapper">
           <div className="success_title">
             <Tooltip title={tooltip}>Success rate:</Tooltip>
           </div>

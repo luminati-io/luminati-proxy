@@ -2,40 +2,12 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import {Netmask} from 'netmask';
 import setdb from '../../../util/setdb.js';
 import {tabs} from './fields.js';
 import {Labeled_controller} from '../common.js';
 import {getContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import PropTypes from 'prop-types';
-
-export const validators = {
-    number: (min, max, req=false)=>val=>{
-        val = Number(val);
-        if (isNaN(val))
-        {
-            if (req)
-                return min;
-            return undefined;
-        }
-        else if (val < min)
-            return min;
-        else if (val > max)
-            return max;
-        return val;
-    },
-    ips_list: val=>{
-        val = val.replace(/\s/g, '');
-        const ips = val.split(',');
-        const res = [];
-        ips.forEach(ip=>{
-            try { res.push(new Netmask(ip).base); }
-            catch(e){ console.log('incorrect ip format'); }
-        });
-        return res.join(',');
-    },
-};
 
 export const Config = withRouter(getContext({provide: PropTypes.object})(
 class Config extends Pure_component {
@@ -100,8 +72,6 @@ class Config extends Pure_component {
               on_change_wrapper={this.on_change_wrapper}
               val={this.state.val===undefined ? '' : this.state.val}
               disabled={disabled}
-              min={this.props.min}
-              max={this.props.max}
               note={this.props.note}
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}

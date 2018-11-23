@@ -14,16 +14,15 @@ import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
     Preset_description} from '../common.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
-import Har_viewer from '../har_viewer.js';
 import * as util from '../util.js';
 import {withRouter} from 'react-router-dom';
 import Rules from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
-import Debug from './debug.js';
 import Rotation from './rotation.js';
 import Speed from './speed.js';
 import Headers from './headers.js';
+import Logs from './logs.js';
 
 const presets = util.presets;
 const event_tracker = {};
@@ -333,7 +332,6 @@ const Index = withRouter(class Index extends Pure_component {
                 _this.saving = false;
                 $('#save_proxy_errors').modal('show');
             });
-            // XXX krzysztof: switch fetch->ajax
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -354,7 +352,6 @@ const Index = withRouter(class Index extends Pure_component {
             if (warnings.length)
                 _this.setState({warnings});
             const update_url = '/api/proxies/'+_this.props.match.params.port;
-            // XXX krzysztof: switch fetch->ajax
             yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -521,11 +518,10 @@ const Main_window = withRouter(({match: {params: {tab}}, ...props})=>{
     case 'speed': Comp = Speed; break;
     case 'rules': Comp = Rules; break;
     case 'rotation': Comp = Rotation; break;
-    case 'debug': Comp = Debug; break;
     case 'headers': Comp = Headers; break;
     case 'general': Comp = General; break;
     case 'logs':
-    default: Comp = Har_viewer;
+    default: Comp = Logs;
     }
     return <Comp {...props}/>;
 });
@@ -623,7 +619,6 @@ const Nav_tabs = ()=>
       <Tab_btn id="rules"/>
       <Tab_btn id="speed"/>
       <Tab_btn id="rotation"/>
-      <Tab_btn id="debug"/>
       <Tab_btn id="headers"/>
       <Tab_btn id="general"/>
     </div>;

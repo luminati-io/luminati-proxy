@@ -180,17 +180,17 @@ const Request = with_proxy_ports(class Request extends Pure_component {
                     disabled={this.props.loading}/>
                 </Field>
               </div>
-              <Go_button on_click={this.go_clicked}
+              <Send_button on_click={this.go_clicked}
                 disabled={this.props.loading}/>
             </div>;
     }
 });
 
-const Go_button = ({on_click, disabled})=>
+const Send_button = ({on_click, disabled})=>
     <div className="go_btn_wrapper">
       <Tooltip title="Start testing redirections">
         <button onClick={on_click} className="btn btn_lpm btn_lpm_primary"
-          disabled={disabled}>Go</button>
+          disabled={disabled}>Send</button>
       </Tooltip>
     </div>;
 

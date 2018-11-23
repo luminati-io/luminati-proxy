@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.113.585 Stable
+- :star: UI improvements
+
 ## 1.113.30 Stable
 - :bug: Fixed multilevel waterfall Rule
 

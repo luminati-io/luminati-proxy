@@ -9,21 +9,22 @@ import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 
+const reverse_lookup_opt = [
+    {key: 'No', value: ''},
+    {key: 'DNS', value: 'dns'},
+    {key: 'File', value: 'file'},
+    {key: 'Values', value: 'values'},
+];
+
+const dns_opt = [
+    {key: 'Local (default) - resolved by the super proxy', value: 'local'},
+    {key: 'Remote - resolved by peer', value: 'remote'},
+];
+
 export default provider({tab_id: 'speed'})(
 class Speed extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
-    dns_options = [
-        {key: 'Local (default) - resolved by the super proxy',
-            value: 'local'},
-        {key: 'Remote - resolved by peer', value: 'remote'},
-    ];
-    reverse_lookup_options = [
-        {key: 'No', value: ''},
-        {key: 'DNS', value: 'dns'},
-        {key: 'File', value: 'file'},
-        {key: 'Values', value: 'values'},
-    ];
     zagent_countries = ['au', 'cn', 'gb', 'in', 'nl', 'us'];
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
@@ -66,15 +67,15 @@ class Speed extends Pure_component {
             .map(c=>({key: c.country_name, value: zproxy(c.country_id)})));
         return <div>
               <Config type="select" id="proxy" data={proxy_data}/>
-              <Config type="select" id="dns" data={this.dns_options}/>
-              <Config type="number" id="pool_size" min="0"
+              <Config type="select" id="dns" data={dns_opt}/>
+              <Config type="select_number" id="pool_size" allow_zero
                 note={pool_size_note} disabled={pool_size_disabled}/>
-              <Config type="number" id="race_reqs" min="1" max="3"/>
-              <Config type="number" id="proxy_count" min="1"/>
-              <Config type="number" id="proxy_switch" min="0"/>
-              <Config type="number" id="throttle" min="0"/>
+              <Config type="select_number" id="race_reqs" allow_zero/>
+              <Config type="select_number" id="proxy_count" allow_zero/>
+              <Config type="select_number" id="proxy_switch" allow_zero/>
+              <Config type="select_number" id="throttle" allow_zero/>
               <Config type="select" id="reverse_lookup"
-                data={this.reverse_lookup_options}/>
+                data={reverse_lookup_opt}/>
               {this.props.form.reverse_lookup=='file' &&
                 <Config type="text" id="reverse_lookup_file"/>}
               {this.props.form.reverse_lookup=='values' &&

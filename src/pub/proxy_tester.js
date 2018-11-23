@@ -129,7 +129,7 @@ class Request extends Pure_component {
                 <div className="footer_buttons">
                   <Tooltip title="Send a test request">
                     <button onClick={this.go}
-                      className="btn btn_lpm btn_lpm_primary">Go</button>
+                      className="btn btn_lpm btn_lpm_primary">Send</button>
                   </Tooltip>
                 </div>
               </div>

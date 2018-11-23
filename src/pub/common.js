@@ -14,6 +14,7 @@ import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import React_select from 'react-select/lib/Creatable';
+import {Netmask} from 'netmask';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -356,6 +357,138 @@ class Yes_no extends Pure_component {
     }
 }
 
+class Pins extends Pure_component {
+    state = {pins: [], max_id: 0};
+    static getDerivedStateFromProps(props, state) {
+        if (props.val==state.raw_val||!props.val)
+            return null;
+        const ips = props.val.split(',');
+        return {
+            raw_val: props.val,
+            pins: ips.map((p, id)=>({id, val: p, edit: false})),
+            max_id: ips.length,
+        };
+    }
+    add_pin = ()=>{
+        this.setState(prev=>({
+            pins: [...prev.pins, {id: prev.max_id+1, val: '', edit: true}],
+            max_id: prev.max_id+1,
+        }));
+    };
+    remove = id=>{
+        this.setState(prev=>({
+            pins: prev.pins.filter(p=>p.id!=id),
+        }), this.fire_on_change);
+    };
+    set_edit = (id, edit)=>{
+        this.setState(prev=>({
+            pins: prev.pins.map(p=>{
+                if (p.id!=id)
+                    return p;
+                return {...p, edit};
+            }),
+        }));
+    };
+    update_pin = (id, val)=>{
+        this.setState(prev=>({
+            pins: prev.pins.map(p=>{
+                if (p.id!=id)
+                    return p;
+                return {...p, val};
+            }),
+        }));
+    };
+    fire_on_change = ()=>{
+        const val = this.state.pins.map(p=>p.val).join(',');
+        this.props.on_change_wrapper(val);
+    };
+    save_pin = (id, val)=>{
+        this.setState(prev=>({
+            pins: prev.pins.map(p=>{
+                if (p.id!=id)
+                    return p;
+                return {...p, val, edit: false};
+            }),
+        }), this.fire_on_change);
+    };
+    render(){
+        return <div className="pins_field">
+              <div className="pins">
+                {this.state.pins.map(p=>
+                  <Pin key={p.id} update_pin={this.update_pin} id={p.id}
+                    set_edit={this.set_edit} edit={p.edit}
+                    save_pin={this.save_pin} remove={this.remove}>
+                    {p.val}
+                  </Pin>
+                )}
+              </div>
+              <Add_pin add_pin={this.add_pin}/>
+            </div>;
+    }
+}
+
+class Pin extends Pure_component {
+    input = React.createRef();
+    componentDidMount(){
+        this.input.current.focus();
+    }
+    componentDidUpdate(){
+        if (this.props.edit)
+            this.input.current.focus();
+    }
+    edit = ()=>{
+        this.props.set_edit(this.props.id, true);
+    };
+    key_up = e=>{
+        if (e.keyCode==13)
+            this.validate_and_save();
+    };
+    validate_and_save = ()=>{
+        let val = (this.props.children||'').trim();
+        try {
+            const netmask = new Netmask(val);
+            val = netmask.base;
+            if (netmask.bitmask!=32)
+                val += '/'+netmask.bitmask;
+        } catch(e){ val = ''; }
+        if (!val)
+            return this.props.remove(this.props.id);
+        this.props.save_pin(this.props.id, val);
+    };
+    on_change = e=>this.props.update_pin(this.props.id, e.target.value);
+    remove = ()=>this.props.remove(this.props.id);
+    on_blur = ()=>this.validate_and_save();
+    render(){
+        const {children} = this.props;
+        const input_classes = classnames({hidden: !this.props.edit});
+        return <div className={classnames('pin', {active: this.props.edit})}>
+              <div className="x" onClick={this.remove}>
+                <div className="glyphicon glyphicon-remove"/>
+              </div>
+              <div className="content" onClick={this.edit}>
+                {!this.props.edit && children}
+                <input ref={this.input} type="text" value={children}
+                  onChange={this.on_change} onBlur={this.on_blur}
+                  className={input_classes} onKeyUp={this.key_up}/>
+              </div>
+              {this.props.edit &&
+                <div className="v">
+                  <div className="glyphicon glyphicon-ok"/>
+                </div>
+              }
+            </div>;
+    }
+}
+
+const Add_pin = ({add_pin})=>
+    <Tooltip title="Add new IP to the list">
+      <button className="btn btn_lpm btn_lpm_small add_pin"
+        onClick={add_pin}>
+        Add IP
+        <i className="glyphicon glyphicon-plus"/>
+      </button>
+    </Tooltip>;
+
 export class Select_number extends Pure_component {
     styles = {
         option: (base, state)=>{
@@ -394,6 +527,8 @@ export class Select_number extends Pure_component {
         let res;
         if (this.props.range=='medium')
             res = [0, 1, 10, 100, 1000];
+        else if (this.props.range=='ms')
+            res = [0, 500, 2000, 5000, 10000];
         else
             res = [0, 1, 3, 5, 10, 20];
         if (this.props.allow_zero)
@@ -444,6 +579,8 @@ export const Form_controller = props=>{
         return <Yes_no {...props}/>;
     else if (type=='select_number')
         return <Select_number {...props}/>;
+    else if (type=='pins')
+        return <Pins {...props}/>;
     return <Input {...props}/>;
 };
 
@@ -485,7 +622,7 @@ export const Labeled_controller = ({label, tooltip, disabled, note, sufix,
       <div className="desc">
         <Tooltip title={tooltip}>{label}</Tooltip>
       </div>
-      <div className="field">
+      <div>
         <div className="inline_field">
           <Form_controller disabled={disabled} {...props}/>
           {sufix && <span className="sufix">{sufix}</span>}
@@ -501,9 +638,13 @@ export const Input = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val, props.id);
     };
-    return <input type={props.type} value={props.val} disabled={props.disabled}
-          onChange={e=>update(e.target.value)} className={props.className}
-          min={props.min} max={props.max} placeholder={props.placeholder}
+    return <input style={props.style}
+          type={props.type}
+          value={props.val}
+          disabled={props.disabled}
+          onChange={e=>update(e.target.value)}
+          className={props.className}
+          placeholder={props.placeholder}
           onBlur={props.on_blur}/>;
 };
 

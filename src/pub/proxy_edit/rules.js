@@ -6,7 +6,6 @@ import setdb from '../../../util/setdb.js';
 import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note, with_proxy_ports} from '../common.js';
-import {validators} from './common.js';
 import {tabs} from './fields.js';
 import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
@@ -285,14 +284,14 @@ class Rule_config extends Pure_component {
         const tab_id = this.props.provide.tab_id;
         return <Labeled_controller
               id={id}
+              style={this.props.style}
               sufix={this.props.sufix}
               data={this.props.data}
               type={this.props.type}
+              range={this.props.range}
               on_change_wrapper={this.value_change}
               val={this.props.rule[id]||''}
               disabled={this.props.disabled}
-              min={this.props.min}
-              max={this.props.max}
               note={this.props.note}
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
@@ -416,11 +415,11 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
               {rule.trigger_type=='body' &&
                 <Rule_config id="body_regex" type="text" rule={rule}/>}
               {rule.trigger_type=='min_req_time' &&
-                <Rule_config id="min_req_time" type="number"
+                <Rule_config id="min_req_time" type="select_number" range="ms"
                   sufix="milliseconds" rule={rule}/>
               }
               {rule.trigger_type=='max_req_time' &&
-                <Rule_config id="max_req_time" type="number"
+                <Rule_config id="max_req_time" type="select_number" range="ms"
                   sufix="milliseconds" rule={rule}/>
               }
               {rule.trigger_type=='status' &&
@@ -431,14 +430,15 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
               {rule.status_code=='Custom' &&
                 <Rule_config id="status_custom" type="text" rule={rule}/>}
               {rule.trigger_type &&
-                <Rule_config id="trigger_url_regex" type="regex" rule={rule}/>}
+                <Rule_config id="trigger_url_regex" type="regex" rule={rule}
+                  style={{width: '100%'}}/>}
               {rule.trigger_type &&
                 <Rule_config id="action" type="select" data={_action_types}
                   on_change={this.action_changed} rule={rule}/>
               }
               {rule.action=='retry' &&
-                <Rule_config id="retry_number" type="number" min="0" max="20"
-                  validator={validators.number(0, 20)} rule={rule}/>
+                <Rule_config id="retry_number" type="select_number"
+                  rule={rule}/>
               }
               {rule.action=='retry_port' &&
                 <Rule_config id="retry_port" type="select" data={ports}
@@ -453,9 +453,8 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
                   data={ban_options} rule={rule} note={ban_ips_note}/>
               }
               {rule.action=='save_to_fast_pool' &&
-                <Rule_config id="fast_pool_size" type="number" min="1"
-                  max="50" validator={validators.number(1, 50)} rule={rule}
-                  note={fast_pool_note}/>
+                <Rule_config id="fast_pool_size" type="select_number"
+                  rule={rule} note={fast_pool_note}/>
               }
               {rule.ban_ip_duration=='custom' &&
                 <Rule_config id="ban_ip_custom" type="number" sufix="minutes"

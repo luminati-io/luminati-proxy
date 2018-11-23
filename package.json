@@ -131,7 +131,7 @@
     "less-loader": "4.0.5",
     "lolex": "2.1.1",
     "mocha": "3.2.0",
-    "moment": "2.17.1",
+    "moment": "2.22.2",
     "nock": "9.0.11",
     "react": "16.6.0",
     "react-dom": "16.6.0",
@@ -192,7 +192,6 @@
       "bin/pub/img/c_edit.svg",
       "bin/pub/img/c_edit_active.svg",
       "bin/pub/img/data_center.svg",
-      "bin/pub/img/debug.svg",
       "bin/pub/img/delete.svg",
       "bin/pub/img/down.svg",
       "bin/pub/img/duplicate.svg",
@@ -334,11 +333,11 @@
       "src/pub/proxy_add.js",
       "src/pub/proxy_blank.js",
       "src/pub/proxy_edit/common.js",
-      "src/pub/proxy_edit/debug.js",
       "src/pub/proxy_edit/fields.js",
       "src/pub/proxy_edit/general.js",
       "src/pub/proxy_edit/headers.js",
       "src/pub/proxy_edit/index.js",
+      "src/pub/proxy_edit/logs.js",
       "src/pub/proxy_edit/rotation.js",
       "src/pub/proxy_edit/rules.js",
       "src/pub/proxy_edit/speed.js",
@@ -358,7 +357,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "092e9c2f99ec151ef6e09c47d34af9b1"
+    "md5": "4841699c58397ba61a39e39b88eb9637"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -394,5 +393,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.113.30"
+  "version": "1.113.585"
 }

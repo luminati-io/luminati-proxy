@@ -7,12 +7,19 @@ import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
 
+const pool_type_opt = [
+    {key: 'Default (Sequential)', value: ''},
+    {key: 'Sequential', value: 'sequential'},
+    {key: 'Round-robin', value: 'round-robin'},
+    // {key: 'Long Availability', value: 'long-availability'},
+];
+
 export default provider({tab_id: 'rotation'})(props=>{
-    const {form, proxy} = props;
+    const {form} = props;
     return <div>
           <Config type="text" id="ip"/>
           <Config type="text" id="vip"/>
-          <Config type="select" id="pool_type" data={proxy.pool_type.values}/>
+          <Config type="select" id="pool_type" data={pool_type_opt}/>
           <Config type="select_number" id="keep_alive" sufix="seconds"
             data={[0, 45]}/>
           <Config type="select_number" id="max_requests"/>

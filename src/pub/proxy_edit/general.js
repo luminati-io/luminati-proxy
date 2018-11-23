@@ -4,7 +4,6 @@ import React from 'react';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
 import {Config} from './common.js';
-import {normalizers} from '../util.js';
 import {withContext} from 'recompose';
 import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
@@ -14,6 +13,12 @@ const route_err_opt = [
     {key: 'Default (pass_dyn)', value: ''},
     {key: 'pass_dyn', value: 'pass_dyn'},
     {key: 'block', value: 'block'}
+];
+
+const debug_opt = [
+    {key: `Default (full)`, value: ''},
+    {key: 'none', value: 'none'},
+    {key: 'full', value: 'full'},
 ];
 
 export default provider({tab_id: 'general'})(props=>{
@@ -48,8 +53,7 @@ export default provider({tab_id: 'general'})(props=>{
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
           <Config type="text" id="password" disabled/>
-          <Config type="text" id="whitelist_ips" save_on_blur
-            validator={normalizers.ips_list}/>
+          <Config type="pins" id="whitelist_ips"/>
           <Config type="yes_no" id="ssl"/>
           <Config type="select" data={route_err_opt} id="route_err"/>
           <Config type="select_number" id="multiply" disabled={mul_disabled}
@@ -64,5 +68,7 @@ export default provider({tab_id: 'general'})(props=>{
           }
           <Config type="yes_no" id="secure_proxy"/>
           <Config type="select" id="iface" data={props.proxy.iface.values}/>
+          <Config type="select" id="log" data={props.proxy.log.values}/>
+          <Config type="select" id="debug" data={debug_opt}/>
         </div>;
 });

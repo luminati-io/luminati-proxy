@@ -1,7 +1,7 @@
 @first_color: #004d74;
 @first_odd: #4a8398;
 @grey: #ccdbe3;
-@grey_border: #E0E9EE;
+@grey_border: #e0e9ee;
 @light_grey: #f5f5f5;
 @dark_grey: #d7d7d7;
 @light: #B4E6EE;
@@ -412,7 +412,8 @@ h4 { margin: 0; }
 }
 select, input[type=number], input[type=text], input[type=password],
 input[type=email], textarea, .json_input_wrapper {
-    width: 100%;
+    min-width: 100px;
+    width: auto;
     height: 32px;
     background-color: white;
     border: solid 1px @grey;
@@ -463,8 +464,8 @@ input.regex {
     border-top-right-radius: 0;
 }
 .select_number {
-    width: 100%;
     min-width: 120px;
+    input { min-width: 0; }
 }
 .btn_lpm {
     padding-left: 11px;
@@ -542,6 +543,56 @@ ul.bullets {
             content: "\2022";
             font-size: 13px;
             padding-right: 6px;
+        }
+    }
+}
+.pins_field {
+    display: flex;
+    align-items: baseline;
+    .pins {
+        display: flex;
+        flex-flow: wrap;
+        .pin {
+            background-color: @light_grey;
+            border: 1px solid @grey_border;
+            border-radius: 3px;
+            padding: 3px;
+            display: flex;
+            margin: 0 6px 2px 0;
+            &.active {
+                border-color: @first_color;
+            }
+            .x, .v {
+                width: 16px;
+                font-size: 10px;
+                text-align: center;
+                cursor: pointer;
+                &:hover {
+                    background-color: @first_color;
+                    color: white;
+                }
+                .glyphicon-remove {
+                    position: relative;
+                    top: 1px;
+                }
+            }
+            .content {
+                padding: 0 2px 0 2px;
+                input {
+                    width: 120px;
+                    height: 23px;
+                    border: none;
+                    padding: 0;
+                }
+            }
+        }
+    }
+    .add_pin {
+        margin-left: 0;
+        cursor: pointer;
+        height: 32px;
+        .glyphicon-plus {
+            margin-left: 5px;
         }
     }
 }
@@ -796,6 +847,7 @@ span.icon_link {
 .rbt {
     &.open {
         width: 100%;
+        min-width: 100px;
         &.clearfix:before { content: none; }
     }
     .rbt-input {
@@ -865,7 +917,6 @@ span.icon_link {
         .icon.speed { background-image: url(/img/speed.svg); }
         .icon.rules { background-image: url(/img/rules.svg); }
         .icon.rotation { background-image: url(/img/rotation.svg); }
-        .icon.debug { background-image: url(/img/debug.svg); }
         .icon.headers { background-image: url(/img/request_headers.svg); }
         .icon.general { background-image: url(/img/general.svg); }
         .icon.proxy_ext { background-image: url(/img/proxy_ext.svg); }
@@ -944,7 +995,6 @@ span.icon_link {
     .main_window {
         margin-top: 10px;
         display: flex;
-        height: 100%;
         &.logs {
             .logs {
                 width: 100%;
@@ -952,9 +1002,8 @@ span.icon_link {
             }
         }
         &.target .desc { width: 100px; }
-        &.speed .desc { width: 195px; }
+        &.speed .desc { width: 175px; }
         &.rotation .desc { width: 125px; }
-        &.debug .desc { width: 120px; }
         &.headers .desc { width: 145px; }
         &.general .desc { width: 195px; }
         &.rules {
@@ -1033,18 +1082,15 @@ span.icon_link {
             line-height: 1.07;
             padding-right: 10px;
         }
-        .field {
-            flex: 1;
-            .inline_field {
-                display: flex;
-                align-items: center;
-            }
+        .inline_field {
+            display: flex;
             align-items: center;
-            .sufix { margin-left: 10px; }
-            .double_field {
-                input { width: 109px; }
-                .devider { margin: 0 5px; }
-            }
+        }
+        align-items: center;
+        .sufix { margin-left: 10px; }
+        .double_field {
+            input { width: 109px; }
+            .devider { margin: 0 5px; }
         }
     }
     .allocated_ips_modal {
@@ -1095,6 +1141,12 @@ span.icon_link {
                 }
             }
         }
+    }
+}
+.details_tables {
+    .details_table {
+        height: 200px;
+        margin-top: 15px;
     }
 }
 .report_bug {
@@ -1151,16 +1203,12 @@ span.icon_link {
                 .empty_row td { cursor: default; }
                 .enable_ssl { margin-left: 2px; }
             }
-            .overall_success_ratio {
-                height: 100%;
-                margin: 0 3px;
-                padding: 1px;
-                display: flex;
-                .success_title {
-                    font-weight: bold;
-                }
-                .success_value { margin-left: 5px; }
+        }
+        .title_wrapper {
+            .success_title {
+                font-weight: bold;
             }
+            .success_value { margin-left: 5px; }
         }
         .enable_ssl_modal {
             .cert_info {
@@ -1496,7 +1544,11 @@ span.icon_link {
             display: flex;
             align-items: baseline;
             margin-bottom: 5px;
-            .desc { margin-right: 5px; }
+            .desc {
+                width: 140px;
+                margin-right: 5px;
+                white-space: nowrap;
+            }
             .double_field { display: flex; }
             .double_field>* {
                 &:first-child { margin-right: 5px; }
@@ -1506,6 +1558,7 @@ span.icon_link {
     }
 }
 .tracer {
+    select, input { width: 100%; }
     padding: 0 15px;
     .request {
         .fields {
@@ -1523,8 +1576,8 @@ span.icon_link {
             }
         }
         .go_btn_wrapper {
-            text-align: center;
             margin-top: 10px;
+            .btn { margin: 0; }
         }
     }
     .live_preview {
@@ -1548,6 +1601,7 @@ span.icon_link {
     .single_instruction { overflow-wrap: break-word; }
 }
 .proxy_tester {
+    select, input { width: 100%; }
     height: 100%;
     padding: 0 15px;
     .title_value_pairs {
@@ -1604,8 +1658,8 @@ span.icon_link {
                 }
             }
             .footer_buttons {
-                text-align: center;
                 margin-top: 10px;
+                .btn { margin: 0; }
             }
         }
         &.body {
@@ -2185,6 +2239,12 @@ span.icon_link {
             &:not(:first-child) {
                 border-top: solid 1px #d0d0d0;
             }
+            .title_wrapper {
+                height: 100%;
+                margin: 0 3px;
+                padding: 1px;
+                display: flex;
+            }
         }
         .toolbar_item {
             position: relative;
@@ -2346,6 +2406,7 @@ span.icon_link {
         }
         .header_container {
             height: 27px;
+            overflow-x: hidden;
             table {
                 th {
                     position: relative;
