@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.113.808",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Long-availability sessions pool"
+            }
+        ]
+    },
+    {
         "ver": "1.113.585",
         "type": "stable",
         "changes": [

@@ -11,8 +11,8 @@ define(['react', 'react-dom', '/www/util/pub/pure_component.js',
     '/util/setdb.js', '/www/locale/pub/i18n.js'],
     (React, ReactDOM, Pure_component, setdb, i18n)=>
 {
-
 const {t} = i18n;
+const Wrap = ({children})=>children;
 class T extends Pure_component {
     constructor(props){
         super(props);
@@ -25,13 +25,17 @@ class T extends Pure_component {
     render(){
         const {translation} = this.state;
         const {children} = this.props;
+        let result = '';
         if (typeof children=='function')
-            return children(key=>t(key, translation));
-        if (typeof children=='string')
-            return t(children.replace(/\s+/g, ' '), translation);
-        console.error('<T> must receive text to translate or a translate '
-            +'function. Received: ', this.props.children);
-        return null;
+            result = children(key=>t(key, translation));
+        else if (typeof children=='string')
+            result = t(children.replace(/\s+/g, ' '), translation);
+        else
+        {
+            console.error('<T> must receive text to translate or a translate '
+                +'function. Received: ', this.props.children);
+        }
+        return <Wrap>{result}</Wrap>;
     }
 }
 const E = {T};

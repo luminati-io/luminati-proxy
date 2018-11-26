@@ -11,7 +11,7 @@ const pool_type_opt = [
     {key: 'Default (Sequential)', value: ''},
     {key: 'Sequential', value: 'sequential'},
     {key: 'Round-robin', value: 'round-robin'},
-    // {key: 'Long Availability', value: 'long-availability'},
+    {key: 'Long Availability', value: 'long_availability'},
 ];
 
 export default provider({tab_id: 'rotation'})(props=>{

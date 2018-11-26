@@ -16,6 +16,7 @@
 @black: #333333;
 @link: #428bca;
 @tooltip: #154055;
+@chrome_border: #d0d0d0;
 
 @font-face {
   font-family: 'Lato';
@@ -342,17 +343,19 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
     }
     li.disabled>a { padding: 0 2px; }
 }
-/* start LPM */
 .pagination_panel {
     height: 28px;
     .pagination { display: inline-block; }
-    select {
+    .select_number {
         float: right;
         width: auto;
-        height: 24px;
         margin-left: 5px;
         background-position: right 7px center;
-        padding: 0 19px 0 4px
+        padding: 0 4px;
+        .react_select__control {
+            height: 24px;
+            width: 120px;
+        }
     }
     .table_buttons {
         display: inline-block;
@@ -760,8 +763,8 @@ span.icon_link {
     margin-bottom: 10px;
     box-shadow: none;
     -webkit-box-shadow: none;
-    border: solid 1px @grey_border;
-    border-radius: 4px;
+    border: 1px solid @chrome_border;
+    border-radius: 0;
     &.no_border {
         border: none;
         .panel_body { padding: 5px 0 0 0; }
@@ -876,11 +879,6 @@ span.icon_link {
             color: @first_color;
             mark { color: @first_color; }
         }
-    }
-}
-.pagination_panel {
-    width: 100%;
-    .pagination {
     }
 }
 .nav_tabs {
@@ -2221,7 +2219,7 @@ span.icon_link {
         }
     }
     .main_panel {
-        border: 1px solid #d0d0d0;
+        border: 1px solid @chrome_border;
         height: 100%;
         z-index: 0;
     }
@@ -2237,7 +2235,7 @@ span.icon_link {
             flex: none;
             align-items: center;
             &:not(:first-child) {
-                border-top: solid 1px #d0d0d0;
+                border-top: solid 1px @chrome_border;
             }
             .title_wrapper {
                 height: 100%;
@@ -2411,7 +2409,7 @@ span.icon_link {
                 th {
                     position: relative;
                     background-color: #f3f3f3;
-                    border-top: 1px solid #d0d0d0;
+                    border-top: 1px solid @chrome_border;
                     border-bottom: 1px solid rgb(205, 205, 205);
                     border-left: 1px solid rgb(205, 205, 205);
                     cursor: default;
@@ -2559,7 +2557,7 @@ span.icon_link {
     display: flex;
     flex-direction: column;
     border-left: 1px solid #cdcdcd;
-    border-top: 1px solid #d0d0d0;
+    border-top: 1px solid @chrome_border;
     .tabbed_pane_header {
         display: flex;
         flex: 0 0 26px;

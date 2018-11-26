@@ -232,10 +232,10 @@ export const Loader = ({show})=>{
         </div>;
 };
 
-export const Loader_small = ({show, saving, loading_msg='Saving...',
-    std_msg='', std_tooltip})=>
-{
+export const Loader_small = props=>{
+    let {show, saving, loading_msg, std_msg='', std_tooltip} = props;
     saving = show||saving;
+    loading_msg = loading_msg||'Saving...';
     const msg = saving ? loading_msg : std_msg;
     const tooltip = saving ? '' : std_tooltip;
     return <div className="loader_small">
@@ -359,7 +359,7 @@ class Yes_no extends Pure_component {
 
 class Pins extends Pure_component {
     state = {pins: [], max_id: 0};
-    static getDerivedStateFromProps(props, state) {
+    static getDerivedStateFromProps(props, state){
         if (props.val==state.raw_val||!props.val)
             return null;
         const ips = props.val.split(',');
@@ -536,11 +536,18 @@ export class Select_number extends Pure_component {
         return res;
     };
     on_change = e=>{
-        this.props.on_change_wrapper(e && +e.value || '');
+        let value = e && +e.value || '';
+        const allow_zero = this.props.allow_zero ||
+            this.get_data().includes(0);
+        if (!value && !allow_zero)
+            value = this.props.default||1;
+        this.props.on_change_wrapper(value);
+    };
+    get_data = ()=>{
+        return this.props.data ? this.props.data : this.opt_from_range();
     };
     render(){
-        const data = this.props.data ?
-            this.props.data : this.opt_from_range();
+        const data = this.get_data();
         const options = data.map(this.value_to_option);
         return <React_select styles={this.styles} className="select_number"
             isClearable noOptionsMessage={()=>'You can use only numbers here'}
@@ -734,10 +741,9 @@ const Warning_msg = ({warning})=>{
     return <Warning text={warning}/>;
 };
 
-export const Pagination_panel = ({entries, items_per_page, cur_page,
-    page_change, children, top, bottom, update_items_per_page, max_buttons,
-    total})=>
-{
+export const Pagination_panel = props=>{
+    let {entries, items_per_page, cur_page, page_change, children, top, bottom,
+        update_items_per_page, max_buttons, total} = props;
     total = total||entries&&entries.length||0;
     let pagination = null;
     if (total>items_per_page)
@@ -754,8 +760,7 @@ export const Pagination_panel = ({entries, items_per_page, cur_page,
     let buttons = null;
     if (top)
         buttons = <div className="table_buttons">{children}</div>;
-    const display_options = [10, 20, 50, 100, 200, 500, 1000].map(v=>({
-        key: v, value: v}));
+    const display_opt = [10, 20, 50, 100, 200, 500, 1000];
     const from = Math.min(cur_page*items_per_page+1, total);
     const to = Math.min((cur_page+1)*items_per_page, total);
     return <div className={classnames('pagination_panel', {top, bottom})}>
@@ -763,8 +768,8 @@ export const Pagination_panel = ({entries, items_per_page, cur_page,
           <div className="numbers">
             <strong>{from}-{to}</strong> of <strong>{total}</strong>
           </div>
-          <Select val={items_per_page} data={display_options}
-            on_change_wrapper={update_items_per_page}/>
+          <Select_number val={items_per_page} data={display_opt}
+            on_change_wrapper={update_items_per_page} default={10}/>
           {buttons}
         </div>;
 };
@@ -813,9 +818,8 @@ export class Tooltip extends Pure_component {
     }
 }
 
-export const Link_icon = ({tooltip, on_click, id, classes, disabled, invisible,
-    small})=>
-{
+export const Link_icon = props=>{
+    let {tooltip, on_click, id, classes, disabled, invisible, small} = props;
     if (invisible)
         tooltip = '';
     if (disabled||invisible)

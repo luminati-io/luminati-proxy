@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.113.808 Stable
+- :star: Long-availability sessions pool
+
 ## 1.113.585 Stable
 - :star: UI improvements
 
