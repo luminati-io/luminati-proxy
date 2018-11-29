@@ -54,6 +54,11 @@ body {
     font-family: "Lato";
     color: @first_color;
 }
+.api_app {
+    margin-top: 50px;
+    text-align: center;
+    button { margin: 10px; }
+}
 .no_nav {
     .page-body { margin-left: 0; }
     .logo_wrapper { background-color: white !important; }
@@ -192,6 +197,12 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
             letter-spacing: 1px;
             text-align: center;
             font-size: 1.1em;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            label { width: 80px; }
+            input { flex: 1; }
         }
     }
     .customers_form {
@@ -354,7 +365,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         padding: 0 4px;
         .react_select__control {
             height: 24px;
-            width: 120px;
+            width: 90px;
         }
     }
     .table_buttons {
@@ -466,8 +477,13 @@ input.regex {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+.react_select__control {
+    .react_select__clear-indicator, .react_select__dropdown-indicator {
+        padding: 1px;
+    }
+}
 .select_number {
-    min-width: 120px;
+    min-width: 100px;
     input { min-width: 0; }
 }
 .btn_lpm {
@@ -1239,6 +1255,7 @@ span.icon_link {
     font-size: 14px;
     &.nav_header { padding: 0 15px 10px; }
     .proxies_panel {
+        border: none; // XXX krzysztof: to remove once generic chrome table
         .add_proxy_btn {
             margin-left: 5px;
             .glyphicon { left: 3px }
@@ -1253,10 +1270,10 @@ span.icon_link {
             table-layout: fixed;
             min-width: 100%;
             width: auto;
-            th, td { padding: 1px 10px; }
+            th, td { padding: 1px 4px; }
             th { white-space: nowrap; }
             td {
-                height: 25px;
+                height: 21px;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -1789,6 +1806,7 @@ span.icon_link {
     select { width: auto; }
     .nav_tabs { margin-bottom: 15px; }
     .ext_proxy {
+        textarea { width: 100%; }
         .json_error {
             position: relative;
             color: #eb3a28;

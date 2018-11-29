@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.114.152",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI improvements in edit proxy page"
+            },
+            {
+                "type": "star",
+                "text": "New pool type 'Long-availability'"
+            },
+            {
+                "type": "star",
+                "text": "Session termination"
+            }
+        ]
+    },
+    {
         "ver": "1.113.808",
         "type": "stable",
         "changes": [

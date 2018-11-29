@@ -71,6 +71,7 @@ conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     proxy_creds_check: true,
     use_proxy_cache: true,
     force: false,
+    session_termination: false,
 });
 
 assign(module.exports, conf);

@@ -25,7 +25,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.113.808/luminati-proxy-manager-v1.113.808-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.114.152/luminati-proxy-manager-v1.114.152-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -175,7 +175,7 @@ Options:
   --city                   City                                         [string]
   --asn                    ASN                                          [number]
   --ip                     Data center IP                               [string]
-  --vip                    VIP                                          [number]
+  --vip                    gIP                                          [number]
   --ext_proxies            A list of proxies from external vendors. Format:
                            [username:password@]ip[:port]                 [array]
   --ext_proxy_username     default username for external vendor ips     [string]

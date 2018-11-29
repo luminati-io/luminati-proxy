@@ -143,7 +143,58 @@ const Page = ()=>
 
 const Root = ()=>
     <BrowserRouter>
-      <App/>
+      <Switch>
+        <Route path="/api_app/confirm_session/:port/:url" exact
+          component={Api_app}/>
+        <Route path="/" component={App}/>
+      </Switch>
     </BrowserRouter>;
+
+const Api_app = withRouter(class Api_app extends Pure_component {
+    state = {loaded: false};
+    componentDidMount(){
+        const port = this.props.match.params.port;
+        const _this = this;
+        this.etask(function*(){
+            const url = `api/proxies/${port}/termination_info`;
+            const res = yield ajax.json({url});
+            const terminated = res.terminated;
+            if (!terminated)
+            {
+                const next = decodeURIComponent(_this.props.match.params.url);
+                return window.location = next;
+            }
+            _this.setState({loaded: true, terminated});
+        });
+    }
+    refresh = ()=>{
+        const port = this.props.match.params.port;
+        const _this = this;
+        this.etask(function*(){
+            yield ajax({url: `/api/proxies/${port}/unblock`, method: 'POST'});
+            const next = decodeURIComponent(_this.props.match.params.url);
+            window.location = next;
+        });
+    };
+    goto_lpm = ()=>this.props.history.push('/');
+    render(){
+        const next_url = decodeURIComponent(this.props.match.params.url);
+        if (!this.state.loaded)
+            return null;
+        if (!this.state.terminated)
+            return 'Redirecting...';
+        return <div className="api_app">
+              <h1>The session has expired</h1>
+              <p>
+                <span>Do you want to refresh it? You will be </span>
+                <span>
+                  redirected to <strong>{next_url}</strong> with new IP.
+                </span>
+              </p>
+              <button onClick={this.goto_lpm}>Go to LPM</button>
+              <button onClick={this.refresh}>Refresh</button>
+            </div>;
+    }
+});
 
 ReactDOM.render(<Root/>, document.getElementById('react_root'));

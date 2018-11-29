@@ -739,6 +739,8 @@ class Alloc_modal extends Pure_component {
         this.etask(function*(){
             this.on('uncaught', e=>{
                 console.log(e);
+            });
+            this.on('finally', ()=>{
                 _this.loading(false);
             });
             _this.loading(true);
@@ -769,7 +771,6 @@ class Alloc_modal extends Pure_component {
             _this.set_field('ips', new_ips);
             _this.set_field('vips', new_vips);
             yield _this.update_other_proxies(map);
-            _this.loading(false);
         });
     };
     update_other_proxies = map=>{
@@ -811,7 +812,7 @@ class Alloc_modal extends Pure_component {
         this.setState({items_per_page}, ()=>this.paginate(0));
     page_change = page=>this.paginate(page-1);
     render(){
-        const type_label = this.props.type=='ips' ? 'IPs' : 'vIPs';
+        const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';
         let title;
         if (this.props.tab=='general')
         {

@@ -86,7 +86,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var is_node = (typeof module === 'undefined' ? 'undefined' : (0, _typeof3.default)(module)) == 'object' && module.exports;
 if (is_node) ;
 
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0), __webpack_require__(36), __webpack_require__(26)], __WEBPACK_AMD_DEFINE_RESULT__ = function (React, _etask, setdb) {
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0), __webpack_require__(36), __webpack_require__(24)], __WEBPACK_AMD_DEFINE_RESULT__ = function (React, _etask, setdb) {
 
     var LONG_CB_MS = 100;
 
@@ -195,8 +195,7 @@ if (is_node) ;
 
 /***/ }),
 /* 14 */,
-/* 15 */,
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1526,7 +1525,7 @@ var Pagination_panel = exports.Pagination_panel = function Pagination_panel(prop
         { className: 'table_buttons' },
         children
     );
-    var display_opt = [10, 20, 50, 100, 200, 500, 1000];
+    var display_opt = [10, 50, 100, 500, 1000];
     var from = Math.min(cur_page * items_per_page + 1, total);
     var to = Math.min((cur_page + 1) * items_per_page, total);
     return _react2.default.createElement(
@@ -2012,6 +2011,7 @@ var Preset_description = exports.Preset_description = function Preset_descriptio
 };
 
 /***/ }),
+/* 16 */,
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2226,7 +2226,7 @@ var presets = {
             opt.keep_alive = 45;
             opt.session = true;
             opt.max_requests = 1;
-            opt.pool_size = 1;
+            opt.pool_size = opt.pool_size > 1 ? opt.pool_size : 10;
         },
         clean: function clean(opt) {
             opt.keep_alive = 0;
@@ -2234,7 +2234,7 @@ var presets = {
             opt.session_duration = 0;
             opt.pool_size = 0;
         },
-        rules: [{ field: 'multiply', label: 'Disables \'Multiply\' options' }, { field: 'pool_type', label: 'Round-robin pool type' }, { field: 'pool_size', label: 'Sets \'Pool size\' requests to 1. It\n                makes sense to choose any other positive number' }, { field: 'max_requests', label: 'Sets \'Max requests\' to 1. It makes\n                sense to choose any other positive number' }],
+        rules: [{ field: 'multiply', label: 'Disables \'Multiply\' options' }, { field: 'pool_type', label: 'Round-robin pool type' }, { field: 'pool_size', label: 'Sets \'Pool size\' requests to 10. It\n                makes sense to choose any other positive number' }, { field: 'max_requests', label: 'Sets \'Max requests\' to 1. It makes\n                sense to choose any other positive number' }],
         disabled: {
             sticky_ip: true,
             session_random: true,
@@ -2408,71 +2408,7 @@ var detect_browser = exports.detect_browser = function detect_browser() {
 };
 
 /***/ }),
-/* 24 */,
-/* 25 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__ = __webpack_require__(784);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BrowserRouter", function() { return __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HashRouter__ = __webpack_require__(796);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "HashRouter", function() { return __WEBPACK_IMPORTED_MODULE_1__HashRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Link__ = __webpack_require__(348);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Link", function() { return __WEBPACK_IMPORTED_MODULE_2__Link__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__ = __webpack_require__(797);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MemoryRouter", function() { return __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__NavLink__ = __webpack_require__(799);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "NavLink", function() { return __WEBPACK_IMPORTED_MODULE_4__NavLink__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Prompt__ = __webpack_require__(801);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Prompt", function() { return __WEBPACK_IMPORTED_MODULE_5__Prompt__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Redirect__ = __webpack_require__(803);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Redirect", function() { return __WEBPACK_IMPORTED_MODULE_6__Redirect__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(349);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Route", function() { return __WEBPACK_IMPORTED_MODULE_7__Route__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Router__ = __webpack_require__(205);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Router", function() { return __WEBPACK_IMPORTED_MODULE_8__Router__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StaticRouter__ = __webpack_require__(805);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "StaticRouter", function() { return __WEBPACK_IMPORTED_MODULE_9__StaticRouter__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Switch__ = __webpack_require__(807);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Switch", function() { return __WEBPACK_IMPORTED_MODULE_10__Switch__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__generatePath__ = __webpack_require__(809);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "generatePath", function() { return __WEBPACK_IMPORTED_MODULE_11__generatePath__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__matchPath__ = __webpack_require__(810);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "matchPath", function() { return __WEBPACK_IMPORTED_MODULE_12__matchPath__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__withRouter__ = __webpack_require__(811);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "withRouter", function() { return __WEBPACK_IMPORTED_MODULE_13__withRouter__["a"]; });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -2559,6 +2495,70 @@ return E;
 
 
 /***/ }),
+/* 25 */,
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__ = __webpack_require__(784);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BrowserRouter", function() { return __WEBPACK_IMPORTED_MODULE_0__BrowserRouter__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HashRouter__ = __webpack_require__(796);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "HashRouter", function() { return __WEBPACK_IMPORTED_MODULE_1__HashRouter__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Link__ = __webpack_require__(348);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Link", function() { return __WEBPACK_IMPORTED_MODULE_2__Link__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__ = __webpack_require__(797);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MemoryRouter", function() { return __WEBPACK_IMPORTED_MODULE_3__MemoryRouter__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__NavLink__ = __webpack_require__(799);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "NavLink", function() { return __WEBPACK_IMPORTED_MODULE_4__NavLink__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Prompt__ = __webpack_require__(801);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Prompt", function() { return __WEBPACK_IMPORTED_MODULE_5__Prompt__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__Redirect__ = __webpack_require__(803);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Redirect", function() { return __WEBPACK_IMPORTED_MODULE_6__Redirect__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(349);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Route", function() { return __WEBPACK_IMPORTED_MODULE_7__Route__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Router__ = __webpack_require__(205);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Router", function() { return __WEBPACK_IMPORTED_MODULE_8__Router__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StaticRouter__ = __webpack_require__(805);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "StaticRouter", function() { return __WEBPACK_IMPORTED_MODULE_9__StaticRouter__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__Switch__ = __webpack_require__(807);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Switch", function() { return __WEBPACK_IMPORTED_MODULE_10__Switch__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__generatePath__ = __webpack_require__(809);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "generatePath", function() { return __WEBPACK_IMPORTED_MODULE_11__generatePath__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__matchPath__ = __webpack_require__(810);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "matchPath", function() { return __WEBPACK_IMPORTED_MODULE_12__matchPath__["a"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__withRouter__ = __webpack_require__(811);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "withRouter", function() { return __WEBPACK_IMPORTED_MODULE_13__withRouter__["a"]; });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/***/ }),
 /* 27 */,
 /* 28 */,
 /* 29 */
@@ -2581,7 +2581,7 @@ var E = ajax;
 var assign = Object.assign;
 E.events = new events.EventEmitter();
 E.json = function(opt){ return ajax(assign({}, opt, {json: 1})); };
-E.abort = function(ajax){ ajax.goto('abort'); };
+E.abort = function(aj){ aj.goto('abort'); };
 // XXX arik: need test
 function ajax(opt){
     var timeout = opt.timeout||20*date.ms.SEC, slow = opt.slow||2*date.ms.SEC;
@@ -2607,9 +2607,9 @@ function ajax(opt){
         if (opt.onuploadprogress)
         {
             ajopt.xhr = function(){
-                var xhr = $.ajaxSettings.xhr();
-                xhr.upload.onprogress = opt.onuploadprogress;
-                return xhr;
+                var _xhr = $.ajaxSettings.xhr();
+                _xhr.upload.onprogress = opt.onuploadprogress;
+                return _xhr;
             };
         }
         if (opt.multipart)
@@ -2623,7 +2623,14 @@ function ajax(opt){
         xhr.done(function(v){
             _this.continue(v); });
         xhr.fail(function(_xhr, status_text, err){
-            _this.throw(err instanceof Error ? err : new Error(''+err)); });
+            if (data_type=='json' && _xhr.status==200 &&
+                ['', 'ok', 'OK'].includes(_xhr.responseText))
+            {
+                _this.continue(null);
+                return;
+            }
+            _this.throw(err instanceof Error ? err : new Error(''+err));
+        });
         return this.wait();
     }, function catch$(err){
         zerr('ajax('+data_type+') failed url '+url+' data '+
@@ -2638,6 +2645,8 @@ function ajax(opt){
         {
             return {
                 err: err,
+                url: url,
+                method: method,
                 status: +xhr.status || 0,
                 data: get_res_data(xhr),
                 xhr: xhr,
@@ -2645,8 +2654,8 @@ function ajax(opt){
                 error: xhr.statusText||'no_status', message: xhr.responseText,
             };
         }
-        err.hola_info = {data_type: data_type, url: url,
-            status: xhr.status, response_text: xhr.responseText};
+        err.hola_info = {url: url, method: method, status: xhr.status,
+            data: get_res_data(xhr), response_text: xhr.responseText};
         err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err;
@@ -2681,13 +2690,13 @@ function ajax(opt){
 });
 
 function get_res_data(xhr){
-    if (xhr.responseJSON)
+    if (xhr.responseJSON!=null && xhr.responseJSON!=='')
         return xhr.responseJSON;
     var content_type = xhr.getResponseHeader('content-type')||'';
     if (xhr.responseText && content_type.includes('application/json'))
     {
         try { return JSON.parse(xhr.responseText); }
-        catch(e) { }
+        catch(e){ }
     }
     return xhr.responseText||'';
 }
@@ -6777,17 +6786,17 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
 var _fields = __webpack_require__(202);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _recompose = __webpack_require__(52);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _propTypes = __webpack_require__(6);
 
@@ -7554,7 +7563,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var Common = _interopRequireWildcard(_common);
 
@@ -13414,11 +13423,6 @@ var tabs = exports.tabs = {
                 label: 'DNS lookup',
                 tooltip: 'Location of DNS resolve'
             },
-            pool_size: {
-                label: 'Pool size',
-                tooltip: 'Maintain number of IPs that will be pinged constantly\n                    - must have keep_alive to work properly',
-                ext: true
-            },
             race_reqs: {
                 label: 'Parallel race requests',
                 tooltip: 'Sends multiple requests in parallel via different\n                    super proxies and uses the fastest request',
@@ -13530,19 +13534,14 @@ var tabs = exports.tabs = {
         label: 'IP control',
         tooltip: 'Set the conditions for which your IPs will change',
         fields: {
-            ip: {
-                label: 'Data center IP',
-                tooltip: 'Choose specific data center IP. to ensure\n                    all requests are executed using specific Data Center IP.\n                    To view the pool of your IPs take a look at \'pool size\'\n                    option',
-                placeholder: 'insert IP value from your pool'
-            },
-            vip: {
-                label: 'gIP',
-                tooltip: 'Choose specific gIP to ensure all requests are\n                    executed using specific gIP. To view the pool of your gIPs\n                    take a look at \'pool size\' option',
-                placeholder: 'insert gIP id'
-            },
             pool_type: {
                 label: 'Pool type',
-                tooltip: 'How to pull the IPs - roundrobin / sequential',
+                tooltip: 'They way of pulling sessions for the following\n                    requests.',
+                ext: true
+            },
+            pool_size: {
+                label: 'Pool size',
+                tooltip: 'Maintain number of IPs that will be pinged constantly\n                    - must have Keep_alive to work properly',
                 ext: true
             },
             keep_alive: {
@@ -13579,6 +13578,10 @@ var tabs = exports.tabs = {
                 label: 'Session ID seed',
                 tooltip: 'A string that will be used to maintain unified\n                    session structure. Each new session will be attached with\n                    a serial number starting from 1. (e.g. session seed \'test\'\n                    will have the following sessions: test-1, test-2 ..)',
                 placeholder: 'e.g. test_session'
+            },
+            session_termination: {
+                label: 'Session termination',
+                tooltip: 'Stop sending new requests when the peer IP becomes\n                    unavailable and redirect to confimration page before new IP\n                    is taken'
             }
         }
     },
@@ -14075,7 +14078,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -14103,9 +14106,9 @@ var _har_preview = __webpack_require__(354);
 
 var _har_preview2 = _interopRequireDefault(_har_preview);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _reactTooltip = __webpack_require__(195);
 
@@ -15587,7 +15590,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _jquery = __webpack_require__(11);
 
@@ -25826,7 +25829,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27831,7 +27834,7 @@ var _inherits2 = __webpack_require__(3);
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -27885,7 +27888,7 @@ var _whitelist_ips2 = _interopRequireDefault(_whitelist_ips);
 
 var _logs = __webpack_require__(856);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _react = __webpack_require__(0);
 
@@ -27895,7 +27898,7 @@ var _reactDom = __webpack_require__(14);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 __webpack_require__(359);
 
@@ -28278,9 +28281,146 @@ var Root = function Root() {
     return _react2.default.createElement(
         _reactRouterDom.BrowserRouter,
         null,
-        _react2.default.createElement(App, null)
+        _react2.default.createElement(
+            _reactRouterDom.Switch,
+            null,
+            _react2.default.createElement(_reactRouterDom.Route, { path: '/api_app/confirm_session/:port/:url', exact: true,
+                component: Api_app }),
+            _react2.default.createElement(_reactRouterDom.Route, { path: '/', component: App })
+        )
     );
 };
+
+var Api_app = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
+    (0, _inherits3.default)(Api_app, _Pure_component2);
+
+    function Api_app() {
+        var _ref2;
+
+        var _temp2, _this3, _ret2;
+
+        (0, _classCallCheck3.default)(this, Api_app);
+
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Api_app.__proto__ || Object.getPrototypeOf(Api_app)).call.apply(_ref2, [this].concat(args))), _this3), _this3.state = { loaded: false }, _this3.refresh = function () {
+            var port = _this3.props.match.params.port;
+            var _this = _this3;
+            _this3.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee12() {
+                var next;
+                return _regenerator2.default.wrap(function _callee12$(_context12) {
+                    while (1) {
+                        switch (_context12.prev = _context12.next) {
+                            case 0:
+                                _context12.next = 2;
+                                return (0, _ajax2.default)({ url: '/api/proxies/' + port + '/unblock', method: 'POST' });
+
+                            case 2:
+                                next = decodeURIComponent(_this.props.match.params.url);
+
+                                window.location = next;
+
+                            case 4:
+                            case 'end':
+                                return _context12.stop();
+                        }
+                    }
+                }, _callee12, this);
+            }));
+        }, _this3.goto_lpm = function () {
+            return _this3.props.history.push('/');
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this3, _ret2);
+    }
+
+    (0, _createClass3.default)(Api_app, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var port = this.props.match.params.port;
+            var _this = this;
+            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee13() {
+                var url, res, terminated, next;
+                return _regenerator2.default.wrap(function _callee13$(_context13) {
+                    while (1) {
+                        switch (_context13.prev = _context13.next) {
+                            case 0:
+                                url = 'api/proxies/' + port + '/termination_info';
+                                _context13.next = 3;
+                                return _ajax2.default.json({ url: url });
+
+                            case 3:
+                                res = _context13.sent;
+                                terminated = res.terminated;
+
+                                if (terminated) {
+                                    _context13.next = 8;
+                                    break;
+                                }
+
+                                next = decodeURIComponent(_this.props.match.params.url);
+                                return _context13.abrupt('return', window.location = next);
+
+                            case 8:
+                                _this.setState({ loaded: true, terminated: terminated });
+
+                            case 9:
+                            case 'end':
+                                return _context13.stop();
+                        }
+                    }
+                }, _callee13, this);
+            }));
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var next_url = decodeURIComponent(this.props.match.params.url);
+            if (!this.state.loaded) return null;
+            if (!this.state.terminated) return 'Redirecting...';
+            return _react2.default.createElement(
+                'div',
+                { className: 'api_app' },
+                _react2.default.createElement(
+                    'h1',
+                    null,
+                    'The session has expired'
+                ),
+                _react2.default.createElement(
+                    'p',
+                    null,
+                    _react2.default.createElement(
+                        'span',
+                        null,
+                        'Do you want to refresh it? You will be '
+                    ),
+                    _react2.default.createElement(
+                        'span',
+                        null,
+                        'redirected to ',
+                        _react2.default.createElement(
+                            'strong',
+                            null,
+                            next_url
+                        ),
+                        ' with new IP.'
+                    )
+                ),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: this.goto_lpm },
+                    'Go to LPM'
+                ),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: this.refresh },
+                    'Refresh'
+                )
+            );
+        }
+    }]);
+    return Api_app;
+}(_pure_component2.default));
 
 _reactDom2.default.render(_react2.default.createElement(Root, null), document.getElementById('react_root'));
 
@@ -29531,7 +29671,7 @@ var _ajax = __webpack_require__(29);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -29539,7 +29679,7 @@ var _url = __webpack_require__(166);
 
 var _url2 = _interopRequireDefault(_url);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _reactTooltip = __webpack_require__(195);
 
@@ -29551,7 +29691,7 @@ var _util = __webpack_require__(23);
 
 var util = _interopRequireWildcard(_util);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _rules2 = __webpack_require__(813);
 
@@ -30477,6 +30617,8 @@ var Alloc_modal = function (_Pure_component4) {
                             case 0:
                                 this.on('uncaught', function (e) {
                                     console.log(e);
+                                });
+                                this.on('finally', function () {
                                     _this.loading(false);
                                 });
                                 _this.loading(true);
@@ -30490,21 +30632,21 @@ var Alloc_modal = function (_Pure_component4) {
                                     data.vips = _this.props.form.vips;
                                     url = '/api/refresh_vips';
                                 }
-                                _context5.next = 7;
+                                _context5.next = 8;
                                 return _ajax2.default.json({ method: 'POST', url: url, data: data });
 
-                            case 7:
+                            case 8:
                                 res = _context5.sent;
 
                                 if (!(res.error || !res.ips && !res.vips)) {
-                                    _context5.next = 11;
+                                    _context5.next = 12;
                                     break;
                                 }
 
                                 console.log('error: ' + res.error);
                                 return _context5.abrupt('return');
 
-                            case 11:
+                            case 12:
                                 new_vals = _this.props.type == 'ips' ? res.ips.map(function (i) {
                                     return i.ip;
                                 }) : res.vips.map(function (v) {
@@ -30521,11 +30663,8 @@ var Alloc_modal = function (_Pure_component4) {
                                 _this.setState({ available_list: new_vals }, _this.paginate);
                                 _this.set_field('ips', new_ips);
                                 _this.set_field('vips', new_vips);
-                                _context5.next = 20;
+                                _context5.next = 21;
                                 return _this.update_other_proxies(map);
-
-                            case 20:
-                                _this.loading(false);
 
                             case 21:
                             case 'end':
@@ -30614,7 +30753,7 @@ var Alloc_modal = function (_Pure_component4) {
         value: function render() {
             var _this9 = this;
 
-            var type_label = this.props.type == 'ips' ? 'IPs' : 'vIPs';
+            var type_label = this.props.type == 'ips' ? 'IPs' : 'gIPs';
             var title = void 0;
             if (this.props.tab == 'general') {
                 title = 'Select the ' + type_label + ' to multiply (' + this.props.zone + ')';
@@ -48741,15 +48880,15 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
 var _recompose = __webpack_require__(52);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _fields = __webpack_require__(202);
 
@@ -49528,13 +49667,13 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
 var _common = __webpack_require__(98);
 
-var _common2 = __webpack_require__(16);
+var _common2 = __webpack_require__(15);
 
 var _recompose = __webpack_require__(52);
 
@@ -49745,7 +49884,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -49835,13 +49974,43 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _classCallCheck2 = __webpack_require__(1);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(12);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = __webpack_require__(2);
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = __webpack_require__(3);
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 var _common = __webpack_require__(98);
 
+var _common2 = __webpack_require__(15);
+
+var _pure_component = __webpack_require__(13);
+
+var _pure_component2 = _interopRequireDefault(_pure_component);
+
 var _recompose = __webpack_require__(52);
+
+var _jquery = __webpack_require__(11);
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _setdb = __webpack_require__(24);
+
+var _setdb2 = _interopRequireDefault(_setdb);
 
 var _propTypes = __webpack_require__(6);
 
@@ -49857,25 +50026,98 @@ var provider = function provider(provide) {
 
 var pool_type_opt = [{ key: 'Default (Sequential)', value: '' }, { key: 'Sequential', value: 'sequential' }, { key: 'Round-robin', value: 'round-robin' }, { key: 'Long Availability', value: 'long_availability' }];
 
-exports.default = provider({ tab_id: 'rotation' })(function (props) {
-    var form = props.form;
+exports.default = provider({ tab_id: 'rotation' })(function (_Pure_component) {
+    (0, _inherits3.default)(Rotation, _Pure_component);
 
-    return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(_common.Config, { type: 'text', id: 'ip' }),
-        _react2.default.createElement(_common.Config, { type: 'text', id: 'vip' }),
-        _react2.default.createElement(_common.Config, { type: 'select', id: 'pool_type', data: pool_type_opt }),
-        _react2.default.createElement(_common.Config, { type: 'select_number', id: 'keep_alive', sufix: 'seconds',
-            data: [0, 45] }),
-        _react2.default.createElement(_common.Config, { type: 'select_number', id: 'max_requests' }),
-        _react2.default.createElement(_common.Config, { type: 'select_number', id: 'session_duration', sufix: 'seconds' }),
-        _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'sticky_ip' }),
-        _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'session_random', disabled: form.sticky_ip }),
-        !form.session_random && !form.sticky_ip && _react2.default.createElement(_common.Config, { type: 'text', id: 'session' }),
-        _react2.default.createElement(_common.Config, { type: 'text', id: 'seed' })
-    );
-});
+    function Rotation() {
+        var _ref;
+
+        var _temp, _this, _ret;
+
+        (0, _classCallCheck3.default)(this, Rotation);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref = Rotation.__proto__ || Object.getPrototypeOf(Rotation)).call.apply(_ref, [this].concat(args))), _this), _this.state = {}, _this.goto_field = _setdb2.default.get('head.proxy_edit.goto_field'), _this.get_type = function () {
+            var curr_plan = _this.props.get_curr_plan();
+            var type = void 0;
+            if (curr_plan && curr_plan.type == 'static') type = 'ips';else if (curr_plan && !!curr_plan.vip) type = 'vips';
+            return type;
+        }, _this.open_modal = function () {
+            return (0, _jquery2.default)('#allocated_ips').modal('show');
+        }, _this.move_to_ssl = function () {
+            return _this.goto_field('ssl');
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+    }
+
+    (0, _createClass3.default)(Rotation, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this2 = this;
+
+            this.setdb_on('head.proxy_edit.disabled_fields', function (disabled_fields) {
+                disabled_fields && _this2.setState({ disabled_fields: disabled_fields });
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            if (!this.state.disabled_fields) return null;
+            var form = this.props.form;
+            var type = this.get_type();
+            var render_modal = ['ips', 'vips'].includes(type);
+            var pool_size_note = void 0;
+            if (!this.state.disabled_fields.pool_size && render_modal) {
+                pool_size_note = _react2.default.createElement(
+                    'a',
+                    { className: 'link', onClick: this.open_modal },
+                    'set from allocated ' + (type == 'ips' ? 'IPs' : 'gIPs')
+                );
+            }
+            var sess_note = _react2.default.createElement(
+                _common2.Note,
+                null,
+                _react2.default.createElement(
+                    'span',
+                    null,
+                    'Should be used only when '
+                ),
+                _react2.default.createElement(
+                    'a',
+                    { className: 'link', onClick: this.move_to_ssl },
+                    'SSL analyzing'
+                ),
+                _react2.default.createElement(
+                    'span',
+                    null,
+                    ' is turned on.'
+                )
+            );
+            return _react2.default.createElement(
+                'div',
+                null,
+                _react2.default.createElement(_common.Config, { type: 'select', id: 'pool_type', data: pool_type_opt }),
+                _react2.default.createElement(_common.Config, { type: 'select_number', id: 'pool_size', allow_zero: true,
+                    note: pool_size_note,
+                    disabled: form.ips.length || form.vips.length }),
+                _react2.default.createElement(_common.Config, { type: 'select_number', id: 'keep_alive', sufix: 'seconds',
+                    data: [0, 45] }),
+                _react2.default.createElement(_common.Config, { type: 'select_number', id: 'max_requests' }),
+                _react2.default.createElement(_common.Config, { type: 'select_number', id: 'session_duration',
+                    sufix: 'seconds' }),
+                _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'sticky_ip' }),
+                _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'session_random',
+                    disabled: form.sticky_ip }),
+                !form.session_random && !form.sticky_ip && _react2.default.createElement(_common.Config, { type: 'text', id: 'session' }),
+                _react2.default.createElement(_common.Config, { type: 'text', id: 'seed' }),
+                _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'session_termination', note: sess_note })
+            );
+        }
+    }]);
+    return Rotation;
+}(_pure_component2.default));
 
 /***/ }),
 /* 822 */
@@ -49912,10 +50154,6 @@ var _react2 = _interopRequireDefault(_react);
 var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
-
-var _jquery = __webpack_require__(11);
-
-var _jquery2 = _interopRequireDefault(_jquery);
 
 var _common = __webpack_require__(98);
 
@@ -49962,43 +50200,13 @@ exports.default = provider({ tab_id: 'speed' })(function (_Pure_component) {
             this.setdb_on('head.locations', function (locations) {
                 locations && _this2.setState({ locations: locations });
             });
-            this.setdb_on('head.proxy_edit.disabled_fields', function (disabled_fields) {
-                disabled_fields && _this2.setState({ disabled_fields: disabled_fields });
-            });
-        }
-    }, {
-        key: 'open_modal',
-        value: function open_modal() {
-            (0, _jquery2.default)('#allocated_ips').modal('show');
-        }
-    }, {
-        key: 'get_type',
-        value: function get_type() {
-            var curr_plan = this.props.get_curr_plan();
-            var type = void 0;
-            if (curr_plan && curr_plan.type == 'static') type = 'ips';else if (curr_plan && !!curr_plan.vip) type = 'vips';
-            return type;
         }
     }, {
         key: 'render',
         value: function render() {
             var _this3 = this;
 
-            if (!this.state.locations || !this.state.disabled_fields) return null;
-            var form = this.props.form;
-            var pool_size_disabled = form.ips.length || form.vips.length;
-            var type = this.get_type();
-            var render_modal = ['ips', 'vips'].includes(type);
-            var pool_size_note = void 0;
-            if (!this.state.disabled_fields.pool_size && render_modal) {
-                pool_size_note = _react2.default.createElement(
-                    'a',
-                    { className: 'link', onClick: function onClick() {
-                            return _this3.open_modal();
-                        } },
-                    'set from allocated ' + (type == 'ips' ? 'IPs' : 'vIPs')
-                );
-            }
+            if (!this.state.locations) return null;
             var zproxy = function zproxy(country_code) {
                 return 'servercountry-' + country_code + '.zproxy.lum-superproxy.io';
             };
@@ -50012,8 +50220,6 @@ exports.default = provider({ tab_id: 'speed' })(function (_Pure_component) {
                 null,
                 _react2.default.createElement(_common.Config, { type: 'select', id: 'proxy', data: proxy_data }),
                 _react2.default.createElement(_common.Config, { type: 'select', id: 'dns', data: dns_opt }),
-                _react2.default.createElement(_common.Config, { type: 'select_number', id: 'pool_size', allow_zero: true,
-                    note: pool_size_note, disabled: pool_size_disabled }),
                 _react2.default.createElement(_common.Config, { type: 'select_number', id: 'race_reqs', allow_zero: true }),
                 _react2.default.createElement(_common.Config, { type: 'select_number', id: 'proxy_count', allow_zero: true }),
                 _react2.default.createElement(_common.Config, { type: 'select_number', id: 'proxy_switch', allow_zero: true }),
@@ -50076,13 +50282,13 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
 var _common = __webpack_require__(98);
 
-var _common2 = __webpack_require__(16);
+var _common2 = __webpack_require__(15);
 
 var _util = __webpack_require__(23);
 
@@ -50280,7 +50486,7 @@ var _moment = __webpack_require__(133);
 
 var _moment2 = _interopRequireDefault(_moment);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _har_viewer = __webpack_require__(209);
 
@@ -53198,7 +53404,7 @@ var _instructions = __webpack_require__(356);
 
 var _instructions2 = _interopRequireDefault(_instructions);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _util = __webpack_require__(23);
 
@@ -53210,7 +53416,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53593,7 +53799,7 @@ var _ajax = __webpack_require__(29);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -53601,7 +53807,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _util = __webpack_require__(23);
 
@@ -53621,7 +53827,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54237,7 +54443,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _util = __webpack_require__(23);
 
@@ -54473,7 +54679,7 @@ var _reactDom = __webpack_require__(14);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _jquery = __webpack_require__(11);
 
@@ -54794,7 +55000,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _pure_component = __webpack_require__(13);
 
@@ -54988,7 +55194,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _classnames = __webpack_require__(4);
 
@@ -55008,7 +55214,7 @@ var _proxy_blank = __webpack_require__(210);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -55410,7 +55616,7 @@ var _ajax = __webpack_require__(29);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -55418,9 +55624,9 @@ var _url = __webpack_require__(166);
 
 var _url2 = _interopRequireDefault(_url);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -55972,7 +56178,7 @@ var _semver = __webpack_require__(357);
 
 var _semver2 = _interopRequireDefault(_semver);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56280,7 +56486,7 @@ var _ajax = __webpack_require__(29);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -56318,9 +56524,9 @@ var _proxy_blank = __webpack_require__(210);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _reactTooltip = __webpack_require__(195);
 
@@ -57077,95 +57283,101 @@ var Proxies = function (_Pure_component2) {
             if (this.state.loaded && !this.state.filtered_proxies.length) return _react2.default.createElement(_proxy_blank2.default, null);
             return _react2.default.createElement(
                 'div',
-                { className: 'panel proxies_panel' },
+                { className: 'panel proxies_panel chrome' },
                 _react2.default.createElement(
                     'div',
-                    { className: 'panel_heading' },
-                    _react2.default.createElement(
-                        'h2',
-                        null,
-                        'Proxies',
-                        _react2.default.createElement(
-                            _common.Tooltip,
-                            { title: 'Add new proxy' },
-                            _react2.default.createElement(
-                                'button',
-                                { className: 'btn btn_lpm btn_lpm_small add_proxy_btn',
-                                    onClick: this.proxy_add },
-                                'New proxy',
-                                _react2.default.createElement('i', { className: 'glyphicon glyphicon-plus' })
-                            )
-                        )
-                    )
-                ),
-                this.state.loaded && displayed_proxies.length && _react2.default.createElement(
-                    'div',
-                    { className: 'panel_body with_table' },
-                    _react2.default.createElement(Proxies_pagination, { entries: this.state.filtered_proxies,
-                        cur_page: this.state.cur_page,
-                        items_per_page: this.state.items_per_page,
-                        page_change: this.page_change,
-                        edit_columns: this.edit_columns,
-                        update_items_per_page: this.update_items_per_page,
-                        download_csv: this.download_csv,
-                        top: true }),
+                    { className: 'main_panel' },
                     _react2.default.createElement(
                         'div',
-                        { className: 'proxies_table_wrapper' },
+                        { className: 'panel_heading' },
                         _react2.default.createElement(
-                            'table',
-                            { className: 'table table-hover' },
+                            'h2',
+                            null,
+                            'Proxies',
                             _react2.default.createElement(
-                                'thead',
-                                null,
+                                _common.Tooltip,
+                                { title: 'Add new proxy' },
                                 _react2.default.createElement(
-                                    'tr',
-                                    null,
-                                    _react2.default.createElement(
-                                        'th',
-                                        { className: 'head_actions' },
-                                        _react2.default.createElement(
-                                            _common.Tooltip,
-                                            { title: 'Delete/duplicate/refresh sessions' },
-                                            'Actions'
-                                        )
-                                    ),
-                                    cols.map(function (col) {
-                                        return _react2.default.createElement(
-                                            'th',
-                                            { key: col.key, className: 'col_' + col.key },
-                                            _react2.default.createElement(
-                                                _common.Tooltip,
-                                                { title: col.tooltip },
-                                                col.title
-                                            )
-                                        );
-                                    })
+                                    'button',
+                                    {
+                                        className: 'btn btn_lpm btn_lpm_small add_proxy_btn',
+                                        onClick: this.proxy_add },
+                                    'New proxy',
+                                    _react2.default.createElement('i', { className: 'glyphicon glyphicon-plus' })
                                 )
-                            ),
-                            _react2.default.createElement(
-                                'tbody',
-                                null,
-                                displayed_proxies.map(function (proxy) {
-                                    return _react2.default.createElement(Proxy_row, { key: proxy.port, go: _this6.state.go,
-                                        update_proxies: _this6.update, proxy: proxy,
-                                        cols: cols, master_port: _this6.props.master_port,
-                                        zones: _this6.state.zones });
-                                })
                             )
                         )
                     ),
-                    _react2.default.createElement(Proxies_pagination, { entries: this.state.filtered_proxies,
-                        cur_page: this.state.cur_page,
-                        items_per_page: this.state.items_per_page,
-                        page_change: this.page_change,
-                        edit_columns: this.edit_columns,
-                        update_items_per_page: this.update_items_per_page,
-                        download_csv: this.download_csv,
-                        bottom: true })
-                ),
-                _react2.default.createElement(Columns_modal, { selected_cols: this.state.selected_cols,
-                    update_selected_cols: this.update_selected_columns })
+                    this.state.loaded && !!displayed_proxies.length && _react2.default.createElement(
+                        'div',
+                        { className: 'panel_body with_table' },
+                        _react2.default.createElement(Proxies_pagination, { entries: this.state.filtered_proxies,
+                            cur_page: this.state.cur_page,
+                            items_per_page: this.state.items_per_page,
+                            page_change: this.page_change,
+                            edit_columns: this.edit_columns,
+                            update_items_per_page: this.update_items_per_page,
+                            download_csv: this.download_csv,
+                            top: true }),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'proxies_table_wrapper' },
+                            _react2.default.createElement(
+                                'table',
+                                { className: 'table table-hover' },
+                                _react2.default.createElement(
+                                    'thead',
+                                    null,
+                                    _react2.default.createElement(
+                                        'tr',
+                                        null,
+                                        _react2.default.createElement(
+                                            'th',
+                                            { className: 'head_actions' },
+                                            _react2.default.createElement(
+                                                _common.Tooltip,
+                                                {
+                                                    title: 'Delete/duplicate/refresh sessions' },
+                                                'Actions'
+                                            )
+                                        ),
+                                        cols.map(function (col) {
+                                            return _react2.default.createElement(
+                                                'th',
+                                                { key: col.key, className: 'col_' + col.key },
+                                                _react2.default.createElement(
+                                                    _common.Tooltip,
+                                                    { title: col.tooltip },
+                                                    col.title
+                                                )
+                                            );
+                                        })
+                                    )
+                                ),
+                                _react2.default.createElement(
+                                    'tbody',
+                                    null,
+                                    displayed_proxies.map(function (proxy) {
+                                        return _react2.default.createElement(Proxy_row, { key: proxy.port, go: _this6.state.go,
+                                            update_proxies: _this6.update, proxy: proxy,
+                                            cols: cols, master_port: _this6.props.master_port,
+                                            zones: _this6.state.zones });
+                                    })
+                                )
+                            )
+                        ),
+                        _react2.default.createElement(Proxies_pagination, { entries: this.state.filtered_proxies,
+                            cur_page: this.state.cur_page,
+                            items_per_page: this.state.items_per_page,
+                            page_change: this.page_change,
+                            edit_columns: this.edit_columns,
+                            update_items_per_page: this.update_items_per_page,
+                            download_csv: this.download_csv,
+                            bottom: true })
+                    ),
+                    _react2.default.createElement(Columns_modal, { selected_cols: this.state.selected_cols,
+                        update_selected_cols: this.update_selected_columns })
+                )
             );
         }
     }]);
@@ -57704,7 +57916,7 @@ var _ajax = __webpack_require__(29);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _pure_component = __webpack_require__(13);
 
@@ -57714,7 +57926,7 @@ var _jquery = __webpack_require__(11);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _chrome_widgets = __webpack_require__(127);
 
@@ -58238,7 +58450,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _codemirror = __webpack_require__(50);
 
@@ -58570,9 +58782,9 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -58870,7 +59082,7 @@ var _proxy_blank = __webpack_require__(210);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _util = __webpack_require__(23);
 
@@ -58878,7 +59090,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -59289,7 +59501,7 @@ var _ajax = __webpack_require__(29);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _setdb = __webpack_require__(26);
+var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
@@ -59305,7 +59517,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 var _util = __webpack_require__(23);
 
@@ -59313,7 +59525,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _prismjs = __webpack_require__(355);
 
@@ -59905,7 +60117,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(16);
+var _common = __webpack_require__(15);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60055,7 +60267,7 @@ var _har_viewer = __webpack_require__(209);
 
 var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
-var _reactRouterDom = __webpack_require__(25);
+var _reactRouterDom = __webpack_require__(26);
 
 var _url = __webpack_require__(166);
 
@@ -60139,7 +60351,7 @@ exports = module.exports = __webpack_require__(92)(undefined);
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n.proxy_form {\n  max-height: 500px;\n}\n.proxy_form.animated {\n  animation-duration: 600ms;\n  -webkit-animation-duration: 600ms;\n}\n.proxy_created {\n  max-height: 0;\n  visibility: hidden;\n  transition: max-height 250ms ease 450ms, visibility 0ms ease-in 800ms;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  max-width: 1000px;\n  margin: auto;\n  text-align: left;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.__react_component_tooltip {\n  cursor: initial !important;\n  white-space: normal;\n  max-width: 400px;\n}\n.__react_component_tooltip.type-info {\n  color: #303942;\n  background-color: white;\n  border: solid 1px #cdcdcd;\n  opacity: 1;\n  padding: 6px 12px;\n  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n  -webkit-filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n}\n.__react_component_tooltip.type-info:after,\n.__react_component_tooltip.type-info:before {\n  content: none;\n}\n.__react_component_tooltip.type-light {\n  padding: 4px 7px;\n  border: solid 1px #154055;\n  color: #004d74;\n}\n.__react_component_tooltip.type-light.place-top:after {\n  border-top-color: #154055;\n  border-top-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  bottom: -6px;\n  margin-left: -6px;\n}\n.__react_component_tooltip.type-light.place-bottom:after {\n  border-bottom-color: #154055;\n  border-bottom-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  top: -6px;\n  margin-left: -6px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel .select_number {\n  float: right;\n  width: auto;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 4px;\n}\n.pagination_panel .select_number .react_select__control {\n  height: 24px;\n  width: 120px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  min-width: 100px;\n  width: auto;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\nselect::placeholder,\ninput[type=number]::placeholder,\ninput[type=text]::placeholder,\ninput[type=password]::placeholder,\ninput[type=email]::placeholder,\ntextarea::placeholder,\n.json_input_wrapper::placeholder {\n  color: #8e8e8e;\n}\nselect[disabled],\ninput[type=number][disabled],\ninput[type=text][disabled],\ninput[type=password][disabled],\ninput[type=email][disabled],\ntextarea[disabled],\n.json_input_wrapper[disabled],\nselect[disabled]::placeholder,\ninput[type=number][disabled]::placeholder,\ninput[type=text][disabled]::placeholder,\ninput[type=password][disabled]::placeholder,\ninput[type=email][disabled]::placeholder,\ntextarea[disabled]::placeholder,\n.json_input_wrapper[disabled]::placeholder {\n  color: #8e8e8e;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\nselect[disabled] {\n  color: #8e8e8e;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\ninput.regex {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.select_number {\n  min-width: 120px;\n}\n.select_number input {\n  min-width: 0;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\nul.bullets {\n  padding-left: 0;\n  margin-bottom: 0;\n}\nul.bullets li {\n  list-style: none;\n}\nul.bullets li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 13px;\n  padding-right: 6px;\n}\n.pins_field {\n  display: flex;\n  align-items: baseline;\n}\n.pins_field .pins {\n  display: flex;\n  flex-flow: wrap;\n}\n.pins_field .pins .pin {\n  background-color: #f5f5f5;\n  border: 1px solid #e0e9ee;\n  border-radius: 3px;\n  padding: 3px;\n  display: flex;\n  margin: 0 6px 2px 0;\n}\n.pins_field .pins .pin.active {\n  border-color: #004d74;\n}\n.pins_field .pins .pin .x,\n.pins_field .pins .pin .v {\n  width: 16px;\n  font-size: 10px;\n  text-align: center;\n  cursor: pointer;\n}\n.pins_field .pins .pin .x:hover,\n.pins_field .pins .pin .v:hover {\n  background-color: #004d74;\n  color: white;\n}\n.pins_field .pins .pin .x .glyphicon-remove,\n.pins_field .pins .pin .v .glyphicon-remove {\n  position: relative;\n  top: 1px;\n}\n.pins_field .pins .pin .content {\n  padding: 0 2px 0 2px;\n}\n.pins_field .pins .pin .content input {\n  width: 120px;\n  height: 23px;\n  border: none;\n  padding: 0;\n}\n.pins_field .add_pin {\n  margin-left: 0;\n  cursor: pointer;\n  height: 32px;\n}\n.pins_field .add_pin .glyphicon-plus {\n  margin-left: 5px;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n@keyframes field_highlight {\n  0% {\n    border: 1px solid white;\n  }\n  50% {\n    border: 1px solid #004d74;\n    margin-left: -5px;\n    margin-right: -5px;\n    padding-left: 8px;\n    padding-right: 8px;\n  }\n  100% {\n    border: 1px solid white;\n  }\n}\n.field_row.animated {\n  border-radius: 3px;\n  animation: field_highlight 900ms;\n  animation-iteration-count: 3;\n  border: 1px solid white;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: 1px solid #d0d0d0;\n  border-radius: 0;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #e0e9ee;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n  min-width: 100px;\n}\n.rbt.open.clearfix:before {\n  content: none;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 175px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: baseline;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .double_field input {\n  width: 109px;\n}\n.proxy_edit .main_window .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  width: 100%;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box {\n  color: #8e8e8e;\n  height: 32px;\n  border: solid 1px #ccdbe3;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.details_tables .details_table {\n  height: 200px;\n  margin-top: 15px;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .title_wrapper .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .title_wrapper .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 10px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 25px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #e0e9ee;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row .internal_name {\n  width: 1px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.zone_tooltip ul li {\n  margin: 3px 0;\n}\n.zone_settings {\n  cursor: default !important;\n}\n.zone_settings .pair {\n  display: flex;\n}\n.zone_settings .pair .title {\n  margin-right: 5px;\n  font-weight: 600;\n}\n.zone_settings .pair .val {\n  display: flex;\n  align-items: center;\n}\n.zone_settings .pair .val .lit {\n  line-height: 1.9;\n  padding: 0 6px;\n  margin-right: 3px;\n  background-color: #e1e9ed;\n  color: inherit;\n  font-size: 11px;\n  border-radius: 3px;\n}\n.zone_settings .perm_icon {\n  width: 18px;\n  height: 18px;\n  float: left;\n  margin: 2px 4px 0;\n  background-repeat: no-repeat;\n  background-size: contain;\n}\n.zone_settings .perm_icon.country {\n  background-image: url(/img/country.svg);\n}\n.zone_settings .perm_icon.state {\n  background-image: url(/img/state.svg);\n}\n.zone_settings .perm_icon.data_center {\n  background-image: url(/img/data_center.svg);\n}\n.zone_settings .perm_icon.asn {\n  background-image: url(/img/asn.svg);\n}\n.zone_settings .perm_icon.city {\n  background-image: url(/img/city.svg);\n}\n.zone_settings .perm_icon.vip {\n  background-image: url(/img/g_ip.svg);\n}\n.zone_settings .perm_icon.residential {\n  background-image: url(/img/residential.svg);\n}\n.zone_settings .perm_icon.mobile {\n  width: 14px;\n  background-image: url(/img/mobile.svg);\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #e0e9ee;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #e0e9ee;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: baseline;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  width: 140px;\n  margin-right: 5px;\n  white-space: nowrap;\n}\n.settings .settings_form .field_row .double_field {\n  display: flex;\n}\n.settings .settings_form .field_row .double_field > *:first-child {\n  margin-right: 5px;\n}\n.settings .settings_form .field_row .double_field > *:last-child {\n  margin-left: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer select,\n.tracer input {\n  width: 100%;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  margin-top: 10px;\n}\n.tracer .request .go_btn_wrapper .btn {\n  margin: 0;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester select,\n.proxy_tester input {\n  width: 100%;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  margin-top: 10px;\n}\n.proxy_tester .panel.request .footer_buttons .btn {\n  margin: 0;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content select {\n  width: auto;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .group {\n  padding-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .group:last-child {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .field {\n  display: flex;\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .field .field_header {\n  display: flex;\n  align-items: center;\n  margin-right: 12px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .icon {\n  width: 26px;\n  height: 26px;\n  margin-right: 5px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 17px;\n  letter-spacing: 0.5px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content .howto.animated {\n  animation-duration: 750ms;\n  -webkit-animation-duration: 750ms;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.status.info {\n  --spritesheet-position: 10px 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar .title_wrapper {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n  overflow-x: hidden;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table tr.pending {\n  color: #7a8c9f;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .disp_value .small_icon.info {\n  display: inline-block;\n  margin-left: 4px;\n  margin-bottom: 0;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.tree_children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n.proxy_form {\n  max-height: 500px;\n}\n.proxy_form.animated {\n  animation-duration: 600ms;\n  -webkit-animation-duration: 600ms;\n}\n.proxy_created {\n  max-height: 0;\n  visibility: hidden;\n  transition: max-height 250ms ease 450ms, visibility 0ms ease-in 800ms;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.api_app {\n  margin-top: 50px;\n  text-align: center;\n}\n.api_app button {\n  margin: 10px;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  max-width: 1000px;\n  margin: auto;\n  text-align: left;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .login_form .form-group,\n.whitelist_ips .login_form .form-group {\n  display: flex;\n  align-items: center;\n}\n.lum_login .login_form .form-group label,\n.whitelist_ips .login_form .form-group label {\n  width: 80px;\n}\n.lum_login .login_form .form-group input,\n.whitelist_ips .login_form .form-group input {\n  flex: 1;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.__react_component_tooltip {\n  cursor: initial !important;\n  white-space: normal;\n  max-width: 400px;\n}\n.__react_component_tooltip.type-info {\n  color: #303942;\n  background-color: white;\n  border: solid 1px #cdcdcd;\n  opacity: 1;\n  padding: 6px 12px;\n  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n  -webkit-filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n}\n.__react_component_tooltip.type-info:after,\n.__react_component_tooltip.type-info:before {\n  content: none;\n}\n.__react_component_tooltip.type-light {\n  padding: 4px 7px;\n  border: solid 1px #154055;\n  color: #004d74;\n}\n.__react_component_tooltip.type-light.place-top:after {\n  border-top-color: #154055;\n  border-top-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  bottom: -6px;\n  margin-left: -6px;\n}\n.__react_component_tooltip.type-light.place-bottom:after {\n  border-bottom-color: #154055;\n  border-bottom-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  top: -6px;\n  margin-left: -6px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel .select_number {\n  float: right;\n  width: auto;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 4px;\n}\n.pagination_panel .select_number .react_select__control {\n  height: 24px;\n  width: 90px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  min-width: 100px;\n  width: auto;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\nselect::placeholder,\ninput[type=number]::placeholder,\ninput[type=text]::placeholder,\ninput[type=password]::placeholder,\ninput[type=email]::placeholder,\ntextarea::placeholder,\n.json_input_wrapper::placeholder {\n  color: #8e8e8e;\n}\nselect[disabled],\ninput[type=number][disabled],\ninput[type=text][disabled],\ninput[type=password][disabled],\ninput[type=email][disabled],\ntextarea[disabled],\n.json_input_wrapper[disabled],\nselect[disabled]::placeholder,\ninput[type=number][disabled]::placeholder,\ninput[type=text][disabled]::placeholder,\ninput[type=password][disabled]::placeholder,\ninput[type=email][disabled]::placeholder,\ntextarea[disabled]::placeholder,\n.json_input_wrapper[disabled]::placeholder {\n  color: #8e8e8e;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\nselect[disabled] {\n  color: #8e8e8e;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\ninput.regex {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.react_select__control .react_select__clear-indicator,\n.react_select__control .react_select__dropdown-indicator {\n  padding: 1px;\n}\n.select_number {\n  min-width: 100px;\n}\n.select_number input {\n  min-width: 0;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\nul.bullets {\n  padding-left: 0;\n  margin-bottom: 0;\n}\nul.bullets li {\n  list-style: none;\n}\nul.bullets li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 13px;\n  padding-right: 6px;\n}\n.pins_field {\n  display: flex;\n  align-items: baseline;\n}\n.pins_field .pins {\n  display: flex;\n  flex-flow: wrap;\n}\n.pins_field .pins .pin {\n  background-color: #f5f5f5;\n  border: 1px solid #e0e9ee;\n  border-radius: 3px;\n  padding: 3px;\n  display: flex;\n  margin: 0 6px 2px 0;\n}\n.pins_field .pins .pin.active {\n  border-color: #004d74;\n}\n.pins_field .pins .pin .x,\n.pins_field .pins .pin .v {\n  width: 16px;\n  font-size: 10px;\n  text-align: center;\n  cursor: pointer;\n}\n.pins_field .pins .pin .x:hover,\n.pins_field .pins .pin .v:hover {\n  background-color: #004d74;\n  color: white;\n}\n.pins_field .pins .pin .x .glyphicon-remove,\n.pins_field .pins .pin .v .glyphicon-remove {\n  position: relative;\n  top: 1px;\n}\n.pins_field .pins .pin .content {\n  padding: 0 2px 0 2px;\n}\n.pins_field .pins .pin .content input {\n  width: 120px;\n  height: 23px;\n  border: none;\n  padding: 0;\n}\n.pins_field .add_pin {\n  margin-left: 0;\n  cursor: pointer;\n  height: 32px;\n}\n.pins_field .add_pin .glyphicon-plus {\n  margin-left: 5px;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n@keyframes field_highlight {\n  0% {\n    border: 1px solid white;\n  }\n  50% {\n    border: 1px solid #004d74;\n    margin-left: -5px;\n    margin-right: -5px;\n    padding-left: 8px;\n    padding-right: 8px;\n  }\n  100% {\n    border: 1px solid white;\n  }\n}\n.field_row.animated {\n  border-radius: 3px;\n  animation: field_highlight 900ms;\n  animation-iteration-count: 3;\n  border: 1px solid white;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: 1px solid #d0d0d0;\n  border-radius: 0;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #e0e9ee;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n  min-width: 100px;\n}\n.rbt.open.clearfix:before {\n  content: none;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding-left: 0;\n  padding-right: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 175px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: baseline;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .double_field input {\n  width: 109px;\n}\n.proxy_edit .main_window .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  width: 100%;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box {\n  color: #8e8e8e;\n  height: 32px;\n  border: solid 1px #ccdbe3;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.details_tables .details_table {\n  height: 200px;\n  margin-top: 15px;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .title_wrapper .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .title_wrapper .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel {\n  border: none;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 4px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 21px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #e0e9ee;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row .internal_name {\n  width: 1px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.zone_tooltip ul li {\n  margin: 3px 0;\n}\n.zone_settings {\n  cursor: default !important;\n}\n.zone_settings .pair {\n  display: flex;\n}\n.zone_settings .pair .title {\n  margin-right: 5px;\n  font-weight: 600;\n}\n.zone_settings .pair .val {\n  display: flex;\n  align-items: center;\n}\n.zone_settings .pair .val .lit {\n  line-height: 1.9;\n  padding: 0 6px;\n  margin-right: 3px;\n  background-color: #e1e9ed;\n  color: inherit;\n  font-size: 11px;\n  border-radius: 3px;\n}\n.zone_settings .perm_icon {\n  width: 18px;\n  height: 18px;\n  float: left;\n  margin: 2px 4px 0;\n  background-repeat: no-repeat;\n  background-size: contain;\n}\n.zone_settings .perm_icon.country {\n  background-image: url(/img/country.svg);\n}\n.zone_settings .perm_icon.state {\n  background-image: url(/img/state.svg);\n}\n.zone_settings .perm_icon.data_center {\n  background-image: url(/img/data_center.svg);\n}\n.zone_settings .perm_icon.asn {\n  background-image: url(/img/asn.svg);\n}\n.zone_settings .perm_icon.city {\n  background-image: url(/img/city.svg);\n}\n.zone_settings .perm_icon.vip {\n  background-image: url(/img/g_ip.svg);\n}\n.zone_settings .perm_icon.residential {\n  background-image: url(/img/residential.svg);\n}\n.zone_settings .perm_icon.mobile {\n  width: 14px;\n  background-image: url(/img/mobile.svg);\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #e0e9ee;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #e0e9ee;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: baseline;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  width: 140px;\n  margin-right: 5px;\n  white-space: nowrap;\n}\n.settings .settings_form .field_row .double_field {\n  display: flex;\n}\n.settings .settings_form .field_row .double_field > *:first-child {\n  margin-right: 5px;\n}\n.settings .settings_form .field_row .double_field > *:last-child {\n  margin-left: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer select,\n.tracer input {\n  width: 100%;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  margin-top: 10px;\n}\n.tracer .request .go_btn_wrapper .btn {\n  margin: 0;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester select,\n.proxy_tester input {\n  width: 100%;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  margin-top: 10px;\n}\n.proxy_tester .panel.request .footer_buttons .btn {\n  margin: 0;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content select {\n  width: auto;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy textarea {\n  width: 100%;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .group {\n  padding-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .group:last-child {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .field {\n  display: flex;\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .field .field_header {\n  display: flex;\n  align-items: center;\n  margin-right: 12px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .icon {\n  width: 26px;\n  height: 26px;\n  margin-right: 5px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 17px;\n  letter-spacing: 0.5px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content .howto.animated {\n  animation-duration: 750ms;\n  -webkit-animation-duration: 750ms;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.status.info {\n  --spritesheet-position: 10px 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar .title_wrapper {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n  overflow-x: hidden;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table tr.pending {\n  color: #7a8c9f;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .disp_value .small_icon.info {\n  display: inline-block;\n  margin-left: 4px;\n  margin-bottom: 0;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.tree_children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
 
 // exports
 

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.113.808",
+        "version": "1.114.152",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -537,6 +537,10 @@
                 "force": {
                     "type": "boolean",
                     "description": "Kill other instances of LPM if there are any"
+                },
+                "session_termination": {
+                    "type": "boolean",
+                    "description": "Stop sending new requests when the peer IP becomes unavailable and redirect to confimration page before new IP is taken"
                 }
             }
         },
@@ -639,7 +643,7 @@
                 },
                 "vip": {
                     "type": "integer",
-                    "description": "VIP"
+                    "description": "gIP"
                 },
                 "ext_proxies": {
                     "type": "array",

@@ -60,12 +60,6 @@ export const tabs = {
                 label: 'DNS lookup',
                 tooltip: 'Location of DNS resolve',
             },
-            pool_size: {
-                label: 'Pool size',
-                tooltip: `Maintain number of IPs that will be pinged constantly
-                    - must have keep_alive to work properly`,
-                ext: true,
-            },
             race_reqs: {
                 label: 'Parallel race requests',
                 tooltip: `Sends multiple requests in parallel via different
@@ -195,24 +189,16 @@ export const tabs = {
         label: 'IP control',
         tooltip: 'Set the conditions for which your IPs will change',
         fields: {
-            ip: {
-                label: 'Data center IP',
-                tooltip: `Choose specific data center IP. to ensure
-                    all requests are executed using specific Data Center IP.
-                    To view the pool of your IPs take a look at 'pool size'
-                    option`,
-                placeholder: 'insert IP value from your pool',
-            },
-            vip: {
-                label: 'gIP',
-                tooltip: `Choose specific gIP to ensure all requests are
-                    executed using specific gIP. To view the pool of your gIPs
-                    take a look at 'pool size' option`,
-                placeholder: 'insert gIP id',
-            },
             pool_type: {
                 label: 'Pool type',
-                tooltip: `How to pull the IPs - roundrobin / sequential`,
+                tooltip: `They way of pulling sessions for the following
+                    requests.`,
+                ext: true,
+            },
+            pool_size: {
+                label: 'Pool size',
+                tooltip: `Maintain number of IPs that will be pinged constantly
+                    - must have Keep_alive to work properly`,
                 ext: true,
             },
             keep_alive: {
@@ -259,6 +245,12 @@ export const tabs = {
                     a serial number starting from 1. (e.g. session seed 'test'
                     will have the following sessions: test-1, test-2 ..)`,
                 placeholder: `e.g. test_session`,
+            },
+            session_termination: {
+                label: 'Session termination',
+                tooltip: `Stop sending new requests when the peer IP becomes
+                    unavailable and redirect to confimration page before new IP
+                    is taken`,
             }
         },
     },

@@ -760,7 +760,7 @@ export const Pagination_panel = props=>{
     let buttons = null;
     if (top)
         buttons = <div className="table_buttons">{children}</div>;
-    const display_opt = [10, 20, 50, 100, 200, 500, 1000];
+    const display_opt = [10, 50, 100, 500, 1000];
     const from = Math.min(cur_page*items_per_page+1, total);
     const to = Math.min((cur_page+1)*items_per_page, total);
     return <div className={classnames('pagination_panel', {top, bottom})}>

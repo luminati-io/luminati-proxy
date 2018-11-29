@@ -14,7 +14,7 @@ var E = ajax;
 var assign = Object.assign;
 E.events = new events.EventEmitter();
 E.json = function(opt){ return ajax(assign({}, opt, {json: 1})); };
-E.abort = function(ajax){ ajax.goto('abort'); };
+E.abort = function(aj){ aj.goto('abort'); };
 // XXX arik: need test
 function ajax(opt){
     var timeout = opt.timeout||20*date.ms.SEC, slow = opt.slow||2*date.ms.SEC;
@@ -40,9 +40,9 @@ function ajax(opt){
         if (opt.onuploadprogress)
         {
             ajopt.xhr = function(){
-                var xhr = $.ajaxSettings.xhr();
-                xhr.upload.onprogress = opt.onuploadprogress;
-                return xhr;
+                var _xhr = $.ajaxSettings.xhr();
+                _xhr.upload.onprogress = opt.onuploadprogress;
+                return _xhr;
             };
         }
         if (opt.multipart)
@@ -56,7 +56,14 @@ function ajax(opt){
         xhr.done(function(v){
             _this.continue(v); });
         xhr.fail(function(_xhr, status_text, err){
-            _this.throw(err instanceof Error ? err : new Error(''+err)); });
+            if (data_type=='json' && _xhr.status==200 &&
+                ['', 'ok', 'OK'].includes(_xhr.responseText))
+            {
+                _this.continue(null);
+                return;
+            }
+            _this.throw(err instanceof Error ? err : new Error(''+err));
+        });
         return this.wait();
     }, function catch$(err){
         zerr('ajax('+data_type+') failed url '+url+' data '+
@@ -71,6 +78,8 @@ function ajax(opt){
         {
             return {
                 err: err,
+                url: url,
+                method: method,
                 status: +xhr.status || 0,
                 data: get_res_data(xhr),
                 xhr: xhr,
@@ -78,8 +87,8 @@ function ajax(opt){
                 error: xhr.statusText||'no_status', message: xhr.responseText,
             };
         }
-        err.hola_info = {data_type: data_type, url: url,
-            status: xhr.status, response_text: xhr.responseText};
+        err.hola_info = {url: url, method: method, status: xhr.status,
+            data: get_res_data(xhr), response_text: xhr.responseText};
         err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err;
@@ -114,13 +123,13 @@ function ajax(opt){
 });
 
 function get_res_data(xhr){
-    if (xhr.responseJSON)
+    if (xhr.responseJSON!=null && xhr.responseJSON!=='')
         return xhr.responseJSON;
     var content_type = xhr.getResponseHeader('content-type')||'';
     if (xhr.responseText && content_type.includes('application/json'))
     {
         try { return JSON.parse(xhr.responseText); }
-        catch(e) { }
+        catch(e){ }
     }
     return xhr.responseText||'';
 }

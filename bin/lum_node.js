@@ -102,7 +102,7 @@ E.write_status_file = (status, error = null, config = null, reason = null)=>{
         reason,
         error,
         config,
-        customer_name: config&&config._defaults&&config._defaults.customer
+        customer_name: config && config._defaults && config._defaults.customer,
     });
     try { file.write_e(E.status_filename, JSON.stringify(E.lpm_status)); }
     catch(e){ zerr.notice(`Fail to write status file: ${zerr.e2s(e)}`); }

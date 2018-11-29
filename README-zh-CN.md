@@ -29,7 +29,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.113.808-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.114.152-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x
@@ -113,7 +113,7 @@ Options:
   --city                   City                                         [string]
   --asn                    ASN                                          [number]
   --ip                     Data center IP                               [string]
-  --vip                    VIP                                          [number]
+  --vip                    gIP                                          [number]
   --ext_proxies            A list of proxies from external vendors. Format:
                            [username:password@]ip[:port]                 [array]
   --ext_proxy_username     default username for external vendor ips     [string]

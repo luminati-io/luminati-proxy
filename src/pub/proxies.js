@@ -621,68 +621,72 @@ class Proxies extends Pure_component {
             return null;
         if (this.state.loaded&&!this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        return <div className="panel proxies_panel">
-              <div className="panel_heading">
-                <h2>
-                  Proxies
-                  <Tooltip title="Add new proxy">
-                    <button className="btn btn_lpm btn_lpm_small add_proxy_btn"
-                      onClick={this.proxy_add}>
-                      New proxy
-                      <i className="glyphicon glyphicon-plus"/>
-                    </button>
-                  </Tooltip>
-                </h2>
-              </div>
-              {this.state.loaded && displayed_proxies.length &&
-                <div className="panel_body with_table">
-                  <Proxies_pagination entries={this.state.filtered_proxies}
-                    cur_page={this.state.cur_page}
-                    items_per_page={this.state.items_per_page}
-                    page_change={this.page_change}
-                    edit_columns={this.edit_columns}
-                    update_items_per_page={this.update_items_per_page}
-                    download_csv={this.download_csv}
-                    top/>
-                  <div className="proxies_table_wrapper">
-                    <table className="table table-hover">
-                      <thead>
-                        <tr>
-                          <th className="head_actions">
-                            <Tooltip title="Delete/duplicate/refresh sessions">
-                              Actions
-                            </Tooltip>
-                          </th>
-                          {cols.map(col=>
-                            <th key={col.key} className={'col_'+col.key}>
-                              <Tooltip title={col.tooltip}>
-                                {col.title}</Tooltip>
-                            </th>
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {displayed_proxies.map(proxy=>
-                          <Proxy_row key={proxy.port} go={this.state.go}
-                            update_proxies={this.update} proxy={proxy}
-                            cols={cols} master_port={this.props.master_port}
-                            zones={this.state.zones}/>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                  <Proxies_pagination entries={this.state.filtered_proxies}
-                    cur_page={this.state.cur_page}
-                    items_per_page={this.state.items_per_page}
-                    page_change={this.page_change}
-                    edit_columns={this.edit_columns}
-                    update_items_per_page={this.update_items_per_page}
-                    download_csv={this.download_csv}
-                    bottom/>
+        return <div className="panel proxies_panel chrome">
+              <div className="main_panel">
+                <div className="panel_heading">
+                  <h2>
+                    Proxies
+                    <Tooltip title="Add new proxy">
+                      <button
+                        className="btn btn_lpm btn_lpm_small add_proxy_btn"
+                        onClick={this.proxy_add}>
+                        New proxy
+                        <i className="glyphicon glyphicon-plus"/>
+                      </button>
+                    </Tooltip>
+                  </h2>
                 </div>
-              }
-              <Columns_modal selected_cols={this.state.selected_cols}
-                update_selected_cols={this.update_selected_columns}/>
+                {this.state.loaded && !!displayed_proxies.length &&
+                  <div className="panel_body with_table">
+                    <Proxies_pagination entries={this.state.filtered_proxies}
+                      cur_page={this.state.cur_page}
+                      items_per_page={this.state.items_per_page}
+                      page_change={this.page_change}
+                      edit_columns={this.edit_columns}
+                      update_items_per_page={this.update_items_per_page}
+                      download_csv={this.download_csv}
+                      top/>
+                    <div className="proxies_table_wrapper">
+                      <table className="table table-hover">
+                        <thead>
+                          <tr>
+                            <th className="head_actions">
+                              <Tooltip
+                                title="Delete/duplicate/refresh sessions">
+                                Actions
+                              </Tooltip>
+                            </th>
+                            {cols.map(col=>
+                              <th key={col.key} className={'col_'+col.key}>
+                                <Tooltip title={col.tooltip}>
+                                  {col.title}</Tooltip>
+                              </th>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {displayed_proxies.map(proxy=>
+                            <Proxy_row key={proxy.port} go={this.state.go}
+                              update_proxies={this.update} proxy={proxy}
+                              cols={cols} master_port={this.props.master_port}
+                              zones={this.state.zones}/>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    <Proxies_pagination entries={this.state.filtered_proxies}
+                      cur_page={this.state.cur_page}
+                      items_per_page={this.state.items_per_page}
+                      page_change={this.page_change}
+                      edit_columns={this.edit_columns}
+                      update_items_per_page={this.update_items_per_page}
+                      download_csv={this.download_csv}
+                      bottom/>
+                  </div>
+                }
+                <Columns_modal selected_cols={this.state.selected_cols}
+                  update_selected_cols={this.update_selected_columns}/>
+              </div>
             </div>;
     }
 }
