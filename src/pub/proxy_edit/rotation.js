@@ -22,6 +22,7 @@ export default provider({tab_id: 'rotation'})(
 class Rotation extends Pure_component {
     state = {};
     goto_field = setdb.get('head.proxy_edit.goto_field');
+    set_field = setdb.get('head.proxy_edit.set_field');
     componentDidMount(){
         this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>{
             disabled_fields && this.setState({disabled_fields});
@@ -38,6 +39,20 @@ class Rotation extends Pure_component {
     };
     open_modal = ()=>$('#allocated_ips').modal('show');
     move_to_ssl = ()=>this.goto_field('ssl');
+    pool_type_changed = pool_type=>{
+        if (this.is_sequential(pool_type))
+        {
+            this.set_field('ips', []);
+            this.set_field('vips', []);
+            this.set_field('pool_size', 0);
+        }
+        else if (!this.props.form.pool_size)
+            this.set_field('pool_size', 1);
+    };
+    is_sequential = pool_type=>{
+        pool_type = pool_type || this.props.form.pool_type;
+        return !pool_type || pool_type=='sequential';
+    };
     render(){
         if (!this.state.disabled_fields)
             return null;
@@ -58,11 +73,13 @@ class Rotation extends Pure_component {
               <a className="link" onClick={this.move_to_ssl}>SSL analyzing</a>
               <span> is turned on.</span>
             </Note>;
+        const pool_size_disabled = form.ips.length||form.vips.length||
+            this.is_sequential();
         return <div>
-              <Config type="select" id="pool_type" data={pool_type_opt}/>
+              <Config type="select" id="pool_type" data={pool_type_opt}
+                on_change={this.pool_type_changed}/>
               <Config type="select_number" id="pool_size" allow_zero
-                note={pool_size_note}
-                disabled={form.ips.length||form.vips.length}/>
+                note={pool_size_note} disabled={pool_size_disabled}/>
               <Config type="select_number" id="keep_alive" sufix="seconds"
                 data={[0, 45]}/>
               <Config type="select_number" id="max_requests"/>

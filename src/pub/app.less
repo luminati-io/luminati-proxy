@@ -967,10 +967,7 @@ span.icon_link {
     flex-direction: column;
     font-size: 14px;
     margin: 0 15px;
-    .har_viewer {
-        padding-left: 0;
-        padding-right: 0;
-    }
+    .har_viewer { padding: 0; }
     .info_icon {
         background: url(/img/info.svg);
         width: 11px;
@@ -1010,6 +1007,14 @@ span.icon_link {
         margin-top: 10px;
         display: flex;
         &.logs {
+            .nav_tabs {
+                .btn_tab { height: 30px; }
+                .title { top: 3px; }
+            }
+            .window_wrapper {
+                flex: 1;
+                padding: 15px 0;
+            }
             .logs {
                 width: 100%;
                 .logs_panel { margin: 0; }
@@ -1155,12 +1160,6 @@ span.icon_link {
                 }
             }
         }
-    }
-}
-.details_tables {
-    .details_table {
-        height: 200px;
-        margin-top: 15px;
     }
 }
 .report_bug {
@@ -2177,6 +2176,9 @@ span.icon_link {
     height: 100%;
 }
 .chrome {
+    &.chrome_table {
+        height: 100%;
+    }
     -webkit-user-select: none;
     user-select: none;
     font-size: 12px;

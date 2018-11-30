@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.114.305 Stable
+- :star: New debugging tools: Sessions and banned IPs were added in 'Logs' tab
+
 ## 1.114.152 Development Latest
 - :star: UI improvements in edit proxy page
 - :star: New pool type 'Long-availability'

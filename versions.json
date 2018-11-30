@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.114.305",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "New debugging tools: Sessions and banned IPs were added in 'Logs' tab"
+            }
+        ]
+    },
+    {
         "ver": "1.114.152",
         "type": "dev",
         "changes": [

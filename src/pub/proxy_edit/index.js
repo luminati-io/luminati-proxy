@@ -11,7 +11,7 @@ import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
     Pagination_panel, Loader_small, Zone_description,
-    Preset_description} from '../common.js';
+    Preset_description, Nav_tabs} from '../common.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import * as util from '../util.js';
@@ -482,7 +482,15 @@ const Index = withRouter(class Index extends Pure_component {
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_preset={this.apply_preset}/>
-                <Nav_tabs/>
+                <Nav_tabs>
+                  <Tab_btn id="logs"/>
+                  <Tab_btn id="target"/>
+                  <Tab_btn id="rotation"/>
+                  <Tab_btn id="speed"/>
+                  <Tab_btn id="rules"/>
+                  <Tab_btn id="headers"/>
+                  <Tab_btn id="general"/>
+                </Nav_tabs>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
                 {this.state.consts && this.state.defaults &&
@@ -611,17 +619,6 @@ const Field = ({id, disabled, children, ...props})=>{
           </select>
         </div>;
 };
-
-const Nav_tabs = ()=>
-    <div className="nav_tabs">
-      <Tab_btn id="logs"/>
-      <Tab_btn id="target"/>
-      <Tab_btn id="rules"/>
-      <Tab_btn id="speed"/>
-      <Tab_btn id="rotation"/>
-      <Tab_btn id="headers"/>
-      <Tab_btn id="general"/>
-    </div>;
 
 const Tab_btn = withRouter(class Tab_btn extends Pure_component {
     state = {};

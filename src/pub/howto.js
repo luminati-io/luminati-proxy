@@ -4,7 +4,7 @@ import 'prismjs/themes/prism.css';
 import React from 'react';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code, Tooltip} from './common.js';
+import {Code, Tooltip, Nav_tabs} from './common.js';
 import {ga_event, swagger_url} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
@@ -30,14 +30,14 @@ const Howto = withRouter(class Howto extends Pure_component {
               </div>
               <div className="howto_panel">
                 <div className="panel_inner">
-                  <div className="nav_tabs tabs">
+                  <Nav_tabs>
                     <Tab id="code" title="Code"
                       tooltip="Examples how to use LPM programatically"
                       on_click={this.choose_click} cur_tab={option}/>
                     <Tab id="browser" title="Browser"
                       tooltip="Examples how to inegrate LPM with the browser"
                       on_click={this.choose_click} cur_tab={option}/>
-                  </div>
+                  </Nav_tabs>
                   <Instructions>{this.props.children}</Instructions>
                 </div>
               </div>

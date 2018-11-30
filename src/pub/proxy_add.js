@@ -7,7 +7,7 @@ import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
 import {Modal, Loader, Textarea, Tooltip, Warnings, Code,
-    Zone_description, Preset_description} from './common.js';
+    Zone_description, Preset_description, Nav_tabs} from './common.js';
 import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
@@ -77,7 +77,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                     port = p.port+1;
             });
             form.port = port;
-            // XXX krzysztof: switch fetch->ajax
             const raw_resp = yield window.fetch('/api/proxies', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -199,7 +198,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 on_hidden={this.on_hidden} footer={Footer_wrapper}
                 className="add_proxy_modal">
                 <div className={anim_classes}>
-                  <Nav_tabs change_tab={this.change_tab}
+                  <Nav_tabs_wrapper change_tab={this.change_tab}
                     cur_tab={this.state.cur_tab}/>
                   {content}
                 </div>
@@ -312,15 +311,15 @@ const Preview = ({title, children})=>{
         </div>;
 };
 
-const Nav_tabs = ({change_tab, cur_tab})=>
-    <div className="nav_tabs tabs">
+const Nav_tabs_wrapper = ({change_tab, cur_tab})=>
+    <Nav_tabs>
       <Tab on_click={change_tab} title="Luminati" id="proxy_lum"
         cur_tab={cur_tab}
         tooltip="Proxy port using your Luminati account"/>
       <Tab on_click={change_tab} title="External" id="proxy_ext"
         cur_tab={cur_tab}
         tooltip="Proxy port configured with external IP and credentials"/>
-    </div>;
+    </Nav_tabs>;
 
 const Tab = ({id, on_click, title, cur_tab, tooltip})=>{
     const active = cur_tab==id;

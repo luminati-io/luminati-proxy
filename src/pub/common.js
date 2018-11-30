@@ -874,7 +874,6 @@ export const any_flag = <Tooltip title="Any">
     </Tooltip>;
 
 export const flag_with_title = (country, title)=>{
-    // XXX krzysztof: add mapping from coutnry code to country name
     return <Tooltip title={country.toUpperCase()}>
           <span>
             <span className={'flag-icon flag-icon-'+country}/>
@@ -1004,3 +1003,8 @@ export const Preset_description = ({preset, rule_clicked})=>{
           </ul>
         </div>;
 };
+
+export const Nav_tabs = ({children})=>
+    <div className="nav_tabs">
+      {children}
+    </div>;
