@@ -238,6 +238,11 @@
       "bin/pub/img/ic_thumbs_up.svg",
       "bin/pub/img/ic_warning.svg",
       "bin/pub/img/info.svg",
+      "bin/pub/img/ins_chrome_mac.gif",
+      "bin/pub/img/ins_chrome_win.gif",
+      "bin/pub/img/ins_firefox.gif",
+      "bin/pub/img/ins_ie.gif",
+      "bin/pub/img/ins_safari.gif",
       "bin/pub/img/large_icons.png",
       "bin/pub/img/loader.gif",
       "bin/pub/img/logo-80legs.svg",
@@ -296,6 +301,7 @@
       "lib/find_iface.js",
       "lib/hash.js",
       "lib/hutil-loader.js",
+      "lib/ip_cache.js",
       "lib/locations.js",
       "lib/log.js",
       "lib/loki.js",
@@ -357,7 +363,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "c3d3f029ce0e95d2153b30ea88dc4c4f"
+    "md5": "c76755f9f68da8c8722601a81d117e54"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -393,5 +399,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.114.305"
+  "version": "1.114.809"
 }

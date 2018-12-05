@@ -176,7 +176,6 @@ class Rules extends Pure_component {
         {
             result = {
                 res: [{
-                    head: true,
                     action: action_raw,
                     action_type: rule.action,
                     trigger_type: rule.trigger_type,

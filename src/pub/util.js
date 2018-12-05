@@ -355,7 +355,6 @@ const presets = {
                         },
                     },
                     action_type: 'process',
-                    head: true,
                     trigger_type: 'url'
                 }],
                 url: 'luminati.io|dp\\/[A-Z0-9]{10}',

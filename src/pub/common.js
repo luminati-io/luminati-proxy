@@ -1004,7 +1004,7 @@ export const Preset_description = ({preset, rule_clicked})=>{
         </div>;
 };
 
-export const Nav_tabs = ({children})=>
-    <div className="nav_tabs">
+export const Nav_tabs = ({children, narrow})=>
+    <div className={classnames('nav_tabs', {narrow})}>
       {children}
     </div>;

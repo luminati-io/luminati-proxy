@@ -25,7 +25,8 @@ export const with_resizable_cols = (cols, Table)=>{
         cols = _.cloneDeep(cols);
         min_width = 22;
         moving_col = null;
-        style = {position: 'relative', display: 'flex', flex: 'auto'};
+        style = {position: 'relative', display: 'flex', flex: 'auto',
+            width: '100%'};
         componentDidMount(){
             this.resize_columns();
             window.document.addEventListener('mousemove', this.on_mouse_move);
@@ -148,3 +149,65 @@ export const Sort_icon = ({show, dir})=>{
         sort_desc: dir==1});
     return <div className="sort_icon"><span className={classes}/></div>;
 };
+
+export class Chrome_table extends Pure_component {
+    state = {};
+    componentDidMount(){
+        const _this = this;
+        this.etask(function*(){
+            this.on('uncaught', e=>console.error(e));
+            const data = yield _this.props.fetch_data();
+            _this.setState({data});
+        });
+    }
+    render(){
+        const {cols, title, children} = this.props;
+        return <div className="chrome chrome_table">
+              <div className="main_panel vbox">
+                <div className="toolbar_container">
+                  <div className="toolbar">
+                    <div className="title_wrapper">{title}</div>
+                  </div>
+                </div>
+                  <div className="tables_container vbox">
+                    <Header_container cols={cols}/>
+                    <Data_container cols={cols} data={this.state.data}>
+                      {children}
+                    </Data_container>
+                  </div>
+              </div>
+            </div>;
+    }
+}
+
+const Data_container = ({cols=[], data=[], children})=>{
+    return <div className="data_container">
+          <table>
+            <colgroup>
+              {cols.map((c, idx)=>
+                <col key={idx} style={{width: c.width}}/>
+              )}
+            </colgroup>
+            <tbody>
+              {data.map(children)}
+              <tr className="filler">
+                {cols.map(c=><td key={c.id}></td>)}
+              </tr>
+            </tbody>
+          </table>
+        </div>;
+};
+
+const Header_container = ({cols})=>
+    <div className="header_container">
+      <table>
+        <colgroup>
+          {(cols||[]).map((c, idx)=><col key={idx} style={{width: c.width}}/>)}
+        </colgroup>
+        <tbody>
+          <tr>
+            {(cols||[]).map((c, idx)=><th key={idx}>{c.title}</th>)}
+          </tr>
+        </tbody>
+      </table>
+    </div>;

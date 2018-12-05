@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.114.809 Stable
+- :star: HAR viewer optimizations
+
 ## 1.114.305 Stable
 - :star: New debugging tools: Sessions and banned IPs were added in 'Logs' tab
 

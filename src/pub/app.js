@@ -123,7 +123,7 @@ const Page = ()=>
     <div>
       <Nav/>
       <Proxy_add/>
-      <div className="page_body">
+      <div className="page_body vbox">
         <Error_boundry>
           <Switch>
             <Route path="/overview" exact component={Overview}/>

@@ -1201,24 +1201,24 @@ describe('proxy', ()=>{
         it('check post', ()=>etask(function*(){
             l = yield lum({rules: {post: [{res: [{trigger_type: 'test',
                 ipban: true, status: {}}], url: 'test'}]}});
-            const t = (req, _res, hdrs_only, expected)=>{
-                const r = l.rules.post(req, {}, {}, _res, hdrs_only);
+            const t = (req, _res, expected)=>{
+                const r = l.rules.post(req, {}, {}, _res);
                 assert.equal(r, expected);
             };
             t({ctx: {h_context: 'STATUS CHECK'}});
             t({ctx: {url: 'invalid'}});
+            sinon.stub(l.rules, 'action').returns(true);
             t({ctx: {url: 'test'}}, {}, true);
             const crtr_stub = sinon.stub(l.rules, 'check_req_time_range')
                 .returns(true);
-            sinon.stub(l.rules, 'action').returns(true);
-            t({ctx: {url: 'test'}}, {}, false, true);
+            t({ctx: {url: 'test'}}, {}, true);
             crtr_stub.returns(false);
             const bh_stub = sinon.stub(l.banlist, 'has').returns(true);
             t({ctx: {url: 'test'}}, {hola_headers: {
-                'x-hola-timeline-debug': '1 2 3'}}, false, true);
+                'x-hola-timeline-debug': '1 2 3'}}, true);
             bh_stub.reset();
             sinon.stub(l.rules, 'cmp').returns(true);
-            t({ctx: {url: 'test'}}, {}, false, true);
+            t({ctx: {url: 'test'}}, {}, true);
         }));
         describe('action', ()=>{
             it('email, reserve_session, fast_pool_session', ()=>
@@ -1739,7 +1739,7 @@ describe('manager', ()=>{
                 assert_has(app.manager._defaults, res._defaults, '_defaults');
             }));
         });
-        describe('recent_stats', ()=>{
+        xdescribe('recent_stats', ()=>{
             const t = (name, expected)=>
             it(name, etask._fn(function*(_this){
                 _this.timeout(6000);

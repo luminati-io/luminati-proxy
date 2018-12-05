@@ -24,7 +24,7 @@ const Howto = withRouter(class Howto extends Pure_component {
             Instructions = Browser_instructions;
         else if (option=='code')
             Instructions = Code_instructions;
-        return <div className="howto">
+        return <div className="howto vbox">
               <div className="nav_header">
                 <h3>How to use the Proxy Manager {cur_title}</h3>
               </div>
@@ -40,9 +40,20 @@ const Howto = withRouter(class Howto extends Pure_component {
                   </Nav_tabs>
                   <Instructions>{this.props.children}</Instructions>
                 </div>
+                <Animated_instructions/>
               </div>
             </div>;
     }
+});
+
+const Animated_instructions = withRouter(props=>{
+    const option = props.match.params.option||'code';
+    const browser = props.match.params.suboption||'chrome_win';
+    if (option!='browser')
+        return null;
+    return <div className="gifs_inner vbox">
+          <div className={classnames('gif', browser)}/>
+        </div>;
 });
 
 const Tab = withRouter(({id, on_click, title, cur_tab, tooltip, match})=>{

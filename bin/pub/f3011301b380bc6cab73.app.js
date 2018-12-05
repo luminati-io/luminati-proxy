@@ -10,8 +10,7 @@ webpackJsonp([0],[
 /* 8 */,
 /* 9 */,
 /* 10 */,
-/* 11 */,
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -44,6 +43,7 @@ exports.default = function () {
 }();
 
 /***/ }),
+/* 12 */,
 /* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -60,7 +60,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -194,8 +194,7 @@ if (is_node) ;
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }),
-/* 14 */,
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -231,7 +230,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -243,7 +242,7 @@ var _inherits2 = __webpack_require__(3);
 
 var _inherits3 = _interopRequireDefault(_inherits2);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -261,7 +260,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -273,7 +272,7 @@ var _reactBootstrapTypeahead = __webpack_require__(298);
 
 var _util = __webpack_require__(23);
 
-var _chrome_widgets = __webpack_require__(127);
+var _chrome_widgets = __webpack_require__(91);
 
 var Chrome = _interopRequireWildcard(_chrome_widgets);
 
@@ -281,9 +280,9 @@ var _codemirror = __webpack_require__(50);
 
 var _codemirror2 = _interopRequireDefault(_codemirror);
 
-__webpack_require__(91);
+__webpack_require__(92);
 
-__webpack_require__(128);
+__webpack_require__(129);
 
 var _Creatable = __webpack_require__(707);
 
@@ -2010,15 +2009,17 @@ var Preset_description = exports.Preset_description = function Preset_descriptio
 };
 
 var Nav_tabs = exports.Nav_tabs = function Nav_tabs(_ref26) {
-    var children = _ref26.children;
+    var children = _ref26.children,
+        narrow = _ref26.narrow;
     return _react2.default.createElement(
         'div',
-        { className: 'nav_tabs' },
+        { className: (0, _classnames2.default)('nav_tabs', { narrow: narrow }) },
         children
     );
 };
 
 /***/ }),
+/* 15 */,
 /* 16 */,
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -2361,7 +2362,6 @@ var presets = {
                         }
                     },
                     action_type: 'process',
-                    head: true,
                     trigger_type: 'url'
                 }],
                 url: 'luminati.io|dp\\/[A-Z0-9]{10}'
@@ -2568,8 +2568,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /***/ }),
 /* 27 */,
-/* 28 */,
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -2583,7 +2582,7 @@ if (!is_node_ff)
     ;
 else
     ;
-!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(11), __webpack_require__(36), __webpack_require__(253), __webpack_require__(105),
+!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(12), __webpack_require__(36), __webpack_require__(253), __webpack_require__(107),
     __webpack_require__(439), __webpack_require__(72)], __WEBPACK_AMD_DEFINE_RESULT__ = function($, etask, date, zescape, zerr, events){
 var E = ajax;
 var assign = Object.assign;
@@ -2714,6 +2713,7 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 
 /***/ }),
+/* 29 */,
 /* 30 */,
 /* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -5789,7 +5789,7 @@ var _getInputText2 = __webpack_require__(671);
 
 var _getInputText3 = _interopRequireDefault(_getInputText2);
 
-var _getOptionLabel2 = __webpack_require__(123);
+var _getOptionLabel2 = __webpack_require__(125);
 
 var _getOptionLabel3 = _interopRequireDefault(_getOptionLabel2);
 
@@ -5805,7 +5805,7 @@ var _scrollIntoViewIfNeeded2 = __webpack_require__(674);
 
 var _scrollIntoViewIfNeeded3 = _interopRequireDefault(_scrollIntoViewIfNeeded2);
 
-var _stripDiacritics2 = __webpack_require__(125);
+var _stripDiacritics2 = __webpack_require__(127);
 
 var _stripDiacritics3 = _interopRequireDefault(_stripDiacritics2);
 
@@ -5910,7 +5910,7 @@ function _resetWarned() {
 
 /*<replacement>*/
 
-var pna = __webpack_require__(129);
+var pna = __webpack_require__(130);
 /*</replacement>*/
 
 /*<replacement>*/
@@ -5925,7 +5925,7 @@ var objectKeys = Object.keys || function (obj) {
 module.exports = Duplex;
 
 /*<replacement>*/
-var util = __webpack_require__(96);
+var util = __webpack_require__(97);
 util.inherits = __webpack_require__(42);
 /*</replacement>*/
 
@@ -6342,10 +6342,10 @@ function isUndefined(arg) {
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return __WEBPACK_IMPORTED_MODULE_1__createHashHistory__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__createMemoryHistory__ = __webpack_require__(792);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return __WEBPACK_IMPORTED_MODULE_2__createMemoryHistory__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__LocationUtils__ = __webpack_require__(132);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__LocationUtils__ = __webpack_require__(133);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return __WEBPACK_IMPORTED_MODULE_3__LocationUtils__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return __WEBPACK_IMPORTED_MODULE_3__LocationUtils__["b"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PathUtils__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__PathUtils__ = __webpack_require__(98);
 /* unused harmony reexport parsePath */
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return __WEBPACK_IMPORTED_MODULE_4__PathUtils__["b"]; });
 
@@ -6451,7 +6451,7 @@ module.exports = Symbol;
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isSymbol = __webpack_require__(116);
+var isSymbol = __webpack_require__(118);
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0;
@@ -6475,10 +6475,413 @@ module.exports = toKey;
 
 
 /***/ }),
-/* 91 */,
+/* 91 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// LICENSE_CODE ZON ISC
+ /*jslint react:true, es6:true*/
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Chrome_table = exports.Sort_icon = exports.with_resizable_cols = exports.Devider = exports.Tooltip = exports.Toolbar_button = undefined;
+
+var _regenerator = __webpack_require__(17);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _toConsumableArray2 = __webpack_require__(37);
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
+var _classCallCheck2 = __webpack_require__(1);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(11);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = __webpack_require__(2);
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = __webpack_require__(3);
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+var _extends2 = __webpack_require__(5);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _pure_component = __webpack_require__(13);
+
+var _pure_component2 = _interopRequireDefault(_pure_component);
+
+var _common = __webpack_require__(14);
+
+var Common = _interopRequireWildcard(_common);
+
+var _classnames = __webpack_require__(4);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _lodash = __webpack_require__(56);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Toolbar_button = exports.Toolbar_button = function Toolbar_button(_ref) {
+    var id = _ref.id,
+        tooltip = _ref.tooltip,
+        on_click = _ref.on_click,
+        active = _ref.active,
+        href = _ref.href;
+    return _react2.default.createElement(
+        Tooltip,
+        { title: tooltip, placement: 'bottom' },
+        _react2.default.createElement(
+            'a',
+            { className: (0, _classnames2.default)('toolbar_item toolbar_button', id, { active: active }),
+                onClick: on_click || function () {
+                    return null;
+                }, href: href },
+            _react2.default.createElement('span', { className: id })
+        )
+    );
+};var Tooltip = exports.Tooltip = function Tooltip(props) {
+    return _react2.default.createElement(Common.Tooltip, (0, _extends3.default)({ className: 'har_tooltip' }, props));
+};
+
+var Devider = exports.Devider = function Devider() {
+    return _react2.default.createElement('div', { className: 'devider' });
+};
+
+var with_resizable_cols = exports.with_resizable_cols = function with_resizable_cols(cols, Table) {
+    var Resizable = function (_Pure_component) {
+        (0, _inherits3.default)(Resizable, _Pure_component);
+
+        function Resizable() {
+            var _ref2;
+
+            var _temp, _this2, _ret;
+
+            (0, _classCallCheck3.default)(this, Resizable);
+
+            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                args[_key] = arguments[_key];
+            }
+
+            return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Resizable.__proto__ || Object.getPrototypeOf(Resizable)).call.apply(_ref2, [this].concat(args))), _this2), _this2.state = {}, _this2.cols = _lodash2.default.cloneDeep(cols), _this2.min_width = 22, _this2.moving_col = null, _this2.style = { position: 'relative', display: 'flex', flex: 'auto',
+                width: '100%' }, _this2.set_ref = function (ref) {
+                _this2.ref = ref;
+            }, _this2.show_column = function (idx) {
+                _this2.cols[idx].hidden = false;
+                _this2.resize_columns();
+            }, _this2.hide_column = function (idx) {
+                _this2.cols[idx].hidden = true;
+                _this2.resize_columns();
+            }, _this2.resize_columns = function () {
+                var total_width = _this2.ref.offsetWidth;
+                var resizable_cols = _this2.cols.filter(function (c) {
+                    return !c.hidden && !c.fixed;
+                });
+                var total_fixed = _this2.cols.reduce(function (acc, c) {
+                    return acc + (!c.hidden && c.fixed || 0);
+                }, 0);
+                var width = (total_width - total_fixed) / resizable_cols.length;
+                var next_cols = _this2.cols.reduce(function (acc, c, idx) {
+                    var w = !c.fixed && width || !c.hidden && c.fixed || 0;
+                    return {
+                        cols: [].concat((0, _toConsumableArray3.default)(acc.cols), [(0, _extends3.default)({}, c, {
+                            width: w,
+                            offset: acc.offset,
+                            border: acc.border
+                        })]),
+                        offset: acc.offset + w,
+                        border: !!w
+                    };
+                }, { cols: [], offset: 0, border: true });
+                _this2.setState({ cols: next_cols.cols });
+            }, _this2.start_moving = function (e, idx) {
+                if (e.nativeEvent.which != 1) return;
+                _this2.start_offset = e.pageX;
+                _this2.start_width = _this2.state.cols[idx].width;
+                _this2.start_width_last = _this2.state.cols.slice(-1)[0].width;
+                _this2.moving_col = idx;
+                _this2.setState({ moving: true });
+            }, _this2.on_mouse_move = function (e) {
+                if (_this2.moving_col === null) return;
+                _this2.setState(function (prev) {
+                    var offset = e.pageX - _this2.start_offset;
+                    if (_this2.start_width_last - offset < _this2.min_width) offset = _this2.start_width_last - _this2.min_width;
+                    if (_this2.start_width + offset < _this2.min_width) offset = _this2.min_width - _this2.start_width;
+                    var total_width = 0;
+                    var next_cols = prev.cols.map(function (c, idx) {
+                        if (idx < _this2.moving_col) {
+                            total_width = total_width + c.width;
+                            return c;
+                        } else if (idx == _this2.moving_col) {
+                            var width = _this2.start_width + offset;
+                            total_width = total_width + width;
+                            return (0, _extends3.default)({}, c, { width: width, offset: total_width - width });
+                        } else if (idx == _this2.state.cols.length - 1) {
+                            var _width = _this2.start_width_last - offset;
+                            return (0, _extends3.default)({}, c, { width: _width, offset: total_width });
+                        }
+                        total_width = total_width + c.width;
+                        return (0, _extends3.default)({}, c, { offset: total_width - c.width });
+                    });
+                    return { cols: next_cols };
+                });
+            }, _this2.on_mouse_up = function () {
+                _this2.moving_col = null;
+                _this2.setState({ moving: false });
+            }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
+        }
+
+        (0, _createClass3.default)(Resizable, [{
+            key: 'componentDidMount',
+            value: function componentDidMount() {
+                this.resize_columns();
+                window.document.addEventListener('mousemove', this.on_mouse_move);
+                window.document.addEventListener('mouseup', this.on_mouse_up);
+            }
+        }, {
+            key: 'willUnmount',
+            value: function willUnmount() {
+                window.document.removeEventListener('mousemove', this.on_mouse_move);
+                window.document.removeEventListener('mouseup', this.on_mouse_up);
+            }
+        }, {
+            key: 'render',
+            value: function render() {
+                return _react2.default.createElement(
+                    'div',
+                    { style: this.style, ref: this.set_ref,
+                        className: (0, _classnames2.default)({ moving: this.state.moving }) },
+                    _react2.default.createElement(Table, (0, _extends3.default)({}, this.props, { cols: this.state.cols,
+                        resize_columns: this.resize_columns,
+                        show_column: this.show_column,
+                        hide_column: this.hide_column })),
+                    _react2.default.createElement(Grid_resizers, { show: !this.props.cur_preview,
+                        start_moving: this.start_moving,
+                        cols: this.state.cols })
+                );
+            }
+        }]);
+        return Resizable;
+    }(_pure_component2.default);
+
+    return Resizable;
+};
+
+var Grid_resizers = function Grid_resizers(_ref3) {
+    var cols = _ref3.cols,
+        start_moving = _ref3.start_moving,
+        show = _ref3.show;
+
+    if (!show || !cols) return null;
+    return _react2.default.createElement(
+        'div',
+        null,
+        cols.slice(0, -1).map(function (c, idx) {
+            return !c.fixed && _react2.default.createElement('div', { key: c.title || idx, style: { left: c.width + c.offset - 2 },
+                onMouseDown: function onMouseDown(e) {
+                    return start_moving(e, idx);
+                },
+                className: 'data_grid_resizer' });
+        })
+    );
+};
+
+var Sort_icon = exports.Sort_icon = function Sort_icon(_ref4) {
+    var show = _ref4.show,
+        dir = _ref4.dir;
+
+    if (!show) return null;
+    var classes = (0, _classnames2.default)('small_icon_mask', { sort_asc: dir == -1,
+        sort_desc: dir == 1 });
+    return _react2.default.createElement(
+        'div',
+        { className: 'sort_icon' },
+        _react2.default.createElement('span', { className: classes })
+    );
+};
+
+var Chrome_table = exports.Chrome_table = function (_Pure_component2) {
+    (0, _inherits3.default)(Chrome_table, _Pure_component2);
+
+    function Chrome_table() {
+        var _ref5;
+
+        var _temp2, _this3, _ret2;
+
+        (0, _classCallCheck3.default)(this, Chrome_table);
+
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Chrome_table.__proto__ || Object.getPrototypeOf(Chrome_table)).call.apply(_ref5, [this].concat(args))), _this3), _this3.state = {}, _temp2), (0, _possibleConstructorReturn3.default)(_this3, _ret2);
+    }
+
+    (0, _createClass3.default)(Chrome_table, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var _this = this;
+            this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                var data;
+                return _regenerator2.default.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                this.on('uncaught', function (e) {
+                                    return console.error(e);
+                                });
+                                _context.next = 3;
+                                return _this.props.fetch_data();
+
+                            case 3:
+                                data = _context.sent;
+
+                                _this.setState({ data: data });
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _props = this.props,
+                cols = _props.cols,
+                title = _props.title,
+                children = _props.children;
+
+            return _react2.default.createElement(
+                'div',
+                { className: 'chrome chrome_table' },
+                _react2.default.createElement(
+                    'div',
+                    { className: 'main_panel vbox' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'toolbar_container' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'toolbar' },
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'title_wrapper' },
+                                title
+                            )
+                        )
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'tables_container vbox' },
+                        _react2.default.createElement(Header_container, { cols: cols }),
+                        _react2.default.createElement(
+                            Data_container,
+                            { cols: cols, data: this.state.data },
+                            children
+                        )
+                    )
+                )
+            );
+        }
+    }]);
+    return Chrome_table;
+}(_pure_component2.default);
+
+var Data_container = function Data_container(_ref6) {
+    var _ref6$cols = _ref6.cols,
+        cols = _ref6$cols === undefined ? [] : _ref6$cols,
+        _ref6$data = _ref6.data,
+        data = _ref6$data === undefined ? [] : _ref6$data,
+        children = _ref6.children;
+
+    return _react2.default.createElement(
+        'div',
+        { className: 'data_container' },
+        _react2.default.createElement(
+            'table',
+            null,
+            _react2.default.createElement(
+                'colgroup',
+                null,
+                cols.map(function (c, idx) {
+                    return _react2.default.createElement('col', { key: idx, style: { width: c.width } });
+                })
+            ),
+            _react2.default.createElement(
+                'tbody',
+                null,
+                data.map(children),
+                _react2.default.createElement(
+                    'tr',
+                    { className: 'filler' },
+                    cols.map(function (c) {
+                        return _react2.default.createElement('td', { key: c.id });
+                    })
+                )
+            )
+        )
+    );
+};
+
+var Header_container = function Header_container(_ref7) {
+    var cols = _ref7.cols;
+    return _react2.default.createElement(
+        'div',
+        { className: 'header_container' },
+        _react2.default.createElement(
+            'table',
+            null,
+            _react2.default.createElement(
+                'colgroup',
+                null,
+                (cols || []).map(function (c, idx) {
+                    return _react2.default.createElement('col', { key: idx, style: { width: c.width } });
+                })
+            ),
+            _react2.default.createElement(
+                'tbody',
+                null,
+                _react2.default.createElement(
+                    'tr',
+                    null,
+                    (cols || []).map(function (c, idx) {
+                        return _react2.default.createElement(
+                            'th',
+                            { key: idx },
+                            c.title
+                        );
+                    })
+                )
+            )
+        )
+    );
+};
+
+/***/ }),
 /* 92 */,
 /* 93 */,
-/* 94 */
+/* 94 */,
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var Parser = __webpack_require__(334),
@@ -6493,7 +6896,7 @@ function defineProp(name, value){
 module.exports = {
 	Parser: Parser,
 	Tokenizer: __webpack_require__(335),
-	ElementType: __webpack_require__(95),
+	ElementType: __webpack_require__(96),
 	DomHandler: DomHandler,
 	get FeedHandler(){
 		return defineProp("FeedHandler", __webpack_require__(740));
@@ -6552,7 +6955,7 @@ module.exports = {
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports) {
 
 //Types of elements found in the DOM
@@ -6573,7 +6976,7 @@ module.exports = {
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// Copyright Joyent, Inc. and other Node contributors.
@@ -6687,7 +7090,7 @@ function objectToString(o) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(199).Buffer))
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6758,7 +7161,7 @@ var createPath = function createPath(location) {
 };
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6774,7 +7177,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -6800,7 +7203,7 @@ var _setdb2 = _interopRequireDefault(_setdb);
 
 var _fields = __webpack_require__(202);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _recompose = __webpack_require__(52);
 
@@ -6894,13 +7297,14 @@ var Config = exports.Config = (0, _reactRouterDom.withRouter)((0, _recompose.get
 }(_pure_component2.default)));
 
 /***/ }),
-/* 99 */,
 /* 100 */,
 /* 101 */,
 /* 102 */,
 /* 103 */,
 /* 104 */,
-/* 105 */
+/* 105 */,
+/* 106 */,
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -7162,8 +7566,6 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 
 
 /***/ }),
-/* 106 */,
-/* 107 */,
 /* 108 */,
 /* 109 */,
 /* 110 */,
@@ -7172,7 +7574,9 @@ return E; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 /* 113 */,
 /* 114 */,
 /* 115 */,
-/* 116 */
+/* 116 */,
+/* 117 */,
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseGetTag = __webpack_require__(62),
@@ -7207,7 +7611,7 @@ module.exports = isSymbol;
 
 
 /***/ }),
-/* 117 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var listCacheClear = __webpack_require__(584),
@@ -7245,10 +7649,10 @@ module.exports = ListCache;
 
 
 /***/ }),
-/* 118 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(119);
+var eq = __webpack_require__(121);
 
 /**
  * Gets the index at which the `key` is found in `array` of key-value pairs.
@@ -7272,7 +7676,7 @@ module.exports = assocIndexOf;
 
 
 /***/ }),
-/* 119 */
+/* 121 */
 /***/ (function(module, exports) {
 
 /**
@@ -7315,7 +7719,7 @@ module.exports = eq;
 
 
 /***/ }),
-/* 120 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getNative = __webpack_require__(64);
@@ -7327,7 +7731,7 @@ module.exports = nativeCreate;
 
 
 /***/ }),
-/* 121 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isKeyable = __webpack_require__(606);
@@ -7351,7 +7755,7 @@ module.exports = getMapData;
 
 
 /***/ }),
-/* 122 */
+/* 124 */
 /***/ (function(module, exports) {
 
 /** Used as references for various `Number` constants. */
@@ -7379,7 +7783,7 @@ module.exports = isIndex;
 
 
 /***/ }),
-/* 123 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7389,7 +7793,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _invariant = __webpack_require__(28);
+var _invariant = __webpack_require__(29);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
@@ -7428,7 +7832,7 @@ exports.default = getOptionLabel;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
 
 /***/ }),
-/* 124 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isArray = __webpack_require__(40),
@@ -7455,7 +7859,7 @@ module.exports = castPath;
 
 
 /***/ }),
-/* 125 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7501,7 +7905,7 @@ function stripDiacritics(str) {
 }
 
 /***/ }),
-/* 126 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7527,246 +7931,8 @@ module.exports = {
 };
 
 /***/ }),
-/* 127 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// LICENSE_CODE ZON ISC
- /*jslint react:true, es6:true*/
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.Sort_icon = exports.with_resizable_cols = exports.Devider = exports.Tooltip = exports.Toolbar_button = undefined;
-
-var _toConsumableArray2 = __webpack_require__(37);
-
-var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-
-var _classCallCheck2 = __webpack_require__(1);
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = __webpack_require__(12);
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _possibleConstructorReturn2 = __webpack_require__(2);
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = __webpack_require__(3);
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-var _extends2 = __webpack_require__(5);
-
-var _extends3 = _interopRequireDefault(_extends2);
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _pure_component = __webpack_require__(13);
-
-var _pure_component2 = _interopRequireDefault(_pure_component);
-
-var _common = __webpack_require__(15);
-
-var Common = _interopRequireWildcard(_common);
-
-var _classnames = __webpack_require__(4);
-
-var _classnames2 = _interopRequireDefault(_classnames);
-
-var _lodash = __webpack_require__(56);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Toolbar_button = exports.Toolbar_button = function Toolbar_button(_ref) {
-    var id = _ref.id,
-        tooltip = _ref.tooltip,
-        on_click = _ref.on_click,
-        active = _ref.active,
-        href = _ref.href;
-    return _react2.default.createElement(
-        Tooltip,
-        { title: tooltip, placement: 'bottom' },
-        _react2.default.createElement(
-            'a',
-            { className: (0, _classnames2.default)('toolbar_item toolbar_button', id, { active: active }),
-                onClick: on_click || function () {
-                    return null;
-                }, href: href },
-            _react2.default.createElement('span', { className: id })
-        )
-    );
-};var Tooltip = exports.Tooltip = function Tooltip(props) {
-    return _react2.default.createElement(Common.Tooltip, (0, _extends3.default)({ className: 'har_tooltip' }, props));
-};
-
-var Devider = exports.Devider = function Devider() {
-    return _react2.default.createElement('div', { className: 'devider' });
-};
-
-var with_resizable_cols = exports.with_resizable_cols = function with_resizable_cols(cols, Table) {
-    var Resizable = function (_Pure_component) {
-        (0, _inherits3.default)(Resizable, _Pure_component);
-
-        function Resizable() {
-            var _ref2;
-
-            var _temp, _this, _ret;
-
-            (0, _classCallCheck3.default)(this, Resizable);
-
-            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                args[_key] = arguments[_key];
-            }
-
-            return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Resizable.__proto__ || Object.getPrototypeOf(Resizable)).call.apply(_ref2, [this].concat(args))), _this), _this.state = {}, _this.cols = _lodash2.default.cloneDeep(cols), _this.min_width = 22, _this.moving_col = null, _this.style = { position: 'relative', display: 'flex', flex: 'auto' }, _this.set_ref = function (ref) {
-                _this.ref = ref;
-            }, _this.show_column = function (idx) {
-                _this.cols[idx].hidden = false;
-                _this.resize_columns();
-            }, _this.hide_column = function (idx) {
-                _this.cols[idx].hidden = true;
-                _this.resize_columns();
-            }, _this.resize_columns = function () {
-                var total_width = _this.ref.offsetWidth;
-                var resizable_cols = _this.cols.filter(function (c) {
-                    return !c.hidden && !c.fixed;
-                });
-                var total_fixed = _this.cols.reduce(function (acc, c) {
-                    return acc + (!c.hidden && c.fixed || 0);
-                }, 0);
-                var width = (total_width - total_fixed) / resizable_cols.length;
-                var next_cols = _this.cols.reduce(function (acc, c, idx) {
-                    var w = !c.fixed && width || !c.hidden && c.fixed || 0;
-                    return {
-                        cols: [].concat((0, _toConsumableArray3.default)(acc.cols), [(0, _extends3.default)({}, c, {
-                            width: w,
-                            offset: acc.offset,
-                            border: acc.border
-                        })]),
-                        offset: acc.offset + w,
-                        border: !!w
-                    };
-                }, { cols: [], offset: 0, border: true });
-                _this.setState({ cols: next_cols.cols });
-            }, _this.start_moving = function (e, idx) {
-                if (e.nativeEvent.which != 1) return;
-                _this.start_offset = e.pageX;
-                _this.start_width = _this.state.cols[idx].width;
-                _this.start_width_last = _this.state.cols.slice(-1)[0].width;
-                _this.moving_col = idx;
-                _this.setState({ moving: true });
-            }, _this.on_mouse_move = function (e) {
-                if (_this.moving_col === null) return;
-                _this.setState(function (prev) {
-                    var offset = e.pageX - _this.start_offset;
-                    if (_this.start_width_last - offset < _this.min_width) offset = _this.start_width_last - _this.min_width;
-                    if (_this.start_width + offset < _this.min_width) offset = _this.min_width - _this.start_width;
-                    var total_width = 0;
-                    var next_cols = prev.cols.map(function (c, idx) {
-                        if (idx < _this.moving_col) {
-                            total_width = total_width + c.width;
-                            return c;
-                        } else if (idx == _this.moving_col) {
-                            var width = _this.start_width + offset;
-                            total_width = total_width + width;
-                            return (0, _extends3.default)({}, c, { width: width, offset: total_width - width });
-                        } else if (idx == _this.state.cols.length - 1) {
-                            var _width = _this.start_width_last - offset;
-                            return (0, _extends3.default)({}, c, { width: _width, offset: total_width });
-                        }
-                        total_width = total_width + c.width;
-                        return (0, _extends3.default)({}, c, { offset: total_width - c.width });
-                    });
-                    return { cols: next_cols };
-                });
-            }, _this.on_mouse_up = function () {
-                _this.moving_col = null;
-                _this.setState({ moving: false });
-            }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
-        }
-
-        (0, _createClass3.default)(Resizable, [{
-            key: 'componentDidMount',
-            value: function componentDidMount() {
-                this.resize_columns();
-                window.document.addEventListener('mousemove', this.on_mouse_move);
-                window.document.addEventListener('mouseup', this.on_mouse_up);
-            }
-        }, {
-            key: 'willUnmount',
-            value: function willUnmount() {
-                window.document.removeEventListener('mousemove', this.on_mouse_move);
-                window.document.removeEventListener('mouseup', this.on_mouse_up);
-            }
-        }, {
-            key: 'render',
-            value: function render() {
-                return _react2.default.createElement(
-                    'div',
-                    { style: this.style, ref: this.set_ref,
-                        className: (0, _classnames2.default)({ moving: this.state.moving }) },
-                    _react2.default.createElement(Table, (0, _extends3.default)({}, this.props, { cols: this.state.cols,
-                        resize_columns: this.resize_columns,
-                        show_column: this.show_column,
-                        hide_column: this.hide_column })),
-                    _react2.default.createElement(Grid_resizers, { show: !this.props.cur_preview,
-                        start_moving: this.start_moving,
-                        cols: this.state.cols })
-                );
-            }
-        }]);
-        return Resizable;
-    }(_pure_component2.default);
-
-    return Resizable;
-};
-
-var Grid_resizers = function Grid_resizers(_ref3) {
-    var cols = _ref3.cols,
-        start_moving = _ref3.start_moving,
-        show = _ref3.show;
-
-    if (!show || !cols) return null;
-    return _react2.default.createElement(
-        'div',
-        null,
-        cols.slice(0, -1).map(function (c, idx) {
-            return !c.fixed && _react2.default.createElement('div', { key: c.title || idx, style: { left: c.width + c.offset - 2 },
-                onMouseDown: function onMouseDown(e) {
-                    return start_moving(e, idx);
-                },
-                className: 'data_grid_resizer' });
-        })
-    );
-};
-
-var Sort_icon = exports.Sort_icon = function Sort_icon(_ref4) {
-    var show = _ref4.show,
-        dir = _ref4.dir;
-
-    if (!show) return null;
-    var classes = (0, _classnames2.default)('small_icon_mask', { sort_asc: dir == -1,
-        sort_desc: dir == 1 });
-    return _react2.default.createElement(
-        'div',
-        { className: 'sort_icon' },
-        _react2.default.createElement('span', { className: classes })
-    );
-};
-
-/***/ }),
-/* 128 */,
-/* 129 */
+/* 129 */,
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7818,7 +7984,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
@@ -7886,7 +8052,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {/**
@@ -7921,7 +8087,7 @@ if (process.env.NODE_ENV !== 'production') {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -7929,7 +8095,7 @@ if (process.env.NODE_ENV !== 'production') {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return locationsAreEqual; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_resolve_pathname__ = __webpack_require__(789);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_value_equal__ = __webpack_require__(790);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PathUtils__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__PathUtils__ = __webpack_require__(98);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
@@ -7997,7 +8163,6 @@ var locationsAreEqual = function locationsAreEqual(a, b) {
 };
 
 /***/ }),
-/* 133 */,
 /* 134 */,
 /* 135 */,
 /* 136 */,
@@ -9068,7 +9233,7 @@ module.exports = noop;
 /* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castPath = __webpack_require__(124),
+var castPath = __webpack_require__(126),
     toKey = __webpack_require__(90);
 
 /**
@@ -9099,7 +9264,7 @@ module.exports = baseGet;
 /***/ (function(module, exports, __webpack_require__) {
 
 var isArray = __webpack_require__(40),
-    isSymbol = __webpack_require__(116);
+    isSymbol = __webpack_require__(118);
 
 /** Used to match property names within property paths. */
 var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
@@ -9279,7 +9444,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _react = __webpack_require__(0);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -9845,7 +10010,7 @@ var _propTypes = __webpack_require__(6);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -12388,7 +12553,7 @@ function isnan (val) {
 
 /*<replacement>*/
 
-var pna = __webpack_require__(129);
+var pna = __webpack_require__(130);
 /*</replacement>*/
 
 module.exports = Writable;
@@ -12425,7 +12590,7 @@ var Duplex;
 Writable.WritableState = WritableState;
 
 /*<replacement>*/
-var util = __webpack_require__(96);
+var util = __webpack_require__(97);
 util.inherits = __webpack_require__(42);
 /*</replacement>*/
 
@@ -12441,7 +12606,7 @@ var Stream = __webpack_require__(342);
 
 /*<replacement>*/
 
-var Buffer = __webpack_require__(130).Buffer;
+var Buffer = __webpack_require__(131).Buffer;
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
@@ -13078,7 +13243,7 @@ Writable.prototype._destroy = function (err, cb) {
 
 /*<replacement>*/
 
-var Buffer = __webpack_require__(130).Buffer;
+var Buffer = __webpack_require__(131).Buffer;
 /*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
@@ -13811,7 +13976,7 @@ var createTransitionManager = function createTransitionManager() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
@@ -14054,7 +14219,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -14078,7 +14243,7 @@ var _lodash = __webpack_require__(56);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _moment = __webpack_require__(133);
+var _moment = __webpack_require__(100);
 
 var _moment2 = _interopRequireDefault(_moment);
 
@@ -14090,15 +14255,15 @@ var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _escape = __webpack_require__(105);
+var _escape = __webpack_require__(107);
 
 var _escape2 = _interopRequireDefault(_escape);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -14108,13 +14273,13 @@ var _reactWaypoint = __webpack_require__(825);
 
 var _reactWaypoint2 = _interopRequireDefault(_reactWaypoint);
 
-var _chrome_widgets = __webpack_require__(127);
+var _chrome_widgets = __webpack_require__(91);
 
 var _har_preview = __webpack_require__(354);
 
 var _har_preview2 = _interopRequireDefault(_har_preview);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _reactRouterDom = __webpack_require__(26);
 
@@ -14440,10 +14605,7 @@ var Actions = function (_Pure_component3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                this.on('uncaught', function (e) {
-                                    return console.log(e);
-                                });
-                                // XXX krzysztof: switch fetch->ajax
+                                this.on('uncaught', console.error);
                                 _context3.next = 3;
                                 return window.fetch('/api/logs_resend', {
                                     method: 'POST',
@@ -14659,27 +14821,19 @@ var table_cols = [{ title: 'select', hidden: true, fixed: 27, tooltip: 'Select/u
 var Tables_container = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_resizable_cols)(table_cols, function (_Pure_component5) {
     (0, _inherits3.default)(Tables_container, _Pure_component5);
 
-    function Tables_container() {
-        var _ref12;
-
-        var _temp5, _this11, _ret5;
-
+    function Tables_container(props) {
         (0, _classCallCheck3.default)(this, Tables_container);
 
-        for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-            args[_key5] = arguments[_key5];
-        }
+        var _this11 = (0, _possibleConstructorReturn3.default)(this, (Tables_container.__proto__ || Object.getPrototypeOf(Tables_container)).call(this, props));
 
-        return _ret5 = (_temp5 = (_this11 = (0, _possibleConstructorReturn3.default)(this, (_ref12 = Tables_container.__proto__ || Object.getPrototypeOf(Tables_container)).call.apply(_ref12, [this].concat(args))), _this11), _this11.uri = '/api/logs', _this11.batch_size = 30, _this11.loaded = { from: 0, to: 0 }, _this11.state = {
-            focused: false,
-            reqs: [],
-            sorted: { field: 'timestamp', dir: 1 }
-        }, _this11.fetch_missing_data = function (pos) {
+        _this11.fetch_missing_data = function (pos) {
             if (_this11.state.stats && _this11.state.stats.total && _this11.state.reqs.length == _this11.state.stats.total) {
                 return;
             }
             if (pos == 'bottom') _this11.get_data({ skip: _this11.loaded.to });
-        }, _this11.get_params = function (opt) {
+        };
+
+        _this11.get_params = function (opt) {
             var params = opt;
             params.limit = opt.limit || _this11.batch_size;
             params.skip = opt.skip || 0;
@@ -14704,7 +14858,9 @@ var Tables_container = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_
                 if (val = _this11.props.filters[filter]) params[filter] = val;
             }
             return params;
-        }, _this11.get_data = function () {
+        };
+
+        _this11.get_data = function () {
             var opt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
             if (_this11.sql_loading) return;
@@ -14743,117 +14899,155 @@ var Tables_container = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_
                                     sum_in: res.sum_in };
 
                                 if (!_this.state.stats || !_this.state.stats.total) _setdb2.default.set('head.har_viewer.stats', stats);
-                                if (params.search) _setdb2.default.set('head.har_viewer.sub_stats', stats);else if (_this.state.sub_stats) _setdb2.default.set('head.har_viewer.sub_stats', null);
 
-                            case 15:
+                            case 14:
                             case 'end':
                                 return _context4.stop();
                         }
                     }
                 }, _callee4, this);
             }));
-        }, _this11.set_new_params = function () {
+        };
+
+        _this11.set_new_params = function () {
             if (_this11.sql_loading) return;
             _this11.loaded.to = 0;
             _setdb2.default.emit_path('head.har_viewer.dc_top');
             _this11.get_data({ replace: true });
-        }, _this11.set_new_params_debounced = _lodash2.default.debounce(_this11.set_new_params, 400), _this11.set_sort = function (field) {
+        };
+
+        _this11.set_new_params_debounced = _lodash2.default.debounce(_this11.set_new_params, 400);
+
+        _this11.set_sort = function (field) {
             if (_this11.sql_loading) return;
             var dir = 1;
             if (_this11.state.sorted.field == field) dir = -1 * _this11.state.sorted.dir;
             _this11.setState({ sorted: { field: field, dir: dir } }, _this11.set_new_params);
-        }, _this11.on_focus = function () {
+        };
+
+        _this11.on_focus = function () {
             return _this11.setState({ focused: true });
-        }, _this11.on_blur = function () {
+        };
+
+        _this11.on_blur = function () {
             return _this11.setState({ focused: false });
-        }, _this11.is_hidden = function (request) {
-            var cur_port = request.details.port;
+        };
+
+        _this11.is_hidden = function (req) {
+            var cur_port = req.details.port;
             var port = _this11.props.match.params.port;
             if (port && cur_port != port) return true;
             if (_this11.port_range && (cur_port < _this11.port_range.from || cur_port > _this11.port_range.to)) {
                 return true;
             }
-            if (_this11.props.search && !request.request.url.match(new RegExp(_this11.props.search))) {
+            if (_this11.props.search && !req.request.url.match(new RegExp(_this11.props.search))) {
                 return true;
             }
-            if (_this11.props.type_filter && _this11.props.type_filter != 'All' && request.details.content_type != _this11.props.type_filter.toLowerCase()) {
+            if (_this11.props.type_filter && _this11.props.type_filter != 'All' && req.details.content_type != _this11.props.type_filter.toLowerCase()) {
                 return true;
             }
-            if (_this11.props.filters.port && _this11.props.filters.port != request.details.port) {
+            if (_this11.props.filters.port && _this11.props.filters.port != req.details.port) {
                 return true;
             }
-            if (_this11.props.filters.protocol && _this11.props.filters.protocol != request.details.protocol) {
+            if (_this11.props.filters.protocol && _this11.props.filters.protocol != req.details.protocol) {
                 return true;
             }
-            if (_this11.props.filters.status_code && _this11.props.filters.status_code != request.response.status) {
+            if (_this11.props.filters.status_code && _this11.props.filters.status_code != req.response.status) {
                 return true;
             }
             return false;
-        }, _this11.on_message = function (event) {
+        };
+
+        _this11.is_visible = function (r) {
+            return !_this11.is_hidden(r);
+        };
+
+        _this11.on_message = function (event) {
             var json = JSON.parse(event.data);
             if (json.type == 'har_viewer') _this11.on_request_message(json.data);else if (json.type == 'har_viewer_start') _this11.on_request_started_message(json.data);else if (json.type == 'har_viewer_abort') _this11.on_request_aborted_message(json.data);
-        }, _this11.on_request_aborted_message = function (uuid) {
-            var new_reqs = _this11.state.reqs.filter(function (r) {
-                return r.uuid != uuid;
-            });
-            var delta = new_reqs.length != _this11.state.reqs.length ? -1 : 0;
-            _this11.setState(function (prev) {
-                return {
-                    reqs: new_reqs,
-                    stats: (0, _extends4.default)({}, prev.stats, {
-                        total: prev.stats.total + delta
-                    })
-                };
-            });
-        }, _this11.on_request_started_message = function (req) {
+        };
+
+        _this11.on_request_aborted_message = function (uuid) {
+            if (_this11.reqs_to_render.map(function (r) {
+                return r.uuid;
+            }).includes(uuid)) {
+                return _this11.reqs_to_render = _this11.reqs_to_render.filter(function (r) {
+                    return r.uuid != uuid;
+                });
+            }
+            _this11.reqs_to_abort.push(uuid);
+            _this11.take_reqs_from_pool();
+        };
+
+        _this11.on_request_started_message = function (req) {
             req.pending = true;
             _this11.on_request_message(req);
-        }, _this11.on_request_message = function (req) {
-            // XXX krzysztof: reduce updating state from 3x to 1x
-            _this11.setState(function (prev) {
-                return {
-                    stats: {
-                        total: prev.stats.total + (req.pending ? 1 : 0),
-                        sum_out: prev.stats.sum_out + req.details.out_bw,
-                        sum_in: prev.stats.sum_in + req.details.in_bw
-                    }
-                };
+        };
+
+        _this11.on_request_message = function (req) {
+            _this11.reqs_to_render.push(req);
+            _this11.take_reqs_from_pool();
+        };
+
+        _this11.take_reqs_from_pool = function () {
+            if (!_this11.reqs_to_render.length && !_this11.reqs_to_abort.length) return;
+            var reqs = _this11.reqs_to_render.filter(_this11.is_visible);
+            var all_reqs = _this11.reqs_to_render;
+            if (_this11.batch_size > _this11.state.reqs.length) {
+                _this11.loaded.to = Math.min(_this11.batch_size, _this11.state.reqs.length + reqs.length);
+            }
+            var new_reqs_set = {};
+            [].concat((0, _toConsumableArray3.default)(_this11.state.reqs), (0, _toConsumableArray3.default)(reqs)).forEach(function (r) {
+                if (_this11.reqs_to_abort.includes(r.uuid)) return;
+                if (!new_reqs_set[r.uuid]) return new_reqs_set[r.uuid] = r;
+                if (new_reqs_set[r.uuid].pending) new_reqs_set[r.uuid] = r;
             });
-            if (_this11.is_hidden(req)) return;
             var sorted_field = _this11.props.cols.find(function (c) {
                 return c.sort_by == _this11.state.sorted.field;
             }).data;
             var dir = _this11.state.sorted.dir;
-            var new_size = Math.max(_this11.state.reqs.length, _this11.batch_size);
-            if (new_size > _this11.state.reqs.length) _this11.loaded.to = _this11.loaded.to + 1;
-            var new_reqs_set = {};
-            [].concat((0, _toConsumableArray3.default)(_this11.state.reqs), [req]).forEach(function (r) {
-                if (!new_reqs_set[r.uuid]) return new_reqs_set[r.uuid] = r;
-                if (new_reqs_set[r.uuid].pending) new_reqs_set[r.uuid] = r;
-            });
             var new_reqs = Object.values(new_reqs_set).sort(function (a, b) {
                 var val_a = _lodash2.default.get(a, sorted_field);
                 var val_b = _lodash2.default.get(b, sorted_field);
                 if (val_a == val_b) return a.uuid > b.uuid ? -1 * dir : dir;
                 return val_a > val_b ? -1 * dir : dir;
-            }).slice(0, new_size);
-            _this11.setState({ reqs: new_reqs });
-            // XXX krzysztof: improve logic for stats and substats
-            if (_this11.state.sub_stats) {
-                _this11.setState(function (prev) {
-                    return {
-                        sub_stats: {
-                            total: prev.sub_stats.total + 1,
-                            sum_out: prev.sub_stats.sum_out + req.details.out_bw,
-                            sum_in: prev.sub_stats.sum_in + req.details.in_bw
-                        }
-                    };
-                });
-            }
-        }, _this11.on_mouse_up = function () {
+            }).slice(0, Math.max(_this11.state.reqs.length, _this11.batch_size));
+            _this11.reqs_to_render = [];
+            _this11.reqs_to_abort = [];
+            _this11.setState(function (prev) {
+                var new_state = { reqs: new_reqs };
+                new_state.stats = {
+                    total: prev.stats.total + all_reqs.filter(function (r) {
+                        return r.pending;
+                    }).length,
+                    sum_out: prev.stats.sum_out + all_reqs.reduce(function (acc, r) {
+                        return acc + r.details.out_bw || 0;
+                    }, 0),
+                    sum_in: prev.stats.sum_in + all_reqs.reduce(function (acc, r) {
+                        return acc + r.details.in_bw || 0;
+                    }, 0)
+                };
+                return new_state;
+            });
+        };
+
+        _this11.on_mouse_up = function () {
             _this11.moving_col = null;
             _this11.props.main_panel_stopped_moving();
-        }, _temp5), (0, _possibleConstructorReturn3.default)(_this11, _ret5);
+        };
+
+        _this11.uri = '/api/logs';
+        _this11.batch_size = 30;
+        _this11.loaded = { from: 0, to: 0 };
+        _this11.state = {
+            focused: false,
+            reqs: [],
+            sorted: { field: 'timestamp', dir: 1 }
+        };
+        _this11.reqs_to_render = [];
+        _this11.reqs_to_abort = [];
+        _this11.take_reqs_from_pool = _lodash2.default.throttle(_this11.take_reqs_from_pool, 100);
+        return _this11;
     }
 
     (0, _createClass3.default)(Tables_container, [{
@@ -14892,9 +15086,6 @@ var Tables_container = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_
             });
             this.setdb_on('head.har_viewer.stats', function (stats) {
                 if (stats) _this12.setState({ stats: stats });
-            });
-            this.setdb_on('head.har_viewer.sub_stats', function (sub_stats) {
-                return _this12.setState({ sub_stats: sub_stats });
             });
             this.setdb_on('head.ws', function (ws) {
                 if (!ws || _this12.ws) return;
@@ -14946,8 +15137,7 @@ var Tables_container = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_
                         cur_preview: this.props.cur_preview,
                         open_preview: this.props.open_preview })
                 ),
-                _react2.default.createElement(Summary_bar, { stats: this.state.stats,
-                    sub_stats: this.state.sub_stats })
+                _react2.default.createElement(Summary_bar, { stats: this.state.stats })
             );
         }
     }]);
@@ -14965,22 +15155,14 @@ var Summary_bar = function (_Pure_component6) {
     (0, _createClass3.default)(Summary_bar, [{
         key: 'render',
         value: function render() {
-            var _ref13 = this.props.stats || { total: 0, sum_in: 0, sum_out: 0 },
-                total = _ref13.total,
-                sum_in = _ref13.sum_in,
-                sum_out = _ref13.sum_out;
+            var _ref12 = this.props.stats || { total: 0, sum_in: 0, sum_out: 0 },
+                total = _ref12.total,
+                sum_in = _ref12.sum_in,
+                sum_out = _ref12.sum_out;
 
             sum_out = (0, _util.bytes_format)(sum_out) || '0 B';
             sum_in = (0, _util.bytes_format)(sum_in) || '0 B';
-            var text = void 0;
-            if (!this.props.sub_stats) text = total + ' requests | ' + sum_out + ' sent | ' + sum_in + ' received';else {
-                var sub_total = this.props.sub_stats.total;
-                var sub_sum_out = this.props.sub_stats.sum_out;
-                var sub_sum_in = this.props.sub_stats.sum_in;
-                sub_sum_out = (0, _util.bytes_format)(sub_sum_out) || '0 B';
-                sub_sum_in = (0, _util.bytes_format)(sub_sum_in) || '0 B';
-                text = sub_total + ' / ' + total + ' requests | ' + sub_sum_out + ' /\n            ' + sum_out + ' sent | ' + sub_sum_in + ' / ' + sum_in + ' received';
-            }
+            var txt = total + ' requests | ' + sum_out + ' sent | ' + sum_in + ' received';
             return _react2.default.createElement(
                 'div',
                 { className: 'summary_bar' },
@@ -14989,8 +15171,8 @@ var Summary_bar = function (_Pure_component6) {
                     null,
                     _react2.default.createElement(
                         _chrome_widgets.Tooltip,
-                        { title: text },
-                        text
+                        { title: txt },
+                        txt
                     )
                 )
             );
@@ -15003,17 +15185,17 @@ var Header_container = function (_Pure_component7) {
     (0, _inherits3.default)(Header_container, _Pure_component7);
 
     function Header_container() {
-        var _ref14;
+        var _ref13;
 
-        var _temp6, _this14, _ret6;
+        var _temp5, _this14, _ret5;
 
         (0, _classCallCheck3.default)(this, Header_container);
 
-        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
-            args[_key6] = arguments[_key6];
+        for (var _len5 = arguments.length, args = Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
+            args[_key5] = arguments[_key5];
         }
 
-        return _ret6 = (_temp6 = (_this14 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Header_container.__proto__ || Object.getPrototypeOf(Header_container)).call.apply(_ref14, [this].concat(args))), _this14), _this14.state = { checked_all: false }, _this14.toggle_all = function () {
+        return _ret5 = (_temp5 = (_this14 = (0, _possibleConstructorReturn3.default)(this, (_ref13 = Header_container.__proto__ || Object.getPrototypeOf(Header_container)).call.apply(_ref13, [this].concat(args))), _this14), _this14.state = { checked_all: false }, _this14.toggle_all = function () {
             var checked_all = !_this14.state.checked_all;
             _this14.setState({ checked_all: checked_all });
             var uuids = _this14.props.reqs.map(function (r) {
@@ -15031,7 +15213,7 @@ var Header_container = function (_Pure_component7) {
             _setdb2.default.emit_path('har_viewer.checked_list');
         }, _this14.click = function (col) {
             if (col.fixed) _this14.toggle_all();else _this14.props.sort(col.sort_by);
-        }, _temp6), (0, _possibleConstructorReturn3.default)(_this14, _ret6);
+        }, _temp5), (0, _possibleConstructorReturn3.default)(_this14, _ret5);
     }
 
     (0, _createClass3.default)(Header_container, [{
@@ -15110,21 +15292,21 @@ var Data_container = function (_Pure_component8) {
     (0, _inherits3.default)(Data_container, _Pure_component8);
 
     function Data_container() {
-        var _ref15;
+        var _ref14;
 
-        var _temp7, _this17, _ret7;
+        var _temp6, _this17, _ret6;
 
         (0, _classCallCheck3.default)(this, Data_container);
 
-        for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
-            args[_key7] = arguments[_key7];
+        for (var _len6 = arguments.length, args = Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {
+            args[_key6] = arguments[_key6];
         }
 
-        return _ret7 = (_temp7 = (_this17 = (0, _possibleConstructorReturn3.default)(this, (_ref15 = Data_container.__proto__ || Object.getPrototypeOf(Data_container)).call.apply(_ref15, [this].concat(args))), _this17), _this17.state = { checked_all: false }, _this17.set_dc_ref = function (ref) {
+        return _ret6 = (_temp6 = (_this17 = (0, _possibleConstructorReturn3.default)(this, (_ref14 = Data_container.__proto__ || Object.getPrototypeOf(Data_container)).call.apply(_ref14, [this].concat(args))), _this17), _this17.state = { checked_all: false }, _this17.set_dc_ref = function (ref) {
             _this17.dc = ref;
         }, _this17.handle_viewpoint_enter = function () {
             _this17.props.fetch_missing_data('bottom');
-        }, _temp7), (0, _possibleConstructorReturn3.default)(_this17, _ret7);
+        }, _temp6), (0, _possibleConstructorReturn3.default)(_this17, _ret6);
     }
 
     (0, _createClass3.default)(Data_container, [{
@@ -15341,19 +15523,19 @@ var Name_cell = function (_Pure_component9) {
     (0, _inherits3.default)(Name_cell, _Pure_component9);
 
     function Name_cell() {
-        var _ref16;
+        var _ref15;
 
-        var _temp8, _this24, _ret8;
+        var _temp7, _this24, _ret7;
 
         (0, _classCallCheck3.default)(this, Name_cell);
 
-        for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
-            args[_key8] = arguments[_key8];
+        for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
+            args[_key7] = arguments[_key7];
         }
 
-        return _ret8 = (_temp8 = (_this24 = (0, _possibleConstructorReturn3.default)(this, (_ref16 = Name_cell.__proto__ || Object.getPrototypeOf(Name_cell)).call.apply(_ref16, [this].concat(args))), _this24), _this24.go_to_timeline = function (e) {
+        return _ret7 = (_temp7 = (_this24 = (0, _possibleConstructorReturn3.default)(this, (_ref15 = Name_cell.__proto__ || Object.getPrototypeOf(Name_cell)).call.apply(_ref15, [this].concat(args))), _this24), _this24.go_to_timeline = function (e) {
             return _setdb2.default.emit('har_viewer.set_pane', 3);
-        }, _temp8), (0, _possibleConstructorReturn3.default)(_this24, _ret8);
+        }, _temp7), (0, _possibleConstructorReturn3.default)(_this24, _ret7);
     }
 
     (0, _createClass3.default)(Name_cell, [{
@@ -15396,10 +15578,10 @@ var Name_cell = function (_Pure_component9) {
     return Name_cell;
 }(_pure_component2.default);
 
-var Status_code_cell = maybe_pending(function (_ref17) {
-    var status = _ref17.status,
-        uuid = _ref17.uuid,
-        req = _ref17.req;
+var Status_code_cell = maybe_pending(function (_ref16) {
+    var status = _ref16.status,
+        uuid = _ref16.uuid,
+        req = _ref16.req;
 
     var enable_ssl_click = function enable_ssl_click(e) {
         e.stopPropagation();
@@ -15467,10 +15649,10 @@ var Status_code_cell = maybe_pending(function (_ref17) {
     );
 });
 
-var Time_cell = maybe_pending(function (_ref18) {
-    var time = _ref18.time,
-        url = _ref18.url,
-        uuid = _ref18.uuid;
+var Time_cell = maybe_pending(function (_ref17) {
+    var time = _ref17.time,
+        url = _ref17.url,
+        uuid = _ref17.uuid;
 
     var enable_ssl_click = function enable_ssl_click(e) {
         e.stopPropagation();
@@ -15520,20 +15702,20 @@ var Select_cell = function (_React$Component4) {
     (0, _inherits3.default)(Select_cell, _React$Component4);
 
     function Select_cell() {
-        var _ref19;
+        var _ref18;
 
-        var _temp9, _this25, _ret9;
+        var _temp8, _this25, _ret8;
 
         (0, _classCallCheck3.default)(this, Select_cell);
 
-        for (var _len9 = arguments.length, args = Array(_len9), _key9 = 0; _key9 < _len9; _key9++) {
-            args[_key9] = arguments[_key9];
+        for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
+            args[_key8] = arguments[_key8];
         }
 
-        return _ret9 = (_temp9 = (_this25 = (0, _possibleConstructorReturn3.default)(this, (_ref19 = Select_cell.__proto__ || Object.getPrototypeOf(Select_cell)).call.apply(_ref19, [this].concat(args))), _this25), _this25.state = { checked: false }, _this25.toggle = function () {
+        return _ret8 = (_temp8 = (_this25 = (0, _possibleConstructorReturn3.default)(this, (_ref18 = Select_cell.__proto__ || Object.getPrototypeOf(Select_cell)).call.apply(_ref18, [this].concat(args))), _this25), _this25.state = { checked: false }, _this25.toggle = function () {
             _setdb2.default.set('har_viewer.checked_list.' + _this25.props.uuid, !_this25.state.checked);
             _setdb2.default.emit_path('har_viewer.checked_list');
-        }, _temp9), (0, _possibleConstructorReturn3.default)(_this25, _ret9);
+        }, _temp8), (0, _possibleConstructorReturn3.default)(_this25, _ret8);
     }
 
     (0, _createClass3.default)(Select_cell, [{
@@ -15566,9 +15748,9 @@ var Select_cell = function (_React$Component4) {
     return Select_cell;
 }(_react2.default.Component);
 
-var Tooltip_and_value = maybe_pending(function (_ref20) {
-    var val = _ref20.val,
-        tip = _ref20.tip;
+var Tooltip_and_value = maybe_pending(function (_ref19) {
+    var val = _ref19.val,
+        tip = _ref19.tip;
     return _react2.default.createElement(
         _chrome_widgets.Tooltip,
         { title: tip || val },
@@ -15598,9 +15780,9 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -17400,7 +17582,7 @@ exports.default = (0, _typeaheadContainer2.default)(Typeahead);
 /* 302 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(117),
+var ListCache = __webpack_require__(119),
     stackClear = __webpack_require__(589),
     stackDelete = __webpack_require__(590),
     stackGet = __webpack_require__(591),
@@ -17622,7 +17804,7 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(103)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(105)(module)))
 
 /***/ }),
 /* 307 */
@@ -17688,7 +17870,7 @@ module.exports = overArg;
 exports.__esModule = true;
 exports.default = getContainer;
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -17713,7 +17895,7 @@ exports.default = function (componentOrElement) {
   return (0, _ownerDocument2.default)(_reactDom2.default.findDOMNode(componentOrElement));
 };
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -18116,7 +18298,7 @@ var _tokenContainer = __webpack_require__(314);
 
 var _tokenContainer2 = _interopRequireDefault(_tokenContainer);
 
-var _keyCode = __webpack_require__(126);
+var _keyCode = __webpack_require__(128);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18257,7 +18439,7 @@ var _reactOnclickoutside2 = _interopRequireDefault(_reactOnclickoutside);
 
 var _utils = __webpack_require__(65);
 
-var _keyCode = __webpack_require__(126);
+var _keyCode = __webpack_require__(128);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18354,7 +18536,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IGNORE_CLASS_NAME", function() { return IGNORE_CLASS_NAME; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 
 
@@ -19125,7 +19307,7 @@ var _propTypes = __webpack_require__(6);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _utils = __webpack_require__(65);
 
@@ -19660,7 +19842,7 @@ var _react2 = _interopRequireDefault(_react);
 
 var _emotion = __webpack_require__(31);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _propTypes = __webpack_require__(6);
 
@@ -21932,7 +22114,7 @@ WritableStream.prototype._write = function(chunk, encoding, cb){
 
 /*<replacement>*/
 
-var pna = __webpack_require__(129);
+var pna = __webpack_require__(130);
 /*</replacement>*/
 
 module.exports = Readable;
@@ -21961,7 +22143,7 @@ var Stream = __webpack_require__(342);
 
 /*<replacement>*/
 
-var Buffer = __webpack_require__(130).Buffer;
+var Buffer = __webpack_require__(131).Buffer;
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
@@ -21973,7 +22155,7 @@ function _isUint8Array(obj) {
 /*</replacement>*/
 
 /*<replacement>*/
-var util = __webpack_require__(96);
+var util = __webpack_require__(97);
 util.inherits = __webpack_require__(42);
 /*</replacement>*/
 
@@ -22955,7 +23137,7 @@ module.exports = __webpack_require__(72).EventEmitter;
 
 /*<replacement>*/
 
-var pna = __webpack_require__(129);
+var pna = __webpack_require__(130);
 /*</replacement>*/
 
 // undocumented cb() API, needed for core, not for public API
@@ -23101,7 +23283,7 @@ module.exports = Transform;
 var Duplex = __webpack_require__(67);
 
 /*<replacement>*/
-var util = __webpack_require__(96);
+var util = __webpack_require__(97);
 util.inherits = __webpack_require__(42);
 /*</replacement>*/
 
@@ -23408,9 +23590,9 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(131);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(132);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history__ = __webpack_require__(80);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -23536,7 +23718,7 @@ Link.contextTypes = {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
@@ -24262,7 +24444,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -24290,9 +24472,9 @@ var _codemirror = __webpack_require__(50);
 
 var _codemirror2 = _interopRequireDefault(_codemirror);
 
-__webpack_require__(128);
+__webpack_require__(129);
 
-__webpack_require__(91);
+__webpack_require__(92);
 
 __webpack_require__(833);
 
@@ -24300,11 +24482,11 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _moment = __webpack_require__(133);
+var _moment = __webpack_require__(100);
 
 var _moment2 = _interopRequireDefault(_moment);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -25837,7 +26019,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27830,7 +28012,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -27846,7 +28028,7 @@ var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -27896,13 +28078,13 @@ var _whitelist_ips2 = _interopRequireDefault(_whitelist_ips);
 
 var _logs = __webpack_require__(856);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -28262,7 +28444,7 @@ var Page = function Page() {
         _react2.default.createElement(_proxy_add2.default, null),
         _react2.default.createElement(
             'div',
-            { className: 'page_body' },
+            { className: 'page_body vbox' },
             _react2.default.createElement(
                 _common.Error_boundry,
                 null,
@@ -28790,7 +28972,7 @@ else
     }
 }
 !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(165), __webpack_require__(253), __webpack_require__(252),
-    __webpack_require__(440), __webpack_require__(441), __webpack_require__(105)], __WEBPACK_AMD_DEFINE_RESULT__ = function(array, date, zutil, sprintf, rate_limit, zescape){
+    __webpack_require__(440), __webpack_require__(441), __webpack_require__(107)], __WEBPACK_AMD_DEFINE_RESULT__ = function(array, date, zutil, sprintf, rate_limit, zescape){
 var E, _zerr;
 var env = process.env;
 var zerr = function(msg){ _zerr(L.ERR, arguments); };
@@ -29639,7 +29821,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -29663,7 +29845,7 @@ var _classnames2 = __webpack_require__(4);
 
 var _classnames3 = _interopRequireDefault(_classnames2);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -29675,7 +29857,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -29687,7 +29869,7 @@ var _url = __webpack_require__(166);
 
 var _url2 = _interopRequireDefault(_url);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _reactTooltip = __webpack_require__(195);
 
@@ -30893,7 +31075,7 @@ module.exports = { "default": __webpack_require__(451), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(145);
-__webpack_require__(102);
+__webpack_require__(104);
 module.exports = __webpack_require__(452);
 
 
@@ -30924,7 +31106,7 @@ module.exports = { "default": __webpack_require__(454), __esModule: true };
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(145);
-__webpack_require__(102);
+__webpack_require__(104);
 module.exports = __webpack_require__(455);
 
 
@@ -31008,7 +31190,7 @@ module.exports = __webpack_require__(18).Object.getPrototypeOf;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 Object.getPrototypeOf(O)
-var toObject = __webpack_require__(101);
+var toObject = __webpack_require__(103);
 var $getPrototypeOf = __webpack_require__(221);
 
 __webpack_require__(257)('getPrototypeOf', function () {
@@ -31410,7 +31592,7 @@ module.exports = now;
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(49),
-    isSymbol = __webpack_require__(116);
+    isSymbol = __webpack_require__(118);
 
 /** Used as references for various `Number` constants. */
 var NAN = 0 / 0;
@@ -31588,7 +31770,7 @@ var _propTypes = __webpack_require__(6);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _Portal = __webpack_require__(634);
 
@@ -31912,7 +32094,7 @@ module.exports = listCacheClear;
 /* 585 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(118);
+var assocIndexOf = __webpack_require__(120);
 
 /** Used for built-in method references. */
 var arrayProto = Array.prototype;
@@ -31953,7 +32135,7 @@ module.exports = listCacheDelete;
 /* 586 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(118);
+var assocIndexOf = __webpack_require__(120);
 
 /**
  * Gets the list cache value for `key`.
@@ -31978,7 +32160,7 @@ module.exports = listCacheGet;
 /* 587 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(118);
+var assocIndexOf = __webpack_require__(120);
 
 /**
  * Checks if a list cache value for `key` exists.
@@ -32000,7 +32182,7 @@ module.exports = listCacheHas;
 /* 588 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(118);
+var assocIndexOf = __webpack_require__(120);
 
 /**
  * Sets the list cache `key` to `value`.
@@ -32032,7 +32214,7 @@ module.exports = listCacheSet;
 /* 589 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(117);
+var ListCache = __webpack_require__(119);
 
 /**
  * Removes all key-value entries from the stack.
@@ -32117,7 +32299,7 @@ module.exports = stackHas;
 /* 593 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(117),
+var ListCache = __webpack_require__(119),
     Map = __webpack_require__(180),
     MapCache = __webpack_require__(182);
 
@@ -32268,7 +32450,7 @@ module.exports = getValue;
 /***/ (function(module, exports, __webpack_require__) {
 
 var Hash = __webpack_require__(599),
-    ListCache = __webpack_require__(117),
+    ListCache = __webpack_require__(119),
     Map = __webpack_require__(180);
 
 /**
@@ -32332,7 +32514,7 @@ module.exports = Hash;
 /* 600 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(120);
+var nativeCreate = __webpack_require__(122);
 
 /**
  * Removes all key-value entries from the hash.
@@ -32376,7 +32558,7 @@ module.exports = hashDelete;
 /* 602 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(120);
+var nativeCreate = __webpack_require__(122);
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -32412,7 +32594,7 @@ module.exports = hashGet;
 /* 603 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(120);
+var nativeCreate = __webpack_require__(122);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -32441,7 +32623,7 @@ module.exports = hashHas;
 /* 604 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(120);
+var nativeCreate = __webpack_require__(122);
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -32470,7 +32652,7 @@ module.exports = hashSet;
 /* 605 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(121);
+var getMapData = __webpack_require__(123);
 
 /**
  * Removes `key` and its value from the map.
@@ -32515,7 +32697,7 @@ module.exports = isKeyable;
 /* 607 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(121);
+var getMapData = __webpack_require__(123);
 
 /**
  * Gets the map value for `key`.
@@ -32537,7 +32719,7 @@ module.exports = mapCacheGet;
 /* 608 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(121);
+var getMapData = __webpack_require__(123);
 
 /**
  * Checks if a map value for `key` exists.
@@ -32559,7 +32741,7 @@ module.exports = mapCacheHas;
 /* 609 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(121);
+var getMapData = __webpack_require__(123);
 
 /**
  * Sets the map `key` to `value`.
@@ -32686,7 +32868,7 @@ module.exports = cacheHas;
 
 var Symbol = __webpack_require__(89),
     Uint8Array = __webpack_require__(615),
-    eq = __webpack_require__(119),
+    eq = __webpack_require__(121),
     equalArrays = __webpack_require__(304),
     mapToArray = __webpack_require__(616),
     setToArray = __webpack_require__(617);
@@ -32961,7 +33143,7 @@ var baseTimes = __webpack_require__(620),
     isArguments = __webpack_require__(184),
     isArray = __webpack_require__(40),
     isBuffer = __webpack_require__(306),
-    isIndex = __webpack_require__(122),
+    isIndex = __webpack_require__(124),
     isTypedArray = __webpack_require__(307);
 
 /** Used for built-in method references. */
@@ -33195,7 +33377,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(103)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(105)(module)))
 
 /***/ }),
 /* 626 */
@@ -33406,7 +33588,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -33512,7 +33694,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
@@ -34023,7 +34205,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _invariant = __webpack_require__(28);
+var _invariant = __webpack_require__(29);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
@@ -34031,7 +34213,7 @@ var _uniqueId = __webpack_require__(640);
 
 var _uniqueId2 = _interopRequireDefault(_uniqueId);
 
-var _getOptionLabel = __webpack_require__(123);
+var _getOptionLabel = __webpack_require__(125);
 
 var _getOptionLabel2 = _interopRequireDefault(_getOptionLabel);
 
@@ -34104,7 +34286,7 @@ module.exports = uniqueId;
 var Symbol = __webpack_require__(89),
     arrayMap = __webpack_require__(642),
     isArray = __webpack_require__(40),
-    isSymbol = __webpack_require__(116);
+    isSymbol = __webpack_require__(118);
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0;
@@ -34207,7 +34389,7 @@ var _some = __webpack_require__(646);
 
 var _some2 = _interopRequireDefault(_some);
 
-var _stripDiacritics = __webpack_require__(125);
+var _stripDiacritics = __webpack_require__(127);
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
@@ -34784,10 +34966,10 @@ module.exports = baseHasIn;
 /* 657 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castPath = __webpack_require__(124),
+var castPath = __webpack_require__(126),
     isArguments = __webpack_require__(184),
     isArray = __webpack_require__(40),
-    isIndex = __webpack_require__(122),
+    isIndex = __webpack_require__(124),
     isLength = __webpack_require__(185),
     toKey = __webpack_require__(90);
 
@@ -35070,9 +35252,9 @@ module.exports = createBaseEach;
 /* 667 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(119),
+var eq = __webpack_require__(121),
     isArrayLike = __webpack_require__(186),
-    isIndex = __webpack_require__(122),
+    isIndex = __webpack_require__(124),
     isObject = __webpack_require__(49);
 
 /**
@@ -35160,11 +35342,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _getOptionLabel = __webpack_require__(123);
+var _getOptionLabel = __webpack_require__(125);
 
 var _getOptionLabel2 = _interopRequireDefault(_getOptionLabel);
 
-var _stripDiacritics = __webpack_require__(125);
+var _stripDiacritics = __webpack_require__(127);
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
@@ -35227,7 +35409,7 @@ var _head = __webpack_require__(190);
 
 var _head2 = _interopRequireDefault(_head);
 
-var _getOptionLabel = __webpack_require__(123);
+var _getOptionLabel = __webpack_require__(125);
 
 var _getOptionLabel2 = _interopRequireDefault(_getOptionLabel);
 
@@ -35363,11 +35545,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _utils = __webpack_require__(65);
 
-var _keyCode = __webpack_require__(126);
+var _keyCode = __webpack_require__(128);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35751,7 +35933,7 @@ module.exports = basePick;
 
 var baseGet = __webpack_require__(188),
     baseSet = __webpack_require__(680),
-    castPath = __webpack_require__(124);
+    castPath = __webpack_require__(126);
 
 /**
  * The base implementation of  `_.pickBy` without support for iteratee shorthands.
@@ -35786,8 +35968,8 @@ module.exports = basePickBy;
 /***/ (function(module, exports, __webpack_require__) {
 
 var assignValue = __webpack_require__(681),
-    castPath = __webpack_require__(124),
-    isIndex = __webpack_require__(122),
+    castPath = __webpack_require__(126),
+    isIndex = __webpack_require__(124),
     isObject = __webpack_require__(49),
     toKey = __webpack_require__(90);
 
@@ -35839,7 +36021,7 @@ module.exports = baseSet;
 /***/ (function(module, exports, __webpack_require__) {
 
 var baseAssignValue = __webpack_require__(682),
-    eq = __webpack_require__(119);
+    eq = __webpack_require__(121);
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -36262,7 +36444,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _stripDiacritics = __webpack_require__(125);
+var _stripDiacritics = __webpack_require__(127);
 
 var _stripDiacritics2 = _interopRequireDefault(_stripDiacritics);
 
@@ -36446,7 +36628,7 @@ var _propTypes3 = __webpack_require__(697);
 
 var _utils = __webpack_require__(65);
 
-var _keyCode = __webpack_require__(126);
+var _keyCode = __webpack_require__(128);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42186,7 +42368,7 @@ exports.default = manageState;
 /* 736 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var htmlparser = __webpack_require__(94);
+var htmlparser = __webpack_require__(95);
 var extend = __webpack_require__(771);
 var quoteRegexp = __webpack_require__(772);
 
@@ -42555,7 +42737,7 @@ module.exports = {"0":65533,"128":8364,"130":8218,"131":402,"132":8222,"133":823
 /* 738 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ElementType = __webpack_require__(95);
+var ElementType = __webpack_require__(96);
 
 var re_whitespace = /\s+/g;
 var NodePrototype = __webpack_require__(338);
@@ -42804,7 +42986,7 @@ Object.keys(domLvl1).forEach(function(key) {
 /* 740 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var index = __webpack_require__(94),
+var index = __webpack_require__(95),
     DomHandler = index.DomHandler,
     DomUtils = index.DomUtils;
 
@@ -42921,7 +43103,7 @@ function Cbs(scope){
 	this.scope = scope;
 }
 
-var EVENTS = __webpack_require__(94).EVENTS;
+var EVENTS = __webpack_require__(95).EVENTS;
 
 Object.keys(EVENTS).forEach(function(name){
 	if(EVENTS[name] === 0){
@@ -43300,7 +43482,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Buffer = __webpack_require__(130).Buffer;
+var Buffer = __webpack_require__(131).Buffer;
 var util = __webpack_require__(747);
 
 function copyBuffer(src, target, offset) {
@@ -43756,7 +43938,7 @@ module.exports = PassThrough;
 var Transform = __webpack_require__(344);
 
 /*<replacement>*/
-var util = __webpack_require__(96);
+var util = __webpack_require__(97);
 util.inherits = __webpack_require__(42);
 /*</replacement>*/
 
@@ -43816,7 +43998,7 @@ function ProxyHandler(cbs){
 	this._cbs = cbs || {};
 }
 
-var EVENTS = __webpack_require__(94).EVENTS;
+var EVENTS = __webpack_require__(95).EVENTS;
 Object.keys(EVENTS).forEach(function(name){
 	if(EVENTS[name] === 0){
 		name = "on" + name;
@@ -43862,7 +44044,7 @@ var DomUtils = module.exports;
 /* 759 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ElementType = __webpack_require__(95),
+var ElementType = __webpack_require__(96),
     getOuterHTML = __webpack_require__(760),
     isTag = ElementType.isTag;
 
@@ -44401,7 +44583,7 @@ exports.prepend = function(elem, prev){
 /* 767 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isTag = __webpack_require__(95).isTag;
+var isTag = __webpack_require__(96).isTag;
 
 module.exports = {
 	filter: filter,
@@ -44501,7 +44683,7 @@ function findAll(test, elems){
 /* 768 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ElementType = __webpack_require__(95);
+var ElementType = __webpack_require__(96);
 var isTag = exports.isTag = ElementType.isTag;
 
 exports.testElement = function(options, element){
@@ -44748,7 +44930,7 @@ function CollectingHandler(cbs){
 	this.events = [];
 }
 
-var EVENTS = __webpack_require__(94).EVENTS;
+var EVENTS = __webpack_require__(95).EVENTS;
 Object.keys(EVENTS).forEach(function(name){
 	if(EVENTS[name] === 0){
 		name = "on" + name;
@@ -45569,7 +45751,7 @@ exports.default = '.__react_component_tooltip{border-radius:3px;display:inline-b
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(131);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(132);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history__ = __webpack_require__(80);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(205);
@@ -46361,10 +46543,10 @@ module.exports = function() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(132);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(133);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(98);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(204);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(347);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -46785,10 +46967,10 @@ function valueEqual(a, b) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(132);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(133);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(98);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(204);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(347);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -47106,8 +47288,8 @@ var createHashHistory = function createHashHistory() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(21);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PathUtils__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(132);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PathUtils__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(133);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__createTransitionManager__ = __webpack_require__(204);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -48004,7 +48186,7 @@ module.exports = function() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(131);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types__ = __webpack_require__(132);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history__ = __webpack_require__(80);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(205);
@@ -48144,7 +48326,7 @@ MemoryRouter.propTypes = {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(131);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(132);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Route__ = __webpack_require__(349);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Link__ = __webpack_require__(348);
@@ -48252,7 +48434,7 @@ module.exports = Array.isArray || function (arr) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_invariant__);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -48356,7 +48538,7 @@ Prompt.contextTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_warning__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_history__ = __webpack_require__(80);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__generatePath__ = __webpack_require__(352);
@@ -48492,7 +48674,7 @@ Redirect.contextTypes = {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react__);
@@ -48673,7 +48855,7 @@ StaticRouter.childContextTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_warning__ = __webpack_require__(81);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_warning__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__matchPath__ = __webpack_require__(208);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -48864,7 +49046,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -48892,7 +49074,7 @@ var _recompose = __webpack_require__(52);
 
 var _reactRouterDom = __webpack_require__(26);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _fields = __webpack_require__(202);
 
@@ -49010,7 +49192,6 @@ exports.default = provider({ tab_id: 'rules' })(function (_Pure_component) {
             if (rule.trigger_type) {
                 result = {
                     res: [{
-                        head: true,
                         action: action_raw,
                         action_type: rule.action,
                         trigger_type: rule.trigger_type
@@ -49651,7 +49832,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -49675,9 +49856,9 @@ var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _common = __webpack_require__(98);
+var _common = __webpack_require__(99);
 
-var _common2 = __webpack_require__(15);
+var _common2 = __webpack_require__(14);
 
 var _recompose = __webpack_require__(52);
 
@@ -49884,7 +50065,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -49892,7 +50073,7 @@ var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _common = __webpack_require__(98);
+var _common = __webpack_require__(99);
 
 var _recompose = __webpack_require__(52);
 
@@ -49982,7 +50163,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -49998,9 +50179,9 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(98);
+var _common = __webpack_require__(99);
 
-var _common2 = __webpack_require__(15);
+var _common2 = __webpack_require__(14);
 
 var _pure_component = __webpack_require__(13);
 
@@ -50008,7 +50189,7 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _recompose = __webpack_require__(52);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -50149,7 +50330,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -50169,7 +50350,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(98);
+var _common = __webpack_require__(99);
 
 var _recompose = __webpack_require__(52);
 
@@ -50276,7 +50457,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -50300,9 +50481,9 @@ var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _common = __webpack_require__(98);
+var _common = __webpack_require__(99);
 
-var _common2 = __webpack_require__(15);
+var _common2 = __webpack_require__(14);
 
 var _util = __webpack_require__(23);
 
@@ -50457,7 +50638,7 @@ var Header = function Header(_ref2) {
  /*jslint react:true, es6:true*/
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _regenerator = __webpack_require__(17);
@@ -50468,7 +50649,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -50484,21 +50665,21 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
 var _recompose = __webpack_require__(52);
 
-var _chrome_widgets = __webpack_require__(127);
+var _chrome_widgets = __webpack_require__(91);
 
 var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
-var _moment = __webpack_require__(133);
+var _moment = __webpack_require__(100);
 
 var _moment2 = _interopRequireDefault(_moment);
 
@@ -50519,417 +50700,256 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var provider = function provider(provide) {
-  return (0, _recompose.withContext)({ provide: _propTypes2.default.object }, function () {
-    return { provide: provide };
-  });
+    return (0, _recompose.withContext)({ provide: _propTypes2.default.object }, function () {
+        return { provide: provide };
+    });
 };
 
 _moment2.default.relativeTimeThreshold('ss', 3);
 
 exports.default = provider({ tab_id: 'debug' })(function (_Pure_component) {
-  (0, _inherits3.default)(Logs, _Pure_component);
+    (0, _inherits3.default)(Logs, _Pure_component);
 
-  function Logs() {
-    var _ref;
+    function Logs() {
+        var _ref;
 
-    var _temp, _this2, _ret;
+        var _temp, _this2, _ret;
 
-    (0, _classCallCheck3.default)(this, Logs);
+        (0, _classCallCheck3.default)(this, Logs);
 
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Logs.__proto__ || Object.getPrototypeOf(Logs)).call.apply(_ref, [this].concat(args))), _this2), _this2.state = { cur_tab: 'har' }, _this2.click_tab = function (id) {
+            return _this2.setState({ cur_tab: id });
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
     }
 
-    return _ret = (_temp = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref = Logs.__proto__ || Object.getPrototypeOf(Logs)).call.apply(_ref, [this].concat(args))), _this2), _this2.state = { cur_tab: 'har' }, _this2.click_tab = function (id) {
-      return _this2.setState({ cur_tab: id });
-    }, _temp), (0, _possibleConstructorReturn3.default)(_this2, _ret);
-  }
-
-  (0, _createClass3.default)(Logs, [{
-    key: 'render',
-    value: function render() {
-      return _react2.default.createElement(
-        'div',
-        { className: 'vbox', style: { height: '100%', width: '100%' } },
-        _react2.default.createElement(Nav, { click_tab: this.click_tab, cur_tab: this.state.cur_tab }),
-        _react2.default.createElement(Window, { tab: this.state.cur_tab })
-      );
-    }
-  }]);
-  return Logs;
+    (0, _createClass3.default)(Logs, [{
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'vbox', style: { height: '100%', width: '100%' } },
+                _react2.default.createElement(Nav, { click_tab: this.click_tab, cur_tab: this.state.cur_tab }),
+                _react2.default.createElement(Window, { tab: this.state.cur_tab })
+            );
+        }
+    }]);
+    return Logs;
 }(_pure_component2.default));
 
 
 var Window = function Window(_ref2) {
-  var tab = _ref2.tab;
+    var tab = _ref2.tab;
 
-  var Comp = void 0;
-  switch (tab) {
-    case 'sessions':
-      Comp = Fast_pool;break;
-    case 'banned_ips':
-      Comp = Banned_ips;break;
-    case 'har':
-    default:
-      Comp = _har_viewer2.default;
-  }
-  return _react2.default.createElement(
-    'div',
-    { className: 'window_wrapper vbox' },
-    _react2.default.createElement(Comp, null)
-  );
+    var Comp = void 0;
+    switch (tab) {
+        case 'sessions':
+            Comp = Sessions;break;
+        case 'banned_ips':
+            Comp = Banned_ips;break;
+        case 'har':
+        default:
+            Comp = _har_viewer2.default;
+    }
+    return _react2.default.createElement(
+        'div',
+        { className: 'window_wrapper vbox' },
+        _react2.default.createElement(Comp, null)
+    );
 };
 
 var Nav = function Nav(_ref3) {
-  var click_tab = _ref3.click_tab,
-      cur_tab = _ref3.cur_tab;
-  return _react2.default.createElement(
-    _common.Nav_tabs,
-    null,
-    _react2.default.createElement(Tab_btn, { id: 'har', on_click: click_tab, title: 'HAR viewer',
-      active: 'har' == cur_tab }),
-    _react2.default.createElement(Tab_btn, { id: 'sessions', on_click: click_tab, title: 'Sessions',
-      active: 'sessions' == cur_tab }),
-    _react2.default.createElement(Tab_btn, { id: 'banned_ips', on_click: click_tab, title: 'Banned IPs',
-      active: 'banned_ips' == cur_tab })
-  );
+    var click_tab = _ref3.click_tab,
+        cur_tab = _ref3.cur_tab;
+    return _react2.default.createElement(
+        _common.Nav_tabs,
+        { narrow: true },
+        _react2.default.createElement(Tab_btn, { id: 'har', on_click: click_tab, title: 'HAR viewer',
+            active: 'har' == cur_tab }),
+        _react2.default.createElement(Tab_btn, { id: 'sessions', on_click: click_tab, title: 'Sessions',
+            active: 'sessions' == cur_tab }),
+        _react2.default.createElement(Tab_btn, { id: 'banned_ips', on_click: click_tab, title: 'Banned IPs',
+            active: 'banned_ips' == cur_tab })
+    );
 };
 
 var Tab_btn = function Tab_btn(_ref4) {
-  var id = _ref4.id,
-      on_click = _ref4.on_click,
-      title = _ref4.title,
-      tooltip = _ref4.tooltip,
-      active = _ref4.active;
-  return _react2.default.createElement(
-    _common.Tooltip,
-    { title: tooltip },
-    _react2.default.createElement(
-      'div',
-      { onClick: function onClick() {
-          return on_click(id);
-        },
-        className: (0, _classnames2.default)('btn_tab', { active: active }) },
-      _react2.default.createElement('div', { className: (0, _classnames2.default)('icon', id) }),
-      _react2.default.createElement(
-        'div',
-        { className: 'title' },
-        title
-      ),
-      _react2.default.createElement('div', { className: 'arrow' })
-    )
-  );
-};
-
-// XXX krzysztof: make it generic component
-var Fast_pool = function Fast_pool() {
-  return _react2.default.createElement(
-    'div',
-    { className: 'chrome chrome_table' },
-    _react2.default.createElement(
-      'div',
-      { className: 'main_panel vbox' },
-      _react2.default.createElement(
-        'div',
-        { className: 'toolbar_container' },
+    var id = _ref4.id,
+        on_click = _ref4.on_click,
+        title = _ref4.title,
+        tooltip = _ref4.tooltip,
+        active = _ref4.active;
+    return _react2.default.createElement(
+        _common.Tooltip,
+        { title: tooltip },
         _react2.default.createElement(
-          'div',
-          { className: 'toolbar' },
-          _react2.default.createElement(
             'div',
-            { className: 'title_wrapper' },
-            'Sessions'
-          )
+            { onClick: function onClick() {
+                    return on_click(id);
+                },
+                className: (0, _classnames2.default)('btn_tab', { active: active }) },
+            _react2.default.createElement('div', { className: (0, _classnames2.default)('icon', id) }),
+            _react2.default.createElement(
+                'div',
+                { className: 'title' },
+                title
+            ),
+            _react2.default.createElement('div', { className: 'arrow' })
         )
-      ),
-      _react2.default.createElement(Fast_pool_table, null)
-    )
-  );
+    );
 };
 
-var Banned_ips = function Banned_ips() {
-  return _react2.default.createElement(
-    'div',
-    { className: 'chrome chrome_table' },
-    _react2.default.createElement(
-      'div',
-      { className: 'main_panel vbox' },
-      _react2.default.createElement(
-        'div',
-        { className: 'toolbar_container' },
-        _react2.default.createElement(
-          'div',
-          { className: 'toolbar' },
-          _react2.default.createElement(
-            'div',
-            { className: 'title_wrapper' },
-            'Banned IPs'
-          )
-        )
-      ),
-      _react2.default.createElement(Banned_ips_table, null)
-    )
-  );
-};
+var banned_ips_cols = [{ id: 'ip', title: 'IP' }, { id: 'ms', title: 'Expire' }];
 
-var Banned_ips_table = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_resizable_cols)([{ id: 'ip', title: 'IP' }, { id: 'ms', title: 'Expire' }], function (_Pure_component2) {
-  (0, _inherits3.default)(Banned_ips_table, _Pure_component2);
+var Banned_ips = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
+    (0, _inherits3.default)(Banned_ips, _Pure_component2);
 
-  function Banned_ips_table() {
-    var _ref5;
+    function Banned_ips() {
+        var _ref5;
 
-    var _temp2, _this3, _ret2;
+        var _temp2, _this3, _ret2;
 
-    (0, _classCallCheck3.default)(this, Banned_ips_table);
+        (0, _classCallCheck3.default)(this, Banned_ips);
 
-    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      args[_key2] = arguments[_key2];
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Banned_ips.__proto__ || Object.getPrototypeOf(Banned_ips)).call.apply(_ref5, [this].concat(args))), _this3), _this3.fetch_data = function () {
+            var _this = _this3;
+            return _this3.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                var port, url, data;
+                return _regenerator2.default.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                port = _this.props.match.params.port;
+                                url = '/api/banlist/' + port + '?full=true';
+                                _context.next = 4;
+                                return _ajax2.default.json({ url: url });
+
+                            case 4:
+                                data = _context.sent;
+                                return _context.abrupt('return', data.ips);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this3, _ret2);
     }
 
-    return _ret2 = (_temp2 = (_this3 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Banned_ips_table.__proto__ || Object.getPrototypeOf(Banned_ips_table)).call.apply(_ref5, [this].concat(args))), _this3), _this3.state = {}, _temp2), (0, _possibleConstructorReturn3.default)(_this3, _ret2);
-  }
-
-  (0, _createClass3.default)(Banned_ips_table, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this = this;
-      this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-        var port, url, data;
-        return _regenerator2.default.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                port = _this.props.match.params.port;
-                url = '/api/banlist/' + port + '?full=true';
-                _context.next = 4;
-                return _ajax2.default.json({ url: url });
-
-              case 4:
-                data = _context.sent;
-
-                _this.setState({ data: data.ips || [] });
-
-              case 6:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var cols = this.props.cols;
-
-      return _react2.default.createElement(
-        'div',
-        { className: 'tables_container vbox' },
-        _react2.default.createElement(Header_container, { cols: cols }),
-        _react2.default.createElement(Ban_data_container, { cols: cols, data: this.state.data })
-      );
-    }
-  }]);
-  return Banned_ips_table;
-}(_pure_component2.default)));
-
-var Fast_pool_table = (0, _reactRouterDom.withRouter)((0, _chrome_widgets.with_resizable_cols)([{ id: 'ip', title: 'Last IP' }, { id: 'session', title: 'Session' }, { id: 'host', title: 'Host' }], function (_Pure_component3) {
-  (0, _inherits3.default)(Fast_pool_table, _Pure_component3);
-
-  function Fast_pool_table() {
-    var _ref6;
-
-    var _temp3, _this4, _ret3;
-
-    (0, _classCallCheck3.default)(this, Fast_pool_table);
-
-    for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-      args[_key3] = arguments[_key3];
-    }
-
-    return _ret3 = (_temp3 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Fast_pool_table.__proto__ || Object.getPrototypeOf(Fast_pool_table)).call.apply(_ref6, [this].concat(args))), _this4), _this4.state = {}, _temp3), (0, _possibleConstructorReturn3.default)(_this4, _ret3);
-  }
-
-  (0, _createClass3.default)(Fast_pool_table, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this = this;
-      this.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-        var port, url, data;
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                port = _this.props.match.params.port;
-                url = '/api/sessions/' + port;
-                _context2.next = 4;
-                return _ajax2.default.json({ url: url });
-
-              case 4:
-                data = _context2.sent;
-
-                _this.setState({ data: data.sessions || [] });
-
-              case 6:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var cols = this.props.cols;
-
-      return _react2.default.createElement(
-        'div',
-        { className: 'tables_container vbox' },
-        _react2.default.createElement(Header_container, { cols: cols }),
-        _react2.default.createElement(Fast_pool_data_container, { cols: cols, data: this.state.data })
-      );
-    }
-  }]);
-  return Fast_pool_table;
-}(_pure_component2.default)));
-
-var Header_container = function Header_container(_ref7) {
-  var cols = _ref7.cols;
-  return _react2.default.createElement(
-    'div',
-    { className: 'header_container' },
-    _react2.default.createElement(
-      'table',
-      null,
-      _react2.default.createElement(
-        'colgroup',
-        null,
-        (cols || []).map(function (c, idx) {
-          return _react2.default.createElement('col', { key: idx, style: { width: c.width } });
-        })
-      ),
-      _react2.default.createElement(
-        'tbody',
-        null,
-        _react2.default.createElement(
-          'tr',
-          null,
-          (cols || []).map(function (c, idx) {
+    (0, _createClass3.default)(Banned_ips, [{
+        key: 'render',
+        value: function render() {
             return _react2.default.createElement(
-              'th',
-              { key: idx },
-              c.title
+                _chrome_widgets.Chrome_table,
+                { title: 'Sessions', cols: banned_ips_cols,
+                    fetch_data: this.fetch_data },
+                function (d) {
+                    return _react2.default.createElement(
+                        'tr',
+                        { key: d.ip },
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.ip
+                        ),
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.to ? (0, _moment2.default)(d.to).fromNow() : ' - '
+                        )
+                    );
+                }
             );
-          })
-        )
-      )
-    )
-  );
-};
+        }
+    }]);
+    return Banned_ips;
+}(_pure_component2.default));
 
-var Ban_data_container = function Ban_data_container(_ref8) {
-  var cols = _ref8.cols,
-      data = _ref8.data;
+var sessions_cols = [{ id: 'ip', title: 'Last IP' }, { id: 'session', title: 'Session' }, { id: 'host', title: 'Host' }];
 
-  if (!data) return null;
-  return _react2.default.createElement(
-    'div',
-    { className: 'data_container' },
-    _react2.default.createElement(
-      'table',
-      null,
-      _react2.default.createElement(
-        'colgroup',
-        null,
-        (cols || []).map(function (c, idx) {
-          return _react2.default.createElement('col', { key: idx, style: { width: c.width } });
-        })
-      ),
-      _react2.default.createElement(
-        'tbody',
-        null,
-        data.map(function (d) {
-          return _react2.default.createElement(
-            'tr',
-            { key: d.ip },
-            _react2.default.createElement(
-              'td',
-              null,
-              d.ip
-            ),
-            _react2.default.createElement(
-              'td',
-              null,
-              d.to ? (0, _moment2.default)(d.to).fromNow() : ' - '
-            )
-          );
-        }),
-        _react2.default.createElement(
-          'tr',
-          { className: 'filler' },
-          _react2.default.createElement('td', null),
-          _react2.default.createElement('td', null)
-        )
-      )
-    )
-  );
-};
+var Sessions = (0, _reactRouterDom.withRouter)(function (_Pure_component3) {
+    (0, _inherits3.default)(Sessions, _Pure_component3);
 
-var Fast_pool_data_container = function Fast_pool_data_container(_ref9) {
-  var _ref9$cols = _ref9.cols,
-      cols = _ref9$cols === undefined ? [] : _ref9$cols,
-      data = _ref9.data;
+    function Sessions() {
+        var _ref6;
 
-  if (!data) return null;
-  return _react2.default.createElement(
-    'div',
-    { className: 'data_container' },
-    _react2.default.createElement(
-      'table',
-      null,
-      _react2.default.createElement(
-        'colgroup',
-        null,
-        cols.map(function (c, idx) {
-          return _react2.default.createElement('col', { key: idx, style: { width: c.width } });
-        })
-      ),
-      _react2.default.createElement(
-        'tbody',
-        null,
-        data.map(function (d) {
-          return _react2.default.createElement(
-            'tr',
-            { key: d.session },
-            _react2.default.createElement(
-              'td',
-              null,
-              d.ip ? d.ip : ' - '
-            ),
-            _react2.default.createElement(
-              'td',
-              null,
-              d.session
-            ),
-            _react2.default.createElement(
-              'td',
-              null,
-              d.host
-            )
-          );
-        }),
-        _react2.default.createElement(
-          'tr',
-          { className: 'filler' },
-          cols.map(function (c) {
-            return _react2.default.createElement('td', { key: c.id });
-          })
-        )
-      )
-    )
-  );
-};
+        var _temp3, _this4, _ret3;
+
+        (0, _classCallCheck3.default)(this, Sessions);
+
+        for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+        }
+
+        return _ret3 = (_temp3 = (_this4 = (0, _possibleConstructorReturn3.default)(this, (_ref6 = Sessions.__proto__ || Object.getPrototypeOf(Sessions)).call.apply(_ref6, [this].concat(args))), _this4), _this4.fetch_data = function () {
+            var _this = _this4;
+            return _this4.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+                var port, url, res;
+                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
+                                port = _this.props.match.params.port;
+                                url = '/api/sessions/' + port;
+                                _context2.next = 4;
+                                return _ajax2.default.json({ url: url });
+
+                            case 4:
+                                res = _context2.sent;
+                                return _context2.abrupt('return', res.sessions);
+
+                            case 6:
+                            case 'end':
+                                return _context2.stop();
+                        }
+                    }
+                }, _callee2, this);
+            }));
+        }, _temp3), (0, _possibleConstructorReturn3.default)(_this4, _ret3);
+    }
+
+    (0, _createClass3.default)(Sessions, [{
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                _chrome_widgets.Chrome_table,
+                { title: 'Sessions', cols: sessions_cols,
+                    fetch_data: this.fetch_data },
+                function (d) {
+                    return _react2.default.createElement(
+                        'tr',
+                        { key: d.session },
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.ip ? d.ip : ' - '
+                        ),
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.session
+                        ),
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.host
+                        )
+                    );
+                }
+            );
+        }
+    }]);
+    return Sessions;
+}(_pure_component2.default));
 
 /***/ }),
 /* 825 */
@@ -51882,7 +51902,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -52080,7 +52100,7 @@ exports.default = Viewer_wrapper;
 
 (function(mod) {
   if (true) // CommonJS
-    mod(__webpack_require__(50), __webpack_require__(834), __webpack_require__(91), __webpack_require__(835));
+    mod(__webpack_require__(50), __webpack_require__(834), __webpack_require__(92), __webpack_require__(835));
   else if (typeof define == "function" && define.amd) // AMD
     define(["../../lib/codemirror", "../xml/xml", "../javascript/javascript", "../css/css"], mod);
   else // Plain browser env
@@ -53480,7 +53500,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -53506,7 +53526,7 @@ var _instructions = __webpack_require__(356);
 
 var _instructions2 = _interopRequireDefault(_instructions);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _util = __webpack_require__(23);
 
@@ -53554,7 +53574,7 @@ var Howto = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
       if (option == 'browser') Instructions = Browser_instructions;else if (option == 'code') Instructions = Code_instructions;
       return _react2.default.createElement(
         'div',
-        { className: 'howto' },
+        { className: 'howto vbox' },
         _react2.default.createElement(
           'div',
           { className: 'nav_header' },
@@ -53586,13 +53606,25 @@ var Howto = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
               null,
               this.props.children
             )
-          )
+          ),
+          _react2.default.createElement(Animated_instructions, null)
         )
       );
     }
   }]);
   return Howto;
 }(_pure_component2.default));
+
+var Animated_instructions = (0, _reactRouterDom.withRouter)(function (props) {
+  var option = props.match.params.option || 'code';
+  var browser = props.match.params.suboption || 'chrome_win';
+  if (option != 'browser') return null;
+  return _react2.default.createElement(
+    'div',
+    { className: 'gifs_inner vbox' },
+    _react2.default.createElement('div', { className: (0, _classnames2.default)('gif', browser) })
+  );
+});
 
 var Tab = (0, _reactRouterDom.withRouter)(function (_ref2) {
   var id = _ref2.id,
@@ -53823,7 +53855,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(93)(content, options);
+var update = __webpack_require__(94)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -53843,7 +53875,7 @@ if(false) {
 /* 838 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(92)(undefined);
+exports = module.exports = __webpack_require__(93)(undefined);
 // imports
 
 
@@ -53873,7 +53905,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -53897,7 +53929,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -53909,7 +53941,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _util = __webpack_require__(23);
 
@@ -53925,7 +53957,7 @@ var _report_bug = __webpack_require__(842);
 
 var _report_bug2 = _interopRequireDefault(_report_bug);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -54521,7 +54553,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -54545,7 +54577,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _util = __webpack_require__(23);
 
@@ -54761,7 +54793,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -54777,13 +54809,13 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(14);
+var _reactDom = __webpack_require__(15);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -55082,7 +55114,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -55102,13 +55134,13 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -55272,7 +55304,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -55292,17 +55324,17 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -55692,7 +55724,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -55714,7 +55746,7 @@ var _pure_component2 = _interopRequireDefault(_pure_component);
 
 var _reactBootstrapTypeahead = __webpack_require__(298);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -55726,7 +55758,7 @@ var _url = __webpack_require__(166);
 
 var _url2 = _interopRequireDefault(_url);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _reactRouterDom = __webpack_require__(26);
 
@@ -56240,7 +56272,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -56272,7 +56304,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -56280,7 +56312,7 @@ var _semver = __webpack_require__(357);
 
 var _semver2 = _interopRequireDefault(_semver);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56564,7 +56596,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -56584,7 +56616,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -56592,7 +56624,7 @@ var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _escape = __webpack_require__(105);
+var _escape = __webpack_require__(107);
 
 var _escape2 = _interopRequireDefault(_escape);
 
@@ -56618,7 +56650,7 @@ var _lodash = __webpack_require__(56);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -56626,7 +56658,7 @@ var _proxy_blank = __webpack_require__(210);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _reactRouterDom = __webpack_require__(26);
 
@@ -57996,7 +58028,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -58014,23 +58046,23 @@ var _react2 = _interopRequireDefault(_react);
 
 var _util = __webpack_require__(23);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
 var _reactRouterDom = __webpack_require__(26);
 
-var _chrome_widgets = __webpack_require__(127);
+var _chrome_widgets = __webpack_require__(91);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -58520,7 +58552,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -58536,7 +58568,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -58552,21 +58584,21 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _codemirror = __webpack_require__(50);
 
 var _codemirror2 = _interopRequireDefault(_codemirror);
 
-__webpack_require__(91);
+__webpack_require__(92);
 
-__webpack_require__(128);
+__webpack_require__(129);
 
 var _fileSaver = __webpack_require__(358);
 
 var _fileSaver2 = _interopRequireDefault(_fileSaver);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -58862,7 +58894,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -58884,13 +58916,13 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _setdb = __webpack_require__(24);
 
 var _setdb2 = _interopRequireDefault(_setdb);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -59156,7 +59188,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -59184,7 +59216,7 @@ var _proxy_blank = __webpack_require__(210);
 
 var _proxy_blank2 = _interopRequireDefault(_proxy_blank);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _util = __webpack_require__(23);
 
@@ -59583,7 +59615,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -59599,7 +59631,7 @@ var _etask = __webpack_require__(36);
 
 var _etask2 = _interopRequireDefault(_etask);
 
-var _ajax = __webpack_require__(29);
+var _ajax = __webpack_require__(28);
 
 var _ajax2 = _interopRequireDefault(_ajax);
 
@@ -59611,7 +59643,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _jquery = __webpack_require__(11);
+var _jquery = __webpack_require__(12);
 
 var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -59619,7 +59651,7 @@ var _classnames = __webpack_require__(4);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 var _util = __webpack_require__(23);
 
@@ -60198,7 +60230,7 @@ var _classCallCheck2 = __webpack_require__(1);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = __webpack_require__(12);
+var _createClass2 = __webpack_require__(11);
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
@@ -60218,7 +60250,7 @@ var _pure_component = __webpack_require__(13);
 
 var _pure_component2 = _interopRequireDefault(_pure_component);
 
-var _common = __webpack_require__(15);
+var _common = __webpack_require__(14);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60360,6 +60392,34 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Dock_logs = exports.Logs = undefined;
 
+var _regenerator = __webpack_require__(17);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _extends2 = __webpack_require__(5);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _classCallCheck2 = __webpack_require__(1);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(11);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _possibleConstructorReturn2 = __webpack_require__(2);
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = __webpack_require__(3);
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+var _objectWithoutProperties2 = __webpack_require__(7);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
@@ -60370,22 +60430,198 @@ var _har_viewer2 = _interopRequireDefault(_har_viewer);
 
 var _reactRouterDom = __webpack_require__(26);
 
+var _common = __webpack_require__(14);
+
+var _chrome_widgets = __webpack_require__(91);
+
 var _url = __webpack_require__(166);
 
 var _url2 = _interopRequireDefault(_url);
 
+var _ajax = __webpack_require__(28);
+
+var _ajax2 = _interopRequireDefault(_ajax);
+
+var _pure_component = __webpack_require__(13);
+
+var _pure_component2 = _interopRequireDefault(_pure_component);
+
+var _classnames = __webpack_require__(4);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _moment = __webpack_require__(100);
+
+var _moment2 = _interopRequireDefault(_moment);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Logs = exports.Logs = (0, _reactRouterDom.withRouter)(function (_ref) {
-    var location = _ref.location;
+var Window = function Window(_ref) {
+    var tab = _ref.tab,
+        props = (0, _objectWithoutProperties3.default)(_ref, ['tab']);
 
-    var qs_o = _url2.default.qs_parse((location.search || '').substr(1));
+    var Comp = void 0;
+    switch (tab) {
+        case 'banned_ips':
+            Comp = Banned_ips;break;
+        case 'har':
+        default:
+            Comp = _har_viewer2.default;
+    }
     return _react2.default.createElement(
         'div',
-        { className: 'logs' },
-        _react2.default.createElement(_har_viewer2.default, qs_o)
+        { style: { flex: 1 }, className: 'window_wrapper vbox' },
+        _react2.default.createElement(Comp, props)
     );
-});
+};
+
+var Logs = exports.Logs = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
+    (0, _inherits3.default)(Logs, _Pure_component);
+
+    function Logs() {
+        var _ref2;
+
+        var _temp, _this, _ret;
+
+        (0, _classCallCheck3.default)(this, Logs);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        return _ret = (_temp = (_this = (0, _possibleConstructorReturn3.default)(this, (_ref2 = Logs.__proto__ || Object.getPrototypeOf(Logs)).call.apply(_ref2, [this].concat(args))), _this), _this.state = { cur_tab: 'har' }, _this.click_tab = function (id) {
+            return _this.setState({ cur_tab: id });
+        }, _temp), (0, _possibleConstructorReturn3.default)(_this, _ret);
+    }
+
+    (0, _createClass3.default)(Logs, [{
+        key: 'render',
+        value: function render() {
+            var _props = this.props,
+                location = _props.location,
+                match = _props.match;
+
+            var qs_o = _url2.default.qs_parse((location.search || '').substr(1));
+            return _react2.default.createElement(
+                'div',
+                { className: 'logs vbox',
+                    style: { height: '100%', width: '100%', padding: 15 } },
+                _react2.default.createElement(Nav, { click_tab: this.click_tab, cur_tab: this.state.cur_tab }),
+                _react2.default.createElement(Window, (0, _extends3.default)({ tab: this.state.cur_tab }, qs_o))
+            );
+        }
+    }]);
+    return Logs;
+}(_pure_component2.default));
+
+var Nav = function Nav(_ref3) {
+    var click_tab = _ref3.click_tab,
+        cur_tab = _ref3.cur_tab;
+    return _react2.default.createElement(
+        _common.Nav_tabs,
+        { narrow: true },
+        _react2.default.createElement(Tab_btn, { id: 'har', on_click: click_tab, title: 'HAR viewer',
+            active: 'har' == cur_tab }),
+        _react2.default.createElement(Tab_btn, { id: 'banned_ips', on_click: click_tab, title: 'Banned IPs',
+            active: 'banned_ips' == cur_tab })
+    );
+};
+
+var Tab_btn = function Tab_btn(_ref4) {
+    var id = _ref4.id,
+        on_click = _ref4.on_click,
+        title = _ref4.title,
+        tooltip = _ref4.tooltip,
+        active = _ref4.active;
+    return _react2.default.createElement(
+        _common.Tooltip,
+        { title: tooltip },
+        _react2.default.createElement(
+            'div',
+            { onClick: function onClick() {
+                    return on_click(id);
+                },
+                className: (0, _classnames2.default)('btn_tab', { active: active }) },
+            _react2.default.createElement('div', { className: (0, _classnames2.default)('icon', id) }),
+            _react2.default.createElement(
+                'div',
+                { className: 'title' },
+                title
+            ),
+            _react2.default.createElement('div', { className: 'arrow' })
+        )
+    );
+};
+
+var banned_ips_cols = [{ id: 'ip', title: 'IP' }, { id: 'ms', title: 'Expire' }];
+
+var Banned_ips = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
+    (0, _inherits3.default)(Banned_ips, _Pure_component2);
+
+    function Banned_ips() {
+        var _ref5;
+
+        var _temp2, _this2, _ret2;
+
+        (0, _classCallCheck3.default)(this, Banned_ips);
+
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+        }
+
+        return _ret2 = (_temp2 = (_this2 = (0, _possibleConstructorReturn3.default)(this, (_ref5 = Banned_ips.__proto__ || Object.getPrototypeOf(Banned_ips)).call.apply(_ref5, [this].concat(args))), _this2), _this2.fetch_data = function () {
+            return _this2.etask( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                var url, data;
+                return _regenerator2.default.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                url = '/api/banlist?full=true';
+                                _context.next = 3;
+                                return _ajax2.default.json({ url: url });
+
+                            case 3:
+                                data = _context.sent;
+                                return _context.abrupt('return', data.ips);
+
+                            case 5:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+        }, _temp2), (0, _possibleConstructorReturn3.default)(_this2, _ret2);
+    }
+
+    (0, _createClass3.default)(Banned_ips, [{
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                _chrome_widgets.Chrome_table,
+                { title: 'Sessions', cols: banned_ips_cols,
+                    fetch_data: this.fetch_data },
+                function (d) {
+                    return _react2.default.createElement(
+                        'tr',
+                        { key: d.ip },
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.ip
+                        ),
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.to ? (0, _moment2.default)(d.to).fromNow() : ' - '
+                        )
+                    );
+                }
+            );
+        }
+    }]);
+    return Banned_ips;
+}(_pure_component2.default));
 
 var Dock_logs = exports.Dock_logs = function Dock_logs() {
     return _react2.default.createElement(
@@ -60427,7 +60663,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(93)(content, options);
+var update = __webpack_require__(94)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -60447,12 +60683,12 @@ if(false) {
 /* 875 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(92)(undefined);
+exports = module.exports = __webpack_require__(93)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n.proxy_form {\n  max-height: 500px;\n}\n.proxy_form.animated {\n  animation-duration: 600ms;\n  -webkit-animation-duration: 600ms;\n}\n.proxy_created {\n  max-height: 0;\n  visibility: hidden;\n  transition: max-height 250ms ease 450ms, visibility 0ms ease-in 800ms;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.api_app {\n  margin-top: 50px;\n  text-align: center;\n}\n.api_app button {\n  margin: 10px;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  max-width: 1000px;\n  margin: auto;\n  text-align: left;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .login_form .form-group,\n.whitelist_ips .login_form .form-group {\n  display: flex;\n  align-items: center;\n}\n.lum_login .login_form .form-group label,\n.whitelist_ips .login_form .form-group label {\n  width: 80px;\n}\n.lum_login .login_form .form-group input,\n.whitelist_ips .login_form .form-group input {\n  flex: 1;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.__react_component_tooltip {\n  cursor: initial !important;\n  white-space: normal;\n  max-width: 400px;\n}\n.__react_component_tooltip.type-info {\n  color: #303942;\n  background-color: white;\n  border: solid 1px #cdcdcd;\n  opacity: 1;\n  padding: 6px 12px;\n  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n  -webkit-filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n}\n.__react_component_tooltip.type-info:after,\n.__react_component_tooltip.type-info:before {\n  content: none;\n}\n.__react_component_tooltip.type-light {\n  padding: 4px 7px;\n  border: solid 1px #154055;\n  color: #004d74;\n}\n.__react_component_tooltip.type-light.place-top:after {\n  border-top-color: #154055;\n  border-top-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  bottom: -6px;\n  margin-left: -6px;\n}\n.__react_component_tooltip.type-light.place-bottom:after {\n  border-bottom-color: #154055;\n  border-bottom-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  top: -6px;\n  margin-left: -6px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel .select_number {\n  float: right;\n  width: auto;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 4px;\n}\n.pagination_panel .select_number .react_select__control {\n  height: 24px;\n  width: 90px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  min-width: 100px;\n  width: auto;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\nselect::placeholder,\ninput[type=number]::placeholder,\ninput[type=text]::placeholder,\ninput[type=password]::placeholder,\ninput[type=email]::placeholder,\ntextarea::placeholder,\n.json_input_wrapper::placeholder {\n  color: #8e8e8e;\n}\nselect[disabled],\ninput[type=number][disabled],\ninput[type=text][disabled],\ninput[type=password][disabled],\ninput[type=email][disabled],\ntextarea[disabled],\n.json_input_wrapper[disabled],\nselect[disabled]::placeholder,\ninput[type=number][disabled]::placeholder,\ninput[type=text][disabled]::placeholder,\ninput[type=password][disabled]::placeholder,\ninput[type=email][disabled]::placeholder,\ntextarea[disabled]::placeholder,\n.json_input_wrapper[disabled]::placeholder {\n  color: #8e8e8e;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\nselect[disabled] {\n  color: #8e8e8e;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\ninput.regex {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.react_select__control .react_select__clear-indicator,\n.react_select__control .react_select__dropdown-indicator {\n  padding: 1px;\n}\n.select_number {\n  min-width: 100px;\n}\n.select_number input {\n  min-width: 0;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\nul.bullets {\n  padding-left: 0;\n  margin-bottom: 0;\n}\nul.bullets li {\n  list-style: none;\n}\nul.bullets li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 13px;\n  padding-right: 6px;\n}\n.pins_field {\n  display: flex;\n  align-items: baseline;\n}\n.pins_field .pins {\n  display: flex;\n  flex-flow: wrap;\n}\n.pins_field .pins .pin {\n  background-color: #f5f5f5;\n  border: 1px solid #e0e9ee;\n  border-radius: 3px;\n  padding: 3px;\n  display: flex;\n  margin: 0 6px 2px 0;\n}\n.pins_field .pins .pin.active {\n  border-color: #004d74;\n}\n.pins_field .pins .pin .x,\n.pins_field .pins .pin .v {\n  width: 16px;\n  font-size: 10px;\n  text-align: center;\n  cursor: pointer;\n}\n.pins_field .pins .pin .x:hover,\n.pins_field .pins .pin .v:hover {\n  background-color: #004d74;\n  color: white;\n}\n.pins_field .pins .pin .x .glyphicon-remove,\n.pins_field .pins .pin .v .glyphicon-remove {\n  position: relative;\n  top: 1px;\n}\n.pins_field .pins .pin .content {\n  padding: 0 2px 0 2px;\n}\n.pins_field .pins .pin .content input {\n  width: 120px;\n  height: 23px;\n  border: none;\n  padding: 0;\n}\n.pins_field .add_pin {\n  margin-left: 0;\n  cursor: pointer;\n  height: 32px;\n}\n.pins_field .add_pin .glyphicon-plus {\n  margin-left: 5px;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n@keyframes field_highlight {\n  0% {\n    border: 1px solid white;\n  }\n  50% {\n    border: 1px solid #004d74;\n    margin-left: -5px;\n    margin-right: -5px;\n    padding-left: 8px;\n    padding-right: 8px;\n  }\n  100% {\n    border: 1px solid white;\n  }\n}\n.field_row.animated {\n  border-radius: 3px;\n  animation: field_highlight 900ms;\n  animation-iteration-count: 3;\n  border: 1px solid white;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: 1px solid #d0d0d0;\n  border-radius: 0;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #e0e9ee;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n  min-width: 100px;\n}\n.rbt.open.clearfix:before {\n  content: none;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .har_viewer {\n  padding: 0;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window.logs .nav_tabs .btn_tab {\n  height: 30px;\n}\n.proxy_edit .main_window.logs .nav_tabs .title {\n  top: 3px;\n}\n.proxy_edit .main_window.logs .window_wrapper {\n  flex: 1;\n  padding: 15px 0;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 175px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: baseline;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .double_field input {\n  width: 109px;\n}\n.proxy_edit .main_window .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  width: 100%;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box {\n  color: #8e8e8e;\n  height: 32px;\n  border: solid 1px #ccdbe3;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .title_wrapper .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .title_wrapper .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel {\n  border: none;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 4px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 21px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #e0e9ee;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row .internal_name {\n  width: 1px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.zone_tooltip ul li {\n  margin: 3px 0;\n}\n.zone_settings {\n  cursor: default !important;\n}\n.zone_settings .pair {\n  display: flex;\n}\n.zone_settings .pair .title {\n  margin-right: 5px;\n  font-weight: 600;\n}\n.zone_settings .pair .val {\n  display: flex;\n  align-items: center;\n}\n.zone_settings .pair .val .lit {\n  line-height: 1.9;\n  padding: 0 6px;\n  margin-right: 3px;\n  background-color: #e1e9ed;\n  color: inherit;\n  font-size: 11px;\n  border-radius: 3px;\n}\n.zone_settings .perm_icon {\n  width: 18px;\n  height: 18px;\n  float: left;\n  margin: 2px 4px 0;\n  background-repeat: no-repeat;\n  background-size: contain;\n}\n.zone_settings .perm_icon.country {\n  background-image: url(/img/country.svg);\n}\n.zone_settings .perm_icon.state {\n  background-image: url(/img/state.svg);\n}\n.zone_settings .perm_icon.data_center {\n  background-image: url(/img/data_center.svg);\n}\n.zone_settings .perm_icon.asn {\n  background-image: url(/img/asn.svg);\n}\n.zone_settings .perm_icon.city {\n  background-image: url(/img/city.svg);\n}\n.zone_settings .perm_icon.vip {\n  background-image: url(/img/g_ip.svg);\n}\n.zone_settings .perm_icon.residential {\n  background-image: url(/img/residential.svg);\n}\n.zone_settings .perm_icon.mobile {\n  width: 14px;\n  background-image: url(/img/mobile.svg);\n}\n.dock_logs .har_viewer {\n  padding: 0;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #e0e9ee;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #e0e9ee;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: baseline;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  width: 140px;\n  margin-right: 5px;\n  white-space: nowrap;\n}\n.settings .settings_form .field_row .double_field {\n  display: flex;\n}\n.settings .settings_form .field_row .double_field > *:first-child {\n  margin-right: 5px;\n}\n.settings .settings_form .field_row .double_field > *:last-child {\n  margin-left: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer select,\n.tracer input {\n  width: 100%;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  margin-top: 10px;\n}\n.tracer .request .go_btn_wrapper .btn {\n  margin: 0;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester select,\n.proxy_tester input {\n  width: 100%;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  margin-top: 10px;\n}\n.proxy_tester .panel.request .footer_buttons .btn {\n  margin: 0;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto .howto_panel {\n  margin: 0 15px;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto .panel_inner {\n  width: 600px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content select {\n  width: auto;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy textarea {\n  width: 100%;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .group {\n  padding-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .group:last-child {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .field {\n  display: flex;\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .field .field_header {\n  display: flex;\n  align-items: center;\n  margin-right: 12px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .icon {\n  width: 26px;\n  height: 26px;\n  margin-right: 5px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 17px;\n  letter-spacing: 0.5px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content .howto.animated {\n  animation-duration: 750ms;\n  -webkit-animation-duration: 750ms;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.logs {\n  height: 100%;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome.chrome_table {\n  height: 100%;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.status.info {\n  --spritesheet-position: 10px 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar .title_wrapper {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n  overflow-x: hidden;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table tr.pending {\n  color: #7a8c9f;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .disp_value .small_icon.info {\n  display: inline-block;\n  margin-left: 4px;\n  margin-bottom: 0;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n  padding: 15px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.tree_children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
+exports.push([module.i, "@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 400;\n  src: local('Lato Regular'), local('Lato-Regular'), url(/font/lato_regular.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n@font-face {\n  font-family: 'Lato';\n  font-style: normal;\n  font-weight: 700;\n  src: local('Lato Bold'), local('Lato-Bold'), url(/font/lato_bold.woff2) format('woff2');\n  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;\n}\n.proxy_form {\n  max-height: 500px;\n}\n.proxy_form.animated {\n  animation-duration: 600ms;\n  -webkit-animation-duration: 600ms;\n}\n.proxy_created {\n  max-height: 0;\n  visibility: hidden;\n  transition: max-height 250ms ease 450ms, visibility 0ms ease-in 800ms;\n}\nhtml,\nbody {\n  line-height: 23px;\n  font-family: \"Lato\";\n  color: #004d74;\n}\n.api_app {\n  margin-top: 50px;\n  text-align: center;\n}\n.api_app button {\n  margin: 10px;\n}\n.no_nav .page-body {\n  margin-left: 0;\n}\n.no_nav .logo_wrapper {\n  background-color: white !important;\n}\n.no_nav .version_filler {\n  background-color: white !important;\n}\n.no_nav .notif {\n  display: none;\n}\n.no_nav .nav_top {\n  background-color: white;\n}\n.no_nav .nav_top .schema {\n  margin-right: 50px;\n}\n.no_nav .nav_top .schema .schema_component {\n  margin-right: 0;\n}\n.alert.alert-info {\n  margin: 0 15px 20px;\n}\n.default_cursor {\n  cursor: default;\n}\n.page-body {\n  padding: 0;\n  margin-left: 50px;\n}\n.page-body a {\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n}\n.page-body a:hover {\n  color: white;\n  background: #428bca;\n  border-color: #428bca;\n  text-decoration: none;\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: .15em;\n}\n.page-body .messages a.custom_link:hover {\n  background: none;\n  border: none;\n  box-shadow: none;\n}\nhtml,\nbody,\n#react_root,\n.page_wrapper,\n.page_wrapper > div,\n.page_body {\n  height: 100%;\n}\n.page_body {\n  padding-left: 50px;\n  padding-top: 60px;\n  position: initial !important;\n}\n.api_link {\n  margin-left: 3px;\n}\n.flag-icon {\n  border-radius: 2px;\n  margin-right: 2px;\n}\n.whitelist_ips .whitelist_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  max-width: 1000px;\n  margin: auto;\n  text-align: left;\n}\n.whitelist_ips .whitelist_header h3 {\n  font-size: 30px;\n}\n.whitelist_ips .steps {\n  max-width: 1000px;\n  margin: auto;\n  margin-top: 50px;\n}\n.whitelist_ips .steps h3 {\n  font-size: 17px;\n}\n.whitelist_ips .steps .instructions {\n  margin: 15px 10px;\n}\n.lum_login,\n.whitelist_ips {\n  padding-top: 70px;\n}\n.lum_login .nav_top,\n.whitelist_ips .nav_top {\n  background-color: white;\n}\n.lum_login .nav_top .logo_big,\n.whitelist_ips .nav_top .logo_big {\n  background-image: url(img/logo_1.svg);\n  width: 158px;\n  height: 33px;\n  margin: 7px;\n  display: block;\n}\n.lum_login .nav_top .version,\n.whitelist_ips .nav_top .version {\n  position: relative;\n  top: 24px;\n  left: -46px;\n  font-size: 9px;\n  font-weight: bold;\n  opacity: 0.5;\n}\n.lum_login .login_form,\n.whitelist_ips .login_form {\n  position: relative;\n  max-width: 800px;\n  margin: auto;\n}\n.lum_login .login_form .col,\n.whitelist_ips .login_form .col {\n  padding: 15px 55px;\n}\n.lum_login .login_form .col_google,\n.whitelist_ips .login_form .col_google {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper,\n.whitelist_ips .login_form .col_google .btn_google_wrapper,\n.lum_login .login_form .col_google .btn_google_wrapper:hover,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover,\n.lum_login .login_form .col_google .btn_google_wrapper:active,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active {\n  text-align: center;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google {\n  box-shadow: none;\n  margin: 89px 0 40px 0;\n  padding: 4px 0;\n  width: 240px;\n  height: 40px;\n  color: white;\n  background-color: #df4a32;\n  border: none;\n}\n.lum_login .login_form .col_google .btn_google_wrapper .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:hover .btn_google .img,\n.lum_login .login_form .col_google .btn_google_wrapper:active .btn_google .img,\n.whitelist_ips .login_form .col_google .btn_google_wrapper:active .btn_google .img {\n  background-image: url(/img/google.svg);\n  width: 20px;\n  height: 20px;\n  display: inline-block;\n  position: relative;\n  top: 5px;\n  right: 20px;\n}\n.lum_login .login_form .col_pass,\n.whitelist_ips .login_form .col_pass {\n  border-left: 1px solid #dde1e2;\n}\n.lum_login .login_form .or_circle,\n.whitelist_ips .login_form .or_circle {\n  width: 32px;\n  height: 32px;\n  border-radius: 16px;\n  border: 1px solid #ddd;\n  text-align: center;\n  line-height: 30px;\n  margin-left: -15px;\n  margin-top: -42px;\n  background-color: #fff;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n}\n.lum_login .login_form .signup,\n.whitelist_ips .login_form .signup {\n  margin-top: 25px;\n  color: #818c93;\n  letter-spacing: 1px;\n  text-align: center;\n  font-size: 1.1em;\n}\n.lum_login .login_form .form-group,\n.whitelist_ips .login_form .form-group {\n  display: flex;\n  align-items: center;\n}\n.lum_login .login_form .form-group label,\n.whitelist_ips .login_form .form-group label {\n  width: 80px;\n}\n.lum_login .login_form .form-group input,\n.whitelist_ips .login_form .form-group input {\n  flex: 1;\n}\n.lum_login .customers_form,\n.whitelist_ips .customers_form {\n  width: 500px;\n  margin: auto;\n}\n.lum_login .warning,\n.whitelist_ips .warning {\n  max-width: 800px;\n  margin: 20px auto !important;\n}\n.lum_login .warning a,\n.whitelist_ips .warning a {\n  margin: 0 6px;\n}\n.lum_login .warning.choose_customer,\n.whitelist_ips .warning.choose_customer {\n  margin: 0 0 20px !important;\n}\n.lum_login .btn.btn_lpm.btn_login,\n.whitelist_ips .btn.btn_lpm.btn_login {\n  margin: 20px 0;\n  width: 100%;\n  height: 40px;\n}\n.lum_login label,\n.whitelist_ips label {\n  font-size: 14px;\n  font-weight: 300;\n  margin-bottom: 3px;\n}\n.lum_login .login_header,\n.whitelist_ips .login_header {\n  margin-bottom: 30px;\n  margin-top: 30px;\n  text-align: center;\n}\n.lum_login .login_header h3,\n.whitelist_ips .login_header h3 {\n  font-size: 30px;\n}\n.__react_component_tooltip {\n  cursor: initial !important;\n  white-space: normal;\n  max-width: 400px;\n}\n.__react_component_tooltip.type-info {\n  color: #303942;\n  background-color: white;\n  border: solid 1px #cdcdcd;\n  opacity: 1;\n  padding: 6px 12px;\n  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n  -webkit-filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.15));\n}\n.__react_component_tooltip.type-info:after,\n.__react_component_tooltip.type-info:before {\n  content: none;\n}\n.__react_component_tooltip.type-light {\n  padding: 4px 7px;\n  border: solid 1px #154055;\n  color: #004d74;\n}\n.__react_component_tooltip.type-light.place-top:after {\n  border-top-color: #154055;\n  border-top-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  bottom: -6px;\n  margin-left: -6px;\n}\n.__react_component_tooltip.type-light.place-bottom:after {\n  border-bottom-color: #154055;\n  border-bottom-width: 6px;\n  border-left: 6px solid transparent;\n  border-right: 6px solid transparent;\n  top: -6px;\n  margin-left: -6px;\n}\n.tooltip.in {\n  opacity: 1;\n}\n.tooltip-proxy-status .tooltip-inner,\n.tooltip-default .tooltip-inner,\n.tooltip .tooltip-inner {\n  word-break: break-word;\n  max-width: 315px;\n  border: solid 1px #154055;\n  background: white;\n  color: #004d74;\n  font-size: 14px;\n  text-align: left;\n}\n.tooltip-proxy-status .tooltip-inner ul,\n.tooltip-default .tooltip-inner ul,\n.tooltip .tooltip-inner ul {\n  padding-left: 20px;\n  padding-top: 10px;\n}\n.tooltip.har_tooltip .tooltip-inner {\n  top: 7px;\n  position: relative;\n  max-width: 550px;\n  background: #f2f2f2;\n  border-radius: 2px;\n  color: #333333;\n  padding: 5px 8px;\n  line-height: 14px;\n  align-items: center;\n  -webkit-filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));\n  border: 1px solid rgba(0, 0, 0, 0.1);\n  background-clip: padding-box;\n  box-sizing: border-box;\n  transition: visibility 0s 100ms, opacity 150ms cubic-bezier(0, 0, 0.2, 1);\n  z-index: 20001;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n}\n.tooltip.har_tooltip .tooltip-arrow {\n  display: none;\n}\n.tooltip.har_tooltip.bottom {\n  margin-top: 0;\n  padding-top: 0;\n  margin-left: 9px;\n}\n.tooltip.har_tooltip.bottom .tooltip-inner {\n  top: 4px;\n}\n.tooltip.wide .tooltip-inner {\n  max-width: 600px;\n}\n.tooltip.top .tooltip-arrow {\n  border-top-color: #154055;\n}\n.tooltip.bottom .tooltip-arrow {\n  border-bottom-color: #154055;\n}\n.pointer {\n  cursor: pointer;\n}\n.opened,\n.table-hover > tbody > tr.opened:hover {\n  background-color: #E6F6F9;\n}\n.table-hover > tbody > tr > td {\n  border: none;\n}\n.table-hover .no-hover:hover {\n  background: none;\n}\n.modal-open .modal {\n  overflow-y: scroll;\n}\n.pagination > li > a:hover,\n.pagination > .disabled > a:hover {\n  box-shadow: none;\n}\n.pagination {\n  margin: 0;\n}\n.pagination .active > a,\n.pagination .active > a:focus,\n.pagination .active > span {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n}\n.pagination .active > a:hover,\n.pagination .active > a:focus:hover,\n.pagination .active > span:hover {\n  background: none;\n  color: #004d74;\n  font-weight: bold;\n  text-decoration: none;\n}\n.pagination li > a,\n.pagination li > span,\n.pagination li > a:focus {\n  font-size: 14px;\n  padding: 0 5px;\n  color: #428bca;\n  line-height: 1.4;\n  background: none;\n  border: none;\n}\n.pagination li > a:hover,\n.pagination li > span:hover,\n.pagination li > a:focus:hover {\n  border: none;\n  background: none;\n  color: white;\n  background: #428bca;\n  text-decoration: none;\n}\n.pagination li.disabled > a {\n  padding: 0 2px;\n}\n.pagination_panel {\n  height: 28px;\n}\n.pagination_panel .pagination {\n  display: inline-block;\n}\n.pagination_panel .select_number {\n  float: right;\n  width: auto;\n  margin-left: 5px;\n  background-position: right 7px center;\n  padding: 0 4px;\n}\n.pagination_panel .select_number .react_select__control {\n  height: 24px;\n  width: 90px;\n}\n.pagination_panel .table_buttons {\n  display: inline-block;\n  float: right;\n  position: relative;\n  top: -3px;\n}\n.pagination_panel .numbers {\n  float: right;\n  margin-left: 5px;\n}\n.pagination_panel.bottom {\n  margin-top: 5px;\n}\nh1 {\n  font-size: 36px;\n  font-weight: 500;\n  margin: 0;\n}\nh2 {\n  color: #004d74;\n  font-size: 36px;\n  font-weight: bold;\n  letter-spacing: 1px;\n  margin: 0;\n}\nh3 {\n  font-size: 24px;\n  letter-spacing: 0.6px;\n  font-weight: bold;\n  margin: 0;\n  line-height: 1;\n}\nh4 {\n  margin: 0;\n}\n.tooltip_block {\n  width: 100%;\n  height: 100%;\n}\n.nav_header {\n  position: relative;\n}\n.nav_header h3 {\n  height: 37px;\n  line-height: 44px;\n}\n.nav_header .subtitle {\n  margin-bottom: 15px;\n}\n.nav_header .warning {\n  position: absolute;\n  top: 0;\n  right: 0;\n}\n.json_input_wrapper {\n  height: auto !important;\n  padding-left: 5px !important;\n  padding-right: 10px !important;\n  max-width: 600px;\n}\n.json_input_wrapper.error {\n  border-color: #eb3a28;\n}\nselect,\ninput[type=number],\ninput[type=text],\ninput[type=password],\ninput[type=email],\ntextarea,\n.json_input_wrapper {\n  min-width: 100px;\n  width: auto;\n  height: 32px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  border-radius: 3px;\n  padding-left: 10px;\n  padding-right: 25px;\n  font-weight: 300;\n  -webkit-appearance: none;\n  -moz-appearance: none;\n  appearance: none;\n}\nselect:focus,\ninput[type=number]:focus,\ninput[type=text]:focus,\ninput[type=password]:focus,\ninput[type=email]:focus,\ntextarea:focus,\n.json_input_wrapper:focus {\n  outline: none;\n  border: solid 1px #004d74;\n}\nselect::placeholder,\ninput[type=number]::placeholder,\ninput[type=text]::placeholder,\ninput[type=password]::placeholder,\ninput[type=email]::placeholder,\ntextarea::placeholder,\n.json_input_wrapper::placeholder {\n  color: #8e8e8e;\n}\nselect[disabled],\ninput[type=number][disabled],\ninput[type=text][disabled],\ninput[type=password][disabled],\ninput[type=email][disabled],\ntextarea[disabled],\n.json_input_wrapper[disabled],\nselect[disabled]::placeholder,\ninput[type=number][disabled]::placeholder,\ninput[type=text][disabled]::placeholder,\ninput[type=password][disabled]::placeholder,\ninput[type=email][disabled]::placeholder,\ntextarea[disabled]::placeholder,\n.json_input_wrapper[disabled]::placeholder {\n  color: #8e8e8e;\n}\ninput[disabled],\nselect[disabled] {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\ntextarea {\n  height: auto;\n  resize: vertical;\n}\nselect {\n  background: url(/img/down.svg) no-repeat;\n  background-position: right 10px center;\n}\nselect[disabled] {\n  color: #8e8e8e;\n}\ninput[type=number]::-webkit-inner-spin-button,\ninput[type=number]::-webkit-outer-spin-button {\n  -webkit-appearance: none;\n}\ninput[type=number] {\n  -moz-appearance: textfield;\n}\ninput[type=number],\ninput[type=text] {\n  padding-right: 10px;\n}\nlabel.form-check-label {\n  font-weight: 300;\n  cursor: pointer;\n}\ninput[type=checkbox] {\n  margin-right: 5px;\n  position: relative;\n  top: 1px;\n}\ninput.regex {\n  border-top-left-radius: 0;\n  border-top-right-radius: 0;\n}\n.react_select__control .react_select__clear-indicator,\n.react_select__control .react_select__dropdown-indicator {\n  padding: 1px;\n}\n.select_number {\n  min-width: 100px;\n}\n.select_number input {\n  min-width: 0;\n}\n.btn_lpm {\n  padding-left: 11px;\n  padding-right: 11px;\n  width: auto;\n  min-width: 140px;\n  height: 32px;\n  border-radius: 2px;\n  background-color: white;\n  border: solid 1px #ccdbe3;\n  color: #004d74;\n  font-size: 16px;\n  font-weight: 300;\n  padding-top: 3px;\n  margin: 0 2px;\n  box-shadow: none;\n}\n.btn_lpm:hover,\n.btn_lpm.active {\n  background-color: #004d74;\n  border-color: #004d74;\n  color: white;\n}\n.btn_lpm:focus {\n  outline: none !important;\n}\n.btn_lpm_primary {\n  color: white;\n  background-color: #004d74;\n  border-color: #004d74;\n}\n.btn_lpm_primary:hover {\n  background-color: #4a8398;\n  border-color: #4a8398;\n}\n.btn_lpm_primary:focus {\n  color: white;\n}\n.btn_lpm.disabled {\n  background-color: #ccdbe3;\n  border-color: #ccdbe3;\n  cursor: default;\n  color: #004d74;\n}\n.btn_lpm.disabled:active {\n  color: white;\n}\n.btn_lpm.disabled:hover {\n  color: #004d74;\n}\n.btn_lpm_big {\n  line-height: 0;\n  font-size: 32px;\n  padding-bottom: 9px;\n  border-radius: 4px;\n  font-weight: 700;\n  width: 280px;\n  height: 60px;\n}\n.btn_lpm_small {\n  height: 24px;\n  font-size: 12px;\n  width: auto;\n  min-width: auto;\n}\n.btn_copy {\n  font-size: 9px;\n  padding: 0;\n  width: 35px;\n  height: 20px;\n  font-weight: 900;\n  margin-left: 10px;\n  position: relative;\n  top: -1px;\n}\n.btn_copy:hover {\n  color: white;\n}\nul.bullets {\n  padding-left: 0;\n  margin-bottom: 0;\n}\nul.bullets li {\n  list-style: none;\n}\nul.bullets li::before {\n  color: #428bca;\n  content: \"\\2022\";\n  font-size: 13px;\n  padding-right: 6px;\n}\n.pins_field {\n  display: flex;\n  align-items: baseline;\n}\n.pins_field .pins {\n  display: flex;\n  flex-flow: wrap;\n}\n.pins_field .pins .pin {\n  background-color: #f5f5f5;\n  border: 1px solid #e0e9ee;\n  border-radius: 3px;\n  padding: 3px;\n  display: flex;\n  margin: 0 6px 2px 0;\n}\n.pins_field .pins .pin.active {\n  border-color: #004d74;\n}\n.pins_field .pins .pin .x,\n.pins_field .pins .pin .v {\n  width: 16px;\n  font-size: 10px;\n  text-align: center;\n  cursor: pointer;\n}\n.pins_field .pins .pin .x:hover,\n.pins_field .pins .pin .v:hover {\n  background-color: #004d74;\n  color: white;\n}\n.pins_field .pins .pin .x .glyphicon-remove,\n.pins_field .pins .pin .v .glyphicon-remove {\n  position: relative;\n  top: 1px;\n}\n.pins_field .pins .pin .content {\n  padding: 0 2px 0 2px;\n}\n.pins_field .pins .pin .content input {\n  width: 120px;\n  height: 23px;\n  border: none;\n  padding: 0;\n}\n.pins_field .add_pin {\n  margin-left: 0;\n  cursor: pointer;\n  height: 32px;\n}\n.pins_field .add_pin .glyphicon-plus {\n  margin-left: 5px;\n}\na.link,\nbutton.link {\n  cursor: pointer;\n  color: #428bca;\n  outline: 3px solid transparent;\n  border: 1px solid transparent;\n  background: none;\n  text-decoration: none;\n}\na.link:hover,\nbutton.link:hover {\n  box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  -webkit-box-shadow: #428bca -2px 0 0 1px, #428bca 2px 0 0 1px;\n  border-radius: 0.15em;\n  background-color: #428bca;\n  border-color: #428bca;\n  color: white;\n}\nspan.icon_link {\n  color: #004d74;\n  cursor: pointer;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  width: 18px;\n  height: 18px;\n  vertical-align: middle;\n  border-radius: 2px;\n  font-size: 14px;\n  position: relative;\n}\nspan.icon_link:hover {\n  background-color: #004d74;\n  color: white;\n}\nspan.icon_link.right i {\n  left: 1px;\n}\nspan.icon_link.top i {\n  top: 0;\n}\nspan.icon_link.small {\n  top: -2px;\n  width: 14px;\n  height: 14px;\n}\nspan.icon_link.small i {\n  font-size: 11px;\n}\nspan.icon_link.disabled {\n  color: #ccc;\n  cursor: default;\n}\nspan.icon_link.disabled:hover {\n  background: inherit;\n  color: #ccc;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n}\n.loader_small {\n  cursor: default;\n  display: flex;\n  align-items: center;\n  margin-top: 5px;\n}\n.loader_small .spinner {\n  background-image: url(/img/loader.gif);\n  width: 30px;\n  height: 30px;\n  background-size: contain;\n  margin-left: 10px;\n  visibility: hidden;\n}\n.loader_small .spinner.show {\n  visibility: visible;\n}\n.loader_small .saving_label {\n  margin-left: 5px;\n}\n.loader_small .saving_label:not(.saving) {\n  text-decoration: underline;\n  color: grey;\n}\n@keyframes field_highlight {\n  0% {\n    border: 1px solid white;\n  }\n  50% {\n    border: 1px solid #004d74;\n    margin-left: -5px;\n    margin-right: -5px;\n    padding-left: 8px;\n    padding-right: 8px;\n  }\n  100% {\n    border: 1px solid white;\n  }\n}\n.field_row.animated {\n  border-radius: 3px;\n  animation: field_highlight 900ms;\n  animation-iteration-count: 3;\n  border: 1px solid white;\n}\n.loader_wrapper {\n  position: fixed;\n  z-index: 5000;\n}\n.loader_wrapper .mask {\n  background-color: #004d74;\n  opacity: 0.1;\n  width: 100%;\n  height: 100%;\n  position: fixed;\n  top: 0;\n  left: 0;\n}\n.loader_wrapper .loader {\n  display: flex;\n  align-items: center;\n  background-color: white;\n  border-radius: 50%;\n  width: 130px;\n  height: 130px;\n  position: fixed;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  left: 0;\n  right: 0;\n  z-index: 10;\n  box-shadow: 0px 4px 6px 0 #d7d7d7;\n}\n.loader_wrapper .loader .spinner {\n  background: url(/img/loader.gif);\n  width: 88px;\n  height: 88px;\n  margin: auto;\n}\n.warning {\n  background-color: #fff5d7;\n  margin: 10px 0;\n  font-size: 14px;\n  color: #003d5b;\n  display: flex;\n  align-items: center;\n  border-radius: 2px;\n  padding: 17px 20px;\n}\n.warning.error {\n  background-color: #ffebeb;\n  color: #eb3a28;\n}\n.warning .warning_icon {\n  background: url(/img/warning.svg);\n  width: 18px;\n  min-width: 18px;\n  height: 18px;\n  margin-right: 22px;\n}\n.buttons_upgrade {\n  position: absolute;\n  right: 5px;\n}\n.btn_upgrade {\n  width: 100px;\n  height: 32px;\n  font-size: 14px;\n  font-weight: 300;\n}\n.panel {\n  margin-bottom: 10px;\n  box-shadow: none;\n  -webkit-box-shadow: none;\n  border: 1px solid #d0d0d0;\n  border-radius: 0;\n}\n.panel.no_border {\n  border: none;\n}\n.panel.no_border .panel_body {\n  padding: 5px 0 0 0;\n}\n.panel.no_border .panel_heading {\n  padding-top: 0;\n}\n.panel .panel_heading {\n  padding: 10px 5px 0;\n  position: relative;\n}\n.panel .panel_heading h2 {\n  font-size: 18px;\n}\n.panel .panel_heading .buttons_wrapper {\n  position: absolute;\n  right: 5px;\n  top: 5px;\n}\n.panel .panel_body {\n  padding: 5px;\n}\n.panel .panel_body.with_table {\n  padding-bottom: 0;\n}\n.panel .panel_footer {\n  padding: 20px;\n  position: relative;\n}\n.panel table {\n  margin-bottom: 0;\n}\n.panel table.table-condensed {\n  font-size: 14px;\n}\n.panel table.table-condensed td,\n.panel table.table-condensed th {\n  padding: 1px 10px;\n}\n.panel table tr {\n  cursor: pointer;\n}\n.panel table tr:hover td {\n  background-color: #F3FBFC;\n}\n.panel table thead tr th {\n  font-weight: 300;\n  font-size: 14px;\n  color: #6694AC;\n  border-bottom: solid 1px #e0e9ee;\n}\n.modal .modal-content {\n  border: 0;\n  width: 640px;\n}\n.modal .modal-header {\n  padding: 15px 40px 15px 15px;\n  border: 0;\n}\n.modal .modal-header h4.modal-title,\n.modal .modal-header h4 {\n  font-size: 24px;\n  font-weight: bold;\n  text-align: center;\n  padding-top: 15px;\n  line-height: 0;\n}\n.modal .modal-header .close_icon {\n  z-index: 100;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n  opacity: 1;\n  position: absolute;\n  top: 20px;\n  right: 20px;\n}\n.modal .modal-header.no_header {\n  padding: 5px;\n}\n.modal .modal-body {\n  padding: 15px 20px 0;\n}\n.modal .modal-footer {\n  padding: 15px 20px;\n  border: 0;\n  text-align: right;\n}\n.modal .modal-footer .default_footer {\n  text-align: right;\n}\n.modal .modal-footer .default_footer .btn.btn_lpm {\n  width: auto;\n  min-width: auto;\n}\n.rbt.open {\n  width: 100%;\n  min-width: 100px;\n}\n.rbt.open.clearfix:before {\n  content: none;\n}\n.rbt .rbt-input {\n  padding: 1px 25px 1px 10px;\n  color: #004d74;\n  border-radius: 3px;\n  border: solid 1px #ccdbe3;\n  -webkit-box-shadow: none;\n  box-shadow: none;\n  cursor: text;\n}\n.rbt .rbt-input[disabled] {\n  cursor: default;\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n  color: #ccdbe3;\n}\n.rbt .rbt-input-wrapper {\n  position: relative;\n  top: 5px;\n}\n.rbt .rbt-input-wrapper input {\n  height: auto;\n}\n.rbt .dropdown-menu {\n  width: 100%;\n}\n.rbt .dropdown-menu .dropdown-item {\n  color: #004d74;\n}\n.rbt .dropdown-menu .dropdown-item mark {\n  color: #004d74;\n}\n.nav_tabs {\n  display: flex;\n}\n.nav_tabs.narrow .btn_tab {\n  height: 30px;\n}\n.nav_tabs.narrow .btn_tab .title {\n  top: 3px;\n}\n.nav_tabs .btn_tab {\n  flex-grow: 1;\n  height: 55px;\n  margin: 0 3px;\n  background-color: #f5f5f5;\n  border: solid 1px #f5f5f5;\n  border-radius: 4px;\n  cursor: pointer;\n  text-align: center;\n  position: relative;\n}\n.nav_tabs .btn_tab .icon {\n  width: 24px;\n  height: 24px;\n  opacity: 0.6;\n  margin: auto;\n  position: relative;\n  top: 5px;\n  background-size: contain;\n}\n.nav_tabs .btn_tab .title {\n  position: absolute;\n  top: 29px;\n  left: 0;\n  right: 0;\n  opacity: 0.8;\n  font-size: 13px;\n}\n.nav_tabs .btn_tab .icon.logs {\n  background-image: url(/img/logs.svg);\n}\n.nav_tabs .btn_tab .icon.target {\n  background-image: url(/img/target.svg);\n}\n.nav_tabs .btn_tab .icon.speed {\n  background-image: url(/img/speed.svg);\n}\n.nav_tabs .btn_tab .icon.rules {\n  background-image: url(/img/rules.svg);\n}\n.nav_tabs .btn_tab .icon.rotation {\n  background-image: url(/img/rotation.svg);\n}\n.nav_tabs .btn_tab .icon.headers {\n  background-image: url(/img/request_headers.svg);\n}\n.nav_tabs .btn_tab .icon.general {\n  background-image: url(/img/general.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_ext {\n  background-image: url(/img/proxy_ext.svg);\n}\n.nav_tabs .btn_tab .icon.proxy_lum {\n  background-image: url(/img/proxy_lum.svg);\n}\n.nav_tabs .btn_tab .icon.code {\n  background-image: url(/img/ic_code.svg);\n}\n.nav_tabs .btn_tab .icon.browser {\n  background-image: url(/img/ic_browser.svg);\n}\n.nav_tabs .btn_tab:first-child {\n  margin-left: 0;\n}\n.nav_tabs .btn_tab:last-child {\n  margin-right: 0;\n}\n.nav_tabs .btn_tab.active,\n.nav_tabs .btn_tab:hover {\n  border-color: #004d74;\n  background-color: white;\n}\n.nav_tabs .btn_tab.active {\n  cursor: default;\n}\n.nav_tabs .btn_tab.active .icon {\n  opacity: 1;\n}\n.nav_tabs .btn_tab.active .title {\n  opacity: 1;\n  font-weight: bold;\n}\n.nav_tabs .btn_tab.active .arrow {\n  border-left: 7px solid transparent;\n  border-right: 7px solid transparent;\n  border-top: 6px solid #004d74;\n  position: absolute;\n  bottom: -7px;\n  left: 0;\n  right: 0;\n  width: 0;\n  margin: auto;\n}\n.proxy_edit {\n  height: 100%;\n  display: flex;\n  flex-direction: column;\n  font-size: 14px;\n  margin: 0 15px;\n}\n.proxy_edit .info_icon {\n  background: url(/img/info.svg);\n  width: 11px;\n  height: 11px;\n  opacity: 0.4;\n  position: absolute;\n  bottom: 6px;\n  right: 6px;\n  cursor: pointer;\n}\n.proxy_edit .nav_wrapper .nav_header {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .nav {\n  display: flex;\n  margin: 5px 0 10px;\n}\n.proxy_edit .nav .field {\n  margin-right: 10px;\n  white-space: nowrap;\n}\n.proxy_edit .nav .action_buttons {\n  flex-grow: 3;\n  display: flex;\n  direction: rtl;\n}\n.proxy_edit .nav .action_buttons .btn_save {\n  margin-right: 0;\n  order: 1;\n}\n.proxy_edit .nav .action_buttons .btn_cancel {\n  margin-left: 0;\n  order: 2;\n}\n.proxy_edit .warnings_modal .modal-body {\n  padding: 10px 20px 0;\n}\n.proxy_edit .note {\n  font-size: 13px;\n  margin-bottom: 15px;\n}\n.proxy_edit .main_window {\n  margin-top: 10px;\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window.logs .window_wrapper {\n  flex: 1;\n  padding: 15px 0;\n}\n.proxy_edit .main_window.logs .logs {\n  width: 100%;\n}\n.proxy_edit .main_window.logs .logs .logs_panel {\n  margin: 0;\n}\n.proxy_edit .main_window.target .desc {\n  width: 100px;\n}\n.proxy_edit .main_window.speed .desc {\n  width: 175px;\n}\n.proxy_edit .main_window.rotation .desc {\n  width: 125px;\n}\n.proxy_edit .main_window.headers .desc {\n  width: 145px;\n}\n.proxy_edit .main_window.general .desc {\n  width: 195px;\n}\n.proxy_edit .main_window.rules .desc {\n  width: 200px;\n}\n.proxy_edit .main_window.rules .rule_wrapper {\n  border: solid 1px #ccdbe3;\n  margin-bottom: 15px;\n  padding: 5px;\n  border-radius: 4px;\n  position: relative;\n}\n.proxy_edit .main_window.rules .rule_wrapper .btn_rule_del {\n  position: absolute;\n  top: 5px;\n  right: -20px;\n  cursor: pointer;\n  background: url(/img/delete.svg);\n  width: 16px;\n  height: 16px;\n}\n.proxy_edit .main_window.rules .rule_add_btn {\n  width: 90px;\n  margin-left: 0;\n}\n.proxy_edit .main_window.rules .rule_add_btn i {\n  left: 4px;\n}\n.proxy_edit .main_window.headers .field_row.headers {\n  position: absolute;\n  align-items: baseline;\n}\n.proxy_edit .main_window.headers .field_row.headers input[type=text] {\n  margin-right: 9px;\n  width: 100px;\n}\n.proxy_edit .main_window.headers .field_row.headers .list .single_header {\n  width: 365px;\n  display: flex;\n  align-items: center;\n  padding: 3px;\n}\n.proxy_edit .main_window.headers .desc {\n  padding-right: 0;\n}\n.proxy_edit .main_window.headers .action_icons {\n  width: 45px;\n  flex-shrink: 0;\n}\n.proxy_edit .main_window .header {\n  font-size: 16px;\n  font-weight: bold;\n  height: 40px;\n}\n.proxy_edit .main_window .note {\n  margin-bottom: 0;\n}\n.proxy_edit .main_window .field_row {\n  padding: 3px;\n  display: flex;\n  align-items: baseline;\n}\n.proxy_edit .main_window .field_row .info_icon {\n  display: inline-block;\n  position: relative;\n  top: 1px;\n  left: 5px;\n}\n.proxy_edit .main_window .field_row.disabled {\n  color: #ccdbe3;\n}\n.proxy_edit .main_window .field_row.disabled input,\n.proxy_edit .main_window .field_row.disabled select {\n  background-color: #f5f5f5;\n  border-color: #e0e9ee;\n}\n.proxy_edit .main_window .field_row.disabled label {\n  cursor: default;\n}\n.proxy_edit .main_window .desc {\n  line-height: 1.07;\n  padding-right: 10px;\n}\n.proxy_edit .main_window .inline_field {\n  display: flex;\n  align-items: center;\n}\n.proxy_edit .main_window .sufix {\n  margin-left: 10px;\n}\n.proxy_edit .main_window .double_field input {\n  width: 109px;\n}\n.proxy_edit .main_window .double_field .devider {\n  margin: 0 5px;\n}\n.proxy_edit .allocated_ips_modal .action_buttons {\n  margin-bottom: 20px;\n  text-align: center;\n}\n.proxy_edit .regex_field {\n  width: 100%;\n  outline: none;\n}\n.proxy_edit .regex_field:hover .tip_box {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box {\n  color: #8e8e8e;\n  height: 32px;\n  border: solid 1px #ccdbe3;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n  border-top-right-radius: 4px;\n  padding: 3px 5px;\n  visibility: hidden;\n}\n.proxy_edit .regex_field .tip_box.active {\n  visibility: visible;\n}\n.proxy_edit .regex_field .tip_box .checks {\n  display: flex;\n}\n.proxy_edit .regex_field .tip_box .check {\n  cursor: pointer;\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.proxy_edit .regex_field .tip_box .check.active:not(.disabled),\n.proxy_edit .regex_field .tip_box .check:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.proxy_edit .regex_field .tip_box .check.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.proxy_edit .regex_field .tip_box .check:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.proxy_edit .regex_field .tip_box .check.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.proxy_edit .regex_field .tip_box .check.disabled:hover,\n.proxy_edit .regex_field .tip_box .check.disabled.active {\n  background: transparent;\n}\n.report_bug .desc {\n  margin: 10px 0;\n}\n.report_bug .modal-footer button.ok {\n  margin-right: 0;\n}\n.report_bug .email_field {\n  display: flex;\n  align-items: center;\n}\n.report_bug .email_field span {\n  width: 330px;\n}\n.overview_page {\n  min-height: 100%;\n  display: flex;\n  flex-direction: column;\n}\n.overview_page .warning {\n  position: relative;\n  margin: 15px;\n  height: 48px;\n}\n.overview_page .panels {\n  display: flex;\n}\n.overview_page .proxies_wrapper {\n  flex: 1;\n  overflow: auto;\n  margin-left: 15px;\n  margin-right: 7px;\n}\n.overview_page .stats_wrapper {\n  width: 305px;\n  min-width: 305px;\n  max-width: 305px;\n  margin-left: 7px;\n  margin-right: 15px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container {\n  height: 100px;\n}\n.overview_page .stats_wrapper .stats_panel .tables_container .data_container {\n  position: initial;\n  flex: 1;\n}\n.overview_page .stats_wrapper .stats_panel h4 {\n  font-size: 16px;\n  margin-bottom: 10px;\n}\n.overview_page .stats_wrapper .stats_panel .stats_btn {\n  font-size: 12px;\n  width: 100px;\n  max-width: 100px;\n  white-space: normal;\n  height: auto;\n  padding: 0;\n}\n.overview_page .stats_wrapper .stats_panel table .empty_row td {\n  cursor: default;\n}\n.overview_page .stats_wrapper .stats_panel table .enable_ssl {\n  margin-left: 2px;\n}\n.overview_page .stats_wrapper .title_wrapper .success_title {\n  font-weight: bold;\n}\n.overview_page .stats_wrapper .title_wrapper .success_value {\n  margin-left: 5px;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .cert_info {\n  line-height: 1.3;\n  font-size: 14px;\n  font-weight: 600;\n}\n.overview_page .stats_wrapper .enable_ssl_modal .instructions {\n  margin-top: 20px;\n  margin-bottom: -10px;\n}\n.overview_page .logs_wrapper {\n  flex: 1;\n  display: flex;\n}\n.overview_page .logs_wrapper .har_viewer {\n  height: auto;\n  padding: 15px;\n}\n.ic_warning {\n  background-image: url(/img/ic_warning.svg);\n  width: 15px;\n  height: 13px;\n  display: inline-block;\n  position: relative;\n  top: 2px;\n  margin: 0 2px;\n}\n.proxies {\n  font-size: 14px;\n}\n.proxies.nav_header {\n  padding: 0 15px 10px;\n}\n.proxies .proxies_panel {\n  border: none;\n}\n.proxies .proxies_panel .add_proxy_btn {\n  margin-left: 5px;\n}\n.proxies .proxies_panel .add_proxy_btn .glyphicon {\n  left: 3px;\n}\n.proxies .proxies_panel .panel_body {\n  position: relative;\n}\n.proxies .proxies_panel .proxies_table_wrapper {\n  overflow-x: auto;\n  margin-left: 64px;\n  overflow-y: visible;\n}\n.proxies .proxies_panel table {\n  table-layout: fixed;\n  min-width: 100%;\n  width: auto;\n}\n.proxies .proxies_panel table th,\n.proxies .proxies_panel table td {\n  padding: 1px 4px;\n}\n.proxies .proxies_panel table th {\n  white-space: nowrap;\n}\n.proxies .proxies_panel table td {\n  height: 21px;\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.proxies .proxies_panel table th.col__status {\n  width: 80px;\n}\n.proxies .proxies_panel table td.last_req_url {\n  max-width: 120px;\n}\n.proxies .proxies_panel table td.port {\n  width: 1px;\n}\n.proxies .proxies_panel .head_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions {\n  background-color: #F3FBFC;\n}\n.proxies .proxies_panel .proxy_row:hover:first-child .proxies_actions {\n  border-top: solid 1px #e0e9ee;\n}\n.proxies .proxies_panel .proxy_row .proxies_actions {\n  width: 64px;\n  position: absolute;\n  left: 5px;\n  text-overflow: initial;\n}\n.proxies .proxies_panel .proxy_row .internal_name {\n  width: 1px;\n}\n.proxies .proxies_panel .proxy_row:hover .proxies_actions .action_icon {\n  visibility: visible;\n}\n.proxies .proxies_panel .proxy_row .action_icon {\n  visibility: hidden;\n  position: relative;\n  cursor: pointer;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled {\n  cursor: default;\n  opacity: 0.3;\n}\n.proxies .proxies_panel .proxy_row .action_icon.disabled:hover {\n  color: inherit;\n  background-color: inherit;\n}\n.proxies .proxies_panel .proxy_row .action_icon.invisible {\n  cursor: default;\n  opacity: 0;\n}\n.proxies .proxies_panel .proxy_row.default td {\n  opacity: 0.6;\n}\n.proxies .proxies_panel .proxy_row.default td.proxies_actions {\n  opacity: 1;\n}\n.proxies .proxies_panel .btn_columns .icon {\n  background: url(/img/columns.svg);\n  width: 16px;\n  height: 14px;\n}\n.zone_tooltip ul li {\n  margin: 3px 0;\n}\n.zone_settings {\n  cursor: default !important;\n}\n.zone_settings .pair {\n  display: flex;\n}\n.zone_settings .pair .title {\n  margin-right: 5px;\n  font-weight: 600;\n}\n.zone_settings .pair .val {\n  display: flex;\n  align-items: center;\n}\n.zone_settings .pair .val .lit {\n  line-height: 1.9;\n  padding: 0 6px;\n  margin-right: 3px;\n  background-color: #e1e9ed;\n  color: inherit;\n  font-size: 11px;\n  border-radius: 3px;\n}\n.zone_settings .perm_icon {\n  width: 18px;\n  height: 18px;\n  float: left;\n  margin: 2px 4px 0;\n  background-repeat: no-repeat;\n  background-size: contain;\n}\n.zone_settings .perm_icon.country {\n  background-image: url(/img/country.svg);\n}\n.zone_settings .perm_icon.state {\n  background-image: url(/img/state.svg);\n}\n.zone_settings .perm_icon.data_center {\n  background-image: url(/img/data_center.svg);\n}\n.zone_settings .perm_icon.asn {\n  background-image: url(/img/asn.svg);\n}\n.zone_settings .perm_icon.city {\n  background-image: url(/img/city.svg);\n}\n.zone_settings .perm_icon.vip {\n  background-image: url(/img/g_ip.svg);\n}\n.zone_settings .perm_icon.residential {\n  background-image: url(/img/residential.svg);\n}\n.zone_settings .perm_icon.mobile {\n  width: 14px;\n  background-image: url(/img/mobile.svg);\n}\n.logs {\n  height: 100%;\n}\n.logs .nav_tabs {\n  margin-bottom: 15px;\n}\n.logs .top_panel {\n  margin: 10px 15px 20px;\n}\n.logs .top_header {\n  margin: 0 15px 16px;\n}\n.logs .logs_panel {\n  border: none;\n  margin: 0 15px 10px;\n}\n.logs .logs_panel .panel_heading {\n  display: flex;\n}\n.logs .logs_panel .panel_heading h2 {\n  flex: 1;\n  white-space: nowrap;\n  margin-right: 15px;\n}\n.logs .logs_panel .panel_body {\n  position: relative;\n}\n.logs .logs_panel .panel_body .requests_table {\n  overflow: hidden;\n  margin-left: 175px;\n}\n.logs .logs_panel .panel_body .requests_table.open {\n  min-height: 400px;\n}\n.logs .logs_panel .panel_body .requests_table table {\n  font-size: 14px;\n  width: 100%;\n}\n.logs .logs_panel .panel_body .requests_table table .fixed_col {\n  position: absolute;\n  left: 0;\n  width: 180px;\n}\n.logs .logs_panel .panel_body .requests_table table td,\n.logs .logs_panel .panel_body .requests_table table th {\n  padding: 1px 10px;\n}\n.logs .logs_panel .panel_body .requests_table table td {\n  z-index: 0;\n}\n.logs .logs_panel .panel_body .requests_table table th {\n  white-space: nowrap;\n  z-index: 1;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow {\n  font-size: 10px;\n  margin-left: 3px;\n}\n.logs .logs_panel .panel_body .requests_table table th .sort_arrow .invisible {\n  visibility: hidden;\n}\n.logs .logs_panel .panel_body .requests_table table tr.active td {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n  cursor: default;\n}\n.logs .logs_panel .panel_body .requests_table table tr td {\n  overflow: hidden;\n  white-space: nowrap;\n}\n.logs .logs_panel .panel_body .tab_nav {\n  display: flex;\n  align-items: flex-end;\n  background-color: white;\n  position: absolute;\n  width: 100%;\n  height: 28px;\n  top: 31px;\n  left: 180px;\n  z-index: 10;\n  border: solid 1px #e0e9ee;\n  border-bottom: none;\n  border-top-left-radius: 4px;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn {\n  height: 100%;\n  cursor: pointer;\n  padding: 1px 10px 0;\n  font-size: 12px;\n  border: solid 1px transparent;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:hover {\n  background-color: #004d74;\n  color: white;\n}\n.logs .logs_panel .panel_body .tab_nav .tab_btn:active,\n.logs .logs_panel .panel_body .tab_nav .tab_btn.active {\n  background-color: #004d74;\n  color: white;\n  text-shadow: 0 0 white;\n}\n.logs .logs_panel .panel_body .tab_nav .close_btn {\n  width: 20px;\n  height: 100%;\n  text-align: center;\n  border-bottom: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview {\n  cursor: default;\n  font-size: 13px;\n  line-height: 1.4;\n  position: absolute;\n  top: 58px;\n  z-index: 10;\n  padding: 5px 10px;\n  background-color: white;\n  overflow: auto;\n  border: solid 1px #e0e9ee;\n}\n.logs .logs_panel .panel_body .preview .section {\n  border-bottom: solid 1px #e0e9ee;\n  margin-bottom: 1px;\n  padding-bottom: 3px;\n}\n.logs .logs_panel .panel_body .preview .section:last-child {\n  border-bottom: none;\n  margin-bottom: 0;\n  padding-bottom: 0;\n}\n.logs .logs_panel .panel_body .preview .section .title {\n  font-weight: 600;\n}\n.logs .logs_panel .panel_body .preview .section .title .glyphicon {\n  top: 0;\n  font-size: 10px;\n  margin-right: 2px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value {\n  display: flex;\n  margin-left: 20px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .key {\n  font-weight: 600;\n  margin-right: 8px;\n}\n.logs .logs_panel .panel_body .preview .section .key_value .value {\n  word-break: break-all;\n}\n.config {\n  height: 100%;\n  font-size: 14px;\n  padding: 0 15px;\n}\n.config .btn {\n  width: 140px;\n}\n.config .nav_buttons {\n  position: absolute;\n  z-index: 10;\n  right: 15px;\n  top: 15px;\n  white-space: nowrap;\n  flex: 1;\n}\n.config .nav_buttons .btn:last-child {\n  margin-right: 0;\n}\n.config .code_panel .panel_body {\n  background-color: #f5f5f5;\n  position: relative;\n  padding: 1px;\n}\n.config .code_panel .panel_body .CodeMirror {\n  flex: auto;\n  display: flex;\n  flex-direction: column;\n}\n.config .code_panel .panel_body .CodeMirror .CodeMirror-scroll {\n  flex: auto;\n}\n.config .code_panel .panel_body .CodeMirror.cm-s-default {\n  padding: 5px;\n  background-color: #f5f5f5;\n}\n.config .code_panel .panel_body .nav_buttons {\n  right: 25px;\n}\n.config .code_panel.editable {\n  border-color: #004d74;\n}\n.config .code_panel.editable .panel_body {\n  background-color: transparent;\n}\n.config .code_panel.editable .panel_body .CodeMirror.cm-s-default {\n  background-color: white;\n}\n.settings {\n  padding: 0 15px;\n}\n.settings .settings_form .field_row {\n  display: flex;\n  align-items: baseline;\n  margin-bottom: 5px;\n}\n.settings .settings_form .field_row .desc {\n  width: 140px;\n  margin-right: 5px;\n  white-space: nowrap;\n}\n.settings .settings_form .field_row .double_field {\n  display: flex;\n}\n.settings .settings_form .field_row .double_field > *:first-child {\n  margin-right: 5px;\n}\n.settings .settings_form .field_row .double_field > *:last-child {\n  margin-left: 5px;\n}\n.tracer {\n  padding: 0 15px;\n}\n.tracer select,\n.tracer input {\n  width: 100%;\n}\n.tracer .request .fields {\n  display: flex;\n}\n.tracer .request .fields .field {\n  margin: 0 5px;\n}\n.tracer .request .fields .field:first-child {\n  margin-left: 0;\n}\n.tracer .request .fields .field:last-child {\n  margin-right: 0;\n}\n.tracer .request .fields .field.url {\n  flex: auto;\n}\n.tracer .request .fields .field.uid {\n  flex: auto;\n}\n.tracer .request .fields .field .title {\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.tracer .request .go_btn_wrapper {\n  margin-top: 10px;\n}\n.tracer .request .go_btn_wrapper .btn {\n  margin: 0;\n}\n.tracer .live_preview {\n  position: relative;\n  display: inline-block;\n  margin-top: 30px;\n  padding: 10px;\n  border: solid 1px #ddd;\n  width: 822px;\n  height: 622px;\n}\n.tracer .live_preview .loader_wrapper {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n}\n.tracer .live_preview .loader_wrapper .mask {\n  display: none;\n}\n.tracer .live_preview .loader_wrapper .loader {\n  position: absolute;\n}\n.tracer .single_instruction {\n  overflow-wrap: break-word;\n}\n.proxy_tester {\n  height: 100%;\n  padding: 0 15px;\n}\n.proxy_tester select,\n.proxy_tester input {\n  width: 100%;\n}\n.proxy_tester .title_value_pairs {\n  font-size: 14px;\n}\n.proxy_tester .title_value_pairs .pair {\n  display: flex;\n}\n.proxy_tester .title_value_pairs .pair .title {\n  flex: 1;\n}\n.proxy_tester .title_value_pairs .pair .value {\n  flex: 1;\n}\n.proxy_tester .har_preview {\n  margin-bottom: 10px;\n  border: 1px solid #cdcdcd;\n  min-height: 300px;\n  z-index: 2000;\n}\n.proxy_tester .panel.request .request_params {\n  display: flex;\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .field {\n  margin: 0 5px;\n}\n.proxy_tester .panel.request .field:first-child {\n  margin-left: 0;\n}\n.proxy_tester .panel.request .field:last-child {\n  margin-right: 0;\n}\n.proxy_tester .panel.request .field .title {\n  font-size: 14px;\n  margin-bottom: 3px;\n  margin-left: 2px;\n}\n.proxy_tester .panel.request .field.url {\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line {\n  display: flex;\n  align-items: center;\n  margin: 5px 0;\n}\n.proxy_tester .panel.request .headers .header_line:first-child {\n  margin-top: 0;\n}\n.proxy_tester .panel.request .headers .header_line:last-child {\n  margin-bottom: 10px;\n}\n.proxy_tester .panel.request .headers .header_line button {\n  min-width: 140px;\n}\n.proxy_tester .panel.request .headers .header_line .header_input {\n  margin-right: 10px;\n  flex: 1;\n}\n.proxy_tester .panel.request .headers .header_line .value_input {\n  margin-right: 5px;\n  flex: 2;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons {\n  width: 45px;\n}\n.proxy_tester .panel.request .headers .header_line .action_icons .add_header {\n  margin-left: 5px;\n}\n.proxy_tester .panel.request .footer_buttons {\n  margin-top: 10px;\n}\n.proxy_tester .panel.request .footer_buttons .btn {\n  margin: 0;\n}\n.proxy_tester .panel.body .panel.code {\n  font-size: 14px;\n  margin-bottom: 0;\n}\n.proxy_tester .panel.body .panel.code .panel_body {\n  overflow: auto;\n  max-height: 400px;\n  padding: 5px;\n}\n.proxy_tester .panel.body .panel.code .panel_body span {\n  word-wrap: break-word;\n}\n.proxy_tester .panel.info .title_value_pairs .pair .value {\n  text-align: right;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .key {\n  min-width: 160px;\n}\n.proxy_tester .panel.response .title_value_pairs .pair .value {\n  word-break: break-all;\n}\n.modal-backdrop.fade.in {\n  opacity: 0.15;\n}\n.howto {\n  flex: 1;\n}\n.howto .nav_header {\n  padding: 0 15px 10px;\n}\n.howto .nav_tabs {\n  margin-bottom: 15px;\n}\n.howto h1.header {\n  width: auto;\n}\n.howto .howto_panel {\n  flex: 1;\n  margin: 0 15px;\n  display: flex;\n}\n.howto .howto_panel .panel_inner {\n  width: 600px;\n  min-width: 550px;\n}\n.howto .howto_panel .gifs_inner {\n  flex: 1;\n}\n.howto .howto_panel .gifs_inner .gif {\n  flex: 1;\n  margin-left: 20px;\n  max-width: 720px;\n  min-width: 400px;\n  background-repeat: no-repeat;\n  background-size: contain;\n}\n.howto .howto_panel .gifs_inner .gif.chrome_mac {\n  background-image: url(/img/ins_chrome_mac.gif);\n}\n.howto .howto_panel .gifs_inner .gif.chrome_win {\n  background-image: url(/img/ins_chrome_win.gif);\n}\n.howto .howto_panel .gifs_inner .gif.ie {\n  background-image: url(/img/ins_ie.gif);\n}\n.howto .howto_panel .gifs_inner .gif.firefox {\n  background-image: url(/img/ins_firefox.gif);\n}\n.howto .howto_panel .gifs_inner .gif.safari {\n  background-image: url(/img/ins_safari.gif);\n}\n.howto .well {\n  box-shadow: none;\n  border-radius: 3px;\n  background-color: white;\n}\n.howto .browser_instructions .header_well {\n  font-size: 14px;\n  font-weight: bold;\n  display: flex;\n  align-items: center;\n}\n.howto .browser_instructions .header_well p {\n  margin: 0 10px 0 5px;\n}\n.howto .browser_instructions .header_well select {\n  background-color: white;\n  width: auto;\n}\n.howto .code_instructions .header_well {\n  text-align: center;\n}\n.howto .instructions_well {\n  position: relative;\n  margin: 10px 0;\n  padding: 5px;\n}\n.howto .instructions_well pre {\n  margin: 0;\n  border: none;\n  font-size: 12px;\n  background-color: white;\n}\n.howto .instructions_well pre .btn_copy {\n  position: absolute;\n  top: 12px;\n  right: 9px;\n}\n.howto .btn_lang {\n  margin: 0 2px;\n}\n.instructions {\n  margin-left: 10px;\n  border-left: 1px solid #004d74;\n  position: relative;\n}\n.instructions .single_instruction {\n  font-size: 14px;\n  padding-left: 18px;\n  position: relative;\n  top: 2px;\n}\n.instructions ul {\n  margin: 0;\n}\n.instructions ol {\n  counter-reset: section;\n  list-style-type: none;\n  padding-left: 0;\n}\n.instructions li {\n  padding-bottom: 12px;\n}\n.instructions ol li .circle_wrapper {\n  position: absolute;\n  left: -13px;\n  background-color: white;\n  height: 28px;\n  display: inline-block;\n}\n.instructions ol li .circle {\n  border: 1px solid #004d74;\n  border-radius: 50%;\n  width: 22px;\n  height: 22px;\n  position: relative;\n  top: 3px;\n  left: 1px;\n}\n.instructions ol li:last-child {\n  padding-bottom: 0;\n}\n.instructions ol li .circle:before {\n  counter-increment: section;\n  content: counters(section, \".\");\n  display: inline-block;\n  font-size: 11px;\n  color: #004d74;\n  margin-top: 3px;\n  text-align: center;\n  font-weight: 600;\n  position: relative;\n  width: 20px;\n  top: -5px;\n}\n.instructions code {\n  font-family: Menlo, Monaco, Consolas, \"Courier New\", monospace;\n  font-size: 12px;\n  font-weight: 300;\n  letter-spacing: -0.1px;\n  background-color: rgba(34, 34, 34, 0.03);\n  border: 1px solid rgba(34, 34, 34, 0.1);\n  color: black;\n  border-radius: 3px;\n  padding: 5px 7px 3px;\n  margin: 0 3px;\n}\n.add_proxy_modal.modal .modal-content select {\n  width: auto;\n}\n.add_proxy_modal.modal .modal-content .nav_tabs {\n  margin-bottom: 15px;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy textarea {\n  width: 100%;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_error {\n  position: relative;\n  color: #eb3a28;\n  font-size: 13px;\n  margin-left: 3px;\n  line-height: 2;\n}\n.add_proxy_modal.modal .modal-content .ext_proxy .json_example {\n  margin-left: 3px;\n  position: relative;\n  line-height: 1;\n  font-size: 13px;\n}\n.add_proxy_modal.modal .modal-content .group {\n  padding-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .group:last-child {\n  margin-bottom: 25px;\n}\n.add_proxy_modal.modal .modal-content .field {\n  display: flex;\n  margin-bottom: 10px;\n}\n.add_proxy_modal.modal .modal-content .field:last-child {\n  margin-bottom: 0;\n}\n.add_proxy_modal.modal .modal-content .field .field_header {\n  display: flex;\n  align-items: center;\n  margin-right: 12px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .icon {\n  width: 26px;\n  height: 26px;\n  margin-right: 5px;\n}\n.add_proxy_modal.modal .modal-content .field .field_header .zone_icon {\n  background: url(/img/zone_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header .preset_icon {\n  background: url(/img/preset_icon.png);\n}\n.add_proxy_modal.modal .modal-content .field .field_header h4 {\n  color: #004d74;\n  font-weight: bold;\n  font-size: 17px;\n  letter-spacing: 0.5px;\n}\n.add_proxy_modal.modal .modal-content .preview {\n  border: solid 1px #ccdbe3;\n  padding: 5px 10px;\n  border-radius: 4px;\n}\n.add_proxy_modal.modal .modal-content .preview .header {\n  height: 30px;\n  font-size: 16px;\n  font-weight: bold;\n}\n.add_proxy_modal.modal .modal-content .preview .desc {\n  font-size: 14px;\n  line-height: 1.3;\n  margin-bottom: 12px;\n}\n.add_proxy_modal.modal .modal-content .howto.animated {\n  animation-duration: 750ms;\n  -webkit-animation-duration: 750ms;\n}\n.nav_left .menu {\n  background-color: #E6F6F9;\n  top: 60px;\n  position: fixed;\n  width: 50px;\n}\n.nav_left .menu .menu_item {\n  opacity: 0.65;\n  background-color: #E6F6F9;\n  height: 40px;\n  position: relative;\n  cursor: pointer;\n}\n.nav_left .menu .menu_item.active {\n  background-color: #B4E6EE;\n  cursor: default;\n}\n.nav_left .menu .menu_item.active .text {\n  color: #004d74;\n}\n.nav_left .menu .menu_item.active,\n.nav_left .menu .menu_item:hover {\n  opacity: 1;\n}\n.nav_left .menu .icon {\n  padding: 0;\n  width: 20px;\n  height: 20px;\n  position: relative;\n  top: 10px;\n  left: 15px;\n}\n.nav_left .menu .howto {\n  background-image: url('img/howto.svg');\n}\n.nav_left .menu .proxies {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .overview {\n  background-image: url('img/proxies.svg');\n}\n.nav_left .menu .logs {\n  background-image: url('img/stats.svg');\n}\n.nav_left .menu .tracer {\n  background-image: url('img/zones.svg');\n}\n.nav_left .menu .proxy_tester {\n  background-image: url('img/tester.svg');\n}\n.nav_left .menu .tools {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .config {\n  background-image: url('img/tools.svg');\n}\n.nav_left .menu .general_config {\n  background-image: url('img/config.svg');\n}\n.nav_left .menu .faq {\n  background-image: url('img/faq.svg');\n}\n.nav_left .menu.lock {\n  pointer-events: none;\n}\n.nav_left .menu.lock .menu_item {\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_left .menu_filler {\n  background-color: #E6F6F9;\n  height: 100%;\n  position: fixed;\n  width: 50px;\n  z-index: -1;\n  top: 10px;\n}\n.nav_left .footer {\n  font-size: 13px;\n  color: #428bca;\n  width: 50px;\n  position: fixed;\n  bottom: 100px;\n}\n.nav_left .footer a {\n  margin: 3px;\n}\n.nav_top {\n  display: flex;\n  position: fixed;\n  background-color: #f5f5f5;\n  top: 0;\n  height: 60px;\n  width: 100%;\n  z-index: 20;\n}\n.nav_top .logo {\n  height: 60px;\n  width: 50px;\n  background-color: #E6F6F9;\n  display: inline-block;\n  background-image: url('img/lum_logo_short.svg');\n  background-position: center;\n  background-repeat: no-repeat;\n  background-size: 40px;\n  cursor: pointer;\n}\n.nav_top .logo.lock {\n  pointer-events: none;\n  opacity: 0.4;\n  cursor: default;\n}\n.nav_top .nav_top_right {\n  flex: 1;\n  display: flex;\n  align-items: center;\n}\n.nav_top .nav_top_right .notif_icon {\n  text-align: right;\n  flex: 1;\n}\n.nav_top .nav_top_right .notif_icon .notif {\n  position: relative;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper {\n  width: 14px;\n  height: 14px;\n  background-color: #004d74;\n  border-radius: 50%;\n  position: absolute;\n  right: -5px;\n  top: -4px;\n}\n.nav_top .nav_top_right .notif_icon .circle_wrapper .circle {\n  font-size: 11px;\n  font-weight: bold;\n  color: white;\n  position: relative;\n  top: -5px;\n  left: -3.5px;\n}\n.nav_top .nav_top_right .notif_icon .icon {\n  background-image: url('img/bell.svg');\n  width: 18px;\n  height: 18px;\n  position: absolute;\n  right: 15px;\n  top: -7px;\n  cursor: pointer;\n}\n.nav_top .dropdown {\n  width: 120px;\n  font-size: 14px;\n  margin-right: 20px;\n}\n.nav_top .dropdown-toggle {\n  padding: 0 14px 0 0;\n  position: relative;\n  text-decoration: none;\n}\n.nav_top .dropdown-toggle .caret {\n  position: absolute;\n  right: 2px;\n  top: 8px;\n}\n.nav_top .dropdown-menu li a {\n  color: #004d74;\n  text-decoration: none;\n  cursor: pointer;\n}\n.nav_top .schema {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  justify-content: center;\n}\n.nav_top .schema .schema_component {\n  width: 100%;\n  max-width: 700px;\n  white-space: nowrap;\n  font-size: 13px;\n  position: relative;\n  display: flex;\n  align-items: center;\n  margin-right: 60px;\n}\n.nav_top .schema .schema_component .layer {\n  margin-right: 32px;\n  cursor: default;\n  position: relative;\n  z-index: 10;\n  flex: 1;\n}\n.nav_top .schema .schema_component .layer .layer_btn {\n  text-align: center;\n  border-radius: 4px;\n  border: solid 1px #cecece;\n  padding: 2px 5px;\n  margin: 3px 0;\n  background: white;\n}\n.nav_top .schema .schema_component .layer:last-child {\n  margin-right: 0;\n}\n.nav_top .schema .schema_component .layer.active .layer_btn {\n  border-color: #004d74;\n}\n.nav_top .schema .schema_component .layer.lpm .icon {\n  width: 16px;\n  height: 16px;\n  background-image: url(/img/lum_logo_short.svg);\n  display: inline-block;\n  position: relative;\n  top: 3px;\n  left: -2px;\n}\n.nav_top .schema .schema_component .layer.port_numbers {\n  position: relative;\n  top: -8px;\n  font-size: 12px;\n  line-height: 1.2;\n  margin-right: 20px;\n  margin-left: -14px;\n  flex: 0;\n}\n.nav_top .schema .schema_component .layer .globe {\n  width: 18px;\n  margin-right: 4px;\n  position: relative;\n  top: -1px;\n}\n.nav_top .schema .schema_component .layer .flag-icon {\n  font-size: 15px;\n  top: 1px;\n}\n.nav_top .schema .schema_component .layer .arr {\n  position: absolute;\n  left: -8px;\n  border-left: 8px solid #004d74;\n  border-top: 4px solid transparent;\n  border-bottom: 4px solid transparent;\n  top: 0;\n  bottom: 0;\n  height: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.nav_top .schema .schema_component .line {\n  position: absolute;\n  width: 100%;\n  border-bottom: solid 1px;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  margin-top: auto;\n  margin-bottom: auto;\n  height: 0;\n}\n@media (max-width: 1200px) {\n  .nav_top .schema .schema_component {\n    width: auto;\n    font-size: 12px;\n  }\n  .nav_top .schema .schema_component .layer {\n    margin-right: 22px;\n  }\n  .nav_top .schema .schema_component .layer.port_numbers {\n    margin-right: 18px;\n    font-size: 11px;\n  }\n  .nav_top .schema .schema_component .layer .layer_btn {\n    padding: 0 4px;\n  }\n}\n.notif_modal .notifs h4.no_messages {\n  text-align: center;\n}\n.notif_modal .notifs .message {\n  width: 100%;\n  background-color: #f5f5f5;\n  border-radius: 2px;\n  padding: 15px;\n  margin: 10px 0;\n}\n.notif_modal .notifs .message .subject {\n  color: #004d74;\n  font-size: 16px;\n  font-weight: bold;\n}\n.notif_modal .notifs .message .text {\n  font-size: 13px;\n}\n.notif_modal .notifs .message.unread {\n  background-color: #E6F6F9;\n}\n.notif_modal .notifs .message.clickable {\n  cursor: pointer;\n}\n.no_proxies {\n  text-align: center;\n}\n.no_proxies .btn_add_port {\n  margin: 20px auto;\n}\n.browser_icon {\n  width: 20px;\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n}\n.browser_icon.firefox {\n  background-image: url(/img/icon_firefox.jpg);\n}\n.browser_icon.chrome {\n  background-image: url(/img/icon_chrome.jpg);\n}\n.browser_icon.explorer {\n  background-image: url(/img/icon_explorer.png);\n}\n.browser_icon.safari {\n  background-image: url(/img/icon_safari.jpg);\n}\n.logo_icon {\n  height: 20px;\n  background-size: contain;\n  display: inline-block;\n  background-repeat: no-repeat;\n  margin-right: 4px;\n}\n.logo_icon.crawlera {\n  background-image: url(/img/logo-crawlera.svg);\n  width: 20px;\n}\n.logo_icon.import {\n  background-image: url(/img/logo-import.svg);\n  width: 100px;\n}\n.logo_icon.legs {\n  background-image: url(/img/logo-80legs.svg);\n  width: 56px;\n}\n.vbox {\n  display: flex;\n  flex-direction: column !important;\n  position: relative;\n}\n.split_widget {\n  flex-direction: row !important;\n  position: relative;\n}\n.flex_auto {\n  flex: auto;\n}\n.chrome {\n  -webkit-user-select: none;\n  user-select: none;\n  font-size: 12px;\n  font-family: Roboto, Ubuntu, Arial, sans-serif !important;\n  color: #303942;\n}\n.chrome.chrome_table {\n  height: 100%;\n}\n.chrome .moving * {\n  cursor: col-resize !important;\n}\n.chrome .small_icon {\n  background-image: url(/img/small_icons.png);\n  background-position: var(--spritesheet-position);\n  width: 10px;\n  height: 10px;\n}\n.chrome .small_icon.close_btn {\n  --spritesheet-position: -20px 70px;\n}\n.chrome .small_icon.status {\n  margin-right: 4px;\n  margin-bottom: 2px;\n}\n.chrome .small_icon.status.green {\n  --spritesheet-position: -20px 50px;\n}\n.chrome .small_icon.status.yellow {\n  --spritesheet-position: 50px 50px;\n}\n.chrome .small_icon.status.red {\n  --spritesheet-position: 0 30px;\n}\n.chrome .small_icon.status.info {\n  --spritesheet-position: 10px 30px;\n}\n.chrome .small_icon.rules {\n  margin-right: 3px;\n  margin-top: 4px;\n  float: left;\n  --spritesheet-position: 0px 50px;\n}\n.chrome .small_icon_mask {\n  width: 10px;\n  height: 10px;\n  -webkit-mask-image: -webkit-image-set(url(/img/small_icons.png) 1x);\n  mask-image: url(/img/small_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  background-color: #6e6e6e;\n}\n.chrome .small_icon_mask.sort_asc {\n  --spritesheet-position: -20px 10px;\n}\n.chrome .small_icon_mask.sort_desc {\n  --spritesheet-position: -80px 30px;\n}\n.chrome .medium_icon {\n  background-image: url(/img/medium_icons.png);\n  background-position: var(--spritesheet-position);\n}\n.chrome .medium_icon.close_btn_h {\n  --spritesheet-position: 0px 16px;\n  width: 16px;\n  height: 16px;\n}\n.chrome .devtools_link {\n  color: #1155cc;\n  text-decoration: underline;\n  display: inline;\n  cursor: pointer;\n}\n.chrome .devtools_link:hover {\n  box-shadow: none;\n  background: none;\n  border-color: transparent;\n  text-decoration: underline;\n  color: #1155cc;\n}\n.chrome .main_panel {\n  border: 1px solid #d0d0d0;\n  height: 100%;\n  z-index: 0;\n}\n.chrome .toolbar_container {\n  background-color: #f3f3f3;\n}\n.chrome .toolbar_container .toolbar {\n  display: flex;\n  position: relative;\n  white-space: nowrap;\n  height: 26px;\n  overflow: hidden;\n  z-index: 12;\n  flex: none;\n  align-items: center;\n}\n.chrome .toolbar_container .toolbar:not(:first-child) {\n  border-top: solid 1px #d0d0d0;\n}\n.chrome .toolbar_container .toolbar .title_wrapper {\n  height: 100%;\n  margin: 0 3px;\n  padding: 1px;\n  display: flex;\n}\n.chrome .toolbar_container .toolbar_item {\n  position: relative;\n  display: inline-block;\n  background-color: transparent;\n  flex: none;\n  align-items: center;\n  justify-content: center;\n  padding: 0;\n  height: 26px;\n  border: none;\n  color: #5a5a5a;\n}\n.chrome .toolbar_container .toolbar_button {\n  white-space: nowrap;\n  overflow: hidden;\n  min-width: 28px;\n  background: transparent;\n  border-radius: 0;\n  cursor: default;\n}\n.chrome .toolbar_container .toolbar_button:hover span {\n  background-color: #333;\n}\n.chrome .toolbar_container .toolbar_button.active span {\n  background-color: #2196f3;\n}\n.chrome .toolbar_container .toolbar_button.close_logs {\n  float: right;\n}\n.chrome .toolbar_container .toolbar_button span {\n  display: inline-block;\n  width: 28px;\n  height: 24px;\n  background-color: #6e6e6e;\n  -webkit-mask-image: -webkit-image-set(url(/img/large_icons.png) 1x);\n  mask-image: url(/img/large_icons.png);\n  -webkit-mask-position: var(--spritesheet-position);\n  mask-position: var(--spritesheet-position);\n}\n.chrome .toolbar_container .toolbar_button span.clear {\n  --spritesheet-position: 0 144px;\n}\n.chrome .toolbar_container .toolbar_button span.docker {\n  --spritesheet-position: 55px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.close_logs {\n  --spritesheet-position: 140px 0;\n}\n.chrome .toolbar_container .toolbar_button span.resend {\n  --spritesheet-position: 59px 1px;\n}\n.chrome .toolbar_container .toolbar_button span.remove {\n  --spritesheet-position: 83px 25px;\n}\n.chrome .toolbar_container .toolbar_button span.filters {\n  --spritesheet-position: -56px 119px;\n}\n.chrome .toolbar_container .toolbar_button span.download {\n  --spritesheet-position: 26px 145px;\n}\n.chrome .toolbar_container .toolbar_button span.actions {\n  --spritesheet-position: 81px 120px;\n}\n.chrome .toolbar_container .devider {\n  background-color: #ccc;\n  height: 16px;\n  width: 1px;\n  margin: auto 2px;\n  display: inline-block;\n}\n.chrome .toolbar_container .search_box {\n  margin: 0 3px;\n}\n.chrome .toolbar_container .search_box input {\n  height: 18px;\n  width: 160px;\n  border: none;\n  padding: 0 0 0 3px;\n  border-radius: 0;\n  color: #303942;\n  font-family: Roboto, Ubuntu, Arial, sans-serif;\n  font-weight: normal;\n}\n.chrome .toolbar_container .search_box input:hover {\n  box-shadow: 0 0 0 1px #e0e0e0;\n}\n.chrome .toolbar_container .search_box input:focus {\n  box-shadow: 0 0 0 1px #03a9f4;\n}\n.chrome .toolbar_container .filters {\n  display: flex;\n  padding: 2px;\n}\n.chrome .toolbar_container .filter {\n  margin: auto 2px;\n  line-height: 1.3;\n  padding: 3px;\n  background: transparent;\n  text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;\n  border-radius: 6px;\n  overflow: hidden;\n}\n.chrome .toolbar_container .filter.active:not(.disabled),\n.chrome .toolbar_container .filter:hover:not(.disabled) {\n  color: white;\n  text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;\n}\n.chrome .toolbar_container .filter.active {\n  background: rgba(0, 0, 0, 0.3);\n}\n.chrome .toolbar_container .filter:hover:not(.active) {\n  background: rgba(0, 0, 0, 0.2);\n}\n.chrome .toolbar_container .filter.disabled {\n  opacity: 0.5;\n  cursor: default;\n}\n.chrome .toolbar_container .filter.disabled:hover,\n.chrome .toolbar_container .filter.disabled.active {\n  background: transparent;\n}\n.chrome .toolbar_container .custom_filter {\n  display: flex;\n  align-items: center;\n  margin: auto 3px;\n}\n.chrome .toolbar_container .custom_filter select {\n  padding: 0 13px 0 5px;\n  margin-right: -10px;\n  height: 22px;\n  width: auto;\n  border: none;\n  font-weight: normal;\n  background-image: none;\n  background-color: transparent;\n  -webkit-appearance: none;\n  appearance: none;\n}\n.chrome .toolbar_container .custom_filter .arrow {\n  background-color: #6e6e6e;\n  -webkit-mask-position: -80px 30px;\n  mask-position: -80px 30px;\n  -webkit-mask-image: url(/img/small_icons.png);\n  mask-image: url(/img/small_icons.png);\n  height: 10px;\n  width: 10px;\n}\n.chrome .summary_bar {\n  flex: 0 0 27px;\n  border-top: 1px solid #ccc;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 27px;\n  padding-left: 5px;\n  background-color: #eee;\n}\n.chrome .summary_bar * {\n  flex: none;\n}\n.chrome .tables_container {\n  width: 100%;\n  outline: none;\n  position: relative;\n  flex: 1;\n}\n.chrome .tables_container .reqs_container {\n  flex: auto;\n  position: relative;\n}\n.chrome .tables_container table {\n  height: 100%;\n  width: 100%;\n  border-spacing: 0;\n  border-collapse: separate;\n  table-layout: fixed;\n}\n.chrome .tables_container table th {\n  font-weight: normal;\n}\n.chrome .tables_container table td,\n.chrome .tables_container table th {\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n  line-height: 18px;\n  height: 18px;\n  padding: 1px 4px;\n  -webkit-user-select: none;\n  user-select: none;\n}\n.chrome .tables_container .header_container {\n  height: 27px;\n  overflow-x: hidden;\n}\n.chrome .tables_container .header_container table th {\n  position: relative;\n  background-color: #f3f3f3;\n  border-top: 1px solid #d0d0d0;\n  border-bottom: 1px solid #cdcdcd;\n  border-left: 1px solid #cdcdcd;\n  cursor: default;\n}\n.chrome .tables_container .header_container table th:first-child {\n  border-left: none;\n}\n.chrome .tables_container .header_container table th:hover {\n  background-color: #e6e6e6;\n}\n.chrome .tables_container .header_container table th:after {\n  content: \"\";\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n}\n.chrome .tables_container .header_container table th:active:after {\n  background-color: rgba(0, 0, 0, 0.15);\n}\n.chrome .tables_container .header_container table th .sort_icon {\n  position: absolute;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  display: flex;\n  align-items: center;\n}\n.chrome .tables_container .header_container table th .sort_icon span {\n  margin-right: 4px;\n  margin-bottom: -2px;\n}\n.chrome .tables_container .data_container {\n  position: absolute;\n  top: 27px;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  overflow-x: hidden;\n  overflow-y: overlay;\n}\n.chrome .tables_container .data_container table tr {\n  height: 20px;\n}\n.chrome .tables_container .data_container table tr:nth-child(even) {\n  background-color: #f5f5f5;\n}\n.chrome .tables_container .data_container table tr:nth-child(odd) {\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr:hover {\n  background-color: #f1f6fd;\n}\n.chrome .tables_container .data_container table tr.selected {\n  background-color: #d4d4d4;\n  color: inherit;\n}\n.chrome .tables_container .data_container table tr.selected.focused {\n  background-color: #2196f3;\n  color: white;\n}\n.chrome .tables_container .data_container table tr.filler {\n  height: auto;\n  background-color: white;\n}\n.chrome .tables_container .data_container table tr.filler td {\n  height: auto;\n  padding: 0;\n  cursor: default;\n}\n.chrome .tables_container .data_container table tr.error:not(.selected) {\n  color: #e60000;\n}\n.chrome .tables_container .data_container table tr.pending {\n  color: #7a8c9f;\n}\n.chrome .tables_container .data_container table td {\n  border-left: 1px solid #e1e1e1;\n  height: 21px;\n  cursor: pointer;\n}\n.chrome .tables_container .data_container table td:first-child {\n  border-left: none;\n}\n.chrome .tables_container .data_container table td .disp_value {\n  display: inline;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.chrome .tables_container .data_container table td .disp_value .small_icon.info {\n  display: inline-block;\n  margin-left: 4px;\n  margin-bottom: 0;\n}\n.chrome .tables_container .data_container table td .icon {\n  width: 16px;\n  height: 16px;\n  float: left;\n  margin-top: 1px;\n  margin-right: 3px;\n}\n.chrome .tables_container .data_container table td .icon.script {\n  background-image: url(/img/resource_document_icon_small.png);\n}\n.chrome .data_grid_resizer {\n  cursor: col-resize;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  width: 5px;\n  z-index: 500;\n}\n.har_viewer {\n  width: 100%;\n  height: 100%;\n  min-height: 300px;\n}\n.har_viewer.waiting * {\n  cursor: wait !important;\n}\n.har_viewer .toolbar input[type=checkbox] {\n  margin-top: 0;\n  top: 0;\n  margin-left: 7px;\n}\n.har_viewer .toolbar .actions {\n  display: flex;\n}\n.har_viewer .tables_container .data_container table td .disp_value {\n  display: block;\n}\n.har_viewer .tables_container .data_container table td label {\n  margin: 0;\n}\n.har_viewer .tables_container .data_container table td input[type=checkbox] {\n  margin-top: 0;\n  margin-left: 3px;\n  top: 3px;\n  position: relative;\n}\n.har_viewer .tables_container .data_container table td:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th:nth-child(2) {\n  border-left: none;\n}\n.har_viewer .tables_container .header_container table th input[type=checkbox] {\n  margin-left: 3px;\n}\n.har_viewer .tables_container .header_container table th label {\n  margin: 0;\n}\n.har_preview {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-left: 1px solid #cdcdcd;\n  border-top: 1px solid #d0d0d0;\n}\n.har_preview .tabbed_pane_header {\n  display: flex;\n  flex: 0 0 26px;\n  border-bottom: 1px solid #ccc;\n  background-color: #f3f3f3;\n  position: relative;\n}\n.har_preview .tabbed_pane_header .left_pane {\n  display: flex;\n  align-items: center;\n  margin: 0 3px 0 5px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper {\n  display: flex;\n  align-items: center;\n  width: 16px;\n  height: 16px;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn {\n  margin: auto;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper .close_btn_h {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn {\n  display: none;\n}\n.har_preview .tabbed_pane_header .left_pane .close_btn_wrapper:hover .close_btn_h {\n  display: block;\n}\n.har_preview .tabbed_pane_header .right_panes {\n  overflow: hidden;\n  flex: auto;\n  display: flex;\n}\n.har_preview .tabbed_pane_header .right_panes .pane {\n  padding: 2px 0.8em;\n  height: 26px;\n  line-height: 15px;\n  white-space: nowrap;\n  cursor: default;\n  display: flex;\n  align-items: center;\n  color: #5a5a5a;\n}\n.har_preview .tabbed_pane_header .right_panes .pane span {\n  text-transform: capitalize;\n}\n.har_preview .tabbed_pane_header .right_panes .pane:hover {\n  color: #333;\n  background-color: #eaeaea;\n}\n.har_preview .tabbed_pane_header .right_panes .pane.active {\n  color: #333;\n}\n.har_preview .tabbed_pane_header .right_panes .pane_slider {\n  height: 2px;\n  position: absolute;\n  bottom: -1px;\n  background-color: #03a9f4;\n  left: 0;\n  z-index: 50;\n  transform-origin: 0 100%;\n  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1);\n}\n.har_preview .tabbed_pane_content {\n  flex-basis: 0;\n  flex-grow: 1;\n  display: flex;\n  max-height: 100%;\n  overflow-x: hidden;\n  background-color: white;\n  position: relative;\n}\n.har_preview .tabbed_pane_content ol {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  list-style-type: none;\n}\n.har_preview .tabbed_pane_content .tree_outline {\n  width: 100%;\n  padding: 0 0 4px 0;\n}\n.har_preview .tabbed_pane_content .tree_outline li {\n  padding-left: 5px;\n  line-height: 20px;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol {\n  padding-bottom: 5px;\n  border-bottom: solid 1px #e0e0e0;\n}\n.har_preview .tabbed_pane_content .tree_outline ol:last-child {\n  border-bottom: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children {\n  padding-left: 10px;\n  display: none;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.open {\n  display: block;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem {\n  -webkit-user-select: none;\n  user-select: none;\n  cursor: default;\n  margin-left: 10px;\n  margin-top: 1px;\n  min-height: 12px;\n  user-select: text;\n  -webkit-user-select: text;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_name {\n  color: #545454;\n  display: inline-block;\n  margin-right: 0.25em;\n  font-weight: bold;\n  vertical-align: top;\n  white-space: pre-wrap;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value {\n  display: inline-block;\n  margin-right: 1em;\n  white-space: pre-wrap;\n  word-break: break-all;\n  margin-top: 1px;\n  font-size: 11px !important;\n  font-family: dejavu sans mono, monospace;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children li.treeitem .header_value .status_wrapper {\n  display: flex;\n  align-items: center;\n}\n.har_preview .tabbed_pane_content .tree_outline ol.children.timeline {\n  padding-right: 16px;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title {\n  font-weight: bold;\n  color: #616161;\n  height: 26px;\n  display: flex;\n  align-items: center;\n  cursor: default;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  background-color: #727272;\n  -webkit-mask-position: 0 0;\n}\n.har_preview .tabbed_pane_content .tree_outline .parent_title.open:before {\n  -webkit-mask-position: -16px 0;\n}\n.har_preview .tabbed_pane_content .codemirror_wrapper {\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n}\n.har_preview .tabbed_pane_content .empty_view {\n  color: #a6a6a6;\n  padding: 30px;\n  display: flex;\n  align-items: center;\n  flex-direction: column;\n  width: 100%;\n}\n.har_preview .tabbed_pane_content .empty_view div {\n  font-size: 1.5em;\n  font-weight: bold;\n  margin-top: auto;\n  margin-bottom: auto;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper {\n  width: 100%;\n  color: #4d4d4d;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table {\n  width: 100%;\n  border-spacing: 0;\n  line-height: initial;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table td {\n  padding: 4px 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td,\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_footer td {\n  border-top: 10px solid transparent;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td {\n  color: #bbb;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .table_header td:last-child {\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .labels {\n  width: 156px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table colgroup .duration {\n  width: 80px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_title {\n  color: #222;\n  white-space: nowrap;\n  text-align: right;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper {\n  position: relative;\n  height: 15px;\n  overflow: hidden;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar {\n  min-width: 1px;\n  position: absolute;\n  top: 0;\n  bottom: 0;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.blocked {\n  border: 1px solid rgba(0, 0, 0, 0.1);\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.send {\n  background-color: #B0BEC5;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.wait {\n  background-color: #00C853;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper table .timing_row .timing_bar_wrapper .timing_bar.receive {\n  background-color: #03A9F4;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info {\n  margin: 5px 10px;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .timeline_info.total {\n  margin-right: 16px;\n  float: right;\n  font-weight: 600;\n}\n.har_preview .tabbed_pane_content .timing_view_wrapper .footer_link {\n  margin: 20px 10px;\n}\n.har_preview .tabbed_pane_content .pane_preview {\n  padding: 4px 8px;\n}\n.json_viewer {\n  color: #303942;\n  cursor: default;\n  width: 100%;\n  font-family: dejavu sans mono, monospace;\n  font-size: 11px !important;\n  padding: 4px 6px;\n  overflow: auto;\n}\n.json_viewer ol.tree_root {\n  padding: 0;\n}\n.json_viewer ol.tree_children {\n  padding-left: 12px;\n}\n.json_viewer li.tree_item:before {\n  -webkit-user-select: none;\n  user-select: none;\n  -webkit-mask-image: url(/img/treeoutline_triangles.png);\n  -webkit-mask-size: 32px 24px;\n  content: \"aa\";\n  color: transparent;\n  text-shadow: none;\n  margin-right: -2px;\n  height: 12px;\n  -webkit-mask-position: 0 0;\n  background-color: #727272;\n}\n.json_viewer li.tree_item:not(.parent):before {\n  background-color: transparent;\n}\n.json_viewer li.tree_item.expanded:before {\n  -webkit-mask-position: -16px 0;\n}\n.json_viewer li.tree_item {\n  text-overflow: ellipsis;\n  white-space: nowrap;\n  position: relative;\n  display: flex;\n  align-items: center;\n  min-height: 16px;\n  height: 12px;\n}\n.json_viewer li.tree_item span {\n  line-height: 13px;\n}\n.json_viewer li.tree_item .name {\n  color: #881391;\n  flex-shrink: 0;\n}\n.json_viewer li.tree_item .separator {\n  flex-shrink: 0;\n  padding-right: 5px;\n}\n.json_viewer li.tree_item .value.number {\n  color: #1c00cf;\n}\n.json_viewer li.tree_item .value.boolean {\n  color: #0d22aa;\n}\n.json_viewer li.tree_item .value.string {\n  white-space: pre;\n  unicode-bidi: -webkit-isolate;\n  color: #c41a16;\n}\n.img_viewer {\n  flex: auto;\n}\n.img_viewer .image {\n  padding: 20px 20px 10px 20px;\n  text-align: center;\n}\n.img_viewer .image img {\n  max-width: 100%;\n  max-height: 1000px;\n  background-image: url(/img/checker.png);\n  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);\n}\n", ""]);
 
 // exports
 

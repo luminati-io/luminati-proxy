@@ -102,6 +102,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
 .page_body {
     padding-left: 50px;
     padding-top: 60px;
+    position: initial !important;
 }
 .api_link { margin-left: 3px; }
 .flag-icon {
@@ -898,6 +899,12 @@ span.icon_link {
     }
 }
 .nav_tabs {
+    &.narrow {
+        .btn_tab {
+            height: 30px;
+            .title { top: 3px; }
+        }
+    }
     display: flex;
     .btn_tab {
         flex-grow: 1;
@@ -967,7 +974,6 @@ span.icon_link {
     flex-direction: column;
     font-size: 14px;
     margin: 0 15px;
-    .har_viewer { padding: 0; }
     .info_icon {
         background: url(/img/info.svg);
         width: 11px;
@@ -1007,10 +1013,6 @@ span.icon_link {
         margin-top: 10px;
         display: flex;
         &.logs {
-            .nav_tabs {
-                .btn_tab { height: 30px; }
-                .title { top: 3px; }
-            }
             .window_wrapper {
                 flex: 1;
                 padding: 15px 0;
@@ -1238,7 +1240,10 @@ span.icon_link {
     .logs_wrapper {
         flex: 1;
         display: flex;
-        .har_viewer { height: auto; }
+        .har_viewer {
+            height: auto;
+            padding: 15px;
+        }
     }
 }
 .ic_warning {
@@ -1377,10 +1382,9 @@ span.icon_link {
         }
     }
 }
-.dock_logs {
-    .har_viewer { padding: 0; }
-}
 .logs {
+    height: 100%;
+    .nav_tabs { margin-bottom: 15px; }
     .top_panel { margin: 10px 15px 20px; }
     .top_header { margin: 0 15px 16px; }
     .logs_panel {
@@ -1701,11 +1705,39 @@ span.icon_link {
 }
 .modal-backdrop.fade.in { opacity: 0.15; }
 .howto {
-    .howto_panel { margin: 0 15px; }
+    flex: 1;
     .nav_header { padding: 0 15px 10px; }
     .nav_tabs { margin-bottom: 15px; }
-    .panel_inner { width: 600px; }
     h1.header { width: auto; }
+    .howto_panel {
+        flex: 1;
+        margin: 0 15px;
+        display: flex;
+        .panel_inner {
+            width: 600px;
+            min-width: 550px;
+        }
+        .gifs_inner {
+            flex: 1;
+            .gif {
+                flex: 1;
+                margin-left: 20px;
+                max-width: 720px;
+                min-width: 400px;
+                background-repeat: no-repeat;
+                background-size: contain;
+                &.chrome_mac {
+                    background-image: url(/img/ins_chrome_mac.gif);
+                }
+                &.chrome_win {
+                    background-image: url(/img/ins_chrome_win.gif);
+                }
+                &.ie { background-image: url(/img/ins_ie.gif); }
+                &.firefox { background-image: url(/img/ins_firefox.gif); }
+                &.safari { background-image: url(/img/ins_safari.gif); }
+            }
+        }
+    }
     .well {
         box-shadow: none;
         border-radius: 3px;
@@ -2172,9 +2204,6 @@ span.icon_link {
     position: relative;
 }
 .flex_auto { flex: auto; }
-.logs {
-    height: 100%;
-}
 .chrome {
     &.chrome_table {
         height: 100%;
@@ -2538,7 +2567,6 @@ span.icon_link {
     width: 100%;
     height: 100%;
     min-height: 300px;
-    padding: 15px;
     .toolbar {
         input[type=checkbox] {
             margin-top: 0;

@@ -230,8 +230,7 @@ class Actions extends Pure_component {
             return;
         const uuids = Object.keys(list).filter(o=>list[o]);
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
-            // XXX krzysztof: switch fetch->ajax
+            this.on('uncaught', console.error);
             yield window.fetch('/api/logs_resend', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -356,14 +355,20 @@ const table_cols = [
 ];
 const Tables_container = withRouter(with_resizable_cols(table_cols,
 class Tables_container extends Pure_component {
-    uri = '/api/logs';
-    batch_size = 30;
-    loaded = {from: 0, to: 0};
-    state = {
-        focused: false,
-        reqs: [],
-        sorted: {field: 'timestamp', dir: 1},
-    };
+    constructor(props){
+        super(props);
+        this.uri = '/api/logs';
+        this.batch_size = 30;
+        this.loaded = {from: 0, to: 0};
+        this.state = {
+            focused: false,
+            reqs: [],
+            sorted: {field: 'timestamp', dir: 1},
+        };
+        this.reqs_to_render = [];
+        this.reqs_to_abort = [];
+        this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
+    }
     componentDidUpdate(prev_props){
         if (this.props.search!=prev_props.search)
             this.set_new_params_debounced();
@@ -402,8 +407,6 @@ class Tables_container extends Pure_component {
             if (stats)
                 this.setState({stats});
         });
-        this.setdb_on('head.har_viewer.sub_stats', sub_stats=>
-            this.setState({sub_stats}));
         this.setdb_on('head.ws', ws=>{
             if (!ws||this.ws)
                 return;
@@ -497,10 +500,6 @@ class Tables_container extends Pure_component {
                 sum_in: res.sum_in};
             if (!_this.state.stats||!_this.state.stats.total)
                 setdb.set('head.har_viewer.stats', stats);
-            if (params.search)
-                setdb.set('head.har_viewer.sub_stats', stats);
-            else if (_this.state.sub_stats)
-                setdb.set('head.har_viewer.sub_stats', null);
         });
     };
     set_new_params = ()=>{
@@ -521,43 +520,44 @@ class Tables_container extends Pure_component {
     };
     on_focus = ()=>this.setState({focused: true});
     on_blur = ()=>this.setState({focused: false});
-    is_hidden = request=>{
-        const cur_port = request.details.port;
+    is_hidden = req=>{
+        const cur_port = req.details.port;
         const port = this.props.match.params.port;
-        if (port&&cur_port!=port)
+        if (port && cur_port!=port)
             return true;
-        if (this.port_range&&
-            (cur_port<this.port_range.from||cur_port>this.port_range.to))
+        if (this.port_range &&
+            (cur_port<this.port_range.from || cur_port>this.port_range.to))
         {
             return true;
         }
-        if (this.props.search&&!request.request.url.match(
+        if (this.props.search && !req.request.url.match(
             new RegExp(this.props.search)))
         {
             return true;
         }
-        if (this.props.type_filter&&this.props.type_filter!='All'&&
-            request.details.content_type!=this.props.type_filter.toLowerCase())
+        if (this.props.type_filter && this.props.type_filter!='All' &&
+            req.details.content_type!=this.props.type_filter.toLowerCase())
         {
             return true;
         }
-        if (this.props.filters.port&&
-            this.props.filters.port!=request.details.port)
+        if (this.props.filters.port &&
+            this.props.filters.port!=req.details.port)
         {
             return true;
         }
-        if (this.props.filters.protocol&&
-            this.props.filters.protocol!=request.details.protocol)
+        if (this.props.filters.protocol &&
+            this.props.filters.protocol!=req.details.protocol)
         {
             return true;
         }
-        if (this.props.filters.status_code&&
-            this.props.filters.status_code!=request.response.status)
+        if (this.props.filters.status_code &&
+            this.props.filters.status_code!=req.response.status)
         {
             return true;
         }
         return false;
     };
+    is_visible = r=>!this.is_hidden(r);
     on_message = event=>{
         const json = JSON.parse(event.data);
         if (json.type=='har_viewer')
@@ -568,63 +568,65 @@ class Tables_container extends Pure_component {
             this.on_request_aborted_message(json.data);
     };
     on_request_aborted_message = uuid=>{
-        const new_reqs = this.state.reqs.filter(r=>r.uuid!=uuid);
-        const delta = new_reqs.length!=this.state.reqs.length ? -1 : 0;
-        this.setState(prev=>({
-            reqs: new_reqs,
-            stats: {
-                ...prev.stats,
-                total: prev.stats.total+delta,
-            },
-        }));
+        if (this.reqs_to_render.map(r=>r.uuid).includes(uuid))
+        {
+            return this.reqs_to_render =
+                this.reqs_to_render.filter(r=>r.uuid!=uuid);
+        }
+        this.reqs_to_abort.push(uuid);
+        this.take_reqs_from_pool();
     };
     on_request_started_message = req=>{
         req.pending = true;
         this.on_request_message(req);
     };
     on_request_message = req=>{
-        // XXX krzysztof: reduce updating state from 3x to 1x
-        this.setState(prev=>({
-            stats: {
-                total: prev.stats.total+(req.pending ? 1 : 0),
-                sum_out: prev.stats.sum_out+req.details.out_bw,
-                sum_in: prev.stats.sum_in+req.details.in_bw,
-            },
-        }));
-        if (this.is_hidden(req))
+        this.reqs_to_render.push(req);
+        this.take_reqs_from_pool();
+    };
+    take_reqs_from_pool = ()=>{
+        if (!this.reqs_to_render.length && !this.reqs_to_abort.length)
             return;
-        const sorted_field = this.props.cols.find(
-            c=>c.sort_by==this.state.sorted.field).data;
-        const dir = this.state.sorted.dir;
-        const new_size = Math.max(this.state.reqs.length, this.batch_size);
-        if (new_size>this.state.reqs.length)
-            this.loaded.to = this.loaded.to+1;
+        const reqs = this.reqs_to_render.filter(this.is_visible);
+        const all_reqs = this.reqs_to_render;
+        if (this.batch_size>this.state.reqs.length)
+        {
+            this.loaded.to = Math.min(this.batch_size,
+                this.state.reqs.length + reqs.length);
+        }
         const new_reqs_set = {};
-        [...this.state.reqs, req].forEach(r=>{
+        [...this.state.reqs, ...reqs].forEach(r=>{
+            if (this.reqs_to_abort.includes(r.uuid))
+                return;
             if (!new_reqs_set[r.uuid])
                 return new_reqs_set[r.uuid] = r;
             if (new_reqs_set[r.uuid].pending)
                 new_reqs_set[r.uuid] = r;
         });
-        const new_reqs = Object.values(new_reqs_set).sort((a, b)=>{
+        const sorted_field = this.props.cols.find(
+            c=>c.sort_by==this.state.sorted.field).data;
+        const dir = this.state.sorted.dir;
+        const new_reqs = Object.values(new_reqs_set)
+        .sort((a, b)=>{
             const val_a = _.get(a, sorted_field);
             const val_b = _.get(b, sorted_field);
             if (val_a==val_b)
                 return a.uuid > b.uuid ? -1*dir : dir;
             return val_a > val_b ? -1*dir : dir;
-        }).slice(0, new_size);
-        this.setState({reqs: new_reqs});
-        // XXX krzysztof: improve logic for stats and substats
-        if (this.state.sub_stats)
-        {
-            this.setState(prev=>({
-                sub_stats: {
-                    total: prev.sub_stats.total+1,
-                    sum_out: prev.sub_stats.sum_out+req.details.out_bw,
-                    sum_in: prev.sub_stats.sum_in+req.details.in_bw,
-                },
-            }));
-        }
+        }).slice(0, Math.max(this.state.reqs.length, this.batch_size));
+        this.reqs_to_render = [];
+        this.reqs_to_abort = [];
+        this.setState(prev=>{
+            const new_state = {reqs: new_reqs};
+            new_state.stats = {
+                total: prev.stats.total + all_reqs.filter(r=>r.pending).length,
+                sum_out: prev.stats.sum_out + all_reqs.reduce((acc, r)=>
+                    acc+r.details.out_bw||0, 0),
+                sum_in: prev.stats.sum_in + all_reqs.reduce((acc, r)=>
+                    acc+r.details.in_bw||0, 0),
+            };
+            return new_state;
+        });
     };
     on_mouse_up = ()=>{
         this.moving_col = null;
@@ -656,8 +658,7 @@ class Tables_container extends Pure_component {
                   cur_preview={this.props.cur_preview}
                   open_preview={this.props.open_preview}/>
               </div>
-              <Summary_bar stats={this.state.stats}
-                sub_stats={this.state.sub_stats}/>
+              <Summary_bar stats={this.state.stats}/>
             </div>;
     }
 }));
@@ -668,22 +669,10 @@ class Summary_bar extends Pure_component {
             {total: 0, sum_in: 0, sum_out: 0};
         sum_out = bytes_format(sum_out)||'0 B';
         sum_in = bytes_format(sum_in)||'0 B';
-        let text;
-        if (!this.props.sub_stats)
-            text = `${total} requests | ${sum_out} sent | ${sum_in} received`;
-        else
-        {
-            let sub_total = this.props.sub_stats.total;
-            let sub_sum_out = this.props.sub_stats.sum_out;
-            let sub_sum_in = this.props.sub_stats.sum_in;
-            sub_sum_out = bytes_format(sub_sum_out)||'0 B';
-            sub_sum_in = bytes_format(sub_sum_in)||'0 B';
-            text = `${sub_total} / ${total} requests | ${sub_sum_out} /
-            ${sum_out} sent | ${sub_sum_in} / ${sum_in} received`;
-        }
+        const txt = `${total} requests | ${sum_out} sent | ${sum_in} received`;
         return <div className="summary_bar">
               <span>
-                <Tooltip title={text}>{text}</Tooltip>
+                <Tooltip title={txt}>{txt}</Tooltip>
               </span>
             </div>;
     }
