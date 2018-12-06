@@ -1150,18 +1150,6 @@ describe('proxy', ()=>{
                 {retry_port: 24001, retry: true});
             assert.ok(r);
         }));
-        it('check post_timeout', ()=>etask(function*(){
-            l = yield lum({rules: {post: [
-                {res: [{timeout: 1}], url: 'test'}]}});
-            sinon.stub(l.rules, 'action').returns(true);
-            const t = (req, expected)=>{
-                const r = l.rules.post_timeout(req, {}, {});
-                assert.equal(r, expected);
-            };
-            t({ctx: {h_context: 'STATUS CHECK'}}, undefined);
-            t({ctx: {}, url: 'invalid'}, undefined);
-            t({ctx: {}, url: 'test.com'}, true);
-        }));
         it('check post_need_body', ()=>etask(function*(){
             l = yield lum({rules: {post: [
                 {res: [], url: 'test'}]}});

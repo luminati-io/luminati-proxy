@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.114.998",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed 502 erros handling with Rules"
+            }
+        ]
+    },
+    {
         "ver": "1.114.809",
         "type": "stable",
         "changes": [

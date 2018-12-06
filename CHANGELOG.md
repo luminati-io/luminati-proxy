@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.114.998 Stable
+- :bug: fixed 502 erros handling with Rules
+
 ## 1.114.809 Stable
 - :star: HAR viewer optimizations
 
