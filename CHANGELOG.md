@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.115.628 
+
 ## 1.114.998 Stable
 - :bug: fixed 502 erros handling with Rules
 

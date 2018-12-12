@@ -440,6 +440,7 @@ var Modal = exports.Modal = function (_React$Component2) {
             var footer = null;
             if (!this.props.no_footer) {
                 footer = this.props.footer || _react2.default.createElement(Footer_default, { cancel_clicked: this.click_cancel.bind(this),
+                    ok_href: this.props.ok_href,
                     ok_clicked: this.click_ok.bind(this),
                     ok_btn_title: this.props.ok_btn_title,
                     ok_btn_classes: this.props.ok_btn_classes,
@@ -578,9 +579,8 @@ var Enable_ssl_modal = exports.Enable_ssl_modal = function (_Pure_component2) {
 
                             case 4:
                                 _this.setState({ loading: false });
-                                window.open('/ssl');
 
-                            case 6:
+                            case 5:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -597,7 +597,7 @@ var Enable_ssl_modal = exports.Enable_ssl_modal = function (_Pure_component2) {
                 Modal,
                 { key: '2', id: this.props.id || 'enable_ssl_modal',
                     title: 'Enable SSL analyzing for all proxies', no_cancel_btn: true,
-                    no_ok_close: true, click_ok: this.enable_ssl,
+                    no_ok_close: true, click_ok: this.enable_ssl, ok_href: '/ssl',
                     ok_btn_title: 'Download certificate', className: 'enable_ssl_modal' },
                 _react2.default.createElement(
                     'p',
@@ -665,19 +665,27 @@ var Tooltip_bytes = exports.Tooltip_bytes = function Tooltip_bytes(_ref5) {
 };
 
 var Footer_default = function Footer_default(props) {
+    var ok_title = props.ok_btn_title || 'OK';
+    var ok_classes = props.ok_btn_classes || 'btn btn_lpm btn_lpm_primary ok';
     return _react2.default.createElement(
         'div',
         { className: 'default_footer' },
         !props.no_cancel_btn && _react2.default.createElement(
             'button',
-            { onClick: props.cancel_clicked, className: 'btn btn_lpm cancel' },
+            { onClick: props.cancel_clicked,
+                className: 'btn btn_lpm cancel' },
             'Cancel'
         ),
-        _react2.default.createElement(
+        props.ok_href && _react2.default.createElement(
+            'a',
+            { href: props.ok_href, onClick: props.ok_clicked,
+                className: ok_classes },
+            ok_title
+        ),
+        !props.ok_href && _react2.default.createElement(
             'button',
-            { onClick: props.ok_clicked,
-                className: props.ok_btn_classes || 'btn btn_lpm btn_lpm_primary ok' },
-            props.ok_btn_title || 'OK'
+            { onClick: props.ok_clicked, className: ok_classes },
+            ok_title
         )
     );
 };
@@ -8630,6 +8638,13 @@ E.is_ip_in_range = function(ips_range, ip){
     var min_ip = E.ip2num(ips[0]), max_ip = E.ip2num(ips[1]);
     var num_ip = E.ip2num(ip);
     return num_ip>=min_ip && num_ip<=max_ip;
+};
+
+E.is_ip_local = function(ip){
+    return E.is_ip_in_range('10.0.0.0-10.255.255.255', ip) ||
+        E.is_ip_in_range('172.16.0.0-172.31.255.255', ip) ||
+        E.is_ip_in_range('192.168.0.0-192.168.255.255', ip) ||
+        E.is_ip_in_range('169.254.0.0-169.254.255.255', ip);
 };
 
 E.host_lookup = function(lookup, host){

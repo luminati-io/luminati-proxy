@@ -86,6 +86,7 @@ export class Modal extends React.Component {
         {
             footer = this.props.footer ||
                 <Footer_default cancel_clicked={this.click_cancel.bind(this)}
+                  ok_href={this.props.ok_href}
                   ok_clicked={this.click_ok.bind(this)}
                   ok_btn_title={this.props.ok_btn_title}
                   ok_btn_classes={this.props.ok_btn_classes}
@@ -154,7 +155,6 @@ export class Enable_ssl_modal extends Pure_component {
             _this.setState({loading: true});
             yield ajax({url: '/api/enable_ssl', method: 'POST'});
             _this.setState({loading: false});
-            window.open('/ssl');
         });
     };
     render(){
@@ -162,7 +162,7 @@ export class Enable_ssl_modal extends Pure_component {
             <Loader key="1" show={this.state.loading}/>,
             <Modal key="2" id={this.props.id||'enable_ssl_modal'}
               title="Enable SSL analyzing for all proxies" no_cancel_btn
-              no_ok_close click_ok={this.enable_ssl}
+              no_ok_close click_ok={this.enable_ssl} ok_href="/ssl"
               ok_btn_title='Download certificate' className="enable_ssl_modal">
               <p className="cert_info">
                 You will also need to add a certificate file to browsers.
@@ -199,16 +199,27 @@ export const Tooltip_bytes = ({bytes, chrome_style})=>{
         </T>;
 };
 
-const Footer_default = props=>
-    <div className="default_footer">
-      {!props.no_cancel_btn &&
-        <button onClick={props.cancel_clicked} className="btn btn_lpm cancel">
-          Cancel</button>
-      }
-      <button onClick={props.ok_clicked}
-        className={props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok'}>
-        {props.ok_btn_title||'OK'}</button>
-    </div>;
+const Footer_default = props=>{
+    const ok_title = props.ok_btn_title||'OK';
+    const ok_classes = props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok';
+    return <div className="default_footer">
+          {!props.no_cancel_btn &&
+            <button onClick={props.cancel_clicked}
+              className="btn btn_lpm cancel">
+              Cancel
+            </button>
+          }
+          {props.ok_href &&
+            <a href={props.ok_href} onClick={props.ok_clicked}
+              className={ok_classes}>{ok_title}</a>
+          }
+          {!props.ok_href &&
+            <button onClick={props.ok_clicked} className={ok_classes}>
+              {ok_title}
+            </button>
+          }
+        </div>;
+};
 
 export const Warnings = props=>
     <div>

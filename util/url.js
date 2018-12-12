@@ -212,6 +212,13 @@ E.is_ip_in_range = function(ips_range, ip){
     return num_ip>=min_ip && num_ip<=max_ip;
 };
 
+E.is_ip_local = function(ip){
+    return E.is_ip_in_range('10.0.0.0-10.255.255.255', ip) ||
+        E.is_ip_in_range('172.16.0.0-172.31.255.255', ip) ||
+        E.is_ip_in_range('192.168.0.0-192.168.255.255', ip) ||
+        E.is_ip_in_range('169.254.0.0-169.254.255.255', ip);
+};
+
 E.host_lookup = function(lookup, host){
     var pos;
     while (1)
