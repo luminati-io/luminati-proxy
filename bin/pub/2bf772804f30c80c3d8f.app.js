@@ -50108,6 +50108,8 @@ var route_err_opt = [{ key: 'Default (pass_dyn)', value: '' }, { key: 'pass_dyn'
 
 var debug_opt = [{ key: 'Default (full)', value: '' }, { key: 'none', value: 'none' }, { key: 'full', value: 'full' }];
 
+var log_level_opt = [{ key: 'Default (error)', value: '' }, { key: 'none', value: 'none' }, { key: 'error', value: 'error' }, { key: 'warn', value: 'warn' }, { key: 'verbose', value: 'verbose' }];
+
 exports.default = provider({ tab_id: 'general' })(function (props) {
     var set_field = _setdb2.default.get('head.proxy_edit.set_field');
     var open_modal = function open_modal() {
@@ -50157,7 +50159,7 @@ exports.default = provider({ tab_id: 'general' })(function (props) {
             on_change: multiply_changed, note: note_vips }),
         _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'secure_proxy' }),
         _react2.default.createElement(_common.Config, { type: 'select', id: 'iface', data: props.proxy.iface.values }),
-        _react2.default.createElement(_common.Config, { type: 'select', id: 'log', data: props.proxy.log.values }),
+        _react2.default.createElement(_common.Config, { type: 'select', id: 'log', data: log_level_opt }),
         _react2.default.createElement(_common.Config, { type: 'select', id: 'debug', data: debug_opt })
     );
 });

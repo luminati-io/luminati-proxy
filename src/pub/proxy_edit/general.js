@@ -21,6 +21,14 @@ const debug_opt = [
     {key: 'full', value: 'full'},
 ];
 
+const log_level_opt = [
+    {key: `Default (error)`, value: ''},
+    {key: `none`, value: 'none'},
+    {key: `error`, value: 'error'},
+    {key: `warn`, value: 'warn'},
+    {key: `verbose`, value: 'verbose'},
+];
+
 export default provider({tab_id: 'general'})(props=>{
     const set_field = setdb.get('head.proxy_edit.set_field');
     const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
@@ -68,7 +76,7 @@ export default provider({tab_id: 'general'})(props=>{
           }
           <Config type="yes_no" id="secure_proxy"/>
           <Config type="select" id="iface" data={props.proxy.iface.values}/>
-          <Config type="select" id="log" data={props.proxy.log.values}/>
+          <Config type="select" id="log" data={log_level_opt}/>
           <Config type="select" id="debug" data={debug_opt}/>
         </div>;
 });
