@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.116.208 Stable
+- :star: Introduced token based auth for adding whitelisted IPs
+
 ## 1.116.113 Stable
 - :bug: Fixed whitelist_ips in local proxy port configuration
 

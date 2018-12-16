@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.116.113",
+        "version": "1.116.208",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -75,9 +75,7 @@
         "/node_version": {
             "get": {
                 "description": "Return the currently running node version\n",
-                "tags": [
-                    "Manager"
-                ],
+                "tags": ["Manager"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -99,13 +97,44 @@
                 }
             }
         },
+        "/add_wip": {
+            "post": {
+                "description": "An alternative to adding IPs to whitelist in the UI. This call needs to be authenticated by token and does not need to be sent from whitelisted IP",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "ip",
+                        "in": "body",
+                        "description": "IP to whitelist"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "token"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfull response"
+                    }
+                }
+            }
+        },
+        "/gen_token": {
+            "get": {
+                "description": "Generate token for token based authentication",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successfull response"
+                    }
+                }
+            }
+        },
         "/proxies_running": {
             "get": {
                 "description": "Return the effective configuration for all running proxies\n",
-                "tags": [
-                    "Proxy",
-                    "Manager"
-                ],
+                "tags": ["Proxy", "Manager"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -120,10 +149,7 @@
         "/proxies": {
             "get": {
                 "description": "Return the explicit configuration for all running proxies\n",
-                "tags": [
-                    "Proxy",
-                    "Manager"
-                ],
+                "tags": ["Proxy", "Manager"],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -136,9 +162,7 @@
             },
             "post": {
                 "description": "Add a new proxy",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "proxy",
@@ -176,9 +200,7 @@
         "/proxies/{port}": {
             "put": {
                 "description": "Update existing proxy",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "port",
@@ -221,9 +243,7 @@
             },
             "delete": {
                 "description": "Delete existing proxy",
-                "tags": [
-                    "Proxy"
-                ],
+                "tags": ["Proxy"],
                 "parameters": [
                     {
                         "name": "port",
