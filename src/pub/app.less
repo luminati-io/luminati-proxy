@@ -1028,7 +1028,7 @@ span.icon_link {
         &.headers .desc { width: 145px; }
         &.general .desc { width: 195px; }
         &.rules {
-            .desc { width: 200px; }
+            .desc { width: 200px; min-width: 200px; }
             .rule_wrapper {
                 border: solid 1px @grey;
                 margin-bottom: 15px;
@@ -1038,7 +1038,7 @@ span.icon_link {
                 .btn_rule_del {
                     position: absolute;
                     top: 5px;
-                    right: -20px;
+                    right: -25px;
                     cursor: pointer;
                     background: url(/img/delete.svg);
                     width: 16px;
@@ -1083,7 +1083,7 @@ span.icon_link {
         .field_row {
             padding: 3px;
             display: flex;
-            align-items: baseline;
+            align-items: center;
             .info_icon {
                 display: inline-block;
                 position: relative;
@@ -1122,8 +1122,16 @@ span.icon_link {
     }
     .regex_field {
         width: 100%;
+        display: flex;
         outline: none;
+        position: relative;
         &:hover .tip_box { visibility: visible; }
+        .regex_code {
+            margin-left: 10px;
+            border-left: 1px solid #ccc;
+            padding-left: 10px;
+            display: none;
+        }
         .tip_box {
             color: #8e8e8e;
             height: 32px;

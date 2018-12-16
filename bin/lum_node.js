@@ -72,8 +72,7 @@ let ua_event_wrapper = (...args)=>{
             category: params.ec,
             label: params.el,
             value: params.ev,
-            customer_name: E.manager&&E.manager._defaults
-                &&E.manager._defaults.customer,
+            customer_name: _.get(E.manager, '_defaults.customer'),
         });
         prev_ua_event(params, (..._args)=>{
             if (_.isFunction(cb))
@@ -102,7 +101,7 @@ E.write_status_file = (status, error = null, config = null, reason = null)=>{
         reason,
         error,
         config,
-        customer_name: config && config._defaults && config._defaults.customer,
+        customer_name: _.get(config, '_defaults.customer'),
     });
     try { file.write_e(E.status_filename, JSON.stringify(E.lpm_status)); }
     catch(e){ zerr.notice(`Fail to write status file: ${zerr.e2s(e)}`); }
@@ -167,7 +166,8 @@ E.handle_signal = (sig, err)=>{
         else
         {
             yield zerr.perr('crash', {error: errstr, reason: sig,
-                config: E.manager&&E.manager._total_conf});
+                customer: _.get(E.manager, '_defaults.customer'),
+                config: _.get(E.manager, '_total_conf')});
         }
         E.shutdown(errstr, true, err);
     });

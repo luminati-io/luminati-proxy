@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.116.113 Stable
+- :bug: Fixed whitelist_ips in local proxy port configuration
+
 ## 1.115.736 Stable
 - :bug: Bug fixes
 

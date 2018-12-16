@@ -225,7 +225,11 @@ const Index = withRouter(class Index extends Pure_component {
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
     };
-    // XXX krzysztof: move this logic to rules module
+    regexp_to_obj = url=>{
+        if (typeof url=='string')
+            return {regexp: url};
+        return url;
+    };
     post_rule_map_to_form = rule=>{
         const result = {};
         const res = rule.res[0];
@@ -239,7 +243,7 @@ const Index = withRouter(class Index extends Pure_component {
                 result.status_custom = res.status.arg;
             }
         }
-        result.trigger_url_regex = rule.url;
+        result.trigger_url_regex = this.regexp_to_obj(rule.url);
         result.trigger_type = res.trigger_type;
         result.body_regex = res.body&&res.body.arg;
         if (res.min_req_time)
@@ -274,7 +278,7 @@ const Index = withRouter(class Index extends Pure_component {
     };
     pre_rule_map_to_form = rule=>{
         const res = {
-            trigger_url_regex: rule.url,
+            trigger_url_regex: this.regexp_to_obj(rule.url),
             action: rule.action,
             trigger_type: rule.trigger_type,
         };

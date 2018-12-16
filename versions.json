@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.116.113",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed whitelist_ips in local proxy port configuration"
+            }
+        ]
+    },
+    {
         "ver": "1.115.736",
         "type": "stable",
         "changes": [

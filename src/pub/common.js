@@ -410,7 +410,8 @@ class Pins extends Pure_component {
         }));
     };
     fire_on_change = ()=>{
-        const val = this.state.pins.map(p=>p.val).join(',');
+        const val = this.state.pins.length &&
+            this.state.pins.map(p=>p.val).join(',') || undefined;
         this.props.on_change_wrapper(val);
     };
     save_pin = (id, val)=>{
@@ -602,6 +603,132 @@ export const Form_controller = props=>{
     return <Input {...props}/>;
 };
 
+export class Js extends Pure_component {
+    componentDidMount(){
+        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript'});
+        this.cm.on('change', this.on_cm_change);
+        this.cm.setSize('100%', '100%');
+        const val = this.props.val.code||gen_code(this.props.val.regexp);
+        this.cm.doc.setValue(val);
+    }
+    componentDidUpdate(prev_props){
+        if (prev_props.val.regexp!=this.props.val.regexp)
+            this.cm.doc.setValue(this.props.val.code||'');
+    }
+    on_cm_change = cm=>{
+        const new_val = cm.doc.getValue();
+        if (new_val==this.props.val.code)
+            return;
+        const val = Object.assign({}, this.props.val, {code: new_val});
+        this.props.on_change_wrapper(val);
+    };
+    set_ref = ref=>{ this.textarea = ref; };
+    render(){
+        return <div className="json_input_wrapper">
+              <textarea ref={this.set_ref}/>
+            </div>;
+    }
+}
+
+const gen_function = body=>{
+    body = body.split('\n').map(l=>'  '+l).join('\n');
+    return `function trigger(opt){\n${body}\n}`;
+};
+const gen_code = val=>{
+    if (!val)
+        return empty_function;
+    return gen_function(`return /${val}/.test(opt.url);`);
+};
+const empty_function = gen_function('return true;');
+
+export class Regex extends Pure_component {
+    render(){
+        return <div tabIndex="1" className="regex_field"
+              onFocus={this.on_focus} onBlur={this.on_blur}>
+              <Regex_input {...this.props}/>
+              <Regex_code {...this.props}/>
+            </div>;
+    }
+}
+
+const Regex_code = props=>{
+    return <div className="regex_code">
+          <Js className="regex" {...props}/>
+        </div>;
+};
+
+class Regex_input extends Pure_component {
+    state = {recognized: false, checked: {}};
+    formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'];
+    componentDidMount(){
+        this.recognize_regexp();
+    }
+    componentDidUpdate(prev_props){
+        if (prev_props.val.regexp!=this.props.val.regexp)
+            this.recognize_regexp();
+    }
+    classes = f=>{
+        const active = this.state.recognized && this.state.checked[f];
+        return classnames('check', {active});
+    };
+    toggle = f=>{
+        ga_event('proxy_edit', 'regexp_generator clicked', f);
+        this.setState(
+            prev=>({checked: {...prev.checked, [f]: !prev.checked[f]}}),
+            this.gen_regexp);
+    };
+    recognize_regexp = ()=>{
+        const m = this.props.val.regexp &&
+            this.props.val.regexp.match(/\\\.\((.+)\)\$/);
+        if (m&&m[1])
+        {
+            const checked = m[1].split('|').reduce(
+                (acc, e)=>({...acc, [e]: true}), {});
+            this.setState({recognized: true, checked});
+        }
+        else
+            this.setState({recognized: false, checked: {}});
+    };
+    gen_regexp = ()=>{
+        const formats = Object.keys(this.state.checked)
+        .filter(f=>this.state.checked[f]).join('|');
+        let regexp = '';
+        if (formats)
+            regexp = `\\.(${formats})$`;
+        const code = gen_code(regexp);
+        const val = Object.assign({}, this.props.val, {regexp, code});
+        this.props.on_change_wrapper(val, this.props.id);
+    };
+    tip = f=>{
+        if (this.state.checked[f])
+            return `Remove file format ${f} from regexp`;
+        return `Add file format ${f} to regexp`;
+    };
+    on_input_change = regexp=>{
+        const code = gen_code(regexp);
+        const val = Object.assign({}, this.props.val, {regexp, code});
+        this.props.on_change_wrapper(val, this.props.id);
+    };
+    render(){
+        const val = this.props.val.regexp||'';
+        return <div className="regex_input">
+              <div className="tip_box active">
+                <div className="checks">
+                  {this.formats.map(f=>
+                    <Tooltip key={f+!!this.state.checked[f]}
+                      title={this.tip(f)}>
+                      <div onClick={this.toggle.bind(null, f)}
+                        className={this.classes(f)}>.{f}</div>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+              <Input className="regex" {...this.props} val={val} type="text"
+                on_change_wrapper={this.on_input_change}/>
+            </div>;
+    }
+}
+
 export class Json extends Pure_component {
     state = {};
     componentDidMount(){
@@ -665,70 +792,6 @@ export const Input = props=>{
           placeholder={props.placeholder}
           onBlur={props.on_blur}/>;
 };
-
-export class Regex extends Pure_component {
-    state = {recognized: false, checked: {}};
-    formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'];
-    componentDidMount(){
-        this.recognize_regexp();
-    }
-    componentDidUpdate(prev_props){
-        if (prev_props.val!=this.props.val)
-            this.recognize_regexp();
-    }
-    recognize_regexp = ()=>{
-        const m = (this.props.val||'').match(/\\\.\((.+)\)\$/);
-        if (m&&m[1])
-        {
-            const checked = m[1].split('|').reduce(
-                (acc, e)=>({...acc, [e]: true}), {});
-            this.setState({recognized: true, checked});
-        }
-        else
-            this.setState({recognized: false, checked: {}});
-    };
-    toggle = f=>{
-        ga_event('proxy_edit', 'regexp_generator clicked', f);
-        this.setState(
-            prev=>({checked: {...prev.checked, [f]: !prev.checked[f]}}),
-            this.gen_regexp);
-    };
-    gen_regexp = ()=>{
-        const formats = Object.keys(this.state.checked)
-            .filter(f=>this.state.checked[f]).join('|');
-        if (formats)
-            this.props.on_change_wrapper(`\\.(${formats})$`, this.props.id);
-        else
-            this.props.on_change_wrapper('', this.props.id);
-    };
-    classes = f=>{
-        const active = this.state.recognized&&this.state.checked[f];
-        return classnames('check', {active});
-    };
-    tip = f=>{
-        if (this.state.checked[f])
-            return `Remove file format ${f} from regex`;
-        return `Add file format ${f} to regex`;
-    };
-    render(){
-        const tip_box_classes = classnames('tip_box', 'active');
-        return <div tabIndex="1" className="regex_field"
-            onFocus={this.on_focus} onBlur={this.on_blur}>
-              <div className={tip_box_classes}>
-                <div className="checks">
-                  {this.formats.map(f=>
-                    <Tooltip key={f+!!this.state.checked[f]}
-                      title={this.tip(f)}>
-                      <div onClick={this.toggle.bind(null, f)}
-                        className={this.classes(f)}>.{f}</div>
-                    </Tooltip>
-                  )}
-                </div>
-              </div>
-              <Input className="regex" {...this.props} type="text"/>
-            </div>;
-    }
-}
 
 export const Checkbox = props=>
   <div className="form-check">

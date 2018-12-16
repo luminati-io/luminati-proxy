@@ -240,7 +240,7 @@ class Rules extends Pure_component {
     goto_ssl = ()=>this.goto_field('ssl');
     goto_debug = ()=>this.goto_field('debug');
     render(){
-        return <div>
+        return <div style={{maxWidth: '100%'}}>
               {!this.props.form.ssl &&
                 <Note>
                   <span><strong>Warning: </strong></span>

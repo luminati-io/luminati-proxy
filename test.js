@@ -1044,19 +1044,42 @@ describe('proxy', ()=>{
             t('12hr', 43200000);
             t('21day', 1814400000);
         }));
-        it('check _url_regexp', ()=>etask(function*(){
-            l = yield lum({rules: true, _rules: {res: {}}});
-            const t = (reg, s, expected)=>{
-                const r = l.rules._url_regexp(reg);
-                assert.equal(r.test(s), expected);
+        it('check Url_condition', ()=>{
+            const Url_condition = require('./lib/rules').Url_condition;
+            const t = (construct, _url, expected)=>{
+                const cond = new Url_condition(construct);
+                assert.equal(cond.test(_url), expected);
             };
             t(undefined, '', true);
-            t('*', '', true);
+            t('', '', true);
             t('**', '', true);
-            t('[-]+', '', false);
-            t('[-]+', '--', true);
-            t('\\', '', false);
-        }));
+            t('*', '', true);
+            t('facebook', 'http://facebook.com', true);
+            t('facebook', 'google', false);
+            t({}, '', true);
+            t({regexp: undefined}, '', true);
+            t({regexp: ''}, '', true);
+            t({regexp: '**'}, '', true);
+            t({regexp: '*'}, '', true);
+            t({regexp: 'facebook'}, 'http://facebook.com', true);
+            t({regexp: 'facebook'}, 'google', false);
+            t({code: 'function trigger(opt){ return false; }'}, '', false);
+            t({code: 'function trigger(opt){ return false; }'},
+                'http://google.com', false);
+            t({code: 'function trigger(opt){ return true; }'}, '', true);
+            t({code: 'function trigger(opt){ return true; }'},
+                'http://google.com', true);
+            t({code: `function trigger(opt){
+                return opt.url.includes('facebook.com'); }`}, '', false);
+            t({code: `function trigger(opt){
+                return opt.url.includes('facebook.com'); }`},
+                'http://google.com', false);
+            t({code: `function trigger(opt){
+                return opt.url.includes('facebook.com'); }`},
+                'http://facebook.com', true);
+            t({code: 'function trigger(opt){ return true; }',
+                regexp: 'facebook.com'}, 'http://google.com', true);
+        });
         it('check _can_retry', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {res: {}}});
             const t = (req, rule, expected)=>{
