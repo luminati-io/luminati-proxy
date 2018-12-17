@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.116.272 Stable
+## 1.116.320 Stable
 - :star: UI improvements
 
 ## 1.116.208 Stable

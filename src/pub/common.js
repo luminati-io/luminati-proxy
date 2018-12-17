@@ -634,7 +634,7 @@ const gen_function = body=>{
     return `function trigger(opt){\n${body}\n}`;
 };
 const gen_code = val=>{
-    if (!val)
+    if (!val||val=='*'||val=='**')
         return empty_function;
     return gen_function(`return /${val}/.test(opt.url);`);
 };

@@ -1304,7 +1304,7 @@ var gen_function = function gen_function(body) {
     return 'function trigger(opt){\n' + body + '\n}';
 };
 var gen_code = function gen_code(val) {
-    if (!val) return empty_function;
+    if (!val || val == '*' || val == '**') return empty_function;
     return gen_function('return /' + val + '/.test(opt.url);');
 };
 var empty_function = gen_function('return true;');
