@@ -4,6 +4,16 @@
         "type": "stable",
         "changes": [
             {
+                "type": "bug",
+                "text": "UI bug fixes"
+            }
+        ]
+    },
+    {
+        "ver": "1.116.320",
+        "type": "stable",
+        "changes": [
+            {
                 "type": "star",
                 "text": "UI improvements"
             }

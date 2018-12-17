@@ -20,6 +20,13 @@
 - SSL 嗅探
 - SOCKSv5 代理
 
+### 软件更新要求
+- 2GB RAM
+- 1 CPU
+- 50GB SSD
+- 2TB 宽带
+- Ubuntu 16 LTS
+
 ## 安装
 
 ### 要求
@@ -29,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.116.320-setup.exe">代理管理安装器</a>.
+下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.116.387-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x

@@ -301,6 +301,10 @@ class Rule_config extends Pure_component {
 
 const Fast_pool_note = ({port, r})=>{
     r = r||'**';
+    if (r.regexp)
+        r = r.regexp;
+    if (r.code)
+        r = '**';
     return <span>
           <span>Check fast pool sessions by fetching </span>
           <a href={window.location.origin+'/api/fast/'+port+'?r='+r}

@@ -22,10 +22,17 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 - SSL analyzing (using a self-signed certificate)
 - SOCKSv5 proxy
 
+### Minimal requirements
+- 2GB RAM
+- 1 CPU
+- 50GB SSD
+- 2TB BW
+- Ubuntu 16 LTS
+
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.116.320/luminati-proxy-manager-v1.116.320-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.116.387/luminati-proxy-manager-v1.116.387-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install

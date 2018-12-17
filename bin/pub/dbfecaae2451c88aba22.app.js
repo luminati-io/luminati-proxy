@@ -49513,6 +49513,8 @@ var Fast_pool_note = function Fast_pool_note(_ref3) {
         r = _ref3.r;
 
     r = r || '**';
+    if (r.regexp) r = r.regexp;
+    if (r.code) r = '**';
     return _react2.default.createElement(
         'span',
         null,

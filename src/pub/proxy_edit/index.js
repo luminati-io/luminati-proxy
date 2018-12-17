@@ -15,7 +15,7 @@ import {Modal, Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import * as util from '../util.js';
-import {withRouter} from 'react-router-dom';
+import {withRouter, Switch, Route} from 'react-router-dom';
 import Rules from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
@@ -492,7 +492,7 @@ const Index = withRouter(class Index extends Pure_component {
                 {this.state.consts && this.state.defaults &&
                     this.state.proxies &&
                   <Main_window
-                    proxy={this.state.consts&&this.state.consts.proxy}
+                    proxy={this.state.consts && this.state.consts.proxy}
                     defaults={this.state.defaults}
                     form={this.state.form}
                     get_curr_plan={this.get_curr_plan}/>
