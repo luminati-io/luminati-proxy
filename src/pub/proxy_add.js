@@ -7,7 +7,8 @@ import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
 import {Modal, Loader, Textarea, Tooltip, Warnings, Code,
-    Zone_description, Preset_description, Nav_tabs} from './common.js';
+    Zone_description, Preset_description, Nav_tabs,
+    Nav_tab} from './common.js';
 import {ga_event, presets} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
@@ -156,7 +157,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 `${this.state.preset}_${value}`);
         }
     };
-    change_tab = id=>{
+    set_tab = id=>{
         ga_event('add-new-port', 'changed proxy type', id);
         this.setState({cur_tab: id});
     };
@@ -198,7 +199,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
                 on_hidden={this.on_hidden} footer={Footer_wrapper}
                 className="add_proxy_modal">
                 <div className={anim_classes}>
-                  <Nav_tabs_wrapper change_tab={this.change_tab}
+                  <Nav_tabs_wrapper set_tab={this.set_tab}
                     cur_tab={this.state.cur_tab}/>
                   {content}
                 </div>
@@ -311,27 +312,13 @@ const Preview = ({title, children})=>{
         </div>;
 };
 
-const Nav_tabs_wrapper = ({change_tab, cur_tab})=>
-    <Nav_tabs>
-      <Tab on_click={change_tab} title="Luminati" id="proxy_lum"
-        cur_tab={cur_tab}
+const Nav_tabs_wrapper = ({set_tab, cur_tab})=>
+    <Nav_tabs set_tab={set_tab} cur_tab={cur_tab}>
+      <Nav_tab title="Luminati" id="proxy_lum"
         tooltip="Proxy port using your Luminati account"/>
-      <Tab on_click={change_tab} title="External" id="proxy_ext"
-        cur_tab={cur_tab}
+      <Nav_tab title="External" id="proxy_ext"
         tooltip="Proxy port configured with external IP and credentials"/>
     </Nav_tabs>;
-
-const Tab = ({id, on_click, title, cur_tab, tooltip})=>{
-    const active = cur_tab==id;
-    const btn_class = classnames('btn_tab', {active});
-    return <Tooltip title={tooltip}>
-          <div onClick={()=>on_click(id)} className={btn_class}>
-            <div className={classnames('icon', id)}/>
-            <div className="title">{title}</div>
-            <div className="arrow"/>
-          </div>
-        </Tooltip>;
-};
 
 const Field = props=>
     <div className="field">

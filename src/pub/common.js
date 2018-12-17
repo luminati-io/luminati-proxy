@@ -410,8 +410,7 @@ class Pins extends Pure_component {
         }));
     };
     fire_on_change = ()=>{
-        const val = this.state.pins.length &&
-            this.state.pins.map(p=>p.val).join(',') || undefined;
+        const val = this.state.pins.map(p=>p.val).join(',');
         this.props.on_change_wrapper(val);
     };
     save_pin = (id, val)=>{
@@ -1078,7 +1077,22 @@ export const Preset_description = ({preset, rule_clicked})=>{
         </div>;
 };
 
-export const Nav_tabs = ({children, narrow})=>
+export const Nav_tabs = ({children, narrow, set_tab, cur_tab})=>
     <div className={classnames('nav_tabs', {narrow})}>
-      {children}
+      {
+        React.Children.map(children, c=>
+          React.cloneElement(c, {set_tab, cur_tab, narrow}))
+      }
     </div>;
+
+export const Nav_tab = ({id, set_tab, title, cur_tab, tooltip, narrow})=>{
+    const active = cur_tab==id;
+    const btn_class = classnames('btn_tab', {active});
+    return <Tooltip title={tooltip}>
+          <div onClick={()=>set_tab(id)} className={btn_class}>
+            {!narrow && <div className={classnames('icon', id)}/>}
+            <div className="title">{title}</div>
+            <div className="arrow"/>
+          </div>
+        </Tooltip>;
+};

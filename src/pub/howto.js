@@ -4,7 +4,7 @@ import 'prismjs/themes/prism.css';
 import React from 'react';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code, Tooltip, Nav_tabs} from './common.js';
+import {Code, Nav_tabs, Nav_tab} from './common.js';
 import {ga_event, swagger_url} from './util.js';
 import Pure_component from '../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
@@ -30,13 +30,11 @@ const Howto = withRouter(class Howto extends Pure_component {
               </div>
               <div className="howto_panel">
                 <div className="panel_inner">
-                  <Nav_tabs>
-                    <Tab id="code" title="Code"
-                      tooltip="Examples how to use LPM programatically"
-                      on_click={this.choose_click} cur_tab={option}/>
-                    <Tab id="browser" title="Browser"
-                      tooltip="Examples how to inegrate LPM with the browser"
-                      on_click={this.choose_click} cur_tab={option}/>
+                  <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
+                    <Nav_tab id="code" title="Code"
+                      tooltip="Examples how to use LPM programatically"/>
+                    <Nav_tab id="browser" title="Browser"
+                      tooltip="Examples how to inegrate LPM with the browser"/>
                   </Nav_tabs>
                   <Instructions>{this.props.children}</Instructions>
                 </div>
@@ -54,18 +52,6 @@ const Animated_instructions = withRouter(props=>{
     return <div className="gifs_inner vbox">
           <div className={classnames('gif', browser)}/>
         </div>;
-});
-
-const Tab = withRouter(({id, on_click, title, cur_tab, tooltip, match})=>{
-    const active = cur_tab==id;
-    const btn_class = classnames('btn_tab', {active});
-    return <Tooltip title={tooltip}>
-          <div onClick={()=>on_click(id)} className={btn_class}>
-            <div className={classnames('icon', id)}/>
-            <div className="title">{title}</div>
-            <div className="arrow"/>
-          </div>
-        </Tooltip>;
 });
 
 const Lang_btn = props=>{

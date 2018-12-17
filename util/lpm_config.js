@@ -22,7 +22,7 @@ const conf = {
     mgr_fields: _.keys(swagger.definitions.manager.properties),
     numeric_fields: prop_by_type(swagger.definitions.proxy, 'integer'),
     boolean_fields: prop_by_type(swagger.definitions.proxy, 'boolean'),
-    credential_fields: qw`customer zone password token`,
+    credential_fields: qw`customer zone password token token_md5`,
     default_superproxy_domain: 'zproxy.lum-superproxy.io',
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields);

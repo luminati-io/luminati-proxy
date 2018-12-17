@@ -9,9 +9,9 @@ import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
-import {Modal, Loader, Warnings, Link_icon, Checkbox, Tooltip,
-    Pagination_panel, Loader_small, Zone_description,
-    Preset_description, Nav_tabs} from '../common.js';
+import {Modal, Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
+    Loader_small, Zone_description, Preset_description, Nav_tabs,
+    Nav_tab} from '../common.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import * as util from '../util.js';
@@ -486,15 +486,7 @@ const Index = withRouter(class Index extends Pure_component {
                   disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_preset={this.apply_preset}/>
-                <Nav_tabs>
-                  <Tab_btn id="logs"/>
-                  <Tab_btn id="target"/>
-                  <Tab_btn id="rotation"/>
-                  <Tab_btn id="speed"/>
-                  <Tab_btn id="rules"/>
-                  <Tab_btn id="headers"/>
-                  <Tab_btn id="general"/>
-                </Nav_tabs>
+                <Nav_tabs_wrapper/>
               </div>
               <div className={classnames('main_window', {[tab]: true})}>
                 {this.state.consts && this.state.defaults &&
@@ -513,6 +505,24 @@ const Index = withRouter(class Index extends Pure_component {
               <Alloc_modal type={type} form={this.state.form}
                 zone={this.state.form.zone||default_zone} tab={tab}/>
             </div>;
+    }
+});
+
+const Nav_tabs_wrapper = withRouter(
+class Nav_tabs_wrapper extends Pure_component {
+    tabs = ['logs', 'target', 'rotation', 'speed', 'rules', 'headers',
+        'general'];
+    set_tab = id=>{
+        const port = this.props.match.params.port;
+        const pathname = `/proxy/${port}/${id}`;
+        this.props.history.push({pathname});
+    };
+    render(){
+        const cur_tab = this.props.match.params.tab||'logs';
+        return <Nav_tabs set_tab={this.set_tab} cur_tab={cur_tab}>
+              {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
+                tooltip={tabs[t].tooltip}/>)}
+            </Nav_tabs>;
     }
 });
 
@@ -623,27 +633,6 @@ const Field = ({id, disabled, children, ...props})=>{
           </select>
         </div>;
 };
-
-const Tab_btn = withRouter(class Tab_btn extends Pure_component {
-    state = {};
-    click = ()=>{
-        const port = this.props.match.params.port;
-        const pathname = `/proxy/${port}/${this.props.id}`;
-        this.props.history.push({pathname});
-    };
-    render(){
-        const cur_tab = this.props.match.params.tab;
-        const active = cur_tab==this.props.id||!cur_tab&&this.props.id=='logs';
-        const btn_class = classnames('btn_tab', {active});
-        return <Tooltip title={tabs[this.props.id].tooltip}>
-              <div onClick={this.click} className={btn_class}>
-                <div className={classnames('icon', this.props.id)}/>
-                <div className="title">{tabs[this.props.id].label}</div>
-                <div className="arrow"/>
-              </div>
-            </Tooltip>;
-    }
-});
 
 class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');

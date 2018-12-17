@@ -5,11 +5,10 @@ import ajax from '../../../util/ajax.js';
 import {withContext} from 'recompose';
 import {Chrome_table} from '../chrome_widgets.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import {Tooltip, Nav_tabs} from '../common.js';
+import {Nav_tabs, Nav_tab} from '../common.js';
 import moment from 'moment';
 import {withRouter} from 'react-router-dom';
 import Har_viewer from '../har_viewer.js';
-import classnames from 'classnames';
 import PropTypes from 'prop-types';
 const provider = provide=>withContext({provide: PropTypes.object},
     ()=>({provide}));
@@ -19,12 +18,12 @@ moment.relativeTimeThreshold('ss', 3);
 export default provider({tab_id: 'debug'})(
 class Logs extends Pure_component {
     state = {cur_tab: 'har'};
-    click_tab = id=>this.setState({cur_tab: id});
+    set_tab = id=>this.setState({cur_tab: id});
     render(){
         return <div className="vbox" style={{height: '100%', width: '100%'}}>
-                <Nav click_tab={this.click_tab} cur_tab={this.state.cur_tab}/>
-                <Window tab={this.state.cur_tab}/>
-              </div>;
+              <Nav set_tab={this.set_tab} cur_tab={this.state.cur_tab}/>
+              <Window tab={this.state.cur_tab}/>
+            </div>;
     }
 });
 
@@ -42,25 +41,12 @@ const Window = ({tab})=>{
         </div>;
 };
 
-const Nav = ({click_tab, cur_tab})=>
-    <Nav_tabs narrow>
-      <Tab_btn id="har" on_click={click_tab} title="HAR viewer"
-        active={'har'==cur_tab}/>
-      <Tab_btn id="sessions" on_click={click_tab} title="Sessions"
-        active={'sessions'==cur_tab}/>
-      <Tab_btn id="banned_ips" on_click={click_tab} title="Banned IPs"
-        active={'banned_ips'==cur_tab}/>
+const Nav = ({set_tab, cur_tab})=>
+    <Nav_tabs narrow set_tab={set_tab} cur_tab={cur_tab}>
+      <Nav_tab id="har" title="HAR viewer"/>
+      <Nav_tab id="sessions" title="Sessions"/>
+      <Nav_tab id="banned_ips" title="Banned IPs"/>
     </Nav_tabs>;
-
-const Tab_btn = ({id, on_click, title, tooltip, active})=>
-    <Tooltip title={tooltip}>
-      <div onClick={()=>on_click(id)}
-        className={classnames('btn_tab', {active})}>
-        <div className={classnames('icon', id)}/>
-        <div className="title">{title}</div>
-        <div className="arrow"/>
-      </div>
-    </Tooltip>;
 
 const banned_ips_cols = [
     {id: 'ip', title: 'IP'},
