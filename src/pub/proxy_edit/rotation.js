@@ -1,15 +1,11 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Config} from './common.js';
 import {Note} from '../common.js';
+import {Config, Tab_context} from './common.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import {withContext} from 'recompose';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
 
 const pool_type_opt = [
     {key: 'Default (Sequential)', value: ''},
@@ -18,8 +14,7 @@ const pool_type_opt = [
     {key: 'Long Availability', value: 'long_availability'},
 ];
 
-export default provider({tab_id: 'rotation'})(
-class Rotation extends Pure_component {
+export default class Rotation extends Pure_component {
     state = {};
     goto_field = setdb.get('head.proxy_edit.goto_field');
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -75,7 +70,7 @@ class Rotation extends Pure_component {
             </Note>;
         const pool_size_disabled = form.ips.length||form.vips.length||
             this.is_sequential();
-        return <div>
+        return <Tab_context.Provider value="rotation">
               <Config type="select" id="pool_type" data={pool_type_opt}
                 on_change={this.pool_type_changed}/>
               <Config type="select_number" id="pool_size" allow_zero
@@ -92,7 +87,7 @@ class Rotation extends Pure_component {
                 <Config type="text" id="session"/>}
               <Config type="text" id="seed"/>
               <Config type="yes_no" id="session_termination" note={sess_note}/>
-            </div>;
+            </Tab_context.Provider>;
     }
-});
+}
 

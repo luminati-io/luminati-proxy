@@ -173,26 +173,6 @@ E.handle_signal = (sig, err)=>{
     });
 };
 
-const check_running = force=>etask(function*(){
-    let tasks;
-    try { tasks = yield ps_list(); }
-    catch(e){ process.exit(); }
-    tasks = tasks.filter(t=>t.name.includes('node') &&
-        /.*lum_node\.js.*/.test(t.cmd) && t.ppid!=process.pid &&
-        t.pid!=process.pid);
-    if (!tasks.length)
-        return;
-    zerr.notice(`LPM is already running (${tasks[0].pid})`);
-    if (!force)
-    {
-        zerr.notice('If you want to kill other instances use --force flag');
-        process.exit();
-    }
-    zerr.notice('Trying to kill it and restart.');
-    for (const t of tasks)
-        process.kill(t.ppid, 'SIGTERM');
-});
-
 const add_alias_for_whitelist_ips = ()=>{
    const func =
         `curl_add_ip(){\n`+
@@ -223,8 +203,40 @@ const add_alias_for_whitelist_ips = ()=>{
     } catch(e){ zerr.warn(`Failed to install ${name}: ${e.message}`); }
 };
 
-E.run = (argv, run_config)=>etask(function*(){
-    yield check_running(argv.force);
+let conflict_shown = false;
+const show_port_conflict = (port, force)=>etask(function*(){
+    if (conflict_shown)
+        return;
+    conflict_shown = true;
+    yield _show_port_conflict(port, force);
+});
+
+const _show_port_conflict = (port, force)=>etask(function*(){
+    let tasks;
+    try { tasks = yield ps_list(); }
+    catch(e){ process.exit(); }
+    tasks = tasks.filter(t=>t.name.includes('node') &&
+        /.*lum_node\.js.*/.test(t.cmd) && t.ppid!=process.pid &&
+        t.pid!=process.pid);
+    if (!tasks.length)
+    {
+        zerr.notice(`There is a conflict on port ${port}`);
+        return E.manager.stop();
+    }
+    const pid = tasks[0].pid;
+    zerr.notice(`LPM is already running (${pid}) and uses port ${port}`);
+    if (!force)
+    {
+        zerr.notice('If you want to kill other instances use --force flag');
+        return process.exit();
+    }
+    zerr.notice('Trying to kill it and restart.');
+    for (const t of tasks)
+        process.kill(t.ppid, 'SIGTERM');
+    E.manager.restart();
+});
+
+E.run = (argv, run_config)=>{
     add_alias_for_whitelist_ips();
     E.read_status_file();
     E.write_status_file('initializing', null,
@@ -239,6 +251,9 @@ E.run = (argv, run_config)=>etask(function*(){
         process.exit();
     })
     .on('error', (e, fatal)=>{
+        let match;
+        if (match = e.message.match(/EADDRINUSE.+:(\d+)/))
+            return show_port_conflict(match[1], argv.force);
         zerr(e.raw ? e.message : 'Unhandled error: '+e);
         const handle_fatal = ()=>{
             if (fatal)
@@ -248,8 +263,13 @@ E.run = (argv, run_config)=>etask(function*(){
             handle_fatal();
         else
         {
-            ua.event('manager', 'error', `v${version} ${JSON.stringify(e)}`,
-                handle_fatal);
+            // XXX krzysztof: make a generic function for sending crashes
+            etask(function*send_err(){
+                yield zerr.perr('crash', {error: zerr.e2s(e),
+                    customer: _.get(E.manager, '_defaults.customer'),
+                    config: _.get(E.manager, '_total_conf')});
+                handle_fatal();
+            });
         }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
@@ -273,7 +293,7 @@ E.run = (argv, run_config)=>etask(function*(){
     }).on('restart', ()=>process.send({command: 'restart'}));
     E.manager.start();
     E.write_status_file('running', null, E.manager&&E.manager._total_conf);
-});
+};
 
 E.handle_upgrade_finished = msg=>{
     if (E.on_upgrade_finished)

@@ -3,16 +3,11 @@
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Config} from './common.js';
+import {Config, Tab_context} from './common.js';
 import {Tooltip, Remove_icon, Add_icon, Input} from '../common.js';
 import * as util from '../util.js';
-import {withContext} from 'recompose';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
 
-export default provider({tab_id: 'headers'})(
-class Headers extends Pure_component {
+export default class Headers extends Pure_component {
     first_header = {name: '', value: ''};
     state = {headers: [this.first_header]};
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -46,7 +41,7 @@ class Headers extends Pure_component {
             this.set_field('user_agent', '');
     };
     render(){
-        return <div>
+        return <Tab_context.Provider value="headers">
               <Config type="select" id="user_agent" data={util.user_agents}
                 disabled={this.props.form.random_user_agent}/>
               <Config type="yes_no" id="random_user_agent"
@@ -67,9 +62,9 @@ class Headers extends Pure_component {
                   )}
                 </div>
               </div>
-            </div>;
+            </Tab_context.Provider>;
     }
-});
+}
 
 const Header = ({name, value, idx, add_clicked, remove_clicked, last,
     update})=>

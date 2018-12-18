@@ -3,11 +3,7 @@
 import React from 'react';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
-import {Config} from './common.js';
-import {withContext} from 'recompose';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
+import {Config, Tab_context} from './common.js';
 
 const route_err_opt = [
     {key: 'Default (pass_dyn)', value: ''},
@@ -29,7 +25,7 @@ const log_level_opt = [
     {key: `verbose`, value: 'verbose'},
 ];
 
-export default provider({tab_id: 'general'})(props=>{
+export default props=>{
     const set_field = setdb.get('head.proxy_edit.set_field');
     const open_modal = ()=>{ $('#allocated_ips').modal('show'); };
     const multiply_changed = val=>{
@@ -56,7 +52,7 @@ export default provider({tab_id: 'general'})(props=>{
     const note_vips = props.form.multiply_vips ?
         <a className="link" onClick={open_modal}>Select gIPs</a> : null;
     const mul_disabled = props.form.multiply_ips||props.form.multiply_vips;
-    return <div>
+    return <Tab_context.Provider value="general">
           <Config type="text" id="internal_name"/>
           <Config type="number" id="port"/>
           <Config type="number" id="socks" disabled={true} val_id="port"/>
@@ -78,5 +74,5 @@ export default provider({tab_id: 'general'})(props=>{
           <Config type="select" id="iface" data={props.proxy.iface.values}/>
           <Config type="select" id="log" data={log_level_opt}/>
           <Config type="select" id="debug" data={debug_opt}/>
-        </div>;
-});
+        </Tab_context.Provider>;
+};

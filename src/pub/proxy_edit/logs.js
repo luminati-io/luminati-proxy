@@ -2,21 +2,16 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import ajax from '../../../util/ajax.js';
-import {withContext} from 'recompose';
 import {Chrome_table} from '../chrome_widgets.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import {Nav_tabs, Nav_tab} from '../common.js';
 import moment from 'moment';
 import {withRouter} from 'react-router-dom';
 import Har_viewer from '../har_viewer.js';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
 
 moment.relativeTimeThreshold('ss', 3);
 
-export default provider({tab_id: 'debug'})(
-class Logs extends Pure_component {
+export default class Logs extends Pure_component {
     state = {cur_tab: 'har'};
     set_tab = id=>this.setState({cur_tab: id});
     render(){
@@ -25,7 +20,7 @@ class Logs extends Pure_component {
               <Window tab={this.state.cur_tab}/>
             </div>;
     }
-});
+}
 
 const Window = ({tab})=>{
     let Comp;

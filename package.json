@@ -143,7 +143,6 @@
     "url-loader": "0.5.9",
     "file-saver": "1.3.3",
     "webpack": "3.4.0",
-    "recompose": "0.26.0",
     "prop-types": "15.6.0",
     "react-waypoint": "8.0.1",
     "react-select": "2.0.0",
@@ -286,6 +285,7 @@
       "lib/luminati.js",
       "lib/manager.js",
       "lib/md5_util.js",
+      "lib/migrations.js",
       "lib/perr.js",
       "lib/req_process.js",
       "lib/router.js",
@@ -341,7 +341,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "8a9bbb833080a1423be5184e0103d67e"
+    "md5": "5542a51883238356b4d6e358c18b74ec"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -377,5 +377,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.116.387"
+  "version": "1.116.548"
 }

@@ -1,6 +1,16 @@
 [
     {
-        "ver": "1.116.320",
+        "ver": "1.116.548",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "support using multiple instances on the same machine"
+            }
+        ]
+    },
+    {
+        "ver": "1.116.387",
         "type": "stable",
         "changes": [
             {

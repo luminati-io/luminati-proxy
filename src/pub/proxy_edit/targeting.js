@@ -3,12 +3,8 @@
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Config} from './common.js';
 import {Note} from '../common.js';
-import {withContext} from 'recompose';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
+import {Config, Tab_context} from './common.js';
 
 const carriers = [
     {value: '', key: 'None'},
@@ -77,8 +73,7 @@ const carriers_note = (()=>{
     return <a className="link" href={mailto}>More carriers</a>;
 })();
 
-export default provider({tab_id: 'target'})(
-class Targeting extends Pure_component {
+export default class Targeting extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -151,7 +146,7 @@ class Targeting extends Pure_component {
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
         const carrier_disabled = !!this.props.form.asn&&
             !!this.props.form.asn.length;
-        return <div>
+        return <Tab_context.Provider value="target">
               {(show_dc_note||show_vips_note)&&
                 <Note>
                   {show_dc_note &&
@@ -186,6 +181,6 @@ class Targeting extends Pure_component {
               <Config type="select" id="carrier" data={carriers}
                 note={carriers_note} disabled={carrier_disabled}
                 depend_a={this.props.form.zone}/>
-            </div>;
+            </Tab_context.Provider>;
     }
-});
+}

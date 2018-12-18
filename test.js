@@ -1813,7 +1813,7 @@ describe('manager', ()=>{
     });
     describe('using passwords', ()=>{
         it('take password from provided zone', etask._fn(function*(_this){
-            _this.timeout(5000);
+            _this.timeout(6000);
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {zone1: {password: ['zone1_pass']}}};
@@ -1826,7 +1826,7 @@ describe('manager', ()=>{
             assert.equal(res.data.password, 'zone1_pass');
         }));
         it('uses password from default zone', etask._fn(function*(_this){
-            _this.timeout(5000);
+            _this.timeout(6000);
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
@@ -1837,6 +1837,46 @@ describe('manager', ()=>{
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'static'}});
             assert.equal(res.data.password, 'static_pass');
+        }));
+        it('uses new proxy custom password', etask._fn(function*(_this){
+            _this.timeout(6000);
+            const config = {proxies: []};
+            const _defaults = {zone: 'static', password: 'xyz',
+                zones: {static: {password: ['static_pass']}}};
+            app = yield app_with_config({config, cli: {}});
+            nock('https://luminati-china.io').get('/cp/lum_local_conf')
+            .query({customer: 'abc', proxy: pkg.version, token: ''})
+            .reply(200, {_defaults});
+            const res = yield json('api/proxies', 'post',
+                {proxy: {port: 24000, zone: 'static', password: 'p1_pass'}});
+            assert.equal(res.data.password, 'p1_pass');
+        }));
+        it('uses existing proxy custom password', etask._fn(function*(_this){
+            _this.timeout(6000);
+            const _defaults = {zone: 'static', password: 'xyz', zones: {
+                static: {password: ['static_pass']},
+                zone2: {password: ['zone2_pass']},
+            }};
+            nock('https://luminati-china.io').get('/cp/lum_local_conf')
+            .query({customer: 'abc', proxy: pkg.version, token: ''})
+            .reply(200, {_defaults});
+            const config = {proxies: [
+                {port: 24000, zone: 'static', password: 'p1_pass'},
+                {port: 24001, zone: 'zone2', password: 'p2_pass'},
+                {port: 24002, zone: 'static'},
+                {port: 24003, zone: 'zone2'},
+                {port: 24004},
+            ]};
+            app = yield app_with_config({config, cli: {}});
+            const res = yield json('api/proxies_running');
+            const t = (port, pwd)=>{
+                assert.equal(res.find(p=>p.port==port).password, pwd);
+            };
+            t(24000, 'p1_pass');
+            t(24001, 'p2_pass');
+            t(24002, 'static_pass');
+            t(24003, 'zone2_pass');
+            t(24004, 'static_pass');
         }));
     });
 });

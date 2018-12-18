@@ -1014,7 +1014,6 @@ span.icon_link {
     .note { font-size: 13px; margin-bottom: 15px; }
     .main_window {
         margin-top: 10px;
-        display: flex;
         &.logs {
             .window_wrapper {
                 flex: 1;
@@ -1033,15 +1032,16 @@ span.icon_link {
         &.rules {
             .desc { width: 200px; min-width: 200px; }
             .rule_wrapper {
-                border: solid 1px @grey;
-                margin-bottom: 15px;
-                padding: 5px;
-                border-radius: 4px;
                 position: relative;
+                display: inline-block;
+                padding: 5px 30px 5px 5px;
+                margin-bottom: 15px;
+                border: solid 1px @grey;
+                border-radius: 4px;
                 .btn_rule_del {
                     position: absolute;
                     top: 5px;
-                    right: -25px;
+                    right: 5px;
                     cursor: pointer;
                     background: url(/img/delete.svg);
                     width: 16px;
@@ -1394,7 +1394,7 @@ span.icon_link {
     }
 }
 .logs {
-    height: 100%;
+    flex: 1;
     .nav_tabs { margin-bottom: 15px; }
     .top_panel { margin: 10px 15px 20px; }
     .top_header { margin: 0 15px 16px; }

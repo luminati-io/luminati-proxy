@@ -3,13 +3,9 @@
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {getContext, withContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note, with_proxy_ports} from '../common.js';
 import {tabs} from './fields.js';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
 
 const trigger_types = [
     {key: '--Select--', value: '', tooltip: `Choose a trigger type.
@@ -97,8 +93,7 @@ const ban_options = [
     {key: 'Custom', value: 'custom'},
 ];
 
-export default provider({tab_id: 'rules'})(
-class Rules extends Pure_component {
+export default class Rules extends Pure_component {
     state = {rules: [{id: 0}], max_id: 0};
     set_field = setdb.get('head.proxy_edit.set_field');
     goto_field = setdb.get('head.proxy_edit.goto_field');
@@ -240,7 +235,7 @@ class Rules extends Pure_component {
     goto_ssl = ()=>this.goto_field('ssl');
     goto_debug = ()=>this.goto_field('debug');
     render(){
-        return <div style={{maxWidth: '100%'}}>
+        return <div style={{maxWidth: '100%', marginBottom: 15}}>
               {!this.props.form.ssl &&
                 <Note>
                   <span><strong>Warning: </strong></span>
@@ -268,9 +263,8 @@ class Rules extends Pure_component {
               </button>
             </div>;
     }
-});
+}
 
-const Rule_config = getContext({provide: PropTypes.object})(
 class Rule_config extends Pure_component {
     value_change = value=>{
         if (this.props.on_change)
@@ -280,7 +274,7 @@ class Rule_config extends Pure_component {
     };
     render(){
         const id = this.props.id;
-        const tab_id = this.props.provide.tab_id;
+        const tab_id = 'rules';
         return <Labeled_controller
               id={id}
               style={this.props.style}
@@ -297,7 +291,7 @@ class Rule_config extends Pure_component {
               label={tabs[tab_id].fields[id].label}
               tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
-});
+}
 
 const Fast_pool_note = ({port, r})=>{
     r = r||'**';
@@ -410,7 +404,7 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
         const ban_ips_note = <Ban_ips_note port={current_port}/>;
         const fast_pool_note = <Fast_pool_note port={current_port}
           r={rule.trigger_url_regex}/>;
-        return <div className="rule_wrapper">
+        return <div><div className="rule_wrapper">
               <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
               <Rule_config id="trigger_type" type="select"
                 data={trigger_types} on_change={this.trigger_change}
@@ -487,7 +481,7 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
                   data={this.state.logins.map(l=>({key: l, value: l}))}
                   note={<Email_note www={this.state.www}/>}/>
               }
-            </div>;
+            </div></div>;
     }
 }));
 

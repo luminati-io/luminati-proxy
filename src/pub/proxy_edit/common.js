@@ -5,12 +5,11 @@ import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {tabs} from './fields.js';
 import {Labeled_controller} from '../common.js';
-import {getContext} from 'recompose';
 import {withRouter} from 'react-router-dom';
-import PropTypes from 'prop-types';
 
-export const Config = withRouter(getContext({provide: PropTypes.object})(
-class Config extends Pure_component {
+export const Tab_context = React.createContext('logs');
+
+export const Config = withRouter(class Config extends Pure_component {
     state = {disabled_fields: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
@@ -55,7 +54,7 @@ class Config extends Pure_component {
             else
                 _default = false;
         }
-        const tab_id = this.props.provide.tab_id;
+        const tab_id = this.context;
         const disabled = this.props.disabled||!this.is_valid_field(id)||
             this.state.disabled_fields[id];
         let state;
@@ -80,4 +79,5 @@ class Config extends Pure_component {
               range={this.props.range}
               tooltip={tabs[tab_id].fields[id].tooltip}/>;
     }
-}));
+});
+Config.WrappedComponent.contextType = Tab_context;

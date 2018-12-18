@@ -2,11 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import {Config} from './common.js';
-import {withContext} from 'recompose';
-import PropTypes from 'prop-types';
-const provider = provide=>withContext({provide: PropTypes.object},
-    ()=>({provide}));
+import {Config, Tab_context} from './common.js';
 
 const reverse_lookup_opt = [
     {key: 'No', value: ''},
@@ -20,8 +16,7 @@ const dns_opt = [
     {key: 'Remote - resolved by peer', value: 'remote'},
 ];
 
-export default provider({tab_id: 'speed'})(
-class Speed extends Pure_component {
+export default class Speed extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
     zagent_countries = ['au', 'cn', 'gb', 'in', 'nl', 'us'];
@@ -39,7 +34,7 @@ class Speed extends Pure_component {
             this.state.locations.countries
             .filter(c=>this.zagent_countries.includes(c.country_id))
             .map(c=>({key: c.country_name, value: zproxy(c.country_id)})));
-        return <div>
+        return <Tab_context.Provider value="speed">
               <Config type="select" id="proxy" data={proxy_data}/>
               <Config type="select" id="dns" data={dns_opt}/>
               <Config type="select_number" id="race_reqs" allow_zero/>
@@ -52,6 +47,6 @@ class Speed extends Pure_component {
                 <Config type="text" id="reverse_lookup_file"/>}
               {this.props.form.reverse_lookup=='values' &&
                 <Config type="textarea" id="reverse_lookup_values"/>}
-            </div>;
+            </Tab_context.Provider>;
     }
-});
+}
