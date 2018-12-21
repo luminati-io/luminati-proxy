@@ -7,10 +7,10 @@ export const bytes_format = (bytes, number)=>{
     number = number!=undefined ?
         number : Math.floor(Math.log(bytes)/Math.log(1000));
     const precision = number ? 2 : 0;
-    let number_format = Intl.NumberFormat('en-US',
-        {maximumFractionDigits: precision});
-    return number_format.format(bytes/Math.pow(1000, Math.floor(number)))+' '
-        +['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
+    let n = (bytes/Math.pow(1000, Math.floor(number))).toFixed(precision);
+    if (+n===0)
+        n = 0;
+    return n+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
 };
 
 export const ga_event = (category, action, label)=>{
@@ -149,7 +149,7 @@ const presets = {
             long as possible`,
         set: opt=>{
             opt.pool_size = 1;
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
             opt.session = true;
         },
         clean: opt=>{},
@@ -178,11 +178,11 @@ const presets = {
             opt.pool_size = 0;
             opt.sticky_ip = true;
             opt.session = '';
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
         },
         clean: opt=>{
             opt.sticky_ip = '';
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
         },
@@ -212,13 +212,13 @@ const presets = {
             max_requests & proxy_count to optimize performance`,
         set: opt=>{
             opt.pool_type = 'round-robin';
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
             opt.session = true;
             opt.max_requests = 1;
             opt.pool_size = opt.pool_size>1 ? opt.pool_size : 10;
         },
         clean: opt=>{
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.pool_size = 0;
@@ -248,7 +248,7 @@ const presets = {
         subtitle: 'Maximum request speed',
         set: opt=>{
             opt.pool_size = 50;
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
             opt.pool_type = 'round-robin';
             opt.proxy_count = 20;
             opt.session_duration = 0;
@@ -258,7 +258,7 @@ const presets = {
         },
         clean: opt=>{
             opt.pool_size = 1;
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.proxy_count = '';
             opt.race_reqs = '';
             opt.use_proxy_cache = true;
@@ -284,7 +284,7 @@ const presets = {
             opt.session = true;
             opt.pool_size = 1;
             opt.pool_type = 'sequential';
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.session_duration = 0;
             opt.random_user_agent = true;
             opt.override_headers = true;
@@ -394,7 +394,7 @@ const presets = {
             opt.session = '';
             opt.pool_size = 1;
             opt.pool_type = null;
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.seed = '';

@@ -130,7 +130,7 @@
     "less": "2.7.2",
     "less-loader": "4.0.5",
     "lolex": "2.1.1",
-    "mocha": "3.2.0",
+    "mocha": "5.2.0",
     "moment": "2.22.2",
     "nock": "9.0.11",
     "react": "16.6.0",
@@ -285,7 +285,7 @@
       "lib/luminati.js",
       "lib/manager.js",
       "lib/md5_util.js",
-      "lib/migrations.js",
+      "lib/migration.js",
       "lib/perr.js",
       "lib/req_process.js",
       "lib/router.js",
@@ -334,14 +334,18 @@
       "src/pub/tracer.js",
       "src/pub/util.js",
       "src/pub/whitelist_ips.js",
-      "test.js",
+      "test/common.js",
+      "test/index.js",
+      "test/manager.js",
+      "test/migration.js",
+      "test/util.js",
       "util/config.js",
       "util/lpm_config.js",
       "util/lpm_file.js",
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "5542a51883238356b4d6e358c18b74ec"
+    "md5": "abcda9a80d69a4f64a1088fa1b2542a7"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -377,5 +381,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.116.548"
+  "version": "1.116.953"
 }

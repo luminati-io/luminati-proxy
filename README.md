@@ -32,7 +32,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.116.548/luminati-proxy-manager-v1.116.548-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.116.953/luminati-proxy-manager-v1.116.953-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -200,8 +200,8 @@ Options:
   --pool_size              Session pool size               [number] [default: 3]
   --pool_type              Pool session iteration order
                                                 [string] [default: "sequential"]
-  --keep_alive             Generate request to keep session alive after given
-                           idle time (seconds)                          [number]
+  --keep_alive             Send a small request every 45 seconds to keep
+                           session alive                               [boolean]
   --seed                   Session ID seed used for identifying sessions from
                            this proxy                                   [string]
   --max_requests           Maximum requests per session   [string] [default: 50]

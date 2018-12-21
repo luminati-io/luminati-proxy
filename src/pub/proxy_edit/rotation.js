@@ -75,8 +75,7 @@ export default class Rotation extends Pure_component {
                 on_change={this.pool_type_changed}/>
               <Config type="select_number" id="pool_size" allow_zero
                 note={pool_size_note} disabled={pool_size_disabled}/>
-              <Config type="select_number" id="keep_alive" sufix="seconds"
-                data={[0, 45]}/>
+              <Config type="yes_no" id="keep_alive"/>
               <Config type="select_number" id="max_requests"/>
               <Config type="select_number" id="session_duration"
                 sufix="seconds"/>

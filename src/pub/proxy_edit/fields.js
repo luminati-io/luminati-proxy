@@ -202,8 +202,9 @@ export const tabs = {
                 ext: true,
             },
             keep_alive: {
-                label: 'Keep-alive',
-                tooltip: `LPM will ping an IP to keep the session alive`,
+                label: 'Keep session alive',
+                tooltip: `LPM will send a small request every 45 seconds to
+                    keep the session alive`,
                 ext: true,
             },
             session_random: {

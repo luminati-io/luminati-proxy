@@ -1,261 +1,39 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const _ = require('lodash');
-const analytics = require('./lib/analytics.js');
 const assert = require('assert');
-const http = require('http');
-const https = require('https');
-const net = require('net');
-const url = require('url');
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
 const socks = require('@luminati-io/socksv5');
-const ssl = require('./lib/ssl.js');
+const ssl = require('../lib/ssl.js');
 const request = require('request');
-const nock = require('nock');
 const lolex = require('lolex');
-const etask = require('./util/etask.js');
-const restore_case = require('./util/http_hdr.js').restore_case;
-const qw = require('./util/string.js').qw;
-const assign = Object.assign;
-const zerr = require('./util/zerr.js');
+const etask = require('../util/etask.js');
 const sinon = require('sinon');
-const zsinon = require('./util/sinon.js');
-const lpm_config = require('./util/lpm_config.js');
-const lpm_util = require('./util/lpm_util.js');
-const lpm_file = require('./util/lpm_file.js');
-const Luminati = require('./lib/luminati.js');
-const Manager = require('./lib/manager.js');
-const Timeline = require('./lib/timeline.js');
-const pkg = require('./package.json');
-const username = require('./lib/username.js');
+const zsinon = require('../util/sinon.js');
+const lpm_config = require('../util/lpm_config.js');
+const Luminati = require('../lib/luminati.js');
+const Timeline = require('../lib/timeline.js');
+const {assert_has, http_proxy, http_ping} = require('./common.js');
+const qw = require('../util/string.js').qw;
+const test_url = {http: 'http://lumtest.com/test',
+    https: 'https://lumtest.com/test'};
 const customer = 'abc';
 const password = 'xyz';
-
-const assert_has = (value, has, prefix)=>{
-    prefix = prefix||'';
-    if (value==has)
-        return;
-    if (Array.isArray(has) && Array.isArray(value))
-    {
-        assert.ok(value.length >= has.length, `${prefix}.length is `
-                +`${value.length} should be at least ${has.length}`);
-        has.forEach((h, i)=>assert_has(value[i], h, `${prefix}[${i}]`));
-        return;
-    }
-    if (has instanceof Object && value instanceof Object)
-    {
-        Object.keys(has).forEach(k=>
-            assert_has(value[k], has[k], `${prefix}.${k}`));
-        return;
-    }
-    assert.equal(value, has, prefix);
-};
-
-let tmp_file_counter = 0;
-const temp_file_path = (ext, pre)=>{
-    const p = path.join(os.tmpdir(),
-        `${pre||'test'}-${Date.now()}-${tmp_file_counter++}.${ext||'tmp'}`);
-    const done = ()=>{
-        if (this.path)
-        {
-            try {
-                fs.unlinkSync(path);
-            } catch(e){}
-            this.path = null;
-        }
-    };
-    return {path: p, done: done};
-};
-
-const temp_file = (content, ext, pre)=>{
-    const temp = temp_file_path(ext, pre);
-    fs.writeFileSync(temp.path, JSON.stringify(content));
-    return temp;
-};
-
-const to_body = req=>({
-    ip: '127.0.0.1',
-    method: req.method,
-    url: req.url,
-    headers: restore_case(req.headers, req.rawHeaders),
-});
 
 const pre_rule = (type, regex)=>({
     rules: {pre: [{action: type, url: regex||'.*'}]},
 });
-
-const http_proxy = port=>etask(function*(){
-    const proxy = {history: [], full_history: []};
-    const handler = (req, res, head)=>{
-        if (proxy.fake)
-        {
-            const body = to_body(req);
-            const auth = username.parse(body.headers['proxy-authorization']);
-            if (auth)
-                body.auth = auth;
-            let status = 200;
-            if (req.url=='http://lumtest.com/fail_url')
-                status = 500;
-            res.writeHead(status,
-                {'content-type': 'application/json', 'x-hola-response': 1});
-            res.write(JSON.stringify(body));
-            proxy.full_history.push(body);
-            if (body.url!='http://lumtest.com/myip.json')
-                proxy.history.push(body);
-            return res.end();
-        }
-        req.pipe(request({
-            host: req.headers.host,
-            uri: req.url,
-            method: req.method,
-            path: url.parse(req.url).path,
-            headers: _.omit(req.headers, 'proxy-authorization'),
-        }).on('response', _res=>{
-            res.writeHead(_res.statusCode, _res.statusMessage,
-                _res.headers);
-            _res.pipe(res);
-        }).on('error', this.throw_fn()));
-    };
-    proxy.http = http.createServer((req, res, head)=>{
-        if (!proxy.connection)
-            return handler(req, res, head);
-        proxy.connection(()=>handler(req, res, head), req);
-    });
-    const headers = {};
-    proxy.http.on('connect', (req, res, head)=>etask(function*(){
-        let _url = req.url;
-        if (proxy.fake)
-        {
-            if (!proxy.https)
-            {
-                proxy.https = https.createServer(
-                    assign({requestCert: false}, ssl()),
-                    (_req, _res, _head)=>{
-                        _.defaults(_req.headers,
-                            headers[_req.socket.remotePort]||{});
-                        handler(_req, _res, _head);
-                    }
-                );
-                yield etask.nfn_apply(proxy.https, '.listen', [0]);
-            }
-            _url = '127.0.0.1:'+proxy.https.address().port;
-        }
-        let req_port;
-        res.write(`HTTP/1.1 200 OK\r\nx-hola-ip: ${to_body(req).ip}\r\n\r\n`);
-        if (req.method=='CONNECT')
-            proxy.full_history.push(to_body(req));
-        const socket = net.connect({
-            host: _url.split(':')[0],
-            port: _url.split(':')[1]||443,
-        });
-        socket.setNoDelay();
-        socket.on('connect', ()=>{
-            req_port = socket.localPort;
-            headers[req_port] = req.headers||{};
-        }).on('close', ()=>delete headers[req_port]).on('error',
-            this.throw_fn());
-        res.pipe(socket).pipe(res);
-        req.on('end', ()=>socket.end());
-    }));
-    yield etask.nfn_apply(proxy.http, '.listen', [port||20001]);
-    proxy.port = proxy.http.address().port;
-    const onconnection = proxy.http._handle.onconnection;
-    proxy.http._handle.onconnection = function(){
-        if (!proxy.busy)
-            return onconnection.apply(proxy.http._handle, arguments);
-        let m = proxy.http.maxConnections;
-        proxy.http.maxConnections = 1;
-        proxy.http._connections++;
-        onconnection.apply(proxy.http._handle, arguments);
-        proxy.http.maxConnections = m;
-        proxy.http._connections--;
-    };
-    proxy.stop = etask._fn(function*(_this){
-        yield etask.nfn_apply(_this.http, '.close', []);
-        if (_this.https)
-            yield etask.nfn_apply(_this.https, '.close', []);
-    });
-    proxy.request = etask._fn(function*(_this, _url){
-        return yield etask.nfn_apply(request, [{
-            url: _url||'http://lumtest.com/myip',
-            proxy: `http://${customer}:${password}@127.0.0.1:${proxy.port}`,
-            strictSSL: false,
-        }]);
-    });
-    return proxy;
-});
-const http_ping = ()=>etask(function*(){
-    let ping = {history: []};
-    const handler = (req, res)=>{
-        let body = to_body(req);
-        ping.history.push(body);
-        res.writeHead(200, 'PONG', {'content-type': 'application/json'});
-        if (req.headers['content-length'])
-            req.pipe(res);
-        else
-        {
-            res.write(JSON.stringify(body));
-            res.end();
-        }
-    };
-    const _http = http.createServer(handler);
-    yield etask.nfn_apply(_http, '.listen', [0]);
-    _http.on('error', this.throw_fn());
-    ping.http = {
-        server: _http,
-        port: _http.address().port,
-        url: `http://127.0.0.1:${_http.address().port}/`,
-    };
-    const _https = https.createServer(ssl(), handler);
-    yield etask.nfn_apply(_https, '.listen', [0]);
-    _https.on('error', this.throw_fn());
-    ping.https = {
-        server: _https,
-        port: _https.address().port,
-        url: `https://localhost:${_https.address().port}/`,
-    };
-    ping.stop = etask._fn(function*(_this){
-        yield etask.nfn_apply(_this.http.server, '.close', []);
-        yield etask.nfn_apply(_this.https.server, '.close', []);
-    });
-    return ping;
-});
-let proxy, ping;
-before(etask._fn(function*before(_this){
-    _this.timeout(30000);
-    console.log('Start prep', new Date());
-    proxy = yield http_proxy();
-    ping = yield http_ping();
-    console.log('End prep', new Date());
-}));
-beforeEach(()=>{
-    proxy.fake = true;
-    proxy.connection = null;
-});
-after('after all', ()=>etask._fn(function*after(_this){
-    _this.timeout(3000);
-    if (proxy)
-        yield proxy.stop();
-    proxy = null;
-    if (ping)
-        yield ping.stop();
-    ping = null;
-}));
 describe('proxy', ()=>{
-    const test_url = {http: 'http://lumtest.com/test',
-        https: 'https://lumtest.com/test'};
+    let proxy, ping;
     const lum = opt=>etask(function*(){
         opt = opt||{};
         if (opt.ssl===true)
-            opt.ssl = assign({requestCert: false}, ssl());
-        const l = new Luminati(assign({
+            opt.ssl = Object.assign({requestCert: false}, ssl());
+        const l = new Luminati(Object.assign({
             proxy: '127.0.0.1',
             proxy_port: proxy.port,
-            customer: customer,
-            password: password,
-            log: 'NONE',
+            customer,
+            password,
+            log: 'none',
             port: 24000,
         }, opt), {send_rule_mail: function(){}, rmt_cfg: {get: ()=>({})}});
         l.test = etask._fn(function*(_this, req_opt){
@@ -265,14 +43,13 @@ describe('proxy', ()=>{
             req_opt.url = req_opt.url||test_url.http;
             req_opt.json = true;
             req_opt.rejectUnauthorized = false;
-            return yield etask.nfn_apply(_this, '.request',
-                [req_opt]);
+            return yield etask.nfn_apply(_this, '.request', [req_opt]);
         });
         yield l.listen();
         return l;
     });
     let l, waiting;
-    const repeat =(n, action)=>{
+    const repeat = (n, action)=>{
         while (n--)
             action();
     };
@@ -282,7 +59,25 @@ describe('proxy', ()=>{
             return next();
         waiting.push(next);
     };
+    before(etask._fn(function*before(_this){
+        _this.timeout(30000);
+        console.log('Start prep', new Date());
+        proxy = yield http_proxy();
+        ping = yield http_ping();
+        console.log('End prep', new Date());
+    }));
+    after('after all', ()=>etask._fn(function*after(_this){
+        _this.timeout(3000);
+        if (proxy)
+            yield proxy.stop();
+        proxy = null;
+        if (ping)
+            yield ping.stop();
+        ping = null;
+    }));
     beforeEach(()=>{
+        proxy.fake = true;
+        proxy.connection = null;
         proxy.history = [];
         proxy.full_history = [];
         waiting = [];
@@ -304,7 +99,7 @@ describe('proxy', ()=>{
             assert.equal(ping.history.length, 1);
             let expected = {statusCode: 200, statusMessage: 'PONG'};
             if (req.body)
-                assign(expected, {body: req.body});
+                Object.assign(expected, {body: req.body});
             assert_has(res, expected, 'res');
         }));
         t('http', ()=>ping.http.url);
@@ -343,7 +138,7 @@ describe('proxy', ()=>{
             function*(){
                 const context = 'context-1';
                 history = [];
-                l = yield lum(assign({handle_usage: aggregator}, opt));
+                l = yield lum(Object.assign({handle_usage: aggregator}, opt));
                 let res = yield l.test({
                     url: _url(),
                     headers: {'x-hola-context': context},
@@ -404,7 +199,7 @@ describe('proxy', ()=>{
                 l = yield lum({pool_size: 3});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
-                        (new Buffer('lum-customer-user-zone-zzz:pass'))
+                        Buffer.from('lum-customer-user-zone-zzz:pass')
                         .toString('base64'),
                 }});
                 assert.ok(!l.sessions);
@@ -420,49 +215,42 @@ describe('proxy', ()=>{
                 l = yield lum({short_username: short});
                 const res = yield l.test({headers: {
                     'proxy-authorization': 'Basic '+
-                        (new Buffer(user+':pass'))
-                        .toString('base64'),
+                        Buffer.from(user+':pass').toString('base64'),
                 }});
-                let m = res.body.headers['proxy-authorization']
-                    .match(/^Basic (.*)/);
-                let h = new Buffer(m[1], 'base64').toString('ascii');
-                let parts = h.split(':');
+                const m = res.body.headers['proxy-authorization']
+                .match(/^Basic (.*)/);
+                const h = Buffer.from(m[1], 'base64').toString('ascii');
+                const parts = h.split(':');
                 assert_has(res.body.auth, expected);
                 if (short)
                     assert.ok(parts[0].length <= user.length);
                 else
                     assert.ok(parts[0].length >= user.length);
             }));
-            t(
-                'short notation',
+            t('short notation',
                 'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
-                true,
-                {
-                    customer: 'ttt',
-                    zone: 'zzz',
-                    direct: true,
-                    session: 'sss',
-                    debug: 'full',
-                    country: 'us',
-                    state: 'fl',
-                    city: 'miami',
-                }
-            );
-            t(
-                'long notation',
+                true, {
+                customer: 'ttt',
+                zone: 'zzz',
+                direct: true,
+                session: 'sss',
+                debug: 'full',
+                country: 'us',
+                state: 'fl',
+                city: 'miami',
+            });
+            t('long notation',
                 'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
-                false,
-                {
-                    customer: 'ttt',
-                    zone: 'zzz',
-                    direct: true,
-                    session: 'sss',
-                    debug: 'full',
-                    country: 'us',
-                    state: 'fl',
-                    city: 'miami',
-                }
-            );
+                false, {
+                customer: 'ttt',
+                zone: 'zzz',
+                direct: true,
+                session: 'sss',
+                debug: 'full',
+                country: 'us',
+                state: 'fl',
+                city: 'miami',
+            });
         });
         describe('pool', ()=>{
             describe('pool_size', ()=>{
@@ -474,7 +262,7 @@ describe('proxy', ()=>{
                     assert.equal(proxy.full_history.length, 1);
                     assert.equal(l.session_mgr.sessions.sessions.length,
                         pool_size);
-                    let sessions = {};
+                    const sessions = {};
                     for (let i=0; i<pool_size; i++)
                     {
                         let s = l.session_mgr.sessions.sessions[i];
@@ -490,7 +278,8 @@ describe('proxy', ()=>{
             describe('max_requests', ()=>{
                 describe('range', ()=>{
                     const pool = 50;
-                    const t=(name, start, end)=>it(name, ()=>etask(function*(){
+                    const t = (name, start, end)=>
+                    it(name, etask._fn(function*(){
                         l = yield lum({max_requests: start+':'+end,
                             pool_size: pool});
                         yield l.session_mgr.refresh_sessions();
@@ -575,20 +364,18 @@ describe('proxy', ()=>{
             });
             describe('keep_alive', ()=>{
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                    _this.timeout(6000);
-                    l = yield lum(assign({keep_alive: 1}, opt)); // actual 1sec
+                    l = yield lum(Object.assign({keep_alive: 0.15}, opt));
                     yield l.test();
                     const s_f = proxy.full_history.length;
                     const s_h = proxy.history.length;
-                    yield etask.sleep(500);
-                    assert.equal(proxy.full_history.length, 0 + s_f);
-                    assert.equal(proxy.history.length, 0 + s_h);
+                    assert.equal(proxy.full_history.length, 0+s_f);
+                    assert.equal(proxy.history.length, 0+s_h);
                     yield l.test();
-                    assert.equal(proxy.full_history.length, 1 + s_f);
-                    assert.equal(proxy.history.length, 1 + s_h);
-                    yield etask.sleep(1500);
-                    assert.equal(proxy.full_history.length, 2 + s_f);
-                    assert.equal(proxy.history.length, 1 + s_h);
+                    assert.equal(proxy.full_history.length, 1+s_f);
+                    assert.equal(proxy.history.length, 1+s_h);
+                    yield etask.sleep(300);
+                    assert.equal(proxy.full_history.length, 2+s_f);
+                    assert.equal(proxy.history.length, 1+s_h);
                 }));
                 t('pool', {pool_size: 1});
                 t('sticky_ip', {sticky_ip: true});
@@ -599,7 +386,8 @@ describe('proxy', ()=>{
                 describe('change after specified timeout', ()=>{
                     const t = (name, opt)=>it(name, etask._fn(function*(_this){
                         _this.timeout(4000);
-                        l = yield lum(assign({session_duration: 1}, opt));
+                        l = yield lum(Object.assign({session_duration: 1},
+                            opt));
                         const initial = yield l.test();
                         yield etask.sleep(1500);
                         const second = yield l.test();
@@ -613,7 +401,8 @@ describe('proxy', ()=>{
                 describe('does not change before specified timeout', ()=>{
                     const t = (name, opt)=>it(name, etask._fn(function*(_this){
                         _this.timeout(4000);
-                        l = yield lum(assign({session_duration: 1}, opt));
+                        l = yield lum(Object.assign({session_duration: 1},
+                            opt));
                         const initial = yield l.test();
                         yield etask.sleep(500);
                         const res1 = yield l.test();
@@ -646,7 +435,7 @@ describe('proxy', ()=>{
                     }
                 }));
                 t(1);
-                // t(2);
+                // broken t(2);
             });
         });
         describe('luminati params', ()=>{
@@ -764,9 +553,12 @@ describe('proxy', ()=>{
         });
         describe('history aggregation', ()=>{
             let clock;
-            before(()=>clock = lolex.install({shouldAdvanceTime: true,
-                advanceTimeDelta: 10, toFake: qw`setTimeout clearTimeout
-                setInterval clearInterval setImmediate clearImmediate`}));
+            before(()=>clock = lolex.install({
+                shouldAdvanceTime: true,
+                advanceTimeDelta: 10,
+                toFake: qw`setTimeout clearTimeout setInterval clearInterval
+                    setImmediate clearImmediate`,
+            }));
             after('after history aggregation', ()=>clock.uninstall());
             let history;
             const aggregator = data=>history.push(data);
@@ -775,7 +567,7 @@ describe('proxy', ()=>{
             function*(){
                 ping.headers = ping.headers||{};
                 ping.headers.connection = 'close';
-                l = yield lum(assign({history: true,
+                l = yield lum(Object.assign({history: true,
                     handle_usage: aggregator}, opt));
                 assert.equal(history.length, 0);
                 let res = yield l.test(_url());
@@ -1045,7 +837,7 @@ describe('proxy', ()=>{
             t('21day', 1814400000);
         }));
         it('check Url_condition', ()=>{
-            const Url_condition = require('./lib/rules').Url_condition;
+            const Url_condition = require('../lib/rules').Url_condition;
             const t = (construct, _url, expected)=>{
                 const cond = new Url_condition(construct);
                 assert.equal(cond.test(_url), expected);
@@ -1265,7 +1057,6 @@ describe('proxy', ()=>{
                 assert.ok(r);
                 assert.ok(add_stub.called);
                 assert.equal(req.session, 'test');
-
             }));
             it('refresh_ip', ()=>etask(function*(){
                 l = yield lum({rules: true});
@@ -1354,7 +1145,7 @@ describe('proxy', ()=>{
                 const get_port_stub = sinon.stub(l, 'get_other_port',
                     port=>{
                         assert.equal(port, 1);
-                        return {_request: (req, res, head)=>{
+                        return {once: ()=>null, _request: (req, res, head)=>{
                             assert.deepEqual(req, _req);
                             assert.deepEqual(res, _res);
                             assert.deepEqual(head, _head);
@@ -1363,6 +1154,97 @@ describe('proxy', ()=>{
                 const r = yield l.rules.pre(_req, _res, _head);
                 assert.ok(get_port_stub.called);
                 assert.equal(r, 'switched');
+            }));
+        });
+        describe('call post after pre', ()=>{
+            const t = action=>it(action, ()=>etask(function*(){
+                l = yield lum({rules: {pre: [{action, url: '.*',
+                    trigger_type: 'url'}]}});
+                const post_stub = sinon.stub(l.rules, 'post');
+                yield l.test(ping.http.url);
+                sinon.assert.calledOnce(post_stub);
+            }));
+            t('null_response');
+            t('bypass_proxy');
+            t('direct');
+            it('switch_port', ()=>etask(function*(){
+                l = yield lum({rules: {pre: [{action: 'switch_port', url: '.*',
+                    trigger_type: 'url', port: 24001}]}});
+                const l2 = yield lum({port: 24001});
+                sinon.stub(l, 'get_other_port', ()=>l2);
+                const post_stub = sinon.stub(l.rules, 'post');
+                yield l.test(ping.http.url);
+                sinon.assert.calledOnce(post_stub);
+                l2.stop(true);
+            }));
+            it('switch_port invalid port', ()=>etask(function*(){
+                l = yield lum({rules: {pre: [{action: 'switch_port', url: '.*',
+                    trigger_type: 'url', port: 24002}]}});
+                sinon.stub(l, 'get_other_port', ()=>null);
+                const post_stub = sinon.stub(l.rules, 'post');
+                yield l.test(ping.http.url);
+                sinon.assert.calledOnce(post_stub);
+            }));
+        });
+        describe('call banip after pre', ()=>{
+            const t = (action, ban)=>it(action, ()=>etask(function*(){
+                l = yield lum({rules: {
+                    pre: [{action, url: '.*', trigger_type: 'url'}],
+                    post: [{url: '.*', res: [{
+                        action: {retry: true, ban_ip: '10min'},
+                        action_type: 'ban_ip',
+                        trigger_type: 'status',
+                        status: {type: 'in', arg: '200 - Succeeded requests'},
+                    }]}],
+                }});
+                if (action=='bypass_proxy')
+                    sinon.stub(l, 'send_bypass_req');
+                else
+                {
+                    const handle_proxy_resp_org = l._handle_proxy_resp.bind(l);
+                    sinon.stub(l, '_handle_proxy_resp', (...args)=>_res=>{
+                        _res.headers['x-hola-timeline-debug'] = '1 2 3 ip';
+                        return handle_proxy_resp_org(...args)(_res);
+                    });
+                }
+                const ban_stub = sinon.stub(l.banlist, 'add');
+                yield l.test(ping.http.url);
+                assert.equal(ban_stub.called, +ban);
+            }));
+            t('null_response', false);
+            t('bypass_proxy', false);
+            t('direct', true);
+            it('switch_port', ()=>etask(function*(){
+                l = yield lum({rules: {
+                    pre: [{action: 'switch_port', url: '.*',
+                        trigger_type: 'url'}],
+                    post: [{url: '.*', res: [{
+                        action: {retry: true, ban_ip: '10min'},
+                        action_type: 'ban_ip',
+                        trigger_type: 'status',
+                        status: {type: 'in', arg: '200 - Succeeded requests'},
+                    }]}],
+                }});
+                const l2 = yield lum({port: 24001, rules: {
+                    post: [{url: '.*', res: [{
+                        action: {retry: true, ban_ip: '30min'},
+                        action_type: 'ban_ip',
+                        trigger_type: 'status',
+                        status: {type: 'in', arg: '200 - Succeeded requests'},
+                    }]}],
+                }});
+                const handle_proxy_resp_org = l2._handle_proxy_resp.bind(l2);
+                sinon.stub(l2, '_handle_proxy_resp', (...args)=>_res=>{
+                    _res.headers['x-hola-timeline-debug'] = '1 2 3 ip';
+                    return handle_proxy_resp_org(...args)(_res);
+                });
+                sinon.stub(l, 'get_other_port', ()=>l2);
+                const ban_stub = sinon.stub(l.banlist, 'add');
+                const ban_stub_l2 = sinon.stub(l2.banlist, 'add');
+                yield l.test(ping.http.url);
+                sinon.assert.calledWith(ban_stub, 'ip', 600000);
+                sinon.assert.calledWith(ban_stub_l2, 'ip', 1800000);
+                l2.stop(true);
             }));
         });
     });
@@ -1376,7 +1258,7 @@ describe('proxy', ()=>{
                 url: '**'}]};
             history = [];
             l = yield lum({handle_usage: aggregator, rules,
-                session: true, max_requests: 1, reserved_keep_alive: 2});
+                session: true, max_requests: 1, keep_alive: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);
@@ -1394,582 +1276,10 @@ describe('proxy', ()=>{
         it('should keep reserved session alive', etask._fn(function*(_this){
             _this.timeout(6000);
             yield l.test();
-            let hst = history.length;
+            const hst = history.length;
             assert.ok(hst<=2);
             yield etask.sleep(3000);
-            assert.ok(hst < history.length);
+            assert.ok(hst<history.length);
         }));
-    });
-});
-describe('manager', ()=>{
-    let app, temp_files;
-    const get_param = (args, param)=>{
-        let i = args.indexOf(param)+1;
-        return i ? args[i] : null;
-    };
-    const app_with_args = (args, only_explicit)=>etask(function*(){
-        let manager;
-        this.finally(()=>{
-            if (this.error && manager)
-                return manager.stop(true);
-        });
-        args = args||[];
-        let www = get_param(args, '--www')||Manager.default.www;
-        let db_file = temp_file_path('sqlite3');
-        if (!only_explicit)
-        {
-            let log = get_param(args, '--log');
-            if (!log)
-                args = args.concat(['--log', 'NONE']);
-            if (!get_param(args, '--database'))
-                args = args.concat(['--database', db_file.path]);
-            if (!get_param(args, '--proxy'))
-                args = args.concat(['--proxy', '127.0.0.1']);
-            if (!get_param(args, '--proxy_port'))
-                args = args.concat(['--proxy_port', proxy.port]);
-            if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
-                args.push('--no-config');
-            if (!get_param(args, '--customer'))
-              args = args.concat(['--customer', customer]);
-            if (!get_param(args, '--password'))
-              args = args.concat(['--password', password]);
-            if (!get_param(args, '--dropin'))
-              args = args.concat(['--no-dropin']);
-            if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
-                args.push('--no-cookie');
-        }
-        manager = new Manager(lpm_util.init_args(args),
-            {bypass_credentials_check: true, skip_ga: true});
-        manager.on('error', this.throw_fn());
-        yield manager.start();
-        let admin = 'http://127.0.0.1:'+www;
-        return {manager, admin, db_file};
-    });
-    const app_with_config = opt=>etask(function*(){
-        let args = [];
-        const cli = opt.cli||{};
-        Object.keys(cli).forEach(k=>{
-            if (typeof cli[k]=='boolean')
-            {
-                if (cli[k])
-                    args.push('--'+k);
-                else
-                    args.push('--no-'+k);
-                return;
-            }
-            args.push('--'+k);
-            args.push(cli[k]);
-        });
-        if (opt.config)
-        {
-            const config_file = temp_file(opt.config||[], 'json');
-            args.push('--config');
-            args.push(config_file.path);
-            temp_files.push(config_file);
-        }
-        (opt.files||[]).forEach(c=>{
-            const file = temp_file(c, 'json');
-            args.push(file.path);
-            temp_files.push(file);
-        });
-        return yield app_with_args(args, opt.only_explicit);
-    });
-    const app_with_proxies = (proxies, cli)=>etask(function*(){
-        return yield app_with_config({config: {proxies}, cli});
-    });
-    const api = (_path, method, data, json)=>etask(function*(){
-        const opt = {
-            url: app.admin+'/'+_path,
-            method: method||'GET',
-            json: json,
-            body: data,
-        };
-        return yield etask.nfn_apply(request, [opt]);
-    });
-    const api_json = (_path, options)=>etask(function*(){
-        let opt = options||{};
-        return yield api(_path, opt.method, opt.body, true);
-    });
-    const json = (_path, method, data)=>etask(function*(){
-        const res = yield api(_path, method, data, true);
-        assert.equal(res.statusCode, 200);
-        return res.body;
-    });
-    afterEach('after manager', ()=>etask(function*(){
-        if (!app)
-            return;
-        yield app.manager.stop(true);
-        if (process.platform=='win32')
-            yield etask.sleep(10);
-        app.db_file.done();
-        app = null;
-    }));
-    beforeEach(()=>temp_files = []);
-    afterEach('after manager 2', ()=>temp_files.forEach(f=>f.done()));
-    describe('get_params', ()=>{
-        const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
-            let mgr = new Manager(lpm_util.init_args(_args), {skip_ga: true});
-            assert.deepEqual(expected, mgr.get_params());
-        }));
-        t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
-        t('credentials',
-            qw`--foo 1 --bar 2 --customer test_user --password abcdefgh`,
-            ['--foo', 1, '--bar', 2]);
-        t('credentials with no-config',
-            qw`--no-config --customer usr --password abc --token t --zone z`,
-            qw`--no-config --customer usr --password abc --token t --zone z`);
-    });
-    xdescribe('config load', ()=>{
-        const t = (name, config, expected)=>it(name, etask._fn(
-        function*(_this){
-            _this.timeout(4000);
-            app = yield app_with_config(config);
-            let proxies = yield json('api/proxies_running');
-            assert_has(proxies, expected, 'proxies');
-        }));
-        const simple_proxy = {port: 24024};
-        t('cli only', {cli: simple_proxy, config: []},
-            [assign({}, simple_proxy, {proxy_type: 'persist'})]);
-        t('main config only', {config: simple_proxy},
-            [assign({}, simple_proxy, {proxy_type: 'persist'})]);
-        t('config file', {files: [simple_proxy]}, [simple_proxy]);
-        t('config override cli', {cli: simple_proxy, config: {port: 24042}},
-            [simple_proxy, {proxy_type: 'persist', port: 24042}]);
-        const multiple_proxies = [
-            assign({}, simple_proxy, {port: 25025}),
-            assign({}, simple_proxy, {port: 26026}),
-            assign({}, simple_proxy, {port: 27027}),
-        ];
-        t('multiple config files', {files: multiple_proxies},
-            multiple_proxies);
-        t('main + config files', {config: simple_proxy,
-            files: multiple_proxies}, [].concat([assign({}, simple_proxy,
-            {proxy_type: 'persist'})], multiple_proxies));
-        describe('default zone', ()=>{
-            const zone_static = {password: ['pass1']};
-            const zone_gen = {password: ['pass2']};
-            const zones = {static: assign({}, zone_static),
-                gen: assign({}, zone_gen)};
-            const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
-                nock('https://luminati-china.io').get('/').reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_stats')
-                    .reply(200, {});
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer: 'testc1', proxy: pkg.version})
-                    .reply(200, {_defaults});
-                t(name, _.set(config, 'cli.customer', 'testc1'), expected);
-            };
-            t2('invalid', {config: {_defaults: {zone: 'foo'},
-                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
-                {zone: 'static'})], {zone: 'static', zones});
-            t2('keep default', {config: {_defaults: {zone: 'gen'},
-                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
-                {zone: 'gen'})]);
-            t2('default disabled', {config: {_defaults: {zone: 'gen'},
-                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
-                {zone: 'static'})], {zone: 'static', zones: assign({}, zones,
-                    {gen: {plans: [{disable: 1}]}})});
-        });
-    });
-    xdescribe('dropin', ()=>{
-        const t = (name, args, expected)=>it(name, etask._fn(
-        function*(_this){
-            _this.timeout(4000);
-            app = yield app_with_args(args);
-            let proxies = yield json('api/proxies_running');
-            assert_has(proxies, expected, 'proxies');
-        }));
-        t('off', ['--no-dropin'], []);
-    });
-    describe('api', ()=>{
-        it('ssl', ()=>etask(function*(){
-            app = yield app_with_args();
-            let res = yield api('ssl');
-            assert_has(res.headers, {
-                'content-type': 'application/x-x509-ca-cert',
-                'content-disposition': 'filename=luminati.crt',
-            }, 'headers');
-            assert.equal(res.body, fs.readFileSync(path.join(__dirname,
-                'bin/ca.crt')), 'certificate');
-        }));
-        describe('version info', ()=>{
-            it('current', ()=>etask(function*(){
-                app = yield app_with_args();
-                const body = yield json('api/version');
-                assert.equal(body.version, pkg.version);
-            }));
-        });
-        describe('proxies', ()=>{
-            describe('get', ()=>{
-                it('normal', ()=>etask(function*(){
-                    let proxies = [{port: 24023}, {port: 24024}];
-                    app = yield app_with_proxies(proxies);
-                    let res = yield json('api/proxies');
-                    assert_has(res, proxies, 'proxies');
-                    res = yield json('api/proxies_running');
-                    assert_has(res, proxies, 'proxies_running');
-                }));
-            });
-            describe('post', ()=>{
-                it('normal non-persist', ()=>etask(function*(){
-                    let sample_proxy = {
-                        port: 24001,
-                        proxy_type: 'non-persist',
-                    };
-                    let proxies = [{port: 24000}];
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield json('api/proxies', 'post',
-                        {proxy: sample_proxy});
-                    assert_has(res, {data: sample_proxy}, 'proxies');
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [{}, sample_proxy], 'proxies');
-                    res = yield json('api/proxies');
-                    assert.equal(res.length, 1);
-                }));
-                it('normal persist', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001};
-                    let proxies = [{port: 24000}];
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield json('api/proxies', 'post',
-                        {proxy: sample_proxy});
-                    assert_has(res, {data: sample_proxy}, 'proxies');
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [{}, sample_proxy], 'proxies');
-                    res = yield json('api/proxies');
-                    assert_has(res, [{}, sample_proxy], 'proxies');
-                }));
-                it('inherit defaults', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001, proxy_type:
-                        'non-persist'};
-                    let proxies = [{port: 24000}];
-                    let res_proxy = assign({}, {customer, password},
-                        sample_proxy);
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield json('api/proxies', 'post',
-                        {proxy: sample_proxy});
-                    assert_has(res, {data: res_proxy}, 'proxies');
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [{}, res_proxy], 'proxies');
-                    res = yield json('api/proxies');
-                    assert.equal(res.length, 1);
-                }));
-                it('conflict', ()=>etask(function*(){
-                    let sample_proxy = {port: 24000};
-                    let proxies = [sample_proxy];
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield api_json('api/proxies',
-                        {method: 'post', body: {proxy: sample_proxy}});
-                    assert.equal(res.statusCode, 400);
-                    assert_has(res.body, {errors: []}, 'proxies');
-                }));
-            });
-            describe('put', ()=>{
-                it('normal', ()=>etask(function*(){
-                    let put_proxy = {port: 24001};
-                    let proxies = [{port: 24000}];
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield json('api/proxies/24000', 'put',
-                        {proxy: put_proxy});
-                    assert_has(res, {data: put_proxy});
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [put_proxy], 'proxies');
-                }));
-                it('inherit defaults', ()=>etask(function*(){
-                    let put_proxy = {port: 24001};
-                    let proxies = [{port: 24000}];
-                    let res_proxy = assign({}, {customer, password},
-                        put_proxy);
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield json('api/proxies/24000', 'put',
-                        {proxy: put_proxy});
-                    assert_has(res, {data: res_proxy});
-                    res = yield json('api/proxies_running');
-                    assert_has(res, [res_proxy], 'proxies');
-                }));
-                it('conflict', ()=>etask(function*(){
-                    let proxies = [{port: 24000}, {port: 24001}];
-                    app = yield app_with_proxies(proxies, {});
-                    let res = yield api_json('api/proxies/24001',
-                        {method: 'put', body: {proxy: {port: 24000}}});
-                    assert.equal(res.statusCode, 400);
-                    assert_has(res.body, {errors: []}, 'proxies');
-                }));
-            });
-            describe('delete', ()=>{
-                it('normal', ()=>etask(function*(){
-                    app = yield app_with_args([]);
-                    let res = yield api_json('api/proxies/24000',
-                        {method: 'delete'});
-                    assert.equal(res.statusCode, 204);
-                }));
-            });
-        });
-        describe('user credentials', ()=>{
-            it('success', ()=>etask(function*(){
-                nock('https://luminati-china.io').get('/').reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_stats')
-                    .reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_config')
-                    .reply(200, {});
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version})
-                    .reply(200, {mock_result: true, _defaults: true});
-                app = yield app_with_args(['--customer', 'mock_user']);
-                let result = yield app.manager.get_lum_local_conf();
-                assert_has(result, {mock_result: true});
-            }));
-            it('login required', ()=>etask(function*(){
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', token: '',
-                        proxy: pkg.version})
-                    .reply(403, 'login_required');
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({token: '', proxy: pkg.version})
-                    .reply(403, 'login_required');
-                app = yield app_with_args(['--customer', 'mock_user']);
-                try {
-                    yield app.manager.get_lum_local_conf(null, null, true);
-                    assert.fail('should have thrown exception');
-                } catch(e){
-                    assert_has(e, {status: 403, message: 'login_required'});
-                }
-            }));
-            it('update defaults', ()=>etask(function*(){
-                let updated = {_defaults: {customer: 'updated'}};
-                nock('https://luminati-china.io').get('/').reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_stats')
-                    .query({customer: 'updated'}).reply(200, {});
-                nock('https://luminati-china.io').post('/update_lpm_config')
-                    .query({customer: 'updated'}).reply(200, {});
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version})
-                    .reply(200, updated);
-                app = yield app_with_args(['--customer', 'mock_user']);
-                let res = yield app.manager.get_lum_local_conf();
-                assert_has(res, updated, 'result');
-                assert_has(app.manager._defaults, res._defaults, '_defaults');
-            }));
-        });
-        xdescribe('recent_stats', ()=>{
-            const t = (name, expected)=>
-            it(name, etask._fn(function*(_this){
-                _this.timeout(6000);
-                nock('https://luminati-china.io').get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version})
-                    .reply(200, {mock_result: true, _defaults: true});
-                app = yield app_with_args(qw`--customer mock_user --port 24000
-                    --request_stats --ssl false`);
-                app.manager.loki.stats_clear();
-                yield etask.nfn_apply(request, [{
-                    proxy: 'http://127.0.0.1:24000',
-                    url: 'http://linkedin.com/',
-                    strictSSL: false,
-                }]);
-                yield etask.sleep(1500);
-                const res = yield api_json(`api/recent_stats`);
-                assert_has(res.body, expected);
-            }));
-            t('main', {
-                status_code: [{key: '200', reqs: 1}],
-                protocol: [{key: 'http', reqs: 1}],
-                hostname: [{key: 'linkedin.com', reqs: 1}],
-                ports: {24000: {
-                    reqs: 1,
-                    success: 1,
-                    url: 'http://linkedin.com/',
-                }},
-                success: 1,
-                total: 1,
-            });
-        });
-    });
-    it('disable analytics', ()=>{
-        const ua = analytics.get_ua();
-        const spy = sinon.stub(ua.ua, 'send', ()=>{});
-        analytics.enabled = false;
-        ua.send();
-        assert(!spy.called);
-        analytics.enabled = true;
-        ua.send();
-        assert(spy.called);
-        spy.restore();
-    });
-    // XXX krzysztof: make it the other way
-    xdescribe('crash on load error', ()=>{
-        const t = (name, proxies)=>it(name, ()=>etask(function*(){
-            try {
-                app = yield app_with_proxies(proxies);
-                assert.fail('Should crash');
-            } catch(e){
-                if (e instanceof assert.AssertionError)
-                    throw e;
-            }
-        }));
-        t('conflict proxy port', [
-            {port: 24024},
-            {port: 24024},
-        ]);
-        t('conflict with www', [{port: Manager.default.www}]);
-    });
-    describe('using passwords', ()=>{
-        it('take password from provided zone', etask._fn(function*(_this){
-            _this.timeout(6000);
-            const config = {proxies: []};
-            const _defaults = {zone: 'static', password: 'xyz',
-                zones: {zone1: {password: ['zone1_pass']}}};
-            app = yield app_with_config({config, cli: {}});
-            nock('https://luminati-china.io').get('/cp/lum_local_conf')
-            .query({customer: 'abc', proxy: pkg.version, token: ''})
-            .reply(200, {_defaults});
-            const res = yield json('api/proxies', 'post',
-                {proxy: {port: 24000, zone: 'zone1'}});
-            assert.equal(res.data.password, 'zone1_pass');
-        }));
-        it('uses password from default zone', etask._fn(function*(_this){
-            _this.timeout(6000);
-            const config = {proxies: []};
-            const _defaults = {zone: 'static', password: 'xyz',
-                zones: {static: {password: ['static_pass']}}};
-            app = yield app_with_config({config, cli: {}});
-            nock('https://luminati-china.io').get('/cp/lum_local_conf')
-            .query({customer: 'abc', proxy: pkg.version, token: ''})
-            .reply(200, {_defaults});
-            const res = yield json('api/proxies', 'post',
-                {proxy: {port: 24000, zone: 'static'}});
-            assert.equal(res.data.password, 'static_pass');
-        }));
-        it('uses new proxy custom password', etask._fn(function*(_this){
-            _this.timeout(6000);
-            const config = {proxies: []};
-            const _defaults = {zone: 'static', password: 'xyz',
-                zones: {static: {password: ['static_pass']}}};
-            app = yield app_with_config({config, cli: {}});
-            nock('https://luminati-china.io').get('/cp/lum_local_conf')
-            .query({customer: 'abc', proxy: pkg.version, token: ''})
-            .reply(200, {_defaults});
-            const res = yield json('api/proxies', 'post',
-                {proxy: {port: 24000, zone: 'static', password: 'p1_pass'}});
-            assert.equal(res.data.password, 'p1_pass');
-        }));
-        it('uses existing proxy custom password', etask._fn(function*(_this){
-            _this.timeout(6000);
-            const _defaults = {zone: 'static', password: 'xyz', zones: {
-                static: {password: ['static_pass']},
-                zone2: {password: ['zone2_pass']},
-            }};
-            nock('https://luminati-china.io').get('/cp/lum_local_conf')
-            .query({customer: 'abc', proxy: pkg.version, token: ''})
-            .reply(200, {_defaults});
-            const config = {proxies: [
-                {port: 24000, zone: 'static', password: 'p1_pass'},
-                {port: 24001, zone: 'zone2', password: 'p2_pass'},
-                {port: 24002, zone: 'static'},
-                {port: 24003, zone: 'zone2'},
-                {port: 24004},
-            ]};
-            app = yield app_with_config({config, cli: {}});
-            const res = yield json('api/proxies_running');
-            const t = (port, pwd)=>{
-                assert.equal(res.find(p=>p.port==port).password, pwd);
-            };
-            t(24000, 'p1_pass');
-            t(24001, 'p2_pass');
-            t(24002, 'static_pass');
-            t(24003, 'zone2_pass');
-            t(24004, 'static_pass');
-        }));
-    });
-});
-
-const util = require('./lib/util.js');
-
-describe('util', ()=>{
-    describe('param_rand_range', ()=>{
-        const t = (arg, res, mult)=>{
-            let name = JSON.stringify(arg)+(mult>0 ? ' mult:'+mult : '');
-            it(name, ()=>{
-                let rand_range = util.param_rand_range(arg, mult);
-                assert.equal(rand_range, res);
-            });
-        };
-        t('0:0', 0);
-        t(0, 0);
-        t('1', 1);
-        t('5:1', 5);
-        t('5:1', 500, 100);
-        t([5, 1], 500, 100);
-        t('test', 0);
-        t(5, 5);
-        it('in range 2:4', ()=>{
-            let rand_range = util.param_rand_range('2:4');
-            assert.ok(rand_range>=2 && rand_range<=4);
-        });
-        it('in range 2:4 mult 100', ()=>{
-            let rand_range = util.param_rand_range('2:4', 100);
-            assert.ok(rand_range>=200 && rand_range<=400);
-        });
-    });
-    it('parse_env_params', ()=>{
-        const t = (env, params, result, error)=>{
-            if (error)
-            {
-                const spy = sinon.stub(zerr, 'zexit',
-                    err=>assert.equal(err, error));
-                lpm_util.t.parse_env_params(env, params);
-                assert(spy.called);
-                spy.restore();
-            }
-            else
-            {
-                assert.deepEqual(lpm_util.t.parse_env_params(env, params),
-                    result);
-            }
-        };
-        t({}, {port: {type: 'integer'}}, {});
-        t({LPM_PORT: '11123'}, {port: {type: 'integer'}}, {port: 11123});
-        t({LPM_PORT: 'asdasdasd'}, {port: {type: 'integer'}}, {},
-            'LPM_PORT not a number asdasdasd');
-        t({LPM_IP: '127.0.0.1'}, {ip: {type: 'string'}}, {ip: '127.0.0.1'});
-        t({LPM_IP: '127.0.0.1'}, {ip: {type: 'string',
-            pattern: '^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$'}}, {ip: '127.0.0.1'});
-        t({LPM_IP: 'notIp'}, {ip: {type: 'string',
-            pattern: '^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$'}}, {},
-            'LPM_IP wrong value pattern ^(\\d+\\.\\d+\\.\\d+\\.\\d+)?$');
-        t({LPM_IPS: '127.0.0.1'}, {ips: {type: 'array'}},
-            {ips: ['127.0.0.1']});
-        t({LPM_IPS: '127.0.0.1;192.168.1.1'}, {ips: {type: 'array'}},
-            {ips: ['127.0.0.1', '192.168.1.1']});
-        t({LPM_OBJECT: '[asdasd'}, {object: {type: 'object'}}, {},
-            'LPM_OBJECT contains invalid JSON: [asdasd');
-        t({LPM_OBJECT: '{"test": [1,2,3]}'}, {object: {type: 'object'}}, {
-            object: {test: [1, 2, 3]}});
-    });
-    it('get_file_path', ()=>{
-        const test_files = [
-            ['test1.file'],
-            ['test2.file', 'test2.file.backup'],
-            ['test3.file', 'test3.file.0', 'test3.file.1'],
-            ['test4.file', 'test4.file.0', 'test4.file.backup']];
-        const create_file = filename=>fs.writeFileSync(
-            path.resolve(os.homedir(), filename));
-        const remove_file = filename=>{
-            fs.unlinkSync(path.resolve(lpm_file.work_dir, filename));
-        };
-        const t = files=>{
-            for (const file of files)
-                create_file(file);
-            lpm_file.get_file_path(files[0]);
-            for (const file of files)
-            {
-                assert.equal(fs.existsSync(path.resolve(os.homedir(), file)),
-                    false);
-                assert.equal(fs.existsSync(path.resolve(
-                    lpm_file.work_dir, file)), true);
-            }
-            for (const file of files)
-                remove_file(file);
-        };
-        for (const files of test_files)
-            t(files);
     });
 });

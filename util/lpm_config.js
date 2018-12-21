@@ -22,7 +22,7 @@ const conf = {
     mgr_fields: _.keys(swagger.definitions.manager.properties),
     numeric_fields: prop_by_type(swagger.definitions.proxy, 'integer'),
     boolean_fields: prop_by_type(swagger.definitions.proxy, 'boolean'),
-    credential_fields: qw`customer zone password token token_auth`,
+    credential_fields: qw`customer zone password token token_auth version`,
     default_superproxy_domain: 'zproxy.lum-superproxy.io',
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields);
@@ -49,6 +49,7 @@ conf.luminati_default = {
     api: 'https://luminati-china.io',
     socket_inactivity_timeout: date.ms.MIN,
     last_preset_applied: 'session_long',
+    keep_alive: false,
 };
 conf.manager_default = assign({}, _.omit(conf.luminati_default, 'port'), {
     www: 22999,

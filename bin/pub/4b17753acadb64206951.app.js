@@ -2190,8 +2190,9 @@ var bytes_format = exports.bytes_format = function bytes_format(bytes, number) {
     if (!bytes || isNaN(parseFloat(bytes)) || !isFinite(bytes)) return '';
     number = number != undefined ? number : Math.floor(Math.log(bytes) / Math.log(1000));
     var precision = number ? 2 : 0;
-    var number_format = Intl.NumberFormat('en-US', { maximumFractionDigits: precision });
-    return number_format.format(bytes / Math.pow(1000, Math.floor(number))) + ' ' + ['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
+    var n = (bytes / Math.pow(1000, Math.floor(number))).toFixed(precision);
+    if (+n === 0) n = 0;
+    return n + ' ' + ['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
 };
 
 var ga_event = exports.ga_event = function ga_event(category, action, label) {
@@ -2324,7 +2325,7 @@ var presets = {
         subtitle: 'All requests share the same long session (IP). For\n            connecting a browser to Luminati, maintaining the same IP for as\n            long as possible',
         set: function set(opt) {
             opt.pool_size = 1;
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
             opt.session = true;
         },
         clean: function clean(opt) {},
@@ -2348,11 +2349,11 @@ var presets = {
             opt.pool_size = 0;
             opt.sticky_ip = true;
             opt.session = '';
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
         },
         clean: function clean(opt) {
             opt.sticky_ip = '';
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
         },
@@ -2375,13 +2376,13 @@ var presets = {
         subtitle: 'Round-robin pool of pre-established sessions (IPs). For\n            spreading requests across large number of IPs. Tweak pool_size,\n            max_requests & proxy_count to optimize performance',
         set: function set(opt) {
             opt.pool_type = 'round-robin';
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
             opt.session = true;
             opt.max_requests = 1;
             opt.pool_size = opt.pool_size > 1 ? opt.pool_size : 10;
         },
         clean: function clean(opt) {
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.pool_size = 0;
@@ -2404,7 +2405,7 @@ var presets = {
         subtitle: 'Maximum request speed',
         set: function set(opt) {
             opt.pool_size = 50;
-            opt.keep_alive = 45;
+            opt.keep_alive = true;
             opt.pool_type = 'round-robin';
             opt.proxy_count = 20;
             opt.session_duration = 0;
@@ -2414,7 +2415,7 @@ var presets = {
         },
         clean: function clean(opt) {
             opt.pool_size = 1;
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.proxy_count = '';
             opt.race_reqs = '';
             opt.use_proxy_cache = true;
@@ -2437,7 +2438,7 @@ var presets = {
             opt.session = true;
             opt.pool_size = 1;
             opt.pool_type = 'sequential';
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.session_duration = 0;
             opt.random_user_agent = true;
             opt.override_headers = true;
@@ -2536,7 +2537,7 @@ var presets = {
             opt.session = '';
             opt.pool_size = 1;
             opt.pool_type = null;
-            opt.keep_alive = 0;
+            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.seed = '';
@@ -12785,8 +12786,8 @@ var tabs = exports.tabs = {
                 ext: true
             },
             keep_alive: {
-                label: 'Keep-alive',
-                tooltip: 'LPM will ping an IP to keep the session alive',
+                label: 'Keep session alive',
+                tooltip: 'LPM will send a small request every 45 seconds to\n                    keep the session alive',
                 ext: true
             },
             session_random: {
@@ -49100,8 +49101,7 @@ var Rotation = function (_Pure_component) {
                     on_change: this.pool_type_changed }),
                 _react2.default.createElement(_common2.Config, { type: 'select_number', id: 'pool_size', allow_zero: true,
                     note: pool_size_note, disabled: pool_size_disabled }),
-                _react2.default.createElement(_common2.Config, { type: 'select_number', id: 'keep_alive', sufix: 'seconds',
-                    data: [0, 45] }),
+                _react2.default.createElement(_common2.Config, { type: 'yes_no', id: 'keep_alive' }),
                 _react2.default.createElement(_common2.Config, { type: 'select_number', id: 'max_requests' }),
                 _react2.default.createElement(_common2.Config, { type: 'select_number', id: 'session_duration',
                     sufix: 'seconds' }),
@@ -55654,8 +55654,8 @@ var columns = [{
     ext: true
 }, {
     key: 'keep_alive',
-    title: 'Keep-alive',
-    type: 'number',
+    title: 'Keep session alive',
+    render: Boolean_cell,
     ext: true
 }, {
     key: 'seed',

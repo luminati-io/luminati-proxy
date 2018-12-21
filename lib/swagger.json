@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.116.548",
+        "version": "1.116.953",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -724,8 +724,8 @@
                     "description": "Pool session iteration order"
                 },
                 "keep_alive": {
-                    "type": "integer",
-                    "description": "Generate request to keep session alive after given idle time (seconds)"
+                    "type": "boolean",
+                    "description": "Send a small request every 45 seconds to keep session alive"
                 },
                 "seed": {
                     "type": "string",

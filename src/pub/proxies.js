@@ -276,8 +276,8 @@ const columns = [
     },
     {
         key: 'keep_alive',
-        title: 'Keep-alive',
-        type: 'number',
+        title: 'Keep session alive',
+        render: Boolean_cell,
         ext: true,
     },
     {
