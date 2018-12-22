@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.116.953 
+## 1.116.963 
 
 ## 1.116.548 Development Latest
 - :star: support using multiple instances on the same machine
