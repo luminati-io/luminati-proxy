@@ -1,8 +1,27 @@
 [
     {
+        "ver": "1.117.683",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Ban IP when combined with Waterfall rule"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed db issues and improved db performance"
+            }
+        ]
+    },
+    {
         "ver": "1.116.963",
-        "type": "stable/dev",
-        "changes": []
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed Ban IP when combined with other rules"
+            }
+        ]
     },
     {
         "ver": "1.116.548",

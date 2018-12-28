@@ -4,7 +4,8 @@ import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
-import {Tooltip, Remove_icon, Add_icon, Input} from '../common.js';
+import {Tooltip, Remove_icon, Add_icon, Input,
+    Field_row_raw} from '../common.js';
 import * as util from '../util.js';
 
 export default class Headers extends Pure_component {
@@ -47,7 +48,7 @@ export default class Headers extends Pure_component {
               <Config type="yes_no" id="random_user_agent"
                 on_change={this.random_user_agent_changed}/>
               <Config type="yes_no" id="override_headers"/>
-              <div className="field_row headers">
+              <Field_row_raw inner_class_name="headers">
                 <div className="desc">
                   <Tooltip title="Custom headers">
                     <span>Headers</span>
@@ -61,7 +62,7 @@ export default class Headers extends Pure_component {
                       add_clicked={this.add} idx={i}/>
                   )}
                 </div>
-              </div>
+              </Field_row_raw>
             </Tab_context.Provider>;
     }
 }

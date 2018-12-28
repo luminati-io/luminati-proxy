@@ -418,7 +418,7 @@ h4 { margin: 0; }
         right: 0;
     }
 }
-.json_input_wrapper {
+.code_mirror_wrapper {
     height: auto !important;
     padding-left: 5px !important;
     padding-right: 10px !important;
@@ -426,7 +426,7 @@ h4 { margin: 0; }
     &.error { border-color: @error_dark; }
 }
 select, input[type=number], input[type=text], input[type=password],
-input[type=email], textarea, .json_input_wrapper {
+input[type=email], textarea, .code_mirror_wrapper {
     min-width: 100px;
     width: auto;
     height: 32px;
@@ -704,12 +704,6 @@ span.icon_link {
         border: 1px solid white;
     }
 }
-.field_row.animated {
-    border-radius: 3px;
-    animation: field_highlight 900ms;
-    animation-iteration-count: 3;
-    border: 1px solid white;
-}
 .loader_wrapper {
     position: fixed;
     z-index: 5000;
@@ -890,6 +884,10 @@ span.icon_link {
         position: relative;
         top: 5px;
     }
+    .rbt-input-hint-container {
+        input { width: 100%; }
+        .rbt-input-hint { top: 5px !important; }
+    }
     .dropdown-menu {
         width: 100%;
         .dropdown-item {
@@ -1047,6 +1045,15 @@ span.icon_link {
                     width: 16px;
                     height: 16px;
                 }
+                .trigger {
+                    display: flex;
+                    .trigger_code {
+                        margin-left: 10px;
+                        border-left: 1px solid #ccc;
+                        padding: 3px 3px 3px 10px;
+                        display: none;
+                    }
+                }
             }
             .rule_add_btn {
                 width: 90px;
@@ -1055,7 +1062,7 @@ span.icon_link {
             }
         }
         &.headers {
-            .field_row.headers {
+            .field_row_inner.headers {
                 position: absolute;
                 align-items: baseline;
                 input[type=text] {
@@ -1083,32 +1090,9 @@ span.icon_link {
             height: 40px;
         }
         .note { margin-bottom: 0; }
-        .field_row {
-            padding: 3px;
-            display: flex;
-            align-items: center;
-            .info_icon {
-                display: inline-block;
-                position: relative;
-                top: 1px;
-                left: 5px;
-            }
-            &.disabled {
-                color: @grey;
-                input, select {
-                    background-color: @light_grey;
-                    border-color: @grey_border;
-                }
-                label { cursor: default; }
-            }
-        }
         .desc {
             line-height: 1.07;
             padding-right: 10px;
-        }
-        .inline_field {
-            display: flex;
-            align-items: center;
         }
         align-items: center;
         .sufix { margin-left: 10px; }
@@ -1129,12 +1113,6 @@ span.icon_link {
         outline: none;
         position: relative;
         &:hover .tip_box { visibility: visible; }
-        .regex_code {
-            margin-left: 10px;
-            border-left: 1px solid #ccc;
-            padding-left: 10px;
-            display: none;
-        }
         .tip_box {
             color: #8e8e8e;
             height: 32px;
@@ -1566,22 +1544,54 @@ span.icon_link {
         }
     }
 }
+.field_row_wrapper {
+    .field_row {
+        display: inline-block;
+        .field_row_inner {
+            display: flex;
+            align-items: center;
+            padding: 3px;
+            .info_icon {
+                display: inline-block;
+                position: relative;
+                top: 1px;
+                left: 5px;
+            }
+            &.disabled {
+                color: @grey;
+                input, select {
+                    background-color: @light_grey;
+                    border-color: @grey_border;
+                }
+                label { cursor: default; }
+            }
+            &.animated {
+                border-radius: 3px;
+                animation: field_highlight 900ms;
+                animation-iteration-count: 3;
+                border: 1px solid white;
+            }
+            .field {
+                display: flex;
+                align-items: center;
+            }
+        }
+        .double_field { display: flex; }
+        .double_field>* {
+            &:first-child { margin-right: 5px; }
+            &:last-child { margin-left: 5px; }
+        }
+    }
+}
 .settings {
     padding: 0 15px;
     .settings_form {
         .field_row {
-            display: flex;
             align-items: baseline;
-            margin-bottom: 5px;
             .desc {
                 width: 140px;
                 margin-right: 5px;
                 white-space: nowrap;
-            }
-            .double_field { display: flex; }
-            .double_field>* {
-                &:first-child { margin-right: 5px; }
-                &:last-child { margin-left: 5px; }
             }
         }
     }

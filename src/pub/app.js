@@ -101,10 +101,6 @@ const App = withRouter(class App extends Pure_component {
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
         });
-        this.etask(function*(){
-            const warnings = yield ajax.json({url: '/api/warnings'});
-            setdb.set('head.warnings', warnings.warnings);
-        });
     };
     render(){
         return <div className="page_wrapper">

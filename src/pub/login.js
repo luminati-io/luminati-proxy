@@ -10,10 +10,7 @@ import {Loader, Logo} from './common.js';
 import {withRouter} from 'react-router-dom';
 
 const Login = withRouter(class Login extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {password: '', username: '', loading: false};
-    }
+    state = {password: '', username: '', loading: false};
     componentDidMount(){
         this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
@@ -25,10 +22,10 @@ const Login = withRouter(class Login extends Pure_component {
             this.save_user();
         }
     }
-    update_password({target: {value}}){ this.setState({password: value}); }
-    update_username({target: {value}}){ this.setState({username: value}); }
-    select_customer(customer){ this.setState({customer}); }
-    save_user(){
+    update_password = ({target: {value}})=>this.setState({password: value});
+    update_username = ({target: {value}})=>this.setState({username: value});
+    select_customer = customer=>this.setState({customer});
+    save_user = ()=>{
         const creds = {};
         if (this.token)
             creds.token = this.token;
@@ -49,6 +46,7 @@ const Login = withRouter(class Login extends Pure_component {
                     update.error_message = 'Something went wrong';
                 _this.setState(update);
             });
+            this.on('finally', ()=>_this.setState({loading: false}));
             _this.setState({loading: true});
             const res = yield ajax.json({url: '/api/creds_user',
                 method: 'POST', data: creds, timeout: 60000});
@@ -67,10 +65,9 @@ const Login = withRouter(class Login extends Pure_component {
             }
             else
                 _this.get_in();
-            _this.setState({loading: false});
         });
-    }
-    get_in(){
+    };
+    get_in = ()=>{
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', _this.get_in);
@@ -83,7 +80,7 @@ const Login = withRouter(class Login extends Pure_component {
             setdb.set('head.zones', zones);
             _this.props.history.push('/overview');
         });
-    }
+    };
     render(){
         return <div className="lum_login">
               <Logo/>
@@ -92,14 +89,13 @@ const Login = withRouter(class Login extends Pure_component {
                 ver_node={this.state.ver_node}/>
               <Loader show={this.state.loading}/>
               <Header/>
-              <Form
-                save_user={this.save_user.bind(this)}
+              <Form save_user={this.save_user}
                 user_customers={this.state.user_customers}
                 password={this.state.password}
                 username={this.state.username}
-                update_password={this.update_password.bind(this)}
-                update_username={this.update_username.bind(this)}
-                select_customer={this.select_customer.bind(this)}/>
+                update_password={this.update_password}
+                update_username={this.update_username}
+                select_customer={this.select_customer}/>
             </div>;
     }
 });
@@ -158,9 +154,7 @@ const Header = ()=>
       <h3>Login with your Luminati account</h3>
     </div>;
 
-const Form = ({user_customers, save_user, update_password, update_username,
-    select_customer, password, username})=>
-{
+const Form = props=>{
     const google_login_url = 'https://accounts.google.com/o/oauth2/v2/auth?'
     +'client_id=943425271003-8ibddns3o1ftp59t2su8c3psocph9v1d.apps.'
     +'googleusercontent.com&response_type=code&redirect_uri='
@@ -172,47 +166,42 @@ const Form = ({user_customers, save_user, update_password, update_username,
             l.protocol+'//'+l.hostname+':'+(l.port||80)+'?api_version=3');
         window.location = href;
     };
-    if (user_customers)
+    if (props.user_customers)
     {
-        return <Customers_form
-              user_customers={user_customers}
-              save_user={save_user}
-              select_customer={select_customer}/>;
+        return <Customers_form user_customers={props.user_customers}
+              save_user={props.save_user}
+              select_customer={props.select_customer}/>;
     }
-    return <First_form
-          password={password}
-          username={username}
+    return <First_form password={props.password}
+          username={props.username}
           google_click={google_click}
-          save_user={save_user}
-          update_password={update_password}
-          update_username={update_username}/>;
+          save_user={props.save_user}
+          update_password={props.update_password}
+          update_username={props.update_username}/>;
 };
 
+const filter_by = (option, props)=>{
+    return option.indexOf(props.text)==0;
+};
 const Typeahead_wrapper = ({data, disabled, on_change, val})=>
     <Typeahead options={data} maxResults={10}
       minLength={0} disabled={disabled} selectHintOnEnter
-      filterBy={(option, text)=>option.indexOf(text)==0}
-      onChange={on_change} selected={val}/>;
+      filterBy={filter_by} onChange={on_change} selected={val}/>;
 
 class Customers_form extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
-    }
-    on_change(e){
+    state = {};
+    on_change = e=>{
         this.setState({cur_customer: e});
         this.props.select_customer(e&&e[0]);
-    }
+    };
     render(){
         return <div className="row customers_form">
               <div className="warning choose_customer">
                 Please choose a customer.</div>
               <div className="form-group">
                 <label htmlFor="user_customer">Customer</label>
-                <Typeahead_wrapper
-                  data={this.props.user_customers}
-                  val={this.state.cur_customer}
-                  on_change={this.on_change.bind(this)}/>
+                <Typeahead_wrapper data={this.props.user_customers}
+                  val={this.state.cur_customer} on_change={this.on_change}/>
               </div>
               <button
                 onClick={this.props.save_user}

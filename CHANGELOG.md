@@ -1,6 +1,11 @@
 Luminati Proxy manager - Change Log
 
-## 1.116.963 
+## 1.117.683 Stable
+- :bug: Fixed Ban IP when combined with Waterfall rule
+- :bug: Fixed db issues and improved db performance
+
+## 1.116.963 Stable
+- :bug: Fixed Ban IP when combined with other rules
 
 ## 1.116.548 Development Latest
 - :star: support using multiple instances on the same machine

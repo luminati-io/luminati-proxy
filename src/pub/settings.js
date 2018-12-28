@@ -3,7 +3,7 @@
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
 import {Labeled_controller, Nav, Loader, Loader_small, Select, Tooltip,
-    Select_number} from './common.js';
+    Select_number, Field_row_raw} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
@@ -165,28 +165,26 @@ class Form extends Pure_component {
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default
                 tooltip={this.tooltips.request_stats}/>
-              <div className="field_row">
+              <Field_row_raw note>
                 <div className="desc">
                   <Tooltip title={this.tooltips.logs_type}>
                     Enable logs for</Tooltip>
                 </div>
-                <div className="field">
-                  <div className="inline_field">
-                    <div className="double_field">
-                      <Select_number val={this.state.settings.logs_value}
-                        data={[0, 100, 1000, 10000]}
-                        on_change_wrapper={this.logs_value_changed}/>
-                      <Select val={this.state.settings.logs_metric}
-                        on_change_wrapper={this.logs_metric_changed}
-                        data={this.logs_metric_opts}/>
-                    </div>
-                    <div className="note">
-                      <strong>Note: </strong>
-                      {note}
-                    </div>
+                <div className="inline_field">
+                  <div className="double_field">
+                    <Select_number val={this.state.settings.logs_value}
+                      data={[0, 100, 1000, 10000]}
+                      on_change_wrapper={this.logs_value_changed}/>
+                    <Select val={this.state.settings.logs_metric}
+                      on_change_wrapper={this.logs_metric_changed}
+                      data={this.logs_metric_opts}/>
+                  </div>
+                  <div className="note">
+                    <strong>Note: </strong>
+                    {note}
                   </div>
                 </div>
-              </div>
+              </Field_row_raw>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

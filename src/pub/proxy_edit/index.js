@@ -225,60 +225,54 @@ const Index = withRouter(class Index extends Pure_component {
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
     };
-    regexp_to_obj = url=>{
-        if (typeof url=='string')
-            return {regexp: url};
-        return url;
-    };
     post_rule_map_to_form = rule=>{
         const result = {};
-        const res = rule.res[0];
-        if (res.status)
+        if (rule.status)
         {
-            if (!res.status_custom)
-                result.status_code = res.status.arg;
+            if (!rule.status_custom)
+                result.status_code = rule.status.arg;
             else
             {
                 result.status_code = 'Custom';
-                result.status_custom = res.status.arg;
+                result.status_custom = rule.status.arg;
             }
         }
-        result.trigger_url_regex = this.regexp_to_obj(rule.url);
-        result.trigger_type = res.trigger_type;
-        result.body_regex = res.body&&res.body.arg;
-        if (res.min_req_time)
+        result.trigger_url_regex = rule.url;
+        result.trigger_type = rule.trigger_type;
+        result.body_regex = rule.body && rule.body.arg;
+        if (rule.min_req_time)
         {
-            const min_req_time = res.min_req_time.match(/\d+/);
-            result.min_req_time = Number(min_req_time&&min_req_time[0]);
+            const min_req_time = rule.min_req_time.match(/\d+/);
+            result.min_req_time = Number(min_req_time && min_req_time[0]);
         }
-        if (res.max_req_time)
+        if (rule.max_req_time)
         {
-            const max_req_time = res.max_req_time.match(/\d+/);
-            result.max_req_time = Number(max_req_time&&max_req_time[0]);
+            const max_req_time = rule.max_req_time.match(/\d+/);
+            result.max_req_time = Number(max_req_time && max_req_time[0]);
         }
-        result.action = res.action_type;
-        result.retry_port = res.action.retry_port;
-        result.retry_number = res.action.retry;
-        if (res.action.fast_pool_session)
-            result.fast_pool_size = res.action.fast_pool_size;
-        if (res.action.ban_ip)
+        result.action = rule.action_type;
+        result.retry_port = rule.action.retry_port;
+        result.retry_number = rule.action.retry;
+        if (rule.action.fast_pool_session)
+            result.fast_pool_size = rule.action.fast_pool_size;
+        if (rule.action.ban_ip)
         {
             result.ban_ip_duration = 'custom';
-            const minutes = res.action.ban_ip.match(/\d+/);
-            result.ban_ip_custom = Number(minutes&&minutes[0]);
+            const minutes = rule.action.ban_ip.match(/\d+/);
+            result.ban_ip_custom = Number(minutes && minutes[0]);
         }
-        if (res.action.process)
-            result.process = JSON.stringify(res.action.process, null, '\t');
-        if (res.action.email)
+        if (rule.action.process)
+            result.process = JSON.stringify(rule.action.process, null, '\t');
+        if (rule.action.email)
         {
             result.send_email = true;
-            result.email = res.action.email;
+            result.email = rule.action.email;
         }
         return result;
     };
     pre_rule_map_to_form = rule=>{
         const res = {
-            trigger_url_regex: this.regexp_to_obj(rule.url),
+            trigger_url_regex: rule.url,
             action: rule.action,
             trigger_type: rule.trigger_type,
         };
@@ -747,7 +741,7 @@ class Alloc_modal extends Pure_component {
                 url = '/api/refresh_vips';
             }
             const res = yield ajax.json({method: 'POST', url, data});
-            if (res.error||!res.ips&&!res.vips)
+            if (res.error || !res.ips && !res.vips)
             {
                 console.log(`error: ${res.error}`);
                 return;

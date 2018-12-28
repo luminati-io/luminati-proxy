@@ -136,7 +136,7 @@ describe('manager', ()=>{
         return res.body;
     });
     afterEach('after manager', etask._fn(function*(_this){
-        _this.timeout(4000);
+        _this.timeout(6000);
         if (!app)
             return;
         yield app.manager.stop(true);
@@ -271,7 +271,8 @@ describe('manager', ()=>{
                     res = yield json('api/proxies');
                     assert.equal(res.length, 1);
                 }));
-                it('normal persist', ()=>etask(function*(){
+                it('normal persist', etask._fn(function*(_this){
+                    _this.timeout(6000);
                     let sample_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {});

@@ -22,7 +22,6 @@ class Overview extends Pure_component {
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>
-                <Warnings/>
               </div>
               <div className="proxies nav_header">
                 <h3>{title}</h3>
@@ -38,27 +37,6 @@ class Overview extends Pure_component {
               <div className="logs_wrapper">
                 <Har_viewer master_port={master_port}/>
               </div>
-            </div>;
-    }
-}
-
-class Warnings extends Pure_component {
-    state = {warnings: []};
-    componentDidMount(){
-        this.setdb_on('head.warnings', warnings=>{
-            warnings&&this.setState({warnings});
-        });
-    }
-    render(){
-        if (!this.state.warnings.length)
-            return null;
-        return <div>
-              {this.state.warnings.map(w=>
-                <div key={w.msg} className="warning">
-                  <div className="warning_icon"/>
-                    <div key={w.msg}>{w.msg}</div>
-                </div>
-              )}
             </div>;
     }
 }

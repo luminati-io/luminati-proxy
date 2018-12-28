@@ -86,6 +86,101 @@ describe('migration', ()=>{
             ]});
         });
     });
+    describe_version('1.116.963', v=>{
+        it('transforms url object into trigger_code for post', ()=>{
+            const proxy = {rules: {post: [{
+                res: [{trigger_type: 'url'}],
+                url: {code: `code`, regexp: `\\.(svg|jpeg)$`},
+            }]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [
+                {rules: {post: [{
+                    res: [{trigger_type: 'url'}],
+                    url: `\\.(svg|jpeg)$`,
+                    trigger_code: `code`,
+                }]}},
+            ]});
+        });
+        it('transforms url object into trigger_code for pre', ()=>{
+            const proxy = {rules: {pre: [{
+                action: 'null_response',
+                url: {code: `code`, regexp: `\\.(svg|jpeg|jpg)$`},
+            }]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [
+                {rules: {pre: [{
+                    action: 'null_response',
+                    url: `\\.(svg|jpeg|jpg)$`,
+                    trigger_code: `code`,
+                }]}},
+            ]});
+        });
+        it('transofrm flat string into trigger_code', ()=>{
+            const proxy = {rules: {pre: [{
+                action: 'null_response',
+                url: 'facebook.com',
+            }]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [
+                {rules: {pre: [{
+                    action: 'null_response',
+                    url: `facebook.com`,
+                    trigger_code: `function trigger(opt){\n  `
+                        +`return /facebook.com/.test(opt.url);\n}`,
+                }]}},
+            ]});
+        });
+        it('transofrm empty regex into trigger_code', ()=>{
+            const proxy = {rules: {pre: [{
+                action: 'null_response',
+                url: '**',
+            }]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [
+                {rules: {pre: [{
+                    action: 'null_response',
+                    url: '',
+                    trigger_code: `function trigger(opt){\n  return true;\n}`,
+                }]}},
+            ]});
+        });
+    });
+    describe_version('1.116.964', v=>{
+        it('transforms array res into flat rule', ()=>{
+            const proxy = {rules: {post: [{
+                res: [{
+                    trigger_type: 'url',
+                    action: {ban_ip: '10min', retry: true},
+                    action_type: 'ban_ip',
+                }],
+                trigger_code: `code`,
+            }]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [
+                {rules: {post: [{
+                    trigger_type: 'url',
+                    trigger_code: `code`,
+                    action_type: 'ban_ip',
+                    action: {ban_ip: '10min', retry: true},
+                }]}},
+            ]});
+        });
+        it('does nothing to proxies without any rules', ()=>{
+            const proxy = {port: 24000, param: 'a'};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [proxy]});
+        });
+        it('does nothing to proxies without post rules', ()=>{
+            const proxy = {port: 24000, rules: {pre: [{id: 'rule1'}]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [proxy]});
+        });
+        it('does nothing to rules without res field', ()=>{
+            const proxy = {port: 24000, rules: {post: [{id: 'rule1'}]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_conf, {proxies: [proxy]});
+        });
+    });
     it('ensures that each migration has a test', ()=>{
         for (let v in migrations)
             assert.equal(tests_run[v], true);

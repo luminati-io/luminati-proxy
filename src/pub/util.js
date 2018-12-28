@@ -241,6 +241,7 @@ const presets = {
             pool_type: true,
             seed: true,
             keep_alive: true,
+            max_requests: true,
         },
     },
     high_performance: {
@@ -297,13 +298,6 @@ const presets = {
                 random: 'string',
                 size: 8,
                 suffix: 'end of cookie',
-                url: '**'
-            },
-            {
-                header: true,
-                name: 'User-Agent',
-                random: 'user-agent',
-                url: '**'
             }];
             opt.rules.post = opt.rules.post||[];
         },
@@ -338,25 +332,20 @@ const presets = {
             opt.ssl = true;
             opt.rules = opt.rules||{};
             opt.rules.post = opt.rules.post||[];
-            if (opt.rules.post.find(r=>
-                r.res[0]&&r.res[0].action&&r.res[0].action.process))
-            {
+            if (opt.rules.post.find(r=>r.action && r.action.process))
                 return;
-            }
             opt.rules.post.push({
-                res: [{
-                    action: {
-                        process: {
-                            title: `$('#productTitle').text()`,
-                            price: `$('#priceblock_ourprice').text().trim()`,
-                            bullets: `$('#featurebullets_feature_div li span')`
-                                +`.map(function(){ return $(this).text() })`
-                                +`.get()`,
-                        },
+                action: {
+                    process: {
+                        title: `$('#productTitle').text()`,
+                        price: `$('#priceblock_ourprice').text().trim()`,
+                        bullets: `$('#featurebullets_feature_div li span')`
+                            +`.map(function(){ return $(this).text() })`
+                            +`.get()`,
                     },
-                    action_type: 'process',
-                    trigger_type: 'url'
-                }],
+                },
+                action_type: 'process',
+                trigger_type: 'url',
                 url: 'luminati.io|dp\\/[A-Z0-9]{10}',
             });
         },
@@ -366,7 +355,7 @@ const presets = {
             if (!opt.rules||!opt.rules.post)
                 return;
             opt.rules.post = opt.rules.post.filter(r=>
-                !r.res[0]||!r.res[0].action||!r.res[0].action.process);
+                !r.action || !r.action.process);
         },
         disabled: {
             random_user_agent: true,

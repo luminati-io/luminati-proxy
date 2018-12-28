@@ -4,7 +4,8 @@ import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {withRouter} from 'react-router-dom';
-import {Labeled_controller, Note, with_proxy_ports} from '../common.js';
+import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
+    Field_row_raw} from '../common.js';
 import {tabs} from './fields.js';
 
 const trigger_types = [
@@ -134,11 +135,8 @@ export default class Rules extends Pure_component {
     };
     post_rule_prepare = rule=>{
         const action_raw = {};
-        if (['retry', 'retry_port', 'ban_ip', 'refresh_ip'].includes(
-            rule.action))
-        {
+        if (['retry', 'retry_port'].includes(rule.action))
             action_raw.retry = true;
-        }
         if (rule.action=='retry' && rule.retry_number)
             action_raw.retry = rule.retry_number;
         else if (rule.action=='retry_port')
@@ -170,35 +168,34 @@ export default class Rules extends Pure_component {
         if (rule.trigger_type)
         {
             result = {
-                res: [{
-                    action: action_raw,
-                    action_type: rule.action,
-                    trigger_type: rule.trigger_type,
-                }],
-                url: rule.trigger_url_regex||'**',
+                action: action_raw,
+                action_type: rule.action,
+                trigger_type: rule.trigger_type,
+                trigger_code: gen_code(rule.trigger_url_regex),
+                url: rule.trigger_url_regex,
             };
         }
         if (rule.trigger_type=='status')
         {
-            let is_custom = rule.status_code=='Custom';
+            const is_custom = rule.status_code=='Custom';
             let rule_status = is_custom ? rule.status_custom :
                 rule.status_code;
             rule_status = rule_status||'';
-            result.res[0].status =
-                {type: is_custom ? '=~' : 'in', arg: rule_status};
-            result.res[0].status_custom = is_custom;
+            result.status = {type: is_custom ? '=~' : 'in', arg: rule_status};
+            result.status_custom = is_custom;
         }
         else if (rule.trigger_type=='body'&&rule.body_regex)
-            result.res[0].body = {type: '=~', arg: rule.body_regex};
+            result.body = {type: '=~', arg: rule.body_regex};
         else if (rule.trigger_type=='min_req_time'&&rule.min_req_time)
-            result.res[0].min_req_time = rule.min_req_time+'ms';
+            result.min_req_time = rule.min_req_time+'ms';
         else if (rule.trigger_type=='max_req_time'&&rule.max_req_time)
-            result.res[0].max_req_time = rule.max_req_time+'ms';
+            result.max_req_time = rule.max_req_time+'ms';
         return result;
     };
     pre_rule_prepare = rule=>{
         const res = {
-            url: rule.trigger_url_regex||'**',
+            trigger_code: gen_code(rule.trigger_url_regex),
+            url: rule.trigger_url_regex,
             action: rule.action,
             trigger_type: rule.trigger_type,
         };
@@ -294,11 +291,6 @@ class Rule_config extends Pure_component {
 }
 
 const Fast_pool_note = ({port, r})=>{
-    r = r||'**';
-    if (r.regexp)
-        r = r.regexp;
-    if (r.code)
-        r = '**';
     return <span>
           <span>Check fast pool sessions by fetching </span>
           <a href={window.location.origin+'/api/fast/'+port+'?r='+r}
@@ -317,6 +309,17 @@ const Ban_ips_note = ({port})=>
       </a>
     </span>;
 
+const gen_function = body=>{
+    body = body.split('\n').map(l=>'  '+l).join('\n');
+    return `function trigger(opt){\n${body}\n}`;
+};
+const gen_code = val=>{
+    if (!val)
+        return empty_function;
+    return gen_function(`return /${val}/.test(opt.url);`);
+};
+const empty_function = gen_function('return true;');
+
 const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
     state = {ports: []};
     componentDidMount(){
@@ -333,7 +336,7 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
         setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
             field, value});
     };
-    trigger_change = val=>{
+    trigger_changed = val=>{
         if (this.props.rule.trigger_type=='url'&&val!='url'||
             this.props.rule.trigger_type!='url'&&val=='url')
         {
@@ -406,29 +409,8 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
           r={rule.trigger_url_regex}/>;
         return <div><div className="rule_wrapper">
               <Btn_rule_del on_click={()=>this.props.rule_del(rule.id)}/>
-              <Rule_config id="trigger_type" type="select"
-                data={trigger_types} on_change={this.trigger_change}
-                rule={rule}/>
-              {rule.trigger_type=='body' &&
-                <Rule_config id="body_regex" type="text" rule={rule}/>}
-              {rule.trigger_type=='min_req_time' &&
-                <Rule_config id="min_req_time" type="select_number" range="ms"
-                  sufix="milliseconds" rule={rule}/>
-              }
-              {rule.trigger_type=='max_req_time' &&
-                <Rule_config id="max_req_time" type="select_number" range="ms"
-                  sufix="milliseconds" rule={rule}/>
-              }
-              {rule.trigger_type=='status' &&
-                <Rule_config id="status_code" type="select"
-                  data={status_types} on_change={this.status_changed}
-                  rule={rule}/>
-              }
-              {rule.status_code=='Custom' &&
-                <Rule_config id="status_custom" type="text" rule={rule}/>}
-              {rule.trigger_type &&
-                <Rule_config id="trigger_url_regex" type="regex" rule={rule}
-                  style={{width: '100%'}}/>}
+              <Trigger rule={rule} trigger_changed={this.trigger_changed}
+                status_changed={this.status_changed}/>
               {rule.trigger_type &&
                 <Rule_config id="action" type="select" data={_action_types}
                   on_change={this.action_changed} rule={rule}/>
@@ -460,11 +442,11 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
               {rule.action=='process' &&
                 <div>
                   <Rule_config id="process" type="json" rule={rule}/>
-                  <div className="field_row">
+                  <Field_row_raw>
                     Test data processing in
                     <a onClick={this.goto_tester} className="link api_link">
                       proxy tester</a>
-                  </div>
+                  </Field_row_raw>
                 </div>
               }
               {rule.action &&
@@ -484,6 +466,55 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
             </div></div>;
     }
 }));
+
+const Trigger = ({rule, trigger_changed, status_changed})=>
+    <div className="trigger">
+      <div className="ui">
+        <Rule_config id="trigger_type" type="select"
+          data={trigger_types} on_change={trigger_changed}
+          rule={rule}/>
+        {rule.trigger_type=='body' &&
+          <Rule_config id="body_regex" type="text" rule={rule}/>}
+        {rule.trigger_type=='min_req_time' &&
+          <Rule_config id="min_req_time" type="select_number"
+            range="ms" sufix="milliseconds" rule={rule}/>
+        }
+        {rule.trigger_type=='max_req_time' &&
+          <Rule_config id="max_req_time" type="select_number"
+            range="ms" sufix="milliseconds" rule={rule}/>
+        }
+        {rule.trigger_type=='status' &&
+          <Rule_config id="status_code" type="select"
+            data={status_types} on_change={status_changed}
+            rule={rule}/>
+        }
+        {rule.status_code=='Custom' &&
+          <Rule_config id="status_custom" type="text" rule={rule}/>}
+        {rule.trigger_type &&
+          <Rule_config id="trigger_url_regex" type="regex"
+            rule={rule} style={{width: '100%'}}/>}
+      </div>
+      <Trigger_code rule={rule}/>
+    </div>;
+
+class Trigger_code extends Pure_component {
+    state = {};
+    static getDerivedStateFromProps(props, state){
+        if (props.rule.trigger_url_regex==state.url)
+            return null;
+        const url = props.rule.trigger_url_regex;
+        const code = gen_code(url);
+        return {url, code};
+    }
+    on_change = val=>{
+        console.log(val);
+    };
+    render(){
+        return <div className="trigger_code">
+              <Cm_wrapper on_change={this.on_change} val={this.state.code}/>
+            </div>;
+    }
+}
 
 const Email_note = ({www})=><div>
       <span>You can manage the list of available emails </span>
