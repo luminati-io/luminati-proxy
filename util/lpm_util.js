@@ -56,8 +56,9 @@ E.init_args = args=>{
         daemon: 'Start as a daemon',
         'stop-daemon': 'Stop running daemon',
         upgrade: 'Upgrade proxy manager',
+        'dir': 'Path to the directory with database and configuration files',
     };
-    let usage = ['Usage:\n  $0 [options] config1 config2 ...'];
+    const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)
     {
         usage.unshift('  docker run luminati/luminati-proxy '

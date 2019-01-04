@@ -32,7 +32,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.117.683/luminati-proxy-manager-v1.117.683-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.118.284/luminati-proxy-manager-v1.118.284-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -173,8 +173,6 @@ Options:
                                                            [number] [default: 5]
   --proxy_retry            Automatically retry on super proxy failure
                                                            [number] [default: 2]
-  --use_proxy_cache        Cache resolved ips of super proxies
-                                                       [boolean] [default: true]
   --insecure               Enable SSL connection/analyzing to insecure hosts
                                                       [boolean] [default: false]
   --country                Country                                      [string]

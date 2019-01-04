@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.117.683",
+        "version": "1.118.284",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -533,10 +533,6 @@
                     "type": "boolean",
                     "description": "Validate proxy credentials"
                 },
-                "use_proxy_cache": {
-                    "type": "boolean",
-                    "description": "Cache resolved ips of super proxies"
-                },
                 "request_stats": {
                     "type": "boolean",
                     "description": "Enable requests statistics"
@@ -561,6 +557,10 @@
                 "session_termination": {
                     "type": "boolean",
                     "description": "Stop sending new requests when the peer IP becomes unavailable and redirect to confimration page before new IP is taken"
+                },
+                "version": {
+                    "type": "string",
+                    "description": "last run LPM version"
                 }
             }
         },
@@ -631,10 +631,6 @@
                 "proxy_retry": {
                     "type": "integer",
                     "description": "Automatically retry on super proxy failure"
-                },
-                "use_proxy_cache": {
-                    "type": "boolean",
-                    "description": "Cache resolved ips of super proxies"
                 },
                 "insecure": {
                     "type": "boolean",

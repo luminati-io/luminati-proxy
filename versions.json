@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.118.284",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Separation between multiple LPM instances"
+            },
+            {
+                "type": "bug",
+                "text": "UI and bug fixes"
+            }
+        ]
+    },
+    {
         "ver": "1.117.683",
         "type": "stable",
         "changes": [

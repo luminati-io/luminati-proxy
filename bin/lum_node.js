@@ -140,8 +140,6 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
         };
         if (!analytics.enabled||!send_ev)
             stop_manager();
-        else
-            ua.event('manager', 'stop', reason, stop_manager);
     }
     if (error)
         zerr(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
@@ -211,13 +209,17 @@ const show_port_conflict = (port, force)=>etask(function*(){
     yield _show_port_conflict(port, force);
 });
 
-const _show_port_conflict = (port, force)=>etask(function*(){
+const get_lpm_tasks = ()=>etask(function*(){
     let tasks;
     try { tasks = yield ps_list(); }
     catch(e){ process.exit(); }
-    tasks = tasks.filter(t=>t.name.includes('node') &&
+    return tasks.filter(t=>t.name.includes('node') &&
         /.*lum_node\.js.*/.test(t.cmd) && t.ppid!=process.pid &&
         t.pid!=process.pid);
+});
+
+const _show_port_conflict = (port, force)=>etask(function*(){
+    const tasks = yield get_lpm_tasks();
     if (!tasks.length)
     {
         zerr.notice(`There is a conflict on port ${port}`);
@@ -236,7 +238,21 @@ const _show_port_conflict = (port, force)=>etask(function*(){
     E.manager.restart();
 });
 
-E.run = (argv, run_config)=>{
+const check_running = argv=>etask(function*(){
+    const tasks = yield get_lpm_tasks();
+    if (!tasks.length)
+        return;
+    if (!argv.dir)
+    {
+        zerr.notice(`LPM is already running (${tasks[0].pid})`);
+        zerr.notice('You need to pass a separate path to the directory for'
+            +' this LPM instance. Use --dir flag');
+        process.exit();
+    }
+});
+
+E.run = (argv, run_config)=>etask(function*(){
+    yield check_running(argv);
     add_alias_for_whitelist_ips();
     E.read_status_file();
     E.write_status_file('initializing', null,
@@ -274,11 +290,6 @@ E.run = (argv, run_config)=>{
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
         E.write_status_file('changing_config', null, zone_autoupdate);
-        if (analytics.enabled)
-        {
-            ua.event('manager', 'config_changed',
-                JSON.stringify(zone_autoupdate));
-        }
         yield E.manager.stop('config change', true, true);
         setTimeout(()=>E.run(argv, zone_autoupdate&&zone_autoupdate.prev ? {
             warnings: [`Your default zone has been automatically changed from `
@@ -293,7 +304,7 @@ E.run = (argv, run_config)=>{
     }).on('restart', ()=>process.send({command: 'restart'}));
     E.manager.start();
     E.write_status_file('running', null, E.manager&&E.manager._total_conf);
-};
+});
 
 E.handle_upgrade_finished = msg=>{
     if (E.on_upgrade_finished)

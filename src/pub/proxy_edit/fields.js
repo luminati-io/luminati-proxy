@@ -109,7 +109,7 @@ export const tabs = {
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
                 placeholder: `i.e. (captcha|robot)`,
-                tooltip: `A string(regular expression) to be scanned in the
+                tooltip: `A string (regular expression) to be scanned in the
                     body of the response`,
             },
             min_req_time: {
@@ -138,7 +138,7 @@ export const tabs = {
             status_custom: {
                 label: 'Custom status code (regex)',
                 placeholder: `i.e. (2..|3..|404)`,
-                tooltip: `A string(regular expression) to be scanned in the
+                tooltip: `A string (regular expression) to be scanned in the
                     head of the response`,
             },
             action: {

@@ -74,16 +74,16 @@ const is_pre_rule = rule=>pre_actions.includes(rule.action)||
 const is_post_rule = rule=>!is_pre_rule(rule);
 
 const status_types = [
-    '--Select--',
-    '200 - Succeeded requests',
-    '403 - Forbidden',
-    '404 - Not found',
-    '500 - Internal server error',
-    '502 - Bad gateway',
-    '503 - Service unavailable',
-    '504 - Gateway timeout',
-    'Custom',
-].map(s=>({key: s, value: s}));
+    {key: '--Select--', value: ''},
+    {key: '200 - Succeeded requests', value: 200},
+    {key: '403 - Forbidden', value: 403},
+    {key: '404 - Not found', value: 404},
+    {key: '500 - Internal server error', value: 500},
+    {key: '502 - Bad gateway', value: 502},
+    {key: '503 - Service unavailable', value: 503},
+    {key: '504 - Gateway timeout', value: 504},
+    {key: 'Custom', value: 'Custom'},
+];
 
 const ban_options = [
     {key: '10 minutes', value: '10min'},
@@ -172,29 +172,29 @@ export default class Rules extends Pure_component {
                 action_type: rule.action,
                 trigger_type: rule.trigger_type,
                 trigger_code: gen_code(rule.trigger_url_regex),
+                type: get_type(rule),
                 url: rule.trigger_url_regex,
             };
         }
         if (rule.trigger_type=='status')
         {
             const is_custom = rule.status_code=='Custom';
-            let rule_status = is_custom ? rule.status_custom :
-                rule.status_code;
-            rule_status = rule_status||'';
-            result.status = {type: is_custom ? '=~' : 'in', arg: rule_status};
+            result.status = (is_custom ? rule.status_custom :
+                +rule.status_code)||'';
             result.status_custom = is_custom;
         }
-        else if (rule.trigger_type=='body'&&rule.body_regex)
-            result.body = {type: '=~', arg: rule.body_regex};
-        else if (rule.trigger_type=='min_req_time'&&rule.min_req_time)
+        else if (rule.trigger_type=='body' && rule.body_regex)
+            result.body = rule.body_regex;
+        else if (rule.trigger_type=='min_req_time' && rule.min_req_time)
             result.min_req_time = rule.min_req_time+'ms';
-        else if (rule.trigger_type=='max_req_time'&&rule.max_req_time)
+        else if (rule.trigger_type=='max_req_time' && rule.max_req_time)
             result.max_req_time = rule.max_req_time+'ms';
         return result;
     };
     pre_rule_prepare = rule=>{
         const res = {
             trigger_code: gen_code(rule.trigger_url_regex),
+            type: get_type(rule),
             url: rule.trigger_url_regex,
             action: rule.action,
             trigger_type: rule.trigger_type,
@@ -313,6 +313,15 @@ const gen_function = body=>{
     body = body.split('\n').map(l=>'  '+l).join('\n');
     return `function trigger(opt){\n${body}\n}`;
 };
+const get_type = r=>{
+    if (r.trigger_type=='body' || r.action=='process')
+        return 'after_body';
+    else if (r.trigger_type=='status' || r.trigger_type=='max_req_time')
+        return 'after_hdr';
+    else if (r.trigger_type=='min_req_time')
+        return 'timeout';
+    return 'before_send';
+};
 const gen_code = val=>{
     if (!val)
         return empty_function;
@@ -324,11 +333,11 @@ const Rule = with_proxy_ports(withRouter(class Rule extends Pure_component {
     state = {ports: []};
     componentDidMount(){
         this.setdb_on('head.consts', consts=>{
-            if (consts&&consts.logins)
+            if (consts && consts.logins)
                 this.setState({logins: consts.logins});
         });
         this.setdb_on('head.defaults', defaults=>{
-            if (defaults&&defaults.www_api)
+            if (defaults && defaults.www_api)
                 this.setState({www: defaults.www_api});
         });
     }

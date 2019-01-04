@@ -253,7 +253,6 @@ const presets = {
             opt.pool_type = 'round-robin';
             opt.proxy_count = 20;
             opt.session_duration = 0;
-            opt.use_proxy_cache = false;
             opt.race_reqs = 2;
             opt.session = true;
         },
@@ -262,7 +261,6 @@ const presets = {
             opt.keep_alive = false;
             opt.proxy_count = '';
             opt.race_reqs = '';
-            opt.use_proxy_cache = true;
         },
         disabled: {
             sticky_ip: true,

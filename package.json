@@ -19,6 +19,7 @@
     },
     "files": [
       "!publish*.js*",
+      "!rollback.js",
       "!**/.jakecache${/*}",
       "!**/test_ln",
       "!**/xvfs_ln",
@@ -345,7 +346,7 @@
       "util/lpm_util.js",
       "webpack.config.js"
     ],
-    "md5": "bcca5fc39825bcc32af2cc6591e89077"
+    "md5": "958793555b63fd97f9dde154d786d31a"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -381,5 +382,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.117.683"
+  "version": "1.118.284"
 }

@@ -3,6 +3,7 @@
 const assert = require('assert');
 const migrate = require('../lib/migration.js');
 const migrations = migrate.migrations;
+const migrate_rule = migrate.migrate_rule;
 const pkg = require('../package.json');
 
 const tests_run = {};
@@ -181,9 +182,115 @@ describe('migration', ()=>{
             assert.deepEqual(_conf, {proxies: [proxy]});
         });
     });
-    it('ensures that each migration has a test', ()=>{
+    describe_version('1.117.683', v=>{
+        const t = (name, _type, rule, type)=>it(name, ()=>{
+            const {proxies: [_proxy]} = migrations[v]({
+                proxies: [{port: 24000, rules: {[_type]: [rule]}}]});
+            assert.deepEqual(_proxy, {port: 24000, rules: {[_type]: [
+                Object.assign({}, rule, {type}),
+            ]}});
+        });
+        t('url -> before_send', 'pre',
+            {action: 'null_response', url: '\\.(jpeg)$'}, 'before_send');
+        t('min_req_time -> timeout', 'pre',
+            {min_req_time: 500, url: '\\.(jpeg)$'}, 'timeout');
+        t('max_req_time -> after_hdr', 'post',
+            {max_req_time: 500, url: '\\.(jpeg)$'}, 'after_hdr');
+        t('status -> after_hdr', 'post',
+            {status: {}, url: '\\.(jpeg)$'}, 'after_hdr');
+        t('body -> after_body', 'post',
+            {body: {}, url: '\\.(jpeg)$'}, 'after_body');
+        t('body -> after_body', 'post',
+            {action_type: 'process', url: '\\.(jpeg)$'}, 'after_body');
+    });
+    describe_version('1.117.684', v=>{
+        const t = (name, rule, obj)=>it(name, ()=>{
+            const {proxies: [_proxy]} = migrations[v]({
+                proxies: [{port: 24000, rules: {post: [rule]}}]});
+            assert.deepEqual(_proxy, {port: 24000, rules: {post: [
+                Object.assign({}, rule, obj),
+            ]}});
+        });
+        t('reduces status into single value', {url: '\\.(jpeg)$',
+            type: 'after_hdr', status: {arg: '200 - Success', type: 'in'}},
+            {status: 200});
+        t('does not change status if it is already simple value',
+            {type: 'after_hdr', status: 200});
+        t('reduces body into single value', {url: '\\.(jpeg)$',
+            type: 'after_body', body: {arg: 'captcha', type: 'in'}},
+            {body: 'captcha'});
+        t('does not change body if it is already simple value',
+            {type: 'after_body', body: 'test123'});
+    });
+    describe_version('x.rules_trigger', v=>{
+        it('migrates correctly whole config', ()=>{
+            const proxy = {port: 24000, rules: {pre: [{
+                action: 'null_response',
+                url: '\\.(jpeg)$',
+            }]}};
+            const _conf = migrations[v]({proxies: [proxy]});
+            const expected_code = `function trigger(opt){\n`
+            +`  if (!/\\.(jpeg)$/.test(opt.url))\n`
+            +`    return false;\n`
+            +`  return true;\n`
+            +`}`;
+            assert.deepEqual(_conf, {proxies: [{port: 24000, rules: {pre: [{
+                action: 'null_response',
+                url: '\\.(jpeg)$',
+                trigger_code: expected_code,
+                type: 'before_send',
+            }]}}]});
+        });
+        describe('rule -> code transformation', ()=>{
+            const t = (name, type, rule, code, _type)=>it(name, ()=>{
+                const _rule = migrate_rule(type)(rule);
+                assert.equal(_rule.trigger_code, code);
+                assert.equal(_rule.type, _type);
+            });
+            describe('pre_rules', ()=>{
+                t('simple', 'pre', {}, `function trigger(opt){\n`
+                    +`  return true;\n}`, 'before_send');
+                t('with url', 'pre', {url: 'facebook'},
+                    `function trigger(opt){\n`
+                    +`  if (!/facebook/.test(opt.url))\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'before_send');
+                it('min_req_time / timeout');
+            });
+            describe('post_rules', ()=>{
+                t('status_code', 'post', {status: {arg: '200 - Success',
+                    type: 'in'}}, `function trigger(opt){\n`
+                    +`  if (opt.status_code!=200)\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'after_hdr');
+                t('status_code with url', 'post', {
+                    status: {arg: '301 - Moved Pernamently', type: 'in'},
+                    url: 'facebook'}, `function trigger(opt){\n`
+                    +`  if (opt.status_code!=301)\n`
+                    +`    return false;\n`
+                    +`  if (!/facebook/.test(opt.url))\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'after_hdr');
+                t('max_req_time', 'post', {max_req_time: 500},
+                    `function trigger(opt){\n`
+                    +`  if (opt.time_passed>500)\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'after_hdr');
+                t('http body', 'post', {body: {arg: 'captcha', type: '=~'}},
+                    `function trigger(opt){\n`
+                    +`  if (!/captcha/.test(opt.body))\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'after_body');
+            });
+        });
+    });
+    it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
+        {
+            if (v.startsWith('x'))
+                continue;
             assert.equal(tests_run[v], true);
+        }
     });
 });
 
@@ -194,6 +301,7 @@ describe('manager', ()=>{
         '2.0.0': c=>{ executed['2.0.0'] = true; return c; },
         '2.1.0': c=>{ executed['2.1.0'] = true; return c; },
         '2.2.0': c=>{ executed['2.2.0'] = true; return c; },
+        'x.dev': c=>{ executed['x.dev'] = true; return c; },
     };
     beforeEach(()=>{
         executed = {};
@@ -219,5 +327,17 @@ describe('manager', ()=>{
         const conf = {_defaults: {version: '2.0.1'}};
         migrate(conf, fake_migrations);
         assert.deepEqual(executed, {'2.1.0': true, '2.2.0': true});
+    });
+    it('does not run migrations starting with x', ()=>{
+        const conf = {};
+        migrate(conf, fake_migrations);
+        assert.equal(executed['x.dev'], undefined);
+    });
+    it('throws error if invalid version and not starting with x', ()=>{
+        const _migrations = Object.assign({}, fake_migrations, {ver: c=>{
+            executed.ver = true;
+            return c;
+        }});
+        assert.throws(()=>migrate({}, _migrations), /Invalid Version/);
     });
 });

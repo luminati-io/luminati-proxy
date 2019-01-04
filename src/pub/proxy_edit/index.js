@@ -230,16 +230,16 @@ const Index = withRouter(class Index extends Pure_component {
         if (rule.status)
         {
             if (!rule.status_custom)
-                result.status_code = rule.status.arg;
+                result.status_code = rule.status;
             else
             {
                 result.status_code = 'Custom';
-                result.status_custom = rule.status.arg;
+                result.status_custom = rule.status;
             }
         }
         result.trigger_url_regex = rule.url;
         result.trigger_type = rule.trigger_type;
-        result.body_regex = rule.body && rule.body.arg;
+        result.body_regex = rule.body;
         if (rule.min_req_time)
         {
             const min_req_time = rule.min_req_time.match(/\d+/);

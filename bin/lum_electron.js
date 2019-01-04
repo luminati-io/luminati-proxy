@@ -2,7 +2,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const electron = require('electron');
-const lpm_config = require('../util/lpm_config.js');
 const child_process = require('child_process');
 const app = electron.app, dialog = electron.dialog;
 const opn = require('opn');
@@ -15,13 +14,7 @@ const zerr = require('../util/zerr.js');
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
-const analytics = require('../lib/analytics.js');
-const ua = analytics.get_ua();
-const assign = Object.assign;
 const E = module.exports;
-
-ua.set('an', 'LPM-electron');
-ua.set('av', `v${lpm_config.version}`);
 
 let manager, upgrade_available, can_upgrade;
 
@@ -91,8 +84,6 @@ auto_updater.on('update-available', e=>etask(function*(){
 
 auto_updater.on('update-downloaded', e=>{
     console.log('Update downloaded');
-    if (analytics.enabled)
-        ua.event('app', 'update-downloaded');
     upgrade_available = true;
     upgrade(e.version);
 });
@@ -139,14 +130,10 @@ const _run = (argv, run_config)=>etask(function*(){
     yield check_conflicts();
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});
-    manager = new Manager(argv, assign({ua}, run_config));
-    if (analytics.enabled)
-        ua.event('app', 'run');
+    manager = new Manager(argv, run_config);
     auto_updater.logger = manager._log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
-        if (analytics.enabled)
-            ua.event('manager', 'www_ready', url).send();
         opn(url);
     })
     .on('upgrade', cb=>{
@@ -157,10 +144,7 @@ const _run = (argv, run_config)=>etask(function*(){
             auto_updater.checkForUpdates();
     })
     .on('stop', ()=>{
-        if (!analytics.enabled)
-            process.exit();
-        else
-            ua.event('manager', 'stop', ()=>process.exit());
+        process.exit();
     })
     .on('error', (e, fatal)=>{
         let e_msg = e.raw ? e.message : 'Unhandled error: '+e;
@@ -171,21 +155,9 @@ const _run = (argv, run_config)=>etask(function*(){
                 process.exit();
             }
         };
-        if (!analytics.enabled)
-            handle_fatal();
-        else
-        {
-            if (e.raw)
-                e = assign({message: e.message}, e);
-            ua.event('manager', 'error', JSON.stringify(e), handle_fatal);
-        }
+        handle_fatal();
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
-        if (analytics.enabled)
-        {
-            ua.event('manager', 'config_changed',
-                JSON.stringify(zone_autoupdate));
-        }
         yield manager.stop('config change', true, true);
         setTimeout(()=>_run(argv, zone_autoupdate && zone_autoupdate.prev ? {
             warnings: [`Your default zone has been automatically changed from `
@@ -198,14 +170,11 @@ const _run = (argv, run_config)=>etask(function*(){
 let quit = err=>{
     if (err)
     {
-        if (!manager||analytics.enabled)
+        if (!manager)
             zerr.perr(err);
         mgr_err('uncaught exception '+zerr.e2s(err));
     }
-    if (!analytics.enabled)
-        app.quit();
-    else
-        ua.event('app', 'quit', ()=>app.quit());
+    app.quit();
 };
 
 E.run = argv=>{

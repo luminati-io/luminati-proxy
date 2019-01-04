@@ -82,7 +82,8 @@ E.is = function(level){ return level<=E.level; };
     E.is[l] = function(){ return level<=E.level; };
 });
 
-E.log_tail = function(size){ return E.log.join('\n').substr(-(size||4096)); };
+E.log_tail = function(size){
+    return (E.log||[]).join('\n').substr(-(size||4096)); };
 
 /* perr is a stub overridden by upper layers */
 E.perr = function(id, info, opt){

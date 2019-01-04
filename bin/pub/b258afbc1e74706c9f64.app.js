@@ -2391,7 +2391,6 @@ var presets = {
             opt.pool_type = 'round-robin';
             opt.proxy_count = 20;
             opt.session_duration = 0;
-            opt.use_proxy_cache = false;
             opt.race_reqs = 2;
             opt.session = true;
         },
@@ -2400,7 +2399,6 @@ var presets = {
             opt.keep_alive = false;
             opt.proxy_count = '';
             opt.race_reqs = '';
-            opt.use_proxy_cache = true;
         },
         disabled: {
             sticky_ip: true,
@@ -12765,7 +12763,7 @@ var tabs = exports.tabs = {
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
                 placeholder: 'i.e. (captcha|robot)',
-                tooltip: 'A string(regular expression) to be scanned in the\n                    body of the response'
+                tooltip: 'A string (regular expression) to be scanned in the\n                    body of the response'
             },
             min_req_time: {
                 label: 'Request time more than',
@@ -12789,7 +12787,7 @@ var tabs = exports.tabs = {
             status_custom: {
                 label: 'Custom status code (regex)',
                 placeholder: 'i.e. (2..|3..|404)',
-                tooltip: 'A string(regular expression) to be scanned in the\n                    head of the response'
+                tooltip: 'A string (regular expression) to be scanned in the\n                    head of the response'
             },
             action: {
                 label: 'Action type',
@@ -28713,7 +28711,8 @@ E.is = function(level){ return level<=E.level; };
     E.is[l] = function(){ return level<=E.level; };
 });
 
-E.log_tail = function(size){ return E.log.join('\n').substr(-(size||4096)); };
+E.log_tail = function(size){
+    return (E.log||[]).join('\n').substr(-(size||4096)); };
 
 /* perr is a stub overridden by upper layers */
 E.perr = function(id, info, opt){
@@ -29759,14 +29758,14 @@ var Index = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
         _this2.post_rule_map_to_form = function (rule) {
             var result = {};
             if (rule.status) {
-                if (!rule.status_custom) result.status_code = rule.status.arg;else {
+                if (!rule.status_custom) result.status_code = rule.status;else {
                     result.status_code = 'Custom';
-                    result.status_custom = rule.status.arg;
+                    result.status_custom = rule.status;
                 }
             }
             result.trigger_url_regex = rule.url;
             result.trigger_type = rule.trigger_type;
-            result.body_regex = rule.body && rule.body.arg;
+            result.body_regex = rule.body;
             if (rule.min_req_time) {
                 var min_req_time = rule.min_req_time.match(/\d+/);
                 result.min_req_time = Number(min_req_time && min_req_time[0]);
@@ -52691,9 +52690,7 @@ var is_post_rule = function is_post_rule(rule) {
     return !is_pre_rule(rule);
 };
 
-var status_types = ['--Select--', '200 - Succeeded requests', '403 - Forbidden', '404 - Not found', '500 - Internal server error', '502 - Bad gateway', '503 - Service unavailable', '504 - Gateway timeout', 'Custom'].map(function (s) {
-    return { key: s, value: s };
-});
+var status_types = [{ key: '--Select--', value: '' }, { key: '200 - Succeeded requests', value: 200 }, { key: '403 - Forbidden', value: 403 }, { key: '404 - Not found', value: 404 }, { key: '500 - Internal server error', value: 500 }, { key: '502 - Bad gateway', value: 502 }, { key: '503 - Service unavailable', value: 503 }, { key: '504 - Gateway timeout', value: 504 }, { key: 'Custom', value: 'Custom' }];
 
 var ban_options = [{ key: '10 minutes', value: '10min' }, { key: '20 minutes', value: '20min' }, { key: '30 minutes', value: '30min' }, { key: '40 minutes', value: '40min' }, { key: '50 minutes', value: '50min' }, { key: 'Custom', value: 'custom' }];
 
@@ -52759,20 +52756,20 @@ var Rules = function (_Pure_component) {
                     action_type: rule.action,
                     trigger_type: rule.trigger_type,
                     trigger_code: gen_code(rule.trigger_url_regex),
+                    type: get_type(rule),
                     url: rule.trigger_url_regex
                 };
             }
             if (rule.trigger_type == 'status') {
                 var is_custom = rule.status_code == 'Custom';
-                var rule_status = is_custom ? rule.status_custom : rule.status_code;
-                rule_status = rule_status || '';
-                result.status = { type: is_custom ? '=~' : 'in', arg: rule_status };
+                result.status = (is_custom ? rule.status_custom : +rule.status_code) || '';
                 result.status_custom = is_custom;
-            } else if (rule.trigger_type == 'body' && rule.body_regex) result.body = { type: '=~', arg: rule.body_regex };else if (rule.trigger_type == 'min_req_time' && rule.min_req_time) result.min_req_time = rule.min_req_time + 'ms';else if (rule.trigger_type == 'max_req_time' && rule.max_req_time) result.max_req_time = rule.max_req_time + 'ms';
+            } else if (rule.trigger_type == 'body' && rule.body_regex) result.body = rule.body_regex;else if (rule.trigger_type == 'min_req_time' && rule.min_req_time) result.min_req_time = rule.min_req_time + 'ms';else if (rule.trigger_type == 'max_req_time' && rule.max_req_time) result.max_req_time = rule.max_req_time + 'ms';
             return result;
         }, _this.pre_rule_prepare = function (rule) {
             var res = {
                 trigger_code: gen_code(rule.trigger_url_regex),
+                type: get_type(rule),
                 url: rule.trigger_url_regex,
                 action: rule.action,
                 trigger_type: rule.trigger_type
@@ -52988,6 +52985,10 @@ var gen_function = function gen_function(body) {
         return '  ' + l;
     }).join('\n');
     return 'function trigger(opt){\n' + body + '\n}';
+};
+var get_type = function get_type(r) {
+    if (r.trigger_type == 'body' || r.action == 'process') return 'after_body';else if (r.trigger_type == 'status' || r.trigger_type == 'max_req_time') return 'after_hdr';else if (r.trigger_type == 'min_req_time') return 'timeout';
+    return 'before_send';
 };
 var gen_code = function gen_code(val) {
     if (!val) return empty_function;
