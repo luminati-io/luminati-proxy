@@ -2,8 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '../../www/util/pub/pure_component.js';
 import React from 'react';
-import {Labeled_controller, Nav, Loader, Loader_small, Select, Tooltip,
-    Select_number, Field_row_raw} from './common.js';
+import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
@@ -33,7 +32,7 @@ class Form extends Pure_component {
             IPs will be able to send requests to all proxies by default. Can
             be changed per proxy`,
         request_stats: `Enable saving statistics to database`,
-        logs_type: `Specify how many requests you want to keep in database. The
+        logs: `Specify how many requests you want to keep in database. The
             limit may be set as a number or maximum database size. Set to 0 to
             disable saving logs to database`,
     };
@@ -46,12 +45,10 @@ class Form extends Pure_component {
             if (!settings||this.state.settings)
                 return;
             const s = {...settings};
-            s.www_whitelist_ips = s.www_whitelist_ips&&
+            s.www_whitelist_ips = s.www_whitelist_ips &&
                 s.www_whitelist_ips.join(',')||'';
-            s.whitelist_ips = s.whitelist_ips&&
+            s.whitelist_ips = s.whitelist_ips &&
                 s.whitelist_ips.join(',')||'';
-            s.logs_metric = s.logs.metric;
-            s.logs_value = s.logs.value;
             this.setState({settings: s});
         });
         this.setdb_on('head.consts', consts=>{
@@ -76,17 +73,8 @@ class Form extends Pure_component {
             prev=>({settings: {...prev.settings, www_whitelist_ips: val}}),
             this.debounced_save);
     };
-    logs_metric_changed = val=>{
-        ga_event('settings', 'change_field', 'logs_metric');
-        this.setState(prev=>({settings: {
-            ...prev.settings,
-            logs_metric: val,
-            logs_value: 1000,
-        }}), this.debounced_save);
-    };
-    logs_value_changed = val=>{
-        ga_event('settings', 'change_field', 'logs_value');
-        this.setState(prev=>({settings: {...prev.settings, logs_value: +val}}),
+    logs_changed = val=>{
+        this.setState(prev=>({settings: {...prev.settings, logs: +val}}),
             this.debounced_save);
     };
     request_stats_changed = val=>{
@@ -124,7 +112,6 @@ class Form extends Pure_component {
                 }
             });
             const body = {..._this.state.settings};
-            body.logs = {metric: body.logs_metric, value: body.logs_value};
             const raw = yield window.fetch('/api/settings', {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
@@ -146,7 +133,7 @@ class Form extends Pure_component {
             const plan = z.plans && z.plans.slice(-1)[0] || {};
             return !plan.archive && !plan.disable;
         }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
-        const note = this.state.settings.logs_value ?
+        const logs_note = this.state.settings.logs ?
             'Set to 0 to disable logs entirely' : 'Logs are disabled';
         return <div className="settings_form">
               <Loader show={!this.state.consts}/>
@@ -165,26 +152,11 @@ class Form extends Pure_component {
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default
                 tooltip={this.tooltips.request_stats}/>
-              <Field_row_raw note>
-                <div className="desc">
-                  <Tooltip title={this.tooltips.logs_type}>
-                    Enable logs for</Tooltip>
-                </div>
-                <div className="inline_field">
-                  <div className="double_field">
-                    <Select_number val={this.state.settings.logs_value}
-                      data={[0, 100, 1000, 10000]}
-                      on_change_wrapper={this.logs_value_changed}/>
-                    <Select val={this.state.settings.logs_metric}
-                      on_change_wrapper={this.logs_metric_changed}
-                      data={this.logs_metric_opts}/>
-                  </div>
-                  <div className="note">
-                    <strong>Note: </strong>
-                    {note}
-                  </div>
-                </div>
-              </Field_row_raw>
+              <Labeled_controller val={this.state.settings.logs}
+                type="select_number" on_change_wrapper={this.logs_changed}
+                data={[0, 100, 1000, 10000]} note={logs_note}
+                label="Limit for logs history" default
+                tooltip={this.tooltips.logs}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

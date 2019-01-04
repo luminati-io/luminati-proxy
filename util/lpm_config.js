@@ -59,7 +59,7 @@ conf.manager_default = Object
     dropin_port: 22225,
     no_usage_stats: false,
     request_stats: true,
-    logs: {metric: 'requests', value: 1000},
+    logs: 1000,
     reverse_lookup_dns: false,
     proxy_creds_check: true,
     force: false,

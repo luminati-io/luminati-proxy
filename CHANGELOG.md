@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.118.308 Stable
+- :bug: Ban IP bug fixes
+
 ## 1.118.284 Development Latest
 - :star: Separation between multiple LPM instances
 - :bug: UI and bug fixes

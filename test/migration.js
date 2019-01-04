@@ -222,6 +222,23 @@ describe('migration', ()=>{
         t('does not change body if it is already simple value',
             {type: 'after_body', body: 'test123'});
     });
+    describe_version('1.118.284', v=>{
+        it('flatten logs object into value', ()=>{
+            const _defaults = {atr: 1, logs: {metric: 'logs', value: 10}};
+            const _conf = migrations[v]({proxies: [], _defaults});
+            assert.equal(_conf._defaults.logs, 10);
+        });
+        it('does not change config if no logs', ()=>{
+            const _defaults = {atr: 1};
+            const _conf = migrations[v]({proxies: [], _defaults});
+            assert.equal(_conf._defaults.logs, undefined);
+        });
+        it('does not change config if logs already simple value', ()=>{
+            const _defaults = {atr: 1, logs: 100};
+            const _conf = migrations[v]({proxies: [], _defaults});
+            assert.equal(_conf._defaults.logs, 100);
+        });
+    });
     describe_version('x.rules_trigger', v=>{
         it('migrates correctly whole config', ()=>{
             const proxy = {port: 24000, rules: {pre: [{

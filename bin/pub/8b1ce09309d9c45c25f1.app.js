@@ -62193,7 +62193,7 @@ var Form = function (_Pure_component) {
             www_whitelist_ips: 'List of IPs that are allowed to access web UI\n            (including all API endpoints at http://localhost:22999/api) and\n            make changes. can also include ranges of ips like so 0.0.0.0/0.\n            Default value is 127.0.0.1, which means that remote access from\n            any other IP is blocked unless list of IPs are added in this\n            field.',
             whitelist_ips: 'Default access grant for all proxies. Only those\n            IPs will be able to send requests to all proxies by default. Can\n            be changed per proxy',
             request_stats: 'Enable saving statistics to database',
-            logs_type: 'Specify how many requests you want to keep in database. The\n            limit may be set as a number or maximum database size. Set to 0 to\n            disable saving logs to database'
+            logs: 'Specify how many requests you want to keep in database. The\n            limit may be set as a number or maximum database size. Set to 0 to\n            disable saving logs to database'
         }, _this2.logs_metric_opts = [{ key: 'requests', value: 'requests' }, { key: 'megabytes', value: 'megabytes' }], _this2.zone_change = function (val) {
             (0, _util.ga_event)('settings', 'change_field', 'zone');
             _this2.setState(function (prev) {
@@ -62209,18 +62209,9 @@ var Form = function (_Pure_component) {
             _this2.setState(function (prev) {
                 return { settings: (0, _extends3.default)({}, prev.settings, { www_whitelist_ips: val }) };
             }, _this2.debounced_save);
-        }, _this2.logs_metric_changed = function (val) {
-            (0, _util.ga_event)('settings', 'change_field', 'logs_metric');
+        }, _this2.logs_changed = function (val) {
             _this2.setState(function (prev) {
-                return { settings: (0, _extends3.default)({}, prev.settings, {
-                        logs_metric: val,
-                        logs_value: 1000
-                    }) };
-            }, _this2.debounced_save);
-        }, _this2.logs_value_changed = function (val) {
-            (0, _util.ga_event)('settings', 'change_field', 'logs_value');
-            _this2.setState(function (prev) {
-                return { settings: (0, _extends3.default)({}, prev.settings, { logs_value: +val }) };
+                return { settings: (0, _extends3.default)({}, prev.settings, { logs: +val }) };
             }, _this2.debounced_save);
         }, _this2.request_stats_changed = function (val) {
             (0, _util.ga_event)('settings', 'change_field', 'request_stats');
@@ -62260,33 +62251,31 @@ var Form = function (_Pure_component) {
                                     }
                                 });
                                 body = (0, _extends3.default)({}, _this.state.settings);
-
-                                body.logs = { metric: body.logs_metric, value: body.logs_value };
-                                _context.next = 6;
+                                _context.next = 5;
                                 return window.fetch('/api/settings', {
                                     method: 'PUT',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify(body)
                                 });
 
-                            case 6:
+                            case 5:
                                 raw = _context.sent;
-                                _context.next = 9;
+                                _context.next = 8;
                                 return raw.json();
 
-                            case 9:
+                            case 8:
                                 settings = _context.sent;
 
                                 _setdb2.default.set('head.settings', settings);
-                                _context.next = 13;
+                                _context.next = 12;
                                 return _ajax2.default.json({ url: '/api/zones' });
 
-                            case 13:
+                            case 12:
                                 zones = _context.sent;
 
                                 _setdb2.default.set('head.zones', zones);
 
-                            case 15:
+                            case 14:
                             case 'end':
                                 return _context.stop();
                         }
@@ -62306,8 +62295,6 @@ var Form = function (_Pure_component) {
                 var s = (0, _extends3.default)({}, settings);
                 s.www_whitelist_ips = s.www_whitelist_ips && s.www_whitelist_ips.join(',') || '';
                 s.whitelist_ips = s.whitelist_ips && s.whitelist_ips.join(',') || '';
-                s.logs_metric = s.logs.metric;
-                s.logs_value = s.logs.value;
                 _this3.setState({ settings: s });
             });
             this.setdb_on('head.consts', function (consts) {
@@ -62327,7 +62314,7 @@ var Form = function (_Pure_component) {
             }).filter(Boolean).map(function (z) {
                 return { key: z, value: z };
             });
-            var note = this.state.settings.logs_value ? 'Set to 0 to disable logs entirely' : 'Logs are disabled';
+            var logs_note = this.state.settings.logs ? 'Set to 0 to disable logs entirely' : 'Logs are disabled';
             return _react2.default.createElement(
                 'div',
                 { className: 'settings_form' },
@@ -62347,43 +62334,11 @@ var Form = function (_Pure_component) {
                     type: 'yes_no', on_change_wrapper: this.request_stats_changed,
                     label: 'Enable recent stats', 'default': true,
                     tooltip: this.tooltips.request_stats }),
-                _react2.default.createElement(
-                    _common.Field_row_raw,
-                    { note: true },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'desc' },
-                        _react2.default.createElement(
-                            _common.Tooltip,
-                            { title: this.tooltips.logs_type },
-                            'Enable logs for'
-                        )
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'inline_field' },
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'double_field' },
-                            _react2.default.createElement(_common.Select_number, { val: this.state.settings.logs_value,
-                                data: [0, 100, 1000, 10000],
-                                on_change_wrapper: this.logs_value_changed }),
-                            _react2.default.createElement(_common.Select, { val: this.state.settings.logs_metric,
-                                on_change_wrapper: this.logs_metric_changed,
-                                data: this.logs_metric_opts })
-                        ),
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'note' },
-                            _react2.default.createElement(
-                                'strong',
-                                null,
-                                'Note: '
-                            ),
-                            note
-                        )
-                    )
-                ),
+                _react2.default.createElement(_common.Labeled_controller, { val: this.state.settings.logs,
+                    type: 'select_number', on_change_wrapper: this.logs_changed,
+                    data: [0, 100, 1000, 10000], note: logs_note,
+                    label: 'Limit for logs history', 'default': true,
+                    tooltip: this.tooltips.logs }),
                 _react2.default.createElement(_common.Loader_small, { show: this.state.saving })
             );
         }

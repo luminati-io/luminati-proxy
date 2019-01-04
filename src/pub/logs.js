@@ -49,13 +49,11 @@ const banned_ips_cols = [
 ];
 
 const Banned_ips = withRouter(class Banned_ips extends Pure_component {
-    fetch_data = ()=>{
-        return this.etask(function*(){
-            const url = `/api/banlist?full=true`;
-            const data = yield ajax.json({url});
-            return data.ips;
-        });
-    };
+    fetch_data = ()=>this.etask(function*(){
+        const url = `/api/banlist?full=true`;
+        const data = yield ajax.json({url});
+        return data.ips;
+    });
     render(){
         return <Chrome_table title="Sessions" cols={banned_ips_cols}
               fetch_data={this.fetch_data}>

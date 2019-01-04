@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.118.308",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Ban IP bug fixes"
+            }
+        ]
+    },
+    {
         "ver": "1.118.284",
         "type": "dev",
         "changes": [

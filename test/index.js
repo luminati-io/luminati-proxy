@@ -751,6 +751,16 @@ describe('proxy', ()=>{
             status: 200,
             url: 'lumtest.com/test',
         }]}, 1);
+        it('should retry when banned ip', ()=>etask(function*(){
+            l = yield lum({rules: []});
+            const ban_stub = sinon.stub(l.banlist, 'has');
+            ban_stub.onFirstCall().returns(true);
+            ban_stub.onSecondCall().returns(true);
+            ban_stub.returns(false);
+            const retry_spy = sinon.spy(l.rules, 'retry');
+            yield l.test();
+            sinon.assert.calledTwice(retry_spy);
+        }));
     });
     describe('rules', ()=>{
         it('should process data', ()=>etask(function*(){
@@ -1158,11 +1168,14 @@ describe('proxy', ()=>{
                 action_type: 'retry_port',
                 status: 200,
             });
-            const inject_headers = (li, ip='ip')=>{
+            const inject_headers = (li, ip, ip_alt)=>{
+                ip = ip||'ip';
+                let call_count = 0;
                 const handle_proxy_resp_org = li._handle_proxy_resp.bind(li);
                 return sinon.stub(li, '_handle_proxy_resp', (...args)=>_res=>{
-                    _res.headers['x-hola-timeline-debug'] = `1 2 3 ${ip}`;
-                    _res.headers['x-hola-ip'] = ip;
+                    const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
+                    _res.headers['x-hola-timeline-debug'] = `1 2 3 ${ip_inj}`;
+                    _res.headers['x-hola-ip'] = ip_inj;
                     return handle_proxy_resp_org(...args)(_res);
                 });
             };
@@ -1235,13 +1248,13 @@ describe('proxy', ()=>{
                 l2.stop(true);
             }));
             describe('existing session', ()=>{
-                let ban_stub;
+                let ban_spy;
                 afterEach(()=>{
-                    sinon.assert.calledWith(ban_stub, 'ip', 600000);
+                    sinon.assert.calledWith(ban_spy, 'ip', 600000);
                 });
-                const build_options = opt=>{
+                const prepare_lum = opt=>etask(function*(){
                     opt = opt||{};
-                    return Object.assign({
+                    l = yield lum(Object.assign({
                         rules: {post: [get_banip_rule()]},
                         session: true,
                         pool_type: 'sequential',
@@ -1251,17 +1264,12 @@ describe('proxy', ()=>{
                         session_duration: 0,
                         sticky_ip: false,
                         random_user_agent: false,
-                    }, opt);
-                };
-                const prepare_ban = ()=>{
-                    inject_headers(l);
-                    const banlist_add_orig = l.banlist.add.bind(l.banlist);
-                    ban_stub = sinon.stub(l.banlist, 'add',
-                        (i, t)=>banlist_add_orig(i, t));
-                };
+                    }, opt));
+                    inject_headers(l, 'ip', 'ip2');
+                    ban_spy = sinon.spy(l.banlist, 'add');
+                });
                 const t = (desc, opt)=>it(desc, ()=>etask(function*(){
-                    l = yield lum(build_options(opt));
-                    prepare_ban();
+                    yield prepare_lum(opt);
                     yield l.test(ping.http.url);
                     const first_session = l.session_mgr.sessions.sessions[0];
                     yield l.test(ping.http.url);
@@ -1273,8 +1281,7 @@ describe('proxy', ()=>{
                     random_user_agent: true});
                 t('custom', {session: false, keep_alive: false});
                 it('sequential', ()=>etask(function*(){
-                    l = yield lum(build_options({pool_size: 0}));
-                    prepare_ban();
+                    yield prepare_lum({pool_size: 0});
                     yield l.test(ping.http.url);
                     const first_session = l.session_mgr.session;
                     yield l.test(ping.http.url);
@@ -1282,9 +1289,8 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 it('per machine', ()=>etask(function*(){
-                    l = yield lum(build_options({session: false,
-                        pool_size: 0, sticky_ip: true}));
-                    prepare_ban();
+                    yield prepare_lum({session: false, pool_size: 0,
+                        sticky_ip: true});
                     yield l.test(ping.http.url);
                     const sticky_sessions = l.session_mgr.sticky_sessions;
                     const first_session = Object.values(sticky_sessions)[0];
@@ -1293,9 +1299,8 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 it('round robin', ()=>etask(function*(){
-                    l = yield lum(build_options({pool_type: 'round-robin',
-                        pool_size: 2, max_requests: 1}));
-                    prepare_ban();
+                    yield prepare_lum({pool_type: 'round-robin', pool_size: 2,
+                        max_requests: 1});
                     yield l.test(ping.http.url);
                     const first_session = l.session_mgr.sessions.sessions[0];
                     yield l.test(ping.http.url);
@@ -1303,9 +1308,8 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 it('high performance', ()=>etask(function*(){
-                    l = yield lum(build_options({pool_type: 'round-robin',
-                        pool_size: 2}));
-                    prepare_ban();
+                    yield prepare_lum({pool_type: 'round-robin',
+                        pool_size: 2});
                     yield l.test(ping.http.url);
                     const first_sessions = l.session_mgr.sessions.sessions
                         .map(s=>s.session);
