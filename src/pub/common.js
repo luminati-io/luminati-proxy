@@ -501,6 +501,63 @@ const Add_pin = ({add_pin})=>
     </Tooltip>;
 
 export class Select_number extends Pure_component {
+    _fmt_num = n=>n && n.toLocaleString({useGrouping: true}) || n;
+    _get_data = ()=>this.props.data ? this.props.data : this.opt_from_range();
+    value_to_option = value=>
+        value!=null && {value, label: this._fmt_num(+value)};
+    opt_from_range = ()=>{
+        let res;
+        if (this.props.range=='medium')
+            res = [0, 1, 10, 100, 1000];
+        else if (this.props.range=='ms')
+            res = [0, 500, 2000, 5000, 10000];
+        else
+            res = [0, 1, 3, 5, 10, 20];
+        if (this.props.allow_zero)
+            res.unshift(0);
+        return res;
+    };
+    on_change = e=>{
+        let value = e && +e.value || '';
+        const allow_zero = this.props.allow_zero ||
+            this._get_data().includes(0);
+        if (!value && !allow_zero)
+            value = this.props.default||1;
+        this.props.on_change_wrapper(value);
+    };
+    validation = s=>!!s && Number(s)==s;
+    render(){
+        const data = this._get_data();
+        const options = data.map(this.value_to_option);
+        return <Select_multiple {...this.props}
+              options={options}
+              on_change={this.on_change}
+              validation={this.validation}
+              value_to_option={this.value_to_option}
+              no_options_message={()=>'You can use only numbers here'}/>;
+    }
+}
+
+export class Select_status extends Pure_component {
+    status_types = ['200', '2..', '403', '404', '500', '503', '(4|5)..'];
+    value_to_option = value=>{
+        if (!value)
+            return {value: '', label: '--Select--'};
+        return {value, label: value};
+    };
+    on_change = e=>this.props.on_change_wrapper(e && e.value || '');
+    render(){
+        const options = this.status_types.map(this.value_to_option);
+        return <Select_multiple {...this.props}
+              class_name="status"
+              options={options}
+              on_change={this.on_change}
+              validation={v=>!!v}
+              value_to_option={this.value_to_option}/>;
+    }
+}
+
+export class Select_multiple extends Pure_component {
     styles = {
         option: (base, state)=>{
             return {
@@ -526,48 +583,20 @@ export class Select_number extends Pure_component {
             color: state.isDisabled ? '#8e8e8e' : '#004d74',
         }),
     };
-    label_to_option = ({label})=>{
-        const num = +label;
-        return {value: num, label: this.fmt_num(num)};
-    };
-    fmt_num = n=>n&&n.toLocaleString({useGrouping: true})||n;
-    value_to_option = value=>
-        value!=null && {value, label: this.fmt_num(+value)};
-    validation = s=>!!s&&Number(s)==s;
-    opt_from_range = ()=>{
-        let res;
-        if (this.props.range=='medium')
-            res = [0, 1, 10, 100, 1000];
-        else if (this.props.range=='ms')
-            res = [0, 500, 2000, 5000, 10000];
-        else
-            res = [0, 1, 3, 5, 10, 20];
-        if (this.props.allow_zero)
-            res.unshift(0);
-        return res;
-    };
-    on_change = e=>{
-        let value = e && +e.value || '';
-        const allow_zero = this.props.allow_zero ||
-            this.get_data().includes(0);
-        if (!value && !allow_zero)
-            value = this.props.default||1;
-        this.props.on_change_wrapper(value);
-    };
-    get_data = ()=>{
-        return this.props.data ? this.props.data : this.opt_from_range();
-    };
     render(){
-        const data = this.get_data();
-        const options = data.map(this.value_to_option);
-        return <React_select styles={this.styles} className="select_number"
-            isClearable noOptionsMessage={()=>'You can use only numbers here'}
+        return <React_select styles={this.styles}
+            className={classnames('select_multiple', this.props.class_name)}
+            isClearable
+            noOptionsMessage={this.props.no_options_message}
             classNamePrefix="react_select"
-            value={this.value_to_option(this.props.val)}
-            onChange={this.on_change}
-            simpleValue autoBlur options={options}
-            isValidNewOption={this.validation} promptTextCreator={l=>l}
-            newOptionCreator={this.label_to_option} pageSize={9}
+            value={this.props.value_to_option(this.props.val)}
+            onChange={this.props.on_change}
+            simpleValue
+            autoBlur
+            options={this.props.options}
+            isValidNewOption={this.props.validation}
+            promptTextCreator={l=>l}
+            pageSize={9}
             shouldKeyDownEventCreateNewOption={()=>true}
             placeholder={this.props.placeholder}
             isDisabled={this.props.disabled}
@@ -597,6 +626,8 @@ export const Form_controller = props=>{
         return <Yes_no {...props}/>;
     else if (type=='select_number')
         return <Select_number {...props}/>;
+    else if (type=='select_status')
+        return <Select_status {...props}/>;
     else if (type=='pins')
         return <Pins {...props}/>;
     return <Input {...props}/>;
@@ -631,7 +662,8 @@ export class Json extends Pure_component {
 
 export class Cm_wrapper extends Pure_component {
     componentDidMount(){
-        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript'});
+        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript',
+            readOnly: 'nocursor'});
         this.cm.on('change', this.on_cm_change);
         this.cm.setSize('100%', '100%');
         this.cm.doc.setValue(this.props.val||'');
@@ -743,7 +775,7 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
 export const Labeled_controller = ({label, tooltip, disabled, note, sufix,
     animated, ...props})=>
     <Field_row_raw disabled={disabled} note={note} animated={animated}>
-      <div className="desc">
+      <div className="desc" style={props.desc_style}>
         <Tooltip title={tooltip}>{label}</Tooltip>
       </div>
       <div>

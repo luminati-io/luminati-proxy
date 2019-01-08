@@ -131,15 +131,9 @@ export const tabs = {
                     regex manually or generate it by clicking on formats above
                     the input`,
             },
-            status_code: {
-                label: 'Status code string to be scanned',
+            status: {
+                label: `Status code (string or regexp)`,
                 tooltip: `Status code to be scanned in the response headers`,
-            },
-            status_custom: {
-                label: 'Custom status code (regex)',
-                placeholder: `i.e. (2..|3..|404)`,
-                tooltip: `A string (regular expression) to be scanned in the
-                    head of the response`,
             },
             action: {
                 label: 'Action type',
@@ -170,7 +164,9 @@ export const tabs = {
                 tooltip: `Ban the IP for a defined amount of time. Choose 0 to
                     ban pernamentaly`,
             },
-            ban_ip_custom: {label: 'Custom duration'},
+            _type: {
+                label: 'Trigger type',
+            },
             process: {label: 'Processing rule'},
             send_email: {
                 label: 'Send email',

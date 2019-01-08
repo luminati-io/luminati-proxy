@@ -3,7 +3,7 @@
 const assert = require('assert');
 const migrate = require('../lib/migration.js');
 const migrations = migrate.migrations;
-const migrate_rule = migrate.migrate_rule;
+const {migrate_rule} = require('../util/rules_util.js');
 const pkg = require('../package.json');
 
 const tests_run = {};
@@ -27,6 +27,14 @@ const describe_version = function(name, tests){
         tests(this.title);
     });
 };
+
+const t_rule = v=>(name, rule, _rule)=>it(name, ()=>{
+    const {proxies: [_proxy]} = migrations[v]({
+        proxies: [{port: 24000, rules: {post: [rule]}}]});
+    assert.deepEqual(_proxy, {port: 24000, rules: {post: [
+        Object.assign({}, rule, _rule),
+    ]}});
+});
 
 describe('migration', ()=>{
     describe_version('1.116.387', v=>{
@@ -204,13 +212,7 @@ describe('migration', ()=>{
             {action_type: 'process', url: '\\.(jpeg)$'}, 'after_body');
     });
     describe_version('1.117.684', v=>{
-        const t = (name, rule, obj)=>it(name, ()=>{
-            const {proxies: [_proxy]} = migrations[v]({
-                proxies: [{port: 24000, rules: {post: [rule]}}]});
-            assert.deepEqual(_proxy, {port: 24000, rules: {post: [
-                Object.assign({}, rule, obj),
-            ]}});
-        });
+        const t = t_rule(v);
         t('reduces status into single value', {url: '\\.(jpeg)$',
             type: 'after_hdr', status: {arg: '200 - Success', type: 'in'}},
             {status: 200});
@@ -239,7 +241,28 @@ describe('migration', ()=>{
             assert.equal(_conf._defaults.logs, 100);
         });
     });
-    describe_version('x.rules_trigger', v=>{
+    describe_version('1.118.308', v=>{
+        const t = t_rule(v);
+        t('transforms ban ip duration into ms', {action: {ban_ip: '55min'}},
+            {action: {ban_ip: 55*60*1000}});
+        t('transforms max_req_time into ms', {max_req_time: '500ms'},
+            {max_req_time: 500});
+        t('transforms min_req_time into ms', {min_req_time: '1000ms'},
+            {min_req_time: 1000});
+    });
+    describe_version('1.118.309', v=>{
+        const t = t_rule(v);
+        t('transforms status into string', {status: 200}, {status: '200'});
+        t('gets rid of status_custom', {status: '523', status_custom: true},
+            {status: '523'});
+    });
+    describe_version('1.118.310', v=>{
+        const t = t_rule(v);
+        t('gets rid of type and trigger_code', {type: 'before_send',
+            url: 'url', trigger_code: '--code--'}, {url: 'url'});
+        t('does nothing', {url: 'url'}, {url: 'url'});
+    });
+    describe_version('x.rules', v=>{
         it('migrates correctly whole config', ()=>{
             const proxy = {port: 24000, rules: {pre: [{
                 action: 'null_response',
@@ -272,18 +295,26 @@ describe('migration', ()=>{
                     +`  if (!/facebook/.test(opt.url))\n`
                     +`    return false;\n`
                     +`  return true;\n}`, 'before_send');
-                it('min_req_time / timeout');
+                t('min_req_time / timeout', 'pre', {min_req_time: 200},
+                    `function trigger(opt){\n`
+                    +`  opt.timeout = 200;\n`
+                    +`  return true;\n}`, 'timeout');
+                t('min_req_time / timeout + url', 'pre', {min_req_time: 200,
+                    url: 'facebook'}, `function trigger(opt){\n`
+                    +`  opt.timeout = 200;\n`
+                    +`  if (!/facebook/.test(opt.url))\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'timeout');
             });
             describe('post_rules', ()=>{
-                t('status_code', 'post', {status: {arg: '200 - Success',
-                    type: 'in'}}, `function trigger(opt){\n`
-                    +`  if (opt.status_code!=200)\n`
+                t('status_code', 'post', {status: '200'},
+                    `function trigger(opt){\n`
+                    +`  if (!/200/.test(opt.status))\n`
                     +`    return false;\n`
                     +`  return true;\n}`, 'after_hdr');
-                t('status_code with url', 'post', {
-                    status: {arg: '301 - Moved Pernamently', type: 'in'},
+                t('status_code with url', 'post', {status: '(4|5)..',
                     url: 'facebook'}, `function trigger(opt){\n`
-                    +`  if (opt.status_code!=301)\n`
+                    +`  if (!/(4|5)../.test(opt.status))\n`
                     +`    return false;\n`
                     +`  if (!/facebook/.test(opt.url))\n`
                     +`    return false;\n`
@@ -293,10 +324,19 @@ describe('migration', ()=>{
                     +`  if (opt.time_passed>500)\n`
                     +`    return false;\n`
                     +`  return true;\n}`, 'after_hdr');
-                t('http body', 'post', {body: {arg: 'captcha', type: '=~'}},
+                t('post / min_req_time', 'post', {min_req_time: 100},
+                    `function trigger(opt){\n`
+                    +`  if (opt.time_passed<100)\n`
+                    +`    return false;\n`
+                    +`  return true;\n}`, 'after_hdr');
+                t('http body', 'post', {body: 'captcha'},
                     `function trigger(opt){\n`
                     +`  if (!/captcha/.test(opt.body))\n`
                     +`    return false;\n`
+                    +`  return true;\n}`, 'after_body');
+                t('process data', 'post', {action: {process: {
+                    title: "$('#productTitle').text()"}}},
+                    `function trigger(opt){\n`
                     +`  return true;\n}`, 'after_body');
             });
         });

@@ -5,6 +5,7 @@ import Pure_component from '../../../www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import $ from 'jquery';
 import _ from 'lodash';
+import {ms} from '../../../util/date.js';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
@@ -71,15 +72,14 @@ const Index = withRouter(class Index extends Pure_component {
         this.setdb_on('head.proxy_edit.loading', loading=>
             this.setState({loading}));
         let state;
-        if ((state = this.props.location.state)&&state.field)
+        if ((state = this.props.location.state) && state.field)
             this.goto_field(state.field);
     }
     willUnmount(){
         setdb.set('head.proxy_edit.form', undefined);
         setdb.set('head.proxy_edit', undefined);
     }
-    delayed_loader(){ return _.debounce(this.update_loader.bind(this)); }
-    update_loader(){
+    update_loader = ()=>{
         this.setState(state=>{
             const show_loader = !state.consts || !state.proxies ||
                 !state.defaults;
@@ -88,7 +88,8 @@ const Index = withRouter(class Index extends Pure_component {
             setdb.set('head.proxy_edit.zone_name', zone_name);
             return {show_loader};
         });
-    }
+    };
+    delayed_loader = ()=>_.debounce(this.update_loader);
     goto_field = field=>{
         let tab;
         for (let [tab_id, tab_o] of Object.entries(tabs))
@@ -227,29 +228,12 @@ const Index = withRouter(class Index extends Pure_component {
     };
     post_rule_map_to_form = rule=>{
         const result = {};
-        if (rule.status)
-        {
-            if (!rule.status_custom)
-                result.status_code = rule.status;
-            else
-            {
-                result.status_code = 'Custom';
-                result.status_custom = rule.status;
-            }
-        }
+        result.status = rule.status;
         result.trigger_url_regex = rule.url;
         result.trigger_type = rule.trigger_type;
         result.body_regex = rule.body;
-        if (rule.min_req_time)
-        {
-            const min_req_time = rule.min_req_time.match(/\d+/);
-            result.min_req_time = Number(min_req_time && min_req_time[0]);
-        }
-        if (rule.max_req_time)
-        {
-            const max_req_time = rule.max_req_time.match(/\d+/);
-            result.max_req_time = Number(max_req_time && max_req_time[0]);
-        }
+        result.min_req_time = rule.min_req_time;
+        result.max_req_time = rule.max_req_time;
         result.action = rule.action_type;
         result.retry_port = rule.action.retry_port;
         result.retry_number = rule.action.retry;
@@ -257,9 +241,13 @@ const Index = withRouter(class Index extends Pure_component {
             result.fast_pool_size = rule.action.fast_pool_size;
         if (rule.action.ban_ip)
         {
-            result.ban_ip_duration = 'custom';
-            const minutes = rule.action.ban_ip.match(/\d+/);
-            result.ban_ip_custom = Number(minutes && minutes[0]);
+            result.ban_ip_duration = rule.action.ban_ip/ms.MIN;
+            if (result.ban_ip_domain = !!rule.action.ban_ip_domain_reqs)
+            {
+                result.ban_ip_domain_reqs = rule.action.ban_ip_domain_reqs;
+                result.ban_ip_domain_time =
+                    rule.action.ban_ip_domain_time/ms.MIN;
+            }
         }
         if (rule.action.process)
             result.process = JSON.stringify(rule.action.process, null, '\t');
@@ -295,7 +283,9 @@ const Index = withRouter(class Index extends Pure_component {
             return;
         const post = (rules.post||[]).map(this.post_rule_map_to_form);
         const pre = (rules.pre||[]).map(this.pre_rule_map_to_form);
-        const _rules = [].concat(post, pre).map((r, i)=>({...r, id: i}));
+        const _rules = [].concat(post, pre).map((r, i)=>{
+            return {...r, id: i};
+        });
         setdb.set('head.proxy_edit.rules', _rules);
     };
     set_errors = _errors=>{

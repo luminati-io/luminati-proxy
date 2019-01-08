@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.118.749",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Rules: trigger code is shown along with the UI options for all rules parameters"
+            }
+        ]
+    },
+    {
         "ver": "1.118.308",
         "type": "stable",
         "changes": [

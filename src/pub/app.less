@@ -358,7 +358,7 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
 .pagination_panel {
     height: 28px;
     .pagination { display: inline-block; }
-    .select_number {
+    .select_multiple {
         float: right;
         width: auto;
         margin-left: 5px;
@@ -483,9 +483,10 @@ input.regex {
         padding: 1px;
     }
 }
-.select_number {
+.select_multiple {
     min-width: 100px;
     input { min-width: 0; }
+    &.status { min-width: 130px; }
 }
 .btn_lpm {
     padding-left: 11px;
@@ -1051,7 +1052,6 @@ span.icon_link {
                         margin-left: 10px;
                         border-left: 1px solid #ccc;
                         padding: 3px 3px 3px 10px;
-                        display: none;
                     }
                 }
             }
@@ -1922,6 +1922,7 @@ span.icon_link {
 }
 .nav_left {
     .menu {
+        z-index: 10;
         background-color: @x_light;
         top: 60px;
         position: fixed;
@@ -1970,10 +1971,11 @@ span.icon_link {
         height: 100%;
         position: fixed;
         width: 50px;
-        z-index: -1;
+        z-index: 1;
         top: 10px;
     }
     .footer {
+        z-index: 5;
         font-size: 13px;
         color: @link;
         width: 50px;

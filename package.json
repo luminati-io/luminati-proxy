@@ -276,6 +276,7 @@
       "lib/cities.js",
       "lib/context.js",
       "lib/db_history.json",
+      "lib/domains.js",
       "lib/find_iface.js",
       "lib/hash.js",
       "lib/hutil-loader.js",
@@ -344,9 +345,10 @@
       "util/lpm_config.js",
       "util/lpm_file.js",
       "util/lpm_util.js",
+      "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "d5363f79d14cce0f77b419083175b819"
+    "md5": "65f67674d1897774a2da232ef08875be"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -382,5 +384,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.118.308"
+  "version": "1.118.749"
 }
