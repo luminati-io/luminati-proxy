@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.118.985 
+
 ## 1.118.749 Development Latest
 - :star: Rules: trigger code is shown along with the UI options for all rules parameters
 

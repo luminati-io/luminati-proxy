@@ -15,6 +15,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import React_select from 'react-select/lib/Creatable';
 import {Netmask} from 'netmask';
+import {withRouter, Route} from 'react-router-dom';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -638,7 +639,7 @@ export class Json extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript'});
         this.cm.on('change', this.on_cm_change);
-        this.cm.setSize('100%', '100%');
+        this.cm.setSize('auto', '100%');
         this.cm.doc.setValue(this.props.val);
     }
     on_cm_change = cm=>{
@@ -652,7 +653,7 @@ export class Json extends Pure_component {
     };
     set_ref = ref=>{ this.textarea = ref; };
     render(){
-        const classes = classnames('code_mirror_wrapper',
+        const classes = classnames('code_mirror_wrapper', 'json',
             {error: !this.state.correct});
         return <div className={classes}>
               <textarea ref={this.set_ref}/>
@@ -765,18 +766,18 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
         {animated});
     return <div className="field_row_wrapper">
           <div className={classes}>
-            <div className={inner_classes}>
+            <div className={inner_classes} style={props.inner_style}>
               {props.children}
             </div>
           </div>
         </div>;
 };
 
-export const Labeled_controller = ({label, tooltip, disabled, note, sufix,
-    animated, ...props})=>
-    <Field_row_raw disabled={disabled} note={note} animated={animated}>
+export const Labeled_controller = ({disabled, note, sufix, ...props})=>
+    <Field_row_raw disabled={disabled} note={note} animated={props.animated}
+      inner_style={props.field_row_inner_style}>
       <div className="desc" style={props.desc_style}>
-        <Tooltip title={tooltip}>{label}</Tooltip>
+        <Tooltip title={props.tooltip}>{props.label}</Tooltip>
       </div>
       <div>
         <div className="field">
@@ -1097,14 +1098,18 @@ export const Nav_tabs = ({children, narrow, set_tab, cur_tab})=>
       }
     </div>;
 
-export const Nav_tab = ({id, set_tab, title, cur_tab, tooltip, narrow})=>{
-    const active = cur_tab==id;
-    const btn_class = classnames('btn_tab', {active});
-    return <Tooltip title={tooltip}>
-          <div onClick={()=>set_tab(id)} className={btn_class}>
-            {!narrow && <div className={classnames('icon', id)}/>}
-            <div className="title">{title}</div>
-            <div className="arrow"/>
-          </div>
-        </Tooltip>;
-};
+export const Nav_tab = withRouter(props=>{
+    const {id} = props;
+    return <Route path={`${props.match.path}/${id}`}>{({match})=>{
+        const active = props.cur_tab==id||!!match;
+        const btn_class = classnames('btn_tab', {active});
+        return <Tooltip title={props.tooltip}>
+              <div onClick={()=>props.set_tab(id)} className={btn_class}>
+                {!props.narrow && <div className={classnames('icon', id)}/>}
+                <div className="title">{props.title}</div>
+                <div className="arrow"/>
+              </div>
+            </Tooltip>;
+    }}
+    </Route>;
+});

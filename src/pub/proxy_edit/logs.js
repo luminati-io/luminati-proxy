@@ -6,35 +6,36 @@ import {Chrome_table} from '../chrome_widgets.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import {Nav_tabs, Nav_tab} from '../common.js';
 import moment from 'moment';
-import {withRouter} from 'react-router-dom';
+import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import Har_viewer from '../har_viewer.js';
 
 moment.relativeTimeThreshold('ss', 3);
 
-export default class Logs extends Pure_component {
-    state = {cur_tab: 'har'};
-    set_tab = id=>this.setState({cur_tab: id});
+const Logs = withRouter(class Logs extends Pure_component {
+    set_tab = id=>{
+        const port = this.props.match.params.port;
+        const pathname = `/proxy/${port}/logs/${id}`;
+        this.props.history.push({pathname});
+    };
     render(){
-        return <div className="vbox" style={{height: '100%', width: '100%'}}>
-              <Nav set_tab={this.set_tab} cur_tab={this.state.cur_tab}/>
-              <Window tab={this.state.cur_tab}/>
+        const path = this.props.match.path;
+        return <div className="in_logs vbox"
+              style={{height: '100%', width: '100%'}}>
+              <Nav set_tab={this.set_tab}/>
+              <div className="window_wrapper vbox">
+                <Switch>
+                  <Route path={`${path}/sessions`} component={Sessions}/>
+                  <Route path={`${path}/banned_ips`} component={Banned_ips}/>
+                  <Route path={`${path}/har`} component={Har_viewer}/>
+                  <Route exact path={path} component={({location})=>
+                    <Redirect to={`${location.pathname}/har`}/>}/>
+                </Switch>
+              </div>
             </div>;
     }
-}
+});
 
-const Window = ({tab})=>{
-    let Comp;
-    switch (tab)
-    {
-    case 'sessions': Comp = Sessions; break;
-    case 'banned_ips': Comp = Banned_ips; break;
-    case 'har':
-    default: Comp = Har_viewer;
-    }
-    return <div className="window_wrapper vbox">
-          <Comp/>
-        </div>;
-};
+export default Logs;
 
 const Nav = ({set_tab, cur_tab})=>
     <Nav_tabs narrow set_tab={set_tab} cur_tab={cur_tab}>

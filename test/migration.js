@@ -3,7 +3,7 @@
 const assert = require('assert');
 const migrate = require('../lib/migration.js');
 const migrations = migrate.migrations;
-const {migrate_rule} = require('../util/rules_util.js');
+const {migrate_trigger} = require('../util/rules_util.js');
 const pkg = require('../package.json');
 
 const tests_run = {};
@@ -283,7 +283,7 @@ describe('migration', ()=>{
         });
         describe('rule -> code transformation', ()=>{
             const t = (name, type, rule, code, _type)=>it(name, ()=>{
-                const _rule = migrate_rule(type)(rule);
+                const _rule = migrate_trigger(type)(rule);
                 assert.equal(_rule.trigger_code, code);
                 assert.equal(_rule.type, _type);
             });

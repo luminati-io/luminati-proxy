@@ -2,20 +2,12 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const E = module.exports;
 
-E.gen_function = body=>{
+const gen_function = body=>{
     body = body.split('\n').map(l=>'  '+l).join('\n');
     return `function trigger(opt){\n${body}\n}`;
 };
 
-const empty_function = E.gen_function('return true;');
-
-E.gen_code = val=>{
-    if (!val)
-        return empty_function;
-    return E.gen_function(`return /${val}/.test(opt.url);`);
-};
-
-E.migrate_rule = t=>rule=>{
+E.migrate_trigger = t=>rule=>{
     let body = '';
     let type = 'before_send';
     if (t=='pre' && rule.min_req_time)
@@ -55,5 +47,19 @@ E.migrate_rule = t=>rule=>{
         +`  return false;\n`;
     }
     body += `return true;`;
-    return Object.assign({}, rule, {type, trigger_code: E.gen_function(body)});
+    return Object.assign({}, rule, {type, trigger_code: gen_function(body)});
+};
+
+E.migrate_action = rule=>{
+    return Object.assign({}, rule, {action_code: get_action(rule)});
+};
+
+// XXX krzysztof: WIP
+const get_action = rule=>{
+    let body = '';
+    if (!rule.action)
+        return '';
+    if (rule.action.retry)
+        body += `opt.retry(${+rule.action.retry});`;
+    return gen_function(body);
 };

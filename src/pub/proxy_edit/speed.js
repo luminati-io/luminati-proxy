@@ -24,9 +24,14 @@ export default class Speed extends Pure_component {
         this.setdb_on('head.locations', locations=>{
             locations && this.setState({locations});
         });
+        this.setdb_on('head.proxy_edit.form', form=>{
+            form && this.setState({form});
+        });
     }
     render(){
         if (!this.state.locations)
+            return null;
+        if (!this.state.form)
             return null;
         const zproxy = country_code=>
             `servercountry-${country_code}.zproxy.lum-superproxy.io`;
@@ -34,19 +39,21 @@ export default class Speed extends Pure_component {
             this.state.locations.countries
             .filter(c=>this.zagent_countries.includes(c.country_id))
             .map(c=>({key: c.country_name, value: zproxy(c.country_id)})));
-        return <Tab_context.Provider value="speed">
-              <Config type="select" id="proxy" data={proxy_data}/>
-              <Config type="select" id="dns" data={dns_opt}/>
-              <Config type="select_number" id="race_reqs" allow_zero/>
-              <Config type="select_number" id="proxy_count" allow_zero/>
-              <Config type="select_number" id="proxy_switch" allow_zero/>
-              <Config type="select_number" id="throttle" allow_zero/>
-              <Config type="select" id="reverse_lookup"
-                data={reverse_lookup_opt}/>
-              {this.props.form.reverse_lookup=='file' &&
-                <Config type="text" id="reverse_lookup_file"/>}
-              {this.props.form.reverse_lookup=='values' &&
-                <Config type="textarea" id="reverse_lookup_values"/>}
-            </Tab_context.Provider>;
+        return <div className="speed">
+              <Tab_context.Provider value="speed">
+                <Config type="select" id="proxy" data={proxy_data}/>
+                <Config type="select" id="dns" data={dns_opt}/>
+                <Config type="select_number" id="race_reqs" allow_zero/>
+                <Config type="select_number" id="proxy_count" allow_zero/>
+                <Config type="select_number" id="proxy_switch" allow_zero/>
+                <Config type="select_number" id="throttle" allow_zero/>
+                <Config type="select" id="reverse_lookup"
+                  data={reverse_lookup_opt}/>
+                {this.state.form.reverse_lookup=='file' &&
+                  <Config type="text" id="reverse_lookup_file"/>}
+                {this.state.form.reverse_lookup=='values' &&
+                  <Config type="textarea" id="reverse_lookup_values"/>}
+              </Tab_context.Provider>
+            </div>;
     }
 }
