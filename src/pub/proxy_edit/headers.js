@@ -19,9 +19,6 @@ export default class Headers extends Pure_component {
             else
                 this.setState({headers: [this.first_header]});
         });
-        this.setdb_on('head.proxy_edit.form', form=>{
-            form && this.setState({form});
-        });
     }
     add = ()=>this.set_field('headers', [
         ...this.state.headers, {name: '', value: ''}]);
@@ -45,32 +42,28 @@ export default class Headers extends Pure_component {
             this.set_field('user_agent', '');
     };
     render(){
-        if (!this.state.form)
-            return null;
-        return <div className="headers">
-              <Tab_context.Provider value="headers">
-                <Config type="select" id="user_agent" data={util.user_agents}
-                  disabled={this.state.form.random_user_agent}/>
-                <Config type="yes_no" id="random_user_agent"
-                  on_change={this.random_user_agent_changed}/>
-                <Config type="yes_no" id="override_headers"/>
-                <Field_row_raw inner_class_name="headers">
-                  <div className="desc">
-                    <Tooltip title="Custom headers">
-                      <span>Headers</span>
-                    </Tooltip>
-                  </div>
-                  <div className="list">
-                    {this.state.headers.map((h, i)=>
-                      <Header last={i+1==this.state.headers.length} key={i}
-                        name={h.name} value={h.value} update={this.update(i)}
-                        remove_clicked={this.remove}
-                        add_clicked={this.add} idx={i}/>
-                    )}
-                  </div>
-                </Field_row_raw>
-              </Tab_context.Provider>
-            </div>;
+        return <Tab_context.Provider value="headers">
+              <Config type="select" id="user_agent" data={util.user_agents}
+                disabled={this.props.form.random_user_agent}/>
+              <Config type="yes_no" id="random_user_agent"
+                on_change={this.random_user_agent_changed}/>
+              <Config type="yes_no" id="override_headers"/>
+              <Field_row_raw inner_class_name="headers">
+                <div className="desc">
+                  <Tooltip title="Custom headers">
+                    <span>Headers</span>
+                  </Tooltip>
+                </div>
+                <div className="list">
+                  {this.state.headers.map((h, i)=>
+                    <Header last={i+1==this.state.headers.length} key={i}
+                      name={h.name} value={h.value} update={this.update(i)}
+                      remove_clicked={this.remove}
+                      add_clicked={this.add} idx={i}/>
+                  )}
+                </div>
+              </Field_row_raw>
+            </Tab_context.Provider>;
     }
 }
 

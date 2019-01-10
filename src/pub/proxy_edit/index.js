@@ -2,8 +2,10 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
+import classnames from 'classnames';
 import $ from 'jquery';
 import _ from 'lodash';
+import {ms} from '../../../util/date.js';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
@@ -13,8 +15,8 @@ import {Modal, Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
     Nav_tab} from '../common.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
-import {presets} from '../util.js';
-import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
+import * as util from '../util.js';
+import {withRouter, Switch, Route} from 'react-router-dom';
 import Rules from './rules.js';
 import Targeting from './targeting.js';
 import General from './general.js';
@@ -22,7 +24,17 @@ import Rotation from './rotation.js';
 import Speed from './speed.js';
 import Headers from './headers.js';
 import Logs from './logs.js';
-import {pre_rule_map_to_form, post_rule_map_to_form} from './rules.js';
+
+const presets = util.presets;
+const event_tracker = {};
+const ga_event = (action, label, opt={})=>{
+    const id = action+label;
+    if (!event_tracker[id] || !opt.single)
+    {
+        event_tracker[id] = true;
+        util.ga_event('proxy_edit', action, label);
+    }
+};
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
@@ -33,7 +45,6 @@ const Index = withRouter(class Index extends Pure_component {
         setdb.set('head.proxy_edit.set_field', this.set_field);
         setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
         setdb.set('head.proxy_edit.goto_field', this.goto_field);
-        setdb.set('head.proxy_edit.get_curr_plan', this.get_curr_plan);
     }
     componentDidMount(){
         setdb.set('head.proxies_running', null);
@@ -102,7 +113,16 @@ const Index = withRouter(class Index extends Pure_component {
             return {form: new_form};
         }, opt.skip_save ? undefined : this.debounced_save);
         setdb.set('head.proxy_edit.form.'+field_name, value);
+        this.send_ga(field_name, value);
     };
+    send_ga(id, value){
+        if (id=='zone')
+        {
+            ga_event('edit zone', value);
+            return;
+        }
+        ga_event('edit '+id, value, {single: true});
+    }
     is_valid_field = field_name=>{
         const proxy = this.state.consts.proxy;
         const form = this.state.form;
@@ -206,11 +226,63 @@ const Index = withRouter(class Index extends Pure_component {
         for (let i in form)
             setdb.emit('head.proxy_edit.form.'+i, form[i]);
     };
+    post_rule_map_to_form = rule=>{
+        const result = {};
+        result.status = rule.status;
+        result.trigger_url_regex = rule.url;
+        result.trigger_type = rule.trigger_type;
+        result.body_regex = rule.body;
+        result.min_req_time = rule.min_req_time;
+        result.max_req_time = rule.max_req_time;
+        result.action = rule.action_type;
+        result.retry_port = rule.action.retry_port;
+        result.retry_number = rule.action.retry;
+        if (rule.action.fast_pool_session)
+            result.fast_pool_size = rule.action.fast_pool_size;
+        if (rule.action.ban_ip)
+        {
+            result.ban_ip_duration = rule.action.ban_ip/ms.MIN;
+            if (result.ban_ip_domain = !!rule.action.ban_ip_domain_reqs)
+            {
+                result.ban_ip_domain_reqs = rule.action.ban_ip_domain_reqs;
+                result.ban_ip_domain_time =
+                    rule.action.ban_ip_domain_time/ms.MIN;
+            }
+        }
+        if (rule.action.process)
+            result.process = JSON.stringify(rule.action.process, null, '\t');
+        if (rule.action.email)
+        {
+            result.send_email = true;
+            result.email = rule.action.email;
+        }
+        return result;
+    };
+    pre_rule_map_to_form = rule=>{
+        const res = {
+            trigger_url_regex: rule.url,
+            action: rule.action,
+            trigger_type: rule.trigger_type,
+        };
+        if (rule.email)
+        {
+            res.send_email = true;
+            res.email = rule.email;
+        }
+        if (rule.retry_port)
+            res.retry_port = rule.retry_port;
+        if (rule.min_req_time)
+            res.min_req_time = rule.min_req_time;
+        if (rule.port)
+            res.switch_port = rule.port;
+        res.retry_number = rule.retry||1;
+        return res;
+    };
     apply_rules = ({rules})=>{
         if (!rules)
             return;
-        const post = (rules.post||[]).map(post_rule_map_to_form);
-        const pre = (rules.pre||[]).map(pre_rule_map_to_form);
+        const post = (rules.post||[]).map(this.post_rule_map_to_form);
+        const pre = (rules.pre||[]).map(this.pre_rule_map_to_form);
         const _rules = [].concat(post, pre).map((r, i)=>{
             return {...r, id: i};
         });
@@ -241,8 +313,8 @@ const Index = withRouter(class Index extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
-                // XXX krzysztof: use perr
                 console.log(e);
+                ga_event('save failed', e.message);
                 _this.setState({error_list: [{msg: 'Something went wrong'}],
                     saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
@@ -258,6 +330,7 @@ const Index = withRouter(class Index extends Pure_component {
             _this.set_errors(errors);
             if (errors.length)
             {
+                ga_event('save failed', JSON.stringify(errors));
                 $('#save_proxy_errors').modal('show');
                 _this.setState({saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
@@ -365,8 +438,8 @@ const Index = withRouter(class Index extends Pure_component {
         return curr_plan;
     };
     render(){
-        let zones = this.state.consts &&
-            this.state.consts.proxy.zone.values || [];
+        let zones = this.state.consts&&
+            this.state.consts.proxy.zone.values||[];
         zones = zones.filter(z=>{
             const plan = z.plans && z.plans.slice(-1)[0] || {};
             return !plan.archive && !plan.disable;
@@ -374,14 +447,15 @@ const Index = withRouter(class Index extends Pure_component {
         let sett = setdb.get('head.settings')||{}, def;
         if (zones[0] && !zones[0].value && (def = sett.zone||zones[0].key))
             zones[0] = {key: `Default (${def})`, value: ''};
-        const default_zone=this.state.consts &&
+        const default_zone=this.state.consts&&
             this.state.consts.proxy.zone.def;
-        const curr_plan = this.state.consts && this.get_curr_plan();
+        const curr_plan = this.state.consts&&this.get_curr_plan();
         let type;
-        if (curr_plan && curr_plan.type=='static')
+        if (curr_plan&&curr_plan.type=='static')
             type = 'ips';
-        else if (curr_plan && !!curr_plan.vip)
+        else if (curr_plan&&!!curr_plan.vip)
             type = 'vips';
+        const tab = this.props.match.params.tab||'logs';
         return <div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
@@ -398,13 +472,22 @@ const Index = withRouter(class Index extends Pure_component {
                   on_change_preset={this.apply_preset}/>
                 <Nav_tabs_wrapper/>
               </div>
-              {this.state.consts && <Main_window/>}
+              <div className={classnames('main_window', {[tab]: true})}>
+                {this.state.consts && this.state.defaults &&
+                    this.state.proxies &&
+                  <Main_window
+                    proxy={this.state.consts && this.state.consts.proxy}
+                    defaults={this.state.defaults}
+                    form={this.state.form}
+                    get_curr_plan={this.get_curr_plan}/>
+                }
+              </div>
               <Modal className="warnings_modal" id="save_proxy_errors"
                 title="Errors:" no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
               <Alloc_modal type={type} form={this.state.form}
-                zone={this.state.form.zone||default_zone}/>
+                zone={this.state.form.zone||default_zone} tab={tab}/>
             </div>;
     }
 });
@@ -419,7 +502,8 @@ class Nav_tabs_wrapper extends Pure_component {
         this.props.history.push({pathname});
     };
     render(){
-        return <Nav_tabs set_tab={this.set_tab}>
+        const cur_tab = this.props.match.params.tab||'logs';
+        return <Nav_tabs set_tab={this.set_tab} cur_tab={cur_tab}>
               {this.tabs.map(t=><Nav_tab key={t} id={t} title={tabs[t].label}
                 tooltip={tabs[t].tooltip}/>)}
             </Nav_tabs>;
@@ -432,21 +516,21 @@ const Port_title = ({port, name})=>{
     return <h3>Proxy on port {port}</h3>;
 };
 
-const Main_window = withRouter(({match})=>
-    <div className="main_window">
-      <Switch>
-        <Route path={`${match.path}/target`} component={Targeting}/>
-        <Route path={`${match.path}/speed`} component={Speed}/>
-        <Route path={`${match.path}/rules`} component={Rules}/>
-        <Route path={`${match.path}/rotation`} component={Rotation}/>
-        <Route path={`${match.path}/headers`} component={Headers}/>
-        <Route path={`${match.path}/general`} component={General}/>
-        <Route path={`${match.path}/logs`} component={Logs}/>
-        <Route exact path={match.path} component={({location})=>
-          <Redirect to={`${location.pathname}/logs`}/>}/>
-      </Switch>
-    </div>
-);
+const Main_window = withRouter(({match: {params: {tab}}, ...props})=>{
+    let Comp;
+    switch (tab)
+    {
+    case 'target': Comp = Targeting; break;
+    case 'speed': Comp = Speed; break;
+    case 'rules': Comp = Rules; break;
+    case 'rotation': Comp = Rotation; break;
+    case 'headers': Comp = Headers; break;
+    case 'general': Comp = General; break;
+    case 'logs':
+    default: Comp = Logs;
+    }
+    return <Comp {...props}/>;
+});
 
 class Nav extends Pure_component {
     state = {};
@@ -467,6 +551,7 @@ class Nav extends Pure_component {
         const disabled_fields = presets[val].disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this._reset_fields();
+        ga_event('edit preset', val);
     };
     update_zone = val=>{
         const zone_name = val||this.props.default_zone;
@@ -564,7 +649,6 @@ class Alloc_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
-                // XXX krzysztof: use perr
                 console.log(e);
                 _this.loading(false);
             });
@@ -628,7 +712,6 @@ class Alloc_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
-                // XXX krzysztof: use perr
                 console.log(e);
             });
             this.on('finally', ()=>{
@@ -650,7 +733,6 @@ class Alloc_modal extends Pure_component {
             const res = yield ajax.json({method: 'POST', url, data});
             if (res.error || !res.ips && !res.vips)
             {
-                // XXX krzysztof: use perr
                 console.log(`error: ${res.error}`);
                 return;
             }
@@ -683,7 +765,6 @@ class Alloc_modal extends Pure_component {
     map_vals = (old_vals, new_vals)=>{
         if (old_vals.length!=new_vals.length)
         {
-            // XXX krzysztof: use perr
             console.log('error ips/vips length mismatch');
             return;
         }
@@ -706,7 +787,14 @@ class Alloc_modal extends Pure_component {
     page_change = page=>this.paginate(page-1);
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';
-        const title = 'Select the '+type_label+' ('+this.props.zone+')';
+        let title;
+        if (this.props.tab=='general')
+        {
+            title = 'Select the '+type_label+' to multiply ('
+            +this.props.zone+')';
+        }
+        else
+            title = 'Select the '+type_label+' ('+this.props.zone+')';
         const Footer = <div className="default_footer">
               <button onClick={this.refresh} className="btn btn_lpm">
                 Refresh</button>
@@ -721,8 +809,8 @@ class Alloc_modal extends Pure_component {
                 cur_page={this.state.cur_page}
                 page_change={this.page_change} top
                 update_items_per_page={this.update_items_per_page}>
-                <Link_icon tooltip="Unselect all" on_click={this.reset}
-                  id="unchecked"/>
+                <Link_icon tooltip="Unselect all"
+                  on_click={this.reset} id="unchecked"/>
                 <Link_icon tooltip="Select all" on_click={this.select_all}
                   id="check"/>
               </Pagination_panel>

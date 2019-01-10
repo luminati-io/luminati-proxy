@@ -77,7 +77,6 @@ export default class Targeting extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
     set_field = setdb.get('head.proxy_edit.set_field');
-    get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -86,14 +85,11 @@ export default class Targeting extends Pure_component {
                 .map(a=>({id: a, label: a}));
             this.setState({locations, asns});
         });
-        this.setdb_on('head.proxy_edit.form', form=>{
-            form && this.setState({form});
-        });
     }
     allowed_countries = ()=>{
         let res = this.state.locations.countries.map(c=>({
             key: c.country_name, value: c.country_id, mob: c.mob}));
-        const curr_plan = this.get_curr_plan();
+        const curr_plan = this.props.get_curr_plan();
         if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
@@ -108,10 +104,10 @@ export default class Targeting extends Pure_component {
         this.set_field('state', '');
     };
     states = ()=>{
-        const country = this.state.form.country;
+        const country = this.props.form.country;
         if (!country||country=='*')
             return [];
-        const curr_plan = this.get_curr_plan();
+        const curr_plan = this.props.get_curr_plan();
         const res = (this.state.locations.regions[country]||[])
         .filter(r=>!curr_plan||!curr_plan.mobile||r.mob)
         .map(r=>({key: r.region_name, value: r.region_id}));
@@ -119,11 +115,11 @@ export default class Targeting extends Pure_component {
     };
     state_changed = ()=>this.set_field('city', []);
     cities = ()=>{
-        const {country, state} = this.state.form;
+        const {country, state} = this.props.form;
         let res;
         if (!country)
             return [];
-        const curr_plan = this.get_curr_plan();
+        const curr_plan = this.props.get_curr_plan();
         res = this.state.locations.cities
         .filter(c=>c.country_id==country)
         .filter(c=>!curr_plan||!curr_plan.mobile||c.mob);
@@ -144,54 +140,47 @@ export default class Targeting extends Pure_component {
     render(){
         if (!this.state.locations)
             return null;
-        if (!this.state.form)
-            return null;
-        const curr_plan = this.get_curr_plan();
+        const curr_plan = this.props.get_curr_plan();
         const show_dc_note = curr_plan&&curr_plan.type=='static';
         const show_vips_note = curr_plan&&
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
-        const carrier_disabled = !!this.state.form.asn &&
-            !! this.state.form.asn.length;
-        return <div className="target">
-              <Tab_context.Provider value="target">
-                {(show_dc_note||show_vips_note) &&
-                  <Note>
-                    {show_dc_note &&
-                      <span>
-                      <div>
-                        This port is configured to use Data Center IPs.</div>
-                      <span>To change Data Center country visit your </span>
-                      </span>
-                    }
-                    {show_vips_note &&
-                      <span>
-                      <div>
-                        This port is configured to use exclusive Residential
-                        IPs.
-                      </div>
-                      <span> To change Exclusive gIP country visit your </span>
-                      </span>
-                    }
-                    <a className="link" target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://luminati.io/cp/zones">zone page</a>
-                    <span> and change your zone plan.</span>
-                  </Note>
-                }
-                <Config type="select" id="country"
-                  data={this.allowed_countries()}
-                  on_change={this.country_changed}/>
-                <Config type="select" id="state" data={this.states()}
-                  on_change={this.state_changed}/>
-                <Config type="typeahead" id="city" data={this.cities()}
-                  on_change={this.city_changed}/>
-                <Config type="typeahead" id="asn" data={this.state.asns}
-                  disabled={!!this.state.form.carrier} update_on_input
-                  depend_a={this.state.form.zone}/>
-                <Config type="select" id="carrier" data={carriers}
-                  note={carriers_note} disabled={carrier_disabled}
-                  depend_a={this.state.form.zone}/>
-              </Tab_context.Provider>
-            </div>;
+        const carrier_disabled = !!this.props.form.asn&&
+            !!this.props.form.asn.length;
+        return <Tab_context.Provider value="target">
+              {(show_dc_note||show_vips_note)&&
+                <Note>
+                  {show_dc_note &&
+                    <span>
+                    <div>This port is configured to use Data Center IPs.</div>
+                    <span>To change Data Center country visit your </span>
+                    </span>
+                  }
+                  {show_vips_note &&
+                    <span>
+                    <div>
+                      This port is configured to use exclusive Residential IPs.
+                    </div>
+                    <span> To change Exclusive gIP country visit your </span>
+                    </span>
+                  }
+                  <a className="link" target="_blank" rel="noopener noreferrer"
+                    href="https://luminati.io/cp/zones">zone page</a>
+                  <span> and change your zone plan.</span>
+                </Note>
+              }
+              <Config type="select" id="country"
+                data={this.allowed_countries()}
+                on_change={this.country_changed}/>
+              <Config type="select" id="state" data={this.states()}
+                on_change={this.state_changed}/>
+              <Config type="typeahead" id="city" data={this.cities()}
+                on_change={this.city_changed}/>
+              <Config type="typeahead" id="asn" data={this.state.asns}
+                disabled={!!this.props.form.carrier} update_on_input
+                depend_a={this.props.form.zone}/>
+              <Config type="select" id="carrier" data={carriers}
+                note={carriers_note} disabled={carrier_disabled}
+                depend_a={this.props.form.zone}/>
+            </Tab_context.Provider>;
     }
 }

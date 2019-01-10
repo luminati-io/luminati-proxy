@@ -18,19 +18,15 @@ export default class Rotation extends Pure_component {
     state = {};
     goto_field = setdb.get('head.proxy_edit.goto_field');
     set_field = setdb.get('head.proxy_edit.set_field');
-    get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
         this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>{
             disabled_fields && this.setState({disabled_fields});
         });
-        this.setdb_on('head.proxy_edit.form', form=>{
-            form && this.setState({form});
-        });
     }
     get_type = ()=>{
-        const curr_plan = this.get_curr_plan();
+        const curr_plan = this.props.get_curr_plan();
         let type;
-        if (curr_plan && curr_plan.type=='static')
+        if (curr_plan&&curr_plan.type=='static')
             type = 'ips';
         else if (curr_plan&&!!curr_plan.vip)
             type = 'vips';
@@ -45,17 +41,17 @@ export default class Rotation extends Pure_component {
             this.set_field('vips', []);
             this.set_field('pool_size', 0);
         }
-        else if (!this.state.form.pool_size)
+        else if (!this.props.form.pool_size)
             this.set_field('pool_size', 1);
     };
     is_sequential = pool_type=>{
-        pool_type = pool_type || this.state.form.pool_type;
+        pool_type = pool_type || this.props.form.pool_type;
         return !pool_type || pool_type=='sequential';
     };
     render(){
         if (!this.state.disabled_fields)
             return null;
-        const form = this.state.form;
+        const form = this.props.form;
         const type = this.get_type();
         const render_modal = ['ips', 'vips'].includes(type);
         let pool_size_note;
@@ -74,26 +70,23 @@ export default class Rotation extends Pure_component {
             </Note>;
         const pool_size_disabled = form.ips.length||form.vips.length||
             this.is_sequential();
-        return <div className="rotation">
-              <Tab_context.Provider value="rotation">
-                <Config type="select" id="pool_type" data={pool_type_opt}
-                  on_change={this.pool_type_changed}/>
-                <Config type="select_number" id="pool_size" allow_zero
-                  note={pool_size_note} disabled={pool_size_disabled}/>
-                <Config type="yes_no" id="keep_alive"/>
-                <Config type="select_number" id="max_requests"/>
-                <Config type="select_number" id="session_duration"
-                  sufix="seconds"/>
-                <Config type="yes_no" id="sticky_ip"/>
-                <Config type="yes_no" id="session_random"
-                  disabled={form.sticky_ip}/>
-                {!form.session_random && !form.sticky_ip &&
-                  <Config type="text" id="session"/>}
-                <Config type="text" id="seed"/>
-                <Config type="yes_no" id="session_termination"
-                  note={sess_note}/>
-              </Tab_context.Provider>
-            </div>;
+        return <Tab_context.Provider value="rotation">
+              <Config type="select" id="pool_type" data={pool_type_opt}
+                on_change={this.pool_type_changed}/>
+              <Config type="select_number" id="pool_size" allow_zero
+                note={pool_size_note} disabled={pool_size_disabled}/>
+              <Config type="yes_no" id="keep_alive"/>
+              <Config type="select_number" id="max_requests"/>
+              <Config type="select_number" id="session_duration"
+                sufix="seconds"/>
+              <Config type="yes_no" id="sticky_ip"/>
+              <Config type="yes_no" id="session_random"
+                disabled={form.sticky_ip}/>
+              {!form.session_random && !form.sticky_ip &&
+                <Config type="text" id="session"/>}
+              <Config type="text" id="seed"/>
+              <Config type="yes_no" id="session_termination" note={sess_note}/>
+            </Tab_context.Provider>;
     }
 }
 

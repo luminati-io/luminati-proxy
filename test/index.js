@@ -36,7 +36,7 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
-        }, opt), {send_rule_mail: function(){}});
+        }, opt), {send_rule_mail: function(){}, rmt_cfg: {get: ()=>({})}});
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};

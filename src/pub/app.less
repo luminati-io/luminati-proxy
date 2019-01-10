@@ -422,8 +422,8 @@ h4 { margin: 0; }
     height: auto !important;
     padding-left: 5px !important;
     padding-right: 10px !important;
+    max-width: 600px;
     &.error { border-color: @error_dark; }
-    &.json { max-width: 300px; }
 }
 select, input[type=number], input[type=text], input[type=password],
 input[type=email], textarea, .code_mirror_wrapper {
@@ -1012,9 +1012,8 @@ span.icon_link {
     }
     .note { font-size: 13px; margin-bottom: 15px; }
     .main_window {
-        flex: 1;
         margin-top: 10px;
-        .in_logs {
+        &.logs {
             .window_wrapper {
                 flex: 1;
                 padding: 15px 0;
@@ -1024,42 +1023,20 @@ span.icon_link {
                 .logs_panel { margin: 0; }
             }
         }
-        .target .desc { width: 100px; }
-        .speed .desc { width: 175px; }
-        .rotation .desc { width: 125px; }
-        .headers .desc { width: 145px; }
-        .general .desc { width: 195px; }
-        .rules {
-            max-width: 100%;
-            margin-bottom: 15px;
+        &.target .desc { width: 100px; }
+        &.speed .desc { width: 175px; }
+        &.rotation .desc { width: 125px; }
+        &.headers .desc { width: 145px; }
+        &.general .desc { width: 195px; }
+        &.rules {
             .desc { width: 200px; min-width: 200px; }
             .rule_wrapper {
                 position: relative;
+                display: inline-block;
                 padding: 5px 30px 5px 5px;
                 margin-bottom: 15px;
                 border: solid 1px @grey;
                 border-radius: 4px;
-                display: grid;
-                grid-template-columns: auto 1fr;
-                grid-template-rows: auto auto;
-                .action, .trigger, .ui, .code {
-                    padding: 3px;
-                }
-                .trigger {
-                    padding-bottom: 8px;
-                }
-                .action {
-                    padding-top: 8px;
-                    border-top: 1px solid @grey;
-                }
-                .ui {
-                    padding-right: 8px;
-                }
-                .code {
-                    padding-left: 8px;
-                    border-left: 1px solid @grey;
-                    overflow-x: hidden;
-                }
                 .btn_rule_del {
                     position: absolute;
                     top: 5px;
@@ -1069,6 +1046,14 @@ span.icon_link {
                     width: 16px;
                     height: 16px;
                 }
+                .trigger {
+                    display: flex;
+                    .trigger_code {
+                        margin-left: 10px;
+                        border-left: 1px solid #ccc;
+                        padding: 3px 3px 3px 10px;
+                    }
+                }
             }
             .rule_add_btn {
                 width: 90px;
@@ -1076,7 +1061,7 @@ span.icon_link {
                 i { left: 4px; }
             }
         }
-        .headers {
+        &.headers {
             .field_row_inner.headers {
                 position: absolute;
                 align-items: baseline;
