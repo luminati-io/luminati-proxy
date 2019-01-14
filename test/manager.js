@@ -86,7 +86,7 @@ describe('manager', ()=>{
         return {manager, admin, db_file};
     });
     const app_with_config = opt=>etask(function*(){
-        let args = [];
+        const args = [];
         const cli = opt.cli||{};
         Object.keys(cli).forEach(k=>{
             if (typeof cli[k]=='boolean')
@@ -246,8 +246,9 @@ describe('manager', ()=>{
         });
         describe('proxies', ()=>{
             describe('get', ()=>{
-                it('normal', ()=>etask(function*(){
-                    let proxies = [{port: 24023}, {port: 24024}];
+                it('normal', ()=>etask._fn(function*(_this){
+                    _this.timeout(6000);
+                    const proxies = [{port: 24023}, {port: 24024}];
                     app = yield app_with_proxies(proxies);
                     let res = yield json('api/proxies');
                     assert_has(res, proxies, 'proxies');

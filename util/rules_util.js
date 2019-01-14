@@ -2,20 +2,12 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const E = module.exports;
 
-E.gen_function = body=>{
+const gen_function = (name, body)=>{
     body = body.split('\n').map(l=>'  '+l).join('\n');
-    return `function trigger(opt){\n${body}\n}`;
+    return `function ${name}(opt){\n${body}\n}`;
 };
 
-const empty_function = E.gen_function('return true;');
-
-E.gen_code = val=>{
-    if (!val)
-        return empty_function;
-    return E.gen_function(`return /${val}/.test(opt.url);`);
-};
-
-E.migrate_rule = t=>rule=>{
+E.migrate_trigger = t=>rule=>{
     let body = '';
     let type = 'before_send';
     if (t=='pre' && rule.min_req_time)
@@ -55,5 +47,41 @@ E.migrate_rule = t=>rule=>{
         +`  return false;\n`;
     }
     body += `return true;`;
-    return Object.assign({}, rule, {type, trigger_code: E.gen_function(body)});
+    return Object.assign({}, rule, {type,
+        trigger_code: gen_function('trigger', body)});
+};
+
+E.migrate_action = rule=>{
+    return Object.assign({}, rule, {action_code: get_action(rule)});
+};
+
+// XXX krzysztof: WIP
+const get_action = rule=>{
+    let body = '';
+    if (!rule.action)
+        return '';
+    if (rule.action.email)
+        body += `opt.notify({mail: ${rule.action.email}});\n`;
+    if (rule.action.retry)
+        body += `opt.retry();\n`;
+    if (rule.action.retry_port)
+        body += `opt.retry({port: ${rule.action.retry_port}});\n`;
+    if (rule.action.ban_ip)
+        body += `opt.ban_ip({ts: ${rule.action.ban_ip}});\n`;
+    if (rule.action.refresh_ip)
+        body += `opt.refresh_ip();\n`;
+    if (rule.action.save_to_pool)
+        body += `opt.save_to_pool();\n`;
+    if (rule.action.save_to_fast_pool)
+        body += `opt.save_to_pool({name: 'fast'});\n`;
+    if (rule.action.process)
+        body += `opt.process(`+JSON.stringify(rule.action.process)+`);\n`;
+    if (rule.action.null_response)
+        body += `opt.null_response();\n`;
+    if (rule.action.direct)
+        body += `opt.direct()\n`;
+    if (rule.action.bypass_proxy)
+        body += `opt.bypass_proxy()\n`;
+    body += `return true;`;
+    return gen_function('action', body);
 };

@@ -1,6 +1,16 @@
 [
     {
-        "ver": "1.118.995",
+        "ver": "1.119.232",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Rules: action code is shown along with the UI options for all rules parameters"
+            }
+        ]
+    },
+    {
+        "ver": "1.118.749",
         "type": "dev",
         "changes": [
             {

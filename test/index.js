@@ -21,7 +21,7 @@ const customer = 'abc';
 const password = 'xyz';
 
 const pre_rule = (type, regex)=>({
-    rules: {pre: [{action: type, url: regex||'.*'}]},
+    rules: {pre: [{action: {[type]: true}, url: regex}]},
 });
 describe('proxy', ()=>{
     let proxy, ping;
@@ -36,7 +36,7 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
-        }, opt), {send_rule_mail: function(){}, rmt_cfg: {get: ()=>({})}});
+        }, opt), {send_rule_mail: function(){}});
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};
@@ -772,10 +772,10 @@ describe('proxy', ()=>{
                   <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const process_rules = {price: `$('#priceblock_ourprice').text()`};
+            const process = {price: `$('#priceblock_ourprice').text()`};
             const req = {ctx: {response: {}}};
             const _res = {headers: {'content-encoding': 'gzip'}};
-            l.rules.process_response(req, _res, process_rules, html, {});
+            l.rules.process_response(req, _res, html, {action: {process}});
             assert.ok(!_res.headers['content-encoding']);
             assert.equal(_res.headers['content-type'],
                 'application/json; charset=utf-8');
@@ -790,10 +790,10 @@ describe('proxy', ()=>{
                   <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const process_rules = {price: 'a-b-v'};
+            const process = {price: 'a-b-v'};
             const req = {ctx: {response: {}}};
             const _res = {headers: {'content-encoding': 'gzip'}};
-            l.rules.process_response(req, _res, process_rules, html, {});
+            l.rules.process_response(req, _res, html, {action: {process}});
             assert.ok(!_res.headers['content-encoding']);
             assert.equal(_res.headers['content-type'],
                 'application/json; charset=utf-8');
@@ -807,9 +807,6 @@ describe('proxy', ()=>{
                 const cond = new Trigger({trigger_code: code});
                 assert.equal(cond.test({url: _url}), expected);
             };
-            t(undefined, '', true);
-            t('', '', true);
-            t('', 'http://facebook.com', true);
             t('function trigger(opt){ return false; }', '', false);
             t('function trigger(opt){ return false; }', 'http://google.com',
                 false);
@@ -827,20 +824,19 @@ describe('proxy', ()=>{
             t('function trigger(opt){ return true; }', 'http://google.com',
                 true);
         });
-        it('check _can_retry', ()=>etask(function*(){
+        it('check can_retry', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {}});
             const t = (req, rule, expected)=>{
-                const r = l.rules._can_retry(req, {}, rule);
+                const r = l.rules.can_retry(req, rule);
                 assert.equal(r, expected);
             };
-            t({retry: 0}, {action: 'test'}, false);
-            t({retry: 0}, {action: 'retry'}, true);
-            t({retry: 0}, {action: 'retry_port'}, true);
+            t({retry: 0}, {test: true}, false);
+            t({retry: 0}, {retry: 1}, true);
             const port_stub = sinon.stub(l, 'get_other_port').returns(false);
-            t({retry: 0}, {action: 'retry_port', retry_port: 1}, false);
+            t({retry: 0}, {retry_port: 24001}, false);
             port_stub.returns(l);
-            t({retry: 0}, {action: 'retry_port', retry_port: 1}, true);
-            t({retry: 5}, {action: 'retry_port'}, false);
+            t({retry: 0}, {retry_port: 24001}, true);
+            t({retry: 5}, {retry: 1}, false);
         }));
         it('check retry', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {}});
@@ -856,18 +852,18 @@ describe('proxy', ()=>{
             l.rules.retry(_req, {}, {}, l.port);
             assert.equal(_req.retry, 2);
         }));
-        it('check _action', ()=>etask(function*(){
+        it('check action', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {}});
             sinon.stub(l.rules, 'gen_session').returns('test');
-            const can_stub = sinon.stub(l.rules, '_can_retry').returns(false);
+            const can_stub = sinon.stub(l.rules, 'can_retry').returns(false);
             const retry_stub = sinon.stub(l.rules, 'retry');
             const req = {};
-            let r = l.rules._action(req, {}, {});
+            let r = l.rules.action(req, {}, {}, {action: {}}, {});
             assert.ok(!r);
             assert.notEqual(req.session, 'test');
             assert.ok(!retry_stub.called);
             can_stub.returns(true);
-            r = l.rules._action(req, {}, {});
+            r = l.rules.action(req, {}, {}, {action: {}}, {});
             assert.ok(r);
             assert.equal(req.session, 'test');
             assert.ok(retry_stub.called);
@@ -910,24 +906,17 @@ describe('proxy', ()=>{
         it('check can_retry', ()=>etask(function*(){
             l = yield lum({rules: true, _rules: {}});
             sinon.stub(l, 'get_other_port').returns(l);
-            let r = l.rules.can_retry({});
-            assert.ok(r);
-            r = l.rules.can_retry({retry: 2}, {}, {retry: 5});
-            assert.ok(r);
-            r = l.rules.can_retry({retry: 5});
-            assert.ok(!r);
-            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false,
-                retry: 5});
-            assert.ok(r);
-            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: false,
-                retry: true});
-            assert.ok(!r);
-            r = l.rules.can_retry({retry: 3}, {}, {refresh_ip: true,
-                retry: true});
-            assert.ok(!r);
-            r = l.rules.can_retry({retry: 1}, {},
-                {retry_port: 24001, retry: true});
-            assert.ok(r);
+            assert.ok(!l.rules.can_retry({}));
+            assert.ok(l.rules.can_retry({retry: 2}, {retry: 5}));
+            assert.ok(!l.rules.can_retry({retry: 5}));
+            assert.ok(l.rules.can_retry({retry: 3}, {refresh_ip: false,
+                retry: 5}));
+            assert.ok(!l.rules.can_retry({retry: 3}, {refresh_ip: false,
+                retry: true}));
+            assert.ok(!l.rules.can_retry({retry: 3}, {refresh_ip: true,
+                retry: true}));
+            assert.ok(l.rules.can_retry({retry: 1}, {retry_port: 24001,
+                retry: true}));
         }));
         it('check post_need_body', ()=>etask(function*(){
             l = yield lum({rules: {post: [{url: 'test'}]}});
@@ -945,7 +934,7 @@ describe('proxy', ()=>{
         it('check post_body', ()=>etask(function*(){
             l = yield lum({rules: {post: [{
                 body: 'test',
-                action: {process: true},
+                action: {process: {}},
                 url: 'test',
             }]}});
             const t = (req, _res, body, expected)=>{
@@ -980,9 +969,8 @@ describe('proxy', ()=>{
                 const fps_stub = sinon.stub(l.session_mgr,
                     'add_fast_pool_session');
                 const r = l.rules.action({ctx: {set_rule: ()=>null}}, {}, {},
-                    {}, {email: true, reserve_session: true,
-                        fast_pool_session: true},
-                    {}, {type: 'max_req_time', value: 200});
+                    {max_req_time: 1000, action: {email: true,
+                    reserve_session: true, fast_pool_session: true}}, {});
                 assert.ok(!r);
                 assert.ok(cr_stub.called);
                 assert.ok(email_stub.called);
@@ -991,20 +979,20 @@ describe('proxy', ()=>{
             }));
             it('ban_ip', ()=>etask(function*(){
                 l = yield lum({rules: true});
-                sinon.stub(l.rules, 'can_retry')
-                    .returns(true);
+                sinon.stub(l.rules, 'can_retry').returns(true);
                 sinon.stub(l.rules, 'retry');
                 sinon.stub(l.rules, 'gen_session').returns('test');
                 const add_stub = sinon.stub(l.banlist, 'add').returns('test');
                 const req = {ctx: {}};
-                const r = l.rules.action(req, {}, {},
-                    {hola_headers: {'x-hola-timeline-debug': '1 2 3'}},
-                    {ban_ip: '1d'}, {});
+                const opt = {_res: {
+                    hola_headers: {'x-hola-timeline-debug': '1 2 3'}}};
+                const r = l.rules.action(req, {}, {}, {action: {ban_ip: 1000}},
+                    opt);
                 assert.ok(r);
                 assert.ok(add_stub.called);
                 assert.equal(req.session, 'test');
             }));
-            describe('ban_ip per domain', ()=>{
+            xdescribe('ban_ip per domain', ()=>{
                 let ban_spy;
                 const t = (url, expected, ban_count=0)=>{
                     const req = {ctx: {url, skip_rule: ()=>false}};
@@ -1061,50 +1049,27 @@ describe('proxy', ()=>{
             });
             it('refresh_ip', ()=>etask(function*(){
                 l = yield lum({rules: true});
-                sinon.stub(l.rules, 'can_retry')
-                    .returns(true);
+                sinon.stub(l.rules, 'can_retry').returns(true);
                 sinon.stub(l.rules, 'retry');
                 const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
                 const req = {ctx: {}};
+                const opt = {_res:
+                    {hola_headers: {'x-hola-timeline-debug': '1 2 3'}}};
                 const r = l.rules.action(req, {}, {},
-                    {hola_headers: {'x-hola-timeline-debug': '1 2 3'}},
-                    {refresh_ip: true}, {});
+                    {action: {refresh_ip: true}}, opt);
                 assert.ok(r);
                 assert.ok(ref_stub.called);
                 assert.equal(l.refresh_task, 'test');
             }));
-            it('url', ()=>etask(function*(){
-                l = yield lum({rules: true});
-                sinon.stub(l.rules, 'can_retry')
-                    .returns(true);
-                sinon.stub(l.rules, 'retry');
-                const req = {ctx: {}};
-                const r = l.rules.action(req, {}, {}, {headers:
-                    {location: 'test'}}, {url: 'location'}, {});
-                assert.ok(r);
-                assert.equal(req.url, 'test');
-            }));
-            it('session', ()=>etask(function*(){
-                l = yield lum({rules: true});
-                sinon.stub(l.rules, 'can_retry')
-                    .returns(true);
-                sinon.stub(l.rules, 'retry');
-                sinon.stub(l.rules, 'gen_session').returns('test');
-                const req = {ctx: {}};
-                const r = l.rules.action(req, {}, {}, {}, {}, {});
-                assert.ok(r);
-                assert.equal(req.session, 'test');
-            }));
         });
         describe('pre', ()=>{
             it('action null_response', ()=>etask(function*(){
-                l = yield lum({rules: {pre: [
-                    {url: '', action: 'null_response', email: 'test@mail'},
-                ]}});
-                const send_stub = sinon.stub(l, '_send_rule_mail',
-                    (to, action, _url)=>{
+                l = yield lum({rules: {pre: [{url: '', action:
+                    {null_response: true, email: 'test@mail'}}]}});
+                const send_stub = sinon.stub(l.mgr, 'send_rule_mail',
+                    (port, to, _url)=>{
+                        assert.equal(port, 24000);
                         assert.equal(to, 'test@mail');
-                        assert.equal(action, 'Null response');
                         assert.equal(_url, 'lumtest.com');
                     });
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
@@ -1116,13 +1081,12 @@ describe('proxy', ()=>{
                 assert.equal(r.status_message, 'NULL');
             }));
             it('action direct', ()=>etask(function*(){
-                l = yield lum({rules: {pre: [
-                    {url: '', action: 'direct', email: 'test@mail'},
-                ]}});
-                const send_stub = sinon.stub(l, '_send_rule_mail',
-                    (to, action, _url)=>{
+                l = yield lum({rules: {pre: [{url: '', action:
+                    {direct: true, email: 'test@mail'}}]}});
+                const send_stub = sinon.stub(l.mgr, 'send_rule_mail',
+                    (port, to, _url)=>{
+                        assert.equal(port, 24000);
                         assert.equal(to, 'test@mail');
-                        assert.equal(action, 'Direct super proxy');
                         assert.equal(_url, 'lumtest.com');
                     });
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
@@ -1133,11 +1097,9 @@ describe('proxy', ()=>{
                 assert.equal(r, undefined);
                 assert.ok(_req.ctx.is_direct);
             }));
-            it('action switch_port', ()=>etask(function*(){
+            it('action retry_port', ()=>etask(function*(){
                 l = yield lum({rules: {pre: [
-                    {url: '', action: 'switch_port', email: 'test@mail',
-                        port: 1},
-                ]}});
+                    {url: '', action: {retry_port: 1, email: 'test@mail'}}]}});
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
                     log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
@@ -1153,12 +1115,13 @@ describe('proxy', ()=>{
                     });
                 const r = yield l.rules.pre(_req, _res, _head);
                 assert.ok(get_port_stub.called);
+                sinon.assert.calledWith(get_port_stub, 1);
                 assert.equal(r, 'switched');
             }));
         });
         describe('call post after pre', ()=>{
             const t = action=>it(action, ()=>etask(function*(){
-                l = yield lum({rules: {pre: [{action, url: '.*'}]}});
+                l = yield lum({rules: {pre: [{[action]: true, url: '.*'}]}});
                 const post_stub = sinon.stub(l.rules, 'post');
                 yield l.test(ping.http.url);
                 sinon.assert.calledOnce(post_stub);
@@ -1166,9 +1129,9 @@ describe('proxy', ()=>{
             t('null_response');
             t('bypass_proxy');
             t('direct');
-            it('switch_port', ()=>etask(function*(){
-                l = yield lum({rules: {pre: [{action: 'switch_port', url: '.*',
-                    port: 24001}]}});
+            it('retry_port', ()=>etask(function*(){
+                l = yield lum({rules: {pre: [{action: {retry: true,
+                    retry_port: 24001}}]}});
                 const l2 = yield lum({port: 24001});
                 sinon.stub(l, 'get_other_port', ()=>l2);
                 const post_stub = sinon.stub(l.rules, 'post');
@@ -1176,9 +1139,9 @@ describe('proxy', ()=>{
                 sinon.assert.calledOnce(post_stub);
                 l2.stop(true);
             }));
-            it('switch_port invalid port', ()=>etask(function*(){
-                l = yield lum({rules: {pre: [{action: 'switch_port', url: '.*',
-                    port: 24002}]}});
+            it('retry_port invalid port', ()=>etask(function*(){
+                l = yield lum({rules: {pre: [{action: {retry: true,
+                    retry_port: 24002}}]}});
                 sinon.stub(l, 'get_other_port', ()=>null);
                 const post_stub = sinon.stub(l.rules, 'post');
                 yield l.test(ping.http.url);
@@ -1209,7 +1172,7 @@ describe('proxy', ()=>{
             };
             const t_pre = (action, ban)=>it(action, ()=>etask(function*(){
                 l = yield lum({rules: {
-                    pre: [{action, url: '.*'}],
+                    pre: [{action: {[action]: true}, url: '.'}],
                     post: [get_banip_rule()],
                 }});
                 if (action=='bypass_proxy')
@@ -1223,9 +1186,9 @@ describe('proxy', ()=>{
             t_pre('null_response', false);
             t_pre('bypass_proxy', false);
             t_pre('direct', true);
-            it('switch_port', ()=>etask(function*(){
-                l = yield lum({rules: {pre: [{action: 'switch_port',
-                    url: '.*'}], post: [get_banip_rule()]}});
+            it('retry_port', ()=>etask(function*(){
+                l = yield lum({rules: {pre: [{action: {retry_port: true}}],
+                    post: [get_banip_rule()]}});
                 const l2 = yield lum({port: 24001, rules: {post:
                     [get_banip_rule(30)]}});
                 inject_headers(l2);

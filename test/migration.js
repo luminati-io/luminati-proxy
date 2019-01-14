@@ -3,7 +3,7 @@
 const assert = require('assert');
 const migrate = require('../lib/migration.js');
 const migrations = migrate.migrations;
-const {migrate_rule} = require('../util/rules_util.js');
+const {migrate_trigger} = require('../util/rules_util.js');
 const pkg = require('../package.json');
 
 const tests_run = {};
@@ -28,12 +28,10 @@ const describe_version = function(name, tests){
     });
 };
 
-const t_rule = v=>(name, rule, _rule)=>it(name, ()=>{
+const t_rule = (v, _type='post')=>(name, rule, _rule)=>it(name, ()=>{
     const {proxies: [_proxy]} = migrations[v]({
-        proxies: [{port: 24000, rules: {post: [rule]}}]});
-    assert.deepEqual(_proxy, {port: 24000, rules: {post: [
-        Object.assign({}, rule, _rule),
-    ]}});
+        proxies: [{port: 24000, rules: {[_type]: [rule]}}]});
+    assert.deepEqual(_proxy, {port: 24000, rules: {[_type]: [_rule]}});
 });
 
 describe('migration', ()=>{
@@ -215,14 +213,16 @@ describe('migration', ()=>{
         const t = t_rule(v);
         t('reduces status into single value', {url: '\\.(jpeg)$',
             type: 'after_hdr', status: {arg: '200 - Success', type: 'in'}},
-            {status: 200});
-        t('does not change status if it is already simple value',
-            {type: 'after_hdr', status: 200});
+            {url: '\\.(jpeg)$', type: 'after_hdr', status: 200});
+        const status_rule = {type: 'after_hdr', status: 200};
+        t('does not change status if it is already simple value', status_rule,
+            status_rule);
         t('reduces body into single value', {url: '\\.(jpeg)$',
             type: 'after_body', body: {arg: 'captcha', type: 'in'}},
-            {body: 'captcha'});
-        t('does not change body if it is already simple value',
-            {type: 'after_body', body: 'test123'});
+            {url: '\\.(jpeg)$', type: 'after_body', body: 'captcha'});
+        const body_rule = {type: 'after_body', body: 'test123'};
+        t('does not change body if it is already simple value', body_rule,
+            body_rule);
     });
     describe_version('1.118.284', v=>{
         it('flatten logs object into value', ()=>{
@@ -262,6 +262,46 @@ describe('migration', ()=>{
             url: 'url', trigger_code: '--code--'}, {url: 'url'});
         t('does nothing', {url: 'url'}, {url: 'url'});
     });
+    describe_version('1.118.985', v=>{
+        const t = t_rule(v, 'pre');
+        t('moves email and null_response into action object', {
+            url: 'facebook',
+            action: 'null_response',
+            email: 'test@test.com',
+        }, {
+            url: 'facebook',
+            action_type: 'null_response',
+            action: {email: 'test@test.com', null_response: true},
+        });
+        t('moves bypass_proxy into action object',
+            {url: 'facebook', action: 'bypass_proxy'},
+            {url: 'facebook', action_type: 'bypass_proxy',
+                action: {bypass_proxy: true}});
+        t('moves direct into action object',
+            {url: 'facebook', action: 'direct'},
+            {url: 'facebook', action_type: 'direct', action: {direct: true}});
+        t('switch_port -> retry_port', {
+            url: 'facebook',
+            action: 'switch_port',
+            port: 24001,
+            retry: 1,
+        }, {
+            url: 'facebook',
+            action_type: 'retry_port',
+            action: {retry_port: 24001},
+        });
+        t('switch_port -> retry_port with email', {
+            email: 'test@test.com',
+            url: 'facebook',
+            action: 'switch_port',
+            port: 24001,
+            retry: 1,
+        }, {
+            url: 'facebook',
+            action_type: 'retry_port',
+            action: {retry_port: 24001, email: 'test@test.com'},
+        });
+    });
     describe_version('x.rules', v=>{
         it('migrates correctly whole config', ()=>{
             const proxy = {port: 24000, rules: {pre: [{
@@ -283,7 +323,7 @@ describe('migration', ()=>{
         });
         describe('rule -> code transformation', ()=>{
             const t = (name, type, rule, code, _type)=>it(name, ()=>{
-                const _rule = migrate_rule(type)(rule);
+                const _rule = migrate_trigger(type)(rule);
                 assert.equal(_rule.trigger_code, code);
                 assert.equal(_rule.type, _type);
             });
