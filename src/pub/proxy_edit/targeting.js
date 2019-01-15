@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Note} from '../common.js';
+import {Note, Ext_tooltip} from '../common.js';
 import {Config, Tab_context} from './common.js';
 
 const carriers = [
@@ -146,6 +146,8 @@ export default class Targeting extends Pure_component {
             return null;
         if (!this.state.form)
             return null;
+        if (this.state.form.ext_proxies)
+            return <Note><Ext_tooltip/></Note>;
         const curr_plan = this.get_curr_plan();
         const show_dc_note = curr_plan&&curr_plan.type=='static';
         const show_vips_note = curr_plan&&

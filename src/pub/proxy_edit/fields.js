@@ -343,7 +343,6 @@ export const tabs = {
                 label: 'SSL to super proxy',
                 tooltip: `Encrypt requests sent to super proxy to avoid
                     detection on DNS`,
-                ext: true,
             },
             iface: {
                 label: 'Interface',

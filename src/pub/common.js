@@ -16,6 +16,7 @@ import 'codemirror/lib/codemirror.css';
 import React_select from 'react-select/lib/Creatable';
 import {Netmask} from 'netmask';
 import {withRouter, Route} from 'react-router-dom';
+import React_tooltip from 'react-tooltip';
 
 export class Modal_dialog extends React.Component {
     componentDidMount(){
@@ -260,6 +261,7 @@ export const Loader_small = props=>{
         </div>;
 };
 
+// XXX krzysztof: refactoring: reuse Copy_btn component
 export class Code extends Pure_component {
     componentDidMount(){
         $(this.ref).find('.btn_copy').tooltip('show')
@@ -287,7 +289,8 @@ export class Code extends Pure_component {
               <textarea style={{position: 'fixed', top: '-1000px'}}/>
               <button onClick={this.copy.bind(this)} data-container="body"
                 className="btn btn_lpm btn_lpm_small btn_copy">
-                Copy</button>
+                Copy
+              </button>
             </code>;
     }
 }
@@ -661,10 +664,44 @@ export class Json extends Pure_component {
     }
 }
 
+class Copy_btn extends Pure_component {
+    textarea = React.createRef();
+    btn = React.createRef();
+    componentDidMount(){
+        $(this.btn.current).tooltip('show').attr('title', 'Copy to clipboard')
+        .tooltip('fixTitle');
+    }
+    copy = ()=>{
+        const txt = this.textarea.current;
+        const area = $(txt)[0];
+        area.value = this.props.val;
+        area.select();
+        try {
+            document.execCommand('copy');
+            $(this.btn.current).attr('title', 'Copied!')
+            .tooltip('fixTitle')
+            .tooltip('show').attr('title', 'Copy to clipboard')
+            .tooltip('fixTitle');
+        } catch(e){ console.log('Oops, unable to copy'); }
+    };
+    render(){
+        return <div className="copy_btn">
+              <button onClick={this.copy} data-container="body"
+                ref={this.btn} className="btn btn_lpm btn_lpm_small btn_copy">
+                Copy
+              </button>
+              <textarea ref={this.textarea}
+                style={{position: 'fixed', top: '-1000px'}}/>
+            </div>;
+    }
+}
+
 export class Cm_wrapper extends Pure_component {
     componentDidMount(){
-        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript',
-            readOnly: 'nocursor'});
+        const opt = {mode: 'javascript'};
+        if (this.props.readonly)
+            opt.readOnly = 'nocursor';
+        this.cm = codemirror.fromTextArea(this.textarea, opt);
         this.cm.on('change', this.on_cm_change);
         this.cm.setSize('100%', '100%');
         this.cm.doc.setValue(this.props.val||'');
@@ -682,6 +719,7 @@ export class Cm_wrapper extends Pure_component {
     set_ref = ref=>{ this.textarea = ref; };
     render(){
         return <div className="code_mirror_wrapper">
+              <Copy_btn val={this.props.val}/>
               <textarea ref={this.set_ref}/>
             </div>;
     }
@@ -773,16 +811,22 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
         </div>;
 };
 
-export const Labeled_controller = ({disabled, note, sufix, ...props})=>
+export const Labeled_controller = ({id, disabled, note, sufix, ...props})=>
     <Field_row_raw disabled={disabled} note={note} animated={props.animated}
       inner_style={props.field_row_inner_style}>
       <div className="desc" style={props.desc_style}>
         <Tooltip title={props.tooltip}>{props.label}</Tooltip>
       </div>
       <div>
-        <div className="field">
+        <div className="field" data-tip data-for={id+'tip'}>
           <Form_controller disabled={disabled} {...props}/>
           {sufix && <span className="sufix">{sufix}</span>}
+          {props.field_tooltip &&
+            <React_tooltip id={id+'tip'} type="light" effect="solid"
+              delayHide={30} delayUpdate={300} place="right">
+              {props.field_tooltip}
+            </React_tooltip>
+          }
         </div>
         {note && <Note>{note}</Note>}
       </div>
@@ -1102,10 +1146,12 @@ export const Nav_tab = withRouter(props=>{
     const {id} = props;
     return <Route path={`${props.match.path}/${id}`}>{({match})=>{
         const active = props.cur_tab==id||!!match;
-        const btn_class = classnames('btn_tab', {active});
+        const {disabled} = props;
+        const btn_class = classnames('btn_tab', {active, disabled});
         return <Tooltip title={props.tooltip}>
-              <div onClick={()=>props.set_tab(id)} className={btn_class}>
-                {!props.narrow && <div className={classnames('icon', id)}/>}
+              <div onClick={()=>!disabled && props.set_tab(id)}
+                 className={btn_class}>
+                 {!props.narrow && <div className={classnames('icon', id)}/>}
                 <div className="title">{props.title}</div>
                 <div className="arrow"/>
               </div>
@@ -1113,3 +1159,9 @@ export const Nav_tab = withRouter(props=>{
     }}
     </Route>;
 });
+
+export const Ext_tooltip = ()=><div>
+      This feature is only available when using{' '}
+      <a className="link" target="_blank" href="https://luminati.io/cp/zones"
+        rel="noopener noreferrer">proxies by Luminati network</a>
+    </div>;

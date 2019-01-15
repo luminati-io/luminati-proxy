@@ -12,21 +12,28 @@ import Preview from './har_preview.js';
 import Proxy_blank from './proxy_blank.js';
 import {withRouter} from 'react-router-dom';
 
-class Proxy_tester extends Pure_component {
+const Proxy_tester = ()=>
+    <div className="vbox"
+      style={{paddingLeft: 15, paddingRight: 15, height: '100%'}}>
+      <Nav title="Proxy Tester"
+        subtitle='Emulate requests from your proxies to any target URL'/>
+      <Tester/>
+    </div>;
+
+export const Tester = class Tester extends Pure_component {
     state = {};
-    title = 'Proxy Tester';
-    subtitle = 'Emulate requests from your proxies to any target URL';
     update_response = response=>this.setState({response});
     clear_response = ()=>this.setState({response: undefined});
     render(){
         return <div className="proxy_tester vbox">
-              <Nav title={this.title} subtitle={this.subtitle}/>
-              <Request update_response={this.update_response}/>
+              <Request update_response={this.update_response}
+                no_labels={this.props.no_labels}
+                port={this.props.port} hide_port={!!this.props.port}/>
               <Preview cur_preview={this.state.response}
                 close_preview={this.clear_response}/>
             </div>;
     }
-}
+};
 
 const Request = with_proxy_ports(withRouter(
 class Request extends Pure_component {
@@ -36,12 +43,14 @@ class Request extends Pure_component {
         max_idx: 0,
         params: {url: 'http://lumtest.com/myip.json', method: 'GET'},
         show_loader: false,
+        lock: false,
     };
     componentDidMount(){
         const params = this.props.history.location.state||{};
         const url = params.url||this.state.params.url;
         const port = params.port;
         this.setState({params: {url, port}});
+        this.setdb_on('head.lock_navigation', lock=>this.setState({lock}));
     }
     add_header = ()=>{
         ga_event('proxy_tester', 'add header');
@@ -89,12 +98,11 @@ class Request extends Pure_component {
         this.etask(function*(){
             this.on('uncaught', e=>{
                 console.error(e);
-                _this.setState({show_loader: false});
                 ga_event('proxy_tester', 'unexpected error', e.message);
             });
+            this.on('finally', ()=>_this.setState({show_loader: false}));
             const resp = yield ajax.json({method: 'POST', url, data,
                 timeout: 60000});
-            _this.setState({show_loader: false});
             if (resp.error)
             {
                 _this.setState({warnings: [{msg: resp.error}]});
@@ -120,7 +128,9 @@ class Request extends Pure_component {
               </Modal>
               <div>
                 <Request_params params={this.state.params}
+                  no_labels={this.props.no_labels}
                   update={this.update_params}
+                  hide_port={this.props.hide_port}
                   port_select={this.props.port_select}/>
                 <Headers headers={this.state.headers}
                   clicked_remove={this.remove_header}
@@ -128,8 +138,10 @@ class Request extends Pure_component {
                   update={this.update_header}/>
                 <div className="footer_buttons">
                   <Tooltip title="Send a test request">
-                    <button onClick={this.go}
-                      className="btn btn_lpm btn_lpm_primary">Send</button>
+                    <button onClick={this.go} disabled={this.state.lock}
+                      className="btn btn_lpm btn_lpm_primary">
+                      {this.state.lock ? 'Saving proxy' : 'Send'}
+                    </button>
                   </Tooltip>
                 </div>
               </div>
@@ -137,53 +149,53 @@ class Request extends Pure_component {
     }
 }));
 
-const Request_params = ({port_select, params, update})=>{
+const Request_params = ({params, update, ...props})=>{
     const methods = [{key: 'GET', value: 'GET'}, {key: 'POST', value: 'POST'}];
     const method_tip = `Method of a test request. Leave GET if you don't know
     what to choose`;
     const port_changed = port=>{
-        ga_event('proxy_tester', 'edit port', port);
         update('port', port);
     };
-    const Port_select = port_select;
+    const Port_select = props.port_select;
     return <div className="request_params">
-          <Tooltip title="Choose a proxy port that will be used for this test">
-            <div className={classnames('field', 'proxy')}>
-              <div className="title">Proxy port</div>
-              <Port_select val={params.port} on_change={port_changed}/>
-            </div>
-          </Tooltip>
+          {!props.hide_port &&
+            <Tooltip
+              title="Choose a proxy port that will be used for this test">
+              <div className={classnames('field', 'proxy')}>
+                <div className="title">Proxy port</div>
+                <Port_select val={params.port} on_change={port_changed}/>
+              </div>
+            </Tooltip>
+          }
           <Field params={params} update={update} name="url" type="text"
-            tooltip="URL that Proxy Tester will use to send a test request"/>
+            tooltip="URL that Proxy Tester will use to send a test request"
+            no_labels={props.no_labels}/>
           <Field params={params} update={update} name="method" type="select"
-            data={methods} tooltip={method_tip}/>
+            data={methods} tooltip={method_tip}
+            no_labels={props.no_labels}/>
         </div>;
 };
 
 // XXX krzysztof: Refactor it the same as link tester, field should take
 // children. This is too generic and complex
-const Field = ({type, update, name, params, tooltip, ...props})=>{
+const Field = ({name, ...props})=>{
     const fields = {port: 'Proxy port', url: 'URL', method: 'Method'};
     const on_change_wrapper = val=>{
-        if (name!='url')
-            ga_event('proxy_tester', 'edit '+name);
-        update(name, val);
-    };
-    const on_blur = ()=>{
-        if (name=='url')
-            ga_event('proxy_tester', 'edit url');
+        props.update(name, val);
     };
     let Comp;
-    if (type=='select')
+    if (props.type=='select')
         Comp = Select;
     else
         Comp = Input;
     const title = fields[name];
-    return <Tooltip title={tooltip}>
+    return <Tooltip title={props.tooltip}>
           <div className={classnames('field', name)}>
-            {title && <div className="title">{fields[name]}</div>}
-            <Comp on_change_wrapper={on_change_wrapper} type={type}
-              val={params[name]} {...props} on_blur={on_blur}/>
+            {!props.no_labels && title &&
+              <div className="title">{fields[name]}</div>
+            }
+            <Comp on_change_wrapper={on_change_wrapper} type={props.type}
+              val={props.params[name]} {...props}/>
           </div>
         </Tooltip>;
 };

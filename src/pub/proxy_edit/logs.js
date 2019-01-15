@@ -4,10 +4,11 @@ import React from 'react';
 import ajax from '../../../util/ajax.js';
 import {Chrome_table} from '../chrome_widgets.js';
 import Pure_component from '../../../www/util/pub/pure_component.js';
-import {Nav_tabs, Nav_tab} from '../common.js';
+import {Nav_tabs, Nav_tab, Note, Ext_tooltip} from '../common.js';
 import moment from 'moment';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import Har_viewer from '../har_viewer.js';
+import setdb from '../../../util/setdb.js';
 
 moment.relativeTimeThreshold('ss', 3);
 
@@ -60,6 +61,8 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         });
     };
     render(){
+        if (setdb.get('head.proxy_edit.form.ext_proxies'))
+            return <Note><Ext_tooltip/></Note>;
         return <Chrome_table title="Sessions" cols={banned_ips_cols}
               fetch_data={this.fetch_data}>
               {d=>
@@ -89,6 +92,8 @@ const Sessions = withRouter(class Sessions extends Pure_component {
         });
     };
     render(){
+        if (setdb.get('head.proxy_edit.form.ext_proxies'))
+            return <Note><Ext_tooltip/></Note>;
         return <Chrome_table title="Sessions" cols={sessions_cols}
               fetch_data={this.fetch_data}>
               {d=>

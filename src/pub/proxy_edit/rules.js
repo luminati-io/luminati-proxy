@@ -3,79 +3,16 @@
 import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {migrate_trigger, migrate_action} from '../../../util/rules_util.js';
+import {migrate_trigger, migrate_action, trigger_types,
+    action_types, default_action} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
 import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
-    Field_row_raw, Tooltip} from '../common.js';
+    Field_row_raw, Tooltip, Ext_tooltip} from '../common.js';
 import {tabs} from './fields.js';
+import {Tester} from '../proxy_tester.js';
 
-const trigger_types = [
-    {key: '--Select--', value: '', tooltip: `Choose a trigger type.
-        For each request the system will check if the trigger is matching
-        the response`},
-    {key: 'URL', value: 'url', tooltip: `Trigger will be pulled for all
-        requests to the selected URL`, type: 'pre'},
-    {key: 'Status code', value: 'status', tooltip: `Trigger will be pulled
-        for all the requests that returns the matching status code`},
-    {key: 'HTML body element', value: 'body', tooltip: `Trigger will be
-        pulled when the response <body> contain the selected string`},
-    {key: 'Request time more than', value: 'min_req_time',
-        tooltip: `Triggers when the request time is above the selected value`,
-        type: 'pre'},
-    {key: 'Request time less than', value: 'max_req_time',
-        tooltip: `Triggers when the request time is below the selected value`},
-];
-
-const default_action = {key: '--Select--', value: '', tooltip: `Select an
-    action.  Once the trigger rule is met the selected action is executed
-    automatically.`};
-const action_types = [
-    {key: 'Retry with new IP', value: 'retry', tooltip: `System will send
-        the exact same request again with newly generated session`,
-        min_req_time: true},
-    {key: 'Retry with new proxy port (Waterfall)', value: 'retry_port',
-        tooltip: `System will send another request using different port
-        from your port list. This can allow cost optimization by escalating the
-        request between different types of networks according to the port
-        configuration.`, min_req_time: true, url: true},
-    {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
-        amount of time. Usually used for failed requests.`, min_req_time: true,
-        type: 'post'},
-    {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
-        Data Center IP with new allocated IP. This action contain
-        additional charges. View the cost of IP refreshing in your zones
-        page http://luminati.io/cp/zones`, type: 'post'},
-    {key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: `Save
-        the current IP to a pool of reserved IPs.  you can then download all
-        the IPs at a later time.`, type: 'post'},
-    {key: 'Save IP to fast pool', value: 'save_to_fast_pool', tooltip: `Save
-        the current IP to fast IP pool to increase the speed of your requests.
-        You will need to specify the size of this pool.`, type: 'post'},
-    {key: 'Null response', value: 'null_response', tooltip: `LPM will return a
-        "null response" without proxying. It is useful when users do not want
-        to make a request, but a browser expects 200 response.`, type: 'pre',
-        only_url: true, url: true},
-    {key: 'Bypass proxy', value: 'bypass_proxy', tooltip: `Requests will be
-        passed directly to target site without any proxy (super proxy or
-        peer).`, type: 'pre', only_url: true, url: true},
-    {key: 'Direct super proxy', value: 'direct', tooltip: `Requests will be
-        passed through super proxy (not through peers)`, type: 'pre',
-        only_url: true, url: true},
-    {key: 'Process data', value: 'process', only_url: true, url: true,
-        type: 'post'},
-];
-
-const pre_actions = action_types.filter(a=>!a.type||a.type=='pre')
-.map(a=>a.value);
-const pre_trigger_types = trigger_types.filter(tt=>tt.type=='pre')
-.map(tt=>tt.value);
-const is_pre_rule = rule=>{
-    return pre_actions.includes(rule.action)&&
-        pre_trigger_types.includes(rule.trigger_type);
-};
-const is_post_rule = rule=>!is_pre_rule(rule);
-const post_rule_prepare = rule=>{
+const rule_prepare = rule=>{
     const action = {};
     if (['retry', 'refresh_ip'].includes(rule.action))
         action.retry = true;
@@ -99,6 +36,12 @@ const post_rule_prepare = rule=>{
         try { action.process = JSON.parse(rule.process); }
         catch(e){ console.log('wrong json'); }
     }
+    else if (rule.action=='null_response')
+        action.null_response = true;
+    else if (rule.action=='bypass_proxy')
+        action.bypass_proxy = true;
+    else if (rule.action=='direct')
+        action.direct = true;
     if (rule.email)
         action.email = rule.email;
     let result = null;
@@ -119,30 +62,7 @@ const post_rule_prepare = rule=>{
         result.min_req_time = rule.min_req_time;
     else if (rule.trigger_type=='max_req_time' && rule.max_req_time)
         result.max_req_time = rule.max_req_time;
-    if (result)
-        result = migrate_trigger('post')(result);
     return result;
-};
-const pre_rule_prepare = rule=>{
-    const action = {[rule.action]: true};
-    if (rule.email)
-        action.email = rule.email;
-    if (rule.action=='retry_port')
-        action.retry_port = Number(rule.retry_port);
-    if (rule.action=='retry' && rule.retry_number)
-        action.retry = rule.retry_number;
-    let res = {
-        url: rule.trigger_url_regex,
-        action,
-        action_type: rule.action,
-        trigger_type: rule.trigger_type,
-    };
-    if (rule.min_req_time)
-        res.min_req_time = rule.min_req_time;
-    if (rule.switch_port)
-        res.port = +rule.switch_port;
-    res = migrate_trigger('pre')(res);
-    return res;
 };
 export const rule_map_to_form = rule=>{
     const result = {};
@@ -204,7 +124,7 @@ export default class Rules extends Pure_component {
     };
     rule_add = ()=>{
         this.setState(prev=>({
-            rules: [...prev.rules, {id: prev.max_id+1}],
+            rules: [{id: prev.max_id+1}, ...prev.rules],
             max_id: prev.max_id+1,
         }));
     };
@@ -219,26 +139,7 @@ export default class Rules extends Pure_component {
     };
     rules_update = ()=>{
         setdb.set('head.proxy_edit.rules', this.state.rules);
-        const clean = r=>{
-            delete r.type;
-            delete r.trigger_code;
-            return r;
-        };
-        const post = this.state.rules.filter(is_post_rule)
-            .map(post_rule_prepare).filter(Boolean).map(clean);
-        const pre = this.state.rules.filter(is_pre_rule)
-            .map(pre_rule_prepare).filter(Boolean).map(clean);
-        let rules = this.state.form.rules||{};
-        if (post.length)
-            rules.post = post;
-        else
-            delete rules.post;
-        if (pre.length)
-            rules.pre = pre;
-        else
-            delete rules.pre;
-        if (!rules.post && !rules.pre)
-            rules = null;
+        const rules = this.state.rules.map(rule_prepare).filter(Boolean);
         this.set_field('rules', rules);
     };
     goto_ssl = ()=>this.goto_field('ssl');
@@ -246,6 +147,8 @@ export default class Rules extends Pure_component {
     render(){
         if (!this.state.form)
             return null;
+        if (this.state.form.ext_proxies)
+            return <Note><Ext_tooltip/></Note>;
         return <div className="rules">
               {!this.state.form.ssl &&
                 <Note>
@@ -263,18 +166,29 @@ export default class Rules extends Pure_component {
                     Request debug info</a>
                 </Note>
               }
-              {this.state.rules.map(r=>
-                <Rule key={r.id} rule={r} rule_del={this.rule_del}
-                   www={this.state.www}/>
-              )}
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
                 onClick={this.rule_add}>
                 New rule
                 <i className="glyphicon glyphicon-plus"/>
               </button>
+              {this.state.rules.map(r=>
+                <Rule key={r.id} rule={r} rule_del={this.rule_del}
+                   www={this.state.www}/>
+              )}
+              <Tester_wrapper/>
             </div>;
     }
 }
+
+const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
+    render(){
+        return <div className="tester_wrapper">
+              <div className="nav_header" style={{marginBottom: 5}}>
+                <h3>Test rules before using in production</h3></div>
+              <Tester port={this.props.match.params.port} no_labels/>
+            </div>;
+    }
+});
 
 class Rule_config extends Pure_component {
     value_change = value=>{
@@ -392,6 +306,7 @@ class Action extends Pure_component {
             at.min_req_time));
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);
+        ports.unshift({key: '--Select--', value: ''});
         const fast_pool_note = <Fast_pool_note port={current_port}
           r={rule.trigger_url_regex}/>;
         if (!rule.trigger_type)
@@ -458,19 +373,19 @@ class Action_code extends Pure_component {
         console.log(val);
     };
     static getDerivedStateFromProps(props, state){
-        let prepared;
-        if (is_pre_rule(props.rule))
-            prepared = pre_rule_prepare(props.rule);
-        else if (is_post_rule(props.rule))
-            prepared = post_rule_prepare(props.rule);
+        const prepared = rule_prepare(props.rule);
         const {action_code} = migrate_action(prepared)||{};
         return {action_code};
     }
     render(){
-        return <div className="action code">
-              <Cm_wrapper on_change={this.on_change}
-                val={this.state.action_code}/>
-            </div>;
+        const tip = 'See the action as JavaScript function. Currently it is'
+        +' Read-only. We are working on support for editing.';
+        return <Tooltip title={tip}>
+              <div className="action code">
+                <Cm_wrapper on_change={this.on_change} readonly
+                  val={this.state.action_code}/>
+              </div>
+            </Tooltip>;
     }
 }
 
@@ -539,18 +454,20 @@ class Trigger_code extends Pure_component {
         {key: 'After body', value: 'after_body'},
         {key: 'Timeout', value: 'timeout'},
     ];
+    set_rule_field = (field, value)=>{
+        setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
+            field, value});
+    };
     state = {};
     static getDerivedStateFromProps(props, state){
-        let prepared;
-        if (is_pre_rule(props.rule))
-            prepared = pre_rule_prepare(props.rule);
-        else if (is_post_rule(props.rule))
-            prepared = post_rule_prepare(props.rule);
-        const {trigger_code, type} = prepared||{};
+        let prepared = rule_prepare(props.rule);
+        if (!prepared)
+            return {};
+        const {trigger_code, type} = migrate_trigger(prepared);
         return {trigger_code, type};
     }
     on_change = val=>{
-        console.log(val);
+        this.set_rule_field('trigger_code', val);
     };
     render(){
         if (!this.state.trigger_code)
@@ -558,24 +475,26 @@ class Trigger_code extends Pure_component {
         const tip = 'See the trigger as JavaScript function. Currently it is'
         +' Read-only. We are working on support for editing.';
         return <Tooltip title={tip}>
-                <div className="trigger code">
-                  <Rule_config id="_type" type="select" data={this.type_opt}
-                    disabled rule={this.props.rule} val={this.state.type}
-                    desc_style={{width: 'auto', minWidth: 'initial'}}
-                    field_row_inner_style={{paddingBottom: 6}}/>
-                  <Cm_wrapper on_change={this.on_change}
-                    val={this.state.trigger_code}/>
-                </div>
-              </Tooltip>;
+              <div className="trigger code">
+                <Rule_config id="_type" type="select" data={this.type_opt}
+                  disabled rule={this.props.rule} val={this.state.type}
+                  desc_style={{width: 'auto', minWidth: 'initial'}}
+                  field_row_inner_style={{paddingBottom: 6}}/>
+                <Cm_wrapper on_change={this.on_change} readonly
+                  val={this.state.trigger_code}/>
+              </div>
+            </Tooltip>;
     }
 }
 
-const Email_note = ({www})=><div>
+const Email_note = ({www})=>
+    <div>
       <span>You can manage the list of available emails </span>
       <a target="_blank" rel="noopener noreferrer" href={`${www}/cp/settings`}>
         here</a>
     </div>;
 
-const Btn_rule_del = ({on_click})=><Note>
+const Btn_rule_del = ({on_click})=>
+    <Note>
       <div className="btn_rule_del" onClick={on_click}/>
     </Note>;

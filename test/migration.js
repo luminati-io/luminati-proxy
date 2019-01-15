@@ -302,84 +302,74 @@ describe('migration', ()=>{
             action: {retry_port: 24001, email: 'test@test.com'},
         });
     });
-    describe_version('x.rules', v=>{
-        it('migrates correctly whole config', ()=>{
-            const proxy = {port: 24000, rules: {pre: [{
-                action: 'null_response',
-                url: '\\.(jpeg)$',
-            }]}};
-            const _conf = migrations[v]({proxies: [proxy]});
-            const expected_code = `function trigger(opt){\n`
-            +`  if (!/\\.(jpeg)$/.test(opt.url))\n`
+    describe_version('1.119.232', v=>{
+        const t = (name, proxy, expected)=>it(name, ()=>{
+            const {proxies: [_proxy]} = migrations[v]({proxies: [proxy]});
+            assert.deepEqual(_proxy, expected);
+        });
+        t('merges pre and post arrays',
+            {port: 24000, rules: {pre: [{a: 1}, {a: 2}], post: [{b: 1}]}},
+            {port: 24000, rules: [{a: 1}, {a: 2}, {b: 1}]});
+        t('takes only pre if post is undefined',
+            {port: 24000, rules: {pre: [{a: 1}, {a: 2}]}},
+            {port: 24000, rules: [{a: 1}, {a: 2}]});
+        t('takes only post if pre is undefined',
+            {port: 24000, rules: {post: [{a: 1}, {a: 2}]}},
+            {port: 24000, rules: [{a: 1}, {a: 2}]});
+        t('skips rules if both pre and post are skipped', {rules: {}}, {});
+    });
+    describe('rule -> code transformation', ()=>{
+        const t = (name, rule, code, _type)=>it(name, ()=>{
+            const _rule = migrate_trigger(rule);
+            assert.equal(_rule.trigger_code, code);
+            assert.equal(_rule.type, _type);
+        });
+        t('simple', {}, `function trigger(opt){\n`
+            +`  return true;\n}`, 'before_send');
+        t('with url', {url: 'facebook'}, `function trigger(opt){\n`
+            +`  if (!/facebook/.test(opt.url))\n`
             +`    return false;\n`
-            +`  return true;\n`
-            +`}`;
-            assert.deepEqual(_conf, {proxies: [{port: 24000, rules: {pre: [{
-                action: 'null_response',
-                url: '\\.(jpeg)$',
-                trigger_code: expected_code,
-                type: 'before_send',
-            }]}}]});
-        });
-        describe('rule -> code transformation', ()=>{
-            const t = (name, type, rule, code, _type)=>it(name, ()=>{
-                const _rule = migrate_trigger(type)(rule);
-                assert.equal(_rule.trigger_code, code);
-                assert.equal(_rule.type, _type);
-            });
-            describe('pre_rules', ()=>{
-                t('simple', 'pre', {}, `function trigger(opt){\n`
-                    +`  return true;\n}`, 'before_send');
-                t('with url', 'pre', {url: 'facebook'},
-                    `function trigger(opt){\n`
-                    +`  if (!/facebook/.test(opt.url))\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'before_send');
-                t('min_req_time / timeout', 'pre', {min_req_time: 200},
-                    `function trigger(opt){\n`
-                    +`  opt.timeout = 200;\n`
-                    +`  return true;\n}`, 'timeout');
-                t('min_req_time / timeout + url', 'pre', {min_req_time: 200,
-                    url: 'facebook'}, `function trigger(opt){\n`
-                    +`  opt.timeout = 200;\n`
-                    +`  if (!/facebook/.test(opt.url))\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'timeout');
-            });
-            describe('post_rules', ()=>{
-                t('status_code', 'post', {status: '200'},
-                    `function trigger(opt){\n`
-                    +`  if (!/200/.test(opt.status))\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'after_hdr');
-                t('status_code with url', 'post', {status: '(4|5)..',
-                    url: 'facebook'}, `function trigger(opt){\n`
-                    +`  if (!/(4|5)../.test(opt.status))\n`
-                    +`    return false;\n`
-                    +`  if (!/facebook/.test(opt.url))\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'after_hdr');
-                t('max_req_time', 'post', {max_req_time: 500},
-                    `function trigger(opt){\n`
-                    +`  if (opt.time_passed>500)\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'after_hdr');
-                t('post / min_req_time', 'post', {min_req_time: 100},
-                    `function trigger(opt){\n`
-                    +`  if (opt.time_passed<100)\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'after_hdr');
-                t('http body', 'post', {body: 'captcha'},
-                    `function trigger(opt){\n`
-                    +`  if (!/captcha/.test(opt.body))\n`
-                    +`    return false;\n`
-                    +`  return true;\n}`, 'after_body');
-                t('process data', 'post', {action: {process: {
-                    title: "$('#productTitle').text()"}}},
-                    `function trigger(opt){\n`
-                    +`  return true;\n}`, 'after_body');
-            });
-        });
+            +`  return true;\n}`, 'before_send');
+        t('min_req_time / retry', {min_req_time: 200, action_type: 'retry',
+            trigger_type: 'min_req_time'}, `function trigger(opt){\n`
+            +`  opt.timeout = 200;\n`
+            +`  return true;\n}`, 'timeout');
+        t('min_req_time / retry_port + url', {trigger_type: 'min_req_time',
+            min_req_time: 200, action_type: 'retry_port', url: 'facebook'},
+            `function trigger(opt){\n`
+            +`  opt.timeout = 200;\n`
+            +`  if (!/facebook/.test(opt.url))\n`
+            +`    return false;\n`
+            +`  return true;\n}`, 'timeout');
+        t('min_req_time ban_ip', {min_req_time: 100, action_type: 'ban_ip',
+            trigger_type: 'min_req_time'}, `function trigger(opt){\n`
+            +`  if (opt.time_passed<100)\n`
+            +`    return false;\n`
+            +`  return true;\n}`, 'after_hdr');
+        t('status_code', {status: '200'},
+            `function trigger(opt){\n`
+            +`  if (!/200/.test(opt.status))\n`
+            +`    return false;\n`
+            +`  return true;\n}`, 'after_hdr');
+        t('status_code with url', {status: '(4|5)..', url: 'facebook'},
+            `function trigger(opt){\n`
+            +`  if (!/(4|5)../.test(opt.status))\n`
+            +`    return false;\n`
+            +`  if (!/facebook/.test(opt.url))\n`
+            +`    return false;\n`
+            +`  return true;\n}`, 'after_hdr');
+        t('max_req_time', {max_req_time: 500}, `function trigger(opt){\n`
+            +`  if (opt.time_passed>500)\n`
+            +`    return false;\n`
+            +`  return true;\n}`, 'after_hdr');
+        t('http body', {body: 'captcha'}, `function trigger(opt){\n`
+            +`  if (!/captcha/.test(opt.body))\n`
+            +`    return false;\n`
+            +`  return true;\n}`, 'after_body');
+        t('process data', {action: {process: {
+            title: "$('#productTitle').text()"}}},
+            `function trigger(opt){\n`
+            +`  return true;\n}`, 'after_body');
     });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)

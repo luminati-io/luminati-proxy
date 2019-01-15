@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.119.493 Stable
+- :bug: Disabling features that dont apply to external proxies
+
 ## 1.119.232 Stable
 - :star: Rules: action code is shown along with the UI options for all rules parameters
 

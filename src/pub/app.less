@@ -236,7 +236,8 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
 .__react_component_tooltip {
     cursor: initial !important;
     white-space: normal;
-    max-width: 400px;
+    max-width: 300px;
+    text-align: left;
     &.type-info {
         color: #303942;
         background-color: white;
@@ -269,6 +270,16 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
                 border-right: 6px solid transparent;
                 top: -6px;
                 margin-left: -6px;
+            }
+        }
+        &.place-left {
+            &:after {
+                border-left-color: @tooltip;
+            }
+        }
+        &.place-right {
+            &:after {
+                border-right-color: @tooltip;
             }
         }
     }
@@ -419,11 +430,18 @@ h4 { margin: 0; }
     }
 }
 .code_mirror_wrapper {
+    position: relative;
     height: auto !important;
     padding-left: 5px !important;
     padding-right: 10px !important;
     &.error { border-color: @error_dark; }
     &.json { max-width: 300px; }
+    .copy_btn {
+        position: absolute;
+        z-index: 10;
+        top: 5px;
+        right: 5px;
+    }
 }
 select, input[type=number], input[type=text], input[type=password],
 input[type=email], textarea, .code_mirror_wrapper {
@@ -968,6 +986,16 @@ span.icon_link {
                 margin: auto;
             }
         }
+        &.disabled {
+            cursor: default;
+            color: @black;
+            .icon {
+                filter: grayscale(100%);
+            }
+            &:hover {
+                border-color: @grey_border;
+            }
+        }
     }
 }
 .proxy_edit {
@@ -1035,7 +1063,7 @@ span.icon_link {
             .rule_wrapper {
                 position: relative;
                 padding: 5px 30px 5px 5px;
-                margin-bottom: 15px;
+                margin-top: 15px;
                 border: solid 1px @grey;
                 border-radius: 4px;
                 display: grid;
@@ -1103,7 +1131,7 @@ span.icon_link {
             font-weight: bold;
             height: 40px;
         }
-        .note { margin-bottom: 0; }
+        .note { margin-bottom: 5px; }
         .desc {
             line-height: 1.07;
             padding-right: 10px;
@@ -1656,7 +1684,6 @@ span.icon_link {
 .proxy_tester {
     select, input { width: 100%; }
     height: 100%;
-    padding: 0 15px;
     .title_value_pairs {
         font-size: 14px;
         .pair {

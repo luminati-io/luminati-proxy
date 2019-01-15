@@ -10,7 +10,7 @@ import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
     Loader_small, Zone_description, Preset_description, Nav_tabs,
-    Nav_tab} from '../common.js';
+    Nav_tab, Ext_tooltip} from '../common.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import {presets} from '../util.js';
@@ -32,6 +32,8 @@ const Index = withRouter(class Index extends Pure_component {
         this.debounced_save = _.debounce(this.save, 500);
         setdb.set('head.proxy_edit.set_field', this.set_field);
         setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
+        setdb.set('head.proxy_edit.is_disabled_ext_proxy',
+            this.is_disabled_ext_proxy);
         setdb.set('head.proxy_edit.goto_field', this.goto_field);
         setdb.set('head.proxy_edit.get_curr_plan', this.get_curr_plan);
     }
@@ -100,8 +102,14 @@ const Index = withRouter(class Index extends Pure_component {
         this.setState(prev_state=>{
             const new_form = {...prev_state.form, [field_name]: value};
             return {form: new_form};
-        }, opt.skip_save ? undefined : this.debounced_save);
+        }, this.start_saving.bind(null, opt));
         setdb.set('head.proxy_edit.form.'+field_name, value);
+    };
+    start_saving = opt=>{
+        if (opt.skip_save)
+            return;
+        this.setState({saving: true}, ()=>this.lock_nav(true));
+        this.debounced_save();
     };
     is_valid_field = field_name=>{
         const proxy = this.state.consts.proxy;
@@ -138,6 +146,16 @@ const Index = withRouter(class Index extends Pure_component {
         if (field_name=='carrier')
             return permissions.includes('asn');
         return true;
+    };
+    is_disabled_ext_proxy = field_name=>{
+        const proxy = this.state.consts.proxy;
+        const form = this.state.form;
+        if (proxy && form.ext_proxies && all_fields[field_name] &&
+            !all_fields[field_name].ext)
+        {
+            return true;
+        }
+        return false;
     };
     apply_preset = (_form, preset)=>{
         const form = Object.assign({}, _form);
@@ -209,11 +227,8 @@ const Index = withRouter(class Index extends Pure_component {
     apply_rules = ({rules})=>{
         if (!rules)
             return;
-        const post = (rules.post||[]).map(rule_map_to_form);
-        const pre = (rules.pre||[]).map(rule_map_to_form);
-        const _rules = [].concat(post, pre).map((r, i)=>{
-            return {...r, id: i};
-        });
+        const _rules = rules.map(rule_map_to_form)
+        .map((r, i)=>({...r, id: i}));
         setdb.set('head.proxy_edit.rules', _rules);
     };
     set_errors = _errors=>{
@@ -237,16 +252,17 @@ const Index = withRouter(class Index extends Pure_component {
         const data = this.prepare_to_save();
         const check_url = '/api/proxy_check/'+this.props.match.params.port;
         this.saving = true;
-        this.setState({saving: true}, ()=>this.lock_nav(true));
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
                 // XXX krzysztof: use perr
                 console.log(e);
-                _this.setState({error_list: [{msg: 'Something went wrong'}],
-                    saving: false}, ()=>_this.lock_nav(false));
-                _this.saving = false;
+                _this.setState({error_list: [{msg: 'Something went wrong'}]});
                 $('#save_proxy_errors').modal('show');
+            });
+            this.on('finally', ()=>{
+                _this.setState({saving: false}, ()=>_this.lock_nav(false));
+                _this.saving = false;
             });
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
@@ -257,12 +273,7 @@ const Index = withRouter(class Index extends Pure_component {
             const errors = json_check.filter(e=>e.lvl=='err');
             _this.set_errors(errors);
             if (errors.length)
-            {
-                $('#save_proxy_errors').modal('show');
-                _this.setState({saving: false}, ()=>_this.lock_nav(false));
-                _this.saving = false;
-                return;
-            }
+                return $('#save_proxy_errors').modal('show');
             const warnings = json_check.filter(w=>w.lvl=='warn');
             if (warnings.length)
                 _this.setState({warnings});
@@ -272,8 +283,6 @@ const Index = withRouter(class Index extends Pure_component {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: data}),
             });
-            _this.setState({saving: false}, ()=>_this.lock_nav(false));
-            _this.saving = false;
             if (_this.props.match.params.port!=_this.state.form.port)
             {
                 const port = _this.state.form.port;
@@ -519,13 +528,13 @@ class Nav extends Pure_component {
 
 const Field = ({id, disabled, children, ...props})=>{
     const options = props.options||[];
-    return <div className="field">
+    return <div className="field" data-tip data-for={id+'tip'}>
           <React_tooltip id={id+'tip'} type="light" effect="solid"
             place="bottom" delayHide={300} delayUpdate={300}>
-            {children}
+            {disabled ? <Ext_tooltip/> : children}
           </React_tooltip>
-          <select data-tip data-for={id+'tip'} value={props.value}
-            disabled={disabled} onChange={e=>props.on_change(e.target.value)}>
+          <select value={props.value} disabled={disabled}
+            onChange={e=>props.on_change(e.target.value)}>
             {options.map(o=>
               <option key={o.key} value={o.value}>{o.key}</option>
             )}

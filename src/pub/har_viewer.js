@@ -751,18 +751,18 @@ class Data_container extends Pure_component {
     state = {checked_all: false};
     componentDidMount(){
         this.setdb_on('head.har_viewer.dc_top', ()=>{
-            if (this.dc)
-                this.dc.scrollTop = 0;
+            if (this.dc.current)
+                this.dc.current.scrollTop = 0;
         });
         this.setdb_on('har_viewer.checked_all', checked_all=>{
             if (checked_all!=undefined)
                 this.setState({checked_all});
         });
     }
-    set_dc_ref = ref=>{ this.dc = ref; };
     handle_viewpoint_enter = ()=>{
         this.props.fetch_missing_data('bottom');
     };
+    dc = React.createRef();
     render(){
         let {cols, open_preview, cur_preview, focused, reqs} = this.props;
         const preview_mode = !!cur_preview;
@@ -773,12 +773,12 @@ class Data_container extends Pure_component {
                 return {...c, width: 'auto'};
             return {...c, width: 0};
         });
-        return <div ref={this.set_dc_ref} className="data_container">
+        return <div ref={this.dc} className="data_container">
               <table>
                 <colgroup>
                   {cols.map((c, idx)=>
                     <col key={c.title}
-                      style={{width: !preview_mode&&idx==cols.length-1 ?
+                      style={{width: !preview_mode && idx==cols.length-1 ?
                         'auto': c.width}}/>
                   )}
                 </colgroup>
@@ -786,7 +786,7 @@ class Data_container extends Pure_component {
                   cur_preview={cur_preview}
                   checked_all={this.state.checked_all} focused={focused}/>
               </table>
-              <Waypoint key={reqs.length} scrollableAncestor={this.dc}
+              <Waypoint key={reqs.length} scrollableAncestor={this.dc.current}
                 onEnter={this.handle_viewpoint_enter}/>
             </div>;
     }
@@ -885,8 +885,12 @@ class Cell_value extends React.Component {
         }
         else if (col=='Peer proxy')
         {
+            const ext_proxy = (setdb.get('head.proxies_running')||[])
+                .some(p=>p.port==req.details.port && p.ext_proxies);
             return <Tooltip_and_value val={req.details.proxy_peer}
-                  pending={!!req.pending}/>;
+                tip={ext_proxy ? 'This feature is only available when using '
+                +'proxies by Luminati network' : req.details.proxy_peer}
+                pending={!!req.pending}/>;
         }
         else if (col=='Date')
         {

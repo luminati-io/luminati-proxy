@@ -4,7 +4,7 @@ import React from 'react';
 import Pure_component from '../../../www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {tabs} from './fields.js';
-import {Labeled_controller} from '../common.js';
+import {Labeled_controller, Ext_tooltip} from '../common.js';
 import {withRouter} from 'react-router-dom';
 
 export const Tab_context = React.createContext('logs');
@@ -13,6 +13,7 @@ export const Config = withRouter(class Config extends Pure_component {
     state = {disabled_fields: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
+    is_disabled_ext_proxy = setdb.get('head.proxy_edit.is_disabled_ext_proxy');
     on_blur = ({target: {value}})=>{
         if (this.props.validator)
             this.set_field(this.props.id, this.props.validator(value));
@@ -77,7 +78,9 @@ export const Config = withRouter(class Config extends Pure_component {
               label={tabs[tab_id].fields[id].label}
               default={_default}
               range={this.props.range}
-              tooltip={tabs[tab_id].fields[id].tooltip}/>;
+              tooltip={tabs[tab_id].fields[id].tooltip}
+              field_tooltip={disabled && this.is_disabled_ext_proxy(id) &&
+                  <Ext_tooltip/>}/>;
     }
 });
 Config.WrappedComponent.contextType = Tab_context;
