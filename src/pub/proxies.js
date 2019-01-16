@@ -652,7 +652,8 @@ class Proxies extends Pure_component {
                           <tr>
                             <th className="head_actions">
                               <Tooltip
-                                title="Delete/duplicate/refresh sessions">
+                                title={'Delete/duplicate/refresh sessions/'+
+                                'open browser'}>
                                 Actions
                               </Tooltip>
                             </th>
@@ -828,6 +829,13 @@ class Actions extends Pure_component {
             yield _this.props.update_proxies();
         });
     };
+    open_browser = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            const url = `/api/browser/${_this.props.proxy.port}`;
+            yield ajax.get(url);
+        });
+    };
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
         const delete_title = `Are you sure you want to delete proxy port
@@ -841,6 +849,9 @@ class Actions extends Pure_component {
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions}
                 tooltip="Refresh Sessions"/>
+              <Action_icon id="new-window"
+                on_click={this.open_browser}
+                tooltip="Open browser configured with this port"/>
               <Modal_dialog title={delete_title}
                 open={this.state.open_delete_dialog}
                 ok_clicked={this.delete_proxy}

@@ -10,7 +10,7 @@ import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
 import {Modal, Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
     Loader_small, Zone_description, Preset_description, Nav_tabs,
-    Nav_tab, Ext_tooltip} from '../common.js';
+    Nav_tab, Ext_tooltip, Tooltip} from '../common.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import {presets} from '../util.js';
@@ -22,7 +22,7 @@ import Rotation from './rotation.js';
 import Speed from './speed.js';
 import Headers from './headers.js';
 import Logs from './logs.js';
-import {rule_map_to_form} from './rules.js';
+import {map_rule_to_form} from './rules.js';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
@@ -227,7 +227,7 @@ const Index = withRouter(class Index extends Pure_component {
     apply_rules = ({rules})=>{
         if (!rules)
             return;
-        const _rules = rules.map(rule_map_to_form)
+        const _rules = rules.map(map_rule_to_form)
         .map((r, i)=>({...r, id: i}));
         setdb.set('head.proxy_edit.rules', _rules);
     };
@@ -397,6 +397,7 @@ const Index = withRouter(class Index extends Pure_component {
                 <div className="nav_header">
                   <Port_title port={this.props.match.params.port}
                     name={this.state.form.internal_name}/>
+                  <Open_browser_btn port={this.props.match.params.port}/>
                   <Loader_small saving={this.state.saving}
                     std_msg="All changes saved in LPM"
                     std_tooltip="All changes are automatically saved to LPM"/>
@@ -440,6 +441,24 @@ const Port_title = ({port, name})=>{
         port = port+` (${name})`;
     return <h3>Proxy on port {port}</h3>;
 };
+
+class Open_browser_btn extends Pure_component {
+    open_browser = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            const url = `/api/browser/${_this.props.port}`;
+            yield ajax.get(url);
+        });
+    };
+    render(){
+        return <Tooltip title="Open browser configured with this port">
+              <button className="btn btn_lpm btn_lpm_small open_browser_btn"
+                onClick={this.open_browser}>
+                <i className="glyphicon glyphicon-new-window"/>
+              </button>
+            </Tooltip>;
+    }
+}
 
 const Main_window = withRouter(({match})=>
     <div className="main_window">

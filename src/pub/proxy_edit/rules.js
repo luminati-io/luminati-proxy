@@ -11,6 +11,8 @@ import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
     Field_row_raw, Tooltip, Ext_tooltip} from '../common.js';
 import {tabs} from './fields.js';
 import {Tester} from '../proxy_tester.js';
+import classnames from 'classnames';
+import {Chrome_table} from '../chrome_widgets.js';
 
 const rule_prepare = rule=>{
     const action = {};
@@ -62,9 +64,18 @@ const rule_prepare = rule=>{
         result.min_req_time = rule.min_req_time;
     else if (rule.trigger_type=='max_req_time' && rule.max_req_time)
         result.max_req_time = rule.max_req_time;
+    if (result && (rule.type || rule.trigger_code))
+    {
+        const {type, trigger_code} = migrate_trigger(result);
+        if (rule.type!=type || rule.trigger_code!=trigger_code)
+        {
+            result.type = rule.type||type;
+            result.trigger_code = rule.trigger_code||trigger_code;
+        }
+    }
     return result;
 };
-export const rule_map_to_form = rule=>{
+export const map_rule_to_form = rule=>{
     const result = {};
     result.status = rule.status;
     result.trigger_url_regex = rule.url;
@@ -93,6 +104,8 @@ export const rule_map_to_form = rule=>{
         result.send_email = true;
         result.email = rule.action.email;
     }
+    result.trigger_code = rule.trigger_code;
+    result.type = rule.type;
     return result;
 };
 
@@ -129,13 +142,15 @@ export default class Rules extends Pure_component {
         }));
     };
     rule_del = id=>{
-        if (this.state.rules.length==1)
-            this.setState({rules: [{id: 0}], max_id: 0}, this.rules_update);
-        else
-        {
-            this.setState(prev=>({rules: prev.rules.filter(r=>r.id!=id)}),
-                this.rules_update);
-        }
+        this.setState(prev=>{
+            const new_state = {rules: prev.rules.filter(r=>r.id!=id)};
+            if (!new_state.rules.length)
+            {
+                new_state.rules.push({id: prev.max_id+1});
+                new_state.max_id = prev.max_id+1;
+            }
+            return new_state;
+        }, this.rules_update);
     };
     rules_update = ()=>{
         setdb.set('head.proxy_edit.rules', this.state.rules);
@@ -180,11 +195,37 @@ export default class Rules extends Pure_component {
     }
 }
 
+const cols = [
+    {id: 'trigger_type', title: 'Trigger'},
+    {id: 'action', title: 'Action'},
+];
+
+// XXX krzysztof: WIP
+//  <Rules_table rules={this.state.rules} rule_del={this.rule_del}
+//    www={this.state.www}/>
+class Rules_table extends Pure_component {
+    data = ()=>{
+        return this.props.rules;
+    };
+    render(){
+        return <Chrome_table title="Rules" cols={cols}
+              fetch_data={this.data}>
+              {d=>
+                <tr key={d.id}>
+                  <td>{d.trigger_type}</td>
+                  <td>{d.action}</td>
+                </tr>
+              }
+            </Chrome_table>;
+    }
+}
+
 const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
     render(){
         return <div className="tester_wrapper">
               <div className="nav_header" style={{marginBottom: 5}}>
-                <h3>Test rules before using in production</h3></div>
+                <h3>Test rules</h3>
+              </div>
               <Tester port={this.props.match.params.port} no_labels/>
             </div>;
     }
@@ -390,10 +431,16 @@ class Action_code extends Pure_component {
 }
 
 class Trigger extends Pure_component {
+    state = {};
     set_rule_field = (field, value)=>{
         setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
             field, value});
     };
+    componentDidMount(){
+        const rule = this.props.rule;
+        if (rule && (rule.trigger_code || rule.type))
+            this.setState({ui_blocked: true});
+    }
     trigger_changed = val=>{
         if (this.props.rule.trigger_type=='url' && val!='url' ||
             this.props.rule.trigger_type!='url' && val=='url' || !val)
@@ -418,10 +465,37 @@ class Trigger extends Pure_component {
         if (!val)
             this.set_rule_field('trigger_url_regex', '');
     };
+    trigger_code_changed = val=>{
+        this.setState({ui_blocked: true});
+        this.set_rule_field('trigger_code', val);
+    };
+    type_changed = val=>{
+        this.setState({ui_blocked: true});
+    };
+    unblock_ui = ()=>{
+        this.set_rule_field('trigger_code', undefined);
+        this.set_rule_field('type', undefined);
+        this.setState({ui_blocked: false});
+    };
     render(){
         const {rule} = this.props;
+        const {ui_blocked} = this.state;
+        let tip = ' ';
+        if (ui_blocked)
+        {
+            tip = `Trigger funciton was modified. Click 'restore' to generate
+                it based on your selections.`;
+        }
         return <React.Fragment>
               <div className="trigger ui">
+                <Tooltip title={tip}>
+                <div className={classnames('mask', {active: ui_blocked})}>
+                  <button className="btn btn_lpm btn_lpm_small reset_btn"
+                    onClick={this.unblock_ui}>
+                    Restore
+                  </button>
+                </div>
+                </Tooltip>
                 <Rule_config id="trigger_type" type="select"
                   data={trigger_types} on_change={this.trigger_changed}
                   rule={rule}/>
@@ -442,7 +516,8 @@ class Trigger extends Pure_component {
                   <Rule_config id="trigger_url_regex" type="regex"
                     rule={rule} style={{width: '100%'}}/>}
               </div>
-              <Trigger_code rule={rule}/>
+              <Trigger_code rule={rule} type_changed={this.type_changed}
+                trigger_code_changed={this.trigger_code_changed}/>
             </React.Fragment>;
     }
 }
@@ -454,36 +529,31 @@ class Trigger_code extends Pure_component {
         {key: 'After body', value: 'after_body'},
         {key: 'Timeout', value: 'timeout'},
     ];
-    set_rule_field = (field, value)=>{
-        setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
-            field, value});
-    };
     state = {};
     static getDerivedStateFromProps(props, state){
-        let prepared = rule_prepare(props.rule);
+        const rule = props.rule;
+        let prepared = rule_prepare(rule);
         if (!prepared)
-            return {};
-        const {trigger_code, type} = migrate_trigger(prepared);
+            return {trigger_code: null};
+        let {trigger_code, type} = migrate_trigger(prepared);
+        if (rule && rule.type)
+            type = rule.type;
+        if (rule && rule.trigger_code)
+            trigger_code = rule.trigger_code;
         return {trigger_code, type};
     }
-    on_change = val=>{
-        this.set_rule_field('trigger_code', val);
-    };
     render(){
         if (!this.state.trigger_code)
             return null;
-        const tip = 'See the trigger as JavaScript function. Currently it is'
-        +' Read-only. We are working on support for editing.';
-        return <Tooltip title={tip}>
-              <div className="trigger code">
-                <Rule_config id="_type" type="select" data={this.type_opt}
-                  disabled rule={this.props.rule} val={this.state.type}
-                  desc_style={{width: 'auto', minWidth: 'initial'}}
-                  field_row_inner_style={{paddingBottom: 6}}/>
-                <Cm_wrapper on_change={this.on_change} readonly
-                  val={this.state.trigger_code}/>
-              </div>
-            </Tooltip>;
+        return <div className="trigger code">
+              <Rule_config id="type" type="select" data={this.type_opt}
+                rule={this.props.rule} val={this.state.type}
+                desc_style={{width: 'auto', minWidth: 'initial'}}
+                on_change={this.props.type_changed}
+                field_row_inner_style={{paddingBottom: 6}}/>
+              <Cm_wrapper on_change={this.props.trigger_code_changed}
+                val={this.state.trigger_code}/>
+            </div>;
     }
 }
 
@@ -495,6 +565,4 @@ const Email_note = ({www})=>
     </div>;
 
 const Btn_rule_del = ({on_click})=>
-    <Note>
-      <div className="btn_rule_del" onClick={on_click}/>
-    </Note>;
+    <div className="btn_rule_del" onClick={on_click}/>;

@@ -101,7 +101,7 @@ export const tabs = {
         tooltip: 'Define custom action for specific rule',
         fields: {
             trigger_type: {
-                label: 'Rule type',
+                label: 'Trigger',
                 tooltip: `In every request the response will be analyzed.
                     if the configured Trigger rule is true, the Action
                     will be executed automatically`,
@@ -136,7 +136,7 @@ export const tabs = {
                 tooltip: `Status code to be scanned in the response headers`,
             },
             action: {
-                label: 'Action type',
+                label: 'Action',
                 tooltip: `The action to be executed when rule is met`,
             },
             fast_pool_size: {
@@ -146,8 +146,8 @@ export const tabs = {
                     use IPs from the fast IPs pool to route requests`,
             },
             retry_number: {
-                label: 'Number of retries',
-                tooltip: 'maximum number of retries to execute',
+                label: 'Retries',
+                tooltip: 'Maximum number of retries to execute',
                 placeholder: `e.g. '5'`,
             },
             retry_port: {
@@ -164,8 +164,14 @@ export const tabs = {
                 tooltip: `Ban the IP for a defined amount of time. Choose 0 to
                     ban pernamentaly`,
             },
-            _type: {
-                label: 'Trigger type',
+            type: {
+                label: 'Schedule',
+                tooltip: `The timing of trigger function execution. You can try
+                    to activate the rule before sending the request (based on
+                    URL), after receiving headers (if you want to check status
+                    code or any specific headers, after body (if you want to
+                    check the whole response), or after specified amount of
+                    time (to timeout the request and retry).`,
             },
             process: {label: 'Processing rule'},
             send_email: {

@@ -140,7 +140,7 @@ class Request extends Pure_component {
                   <Tooltip title="Send a test request">
                     <button onClick={this.go} disabled={this.state.lock}
                       className="btn btn_lpm btn_lpm_primary">
-                      {this.state.lock ? 'Saving proxy' : 'Send'}
+                      {this.state.lock ? 'Saving proxy' : 'Test'}
                     </button>
                   </Tooltip>
                 </div>

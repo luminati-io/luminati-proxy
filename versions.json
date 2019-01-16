@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.119.617",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "New buttons and endpoint on API for opening a new browser configured with a determined port"
+            },
+            {
+                "type": "star",
+                "text": "Rules: tigger code is now editible"
+            }
+        ]
+    },
+    {
         "ver": "1.119.493",
         "type": "stable",
         "changes": [

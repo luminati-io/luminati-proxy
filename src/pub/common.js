@@ -707,8 +707,11 @@ export class Cm_wrapper extends Pure_component {
         this.cm.doc.setValue(this.props.val||'');
     }
     componentDidUpdate(prev_props){
-        if (prev_props.val!=this.props.val)
+        if (prev_props.val!=this.props.val &&
+            this.cm.doc.getValue()!=this.props.val)
+        {
             this.cm.doc.setValue(this.props.val||'');
+        }
     }
     on_cm_change = cm=>{
         const new_val = cm.doc.getValue();
@@ -910,7 +913,9 @@ export class Tooltip extends Pure_component {
             return;
         $(this.ref).tooltip();
     }
-    componentWillUnmount(){ $(this.ref).tooltip('destroy'); }
+    componentWillUnmount(){
+        $(this.ref).tooltip('destroy');
+    }
     componentDidUpdate(){
         $(this.ref).attr('title', this.props.title).tooltip('fixTitle'); }
     on_mouse_leave(){

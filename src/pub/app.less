@@ -1018,6 +1018,9 @@ span.icon_link {
         .nav_header {
             display: flex;
             align-items: center;
+            .open_browser_btn {
+                margin: 5px 0 0 5px;
+            }
         }
     }
     .nav {
@@ -1062,28 +1065,35 @@ span.icon_link {
             .desc { width: 200px; min-width: 200px; }
             .rule_wrapper {
                 position: relative;
-                padding: 5px 30px 5px 5px;
                 margin-top: 15px;
                 border: solid 1px @grey;
                 border-radius: 4px;
                 display: grid;
                 grid-template-columns: auto 1fr;
                 grid-template-rows: auto auto;
-                .action, .trigger, .ui, .code {
-                    padding: 3px;
+                .action, .trigger, .ui, .code { padding: 8px; }
+                .trigger.ui {
+                    position: relative;
+                    .mask {
+                        position: absolute;
+                        background-color: rgba(0, 0, 0, 0.05);
+                        border-top-left-radius: 2px;
+                        width: 100%;
+                        height: 100%;
+                        top: 0;
+                        left: 0;
+                        z-index: 5;
+                        display: none;
+                        &.active { display: block; }
+                        .reset_btn {
+                            position: absolute;
+                            right: 9px;
+                            top: 11px;
+                        }
+                    }
                 }
-                .trigger {
-                    padding-bottom: 8px;
-                }
-                .action {
-                    padding-top: 8px;
-                    border-top: 1px solid @grey;
-                }
-                .ui {
-                    padding-right: 8px;
-                }
+                .action { border-top: 1px solid @grey; }
                 .code {
-                    padding-left: 8px;
                     border-left: 1px solid @grey;
                     overflow: hidden;
                 }
@@ -1298,7 +1308,7 @@ span.icon_link {
         .panel_body { position: relative; }
         .proxies_table_wrapper {
             overflow-x: auto;
-            margin-left: 64px;
+            margin-left: 76px;
             overflow-y: visible;
         }
         table {
@@ -1318,7 +1328,7 @@ span.icon_link {
             td.port { width: 1px; }
         }
         .head_actions {
-            width: 64px;
+            width: 76px;
             position: absolute;
             left: 5px;
         }
@@ -1330,7 +1340,7 @@ span.icon_link {
                 }
             }
             .proxies_actions {
-                width: 64px;
+                width: 76px;
                 position: absolute;
                 left: 5px;
                 text-overflow: initial;

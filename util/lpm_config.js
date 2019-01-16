@@ -49,6 +49,9 @@ conf.luminati_default = {
     socket_inactivity_timeout: date.ms.MIN,
     last_preset_applied: 'session_long',
     keep_alive: false,
+    multiply_ips: false,
+    multiply_vips: false,
+    multiply: 1,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.luminati_default, 'port'), {
