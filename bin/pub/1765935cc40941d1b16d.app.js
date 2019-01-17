@@ -53385,11 +53385,6 @@ var Rules = function (_Pure_component) {
             var _this3 = this;
 
             if (!this.state.form) return null;
-            if (this.state.form.ext_proxies) return _react2.default.createElement(
-                _common.Note,
-                null,
-                _react2.default.createElement(_common.Ext_tooltip, null)
-            );
             return _react2.default.createElement(
                 'div',
                 { className: 'rules' },

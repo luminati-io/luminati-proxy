@@ -162,8 +162,6 @@ export default class Rules extends Pure_component {
     render(){
         if (!this.state.form)
             return null;
-        if (this.state.form.ext_proxies)
-            return <Note><Ext_tooltip/></Note>;
         return <div className="rules">
               {!this.state.form.ssl &&
                 <Note>

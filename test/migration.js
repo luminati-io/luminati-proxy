@@ -318,6 +318,22 @@ describe('migration', ()=>{
             {port: 24000, rules: [{a: 1}, {a: 2}]});
         t('skips rules if both pre and post are skipped', {rules: {}}, {});
     });
+    describe_version('1.119.617', v=>{
+        const t = (name, rule, _rule)=>it(name, ()=>{
+            const {proxies: [_proxy]} = migrations[v]({
+                proxies: [{port: 24000, rules: [rule]}]});
+            assert.deepEqual(_proxy, {port: 24000, rules: [_rule]});
+        });
+        t('delete url if its *', {url: '*', action: {null_response: true}},
+            {action: {null_response: true}});
+        t('delete url if its **', {url: '**', action: {null_response: true}},
+            {action: {null_response: true}});
+        t('does not change if url doesnt exists',
+            {action: {null_response: true}}, {action: {null_response: true}});
+        t('does not change if url is correct', {url: 'x',
+            action: {null_response: true}}, {url: 'x',
+            action: {null_response: true}});
+    });
     describe('rule -> code transformation', ()=>{
         const t = (name, rule, code, _type)=>it(name, ()=>{
             const _rule = migrate_trigger(rule);

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.119.681 Stable
+- :bug: Fixed rules with external proxies
+
 ## 1.119.617 Stable
 - :star: New buttons and endpoint on API for opening a new browser configured with a determined port
 - :star: Rules: tigger code is now editible
