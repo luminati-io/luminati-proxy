@@ -206,8 +206,7 @@ class Rules_table extends Pure_component {
         return this.props.rules;
     };
     render(){
-        return <Chrome_table title="Rules" cols={cols}
-              fetch_data={this.data}>
+        return <Chrome_table title="Rules" cols={cols} fetch_data={this.data}>
               {d=>
                 <tr key={d.id}>
                   <td>{d.trigger_type}</td>

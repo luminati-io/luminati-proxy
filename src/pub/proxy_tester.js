@@ -48,7 +48,7 @@ class Request extends Pure_component {
     componentDidMount(){
         const params = this.props.history.location.state||{};
         const url = params.url||this.state.params.url;
-        const port = params.port;
+        const port = this.props.port||params.port;
         this.setState({params: {url, port}});
         this.setdb_on('head.lock_navigation', lock=>this.setState({lock}));
     }

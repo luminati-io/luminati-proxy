@@ -24544,7 +24544,7 @@ var Request = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(func
 
             var params = this.props.history.location.state || {};
             var url = params.url || this.state.params.url;
-            var port = params.port;
+            var port = this.props.port || params.port;
             this.setState({ params: { url: url, port: port } });
             this.setdb_on('head.lock_navigation', function (lock) {
                 return _this4.setState({ lock: lock });
@@ -53490,8 +53490,7 @@ var Rules_table = function (_Pure_component2) {
         value: function render() {
             return _react2.default.createElement(
                 _chrome_widgets.Chrome_table,
-                { title: 'Rules', cols: cols,
-                    fetch_data: this.data },
+                { title: 'Rules', cols: cols, fetch_data: this.data },
                 function (d) {
                     return _react2.default.createElement(
                         'tr',
