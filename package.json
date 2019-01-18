@@ -211,6 +211,7 @@
       "bin/pub/img/icon_explorer.png",
       "bin/pub/img/icon_firefox.jpg",
       "bin/pub/img/icon_safari.jpg",
+      "bin/pub/img/ic_browse.svg",
       "bin/pub/img/ic_browser.svg",
       "bin/pub/img/ic_cancel.svg",
       "bin/pub/img/ic_checkmark.svg",
@@ -348,7 +349,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "0aaa677ea2a5102e8201623e0c342a4e"
+    "md5": "e807575efd1239ff76c950a5154c843e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -384,5 +385,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.119.748"
+  "version": "1.119.855"
 }

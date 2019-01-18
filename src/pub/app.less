@@ -663,9 +663,19 @@ span.icon_link {
     border-radius: 2px;
     font-size: 14px;
     position: relative;
+    .img_icon {
+        background-size: contain;
+        background-position: bottom;
+        background-repeat: no-repeat;
+        width: 90%;
+        height: 90%;
+    }
     &:hover {
         background-color: @first_color;
         color: white;
+        .img_icon {
+            filter: grayscale(100%) brightness(3);
+        }
     }
     &.right i { left: 1px; }
     &.top i { top: 0; }
@@ -1018,9 +1028,6 @@ span.icon_link {
         .nav_header {
             display: flex;
             align-items: center;
-            .open_browser_btn {
-                margin: 5px 0 0 5px;
-            }
         }
     }
     .nav {
@@ -1036,6 +1043,23 @@ span.icon_link {
             direction: rtl;
             .btn_save { margin-right: 0; order: 1; }
             .btn_cancel { margin-left: 0; order: 2; }
+        }
+        .btn_browse {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .browse_icon {
+                background: url(/img/ic_browse.svg);
+                width: 18px;
+                height: 18px;
+                background-size: contain;
+                margin-left: 3px;
+            }
+            &:hover {
+               .browse_icon {
+                   filter: grayscale(100%) brightness(3);
+               }
+            }
         }
     }
     .warnings_modal {

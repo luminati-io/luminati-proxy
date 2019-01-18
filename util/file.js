@@ -436,11 +436,12 @@ E.is_exec = path=>{
     catch(e){ return false; }
     return true;
 };
-E.which = bin=>{
+E.which = (bin, env)=>{
     bin = E.normalize(bin);
     if (E.is_absolute(bin)&&E.is_exec(bin))
         return bin;
-    let paths = process.env.PATH.split(E.is_win ? ';' : ':');
+    env = env||process.env;
+    let paths = env.PATH.split(E.is_win ? ';' : ':');
     for (let i=0; i<paths.length; i++)
     {
         let filename = E.normalize(`${paths[i]}/${bin}`);

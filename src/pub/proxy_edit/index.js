@@ -397,7 +397,6 @@ const Index = withRouter(class Index extends Pure_component {
                 <div className="nav_header">
                   <Port_title port={this.props.match.params.port}
                     name={this.state.form.internal_name}/>
-                  <Open_browser_btn port={this.props.match.params.port}/>
                   <Loader_small saving={this.state.saving}
                     std_msg="All changes saved in LPM"
                     std_tooltip="All changes are automatically saved to LPM"/>
@@ -451,10 +450,11 @@ class Open_browser_btn extends Pure_component {
         });
     };
     render(){
-        return <Tooltip title="Open browser configured with this port">
-              <button className="btn btn_lpm btn_lpm_small open_browser_btn"
+        return <Tooltip title="Open browser configured with this port"
+              placement="bottom">
+              <button className="btn btn_lpm btn_browse"
                 onClick={this.open_browser}>
-                <i className="glyphicon glyphicon-new-window"/>
+                Browse <div className="icon browse_icon"></div>
               </button>
             </Tooltip>;
     }
@@ -541,6 +541,7 @@ class Nav extends Pure_component {
                 value={preset} disabled={this.props.disabled} id="preset">
                 <Preset_description preset={preset} rule_clicked={()=>0}/>
               </Field>
+              <Open_browser_btn port={this.props.form.port}/>
             </div>;
     }
 }

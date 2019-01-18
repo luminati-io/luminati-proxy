@@ -849,9 +849,10 @@ class Actions extends Pure_component {
               <Action_icon id="refresh"
                 on_click={this.refresh_sessions}
                 tooltip="Refresh Sessions"/>
-              <Action_icon id="new-window"
+              <Action_icon id="browse"
                 on_click={this.open_browser}
-                tooltip="Open browser configured with this port"/>
+                tooltip="Open browser configured with this port"
+                img="/img/ic_browse.svg"/>
               <Modal_dialog title={delete_title}
                 open={this.state.open_delete_dialog}
                 ok_clicked={this.delete_proxy}
@@ -861,13 +862,14 @@ class Actions extends Pure_component {
 }
 
 const Action_icon = ({on_click, disabled, invisible, id, tooltip,
-    tooltip_disabled})=>
+    tooltip_disabled, img})=>
 {
     const classes = classnames('action_icon', {disabled, invisible});
     if (disabled)
         tooltip = tooltip_disabled;
     return <Link_icon tooltip={tooltip} on_click={on_click} id={id}
-          classes={classes} invisible={invisible} disabled={disabled}/>;
+          classes={classes} invisible={invisible} disabled={disabled}
+          img={img}/>;
 };
 
 export default Proxies;

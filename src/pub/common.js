@@ -954,16 +954,21 @@ export class Tooltip extends Pure_component {
 }
 
 export const Link_icon = props=>{
-    let {tooltip, on_click, id, classes, disabled, invisible, small} = props;
+    let {tooltip, on_click, id, classes, disabled, invisible, small, img} =
+        props;
     if (invisible)
         tooltip = '';
     if (disabled||invisible)
         on_click = ()=>null;
     classes = classnames(classes, {small});
+    const icon = img
+        ? <div className="img_icon"
+            style={{backgroundImage: `url(${img})`}}></div>
+        : <i className={classnames('glyphicon', 'glyphicon-'+id)}/>;
     return <Tooltip title={tooltip} key={id}>
           <span className={classnames('link', 'icon_link', classes)}
             onClick={on_click}>
-            <i className={classnames('glyphicon', 'glyphicon-'+id)}/>
+            {icon}
           </span>
         </Tooltip>;
 };

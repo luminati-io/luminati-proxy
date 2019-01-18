@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.119.855 Stable
+- :bug: Fixed db errors
+
 ## 1.119.748 Stable
 - :bug: Fixed default port in rules tester
 
