@@ -67,14 +67,16 @@ E.init_args = args=>{
     const defaults = Object.assign({}, lpm_config.manager_default,
         parse_env_params(process.env, lpm_config.proxy_fields));
     args = (args||process.argv.slice(2)).map(String);
-    const argv = yargs(args).usage(usage.join(' \n'))
+    const argv = yargs(args)
+    .usage(usage.join(' \n'))
     .options(lpm_config.proxy_fields)
     .describe(added_descriptions)
     .number(lpm_config.numeric_fields)
     .default(defaults)
     .help('h')
     .alias({'help': ['h', '?'], port: 'p', daemon: 'd', 'version': 'v'})
-    .version(()=>`luminati-proxy version: ${pkg.version}`).argv;
+    .version(()=>pkg.version)
+    .argv;
     argv.native_args = args;
     if (argv.log instanceof Array)
         argv.log = argv.log.pop();

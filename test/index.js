@@ -963,7 +963,7 @@ describe('proxy', ()=>{
                 l = yield lum({rules: []});
                 const cr_stub = sinon.stub(l.rules, 'can_retry')
                     .returns(false);
-                const email_stub = sinon.stub(l, '_send_rule_mail');
+                const email_stub = sinon.stub(l, 'send_email');
                 const rps_stub = sinon.stub(l.session_mgr,
                     'add_reserve_pool_session');
                 const fps_stub = sinon.stub(l.session_mgr,

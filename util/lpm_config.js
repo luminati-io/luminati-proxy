@@ -24,7 +24,8 @@ const conf = {
     credential_fields: qw`customer zone password token token_auth`,
     default_superproxy_domain: 'zproxy.lum-superproxy.io',
 };
-conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields);
+conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
+    'version');
 conf.proxy_params = _(swagger.definitions.proxy.properties).pickBy(
     k=>!conf.credential_fields.includes(k)).keys().value();
 conf.luminati_default = {

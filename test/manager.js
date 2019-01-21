@@ -526,4 +526,14 @@ describe('manager', ()=>{
             t(24004, 'static_pass');
         }));
     });
+    describe('flags', ()=>{
+        it('exits immediately with version on -v', etask._fn(function*(_this){
+            const exec = require('child_process').execFile;
+            exec('node', ['./bin/index.js', '--version'], (err, res)=>{
+                this.continue();
+                assert.equal(res, pkg.version+'\n');
+            });
+            yield this.wait();
+        }));
+    });
 });

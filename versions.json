@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.120.149",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed installation script"
+            }
+        ]
+    },
+    {
         "ver": "1.119.886",
         "type": "stable",
         "changes": [

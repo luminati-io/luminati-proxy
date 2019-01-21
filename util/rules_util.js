@@ -130,7 +130,7 @@ const get_action = rule=>{
     if (!rule.action)
         return '';
     if (rule.action.email)
-        body += `opt.notify({mail: ${rule.action.email}});\n`;
+        body += `opt.notify({mail: '${rule.action.email}'});\n`;
     if (rule.action.retry)
         body += `opt.retry(${+rule.action.retry});\n`;
     if (rule.action.retry_port)

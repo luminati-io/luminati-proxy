@@ -1528,5 +1528,16 @@ E.interval = function(opt, states){
     }
     throw new Error('unexpected mode '+opt.mode);
 };
-
+E._class = function(cls){
+    var proto = cls.prototype, keys = Object.getOwnPropertyNames(proto);
+    for (var i=0; i<keys.length; i++)
+    {
+        var key = keys[i];
+        var p = proto[key];
+        if (p && p.constructor && p.constructor.name=='GeneratorFunction')
+            proto[key] = E._fn(p);
+    }
+    return cls;
+};
+    
 return Etask; }); }());

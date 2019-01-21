@@ -4701,7 +4701,18 @@ E.interval = function(opt, states){
     }
     throw new Error('unexpected mode '+opt.mode);
 };
-
+E._class = function(cls){
+    var proto = cls.prototype, keys = Object.getOwnPropertyNames(proto);
+    for (var i=0; i<keys.length; i++)
+    {
+        var key = keys[i];
+        var p = proto[key];
+        if (p && p.constructor && p.constructor.name=='GeneratorFunction')
+            proto[key] = E._fn(p);
+    }
+    return cls;
+};
+    
 return Etask; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }());
 
@@ -54142,7 +54153,7 @@ const get_action = rule=>{
     if (!rule.action)
         return '';
     if (rule.action.email)
-        body += `opt.notify({mail: ${rule.action.email}});\n`;
+        body += `opt.notify({mail: '${rule.action.email}'});\n`;
     if (rule.action.retry)
         body += `opt.retry(${+rule.action.retry});\n`;
     if (rule.action.retry_port)

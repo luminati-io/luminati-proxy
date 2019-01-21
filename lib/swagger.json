@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.119.886",
+        "version": "1.120.149",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -557,10 +557,6 @@
                 "session_termination": {
                     "type": "boolean",
                     "description": "Stop sending new requests when the peer IP becomes unavailable and redirect to confimration page before new IP is taken"
-                },
-                "version": {
-                    "type": "string",
-                    "description": "last run LPM version"
                 }
             }
         },
