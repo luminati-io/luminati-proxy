@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.119.886",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Rules: added a new action - banning IPs per domains"
+            }
+        ]
+    },
+    {
         "ver": "1.119.855",
         "type": "stable",
         "changes": [

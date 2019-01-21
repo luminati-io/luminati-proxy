@@ -35,6 +35,9 @@ E.action_types = [
     {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
         amount of time. Usually used for failed requests.`, min_req_time: true,
         type: 'post'},
+    {key: 'Ban IP per domain', value: 'ban_ip_domain', tooltip: `Will ban the
+        IP for custom amount of time per domain.`, min_req_time: true,
+        type: 'post'},
     {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
         Data Center IP with new allocated IP. This action contain
         additional charges. View the cost of IP refreshing in your zones
@@ -134,6 +137,11 @@ const get_action = rule=>{
         body += `opt.retry({port: ${rule.action.retry_port}});\n`;
     if (rule.action.ban_ip)
         body += `opt.ban_ip({ts: ${rule.action.ban_ip}});\n`;
+    if (rule.action.ban_ip_domain)
+    {
+        body += `opt.ban_ip({ts: ${rule.action.ban_ip_domain}, `
+        +`per_domain: true});\n`;
+    }
     if (rule.action.refresh_ip)
         body += `opt.refresh_ip();\n`;
     if (rule.action.reserve_session)

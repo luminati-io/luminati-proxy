@@ -53254,7 +53254,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var rule_prepare = function rule_prepare(rule) {
     var action = {};
     if (['retry', 'refresh_ip'].includes(rule.action)) action.retry = true;
-    if (rule.action == 'retry' && rule.retry_number) action.retry = rule.retry_number;else if (rule.action == 'retry_port') action.retry_port = Number(rule.retry_port);else if (rule.action == 'ban_ip') action.ban_ip = (rule.ban_ip_duration || 0) * _date.ms.MIN;else if (rule.action == 'refresh_ip') action.refresh_ip = true;else if (rule.action == 'save_to_pool') action.reserve_session = true;else if (rule.action == 'save_to_fast_pool') {
+    if (rule.action == 'retry' && rule.retry_number) action.retry = rule.retry_number;else if (rule.action == 'retry_port') action.retry_port = Number(rule.retry_port);else if (rule.action == 'ban_ip') action.ban_ip = (rule.ban_ip_duration || 0) * _date.ms.MIN;else if (rule.action == 'ban_ip_domain') action.ban_ip_domain = (rule.ban_ip_duration || 0) * _date.ms.MIN;else if (rule.action == 'refresh_ip') action.refresh_ip = true;else if (rule.action == 'save_to_pool') action.reserve_session = true;else if (rule.action == 'save_to_fast_pool') {
         action.fast_pool_session = true;
         action.fast_pool_size = rule.fast_pool_size;
     } else if (rule.action == 'process') {
@@ -53298,13 +53298,8 @@ var rule_prepare = function rule_prepare(rule) {
     result.retry_port = rule.action.retry_port;
     result.retry_number = rule.action.retry;
     if (rule.action.fast_pool_session) result.fast_pool_size = rule.action.fast_pool_size;
-    if (rule.action.ban_ip) {
-        result.ban_ip_duration = rule.action.ban_ip / _date.ms.MIN;
-        if (result.ban_ip_domain = !!rule.action.ban_ip_domain_reqs) {
-            result.ban_ip_domain_reqs = rule.action.ban_ip_domain_reqs;
-            result.ban_ip_domain_time = rule.action.ban_ip_domain_time / _date.ms.MIN;
-        }
-    }
+    if (rule.action.ban_ip) result.ban_ip_duration = rule.action.ban_ip / _date.ms.MIN;
+    if (rule.action.ban_ip_domain) result.ban_ip_duration = rule.action.ban_ip_domain / _date.ms.MIN;
     if (rule.action.process) result.process = JSON.stringify(rule.action.process, null, '  ');
     if (rule.action.email) {
         result.send_email = true;
@@ -53681,7 +53676,7 @@ var Action = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(funct
                 })[0];
                 _this7.set_rule_field(val, def_port && def_port.value || '');
             }
-            if (val != 'ban_ip') _this7.set_rule_field('ban_ip_duration', '');
+            if (val != 'ban_ip' && val != 'ban_ip_domain') _this7.set_rule_field('ban_ip_duration', '');
             if (!val) {
                 _this7.set_rule_field('email', '');
                 _this7.set_rule_field('send_email', false);
@@ -53750,7 +53745,7 @@ var Action = (0, _common.with_proxy_ports)((0, _reactRouterDom.withRouter)(funct
                         rule: rule }),
                     rule.action == 'switch_port' && _react2.default.createElement(Rule_config, { id: 'switch_port', type: 'select', data: ports,
                         rule: rule }),
-                    rule.action == 'ban_ip' && _react2.default.createElement(Rule_config, { id: 'ban_ip_duration', type: 'select_number',
+                    (rule.action == 'ban_ip' || rule.action == 'ban_ip_domain') && _react2.default.createElement(Rule_config, { id: 'ban_ip_duration', type: 'select_number',
                         data: [0, 1, 5, 10, 30, 60], sufix: 'minutes', rule: rule,
                         note: _react2.default.createElement(Ban_ips_note, null) }),
                     rule.action == 'save_to_fast_pool' && _react2.default.createElement(Rule_config, { id: 'fast_pool_size', type: 'select_number',
@@ -54052,6 +54047,9 @@ E.action_types = [
     {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
         amount of time. Usually used for failed requests.`, min_req_time: true,
         type: 'post'},
+    {key: 'Ban IP per domain', value: 'ban_ip_domain', tooltip: `Will ban the
+        IP for custom amount of time per domain.`, min_req_time: true,
+        type: 'post'},
     {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
         Data Center IP with new allocated IP. This action contain
         additional charges. View the cost of IP refreshing in your zones
@@ -54151,6 +54149,11 @@ const get_action = rule=>{
         body += `opt.retry({port: ${rule.action.retry_port}});\n`;
     if (rule.action.ban_ip)
         body += `opt.ban_ip({ts: ${rule.action.ban_ip}});\n`;
+    if (rule.action.ban_ip_domain)
+    {
+        body += `opt.ban_ip({ts: ${rule.action.ban_ip_domain}, `
+        +`per_domain: true});\n`;
+    }
     if (rule.action.refresh_ip)
         body += `opt.refresh_ip();\n`;
     if (rule.action.reserve_session)
@@ -56774,7 +56777,7 @@ var Nav = function Nav(_ref3) {
     );
 };
 
-var banned_ips_cols = [{ id: 'ip', title: 'IP' }, { id: 'ms', title: 'Expire' }];
+var banned_ips_cols = [{ id: 'ip', title: 'IP' }, { id: 'domain', title: 'Domain' }, { id: 'ms', title: 'Expire' }];
 
 var Banned_ips = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
     (0, _inherits3.default)(Banned_ips, _Pure_component2);
@@ -56837,6 +56840,11 @@ var Banned_ips = (0, _reactRouterDom.withRouter)(function (_Pure_component2) {
                             'td',
                             null,
                             d.ip
+                        ),
+                        _react2.default.createElement(
+                            'td',
+                            null,
+                            d.domain || ' - '
                         ),
                         _react2.default.createElement(
                             'td',

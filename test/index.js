@@ -96,9 +96,9 @@ describe('proxy', ()=>{
             proxy.fake = false;
             req = req();
             l = yield lum(opt);
-            let res = yield l.test(req);
+            const res = yield l.test(req);
             assert.equal(ping.history.length, 1);
-            let expected = {statusCode: 200, statusMessage: 'PONG'};
+            const expected = {statusCode: 200, statusMessage: 'PONG'};
             if (req.body)
                 Object.assign(expected, {body: req.body});
             assert_has(res, expected, 'res');
@@ -571,7 +571,7 @@ describe('proxy', ()=>{
                 l = yield lum(Object.assign({history: true,
                     handle_usage: aggregator}, opt));
                 assert.equal(history.length, 0);
-                let res = yield l.test(_url());
+                const res = yield l.test(_url());
                 yield etask.sleep(400);
                 res.socket.destroy();
                 assert.equal(history.length, 1);

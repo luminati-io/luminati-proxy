@@ -8,7 +8,7 @@ import {migrate_trigger, migrate_action, trigger_types,
 import {ms} from '../../../util/date.js';
 import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
-    Field_row_raw, Tooltip, Ext_tooltip} from '../common.js';
+    Field_row_raw, Tooltip} from '../common.js';
 import {tabs} from './fields.js';
 import {Tester} from '../proxy_tester.js';
 import classnames from 'classnames';
@@ -24,6 +24,8 @@ const rule_prepare = rule=>{
         action.retry_port = Number(rule.retry_port);
     else if (rule.action=='ban_ip')
         action.ban_ip = (rule.ban_ip_duration||0)*ms.MIN;
+    else if (rule.action=='ban_ip_domain')
+        action.ban_ip_domain = (rule.ban_ip_duration||0)*ms.MIN;
     else if (rule.action=='refresh_ip')
         action.refresh_ip = true;
     else if (rule.action=='save_to_pool')
@@ -89,14 +91,9 @@ export const map_rule_to_form = rule=>{
     if (rule.action.fast_pool_session)
         result.fast_pool_size = rule.action.fast_pool_size;
     if (rule.action.ban_ip)
-    {
         result.ban_ip_duration = rule.action.ban_ip/ms.MIN;
-        if (result.ban_ip_domain = !!rule.action.ban_ip_domain_reqs)
-        {
-            result.ban_ip_domain_reqs = rule.action.ban_ip_domain_reqs;
-            result.ban_ip_domain_time = rule.action.ban_ip_domain_time/ms.MIN;
-        }
-    }
+    if (rule.action.ban_ip_domain)
+        result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
     if (rule.action.process)
         result.process = JSON.stringify(rule.action.process, null, '  ');
     if (rule.action.email)
@@ -311,7 +308,7 @@ class Action extends Pure_component {
                 p.value!=this.props.match.params.port)[0];
             this.set_rule_field(val, def_port && def_port.value || '');
         }
-        if (val!='ban_ip')
+        if (val!='ban_ip' && val!='ban_ip_domain')
             this.set_rule_field('ban_ip_duration', '');
         if (!val)
         {
@@ -367,7 +364,7 @@ class Action extends Pure_component {
                   <Rule_config id="switch_port" type="select" data={ports}
                     rule={rule}/>
                 }
-                {rule.action=='ban_ip' &&
+                {(rule.action=='ban_ip' || rule.action=='ban_ip_domain') &&
                   <Rule_config id="ban_ip_duration" type="select_number"
                     data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
                     note={<Ban_ips_note/>}/>

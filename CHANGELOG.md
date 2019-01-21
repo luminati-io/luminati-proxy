@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.119.886 Stable
+- :star: Rules: added a new action - banning IPs per domains
+
 ## 1.119.855 Stable
 - :bug: Fixed db errors
 

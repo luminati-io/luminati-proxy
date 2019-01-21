@@ -47,6 +47,7 @@ const Nav = ({set_tab, cur_tab})=>
 
 const banned_ips_cols = [
     {id: 'ip', title: 'IP'},
+    {id: 'domain', title: 'Domain'},
     {id: 'ms', title: 'Expire'},
 ];
 
@@ -68,6 +69,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
               {d=>
                 <tr key={d.ip}>
                   <td>{d.ip}</td>
+                  <td>{d.domain||' - '}</td>
                   <td>{d.to ? moment(d.to).fromNow() : ' - '}</td>
                 </tr>
               }
