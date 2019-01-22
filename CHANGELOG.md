@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.120.280 
+
 ## 1.120.149 Stable
 - :bug: Fixed installation script
 
