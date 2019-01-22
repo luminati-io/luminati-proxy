@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.120.389",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed UI: incorrect cache"
+            }
+        ]
+    },
+    {
         "ver": "1.120.280",
         "type": "stable/dev",
         "changes": []
