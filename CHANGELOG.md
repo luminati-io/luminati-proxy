@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.120.966 Stable
+- :bug: Fixed random-headers preset
+
 ## 1.120.619 Stable
 - :bug: Fixed checking for upgrades in China
 

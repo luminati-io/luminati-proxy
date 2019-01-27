@@ -184,6 +184,11 @@ E.master_on = function(name, fn){
     add_handler(name, fn);
 };
 
+E.master_once = (name, fn)=>E.master_on(name, function(){
+    delete handlers[name];
+    fn(...arguments);
+});
+
 E.call_worker = function(worker, name, args, send_handle){
     if (!cluster.isMaster)
         throw new Error('call_worker called not from Cluster master');

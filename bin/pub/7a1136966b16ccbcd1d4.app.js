@@ -2664,8 +2664,8 @@ var presets = {
         rules: [{ field: 'pool_size', label: 'Sets \'Pool size\' to 50' }, { field: 'pool_type', label: 'Round-robin pool type' }]
     },
     rnd_usr_agent_and_cookie_header: {
-        title: 'Random User-Agent and cookie headers',
-        subtitle: 'Rotate User-Agent and cookie on each request',
+        title: 'Random User-Agent',
+        subtitle: 'Rotate User-Agent on each request',
         set: function set(opt) {
             opt.session = true;
             opt.pool_size = 1;
@@ -2674,20 +2674,8 @@ var presets = {
             opt.session_duration = 0;
             opt.random_user_agent = true;
             opt.override_headers = true;
-            opt.rules = opt.rules || {};
-            opt.rules.pre = [{
-                alphabet: 'wertyuiop;lkjhgfdQWERTYUJBVCF5467',
-                header: true,
-                name: 'cookie',
-                prefix: 'v=',
-                random: 'string',
-                size: 8,
-                suffix: 'end of cookie'
-            }];
-            opt.rules.post = opt.rules.post || [];
         },
         clean: function clean(opt) {
-            opt.rules.pre = [];
             opt.random_user_agent = '';
             opt.override_headers = false;
         },
@@ -2715,12 +2703,11 @@ var presets = {
             opt.random_user_agent = true;
             opt.override_headers = true;
             opt.ssl = true;
-            opt.rules = opt.rules || {};
-            opt.rules.post = opt.rules.post || [];
-            if (opt.rules.post.find(function (r) {
+            opt.rules = opt.rules || [];
+            if (opt.rules.find(function (r) {
                 return r.action && r.action.process;
             })) return;
-            opt.rules.post.push({
+            opt.rules.push({
                 action: {
                     process: {
                         title: '$(\'#productTitle\').text()',
@@ -2736,8 +2723,8 @@ var presets = {
         clean: function clean(opt) {
             opt.dns = '';
             opt.random_user_agent = false;
-            if (!opt.rules || !opt.rules.post) return;
-            opt.rules.post = opt.rules.post.filter(function (r) {
+            if (!opt.rules) return;
+            opt.rules = opt.rules.filter(function (r) {
                 return !r.action || !r.action.process;
             });
         },
