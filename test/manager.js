@@ -9,6 +9,7 @@ const assert = require('assert');
 const request = require('request');
 const sinon = require('sinon');
 const Manager = require('../lib/manager.js');
+const zlog = require('../lib/log.js');
 const etask = require('../util/etask.js');
 const analytics = require('../lib/analytics.js');
 const pkg = require('../package.json');
@@ -42,6 +43,7 @@ const temp_file = (content, ext, pre)=>{
 };
 
 describe('manager', ()=>{
+    const log_stub = sinon.stub(zlog._log, 'push');
     let app, temp_files;
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
@@ -441,22 +443,21 @@ describe('manager', ()=>{
         assert(spy.called);
         spy.restore();
     });
-    // XXX krzysztof: make it the other way
-    xdescribe('crash on load error', ()=>{
-        const t = (name, proxies)=>it(name, ()=>etask(function*(){
-            try {
-                app = yield app_with_proxies(proxies);
-                assert.fail('Should crash');
-            } catch(e){
-                if (e instanceof assert.AssertionError)
-                    throw e;
-            }
+    describe('crash on load error', ()=>{
+        beforeEach(()=>{
+            log_stub.reset();
+        });
+        const t = (name, proxies, msg)=>it(name, etask._fn(function*(_this){
+            _this.timeout(6000);
+            const err_matcher = sinon.match(msg);
+            app = yield app_with_proxies(proxies);
+            sinon.assert.calledWith(log_stub, err_matcher);
         }));
-        t('conflict proxy port', [
-            {port: 24024},
-            {port: 24024},
-        ]);
-        t('conflict with www', [{port: Manager.default.www}]);
+        t('conflict proxy port', [{port: 24024}, {port: 24024}],
+            'Port 24024 is already in use by Proxy #1 - skipped');
+        const www_port = Manager.default.www;
+        t('conflict with www', [{port: www_port}],
+            `Port ${www_port} is already in use by UI/API - skipped`);
     });
     describe('using passwords', ()=>{
         it('take password from provided zone', etask._fn(function*(_this){
@@ -535,5 +536,28 @@ describe('manager', ()=>{
             });
             yield this.wait();
         }));
+    });
+    xdescribe('migrating', ()=>{
+        beforeEach(()=>{
+            log_stub.reset();
+        });
+        const t = (name, should_run_migrations, config={}, cli={})=>
+        it(name, etask._fn(function*(_this){
+            _this.timeout(6000);
+            const notice = 'NOTICE: Migrating config file 1.116.387';
+            const first_migration_match = sinon.match(notice);
+            app = yield app_with_config({config, cli});
+            if (should_run_migrations)
+                sinon.assert.calledWith(log_stub, first_migration_match);
+            else
+                sinon.assert.neverCalledWith(log_stub, first_migration_match);
+        }));
+        t('should run migrations if config file exists and version is old',
+            true, {proxies: [{}]});
+        t('should not run migrations if --no-config flag is passed',
+            false, {proxies: [{}]}, {'no-config': true});
+        t('should not run migrations if config does not exist', false);
+        t('should not run migrations if config exists and version is new',
+            false, {_defaults: {version: '1.120.0'}});
     });
 });

@@ -60,8 +60,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             form = {
                 proxy_type: 'persist',
                 ext_proxies: this.state.parsed_ips_list,
-                // XXX krzysztof: move it to backend session: true
-                session: true,
             };
         }
         const _this = this;

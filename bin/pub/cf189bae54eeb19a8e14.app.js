@@ -63570,9 +63570,7 @@ var Proxy_add = (0, _reactRouterDom.withRouter)(function (_Pure_component) {
             } else {
                 form = {
                     proxy_type: 'persist',
-                    ext_proxies: _this2.state.parsed_ips_list,
-                    // XXX krzysztof: move it to backend session: true
-                    session: true
+                    ext_proxies: _this2.state.parsed_ips_list
                 };
             }
             var _this = _this2;
