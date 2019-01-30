@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import etask from '../../util/etask.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import Proxy_blank from './proxy_blank.js';
 import {Input, Loader, Nav, Loader_small, Tooltip, Circle_li as Li,
     Modal_dialog, Warning, with_proxy_ports} from './common.js';

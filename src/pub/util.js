@@ -1,6 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, es6:true*/
 
+import user_agent_gen from '/www/util/pub/user_agent_gen.js';
+
 export const bytes_format = (bytes, number)=>{
     if (!bytes||isNaN(parseFloat(bytes))||!isFinite(bytes))
         return '';
@@ -19,70 +21,15 @@ export const ga_event = (category, action, label)=>{
     window.ga('send', 'event', category, action, label);
 };
 
+const formatted_user_agents = user_agent_gen.map(u=>({
+    key: u.name,
+    value: u.value,
+}));
+
 export const user_agents = [{
     key: 'None',
     value: '',
-}, {
-    key: 'Chrome 58 Windows 10',
-    value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-}, {
-    key: 'Chrome 58 Windows 7',
-    value: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-}, {
-    key: 'Chrome 58 Android 4',
-    value: 'Mozilla/5.0 (Linux; Android 4.1.1; Nexus 7 Build/JRO03D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/58.0.1025.166 Safari/535.19',
-}, {
-    key: 'Chrome 58 OSX 10.12.4',
-    value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-}, {
-    key: 'Chrome 58 Linux',
-    value: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-}, {
-    key: 'Chrome 56 iOS 10.3',
-    value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) CriOS/56.0.2924.75 Mobile/14E5239e Safari/602.1',
-}, {
-    key: 'Chrome 52 Samsung Galaxy S6',
-    value: 'Mozilla/5.0 (Linux; Android 6.0.1; SM-G920V Build/MMB29K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.98 Mobile Safari/537.36',
-}, {
-    key: 'Chromium 58 Linux',
-    value: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/58.0.3029.110 Chrome/58.0.3029.110 Safari/537.36',
-}, {
-    key: 'Opera 45 Windows 10',
-    value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36 OPR/45.0.2552.812',
-}, {
-    key: 'Firefox 53 Windows 10',
-    value: 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0',
-}, {
-    key: 'Firefox 53 Windows 7',
-    value: 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:53.0) Gecko/20100101 Firefox/53.0',
-}, {
-    key: 'Firefox 53 OSX 10.12',
-    value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:53.0) Gecko/20100101 Firefox/53.0',
-}, {
-    key: 'Firefox 53 Linux',
-    value: 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:53.0) Gecko/20100101 Firefox/53.0',
-}, {
-    key: 'Firefox 41 Android 4.4',
-    value: 'Mozilla/5.0 (Android 4.4; Mobile; rv:41.0) Gecko/41.0 Firefox/41.0',
-}, {
-    key: 'Safari 10.1 MacOSX 10.12.4',
-    value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.1 Safari/603.1.30',
-}, {
-    key: 'Safari Mobile 10.0 Android 4.4',
-    value: 'Mozilla/5.0 (Linux; U; Android 4.4; en-gb; GT-P1000 Build/FROYO) AppleWebKit/533.1 (KHTML, like Gecko) Version/10.0 Mobile Safari/533.1',
-}, {
-    key: 'Safari Mobile 10.0 iOS 8',
-    value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 8_0_2 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/10.0 Mobile/12A366 Safari/600.1.4',
-}, {
-    key: 'IE 11.0 for Desktop Windows 10',
-    value: 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
-}, {
-    key: 'Edge 15.0 Windows 10',
-    value: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36 Edge/15.15063',
-}, {
-    key: 'Samsung Browser 3.3 Samsung Galaxy Tab A',
-    value: 'Mozilla/5.0 (Linux; Android 5.0.2; SAMSUNG SM-T550 Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/3.3 Chrome/38.0.2125.102 Safari/537.36',
-}];
+}, ...formatted_user_agents];
 
 export const status_codes = {
     200: 'OK',

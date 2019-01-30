@@ -4,7 +4,7 @@ import React from 'react';
 import Proxies from './proxies.js';
 import Stats from './stats.js';
 import Har_viewer from './har_viewer';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import semver from 'semver';
 import {Tooltip} from './common.js';

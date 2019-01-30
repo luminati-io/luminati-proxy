@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import {Modal, Tooltip} from './common.js';
 import $ from 'jquery';
 import {ga_event} from './util.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import semver from 'semver';
 

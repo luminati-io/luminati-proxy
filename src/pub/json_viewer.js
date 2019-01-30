@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import classnames from 'classnames';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 
 const has_children = o=>typeof o=='object'&&Object.keys(o).length;

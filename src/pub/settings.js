@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 import {Labeled_controller, Nav, Loader, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';

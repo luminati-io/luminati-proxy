@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import * as Common from './common.js';
 import classnames from 'classnames';
 import _ from 'lodash';

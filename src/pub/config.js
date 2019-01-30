@@ -4,7 +4,7 @@ import React from 'react';
 import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import classnames from 'classnames';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import {Nav, Modal, Link_icon} from './common.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';

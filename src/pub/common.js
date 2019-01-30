@@ -6,7 +6,7 @@ import React from 'react';
 import {Pagination} from 'react-bootstrap';
 import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import {bytes_format, get_static_country, presets} from './util.js';
 import * as Chrome from './chrome_widgets.js';

@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {Note, Ext_tooltip} from '../common.js';
 import {Config, Tab_context} from './common.js';

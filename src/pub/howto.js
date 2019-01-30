@@ -6,7 +6,7 @@ import prism from 'prismjs';
 import instructions from './instructions.js';
 import {Code, Nav_tabs, Nav_tab} from './common.js';
 import {ga_event, swagger_url} from './util.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import {withRouter} from 'react-router-dom';
 

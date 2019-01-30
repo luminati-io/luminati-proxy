@@ -4,7 +4,7 @@ import React from 'react';
 import {ga_event, status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
 import {Tooltip_bytes} from './common.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {withRouter} from 'react-router-dom';
 import {Tooltip, Toolbar_button, Devider, Sort_icon,

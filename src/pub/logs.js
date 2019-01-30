@@ -7,7 +7,7 @@ import {Nav_tabs, Nav_tab} from './common.js';
 import {Chrome_table} from './chrome_widgets.js';
 import zurl from '../../util/url.js';
 import ajax from '../../util/ajax.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import moment from 'moment';
 
 const Window = ({tab, ...props})=>{

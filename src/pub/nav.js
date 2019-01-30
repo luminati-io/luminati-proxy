@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';

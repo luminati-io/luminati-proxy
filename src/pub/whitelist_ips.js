@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import {Logo, Circle_li as Li, Code} from './common.js';
 
 export default class Whitelist_ips extends Pure_component {

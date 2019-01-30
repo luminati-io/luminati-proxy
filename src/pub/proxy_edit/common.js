@@ -1,7 +1,7 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import Pure_component from '../../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {tabs} from './fields.js';
 import {Labeled_controller, Ext_tooltip} from '../common.js';

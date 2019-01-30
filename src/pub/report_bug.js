@@ -3,7 +3,7 @@
 import etask from '../../util/etask.js';
 import React from 'react';
 import {Modal, Loader} from './common.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {detect_browser} from './util.js';
 

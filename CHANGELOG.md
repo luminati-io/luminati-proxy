@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.121.461 Stable
+- :bug: UI fixes in Firefox
+- :star: Updated list of User-Agent headers
+
 ## 1.121.365 Stable
 - :bug: UI and bug fixes
 

@@ -10,7 +10,7 @@ import {Modal, Loader, Textarea, Tooltip, Warnings, Code,
     Zone_description, Preset_description, Nav_tabs,
     Nav_tab} from './common.js';
 import {ga_event, presets} from './util.js';
-import Pure_component from '../../www/util/pub/pure_component.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';

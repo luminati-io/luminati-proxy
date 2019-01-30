@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.121.461",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "UI fixes in Firefox"
+            },
+            {
+                "type": "star",
+                "text": "Updated list of User-Agent headers"
+            }
+        ]
+    },
+    {
         "ver": "1.121.365",
         "type": "stable",
         "changes": [
