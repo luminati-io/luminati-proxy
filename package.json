@@ -380,8 +380,8 @@
   "scripts": {
     "electron": "electron .",
     "start": "bin/index.js",
-    "test": "./node_modules/mocha/bin/mocha",
-    "test-win": "node node_modules/mocha/bin/mocha",
+    "test": "./node_modules/mocha/bin/mocha --exit",
+    "test-win": "node node_modules/mocha/bin/mocha --exit",
     "build": "node_modules/webpack/bin/webpack.js"
   },
   "version": "1.121.461"
