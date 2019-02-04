@@ -1,5 +1,5 @@
 language: node_js
-before_install: if [[ `npm -v` != 6* ]]; then npm i -g npm@6; fi
+before_install: if [[ `npm -v` != 4* ]]; then npm i -g npm@4; fi
 node_js:
 #  - node
   - '10'
