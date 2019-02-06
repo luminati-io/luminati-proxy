@@ -80,6 +80,10 @@ class Request extends Pure_component {
         this.setState(prev_state=>({
             params: {...prev_state.params, [field]: value}}));
     };
+    key_up = e=>{
+        if (e.keyCode==13)
+            this.go();
+    };
     go = ()=>{
         ga_event('proxy_tester', 'run test');
         const port = this.state.params.port||this.props.def_port;
@@ -130,6 +134,7 @@ class Request extends Pure_component {
                 <Request_params params={this.state.params}
                   no_labels={this.props.no_labels}
                   update={this.update_params}
+                  key_up={this.key_up}
                   hide_port={this.props.hide_port}
                   port_select={this.props.port_select}/>
                 <Headers headers={this.state.headers}
@@ -169,6 +174,7 @@ const Request_params = ({params, update, ...props})=>{
           }
           <Field params={params} update={update} name="url" type="text"
             tooltip="URL that Proxy Tester will use to send a test request"
+            on_key_up={props.key_up}
             no_labels={props.no_labels}/>
           <Field params={params} update={update} name="method" type="select"
             data={methods} tooltip={method_tip}

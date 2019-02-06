@@ -129,7 +129,8 @@ E.browser = (proxy=24000)=>({
             <code>Change proxy settings</code></Li>
           <Li>System Preferences should start up automatically, with the
             Network window open and Proxies selected.</Li>
-          <Li>Choose <code>Web Proxy (HTTP)</code></Li>
+          <Li>Choose <code>Web Proxy (HTTP)</code> and
+            <code>Secure Web Proxy (HTTPS)</code></Li>
           <Li>
             Enter <code>Address</code>: <Code>127.0.0.1</Code> and
             <code>Port</code>: <Code> {proxy}</Code>

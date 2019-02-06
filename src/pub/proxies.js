@@ -347,7 +347,6 @@ const columns = [
         key: 'in_bw',
         title: 'BW up',
         render: ({proxy})=>Tooltip_bytes({bytes: proxy.out_bw}),
-        sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
@@ -357,6 +356,16 @@ const columns = [
         key: 'out_bw',
         title: 'BW down',
         render: ({proxy})=>Tooltip_bytes({bytes: proxy.in_bw}),
+        ext: true,
+        tooltip: 'Data transmitted to destination website. This includes'
+            +'request headers, request data, response headers, response data',
+        dynamic: true,
+    },
+    {
+        key: 'bw',
+        title: 'BW',
+        render: ({proxy})=>Tooltip_bytes({bytes: proxy.bw,
+            bytes_out: proxy.out_bw, bytes_in: proxy.in_bw}),
         sticky: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
@@ -543,11 +552,13 @@ class Proxies extends Pure_component {
             }
             _this.setState(prev=>{
                 const new_proxies = prev.proxies.map(p=>{
-                    let stat = {reqs: 0, success: 0, in_bw: 0, out_bw: 0};
+                    let stat = {reqs: 0, success: 0, in_bw: 0, out_bw: 0,
+                        bw: 0};
                     if (''+p.port in stats.ports)
                         stat = stats.ports[p.port];
                     p.in_bw = stat.in_bw;
                     p.out_bw = stat.out_bw;
+                    p.bw = p.in_bw+p.out_bw;
                     p.reqs = stat.reqs;
                     p.success = stat.success;
                     p.last_req = {url: stat.url, ts: stat.timestamp};
@@ -562,6 +573,7 @@ class Proxies extends Pure_component {
                             const master_port = new_proxies[p.master_port];
                             master_port.in_bw += p.in_bw;
                             master_port.out_bw += p.out_bw;
+                            master_port.bw += p.bw;
                             master_port.reqs += p.reqs;
                             master_port.success += p.success;
                             if (!master_port.last_req.ts ||

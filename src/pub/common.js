@@ -190,14 +190,23 @@ export class Enable_ssl_modal extends Pure_component {
     }
 }
 
-export const Tooltip_bytes = ({bytes, chrome_style})=>{
+export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
     bytes = bytes||0;
     const tooltip = [0, 1, 2, 3]
-        .map(n=>`<div>${bytes_format(bytes, n)}</div>`)
+        .map(n=>{
+            const bw = bytes_format(bytes, n);
+            const bw_out = bytes_format(bytes_out, n);
+            const bw_in = bytes_format(bytes_in, n);
+            const details = bytes_out && bytes_in &&
+                `(${bw_out} up | ${bw_in} down)` || '';
+            return `<div><strong>${bw}</strong> ${details}</div>`;
+        })
         .join('');
     const T = chrome_style ? Chrome.Tooltip : Tooltip;
     return <T title={bytes ? tooltip : ''}>
-          <div className="disp_value">{bytes_format(bytes)||'—'}</div>
+          <div className="disp_value">
+            {bytes_format(bytes)||'—'}
+          </div>
         </T>;
 };
 
@@ -849,7 +858,8 @@ export const Input = props=>{
           onChange={e=>update(e.target.value)}
           className={props.className}
           placeholder={props.placeholder}
-          onBlur={props.on_blur}/>;
+          onBlur={props.on_blur}
+          onKeyUp={props.on_key_up}/>;
 };
 
 export const Checkbox = props=>

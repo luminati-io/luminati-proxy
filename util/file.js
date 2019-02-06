@@ -87,8 +87,9 @@ E.read_lines_e = filename=>{
         ret.pop();
     return ret;
 };
-E.fread_e = (fd, start, size)=>{
-    let decoder = new StringDecoder(), rest = size;
+E.fread_e = (fd, start, size, opt)=>{
+    opt = opt||{};
+    let decoder = new StringDecoder(opt.encoding), rest = size;
     let ret = '', append_ret = buf=>ret += decoder.write(buf);
     E.fread_cb_e(fd, start, rest===undefined ? append_ret : buf=>{
         rest -= buf.length;

@@ -68,6 +68,7 @@ export const Config = withRouter(class Config extends Pure_component {
               sufix={this.props.sufix}
               data={this.props.data}
               type={this.props.type}
+              on_key_up={this.on_key_up}
               on_input_change={this.on_input_change}
               on_change_wrapper={this.on_change_wrapper}
               val={this.state.val===undefined ? '' : this.state.val}

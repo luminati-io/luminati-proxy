@@ -134,9 +134,10 @@ E.read_lines_e = path=>etask(function*read_lines_e(){
         ret.pop();
     return ret;
 });
-E.fread_e = (fd, start, size)=>etask(function*fread_e(){
+E.fread_e = (fd, start, size, opt)=>etask(function*fread_e(){
     start = start||0;
-    let decoder = new StringDecoder(), rest = size;
+    opt = opt||{};
+    let decoder = new StringDecoder(opt.encoding), rest = size;
     let ret = '', append_ret = buf=>ret += decoder.write(buf);
     yield E.fread_cb_e(fd, start, rest===undefined ? append_ret : buf=>{
         rest -= buf.length;

@@ -118,7 +118,8 @@ const Result = ({redirects, loading, tracing_url, filename, loading_page,
           <div className="results instructions">
             <ol>
               {redirects.map(l=>
-                <Result_row key={l.url} url={l.url} code={l.code}/>
+                <Result_row key={l.url} url={l.url} code={l.code} body={l.body}
+                  headers={l.headers}/>
               )}
               {tracing_url && loading && <Result_row url={tracing_url}/>}
             </ol>
@@ -134,15 +135,25 @@ const Result = ({redirects, loading, tracing_url, filename, loading_page,
         </div>;
 };
 
-const Result_row = ({url, code})=>
-    <Li>
-      {url+' '}
-      {code &&
-        <Tooltip title={code+' - '+status_codes[code]}>
-          <strong>({code})</strong>
-        </Tooltip>
-      }
-    </Li>;
+const calc_tip = (code, headers=[])=>{
+    if (!code)
+        return null;
+    const title = `${code} - ${status_codes[code]}`;
+    const _headers = Object.keys(headers)
+        .map(k=>`<li><strong>${k}:</strong> ${headers[k]}</li>`).join('\n');
+    return `${title}</br><ul>${_headers}</ul>`;
+};
+const Result_row = ({url, code, body, headers})=>{
+    const tip = calc_tip(code, headers, body);
+    return <Li>
+          <Tooltip title={tip} placement="right">
+            <span>
+              {url+' '}
+              {code && <strong>({code})</strong>}
+            </span>
+          </Tooltip>
+        </Li>;
+};
 
 const Request = with_proxy_ports(class Request extends Pure_component {
     def_url = 'http://lumtest.com/myip.json';
@@ -151,6 +162,10 @@ const Request = with_proxy_ports(class Request extends Pure_component {
     port_changed = port=>this.setState({port});
     uid_changed = uid=>this.setState({uid});
     go_clicked = ()=>this.props.execute(this.state, this.props.def_port);
+    key_up = e=>{
+        if (e.keyCode==13)
+            this.go_clicked();
+    };
     render(){
         if (!this.props.ports.length)
             return <Proxy_blank/>;
@@ -171,7 +186,7 @@ const Request = with_proxy_ports(class Request extends Pure_component {
                 <Field title="URL" className="url" tooltip={url_tip}>
                   <Input type="text" val={this.state.url}
                     on_change_wrapper={this.url_changed}
-                    disabled={this.props.loading}/>
+                    disabled={this.props.loading} on_key_up={this.key_up}/>
                 </Field>
                 <Field title="X-Unique-Id header (optional)" tooltip={uid_tip}
                   className="uid">
