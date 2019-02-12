@@ -3,8 +3,8 @@
 (function(){
 var define, process, zerr, assert;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire ||
+    typeof navigator=='object' && navigator.product=='ReactNative';
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 if (!is_node)
@@ -135,7 +135,7 @@ function Etask(opt, states){
         states = opt;
         opt = undefined;
     }
-    opt = (typeof opt=='string' && {name: opt})||opt||{};
+    opt = typeof opt=='string' && {name: opt} || opt || {};
     if (typeof states=='function')
     {
         if (states.constructor.name=='GeneratorFunction')
@@ -882,7 +882,7 @@ function Etask_err(err){ this.error = err || new Error(); }
 E.Etask_err = Etask_err;
 E.err = function(err){ return new Etask_err(err); };
 E.is_err = function(v){
-    return (v instanceof Etask && v.error!==undefined) ||
+    return v instanceof Etask && v.error!==undefined ||
         v instanceof Etask_err;
 };
 E.err_res = function(err, res){ return err ? E.err(err) : res; };
@@ -892,7 +892,7 @@ E._res2rv = function(res){
 };
 E.is_final = function(v){
     return !v || typeof v.then!='function' || v instanceof Etask_err ||
-        (v instanceof Etask && !!v.tm_completed);
+        v instanceof Etask && !!v.tm_completed;
 };
 
 // promise compliant .then() implementation for Etask and Etask_err.
@@ -1265,8 +1265,7 @@ E.all = function(a_or_o, ao2){
             return this.goto('loop');
         }]);
     }
-    else
-        assert(0, 'invalid type');
+    assert(0, 'invalid type');
 };
 
 E.all_limit = function(limit, arr_iter, cb){
@@ -1447,7 +1446,7 @@ E.fn = function(opt, states){ return etask_fn(opt, states, false); };
 E._fn = function(opt, states){ return etask_fn(opt, states, true); };
 E._generator = function(gen, ctor, opt){
     opt = opt||{};
-    opt.name = opt.name||(ctor && ctor.name)||'generator';
+    opt.name = opt.name || ctor && ctor.name || 'generator';
     if (opt.cancel===undefined)
         opt.cancel = true;
     var done;
@@ -1539,5 +1538,5 @@ E._class = function(cls){
     }
     return cls;
 };
-    
+
 return Etask; }); }());

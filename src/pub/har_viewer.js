@@ -2,21 +2,22 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
+import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
+import {withRouter} from 'react-router-dom';
+import React_tooltip from 'react-tooltip';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
-import $ from 'jquery';
 import {status_codes, bytes_format} from './util.js';
 import Waypoint from 'react-waypoint';
 import {Toolbar_button, Tooltip, Devider, Sort_icon,
     with_resizable_cols} from './chrome_widgets.js';
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
-import {withRouter} from 'react-router-dom';
-import React_tooltip from 'react-tooltip';
+import ws from './ws.js';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
@@ -407,12 +408,7 @@ class Tables_container extends Pure_component {
             if (stats)
                 this.setState({stats});
         });
-        this.setdb_on('head.ws', ws=>{
-            if (!ws||this.ws)
-                return;
-            this.ws = ws;
-            this.ws.addEventListener('message', this.on_message);
-        });
+        ws.addEventListener('message', this.on_message);
         this.setdb_on('har_viewer.select_mode', select=>{
             if (select==undefined)
                 return;
@@ -424,8 +420,7 @@ class Tables_container extends Pure_component {
     }
     willUnmount(){
         window.removeEventListener('resize', this.props.resize_columns);
-        if (this.ws)
-            this.ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('message', this.on_message);
         setdb.set('head.har_viewer.reqs', []);
         setdb.set('head.har_viewer.stats', null);
         setdb.set('har_viewer', null);

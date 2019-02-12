@@ -1,5 +1,12 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
+import Pure_component from '/www/util/pub/pure_component.js';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import Proxy_edit from './proxy_edit/index.js';
@@ -15,14 +22,8 @@ import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
 import {Enable_ssl_modal, Error_boundry} from './common.js';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
-import 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.css';
 import './app.less';
-import 'es6-shim';
-import Pure_component from '/www/util/pub/pure_component.js';
+import ws from './ws.js';
 
 window.setdb = setdb;
 setdb.setMaxListeners(30);
@@ -81,9 +82,7 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});
             setdb.set('head.defaults', defaults);
-            const socket = new WebSocket(
-                `ws://${window.location.hostname}:${defaults.ws}`);
-            setdb.set('head.ws', socket);
+            ws.set_location(window.location.hostname, defaults.ws);
         });
         this.etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});

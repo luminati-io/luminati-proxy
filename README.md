@@ -32,7 +32,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.122.334/luminati-proxy-manager-v1.122.334-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.123.8/luminati-proxy-manager-v1.123.8-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -191,7 +191,6 @@ Options:
                                                       [boolean] [default: false]
   --reverse_lookup_file    Process reverse lookup via file              [string]
   --reverse_lookup_values  Process reverse lookup via value              [array]
-  --debug                  Luminati request debug info                  [string]
   --session                Luminati session for all proxy requests      [string]
   --sticky_ip              Use session per requesting host to maintain IP per
                            host                       [boolean] [default: false]

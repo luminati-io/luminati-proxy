@@ -281,12 +281,14 @@ const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
             return {key: `Default (${z.name})`, value: z.name};
         return {key: z.name, value: z.name};
     });
+    const zone_obj = zones_opt.find(z=>z.value==zone);
+    const title = zone_obj && zone_obj.key || 'no zone';
     return <div className="lum_proxy">
           <div className="group">
             <Field icon_class="zone_icon" val={zone} options={zones_opt}
               title="Zone" on_change={on_field_change('zone')}
               tooltip={zone_tip}/>
-            <Preview title={zones_opt.find(z=>z.value==zone).key}>
+            <Preview title={title}>
               <Zone_description zones={zones} zone_name={zone}/>
               <a className="link" href="https://luminati.io/cp/zones"
                 target="_blank" rel="noopener noreferrer">Edit zone</a>

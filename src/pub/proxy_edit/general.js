@@ -23,7 +23,8 @@ const log_level_opt = [
     {key: `none`, value: 'none'},
     {key: `error`, value: 'error'},
     {key: `warn`, value: 'warn'},
-    {key: `verbose`, value: 'verbose'},
+    {key: `notice`, value: 'notice'},
+    {key: `info`, value: 'info'},
 ];
 
 export default class General extends Pure_component {

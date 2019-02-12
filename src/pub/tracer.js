@@ -1,29 +1,22 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
-import React from 'react';
-import etask from '../../util/etask.js';
 import Pure_component from '/www/util/pub/pure_component.js';
+import React from 'react';
+import {withRouter} from 'react-router-dom';
+import classnames from 'classnames';
+import etask from '../../util/etask.js';
 import Proxy_blank from './proxy_blank.js';
 import {Input, Loader, Nav, Loader_small, Tooltip, Circle_li as Li,
     Modal_dialog, Warning, with_proxy_ports} from './common.js';
 import {status_codes, swagger_link_tester_url} from './util.js';
-import classnames from 'classnames';
-import {withRouter} from 'react-router-dom';
+import ws from './ws.js';
 
 export default withRouter(class Tracer extends Pure_component {
     state = {loading: false};
     title = 'Test affiliate links';
     subtitle = 'Trace links and see all the redirections';
-    componentDidMount(){
-        this.setdb_on('head.ws', ws=>{
-            if (!ws||this.ws)
-                return;
-            this.ws = ws;
-        });
-    }
     willUnmount(){
-        if (this.ws)
-            this.ws.removeEventListener('message', this.on_message);
+        ws.removeEventListener('message', this.on_message);
     }
     set_result = res=>this.setState(res);
     execute = ({url, port, uid}, def_port)=>{
@@ -39,11 +32,11 @@ export default withRouter(class Tracer extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('finally', e=>{
-                _this.ws.removeEventListener('message', _this.on_message);
+                ws.removeEventListener('message', _this.on_message);
                 _this.setState({loading: false});
             });
             this.on('uncaught', e=>console.log(e));
-            _this.ws.addEventListener('message', _this.on_message);
+            ws.addEventListener('message', _this.on_message);
             const raw_trace = yield window.fetch('/api/trace', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -118,8 +111,8 @@ const Result = ({redirects, loading, tracing_url, filename, loading_page,
           <div className="results instructions">
             <ol>
               {redirects.map(l=>
-                <Result_row key={l.url} url={l.url} code={l.code} body={l.body}
-                  headers={l.headers}/>
+                <Result_row key={l.url} url={l.url} code={l.code}
+                  log={l.req_log}/>
               )}
               {tracing_url && loading && <Result_row url={tracing_url}/>}
             </ol>
@@ -135,16 +128,16 @@ const Result = ({redirects, loading, tracing_url, filename, loading_page,
         </div>;
 };
 
-const calc_tip = (code, headers=[])=>{
+const calc_tip = (code, log)=>{
     if (!code)
         return null;
     const title = `${code} - ${status_codes[code]}`;
-    const _headers = Object.keys(headers)
-        .map(k=>`<li><strong>${k}:</strong> ${headers[k]}</li>`).join('\n');
+    const _headers = log.response.headers.map(h=>
+        `<li><strong>${h.name}:</strong> ${h.value}</li>`).join('\n');
     return `${title}</br><ul>${_headers}</ul>`;
 };
-const Result_row = ({url, code, body, headers})=>{
-    const tip = calc_tip(code, headers, body);
+const Result_row = ({url, code, log})=>{
+    const tip = calc_tip(code, log);
     return <Li>
           <Tooltip title={tip} placement="right">
             <span>

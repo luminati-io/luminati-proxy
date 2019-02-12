@@ -124,6 +124,7 @@
     "electron-builder": "16.6.1",
     "electron-rebuild": "1.7.2",
     "es6-shim": "0.35.3",
+    "event-target-shim": "5.0.0",
     "file-loader": "0.11.2",
     "html-webpack-plugin": "2.30.1",
     "jquery": "3.1.1",
@@ -335,6 +336,7 @@
       "src/pub/tracer.js",
       "src/pub/util.js",
       "src/pub/whitelist_ips.js",
+      "src/pub/ws.js",
       "test/common.js",
       "test/index.js",
       "test/manager.js",
@@ -347,7 +349,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "6ea67aea5b278ca948142d24b7514702"
+    "md5": "de8e767b5651a6005078c316f95054e1"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -369,7 +371,7 @@
     "heapdump": "0.3.9",
     "posix": "4.1.2",
     "sinon": "1.17.7",
-    "puppeteer": "1.9.0"
+    "puppeteer": "1.12.2"
   },
   "preferGlobal": true,
   "recomendedNode": ">=10.0",
@@ -384,5 +386,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.122.334"
+  "version": "1.123.8"
 }
