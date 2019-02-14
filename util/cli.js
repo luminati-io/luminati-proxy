@@ -50,7 +50,7 @@ function guess_dryrun(args){
     let dry = find_opt('dry-run', args)>=0;
     let real = find_opt('real-run', args)>=0;
     if (!dry&&!real)
-        return;
+        return E.dry_run = false;
     // Set dry-run mode if real-run or dry-run options requested
     E.dry_run = true;
     if (!dry)

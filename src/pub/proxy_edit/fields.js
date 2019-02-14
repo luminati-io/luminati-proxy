@@ -323,6 +323,11 @@ export const tabs = {
                 tooltip: `Enable SSL Logs in order to save HTTPs requests`,
                 ext: true,
             },
+            secure_proxy: {
+                label: 'SSL to super proxy',
+                tooltip: `Encrypt requests sent to super proxy to avoid
+                    detection on DNS`,
+            },
             route_err: {
                 label: 'Route',
                 tooltip: `<div><b>pass_dyn:</b> If request can't pass via `
@@ -344,11 +349,6 @@ export const tabs = {
                 label: 'Multiply proxy port per gIP',
                 tooltip: `Create proxy port for every selected gIP from pool
                     of available gIPS in your zone`,
-            },
-            secure_proxy: {
-                label: 'SSL to super proxy',
-                tooltip: `Encrypt requests sent to super proxy to avoid
-                    detection on DNS`,
             },
             iface: {
                 label: 'Interface',

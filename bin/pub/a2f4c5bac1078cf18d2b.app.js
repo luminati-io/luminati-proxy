@@ -14047,6 +14047,10 @@ var tabs = exports.tabs = {
                 tooltip: 'Enable SSL Logs in order to save HTTPs requests',
                 ext: true
             },
+            secure_proxy: {
+                label: 'SSL to super proxy',
+                tooltip: 'Encrypt requests sent to super proxy to avoid\n                    detection on DNS'
+            },
             route_err: {
                 label: 'Route',
                 tooltip: '<div><b>pass_dyn:</b> If request can\'t pass via ' + 'peer, auto pass via super proxy<br><b>block</b> If ' + 'request can\'t pass via peer, block request and don\'t ' + 'auto send via super proxy</div>'
@@ -14063,10 +14067,6 @@ var tabs = exports.tabs = {
             multiply_vips: {
                 label: 'Multiply proxy port per gIP',
                 tooltip: 'Create proxy port for every selected gIP from pool\n                    of available gIPS in your zone'
-            },
-            secure_proxy: {
-                label: 'SSL to super proxy',
-                tooltip: 'Encrypt requests sent to super proxy to avoid\n                    detection on DNS'
             },
             iface: {
                 label: 'Interface',
@@ -56230,6 +56230,7 @@ var General = function (_Pure_component) {
                     _react2.default.createElement(_common.Config, { type: 'text', id: 'password', disabled: true }),
                     _react2.default.createElement(_common.Config, { type: 'pins', id: 'whitelist_ips' }),
                     _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'ssl' }),
+                    _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'secure_proxy' }),
                     _react2.default.createElement(_common.Config, { type: 'select', data: route_err_opt, id: 'route_err' }),
                     _react2.default.createElement(_common.Config, { type: 'select_number', id: 'multiply', range: 'medium',
                         disabled: form.multiply_ips || form.multiply_vips }),
@@ -56237,7 +56238,6 @@ var General = function (_Pure_component) {
                         on_change: this.multiply_changed, note: note_ips }),
                     type == 'vips' && _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'multiply_vips',
                         on_change: this.multiply_changed, note: note_vips }),
-                    _react2.default.createElement(_common.Config, { type: 'yes_no', id: 'secure_proxy' }),
                     _react2.default.createElement(_common.Config, { type: 'select', id: 'iface',
                         data: this.state.proxy.iface.values }),
                     _react2.default.createElement(_common.Config, { type: 'select', id: 'log', data: log_level_opt }),

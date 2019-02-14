@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.123.208 
+
 ## 1.123.8 Stable
 - :star: UI improvements: websocket automatically reconnects
 

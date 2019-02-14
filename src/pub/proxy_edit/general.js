@@ -81,6 +81,7 @@ export default class General extends Pure_component {
                 <Config type="text" id="password" disabled/>
                 <Config type="pins" id="whitelist_ips"/>
                 <Config type="yes_no" id="ssl"/>
+                <Config type="yes_no" id="secure_proxy"/>
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply" range="medium"
                   disabled={form.multiply_ips||form.multiply_vips}/>
@@ -92,7 +93,6 @@ export default class General extends Pure_component {
                   <Config type="yes_no" id="multiply_vips"
                     on_change={this.multiply_changed} note={note_vips}/>
                 }
-                <Config type="yes_no" id="secure_proxy"/>
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
                 <Config type="select" id="log" data={log_level_opt}/>
