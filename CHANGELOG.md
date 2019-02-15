@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.123.411 Development Latest
+- :bug: Fixed 'SSL to superproxy'
+- :star: Resolved stability issues in China
+
 ## 1.123.208 
 
 ## 1.123.8 Stable

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.123.411",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed 'SSL to superproxy'"
+            },
+            {
+                "type": "star",
+                "text": "Resolved stability issues in China"
+            }
+        ]
+    },
+    {
         "ver": "1.123.208",
         "type": "stable/dev",
         "changes": []
