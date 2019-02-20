@@ -8,11 +8,12 @@ import {migrate_trigger, migrate_action, trigger_types,
 import {ms} from '../../../util/date.js';
 import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
-    Field_row_raw, Tooltip} from '../common.js';
+    Field_row_raw} from '../common.js';
 import {tabs} from './fields.js';
 import {Tester} from '../proxy_tester.js';
 import classnames from 'classnames';
 import {Chrome_table} from '../chrome_widgets.js';
+import Tooltip from '../common/tooltip.js';
 
 const rule_prepare = rule=>{
     const action = {};

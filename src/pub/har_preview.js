@@ -35,7 +35,7 @@ class Preview extends Pure_component {
         return <div style={this.props.style} className="har_preview chrome">
               <div className="tabbed_pane_header">
                 <div className="left_pane">
-                  <div onClick={this.props.close_preview}
+                  <div onClick={this.props.close}
                     className="close_btn_wrapper">
                     <div className="small_icon close_btn"/>
                     <div className="medium_icon close_btn_h"/>
@@ -161,7 +161,8 @@ class Body_section extends Pure_component {
         catch(e){ raw_body = this.props.body; }
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent_title', {open: this.state.open})}>
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
               {this.props.title}
             </li>,
             <ol key="ol"
@@ -181,7 +182,8 @@ class Preview_section extends Pure_component {
             return null;
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent_title', {open: this.state.open})}>
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
               {this.props.title}
               {!this.state.open ? ` (${this.props.pairs.length})` : ''}
             </li>,
@@ -277,7 +279,8 @@ class Single_timeline extends Pure_component {
             `${timeline.port} (${rule})` : timeline.port;
         return [
             <li key="li" onClick={this.toggle}
-              className={classnames('parent_title', {open: this.state.open})}>
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
               {title}
             </li>,
             <ol key="ol" className={children_classes}>

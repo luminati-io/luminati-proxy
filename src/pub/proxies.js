@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
+import ReactDOM from 'react-dom';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
@@ -13,39 +14,62 @@ import {get_static_country} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
-import {Modal, Checkbox, Pagination_panel, Link_icon, any_flag,
-    flag_with_title, Tooltip, Modal_dialog, Tooltip_bytes,
-    Zone_description} from './common.js';
+import {Checkbox, any_flag, flag_with_title,
+    Tooltip_bytes} from './common.js';
 import {withRouter} from 'react-router-dom';
-import React_tooltip from 'react-tooltip';
+import Zone_description from './common/zone_desc.js';
+import {Modal_dialog, Modal} from './common/modals.js';
+import {Toolbar_container, Toolbar_row, Toolbar_button,
+    Devider} from './chrome_widgets.js';
+import {AutoSizer, Table, Column} from 'react-virtualized';
+import 'react-virtualized/styles.css';
+import Tooltip from './common/tooltip.js';
+import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
 
-const Targeting_cell = ({proxy, zones})=>{
-    const static_country = get_static_country(proxy, zones);
-    if (static_country&&static_country!='any'&&static_country!='*')
-        return flag_with_title(static_country, static_country.toUpperCase());
-    let val = proxy.country;
-    if (!val||val=='any'||val=='*')
-        return any_flag;
-    val = val.toUpperCase();
-    const state = proxy.state&&proxy.state.toUpperCase();
-    if (!state)
-        return flag_with_title(proxy.country, val);
-    if (!proxy.city)
-        return flag_with_title(proxy.country, `${val} (${state})`);
-    return flag_with_title(proxy.country,
-        `${val} (${state}), ${proxy.city}`);
+const Actions_cell = ({proxy, mgr, scrolling})=>{
+    return <Actions proxy={proxy} get_status={mgr.get_status}
+          update_proxies={mgr.update} scrolling={scrolling}/>;
 };
 
-const Status_cell = ({proxy, status, status_details})=>{
-    const details = status_details && status_details.map(d=>d.msg).join(',');
-    if (!status)
-    {
-        return <Tooltip title="Status of this proxy is being tested">
-            Testing</Tooltip>;
+class Targeting_cell extends Pure_component {
+    render(){
+        const {proxy, mgr} = this.props;
+        const zones = mgr.state.zones;
+        const static_country = get_static_country(proxy, zones);
+        if (static_country && static_country!='any' && static_country!='*')
+        {
+            return flag_with_title(static_country,
+                static_country.toUpperCase());
+        }
+        let val = proxy.country;
+        if (!val||val=='any'||val=='*')
+            return any_flag;
+        val = val.toUpperCase();
+        const state = proxy.state&&proxy.state.toUpperCase();
+        if (!state)
+            return flag_with_title(proxy.country, val);
+        if (!proxy.city)
+            return flag_with_title(proxy.country, `${val} (${state})`);
+        return flag_with_title(proxy.country,
+            `${val} (${state}), ${proxy.city}`);
     }
-    else if (status=='error')
+}
+
+const Status_cell = ({proxy, scrolling})=>{
+    const status = proxy._status;
+    const status_details = proxy._status_details;
+    if (scrolling)
+    {
+        if (!status)
+            return 'Testing';
+        else if (status=='ok')
+            return 'OK';
+        return 'Error';
+    }
+    const details = status_details && status_details.map(d=>d.msg).join(',');
+    if (status=='error')
         return <Tooltip title={details}>Error</Tooltip>;
-    else if (status=='ok'&&details)
+    else if (status=='ok' && details)
     {
         return <Tooltip title={details}>
               <span>
@@ -54,8 +78,10 @@ const Status_cell = ({proxy, status, status_details})=>{
               </span>
             </Tooltip>;
     }
-    else if (status=='ok'&&!details)
+    else if (status=='ok' && !details)
         return <Tooltip title="This proxy works correctly">OK</Tooltip>;
+    return <Tooltip title="Status of this proxy is being tested">
+        Testing</Tooltip>;
 };
 
 const Boolean_cell = ({proxy, col})=>{
@@ -71,29 +97,38 @@ const Session_cell = ({proxy})=>{
         return proxy.session;
 };
 
-const Type_cell = ({proxy})=>{
-    let val, tip;
-    if (proxy.ext_proxies)
-    {
-        val = 'External';
-        tip = 'Proxy port configured with external IP and credentials';
+class Type_cell extends React.Component {
+    render(){
+        if (this.props.scrolling)
+            return 'Luminati';
+        const proxy = this.props.proxy;
+        let val, tip;
+        if (proxy.ext_proxies)
+        {
+            val = 'External';
+            tip = 'Proxy port configured with external IP and credentials';
+        }
+        else
+        {
+            val = 'Luminati';
+            tip = 'Proxy port using your Luminati account';
+        }
+        return <Tooltip title={tip}>{val}</Tooltip>;
     }
-    else
-    {
-        val = 'Luminati';
-        tip = 'Proxy port using your Luminati account';
-    }
-    return <Tooltip title={tip}>{val}</Tooltip>;
-};
+}
 
-const Last_req_cell = ({proxy})=>{
+const Last_req_cell = ({proxy, scrolling})=>{
     const val = (proxy.last_req||{}).url||'—';
+    if (scrolling)
+        return val;
     return <Tooltip title={val}>{val}</Tooltip>;
 };
 
-const Port_cell = ({proxy, master_port})=>{
+const Port_cell = ({proxy, mgr, scrolling})=>{
+    if (scrolling)
+        return proxy.port;
     let val;
-    if (!master_port&&proxy.multiply&&proxy.multiply>1)
+    if (!mgr.props.master_port && proxy.multiply && proxy.multiply>1)
         val = proxy.port+':1..'+proxy.multiply;
     else
         val = proxy.port;
@@ -116,19 +151,38 @@ const Reqs_cell = ({proxy})=>{
         {reqs}</Tooltip>;
 };
 
-const Zone_cell = ({proxy, zones})=>{
+const Zone_cell = ({proxy, mgr, scrolling})=>{
+    if (scrolling)
+        return proxy.zone;
+    const zones = mgr.state.zones;
     return <div>
-          <React_tooltip id={''+proxy.port} type="light" effect="solid"
-            delayHide={0} delayShow={0} delayUpdate={0}>
-            <div className="zone_tooltip">
-              <Zone_description zones={zones} zone_name={proxy.zone}/>
-            </div>
-          </React_tooltip>
-          <span data-tip data-for={''+proxy.port}>{proxy.zone}</span>
+          <OverlayTrigger
+            placement="top"
+            overlay={
+              <B_tooltip id={`${proxy.port}-zone-tooltip`}>
+                <div className="zone_tooltip">
+                  <Zone_description zones={zones} zone_name={proxy.zone}/>
+                </div>
+              </B_tooltip>
+            }
+          >
+            <span>{proxy.zone}</span>
+          </OverlayTrigger>
         </div>;
 };
 
 const columns = [
+    {
+        key: 'actions',
+        title: 'Actions',
+        tooltip: `Delete/duplicate/refresh sessions/open browser`,
+        ext: true,
+        sticky: true,
+        render: Actions_cell,
+        width: 80,
+        shrink: 0,
+        grow: 0,
+    },
     {
         key: 'internal_name',
         title: 'Internal name',
@@ -148,6 +202,7 @@ const columns = [
             +'connect the crawler to send requests through the port',
         ext: true,
         dynamic: true,
+        width: 90,
     },
     {
         key: 'proxy_type',
@@ -157,6 +212,7 @@ const columns = [
             +'(non-Luminati)',
         sticky: true,
         ext: true,
+        width: 70,
     },
     {
         key: '_status',
@@ -167,6 +223,7 @@ const columns = [
         tooltip: 'Real time proxy status',
         ext: true,
         dynamic: true,
+        width: 55,
     },
     {
         key: 'iface',
@@ -178,7 +235,7 @@ const columns = [
     },
     {
         key: 'multiply',
-        title: 'Multiple',
+        title: 'Multiply',
         type: 'number',
         tooltip: 'Number of multiplied proxy ports. A proxy port can be '
             +'multiplied in the proxy configuration page',
@@ -223,6 +280,7 @@ const columns = [
         default: true,
         render: Targeting_cell,
         tooltip: 'Exit node (IP) GEO location',
+        width: 62,
     },
     {
         key: 'asn',
@@ -230,19 +288,6 @@ const columns = [
         type: 'number',
         tooltip: 'ASN uniquely identifies each network on the internet. You '
             +'can target exit nodes (IPs) on specific ASNs',
-    },
-    {
-        key: 'ip',
-        title: 'Datacenter IP',
-        type: 'text',
-    },
-    {
-        key: 'vip',
-        title: 'gIP',
-        type: 'number',
-        tooltip: 'A gIP is a group of exclusive residential IPs. Using gIPs '
-            +'ensures that nobody else uses the same IPs with the same target '
-            +'sites as you do.',
     },
     {
         key: 'max_requests',
@@ -333,7 +378,7 @@ const columns = [
         type: 'options',
     },
     {
-        key: 'success_rate',
+        key: 'success',
         title: 'Success',
         tooltip: 'The ratio of successful requests out of total requests. A '
             +'request considered as successful if the server of the '
@@ -342,6 +387,7 @@ const columns = [
         default: true,
         ext: true,
         dynamic: true,
+        width: 58,
     },
     {
         key: 'in_bw',
@@ -351,6 +397,7 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        width: 90,
     },
     {
         key: 'out_bw',
@@ -360,6 +407,7 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        width: 90,
     },
     {
         key: 'bw',
@@ -371,6 +419,7 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        width: 90,
     },
     {
         key: 'reqs',
@@ -380,6 +429,8 @@ const columns = [
         ext: true,
         tooltip: 'Number of all requests sent from this proxy port',
         dynamic: true,
+        grow: 0,
+        width: 60,
     },
     {
         key: 'last_req.url',
@@ -389,8 +440,11 @@ const columns = [
         ext: true,
         tooltip: 'Last request that was sent on this proxy port',
         dynamic: true,
+        grow: 1,
     },
 ];
+const columns_obj = Object.keys(columns)
+    .reduce((acc, col)=>({...acc, [columns[col].key]: columns[col]}), {});
 
 class Columns_modal extends Pure_component {
     state = {selected_cols: []};
@@ -446,36 +500,17 @@ class Columns_modal extends Pure_component {
     }
 }
 
-const save_pagination = (table, opt={})=>{
-    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    curr[table] = curr[table]||{};
-    if (opt.page)
-        curr[table].page = opt.page;
-    if (opt.items)
-        curr[table].items = opt.items;
-    window.localStorage.setItem('pagination', JSON.stringify(curr));
-};
-
-const get_pagination = table=>{
-    const curr = JSON.parse(window.localStorage.getItem('pagination'))||{};
-    return {items: 10, page: 0, ...curr[table]||{}};
-};
-
-class Proxies extends Pure_component {
+const Proxies = withRouter(class Proxies extends Pure_component {
     constructor(props){
         super(props);
         let from_storage = JSON.parse(window.localStorage.getItem(
             'columns'))||{};
         from_storage = Object.keys(from_storage).filter(c=>from_storage[c]);
         const default_cols = columns.filter(c=>c.default).map(col=>col.key);
-        const pagination = get_pagination('proxies');
         this.state = {
-            selected_cols: from_storage.length&&from_storage||default_cols,
-            items_per_page: pagination.items,
-            cur_page: 0,
+            selected_cols: from_storage.length && from_storage || default_cols,
             proxies: [],
             filtered_proxies: [],
-            displayed_proxies: [],
             loaded: false,
         };
         setdb.set('head.proxies.update', this.update);
@@ -487,8 +522,7 @@ class Proxies extends Pure_component {
             proxies = this.prepare_proxies(proxies||[]);
             const filtered_proxies = this.filter_proxies(proxies,
                 this.props.master_port);
-            this.setState({proxies, filtered_proxies, loaded: true},
-                this.paginate);
+            this.setState({proxies, filtered_proxies, loaded: true});
         });
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -508,7 +542,7 @@ class Proxies extends Pure_component {
         {
             const filtered_proxies = this.filter_proxies(this.state.proxies,
                 props.master_port);
-            this.setState({filtered_proxies}, this.paginate);
+            this.setState({filtered_proxies});
         }
     }
     filter_proxies = (proxies, mp)=>{
@@ -528,10 +562,6 @@ class Proxies extends Pure_component {
             cur._status_details = cur._status_details||[];
         }
         return proxies;
-    };
-    update_items_per_page = items_per_page=>{
-        this.setState({items_per_page}, ()=>this.paginate(0));
-        save_pagination('proxies', {items: items_per_page});
     };
     req_status = ()=>{
         const _this = this;
@@ -589,7 +619,7 @@ class Proxies extends Pure_component {
                     Object.values(new_proxies), _this.props.master_port);
                 return {proxies: Object.values(new_proxies), filtered_proxies,
                     stats};
-            }, ()=>_this.paginate(_this.state.cur_page));
+            });
             yield etask.sleep(1000);
             _this.req_status();
         });
@@ -607,211 +637,172 @@ class Proxies extends Pure_component {
     edit_columns = ()=>$('#edit_columns').modal('show');
     update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
-    proxy_add = ()=>{ $('#add_new_proxy_modal').modal('show'); };
-    paginate = (page=-1)=>{
-        page = page>-1 ? page : this.state.cur_page;
-        const pages = Math.ceil(
-            this.state.filtered_proxies.length/this.state.items_per_page);
-        const cur_page = Math.min(pages, page);
-        const displayed_proxies = this.state.filtered_proxies.slice(
-            cur_page*this.state.items_per_page,
-            (cur_page+1)*this.state.items_per_page);
-        this.setState({displayed_proxies, cur_page});
+    proxy_add = ()=>$('#add_new_proxy_modal').modal('show');
+    cell_renderer = function Cell_renderer(props){
+        return <Cell {...props} mgr={this}/>;
     };
-    page_change = page=>{
-        this.paginate(page-1);
-        save_pagination('proxies', {page});
+    on_row_click = e=>{
+        const proxy = e.rowData;
+        if (proxy.proxy_type!='persist')
+            return;
+        if (!this.props.master_port && proxy.multiply && proxy.multiply>1)
+            this.props.history.push(`/overview/${proxy.port}`);
+        else
+            this.props.history.push(`/proxy/${proxy.port}`);
     };
     render(){
         const cols = columns.filter(col=>
-            this.state.selected_cols.includes(col.key)||col.sticky||
-            col.calc_show&&col.calc_show(this.state.filtered_proxies));
-        const displayed_proxies = this.state.displayed_proxies;
+            this.state.selected_cols.includes(col.key) || col.sticky ||
+            col.calc_show && col.calc_show(this.state.filtered_proxies));
         if (!this.state.zones)
             return null;
         if (!this.state.countries)
             return null;
-        if (this.state.loaded&&!this.state.filtered_proxies.length)
+        if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        return <div className="panel proxies_panel chrome">
-              <div className="main_panel">
-                <div className="panel_heading">
-                  <h2>
-                    Proxies
-                    <Tooltip title="Add new proxy">
-                      <button
-                        className="btn btn_lpm btn_lpm_small add_proxy_btn"
-                        onClick={this.proxy_add}>
-                        New proxy
-                        <i className="glyphicon glyphicon-plus"/>
-                      </button>
-                    </Tooltip>
-                  </h2>
-                </div>
-                {this.state.loaded && !!displayed_proxies.length &&
-                  <div className="panel_body with_table">
-                    <Proxies_pagination entries={this.state.filtered_proxies}
-                      cur_page={this.state.cur_page}
-                      items_per_page={this.state.items_per_page}
-                      page_change={this.page_change}
-                      edit_columns={this.edit_columns}
-                      update_items_per_page={this.update_items_per_page}
-                      download_csv={this.download_csv}
-                      top/>
-                    <div className="proxies_table_wrapper">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th className="head_actions">
-                              <Tooltip
-                                title={'Delete/duplicate/refresh sessions/'+
-                                'open browser'}>
-                                Actions
-                              </Tooltip>
-                            </th>
+        return <div className="proxies_panel chrome">
+              <div className="main_panel vbox">
+                <Toolbar proxy_add={this.proxy_add}
+                  edit_columns={this.edit_columns}
+                  download_csv={this.download_csv}/>
+                {this.state.loaded && !!this.state.filtered_proxies.length &&
+                  <React.Fragment>
+                    <div className="chrome chrome_table vbox">
+                      <div className="tables_container header_container hack">
+                      <div className="chrome_table">
+                      <AutoSizer disableHeight>
+                        {({width})=>
+                          <Table width={width}
+                            height={328}
+                            onRowClick={this.on_row_click}
+                            gridClassName="chrome_grid"
+                            headerHeight={27}
+                            headerClassName="chrome_th"
+                            rowClassName="chrome_tr"
+                            rowHeight={22}
+                            rowCount={this.state.filtered_proxies.length+1}
+                            rowGetter={({index})=>
+                              this.state.filtered_proxies[index]||'filler'}>
                             {cols.map(col=>
-                              <th key={col.key} className={'col_'+col.key}>
-                                <Tooltip title={col.tooltip}>
-                                  {col.title}</Tooltip>
-                              </th>
+                              <Column key={col.key}
+                                cellRenderer={this.cell_renderer.bind(this)}
+                                label={col.title}
+                                className="chrome_td"
+                                dataKey={col.key}
+                                flexGrow={col.grow!==undefined ? col.grow : 1}
+                                flexShrink={col.shrink!==undefined ?
+                                  col.shrink : 1}
+                                width={col.width||100}/>
                             )}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {displayed_proxies.map(proxy=>
-                            <Proxy_row key={proxy.port} go={this.state.go}
-                              update_proxies={this.update} proxy={proxy}
-                              cols={cols} master_port={this.props.master_port}
-                              zones={this.state.zones}/>
-                          )}
-                        </tbody>
-                      </table>
+                          </Table>
+                        }
+                      </AutoSizer>
+                      </div>
+                      </div>
                     </div>
-                    <Proxies_pagination entries={this.state.filtered_proxies}
-                      cur_page={this.state.cur_page}
-                      items_per_page={this.state.items_per_page}
-                      page_change={this.page_change}
-                      edit_columns={this.edit_columns}
-                      update_items_per_page={this.update_items_per_page}
-                      download_csv={this.download_csv}
-                      bottom/>
-                  </div>
+                  </React.Fragment>
                 }
-                <Columns_modal selected_cols={this.state.selected_cols}
-                  update_selected_cols={this.update_selected_columns}/>
               </div>
+              <Columns_modal selected_cols={this.state.selected_cols}
+                update_selected_cols={this.update_selected_columns}/>
             </div>;
+    }
+});
+
+class Toolbar extends Pure_component {
+    render(){
+        const {proxy_add, edit_columns, download_csv} = this.props;
+        return <Toolbar_container>
+              <Toolbar_row>
+                <Toolbar_button id="add" tooltip="Add new proxy"
+                  on_click={proxy_add}>
+                  <span style={{marginRight: 5, position: 'relative',
+                    top: -3}}>Add new proxy</span>
+                </Toolbar_button>
+                <Devider/>
+                <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
+                  id="filters"/>
+                <Toolbar_button tooltip="Download all proxy ports as CSV"
+                  on_click={download_csv} id="download"/>
+              </Toolbar_row>
+            </Toolbar_container>;
     }
 }
 
-const Proxies_pagination = ({entries, items_per_page, cur_page, bottom,
-    page_change, edit_columns, download_csv, top, update_items_per_page})=>
-    <Pagination_panel entries={entries} items_per_page={items_per_page}
-      cur_page={cur_page} page_change={page_change} top={top} bottom={bottom}
-      update_items_per_page={update_items_per_page}>
-        <Link_icon tooltip="Edit columns" on_click={edit_columns} id="filter"/>
-        <Link_icon tooltip="Download all proxy ports as CSV"
-          on_click={download_csv} id="download"/>
-    </Pagination_panel>;
+class Cell extends React.Component {
+    shouldComponentUpdate(next_props){
+        if (this.props.dataKey=='last_req.url')
+            return true;
+        return this.props.cellData!=next_props.cellData ||
+            this.props.rowData!=next_props.rowData;
+    }
+    render(){
+        const props = this.props;
+        const col = columns_obj[props.dataKey];
+        const proxy = props.rowData;
+        if (props.rowData=='filler')
+            return <div className="chrome_td"></div>;
+        else if (!col.ext && proxy.ext_proxies)
+            return '—';
+        else if (col.render)
+        {
+            const S_cell = col.render;
+            return <S_cell proxy={props.rowData} mgr={props.mgr}/>;
+        }
+        return props.cellData;
+    }
+}
 
-const Proxy_row = withRouter(class Proxy_row extends Pure_component {
-    state = {status: this.props.proxy._status,
-        status_details: this.props.proxy._status_details};
-    componentDidMount(){ this.get_status(); }
+class Actions extends Pure_component {
+    state = {open_delete_dialog: false};
+    componentDidMount(){
+        if (!this.props.proxy.status)
+            this.get_status();
+    }
+    // XXX krzysztof: this logic is a mess, rewrite it
     get_status = (opt={})=>{
-        const {proxy} = this.props;
-        if (!opt.force&&proxy._status=='ok')
+        const proxy = this.props.proxy;
+        if (!opt.force && proxy._status=='ok')
             return;
-        const _this = this;
         return this.etask(function*(){
             this.on('uncaught', e=>{
-                _this.setState({status: 'error', status_details:
-                    [{msg: 'Failed to get proxy status'}]});
+                proxy._status = 'error';
+                proxy._status_details = [{msg: 'Failed to get proxy status'}];
+                setdb.emit_path('head.proxies_running');
             });
             const params = {};
             if (proxy.proxy_type!='duplicate')
                 params.with_details = true;
             if (opt.force)
             {
-                _this.setState({status: undefined});
+                proxy._status = undefined;
+                setdb.emit_path('head.proxies_running');
                 params.force = true;
             }
             const uri = '/api/proxy_status/'+proxy.port;
             const url = zescape.uri(uri, params);
             const res = yield ajax.json({url});
-            if (res.status=='ok')
-            {
-                _this.setState({status: res.status,
-                    status_details: res.status_details});
-            }
-            else
+            if (res.status!='ok')
             {
                 let errors = res.status_details.filter(s=>s.lvl=='err');
                 res.status_details = errors.length ?
                     errors : [{msg: res.status}];
                 res.status = 'error';
-                _this.setState({status: res.status,
-                    status_details: res.status_details});
             }
             proxy._status = res.status;
             proxy._status_details = res.status_details;
+            setdb.emit_path('head.proxies_running');
         });
     };
-    edit = ()=>{
-        if (this.props.proxy.proxy_type!='persist')
-            return;
-        if (!this.props.master_port && this.props.proxy.multiply &&
-            this.props.proxy.multiply>1)
-        {
-            this.props.history.push(`/overview/${this.props.proxy.port}`);
-        }
-        else
-            this.props.history.push(`/proxy/${this.props.proxy.port}`);
+    open_delete_dialog = e=>{
+        e.stopPropagation();
+        this.setState({open_delete_dialog: true});
     };
-    render(){
-        const proxy = this.props.proxy;
-        const cell_class = col=>classnames(col.key.replace(/\./g, '_'),
-            {default_cursor: this.props.proxy.proxy_type!='persist'});
-        const row_class = classnames('proxy_row',
-            {default: proxy.port==22225});
-        return <tr className={row_class}>
-              <Actions proxy={proxy} get_status={this.get_status}
-                update_proxies={this.props.update_proxies}/>
-              {this.props.cols.map(col=>
-                <Cell key={col.key} proxy={proxy} col={col}
-                  status={this.state.status} zones={this.props.zones}
-                  status_details={this.state.status_details}
-                  master_port={this.props.master_port} on_click={this.edit}
-                  className={cell_class(col)}/>
-              )}
-            </tr>;
-    }
-});
-
-class Cell extends React.Component {
-    shouldComponentUpdate(){ return !!this.props.col.dynamic; }
-    render(){
-        const {proxy, col, master_port, status, status_details, on_click,
-            zones, className} = this.props;
-        let val;
-        if (!col.ext&&proxy.ext_proxies)
-            val = '—';
-        else if (col.render)
-        {
-            val = col.render({proxy, col: col.key, master_port, status,
-                status_details, zones})||null;
-        }
-        else
-            val = _.get(proxy, col.key)||null;
-        return <td onClick={on_click} className={className}>{val}</td>;
-    }
-}
-
-class Actions extends Pure_component {
-    state = {open_delete_dialog: false};
-    open_delete_dialog = ()=>this.setState({open_delete_dialog: true});
-    close_delete_dialog = ()=>this.setState({open_delete_dialog: false});
-    delete_proxy = ()=>{
+    close_delete_dialog = ()=>{
+        this.setState({open_delete_dialog: false});
+    };
+    delete_proxy = e=>{
+        e.stopPropagation();
         const _this = this;
         this.etask(function*(){
             yield ajax.json({url: '/api/proxies/'+_this.props.proxy.port,
@@ -820,19 +811,20 @@ class Actions extends Pure_component {
             _this.close_delete_dialog();
         });
     };
-    refresh_sessions = ()=>{
+    refresh_sessions = e=>{
+        e.stopPropagation();
         const _this = this;
         this.etask(function*(){
             const url = '/api/refresh_sessions/'+_this.props.proxy.port;
             yield ajax.json({url, method: 'POST'});
-            yield _this.props.get_status({force: true});
+            yield _this.get_status({force: true});
         });
     };
-    duplicate = ()=>{
+    duplicate = event=>{
+        event.stopPropagation();
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
-            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/proxy_dup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -841,7 +833,8 @@ class Actions extends Pure_component {
             yield _this.props.update_proxies();
         });
     };
-    open_browser = ()=>{
+    open_browser = e=>{
+        e.stopPropagation();
         const _this = this;
         this.etask(function*(){
             const url = `/api/browser/${_this.props.proxy.port}`;
@@ -852,36 +845,47 @@ class Actions extends Pure_component {
         const persist = this.props.proxy.proxy_type=='persist';
         const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
-        return <td className="proxies_actions">
-              <Action_icon id="trash"
-                on_click={this.open_delete_dialog}
-                tooltip="Delete" invisible={!persist}/>
-              <Action_icon id="duplicate" on_click={this.duplicate}
-                tooltip="Duplicate proxy port" invisible={!persist}/>
-              <Action_icon id="refresh"
-                on_click={this.refresh_sessions}
-                tooltip="Refresh Sessions"/>
-              <Action_icon id="browse"
-                on_click={this.open_browser}
-                tooltip="Open browser configured with this port"
-                img="/img/ic_browse.svg"/>
-              <Modal_dialog title={delete_title}
-                open={this.state.open_delete_dialog}
-                ok_clicked={this.delete_proxy}
-                cancel_clicked={this.close_delete_dialog}/>
-            </td>;
+        return <div className="proxies_actions">
+            {!!persist &&
+              <React.Fragment>
+                <Action_icon id="trash" scrolling={this.props.scrolling}
+                  on_click={this.open_delete_dialog}
+                  tooltip="Delete" invisible={!persist}/>
+                <Action_icon id="duplicate" on_click={this.duplicate}
+                  tooltip="Duplicate proxy port" invisible={!persist}
+                  scrolling={this.props.scrolling}/>
+              </React.Fragment>
+            }
+            <Action_icon id="refresh" scrolling={this.props.scrolling}
+              on_click={this.refresh_sessions}
+              tooltip="Refresh Sessions"/>
+            <Action_icon id="browser" scrolling={this.props.scrolling}
+              on_click={this.open_browser}
+              tooltip="Open browser configured with this port"/>
+            {!!persist &&
+              <Portal>
+                <Modal_dialog title={delete_title}
+                  open={this.state.open_delete_dialog}
+                  ok_clicked={this.delete_proxy}
+                  cancel_clicked={this.close_delete_dialog}/>
+              </Portal>
+            }
+          </div>;
     }
 }
 
-const Action_icon = ({on_click, disabled, invisible, id, tooltip,
-    tooltip_disabled, img})=>
-{
-    const classes = classnames('action_icon', {disabled, invisible});
-    if (disabled)
-        tooltip = tooltip_disabled;
-    return <Link_icon tooltip={tooltip} on_click={on_click} id={id}
-          classes={classes} invisible={invisible} disabled={disabled}
-          img={img}/>;
+const Portal = props=>ReactDOM.createPortal(props.children,
+    document.getElementById('del_modal'));
+
+const Action_icon = props=>{
+    let {on_click, invisible, id, tooltip, scrolling} = props;
+    const classes = classnames('action_icon', 'chrome_icon', id,
+        {invisible});
+    if (scrolling)
+        return <div className={classes}/>;
+    return <Tooltip title={tooltip}>
+          <div onClick={on_click} className={classes}/>
+        </Tooltip>;
 };
 
 export default Proxies;

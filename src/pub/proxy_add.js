@@ -6,14 +6,17 @@ import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Modal, Loader, Textarea, Tooltip, Warnings, Code,
-    Zone_description, Preset_description, Nav_tabs,
-    Nav_tab} from './common.js';
+import {Loader, Warnings, Code, Preset_description} from './common.js';
+import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {ga_event, presets} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
+import Tooltip from './common/tooltip.js';
+import {Textarea} from './common/controls.js';
+import Zone_description from './common/zone_desc.js';
+import {Modal} from './common/modals.js';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     presets_opt = Object.keys(presets).map(p=>{
@@ -270,9 +273,9 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
         </div>;
 };
 
-const Lum_proxy = ({zone, zones, on_field_change, preset, rule_clicked,
-    presets_opt, created_port})=>
-{
+const Lum_proxy = props=>{
+    const {zone, zones, on_field_change, preset, rule_clicked,
+        presets_opt} = props;
     const preset_tip = `Presets is a set of preconfigured configurations
     for specific purposes`;
     const zone_tip = `Zone that will be used by this proxy port`;

@@ -1,8 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Tooltip} from './common.js';
 import $ from 'jquery';
+import Tooltip from './common/tooltip.js';
 
 const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
 

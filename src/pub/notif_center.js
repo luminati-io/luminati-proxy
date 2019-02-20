@@ -2,12 +2,13 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Tooltip} from './common.js';
 import $ from 'jquery';
 import {ga_event} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import semver from 'semver';
+import Tooltip from './common/tooltip.js';
+import {Modal} from './common/modals.js';
 
 class Notif_center extends Pure_component {
     state = {loaded: false, notifs: []};

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.124.62",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved UI in Link Tester"
+            },
+            {
+                "type": "star",
+                "text": "Improved UI proxies list table"
+            }
+        ]
+    },
+    {
         "ver": "1.123.411",
         "type": "dev",
         "changes": [

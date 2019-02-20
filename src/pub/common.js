@@ -1,194 +1,20 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true*/
-import $ from 'jquery';
-import classnames from 'classnames';
 import React from 'react';
-import {Pagination} from 'react-bootstrap';
-import etask from '../../util/etask.js';
-import ajax from '../../util/ajax.js';
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Typeahead} from 'react-bootstrap-typeahead';
-import {bytes_format, get_static_country, presets} from './util.js';
-import * as Chrome from './chrome_widgets.js';
+import React_tooltip from 'react-tooltip';
+import {Pagination} from 'react-bootstrap';
+import classnames from 'classnames';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
-import React_select from 'react-select/lib/Creatable';
-import {Netmask} from 'netmask';
-import {withRouter, Route} from 'react-router-dom';
-import React_tooltip from 'react-tooltip';
-
-export class Modal_dialog extends React.Component {
-    componentDidMount(){
-        $(this.ref).on('hide.bs.modal', ()=>{
-            this.props.cancel_clicked && this.props.cancel_clicked();
-        });
-    }
-    componentWillReceiveProps(new_props){
-        if (this.props.open==new_props.open)
-            return;
-        if (new_props.open)
-            $(this.ref).modal();
-        else
-            $(this.ref).modal('hide');
-    }
-    set_ref = e=>{ this.ref = e; };
-    render(){
-        return <div tabIndex="-1" ref={this.set_ref}
-              className={classnames('modal', 'fade', this.props.className)}>
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <button className="close close_icon" data-dismiss="modal"
-                        aria-label="Close"/>
-                    <h4 className="modal-title">{this.props.title}</h4>
-                  </div>
-                  {this.props.children &&
-                    <div className="modal-body">{this.props.children}</div>
-                  }
-                  <div className="modal-footer">
-                    <Footer_default ok_clicked={this.props.ok_clicked}
-                      cancel_clicked={this.props.cancel_clicked}
-                      no_cancel_btn={this.props.no_cancel_btn}/>
-                  </div>
-                </div>
-              </div>
-            </div>;
-    }
-}
-
-export class Modal extends React.Component {
-    componentDidMount(){
-        $(this.ref).on('hidden.bs.modal', ()=>{
-            this.props.on_hidden && this.props.on_hidden();
-        });
-    }
-    click_cancel(){
-        if (this.props.cancel_clicked)
-            this.props.cancel_clicked();
-        $('#'+this.props.id).modal('hide');
-    }
-    click_ok(){
-        if (!this.props.no_ok_close)
-            $('#'+this.props.id).modal('hide');
-        const _this = this;
-        etask(function*(){
-            if (_this.props.click_ok)
-                yield _this.props.click_ok();
-        });
-    }
-    on_dismiss = ()=>{
-        if (this.props.on_dismiss)
-            this.props.on_dismiss();
-    };
-    set_ref = e=>{ this.ref = e; };
-    render(){
-        let footer = null;
-        if (!this.props.no_footer)
-        {
-            footer = this.props.footer ||
-                <Footer_default cancel_clicked={this.click_cancel.bind(this)}
-                  ok_href={this.props.ok_href}
-                  ok_clicked={this.click_ok.bind(this)}
-                  ok_btn_title={this.props.ok_btn_title}
-                  ok_btn_classes={this.props.ok_btn_classes}
-                  no_cancel_btn={this.props.no_cancel_btn}/>;
-        }
-        const header_classes = classnames('modal-header',
-            {no_header: this.props.no_header});
-        return <div id={this.props.id} tabIndex="-1" ref={this.set_ref}
-              className={classnames('modal', 'fade', this.props.className)}>
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className={header_classes}>
-                    {!this.props.no_close &&
-                      <button className="close close_icon" data-dismiss="modal"
-                          aria-label="Close" onClick={this.on_dismiss}>
-                      </button>
-                    }
-                    {!this.props.no_header && !this.props.custom_header &&
-                      <h4 className="modal-title">{this.props.title}</h4>
-                    }
-                    {this.props.custom_header && this.props.custom_header}
-                  </div>
-                  {this.props.children &&
-                    <div className="modal-body">{this.props.children}</div>
-                  }
-                  <div className="modal-footer">{footer}</div>
-                </div>
-              </div>
-            </div>;
-    }
-}
-
-export class Error_boundry extends Pure_component {
-    state = {error: false};
-    static getDerivedStateFromError(error){
-        return {error: true};
-    }
-    componentDidCatch(error, info){
-        this.log_error(error, info);
-    }
-    log_error = (error, info)=>{
-        const {message, stack} = error;
-        this.etask(function*(){
-            yield window.fetch('/api/react_error', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({backtrace: stack, message,
-                    stack: info.componentStack}),
-            });
-        });
-    };
-    render(){
-        if (this.state.error)
-            return <h1>Error</h1>;
-        return this.props.children;
-    }
-}
-
-export class Enable_ssl_modal extends Pure_component {
-    state = {loading: false};
-    faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
-    enable_ssl = ()=>{
-        const _this = this;
-        this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
-            _this.setState({loading: true});
-            yield ajax({url: '/api/enable_ssl', method: 'POST'});
-            _this.setState({loading: false});
-        });
-    };
-    render(){
-        return [
-            <Loader key="1" show={this.state.loading}/>,
-            <Modal key="2" id={this.props.id||'enable_ssl_modal'}
-              title="Enable SSL analyzing for all proxies" no_cancel_btn
-              no_ok_close click_ok={this.enable_ssl} ok_href="/ssl"
-              ok_btn_title='Download certificate' className="enable_ssl_modal">
-              <p className="cert_info">
-                You will also need to add a certificate file to browsers.
-                Gathering stats for HTTPS requests requires setting a
-                certificate key.
-              </p>
-              <div className="instructions">
-                <ol>
-                  <Circle_li>Download our free certificate key
-                    <a href="/ssl" target="_blank" download> here</a>
-                  </Circle_li>
-                  <Circle_li>
-                    Add the certificate to your browser.
-                    You can find more detailed
-                    instructions <a className="link" href={this.faq_cert_url}
-                      rel="noopener noreferrer" target="_blank">here</a>
-                  </Circle_li>
-                  <Circle_li>Refresh the page</Circle_li>
-                </ol>
-              </div>
-            </Modal>,
-        ];
-    }
-}
+import $ from 'jquery';
+import {bytes_format, presets} from './util.js';
+import * as Chrome from './chrome_widgets.js';
+import {Pins, Select_status, Select_number, Yes_no,
+    Regex, Json, Textarea, Typeahead_wrapper, Input,
+    Select} from './common/controls.js';
+import Tooltip from './common/tooltip.js';
 
 export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
     bytes = bytes||0;
@@ -208,28 +34,6 @@ export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
             {bytes_format(bytes)||'—'}
           </div>
         </T>;
-};
-
-const Footer_default = props=>{
-    const ok_title = props.ok_btn_title||'OK';
-    const ok_classes = props.ok_btn_classes||'btn btn_lpm btn_lpm_primary ok';
-    return <div className="default_footer">
-          {!props.no_cancel_btn &&
-            <button onClick={props.cancel_clicked}
-              className="btn btn_lpm cancel">
-              Cancel
-            </button>
-          }
-          {props.ok_href &&
-            <a href={props.ok_href} onClick={props.ok_clicked}
-              className={ok_classes}>{ok_title}</a>
-          }
-          {!props.ok_href &&
-            <button onClick={props.ok_clicked} className={ok_classes}>
-              {ok_title}
-            </button>
-          }
-        </div>;
 };
 
 export const Warnings = props=>
@@ -263,9 +67,7 @@ export const Loader_small = props=>{
     return <div className="loader_small">
           <div className={classnames('spinner', {show: saving})}/>
           <div className={classnames('saving_label', {saving})}>
-            <Tooltip title={tooltip}>
-              {msg}
-            </Tooltip>
+            <Tooltip title={tooltip}>{msg}</Tooltip>
           </div>
         </div>;
 };
@@ -304,12 +106,6 @@ export class Code extends Pure_component {
     }
 }
 
-export const Textarea = props=>{
-    return <textarea value={props.val} rows={props.rows||3}
-          placeholder={props.placeholder}
-          onChange={e=>props.on_change_wrapper(e.target.value)}/>;
-};
-
 export const with_proxy_ports = Component=>{
     const port_select = data=>function port_select_inner(props){
         return <Select val={props.val}
@@ -347,282 +143,6 @@ export const with_proxy_ports = Component=>{
     return With_proxy_ports;
 };
 
-export const Select = props=>{
-    const update = val=>{
-        if (val=='true')
-            val = true;
-        else if (val=='false')
-            val = false;
-        if (props.on_change_wrapper)
-            props.on_change_wrapper(val);
-    };
-    const conf = (props.data||[]).find(c=>c.value==props.val);
-    return <Tooltip key={props.val} title={conf&&conf.tooltip||''}>
-          <select value={''+props.val}
-            onChange={e=>update(e.target.value)} disabled={props.disabled}>
-            {(props.data||[]).map((c, i)=>
-              <option key={i} value={c.value}>{c.key}</option>
-            )}
-          </select>
-        </Tooltip>;
-};
-
-class Yes_no extends Pure_component {
-    options = ()=>{
-        const default_label = this.props.default ? 'Yes' : 'No';
-        return [
-            {key: 'No', value: false},
-            {key: 'Default ('+default_label+')', value: ''},
-            {key: 'Yes', value: true},
-        ];
-    };
-    render(){
-        return <Select {...this.props} data={this.options()}/>;
-    }
-}
-
-class Pins extends Pure_component {
-    state = {pins: [], max_id: 0};
-    static getDerivedStateFromProps(props, state){
-        if (props.val==state.raw_val||!props.val)
-            return null;
-        const ips = props.val.split(',');
-        return {
-            raw_val: props.val,
-            pins: ips.map((p, id)=>({id, val: p, edit: false})),
-            max_id: ips.length,
-        };
-    }
-    add_pin = ()=>{
-        this.setState(prev=>({
-            pins: [...prev.pins, {id: prev.max_id+1, val: '', edit: true}],
-            max_id: prev.max_id+1,
-        }));
-    };
-    remove = id=>{
-        this.setState(prev=>({
-            pins: prev.pins.filter(p=>p.id!=id),
-        }), this.fire_on_change);
-    };
-    set_edit = (id, edit)=>{
-        this.setState(prev=>({
-            pins: prev.pins.map(p=>{
-                if (p.id!=id)
-                    return p;
-                return {...p, edit};
-            }),
-        }));
-    };
-    update_pin = (id, val)=>{
-        this.setState(prev=>({
-            pins: prev.pins.map(p=>{
-                if (p.id!=id)
-                    return p;
-                return {...p, val};
-            }),
-        }));
-    };
-    fire_on_change = ()=>{
-        const val = this.state.pins.map(p=>p.val).join(',');
-        this.props.on_change_wrapper(val);
-    };
-    save_pin = (id, val)=>{
-        this.setState(prev=>({
-            pins: prev.pins.map(p=>{
-                if (p.id!=id)
-                    return p;
-                return {...p, val, edit: false};
-            }),
-        }), this.fire_on_change);
-    };
-    render(){
-        return <div className="pins_field">
-              <div className="pins">
-                {this.state.pins.map(p=>
-                  <Pin key={p.id} update_pin={this.update_pin} id={p.id}
-                    set_edit={this.set_edit} edit={p.edit}
-                    save_pin={this.save_pin} remove={this.remove}>
-                    {p.val}
-                  </Pin>
-                )}
-              </div>
-              <Add_pin add_pin={this.add_pin}/>
-            </div>;
-    }
-}
-
-class Pin extends Pure_component {
-    input = React.createRef();
-    componentDidMount(){
-        this.input.current.focus();
-    }
-    componentDidUpdate(){
-        if (this.props.edit)
-            this.input.current.focus();
-    }
-    edit = ()=>{
-        this.props.set_edit(this.props.id, true);
-    };
-    key_up = e=>{
-        if (e.keyCode==13)
-            this.validate_and_save();
-    };
-    validate_and_save = ()=>{
-        let val = (this.props.children||'').trim();
-        try {
-            const netmask = new Netmask(val);
-            val = netmask.base;
-            if (netmask.bitmask!=32)
-                val += '/'+netmask.bitmask;
-        } catch(e){ val = ''; }
-        if (!val)
-            return this.props.remove(this.props.id);
-        this.props.save_pin(this.props.id, val);
-    };
-    on_change = e=>this.props.update_pin(this.props.id, e.target.value);
-    remove = ()=>this.props.remove(this.props.id);
-    on_blur = ()=>this.validate_and_save();
-    render(){
-        const {children} = this.props;
-        const input_classes = classnames({hidden: !this.props.edit});
-        return <div className={classnames('pin', {active: this.props.edit})}>
-              <div className="x" onClick={this.remove}>
-                <div className="glyphicon glyphicon-remove"/>
-              </div>
-              <div className="content" onClick={this.edit}>
-                {!this.props.edit && children}
-                <input ref={this.input} type="text" value={children}
-                  onChange={this.on_change} onBlur={this.on_blur}
-                  className={input_classes} onKeyUp={this.key_up}/>
-              </div>
-              {this.props.edit &&
-                <div className="v">
-                  <div className="glyphicon glyphicon-ok"/>
-                </div>
-              }
-            </div>;
-    }
-}
-
-const Add_pin = ({add_pin})=>
-    <Tooltip title="Add new IP to the list">
-      <button className="btn btn_lpm btn_lpm_small add_pin"
-        onClick={add_pin}>
-        Add IP
-        <i className="glyphicon glyphicon-plus"/>
-      </button>
-    </Tooltip>;
-
-export class Select_number extends Pure_component {
-    _fmt_num = n=>n && n.toLocaleString({useGrouping: true}) || n;
-    _get_data = ()=>this.props.data ? this.props.data : this.opt_from_range();
-    value_to_option = value=>
-        value!=null && {value, label: this._fmt_num(+value)};
-    opt_from_range = ()=>{
-        let res;
-        if (this.props.range=='medium')
-            res = [0, 1, 10, 100, 1000];
-        else if (this.props.range=='ms')
-            res = [0, 500, 2000, 5000, 10000];
-        else
-            res = [0, 1, 3, 5, 10, 20];
-        if (this.props.allow_zero)
-            res.unshift(0);
-        return res;
-    };
-    on_change = e=>{
-        let value = e && +e.value || '';
-        const allow_zero = this.props.allow_zero ||
-            this._get_data().includes(0);
-        if (!value && !allow_zero)
-            value = this.props.default||1;
-        this.props.on_change_wrapper(value);
-    };
-    validation = s=>!!s && Number(s)==s;
-    render(){
-        const data = this._get_data();
-        const options = data.map(this.value_to_option);
-        return <Select_multiple {...this.props}
-              options={options}
-              on_change={this.on_change}
-              validation={this.validation}
-              value_to_option={this.value_to_option}
-              no_options_message={()=>'You can use only numbers here'}/>;
-    }
-}
-
-export class Select_status extends Pure_component {
-    status_types = ['200', '2..', '403', '404', '500', '503', '(4|5)..'];
-    value_to_option = value=>{
-        if (!value)
-            return {value: '', label: '--Select--'};
-        return {value, label: value};
-    };
-    on_change = e=>this.props.on_change_wrapper(e && e.value || '');
-    render(){
-        const options = this.status_types.map(this.value_to_option);
-        return <Select_multiple {...this.props}
-              class_name="status"
-              options={options}
-              on_change={this.on_change}
-              validation={v=>!!v}
-              value_to_option={this.value_to_option}/>;
-    }
-}
-
-export class Select_multiple extends Pure_component {
-    styles = {
-        option: (base, state)=>{
-            return {
-                ...base,
-                padding: '2px 12px',
-                'background-color': state.isFocused ? '#f5f5f5' : 'white',
-                color: '#004d74',
-            };
-        },
-        control: (base, state)=>{
-            return {
-                display: 'flex',
-                height: 32,
-                'border-radius': 3,
-                border: 'solid 1px',
-                'border-color': state.isFocused ? '#004d74' :
-                    state.isDisabled ? '#e0e9ee' : '#ccdbe3',
-                'background-color': state.isDisabled ? '#f5f5f5;' : 'white',
-            };
-        },
-        singleValue: (base, state)=>({
-            ...base,
-            color: state.isDisabled ? '#8e8e8e' : '#004d74',
-        }),
-    };
-    render(){
-        return <React_select styles={this.styles}
-            className={classnames('select_multiple', this.props.class_name)}
-            isClearable
-            noOptionsMessage={this.props.no_options_message}
-            classNamePrefix="react_select"
-            value={this.props.value_to_option(this.props.val)}
-            onChange={this.props.on_change}
-            simpleValue
-            autoBlur
-            options={this.props.options}
-            isValidNewOption={this.props.validation}
-            promptTextCreator={l=>l}
-            pageSize={9}
-            shouldKeyDownEventCreateNewOption={()=>true}
-            placeholder={this.props.placeholder}
-            isDisabled={this.props.disabled}
-            onSelectResetsInput={!this.props.update_on_input}/>;
-    }
-}
-
-const Typeahead_wrapper = props=>
-    <Typeahead options={props.data} maxResults={10}
-      minLength={1} disabled={props.disabled} selectHintOnEnter
-      onChange={props.on_change_wrapper} selected={props.val}
-      onInputChange={props.on_input_change}/>;
-
 export const Form_controller = props=>{
     const type = props.type;
     if (type=='select')
@@ -645,33 +165,6 @@ export const Form_controller = props=>{
         return <Pins {...props}/>;
     return <Input {...props}/>;
 };
-
-export class Json extends Pure_component {
-    state = {};
-    componentDidMount(){
-        this.cm = codemirror.fromTextArea(this.textarea, {mode: 'javascript'});
-        this.cm.on('change', this.on_cm_change);
-        this.cm.setSize('auto', '100%');
-        this.cm.doc.setValue(this.props.val);
-    }
-    on_cm_change = cm=>{
-        const new_val = cm.doc.getValue();
-        let correct = true;
-        try { JSON.parse(new_val); }
-        catch(e){ correct = false; }
-        if (correct)
-            this.props.on_change_wrapper(new_val);
-        this.setState({correct});
-    };
-    set_ref = ref=>{ this.textarea = ref; };
-    render(){
-        const classes = classnames('code_mirror_wrapper', 'json',
-            {error: !this.state.correct});
-        return <div className={classes}>
-              <textarea ref={this.set_ref}/>
-            </div>;
-    }
-}
 
 class Copy_btn extends Pure_component {
     textarea = React.createRef();
@@ -737,74 +230,6 @@ export class Cm_wrapper extends Pure_component {
     }
 }
 
-class Regex extends Pure_component {
-    state = {recognized: false, checked: {}};
-    formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'];
-    componentDidMount(){
-        this.recognize_regexp();
-    }
-    componentDidUpdate(prev_props){
-        if (prev_props.val!=this.props.val)
-            this.recognize_regexp();
-    }
-    classes = f=>{
-        const active = this.state.recognized && this.state.checked[f];
-        return classnames('check', {active});
-    };
-    toggle = f=>{
-        this.setState(
-            prev=>({checked: {...prev.checked, [f]: !prev.checked[f]}}),
-            this.gen_regexp);
-    };
-    recognize_regexp = ()=>{
-        const m = this.props.val && this.props.val.match(/\\\.\((.+)\)\$/);
-        if (m&&m[1])
-        {
-            const checked = m[1].split('|').reduce(
-                (acc, e)=>({...acc, [e]: true}), {});
-            this.setState({recognized: true, checked});
-        }
-        else
-            this.setState({recognized: false, checked: {}});
-    };
-    gen_regexp = ()=>{
-        const formats = Object.keys(this.state.checked)
-        .filter(f=>this.state.checked[f]).join('|');
-        let regexp = '';
-        if (formats)
-            regexp = `\\.(${formats})$`;
-        this.props.on_change_wrapper(regexp, this.props.id);
-    };
-    tip = f=>{
-        if (this.state.checked[f])
-            return `Remove file format ${f} from regexp`;
-        return `Add file format ${f} to regexp`;
-    };
-    on_input_change = regexp=>{
-        this.props.on_change_wrapper(regexp, this.props.id);
-    };
-    render(){
-        const val = this.props.val||'';
-        return <div className="regex_field">
-              <div className="regex_input">
-                <div className="tip_box active">
-                  <div className="checks">
-                    {this.formats.map(f=>
-                      <Tooltip key={f+!!this.state.checked[f]}
-                        title={this.tip(f)}>
-                        <div onClick={this.toggle.bind(null, f)}
-                          className={this.classes(f)}>.{f}</div>
-                      </Tooltip>
-                    )}
-                  </div>
-                </div>
-                <Input className="regex" {...this.props} val={val} type="text"
-                  on_change_wrapper={this.on_input_change}/>
-              </div>
-            </div>;
-    }
-}
-
 export const Note = props=>
     <div className="note">
       <span>{props.children}</span>
@@ -843,24 +268,6 @@ export const Labeled_controller = ({id, disabled, note, sufix, ...props})=>
         {note && <Note>{note}</Note>}
       </div>
     </Field_row_raw>;
-
-export const Input = props=>{
-    const update = val=>{
-        if (props.type=='number' && val)
-            val = Number(val);
-        if (props.on_change_wrapper)
-            props.on_change_wrapper(val, props.id);
-    };
-    return <input style={props.style}
-          type={props.type}
-          value={props.val}
-          disabled={props.disabled}
-          onChange={e=>update(e.target.value)}
-          className={props.className}
-          placeholder={props.placeholder}
-          onBlur={props.on_blur}
-          onKeyUp={props.on_key_up}/>;
-};
 
 export const Checkbox = props=>
   <div className="form-check">
@@ -917,52 +324,6 @@ export const Pagination_panel = props=>{
         </div>;
 };
 
-export class Tooltip extends Pure_component {
-    componentDidMount(){
-        if (!this.ref)
-            return;
-        $(this.ref).tooltip();
-    }
-    componentWillUnmount(){
-        $(this.ref).tooltip('destroy');
-    }
-    componentDidUpdate(){
-        $(this.ref).attr('title', this.props.title).tooltip('fixTitle'); }
-    on_mouse_leave(){
-        if (!this.ref)
-            return;
-        $(this.ref).tooltip('hide');
-    }
-    set_ref(e){ this.ref = e; }
-    render(){
-        if (!this.props.children)
-            return null;
-        if (!this.props.title)
-            return this.props.children;
-        const props = {
-            'data-toggle': 'tooltip',
-            'data-placement': this.props.placement||'top',
-            'data-container': 'body',
-            'data-html': true,
-            'data-template': `<div class="tooltip ${this.props.className||''}"
-                role="tooltip">
-                <div class="tooltip-arrow"></div>
-                <div class="tooltip-inner"></div>
-            </div>`,
-            title: this.props.title,
-            ref: this.set_ref.bind(this),
-            onMouseLeave: this.on_mouse_leave.bind(this),
-        };
-        return React.Children.map(this.props.children, c=>{
-            if (typeof c=='number')
-                c = ''+c;
-            if (typeof c=='string')
-                return React.createElement('span', props, c);
-            return React.cloneElement(c, props);
-        });
-    }
-}
-
 export const Link_icon = props=>{
     let {tooltip, on_click, id, classes, disabled, invisible, small, img} =
         props;
@@ -982,14 +343,6 @@ export const Link_icon = props=>{
           </span>
         </Tooltip>;
 };
-
-export const Circle_li = props=>
-    <li>
-      <div className="circle_wrapper">
-        <div className="circle"/>
-      </div>
-      <div className="single_instruction">{props.children}</div>
-    </li>;
 
 export const Add_icon = ({click, tooltip})=>
     <Tooltip title={tooltip}>
@@ -1032,106 +385,6 @@ export const flag_with_title = (country, title)=>{
         </Tooltip>;
 };
 
-class Perm_icons extends Pure_component {
-    prem_tooltips = {
-        vip: 'gIP - Group of exclusive residential IPs',
-        residential: 'Residential IPs',
-        country: 'Country resolution',
-        state: 'Residential IPs - State resolution',
-        data_center: 'Data center IPs',
-        asn: 'Residential IPs - "Autonomous System Number" (ASN) resolution',
-        city: 'Residential IPs - City resolution',
-        mobile: 'Mobile IPs',
-    };
-    perm_icons = ['country', 'state', 'asn', 'city', 'vip'];
-    render(){
-        const {perm_list} = this.props;
-        if (!perm_list||!perm_list.length)
-            return <div>no perm</div>;
-        const perm = {};
-        for (let p of perm_list)
-            perm[p] = true;
-        const icons = perm_list.filter(p=>this.perm_icons.includes(p));
-        if (perm.mobile)
-            icons.unshift('mobile');
-        else if (perm.vip)
-            icons.unshift('residential');
-        else if (perm.route_dedicated)
-            icons.unshift('data_center');
-        return <div>{icons.map(_perm=>
-              <Tooltip key={_perm} title={this.prem_tooltips[_perm]}>
-                <div className={'perm_icon '+_perm}/>
-              </Tooltip>)}
-            </div>;
-    }
-}
-
-export class Zone_description extends Pure_component {
-    network_types = {
-        static: {
-            label: 'Data center',
-            tooltip: `Static IPs from various data centers located around
-                the globe`,
-        },
-        resident: {
-            label: 'Residential',
-            tooltip: `P2P residential network. Millions of IPs from real
-                devices`,
-        },
-        custom: {
-            label: 'Custom',
-            tooltip: `3G and 4G network from real mobile devices`,
-        },
-    };
-    ips_types = {
-        shared: 'Shared',
-        dedicated: 'Exclusive / Unlimited domains',
-        selective: 'Exclusive domains',
-    };
-    render(){
-        const {zone_name, zones} = this.props;
-        const zone = zones.zones.find(z=>z.name==(zone_name||zones.def));
-        if (!zone)
-            return <span>This zone is disabled</span>;
-        const plan = zone.plan;
-        const static_country = get_static_country({zone: zone_name}, zones);
-        let c = any_flag;
-        if (static_country&&static_country!='any'&&static_country!='*')
-            c = flag_with_title(static_country, static_country.toUpperCase());
-        return <div className="zone_settings">
-              <ul className="bullets">
-                <Zone_bullet atr="Network type"
-                  tip="The network accessible by this zone">
-                  <Tooltip title={this.network_types[plan.type].tooltip}>
-                    {this.network_types[plan.type].label}
-                  </Tooltip>
-                </Zone_bullet>
-                <Zone_bullet show={plan.ips_type!==undefined}
-                  atr="IP exclusivity">
-                  {this.ips_types[plan.ips_type]}
-                </Zone_bullet>
-                <Zone_bullet atr="Country" tip="Allowed country">
-                  {c}</Zone_bullet>
-                <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
-                  {plan.ips}</Zone_bullet>
-                <Zone_bullet atr="Permissions" tip="Set of permissions">
-                  <Perm_icons perm_list={zone.perm.split(' ')}/></Zone_bullet>
-              </ul>
-            </div>;
-    }
-}
-
-const Zone_bullet = ({tip, show, atr, children})=>{
-    if (show===undefined)
-        show = true;
-    if (!show)
-        return null;
-    return <li className="pair">
-          <Tooltip title={tip}><span className="title">{atr}:</span></Tooltip>
-          <span className="val">{children}</span>
-        </li>;
-};
-
 export const Preset_description = ({preset, rule_clicked})=>{
     if (!preset)
         return null;
@@ -1153,32 +406,6 @@ export const Preset_description = ({preset, rule_clicked})=>{
           </ul>
         </div>;
 };
-
-export const Nav_tabs = ({children, narrow, set_tab, cur_tab})=>
-    <div className={classnames('nav_tabs', {narrow})}>
-      {
-        React.Children.map(children, c=>
-          React.cloneElement(c, {set_tab, cur_tab, narrow}))
-      }
-    </div>;
-
-export const Nav_tab = withRouter(props=>{
-    const {id} = props;
-    return <Route path={`${props.match.path}/${id}`}>{({match})=>{
-        const active = props.cur_tab==id||!!match;
-        const {disabled} = props;
-        const btn_class = classnames('btn_tab', {active, disabled});
-        return <Tooltip title={props.tooltip}>
-              <div onClick={()=>!disabled && props.set_tab(id)}
-                 className={btn_class}>
-                 {!props.narrow && <div className={classnames('icon', id)}/>}
-                <div className="title">{props.title}</div>
-                <div className="arrow"/>
-              </div>
-            </Tooltip>;
-    }}
-    </Route>;
-});
 
 export const Ext_tooltip = ()=><div>
       This feature is only available when using{' '}

@@ -3,7 +3,7 @@
 import React from 'react';
 import Har_viewer from './har_viewer.js';
 import {withRouter} from 'react-router-dom';
-import {Nav_tabs, Nav_tab} from './common.js';
+import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {Chrome_table} from './chrome_widgets.js';
 import zurl from '../../util/url.js';
 import ajax from '../../util/ajax.js';

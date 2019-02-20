@@ -4,11 +4,12 @@ import React from 'react';
 import ajax from '../../../util/ajax.js';
 import {Chrome_table} from '../chrome_widgets.js';
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Nav_tabs, Nav_tab, Note, Ext_tooltip} from '../common.js';
+import {Note, Ext_tooltip} from '../common.js';
 import moment from 'moment';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
+import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 
 moment.relativeTimeThreshold('ss', 3);
 

@@ -13,8 +13,8 @@ import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
 import {status_codes, bytes_format} from './util.js';
 import Waypoint from 'react-waypoint';
-import {Toolbar_button, Tooltip, Devider, Sort_icon,
-    with_resizable_cols} from './chrome_widgets.js';
+import {Toolbar_button, Devider, Sort_icon, with_resizable_cols,
+    Toolbar_container, Toolbar_row, Tooltip} from './chrome_widgets.js';
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
 import ws from './ws.js';
@@ -148,7 +148,7 @@ class Har_viewer extends Pure_component {
                     cur_preview={this.state.cur_preview}/>
                   <Preview cur_preview={this.state.cur_preview}
                     style={preview_style}
-                    close_preview={this.close_preview}/>
+                    close={this.close_preview}/>
                   <Tables_resizer show={!!this.state.cur_preview}
                     start_moving={this.start_moving_width}
                     offset={this.state.tables_width}/>
@@ -176,7 +176,7 @@ class Toolbar extends Pure_component {
         const {clear, search_val, on_change_search, type_filter,
             set_type_filter, filters, set_filter, master_port, undock,
             dock_mode} = this.props;
-        return <div className="toolbar_container">
+        return <Toolbar_container>
               <Toolbar_row>
                 <Toolbar_button id="clear" tooltip="Clear" on_click={clear}/>
                 {!dock_mode &&
@@ -206,14 +206,9 @@ class Toolbar extends Pure_component {
                     master_port={master_port}/>
                 </Toolbar_row>
               }
-            </div>;
+            </Toolbar_container>;
     }
 }
-
-const Toolbar_row = ({children})=>
-    <div className="toolbar">
-      {children}
-    </div>;
 
 class Actions extends Pure_component {
     state = {any_checked: false};

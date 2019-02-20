@@ -3,14 +3,17 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {Input, Select, Loader, Modal, Warnings, Nav, with_proxy_ports,
-    Tooltip, Add_icon, Remove_icon} from './common.js';
+import {Loader, Warnings, Nav, with_proxy_ports, Add_icon,
+    Remove_icon} from './common.js';
+import {Input, Select} from './common/controls.js';
 import classnames from 'classnames';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
 import Preview from './har_preview.js';
 import Proxy_blank from './proxy_blank.js';
 import {withRouter} from 'react-router-dom';
+import Tooltip from './common/tooltip.js';
+import {Modal} from './common/modals.js';
 
 const Proxy_tester = ()=>
     <div className="vbox"
@@ -30,7 +33,7 @@ export const Tester = class Tester extends Pure_component {
                 no_labels={this.props.no_labels}
                 port={this.props.port} hide_port={!!this.props.port}/>
               <Preview cur_preview={this.state.response}
-                close_preview={this.clear_response}/>
+                close={this.clear_response}/>
             </div>;
     }
 };

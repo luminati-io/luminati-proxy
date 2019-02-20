@@ -1538,5 +1538,9 @@ E._class = function(cls){
     }
     return cls;
 };
+E.shutdown = function(){
+    while (E.root.length)
+        E.root[0].return();
+};
 
 return Etask; }); }());

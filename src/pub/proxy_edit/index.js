@@ -8,9 +8,9 @@ import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import setdb from '../../../util/setdb.js';
 import zurl from '../../../util/url.js';
-import {Modal, Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
-    Loader_small, Zone_description, Preset_description, Nav_tabs,
-    Nav_tab, Ext_tooltip, Tooltip} from '../common.js';
+import {Loader, Warnings, Link_icon, Checkbox, Pagination_panel,
+    Loader_small, Preset_description, Ext_tooltip} from '../common.js';
+import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
 import {presets} from '../util.js';
@@ -23,6 +23,9 @@ import Speed from './speed.js';
 import Headers from './headers.js';
 import Logs from './logs.js';
 import {map_rule_to_form} from './rules.js';
+import Tooltip from '../common/tooltip.js';
+import Zone_description from '../common/zone_desc.js';
+import {Modal} from '../common/modals.js';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){

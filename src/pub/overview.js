@@ -7,7 +7,7 @@ import Har_viewer from './har_viewer';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import semver from 'semver';
-import {Tooltip} from './common.js';
+import Tooltip from './common/tooltip.js';
 
 class Overview extends Pure_component {
     componentDidMount(){

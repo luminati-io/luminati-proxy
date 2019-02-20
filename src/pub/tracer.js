@@ -6,10 +6,15 @@ import {withRouter} from 'react-router-dom';
 import classnames from 'classnames';
 import etask from '../../util/etask.js';
 import Proxy_blank from './proxy_blank.js';
-import {Input, Loader, Nav, Loader_small, Tooltip, Circle_li as Li,
-    Modal_dialog, Warning, with_proxy_ports} from './common.js';
-import {status_codes, swagger_link_tester_url} from './util.js';
+import {Loader, Nav, Loader_small, Warning,
+    with_proxy_ports} from './common.js';
+import {swagger_link_tester_url} from './util.js';
+import Preview from './har_preview.js';
 import ws from './ws.js';
+import {Instructions, Li} from './common/bullets.js';
+import Tooltip from './common/tooltip.js';
+import {Input} from './common/controls.js';
+import {Modal_dialog} from './common/modals.js';
 
 export default withRouter(class Tracer extends Pure_component {
     state = {loading: false};
@@ -84,7 +89,6 @@ export default withRouter(class Tracer extends Pure_component {
               <Result redirects={this.state.redirects}
                 loading={this.state.loading}
                 tracing_url={this.state.tracing_url}
-                loading_page={this.state.loading_page}
                 traced={this.state.traced} filename={this.state.filename}/>
               <Modal_dialog title="Error" open={this.state.errors}
                 ok_clicked={this.dismiss_errors} no_cancel_btn>
@@ -102,23 +106,22 @@ const Error_ssl_off = ({port, goto_ssl})=>
       <span> in the proxy port configuration page.</span>
     </span>;
 
-const Result = ({redirects, loading, tracing_url, filename, loading_page,
-    traced})=>
-{
+const Result = props=>{
+    const {redirects, loading, tracing_url, filename, traced} = props;
     if (!redirects)
         return null;
     return <div>
-          <div className="results instructions">
-            <ol>
-              {redirects.map(l=>
-                <Result_row key={l.url} url={l.url} code={l.code}
-                  log={l.req_log}/>
-              )}
-              {tracing_url && loading && <Result_row url={tracing_url}/>}
-            </ol>
-            {tracing_url && loading && <Loader_small show
-                loading_msg="Loading..."/>}
-          </div>
+          <Instructions>
+            {redirects.map(l=>
+              <Result_row key={l.url} url={l.url} log={l.req_log}/>
+            )}
+            {tracing_url && loading &&
+              <Result_row loading url={tracing_url}/>
+            }
+            {tracing_url && loading &&
+              <Loader_small show loading_msg="Loading..."/>
+            }
+          </Instructions>
           {traced &&
             <div className="live_preview">
               <Loader show={loading}/>
@@ -128,25 +131,32 @@ const Result = ({redirects, loading, tracing_url, filename, loading_page,
         </div>;
 };
 
-const calc_tip = (code, log)=>{
-    if (!code)
-        return null;
-    const title = `${code} - ${status_codes[code]}`;
-    const _headers = log.response.headers.map(h=>
-        `<li><strong>${h.name}:</strong> ${h.value}</li>`).join('\n');
-    return `${title}</br><ul>${_headers}</ul>`;
-};
-const Result_row = ({url, code, log})=>{
-    const tip = calc_tip(code, log);
-    return <Li>
-          <Tooltip title={tip} placement="right">
-            <span>
-              {url+' '}
-              {code && <strong>({code})</strong>}
-            </span>
-          </Tooltip>
-        </Li>;
-};
+class Result_row extends Pure_component {
+    state = {open: false};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const tip = 'click to '+(this.state.open ? 'hide' : 'show details');
+        const {log} = this.props;
+        const code = log && log.response.status;
+        const open = this.state.open;
+        const classes = classnames('step_title', {open, expandable: !!log});
+        return <Li>
+              <Tooltip key={this.props.url+tip} title={log ? tip : ''}
+                placement="right">
+                <span className={classes} onClick={this.toggle}>
+                  {this.props.url}
+                  {code && <strong className="status_code">({code})</strong>}
+                </span>
+              </Tooltip>
+              {!!log &&
+                <div className={classnames('preview_wrapper', 'vbox',
+                  {closed: !open, open})}>
+                  <Preview cur_preview={log} close={this.toggle}/>
+                </div>
+              }
+            </Li>;
+    }
+}
 
 const Request = with_proxy_ports(class Request extends Pure_component {
     def_url = 'http://lumtest.com/myip.json';
@@ -196,7 +206,7 @@ const Request = with_proxy_ports(class Request extends Pure_component {
 
 const Send_button = ({on_click, disabled})=>
     <div className="go_btn_wrapper">
-      <Tooltip title="Start testing redirections">
+      <Tooltip key={''+disabled} title="Start testing redirections">
         <button onClick={on_click} className="btn btn_lpm btn_lpm_primary"
           disabled={disabled}>Test</button>
       </Tooltip>

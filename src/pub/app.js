@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import {withRouter, Switch, BrowserRouter, Route} from 'react-router-dom';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
+import 'flag-icon-css/css/flag-icon.css';
 import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
@@ -21,7 +22,8 @@ import Tracer from './tracer.js';
 import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
-import {Enable_ssl_modal, Error_boundry} from './common.js';
+import Enable_ssl_modal from './common/ssl_modal.js';
+import Error_boundry from './common/error_boundry.js';
 import './app.less';
 import ws from './ws.js';
 

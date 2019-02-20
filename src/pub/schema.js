@@ -3,8 +3,8 @@
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
 import classnames from 'classnames';
-import {Tooltip} from './common.js';
 import {get_static_country} from './util.js';
+import Tooltip from './common/tooltip.js';
 
 const tooltips = {
     crawler: `Your crawler or bot that systematically browses the web. Connect

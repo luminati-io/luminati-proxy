@@ -4,7 +4,8 @@ import 'prismjs/themes/prism.css';
 import React from 'react';
 import prism from 'prismjs';
 import instructions from './instructions.js';
-import {Code, Nav_tabs, Nav_tab} from './common.js';
+import {Code} from './common.js';
+import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {ga_event, swagger_url} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
@@ -130,9 +131,7 @@ class Browser_instructions extends Pure_component {
                 </select>
               </div>
               <div className="instructions_well">
-                <div className="instructions">
-                  {instructions.browser(this.port)[browser]}
-                </div>
+                {instructions.browser(this.port)[browser]}
               </div>
             </div>;
     }

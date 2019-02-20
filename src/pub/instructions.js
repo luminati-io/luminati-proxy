@@ -1,7 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Code, Circle_li as Li} from './common.js';
+import {Code} from './common.js';
+import {Instructions, Li} from './common/bullets.js';
 
 const E = {};
 
@@ -104,7 +105,7 @@ const Last_step = ()=>
       and start browsing.</Li>;
 
 E.browser = (proxy=24000)=>({
-    chrome_win: <ol>
+    chrome_win: <Instructions>
           <Li>Open <Code>chrome://settings/</Code> in
             a <a className="link" onClick={()=>window.open()}>new tab</a>.</Li>
           <Li>Click <code>Advanced</code></Li>
@@ -120,8 +121,8 @@ E.browser = (proxy=24000)=>({
           <Li>Check the "Bypass proxy server for local addresses" checkbox</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
           <Last_step/>
-        </ol>,
-    chrome_mac: <ol>
+        </Instructions>,
+    chrome_mac: <Instructions>
           <Li>Open <Code>chrome://settings/</Code> in
             a <a className="link" onClick={()=>window.open()}>new tab</a>.</Li>
           <Li>Click <code>Advanced</code></Li>
@@ -137,8 +138,8 @@ E.browser = (proxy=24000)=>({
           </Li>
           <Li>Save changes by pressing <code>OK</code>.</Li>
           <Last_step/>
-        </ol>,
-    ie: <ol>
+        </Instructions>,
+    ie: <Instructions>
           <Li>Click the Tools button, and then click Internet options.</Li>
           <Li>Click the Connections tab.</Li>
           <Li>Click <code>LAN settings</code></Li>
@@ -150,8 +151,8 @@ E.browser = (proxy=24000)=>({
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
           <Last_step/>
-        </ol>,
-    firefox: <ol>
+        </Instructions>,
+    firefox: <Instructions>
           <Li>Open <Code>about:preferences</Code> in
             a <a className="link" onClick={()=>window.open()}>new tab</a>.</Li>
           <Li>Click the <code>General</code> tab and scroll down to
@@ -169,8 +170,8 @@ E.browser = (proxy=24000)=>({
             area.</Li>
           <Li>Save changes by pressing <code>OK</code></Li>
           <Last_step/>
-        </ol>,
-    safari: <ol>
+        </Instructions>,
+    safari: <Instructions>
           <Li>
             Pull down the Safari menu and select <code>Preferences</code></Li>
           <Li>Click on the <code>Advanced</code> icon.</Li>
@@ -185,7 +186,7 @@ E.browser = (proxy=24000)=>({
           </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
           <Last_step/>
-        </ol>,
+        </Instructions>,
 });
 
 export default E;

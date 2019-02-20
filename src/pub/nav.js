@@ -6,13 +6,14 @@ import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import classnames from 'classnames';
-import {Tooltip, Modal} from './common.js';
 import {swagger_url} from './util.js';
 import Schema from './schema.js';
 import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
 import $ from 'jquery';
 import {Route, withRouter, Link} from 'react-router-dom';
+import Tooltip from './common/tooltip.js';
+import {Modal} from './common/modals.js';
 
 const Nav = ()=>
     <div className="nav">

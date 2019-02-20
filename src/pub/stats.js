@@ -8,7 +8,8 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {withRouter} from 'react-router-dom';
 import {Tooltip, Toolbar_button, Devider, Sort_icon,
-    with_resizable_cols} from './chrome_widgets.js';
+    with_resizable_cols, Toolbar_container,
+    Toolbar_row} from './chrome_widgets.js';
 
 class Stats extends Pure_component {
     state = {
@@ -201,15 +202,15 @@ class Toolbar extends Pure_component {
         });
     };
     render(){
-        return <div className="toolbar_container">
-              <div className="toolbar">
+        return <Toolbar_container>
+              <Toolbar_row>
                 <Toolbar_button id="clear" tooltip="Clear"
                   on_click={this.clear}/>
                 <Devider/>
                 <Success_ratio total={this.props.stats.total}
                   success={this.props.stats.success}/>
-              </div>
-            </div>;
+              </Toolbar_row>
+            </Toolbar_container>;
     }
 }
 

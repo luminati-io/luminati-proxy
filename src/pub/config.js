@@ -5,13 +5,14 @@ import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Nav, Modal, Link_icon} from './common.js';
+import {Nav, Link_icon} from './common.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
 import {ga_event} from './util.js';
+import {Modal} from './common/modals.js';
 
 class Config extends Pure_component {
     constructor(props){

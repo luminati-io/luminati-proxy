@@ -2,10 +2,11 @@
 'use strict'; /*jslint react:true, es6:true*/
 import etask from '../../util/etask.js';
 import React from 'react';
-import {Modal, Loader} from './common.js';
+import {Loader} from './common.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {detect_browser} from './util.js';
+import {Modal} from './common/modals.js';
 
 class Index extends Pure_component {
     state = {desc: '', email: '', sending: false};
@@ -45,7 +46,7 @@ class Index extends Pure_component {
                 <div className="desc">Briefly describe your issue below and
                   our support engineer will contact you shortly:</div>
                 <textarea placeholder="Describe your issue here"
-                  value={this.state.desc}
+                  style={{width: '100%'}} value={this.state.desc}
                   onChange={this.desc_changed}/>
                 <div className="email_field">
                   <span>Contact in the following address</span>

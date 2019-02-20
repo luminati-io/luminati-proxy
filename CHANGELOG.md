@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.124.62 Development Latest
+- :star: Improved UI in Link Tester
+- :star: Improved UI proxies list table
+
 ## 1.123.411 Development Latest
 - :bug: Fixed 'SSL to superproxy'
 - :star: Resolved stability issues in China

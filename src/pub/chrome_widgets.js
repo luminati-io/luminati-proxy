@@ -2,20 +2,21 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
-import * as Common from './common.js';
 import classnames from 'classnames';
 import _ from 'lodash';
+import Default_tooltip from './common/tooltip.js';
 
-export const Toolbar_button = ({id, tooltip, on_click, active, href})=>
+export const Toolbar_button = ({id, tooltip, active, href, ...props})=>
     <Tooltip title={tooltip} placement={'bottom'}>
       <a className={classnames('toolbar_item toolbar_button', id, {active})}
-        onClick={on_click||(()=>null)} href={href}>
-        <span className={id}/>
+        onClick={props.on_click||(()=>null)} href={href}>
+        <span className={classnames(id, 't_button', 'chrome_icon')}/>
+        {props.children}
       </a>
     </Tooltip>;
 
 export const Tooltip = props=>
-    <Common.Tooltip className="har_tooltip" {...props}/>;
+    <Default_tooltip className="har_tooltip" {...props}/>;
 
 export const Devider = ()=><div className="devider"/>;
 
@@ -164,17 +165,17 @@ export class Chrome_table extends Pure_component {
         const {cols, title, children} = this.props;
         return <div className="chrome chrome_table">
               <div className="main_panel vbox">
-                <div className="toolbar_container">
-                  <div className="toolbar">
+                <Toolbar_container>
+                  <Toolbar_row>
                     <div className="title_wrapper">{title}</div>
-                  </div>
+                  </Toolbar_row>
+                </Toolbar_container>
+                <div className="tables_container vbox">
+                  <Header_container cols={cols}/>
+                  <Data_container cols={cols} data={this.state.data}>
+                    {children}
+                  </Data_container>
                 </div>
-                  <div className="tables_container vbox">
-                    <Header_container cols={cols}/>
-                    <Data_container cols={cols} data={this.state.data}>
-                      {children}
-                    </Data_container>
-                  </div>
               </div>
             </div>;
     }
@@ -210,4 +211,14 @@ const Header_container = ({cols})=>
           </tr>
         </tbody>
       </table>
+    </div>;
+
+export const Toolbar_container = ({children})=>
+    <div className="toolbar_container">
+      {children}
+    </div>;
+
+export const Toolbar_row = ({children})=>
+    <div className="toolbar">
+      {children}
     </div>;
