@@ -1,16 +1,6 @@
 [
     {
-        "ver": "1.124.155",
-        "type": "stable",
-        "changes": [
-            {
-                "type": "bug",
-                "text": "Fixed issues realted to LokiJS"
-            }
-        ]
-    },
-    {
-        "ver": "1.124.62",
+        "ver": "1.124.193",
         "type": "dev",
         "changes": [
             {
