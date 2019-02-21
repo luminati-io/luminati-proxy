@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.124.155 Stable
+- :bug: Fixed issues realted to LokiJS
+
 ## 1.124.62 Development Latest
 - :star: Improved UI in Link Tester
 - :star: Improved UI proxies list table
