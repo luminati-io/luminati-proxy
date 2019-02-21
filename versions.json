@@ -1,6 +1,16 @@
 [
     {
-        "ver": "1.124.193",
+        "ver": "1.124.224",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "UI bug fix"
+            }
+        ]
+    },
+    {
+        "ver": "1.124.62",
         "type": "dev",
         "changes": [
             {

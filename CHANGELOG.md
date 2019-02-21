@@ -1,6 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.124.193 Development Latest
+## 1.124.224 Stable
+- :bug: UI bug fix
+
+## 1.124.62 Development Latest
 - :star: Improved UI in Link Tester
 - :star: Improved UI proxies list table
 

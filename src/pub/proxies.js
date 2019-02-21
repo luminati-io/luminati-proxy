@@ -749,7 +749,7 @@ class Cell extends React.Component {
             const S_cell = col.render;
             return <S_cell proxy={props.rowData} mgr={props.mgr}/>;
         }
-        return props.cellData;
+        return props.cellData||'';
     }
 }
 
