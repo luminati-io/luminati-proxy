@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.124.317",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Prepare code for pending unblocker feature"
+            }
+        ]
+    },
+    {
         "ver": "1.124.224",
         "type": "stable",
         "changes": [
@@ -39,7 +49,7 @@
     },
     {
         "ver": "1.123.208",
-        "type": "stable/dev",
+        "type": "dev",
         "changes": []
     },
     {

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.124.317 Development Latest
+- :sparkles: Prepare code for pending unblocker feature
+
 ## 1.124.224 Stable
 - :bug: UI bug fix
 
@@ -11,7 +14,7 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed 'SSL to superproxy'
 - :star: Resolved stability issues in China
 
-## 1.123.208 
+## 1.123.208 Development Latest
 
 ## 1.123.8 Stable
 - :star: UI improvements: websocket automatically reconnects

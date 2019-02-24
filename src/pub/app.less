@@ -1333,20 +1333,12 @@ span.icon_link {
     min-height: 301px;
 }
 .proxies {
-    font-size: 14px;
     &.nav_header { padding: 0 15px 10px; }
     .proxies_panel {
         height: 100%;
-        .head_actions { width: 80px; }
-        .proxy_row {
-            display: flex;
-            &.default {
-                td { opacity: 0.6; }
-                td.proxies_actions { opacity: 1; }
-            }
-        }
     }
     .proxies_actions {
+        visibility: hidden;
         display: grid;
         grid-template-columns: 25% 25% 25% 25%;
         .action_icon.chrome_icon { width: 18px; }
@@ -1354,6 +1346,11 @@ span.icon_link {
         .duplicate { grid-column: 2; }
         .refresh { grid-column: 3; }
         .browser { grid-column: 4; }
+    }
+    .chrome_tr:hover {
+        .proxies_actions {
+            visibility: visible;
+        }
     }
 }
 .zone_tooltip {
