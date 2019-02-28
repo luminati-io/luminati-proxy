@@ -168,7 +168,7 @@ class Body_section extends Pure_component {
             <ol key="ol"
               className={classnames('children', {open: this.state.open})}>
               {!!json && <JSON_viewer json={json}/>}
-              {!!raw_body && <Header_pair name="p" value={raw_body}/>}
+              {!!raw_body && <Header_pair name="raw-data" value={raw_body}/>}
             </ol>
         ];
     }

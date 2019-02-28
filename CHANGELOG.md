@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.125.95 Stable
+- :star: Improved 'Download all proxy ports as CSV'
+
 ## 1.124.317 Development Latest
 - :sparkles: Prepare code for pending unblocker feature
 

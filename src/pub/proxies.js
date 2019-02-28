@@ -182,6 +182,7 @@ const columns = [
         width: 80,
         shrink: 0,
         grow: 0,
+        csv: false,
     },
     {
         key: 'internal_name',
@@ -210,7 +211,7 @@ const columns = [
         render: Type_cell,
         tooltip: 'Type of connected proxy - Luminati proxy or external proxy '
             +'(non-Luminati)',
-        sticky: true,
+        default: true,
         ext: true,
         width: 70,
     },
@@ -219,7 +220,7 @@ const columns = [
         title: 'Status',
         type: 'status',
         render: Status_cell,
-        sticky: true,
+        default: true,
         tooltip: 'Real time proxy status',
         ext: true,
         dynamic: true,
@@ -242,20 +243,17 @@ const columns = [
         ext: true,
     },
     {
-        key: 'history',
-        title: 'Logs',
-        render: Boolean_cell,
-        tooltip: 'Last 1K requests are automatically logged for easy '
-            +'debugging. To save all requests, Enable Logs in proxy '
-            +'configuration page',
-        ext: true,
-    },
-    {
         key: 'ssl',
         title: 'SSL Log',
         render: Boolean_cell,
         tooltip: 'In order to log HTTPS requests, enable SSL Logs in proxy '
             +'configuration',
+        ext: true,
+    },
+    {
+        key: 'secure_proxy',
+        title: 'SSL for super proxy',
+        render: Boolean_cell,
         ext: true,
     },
     {
@@ -266,12 +264,6 @@ const columns = [
         tooltip: 'Specific Luminati zone configured for this proxy. Switch '
             +'zones in proxy configuration page.',
         render: Zone_cell,
-    },
-    {
-        key: 'secure_proxy',
-        title: 'SSL for super proxy',
-        render: Boolean_cell,
-        ext: true,
     },
     {
         key: 'country',
@@ -414,7 +406,7 @@ const columns = [
         title: 'BW',
         render: ({proxy})=>Tooltip_bytes({bytes: proxy.bw,
             bytes_out: proxy.out_bw, bytes_in: proxy.in_bw}),
-        sticky: true,
+        default: true,
         ext: true,
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
@@ -424,8 +416,8 @@ const columns = [
     {
         key: 'reqs',
         title: 'Requests',
-        sticky: true,
         render: Reqs_cell,
+        default: true,
         ext: true,
         tooltip: 'Number of all requests sent from this proxy port',
         dynamic: true,
@@ -435,7 +427,7 @@ const columns = [
     {
         key: 'last_req.url',
         title: 'Last request',
-        sticky: true,
+        default: true,
         render: Last_req_cell,
         ext: true,
         tooltip: 'Last request that was sent on this proxy port',
@@ -631,7 +623,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         });
     };
     download_csv = ()=>{
-        const data = this.state.proxies.map(p=>['127.0.0.1:'+p.port]);
+        const cols = this.get_cols().filter(c=>c.csv==undefined || c.csv);
+        const titles = [cols.map(col=>col.title)];
+        const data = titles.concat(this.state.proxies.map(p=>{
+            return cols.map(col=>{
+                const val = _.get(p, col.key);
+                if (val==undefined)
+                    return '-';
+                return val;
+            });
+        }));
         filesaver.saveAs(csv.to_blob(data), 'proxies.csv');
     };
     edit_columns = ()=>$('#edit_columns').modal('show');
@@ -650,10 +651,13 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         else
             this.props.history.push(`/proxy/${proxy.port}`);
     };
+    get_cols = ()=>{
+        return columns.filter(col=>this.state.selected_cols.includes(col.key)
+            || col.sticky || col.calc_show &&
+            col.calc_show(this.state.filtered_proxies));
+    };
     render(){
-        const cols = columns.filter(col=>
-            this.state.selected_cols.includes(col.key) || col.sticky ||
-            col.calc_show && col.calc_show(this.state.filtered_proxies));
+        const cols = this.get_cols();
         if (!this.state.zones)
             return null;
         if (!this.state.countries)
@@ -747,7 +751,8 @@ class Cell extends React.Component {
         else if (col.render)
         {
             const S_cell = col.render;
-            return <S_cell proxy={props.rowData} mgr={props.mgr}/>;
+            return <S_cell proxy={props.rowData} mgr={props.mgr}
+              col={props.dataKey}/>;
         }
         return props.cellData||'';
     }

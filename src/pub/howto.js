@@ -35,7 +35,8 @@ const Howto = withRouter(class Howto extends Pure_component {
                     <Nav_tab id="code" title="Code"
                       tooltip="Examples how to use LPM programatically"/>
                     <Nav_tab id="browser" title="Browser"
-                      tooltip="Examples how to inegrate LPM with the browser"/>
+                      tooltip="Examples how to integrate LPM with the
+                      browser"/>
                   </Nav_tabs>
                   <Instructions>{this.props.children}</Instructions>
                 </div>

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.125.95",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved 'Download all proxy ports as CSV'"
+            }
+        ]
+    },
+    {
         "ver": "1.124.317",
         "type": "dev",
         "changes": [

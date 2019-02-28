@@ -44,7 +44,7 @@ class Request extends Pure_component {
     state = {
         headers: [this.first_header],
         max_idx: 0,
-        params: {url: 'http://lumtest.com/myip.json', method: 'GET'},
+        params: {url: 'http://lumtest.com/myip.json'},
         show_loader: false,
         lock: false,
     };
@@ -97,7 +97,6 @@ class Request extends Pure_component {
                     return acc;
                 return {...acc, [el.header]: el.value};
             }, {}),
-            method: this.state.params.method,
             url: this.state.params.url,
         };
         this.setState({show_loader: true});
@@ -109,13 +108,12 @@ class Request extends Pure_component {
             });
             this.on('finally', ()=>_this.setState({show_loader: false}));
             const resp = yield ajax.json({method: 'POST', url, data,
-                timeout: 60000});
+                timeout: 120000});
             if (resp.error)
             {
                 _this.setState({warnings: [{msg: resp.error}]});
                 $('#warnings_modal').modal();
-                ga_event('proxy_tester', 'response has errors',
-                    resp.error);
+                ga_event('proxy_tester', 'response has errors', resp.error);
             }
             else
             {
@@ -158,9 +156,6 @@ class Request extends Pure_component {
 }));
 
 const Request_params = ({params, update, ...props})=>{
-    const methods = [{key: 'GET', value: 'GET'}, {key: 'POST', value: 'POST'}];
-    const method_tip = `Method of a test request. Leave GET if you don't know
-    what to choose`;
     const port_changed = port=>{
         update('port', port);
     };
@@ -177,18 +172,14 @@ const Request_params = ({params, update, ...props})=>{
           }
           <Field params={params} update={update} name="url" type="text"
             tooltip="URL that Proxy Tester will use to send a test request"
-            on_key_up={props.key_up}
-            no_labels={props.no_labels}/>
-          <Field params={params} update={update} name="method" type="select"
-            data={methods} tooltip={method_tip}
-            no_labels={props.no_labels}/>
+            on_key_up={props.key_up} no_labels={props.no_labels}/>
         </div>;
 };
 
 // XXX krzysztof: Refactor it the same as link tester, field should take
 // children. This is too generic and complex
 const Field = ({name, ...props})=>{
-    const fields = {port: 'Proxy port', url: 'URL', method: 'Method'};
+    const fields = {port: 'Proxy port', url: 'URL'};
     const on_change_wrapper = val=>{
         props.update(name, val);
     };

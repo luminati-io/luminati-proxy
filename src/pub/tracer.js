@@ -24,7 +24,7 @@ export default withRouter(class Tracer extends Pure_component {
         ws.removeEventListener('message', this.on_message);
     }
     set_result = res=>this.setState(res);
-    execute = ({url, port, uid}, def_port)=>{
+    execute = ({url, port}, def_port)=>{
         url = url.trim();
         port = port||def_port;
         if (!/^https?:\/\//.test(url))
@@ -45,7 +45,7 @@ export default withRouter(class Tracer extends Pure_component {
             const raw_trace = yield window.fetch('/api/trace', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({url, port, uid}),
+                body: JSON.stringify({url, port}),
             });
             if (raw_trace.status==200)
             {
@@ -160,10 +160,9 @@ class Result_row extends Pure_component {
 
 const Request = with_proxy_ports(class Request extends Pure_component {
     def_url = 'http://lumtest.com/myip.json';
-    state = {url: this.def_url, port: '', uid: ''};
+    state = {url: this.def_url, port: ''};
     url_changed = value=>this.setState({url: value});
     port_changed = port=>this.setState({port});
-    uid_changed = uid=>this.setState({uid});
     go_clicked = ()=>this.props.execute(this.state, this.props.def_port);
     key_up = e=>{
         if (e.keyCode==13)
@@ -176,8 +175,6 @@ const Request = with_proxy_ports(class Request extends Pure_component {
             test.`;
         const url_tip = `URL that will be used as a starting point. Following
             requests will be done based on 'Location' header of the response.`;
-        const uid_tip = `Add unique tracking parameter inside a request header.
-            It can be used for your future analysis.`;
         const Port_select = this.props.port_select;
         return <div className="panel no_border request">
               <div className="fields">
@@ -190,12 +187,6 @@ const Request = with_proxy_ports(class Request extends Pure_component {
                   <Input type="text" val={this.state.url}
                     on_change_wrapper={this.url_changed}
                     disabled={this.props.loading} on_key_up={this.key_up}/>
-                </Field>
-                <Field title="X-Unique-Id header (optional)" tooltip={uid_tip}
-                  className="uid">
-                  <Input type="text" val={this.state.uid}
-                    on_change_wrapper={this.uid_changed}
-                    disabled={this.props.loading}/>
                 </Field>
               </div>
               <Send_button on_click={this.go_clicked}

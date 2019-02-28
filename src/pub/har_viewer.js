@@ -938,7 +938,7 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
                 delayHide={100} delayShow={0} delayUpdate={500}
                 offset={{top: -10}}>
                 <div>
-                  Status code of this request could not be parsed becasue the
+                  Status code of this request could not be parsed because the
                   connection is encrypted.
                 </div>
                 <div style={{marginTop: 10}}>

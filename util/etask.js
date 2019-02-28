@@ -1351,7 +1351,7 @@ E._apply = function(opt, func, _this, args){
 // nfn_apply([opt, ]object, method, args)
 // nfn_apply([opt, ]func, this, args)
 E.nfn_apply = function(opt, func, _this, args){
-    var _opt = {nfn: 1};
+    var _opt = {nfn: 1, cancel: 1};
     if (typeof opt=='function' || typeof func=='string')
     {
         args = _this;
@@ -1539,8 +1539,19 @@ E._class = function(cls){
     return cls;
 };
 E.shutdown = function(){
+    var prev;
     while (E.root.length)
-        E.root[0].return();
+    {
+        var e = E.root[0];
+        if (e==prev)
+        {
+            assert(e.tm_completed);
+            zerr.zexit('etask root not removed after return - '+
+                'fix non-cancelable child etask');
+        }
+        prev = e;
+        e.return();
+    }
 };
 
 return Etask; }); }());

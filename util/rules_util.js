@@ -60,6 +60,7 @@ E.action_types = [
         only_url: true, url: true},
     {key: 'Process data', value: 'process', only_url: true, url: true,
         type: 'post'},
+    {key: 'Solve captcha', value: 'solve_captcha', url: true, type: 'post'},
 ];
 
 const gen_function = (name, body)=>{
@@ -109,7 +110,7 @@ E.migrate_trigger = rule=>{
         +`  return false;\n`;
         type = 'after_body';
     }
-    if (rule.action && rule.action.process)
+    if (rule.action && (rule.action.process || rule.action.solve_captcha))
         type = 'after_body';
     if (rule.url)
     {
@@ -159,6 +160,8 @@ const get_action = rule=>{
         body += `opt.direct()\n`;
     if (rule.action.bypass_proxy)
         body += `opt.bypass_proxy()\n`;
+    if (rule.action.solve_captcha)
+        body += `opt.solve_captcha()\n`;
     body += `return true;`;
     return gen_function('action', body);
 };

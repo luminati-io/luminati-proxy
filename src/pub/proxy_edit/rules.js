@@ -41,6 +41,8 @@ const rule_prepare = rule=>{
         try { action.process = JSON.parse(rule.process); }
         catch(e){ console.log('wrong json'); }
     }
+    else if (rule.action=='solve_captcha')
+        action.solve_captcha = true;
     else if (rule.action=='null_response')
         action.null_response = true;
     else if (rule.action=='bypass_proxy')
@@ -97,6 +99,8 @@ export const map_rule_to_form = rule=>{
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
     if (rule.action.process)
         result.process = JSON.stringify(rule.action.process, null, '  ');
+    if (rule.action.solve_captcha)
+        result.solve_captcha = true;
     if (rule.action.email)
     {
         result.send_email = true;
@@ -294,8 +298,12 @@ class Action extends Pure_component {
                 this.setState({logins: consts.logins});
         });
         this.setdb_on('head.defaults', defaults=>{
-            if (defaults && defaults.www_api)
-                this.setState({www: defaults.www_api});
+            if (defaults)
+                this.setState({defaults});
+        });
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({settings});
         });
     }
     set_rule_field = (field, value)=>{
@@ -332,21 +340,22 @@ class Action extends Pure_component {
     };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {logins, www} = this.state;
+        const {logins, defaults, settings} = this.state;
+        if (!rule.trigger_type || !settings)
+            return null;
         const _action_types = [default_action].concat(action_types
         .filter(at=>at.value!='save_to_fast_pool' ||
             rule.trigger_type=='max_req_time')
         .filter(at=>rule.trigger_type=='url' && at.url ||
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
-            at.min_req_time));
+            at.min_req_time)
+        .filter(at=>at.value!='solve_captcha'||settings['2captcha']));
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);
         ports.unshift({key: '--Select--', value: ''});
         const fast_pool_note = <Fast_pool_note port={current_port}
           r={rule.trigger_url_regex}/>;
-        if (!rule.trigger_type)
-            return null;
         return <React.Fragment>
               <div className="action ui">
                 {rule.trigger_type &&
@@ -395,7 +404,7 @@ class Action extends Pure_component {
                 {rule.send_email && logins && logins.length>1 &&
                   <Rule_config id="email" type="select" rule={rule}
                     data={logins.map(l=>({key: l, value: l}))}
-                    note={<Email_note www={www}/>}/>
+                    note={<Email_note www={defaults.www_api}/>}/>
                 }
               </div>
               <Action_code rule={rule}/>
