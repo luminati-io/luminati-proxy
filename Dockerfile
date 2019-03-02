@@ -5,9 +5,15 @@
 #
 
 # Pull base image.
-FROM node:9.4.0
+FROM node:10.10
 
-RUN npm install -g npm@4.6.1
+USER node
+RUN mkdir /home/node/.npm-global
+ENV PATH=/home/node/.npm-global/bin:$PATH
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+
+
+RUN npm install -g npm@6.4.1
 
 # Install Luminati Proxy Manager
 RUN npm install -g @luminati-io/luminati-proxy
