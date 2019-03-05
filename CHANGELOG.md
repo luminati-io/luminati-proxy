@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.125.539 Development Latest
+- :sparkles: Added prototype of 2captcha integration
+
 ## 1.125.95 Stable
 - :star: Improved 'Download all proxy ports as CSV'
 

@@ -1,12 +1,13 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import {withRouter} from 'react-router-dom';
+import $ from 'jquery';
 import {ga_event, status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
 import {Tooltip_bytes} from './common.js';
 import Pure_component from '/www/util/pub/pure_component.js';
-import $ from 'jquery';
-import {withRouter} from 'react-router-dom';
+import setdb from '../../util/setdb.js';
 import {Tooltip, Toolbar_button, Devider, Sort_icon,
     with_resizable_cols, Toolbar_container,
     Toolbar_row} from './chrome_widgets.js';
@@ -180,17 +181,18 @@ const Row = withRouter(class Row extends Pure_component {
 });
 
 const Summary_bar = ({enable_ssl_click, show})=>{
-    if (!show)
-        return null;
     const tooltip = `Enable HTTPS analyzing for all your proxies. You will also
         need to install SSL certificate. It allows you to use rules and logs
         for HTTPS requests`;
     return <div className="summary_bar">
-          <a className="link enable_https" onClick={enable_ssl_click}>
-            <Tooltip title={tooltip}>
-              Enable HTTPS request logging and debugging
-            </Tooltip>
-          </a>
+          {show &&
+            <a className="link enable_https" onClick={enable_ssl_click}>
+              <Tooltip title={tooltip}>
+                Enable HTTPS request logging and debugging
+              </Tooltip>
+            </a>
+          }
+          <span>-</span>
         </div>;
 };
 
@@ -198,7 +200,8 @@ class Toolbar extends Pure_component {
     clear = ()=>{
         ga_event('stats panel', 'click', 'reset btn');
         this.etask(function*(){
-            yield ajax({url: '/api/recent_stats/reset'});
+            yield ajax({url: '/api/logs_reset'});
+            setdb.emit_path('head.har_viewer.reset_reqs');
         });
     };
     render(){

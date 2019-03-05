@@ -47,7 +47,7 @@ conf.luminati_default = {
     proxy_retry: 2,
     proxy_switch: 2,
     api: 'https://luminati-china.io',
-    socket_inactivity_timeout: date.ms.MIN,
+    socket_inactivity_timeout: 120*date.ms.SEC,
     last_preset_applied: 'session_long',
     keep_alive: false,
     multiply_ips: false,

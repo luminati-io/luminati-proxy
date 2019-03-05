@@ -14,6 +14,9 @@ import Proxy_blank from './proxy_blank.js';
 import {withRouter} from 'react-router-dom';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
+import date from '../../util/date.js';
+import {Typeahead} from 'react-bootstrap-typeahead';
+const {SEC} = date.ms;
 
 const Proxy_tester = ()=>
     <div className="vbox"
@@ -108,7 +111,7 @@ class Request extends Pure_component {
             });
             this.on('finally', ()=>_this.setState({show_loader: false}));
             const resp = yield ajax.json({method: 'POST', url, data,
-                timeout: 120000});
+                timeout: 120*SEC});
             if (resp.error)
             {
                 _this.setState({warnings: [{msg: resp.error}]});
@@ -176,8 +179,6 @@ const Request_params = ({params, update, ...props})=>{
         </div>;
 };
 
-// XXX krzysztof: Refactor it the same as link tester, field should take
-// children. This is too generic and complex
 const Field = ({name, ...props})=>{
     const fields = {port: 'Proxy port', url: 'URL'};
     const on_change_wrapper = val=>{

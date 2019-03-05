@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.125.539",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added prototype of 2captcha integration"
+            }
+        ]
+    },
+    {
         "ver": "1.125.95",
         "type": "stable",
         "changes": [
