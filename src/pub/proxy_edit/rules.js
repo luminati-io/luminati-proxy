@@ -305,6 +305,14 @@ class Action extends Pure_component {
             if (settings)
                 this.setState({settings});
         });
+        this.setdb_on('head.zones', zones=>{
+            if (zones)
+                this.setState({zones});
+        });
+        this.setdb_on('head.proxy_edit.zone_name', cur_zone=>{
+            if (cur_zone)
+                this.setState({cur_zone});
+        });
     }
     set_rule_field = (field, value)=>{
         setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
@@ -340,9 +348,12 @@ class Action extends Pure_component {
     };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {logins, defaults, settings} = this.state;
+        const {logins, defaults, settings, zones, cur_zone} = this.state;
         if (!rule.trigger_type || !settings)
             return null;
+        if (!zones || !cur_zone)
+            return null;
+        const zone = (zones.zones||[]).find(z=>z.name==cur_zone)||{};
         const _action_types = [default_action].concat(action_types
         .filter(at=>at.value!='save_to_fast_pool' ||
             rule.trigger_type=='max_req_time')
@@ -350,7 +361,8 @@ class Action extends Pure_component {
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
             at.min_req_time)
-        .filter(at=>at.value!='solve_captcha'||settings['2captcha']));
+        .filter(at=>at.value!='solve_captcha'||settings['2captcha'])
+        .filter(at=>at.value!='refresh_ip'||zone.plan.type=='static'));
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);
         ports.unshift({key: '--Select--', value: ''});

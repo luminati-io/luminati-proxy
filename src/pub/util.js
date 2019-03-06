@@ -311,7 +311,7 @@ const presets = {
             use cases`,
         set: function(opt){},
         clean: opt=>{
-            opt.session = '';
+            opt.session = true;
             opt.pool_size = 1;
             opt.pool_type = null;
             opt.keep_alive = false;

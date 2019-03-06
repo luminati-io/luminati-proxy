@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.125.699 Stable
+- :bug: Fix refresh IPs rule action
+
 ## 1.125.645 Stable
 - :star: Added support for 'Static residential' in UI
 - :star: Updated node and npm versions in Docker file

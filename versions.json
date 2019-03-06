@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.125.699",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix refresh IPs rule action"
+            }
+        ]
+    },
+    {
         "ver": "1.125.645",
         "type": "stable",
         "changes": [
