@@ -263,6 +263,7 @@
       "bin/pub/img/social_btns.svg",
       "bin/pub/img/speed.svg",
       "bin/pub/img/state.svg",
+      "bin/pub/img/static_res.svg",
       "bin/pub/img/stats.svg",
       "bin/pub/img/success.svg",
       "bin/pub/img/target.svg",
@@ -360,7 +361,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "6acffce6a939e8987b3b2c1d54a5a3e8"
+    "md5": "98c0a7fd51a10846dbc2c3e8d49543d1"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -397,5 +398,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.125.539"
+  "version": "1.125.645"
 }

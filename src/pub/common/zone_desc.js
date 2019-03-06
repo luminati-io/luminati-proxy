@@ -22,6 +22,10 @@ export default class Zone_description extends Pure_component {
             label: 'Custom',
             tooltip: `3G and 4G network from real mobile devices`,
         },
+        static_res: {
+            label: 'Static residential',
+            tooltip: 'Static residential IPs',
+        },
     };
     ips_types = {
         shared: 'Shared',
@@ -34,6 +38,8 @@ export default class Zone_description extends Pure_component {
         if (!zone)
             return <span>This zone is disabled</span>;
         const plan = zone.plan;
+        if (plan.pool_ip_type)
+            plan.type = plan.pool_ip_type;
         const static_country = get_static_country({zone: zone_name}, zones);
         let c = any_flag;
         if (static_country && static_country!='any' && static_country!='*')
@@ -55,7 +61,8 @@ export default class Zone_description extends Pure_component {
                 <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
                   {plan.ips}</Zone_bullet>
                 <Zone_bullet atr="Permissions" tip="Set of permissions">
-                  <Perm_icons perm_list={zone.perm.split(' ')}/></Zone_bullet>
+                  <Perm_icons perm_list={zone.perm.split(' ')} plan={plan}/>
+                </Zone_bullet>
               </ul>
             </div>;
     }
@@ -68,6 +75,7 @@ class Perm_icons extends Pure_component {
         country: 'Country resolution',
         state: 'Residential IPs - State resolution',
         data_center: 'Data center IPs',
+        static_res: 'Static residential IPs',
         asn: 'Residential IPs - "Autonomous System Number" (ASN) resolution',
         city: 'Residential IPs - City resolution',
         mobile: 'Mobile IPs',
@@ -83,6 +91,8 @@ class Perm_icons extends Pure_component {
         const icons = perm_list.filter(p=>this.perm_icons.includes(p));
         if (perm.mobile)
             icons.unshift('mobile');
+        else if (this.props.plan.pool_ip_type=='static_res')
+            icons.unshift('static_res');
         else if (perm.vip)
             icons.unshift('residential');
         else if (perm.route_dedicated)

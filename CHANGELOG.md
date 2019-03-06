@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.125.645 Stable
+- :star: Added support for 'Static residential' in UI
+- :star: Updated node and npm versions in Docker file
+
 ## 1.125.539 Development Latest
 - :sparkles: Added prototype of 2captcha integration
 

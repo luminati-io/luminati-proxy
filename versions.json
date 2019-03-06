@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.125.645",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for 'Static residential' in UI"
+            },
+            {
+                "type": "star",
+                "text": "Updated node and npm versions in Docker file"
+            }
+        ]
+    },
+    {
         "ver": "1.125.539",
         "type": "dev",
         "changes": [
