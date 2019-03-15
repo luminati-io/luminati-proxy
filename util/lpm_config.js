@@ -46,7 +46,7 @@ conf.luminati_default = {
     test_url: 'http://lumtest.com/myip.json',
     proxy_retry: 2,
     proxy_switch: 2,
-    api: 'https://luminati-china.io',
+    api: 'https://'+pkg.api_domain,
     socket_inactivity_timeout: 120*date.ms.SEC,
     last_preset_applied: 'session_long',
     keep_alive: false,

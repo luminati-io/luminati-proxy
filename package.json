@@ -156,6 +156,7 @@
     "npm": "4.6.1"
   },
   "homepage": "https://luminati.io/",
+  "api_domain": "lum-lpm.com",
   "keywords": [
     "luminati",
     "proxy",
@@ -361,7 +362,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "47768408094a5a082869c6b317793d4d"
+    "md5": "dfcdb813f28ce0adf18ca74ed6363535"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -398,5 +399,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.125.699"
+  "version": "1.126.871"
 }

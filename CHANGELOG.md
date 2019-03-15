@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.126.871 
+
 ## 1.125.699 Stable
 - :bug: Fix refresh IPs rule action
 

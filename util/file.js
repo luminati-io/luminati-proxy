@@ -1,6 +1,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
-require('./config.js');
+const zconf = require('./config.js');
 const array = require('./array.js');
 const crypto = require('crypto');
 const rimraf = require('rimraf');
@@ -15,6 +15,9 @@ E.error = null; // an Error() object
 E.read_buf_size = 8192;
 E.is_win = /^win/.test(process.platform);
 E.is_darwin = /^darwin/.test(process.platform);
+E.is_linux = /^linux/.test(process.platform);
+E.is_zlinux = E.is_linux && !/ARCH=ANDROID/.test(zconf.CONFIG_MAKEFLAGS);
+E.is_android = E.is_linux && !E.is_zlinux;
 
 let check_file = (dst, opt)=>{
     opt = opt||{};

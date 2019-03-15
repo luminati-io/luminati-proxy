@@ -2,64 +2,14 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
+import carriers_gen from '/www/util/pub/carriers_gen.js';
 import setdb from '../../../util/setdb.js';
 import {Note, Ext_tooltip} from '../common.js';
 import {Config, Tab_context} from './common.js';
 
 const carriers = [
     {value: '', key: 'None'},
-    {value: 'a1', key: 'A1 Austria'},
-    {value: 'aircel', key: 'Aircel'},
-    {value: 'airtel', key: 'Airtel'},
-    {value: 'att', key: 'AT&T'},
-    {value: 'vimpelcom', key: 'Beeline Russia'},
-    {value: 'celcom', key: 'Celcom'},
-    {value: 'chinamobile', key: 'China Mobile'},
-    {value: 'claro', key: 'Claro'},
-    {value: 'comcast', key: 'Comcast'},
-    {value: 'cox', key: 'Cox'},
-    {value: 'dt', key: 'Deutsche Telekom'},
-    {value: 'digi', key: 'Digi Malaysia'},
-    {value: 'docomo', key: 'Docomo'},
-    {value: 'dtac', key: 'DTAC Trinet'},
-    {value: 'etisalat', key: 'Etisalat'},
-    {value: 'idea', key: 'Idea India'},
-    {value: 'kyivstar', key: 'Kyivstar'},
-    {value: 'meo', key: 'MEO Portugal'},
-    {value: 'megafont', key: 'Megafon Russia'},
-    {value: 'mtn', key: 'MTN - Mahanager Telephone'},
-    {value: 'mtnza', key: 'MTN South Africa'},
-    {value: 'mts', key: 'MTS Russia'},
-    {value: 'optus', key: 'Optus'},
-    {value: 'orange', key: 'Orange'},
-    {value: 'qwest', key: 'Qwest'},
-    {value: 'reliance_jio', key: 'Reliance Jio'},
-    {value: 'robi', key: 'Robi'},
-    {value: 'sprint', key: 'Sprint'},
-    {value: 'telefonica', key: 'Telefonica'},
-    {value: 'telstra', key: 'Telstra'},
-    {value: 'tmobile', key: 'T-Mobile'},
-    {value: 'tigo', key: 'Tigo'},
-    {value: 'tim', key: 'TIM (Telecom Italia)'},
-    {value: 'vodacomza', key: 'Vodacom South Africa'},
-    {value: 'vodafone', key: 'Vodafone'},
-    {value: 'verizon', key: 'Verizon'},
-    {value: 'vivo', key: 'Vivo'},
-    {value: 'zain', key: 'Zain'},
-    {value: 'umobile', key: 'U-Mobile'},
-    {value: 'proximus', key: 'Proximus'},
-    {value: 'tele2', key: 'Tele2'},
-    {value: 'mobitel', key: 'Mobitel'},
-    {value: 'o2', key: 'O2'},
-    {value: 'bsnl', key: 'BSNL'},
-    {value: 'bouygues', key: 'Bouygues Telecom'},
-    {value: 'free', key: 'Free'},
-    {value: 'sfr', key: 'SFR'},
-    {value: 'mobiltel', key: 'Mobiltel'},
-    {value: 'sunrise', key: 'Sunrise Communications'},
-    {value: 'digicel', key: 'Digicel'},
-    {value: 'three', key: 'Three'},
-    {value: 'windit', key: 'Wind'},
+    ...carriers_gen.map(c=>({value: c.value, key: c.label}))
 ];
 
 const carriers_note = (()=>{

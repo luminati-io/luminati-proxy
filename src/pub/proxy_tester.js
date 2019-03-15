@@ -16,6 +16,7 @@ import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import date from '../../util/date.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
+import {T} from '/www/locale/pub/i18n_react.js';
 const {SEC} = date.ms;
 
 const Proxy_tester = ()=>
@@ -168,7 +169,7 @@ const Request_params = ({params, update, ...props})=>{
             <Tooltip
               title="Choose a proxy port that will be used for this test">
               <div className={classnames('field', 'proxy')}>
-                <div className="title">Proxy port</div>
+                <div className="title"><T>Proxy port</T></div>
                 <Port_select val={params.port} on_change={port_changed}/>
               </div>
             </Tooltip>

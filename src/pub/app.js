@@ -26,12 +26,14 @@ import Enable_ssl_modal from './common/ssl_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import './app.less';
 import ws from './ws.js';
+import i18n from '/www/locale/pub/i18n.js';
 
 window.setdb = setdb;
 setdb.setMaxListeners(30);
 
 const App = withRouter(class App extends Pure_component {
     componentDidMount(){
+        this.init_i18n();
         const _this = this;
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/version'});
@@ -65,6 +67,9 @@ const App = withRouter(class App extends Pure_component {
             });
         });
     }
+    init_i18n = ()=>{
+        i18n.init('en zh_CN'.split(' '), '/www/lum/pub/locale', 'en');
+    };
     load_data = ()=>{
         this.etask(function*(){
             const locations = yield ajax.json({url: '/api/all_locations'});

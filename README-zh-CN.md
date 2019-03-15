@@ -8,7 +8,7 @@
 
 用 Luminati HTTP/HTTPS 代理管理器你可以使用Luminati 住宅 IPs 或 Luminati 数据心 IPs.
 
-这个工具需要一个 [Luminati](https://luminati-china.io/?cam=github-proxy) 账户.
+这个工具需要一个 [Luminati](https://lum-lpm.com/?cam=github-proxy) 账户.
 
 ## 特征
 - 可扩展
@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://luminati-china.io/static/lpm/luminati-proxy-manager-v1.125.699-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.126.871-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x
@@ -75,7 +75,7 @@ Luminati 代理服务器所含的”Dropin 模式” 和现有的超级代理服
 luminati --no-dropin
 ```
 
-为了完整的API解说文件 （为了'dropin'代理请求），请从你的Luminati.io账户关注 <a href="https://luminati-china.io/cp/api_example?manager=all&group=active">API例网页</a>.
+为了完整的API解说文件 （为了'dropin'代理请求），请从你的Luminati.io账户关注 <a href="https://lum-lpm.com/cp/api_example?manager=all&group=active">API例网页</a>.
 
 ### 完整的API命令名单:
 ```sh
@@ -175,7 +175,7 @@ Options:
                                                       [boolean] [default: false]
   --version, -v            Show version number                         [boolean]
   --help, -h, -?           Show help                                   [boolean]
-  --api                                   [default: "https://luminati-china.io"]
+  --api                                   [default: "https://lum-lpm.com"]
 
 ```
 
@@ -197,7 +197,7 @@ docker run luminati/luminati-proxy luminati --version
 
 ## 帮助
 
-常见问题 [FAQ](https://luminati-china.io/faq#proxy)
+常见问题 [FAQ](https://lum-lpm.com/faq#proxy)
 
 如果你在Luminati 常见问题找不着解决方式，可以在 [github 上提问](https://github.com/luminati-io/luminati-proxy/issues).
 

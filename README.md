@@ -10,7 +10,7 @@ With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IP
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 
-<em>Read this in [中文](https://luminati-china.io/static/lpm/README-zh-CN.html).</em>
+<em>Read this in [中文](https://lum-lpm.com/static/lpm/README-zh-CN.html).</em>
 
 ## Features
 - Highly scalable
@@ -32,7 +32,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.125.699/luminati-proxy-manager-v1.125.699-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.126.871/luminati-proxy-manager-v1.126.871-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -240,7 +240,7 @@ Options:
                                                       [boolean] [default: false]
   --version, -v            Show version number                         [boolean]
   --help, -h, -?           Show help                                   [boolean]
-  --api                                   [default: "https://luminati-china.io"]
+  --api                                   [default: "https://lum-lpm.com"]
 
 ```
 
@@ -324,55 +324,3 @@ Or contact [support@luminati.io](mailto:support@luminati.io).
 Working documentation of the API can be found inside the app.
 
 A non-working version of it can be found [here](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/swagger.json)
-
-## Node.js API
-
-The proxy manager can be used as a required module for node.js applications - eliminating the need to run it as a standalone process.
-
-The API supports both [Promises](https://www.promisejs.org/) and [Generators](https://www.promisejs.org/generators/). Internally, it uses the [request](https://github.com/request/request) module and supports all of its features.
-
-### Promises
-```js
-'use strict';
-const Luminati = require('luminati-proxy').Luminati;
-
-const proxy = new Luminati({
-    customer: 'CUSTOMER', // your customer name
-    password: 'PASSWORD', // your password
-    zone: 'gen', // zone to use
-    proxy_count: 5, //minimum number of proxies to use for distributing requests
-});
-proxy.on('response', res=>console.log('Response:', res));
-proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
-    proxy.request('http://lumtest.com/myip', (err, res)=>{
-        if (err)
-            return reject(err);
-        resolve(res);
-    });
-})).then(res=>{
-    console.log('Result:', res.statusCode, res.body);
-}, err=>{
-    console.log('Error:', err);
-}).then(()=>proxy.stop());
-```
-
-### Generators
-```js
-'use strict';
-const etask = require('./util/etask.js');
-const Luminati = require('luminati-proxy').Luminati;
-
-etask(function*(){
-    const proxy = new Luminati({
-        customer: 'CUSTOMER', // your customer name
-        password: 'PASSWORD', // your password
-        zone: 'gen', // zone to use
-        proxy_count: 5, //minimum number of proxies to use for distributing requests
-    });
-    yield proxy.listen(0, '127.0.0.1'); // port and ip to listen to
-    let res = yield etask.nfn_apply(proxy, '.request',
-        ['http://lumtest.com/myip']);
-    console.log('Result:', res.statusCode, res.body);
-    yield proxy.stop();
-});
-```
