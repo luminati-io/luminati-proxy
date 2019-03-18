@@ -5,12 +5,14 @@
 #
 
 # Pull base image.
-FROM node:10.11.0
+FROM node:10-alpine
 
+USER root
+RUN apk add --update python make g++
 RUN npm install -g npm@6.4.1
 
 # Install Luminati Proxy Manager
-RUN npm install -g @luminati-io/luminati-proxy
+RUN npm install -g @luminati-io/luminati-proxy --unsafe-perm=true --allow-root
 
 # Mark environment as Docker for CLI output
 ENV DOCKER 1
