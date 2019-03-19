@@ -10,6 +10,7 @@ FROM node:10.11.0
 RUN npm install -g npm@6.4.1
 
 # Install Luminati Proxy Manager
+USER root
 RUN npm install -g @luminati-io/luminati-proxy
 
 # Mark environment as Docker for CLI output
