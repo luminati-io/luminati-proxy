@@ -362,7 +362,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "dfcdb813f28ce0adf18ca74ed6363535"
+    "md5": "c78b0c83cbf57ab2f1306497cfdbcea0"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -399,5 +399,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.126.871"
+  "version": "1.127.526"
 }

@@ -4,12 +4,18 @@ require('./config.js');
 const HTTPParser = process.binding('http_parser').HTTPParser;
 const E = exports;
 
+const special_case_words = {
+    te: 'TE',
+    etag: 'ETag',
+};
+
 E.capitalize = function(headers){
     let res = {};
     for (let header in headers)
     {
-        let new_header = header.split('-').map(word=>{
-            return word.length ? word[0].toUpperCase()+word.substr(1) : '';
+        let new_header = header.toLowerCase().split('-').map(word=>{
+            return special_case_words[word] ||
+                (word.length ? word[0].toUpperCase()+word.substr(1) : '');
         }).join('-');
         res[new_header] = headers[header];
     }

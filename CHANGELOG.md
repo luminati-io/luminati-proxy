@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.127.526 Stable
+- :bug: Fix 'long availability' pool type
+
 ## 1.126.871 
 
 ## 1.125.699 Stable

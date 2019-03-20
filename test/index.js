@@ -1351,4 +1351,22 @@ describe('proxy', ()=>{
             assert.ok(hst<history.length);
         }));
     });
+    describe('long_availability', ()=>{
+        it('should keep the number of sessions', etask._fn(function*(_this){
+            _this.timeout(6000);
+            l = yield lum({pool_type: 'long_availability', pool_size: 10,
+                keep_alive: 1});
+            yield l.test();
+            assert.equal(l.session_mgr.sessions.sessions.length, 10);
+            const initial_sessions = l.session_mgr.sessions.sessions;
+            assert.ok(initial_sessions[0].session.endsWith('1'));
+            assert.ok(initial_sessions[9].session.endsWith('10'));
+            l.session_mgr.info_request = ()=>null;
+            yield etask.sleep(1500);
+            const new_sessions = l.session_mgr.sessions.sessions;
+            assert.equal(new_sessions.length, 10);
+            assert.ok(new_sessions[0].session.endsWith('11'));
+            assert.ok(new_sessions[9].session.endsWith('20'));
+        }));
+    });
 });

@@ -82,28 +82,34 @@ const sessions_cols = [
     {id: 'ip', title: 'Last IP'},
     {id: 'session', title: 'Session'},
     {id: 'host', title: 'Host'},
+    {id: 'created', title: 'Created'},
 ];
 
 const Sessions = withRouter(class Sessions extends Pure_component {
+    state = {sessions: 0};
     fetch_data = ()=>{
         const _this = this;
         return this.etask(function*(){
             const port = _this.props.match.params.port;
             const url = `/api/sessions/${port}`;
             const res = yield ajax.json({url});
+            _this.setState({sessions: res.sessions});
             return res.sessions;
         });
     };
     render(){
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        return <Chrome_table title="Sessions" cols={sessions_cols}
+        const sessions_n = (this.state.sessions||[]).length;
+        const title = `Sessions (${sessions_n})`;
+        return <Chrome_table title={title} cols={sessions_cols}
               fetch_data={this.fetch_data}>
               {d=>
                 <tr key={d.session}>
                   <td>{d.ip ? d.ip : ' - '}</td>
                   <td>{d.session}</td>
                   <td>{d.host}</td>
+                  <td>{moment(d.created).fromNow()}</td>
                 </tr>
               }
             </Chrome_table>;
