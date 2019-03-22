@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.127.776 Stable
+- :star: Updated dependencies
+
 ## 1.127.735 Stable
 - :star: Convenient way to use an alternative domain when it stops working
 
