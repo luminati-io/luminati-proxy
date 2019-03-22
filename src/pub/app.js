@@ -23,6 +23,7 @@ import Proxy_add from './proxy_add.js';
 import Whitelist_ips from './whitelist_ips.js';
 import {Logs, Dock_logs} from './logs.js';
 import Enable_ssl_modal from './common/ssl_modal.js';
+import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import './app.less';
 import ws from './ws.js';
@@ -83,6 +84,10 @@ const App = withRouter(class App extends Pure_component {
             window.ga('set', 'dimension1', settings.customer);
         });
         this.etask(function*(){
+            const conn = yield ajax.json({url: '/api/conn'});
+            setdb.set('head.conn', conn);
+        });
+        this.etask(function*(){
             const version = yield ajax.json({url: '/api/last_version'});
             setdb.set('head.ver_last', version);
         });
@@ -111,6 +116,8 @@ const App = withRouter(class App extends Pure_component {
     render(){
         return <div className="page_wrapper">
               <Enable_ssl_modal/>
+              <Api_url_modal/>
+              <Old_modals/>
               <Switch>
                 <Route path="/login" exact component={Login}/>
                 <Route path="/whitelist_ips" exact component={Whitelist_ips}/>
@@ -120,6 +127,52 @@ const App = withRouter(class App extends Pure_component {
             </div>;
     }
 });
+
+const Old_modals = ()=>
+    <div className="old_modals">
+      <div id="restarting" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Restarting...</h4>
+            </div>
+            <div className="modal-body">
+              Please wait. The page will be reloaded automatically
+              once the application has restarted.
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <div id="upgrading" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">
+                Luminati Proxy Manager is upgrading</h4>
+            </div>
+            <div className="modal-body">
+              Please wait...
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <div id="shutdown" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Shutdown</h4>
+            </div>
+            <div className="modal-body">
+              The application has been shut down. To restart,
+              please run it manually and reload this page.
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+    </div>;
 
 const Page = ()=>
     <div>

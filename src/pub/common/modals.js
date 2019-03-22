@@ -38,6 +38,7 @@ export class Modal_dialog extends React.Component {
                   }
                   <div className="modal-footer">
                     <Footer_default ok_clicked={this.props.ok_clicked}
+                      ok_disabled={this.props.ok_disabled}
                       cancel_clicked={this.props.cancel_clicked}
                       no_cancel_btn={this.props.no_cancel_btn}/>
                   </div>
@@ -126,7 +127,8 @@ const Footer_default = props=>{
               className={ok_classes}>{ok_title}</a>
           }
           {!props.ok_href &&
-            <button onClick={props.ok_clicked} className={ok_classes}>
+            <button onClick={props.ok_clicked} className={ok_classes}
+              disabled={props.ok_disabled}>
               {ok_title}
             </button>
           }

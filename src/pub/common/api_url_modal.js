@@ -1,0 +1,109 @@
+// LICENSE_CODE ZON ISC
+'use strict'; /*jslint react:true*/
+import React from 'react';
+import Pure_component from '/www/util/pub/pure_component.js';
+import $ from 'jquery';
+import {Modal_dialog} from './modals.js';
+import {Loader, Labeled_controller} from '../common.js';
+import etask from '../../../util/etask.js';
+import ajax from '../../../util/ajax.js';
+import classnames from 'classnames';
+
+export default class Api_url_modal extends Pure_component {
+    state = {url: '', loading: false, saving: false};
+    componentDidMount(){
+        this.setdb_on('head.conn', conn=>{
+            if (!conn)
+                return;
+            this.setState({conn});
+        });
+    }
+    click_ok = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            this.on('finally', ()=>{
+                _this.setState({loading: false});
+            });
+            _this.setState({loading: true, saving: true});
+            yield window.fetch('/api/api_url', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({url: _this.state.url}),
+            });
+            $('#restarting').modal({backdrop: 'static', keyboard: false});
+            yield etask.sleep(3000);
+            yield _this.check_reload();
+        });
+    };
+    check_reload(){
+        const _this = this;
+        const retry = ()=>{ setTimeout(_this.check_reload.bind(_this), 500); };
+        return etask(function*(){
+            this.on('uncaught', retry);
+            yield ajax.json({url: 'api/proxies_running'});
+            window.location.reload();
+        });
+    }
+    url_changed = val=>this.setState({url: val.trim()});
+    valid_url = ()=>{
+        return !!this.state.url;
+    };
+    render(){
+        const open = this.state.conn && !this.state.conn.domain &&
+            !this.state.saving;
+        const phone_link = 'https://zingaya.com/widget/680d22dda1bf4092ab04c1d'
+            +'9a7062b0a';
+        return <React.Fragment>
+              <Loader show={this.state.loading}/>
+              <Modal_dialog open={open}
+                title="Cannot connect to Luminati"
+                ok_clicked={this.click_ok} ok_disabled={!this.valid_url()}
+                no_cancel_btn>
+                <div className="api_url_modal">
+                  <p>
+                    Please contact Luminati support to receive an alternative
+                    domain
+                  </p>
+                  <Contact_btn href={phone_link} type="fas" id="phone">
+                    +1-888-538-9204
+                  </Contact_btn>
+                  <Contact_btn href="//web.whatsapp.com" type="fab"
+                    id="whatsapp-square">
+                    +972-54-353-6332
+                  </Contact_btn>
+                  <Contact_btn href="skype:luminati.io?call" type="fab"
+                    id="skype">
+                    luminati.io
+                  </Contact_btn>
+                  <Contact_btn href="//web.wechat.com" type="fab" id="weixin">
+                    luminati_io
+                  </Contact_btn>
+                  <Contact_btn href="mailto:support@luminati-china-mail.com"
+                    type="fas" id="envelope">
+                    support@luminati-china-mail.com
+                  </Contact_btn>
+                  <Contact_btn href="http://w.qq.com" type="fab" id="qq">
+                    3426730462
+                  </Contact_btn>
+                  <Contact_btn href="https://twitter.com/luminati_io"
+                    type="fab" id="twitter">
+                    luminati_io
+                  </Contact_btn>
+                  <Contact_btn href="" type="fas" id="home">
+                    Head office
+                  </Contact_btn>
+                  <Labeled_controller id="url" label="Alternative domain"
+                    val={this.state.url} type="text"
+                    placeholder="New domain url"
+                    on_change_wrapper={this.url_changed}/>
+                </div>
+              </Modal_dialog>
+            </React.Fragment>;
+    }
+}
+
+const Contact_btn = props=>
+    <a href={props.href} className="btn btn_lpm btn_support">
+      <div className={classnames('icon', props.type, `fa-${props.id}`)}/>
+      {props.children}
+    </a>;

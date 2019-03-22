@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.127.735 Stable
+- :star: Convenient way to use an alternative domain when it stops working
+
 ## 1.127.526 Stable
 - :bug: Fix 'long availability' pool type
 

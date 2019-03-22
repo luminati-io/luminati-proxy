@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.127.526",
+        "version": "1.127.735",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -521,10 +521,6 @@
                     "type": "boolean",
                     "description": "Disable collection of usage statistics"
                 },
-                "rules": {
-                    "type": "object",
-                    "description": "Proxy request rules"
-                },
                 "token": {
                     "type": "string",
                     "description": "A Google authorization token for accessing luminati.io"
@@ -539,7 +535,7 @@
                 },
                 "test_url": {
                     "type": "string",
-                    "description": "A url for testing proxy"
+                    "description": "Url for testing proxy"
                 },
                 "logs": {
                     "type": "boolean",
@@ -557,6 +553,10 @@
                 "session_termination": {
                     "type": "boolean",
                     "description": "Stop sending new requests when the peer IP becomes unavailable and redirect to confimration page before new IP is taken"
+                },
+                "api": {
+                    "type": "string",
+                    "description": "Alternative domain url to luminati API"
                 }
             }
         },

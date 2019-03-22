@@ -19,7 +19,7 @@ E.is_env_compat = ()=>{
     const path = require('path');
     const pkg = require('../package.json');
     const excluded = ['bootstrap', 'codemirror', 'notosans-fontface',
-        'require-css', 'flag-icon-css', 'swagger-ui', 'font-awesome',
+        'require-css', 'flag-icon-css', 'swagger-ui',
         'animate.css'].concat(Object.keys(pkg.optionalDependencies));
     for (let dep in pkg.dependencies)
     {

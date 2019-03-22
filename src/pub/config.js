@@ -49,7 +49,6 @@ class Config extends Pure_component {
         const _this = this;
         this.etask(function*(){
             const check_url = '/api/config_check';
-            // XXX krzysztof: switch fetch->ajax
             const raw_check = yield window.fetch(check_url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

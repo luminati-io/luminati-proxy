@@ -46,7 +46,6 @@ conf.luminati_default = {
     test_url: 'http://lumtest.com/myip.json',
     proxy_retry: 2,
     proxy_switch: 2,
-    api: 'https://'+pkg.api_domain,
     socket_inactivity_timeout: 120*date.ms.SEC,
     last_preset_applied: 'session_long',
     keep_alive: false,
@@ -56,6 +55,7 @@ conf.luminati_default = {
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.luminati_default, 'port'), {
+    api: 'https://'+pkg.api_domain,
     www: 22999,
     www_whitelist_ips: [],
     ws: 22998,

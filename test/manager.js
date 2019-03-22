@@ -355,8 +355,9 @@ describe('manager', ()=>{
             });
         });
         describe('user credentials', ()=>{
-            it('success', ()=>etask(function*(){
-                nock(api_base).get('/').reply(200, {});
+            it('success', etask._fn(function*(_this){
+                _this.timeout(6000);
+                nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).post('/update_lpm_stats')
                     .reply(200, {});
                 nock(api_base).post('/update_lpm_config')
@@ -365,10 +366,12 @@ describe('manager', ()=>{
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
-                let result = yield app.manager.get_lum_local_conf();
+                const result = yield app.manager.get_lum_local_conf();
                 assert_has(result, {mock_result: true});
             }));
-            it('login required', ()=>etask(function*(){
+            it('login required', etask._fn(function*(_this){
+                _this.timeout(6000);
+                nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', token: '',
                         proxy: pkg.version})
@@ -384,9 +387,10 @@ describe('manager', ()=>{
                     assert_has(e, {status: 403, message: 'login_required'});
                 }
             }));
-            it('update defaults', ()=>etask(function*(){
+            it('update defaults', etask._fn(function*(_this){
+                _this.timeout(6000);
                 let updated = {_defaults: {customer: 'updated'}};
-                nock(api_base).get('/').reply(200, {});
+                nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).post('/update_lpm_stats')
                     .query({customer: 'updated'}).reply(200, {});
                 nock(api_base).post('/update_lpm_config')

@@ -67,7 +67,6 @@
     "electron-updater": "2.8.9",
     "node-abi": "2.7.1",
     "express": "4.14.0",
-    "font-awesome": "4.7.0",
     "flag-icon-css": "3.2.1",
     "http-shutdown": "1.1.0",
     "json-stable-stringify": "1.0.1",
@@ -307,6 +306,7 @@
       "src/pub/app.js",
       "src/pub/app.less",
       "src/pub/chrome_widgets.js",
+      "src/pub/common/api_url_modal.js",
       "src/pub/common/bullets.js",
       "src/pub/common/controls.js",
       "src/pub/common/error_boundry.js",
@@ -362,7 +362,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "c78b0c83cbf57ab2f1306497cfdbcea0"
+    "md5": "4ddf5a267509e0bcdd4017109b469c3e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -399,5 +399,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.127.526"
+  "version": "1.127.735"
 }

@@ -130,7 +130,7 @@ const Node_message = ({ver_node})=>{
             <div>
               The recommended version of node.js is
               <strong> {ver_node.recommended}</strong>. You are using version
-              <strong> {ver_node.current&&ver_node.current.raw}</strong>.
+              <strong> {ver_node.current && ver_node.current.raw}</strong>.
             </div>
             <div>
               Please upgrade your node using nvm, nave or visit

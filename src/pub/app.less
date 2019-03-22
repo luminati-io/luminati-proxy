@@ -54,6 +54,7 @@ body {
     font-family: "Lato";
     color: @first_color;
 }
+.old_modals { height: auto !important; }
 .api_app {
     margin-top: 50px;
     text-align: center;
@@ -1239,6 +1240,24 @@ span.icon_link {
         display: flex;
         align-items: center;
         span { width: 330px; }
+    }
+}
+.api_url_modal {
+    .desc { margin-right: 10px; }
+    .btn_support {
+        position: relative;
+        width: 295px;
+        margin-bottom: 5px;
+        .icon {
+            margin-right: 10px;
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            margin-top: auto;
+            margin-bottom: auto;
+            height: 16px;
+        }
     }
 }
 .overview_page {
