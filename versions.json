@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.128.416",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix crashes in China"
+            }
+        ]
+    },
+    {
         "ver": "1.128.322",
         "type": "stable",
         "changes": [

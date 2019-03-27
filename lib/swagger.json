@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.128.322",
+        "version": "1.128.416",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -757,7 +757,9 @@
                 },
                 "headers":{
                     "type":"array",
-                    "items": {"type":[
+                    "items": {"type": "object"},
+                    "description":"Request headers",
+                    "example":[
                        {
                         "name": "accept",
                         "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
@@ -779,7 +781,6 @@
                         "value": "1"
                        }
                      ]
-                   }
                 }
             }
         }

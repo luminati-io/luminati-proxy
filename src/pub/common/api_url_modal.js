@@ -8,6 +8,7 @@ import {Loader, Labeled_controller} from '../common.js';
 import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import classnames from 'classnames';
+import {Instructions, Li} from './bullets.js';
 
 export default class Api_url_modal extends Pure_component {
     state = {url: '', loading: false, saving: false};
@@ -16,6 +17,11 @@ export default class Api_url_modal extends Pure_component {
             if (!conn)
                 return;
             this.setState({conn});
+        });
+        this.setdb_on('head.settings', settings=>{
+            if (!settings)
+                return;
+            this.setState({settings});
         });
     }
     click_ok = ()=>{
@@ -49,10 +55,14 @@ export default class Api_url_modal extends Pure_component {
         return !!this.state.url;
     };
     render(){
+        if (!this.state.settings)
+            return null;
         const open = this.state.conn && !this.state.conn.domain &&
             !this.state.saving;
         const phone_link = 'https://zingaya.com/widget/680d22dda1bf4092ab04c1d'
             +'9a7062b0a';
+        const mail_domain = this.state.settings.mail_domain;
+        const mail_link = `mailto:support@${mail_domain}`;
         return <React.Fragment>
               <Loader show={this.state.loading}/>
               <Modal_dialog open={open}
@@ -60,42 +70,49 @@ export default class Api_url_modal extends Pure_component {
                 ok_clicked={this.click_ok} ok_disabled={!this.valid_url()}
                 no_cancel_btn>
                 <div className="api_url_modal">
-                  <p>
+                <Instructions>
+                  <Li>
                     Please contact Luminati support to receive an alternative
                     domain
-                  </p>
-                  <Contact_btn href={phone_link} type="fas" id="phone">
-                    +1-888-538-9204
-                  </Contact_btn>
-                  <Contact_btn href="//web.whatsapp.com" type="fab"
-                    id="whatsapp-square">
-                    +972-54-353-6332
-                  </Contact_btn>
-                  <Contact_btn href="skype:luminati.io?call" type="fab"
-                    id="skype">
-                    luminati.io
-                  </Contact_btn>
-                  <Contact_btn href="//web.wechat.com" type="fab" id="weixin">
-                    luminati_io
-                  </Contact_btn>
-                  <Contact_btn href="mailto:support@luminati-china-mail.com"
-                    type="fas" id="envelope">
-                    support@luminati-china-mail.com
-                  </Contact_btn>
-                  <Contact_btn href="http://w.qq.com" type="fab" id="qq">
-                    3426730462
-                  </Contact_btn>
-                  <Contact_btn href="https://twitter.com/luminati_io"
-                    type="fab" id="twitter">
-                    luminati_io
-                  </Contact_btn>
-                  <Contact_btn href="" type="fas" id="home">
-                    Head office
-                  </Contact_btn>
-                  <Labeled_controller id="url" label="Alternative domain"
-                    val={this.state.url} type="text"
-                    placeholder="New domain url"
-                    on_change_wrapper={this.url_changed}/>
+                    <Contact_btn href={phone_link} type="fas" id="phone">
+                      +1-888-538-9204
+                    </Contact_btn>
+                    <Contact_btn href="//web.whatsapp.com" type="fab"
+                      id="whatsapp-square">
+                      +972-54-353-6332
+                    </Contact_btn>
+                    <Contact_btn href="skype:luminati.io?call" type="fab"
+                      id="skype">
+                      luminati.io
+                    </Contact_btn>
+                    <Contact_btn href="//web.wechat.com" type="fab" id="weixin">
+                      luminati_io
+                    </Contact_btn>
+                    <Contact_btn href={mail_link} type="fas" id="envelope">
+                      support@{mail_domain}
+                    </Contact_btn>
+                    <Contact_btn href="http://w.qq.com" type="fab" id="qq">
+                      3426730462
+                    </Contact_btn>
+                    <Contact_btn href="https://twitter.com/luminati_io"
+                      type="fab" id="twitter">
+                      luminati_io
+                    </Contact_btn>
+                    <Contact_btn href="" type="fas" id="home">
+                      Head office
+                    </Contact_btn>
+                  </Li>
+                  <Li>
+                    <div>Paste the new domain inside the field below</div>
+                    <Labeled_controller id="url" label="Alternative domain"
+                      val={this.state.url} type="text"
+                      placeholder="New domain url"
+                      on_change_wrapper={this.url_changed}/>
+                  </Li>
+                  <Li>
+                    Click OK to save and wait till the LPM restarts
+                  </Li>
+                </Instructions>
                 </div>
               </Modal_dialog>
             </React.Fragment>;

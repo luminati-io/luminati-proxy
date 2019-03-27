@@ -38,11 +38,11 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "http://luminati.io/static/lpm"
+        "url": "http://lum-lpm.com/static/lpm"
       },
       {
         "provider": "generic",
-        "url": "http://luminati-china.co/static/lpm"
+        "url": "http://luminati.io/static/lpm"
       }
     ],
     "win": {
@@ -162,6 +162,7 @@
   },
   "homepage": "https://luminati.io/",
   "api_domain": "lum-lpm.com",
+  "mail_domain": "luminati-china-mail.co",
   "keywords": [
     "luminati",
     "proxy",
@@ -368,7 +369,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "eee29044bbf907334688619de5dc7b58"
+    "md5": "08f88c3e1e159b16b0c2e4d6f800071c"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -406,5 +407,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.128.322"
+  "version": "1.128.416"
 }

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.128.416 Stable
+- :bug: Fix crashes in China
+
 ## 1.128.322 Stable
 - :star: Improved logs and error handling
 
