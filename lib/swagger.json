@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.127.776",
+        "version": "1.128.322",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -754,6 +754,32 @@
                 "route_err": {
                     "type": "string",
                     "description": "Block or allow requests to be automatically sent through super proxy on error"
+                },
+                "headers":{
+                    "type":"array",
+                    "items": {"type":[
+                       {
+                        "name": "accept",
+                        "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+                       },
+                       {
+                        "name": "accept-language",
+                        "value": "en-US,en;q=0.9"
+                       },
+                       {
+                        "name": "alexatoolbar-alx_ns_ph",
+                        "value": "AlexaToolbar/alx-4.0.3"
+                       },
+                       {
+                        "name": "cache-control",
+                        "value": "max-age=0"
+                       },
+                       {
+                        "name": "upgrade-insecure-requests",
+                        "value": "1"
+                       }
+                     ]
+                   }
                 }
             }
         }

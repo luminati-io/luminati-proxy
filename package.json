@@ -35,10 +35,16 @@
       "warningsAsErrors": false
     },
     "productName": "Luminati Proxy Manager",
-    "publish": {
-      "provider": "generic",
-      "url": "http://luminati.io/static/lpm"
-    },
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "http://luminati.io/static/lpm"
+      },
+      {
+        "provider": "generic",
+        "url": "http://luminati-china.co/static/lpm"
+      }
+    ],
     "win": {
       "target": "nsis"
     },
@@ -362,7 +368,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "55588350f166a17f498e31ca9cc705af"
+    "md5": "eee29044bbf907334688619de5dc7b58"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -384,7 +390,8 @@
     "heapdump": "0.3.12",
     "posix": "4.1.2",
     "sinon": "1.17.7",
-    "puppeteer": "1.12.2"
+    "puppeteer": "1.12.2",
+    "longjohn": "0.2.12"
   },
   "preferGlobal": true,
   "recomendedNode": ">=10.0",
@@ -399,5 +406,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.127.776"
+  "version": "1.128.322"
 }

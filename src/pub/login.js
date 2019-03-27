@@ -128,9 +128,10 @@ const Node_message = ({ver_node})=>{
           <div className="warning_icon"/>
           <div>
             <div>
-              The recommended version of node.js is
-              <strong> {ver_node.recommended}</strong>. You are using version
-              <strong> {ver_node.current && ver_node.current.raw}</strong>.
+              <span>The recommended version of node.js is </span>
+              <strong>{ver_node.recommended}</strong>.
+              <span>You are using version </span>
+              <strong>{ver_node.current && ver_node.current.raw}</strong>.
             </div>
             <div>
               Please upgrade your node using nvm, nave or visit
