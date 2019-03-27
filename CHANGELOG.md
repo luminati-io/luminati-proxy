@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.128.452 Stable
+- :star: Added support for adding multiple proxies in CLI
+
 ## 1.128.416 Stable
 - :bug: Fix crashes in China
 

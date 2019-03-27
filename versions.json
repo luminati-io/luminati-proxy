@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.128.452",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for adding multiple proxies in CLI"
+            }
+        ]
+    },
+    {
         "ver": "1.128.416",
         "type": "stable",
         "changes": [
