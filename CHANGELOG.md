@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.128.768 Stable
+- :bug: Fix crashes in SOCKS5 when connection is closed
+- :bug: Fix issues with LokiJS
+
 ## 1.128.452 Stable
 - :star: Added support for adding multiple proxies in CLI
 

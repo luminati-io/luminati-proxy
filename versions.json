@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.128.768",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix crashes in SOCKS5 when connection is closed"
+            },
+            {
+                "type": "bug",
+                "text": "Fix issues with LokiJS"
+            }
+        ]
+    },
+    {
         "ver": "1.128.452",
         "type": "stable",
         "changes": [
