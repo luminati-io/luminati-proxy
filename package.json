@@ -310,6 +310,8 @@
       "lib/tracer.js",
       "lib/username.js",
       "lib/util.js",
+      "publish_cn.js",
+      "publish_validate.js",
       "src/pub/app.js",
       "src/pub/app.less",
       "src/pub/chrome_widgets.js",
@@ -369,7 +371,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "1c30e6aca78d09ef65442dc48b67d612"
+    "md5": "ad54d7fb95788ccecfd3eefeaf7c4b02"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -407,5 +409,5 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.128.768"
+  "version": "1.129.361"
 }

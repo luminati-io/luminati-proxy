@@ -370,6 +370,8 @@ function parse_leaf(v, opt){
     }
     if (v.__Infinity__ && opt.inf)
         return v.__Infinity__ < 0 ? -Infinity : Infinity;
+    if (v.__ObjectId__ && typeof opt.object_id=='function')
+        return opt.object_id(v.__ObjectId__);
     return v;
 }
 

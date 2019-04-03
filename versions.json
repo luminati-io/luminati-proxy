@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.129.361",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix crashes when incorrect header check"
+            }
+        ]
+    },
+    {
         "ver": "1.128.768",
         "type": "stable",
         "changes": [

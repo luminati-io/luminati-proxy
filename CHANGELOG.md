@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.129.361 Stable
+- :bug: Fix crashes when incorrect header check
+
 ## 1.128.768 Stable
 - :bug: Fix crashes in SOCKS5 when connection is closed
 - :bug: Fix issues with LokiJS

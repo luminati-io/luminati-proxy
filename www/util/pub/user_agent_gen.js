@@ -45,10 +45,6 @@ const E = [
     {name: 'Safari 12.0.1 MacOSX 10.14.1', value: 'Mozilla/5.0 (Macintosh; '
         +'Intel Mac OS X 10_14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) '
         +'Version/12.0.1 Safari/605.1.15'},
-    // XXX iago: double check safari android
-    {name: 'Safari Mobile 12.1 Android 4.4', value: 'Mozilla/5.0 (Linux; U; '
-        +'Android 4.4; en-gb; GT-P1000 Build/FROYO) AppleWebKit/605.1.15 '
-        +'(KHTML, like Gecko) Version/12.1 Mobile Safari/605.1.15'},
     {name: 'Safari Mobile 12.1 iOS 12', value: 'Mozilla/5.0 (iPhone; CPU '
         +'iPhone OS 12_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like '
         +'Gecko) Version/12.0 Mobile/15E148 Safari/604.1'},
