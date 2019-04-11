@@ -39,7 +39,7 @@ const Nav_left = withRouter(class Nav_left extends Pure_component {
                   label="Proxy tester"/>
                 <Nav_link to="/tracer" name="tracer"
                   label="Test affiliate links"/>
-                <Nav_link to="/logs" name="logs" label="Logs"/>
+                <Nav_link to="/logs" name="logs" label="Request logs"/>
                 <Nav_link to="/settings" name="general_config"
                   label="General settings"/>
                 <Nav_link to="/config" name="config"

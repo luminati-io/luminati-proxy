@@ -70,8 +70,6 @@ conf.manager_default = Object
     session_termination: false,
     config: lpm_file.get_file_path(
         '.luminati.json'.substr(conf.is_win ? 1 : 0)),
-    database: lpm_file.get_file_path(
-        '.luminati.sqlite3'.substr(conf.is_win ? 1 : 0)),
     loki: lpm_file.get_file_path(
         '.luminati.db'.substr(conf.is_win ? 1 : 0)),
     cookie: lpm_file.get_file_path(

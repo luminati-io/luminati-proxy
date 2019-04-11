@@ -6,7 +6,7 @@ export const tabs = {
     logs: {
         fields: [],
         label: 'Logs',
-        tooltip: 'Logs of requests sent through this proxy port',
+        tooltip: 'Request logs of requests sent through this proxy port',
     },
     target: {
         label: 'Targeting',
@@ -319,8 +319,9 @@ export const tabs = {
                 ext: true,
             },
             ssl: {
-                label: 'Enable SSL logs',
-                tooltip: `Enable SSL Logs in order to save HTTPs requests`,
+                label: 'SSL request logs',
+                tooltip: `Enable SSL request logs in order to save HTTPs
+                    requests`,
                 ext: true,
             },
             secure_proxy: {

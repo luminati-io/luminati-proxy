@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.129.361-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.130.656-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x
@@ -150,8 +150,6 @@ Options:
   --ws                     WebSocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
-  --database               Database file containing logs and cached values
-                            [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
                                 [string] [default: "~/.luminati.jar"]
   --dropin                 Create dropin mode proxy port (default: 22225)

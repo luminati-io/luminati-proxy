@@ -58,14 +58,11 @@ describe('manager', ()=>{
         });
         args = args||[];
         const www = get_param(args, '--www')||Manager.default.www;
-        const db_file = temp_file_path('sqlite3');
         if (!only_explicit)
         {
             let log = get_param(args, '--log');
             if (!log)
                 args = args.concat(['--log', 'NONE']);
-            if (!get_param(args, '--database'))
-                args = args.concat(['--database', db_file.path]);
             if (!get_param(args, '--proxy'))
                 args = args.concat(['--proxy', '127.0.0.1']);
             if (!get_param(args, '--proxy_port'))
@@ -86,7 +83,7 @@ describe('manager', ()=>{
         manager.on('error', this.throw_fn());
         yield manager.start();
         const admin = 'http://127.0.0.1:'+www;
-        return {manager, admin, db_file};
+        return {manager, admin};
     });
     const app_with_config = opt=>etask(function*(){
         const args = [];
@@ -147,7 +144,6 @@ describe('manager', ()=>{
             yield etask.sleep(10);
         if (!app)
             return;
-        app.db_file.done();
         app = null;
     }));
     beforeEach(()=>temp_files = []);
@@ -260,12 +256,13 @@ describe('manager', ()=>{
                 }));
             });
             describe('post', ()=>{
-                it('normal non-persist', ()=>etask(function*(){
-                    let sample_proxy = {
+                it('normal non-persist', ()=>etask._fn(function*(_this){
+                    _this.timeout(6000);
+                    const sample_proxy = {
                         port: 24001,
                         proxy_type: 'non-persist',
                     };
-                    let proxies = [{port: 24000}];
+                    const proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});

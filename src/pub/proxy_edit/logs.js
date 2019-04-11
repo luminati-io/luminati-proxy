@@ -11,7 +11,8 @@ import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 
-moment.relativeTimeThreshold('ss', 3);
+moment.relativeTimeThreshold('ss', 60);
+moment.relativeTimeThreshold('s', 50);
 
 const Logs = withRouter(class Logs extends Pure_component {
     set_tab = id=>{
@@ -102,16 +103,53 @@ const Sessions = withRouter(class Sessions extends Pure_component {
             return <Note><Ext_tooltip/></Note>;
         const sessions_n = (this.state.sessions||[]).length;
         const title = `Sessions (${sessions_n})`;
+        const port = this.props.match.params.port;
         return <Chrome_table title={title} cols={sessions_cols}
               fetch_data={this.fetch_data}>
-              {d=>
-                <tr key={d.session}>
-                  <td>{d.ip ? d.ip : ' - '}</td>
-                  <td>{d.session}</td>
-                  <td>{d.host}</td>
-                  <td>{moment(d.created).fromNow()}</td>
-                </tr>
-              }
+              {data=><Session_row data={data} key={data.session} port={port}/>}
             </Chrome_table>;
     }
 });
+
+class Session_row extends Pure_component {
+    state = {};
+    componentDidMount(){
+        const session = this.props.data.session;
+        const port = this.props.port;
+        this.setdb_on('ws.sessions.'+port+'.'+session, data=>{
+            if (!data)
+                return;
+            this.setState(data);
+        });
+    }
+    render(){
+        const data = this.props.data;
+        const ip = this.state.ip||data.ip;
+        const host = this.state.host||data.host;
+        return <tr>
+              <td>{ip ? ip : ' - '}</td>
+              <td>{data.session}</td>
+              <td>{host}</td>
+              <Created_cell created={data.created}/>
+            </tr>;
+    }
+}
+
+class Created_cell extends Pure_component {
+    state = {};
+    componentDidMount(){
+        const _this = this;
+        let timer = 0;
+        this.interval = setInterval(()=>{
+            timer++;
+            _this.setState({timer});
+        }, 10*1000);
+    }
+    willUnmount(){
+        clearInterval(this.interval);
+    }
+    render(){
+        const {created} = this.props;
+        return <td>{moment(created).fromNow()}</td>;
+    }
+}

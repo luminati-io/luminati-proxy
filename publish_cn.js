@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON
 'use strict'; /*jslint node:true*/
+if (!module.parent)
+    global.zon_config_fallback = {};
+require('../../util/config.js');
 const etask = require('../../util/etask.js');
 const cli = require('../../util/cli.js');
 const oss = require('ali-oss');

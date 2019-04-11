@@ -51,7 +51,7 @@ E.restore_case = function(headers, original_raw){
     return res;
 };
 
-let parser = new HTTPParser(HTTPParser.REQUEST);
+let parser = new HTTPParser(HTTPParser.REQUEST), parser_usages = 0;
 E.parse_request = buffer=>{
     let ret;
     parser[HTTPParser.kOnHeadersComplete] =
@@ -59,7 +59,8 @@ E.parse_request = buffer=>{
         status_message, upgrade, should_keep_alive)=>
         ret = {version_major, version_minor, raw_headers, method, url,
             upgrade, should_keep_alive};
-    parser.reinitialize(HTTPParser.REQUEST);
+    parser.reinitialize(HTTPParser.REQUEST, !!parser_usages);
+    parser_usages++;
     let exec_res = parser.execute(buffer);
     if (exec_res instanceof Error)
         throw exec_res;

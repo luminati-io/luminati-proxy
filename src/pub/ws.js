@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint browser:true, react:true, es6:true*/
 import {EventTarget} from 'event-target-shim';
+import setdb from '../../util/setdb.js';
 
 class Ws_wrapper extends EventTarget {
     set_location = (url, port)=>{
@@ -15,17 +16,18 @@ class Ws_wrapper extends EventTarget {
         const _this = this;
         this.socket.addEventListener('message', event=>{
             _this.dispatchEvent(event, 'message');
+            _this.global_handler(event);
         });
         this.socket.addEventListener('error', e=>{
-            switch (e.code){
-            case 'ECONNREFUSED':
+            if (e.code=='ECONNREFUSED')
                 console.log('need to reconnect');
-                break;
-            default:
-                console.log('error');
-                break;
-            }
         });
+    };
+    global_handler = event=>{
+        const json = JSON.parse(event.data);
+        if (json.type!='global')
+            return;
+        setdb.set('ws.'+json.data.path, json.data.payload);
     };
     start_checking = ()=>{
         const _this = this;

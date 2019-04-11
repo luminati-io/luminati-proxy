@@ -32,7 +32,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.129.361/luminati-proxy-manager-v1.129.361-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.130.656/luminati-proxy-manager-v1.130.656-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -215,8 +215,6 @@ Options:
   --ws                     WebSocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
-  --database               Database file containing logs and cached values
-                            [string] [default: "~/.luminati.sqlite3"]
   --cookie                 Cookie Jar file
                                 [string] [default: "~/.luminati.jar"]
   --dropin                 Create dropin mode proxy port (default: 22225)

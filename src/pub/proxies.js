@@ -56,18 +56,14 @@ class Targeting_cell extends Pure_component {
 }
 
 const Status_cell = ({proxy, scrolling})=>{
-    const status = proxy._status;
-    const status_details = proxy._status_details;
-    if (scrolling)
-    {
-        if (!status)
-            return 'Testing';
-        else if (status=='ok')
-            return 'OK';
-        return 'Error';
-    }
-    const details = status_details && status_details.map(d=>d.msg).join(',');
-    if (status=='error')
+    const status = proxy.status;
+    const status_details = proxy.status_details;
+    let details = (status_details||[]).map(d=>d.msg).join(',');
+    if (!details.length && status!='ok')
+        details = status;
+    if (status=='testing')
+        return <Tooltip title="Status is being tested">Testing</Tooltip>;
+    else if (status && status!='ok')
         return <Tooltip title={details}>Error</Tooltip>;
     else if (status=='ok' && details)
     {
@@ -80,8 +76,7 @@ const Status_cell = ({proxy, scrolling})=>{
     }
     else if (status=='ok' && !details)
         return <Tooltip title="This proxy works correctly">OK</Tooltip>;
-    return <Tooltip title="Status of this proxy is being tested">
-        Testing</Tooltip>;
+    return <Tooltip title="Status of this proxy is unknown">?</Tooltip>;
 };
 
 const Boolean_cell = ({proxy, col})=>{
@@ -216,7 +211,7 @@ const columns = [
         width: 70,
     },
     {
-        key: '_status',
+        key: 'status',
         title: 'Status',
         type: 'status',
         render: Status_cell,
@@ -259,8 +254,8 @@ const columns = [
         key: 'ssl',
         title: 'SSL Log',
         render: Boolean_cell,
-        tooltip: 'In order to log HTTPS requests, enable SSL Logs in proxy '
-            +'configuration',
+        tooltip: 'In order to log HTTPS requests, enable SSL request logs in '
+            +'proxy configuration',
         ext: true,
     },
     {
@@ -437,16 +432,6 @@ const columns = [
         grow: 0,
         width: 60,
     },
-    {
-        key: 'last_req.url',
-        title: 'Last request',
-        default: true,
-        render: Last_req_cell,
-        ext: true,
-        tooltip: 'Last request that was sent on this proxy port',
-        dynamic: true,
-        grow: 1,
-    },
 ];
 const columns_obj = Object.keys(columns)
     .reduce((acc, col)=>({...acc, [columns[col].key]: columns[col]}), {});
@@ -564,7 +549,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             const cur = proxies[i];
             if (Array.isArray(cur.proxy)&&cur.proxy.length==1)
                 cur.proxy = cur.proxy[0];
-            cur._status_details = cur._status_details||[];
+            cur.status_details = cur.status_details||[];
         }
         return proxies;
     };
@@ -780,23 +765,26 @@ class Actions extends Pure_component {
     // XXX krzysztof: this logic is a mess, rewrite it
     get_status = (opt={})=>{
         const proxy = this.props.proxy;
-        if (!opt.force && proxy._status=='ok')
+        if (!opt.force && proxy.status=='ok')
             return;
         return this.etask(function*(){
             this.on('uncaught', e=>{
-                proxy._status = 'error';
-                proxy._status_details = [{msg: 'Failed to get proxy status'}];
+                proxy.status = 'error';
+                proxy.status_details = [{msg: 'Failed to get proxy status'}];
                 setdb.emit_path('head.proxies_running');
             });
             const params = {};
             if (proxy.proxy_type!='duplicate')
                 params.with_details = true;
+            if (!proxy.status)
+                proxy.status = 'testing';
             if (opt.force)
             {
-                proxy._status = undefined;
-                setdb.emit_path('head.proxies_running');
+                proxy.status = 'testing';
                 params.force = true;
             }
+            if (proxy.status=='testing' || opt.force)
+                setdb.emit_path('head.proxies_running');
             const uri = '/api/proxy_status/'+proxy.port;
             const url = zescape.uri(uri, params);
             const res = yield ajax.json({url});
@@ -807,8 +795,8 @@ class Actions extends Pure_component {
                     errors : [{msg: res.status}];
                 res.status = 'error';
             }
-            proxy._status = res.status;
-            proxy._status_details = res.status_details;
+            proxy.status = res.status;
+            proxy.status_details = res.status_details;
             setdb.emit_path('head.proxies_running');
         });
     };

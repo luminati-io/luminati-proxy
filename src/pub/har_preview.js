@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 import JSON_viewer from './json_viewer.js';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/lib/codemirror.css';
@@ -100,19 +101,45 @@ class Pane_headers extends Pure_component {
 
 class Pane_response extends Pure_component {
     render(){
-        const content_type = this.props.req.details.content_type;
+        const req = this.props.req;
+        const {port, content_type} = req.details;
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
         if (!content_type||['xhr', 'css', 'js', 'font', 'html', 'other']
             .includes(content_type))
         {
-            return <Codemirror_wrapper req={this.props.req}/>;
+            return <Codemirror_wrapper req={req}/>;
         }
         return <No_response_data/>;
     }
 }
 
+const Encrypted_response_data = withRouter(
+class Encrypted_response_data extends Pure_component {
+    goto_ssl = ()=>{
+        this.props.history.push({
+            pathname: `/proxy/${this.props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    render(){
+        return <div className="empty_view">
+              <div className="block">
+                <div>This request is using SSL encryption.</div>
+                <div>
+                  <span>You need to turn on </span>
+                  <a className="link" onClick={this.goto_ssl}>
+                    SSL analyzing</a>
+                  <span> to read the response here.</span>
+                </div>
+              </div>
+            </div>;
+    }
+});
+
 const No_response_data = ()=>
     <div className="empty_view">
-      <div>This request has no response data available.</div>
+      <div className="block">This request has no response data available.</div>
     </div>;
 
 class Codemirror_wrapper extends Pure_component {
@@ -353,8 +380,11 @@ class Pane_preview extends Pure_component {
     render(){
         const content_type = this.props.req.details.content_type;
         const text = this.props.req.response.content.text;
+        const port = this.props.req.details.port;
         let json;
-        if (content_type=='xhr'&&(json = is_json_str(text)))
+        if (content_type=='unknown')
+            return <Encrypted_response_data port={port}/>;
+        if (content_type=='xhr' && (json = is_json_str(text)))
             return <JSON_viewer json={json}/>;
         if (content_type=='img')
             return <Img_viewer img={this.props.req.request.url}/>;

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.129.361",
+        "version": "1.130.656",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -495,10 +495,6 @@
                 "config": {
                     "type": "string",
                     "description": "Config file containing proxy definitions"
-                },
-                "database": {
-                    "type": "string",
-                    "description": "Database file containing logs and cached values"
                 },
                 "cookie": {
                     "type": "string",

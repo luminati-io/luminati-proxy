@@ -11,7 +11,7 @@ const lpm_file = require('../util/lpm_file.js');
 const qw = require('../util/string.js').qw;
 const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
-const version = require('../package.json').version;
+const pkg = require('../package.json');
 const _ = require('lodash');
 const crypto = require('crypto');
 const ps_list = require('ps-list');
@@ -22,6 +22,10 @@ const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
 const os = require('os');
+const download = require('download');
+const extract = require('extract-zip');
+const is_pkg = typeof process.pkg!=='undefined';
+const path = require('path');
 
 const gen_filename = name=>{
     return lpm_file.get_file_path(
@@ -118,7 +122,7 @@ E.read_status_file = ()=>{
         zerr.perr('crash_sudden', E.lpm_status);
 };
 
-E.shutdown = (reason, send_ev = true, error = null)=>{
+E.shutdown = (reason, error=null)=>{
     if (E.shutdowning)
         return;
     E.shutdowning = true;
@@ -134,12 +138,8 @@ E.shutdown = (reason, send_ev = true, error = null)=>{
         reason);
     if (E.manager)
     {
-        let stop_manager = ()=>{
-            E.manager.stop(reason, true);
-            E.manager = null;
-        };
-        if (!analytics.enabled||!send_ev)
-            stop_manager();
+        E.manager.stop(reason, true);
+        E.manager = null;
     }
     if (error)
         zerr(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
@@ -167,7 +167,7 @@ E.handle_signal = (sig, err)=>{
                 customer: _.get(E.manager, '_defaults.customer'),
                 config: _.get(E.manager, '_total_conf')});
         }
-        E.shutdown(errstr, true, err);
+        E.shutdown(errstr, err);
     });
 };
 
@@ -251,9 +251,26 @@ const check_running = argv=>etask(function*(){
     }
 });
 
+const fetch_puppeteer = ()=>etask(function*lum_node_fetch_puppeteer(){
+    if (!is_pkg || file.exists('./chromium'))
+        return;
+    this.on('uncaught', e=>{
+        zerr('There was an error while fetching puppeteer: %s', e.message);
+    });
+    zerr.notice('Started fetching puppeteer binary');
+    yield download(`http://${pkg.api_domain}/static/lpm/puppeteer.zip`, 'tmp');
+    const source = path.join(process.cwd(), 'tmp', 'puppeteer.zip');
+    extract(source, {dir: process.cwd()}, err=>{
+        if (err)
+            return this.throw(err);
+        zerr.notice('Puppeteer fetched');
+    });
+});
+
 E.run = (argv, run_config)=>etask(function*(){
     yield check_running(argv);
     add_alias_for_whitelist_ips();
+    fetch_puppeteer();
     E.read_status_file();
     E.write_status_file('initializing', null,
         E.manager&&E.manager._total_conf);
@@ -313,7 +330,7 @@ E.handle_upgrade_finished = msg=>{
 };
 
 E.handle_shutdown = msg=>{
-    E.shutdown(msg.reason, true, msg.error);
+    E.shutdown(msg.reason, msg.error);
 };
 
 E.handle_msg = msg=>{
@@ -330,7 +347,7 @@ E.handle_msg = msg=>{
 
 E.init_ua = argv=>{
     ua.set('an', 'LPM');
-    ua.set('av', `v${version}`);
+    ua.set('av', `v${pkg.version}`);
     E.ua_filename = gen_filename('ua_ev');
     E.last_ev = null;
     ua.event = ua_event_wrapper;
@@ -347,7 +364,7 @@ E.init_status = ()=>{
         create_date: zdate(),
         update_date: zdate(),
         customer_name: null,
-        version,
+        version: pkg.version,
     };
 };
 

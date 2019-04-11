@@ -134,7 +134,7 @@ class Form extends Pure_component {
             return !plan.archive && !plan.disable;
         }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
         const logs_note = this.state.settings.logs ?
-            'Set to 0 to disable logs entirely' : 'Logs are disabled';
+            'Set to 0 to disable logs entirely' : 'Request logs are disabled';
         return <div className="settings_form">
               <Loader show={!this.state.consts}/>
               <Labeled_controller val={this.state.settings.zone} type="select"
@@ -155,7 +155,7 @@ class Form extends Pure_component {
               <Labeled_controller val={this.state.settings.logs}
                 type="select_number" on_change_wrapper={this.logs_changed}
                 data={[0, 100, 1000, 10000]} note={logs_note}
-                label="Limit for logs history" default
+                label="Limit for request logs" default
                 tooltip={this.tooltips.logs}/>
               <Loader_small show={this.state.saving}/>
             </div>;

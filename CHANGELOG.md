@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.130.656 Development Latest
+- :star: Stability improvements
+
 ## 1.129.361 Stable
 - :bug: Fix crashes when incorrect header check
 

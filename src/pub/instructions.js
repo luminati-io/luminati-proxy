@@ -119,6 +119,7 @@ E.browser = (proxy=24000)=>({
           <Li>Check the "Bypass proxy server for local addresses" check-box
             </Li>
           <Li>Save changes by pressing <code>OK</code></Li>
+          <Li>Restart browser</Li>
           <Last_step/>
         </Instructions>,
     chrome_mac:
@@ -135,6 +136,7 @@ E.browser = (proxy=24000)=>({
           <Li>Enter <code>Address</code>: <Code>127.0.0.1</Code> and <code>
             Port</code>: <Code> {proxy}</Code></Li>
           <Li>Save changes by pressing <code>OK</code></Li>
+          <Li>Restart browser</Li>
           <Last_step/>
         </Instructions>,
     ie:

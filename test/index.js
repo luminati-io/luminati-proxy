@@ -2,7 +2,7 @@
 'use strict'; /*jslint node:true, mocha:true*/
 const _ = require('lodash');
 const assert = require('assert');
-const socks = require('@luminati-io/socksv5');
+const socks = require('lum_socksv5');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
 const lolex = require('lolex');
@@ -47,6 +47,7 @@ describe('proxy', ()=>{
             return yield etask.nfn_apply(_this, '.request', [req_opt]);
         });
         yield l.listen();
+        l.session_mgr._request_session({}, {init: true});
         return l;
     });
     let l, waiting;
@@ -372,24 +373,25 @@ describe('proxy', ()=>{
                 }));
             });
             describe('keep_alive', ()=>{
-                const t = (name, opt)=>it(name, etask._fn(function*(_this){
+                const assert_keep_alive = num=>assert.equal(
+                    proxy.full_history.length-proxy.history.length, num);
+                const t = (name, opt, ex)=>it(name, etask._fn(function*(_this){
                     l = yield lum(Object.assign({keep_alive: 0.15}, opt));
+                    yield etask.sleep(50);
+                    assert.equal(proxy.history.length, 0);
+                    assert_keep_alive(ex[0]);
                     yield l.test();
-                    const s_f = proxy.full_history.length;
-                    const s_h = proxy.history.length;
-                    assert.equal(proxy.full_history.length, 0+s_f);
-                    assert.equal(proxy.history.length, 0+s_h);
-                    yield l.test();
-                    assert.equal(proxy.full_history.length, 1+s_f);
-                    assert.equal(proxy.history.length, 1+s_h);
-                    yield etask.sleep(300);
-                    assert.equal(proxy.full_history.length, 2+s_f);
-                    assert.equal(proxy.history.length, 1+s_h);
+                    assert.equal(proxy.history.length, 1);
+                    assert_keep_alive(ex[1]);
+                    yield etask.sleep(0.2*ms.SEC);
+                    assert.equal(proxy.history.length, 1);
+                    assert_keep_alive(ex[2]);
                 }));
-                t('pool', {pool_size: 1});
-                t('sticky_ip', {sticky_ip: true});
-                t('session explicit', {session: 'test'});
-                t('session using seed', {session: true, seed: 'seed'});
+                t('pool', {pool_size: 1}, [1, 1, 2]);
+                t('sticky_ip', {sticky_ip: true}, [0, 0, 1]);
+                t('session explicit', {session: 'test'}, [0, 0, 1]);
+                t('session using seed', {session: true, seed: 'seed'},
+                    [0, 0, 1]);
             });
             describe('session_duration', ()=>{
                 describe('change after specified timeout', ()=>{
@@ -622,19 +624,17 @@ describe('proxy', ()=>{
                 content_size: 0,
             }), pre_rule('null_response'));
             it('pool', etask._fn(function*(_this){
-                const one_each_aggregator = data=>{
-                    if (!history.some(_.matches({context: data.context})))
-                        history.push(data);
-                };
-                l = yield lum({pool_size: 1, keep_alive: 0.01,
+                const one_each_aggregator = data=>history.push(data);
+                l = yield lum({pool_size: 1, keep_alive: 0.3,
                     handle_usage: one_each_aggregator});
                 yield l.test();
                 yield etask.sleep(400);
                 assert_has(history, [
+                    {context: 'SESSION KEEP ALIVE'},
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
                 ]);
-                assert.equal(history.length, 2);
+                assert.equal(history.length, 3);
             }));
         });
         describe('whitelist', ()=>{

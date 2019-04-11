@@ -162,7 +162,7 @@ const presets = {
             opt.keep_alive = true;
             opt.session = true;
             opt.max_requests = 1;
-            opt.pool_size = opt.pool_size>1 ? opt.pool_size : 10;
+            opt.pool_size = 0;
         },
         clean: opt=>{
             opt.keep_alive = false;
@@ -173,8 +173,6 @@ const presets = {
         rules: [
             {field: 'multiply', label: `Disables 'Multiply' options`},
             {field: 'pool_type', label: `Round-robin pool type`},
-            {field: 'pool_size', label: `Sets 'Pool size' requests to 10. It
-                makes sense to choose any other positive number`},
             {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
                 sense to choose any other positive number`},
         ],

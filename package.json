@@ -71,21 +71,16 @@
     "check-node-version": "2.0.1",
     "country-language": "0.1.7",
     "electron-updater": "2.8.9",
-    "node-abi": "2.7.1",
     "express": "4.14.0",
     "flag-icon-css": "3.2.1",
     "http-shutdown": "1.1.0",
     "json-stable-stringify": "1.0.1",
-    "json2csv": "3.7.3",
     "lodash": "4.17.11",
     "node-forge": "0.6.46",
-    "notosans-fontface": "1.0.1",
     "pm2": "2.10.1",
     "request": "2.79.0",
     "request-stats": "2.0.1",
     "semver": "5.3.0",
-    "@luminati-io/socksv5": "0.0.7",
-    "sqlite3": "4.0.2",
     "sudo-prompt": "6.2.1",
     "taskkill": "2.0.0",
     "tasklist": "3.1.0",
@@ -104,13 +99,13 @@
     "ws": "5.1.1",
     "diacritic": "0.0.2",
     "underscore": "1.8.3",
-    "node-getopt": "0.2.3",
-    "rimraf": "2.5.2",
-    "log-buffer": "0.0.3",
     "cheerio": "1.0.0-rc.2",
     "prompt-sync": "4.1.6",
-    "lum_lokijs": "1.5.7",
-    "ps-list": "5.0.0"
+    "lum_lokijs": "1.5.9",
+    "lum_socksv5": "0.0.10",
+    "ps-list": "5.0.0",
+    "download": "7.1.0",
+    "extract-zip": "1.6.7"
   },
   "description": "A configurable local proxy for luminati.io",
   "devDependencies": {
@@ -123,7 +118,7 @@
     "babel-preset-react": "6.24.1",
     "babel-plugin-transform-object-rest-spread": "6.23.0",
     "babel-plugin-transform-runtime": "6.23.0",
-    "bootstrap": "3.3.7",
+    "bootstrap": "3.4.1",
     "codemirror": "5.21.0",
     "css-loader": "0.28.4",
     "electron": "4.0.4",
@@ -286,7 +281,6 @@
       "lib/analytics.js",
       "lib/cities.js",
       "lib/context.js",
-      "lib/db_history.json",
       "lib/find_iface.js",
       "lib/hash.js",
       "lib/hutil-loader.js",
@@ -299,6 +293,7 @@
       "lib/md5_util.js",
       "lib/migration.js",
       "lib/perr.js",
+      "lib/puppeteer.js",
       "lib/recaptcha.js",
       "lib/req_process.js",
       "lib/router.js",
@@ -371,7 +366,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "ad54d7fb95788ccecfd3eefeaf7c4b02"
+    "md5": "f17cb4f36b1e3fcb573b8b7360fc674e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -409,5 +404,25 @@
     "test-win": "node node_modules/mocha/bin/mocha",
     "build": "node_modules/webpack/bin/webpack.js"
   },
-  "version": "1.129.361"
+  "pkg": {
+    "scripts": [
+      "util/*.js",
+      "bin/*.js",
+      "node_modules/lum_socksv5/lib/*.js",
+      "node_modules/lum_socksv5/lib/auth/*.js"
+    ],
+    "assets": [
+      "db/*.csv",
+      "bin/pub/index.html",
+      "bin/pub/*.js",
+      "bin/pub/favicon.ico",
+      "bin/pub/do.svg",
+      "bin/pub/font/*.woff2",
+      "bin/pub/img/*.svg",
+      "bin/pub/img/*.png",
+      "bin/pub/img/*.jpg",
+      "bin/pub/img/*.gif"
+    ]
+  },
+  "version": "1.130.656"
 }

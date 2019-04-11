@@ -478,16 +478,17 @@ E.disk_io_time = function(stats){
 };
 
 E.info = function(){
-    var info = {type: os.type(), endianness: os.endianness(),
-        hostname: os.hostname(), arch: os.arch()};
-    var m;
-    if (info.type=='Linux')
-    {
-        info.issue = file.read_line('/etc/issue');
-        if (info.issue && (m = info.issue.match(/^Ubuntu ([0-9.]+) /)))
-            info.ubuntu = m[1];
-    }
-    return info;
+    return {type: os.type(), endianness: os.endianness(),
+        hostname: os.hostname(), arch: os.arch(),
+        release: E.get_release()};
+};
+
+E.node = function(){
+    let host = exec.get_line('/usr/local/bin/node -v').replace(/^v/, '');
+    let hola_server = file.is_win ? host :
+        exec.get_line('cat /etc/init/node_clog.conf 2>&1 '+
+        `| grep 'env NAVE=' | sed 's|.*"\\(.*\\)"|\\1|'`);
+    return {host, hola_server};
 };
 
 E.ps = function(){
