@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.130.656 Development Latest
+## 1.130.673 Development Latest
 - :star: Stability improvements
 
 ## 1.129.361 Stable

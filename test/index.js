@@ -645,6 +645,7 @@ describe('proxy', ()=>{
             }));
             it('http reject', etask._fn(function*(){
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
+                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
                 let res = yield l.test({url: test_url.http});
                 assert.equal(res.statusCode, 403);
                 assert.equal(res.body, undefined);
@@ -656,6 +657,7 @@ describe('proxy', ()=>{
             }));
             it('https reject', etask._fn(function*(){
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
+                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
                 let error;
                 try {
                     yield l.test({url: test_url.https});
@@ -678,6 +680,7 @@ describe('proxy', ()=>{
             }));
             it('socks http reject', etask._fn(function*(){
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
+                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
                 let res = yield etask.nfn_apply(request, [{
                     agent: new socks.HttpAgent({
                         proxyHost: '127.0.0.1',
@@ -704,6 +707,7 @@ describe('proxy', ()=>{
             }));
             it('socks https reject', etask._fn(function*(){
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
+                sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
                 let error;
                 try {
                     yield etask.nfn_apply(request, [{

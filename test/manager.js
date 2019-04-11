@@ -531,6 +531,7 @@ describe('manager', ()=>{
     });
     describe('flags', ()=>{
         it('exits immediately with version on -v', etask._fn(function*(_this){
+            _this.timeout(6000);
             const exec = require('child_process').execFile;
             exec('node', ['./bin/index.js', '--version'], (err, res)=>{
                 this.continue();
