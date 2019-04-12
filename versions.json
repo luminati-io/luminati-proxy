@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.130.708",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add token based authentication at the request level"
+            }
+        ]
+    },
+    {
         "ver": "1.130.673",
         "type": "dev",
         "changes": [

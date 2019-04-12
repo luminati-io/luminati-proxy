@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.130.708 Stable
+- :star: Add token based authentication at the request level
+
 ## 1.130.673 Development Latest
 - :star: Stability improvements
 
