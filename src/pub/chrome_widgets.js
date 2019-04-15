@@ -152,15 +152,6 @@ export const Sort_icon = ({show, dir})=>{
 };
 
 export class Chrome_table extends Pure_component {
-    state = {};
-    componentDidMount(){
-        const _this = this;
-        this.etask(function*(){
-            this.on('uncaught', e=>console.error(e));
-            const data = yield _this.props.fetch_data();
-            _this.setState({data});
-        });
-    }
     render(){
         const {cols, title, children} = this.props;
         return <div className="chrome chrome_table">
@@ -172,16 +163,14 @@ export class Chrome_table extends Pure_component {
                 </Toolbar_container>
                 <div className="tables_container vbox">
                   <Header_container cols={cols}/>
-                  <Data_container cols={cols} data={this.state.data}>
-                    {children}
-                  </Data_container>
+                  <Data_container cols={cols}>{children}</Data_container>
                 </div>
               </div>
             </div>;
     }
 }
 
-const Data_container = ({cols=[], data=[], children})=>{
+const Data_container = ({cols=[], children})=>{
     return <div className="data_container">
           <table>
             <colgroup>
@@ -190,7 +179,7 @@ const Data_container = ({cols=[], data=[], children})=>{
               )}
             </colgroup>
             <tbody>
-              {data.map(children)}
+              {children}
               <tr className="filler">
                 {cols.map(c=><td key={c.id}></td>)}
               </tr>

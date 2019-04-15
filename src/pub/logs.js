@@ -49,20 +49,27 @@ const banned_ips_cols = [
 ];
 
 const Banned_ips = withRouter(class Banned_ips extends Pure_component {
+    state = {ips: []};
+    componentDidMount(){
+        const _this = this;
+        this.etask(function*(){
+            const ips = yield _this.fetch_data();
+            _this.setState({ips});
+        });
+    }
     fetch_data = ()=>this.etask(function*(){
         const url = `/api/banlist?full=true`;
         const data = yield ajax.json({url});
         return data.ips;
     });
     render(){
-        return <Chrome_table title="Sessions" cols={banned_ips_cols}
-              fetch_data={this.fetch_data}>
-              {d=>
+        return <Chrome_table title="Global banned IPs" cols={banned_ips_cols}>
+              {this.state.ips.map(d=>
                 <tr key={d.ip}>
                   <td>{d.ip}</td>
                   <td>{d.to ? moment(d.to).fromNow() : ' - '}</td>
                 </tr>
-              }
+              )}
             </Chrome_table>;
     }
 });

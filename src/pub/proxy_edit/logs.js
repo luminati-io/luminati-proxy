@@ -54,6 +54,14 @@ const banned_ips_cols = [
 ];
 
 const Banned_ips = withRouter(class Banned_ips extends Pure_component {
+    state = {ips: []};
+    componentDidMount(){
+        const _this = this;
+        this.etask(function*(){
+            const ips = yield _this.fetch_data();
+            _this.setState({ips});
+        });
+    }
     fetch_data = ()=>{
         const _this = this;
         return this.etask(function*(){
@@ -66,15 +74,14 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
     render(){
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        return <Chrome_table title="Sessions" cols={banned_ips_cols}
-              fetch_data={this.fetch_data}>
-              {d=>
+        return <Chrome_table title="Sessions" cols={banned_ips_cols}>
+              {this.state.ips.map(d=>
                 <tr key={d.ip}>
                   <td>{d.ip}</td>
                   <td>{d.domain||' - '}</td>
                   <td>{d.to ? moment(d.to).fromNow() : ' - '}</td>
                 </tr>
-              }
+              )}
             </Chrome_table>;
     }
 });
@@ -87,50 +94,54 @@ const sessions_cols = [
 ];
 
 const Sessions = withRouter(class Sessions extends Pure_component {
-    state = {sessions: 0};
+    state = {sessions: {}};
+    componentDidMount(){
+        const port = this.props.match.params.port;
+        const _this = this;
+        this.etask(function*(){
+            const sessions = yield _this.fetch_data();
+            setdb.set('ws.sessions.'+port, sessions);
+        });
+        this.setdb_on('ws.sessions.'+port, sessions=>{
+            if (!sessions)
+                return;
+            this.setState({sessions});
+        });
+    }
     fetch_data = ()=>{
         const _this = this;
         return this.etask(function*(){
             const port = _this.props.match.params.port;
             const url = `/api/sessions/${port}`;
             const res = yield ajax.json({url});
-            _this.setState({sessions: res.sessions});
-            return res.sessions;
+            return res;
         });
     };
     render(){
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        const sessions_n = (this.state.sessions||[]).length;
-        const title = `Sessions (${sessions_n})`;
+        const sessions_arr = Object.keys(this.state.sessions)
+            .map(id=>this.state.sessions[id]).filter(s=>s.session);
+        const title = `Sessions (${sessions_arr.length})`;
         const port = this.props.match.params.port;
-        return <Chrome_table title={title} cols={sessions_cols}
-              fetch_data={this.fetch_data}>
-              {data=><Session_row data={data} key={data.session} port={port}/>}
+        return <Chrome_table title={title} cols={sessions_cols}>
+              {sessions_arr.map(sess=>
+                <Session_row session={sess.session} key={sess.session}
+                  ip={sess.ip} port={port} created={sess.created}
+                  host={sess.host}/>
+              )}
             </Chrome_table>;
     }
 });
 
 class Session_row extends Pure_component {
-    state = {};
-    componentDidMount(){
-        const session = this.props.data.session;
-        const port = this.props.port;
-        this.setdb_on('ws.sessions.'+port+'.'+session, data=>{
-            if (!data)
-                return;
-            this.setState(data);
-        });
-    }
     render(){
-        const data = this.props.data;
-        const ip = this.state.ip||data.ip;
-        const host = this.state.host||data.host;
+        const {session, ip, host, created} = this.props;
         return <tr>
-              <td>{ip ? ip : ' - '}</td>
-              <td>{data.session}</td>
+              <td>{ip||' - '}</td>
+              <td>{session}</td>
               <td>{host}</td>
-              <Created_cell created={data.created}/>
+              <Created_cell created={created}/>
             </tr>;
     }
 }

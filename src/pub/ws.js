@@ -27,7 +27,10 @@ class Ws_wrapper extends EventTarget {
         const json = JSON.parse(event.data);
         if (json.type!='global')
             return;
-        setdb.set('ws.'+json.data.path, json.data.payload);
+        const {path, payload} = json.data;
+        if (path.endsWith('.remove') || path.endsWith('.add'))
+            return setdb.emit('ws.'+path, payload);
+        setdb.set('ws.'+path, payload);
     };
     start_checking = ()=>{
         const _this = this;

@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.131.19 
+- :bug: Fix lokijs related crashes
+- :star: Improved sessions management
+- :star: Introduced live data on the UI
+
 ## 1.130.708 Stable
 - :star: Add token based authentication at the request level
 

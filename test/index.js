@@ -1355,7 +1355,7 @@ describe('proxy', ()=>{
             assert.ok(hst<history.length);
         }));
     });
-    describe('long_availability', ()=>{
+    xdescribe('long_availability', ()=>{
         it('should keep the number of sessions', etask._fn(function*(_this){
             _this.timeout(6000);
             l = yield lum({pool_type: 'long_availability', pool_size: 10,

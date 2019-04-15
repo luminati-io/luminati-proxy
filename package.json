@@ -103,7 +103,7 @@
     "log-buffer": "0.0.3",
     "cheerio": "1.0.0-rc.2",
     "prompt-sync": "4.1.6",
-    "lum_lokijs": "1.5.9",
+    "lum_lokijs": "1.5.10",
     "lum_socksv5": "0.0.10",
     "ps-list": "5.0.0",
     "download": "7.1.0",
@@ -368,7 +368,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "15fa69afb4e30450fb26b560b03a0d0e"
+    "md5": "4f50866f9d38e36083b5f5cfff322237"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -426,5 +426,5 @@
       "bin/pub/img/*.gif"
     ]
   },
-  "version": "1.130.708"
+  "version": "1.131.19"
 }
