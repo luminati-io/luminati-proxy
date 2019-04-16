@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.131.176",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix an issue causing empty HAR logs"
+            }
+        ]
+    },
+    {
         "ver": "1.131.19",
         "type": "stable/dev",
         "changes": [

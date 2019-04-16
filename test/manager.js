@@ -9,6 +9,7 @@ const assert = require('assert');
 const request = require('request');
 const sinon = require('sinon');
 const Manager = require('../lib/manager.js');
+const Timeline = require('../lib/timeline.js');
 const zlog = require('../lib/log.js');
 const etask = require('../util/etask.js');
 const analytics = require('../lib/analytics.js');
@@ -70,13 +71,14 @@ describe('manager', ()=>{
             if (!get_param(args, '--config')&&!get_param(args, '--no-config'))
                 args.push('--no-config');
             if (!get_param(args, '--customer'))
-              args = args.concat(['--customer', customer]);
+                args = args.concat(['--customer', customer]);
             if (!get_param(args, '--password'))
-              args = args.concat(['--password', password]);
+                args = args.concat(['--password', password]);
             if (!get_param(args, '--dropin'))
-              args = args.concat(['--no-dropin']);
+                args = args.concat(['--no-dropin']);
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
                 args.push('--no-cookie');
+            args = args.concat('--loki', '/tmp/testdb');
         }
         manager = new Manager(lpm_util.init_args(args),
             {bypass_credentials_check: true, skip_ga: true});
@@ -386,7 +388,7 @@ describe('manager', ()=>{
             }));
             it('update defaults', etask._fn(function*(_this){
                 _this.timeout(6000);
-                let updated = {_defaults: {customer: 'updated'}};
+                const updated = {_defaults: {customer: 'updated'}};
                 nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).post('/update_lpm_stats')
                     .query({customer: 'updated'}).reply(200, {});
@@ -396,9 +398,26 @@ describe('manager', ()=>{
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, updated);
                 app = yield app_with_args(['--customer', 'mock_user']);
-                let res = yield app.manager.get_lum_local_conf();
+                const res = yield app.manager.get_lum_local_conf();
                 assert_has(res, updated, 'result');
                 assert_has(app.manager._defaults, res._defaults, '_defaults');
+            }));
+        });
+        describe('har logs', ()=>{
+            it('fetches all the logs', etask._fn(function*(_this){
+                _this.timeout(6000);
+                app = yield app_with_args(['--customer', 'mock_user',
+                    '--port', '24000']);
+                app.manager.loki.requests_clear();
+                app.manager.proxies_running[24000]._handle_usage({
+                    timeline: new Timeline(),
+                    request: {url: 'http://bbc.com'},
+                    response: {},
+                });
+                const res = yield api_json(`api/logs_har`);
+                assert_has(res.body.log.entries[0],
+                    {request: {url: 'http://bbc.com'}});
+                assert.equal(res.body.log.entries.length, 1);
             }));
         });
         xdescribe('recent_stats', ()=>{

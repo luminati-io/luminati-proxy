@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.131.176 Stable
+- :bug: Fix an issue causing empty HAR logs
+
 ## 1.131.19 
 - :bug: Fix lokijs related crashes
 - :star: Improved sessions management
