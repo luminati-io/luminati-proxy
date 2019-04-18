@@ -4,19 +4,19 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import _ from 'lodash';
-import Default_tooltip from './common/tooltip.js';
+import Tooltip from './common/tooltip.js';
+import {T} from './common/i18n.js';
 
 export const Toolbar_button = ({id, tooltip, active, href, ...props})=>
-    <Tooltip title={tooltip} placement={'bottom'}>
+    <T>{t=>
+    <Tooltip title={t(tooltip)} placement={'bottom'}>
       <a className={classnames('toolbar_item toolbar_button', id, {active})}
         onClick={props.on_click||(()=>null)} href={href}>
         <span className={classnames(id, 't_button', 'chrome_icon')}/>
         {props.children}
       </a>
-    </Tooltip>;
-
-export const Tooltip = props=>
-    <Default_tooltip className="har_tooltip" {...props}/>;
+    </Tooltip>
+    }</T>;
 
 export const Devider = ()=><div className="devider"/>;
 
@@ -196,7 +196,7 @@ const Header_container = ({cols})=>
         </colgroup>
         <tbody>
           <tr>
-            {(cols||[]).map((c, idx)=><th key={idx}>{c.title}</th>)}
+            {(cols||[]).map((c, idx)=><th key={idx}><T>{c.title}</T></th>)}
           </tr>
         </tbody>
       </table>

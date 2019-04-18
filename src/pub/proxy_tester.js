@@ -15,15 +15,14 @@ import {withRouter} from 'react-router-dom';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import date from '../../util/date.js';
-import {Typeahead} from 'react-bootstrap-typeahead';
-import {T} from '/www/locale/pub/i18n_react.js';
+import {T} from './common/i18n.js';
 const {SEC} = date.ms;
 
 const Proxy_tester = ()=>
     <div className="vbox"
       style={{paddingLeft: 15, paddingRight: 15, height: '100%'}}>
-      <Nav title="Proxy Tester"
-        subtitle='Emulate requests from your proxies to any target URL'/>
+      <Nav title="Proxy tester"
+        subtitle="Emulate requests from your proxies to any target URL"/>
       <Tester/>
     </div>;
 

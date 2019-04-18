@@ -19,6 +19,7 @@ import {Checkbox, any_flag, flag_with_title,
 import {withRouter} from 'react-router-dom';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
+import {T, with_tt} from './common/i18n.js';
 import {Toolbar_container, Toolbar_row, Toolbar_button,
     Devider} from './chrome_widgets.js';
 import {AutoSizer, Table, Column} from 'react-virtualized';
@@ -62,21 +63,36 @@ const Status_cell = ({proxy, scrolling})=>{
     if (!details.length && status!='ok')
         details = status;
     if (status=='testing')
-        return <Tooltip title="Status is being tested">Testing</Tooltip>;
+    {
+        return <T>
+            {t=>
+              <Tooltip title={t('Status is being tested')}>
+                {t('Testing')}
+              </Tooltip>
+            }</T>;
+    }
     else if (status && status!='ok')
-        return <Tooltip title={details}>Error</Tooltip>;
+        return <T>{t=><Tooltip title={t(details)}>{t('Error')}</Tooltip>}</T>;
     else if (status=='ok' && details)
     {
-        return <Tooltip title={details}>
+        return <T>{t=><Tooltip title={t(details)}>
               <span>
-                OK
+                {t('OK')}
                 <div className="ic_warning"/>
               </span>
-            </Tooltip>;
+              </Tooltip>
+            }</T>;
     }
     else if (status=='ok' && !details)
-        return <Tooltip title="This proxy works correctly">OK</Tooltip>;
-    return <Tooltip title="Status of this proxy is unknown">?</Tooltip>;
+    {
+        return <T>{t=>
+              <Tooltip title={t('This proxy works correctly')}>
+                {t('OK')}
+              </Tooltip>
+            }</T>;
+    }
+    return <T>{t=>
+        <Tooltip title={t('Status of this proxy is unknown')}>?</Tooltip>}</T>;
 };
 
 const Boolean_cell = ({proxy, col})=>{
@@ -108,16 +124,9 @@ class Type_cell extends React.Component {
             val = 'Luminati';
             tip = 'Proxy port using your Luminati account';
         }
-        return <Tooltip title={tip}>{val}</Tooltip>;
+        return <Tooltip title={tip}><T>{val}</T></Tooltip>;
     }
 }
-
-const Last_req_cell = ({proxy, scrolling})=>{
-    const val = (proxy.last_req||{}).url||'—';
-    if (scrolling)
-        return val;
-    return <Tooltip title={val}>{val}</Tooltip>;
-};
 
 const Port_cell = ({proxy, mgr, scrolling})=>{
     if (scrolling)
@@ -133,12 +142,13 @@ const Port_cell = ({proxy, mgr, scrolling})=>{
     return <Tooltip title={title}>{val}</Tooltip>;
 };
 
-const Success_rate_cell = ({proxy})=>{
+const Success_rate_cell = with_tt(['Total', 'Success'], ({proxy, t})=>{
     const val = !proxy.reqs ? '—' :
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
-    const title = `total: ${proxy.reqs}, success: ${proxy.success}`;
+    const title = `${t['Total']}: ${proxy.reqs},
+        ${t['Success']}: ${proxy.success}`;
     return <Tooltip title={title}>{val}</Tooltip>;
-};
+});
 
 const Reqs_cell = ({proxy})=>{
     const reqs = proxy.reqs||0;
@@ -688,7 +698,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             {cols.map(col=>
                               <Column key={col.key}
                                 cellRenderer={this.cell_renderer.bind(this)}
-                                label={col.title}
+                                label={<T>{col.title}</T>}
                                 className="chrome_td"
                                 dataKey={col.key}
                                 flexGrow={col.grow!==undefined ? col.grow : 1}
@@ -719,7 +729,7 @@ class Toolbar extends Pure_component {
                 <Toolbar_button id="add" tooltip="Add new proxy"
                   on_click={proxy_add}>
                   <span style={{marginRight: 5, position: 'relative',
-                    top: -3}}>Add new proxy</span>
+                    top: -3}}><T>Add new proxy</T></span>
                 </Toolbar_button>
                 <Devider/>
                 <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
@@ -889,9 +899,9 @@ const Action_icon = props=>{
         {invisible});
     if (scrolling)
         return <div className={classes}/>;
-    return <Tooltip title={tooltip}>
+    return <T>{t=><Tooltip title={t(tooltip)}>
           <div onClick={on_click} className={classes}/>
-        </Tooltip>;
+        </Tooltip>}</T>;
 };
 
 export default Proxies;

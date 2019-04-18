@@ -10,6 +10,7 @@ import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
+import {with_tt} from '../common/i18n.js';
 
 moment.relativeTimeThreshold('ss', 60);
 moment.relativeTimeThreshold('s', 50);
@@ -74,7 +75,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
     render(){
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        return <Chrome_table title="Sessions" cols={banned_ips_cols}>
+        return <Chrome_table title="Banned IPs" cols={banned_ips_cols}>
               {this.state.ips.map(d=>
                 <tr key={d.ip}>
                   <td>{d.ip}</td>
@@ -93,7 +94,8 @@ const sessions_cols = [
     {id: 'created', title: 'Created'},
 ];
 
-const Sessions = withRouter(class Sessions extends Pure_component {
+const Sessions = with_tt(['Sessions'], withRouter(
+class Sessions extends Pure_component {
     state = {sessions: {}};
     componentDidMount(){
         const port = this.props.match.params.port;
@@ -118,12 +120,13 @@ const Sessions = withRouter(class Sessions extends Pure_component {
         });
     };
     render(){
+        const {t, match} = this.props;
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
         const sessions_arr = Object.keys(this.state.sessions)
             .map(id=>this.state.sessions[id]).filter(s=>s.session);
-        const title = `Sessions (${sessions_arr.length})`;
-        const port = this.props.match.params.port;
+        const title = `${t['Sessions']} (${sessions_arr.length})`;
+        const port = match.params.port;
         return <Chrome_table title={title} cols={sessions_cols}>
               {sessions_arr.map(sess=>
                 <Session_row session={sess.session} key={sess.session}
@@ -132,7 +135,7 @@ const Sessions = withRouter(class Sessions extends Pure_component {
               )}
             </Chrome_table>;
     }
-});
+}));
 
 class Session_row extends Pure_component {
     render(){

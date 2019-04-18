@@ -14,7 +14,8 @@ export default class Tooltip extends Pure_component {
         $(this.ref).tooltip('destroy');
     }
     componentDidUpdate(){
-        $(this.ref).attr('title', this.props.title).tooltip('fixTitle'); }
+        $(this.ref).attr('title', this.props.title).tooltip('fixTitle');
+    }
     on_mouse_leave(){
         if (!this.ref)
             return;
@@ -26,12 +27,13 @@ export default class Tooltip extends Pure_component {
             return null;
         if (!this.props.title)
             return this.props.children;
+        const classes = `tooltip har_tooltip ${this.props.className||''}`;
         const props = {
             'data-toggle': 'tooltip',
             'data-placement': this.props.placement||'top',
             'data-container': 'body',
             'data-html': true,
-            'data-template': `<div class="tooltip ${this.props.className||''}"
+            'data-template': `<div class="${classes}"
                 role="tooltip">
                 <div class="tooltip-arrow"></div>
                 <div class="tooltip-inner"></div>
@@ -43,7 +45,7 @@ export default class Tooltip extends Pure_component {
         return React.Children.map(this.props.children, c=>{
             if (typeof c=='number')
                 c = ''+c;
-            if (typeof c=='string')
+            if (typeof c=='string' || typeof c=='object' && c.type.name=='T')
                 return React.createElement('span', props, c);
             return React.cloneElement(c, props);
         });

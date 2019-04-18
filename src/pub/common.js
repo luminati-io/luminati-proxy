@@ -10,11 +10,11 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import $ from 'jquery';
 import {bytes_format, presets} from './util.js';
-import * as Chrome from './chrome_widgets.js';
 import {Pins, Select_status, Select_number, Yes_no,
     Regex, Json, Textarea, Typeahead_wrapper, Input,
     Select} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
+import {T, with_tt} from './common/i18n.js';
 
 export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
     bytes = bytes||0;
@@ -28,12 +28,11 @@ export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
             return `<div><strong>${bw}</strong> ${details}</div>`;
         })
         .join('');
-    const T = chrome_style ? Chrome.Tooltip : Tooltip;
-    return <T title={bytes ? tooltip : ''}>
+    return <Tooltip title={bytes ? tooltip : ''}>
           <div className="disp_value">
             {bytes_format(bytes)||'—'}
           </div>
-        </T>;
+        </Tooltip>;
 };
 
 export const Warnings = props=>
@@ -73,13 +72,16 @@ export const Loader_small = props=>{
 };
 
 // XXX krzysztof: refactoring: reuse Copy_btn component
-export class Code extends Pure_component {
+export const Code = with_tt(['Copy to clipboard', 'Copy', 'Copied!'],
+class Code extends Pure_component {
     componentDidMount(){
+        const {t} = this.props;
         $(this.ref).find('.btn_copy').tooltip('show')
-        .attr('title', 'Copy to clipboard').tooltip('fixTitle');
+        .attr('title', t['Copy to clipboard']).tooltip('fixTitle');
     }
     set_ref(e){ this.ref = e; }
     copy(){
+        const {t} = this.props;
         if (this.props.on_click)
             this.props.on_click();
         const area = $(this.ref).children('textarea')[0];
@@ -88,23 +90,24 @@ export class Code extends Pure_component {
         area.select();
         try {
             document.execCommand('copy');
-            $(this.ref).find('.btn_copy').attr('title', 'Copied!')
+            $(this.ref).find('.btn_copy').attr('title', t['Copied!'])
             .tooltip('fixTitle')
-            .tooltip('show').attr('title', 'Copy to clipboard')
+            .tooltip('show').attr('title', t['Copy to clipboard'])
             .tooltip('fixTitle');
         } catch(e){ console.log('Oops, unable to copy'); }
     }
     render(){
+        const {t} = this.props;
         return <code ref={this.set_ref.bind(this)}>
               <span className="source">{this.props.children}</span>
               <textarea style={{position: 'fixed', top: '-1000px'}}/>
               <button onClick={this.copy.bind(this)} data-container="body"
                 className="btn btn_lpm btn_lpm_small btn_copy">
-                Copy
+                {t['Copy']}
               </button>
             </code>;
     }
-}
+});
 
 export const with_proxy_ports = Component=>{
     const port_select = data=>function port_select_inner(props){
@@ -166,14 +169,17 @@ export const Form_controller = props=>{
     return <Input {...props}/>;
 };
 
+const Copy_btn = with_tt(['Copy to clipboard', 'Copy'],
 class Copy_btn extends Pure_component {
     textarea = React.createRef();
     btn = React.createRef();
     componentDidMount(){
-        $(this.btn.current).tooltip('show').attr('title', 'Copy to clipboard')
-        .tooltip('fixTitle');
+        const {t} = this.props;
+        $(this.btn.current).tooltip('show')
+        .attr('title', t['Copy to clipboard']).tooltip('fixTitle');
     }
     copy = ()=>{
+        const {t} = this.props;
         const txt = this.textarea.current;
         const area = $(txt)[0];
         area.value = this.props.val;
@@ -182,21 +188,22 @@ class Copy_btn extends Pure_component {
             document.execCommand('copy');
             $(this.btn.current).attr('title', 'Copied!')
             .tooltip('fixTitle')
-            .tooltip('show').attr('title', 'Copy to clipboard')
+            .tooltip('show').attr('title', t['Copy to clipboard'])
             .tooltip('fixTitle');
         } catch(e){ console.log('Oops, unable to copy'); }
     };
     render(){
+        const {t} = this.props;
         return <div className="copy_btn">
               <button onClick={this.copy} data-container="body"
                 ref={this.btn} className="btn btn_lpm btn_lpm_small btn_copy">
-                Copy
+                {t['Copy']}
               </button>
               <textarea ref={this.textarea}
                 style={{position: 'fixed', top: '-1000px'}}/>
             </div>;
     }
-}
+});
 
 export class Cm_wrapper extends Pure_component {
     componentDidMount(){
@@ -251,22 +258,24 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
 export const Labeled_controller = ({id, disabled, note, sufix, ...props})=>
     <Field_row_raw disabled={disabled} note={note} animated={props.animated}
       inner_style={props.field_row_inner_style}>
-      <div className="desc" style={props.desc_style}>
-        <Tooltip title={props.tooltip}>{props.label}</Tooltip>
-      </div>
-      <div>
-        <div className="field" data-tip data-for={id+'tip'}>
-          <Form_controller disabled={disabled} {...props}/>
-          {sufix && <span className="sufix">{sufix}</span>}
-          {props.field_tooltip &&
-            <React_tooltip id={id+'tip'} type="light" effect="solid"
-              delayHide={30} delayUpdate={300} place="right">
-              {props.field_tooltip}
-            </React_tooltip>
-          }
+      <T>{t=><React.Fragment>
+        <div className="desc" style={props.desc_style}>
+          <Tooltip title={t(props.tooltip)}>{t(props.label)}</Tooltip>
         </div>
-        {note && <Note>{note}</Note>}
-      </div>
+        <div>
+          <div className="field" data-tip data-for={id+'tip'}>
+            <Form_controller disabled={disabled} {...props}/>
+            {sufix && <span className="sufix">{t(sufix)}</span>}
+            {props.field_tooltip &&
+              <React_tooltip id={id+'tip'} type="light" effect="solid"
+                delayHide={30} delayUpdate={300} place="right">
+                {t(props.field_tooltip)}
+              </React_tooltip>
+            }
+          </div>
+          {note && <Note>{t(note)}</Note>}
+        </div>
+      </React.Fragment>}</T>
     </Field_row_raw>;
 
 export const Checkbox = props=>
@@ -280,8 +289,8 @@ export const Checkbox = props=>
 
 export const Nav = ({title, subtitle, warning})=>
     <div className="nav_header">
-      <h3>{title}</h3>
-      <div className="subtitle">{subtitle}</div>
+      <h3><T>{title}</T></h3>
+      <div className="subtitle"><T>{subtitle}</T></div>
       <Warning_msg warning={warning}/>
     </div>;
 
@@ -336,12 +345,12 @@ export const Link_icon = props=>{
         ? <div className="img_icon"
             style={{backgroundImage: `url(${img})`}}></div>
         : <i className={classnames('glyphicon', 'glyphicon-'+id)}/>;
-    return <Tooltip title={tooltip} key={id}>
+    return <T>{t=><Tooltip title={t(tooltip)} key={id}>
           <span className={classnames('link', 'icon_link', classes)}
             onClick={on_click}>
             {icon}
           </span>
-        </Tooltip>;
+        </Tooltip>}</T>;
 };
 
 export const Add_icon = ({click, tooltip})=>
@@ -371,10 +380,14 @@ export class Logo extends Pure_component {
     }
 }
 
-export const any_flag = <Tooltip title="Any">
-      <img src="/img/flag_any_country.svg" style={{height: 18}}/>
-      <span className="lit" style={{marginLeft: 2}}>Any</span>
-    </Tooltip>;
+export const any_flag = <T>{t=>
+      <Tooltip title={t('Any')}>
+        <span>
+          <img src="/img/flag_any_country.svg" style={{height: 18}}/>
+          <span className="lit" style={{marginLeft: 2}}>{t('Any')}</span>
+        </span>
+      </Tooltip>
+    }</T>;
 
 export const flag_with_title = (country, title)=>{
     return <Tooltip title={country.toUpperCase()}>

@@ -17,6 +17,7 @@ import Tooltip from './common/tooltip.js';
 import {Textarea} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal} from './common/modals.js';
+import {T} from './common/i18n.js';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     presets_opt = Object.keys(presets).map(p=>{
@@ -294,7 +295,7 @@ const Lum_proxy = props=>{
             <Preview title={title}>
               <Zone_description zones={zones} zone_name={zone}/>
               <a className="link" href="https://luminati.io/cp/zones"
-                target="_blank" rel="noopener noreferrer">Edit zone</a>
+                target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
             </Preview>
           </div>
           <div className="group">
@@ -310,7 +311,7 @@ const Lum_proxy = props=>{
 
 const Preview = ({title, children})=>{
     return <div className="preview">
-          <div className="header">{title}</div>
+          <div className="header"><T>{title}</T></div>
           {children}
         </div>;
 };
@@ -324,19 +325,21 @@ const Nav_tabs_wrapper = ({set_tab, cur_tab})=>
     </Nav_tabs>;
 
 const Field = props=>
-    <div className="field">
-      <div className="field_header">
-        <div className={classnames('icon', props.icon_class)}/>
-        <h4>{props.title}:</h4>
+    <T>{t=>
+      <div className="field">
+        <div className="field_header">
+          <div className={classnames('icon', props.icon_class)}/>
+          <h4>{t(props.title)}:</h4>
+        </div>
+        <Tooltip title={t(props.tooltip)}>
+          <select onChange={e=>props.on_change(e.target.value)}
+            value={props.val}>
+            {props.options.map((o, i)=>
+              <option key={i} value={o.value}>{t(o.key)}</option>)}
+          </select>
+        </Tooltip>
       </div>
-      <Tooltip title={props.tooltip}>
-        <select onChange={e=>props.on_change(e.target.value)}
-          value={props.val}>
-          {props.options.map((o, i)=>
-            <option key={i} value={o.value}>{o.key}</option>)}
-        </select>
-      </Tooltip>
-    </div>;
+    }</T>;
 
 const Footer = props=>{
     const save_clicked = ()=>{
@@ -357,9 +360,15 @@ const Footer = props=>{
               style={{float: 'left'}}>Advanced options</a>
           </Tooltip>
           {!props.created_port &&
-            <button onClick={save_clicked} className={classes}>Save</button>}
+            <button onClick={save_clicked} className={classes}>
+              <T>Save</T>
+            </button>
+          }
           {!!props.created_port &&
-            <button onClick={ok_clicked} className={classes}>OK</button>}
+            <button onClick={ok_clicked} className={classes}>
+              <T>OK</T>
+            </button>
+          }
         </div>;
 };
 

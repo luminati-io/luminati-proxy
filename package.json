@@ -316,6 +316,7 @@
       "src/pub/common/bullets.js",
       "src/pub/common/controls.js",
       "src/pub/common/error_boundry.js",
+      "src/pub/common/i18n.js",
       "src/pub/common/modals.js",
       "src/pub/common/nav_tabs.js",
       "src/pub/common/ssl_modal.js",
@@ -368,7 +369,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "430703067a15abdb60c9ee9fd621dc5d"
+    "md5": "97034f1e49a724a4500253d7160ed066"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -426,5 +427,5 @@
       "bin/pub/img/*.gif"
     ]
   },
-  "version": "1.131.176"
+  "version": "1.131.652"
 }

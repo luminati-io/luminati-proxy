@@ -4,6 +4,7 @@ import React from 'react';
 import classnames from 'classnames';
 import {withRouter, Route} from 'react-router-dom';
 import Tooltip from './tooltip.js';
+import {T} from './i18n.js';
 
 export const Nav_tabs = ({children, narrow, set_tab, cur_tab})=>
     <div className={classnames('nav_tabs', {narrow})}>
@@ -19,14 +20,14 @@ export const Nav_tab = withRouter(props=>{
         const active = props.cur_tab==id||!!match;
         const {disabled} = props;
         const btn_class = classnames('btn_tab', {active, disabled});
-        return <Tooltip title={props.tooltip}>
+        return <T>{t=><Tooltip title={t(props.tooltip)}>
               <div onClick={()=>!disabled && props.set_tab(id)}
                 className={btn_class}>
                 {!props.narrow && <div className={classnames('icon', id)}/>}
-                <div className="title">{props.title}</div>
+                <div className="title"><T>{props.title}</T></div>
                 <div className="arrow"/>
               </div>
-            </Tooltip>;
+            </Tooltip>}</T>;
     }}
     </Route>;
 });

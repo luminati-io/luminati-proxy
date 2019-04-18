@@ -15,12 +15,9 @@ import {ga_event} from './util.js';
 import {Modal} from './common/modals.js';
 
 class Config extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {editable: false, changed: false, persisted_config: ''};
-        this.title = 'Manual Configuration';
-        this.subtitle = 'Edit or export your ports configuration as JSON file';
-    }
+    state = {editable: false, changed: false, persisted_config: ''};
+    title = 'Manual configuration';
+    subtitle = 'Edit or export your ports configuration as JSON file';
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea,
             {mode: 'javascript', readOnly: 'nocursor'});

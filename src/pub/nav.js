@@ -14,6 +14,7 @@ import $ from 'jquery';
 import {Route, withRouter, Link} from 'react-router-dom';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
+import {T, langs, set_lang} from './common/i18n.js';
 
 const Nav = ()=>
     <div className="nav">
@@ -60,9 +61,9 @@ const Nav_link = ({label, to, name})=>
 const Nav_link_inner = ({label, to, name, match})=>
     <Link to={to}>
       <div className={classnames('menu_item', {active: match})}>
-        <Tooltip title={label} placement="right">
+        <T>{t=><Tooltip title={t(label)} placement="right">
           <div className={classnames('icon', name)}/>
-        </Tooltip>
+        </Tooltip>}</T>
       </div>
     </Link>;
 
@@ -70,11 +71,12 @@ class Nav_top extends Pure_component {
     state = {ver: '', lock: false};
     componentDidMount(){
         this.setdb_on('head.lock_navigation', lock=>
-            lock!==undefined&&this.setState({lock}));
+            lock!==undefined && this.setState({lock}));
         this.setdb_on('head.version', ver=>this.setState({ver}));
     }
     render(){
-        const tooltip = 'Luminati Proxy Manager V'+this.state.ver;
+        const {ver} = this.state;
+        const tooltip = `Luminati Proxy Manager v.${ver}`;
         return <div className="nav_top">
               <Tooltip title={tooltip} placement="right">
                 <div><Logo lock={this.state.lock}/></div>
@@ -88,14 +90,14 @@ const Footer = ()=>
     <div className="footer">
       <div>
         <a href="http://luminati.io/faq#proxy" rel="noopener noreferrer"
-          target="_blank" className="link">FAQ</a>
+          target="_blank" className="link"><T>FAQ</T></a>
       </div>
       <div>
         <a href="mailto:lpm@luminati.io" className="link">
-          Contact</a>
+          <T>Contact</T></a>
       </div>
       <div>
-        <a href={swagger_url} className="link">API</a>
+        <a href={swagger_url} className="link"><T>API</T></a>
       </div>
     </div>;
 
@@ -107,7 +109,8 @@ const Nav_right = ()=>
       <div className="schema"><Schema/></div>
       <div className="notif_icon"><Notif/></div>
       <Patent/>
-      <Dropdown/>
+      <Language/>
+      <Account/>
     </div>;
 
 const Patent = ()=>
@@ -177,25 +180,70 @@ class Shutdown_modal extends Pure_component {
     }
 }
 
-const Dropdown = withRouter(class Dropdown extends Pure_component {
-    constructor(props){
-        super(props);
-        this.state = {};
+class Language extends Pure_component {
+    state = {};
+    componentDidMount(){
+        let lang = window.localStorage.getItem('lang');
+        if (lang)
+            return this.set_lang(lang);
+        this.setdb_on('head.conn', conn=>{
+            if (!conn)
+                return;
+            if (conn.current_country=='cn')
+                lang = 'cn';
+            else
+                lang = 'en';
+            this.set_lang(lang);
+        });
     }
+    set_lang = lang=>{
+        this.setState({lang});
+        set_lang(lang);
+        let curr = window.localStorage.getItem('lang');
+        if (curr!=lang)
+            window.localStorage.setItem('lang', lang);
+    };
+    render(){
+        if (!this.state.lang)
+            return null;
+        return <div className="dropdown">
+              <a className="link dropdown-toggle" data-toggle="dropdown">
+                <Lang_cell lang={this.state.lang}/>
+              </a>
+              <ul className="dropdown-menu dropdown-menu-right">
+                <li onClick={this.set_lang.bind(this, 'cn')}><a>
+                  <Lang_cell lang="cn"/>
+                </a></li>
+                <li onClick={this.set_lang.bind(this, 'en')}><a>
+                  <Lang_cell lang="en"/>
+                </a></li>
+              </ul>
+            </div>;
+    }
+}
+
+const Lang_cell = ({lang})=>
+    <React.Fragment>
+      <span className={`flag-icon flag-icon-${langs[lang].flag}`}/>
+      {langs[lang].name}
+    </React.Fragment>;
+
+const Account = withRouter(class Account extends Pure_component {
+    state = {};
     componentWillMount(){
         this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
     }
-    open_report_bug(){ $('#report_bug_modal').modal(); }
-    upgrade(){ $('#upgrade_modal').modal(); }
-    shutdown(){ $('#shutdown_modal').modal(); }
-    logout(){
+    open_report_bug = ()=>$('#report_bug_modal').modal();
+    upgrade = ()=>$('#upgrade_modal').modal();
+    shutdown = ()=>$('#shutdown_modal').modal();
+    logout = ()=>{
         const _this = this;
         this.etask(function*(){
             yield ajax({url: '/api/logout', method: 'POST'});
             _this.props.history.push('/login');
         });
-    }
+    };
     render(){
         if (!this.state.settings)
             return null;
@@ -203,28 +251,21 @@ const Dropdown = withRouter(class Dropdown extends Pure_component {
         const tip = `You are currently logged in as
         ${this.state.settings.customer}`;
         return <div className="dropdown">
-                <a className="link dropdown-toggle" data-toggle="dropdown">
-              <Tooltip placement="left" title={tip}>
-                  {this.state.settings.customer}
-              </Tooltip>
-                  <span className="caret"/>
-                </a>
+              <a className="link dropdown-toggle" data-toggle="dropdown">
+                <Tooltip placement="bottom" title={tip}>
+                  <span>
+                    {this.state.settings.customer}
+                    <span style={{marginLeft: 5}} className="caret"/>
+                  </span>
+                </Tooltip>
+              </a>
               <ul className="dropdown-menu dropdown-menu-right">
                 {is_upgradable &&
-                  <li>
-                    <a onClick={this.upgrade.bind(this)}>Upgrade</a>
-                  </li>
+                  <li><a onClick={this.upgrade}>Upgrade</a></li>
                 }
-                <li>
-                  <a onClick={this.open_report_bug.bind(this)}>
-                    Report a bug</a>
-                </li>
-                <li>
-                  <a onClick={this.logout.bind(this)}>Log out</a>
-                </li>
-                <li>
-                  <a onClick={this.shutdown.bind(this)}>Shut down</a>
-                </li>
+                <li><a onClick={this.open_report_bug}>Report a bug</a></li>
+                <li><a onClick={this.logout}>Log out</a></li>
+                <li><a onClick={this.shutdown}>Shut down</a></li>
               </ul>
             </div>;
     }

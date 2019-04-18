@@ -8,6 +8,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import semver from 'semver';
 import Tooltip from './common/tooltip.js';
+import {T} from './common/i18n.js';
 
 class Overview extends Pure_component {
     componentDidMount(){
@@ -18,7 +19,9 @@ class Overview extends Pure_component {
     render(){
         const master_port = this.props.match.params.master_port;
         const title = master_port ?
-            `Overview of multiplied proxy port - ${master_port}` : 'Overview';
+            <span>
+              <T>Overview of multiplied proxy port</T> - {master_port}
+            </span> : <T>Overview</T>;
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>

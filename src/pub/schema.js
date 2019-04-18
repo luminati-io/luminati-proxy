@@ -5,6 +5,7 @@ import React from 'react';
 import classnames from 'classnames';
 import {get_static_country} from './util.js';
 import Tooltip from './common/tooltip.js';
+import {T} from './common/i18n.js';
 
 const tooltips = {
     crawler: `Your crawler or bot that systematically browses the web. Connect
@@ -12,16 +13,16 @@ const tooltips = {
         <ul>
           <li>
             <div>Browser and extension based crawlers</div>
-            <div class="browser_icon firefox"/>
-            <div class="browser_icon chrome"/>
-            <div class="browser_icon safari"/>
-            <div class="browser_icon explorer"/>
+            <div class="browser_icon firefox"></div>
+            <div class="browser_icon chrome"></div>
+            <div class="browser_icon safari"></div>
+            <div class="browser_icon explorer"></div>
           </li>
           <li>
             <div>Dedicated crawling solutions</div>
-            <div class="logo_icon crawlera"/>
-            <div class="logo_icon legs"/>
-            <div class="logo_icon import"/>
+            <div class="logo_icon crawlera"></div>
+            <div class="logo_icon legs"></div>
+            <div class="logo_icon import"></div>
           </li>
         </ul>`,
     port_numbers: `Defined proxy ports in Luminati Proxy Manager`,
@@ -80,26 +81,26 @@ class Schema extends Pure_component {
         return <span className="schema_component">
               <div className="line"/>
               <Layer id="crawler" no_arr>
-                Crawler
+                <T>Crawler</T>
               </Layer>
               <Proxy_port_layer proxies={this.state.proxies}
                 form={this.state.form}/>
               <Layer id="lpm" class_names="port active">
                 <div className="icon"/>
-                LPM
+                <T>LPM</T>
               </Layer>
-              <Layer no_btn id="port_numbers">Port 22225</Layer>
+              <Layer no_btn id="port_numbers"><T>Port</T> 22225</Layer>
               <Layer id="super_proxy">
                 <span className="flag-icon flag-icon-us"/>
-                Super Proxy
+                <T>Super Proxy</T>
               </Layer>
-              <Layer no_btn id="port_numbers">Port 80, 443</Layer>
+              <Layer no_btn id="port_numbers"><T>Port</T> 80, 443</Layer>
               <Layer id="peer">
                 <Peer proxies={this.state.proxies} form={this.state.form}
                   zones={this.state.zones}/>
-                Peer
+                <T>Peer</T>
               </Layer>
-              <Layer id="destination">Destination</Layer>
+              <Layer id="destination"><T>Destination</T></Layer>
             </span>;
     }
 }
@@ -107,17 +108,14 @@ class Schema extends Pure_component {
 const Proxy_port_layer = ({proxies, form})=>{
     let label;
     if (form.port)
-        label = 'Proxy port '+form.port;
+        label = ' '+form.port;
     else if (!proxies.length)
-        label = 'Proxy port';
+        label = '';
     else if (proxies.length==1)
-        label = 'Proxy port '+proxies[0].port;
+        label = ' '+proxies[0].port;
     else
-    {
-        label = 'Proxy port '+proxies[0].port+' - '
-        +proxies[proxies.length-1].port;
-    }
-    return <Layer no_btn id="port_numbers">{label}</Layer>;
+        label = ' '+proxies[0].port+' - '+proxies[proxies.length-1].port;
+    return <Layer no_btn id="port_numbers"><T>Proxy port</T>{label}</Layer>;
 };
 
 const Layer = ({id, no_btn, no_arr, class_names, children})=>{

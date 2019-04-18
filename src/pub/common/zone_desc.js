@@ -5,6 +5,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import Tooltip from './tooltip.js';
 import {get_static_country} from '../util.js';
 import {flag_with_title, any_flag} from '../common.js';
+import {T} from './i18n.js';
 
 export default class Zone_description extends Pure_component {
     network_types = {
@@ -110,8 +111,12 @@ const Zone_bullet = ({tip, show, atr, children})=>{
         show = true;
     if (!show)
         return null;
-    return <li className="pair">
-          <Tooltip title={tip}><span className="title">{atr}:</span></Tooltip>
-          <span className="val">{children}</span>
-        </li>;
+    return <T>{t=>
+          <li className="pair">
+            <Tooltip title={t(tip)}>
+              <span className="title">{t(atr)}:</span>
+            </Tooltip>
+            <span className="val">{children}</span>
+          </li>
+        }</T>;
 };

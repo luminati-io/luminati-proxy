@@ -6,11 +6,13 @@ import $ from 'jquery';
 import {ga_event, status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
 import {Tooltip_bytes} from './common.js';
+import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
-import {Tooltip, Toolbar_button, Devider, Sort_icon,
+import {Toolbar_button, Devider, Sort_icon,
     with_resizable_cols, Toolbar_container,
     Toolbar_row} from './chrome_widgets.js';
+import {T} from './common/i18n.js';
 
 class Stats extends Pure_component {
     state = {
@@ -123,12 +125,14 @@ const Header_container = ({title, cols, sorting, sort, tooltip})=>
     </div>;
 
 const Header = ({sort, sorting, id, label, tooltip})=>
-    <Tooltip title={tooltip}>
-      <th onClick={()=>sort(id)}>
-        <div>{label}</div>
-        <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
-      </th>
-    </Tooltip>;
+    <T>{t=>
+      <Tooltip title={t(tooltip)}>
+        <th onClick={()=>sort(id)}>
+          <div>{t(label)}</div>
+          <Sort_icon show={sorting.col==id} dir={sorting.dir}/>
+        </th>
+      </Tooltip>
+    }</T>;
 
 const Data_container = ({stats, row_key, logs, ssl_warning, cols, sorting})=>{
     if (!cols)
@@ -187,12 +191,14 @@ const Summary_bar = ({enable_ssl_click, show})=>{
     return <div className="summary_bar">
           {show &&
             <a className="link enable_https" onClick={enable_ssl_click}>
-              <Tooltip title={tooltip}>
-                Enable HTTPS request logging and debugging
-              </Tooltip>
+              <T>{t=>
+                <Tooltip title={tooltip}>
+                  {t('Enable HTTPS request logging and debugging')}
+                </Tooltip>
+              }</T>
             </a>
           }
-          <span>-</span>
+          {!show && <span>-</span>}
         </div>;
 };
 
@@ -222,15 +228,21 @@ const Success_ratio = ({total=0, success=0})=>{
     const tooltip = `Ratio of successful requests out of total
         requests, where successful requests are calculated as 2xx,
         3xx or 404 HTTP status codes`;
-    const val_tooltip = `total: ${total}, success: ${success}`;
     return <div className="title_wrapper">
           <div className="success_title">
-            <Tooltip title={tooltip}>Success rate:</Tooltip>
+            <T>{t=>
+              <Tooltip title={tooltip}>
+                <span>{t('Success rate')}:</span>
+              </Tooltip>
+            }</T>
           </div>
           <div className="success_value">
-            <Tooltip title={val_tooltip}>
-              {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}
-            </Tooltip>
+            <T>{t=>
+              <Tooltip
+                title={`${t('Total')}: ${total}, ${t('Success')}: ${success}`}>
+                {isNaN(ratio) ? '-' : ratio.toFixed(2)+'%'}
+              </Tooltip>
+            }</T>
           </div>
         </div>;
 };

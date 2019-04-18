@@ -155,7 +155,7 @@ E.swap_usage = function(){
         p.used += +splitted[3];
         return p;
     }, {total: 0, used: 0});
-    ret.usage = data.total ? (data.used/data.total)*100 : 0;
+    ret.usage = data.total ? data.used/data.total*100 : 0;
     return ret;
 };
 
@@ -403,7 +403,7 @@ function calc_diskstat(cur, prev){
     let d_ts = cur.ts-prev.ts;
     let d_ios = cur.rw_ios-prev.rw_ios;
     cur.await = d_ios ? (cur.rw_ms-prev.rw_ms)/d_ios : 0;
-    cur.util = d_ts ? ((cur.io_ms-prev.io_ms)/d_ts)*100 : 0;
+    cur.util = d_ts ? (cur.io_ms-prev.io_ms)/d_ts*100 : 0;
     cur.util_weighted = d_ts
         ? (cur.io_weighted_ms-prev.io_weighted_ms)/d_ts : 0;
 }
@@ -484,10 +484,9 @@ E.info = function(){
 };
 
 E.node = function(){
+    const dst = file.is_dir('/var/hola_server') ? 'hola_server' : 'hola_agent';
     let host = exec.get_line('/usr/local/bin/node -v').replace(/^v/, '');
-    let hola_server = file.is_win ? host :
-        exec.get_line('cat /etc/init/node_clog.conf 2>&1 '+
-        `| grep 'env NAVE=' | sed 's|.*"\\(.*\\)"|\\1|'`);
+    let hola_server = file.read_line(`/var/${dst}/node_version`);
     return {host, hola_server};
 };
 
@@ -516,8 +515,8 @@ E.fd_use = opt=>etask(function*(){
         let dir = `/proc/${pid}/fd`;
         let open = yield efile.readdir(dir);
         let nopen = efile.error ? -1 : open.length;
-        let ln = cyg_read('/proc/'+pid+'/limits'), nmax = -1, m;
-        if (m = /Max open files\s+([0-9]+)/g.exec(ln))
+        let ln_re = cyg_read('/proc/'+pid+'/limits'), nmax = -1, m;
+        if (m = /Max open files\s+([0-9]+)/g.exec(ln_re))
             nmax = +m[1];
         let use = calc(nopen, nmax);
         if (res.use<use)
@@ -541,6 +540,14 @@ E.fd_use = opt=>etask(function*(){
         res.match = calc(res.match, res.glob.max);
     return res;
 });
+
+E.systemd_analyze = (type, args=[])=>{
+    args = [].concat(args);
+    if (E.is_release(['c:trusty']))
+        return 'No systemd info for trusty';
+    return exec.get(`systemd-analyze ${type} ${args.join(' ')}`,
+        {out: 'stdout', stdio: 'pipe'});
+};
 
 const PAGESIZE = 4096;
 

@@ -10,6 +10,7 @@ import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import Tooltip from './tooltip.js';
+import {T} from './i18n.js';
 
 export class Pins extends Pure_component {
     state = {pins: [], max_id: 0};
@@ -138,7 +139,7 @@ const Add_pin = ({add_pin})=>
     <Tooltip title="Add new IP to the list">
       <button className="btn btn_lpm btn_lpm_small add_pin"
         onClick={add_pin}>
-        Add IP
+        <T>Add IP</T>
         <i className="glyphicon glyphicon-plus"/>
       </button>
     </Tooltip>;

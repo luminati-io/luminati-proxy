@@ -14,9 +14,11 @@ import zescape from '../../util/escape.js';
 import {status_codes, bytes_format} from './util.js';
 import Waypoint from 'react-waypoint';
 import {Toolbar_button, Devider, Sort_icon, with_resizable_cols,
-    Toolbar_container, Toolbar_row, Tooltip} from './chrome_widgets.js';
+    Toolbar_container, Toolbar_row} from './chrome_widgets.js';
+import {T} from './common/i18n.js';
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
+import Tooltip from './common/tooltip.js';
 import ws from './ws.js';
 
 const loader = {
@@ -718,17 +720,19 @@ class Header_container extends Pure_component {
                 <tbody>
                   <tr>
                     {cols.map(c=>
-                      <Tooltip key={c.title} title={c.tooltip||c.title}>
-                        <th key={c.title} onClick={()=>this.click(c)}>
-                          <div>
-                            {c.title=='select' &&
-                              <Checkbox checked={this.state.checked_all}/>}
-                            {c.title!='select' && c.title}
-                          </div>
-                          <Sort_icon show={c.sort_by==sorted.field}
-                            dir={sorted.dir}/>
-                        </th>
-                      </Tooltip>
+                      <T key={c.title}>{t=>
+                        <Tooltip title={t(c.tooltip||c.title)}>
+                          <th key={c.title} onClick={()=>this.click(c)}>
+                            <div>
+                              {c.title=='select' &&
+                                <Checkbox checked={this.state.checked_all}/>}
+                              {c.title!='select' && t(c.title)}
+                            </div>
+                            <Sort_icon show={c.sort_by==sorted.field}
+                              dir={sorted.dir}/>
+                          </th>
+                        </Tooltip>
+                      }</T>
                     )}
                   </tr>
                 </tbody>
@@ -938,14 +942,16 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
                 delayHide={100} delayShow={0} delayUpdate={500}
                 offset={{top: -10}}>
                 <div>
-                  Status code of this request could not be parsed because the
-                  connection is encrypted.
+                  <T>
+                    Status code of this request could not be parsed because the
+                    connection is encrypted.
+                  </T>
                 </div>
                 <div style={{marginTop: 10}}>
                   <a onClick={enable_ssl_click} className="link">
-                    Enable SSL analyzing</a>
-                  <span> to see the status codes and other information about
-                    requests</span>
+                    <T>Enable SSL analyzing</T></a>
+                    <T> to see the status codes and other information about
+                      requests</T>
                 </div>
               </React_tooltip>
               <div data-tip="React-tooltip" data-for={'s'+uuid}>
@@ -972,14 +978,16 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
             delayHide={100} delayShow={0} delayUpdate={500}
             offset={{top: -10}}>
             <div>
-              Timing of this request could not be parsed becasue the
-              connection is encrypted.
+              <T>
+                Timing of this request could not be parsed becasue the
+                connection is encrypted.
+              </T>
             </div>
             <div style={{marginTop: 10}}>
               <a onClick={enable_ssl_click} className="link">
-                Enable SSL analyzing</a>
-              <span> to see the timing and other information about requests
-              </span>
+                <T>Enable SSL analyzing</T>
+              </a>
+              <T> to see the timing and other information about requests</T>
             </div>
           </React_tooltip>
           <div data-tip="React-tooltip" data-for={'t'+uuid}>

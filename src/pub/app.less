@@ -2070,6 +2070,7 @@ span.icon_link {
         }
     }
     .nav_top_right {
+        margin-right: 10px;
         flex: 1;
         display: flex;
         align-items: center;
@@ -2106,30 +2107,24 @@ span.icon_link {
                 height: 18px;
                 position: absolute;
                 right: 15px;
-                top: -7px;
+                top: -9px;
                 cursor: pointer;
             }
         }
     }
     .dropdown {
-        width: 120px;
-        font-size: 14px;
-        margin-right: 20px;
+        margin-right: 10px;
+        white-space: nowrap;
     }
     .dropdown-toggle {
-        padding: 0 14px 0 0;
         position: relative;
         text-decoration: none;
-        .caret {
-            position: absolute;
-            right: 2px;
-            top: 8px;
-        }
     }
     .dropdown-menu li a {
         color: @first_color;
         text-decoration: none;
         cursor: pointer;
+        .flag-icon { margin-right: 5px; }
     }
     .schema {
         width: 100%;

@@ -15,6 +15,7 @@ import {Instructions, Li} from './common/bullets.js';
 import Tooltip from './common/tooltip.js';
 import {Input} from './common/controls.js';
 import {Modal_dialog} from './common/modals.js';
+import {T} from './common/i18n.js';
 
 export default withRouter(class Tracer extends Pure_component {
     state = {loading: false};
@@ -204,9 +205,11 @@ const Send_button = ({on_click, disabled})=>
     </div>;
 
 const Field = ({children, title, className, tooltip})=>
-    <Tooltip title={tooltip}>
-      <div className={classnames('field', className)}>
-        <div className="title">{title}</div>
-        {children}
-      </div>
-    </Tooltip>;
+    <T>{t=>
+      <Tooltip title={t(tooltip)}>
+        <div className={classnames('field', className)}>
+          <div className="title">{t(title)}</div>
+          {children}
+        </div>
+      </Tooltip>
+    }</T>;
