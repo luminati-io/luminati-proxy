@@ -26,6 +26,7 @@ import {map_rule_to_form} from './rules.js';
 import Tooltip from '../common/tooltip.js';
 import Zone_description from '../common/zone_desc.js';
 import {Modal} from '../common/modals.js';
+import {T} from '../common/i18n.js';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
@@ -394,15 +395,16 @@ const Index = withRouter(class Index extends Pure_component {
             type = 'ips';
         else if (curr_plan && !!curr_plan.vip)
             type = 'vips';
-        return <div className="proxy_edit">
+        return <T>{t=><div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
                 <div className="nav_header">
                   <Port_title port={this.props.match.params.port}
-                    name={this.state.form.internal_name}/>
+                    name={this.state.form.internal_name} t={t}/>
                   <Loader_small saving={this.state.saving}
-                    std_msg="All changes saved in LPM"
-                    std_tooltip="All changes are automatically saved to LPM"/>
+                    std_msg={t('All changes saved in LPM')}
+                    std_tooltip=
+                    {t('All changes are automatically saved to LPM')}/>
                 </div>
                 <Nav zones={zones} default_zone={default_zone}
                   disabled={!!this.state.form.ext_proxies}
@@ -412,12 +414,12 @@ const Index = withRouter(class Index extends Pure_component {
               </div>
               {this.state.consts && <Main_window/>}
               <Modal className="warnings_modal" id="save_proxy_errors"
-                title="Errors:" no_cancel_btn>
+                title={t('Error')} no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
               <Alloc_modal type={type} form={this.state.form}
                 zone={this.state.form.zone||default_zone}/>
-            </div>;
+            </div>}</T>;
     }
 });
 
@@ -438,10 +440,10 @@ class Nav_tabs_wrapper extends Pure_component {
     }
 });
 
-const Port_title = ({port, name})=>{
+const Port_title = ({port, name, t})=>{
     if (name)
         port = port+` (${name})`;
-    return <h3>Proxy on port {port}</h3>;
+    return <h3>{t('Proxy on port')} {port}</h3>;
 };
 
 class Open_browser_btn extends Pure_component {
@@ -453,13 +455,16 @@ class Open_browser_btn extends Pure_component {
         });
     };
     render(){
-        return <Tooltip title="Open browser configured with this port"
-              placement="bottom">
-              <button className="btn btn_lpm btn_browse"
-                onClick={this.open_browser}>
-                Browse <div className="icon browse_icon"></div>
-              </button>
-            </Tooltip>;
+        return <T>{t=>
+              <Tooltip title={t('Open browser configured with this port')}
+                placement="bottom">
+                <button className="btn btn_lpm btn_browse"
+                  onClick={this.open_browser}>
+                  {t('Browse')}
+                  <div className="icon browse_icon"></div>
+                </button>
+              </Tooltip>
+            }</T>;
     }
 }
 
@@ -484,7 +489,7 @@ class Nav extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     is_valid_field = setdb.get('head.proxy_edit.is_valid_field');
     componentDidMount(){
-        this.setdb_on('head.zones', zones=>zones&&this.setState({zones}));
+        this.setdb_on('head.zones', zones=>zones && this.setState({zones}));
     }
     _reset_fields = ()=>{
         this.set_field('ips', []);
@@ -540,7 +545,7 @@ class Nav extends Pure_component {
                     zone_name={this.props.form.zone}/>
                 </div>
               </Field>
-              <Field on_change={this.update_preset} options={presets_opt}
+              <Field i18n on_change={this.update_preset} options={presets_opt}
                 value={preset} disabled={this.props.disabled} id="preset">
                 <Preset_description preset={preset} rule_clicked={()=>0}/>
               </Field>
@@ -549,9 +554,9 @@ class Nav extends Pure_component {
     }
 }
 
-const Field = ({id, disabled, children, ...props})=>{
+const Field = ({id, disabled, children, i18n, ...props})=>{
     const options = props.options||[];
-    return <div className="field" data-tip data-for={id+'tip'}>
+    return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
           <React_tooltip id={id+'tip'} type="light" effect="solid"
             place="bottom" delayHide={300} delayUpdate={300}>
             {disabled ? <Ext_tooltip/> : children}
@@ -559,10 +564,12 @@ const Field = ({id, disabled, children, ...props})=>{
           <select value={props.value} disabled={disabled}
             onChange={e=>props.on_change(e.target.value)}>
             {options.map(o=>
-              <option key={o.key} value={o.value}>{o.key}</option>
+              <option key={o.key} value={o.value}>
+                {i18n ? t(o.key) : o.key}
+              </option>
             )}
           </select>
-        </div>;
+        </div>}</T>;
 };
 
 class Alloc_modal extends Pure_component {

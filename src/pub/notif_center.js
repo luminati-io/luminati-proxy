@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import semver from 'semver';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
+import {T} from './common/i18n.js';
 
 class Notif_center extends Pure_component {
     state = {loaded: false, notifs: []};
@@ -60,7 +61,6 @@ class Notif_center extends Pure_component {
     message_clicked(message){
         ga_event('notif-center', 'notif-clicked', message.title);
         this.etask(function*(){
-            // XXX krzysztof: switch fetch->ajax
             yield window.fetch('/api/update_notifs', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -93,11 +93,11 @@ class Notif_center extends Pure_component {
                   </Modal>
                 </div>
               </Modal_portal>
-              <Tooltip title={tip} placement="bottom">
+              <T>{t=><Tooltip title={t(tip)} placement="bottom">
                 <div onClick={this.open.bind(this)} className="icon">
                   <Circle_icon number={number}/>
                 </div>
-              </Tooltip>
+              </Tooltip>}</T>
             </div>;
     }
 }

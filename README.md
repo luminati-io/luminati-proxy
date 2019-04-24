@@ -32,7 +32,7 @@ This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.131.652/luminati-proxy-manager-v1.131.652-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.132.341/luminati-proxy-manager-v1.132.341-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install

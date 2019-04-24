@@ -369,7 +369,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "97034f1e49a724a4500253d7160ed066"
+    "md5": "ea503ac8c83e84d838eb0f51dae670f2"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -427,5 +427,5 @@
       "bin/pub/img/*.gif"
     ]
   },
-  "version": "1.131.652"
+  "version": "1.132.341"
 }

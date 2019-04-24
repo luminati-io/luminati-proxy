@@ -3,6 +3,7 @@
 import React from 'react';
 import {Code} from './common.js';
 import {Instructions, Li} from './common/bullets.js';
+import {T} from './common/i18n.js';
 
 const E = {};
 
@@ -100,87 +101,140 @@ print $agent->get('http://lumtest.com/myip.json')->content();`,
 });
 
 const Last_step = ()=>
-    <Li>You are all set! Open a <a className="link"
-      onClick={()=>window.open()}>new tab</a> and start browsing</Li>;
+    <Li>
+      <T>You are all set! Open a</T>
+      <a className="link" onClick={()=>window.open()}><T>new tab</T></a>
+      <T>and start browsing.</T>
+    </Li>;
 
 E.browser = (proxy=24000)=>({
     chrome_win:
         <Instructions>
-          <Li>Open <Code>chrome://settings/</Code> in a <a className="link"
-            onClick={()=>window.open()}>new tab</a></Li>
-          <Li>Click <code>Advanced</code></Li>
-          <Li>In the <code>System</code> section, click <code>Open proxy
-            settings</code></Li>
-          <Li>Click <code>LAN settings</code></Li>
-          <Li>Select the <code>Use a proxy server for your LAN</code> check-box
-            under <code>Proxy Server</code></Li>
-          <Li>Enter <code>Address</code>: <Code>127.0.0.1</Code> and <code>
-            Port</code>: <Code> {proxy}</Code></Li>
-          <Li>Check the "Bypass proxy server for local addresses" check-box
-            </Li>
-          <Li>Save changes by pressing <code>OK</code></Li>
-          <Li>Restart browser</Li>
+          <Li><T>Open</T><Code>chrome://settings/</Code> <T>in a</T>
+            <a className="link" onClick={()=>window.open()}>
+              <T>new tab</T></a>
+          </Li>
+          <Li><T>Click</T><code><T>Advanced</T></code></Li>
+          <Li><T>In the</T><code><T>System</T></code> <T>section, click</T>
+            <code><T>Open proxy settings</T></code></Li>
+          <Li><T>Click</T><code><T>LAN settings</T></code></Li>
+          <Li>
+            <T>Select the</T>
+            <code><T>Use a proxy server for your LAN</T></code>
+            <T>check-box under</T><code><T>Proxy Server</T></code>
+          </Li>
+          <Li>
+            <T>Enter</T><code><T>Address</T></code>:
+            <Code>127.0.0.1</Code> <T>and</T> <code> <T>Port</T></code>:
+            <Code> {proxy}</Code>
+          </Li>
+          <Li>
+            <T>Check the "Bypass proxy server for local addresses"
+              check-box</T>
+          </Li>
+          <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
+          <Li><T>Restart browser</T></Li>
           <Last_step/>
         </Instructions>,
     chrome_mac:
         <Instructions>
-          <Li>Open <Code>chrome://settings/</Code> in a <a className="link"
-            onClick={()=>window.open()}>new tab</a></Li>
-          <Li>Click <code>Advanced</code></Li>
-          <Li>In the <code>Network</code> section, click <code>Change proxy
-            settings</code></Li>
-          <Li>System Preferences should start up automatically, with the
-            Network window open and Proxies selected</Li>
-          <Li>Choose <code>Web Proxy (HTTP)</code> and <code>Secure Web Proxy
-            (HTTPS)</code></Li>
-          <Li>Enter <code>Address</code>: <Code>127.0.0.1</Code> and <code>
-            Port</code>: <Code> {proxy}</Code></Li>
-          <Li>Save changes by pressing <code>OK</code></Li>
-          <Li>Restart browser</Li>
+          <Li>
+            <T>Open</T><Code>chrome://settings/</Code><T>in a</T>
+            <a className="link" onClick={()=>window.open()}><T>new tab</T></a>
+          </Li>
+          <Li><T>Click</T><code><T>Advanced</T></code></Li>
+          <Li>
+            <T>In the</T><code><T>Network</T></code><T>section, click</T>
+            <code><T>Change proxy settings</T></code>
+          </Li>
+          <Li><T>System Preferences should start up automatically, with the
+            Network window open and Proxies selected.</T></Li>
+          <Li>
+            <T>Choose</T><code><T>Web Proxy (HTTP)</T></code><T>and</T><code>
+            <T>Secure Web Proxy (HTTPS)</T></code></Li>
+          <Li>
+            <T>Enter</T><code><T>Address</T></code>: <Code>127.0.0.1</Code>
+            <T>and</T><code><T>Port</T></code>: <Code> {proxy}</Code>
+          </Li>
+          <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
+          <Li><T>Restart browser</T></Li>
           <Last_step/>
         </Instructions>,
     ie:
         <Instructions>
-          <Li>Click the Tools button, and then click Internet options</Li>
-          <Li>Click the Connections tab</Li>
-          <Li>Click <code>LAN settings</code></Li>
-          <Li>Select the <code>Use a proxy server for your LAN</code>check-box
-            </Li>
-          <Li>Enter <code>Address</code>: <Code>127.0.0.1</Code> and <code>
-            Port</code>: <Code> {proxy}</Code></Li>
-          <Li>Save changes by pressing <code>OK</code></Li>
+          <Li>
+            <T>Click the Tools button, and then click Internet options.</T>
+          </Li>
+          <Li><T>Click the Connections tab.</T></Li>
+          <Li><T>Click</T><code><T>LAN settings</T></code></Li>
+          <Li>
+            <T>Select the</T>
+            <code><T>Use a proxy server for your LAN</T></code>
+            <T>check-box.</T>
+          </Li>
+          <Li>
+            <T>Enter</T><code><T>Address</T></code>: <Code>127.0.0.1</Code>
+            <T>and</T>
+            <code><T>Port</T></code>: <Code> {proxy}</Code>
+          </Li>
+          <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
           <Last_step/>
         </Instructions>,
     firefox:
         <Instructions>
-          <Li>Open <Code>about:preferences</Code> in a <a className="link"
-            onClick={()=>window.open()}>new tab</a></Li>
-          <Li>Click the <code>General</code> tab and scroll down to
-            <code>Network Settings</code></Li>
-          <Li>Open network settings by clicking <code>Settings...</code>
-            button</Li>
-          <Li>Choose <code>Manual proxy configuration</code> radio button</Li>
-          <Li>Enter <code>HTTP Proxy</code>: <Code>127.0.0.1</Code> and <code>
-            Port</code>: <Code> {proxy}</Code></Li>
-          <Li>Tick <code>Use this proxy server for all protocols</code>
-            check-box</Li>
-          <Li>Add <code>localhost,127.0.0.1</code> to "No proxy for:" text
-            area</Li>
-          <Li>Save changes by pressing <code>OK</code></Li>
+          <Li>
+            <T>Open</T><Code>about:preferences</Code><T>in a</T>
+            <a className="link" onClick={()=>window.open()}><T>new tab</T></a>
+          </Li>
+          <Li>
+            <T>Click the</T><code><T>General</T></code>
+            <T>tab and scroll down to</T><code><T>Network Settings</T></code>
+          </Li>
+          <Li>
+            <T>Open network settings by clicking</T>
+            <code><T>Settings...</T></code><T>button.</T></Li>
+          <Li>
+            <T>Choose</T><code><T>Manual proxy configuration</T></code>
+            <T>radio button.</T>
+          </Li>
+          <Li>
+            <T>Enter</T><code><T>HTTP Proxy</T></code>: <Code>127.0.0.1</Code>
+            <T>and</T><code><T>Port</T></code>: <Code>{proxy}</Code>
+          </Li>
+          <Li>
+            <T>Tick</T>
+            <code><T>Use this proxy server for all protocols</T></code>
+            <T>check-box.</T>
+          </Li>
+          <Li>
+            <T>Add</T><code>localhost,127.0.0.1</code>
+            <T>to "No proxy for:" text area</T>
+          </Li>
+          <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
           <Last_step/>
         </Instructions>,
     safari:
         <Instructions>
-          <Li>Pull down the Safari menu and select <code>Preferences</code>
-            </Li>
-          <Li>Click on the <code>Advanced</code> icon</Li>
-          <Li>In the <code>Proxies</code> option, click on Change Settings</Li>
-          <Li>System Preferences should start up automatically, with the
-            Network window open and Proxies selected</Li>
-          <Li>Choose <code>Web Proxy (HTTP)</code></Li>
-          <Li>Enter <code>Web Proxy Server</code>: <Code>127.0.0.1</Code> and
-            <code>Port</code>: <Code> {proxy}</Code></Li>
-          <Li>Save changes by pressing <code>OK</code></Li>
+          <Li>
+            <T>Pull down the Safari menu and select</T>
+            <code><T>Preferences</T></code>
+          </Li>
+          <Li><T>Click on the</T><code><T>Advanced</T></code><T>icon.</T></Li>
+          <Li>
+            <T>In the</T><code><T>Proxies</T></code>
+            <T>option, click on Change Settings.</T>
+          </Li>
+          <Li>
+            <T>System Preferences should start up automatically, with the
+              Network window open and Proxies selected.</T>
+          </Li>
+          <Li><T>Choose</T><code><T>Web Proxy (HTTP)</T></code></Li>
+          <Li>
+            <T>Enter</T><code><T>Web Proxy Server</T></code>:
+            <Code>127.0.0.1</Code><T>and</T><code>Port</code>:
+            <Code> {proxy}</Code>
+          </Li>
+          <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
           <Last_step/>
         </Instructions>,
 });

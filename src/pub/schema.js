@@ -7,47 +7,49 @@ import {get_static_country} from './util.js';
 import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
-const tooltips = {
-    crawler: `Your crawler or bot that systematically browses the web. Connect
-        any type of crawler to the Luminati Proxy Manager:
-        <ul>
+const tooltips = t=>({
+    crawler: t('Your crawler or bot that systematically browses the web. '
+        +'Connect any type of crawler to the Luminati Proxy Manager:')
+        +`<ul>
           <li>
-            <div>Browser and extension based crawlers</div>
+            <div>${t('Browser and extension based crawlers')}</div>
             <div class="browser_icon firefox"></div>
             <div class="browser_icon chrome"></div>
             <div class="browser_icon safari"></div>
             <div class="browser_icon explorer"></div>
           </li>
           <li>
-            <div>Dedicated crawling solutions</div>
+            <div>${t('Dedicated crawling solutions')}</div>
             <div class="logo_icon crawlera"></div>
             <div class="logo_icon legs"></div>
             <div class="logo_icon import"></div>
           </li>
         </ul>`,
-    port_numbers: `Defined proxy ports in Luminati Proxy Manager`,
-    lpm: `Luminati Proxy Manager - open-source proxy service that holds
-        valuable features, such as:
+    port_numbers: t('Defined proxy ports in Luminati Proxy Manager'),
+    lpm: t('Luminati Proxy Manager - open-source proxy service that holds '
+        +'valuable features, such as:')
+        +`<ul>
+          <li>${t('IP rotation control')}</li>
+          <li>${t('auto retry')}</li>
+          <li>${t('speed optimization')}</li>
+          <li>${t('auto blacklist of bad IPs')}</li>
+          <li>${t('powerful debugging options')}</li>
+        </ul>`
+        +t('and more. View full list of features by clicking any proxy port '
+            +'in the')
+        +`<strong>${t('Proxies')}</strong> ${t('table')}`,
+    super_proxy: t('Load balancing servers, that manage the traffic between '
+        +'the Luminati Proxy Manager and the peer'),
+    peer: `${t('Exit node (IP) - This might be:')}
         <ul>
-          <li>IP rotation control</li>
-          <li>auto retry</li>
-          <li>speed optimization</li>
-          <li>auto blacklist of bad IPs</li>
-          <li>powerful debugging options</li>
-        </ul>
-        and more. View full list of features by clicking any proxy port in
-        the <strong>Proxies</strong> table`,
-    super_proxy: `Load balancing servers, that manage the traffic between the
-        Luminati Proxy Manager and the peer`,
-    peer: `Exit node (IP) - This might be:
-        <ul>
-          <li>Residential IP - provided through cable modem, DSL or wireless
-            router</li>
-          <li>Datacenter IP (static)</li>
-          <li>Mobile IP - based on a 3G or 4G cellular network</li>
+          <li>${t('Residential IP - provided through cable modem, DSL or '
+              +'wireless router')}</li>
+          <li>${t('Datacenter IP (static)')}</li>
+          <li>${t('Mobile IP - based on a 3G or 4G cellular network')}</li>
         </ul>`,
-    destination: `The target website that the crawler is collecting data from`,
-};
+    destination: t('The target website that the crawler is collecting data '
+        +'from'),
+});
 
 class Schema extends Pure_component {
     state = {form: {}, proxies: []};
@@ -120,13 +122,15 @@ const Proxy_port_layer = ({proxies, form})=>{
 
 const Layer = ({id, no_btn, no_arr, class_names, children})=>{
     return <div className={classnames('layer', id, class_names)}>
-          <Tooltip placement="bottom" title={tooltips[id]}>
-            <span>
-              {!no_btn && !no_arr && <div className="arr"/>}
-              {!no_btn && <div className="layer_btn">{children}</div>}
-              {no_btn && children}
-            </span>
-          </Tooltip>
+          <T>{t=>
+            <Tooltip placement="bottom" title={tooltips(t)[id]}>
+              <span>
+                {!no_btn && !no_arr && <div className="arr"/>}
+                {!no_btn && <div className="layer_btn">{children}</div>}
+                {no_btn && children}
+              </span>
+            </Tooltip>
+          }</T>
         </div>;
 };
 

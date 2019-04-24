@@ -6,6 +6,7 @@ import carriers_gen from '/www/util/pub/carriers_gen.js';
 import setdb from '../../../util/setdb.js';
 import {Note, Ext_tooltip} from '../common.js';
 import {Config, Tab_context} from './common.js';
+import {T} from '../common/i18n.js';
 
 const carriers = [
     {value: '', key: 'None'},
@@ -20,7 +21,7 @@ const carriers_note = (()=>{
     +` it in less than 2 business days!`;
     const mail = 'lumext@luminati.io';
     const mailto = `mailto:${mail}?subject=${subject}&body=${body}`;
-    return <a className="link" href={mailto}>More carriers</a>;
+    return <a className="link" href={mailto}><T>More carriers</T></a>;
 })();
 
 export default class Targeting extends Pure_component {
@@ -44,12 +45,12 @@ export default class Targeting extends Pure_component {
         let res = this.state.locations.countries.map(c=>({
             key: c.country_name, value: c.country_id, mob: c.mob}));
         const curr_plan = this.get_curr_plan();
-        if (curr_plan&&curr_plan.ip_alloc_preset=='shared_block')
+        if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
                 this.state.locations.shared_countries.includes(r.value));
         }
-        if (curr_plan&&curr_plan.mobile)
+        if (curr_plan && curr_plan.mobile)
             res = res.filter(r=>r.mob);
         return [this.def_value, ...res];
     };

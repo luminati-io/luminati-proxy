@@ -1,19 +1,20 @@
 // LICENSE_CODE ZON
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
+import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
 import {migrate_trigger, migrate_action, trigger_types,
     action_types, default_action} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
-import {withRouter} from 'react-router-dom';
 import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
     Field_row_raw} from '../common.js';
 import {tabs} from './fields.js';
 import {Tester} from '../proxy_tester.js';
-import classnames from 'classnames';
 import {Chrome_table} from '../chrome_widgets.js';
 import Tooltip from '../common/tooltip.js';
+import {T} from '../common/i18n.js';
 
 const rule_prepare = rule=>{
     const action = {};
@@ -167,23 +168,25 @@ export default class Rules extends Pure_component {
         return <div className="rules">
               {!this.state.form.ssl &&
                 <Note>
-                  <span><strong>Warning: </strong></span>
-                  <span>we can't apply rules to HTTPS requests unless </span>
-                  <a onClick={this.goto_ssl} className="link">SSL proxy</a>
-                  <span> is turned on</span>
+                  <span><strong><T>Warning:</T></strong></span>
+                  <span>
+                    <T>we can't apply rules to HTTPS requests unless</T></span>
+                  <a onClick={this.goto_ssl} className="link">
+                    <T>SSL analyzing</T></a>
+                  <span><T>is turned on</T></span>
                 </Note>
               }
               {this.state.form.debug=='none' &&
                 <Note>
-                  <span><strong>Warning: </strong></span>
-                  <span>some rules may not work correctly without </span>
+                  <span><strong><T>Warning:</T></strong></span>
+                  <span><T>some rules may not work correctly without</T></span>
                   <a onClick={this.goto_debug} className="link">
-                    Request debug info</a>
+                    <T>Request debug info</T></a>
                 </Note>
               }
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
                 onClick={this.rule_add}>
-                New rule
+                <T>New rule</T>
                 <i className="glyphicon glyphicon-plus"/>
               </button>
               {this.state.rules.map(r=>
@@ -200,9 +203,6 @@ const cols = [
     {id: 'action', title: 'Action'},
 ];
 
-// XXX krzysztof: WIP
-//  <Rules_table rules={this.state.rules} rule_del={this.rule_del}
-//    www={this.state.www}/>
 class Rules_table extends Pure_component {
     data = ()=>{
         return this.props.rules;
@@ -223,7 +223,7 @@ const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
     render(){
         return <div className="tester_wrapper">
               <div className="nav_header" style={{marginBottom: 5}}>
-                <h3>Test rules</h3>
+                <h3><T>Test rules</T></h3>
               </div>
               <Tester port={this.props.match.params.port} no_labels/>
             </div>;

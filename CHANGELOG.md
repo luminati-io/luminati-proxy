@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.132.341 Stable
+- :star: Add missing translations for Chinese
+
 ## 1.131.652 Stable
 - :sparkles: Introduced Chinese translations
 

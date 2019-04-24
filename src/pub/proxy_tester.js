@@ -5,7 +5,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {Loader, Warnings, Nav, with_proxy_ports, Add_icon,
     Remove_icon} from './common.js';
-import {Input, Select} from './common/controls.js';
+import {Input} from './common/controls.js';
 import classnames from 'classnames';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
@@ -128,7 +128,7 @@ class Request extends Pure_component {
     render(){
         if (!this.props.ports.length)
             return <Proxy_blank/>;
-        return <div className="panel no_border request">
+        return <T>{t=><div className="panel no_border request">
               <Loader show={this.state.show_loader}/>
               <Modal className="warnings_modal" id="warnings_modal"
                 title="Warnings:" no_cancel_btn>
@@ -146,15 +146,15 @@ class Request extends Pure_component {
                   clicked_add={this.add_header}
                   update={this.update_header}/>
                 <div className="footer_buttons">
-                  <Tooltip title="Send a test request">
+                  <Tooltip title={t('Send a test request')}>
                     <button onClick={this.go} disabled={this.state.lock}
                       className="btn btn_lpm btn_lpm_primary">
-                      {this.state.lock ? 'Saving proxy' : 'Test'}
+                      {this.state.lock ? t('Saving proxy') : t('Test')}
                     </button>
                   </Tooltip>
                 </div>
               </div>
-            </div>;
+            </div>}</T>;
     }
 }));
 
@@ -163,42 +163,34 @@ const Request_params = ({params, update, ...props})=>{
         update('port', port);
     };
     const Port_select = props.port_select;
-    return <div className="request_params">
+    return <T>{t=><div className="request_params">
           {!props.hide_port &&
             <Tooltip
-              title="Choose a proxy port that will be used for this test">
+              title={t('Choose a proxy port that will be used for this test')}>
               <div className={classnames('field', 'proxy')}>
-                <div className="title"><T>Proxy port</T></div>
+                <div className="title">{t('Proxy port')}</div>
                 <Port_select val={params.port} on_change={port_changed}/>
               </div>
             </Tooltip>
           }
-          <Field params={params} update={update} name="url" type="text"
+          <Url_input params={params} update={update} name="url" type="text"
             tooltip="URL that Proxy Tester will use to send a test request"
             on_key_up={props.key_up} no_labels={props.no_labels}/>
-        </div>;
+        </div>}</T>;
 };
 
-const Field = ({name, ...props})=>{
-    const fields = {port: 'Proxy port', url: 'URL'};
+// XXX krzysztof: refactoring needed
+const Url_input = ({name, ...props})=>{
     const on_change_wrapper = val=>{
         props.update(name, val);
     };
-    let Comp;
-    if (props.type=='select')
-        Comp = Select;
-    else
-        Comp = Input;
-    const title = fields[name];
-    return <Tooltip title={props.tooltip}>
+    return <T>{t=><Tooltip title={t(props.tooltip)}>
           <div className={classnames('field', name)}>
-            {!props.no_labels && title &&
-              <div className="title">{fields[name]}</div>
-            }
-            <Comp on_change_wrapper={on_change_wrapper} type={props.type}
+            {!props.no_labels && <div className="title">{t('URL')}</div>}
+            <Input on_change_wrapper={on_change_wrapper} type={props.type}
               val={props.params[name]} {...props}/>
           </div>
-        </Tooltip>;
+        </Tooltip>}</T>;
 };
 
 const Headers = ({headers, clicked_remove, clicked_add, update})=>
@@ -213,29 +205,33 @@ const Headers = ({headers, clicked_remove, clicked_add, update})=>
 class New_header_params extends Pure_component {
     input_changed = field=>value=>
         this.props.update(this.props.header.idx, field, value);
-    header_tip = `Header name that will be sent along with the request`;
-    value_tip = `Value of the header that will be sent along with the request`;
+    header_tip = 'Header name that will be sent along with the request';
+    value_tip = 'Value of the header that will be sent along with the request';
     render(){
         const {clicked_add, clicked_remove, header, last} = this.props;
-        return <div className="header_line">
-              <Tooltip title={this.header_tip}>
+        return <T>{t=><div className="header_line">
+              <Tooltip title={t(this.header_tip)}>
                 <div className="header_input">
-                  <Input val={header.header} type="text" placeholder="Header"
+                  <Input val={header.header} type="text"
+                    placeholder={t('Header')}
                     on_change_wrapper={this.input_changed('header')}/>
                 </div>
               </Tooltip>
-              <Tooltip title={this.value_tip}>
+              <Tooltip title={t(this.value_tip)}>
                 <div className="value_input">
-                  <Input val={header.value} type="text" placeholder="Value"
+                  <Input val={header.value} type="text"
+                    placeholder={t('Value')}
                     on_change_wrapper={this.input_changed('value')}/>
                 </div>
               </Tooltip>
               <div className="action_icons">
-                <Remove_icon tooltip="Remove header"
+                <Remove_icon tooltip={t('Remove header')}
                   click={()=>clicked_remove(header.idx)}/>
-                {last && <Add_icon tooltip="Add header" click={clicked_add}/>}
+                {last &&
+                  <Add_icon tooltip={t('Add header')} click={clicked_add}/>
+                }
               </div>
-            </div>;
+            </div>}</T>;
     }
 }
 

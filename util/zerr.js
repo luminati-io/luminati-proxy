@@ -188,7 +188,7 @@ E.set_level = function(level){
 
 if (is_node)
 { // zerr-node
-E.ZEXIT_LOG_DIR = '/tmp/zexit_logs';
+E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
 E.prefix = '';
 
 E.level = L.NOTICE;

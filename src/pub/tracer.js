@@ -83,9 +83,9 @@ export default withRouter(class Tracer extends Pure_component {
               <Request execute={this.execute} set_result={this.set_result}
                 loading={this.state.loading}/>
               <div>
-                View the documentation of the API endpoint
+                <T>View the documentation of the API endpoint</T>
                 <a className="link api_link" href={swagger_link_tester_url}
-                  target="_blank" rel="noopener noreferrer">here</a>
+                  target="_blank" rel="noopener noreferrer"><T>here</T></a>
               </div>
               <Result redirects={this.state.redirects}
                 loading={this.state.loading}
@@ -172,10 +172,10 @@ const Request = with_proxy_ports(class Request extends Pure_component {
     render(){
         if (!this.props.ports.length)
             return <Proxy_blank/>;
-        const port_tip = `Choose a proxy port that will be used for this
-            test.`;
-        const url_tip = `URL that will be used as a starting point. Following
-            requests will be done based on 'Location' header of the response.`;
+        const port_tip = 'Choose a proxy port that will be used for this '
+        +'test.';
+        const url_tip = 'URL that will be used as a starting point. Following '
+        +'requests will be done based on \'Location\' header of the response.';
         const Port_select = this.props.port_select;
         return <div className="panel no_border request">
               <div className="fields">
@@ -197,12 +197,12 @@ const Request = with_proxy_ports(class Request extends Pure_component {
 });
 
 const Send_button = ({on_click, disabled})=>
-    <div className="go_btn_wrapper">
-      <Tooltip key={''+disabled} title="Start testing redirections">
+    <T>{t=><div className="go_btn_wrapper">
+      <Tooltip key={''+disabled} title={t('Start testing redirections')}>
         <button onClick={on_click} className="btn btn_lpm btn_lpm_primary"
-          disabled={disabled}>Test</button>
+          disabled={disabled}>{t('Test')}</button>
       </Tooltip>
-    </div>;
+    </div>}</T>;
 
 const Field = ({children, title, className, tooltip})=>
     <T>{t=>

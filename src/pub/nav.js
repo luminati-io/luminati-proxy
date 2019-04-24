@@ -1,20 +1,21 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
+import {Route, withRouter, Link} from 'react-router-dom';
 import React from 'react';
+import $ from 'jquery';
+import classnames from 'classnames';
 import etask from '../../util/etask.js';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
-import classnames from 'classnames';
 import {swagger_url} from './util.js';
 import Schema from './schema.js';
 import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
-import $ from 'jquery';
-import {Route, withRouter, Link} from 'react-router-dom';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
-import {T, langs, set_lang} from './common/i18n.js';
+import {T} from './common/i18n.js';
+import {Language} from './common.js';
 
 const Nav = ()=>
     <div className="nav">
@@ -180,54 +181,6 @@ class Shutdown_modal extends Pure_component {
     }
 }
 
-class Language extends Pure_component {
-    state = {};
-    componentDidMount(){
-        let lang = window.localStorage.getItem('lang');
-        if (lang)
-            return this.set_lang(lang);
-        this.setdb_on('head.conn', conn=>{
-            if (!conn)
-                return;
-            if (conn.current_country=='cn')
-                lang = 'cn';
-            else
-                lang = 'en';
-            this.set_lang(lang);
-        });
-    }
-    set_lang = lang=>{
-        this.setState({lang});
-        set_lang(lang);
-        let curr = window.localStorage.getItem('lang');
-        if (curr!=lang)
-            window.localStorage.setItem('lang', lang);
-    };
-    render(){
-        if (!this.state.lang)
-            return null;
-        return <div className="dropdown">
-              <a className="link dropdown-toggle" data-toggle="dropdown">
-                <Lang_cell lang={this.state.lang}/>
-              </a>
-              <ul className="dropdown-menu dropdown-menu-right">
-                <li onClick={this.set_lang.bind(this, 'cn')}><a>
-                  <Lang_cell lang="cn"/>
-                </a></li>
-                <li onClick={this.set_lang.bind(this, 'en')}><a>
-                  <Lang_cell lang="en"/>
-                </a></li>
-              </ul>
-            </div>;
-    }
-}
-
-const Lang_cell = ({lang})=>
-    <React.Fragment>
-      <span className={`flag-icon flag-icon-${langs[lang].flag}`}/>
-      {langs[lang].name}
-    </React.Fragment>;
-
 const Account = withRouter(class Account extends Pure_component {
     state = {};
     componentWillMount(){
@@ -247,27 +200,29 @@ const Account = withRouter(class Account extends Pure_component {
     render(){
         if (!this.state.settings)
             return null;
-        const is_upgradable = this.state.ver_last&&this.state.ver_last.newer;
-        const tip = `You are currently logged in as
-        ${this.state.settings.customer}`;
-        return <div className="dropdown">
+        const is_upgradable = this.state.ver_last && this.state.ver_last.newer;
+        const customer = this.state.settings.customer;
+        return <T>{t=><div className="dropdown">
               <a className="link dropdown-toggle" data-toggle="dropdown">
-                <Tooltip placement="bottom" title={tip}>
+                <Tooltip placement="bottom"
+                  title={t('You are currently logged in as')+' '+customer}>
                   <span>
-                    {this.state.settings.customer}
+                    {customer}
                     <span style={{marginLeft: 5}} className="caret"/>
                   </span>
                 </Tooltip>
               </a>
               <ul className="dropdown-menu dropdown-menu-right">
                 {is_upgradable &&
-                  <li><a onClick={this.upgrade}>Upgrade</a></li>
+                  <li><a onClick={this.upgrade}>{t('Upgrade')}</a></li>
                 }
-                <li><a onClick={this.open_report_bug}>Report a bug</a></li>
-                <li><a onClick={this.logout}>Log out</a></li>
-                <li><a onClick={this.shutdown}>Shut down</a></li>
+                <li>
+                  <a onClick={this.open_report_bug}>{t('Report a bug')}</a>
+                </li>
+                <li><a onClick={this.logout}>{t('Log out')}</a></li>
+                <li><a onClick={this.shutdown}>{t('Shut down')}</a></li>
               </ul>
-            </div>;
+            </div>}</T>;
     }
 });
 

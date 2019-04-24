@@ -42,6 +42,11 @@
   "Features": "Features",
   "Exclusive IPs": "Exclusive IPs",
   "Click the toggle to&nbsp;learn more about Luminati features": "Click the toggle to&nbsp;learn more about Luminati features",
+  "Full Name": "Full Name",
+  "Address": "Address",
+  "Work phone": "Work phone",
+  "Phone number": "Phone number",
+  "Choose a file": "Choose a file",
   "Country": "Country",
   "City": "City",
   "ASN": "ASN",
@@ -208,5 +213,11 @@
   "Learning hub": "Learning hub",
   "SLA": "SLA",
   "Luminati's residential network": "Luminati's residential network",
-  "World's largest proxy network": "World's largest proxy network"
+  "World's largest proxy network": "World's largest proxy network",
+  "I finished the current project, will use the account again in the future":
+    "I finished the current project, will use the account again in the future",
+  "Luminati is not working": "Luminati is not working",
+  "I was not satisfied with the service":
+    "I was not satisfied with the service",
+  "I found another solution": "I found another solution"
 }

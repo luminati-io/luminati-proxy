@@ -94,7 +94,7 @@ class Pane_headers extends Pure_component {
               <Preview_section title="Request headers"
                 pairs={req.request.headers}/>
               <Body_section title="Request body"
-                body={req.request.postData&&req.request.postData.text}/>
+                body={req.request.postData && req.request.postData.text}/>
              </ol>;
     }
 }

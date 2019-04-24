@@ -11,17 +11,17 @@ export default class Zone_description extends Pure_component {
     network_types = {
         static: {
             label: 'Data center',
-            tooltip: `Static IPs from various data centers located around
-                the globe`,
+            tooltip: 'Static IPs from various data centers located around '
+                +'the globe',
         },
         resident: {
             label: 'Residential',
-            tooltip: `P2P residential network. Millions of IPs from real
-                devices`,
+            tooltip: 'P2P residential network. Millions of IPs from real '
+                +'devices',
         },
         custom: {
             label: 'Custom',
-            tooltip: `3G and 4G network from real mobile devices`,
+            tooltip: '3G and 4G network from real mobile devices',
         },
         static_res: {
             label: 'Static residential',
@@ -45,27 +45,27 @@ export default class Zone_description extends Pure_component {
         let c = any_flag;
         if (static_country && static_country!='any' && static_country!='*')
             c = flag_with_title(static_country, static_country.toUpperCase());
-        return <div className="zone_settings">
+        return <T>{t=><div className="zone_settings">
               <ul className="bullets">
                 <Zone_bullet atr="Network type"
                   tip="The network accessible by this zone">
-                  <Tooltip title={this.network_types[plan.type].tooltip}>
-                    {this.network_types[plan.type].label}
+                  <Tooltip title={t(this.network_types[plan.type].tooltip)}>
+                    {t(this.network_types[plan.type].label)}
                   </Tooltip>
                 </Zone_bullet>
                 <Zone_bullet show={plan.ips_type!==undefined}
                   atr="IP exclusivity">
-                  {this.ips_types[plan.ips_type]}
+                  {t(this.ips_types[plan.ips_type])}
                 </Zone_bullet>
                 <Zone_bullet atr="Country" tip="Allowed country">
-                  {c}</Zone_bullet>
+                  {t(c)}</Zone_bullet>
                 <Zone_bullet show={plan.ips!==undefined} atr="Number of IPs">
                   {plan.ips}</Zone_bullet>
                 <Zone_bullet atr="Permissions" tip="Set of permissions">
                   <Perm_icons perm_list={zone.perm.split(' ')} plan={plan}/>
                 </Zone_bullet>
               </ul>
-            </div>;
+            </div>}</T>;
     }
 }
 
@@ -98,11 +98,13 @@ class Perm_icons extends Pure_component {
             icons.unshift('residential');
         else if (perm.route_dedicated)
             icons.unshift('data_center');
-        return <div>{icons.map(_perm=>
-              <Tooltip key={_perm} title={this.prem_tooltips[_perm]}>
-                <div className={'perm_icon '+_perm}/>
-              </Tooltip>)}
-            </div>;
+        return <T>{t=>
+              <div>{icons.map(_perm=>
+                <Tooltip key={_perm} title={t(this.prem_tooltips[_perm])}>
+                  <div className={'perm_icon '+_perm}/>
+                </Tooltip>)}
+              </div>
+            }</T>;
     }
 }
 

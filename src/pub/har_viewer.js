@@ -661,10 +661,11 @@ class Summary_bar extends Pure_component {
             {total: 0, sum_in: 0, sum_out: 0};
         sum_out = bytes_format(sum_out)||'0 B';
         sum_in = bytes_format(sum_in)||'0 B';
-        const txt = `${total} requests | ${sum_out} sent | ${sum_in} received`;
+        const txt = t=>(`${total} ${t('requests')} | ${sum_out} ${t('sent')} `
+            +`| ${sum_in} ${t('received')}`);
         return <div className="summary_bar">
               <span>
-                <Tooltip title={txt}>{txt}</Tooltip>
+                <T>{t=><Tooltip title={txt(t)}>{txt(t)}</Tooltip>}</T>
               </span>
             </div>;
     }
@@ -950,7 +951,7 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
                 <div style={{marginTop: 10}}>
                   <a onClick={enable_ssl_click} className="link">
                     <T>Enable SSL analyzing</T></a>
-                    <T> to see the status codes and other information about
+                    <T>to see the status codes and other information about
                       requests</T>
                 </div>
               </React_tooltip>
@@ -979,7 +980,7 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
             offset={{top: -10}}>
             <div>
               <T>
-                Timing of this request could not be parsed becasue the
+                Timing of this request could not be parsed because the
                 connection is encrypted.
               </T>
             </div>
@@ -987,7 +988,7 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
               <a onClick={enable_ssl_click} className="link">
                 <T>Enable SSL analyzing</T>
               </a>
-              <T> to see the timing and other information about requests</T>
+              <T>to see the timing and other information about requests</T>
             </div>
           </React_tooltip>
           <div data-tip="React-tooltip" data-for={'t'+uuid}>

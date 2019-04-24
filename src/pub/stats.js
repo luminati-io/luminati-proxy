@@ -56,15 +56,15 @@ const Empty_row = ()=>
     </tr>;
 
 const Key_cell = ({title, warning, row_key})=>{
-    const warning_tooltip = `Some of your proxy ports don't have SSL analyzing
-        enabled and there are connections on HTTPS protocol detected`;
+    const warning_tooltip = 'Some of your proxy ports don\'t have SSL '
+    +'analyzing enabled and there are connections on HTTPS protocol detected';
     return <td>
           <Cell row_key={row_key}>{title}</Cell>
-          {warning &&
-            <Tooltip title={warning_tooltip}>
+          {warning && <T>{t=>
+            <Tooltip title={t(warning_tooltip)}>
               <div className="ic_warning"/>
             </Tooltip>
-          }
+          }</T>}
         </td>;
 };
 
@@ -185,14 +185,14 @@ const Row = withRouter(class Row extends Pure_component {
 });
 
 const Summary_bar = ({enable_ssl_click, show})=>{
-    const tooltip = `Enable HTTPS analyzing for all your proxies. You will also
-        need to install SSL certificate. It allows you to use rules and logs
-        for HTTPS requests`;
+    const tooltip = 'Enable HTTPS analyzing for all your proxies. You will '
+    +'also need to install SSL certificate. It allows you to use rules and '
+    +'logs for HTTPS requests';
     return <div className="summary_bar">
           {show &&
             <a className="link enable_https" onClick={enable_ssl_click}>
               <T>{t=>
-                <Tooltip title={tooltip}>
+                <Tooltip title={t(tooltip)}>
                   {t('Enable HTTPS request logging and debugging')}
                 </Tooltip>
               }</T>
@@ -225,13 +225,13 @@ class Toolbar extends Pure_component {
 
 const Success_ratio = ({total=0, success=0})=>{
     const ratio = total==0 ? NaN : success/total*100;
-    const tooltip = `Ratio of successful requests out of total
-        requests, where successful requests are calculated as 2xx,
-        3xx or 404 HTTP status codes`;
+    const tooltip = 'Ratio of successful requests out of total '
+    +'requests, where successful requests are calculated as 2xx, '
+    +'3xx or 404 HTTP status codes';
     return <div className="title_wrapper">
           <div className="success_title">
             <T>{t=>
-              <Tooltip title={tooltip}>
+              <Tooltip title={t(tooltip)}>
                 <span>{t('Success rate')}:</span>
               </Tooltip>
             }</T>

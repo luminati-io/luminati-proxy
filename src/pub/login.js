@@ -1,13 +1,14 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {Loader, Logo} from './common.js';
-import {withRouter} from 'react-router-dom';
+import {T} from './common/i18n.js';
 
 const Login = withRouter(class Login extends Pure_component {
     state = {password: '', username: '', loading: false};
@@ -152,7 +153,7 @@ const Node_message = ({ver_node})=>{
 
 const Header = ()=>
     <div className="login_header">
-      <h3>Login with your Luminati account</h3>
+      <h3><T>Login with your Luminati account</T></h3>
     </div>;
 
 const Form = props=>{
@@ -196,11 +197,11 @@ class Customers_form extends Pure_component {
         this.props.select_customer(e&&e[0]);
     };
     render(){
-        return <div className="row customers_form">
+        return <T>{t=><div className="row customers_form">
               <div className="warning choose_customer">
-                Please choose a customer.</div>
+                {t('Please choose a customer.')}</div>
               <div className="form-group">
-                <label htmlFor="user_customer">Customer</label>
+                <label htmlFor="user_customer">{t('Customer')}</label>
                 <Typeahead_wrapper data={this.props.user_customers}
                   val={this.state.cur_customer} on_change={this.on_change}/>
               </div>
@@ -208,9 +209,9 @@ class Customers_form extends Pure_component {
                 onClick={this.props.save_user}
                 className="btn btn_lpm btn_login"
                 disabled={this.props.saving_user}>
-                {this.props.saving_user ? 'Logging in...' : 'Log in'}
+                {this.props.saving_user ? t('Logging in...') : t('Log in')}
               </button>
-            </div>;
+            </div>}</T>;
     }
 }
 
@@ -222,20 +223,20 @@ class First_form extends Pure_component {
     render(){
         const {google_click, saving_user, password, username} = this.props;
         return <div className="login_form">
-              <div>
+              <T>{t=><div>
                 <div className="row">
                   <div className="col col_google col-sm-6">
                     <div className="btn_google_wrapper">
                       <a className="btn btn_lpm btn_google"
                         onClick={google_click}>
                         <div className="img"/>
-                        Log in with Google
+                        {t('Log in with Google')}
                       </a>
                     </div>
                   </div>
                   <div className="col col_pass col-sm-6">
                     <div className="form-group">
-                      <label htmlFor="username">Email</label>
+                      <label htmlFor="username">{t('Email')}</label>
                       <input type="email"
                         name="username"
                         onChange={this.props.update_username}
@@ -243,7 +244,7 @@ class First_form extends Pure_component {
                         value={username}/>
                     </div>
                     <div className="form-group">
-                      <label htmlFor="user_password">Password</label>
+                      <label htmlFor="user_password">{t('Password')}</label>
                       <input type="password"
                         name="password"
                         onChange={this.props.update_password}
@@ -253,24 +254,24 @@ class First_form extends Pure_component {
                     <button type="submit"
                       className="btn btn_lpm btn_login"
                       onClick={this.props.save_user}>
-                      {saving_user ? 'Logging in...' : 'Log in'}
+                      {saving_user ? t('Logging in...') : t('Log in')}
                     </button>
                   </div>
                   <div className="or_circle">Or</div>
                 </div>
                 <div className="row">
                   <div className="signup">
-                    Don't have a Luminati account?
+                    {t('Don\'t have a Luminati account?')}
                     <a href="https://luminati.io/?need_signup=1"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="link">
-                      Sign up
+                      {t('Sign up')}
                     </a>
                   </div>
                 </div>
               </div>
-            </div>;
+            }</T></div>;
     }
 }
 

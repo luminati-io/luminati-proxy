@@ -124,7 +124,7 @@ class Type_cell extends React.Component {
             val = 'Luminati';
             tip = 'Proxy port using your Luminati account';
         }
-        return <Tooltip title={tip}><T>{val}</T></Tooltip>;
+        return <T>{t=><Tooltip title={t(tip)}>{t(val)}</Tooltip>}</T>;
     }
 }
 
@@ -230,19 +230,6 @@ const columns = [
         ext: true,
         dynamic: true,
         width: 55,
-    },
-    {
-        key: 'ip',
-        title: 'Datacenter IP',
-        type: 'text',
-    },
-    {
-        key: 'vip',
-        title: 'gIP',
-        type: 'number',
-        tooltip: 'A gIP is a group of exclusive residential IPs. Using gIPs '
-            +'ensures that nobody else uses the same IPs with the same target '
-            +'sites as you do.',
     },
     {
         key: 'iface',
@@ -352,7 +339,7 @@ const columns = [
     },
     {
         key: 'race_reqs',
-        title: 'Race request',
+        title: 'Parallel race requests',
         type: 'number',
     },
     {
@@ -479,20 +466,22 @@ class Columns_modal extends Pure_component {
     render(){
         const header = <div className="header_buttons">
               <button onClick={this.select_all} className="btn btn_lpm">
-                Check all</button>
+                <T>Check all</T></button>
               <button onClick={this.select_none} className="btn btn_lpm">
-                Uncheck all</button>
+                <T>Uncheck all</T></button>
               <button onClick={this.select_default} className="btn btn_lpm">
-                Default</button>
+                <T>Default</T></button>
             </div>;
         return <Modal id="edit_columns" custom_header={header}
               click_ok={this.click_ok} cancel_clicked={this.click_cancel}>
               <div className="row columns">
                 {columns.filter(col=>!col.sticky).map(col=>
                   <div key={col.key} className="col-md-6">
-                    <Checkbox text={col.title} value={col.key}
-                      on_change={this.on_change}
-                      checked={!!this.state.selected_cols[col.key]}/>
+                    <T>{t=>
+                      <Checkbox text={t(col.title)} value={col.key}
+                        on_change={this.on_change}
+                        checked={!!this.state.selected_cols[col.key]}/>
+                    }</T>
                   </div>
                 )}
               </div>

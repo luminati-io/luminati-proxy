@@ -296,10 +296,10 @@ const presets = {
         },
         rules: [
             {field: 'dns', label: `Sets DNS to resolve remotely`},
-            {field: 'random_user_agent', label: `Generates random User-Agent
-                for each request`},
-            {field: 'trigger_type', label: `Creates an explanatory rule for
-                post-processing each request to scrape data you need`},
+            {field: 'random_user_agent',
+                label: 'Generates random User-Agent for each request'},
+            {field: 'trigger_type', label: 'Creates an explanatory rule for '
+                +'post-processing each request to scrape data you need'},
             {field: 'ssl', label: `Enables SSL analyzing`},
         ],
     },
@@ -320,7 +320,11 @@ const presets = {
     },
 };
 for (let k in presets)
+{
     presets[k].key = k;
+    presets[k].subtitle = presets[k].subtitle.replace(/\s+/g, ' ')
+    .replace(/\n/g, ' ');
+}
 export {presets};
 
 export const swagger_url = 'http://petstore.swagger.io/?url=https://'

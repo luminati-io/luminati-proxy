@@ -90,11 +90,26 @@ E.mem_usage = function(){
 };
 E.freemem_percent = function(){ return 100*(1-E.mem_usage()); };
 E.get_release = function(){
-    if (file.is_win || file.is_darwin)
-        distro_release = {};
-    if (!distro_release)
+    if (distro_release)
+        return distro_release;
+    distro_release = {};
+    if (file.is_win)
     {
-        var info = exec.get_lines(['lsb_release', '-i', '-r', '-c', '-s']);
+        const lines = exec.get_lines('systeminfo.exe');
+        const values = {id: /OS Name:\s+(.+)/, version: /OS Version:\s+(.+)/};
+        for (let l of lines)
+        {
+            let v;
+            for (let k in values)
+            {
+                if (v = values[k].exec(l))
+                    distro_release[k] = v[1];
+            }
+        }
+    }
+    else if (!file.is_darwin)
+    {
+        const info = exec.get_lines(['lsb_release', '-i', '-r', '-c', '-s']);
         distro_release = {
             id: info[0].toLowerCase(),
             version: info[1],
@@ -104,6 +119,7 @@ E.get_release = function(){
     return distro_release;
 };
 E.is_release = function(releases){
+    releases = array.to_array(releases);
     E.get_release();
     return releases.some(function(e){
         var m = e.toLowerCase().match(/^(i|v|c):(.*)$/);
@@ -477,10 +493,18 @@ E.disk_io_time = function(stats){
     return io;
 };
 
+E.get_kernel = function(){
+    const uname = exec.get_line('uname -snrv');
+    const res = /^(\S+) (\S+) (\S+) (.+)/.exec(uname);
+    if (!res)
+        return {};
+    return {name: res[1], node: res[2], release: res[3], version: res[4]};
+};
+
 E.info = function(){
     return {type: os.type(), endianness: os.endianness(),
         hostname: os.hostname(), arch: os.arch(),
-        release: E.get_release()};
+        release: E.get_release(), kernel: E.get_kernel()};
 };
 
 E.node = function(){

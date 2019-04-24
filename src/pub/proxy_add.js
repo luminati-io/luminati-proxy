@@ -277,8 +277,8 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 const Lum_proxy = props=>{
     const {zone, zones, on_field_change, preset, rule_clicked,
         presets_opt} = props;
-    const preset_tip = `Presets is a set of preconfigured configurations
-    for specific purposes`;
+    const preset_tip = 'Presets is a set of preconfigured configurations '
+    +'for specific purposes';
     const zone_tip = `Zone that will be used by this proxy port`;
     const zones_opt = zones.zones.map(z=>{
         if (z.name==zones.def)
@@ -299,7 +299,7 @@ const Lum_proxy = props=>{
             </Preview>
           </div>
           <div className="group">
-            <Field icon_class="preset_icon" val={preset}
+            <Field icon_class="preset_icon" val={preset} i18n
               options={presets_opt} title="Preset configuration"
               on_change={on_field_change('preset')} tooltip={preset_tip}/>
             <Preview title={presets_opt.find(p=>p.value==preset).key}>
@@ -335,7 +335,9 @@ const Field = props=>
           <select onChange={e=>props.on_change(e.target.value)}
             value={props.val}>
             {props.options.map((o, i)=>
-              <option key={i} value={o.value}>{t(o.key)}</option>)}
+              <option key={i} value={o.value}>
+                {props.i18n ? t(o.key) : o.key}
+              </option>)}
           </select>
         </Tooltip>
       </div>
@@ -348,16 +350,14 @@ const Footer = props=>{
             return;
         props.save_clicked();
     };
-    const ok_clicked = ()=>{
-        $('#add_new_proxy_modal').modal('hide');
-    };
+    const ok_clicked = ()=>$('#add_new_proxy_modal').modal('hide');
     const classes = classnames('btn', 'btn_lpm', 'btn_lpm_primary',
         {disabled: props.disabled});
     const adv_tip = 'Creates a proxy port and moves to the configuration page';
-    return <div className="footer">
+    return <T>{t=><div className="footer">
           <Tooltip title={adv_tip}>
             <a onClick={props.advanced_clicked} className="link"
-              style={{float: 'left'}}>Advanced options</a>
+              style={{float: 'left'}}>{t('Advanced options')}</a>
           </Tooltip>
           {!props.created_port &&
             <button onClick={save_clicked} className={classes}>
@@ -366,10 +366,10 @@ const Footer = props=>{
           }
           {!!props.created_port &&
             <button onClick={ok_clicked} className={classes}>
-              <T>OK</T>
+            {t('OK')}
             </button>
           }
-        </div>;
+        </div>}</T>;
 };
 
 export default Proxy_add;

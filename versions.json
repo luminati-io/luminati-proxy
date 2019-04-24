@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.132.341",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add missing translations for Chinese"
+            }
+        ]
+    },
+    {
         "ver": "1.131.652",
         "type": "stable",
         "changes": [

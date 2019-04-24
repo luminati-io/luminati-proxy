@@ -2,14 +2,15 @@
 'use strict'; /*jslint react:true, es6:true*/
 import 'prismjs/themes/prism.css';
 import React from 'react';
+import classnames from 'classnames';
+import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
 import {Code} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
+import {T} from './common/i18n.js';
 import {ga_event, swagger_url} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
-import classnames from 'classnames';
-import {withRouter} from 'react-router-dom';
 
 const Howto = withRouter(class Howto extends Pure_component {
     choose_click = option=>{
@@ -25,9 +26,9 @@ const Howto = withRouter(class Howto extends Pure_component {
             Instructions = Browser_instructions;
         else if (option=='code')
             Instructions = Code_instructions;
-        return <div className="howto vbox">
+        return <T>{t=><div className="howto vbox">
               <div className="nav_header">
-                <h3>How to use the Proxy Manager {cur_title}</h3>
+                <h3>{t('How to use the Proxy Manager')} {t(cur_title)}</h3>
               </div>
               <div className="howto_panel">
                 <div className="panel_inner">
@@ -42,7 +43,7 @@ const Howto = withRouter(class Howto extends Pure_component {
                 </div>
                 <Animated_instructions/>
               </div>
-            </div>;
+            </div>}</T>;
     }
 });
 
@@ -122,7 +123,7 @@ class Browser_instructions extends Pure_component {
         const browser = this.props.match.params.suboption||'chrome_win';
         return <div className="browser_instructions">
               <div className="header_well">
-                <p>Choose browser</p>
+                <p><T>Choose browser</T></p>
                 <select value={browser} onChange={this.browser_changed}>
                   <option value="chrome_win">Chrome Windows</option>
                   <option value="chrome_mac">Chrome Mac</option>

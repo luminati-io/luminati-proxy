@@ -4,7 +4,7 @@ import React from 'react';
 
 export const tabs = {
     logs: {
-        fields: [],
+        fields: {},
         label: 'Logs',
         tooltip: 'Request logs of requests sent through this proxy port',
     },
@@ -49,11 +49,11 @@ export const tabs = {
         tooltip: 'Control the speed of your request to improve performance',
         fields: {
             proxy: {
-                label: `Super Proxy's location`,
-                tooltip: `For shorter latency to the Super Proxy you can
+                label: `Super-Proxy's location`,
+                tooltip: `For a shorter latency to the Super-Proxy, you can
                     choose its location. Please note that this does not
                     restrict the IPs chosen country but will simply improve
-                    performances by using Super Proxies which have shorter
+                    performances by using #Super-Proxies which have shorter
                     roundtrips relative to your current location.`,
             },
             dns: {
@@ -63,12 +63,13 @@ export const tabs = {
             race_reqs: {
                 label: 'Parallel race requests',
                 tooltip: `Sends multiple requests in parallel via different
-                    super proxies and uses the fastest request`,
+                    Super-Proxies and uses the fastest request.`,
                 placeholder: 'Number of parallel requests'
             },
             proxy_count: {
                 label: 'Minimum number of super proxies',
-                tooltip: `Minimum number of super proxies to use in parallel`,
+                tooltip: `The minimal number of Super-Proxies to use in
+                    parallel.`,
             },
             proxy_switch: {
                 label: 'Switch super proxy on failure',
@@ -77,8 +78,8 @@ export const tabs = {
             },
             throttle: {
                 label: 'Throttle requests',
-                tooltip: `Throttle requests above the given number. Allow
-                    maximum number of parallel requests`,
+                tooltip: `Throttle requests above the given number.
+                    Allow a maximal number of parallel requests.`,
                 ext: true,
             },
             reverse_lookup: {
@@ -102,9 +103,9 @@ export const tabs = {
         fields: {
             trigger_type: {
                 label: 'Trigger',
-                tooltip: `In every request the response will be analyzed.
-                    if the configured Trigger rule is true, the Action
-                    will be executed automatically`,
+                tooltip: `In every request, the response will be analyzed. if
+                    the configured Trigger rule is true, then the Action will
+                    be executed automatically`,
             },
             body_regex: {
                 label: 'String to be scanned in body (Regex)',
@@ -115,21 +116,21 @@ export const tabs = {
             min_req_time: {
                 label: 'Request time more than',
                 placeholder: '500',
-                tooltip: `Any request time above the given value in
-                    milliseconds will trigger the action`,
+                tooltip: `Any request time above the given value (in
+                    milliseconds) will trigger the action`,
             },
             max_req_time: {
                 label: 'Request time less than',
                 placeholder: '500',
-                tooltip: `Any request time below the given value in
-                    milliseconds will trigger the action`,
+                tooltip: `Any request time below the given value (in
+                    milliseconds) will trigger the action`,
             },
             trigger_url_regex: {
                 label: `Optional regex to apply only for specific URLs`,
                 placeholder: `i.e. example.com`,
                 tooltip: `Enable trigger only for certain URLs. You can type
-                    regex manually or generate it by clicking on formats above
-                    the input`,
+                    regex manually or generate it by choosing from the offered
+                    formats above the input.`,
             },
             status: {
                 label: `Status code (string or regexp)`,
@@ -137,13 +138,14 @@ export const tabs = {
             },
             action: {
                 label: 'Action',
-                tooltip: `The action to be executed when rule is met`,
+                tooltip: `The action to be executed when the rule's condition
+                    is met`,
             },
             fast_pool_size: {
                 label: 'Fast pool size',
-                tooltip: `System will store fast IPs up to the selected pool
-                    size number. Once pool size is reached, the system will
-                    use IPs from the fast IPs pool to route requests`,
+                tooltip: `The system will store fast IPs up to the selected
+                    pool size number. Once pool size is reached, the system
+                    will use IPs from the fast IPs pool to route requests.`,
             },
             retry_number: {
                 label: 'Retries',
@@ -156,34 +158,35 @@ export const tabs = {
             },
             switch_port: {
                 label: 'Switch port that will be used to make the request',
-                tooltip: `By using this action you can split your traffic
+                tooltip: `Using this action you can split your traffic
                     between ports`,
             },
             ban_ip_duration: {
                 label: 'Ban IP for',
                 tooltip: `Ban the IP for a defined amount of time. Choose 0 to
-                    ban pernamentaly`,
+                    ban forever`,
             },
             type: {
                 label: 'Schedule',
-                tooltip: `The timing of trigger function execution. You can try
-                    to activate the rule before sending the request (based on
-                    URL), after receiving headers (if you want to check status
-                    code or any specific headers, after body (if you want to
-                    check the whole response), or after specified amount of
+                tooltip: `The timing for the execution of the triggered
+                    function. You can try to activate the rule before sending
+                    the request for a specific URL, after receiving headers
+                    (to check status code for example), after body (to check
+                    the whole response), or after a specified amount of
                     time (to timeout the request and retry).`,
             },
             process: {label: 'Processing rule'},
             send_email: {
                 label: 'Send email',
-                tooltip: `Every time the rule is triggered and executed the
-                    email notification will be sent to the provided address`,
+                tooltip: `Every time the rule is triggered and executed, the
+                        email notification will be sent to the provided
+                        address`,
             },
             email: {
                 label: 'Email address',
                 tooltip: `Notifications will be sent to this email address.
-                    If you want to use another email you can add it to the
-                    list in control panel by going to the link below`,
+                        If you want to use another email you can add it to the
+                        list in control panel by going to the link below.`,
             },
         },
     },
@@ -193,58 +196,59 @@ export const tabs = {
         fields: {
             pool_type: {
                 label: 'Pool type',
-                tooltip: `They way of pulling sessions for the following
+                tooltip: `The order of pulling sessions for the following
                     requests.`,
                 ext: true,
             },
             pool_size: {
                 label: 'Pool size',
-                tooltip: `Maintain number of IPs that will be pinged constantly
-                    - must have Keep_alive to work properly`,
+                tooltip: `Maintain a number of IPs that will be pinged
+                    constantly - must have Keep_alive to work properly.`,
                 ext: true,
             },
             keep_alive: {
                 label: 'Keep session alive',
-                tooltip: `LPM will send a small request every 45 seconds to
-                    keep the session alive`,
+                tooltip: `The LPM will send a small request every 45 seconds
+                    to keep the session alive.`,
                 ext: true,
             },
             session_random: {
                 label: 'Random session',
-                tooltip: `Each session is generated randomly. Disable it if you
-                    want to define sessions manually`,
+                tooltip: `Each session is generated randomly. Disable this
+                    if you want to define sessions manually`,
                 ext: true,
             },
             session: {
                 label: 'Explicit session',
-                tooltip: `Insert session ID to maintain the same ip for as long
-                    as possible.`,
+                tooltip: `Insert a session ID to maintain the same IP for as
+                    long as possible.`,
                 placeholder: `e.g. session-1234`,
             },
             sticky_ip: {
                 label: 'Sticky IP',
-                tooltip: `When connecting to remote LPM server stick sessions
-                    to each computer. Each connected computer will receive
-                    a unique session`,
+                tooltip: `When connecting to the remote LPM server,
+                    stick sessions to each computer. Each connected
+                    computer will receive a unique session.`,
                 ext: true,
             },
             max_requests: {
                 label: 'Max requests',
-                tooltip: `Change session based on number of requests can be a
+                tooltip: `Change session based on number of requests - can be a
                     range or a fixed number. when using browser it should be
-                    taken into consideration that one page load will attempt
-                    multiple requests under the hood`,
+                    taken into consideration that one page-load will attempt
+                    multiple requests under the hood.`,
                 ext: true,
             },
             session_duration: {
                 label: 'Session duration',
-                tooltip: `Change session every fixed number of seconds`,
+                tooltip: `Make the session change automatically every X
+                    seconds.`,
                 ext: true,
             },
             seed: {
                 label: 'Session ID seed',
                 tooltip: `A string that will be used to maintain unified
-                    session structure. Each new session will be attached with
+                    session structure. Each new session will be associated with
                     a serial number starting from 1. (e.g. session seed 'test'
                     will have the following sessions: test-1, test-2 ..)`,
                 placeholder: `e.g. test_session`,
@@ -252,7 +256,7 @@ export const tabs = {
             session_termination: {
                 label: 'Session termination',
                 tooltip: `Stop sending new requests when the peer IP becomes
-                    unavailable and redirect to confimration page before new IP
+                    unavailable and redirect to confirmation page before new IP
                     is taken`,
             }
         },
@@ -273,23 +277,23 @@ export const tabs = {
             },
             override_headers: {
                 label: 'Override headers',
-                tooltip: `If you use a browser or other software then requests
+                tooltip: `If you use a browser or other software, then requests
                     may already have defined a few headers for you. Enabling
-                    this option will allow for overriding those headers`,
+                    this option will allow overriding those headers`,
             },
         },
     },
     general: {
         label: 'General',
-        tooltip: `General configuration such as port number, password and
-            bypasing`,
+        tooltip: `General configuration such as 'port number', 'password', and
+            'bypassing'`,
         fields: {
             internal_name: {
                 label: 'Internal name',
-                tooltip: `You can choose a name for this proxy port. If the
-                    name is passed it will be shown in the dropdowns across
-                    whole LPM. It doesn't change any behavior of the proxy
-                    port`,
+                tooltip: `You can choose a name for this proxy port.
+                    If the name is passed it will be shown in the dropdowns
+                    across whole LPM. It doesn't change any behavior of the
+                    proxy port.`,
                 ext: true,
             },
             port: {
@@ -300,41 +304,42 @@ export const tabs = {
             },
             socks: {
                 label: 'SOCKS 5 port',
-                tooltip: `SOCKS 5 port is the same as proxy port and is
+                tooltip: `A SOCKS 5 port is the same as a proxy port, and is
                     automatically created.`,
                 ext: true,
             },
             password: {
                 label: 'Zone password',
-                tooltip: `Zone password as it appears in your zones page in
-                    your Luminati's control panel http://luminati.io/cp/zones`,
+                tooltip: `The Zone password, as it appears in 'Zones' page in
+                    Luminati's control panel http://luminati.io/cp/zones`,
             },
             whitelist_ips: {
                 label: 'Whitelist IP access',
-                tooltip: `Grant proxy access to specific IPs. Only those
-                    IPs will be able to send requests to this proxy port.
-                    Setting this field will override the 'General settings'|
-                    'Proxy whitelisted IPs' for this port.`,
-                placeholder: `e.g. 1.1.1.1,23.23.23.23`,
+                tooltip: `Grant proxy access to specific IPs. Only those IPs
+                    will be able to send requests via this proxy port. Any
+                    value set in this field will override the 'General
+                    settings' and 'Proxy whitelisted IPs' for this port.`,
+                placeholder: `e.g. 1.1.1.1, 23.23.23.23`,
                 ext: true,
             },
             ssl: {
-                label: 'SSL request logs',
+                label: 'SSL analyzing',
                 tooltip: `Enable SSL request logs in order to save HTTPs
                     requests`,
                 ext: true,
             },
             secure_proxy: {
                 label: 'SSL to super proxy',
-                tooltip: `Encrypt requests sent to super proxy to avoid
+                tooltip: `Encrypt requests sent to the Super-Proxy to avoid
                     detection on DNS`,
             },
             route_err: {
                 label: 'Route',
-                tooltip: `<div><b>pass_dyn:</b> If request can't pass via `
-                    +`peer, auto pass via super proxy<br><b>block</b> If `
-                    +`request can't pass via peer, block request and don't `
-                    +`auto send via super proxy</div>`,
+                tooltip: `<div><b>pass_dyn:</b> If a request can't pass via `
+                    +`peer, automatically pass it via the Super-Proxy`
+                    +`<br><b>block</b> If a `
+                    +`request can't pass via peer, block it and don't `
+                    +`send via Super-Proxy</div>`,
             },
             multiply: {
                 label: 'Multiply proxy port',
@@ -343,13 +348,13 @@ export const tabs = {
             },
             multiply_ips: {
                 label: 'Multiply proxy port per IP',
-                tooltip: `Create proxy port for every selected IP from the
+                tooltip: `Create a proxy port for every selected IP from the
                     pool`,
             },
             multiply_vips: {
                 label: 'Multiply proxy port per gIP',
-                tooltip: `Create proxy port for every selected gIP from pool
-                    of available gIPS in your zone`,
+                tooltip: `Create a proxy port for every selected gIP from pool
+                    of available gIPs in your zone`,
             },
             iface: {
                 label: 'Interface',
@@ -359,21 +364,29 @@ export const tabs = {
             },
             log: {
                 label: 'Log level',
-                tooltip: `Level of the logs in the console. Decide how much
-                    debug information you want to see.`,
+                tooltip: `Decide how elaborate is the debugging information
+                    that you see in the console's log.`,
                 ext: true,
             },
             debug: {
                 label: 'Luminati request debug info',
                 tooltip: `Attach additional headers in the response of each
-                    request with debug info such as Peer IP or timeline of the
-                    request. You can resign from it to save bandwidth (very
-                    little) or if the additional headers are breaking your
-                    operations`,
+                    request with debug info, such as "Peer IP" or the timeline
+                    of the request. You can resign from it to save bandwidth
+                    (very little) or if the additional headers are breaking
+                    your operations.`,
             },
         },
     },
 };
+
+Object.keys(tabs).forEach(t=>{
+    const format = s=>s.replace(/\s+/g, ' ').replace(/\n/g, ' ');
+    const tab = tabs[t];
+    tab.tooltip = format(tab.tooltip);
+    for (let f in tab.fields)
+        tab.fields[f].tooltip = format(tab.fields[f].tooltip||'');
+});
 
 export const all_fields = Object.keys(tabs)
     .map(k=>tabs[k].fields)

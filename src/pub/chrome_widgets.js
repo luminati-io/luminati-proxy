@@ -154,11 +154,11 @@ export const Sort_icon = ({show, dir})=>{
 export class Chrome_table extends Pure_component {
     render(){
         const {cols, title, children} = this.props;
-        return <div className="chrome chrome_table">
+        return <T>{t=><div className="chrome chrome_table">
               <div className="main_panel vbox">
                 <Toolbar_container>
                   <Toolbar_row>
-                    <div className="title_wrapper">{title}</div>
+                    <div className="title_wrapper">{t(title)}</div>
                   </Toolbar_row>
                 </Toolbar_container>
                 <div className="tables_container vbox">
@@ -166,7 +166,7 @@ export class Chrome_table extends Pure_component {
                   <Data_container cols={cols}>{children}</Data_container>
                 </div>
               </div>
-            </div>;
+            </div>}</T>;
     }
 }
 

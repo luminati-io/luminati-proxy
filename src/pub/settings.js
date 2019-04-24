@@ -16,26 +16,29 @@ export default function Settings(){
         </div>;
 }
 
+const tooltips = {
+    zone: `Default zone will be used automatically when creating a new
+        port, if you don't specify any specific zone. This value can be
+        overriden in each proxy port settings`,
+    www_whitelist_ips: `List of IPs that are allowed to access web UI
+        (including all API endpoints at http://localhost:22999/api) and
+        make changes. can also include ranges of ips like so 0.0.0.0/0.
+        Default value is 127.0.0.1, which means that remote access from
+        any other IP is blocked unless list of IPs are added in this
+        field.`,
+    whitelist_ips: `Default access grant for all proxies. Only those
+        IPs will be able to send requests to all proxies by default. Can
+        be changed per proxy`,
+    request_stats: `Enable saving statistics to database`,
+    logs: `Specify how many requests you want to keep in database. The
+        limit may be set as a number or maximum database size. Set to 0 to
+        disable saving logs to database`,
+};
+for (let f in tooltips)
+    tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
+
 class Form extends Pure_component {
     state = {saving: false};
-    tooltips = {
-        zone: `Default zone will be used automatically when creating a new
-            port, if you don't specify any specific zone. This value can be
-            overriden in each proxy port settings`,
-        www_whitelist_ips: `List of IPs that are allowed to access web UI
-            (including all API endpoints at http://localhost:22999/api) and
-            make changes. can also include ranges of ips like so 0.0.0.0/0.
-            Default value is 127.0.0.1, which means that remote access from
-            any other IP is blocked unless list of IPs are added in this
-            field.`,
-        whitelist_ips: `Default access grant for all proxies. Only those
-            IPs will be able to send requests to all proxies by default. Can
-            be changed per proxy`,
-        request_stats: `Enable saving statistics to database`,
-        logs: `Specify how many requests you want to keep in database. The
-            limit may be set as a number or maximum database size. Set to 0 to
-            disable saving logs to database`,
-    };
     logs_metric_opts = [
         {key: 'requests', value: 'requests'},
         {key: 'megabytes', value: 'megabytes'},
@@ -139,24 +142,24 @@ class Form extends Pure_component {
               <Loader show={!this.state.consts}/>
               <Labeled_controller val={this.state.settings.zone} type="select"
                 on_change_wrapper={this.zone_change} label="Default zone"
-                tooltip={this.tooltips.zone} data={zone_opt}/>
+                tooltip={tooltips.zone} data={zone_opt}/>
               <Labeled_controller val={this.state.settings.www_whitelist_ips}
                 type="pins" label="Admin whitelisted IPs"
                 on_change_wrapper={this.www_whitelist_ips_change}
-                tooltip={this.tooltips.www_whitelist_ips}/>
+                tooltip={tooltips.www_whitelist_ips}/>
               <Labeled_controller val={this.state.settings.whitelist_ips}
                 type="pins" label="Proxy whitelisted IPs"
                 on_change_wrapper={this.whitelist_ips_change}
-                tooltip={this.tooltips.whitelist_ips}/>
+                tooltip={tooltips.whitelist_ips}/>
               <Labeled_controller val={this.state.settings.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default
-                tooltip={this.tooltips.request_stats}/>
+                tooltip={tooltips.request_stats}/>
               <Labeled_controller val={this.state.settings.logs}
                 type="select_number" on_change_wrapper={this.logs_changed}
                 data={[0, 100, 1000, 10000]} note={logs_note}
                 label="Limit for request logs" default
-                tooltip={this.tooltips.logs}/>
+                tooltip={tooltips.logs}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }
