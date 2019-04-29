@@ -322,7 +322,6 @@ const Index = withRouter(class Index extends Pure_component {
         save_form.ssl = effective('ssl');
         save_form.max_requests = effective('max_requests');
         save_form.session_duration = effective('session_duration');
-        save_form.keep_alive = effective('keep_alive');
         save_form.pool_size = effective('pool_size');
         save_form.proxy_type = 'persist';
         if (save_form.reverse_lookup=='dns')

@@ -317,12 +317,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'keep_alive',
-        title: 'Keep session alive',
-        render: Boolean_cell,
-        ext: true,
-    },
-    {
         key: 'seed',
         title: 'Seed',
         type: 'text',

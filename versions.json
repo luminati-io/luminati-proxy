@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.132.959",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "List of banned IPs persists across changes in proxy port"
+            },
+            {
+                "type": "star",
+                "text": "Sessions are automatically refreshed on banning IP"
+            }
+        ]
+    },
+    {
         "ver": "1.132.512",
         "type": "stable",
         "changes": [

@@ -48,7 +48,6 @@ conf.luminati_default = {
     proxy_switch: 2,
     socket_inactivity_timeout: 120*date.ms.SEC,
     last_preset_applied: 'session_long',
-    keep_alive: false,
     multiply_ips: false,
     multiply_vips: false,
     multiply: 1,

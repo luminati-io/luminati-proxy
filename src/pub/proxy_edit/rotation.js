@@ -46,8 +46,6 @@ export default class Rotation extends Pure_component {
             this.set_field('vips', []);
             this.set_field('pool_size', 0);
         }
-        else if (this.is_long_availability(pool_type))
-            this.set_field('keep_alive', true);
         else if (!this.state.form.pool_size)
             this.set_field('pool_size', 1);
     };
@@ -89,8 +87,6 @@ export default class Rotation extends Pure_component {
                   on_change={this.pool_type_changed}/>
                 <Config type="select_number" id="pool_size" allow_zero
                   note={pool_size_note} disabled={pool_size_disabled}/>
-                <Config type="yes_no" id="keep_alive"
-                  disabled={this.is_long_availability()}/>
                 <Config type="select_number" id="max_requests"/>
                 <Config type="select_number" id="session_duration"
                   sufix="seconds"/>

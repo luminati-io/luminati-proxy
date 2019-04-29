@@ -203,13 +203,7 @@ export const tabs = {
             pool_size: {
                 label: 'Pool size',
                 tooltip: `Maintain a number of IPs that will be pinged
-                    constantly - must have Keep_alive to work properly.`,
-                ext: true,
-            },
-            keep_alive: {
-                label: 'Keep session alive',
-                tooltip: `The LPM will send a small request every 45 seconds
-                    to keep the session alive.`,
+                    every 45 seconds`,
                 ext: true,
             },
             session_random: {

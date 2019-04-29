@@ -269,7 +269,7 @@ describe('proxy', ()=>{
                     yield l.test();
                     assert.equal(proxy.history.length, 1);
                     assert.equal(proxy.history[0].url, test_url.http);
-                    assert.equal(proxy.full_history.length, 1);
+                    assert.equal(proxy.full_history.length, 1+pool_size);
                     assert.equal(l.session_mgr.sessions.sessions.length,
                         pool_size);
                     const sessions = {};
@@ -527,8 +527,8 @@ describe('proxy', ()=>{
         });
         describe('refresh_sessions', ()=>{
             const test_session = session=>etask(function*(){
-                let res = yield l.test();
-                let auth = res.body.auth;
+                const res = yield l.test();
+                const auth = res.body.auth;
                 assert.ok(session.test(auth.session));
             });
             const t1 = (name, opt, before, after)=>it(name, ()=>etask(
@@ -766,7 +766,7 @@ describe('proxy', ()=>{
         }], 1);
         it('should retry when banned ip', ()=>etask(function*(){
             l = yield lum({rules: []});
-            const ban_stub = sinon.stub(l.banlist, 'has');
+            const ban_stub = sinon.stub(l, 'is_ip_banned');
             ban_stub.onFirstCall().returns(true);
             ban_stub.onSecondCall().returns(true);
             ban_stub.returns(false);
@@ -994,7 +994,7 @@ describe('proxy', ()=>{
                 sinon.stub(l.rules, 'can_retry').returns(true);
                 sinon.stub(l.rules, 'retry');
                 sinon.stub(l.rules, 'gen_session').returns('test');
-                const add_stub = sinon.stub(l.banlist, 'add').returns('test');
+                const add_stub = sinon.stub(l, 'banip').returns('test');
                 const req = {ctx: {}};
                 const opt = {_res: {
                     hola_headers: {'x-hola-timeline-debug': '1 2 3'}}};
@@ -1021,7 +1021,7 @@ describe('proxy', ()=>{
                     l = yield lum({rules: [{action_type: 'ban_ip',
                         status: '200', action: {ban_ip: 10*ms.MIN,
                         ban_ip_domain_reqs: 4, ban_ip_domain_time: 200}}]});
-                    ban_spy = sinon.spy(l.banlist, 'add');
+                    ban_spy = sinon.spy(l, 'banip');
                 }));
                 it('group requests by domain', ()=>{
                     t('http://lumtest.com/test', {'lumtest.com': 1});
@@ -1189,7 +1189,7 @@ describe('proxy', ()=>{
                     sinon.stub(l, 'send_bypass_req');
                 else
                     inject_headers(l);
-                const ban_stub = sinon.stub(l.banlist, 'add');
+                const ban_stub = sinon.stub(l, 'banip');
                 yield l.test(ping.http.url);
                 assert.equal(ban_stub.called, +ban);
             }));
@@ -1203,8 +1203,8 @@ describe('proxy', ()=>{
                     rules: [get_banip_rule(30)]});
                 inject_headers(l2);
                 sinon.stub(l, 'get_other_port', ()=>l2);
-                const ban_stub = sinon.stub(l.banlist, 'add');
-                const ban_stub_l2 = sinon.stub(l2.banlist, 'add');
+                const ban_stub = sinon.stub(l, 'banip');
+                const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
                 sinon.assert.calledWith(ban_stub, 'ip', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip', 1800000);
@@ -1217,8 +1217,8 @@ describe('proxy', ()=>{
                 const header_stub = inject_headers(l);
                 const header_stub_l2 = inject_headers(l2, 'ip2');
                 sinon.stub(l, 'get_other_port', ()=>l2);
-                const ban_stub = sinon.stub(l.banlist, 'add');
-                const ban_stub_l2 = sinon.stub(l2.banlist, 'add');
+                const ban_stub = sinon.stub(l, 'banip');
+                const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
                 sinon.assert.calledWith(ban_stub, 'ip', 600000);
                 sinon.assert.calledWith(ban_stub, 'ip2', 600000);
@@ -1239,8 +1239,8 @@ describe('proxy', ()=>{
                     rules: [get_banip_rule(30)]});
                 inject_headers(l2);
                 sinon.stub(l, 'get_other_port', ()=>l2);
-                const ban_stub = sinon.stub(l.banlist, 'add');
-                const ban_stub_l2 = sinon.stub(l2.banlist, 'add');
+                const ban_stub = sinon.stub(l, 'banip');
+                const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
                 sinon.assert.calledWith(ban_stub, 'ip', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip', 1800000);
@@ -1256,16 +1256,11 @@ describe('proxy', ()=>{
                     l = yield lum(Object.assign({
                         rules: [get_banip_rule()],
                         session: true,
-                        pool_type: 'sequential',
                         pool_size: 1,
-                        keep_alive: true,
-                        max_requests: 0,
-                        session_duration: 0,
                         sticky_ip: false,
-                        random_user_agent: false,
                     }, opt));
                     inject_headers(l, 'ip', 'ip2');
-                    ban_spy = sinon.spy(l.banlist, 'add');
+                    ban_spy = sinon.spy(l, 'banip');
                 });
                 const t = (desc, opt)=>it(desc, ()=>etask(function*(){
                     yield prepare_lum(opt);
@@ -1276,9 +1271,8 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 t('long session');
-                t('random UA/online shopping', {keep_alive: false,
-                    random_user_agent: true});
-                t('custom', {session: false, keep_alive: false});
+                t('random UA/online shopping', {random_user_agent: true});
+                t('custom', {session: false});
                 it('sequential', ()=>etask(function*(){
                     yield prepare_lum({pool_size: 0});
                     yield l.test(ping.http.url);
@@ -1331,7 +1325,7 @@ describe('proxy', ()=>{
             }];
             history = [];
             l = yield lum({handle_usage: aggregator, rules,
-                session: true, max_requests: 1, keep_alive: 2});
+                session: true, max_requests: 1, pool_size: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);
@@ -1346,7 +1340,7 @@ describe('proxy', ()=>{
             assert.notEqual(unames[0], unames[2]);
             assert.equal(unames[unames.length-1], unames[0]);
         }));
-        it('should keep reserved session alive', etask._fn(function*(_this){
+        xit('should keep reserved session alive', etask._fn(function*(_this){
             _this.timeout(6000);
             yield l.test();
             const hst = history.length;
@@ -1358,8 +1352,7 @@ describe('proxy', ()=>{
     xdescribe('long_availability', ()=>{
         it('should keep the number of sessions', etask._fn(function*(_this){
             _this.timeout(6000);
-            l = yield lum({pool_type: 'long_availability', pool_size: 10,
-                keep_alive: 1});
+            l = yield lum({pool_type: 'long_availability', pool_size: 10});
             yield l.test();
             assert.equal(l.session_mgr.sessions.sessions.length, 10);
             const initial_sessions = l.session_mgr.sessions.sessions;

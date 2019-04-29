@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.132.512-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.132.959-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x
@@ -135,8 +135,6 @@ Options:
   --pool_size              Session pool size               [number] [default: 3]
   --pool_type              Pool session iteration order
                                                 [string] [default: "sequential"]
-  --keep_alive             Send a small request every 45 seconds to keep
-                           session alive                               [boolean]
   --seed                   Session ID seed used for identifying sessions from
                            this proxy                                   [string]
   --max_requests           Maximum requests per session   [string] [default: 50]

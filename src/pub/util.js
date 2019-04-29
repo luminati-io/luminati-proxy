@@ -96,7 +96,6 @@ const presets = {
             long as possible`,
         set: opt=>{
             opt.pool_size = 1;
-            opt.keep_alive = true;
             opt.session = true;
         },
         clean: opt=>{},
@@ -110,7 +109,6 @@ const presets = {
             session: true,
             pool_type: true,
             seed: true,
-            keep_alive: true,
             pool_size: true,
             max_requests: true,
             session_duration: true,
@@ -125,11 +123,9 @@ const presets = {
             opt.pool_size = 0;
             opt.sticky_ip = true;
             opt.session = '';
-            opt.keep_alive = true;
         },
         clean: opt=>{
             opt.sticky_ip = '';
-            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
         },
@@ -149,7 +145,6 @@ const presets = {
             pool_type: true,
             seed: true,
             pool_size: true,
-            keep_alive: true,
         },
     },
     round_robin: {
@@ -159,13 +154,11 @@ const presets = {
             max_requests & proxy_count to optimize performance`,
         set: opt=>{
             opt.pool_type = 'round-robin';
-            opt.keep_alive = true;
             opt.session = true;
             opt.max_requests = 1;
             opt.pool_size = 0;
         },
         clean: opt=>{
-            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.pool_size = 0;
@@ -185,7 +178,6 @@ const presets = {
             multiply_vips: true,
             pool_type: true,
             seed: true,
-            keep_alive: true,
             max_requests: true,
         },
     },
@@ -194,7 +186,6 @@ const presets = {
         subtitle: 'Maximum request speed',
         set: opt=>{
             opt.pool_size = 50;
-            opt.keep_alive = true;
             opt.pool_type = 'round-robin';
             opt.proxy_count = 20;
             opt.session_duration = 0;
@@ -203,7 +194,6 @@ const presets = {
         },
         clean: opt=>{
             opt.pool_size = 1;
-            opt.keep_alive = false;
             opt.proxy_count = '';
             opt.race_reqs = '';
         },
@@ -213,7 +203,6 @@ const presets = {
             session: true,
             pool_type: true,
             seed: true,
-            keep_alive: true,
             pool_size: true,
         },
         rules: [
@@ -228,7 +217,6 @@ const presets = {
             opt.session = true;
             opt.pool_size = 1;
             opt.pool_type = 'sequential';
-            opt.keep_alive = false;
             opt.session_duration = 0;
             opt.random_user_agent = true;
             opt.override_headers = true;
@@ -244,7 +232,6 @@ const presets = {
             session: true,
             pool_type: true,
             seed: true,
-            keep_alive: true,
             pool_size: true,
             override_headers: true,
         },
@@ -312,7 +299,6 @@ const presets = {
             opt.session = true;
             opt.pool_size = 1;
             opt.pool_type = null;
-            opt.keep_alive = false;
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.seed = '';

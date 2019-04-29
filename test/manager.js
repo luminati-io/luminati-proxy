@@ -313,9 +313,10 @@ describe('manager', ()=>{
                 }));
             });
             describe('put', ()=>{
-                it('normal', ()=>etask(function*(){
-                    let put_proxy = {port: 24001};
-                    let proxies = [{port: 24000}];
+                it('normal', etask._fn(function*(_this){
+                    _this.timeout(6000);
+                    const put_proxy = {port: 24001};
+                    const proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies/24000', 'put',
                         {proxy: put_proxy});
@@ -324,9 +325,9 @@ describe('manager', ()=>{
                     assert_has(res, [put_proxy], 'proxies');
                 }));
                 it('inherit defaults', ()=>etask(function*(){
-                    let put_proxy = {port: 24001};
-                    let proxies = [{port: 24000}];
-                    let res_proxy = assign({}, {customer, password},
+                    const put_proxy = {port: 24001};
+                    const proxies = [{port: 24000}];
+                    const res_proxy = assign({}, {customer, password},
                         put_proxy);
                     app = yield app_with_proxies(proxies, {});
                     let res = yield json('api/proxies/24000', 'put',

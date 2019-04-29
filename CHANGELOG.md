@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.132.959 Stable
+- :star: List of banned IPs persists across changes in proxy port
+- :star: Sessions are automatically refreshed on banning IP
+
 ## 1.132.512 Stable
 - :bug: Fix errors about sessions
 
