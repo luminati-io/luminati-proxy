@@ -42,8 +42,6 @@ const rule_prepare = rule=>{
         try { action.process = JSON.parse(rule.process); }
         catch(e){ console.log('wrong json'); }
     }
-    else if (rule.action=='solve_captcha')
-        action.solve_captcha = true;
     else if (rule.action=='null_response')
         action.null_response = true;
     else if (rule.action=='bypass_proxy')
@@ -100,8 +98,6 @@ export const map_rule_to_form = rule=>{
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
     if (rule.action.process)
         result.process = JSON.stringify(rule.action.process, null, '  ');
-    if (rule.action.solve_captcha)
-        result.solve_captcha = true;
     if (rule.action.email)
     {
         result.send_email = true;
@@ -361,7 +357,6 @@ class Action extends Pure_component {
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
             at.min_req_time)
-        .filter(at=>at.value!='solve_captcha'||settings['2captcha'])
         .filter(at=>at.value!='refresh_ip'||zone.plan.type=='static'));
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);

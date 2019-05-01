@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.133.416 Stable
+- :star: Added support for testing SMTP
+
+## 1.132.959 
+
 ## 1.132.959 Stable
 - :star: List of banned IPs persists across changes in proxy port
 - :star: Sessions are automatically refreshed on banning IP

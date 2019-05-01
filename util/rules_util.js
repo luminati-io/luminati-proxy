@@ -60,7 +60,6 @@ E.action_types = [
         only_url: true, url: true},
     {key: 'Process data', value: 'process', only_url: true, url: true,
         type: 'post'},
-    {key: 'Solve captcha', value: 'solve_captcha', url: true, type: 'post'},
 ];
 
 const gen_function = (name, body)=>{
@@ -110,7 +109,7 @@ E.migrate_trigger = rule=>{
         +`  return false;\n`;
         type = 'after_body';
     }
-    if (rule.action && (rule.action.process || rule.action.solve_captcha))
+    if (rule.action && rule.action.process)
         type = 'after_body';
     if (rule.url)
     {
@@ -136,9 +135,9 @@ const get_action = rule=>{
         body += `opt.retry(${+rule.action.retry});\n`;
     if (rule.action.retry_port)
         body += `opt.retry({port: ${rule.action.retry_port}});\n`;
-    if (rule.action.ban_ip)
+    if (rule.action.ban_ip!=undefined)
         body += `opt.ban_ip({ts: ${rule.action.ban_ip}});\n`;
-    if (rule.action.ban_ip_domain)
+    if (rule.action.ban_ip_domain!=undefined)
     {
         body += `opt.ban_ip({ts: ${rule.action.ban_ip_domain}, `
         +`per_domain: true});\n`;
@@ -160,8 +159,6 @@ const get_action = rule=>{
         body += `opt.direct()\n`;
     if (rule.action.bypass_proxy)
         body += `opt.bypass_proxy()\n`;
-    if (rule.action.solve_captcha)
-        body += `opt.solve_captcha()\n`;
     body += `return true;`;
     return gen_function('action', body);
 };

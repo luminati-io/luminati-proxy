@@ -395,6 +395,8 @@ export class Language extends Pure_component {
                 return;
             if (conn.current_country=='cn')
                 lang = 'cn';
+            else if (conn.current_country=='ru')
+                lang = 'ru';
             else
                 lang = 'en';
             this.set_lang(lang);
@@ -417,6 +419,9 @@ export class Language extends Pure_component {
               <ul className="dropdown-menu dropdown-menu-right">
                 <li onClick={this.set_lang.bind(this, 'cn')}><a>
                   <Lang_cell lang="cn"/>
+                </a></li>
+                <li onClick={this.set_lang.bind(this, 'ru')}><a>
+                  <Lang_cell lang="ru"/>
                 </a></li>
                 <li onClick={this.set_lang.bind(this, 'en')}><a>
                   <Lang_cell lang="en"/>

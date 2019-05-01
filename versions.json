@@ -1,5 +1,20 @@
 [
     {
+        "ver": "1.133.416",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for testing SMTP"
+            }
+        ]
+    },
+    {
+        "ver": "1.132.959",
+        "type": "stable/dev",
+        "changes": []
+    },
+    {
         "ver": "1.132.959",
         "type": "stable",
         "changes": [

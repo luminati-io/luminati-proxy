@@ -296,7 +296,6 @@
       "lib/migration.js",
       "lib/perr.js",
       "lib/puppeteer.js",
-      "lib/recaptcha.js",
       "lib/req_process.js",
       "lib/router.js",
       "lib/rules.js",
@@ -369,7 +368,7 @@
       "util/rules_util.js",
       "webpack.config.js"
     ],
-    "md5": "0d1d9a44fa189a1f80c8596b32e5dad8"
+    "md5": "39eb704a02f764f3777bdea45e46471e"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -427,5 +426,5 @@
       "bin/pub/img/*.gif"
     ]
   },
-  "version": "1.132.959"
+  "version": "1.133.416"
 }

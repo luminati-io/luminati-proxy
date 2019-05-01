@@ -3,6 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import Cn from '/www/lum/pub/locale/zh_CN.json';
+import Ru from '/www/lum/pub/locale/ru.json';
 import setdb from '../../../util/setdb.js';
 
 const t = (key, translation)=>{
@@ -57,6 +58,8 @@ export const with_tt = (keys, Component)=>class extends Pure_component {
 export const set_lang = lang=>{
     if (lang=='cn')
         setdb.set('i18n.translation', Cn);
+    else if (lang=='ru')
+        setdb.set('i18n.translation', Ru);
     else
         setdb.set('i18n.translation', null);
 };
@@ -68,4 +71,5 @@ export const init = ()=>{
 export const langs = {
     cn: {name: '简体中文', flag: 'cn'},
     en: {name: 'English', flag: 'gb'},
+    ru: {name: 'русский', flag: 'ru'}
 };
