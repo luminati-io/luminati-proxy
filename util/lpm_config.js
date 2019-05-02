@@ -52,7 +52,9 @@ conf.luminati_default = {
     last_preset_applied: 'session_long',
     multiply_ips: false,
     multiply_vips: false,
-    multiply: 1,
+    multiply: 0,
+    max_requests: 0,
+    session_duration: 0,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.luminati_default, 'port'), {

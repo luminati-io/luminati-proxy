@@ -43,10 +43,10 @@ export default class Speed extends Pure_component {
               <Tab_context.Provider value="speed">
                 <Config type="select" id="proxy" data={proxy_data}/>
                 <Config type="select" id="dns" data={dns_opt}/>
-                <Config type="select_number" id="race_reqs" allow_zero/>
-                <Config type="select_number" id="proxy_count" allow_zero/>
-                <Config type="select_number" id="proxy_switch" allow_zero/>
-                <Config type="select_number" id="throttle" allow_zero/>
+                <Config type="select_number" id="race_reqs"/>
+                <Config type="select_number" id="proxy_count"/>
+                <Config type="select_number" id="proxy_switch"/>
+                <Config type="select_number" id="throttle"/>
                 <Config type="select" id="reverse_lookup"
                   data={reverse_lookup_opt}/>
                 {this.state.form.reverse_lookup=='file' &&

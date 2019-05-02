@@ -83,7 +83,8 @@ export default class General extends Pure_component {
                 <Config type="yes_no" id="ssl"/>
                 <Config type="yes_no" id="secure_proxy"/>
                 <Config type="select" data={route_err_opt} id="route_err"/>
-                <Config type="select_number" id="multiply" range="medium"
+                <Config type="select_number" id="multiply"
+                  data={[0, 5, 20, 100, 500]}
                   disabled={form.multiply_ips||form.multiply_vips}/>
                 {type=='ips' &&
                   <Config type="yes_no" id="multiply_ips"

@@ -328,7 +328,7 @@ const columns = [
     },
     {
         key: 'proxy_count',
-        title: 'Mininum super proxies',
+        title: 'Minimum super proxies',
         type: 'number',
     },
     {

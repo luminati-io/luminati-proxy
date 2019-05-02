@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.133.690 Stable
+- :star: UI improvements
+
 ## 1.133.416 Stable
 - :star: Added support for testing SMTP
 

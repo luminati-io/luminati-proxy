@@ -166,8 +166,12 @@ export class Select_status extends Pure_component {
 export class Select_number extends Pure_component {
     _fmt_num = n=>n && n.toLocaleString({useGrouping: true}) || n;
     _get_data = ()=>this.props.data ? this.props.data : this.opt_from_range();
-    value_to_option = value=>
-        value!=null && {value, label: this._fmt_num(+value)};
+    value_to_option = value=>{
+        if (value==null)
+            return false;
+        const label = value==0 ? 'Disabled' : this._fmt_num(+value);
+        return {value, label};
+    };
     opt_from_range = ()=>{
         let res;
         if (this.props.range=='medium')
@@ -176,14 +180,11 @@ export class Select_number extends Pure_component {
             res = [0, 500, 2000, 5000, 10000];
         else
             res = [0, 1, 3, 5, 10, 20];
-        if (this.props.allow_zero)
-            res.unshift(0);
         return res;
     };
     on_change = e=>{
         let value = e && +e.value || '';
-        const allow_zero = this.props.allow_zero ||
-            this._get_data().includes(0);
+        const allow_zero = this._get_data().includes(0);
         if (!value && !allow_zero)
             value = this.props.default||1;
         this.props.on_change_wrapper(value);

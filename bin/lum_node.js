@@ -251,16 +251,44 @@ const check_running = argv=>etask(function*(){
     }
 });
 
-const fetch_puppeteer = ()=>etask(function*lum_node_fetch_puppeteer(){
-    if (!is_pkg || file.exists('./chromium'))
+const install_windows = ()=>etask(function*lum_node_fetch_puppeteer(){
+    if (!is_pkg)
         return;
     this.on('uncaught', e=>{
-        zerr('There was an error while fetching puppeteer: %s', e.message);
+        zerr('There was an error while installing on Windows: %s', e.message);
     });
+    zerr.notice('Checking installation on Windows');
+    const install_path = path.resolve(os.homedir(), 'luminati_proxy_manager');
+    if (!file.exists(install_path))
+    {
+        file.mkdir_e(install_path);
+        zerr.notice('Created %s', install_path);
+    }
+    const dst = path.resolve(install_path, 'lpm.exe');
+    if (install_path!=process.cwd())
+    {
+        zerr.notice('Moving installation %s, to %s', process.execPath, dst);
+        file.copy_e(process.execPath, dst);
+    }
+    const puppeteer_path = path.resolve(install_path, 'chromium');
+    if (file.exists(puppeteer_path))
+        return;
+    const old_install_path = path.resolve(os.homedir(),
+        'AppData/Local/Programs/@luminati-ioluminati-proxy');
+    const old_puppeteer_path = path.resolve(old_install_path,
+        'resources/app/node_modules/puppeteer/.local-chromium');
+    if (file.exists(old_puppeteer_path))
+    {
+        const new_puppeteer_path = path.resolve(install_path, 'chromium');
+        zerr.notice('Copying puppeteer from %s to %s', old_puppeteer_path,
+            new_puppeteer_path);
+        file.rename_e(old_puppeteer_path, new_puppeteer_path);
+        return zerr.notice('Puppeteer reused from previous installation');
+    }
     zerr.notice('Started fetching puppeteer binary');
     yield download(`http://${pkg.api_domain}/static/lpm/puppeteer.zip`, 'tmp');
     const source = path.join(process.cwd(), 'tmp', 'puppeteer.zip');
-    extract(source, {dir: process.cwd()}, err=>{
+    extract(source, {dir: install_path}, err=>{
         if (err)
             return this.throw(err);
         zerr.notice('Puppeteer fetched');
@@ -270,7 +298,7 @@ const fetch_puppeteer = ()=>etask(function*lum_node_fetch_puppeteer(){
 E.run = (argv, run_config)=>etask(function*(){
     yield check_running(argv);
     add_alias_for_whitelist_ips();
-    fetch_puppeteer();
+    install_windows();
     E.read_status_file();
     E.write_status_file('initializing', null,
         E.manager&&E.manager._total_conf);

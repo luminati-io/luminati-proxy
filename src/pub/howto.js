@@ -34,7 +34,7 @@ const Howto = withRouter(class Howto extends Pure_component {
                 <div className="panel_inner">
                   <Nav_tabs set_tab={this.choose_click} cur_tab={option}>
                     <Nav_tab id="code" title="Code"
-                      tooltip="Examples how to use LPM programatically"/>
+                      tooltip="Examples how to use LPM programmatically"/>
                     <Nav_tab id="browser" title="Browser"
                       tooltip="Examples how to integrate LPM with the
                       browser"/>

@@ -85,7 +85,7 @@ export default class Rotation extends Pure_component {
               <Tab_context.Provider value="rotation">
                 <Config type="select" id="pool_type" data={pool_type_opt}
                   on_change={this.pool_type_changed}/>
-                <Config type="select_number" id="pool_size" allow_zero
+                <Config type="select_number" id="pool_size"
                   note={pool_size_note} disabled={pool_size_disabled}/>
                 <Config type="select_number" id="max_requests"/>
                 <Config type="select_number" id="session_duration"

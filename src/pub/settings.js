@@ -19,7 +19,7 @@ export default function Settings(){
 const tooltips = {
     zone: `Default zone will be used automatically when creating a new
         port, if you don't specify any specific zone. This value can be
-        overriden in each proxy port settings`,
+        overridden in each proxy port settings`,
     www_whitelist_ips: `List of IPs that are allowed to access web UI
         (including all API endpoints at http://localhost:22999/api) and
         make changes. can also include ranges of ips like so 0.0.0.0/0.
@@ -31,8 +31,7 @@ const tooltips = {
         be changed per proxy`,
     request_stats: `Enable saving statistics to database`,
     logs: `Specify how many requests you want to keep in database. The
-        limit may be set as a number or maximum database size. Set to 0 to
-        disable saving logs to database`,
+        limit may be set as a number or maximum database size.`,
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
@@ -136,8 +135,6 @@ class Form extends Pure_component {
             const plan = z.plans && z.plans.slice(-1)[0] || {};
             return !plan.archive && !plan.disable;
         }).map(z=>z.value).filter(Boolean).map(z=>({key: z, value: z}));
-        const logs_note = this.state.settings.logs ?
-            'Set to 0 to disable logs entirely' : 'Request logs are disabled';
         return <div className="settings_form">
               <Loader show={!this.state.consts}/>
               <Labeled_controller val={this.state.settings.zone} type="select"
@@ -157,7 +154,7 @@ class Form extends Pure_component {
                 tooltip={tooltips.request_stats}/>
               <Labeled_controller val={this.state.settings.logs}
                 type="select_number" on_change_wrapper={this.logs_changed}
-                data={[0, 100, 1000, 10000]} note={logs_note}
+                data={[0, 100, 1000, 10000]}
                 label="Limit for request logs" default
                 tooltip={tooltips.logs}/>
               <Loader_small show={this.state.saving}/>
