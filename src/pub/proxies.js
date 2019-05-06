@@ -348,6 +348,19 @@ const columns = [
         ext: true,
     },
     {
+        key: 'ip',
+        title: 'Datacenter IP',
+        type: 'text',
+    },
+    {
+        key: 'vip',
+        title: 'gIP',
+        type: 'number',
+        tooltip: 'A gIP is a group of exclusive residential IPs. Using gIPs '
+            +'ensures that nobody else uses the same IPs with the same target '
+            +'sites as you do.',
+    },
+    {
         key: 'proxy',
         title: 'Super Proxy',
         type: 'text'

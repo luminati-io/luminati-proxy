@@ -26,6 +26,9 @@ const download = require('download');
 const extract = require('extract-zip');
 const is_pkg = typeof process.pkg!=='undefined';
 const path = require('path');
+const ws = require('lum_windows-shortcuts');
+const install_path = path.resolve(os.homedir(), 'luminati_proxy_manager');
+const exe_path = path.resolve(install_path, 'lpm.exe');
 
 const gen_filename = name=>{
     return lpm_file.get_file_path(
@@ -172,7 +175,7 @@ E.handle_signal = (sig, err)=>{
 };
 
 const add_alias_for_whitelist_ips = ()=>{
-   const func =
+    const func =
         `curl_add_ip(){\n`+
         `    ENDPOINT="http://127.0.0.1:22999/api/add_whitelist_ip"\n`+
         `    DATA="ip="$1\n`+
@@ -251,24 +254,43 @@ const check_running = argv=>etask(function*(){
     }
 });
 
-const install_windows = ()=>etask(function*lum_node_fetch_puppeteer(){
-    if (!is_pkg)
-        return;
+const upgrade_win = function(){
+    try {
+        zerr.notice('Copying %s to %s', process.execPath, exe_path);
+        file.copy_e(process.execPath, exe_path);
+        const subprocess = child_process.spawn(exe_path, ['--cleanup_win',
+            process.execPath, '--kill_pid', process.pid],
+            {detached: true, stdio: 'ignore', shell: true});
+        subprocess.unref();
+    } catch(e){
+        zerr.notice(e.message);
+    }
+};
+
+const install_win = ()=>etask(function*lum_node_install_win(){
     this.on('uncaught', e=>{
         zerr('There was an error while installing on Windows: %s', e.message);
     });
     zerr.notice('Checking installation on Windows');
-    const install_path = path.resolve(os.homedir(), 'luminati_proxy_manager');
     if (!file.exists(install_path))
     {
         file.mkdir_e(install_path);
         zerr.notice('Created %s', install_path);
     }
-    const dst = path.resolve(install_path, 'lpm.exe');
-    if (install_path!=process.cwd())
+    if (process.execPath!=exe_path)
+        upgrade_win();
+    const lnk_path = path.resolve(os.homedir(),
+        'Desktop/Luminati Proxy Manager.lnk');
+    if (!file.exists(lnk_path))
     {
-        zerr.notice('Moving installation %s, to %s', process.execPath, dst);
-        file.copy_e(process.execPath, dst);
+        ws.create(lnk_path, {
+            target: exe_path,
+            icon: path.join(__dirname, '../build/pkgcon.ico'),
+        }, e=>{
+            if (e)
+                return console.log('ERR while creating a shortcut: %s', e);
+            console.log('shortcut created: %s', lnk_path);
+        });
     }
     const puppeteer_path = path.resolve(install_path, 'chromium');
     if (file.exists(puppeteer_path))
@@ -295,10 +317,36 @@ const install_windows = ()=>etask(function*lum_node_fetch_puppeteer(){
     });
 });
 
+const cleanup_win = function(path){
+    zerr.notice('Cleaning up after installation. Deleting file %s', path);
+    try {
+        file.unlink_e(path);
+    } catch(e){
+        zerr.notice(e.message);
+    }
+};
+
 E.run = (argv, run_config)=>etask(function*(){
+    zerr.notice('Running Luminati Proxy Manager v%s, PID: %s', pkg.version,
+        process.pid);
+    if (is_pkg && argv.kill_pid)
+    {
+        zerr.notice('Killing previous process %s', argv.kill_pid);
+        try {
+            process.kill(argv.kill_pid);
+            yield etask.sleep(4000);
+        }
+        catch(e){ zerr.notice('Could not kill process %s', argv.kill_pid); }
+    }
     yield check_running(argv);
-    add_alias_for_whitelist_ips();
-    install_windows();
+    if (is_pkg && argv.upgrade_win)
+        upgrade_win();
+    else if (is_pkg && argv.cleanup_win)
+        cleanup_win(argv.cleanup_win);
+    if (is_pkg)
+        install_win();
+    if (!is_pkg)
+        add_alias_for_whitelist_ips();
     E.read_status_file();
     E.write_status_file('initializing', null,
         E.manager&&E.manager._total_conf);

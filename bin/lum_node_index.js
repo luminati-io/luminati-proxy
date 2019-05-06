@@ -17,7 +17,13 @@ const Lum_common = require('./lum_common.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
+const semver = require('semver');
 const sudo_prompt = require('sudo-prompt');
+const pkg = require('../package.json');
+const is_pkg = typeof process.pkg!=='undefined';
+const util_lib = require('../lib/util.js');
+const os = require('os');
+const download = require('download');
 
 class Lum_node_index extends Lum_common {
     pm2_cmd(command, opt){ return etask(function*pm2_cmd(){
@@ -99,6 +105,8 @@ class Lum_node_index extends Lum_common {
         }
     }
     upgrade(cb){
+        if (is_pkg)
+            return this.upgrade_pkg(cb);
         const log_file = path.join(lpm_config.work_dir,
             'luminati_upgrade.log');
         const npm_cmd = 'npm install --unsafe-perm -g '
@@ -122,6 +130,26 @@ class Lum_node_index extends Lum_common {
             check_compat();
         });
     }
+    upgrade_pkg(cb){
+    return etask(function*(){
+        const r = yield util_lib.json({
+            url: `${pkg.api_domain}/lpm_config.json`,
+            qs: {md5: pkg.lpm.md5, ver: pkg.version},
+        });
+        const newer = r.body.ver && semver.lt(pkg.version, r.body.ver);
+        if (!newer)
+            return cb();
+        zerr.notice('Upgrading proxy manager');
+        const install_path = path.resolve(os.homedir(),
+            'luminati_proxy_manager');
+        const download_url = `http://${pkg.api_domain}/static/lpm/`
+            +`luminati-proxy-${r.body.ver}-beta.exe`;
+        const upgrade_path = path.resolve(install_path, 'upgrade.exe');
+        yield download(download_url, upgrade_path);
+        child_process.spawn(upgrade_path, ['--upgrade_win', 1, '--kill_pid',
+            process.pid], {detached: true});
+        cb();
+    }); }
     run(){
         if (this.run_daemon())
             return;

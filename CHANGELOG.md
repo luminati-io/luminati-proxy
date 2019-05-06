@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.134.15 Stable
+- :star: lightweight exe installer
+
 ## 1.133.690 Stable
 - :star: UI improvements
 

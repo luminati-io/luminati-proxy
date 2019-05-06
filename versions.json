@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.134.15",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "lightweight exe installer"
+            }
+        ]
+    },
+    {
         "ver": "1.133.690",
         "type": "stable",
         "changes": [
