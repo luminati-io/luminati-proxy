@@ -14,7 +14,7 @@ import {Pins, Select_status, Select_number, Yes_no,
     Regex, Json, Textarea, Typeahead_wrapper, Input,
     Select} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
-import {T, with_tt, set_lang, langs} from './common/i18n.js';
+import {T, with_tt, Language} from './common/i18n.js';
 
 export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
     bytes = bytes||0;
@@ -383,60 +383,6 @@ export class Logo extends Pure_component {
             </div>;
     }
 }
-
-export class Language extends Pure_component {
-    state = {};
-    componentDidMount(){
-        let lang = window.localStorage.getItem('lang');
-        if (lang)
-            return this.set_lang(lang);
-        this.setdb_on('head.conn', conn=>{
-            if (!conn)
-                return;
-            if (conn.current_country=='cn')
-                lang = 'cn';
-            else if (conn.current_country=='ru')
-                lang = 'ru';
-            else
-                lang = 'en';
-            this.set_lang(lang);
-        });
-    }
-    set_lang = lang=>{
-        this.setState({lang});
-        set_lang(lang);
-        let curr = window.localStorage.getItem('lang');
-        if (curr!=lang)
-            window.localStorage.setItem('lang', lang);
-    };
-    render(){
-        if (!this.state.lang)
-            return null;
-        return <div className="dropdown">
-              <a className="link dropdown-toggle" data-toggle="dropdown">
-                <Lang_cell lang={this.state.lang}/>
-              </a>
-              <ul className="dropdown-menu dropdown-menu-right">
-                <li onClick={this.set_lang.bind(this, 'cn')}><a>
-                  <Lang_cell lang="cn"/>
-                </a></li>
-                <li onClick={this.set_lang.bind(this, 'ru')}><a>
-                  <Lang_cell lang="ru"/>
-                </a></li>
-                <li onClick={this.set_lang.bind(this, 'en')}><a>
-                  <Lang_cell lang="en"/>
-                </a></li>
-              </ul>
-            </div>;
-    }
-}
-
-const Lang_cell = ({lang})=>
-    <React.Fragment>
-      <span className={`flag-icon flag-icon-${langs[lang].flag}`}/>
-      {langs[lang].name}
-    </React.Fragment>;
-
 
 export const any_flag = <T>{t=>
       <Tooltip title={t('Any')}>

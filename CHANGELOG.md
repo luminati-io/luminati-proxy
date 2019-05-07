@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.134.251 Stable
+- :star: Added translations for: Russian, Spanish, Protuguese, Turkish, Korean
+
 ## 1.134.15 Stable
 - :star: lightweight exe installer
 

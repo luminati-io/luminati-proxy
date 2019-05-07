@@ -15,7 +15,7 @@ import Report_bug_modal from './report_bug.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
-import {Language} from './common.js';
+import {Language} from './common/i18n.js';
 
 const Nav = ()=>
     <div className="nav">

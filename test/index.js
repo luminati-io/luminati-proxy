@@ -219,6 +219,26 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.zone, 'zzz');
             }));
         });
+        describe('password is optional', ()=>{
+            it('should use default password if skipped', ()=>etask(function*(){
+                l = yield lum();
+                const res = yield l.test({headers: {
+                    'proxy-authorization': 'Basic '+
+                        Buffer.from('country-es').toString('base64'),
+                }});
+                assert.equal(res.body.auth.country, 'es');
+                assert.equal(res.body.auth.password, 'xyz');
+            }));
+            it('should use provided password if passed', ()=>etask(function*(){
+                l = yield lum();
+                const res = yield l.test({headers: {
+                    'proxy-authorization': 'Basic '+
+                        Buffer.from('country-es:abc').toString('base64'),
+                }});
+                assert.equal(res.body.auth.country, 'es');
+                assert.equal(res.body.auth.password, 'abc');
+            }));
+        });
         describe('short_username', ()=>{
             const t = (name, user, short, expected)=>it(name, ()=>etask(
             function*(){

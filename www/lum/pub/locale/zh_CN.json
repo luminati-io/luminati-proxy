@@ -2285,7 +2285,7 @@
   "Shared Proxies": "共享代理",
   "Shared proxy rotation": "共享代理服务器循环切换",
   "Sign up to get local proxies in your target country": "注册后即可获取您所选国家的本地代理",
-  "Simply because it is the largest, fastest and most reliable world wide residential proxy network. Our network can be used via backconnect, while keeping a dedicated IP throughout long sessions, or rotating IP’s controlled by": "很简单，因为它是全世界规模最大、速度最快、最可靠的住宅代理网络。我们的网络在以背面连接方式进行使用的同时还可以在长会话中持续使用一个专属IP或",
+  "Simply because it is the largest, fastest and most reliable worldwide residential proxy network. Our network can be used via backconnect, while keeping a dedicated IP throughout long sessions, or rotating IP’s controlled by": "很简单，因为它是全世界规模最大、速度最快、最可靠的住宅代理网络。我们的网络在以背面连接方式进行使用的同时还可以在长会话中持续使用一个专属IP或",
   "Sitemap": "网站地图",
   "Start now": "现在开始",
   "Tap 'Modify' network": "点击'修改'网络",
@@ -2999,5 +2999,15 @@
   "LPM": "LPM",
   "Unselect all": "全部取消选择",
   "Saving proxy": "保存代理",
-  "+972-54-353-6332": "+86-1087833351"
+  "+972-54-353-6332": "+86-01087833351",
+  "Total": "总",
+  "Success rate": "成功率",
+  "Error": "错误",
+  "Luminati": "Luminati",
+  "Datacenter IP": "数据中心IP",
+  "Data center IPs": "数据中心的IP地址",
+  "gIP": "gIP",
+  "Country resolution": "国家解析",
+  "Permissions": "权限",
+  "Network type": "网络类型"
 }

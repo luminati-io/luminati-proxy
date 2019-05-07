@@ -228,6 +228,8 @@ var __zerr = function(level, args){
     var msg = zerr_format(args);
     var k = Object.keys(L);
     var prefix = E.hide_timestamp ? '' : E.prefix+date.to_sql_ms()+' ';
+    if (env.CURRENT_SYSTEMD_UNIT_NAME)
+        prefix = '<'+level+'>'+prefix;
     console.error(prefix+k[level]+': '+msg);
 };
 

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.134.251",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added translations for: Russian, Spanish, Protuguese, Turkish, Korean"
+            }
+        ]
+    },
+    {
         "ver": "1.134.15",
         "type": "stable",
         "changes": [
