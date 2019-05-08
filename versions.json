@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.134.429",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed some translations"
+            },
+            {
+                "type": "bug",
+                "text": "SMTP connections more transparent"
+            }
+        ]
+    },
+    {
         "ver": "1.134.251",
         "type": "stable",
         "changes": [

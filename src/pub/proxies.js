@@ -349,7 +349,7 @@ const columns = [
     },
     {
         key: 'ip',
-        title: 'Datacenter IP',
+        title: 'Datacenter IPs',
         type: 'text',
     },
     {

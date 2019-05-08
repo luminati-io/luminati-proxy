@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.134.429 Stable
+- :bug: Fixed some translations
+- :bug: SMTP connections more transparent
+
 ## 1.134.251 Stable
 - :star: Added translations for: Russian, Spanish, Protuguese, Turkish, Korean
 
