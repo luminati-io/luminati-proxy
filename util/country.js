@@ -62,7 +62,7 @@ E.list = {
     CG: 'Congo',
     CK: 'Cook Islands',
     CR: 'Costa Rica',
-    CI: "Cote D'Ivorie (Ivory Coast)",
+    CI: "Cote D'Ivoire (Ivory Coast)",
     HR: 'Croatia (Hrvatska)',
     CU: 'Cuba',
     CW: 'Curacao',

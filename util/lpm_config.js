@@ -77,6 +77,8 @@ conf.manager_default = Object
         '.luminati.db'.substr(conf.is_win ? 1 : 0)),
     cookie: lpm_file.get_file_path(
         '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
+    high_perf: false,
+    idle_pool: true,
 });
 
 Object.assign(module.exports, conf);

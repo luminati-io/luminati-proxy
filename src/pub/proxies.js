@@ -385,7 +385,7 @@ const columns = [
         key: 'success',
         title: 'Success',
         tooltip: 'The ratio of successful requests out of total requests. A '
-            +'request considered as successful if the server of the '
+            +'request is considered as successful if the server of the '
             +'destination website responded',
         render: Success_rate_cell,
         default: true,

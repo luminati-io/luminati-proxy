@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.135.418 Stable
+- :bug: Multiple bug fixed and improved error handling
+- :star: Performance optimizations
+- :star: Stop maintaining pool on inactivity - "Idle pool" as a new option in proxy config
+
 ## 1.134.429 Stable
 - :bug: Fixed some translations
 - :bug: SMTP connections more transparent

@@ -346,7 +346,8 @@ describe('manager', ()=>{
                 }));
             });
             describe('delete', ()=>{
-                it('normal', ()=>etask(function*(){
+                it('normal', etask._fn(function*(_this){
+                    _this.timeout(6000);
                     app = yield app_with_args([]);
                     let res = yield api_json('api/proxies/24000',
                         {method: 'delete'});

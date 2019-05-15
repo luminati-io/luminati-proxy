@@ -252,7 +252,12 @@ export const tabs = {
                 tooltip: `Stop sending new requests when the peer IP becomes
                     unavailable and redirect to confirmation page before new IP
                     is taken`,
-            }
+            },
+            idle_pool: {
+                label: 'Idle pool',
+                tooltip: `Stop maintaining the pool after 1 hour of inactivity
+                    to save bandwidth`,
+            },
         },
     },
     headers: {

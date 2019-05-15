@@ -1,6 +1,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
 require('./config.js');
+const string = require('./string.js');
+const {qw} = string;
 const HTTPParser = process.binding('http_parser').HTTPParser;
 const E = exports;
 
@@ -49,6 +51,60 @@ E.restore_case = function(headers, original_raw){
             res[names[name][0]] = value;
     }
     return res;
+};
+
+// default chrome headers
+// XXX andreish: support other browsers
+E.browser_defaults = ()=>({
+    connection: 'keep-alive',
+    accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+    'cache-control': 'max-age=0',
+    'upgrade-insecure-requests': '1',
+    'accept-encoding': 'gzip, deflate, br',
+    'accept-language': 'en-US,en;q=0.9',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+});
+
+E.like_browser_case_and_order = function(headers){
+    let ordered_headers = {};
+    const header_keys = qw`host connection cache-control
+        upgrade-insecure-requests user-agent accept accept-encoding
+        accept-language cookie`;
+    for (let header of header_keys)
+    {
+        let value = headers[header];
+        if (value)
+            ordered_headers[header] = value;
+    }
+    for (let header in headers)
+    {
+        if (!header_keys.includes(header))
+            ordered_headers[header] = headers[header];
+    }
+    return E.capitalize(ordered_headers);
+};
+
+E.browser_default_headers_http2 = qw`:authority :method :path :scheme accept
+    accept-encoding accept-language cache-control cookie
+    upgrade-insecure-requests user-agent`;
+
+E.like_browser_case_and_order_http2 = function(headers){
+    let ordered_headers = {};
+    const header_keys = E.browser_default_headers_http2;
+    let req_headers = {};
+    for (let h in headers)
+        req_headers[h.toLowerCase()] = headers[h];
+    for (let h of header_keys)
+    {
+        if (req_headers[h])
+            ordered_headers[h] = req_headers[h];
+    }
+    for (let h in req_headers)
+    {
+        if (!header_keys.includes(h))
+           ordered_headers[h] = req_headers[h];
+    }
+    return ordered_headers;
 };
 
 let parser = new HTTPParser(HTTPParser.REQUEST), parser_usages = 0;

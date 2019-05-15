@@ -442,7 +442,6 @@
   "Contact us": "Contacto",
   "License": "Licencia",
   "Head office": "Oficina Central",
-  "Network type": "Tipo de Network",
   "Datacenter": "DataCenter",
   "IP type": "IP type",
   "Shared": "Compartido",
@@ -828,7 +827,7 @@
   "Multiply": "Multiplicar",
   "Number of multiplied proxy ports. A proxy port can be multiplied in the proxy configuration page.": "Número de puertos proxy multiplicados. Un puerto proxy se puede multiplicar en la página Configuración de proxy.",
   "Logs": "Registros",
-  "Last 1K requests are automatically logged for easy debugging. To save all requests, Enable Logs in proxy configuration page.": "Las últimas solicitudes de 1K se registran automáticamente para una depuración fácil. Para guardar todas las solicitudes, Habilitar registros en la página Configuración de proxy.",
+  "Last 1K requests are automatically logged for easy debugging. To save all requests, Enable Logs in proxy configuration page.": "Las últimas 1K solicitudes se registran automáticamente para una depuración fácil. Para guardar todas las solicitudes, Habilitar registros en la página Configuración de proxy.",
   "SSL Log": "Registro SSL",
   "In order to log HTTPS requests, enable SSL Logs in proxy configuration": "Para registrar las solicitudes HTTPS, habilitar los registros SSL en la configuración del proxy",
   "Zone": "Zona",
@@ -846,7 +845,7 @@
   "Keep session alive": "Mantener la sesión activa",
   "Seed": "Seed",
   "Session": "Sesión",
-  "Minimum super proxies": "Proxies super mínimo",
+  "Minimum super proxies": "Mínimo de super proxies",
   "DNS": "DNS",
   "Log Level": "Nivel de registro",
   "Super Proxy": "Super Proxy",
@@ -854,7 +853,7 @@
   "Throttle concurrent connections": "Acelerador de conexiones simultáneas",
   "Debug info": "Información de depuración",
   "Success": "Éxito",
-  "The ratio of successful requests out of total requests. A request considered as successful if the server of the destination website responded.": "La proporción de solicitudes aceptadas dentro del total de solicitudes. Una solicitud considerada como exitosa si respondió el servidor del sitio web de destino.",
+  "The ratio of successful requests out of total requests. A request is considered as successful if the server of the destination website responded.": "La proporción de solicitudes aceptadas dentro del total de solicitudes. Una solicitud considerada como exitosa si respondió el servidor del sitio web de destino.",
   "BW up": "BW arriba",
   "BW down": "BW abajo",
   "BW": "BW",
@@ -1193,6 +1192,9 @@
   "gIP": "gIP",
   "Country resolution": "resolución país",
   "Permissions": "permisos",
-  "Network type": "Tipo de red"
+  "Network type": "Tipo de red",
+  "The network accessible by this zone": "La red de acceso por esta zona",
+  "Shared": "Compartido",
+  "Object": "Objeto"
 }
 

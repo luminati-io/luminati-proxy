@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.134.429",
+        "version": "1.135.418",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -525,6 +525,9 @@
                     "type": "boolean",
                     "description": "Validate proxy credentials"
                 },
+                "high_perf": {
+                    "type": "boolean"
+                },
                 "request_stats": {
                     "type": "boolean",
                     "description": "Enable requests statistics"
@@ -746,6 +749,14 @@
                 "route_err": {
                     "type": "string",
                     "description": "Block or allow requests to be automatically sent through super proxy on error"
+                },
+                "smtp": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                },
+                "idle_pool": {
+                    "type": "boolean",
+                    "description": "Stop maintaining the pool after 1h of inactivity to save bandwidth"
                 },
                 "headers":{
                     "type":"array",

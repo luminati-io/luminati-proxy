@@ -317,10 +317,10 @@ const install_win = ()=>etask(function*lum_node_install_win(){
     });
 });
 
-const cleanup_win = function(path){
-    zerr.notice('Cleaning up after installation. Deleting file %s', path);
+const cleanup_win = function(_path){
+    zerr.notice('Cleaning up after installation. Deleting file %s', _path);
     try {
-        file.unlink_e(path);
+        file.unlink_e(_path);
     } catch(e){
         zerr.notice(e.message);
     }
@@ -335,8 +335,7 @@ E.run = (argv, run_config)=>etask(function*(){
         try {
             process.kill(argv.kill_pid);
             yield etask.sleep(4000);
-        }
-        catch(e){ zerr.notice('Could not kill process %s', argv.kill_pid); }
+        } catch(e){ zerr.notice('Could not kill process %s', argv.kill_pid); }
     }
     yield check_running(argv);
     if (is_pkg && argv.upgrade_win)

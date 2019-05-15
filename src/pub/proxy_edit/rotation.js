@@ -96,6 +96,7 @@ export default class Rotation extends Pure_component {
                 {!form.session_random && !form.sticky_ip &&
                   <Config type="text" id="session"/>}
                 <Config type="text" id="seed"/>
+                <Config type="yes_no" id="idle_pool"/>
                 <Config type="yes_no" id="session_termination"
                   note={sess_note}/>
               </Tab_context.Provider>

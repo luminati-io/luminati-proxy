@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.135.418",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Multiple bug fixed and improved error handling"
+            },
+            {
+                "type": "star",
+                "text": "Performance optimizations"
+            },
+            {
+                "type": "star",
+                "text": "Stop maintaining pool on inactivity - \"Idle pool\" as a new option in proxy config"
+            }
+        ]
+    },
+    {
         "ver": "1.134.429",
         "type": "stable",
         "changes": [

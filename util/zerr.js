@@ -186,6 +186,31 @@ E.set_level = function(level){
     return prev;
 };
 
+E.print_stack_trace = function(opt){
+    if (!opt)
+        opt = {};
+    if (opt.limit===undefined)
+        opt.limit = Infinity;
+    if (opt.short===undefined)
+        opt.short = true;
+    var old_stack_limit;
+    if (opt.limit)
+    {
+        old_stack_limit = Error.stackTraceLimit;
+        Error.stackTraceLimit = opt.limit;
+    }
+    var stack = zerr.e2s(new Error());
+    if (opt.short)
+    {
+        stack = stack
+            .replace(/^.+util\/etask.+$/gm, '    ...')
+            .replace(/( {4}\.\.\.\n)+/g, '    ...\n');
+    }
+    zerr(stack);
+    if (opt.limit)
+        Error.stackTraceLimit = old_stack_limit;
+};
+
 if (is_node)
 { // zerr-node
 E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
