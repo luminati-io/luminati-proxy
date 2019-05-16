@@ -1163,8 +1163,13 @@ describe('proxy', ()=>{
             it('action retry_port', ()=>etask(function*(){
                 l = yield lum({rules: [{action: {retry_port: 1,
                     email: 'test@mail'}}]});
-                const _req = {ctx: {response: {}, url: 'lumtest.com',
-                    log: l.log, timeline: new Timeline(1)}};
+                const _req = {ctx: {
+                    response: {},
+                    url: 'lumtest.com',
+                    log: l.log,
+                    timeline: new Timeline(1),
+                    rule_executed: ()=>0,
+                }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const _head = {};
                 const get_port_stub = sinon.stub(l, 'get_other_port', port=>{
@@ -1271,7 +1276,6 @@ describe('proxy', ()=>{
                 const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
                 sinon.assert.calledWith(ban_stub, 'ip', 600000);
-                sinon.assert.calledWith(ban_stub, 'ip2', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip2', 1800000);
                 header_stub.restore();
                 header_stub_l2.restore();
@@ -1279,7 +1283,6 @@ describe('proxy', ()=>{
                 inject_headers(l2, 'ip4');
                 yield l.test(ping.http.url);
                 sinon.assert.calledWith(ban_stub, 'ip3', 600000);
-                sinon.assert.calledWith(ban_stub, 'ip4', 600000);
                 sinon.assert.calledWith(ban_stub_l2, 'ip4', 1800000);
                 l2.stop(true);
             }));
@@ -1287,6 +1290,7 @@ describe('proxy', ()=>{
                 l = yield lum({rules: [get_retry_rule(), get_banip_rule()]});
                 const l2 = yield lum({port: 24001,
                     rules: [get_banip_rule(30)]});
+                inject_headers(l);
                 inject_headers(l2);
                 sinon.stub(l, 'get_other_port', ()=>l2);
                 const ban_stub = sinon.stub(l, 'banip');
