@@ -81,7 +81,8 @@ export const Config = withRouter(class Config extends Pure_component {
               range={this.props.range}
               tooltip={tabs[tab_id].fields[id].tooltip}
               field_tooltip={disabled && this.is_disabled_ext_proxy(id) &&
-                  <Ext_tooltip/>}/>;
+                  <Ext_tooltip/>}
+              exact={this.props.exact}/>;
     }
 });
 Config.WrappedComponent.contextType = Tab_context;

@@ -96,6 +96,7 @@ export default class General extends Pure_component {
                 }
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
+                <Config type="pins" id="smtp" exact/>
                 <Config type="select" id="log" data={log_level_opt}/>
                 <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>

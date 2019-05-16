@@ -72,7 +72,8 @@ export class Pins extends Pure_component {
                 {this.state.pins.map(p=>
                   <Pin key={p.id} update_pin={this.update_pin} id={p.id}
                     set_edit={this.set_edit} edit={p.edit}
-                    save_pin={this.save_pin} remove={this.remove}>
+                    exact={this.props.exact} save_pin={this.save_pin}
+                    remove={this.remove}>
                     {p.val}
                   </Pin>
                 )}
@@ -103,7 +104,7 @@ class Pin extends Pure_component {
         try {
             const netmask = new Netmask(val);
             val = netmask.base;
-            if (netmask.bitmask!=32)
+            if (netmask.bitmask!=32 && !this.props.exact)
                 val += '/'+netmask.bitmask;
         } catch(e){ val = ''; }
         if (!val)

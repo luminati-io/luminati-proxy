@@ -208,6 +208,8 @@ const Index = withRouter(class Index extends Pure_component {
             form.vips = [];
         if (Array.isArray(form.whitelist_ips))
             form.whitelist_ips = form.whitelist_ips.join(',');
+        if (Array.isArray(form.smtp))
+            form.smtp = form.smtp.join(',');
         if (form.city && !Array.isArray(form.city) && form.state)
         {
             form.city = [{id: form.city,
@@ -345,6 +347,11 @@ const Index = withRouter(class Index extends Pure_component {
         }
         else
             save_form.whitelist_ips = [];
+        // XXX krzysztof: extract the logic of mapping specific fields
+        if (save_form.smtp)
+            save_form.smtp = save_form.smtp.split(',').filter(Boolean);
+        else
+            save_form.smtp = [];
         if (save_form.city.length)
             save_form.city = save_form.city[0].id;
         else

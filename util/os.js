@@ -89,8 +89,8 @@ E.mem_usage = function(){
     return (info.memtotal-info.memfree_all)/info.memtotal;
 };
 E.freemem_percent = function(){ return 100*(1-E.mem_usage()); };
-E.get_release = function(){
-    if (distro_release)
+E.get_release = function(no_cache){
+    if (distro_release && !no_cache)
         return distro_release;
     distro_release = {};
     if (file.is_win)
@@ -118,9 +118,9 @@ E.get_release = function(){
     }
     return distro_release;
 };
-E.is_release = function(releases){
+E.is_release = function(releases, no_cache){
     releases = array.to_array(releases);
-    E.get_release();
+    E.get_release(no_cache);
     return releases.some(function(e){
         var m = e.toLowerCase().match(/^(i|v|c):(.*)$/);
         switch (m[1])
@@ -278,6 +278,30 @@ E.cpu_usage = function(cpus_curr, cpus_prev){
 if (!file.is_darwin)
     E.cpu_usage(); // init
 
+E.eth_dev = ()=>{
+    let is_ether = ifname=>/^(en|wl|eth)/.test(ifname);
+    let ifaces = Object.keys(os.networkInterfaces()).filter(is_ether);
+    if (E.is_release(['c:trusty']))
+        return {eth_dev: 'eth0', udptunnel_dev: 'eth1', ifaces};
+    // https://cgit.freedesktop.org/systemd/systemd/tree/src/udev/udev-builtin-net_id.c#n20
+    if (!ifaces.length)
+        throw new Error('No ethernet interfaces found');
+    if (ifaces.length==1)
+        return {eth_dev: ifaces[0], ifaces};
+    let routes = cli.exec_get_lines(`/sbin/ip -4 route`);
+    let default_route = array.grep(routes, /^default/)[0];
+    if (!default_route)
+        throw new Error('Default route not found');
+    let m = default_route.match(/dev (\w+)/);
+    if (!m)
+        throw new Error('Cannot determine interface for default route');
+    if (!is_ether(m[1]))
+        throw new Error('None of multiple ethernet interfaces is default');
+    let eth_dev = m[1];
+    let udptunnel_dev = ifaces.filter(s=>s!=eth_dev)[0];
+    return {eth_dev, udptunnel_dev, ifaces, routes};
+};
+
 E.net_dev = undefined;
 function set_net_dev(){
     if (E.net_dev)
@@ -295,7 +319,9 @@ function set_net_dev(){
         });
         return;
     }
-    var search = ['eth0', 'venet0', 'em1'];
+    let eth_dev = 'ens3';
+    try { eth_dev = E.eth_dev(); } catch(e){ zerr(e); }
+    var search = [eth_dev.eth_dev, 'eth0', 'venet0', 'em1'];
     for (var i in search)
     {
         if (file.exists('/sys/class/net/'+search[i]))

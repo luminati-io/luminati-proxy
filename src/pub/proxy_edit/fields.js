@@ -375,6 +375,11 @@ export const tabs = {
                     (very little) or if the additional headers are breaking
                     your operations.`,
             },
+            smtp: {
+                label: 'Proxy through SMTP',
+                tooltip: `IPs that will be randomly chosen to proxy whole
+                    traffic through SMTP protocol`,
+            },
         },
     },
 };
