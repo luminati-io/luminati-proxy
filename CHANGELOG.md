@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.135.762 Stable
+- :bug: Allow for any values (IPs/domains) in SMTP field
+
 ## 1.135.662 Stable
 - :star: Added Rules section to the HAR viewer
 

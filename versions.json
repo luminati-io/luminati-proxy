@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.135.762",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Allow for any values (IPs/domains) in SMTP field"
+            }
+        ]
+    },
+    {
         "ver": "1.135.662",
         "type": "stable",
         "changes": [

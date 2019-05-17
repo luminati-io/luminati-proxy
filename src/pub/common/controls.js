@@ -101,10 +101,12 @@ class Pin extends Pure_component {
     };
     validate_and_save = ()=>{
         let val = (this.props.children||'').trim();
+        if (this.props.exact)
+            return this.props.save_pin(this.props.id, val);
         try {
             const netmask = new Netmask(val);
             val = netmask.base;
-            if (netmask.bitmask!=32 && !this.props.exact)
+            if (netmask.bitmask!=32)
                 val += '/'+netmask.bitmask;
         } catch(e){ val = ''; }
         if (!val)
