@@ -11,6 +11,7 @@ import 'codemirror/mode/htmlmixed/htmlmixed';
 import classnames from 'classnames';
 import moment from 'moment';
 import $ from 'jquery';
+import {trigger_types, action_types} from '../../util/rules_util.js';
 
 class Preview extends Pure_component {
     panes = [
@@ -18,6 +19,7 @@ class Preview extends Pure_component {
         {id: 'preview', width: 63, comp: Pane_preview},
         {id: 'response', width: 72, comp: Pane_response},
         {id: 'timing', width: 57, comp: Pane_timing},
+        {id: 'rules', width: 50, comp: Pane_rules},
     ];
     state = {cur_pane: 0};
     select_pane = id=>{ this.setState({cur_pane: id}); };
@@ -123,19 +125,22 @@ class Encrypted_response_data extends Pure_component {
         });
     };
     render(){
-        return <div className="empty_view">
-              <div className="block">
-                <div>This request is using SSL encryption.</div>
-                <div>
-                  <span>You need to turn on </span>
-                  <a className="link" onClick={this.goto_ssl}>
-                    SSL analyzing</a>
-                  <span> to read the response here.</span>
-                </div>
+        return <Pane_info>
+              <div>This request is using SSL encryption.</div>
+              <div>
+                <span>You need to turn on </span>
+                <a className="link" onClick={this.goto_ssl}>
+                  SSL analyzing</a>
+                <span> to read the response here.</span>
               </div>
-            </div>;
+            </Pane_info>;
     }
 });
+
+const Pane_info = ({children})=>
+    <div className="empty_view">
+      <div className="block">{children}</div>
+    </div>;
 
 const No_response_data = ()=>
     <div className="empty_view">
@@ -245,19 +250,87 @@ const Status_value = ({value})=>{
         </div>;
 };
 
+class Pane_rules extends Pure_component {
+    render(){
+        const {details: {rules}} = this.props.req;
+        if (!rules || !rules.length)
+        {
+            return <Pane_info>
+                  <div>No rules have been triggered on this request.</div>
+                </Pane_info>;
+        }
+        return <div className="rules_view_wrapper">
+              <ol className="tree_outline">
+                {rules.map((r, idx)=>
+                  <Rule_preview key={idx} rule={r} idx={idx+1}/>
+                )}
+              </ol>
+            </div>;
+    }
+}
+
+class Rule_preview extends Pure_component {
+    state = {open: true};
+    toggle = ()=>this.setState(prev=>({open: !prev.open}));
+    render(){
+        const {rule, idx} = this.props;
+        const children_classes = classnames('children', 'timeline',
+            {open: this.state.open});
+        const first_trigger = trigger_types.find(t=>rule[t.value]);
+        return [
+            <li key="li" onClick={this.toggle}
+              className={classnames('parent_title', 'expandable',
+              {open: this.state.open})}>
+              {idx}. {first_trigger.key}
+            </li>,
+            <ol key="ol" className={children_classes}>
+              <Trigger_section rule={rule}/>
+              <Action_section actions={rule.action}/>
+            </ol>
+        ];
+    }
+}
+
+const Trigger_section = ({rule})=>
+    <div className="trigger_section">
+      {trigger_types.map(t=><Trigger key={t.value} type={t} rule={rule}/>)}
+    </div>;
+
+const Trigger = ({type, rule})=>{
+    if (!rule[type.value])
+        return null;
+    return <div className="trigger">
+          {type.key}: {rule[type.value]}
+        </div>;
+};
+
+const Action_section = ({actions})=>
+    <div className="action_section">
+      {Object.keys(actions).map(a=>
+        <Action key={a} action={a} value={actions[a]}/>
+      )}
+    </div>;
+
+const Action = ({action, value})=>{
+    const key = (action_types.find(a=>a.value==action)||{}).key;
+    return <div className="action">
+          {key} {value ? `: ${value}` : ''}
+        </div>;
+};
+
 class Pane_timing extends Pure_component {
     state = {};
     componentDidMount(){
         this.setdb_on('head.recent_stats', stats=>this.setState({stats})); }
     render(){
-        const {startedDateTime, details: {rule}} = this.props.req;
+        const {startedDateTime} = this.props.req;
         const started_at = moment(new Date(startedDateTime)).format(
             'YYYY-MM-DD HH:mm:ss');
         return <div className="timing_view_wrapper">
               <div className="timeline_info">Started at {started_at}</div>
               <ol className="tree_outline">
                 {this.props.req.details.timeline.map((timeline, idx)=>
-                  <Single_timeline key={idx} timeline={timeline} rule={rule}
+                  <Single_timeline key={idx} timeline={timeline}
                     time={this.props.req.time} req={this.props.req}/>
                 )}
               </ol>
@@ -301,14 +374,12 @@ class Single_timeline extends Pure_component {
         }, {last_section: -1, data: []}).data;
         const children_classes = classnames('children', 'timeline',
             {open: this.state.open});
-        const {rule, timeline} = this.props;
-        const title = this.props.rule ?
-            `${timeline.port} (${rule})` : timeline.port;
+        const {timeline} = this.props;
         return [
             <li key="li" onClick={this.toggle}
               className={classnames('parent_title', 'expandable',
               {open: this.state.open})}>
-              {title}
+              {timeline.port}
             </li>,
             <ol key="ol" className={children_classes}>
               <table>

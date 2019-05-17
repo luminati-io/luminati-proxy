@@ -856,14 +856,14 @@ const maybe_pending = Component=>function pies(props){
 
 class Cell_value extends React.Component {
     render(){
-        const {col, req, req: {details: {timeline, rule}}} = this.props;
+        const {col, req, req: {details: {timeline, rules}}} = this.props;
         if (col=='select')
         {
             return <Select_cell uuid={req.uuid}
               checked_all={this.props.checked_all}/>;
         }
         if (col=='Name')
-            return <Name_cell req={req} timeline={timeline} rule={rule}/>;
+            return <Name_cell req={req} timeline={timeline} rules={rules}/>;
         else if (col=='Status')
         {
             return <Status_code_cell status={req.response.status}
@@ -898,18 +898,18 @@ class Cell_value extends React.Component {
 }
 
 class Name_cell extends Pure_component {
-    go_to_timeline = e=>setdb.emit('har_viewer.set_pane', 3);
+    go_to_rules = e=>setdb.emit('har_viewer.set_pane', 4);
     render(){
-        const {req, timeline, rule} = this.props;
+        const {req, rules} = this.props;
         const rule_tip = 'At least one rule has been applied to this'
         +' request. Click to see more details';
         const status_check = req.details.context=='STATUS CHECK';
         return <div className="col_name">
               <div>
                 <div className="icon script"/>
-                {(timeline && timeline.length>1 || rule) &&
+                {!!rules && !!rules.length &&
                   <Tooltip title={rule_tip}>
-                    <div onClick={this.go_to_timeline}
+                    <div onClick={this.go_to_rules}
                       className="small_icon rules"/>
                   </Tooltip>
                 }

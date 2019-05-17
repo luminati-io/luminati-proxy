@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.135.662 Stable
+- :star: Added Rules section to the HAR viewer
+
 ## 1.135.636 Stable
 - :star: Added UI for choosing SMTP proxy targets under "General" tab
 
