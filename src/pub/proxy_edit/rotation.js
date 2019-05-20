@@ -63,6 +63,8 @@ export default class Rotation extends Pure_component {
         if (!this.state.disabled_fields)
             return null;
         const form = this.state.form;
+        if (!form)
+            return null;
         const type = this.get_type();
         const render_modal = ['ips', 'vips'].includes(type);
         let pool_size_note;

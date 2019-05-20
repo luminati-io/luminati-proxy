@@ -33,9 +33,7 @@ export default class Targeting extends Pure_component {
         this.setdb_on('head.locations', locations=>{
             if (!locations)
                 return;
-            const asns = Object.keys(locations.asns)
-                .map(a=>({id: a, label: a}));
-            this.setState({locations, asns});
+            this.setState({locations});
         });
         this.setdb_on('head.proxy_edit.form', form=>{
             form && this.setState({form});
@@ -88,8 +86,21 @@ export default class Targeting extends Pure_component {
         });
         return res;
     };
+    asns = ()=>{
+        const {country} = this.state.form;
+        const {locations} = this.state;
+        let asns;
+        if (!country)
+        {
+            asns = Object.values(locations.asns)
+                .reduce((acc, el)=>Object.assign(acc, el), {});
+        }
+        else
+            asns = locations.asns[country];
+        return Object.keys(asns).map(a=>({id: a, label: a}));
+    };
     city_changed = e=>{
-        if (e&&e.length)
+        if (e && e.length)
             this.set_field('state', e[0].region);
     };
     render(){
@@ -138,7 +149,7 @@ export default class Targeting extends Pure_component {
                   on_change={this.state_changed}/>
                 <Config type="typeahead" id="city" data={this.cities()}
                   on_change={this.city_changed}/>
-                <Config type="typeahead" id="asn" data={this.state.asns}
+                <Config type="typeahead" id="asn" data={this.asns()}
                   disabled={!!this.state.form.carrier} update_on_input
                   depend_a={this.state.form.zone}/>
                 <Config type="select" id="carrier" data={carriers}

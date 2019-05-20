@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.136.76",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Bug fixes (lokijs, proxy status, creating proxy port by clicking on a feature)"
+            },
+            {
+                "type": "star",
+                "text": "ASN codes are filtered based on country selection"
+            }
+        ]
+    },
+    {
         "ver": "1.135.762",
         "type": "stable",
         "changes": [

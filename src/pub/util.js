@@ -98,7 +98,9 @@ const presets = {
             opt.pool_size = 1;
             opt.session = true;
         },
-        clean: opt=>{},
+        clean: opt=>{
+            opt.pool_size = 0;
+        },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 1`},
             {field: 'pool_type', label: `Sequential pool type`},
@@ -156,7 +158,6 @@ const presets = {
             opt.pool_type = 'round-robin';
             opt.session = true;
             opt.max_requests = 1;
-            opt.pool_size = 0;
         },
         clean: opt=>{
             opt.max_requests = 0;
@@ -193,7 +194,7 @@ const presets = {
             opt.session = true;
         },
         clean: opt=>{
-            opt.pool_size = 1;
+            opt.pool_size = 0;
             opt.proxy_count = '';
             opt.race_reqs = '';
         },
@@ -215,13 +216,13 @@ const presets = {
         subtitle: 'Rotate User-Agent on each request',
         set: opt=>{
             opt.session = true;
-            opt.pool_size = 1;
             opt.pool_type = 'sequential';
             opt.session_duration = 0;
             opt.random_user_agent = true;
             opt.override_headers = true;
         },
         clean: opt=>{
+            opt.pool_size = 0;
             opt.random_user_agent = '';
             opt.override_headers = false;
         },
@@ -297,7 +298,7 @@ const presets = {
         set: function(opt){},
         clean: opt=>{
             opt.session = true;
-            opt.pool_size = 1;
+            opt.pool_size = 0;
             opt.pool_type = null;
             opt.max_requests = 0;
             opt.session_duration = 0;
