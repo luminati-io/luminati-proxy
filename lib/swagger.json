@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.136.76",
+        "version": "1.136.350",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -711,7 +711,7 @@
                 },
                 "pool_type": {
                     "type": "string",
-                    "pattern": "^(sequential|round-robin)?$",
+                    "pattern": "^(default|long_availability)?$",
                     "description": "Pool session iteration order"
                 },
                 "seed": {

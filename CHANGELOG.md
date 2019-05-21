@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.136.350 Stable
+- :star: Carriers are filtered based on country selection
+- :star: Simplification of proxy port config
+
 ## 1.136.76 Stable
 - :bug: Bug fixes (lokijs, proxy status, creating proxy port by clicking on a feature)
 - :star: ASN codes are filtered based on country selection

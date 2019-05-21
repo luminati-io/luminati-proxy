@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.136.350",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Carriers are filtered based on country selection"
+            },
+            {
+                "type": "star",
+                "text": "Simplification of proxy port config"
+            }
+        ]
+    },
+    {
         "ver": "1.136.76",
         "type": "stable",
         "changes": [

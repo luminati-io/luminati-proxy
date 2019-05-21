@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.136.76-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.136.350-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10版 (最好用x
@@ -133,8 +133,7 @@ Options:
   --sticky_ip              Use session per requesting host to maintain IP per
                            host                       [boolean] [default: false]
   --pool_size              Session pool size               [number] [default: 3]
-  --pool_type              Pool session iteration order
-                                                [string] [default: "sequential"]
+  --pool_type              Pool session iteration order                 [string]
   --seed                   Session ID seed used for identifying sessions from
                            this proxy                                   [string]
   --max_requests           Maximum requests per session   [string] [default: 50]

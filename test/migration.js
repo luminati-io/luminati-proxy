@@ -387,6 +387,36 @@ describe('migration', ()=>{
             `function trigger(opt){\n`
             +`  return true;\n}`, 'after_body');
     });
+    describe_version('1.136.76', v=>{
+        it('should migrate preset round_robin -> rotating', ()=>{
+            const conf = {proxies: [
+                {port: 24000, field: 1, last_preset_applied: 'round_robin'},
+                {port: 24001, last_preset_applied: 'other_preset'},
+                {port: 24003},
+            ]};
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {proxies: [
+                {port: 24000, field: 1, last_preset_applied: 'rotating'},
+                {port: 24001, last_preset_applied: 'other_preset'},
+                {port: 24003},
+            ]});
+        });
+        it('should migrate pool_type round_robin, sequential -> default', ()=>{
+            const conf = {proxies: [
+                {port: 24000, field: 1, pool_type: 'round_robin'},
+                {port: 24001, pool_type: 'sequential'},
+                {port: 24002, pool_type: 'long_availability'},
+                {port: 24003},
+            ]};
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {proxies: [
+                {port: 24000, field: 1},
+                {port: 24001},
+                {port: 24002, pool_type: 'long_availability'},
+                {port: 24003},
+            ]});
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

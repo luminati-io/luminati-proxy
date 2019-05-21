@@ -103,7 +103,6 @@ const presets = {
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 1`},
-            {field: 'pool_type', label: `Sequential pool type`},
         ],
         disabled: {
             sticky_ip: true,
@@ -133,7 +132,6 @@ const presets = {
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 0`},
-            {field: 'pool_type', label: `Sequential pool type`},
             {field: 'sticky_ip', label: `Enables 'Sticky Ip'`},
             {field: 'multiply', label: `Disables 'Multiply' options`},
         ],
@@ -149,13 +147,11 @@ const presets = {
             pool_size: true,
         },
     },
-    round_robin: {
-        title: 'Round-robin (IP) pool',
-        subtitle: `Round-robin pool of pre-established sessions (IPs). For
-            spreading requests across large number of IPs. Tweak pool_size,
-            max_requests & proxy_count to optimize performance`,
+    rotating: {
+        title: 'Rotating (IPs)',
+        subtitle: 'For changing the IP on each request',
         set: opt=>{
-            opt.pool_type = 'round-robin';
+            opt.pool_type = '';
             opt.session = true;
             opt.max_requests = 1;
         },
@@ -166,7 +162,6 @@ const presets = {
         },
         rules: [
             {field: 'multiply', label: `Disables 'Multiply' options`},
-            {field: 'pool_type', label: `Round-robin pool type`},
             {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
                 sense to choose any other positive number`},
         ],
@@ -179,7 +174,6 @@ const presets = {
             multiply_vips: true,
             pool_type: true,
             seed: true,
-            max_requests: true,
         },
     },
     high_performance: {
@@ -187,9 +181,9 @@ const presets = {
         subtitle: 'Maximum request speed',
         set: opt=>{
             opt.pool_size = 50;
-            opt.pool_type = 'round-robin';
+            opt.pool_type = '';
             opt.proxy_count = 20;
-            opt.session_duration = 0;
+            opt.max_requests = 1;
             opt.race_reqs = 2;
             opt.session = true;
         },
@@ -208,7 +202,10 @@ const presets = {
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 50`},
-            {field: 'pool_type', label: `Round-robin pool type`},
+            {field: 'race_reqs', label: `Uses race requests`},
+            {field: 'proxy_count', label: `Uses 20 different super proxies`},
+            {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
+                sense to choose any other positive number`},
         ],
     },
     rnd_usr_agent_and_cookie_header: {
@@ -216,7 +213,7 @@ const presets = {
         subtitle: 'Rotate User-Agent on each request',
         set: opt=>{
             opt.session = true;
-            opt.pool_type = 'sequential';
+            opt.pool_type = '';
             opt.session_duration = 0;
             opt.random_user_agent = true;
             opt.override_headers = true;

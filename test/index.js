@@ -285,27 +285,27 @@ describe('proxy', ()=>{
         describe('pool', ()=>{
             describe('idle_pool', ()=>{
                 it('should idle', etask._fn(function*(_this){
-                    l = yield lum({pool_size: 1, pool_type: 'sequential',
-                        idle_pool: 250, keep_alive: 0.1});
+                    l = yield lum({pool_size: 1, idle_pool: 250,
+                        keep_alive: 0.1});
                     yield etask.sleep(450);
                     assert.equal(proxy.full_history.length, 3);
                 }));
                 it('should not idle', etask._fn(function*(_this){
-                    l = yield lum({pool_size: 1, pool_type: 'sequential',
-                        idle_pool: false, keep_alive: 0.1});
+                    l = yield lum({pool_size: 1, idle_pool: false,
+                        keep_alive: 0.1});
                     yield etask.sleep(450);
                     assert.equal(proxy.full_history.length, 5);
                 }));
                 it('should call reset idle pool on each connection', etask._fn(
                 function*(_this){
-                    l = yield lum({pool_size: 1, pool_type: 'sequential'});
+                    l = yield lum({pool_size: 1});
                     const spy = sinon.spy(l.session_mgr, 'reset_idle_pool');
                     yield l.test();
                     sinon.assert.calledOnce(spy);
                 }));
                 it('should set idle time correctly', etask._fn(
                 function*(_this){
-                    l = yield lum({pool_size: 1, pool_type: 'sequential'});
+                    l = yield lum({pool_size: 1});
                     let offset = l.session_mgr.idle_date-Date.now();
                     assert.ok(Math.abs(offset-ms.HOUR)<100);
                     yield etask.sleep(500);
@@ -316,7 +316,7 @@ describe('proxy', ()=>{
             });
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
-                    l = yield lum({pool_size, pool_type: 'round-robin'});
+                    l = yield lum({pool_size});
                     yield l.test();
                     assert.equal(proxy.history.length, 1);
                     assert.equal(proxy.history[0].url, test_url.http);
@@ -399,15 +399,9 @@ describe('proxy', ()=>{
                     for (let j=1; j<pool_size; j++)
                         assert.notEqual(sessions[j-1][0], sessions[j][0]);
                 }));
-                t('1, round-robin pool', {max_requests: 1, pool_size: 1,
-                    pool_type: 'round-robin'});
-                t('2, round-robin pool', {max_requests: 2, pool_size: 2,
-                    pool_type: 'round-robin'});
-                t('5, round-robin pool', {max_requests: 5, pool_size: 5,
-                    pool_type: 'round-robin'});
-                t('1, sequential pool', {max_requests: 1, pool_size: 1});
-                t('2, sequential pool', {max_requests: 2, pool_size: 2});
-                t('5, sequential pool', {max_requests: 5, pool_size: 5});
+                t('1, default pool', {max_requests: 1, pool_size: 1});
+                t('2, default pool', {max_requests: 2, pool_size: 2});
+                t('5, default pool', {max_requests: 5, pool_size: 5});
                 t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
                 t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
                 t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
@@ -604,10 +598,7 @@ describe('proxy', ()=>{
                 let after =l.session_mgr.sessions.sessions.map(s=>s.session);
                 test(pre, after);
             }));
-            t2('round-robin', {pool_size: 3, pool_type: 'round-robin'},
-                (pre, after)=>after.forEach(a=>pre.forEach(
-                    p=>assert.notEqual(p, a))));
-            t2('sequential', {pool_size: 3}, (pre, after)=>{
+            t2('default', {pool_size: 3}, (pre, after)=>{
                 let first = pre.shift();
                 after.forEach(a=>assert.notEqual(a, first));
                 assert_has(after, pre);
@@ -1327,7 +1318,7 @@ describe('proxy', ()=>{
                 t('long session');
                 t('random UA/online shopping', {random_user_agent: true});
                 t('custom', {session: false});
-                it('sequential', ()=>etask(function*(){
+                it('default pool', ()=>etask(function*(){
                     yield prepare_lum({pool_size: 0});
                     yield l.test(ping.http.url);
                     const first_session = l.session_mgr.session;
@@ -1345,9 +1336,8 @@ describe('proxy', ()=>{
                     const second_session = Object.values(sticky_sessions)[0];
                     assert.ok(first_session!=second_session);
                 }));
-                it('round robin', ()=>etask(function*(){
-                    yield prepare_lum({pool_type: 'round-robin', pool_size: 2,
-                        max_requests: 1});
+                it('default pool', ()=>etask(function*(){
+                    yield prepare_lum({pool_size: 2, max_requests: 1});
                     yield l.test(ping.http.url);
                     const first_session = l.session_mgr.sessions.sessions[0];
                     yield l.test(ping.http.url);
@@ -1355,8 +1345,7 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 it('high performance', ()=>etask(function*(){
-                    yield prepare_lum({pool_type: 'round-robin',
-                        pool_size: 2});
+                    yield prepare_lum({pool_size: 2});
                     yield l.test(ping.http.url);
                     const first_sessions = l.session_mgr.sessions.sessions
                         .map(s=>s.session);
@@ -1378,7 +1367,7 @@ describe('proxy', ()=>{
                 status: '200',
             }];
             history = [];
-            l = yield lum({handle_usage: aggregator, rules,
+            l = yield lum({handle_usage: aggregator, rules, keep_alive: 0,
                 session: true, max_requests: 1, pool_size: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
@@ -1391,7 +1380,7 @@ describe('proxy', ()=>{
             yield l.test({headers: {'x-lpm-reserved': true}});
             yield etask.sleep(400);
             const unames = history.map(h=>h.username);
-            assert.notEqual(unames[0], unames[2]);
+            assert.notEqual(unames[0], unames[1]);
             assert.equal(unames[unames.length-1], unames[0]);
         }));
         xit('should keep reserved session alive', etask._fn(function*(_this){

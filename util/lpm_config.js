@@ -39,7 +39,7 @@ conf.luminati_default = {
     proxy: conf.default_superproxy_domain,
     proxy_port: 22225,
     proxy_count: 1,
-    pool_type: 'sequential',
+    pool_type: 'default',
     sticky_ip: false,
     insecure: false,
     secure_proxy: false,
@@ -55,6 +55,7 @@ conf.luminati_default = {
     multiply: 0,
     max_requests: 0,
     session_duration: 0,
+    random_user_agent: false,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.luminati_default, 'port'), {

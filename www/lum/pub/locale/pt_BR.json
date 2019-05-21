@@ -430,7 +430,7 @@
     "Envie um numero de ilimitado de sessoes para uma captacao mais rapida de dados",
   "How does it work?": "Como funciona? ",
   "Exclusive IPs": "IPs exclusivos",
-  "Use IPs exclusively for specific target websites": 
+  "Use IPs exclusively for specific target websites":
   "Use IPs exclusivas para sites de destino específicos Saiba mais sobre a exclusividade de IP",
   "Learn about IP exclusivity": "Aprenda mais sobre as IPs exclusivas",
   "Quick integration": "Integração rápida",
@@ -445,7 +445,7 @@
   "From the engineers who built the product":
     "Dos engenheiros que construíram o produto",
   "Read more": "Consulte para Maiores informaçoes",
-  "Speed up development time with built-in scraping features": 
+  "Speed up development time with built-in scraping features":
     "Acelere o tempo de desenvolvimento com recursos integrados de raspagem",
   "Learn about LPM": "Aprenda mais sobre o LPM",
   "100% legal and patented": "100% legal e patenteado",
@@ -1509,7 +1509,7 @@
   "Why use Luminati’s Residential IP Proxy?": "Por que usar o Proxy de IP Residencial da Luminati?",
   "Simply because it is the largest, fastest and most reliable worldwide residential proxy network. Our network can be used via backconnect, while keeping a dedicated IP throughout long sessions, or rotating IP’s controlled by": "Porque ela é a maior, mais rápida e mais confiável rede de proxies residenciais do mundo. Nossa rede pode ser usada via backconnect, mantendo um IP exclusivo por todas as sessões longas ou IPs rotativos gerenciados por",
   "custom rules you can easily create": "regras personalizadas que você pode criar facilmente.",
-  "https://luminati.io/tool/unblocker": "https://luminati.io/tool/unblocker?hl=pt_BR",
+  "https://luminati.io/proxy-tools/unblocker": "https://luminati.io/proxy-tools/unblocker?hl=pt_BR",
   "Luminati Unblocker": "Luminati Unblocker",
   "The first automated unblocking software to reach your target sites and get 100% success rates - no experience required. With our powerful unblocking technology just send one request and we will get you the most accurate data available.": "O primeiro software de desbloqueio automático para alcançar seus sites de destino e obter 100% de taxas de sucesso - nenhuma experiência é necessária. Com nossa poderosa tecnologia de desbloqueio, basta enviar uma requisição e obteremos os dados mais precisos.",
   "Start Now": "Comece agora",
@@ -1542,7 +1542,7 @@
   "Getting Started is Easy!": "Começar é Fácil!",
   "Click here to get connected to your personal Luminati Account Manager and begin using the Luminati Unblocker today!": "Clique aqui para se conectar ao seu Gerente de Conta da Luminati e comece a usar o Luminati Unblocker hoje mesmo!",
   "Start Now": "Comece agora",
-  "https://luminati.io/tool/lpm": "https://luminati.io/tool/lpm?hl=pt_BR",
+  "https://luminati.io/proxy-tools/lpm": "https://luminati.io/proxy-tools/lpm?hl=pt_BR",
   "Luminati Proxy Manager": "Luminati Proxy Manager",
   "The most advanced open - source proxy manager allowing you to Speed up development time with built-in scraping features.": "O gerenciador de proxies de código aberto mais avançado, que permite que você Acelere o tempo de desenvolvimento com recursos de coleta de dados integrados.",
   "Start Now": "Comece agora",
@@ -1596,7 +1596,7 @@
   "Previous versions": "Versões anteriores",
   "Getting Started is Easy!": "Começar é Fácil!",
   "Just download the Luminati Proxy Manager based on your requirements and get your web data extraction projects up and running today!": "Baixe o Luminati Proxy Manager de acordo com os seus requisitos e faça seus projetos de extração de dados da web saírem do papel hoje mesmo!",
-  "https://luminati.io/tool/link-tester": "https://luminati.io/tool/link-tester?hl=pt_BR",
+  "https://luminati.io/proxy-tools/link-tester": "https://luminati.io/proxy-tools/link-tester?hl=pt_BR",
   "Affiliate Link Tester": "Analisador de Link de Afiliado",
   "Track a link's path from start to finish and anything in the middle, from anywhere in the world": "Acompanhe o caminho de um link do início ao fim, e o que estiver no meio, de qualquer lugar no mundo",
   "Start Now": "Comece agora",
@@ -1633,7 +1633,7 @@
   "Just Input the link and click ‘Go’": "Só insira o link e clique em ‘Go’.",
   "Getting Started is Easy!": "Começar é Fácil!",
   "Just download the Luminati Proxy Manager based on your requirements and get your web data extraction projects up and running today!": "Baixe o Luminati Proxy Manager de acordo com os seus requisitos e faça seus projetos de extração de dados da web saírem do papel hoje mesmo!",
-  "https://luminati.io/tool/chrome-ext": "https://luminati.io/tool/chrome-ext?hl=pt_BR",
+  "https://luminati.io/proxy-tools/chrome-ext": "https://luminati.io/proxy-tools/chrome-ext?hl=pt_BR",
   "Luminati’s Chrome Extension": "Extensão para o Chrome da Luminati",
   "Easily rotate shared or static IPs from across the globe with just the click of your mouse from the comfort of your chrome toolbar!": "Alterne facilmente entre IPs compartilhados ou estáticos de todo o mundo com apenas um clique da aba de ferramentas do seu Chrome!",
   "Use cases": "Casos de uso",
@@ -1785,5 +1785,23 @@
   "Static Residential": "Residencial estática",
   "Read more": "Consulte Mais informação",
   "Pricing": "Preço",
-  "LANDING PAGES COMMON - END": "LANDING PAGES COMMON - END"
+  "LANDING PAGES COMMON - END": "LANDING PAGES COMMON - END",
+  "FOOTER - START": "FOOTER - START",
+  "PROXY NETWORKS": "REDES DE PROXY",
+  "Datacenter Proxies": "Datacenter Proxies",
+  "Static residential Proxies": "Proxies residenciais estáticos",
+  "Residential Proxies": "Proxies residenciais",
+  "Mobile Proxies": "Proxies móveis",
+  "PROXY TOOLS": "FERRAMENTAS DE PROXY",
+  "Luminati Proxy Manager (LPM)": "Luminati Gerente de Proxy (LPM)",
+  "Luminati SDK": "Luminati SDK",
+  "Captcha Solver": "captcha Solver",
+  "Unblocker": "ferramenta Desbloquear",
+  "COMPANY": "COMPANY",
+  "Careers": "Carreira",
+  "Privacy policy": "Política de Privacidade",
+  "Legal": "Legal",
+  "SUPPORT": "APOIO, SUPORTE",
+  "SLA": "SLA",
+  "FOOTER - END": "FOOTER - END"
 }

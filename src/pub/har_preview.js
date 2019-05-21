@@ -276,7 +276,7 @@ class Rule_preview extends Pure_component {
         const {rule, idx} = this.props;
         const children_classes = classnames('children', 'timeline',
             {open: this.state.open});
-        const first_trigger = trigger_types.find(t=>rule[t.value]);
+        const first_trigger = trigger_types.find(t=>rule[t.value])||{};
         return [
             <li key="li" onClick={this.toggle}
               className={classnames('parent_title', 'expandable',

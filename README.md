@@ -33,7 +33,7 @@ Please report issues or bugs to your Lumianti account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.136.76/luminati-proxy-manager-v1.136.76-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.136.350/luminati-proxy-manager-v1.136.350-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -196,8 +196,7 @@ Options:
   --sticky_ip              Use session per requesting host to maintain IP per
                            host                       [boolean] [default: false]
   --pool_size              Session pool size               [number] [default: 3]
-  --pool_type              Pool session iteration order
-                                                [string] [default: "sequential"]
+  --pool_type              Pool session iteration order                 [string]
   --seed                   Session ID seed used for identifying sessions from
                            this proxy                                   [string]
   --max_requests           Maximum requests per session   [string] [default: 50]

@@ -9,9 +9,7 @@ import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 
 const pool_type_opt = [
-    {key: 'Default (Sequential)', value: ''},
-    {key: 'Sequential', value: 'sequential'},
-    {key: 'Round-robin', value: 'round-robin'},
+    {key: 'Default', value: ''},
     {key: 'Long Availability', value: 'long_availability'},
 ];
 
@@ -39,20 +37,6 @@ export default class Rotation extends Pure_component {
     };
     open_modal = ()=>$('#allocated_ips').modal('show');
     move_to_ssl = ()=>this.goto_field('ssl');
-    pool_type_changed = pool_type=>{
-        if (this.is_sequential(pool_type))
-        {
-            this.set_field('ips', []);
-            this.set_field('vips', []);
-            this.set_field('pool_size', 0);
-        }
-        else if (!this.state.form.pool_size)
-            this.set_field('pool_size', 1);
-    };
-    is_sequential = pool_type=>{
-        pool_type = pool_type || this.state.form.pool_type;
-        return !pool_type || pool_type=='sequential';
-    };
     is_long_availability = pool_type=>{
         pool_type = pool_type || this.state.form.pool_type;
         return !pool_type || pool_type=='long_availability';
@@ -72,7 +56,7 @@ export default class Rotation extends Pure_component {
         {
             pool_size_note =
                 <a className="link" onClick={this.open_modal}>
-                  {'set from allocated '+(type=='ips' ? 'IPs' : 'gIPs')}
+                  {'manage '+(type=='ips' ? 'IPs' : 'gIPs')}
                 </a>;
         }
         const sess_note =
@@ -81,12 +65,10 @@ export default class Rotation extends Pure_component {
               <a className="link" onClick={this.move_to_ssl}>SSL analyzing</a>
               <span> is turned on.</span>
             </Note>;
-        const pool_size_disabled = form.ips.length||form.vips.length||
-            this.is_sequential();
+        const pool_size_disabled = form.ips.length||form.vips.length;
         return <div className="rotation">
               <Tab_context.Provider value="rotation">
-                <Config type="select" id="pool_type" data={pool_type_opt}
-                  on_change={this.pool_type_changed}/>
+                <Config type="select" id="pool_type" data={pool_type_opt}/>
                 <Config type="select_number" id="pool_size"
                   note={pool_size_note} disabled={pool_size_disabled}/>
                 <Config type="select_number" id="max_requests"/>

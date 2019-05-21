@@ -368,9 +368,10 @@
       "util/lpm_file.js",
       "util/lpm_util.js",
       "util/rules_util.js",
+      "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "b256ff0824dde08e056cb3faaf266479"
+    "md5": "8f145086549757fce4a5a9d92ff8282a"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -431,5 +432,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.136.76"
+  "version": "1.136.350"
 }

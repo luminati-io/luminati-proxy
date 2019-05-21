@@ -99,6 +99,22 @@ export default class Targeting extends Pure_component {
             asns = locations.asns[country];
         return Object.keys(asns).map(a=>({id: a, label: a}));
     };
+    carriers = ()=>{
+        const {country} = this.state.form;
+        const {locations} = this.state;
+        let res;
+        if (!country)
+        {
+            res = Object.values(locations.carriers).reduce(
+                (acc, el)=>[...acc, ...el], []);
+        }
+        else
+            res = locations.carriers[country];
+        return [
+            {value: '', key: 'None'},
+            ...carriers.filter(c=>res.includes(c.value)),
+        ];
+    };
     city_changed = e=>{
         if (e && e.length)
             this.set_field('state', e[0].region);
@@ -152,7 +168,7 @@ export default class Targeting extends Pure_component {
                 <Config type="typeahead" id="asn" data={this.asns()}
                   disabled={!!this.state.form.carrier} update_on_input
                   depend_a={this.state.form.zone}/>
-                <Config type="select" id="carrier" data={carriers}
+                <Config type="select" id="carrier" data={this.carriers()}
                   note={carriers_note} disabled={carrier_disabled}
                   depend_a={this.state.form.zone}/>
               </Tab_context.Provider>

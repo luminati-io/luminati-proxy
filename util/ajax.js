@@ -56,7 +56,7 @@ function ajax(opt){
         xhr.done(function(v){
             _this.continue(v); });
         xhr.fail(function(_xhr, status_text, err){
-            if (data_type=='json' && _xhr.status==200 &&
+            if (data_type=='json' && _xhr && _xhr.status==200 &&
                 ['', 'ok', 'OK'].includes(_xhr.responseText))
             {
                 _this.continue(null);
