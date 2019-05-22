@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.136.517",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Bug fixes (crashes)"
+            }
+        ]
+    },
+    {
         "ver": "1.136.350",
         "type": "stable",
         "changes": [

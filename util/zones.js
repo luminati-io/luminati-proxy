@@ -48,6 +48,21 @@ E.get_perm = zone=>{
     return res;
 };
 
+E.get_password = (proxy, zone_name, zones)=>{
+    if (proxy.password)
+        return proxy.password;
+    const zone = zones.find(z=>z.zone==zone_name);
+    return zone && zone.password;
+};
+
+E.is_static_proxy = (proxy, zones)=>{
+    const zone = zones.find(z=>z.zone==proxy.zone);
+    if (!zone)
+        return false;
+    const plan = E.get_plan(zone.plans);
+    return plan && plan.type=='static';
+};
+
 // XXX krzysztof: TODO
 function Zones_mgr(){
 }
