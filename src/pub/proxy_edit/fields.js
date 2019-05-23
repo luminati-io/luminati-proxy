@@ -186,7 +186,7 @@ export const tabs = {
                 label: 'Email address',
                 tooltip: `Notifications will be sent to this email address.
                         If you want to use another email you can add it to the
-                        list in control panel by going to the link below.`,
+                        list in control panel by going to the link below`,
             },
         },
     },
@@ -202,9 +202,17 @@ export const tabs = {
             },
             pool_size: {
                 label: 'Pool size',
-                tooltip: `Maintain a number of IPs that will be pinged
-                    every 45 seconds`,
+                tooltip: `A pool of sessions that is used for the requests.
+                    Each session is associated with an IP. For non-static zones
+                    the sessions are pinged every 45 seconds to keep them
+                    alive`,
                 ext: true,
+            },
+            pool_prefill: {
+                label: 'Pool prefill',
+                tooltip: `Automatically prefill pool with random sessions. This
+                    should be turned off only in advanced cases when you want
+                    to build a pool of IPs based on the rules`,
             },
             session_random: {
                 label: 'Random session',
@@ -222,7 +230,7 @@ export const tabs = {
                 label: 'Sticky IP',
                 tooltip: `When connecting to the remote LPM server,
                     stick sessions to each computer. Each connected
-                    computer will receive a unique session.`,
+                    computer will receive a unique session`,
                 ext: true,
             },
             max_requests: {
@@ -230,13 +238,13 @@ export const tabs = {
                 tooltip: `Change session based on number of requests - can be a
                     range or a fixed number. when using browser it should be
                     taken into consideration that one page-load will attempt
-                    multiple requests under the hood.`,
+                    multiple requests under the hood`,
                 ext: true,
             },
             session_duration: {
                 label: 'Session duration',
                 tooltip: `Make the session change automatically every X
-                    seconds.`,
+                    seconds`,
                 ext: true,
             },
             seed: {
@@ -292,7 +300,7 @@ export const tabs = {
                 tooltip: `You can choose a name for this proxy port.
                     If the name is passed it will be shown in the dropdowns
                     across whole LPM. It doesn't change any behavior of the
-                    proxy port.`,
+                    proxy port`,
                 ext: true,
             },
             port: {
@@ -304,7 +312,7 @@ export const tabs = {
             socks: {
                 label: 'SOCKS 5 port',
                 tooltip: `A SOCKS 5 port is the same as a proxy port, and is
-                    automatically created.`,
+                    automatically created`,
                 ext: true,
             },
             password: {
@@ -364,7 +372,7 @@ export const tabs = {
             log: {
                 label: 'Log level',
                 tooltip: `Decide how elaborate is the debugging information
-                    that you see in the console's log.`,
+                    that you see in the console's log`,
                 ext: true,
             },
             debug: {
@@ -373,7 +381,7 @@ export const tabs = {
                     request with debug info, such as "Peer IP" or the timeline
                     of the request. You can resign from it to save bandwidth
                     (very little) or if the additional headers are breaking
-                    your operations.`,
+                    your operations`,
             },
             smtp: {
                 label: 'Proxy through SMTP',

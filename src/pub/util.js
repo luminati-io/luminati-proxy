@@ -113,6 +113,8 @@ const presets = {
             pool_size: true,
             max_requests: true,
             session_duration: true,
+            idle_pool: true,
+            pool_prefill: true,
         },
     },
     sticky_ip: {
@@ -145,6 +147,8 @@ const presets = {
             pool_type: true,
             seed: true,
             pool_size: true,
+            idle_pool: true,
+            pool_prefill: true,
         },
     },
     rotating: {
@@ -174,6 +178,7 @@ const presets = {
             multiply_vips: true,
             pool_type: true,
             seed: true,
+            idle_pool: true,
         },
     },
     high_performance: {
@@ -199,6 +204,7 @@ const presets = {
             pool_type: true,
             seed: true,
             pool_size: true,
+            idle_pool: true,
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 50`},
@@ -232,6 +238,8 @@ const presets = {
             seed: true,
             pool_size: true,
             override_headers: true,
+            idle_pool: true,
+            pool_prefill: true,
         },
     },
     shop: {
@@ -278,6 +286,8 @@ const presets = {
             session: true,
             seed: true,
             ssl: true,
+            idle_pool: true,
+            pool_prefill: true,
         },
         rules: [
             {field: 'dns', label: `Sets DNS to resolve remotely`},
@@ -300,6 +310,8 @@ const presets = {
             opt.max_requests = 0;
             opt.session_duration = 0;
             opt.seed = '';
+            opt.idle_pool = true;
+            opt.pool_prefill = true;
         },
     },
 };

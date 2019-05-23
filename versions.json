@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.136.784",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support to add/remove IPs in DC pool"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed modal with IP allocation"
+            },
+            {
+                "type": "bug",
+                "text": "Removed ES/PT translations"
+            }
+        ]
+    },
+    {
         "ver": "1.136.517",
         "type": "stable",
         "changes": [

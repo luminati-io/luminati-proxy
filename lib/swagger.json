@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.136.517",
+        "version": "1.136.784",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -757,6 +757,9 @@
                 "idle_pool": {
                     "type": "boolean",
                     "description": "Stop maintaining the pool after 1h of inactivity to save bandwidth"
+                },
+                "pool_prefill": {
+                    "type": "boolean"
                 },
                 "headers":{
                     "type":"array",

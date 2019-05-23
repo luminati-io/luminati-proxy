@@ -604,8 +604,7 @@ class Alloc_modal extends Pure_component {
             endpoint = '/api/allocated_ips';
         else
             endpoint = '/api/allocated_vips';
-        const url = zurl.qs_add(window.location.host+endpoint,
-            {zone: this.props.zone, key});
+        const url = `${endpoint}?zone=${this.props.zone}&key=${key}`;
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{

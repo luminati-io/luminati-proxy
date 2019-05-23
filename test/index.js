@@ -818,6 +818,17 @@ describe('proxy', ()=>{
         }));
     });
     describe('rules', ()=>{
+        const inject_headers = (li, ip, ip_alt)=>{
+            ip = ip||'ip';
+            let call_count = 0;
+            const handle_proxy_resp_org = li._handle_proxy_resp.bind(li);
+            return sinon.stub(li, '_handle_proxy_resp', (...args)=>_res=>{
+                const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
+                _res.headers['x-hola-timeline-debug'] = `1 2 3 ${ip_inj}`;
+                _res.headers['x-hola-ip'] = ip_inj;
+                return handle_proxy_resp_org(...args)(_res);
+            });
+        };
         it('should process data', ()=>etask(function*(){
             l = yield lum({rules: []});
             const html = `
@@ -1046,6 +1057,89 @@ describe('proxy', ()=>{
                 assert.ok(add_stub.called);
                 assert.equal(req.session, 'test');
             }));
+            describe('dc pool', ()=>{
+                it('adds to pool when prefill turned off and gathering',
+                ()=>etask(function*(){
+                    const ips = ['2.3.4.5'];
+                    l = yield lum({
+                        pool_prefill: false,
+                        keep_alive: 0,
+                        rules: [{
+                            action: {reserve_session: true},
+                            action_type: 'save_to_pool',
+                            status: '200',
+                        }],
+                        pool_size: 2,
+                        static: true,
+                        ips,
+                    });
+                    inject_headers(l, '1.2.3.4');
+                    l.mgr.save_config = ()=>null;
+                    l.mgr.proxies = [{port: 24000, ips}];
+                    yield l.test();
+                    assert.ok(l.opt.ips.includes('1.2.3.4'));
+                }));
+                it('does not add to pool when pool is full',
+                ()=>etask(function*(){
+                    const ips = ['2.3.4.5', '3.4.5.6'];
+                    l = yield lum({
+                        pool_prefill: false,
+                        keep_alive: 0,
+                        rules: [{
+                            action: {reserve_session: true},
+                            action_type: 'save_to_pool',
+                            status: '200',
+                        }],
+                        pool_size: 2,
+                        static: true,
+                        ips,
+                    });
+                    inject_headers(l, '1.2.3.4');
+                    l.mgr.save_config = ()=>null;
+                    l.mgr.proxies = [{port: 24000, ips}];
+                    yield l.test();
+                    assert.ok(!l.opt.ips.includes('1.2.3.4'));
+                }));
+                it('removes from pool on ban', ()=>etask(function*(){
+                    l = yield lum({
+                        keep_alive: 0,
+                        rules: [{
+                            action_type: 'ban_ip',
+                            status: '200',
+                            action: {ban_ip: 0},
+                        }],
+                        pool_size: 2,
+                        ips: ['1.2.3.4', '2.3.4.5'],
+                    });
+                    inject_headers(l, '1.2.3.4');
+                    l.mgr.save_config = ()=>null;
+                    const stub = sinon.stub(l.mgr, 'save_config');
+                    assert.ok(l.opt.ips.includes('1.2.3.4'));
+                    yield l.test();
+                    sinon.assert.calledOnce(stub);
+                    assert.ok(!l.opt.ips.includes('1.2.3.4'));
+                }));
+                it('does not replace session on remove', ()=>etask(function*(){
+                    l = yield lum({
+                        pool_prefill: false,
+                        keep_alive: 0,
+                        rules: [{
+                            action_type: 'ban_ip',
+                            status: '200',
+                            action: {ban_ip: 0},
+                        }],
+                        pool_size: 2,
+                        ips: ['1.2.3.4', '2.3.4.5'],
+                    });
+                    inject_headers(l, '1.2.3.4');
+                    l.mgr.save_config = ()=>null;
+                    const stub = sinon.stub(l.mgr, 'save_config');
+                    assert.equal(l.session_mgr.sessions.sessions.length, 2);
+                    yield l.test();
+                    sinon.assert.calledOnce(stub);
+                    assert.equal(l.session_mgr.sessions.sessions.length, 1);
+                }));
+            });
             xdescribe('ban_ip per domain', ()=>{
                 let ban_spy;
                 const t = (url, expected, ban_count=0)=>{
@@ -1220,17 +1314,6 @@ describe('proxy', ()=>{
                 action_type: 'retry_port',
                 status: '200',
             });
-            const inject_headers = (li, ip, ip_alt)=>{
-                ip = ip||'ip';
-                let call_count = 0;
-                const handle_proxy_resp_org = li._handle_proxy_resp.bind(li);
-                return sinon.stub(li, '_handle_proxy_resp', (...args)=>_res=>{
-                    const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
-                    _res.headers['x-hola-timeline-debug'] = `1 2 3 ${ip_inj}`;
-                    _res.headers['x-hola-ip'] = ip_inj;
-                    return handle_proxy_resp_org(...args)(_res);
-                });
-            };
             const t_pre = (action, ban)=>it(action, ()=>etask(function*(){
                 l = yield lum({rules: [{action: {[action]: true}},
                     get_banip_rule()]});

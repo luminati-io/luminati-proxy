@@ -56,6 +56,7 @@ conf.luminati_default = {
     max_requests: 0,
     session_duration: 0,
     random_user_agent: false,
+    pool_prefill: true,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.luminati_default, 'port'), {

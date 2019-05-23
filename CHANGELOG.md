@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.136.784 Development Latest
+- :star: Added support to add/remove IPs in DC pool
+- :bug: Fixed modal with IP allocation
+- :bug: Removed ES/PT translations
+
 ## 1.136.517 Stable
 - :bug: Bug fixes (crashes)
 
