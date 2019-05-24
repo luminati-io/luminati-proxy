@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.136.969 Stable
+- :bug: Fixed triggering certain rules for SMTP requests
+
 ## 1.136.784 Development Latest
 - :star: Added support to add/remove IPs in DC pool
 - :bug: Fixed modal with IP allocation

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.136.969",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed triggering certain rules for SMTP requests"
+            }
+        ]
+    },
+    {
         "ver": "1.136.784",
         "type": "dev",
         "changes": [
