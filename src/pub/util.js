@@ -125,10 +125,8 @@ const presets = {
         set: function(opt){
             opt.pool_size = 0;
             opt.sticky_ip = true;
-            opt.session = '';
         },
         clean: opt=>{
-            opt.sticky_ip = '';
             opt.max_requests = 0;
             opt.session_duration = 0;
         },
@@ -304,7 +302,7 @@ const presets = {
             use cases`,
         set: function(opt){},
         clean: opt=>{
-            opt.session = true;
+            opt.session = null;
             opt.pool_size = 0;
             opt.pool_type = null;
             opt.max_requests = 0;

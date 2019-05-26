@@ -39,7 +39,7 @@ export const Config = withRouter(class Config extends Pure_component {
         this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
             disabled_fields&&this.setState({disabled_fields}));
         this.setdb_on('head.defaults', defaults=>
-            defaults&&this.setState({defaults}));
+            defaults && this.setState({defaults}));
     }
     render(){
         if (!this.state.show||!this.state.defaults)

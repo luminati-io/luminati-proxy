@@ -77,10 +77,8 @@ export default class Rotation extends Pure_component {
                 <Config type="select_number" id="session_duration"
                   sufix="seconds"/>
                 <Config type="yes_no" id="sticky_ip"/>
-                <Config type="yes_no" id="session_random"
-                  disabled={form.sticky_ip}/>
-                {!form.session_random && !form.sticky_ip &&
-                  <Config type="text" id="session"/>}
+                <Config type="yes_no" id="session_random"/>
+                {!form.session_random && <Config type="text" id="session"/>}
                 <Config type="text" id="seed"/>
                 <Config type="yes_no" id="session_termination"
                   note={sess_note}/>

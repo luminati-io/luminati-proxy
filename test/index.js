@@ -293,7 +293,7 @@ describe('proxy', ()=>{
                 it('should not idle', etask._fn(function*(_this){
                     l = yield lum({pool_size: 1, idle_pool: false,
                         keep_alive: 0.1});
-                    yield etask.sleep(450);
+                    yield etask.sleep(490);
                     assert.equal(proxy.full_history.length, 5);
                 }));
                 it('should call reset idle pool on each connection', etask._fn(
@@ -337,37 +337,9 @@ describe('proxy', ()=>{
                 t(10);
             });
             describe('max_requests', ()=>{
-                describe('range', ()=>{
-                    const pool = 50;
-                    const t = (name, start, end)=>
-                    it(name, etask._fn(function*(){
-                        l = yield lum({max_requests: start+':'+end,
-                            pool_size: pool});
-                        yield l.session_mgr.refresh_sessions();
-                        let max_requests = l.session_mgr.sessions.sessions
-                            .map(s=>s.max_requests);
-                        let count = {};
-                        max_requests.forEach(m=>{
-                            if (!start || !end)
-                                assert.equal(m, start || end);
-                            else
-                                assert.ok(start<=m && m<=end);
-                            count[m] = count[m] ? count[m]+1 : 1;
-                        });
-                        if (start && end && start!=end)
-                        {
-                            for (let c in count)
-                                assert.notEqual(count[c], pool);
-                        }
-                    }));
-                    t('valid', 60, 70);
-                    t('same', 50, 50);
-                    t('only end', '', 30);
-                    t('only start', 15, '');
-                });
                 it('disabled', ()=>etask(function*(){
                     l = yield lum({max_requests: '0'});
-                    assert.equal(l.session_mgr.max_requests, 0);
+                    assert.equal(l.session_mgr.opt.max_requests, 0);
                 }));
                 const test_call = ()=>etask(function*(){
                     const res = yield l.test();
@@ -405,13 +377,12 @@ describe('proxy', ()=>{
                 t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
                 t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
                 t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
-                t('1, session using seed', {max_requests: 1, session: true});
-                t('2, session using seed', {max_requests: 2, session: true});
-                t('5, session using seed', {max_requests: 5, session: true});
+                t('1, session using seed', {max_requests: 1});
+                t('2, session using seed', {max_requests: 2});
+                t('5, session using seed', {max_requests: 5});
                 it('no pool size', etask._fn(function*(_this){
                     _this.timeout(4000);
-                    l = yield lum({max_requests: 1, pool_size: 0,
-                        session: true});
+                    l = yield lum({max_requests: 1, pool_size: 0});
                     const s1 = yield test_call();
                     const s2 = yield test_call();
                     assert.notEqual(s1, s2);
@@ -434,9 +405,8 @@ describe('proxy', ()=>{
                 }));
                 t('pool', {pool_size: 1}, [1, 1, 2]);
                 t('sticky_ip', {sticky_ip: true}, [0, 0, 1]);
-                t('session explicit', {session: 'test'}, [0, 0, 1]);
-                t('session using seed', {session: true, seed: 'seed'},
-                    [0, 0, 1]);
+                t('session explicit', {session: 'test'}, [1, 1, 2]);
+                t('session using seed', {seed: 'seed'}, [0, 0, 1]);
             });
             describe('session_duration', ()=>{
                 describe('change after specified timeout', ()=>{
@@ -452,7 +422,7 @@ describe('proxy', ()=>{
                     }));
                     t('pool', {pool_size: 1});
                     t('sticky_ip', {sticky_ip: true});
-                    t('session using seed', {session: true, seed: 'seed'});
+                    t('session using seed', {seed: 'seed'});
                 });
                 describe('does not change before specified timeout', ()=>{
                     const t = (name, opt)=>it(name, etask._fn(function*(_this){
@@ -470,7 +440,7 @@ describe('proxy', ()=>{
                     }));
                     t('pool', {pool_size: 1});
                     t('sticky_ip', {sticky_ip: true});
-                    t('session using seed', {session: true, seed: 'seed'});
+                    t('session using seed', {seed: 'seed'});
                 });
             });
             describe('fastest', ()=>{
@@ -513,8 +483,7 @@ describe('proxy', ()=>{
             t('raw', {raw: true});
             t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});
-            t('session using seed', {session: true, seed: 'seed'},
-                {session: 'seed_1'});
+            t('session using seed', {seed: 'seed'}, {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'newyork'});
@@ -585,9 +554,9 @@ describe('proxy', ()=>{
             }));
             t1('pool', {pool_size: 1}, /24000_[0-9a-f]+_1/,
                 /24000_[0-9a-f]+_2/);
-            t1('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_[0-9a-f]+_1/,
-                /24000_127_0_0_1_[0-9a-f]+_2/);
-            t1('session using seed', {session: true, seed: 'seed'},
+            t1('sticky_ip', {sticky_ip: true},
+                /24000_127_0_0_1_[0-9a-f]+_1/, /24000_127_0_0_1_[0-9a-f]+_2/);
+            t1('session using seed', {seed: 'seed'},
                 /seed_1/, /seed_2/);
             const t2 = (name, opt, test)=>it(name, ()=>etask(function*(){
                 l = yield lum(opt);
@@ -1383,7 +1352,6 @@ describe('proxy', ()=>{
                     opt = opt||{};
                     l = yield lum(Object.assign({
                         rules: [get_banip_rule()],
-                        session: true,
                         pool_size: 1,
                         sticky_ip: false,
                     }, opt));
@@ -1451,7 +1419,7 @@ describe('proxy', ()=>{
             }];
             history = [];
             l = yield lum({handle_usage: aggregator, rules, keep_alive: 0,
-                session: true, max_requests: 1, pool_size: 2});
+                max_requests: 1, pool_size: 2});
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);
@@ -1491,5 +1459,8 @@ describe('proxy', ()=>{
             assert.ok(new_sessions[0].session.endsWith('11'));
             assert.ok(new_sessions[9].session.endsWith('20'));
         }));
+    });
+    describe('gather and consume', ()=>{
+        // XXX krzysztof: add tests!
     });
 });

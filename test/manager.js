@@ -302,11 +302,12 @@ describe('manager', ()=>{
                     res = yield json('api/proxies');
                     assert.equal(res.length, 1);
                 }));
-                it('conflict', ()=>etask(function*(){
-                    let sample_proxy = {port: 24000};
-                    let proxies = [sample_proxy];
+                it('conflict', etask._fn(function*(_this){
+                    _this.timeout(6000);
+                    const sample_proxy = {port: 24000};
+                    const proxies = [sample_proxy];
                     app = yield app_with_proxies(proxies, {});
-                    let res = yield api_json('api/proxies',
+                    const res = yield api_json('api/proxies',
                         {method: 'post', body: {proxy: sample_proxy}});
                     assert.equal(res.statusCode, 400);
                     assert_has(res.body, {errors: []}, 'proxies');
@@ -336,7 +337,8 @@ describe('manager', ()=>{
                     res = yield json('api/proxies_running');
                     assert_has(res, [res_proxy], 'proxies');
                 }));
-                it('conflict', ()=>etask(function*(){
+                it('conflict', etask._fn(function*(_this){
+                    _this.timeout(6000);
                     let proxies = [{port: 24000}, {port: 24001}];
                     app = yield app_with_proxies(proxies, {});
                     let res = yield api_json('api/proxies/24001',
@@ -510,7 +512,7 @@ describe('manager', ()=>{
             assert.equal(res.data.password, 'static_pass');
         }));
         it('uses new proxy custom password', etask._fn(function*(_this){
-            _this.timeout(6000);
+            _this.timeout(8000);
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.137.113 Stable
+- :star: Improved support off adding/removing IPs in DC pool
+- :star: UI improvements in HAR viewer
+
 ## 1.136.969 Stable
 - :bug: Fixed triggering certain rules for SMTP requests
 

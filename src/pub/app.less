@@ -2292,11 +2292,7 @@ span.icon_link {
 }
 .flex_auto { flex: auto; }
 .chrome {
-    &.chrome_table {
-        height: 100%;
-    }
-    -webkit-user-select: none;
-    user-select: none;
+    &.chrome_table { height: 100%; }
     font-size: 12px;
     font-family: Roboto, Ubuntu, Arial, sans-serif !important;
     color: rgb(48, 57, 66);
@@ -2319,7 +2315,8 @@ span.icon_link {
             margin-right: 3px;
             margin-top: 4px;
             float: left;
-            --spritesheet-position: 0px 50px;
+            &.good { --spritesheet-position: 0px 50px; }
+            &.bad { --spritesheet-position: -40px 70px; }
         }
     }
     .small_icon_mask {
@@ -2827,8 +2824,6 @@ span.icon_link {
                     display: none;
                     &.open { display: block; }
                     li.treeitem {
-                        -webkit-user-select: none;
-                        user-select: none;
                         cursor: default;
                         margin-left: 10px;
                         margin-top: 1px;

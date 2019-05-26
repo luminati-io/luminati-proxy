@@ -185,7 +185,7 @@ const Index = withRouter(class Index extends Pure_component {
         if (form.session===true)
         {
             form.session_random = true;
-            form.session = '';
+            form.session = true;
         }
         else
             form.session_random = false;
@@ -363,8 +363,6 @@ const Index = withRouter(class Index extends Pure_component {
         if (!save_form.max_requests)
             save_form.max_requests = 0;
         delete save_form.preset;
-        if (!save_form.session)
-            save_form.session = false;
         if (save_form.session_random)
             save_form.session = true;
         delete save_form.session_random;
