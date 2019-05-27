@@ -150,7 +150,7 @@ const No_response_data = ()=>
 class Codemirror_wrapper extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea, {
-            readOnly: 'nocursor',
+            readOnly: true,
             lineNumbers: true,
         });
         this.cm.setSize('100%', '100%');

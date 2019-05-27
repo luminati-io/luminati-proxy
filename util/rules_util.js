@@ -10,8 +10,8 @@ E.trigger_types = [
         requests to the selected URL`, type: 'pre'},
     {key: 'Status code', value: 'status', tooltip: `Trigger will be pulled
         for all the requests that returns the matching status code`},
-    {key: 'HTML body element', value: 'body', tooltip: `Trigger will be
-        pulled when the response <body> contain the selected string`},
+    {key: 'Response body', value: 'body', tooltip: `Trigger will be
+        pulled when the response body contain the selected string`},
     {key: 'Request time more than', value: 'min_req_time',
         tooltip: `Triggers when the request time is above the selected value`,
         type: 'pre'},
@@ -20,7 +20,7 @@ E.trigger_types = [
 ];
 
 E.default_action = {key: '--Select--', value: '', tooltip: `Select an
-    action.  Once the trigger rule is met the selected action is executed
+    action. Once the trigger rule is met the selected action is executed
     automatically.`};
 
 E.action_types = [

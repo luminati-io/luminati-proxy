@@ -349,7 +349,7 @@ class Action extends Pure_component {
             return null;
         if (!zones || !cur_zone)
             return null;
-        const zone = (zones.zones||[]).find(z=>z.name==cur_zone)||{};
+        const zone = (zones.zones||[]).find(z=>z.name==cur_zone) || {plan: {}};
         const _action_types = [default_action].concat(action_types
         .filter(at=>at.value!='save_to_fast_pool' ||
             rule.trigger_type=='max_req_time')

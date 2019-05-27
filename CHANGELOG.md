@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.137.285 Development Latest
+- :bug: Fixed memory leaks
+
 ## 1.137.113 Stable
 - :star: Improved support off adding/removing IPs in DC pool
 - :star: UI improvements in HAR viewer

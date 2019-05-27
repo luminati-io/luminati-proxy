@@ -156,11 +156,7 @@ E.shutdown = (reason, error=null)=>{
 E.handle_signal = (sig, err)=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
     if (err)
-    {
         zerr.crit(errstr);
-        if ((err.message||'').includes('SQLITE') && E.manager)
-            return void E.manager.perr('crash_sqlite', {error: errstr});
-    }
     etask(function*handle_signal_lum_node(){
         if (sig=='SIGINT'||sig=='SIGTERM')
             yield zerr.perr('sig', {reason: sig});
