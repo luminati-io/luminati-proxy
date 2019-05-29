@@ -8,15 +8,12 @@ const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const lpm_util = require('../util/lpm_util.js');
 const lpm_file = require('../util/lpm_file.js');
-const qw = require('../util/string.js').qw;
 const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
 const pkg = require('../package.json');
 const _ = require('lodash');
-const crypto = require('crypto');
 const ps_list = require('ps-list');
 const analytics = require('../lib/analytics.js');
-const ua = analytics.get_ua();
 const E = module.exports = {};
 const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
@@ -33,70 +30,6 @@ const exe_path = path.resolve(install_path, 'lpm.exe');
 const gen_filename = name=>{
     return lpm_file.get_file_path(
         `.luminati_${name}.json`.substr(is_win ? 1 : 0));
-};
-let prev_ua_event = ua.event.bind(ua);
-let ua_event_wrapper = (...args)=>{
-    let send = true, hash;
-    if (!E.last_ev)
-    {
-        try { E.last_ev = JSON.parse(file.read_e(E.ua_filename)); }
-        catch(e){ E.last_ev = {}; }
-    }
-    const cb = _.isFunction(_.last(args)) ? args.pop() : null;
-    let params;
-    if (_.isObject(_.last(args)))
-        params = args.pop();
-    params = Object.assign({}, params,
-        _.zipObject(_.take(qw`ec ea el ev`, args.length), args));
-    if (params.ec&&params.ea)
-    {
-        hash = crypto.createHash('md5').update(_.values(params).join(''))
-            .digest('hex');
-        send = !E.last_ev[hash] || E.last_ev[hash].ts<Date.now()-10*60*1000;
-    }
-    const last_day = Date.now()-24*3600*1000;
-    if (!E.last_ev.clean || E.last_ev.clean.ts<last_day)
-    {
-        for (let k in E.last_ev)
-        {
-            if (E.last_ev[k].ts<last_day)
-                delete E.last_ev[k];
-        }
-        E.last_ev.clean = {ts: Date.now()};
-    }
-    let ev;
-    if (hash)
-    {
-        ev = (E.last_ev[hash]&&E.last_ev[hash].c||0)+1;
-        E.last_ev[hash] = {ts: Date.now(), c: send ? 0 : ev};
-    }
-    if (send)
-    {
-        if (params.ev===undefined && ev>1)
-            params.ev = ev;
-        zerr.perr('event', {
-            action: params.ea,
-            category: params.ec,
-            label: params.el,
-            value: params.ev,
-            customer_name: _.get(E.manager, '_defaults.customer'),
-        });
-        prev_ua_event(params, (..._args)=>{
-            if (_.isFunction(cb))
-                cb.apply(null, _args);
-        });
-    }
-    else if (_.isFunction(cb))
-        cb();
-};
-
-E.write_ua_file = ()=>{
-    if (!E.last_ev)
-        return;
-    try {
-        file.write_e(E.ua_filename, JSON.stringify(E.last_ev));
-        E.last_ev = null;
-    } catch(e){ zerr.notice(`Fail to write ua file: ${zerr.e2s(e)}`); }
 };
 
 E.write_status_file = (status, error = null, config = null, reason = null)=>{
@@ -136,7 +69,6 @@ E.shutdown = (reason, error=null)=>{
         E.uninit();
         process.exit(1);
     }, shutdown_timeout);
-    E.write_ua_file();
     E.write_status_file('shutdowning', error, E.manager&&E.manager._total_conf,
         reason);
     if (E.manager)
@@ -158,9 +90,7 @@ E.handle_signal = (sig, err)=>{
     if (err)
         zerr.crit(errstr);
     etask(function*handle_signal_lum_node(){
-        if (sig=='SIGINT'||sig=='SIGTERM')
-            yield zerr.perr('sig', {reason: sig});
-        else
+        if (sig!='SIGINT' && sig!='SIGTERM')
         {
             yield zerr.perr('crash', {error: errstr, reason: sig,
                 customer: _.get(E.manager, '_defaults.customer'),
@@ -345,9 +275,8 @@ E.run = (argv, run_config)=>etask(function*(){
     E.read_status_file();
     E.write_status_file('initializing', null,
         E.manager&&E.manager._total_conf);
-    E.manager = new Manager(argv, Object.assign({ua}, run_config));
+    E.manager = new Manager(argv, Object.assign({}, run_config));
     E.manager.on('stop', ()=>{
-        E.write_ua_file();
         zerr.flush();
         if (E.shutdown_timeout)
             clearTimeout(E.shutdown_timeout);
@@ -363,7 +292,7 @@ E.run = (argv, run_config)=>etask(function*(){
             if (fatal)
                 E.manager.stop();
         };
-        if (!analytics.enabled||e.raw)
+        if (!analytics.enabled || e.raw)
             handle_fatal();
         else
         {
@@ -416,16 +345,6 @@ E.handle_msg = msg=>{
     }
 };
 
-E.init_ua = argv=>{
-    ua.set('an', 'LPM');
-    ua.set('av', `v${pkg.version}`);
-    E.ua_filename = gen_filename('ua_ev');
-    E.last_ev = null;
-    ua.event = ua_event_wrapper;
-};
-
-E.uninit_ua = ()=>ua.event = prev_ua_event;
-
 E.init_status = ()=>{
     E.status_filename = gen_filename('status');
     E.lpm_status = {
@@ -465,7 +384,6 @@ E.init = argv=>{
     E.shutdowning = false;
     E.manager = null;
     E.on_upgrade_finished = null;
-    E.init_ua(argv);
     E.init_status();
     E.init_traps();
     if (process.env.DEBUG_ETASKS)
@@ -473,7 +391,6 @@ E.init = argv=>{
 };
 
 E.uninit = ()=>{
-    E.uninit_ua();
     E.uninit_status();
     E.uninit_traps();
     E.uninit_cmd();

@@ -41,9 +41,17 @@ describe('proxy', ()=>{
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};
             req_opt = req_opt||{};
-            req_opt.url = req_opt.url||test_url.http;
+            req_opt.url = req_opt.url || test_url.http;
             req_opt.json = true;
             req_opt.rejectUnauthorized = false;
+            if (req_opt.fake)
+            {
+                req_opt.headers = {
+                    'x-lpm-fake': true,
+                    'x-lpm-fake-status': req_opt.fake.status,
+                };
+                delete req_opt.fake;
+            }
             return yield etask.nfn_apply(_this, '.request', [req_opt]);
         });
         yield l.listen();
@@ -745,7 +753,6 @@ describe('proxy', ()=>{
         etask._fn(function*(_this){
             rules = rules || [{
                     action: {ban_ip: 60*ms.MIN, retry: true},
-                    head: true,
                     status,
                     url: 'lumtest.com'
             }];
@@ -766,12 +773,10 @@ describe('proxy', ()=>{
         t('should ignore rule when status does not match', 404, null, 0);
         t('should prioritize', null, [{
             action: {url: 'http://lumtest.com/fail_url'},
-            head: true,
             status: '200',
             url: 'lumtest.com'
         }, {
             action: {ban_ip: 60*ms.MIN, retry: true},
-            head: true,
             status: '200',
             url: 'lumtest.com',
         }], 1);
@@ -1412,11 +1417,7 @@ describe('proxy', ()=>{
         let history;
         const aggregator = data=>history.push(data);
         beforeEach(etask._fn(function*(_this){
-            const rules = [{
-                action: {reserve_session: true},
-                head: true,
-                status: '200',
-            }];
+            const rules = [{action: {reserve_session: true}, status: '200'}];
             history = [];
             l = yield lum({handle_usage: aggregator, rules, keep_alive: 0,
                 max_requests: 1, pool_size: 2});
@@ -1461,6 +1462,13 @@ describe('proxy', ()=>{
         }));
     });
     describe('gather and consume', ()=>{
-        // XXX krzysztof: add tests!
+        it('should not add duplicated sessions', etask._fn(function*(_this){
+            const rules = [{status: '200', action: {reserve_session: true}}];
+            l = yield lum({pool_size: 3, rules, pool_prefill: false});
+            l.mgr.proxies = [{port: 24000}];
+            yield l.test({fake: 1});
+            yield l.test({fake: 1});
+            assert.equal(l.session_mgr.sessions.sessions.length, 1);
+        }));
     });
 });

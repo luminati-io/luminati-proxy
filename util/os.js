@@ -486,7 +486,7 @@ E.diskstats = function(){
     for (let i=0; i<diskstats.length; i++)
     {
         let n = diskstats[i].trim().split(/\s+/), dev = n[2];
-        if (/\d+$/.test(dev)) // ignore paritions
+        if (/\d+$/.test(dev) && !/nvme\dn\d$/.test(dev)) // ignore paritions
             continue;
         let cur = ret[dev] = {major: +n[0], minor: +n[1], reads: +n[3],
             reads_merged: +n[4], reads_sector: +n[5], reads_ms: +n[6],

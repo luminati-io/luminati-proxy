@@ -66,6 +66,7 @@ function ajax(opt){
         });
         return this.wait();
     }, function catch$(err){
+        xhr = xhr||{};
         zerr('ajax('+data_type+') failed url '+url+' data '+
             zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
             xhr.statusText+'\nresponseText: '+

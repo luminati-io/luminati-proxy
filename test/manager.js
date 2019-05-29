@@ -12,7 +12,6 @@ const Manager = require('../lib/manager.js');
 const Timeline = require('../lib/timeline.js');
 const zlog = require('../lib/log.js');
 const etask = require('../util/etask.js');
-const analytics = require('../lib/analytics.js');
 const pkg = require('../package.json');
 const qw = require('../util/string.js').qw;
 const lpm_util = require('../util/lpm_util.js');
@@ -456,17 +455,6 @@ describe('manager', ()=>{
                 total: 1,
             });
         });
-    });
-    it('disable analytics', ()=>{
-        const ua = analytics.get_ua();
-        const spy = sinon.stub(ua.ua, 'send', ()=>{});
-        analytics.enabled = false;
-        ua.send();
-        assert(!spy.called);
-        analytics.enabled = true;
-        ua.send();
-        assert(spy.called);
-        spy.restore();
     });
     describe('crash on load error', ()=>{
         beforeEach(()=>{

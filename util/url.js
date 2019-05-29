@@ -203,6 +203,23 @@ E.is_valid_email = function(email){
     return !!(n && E.is_valid_domain(n[1]));
 };
 
+// XXX dmitriie: move to email.js:is_alias
+E.is_alias_email = function(email){
+    if (!E.is_valid_email(email))
+        return false;
+    var n = email.toLowerCase().match(/^([a-z0-9_\.\-\+]+)@.*$/);
+    return !!(n && /.+\+.+/.test(n[1]));
+};
+
+// XXX dmitriie: move to email.js:get_main
+E.get_main_email = function(email){
+    if (!E.is_valid_email(email))
+        return;
+    if (E.is_alias_email(email))
+        return email.replace(/\+.+@/, '@');
+    return email;
+};
+
 E.is_ip_in_range = function(ips_range, ip){
     if (!E.is_ip_range(ips_range) || !E.is_ip(ip))
         return false;
