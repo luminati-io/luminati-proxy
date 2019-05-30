@@ -9,6 +9,8 @@ const assert = require('assert');
 const request = require('request');
 const sinon = require('sinon');
 const Manager = require('../lib/manager.js');
+const cities = require('../lib/cities');
+sinon.stub(cities, 'ensure_data', ()=>null);
 const Timeline = require('../lib/timeline.js');
 const zlog = require('../lib/log.js');
 const etask = require('../util/etask.js');
@@ -79,8 +81,9 @@ describe('manager', ()=>{
                 args.push('--no-cookie');
             args = args.concat('--loki', '/tmp/testdb');
         }
+        Manager.prototype.check_conn = ()=>null;
         manager = new Manager(lpm_util.init_args(args),
-            {bypass_credentials_check: true, skip_ga: true});
+            {bypass_credentials_check: true});
         manager.on('error', this.throw_fn());
         yield manager.start();
         const admin = 'http://127.0.0.1:'+www;
@@ -137,7 +140,6 @@ describe('manager', ()=>{
         return res.body;
     });
     afterEach('after manager', etask._fn(function*(_this){
-        _this.timeout(6000);
         if (!app)
             return;
         yield app.manager.stop(true);
@@ -151,8 +153,7 @@ describe('manager', ()=>{
     afterEach('after manager 2', ()=>temp_files.forEach(f=>f.done()));
     describe('get_params', ()=>{
         const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
-            const mgr = new Manager(lpm_util.init_args(_args),
-                {skip_ga: true});
+            const mgr = new Manager(lpm_util.init_args(_args));
             assert.deepEqual(expected, mgr.get_params());
         }));
         t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
@@ -166,7 +167,6 @@ describe('manager', ()=>{
     xdescribe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
         function*(_this){
-            _this.timeout(4000);
             app = yield app_with_config(config);
             let proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
@@ -218,7 +218,6 @@ describe('manager', ()=>{
     xdescribe('dropin', ()=>{
         const t = (name, args, expected)=>it(name, etask._fn(
         function*(_this){
-            _this.timeout(4000);
             app = yield app_with_args(args);
             let proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
@@ -227,7 +226,6 @@ describe('manager', ()=>{
     });
     describe('api', ()=>{
         it('ssl', etask._fn(function*(_this){
-            _this.timeout(6000);
             app = yield app_with_args();
             const res = yield api('ssl');
             assert_has(res.headers, {
@@ -247,7 +245,6 @@ describe('manager', ()=>{
         describe('proxies', ()=>{
             describe('get', ()=>{
                 it('normal', ()=>etask._fn(function*(_this){
-                    _this.timeout(6000);
                     const proxies = [{port: 24023}, {port: 24024}];
                     app = yield app_with_proxies(proxies);
                     let res = yield json('api/proxies');
@@ -258,7 +255,6 @@ describe('manager', ()=>{
             });
             describe('post', ()=>{
                 it('normal non-persist', ()=>etask._fn(function*(_this){
-                    _this.timeout(6000);
                     const sample_proxy = {
                         port: 24001,
                         proxy_type: 'non-persist',
@@ -274,7 +270,6 @@ describe('manager', ()=>{
                     assert.equal(res.length, 1);
                 }));
                 it('normal persist', etask._fn(function*(_this){
-                    _this.timeout(6000);
                     let sample_proxy = {port: 24001};
                     let proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {});
@@ -287,12 +282,11 @@ describe('manager', ()=>{
                     assert_has(res, [{}, sample_proxy], 'proxies');
                 }));
                 it('inherit defaults', ()=>etask(function*(){
-                    let sample_proxy = {port: 24001, proxy_type:
+                    const sample_proxy = {port: 24001, proxy_type:
                         'non-persist'};
-                    let proxies = [{port: 24000}];
-                    let res_proxy = assign({}, {customer, password},
+                    const res_proxy = assign({}, {customer, password},
                         sample_proxy);
-                    app = yield app_with_proxies(proxies, {});
+                    app = yield app_with_proxies([{port: 24000}], {});
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
                     assert_has(res, {data: res_proxy}, 'proxies');
@@ -302,7 +296,6 @@ describe('manager', ()=>{
                     assert.equal(res.length, 1);
                 }));
                 it('conflict', etask._fn(function*(_this){
-                    _this.timeout(6000);
                     const sample_proxy = {port: 24000};
                     const proxies = [sample_proxy];
                     app = yield app_with_proxies(proxies, {});
@@ -314,7 +307,6 @@ describe('manager', ()=>{
             });
             describe('put', ()=>{
                 it('normal', etask._fn(function*(_this){
-                    _this.timeout(6000);
                     const put_proxy = {port: 24001};
                     const proxies = [{port: 24000}];
                     app = yield app_with_proxies(proxies, {});
@@ -337,7 +329,6 @@ describe('manager', ()=>{
                     assert_has(res, [res_proxy], 'proxies');
                 }));
                 it('conflict', etask._fn(function*(_this){
-                    _this.timeout(6000);
                     let proxies = [{port: 24000}, {port: 24001}];
                     app = yield app_with_proxies(proxies, {});
                     let res = yield api_json('api/proxies/24001',
@@ -348,7 +339,6 @@ describe('manager', ()=>{
             });
             describe('delete', ()=>{
                 it('normal', etask._fn(function*(_this){
-                    _this.timeout(6000);
                     app = yield app_with_args([]);
                     let res = yield api_json('api/proxies/24000',
                         {method: 'delete'});
@@ -358,7 +348,6 @@ describe('manager', ()=>{
         });
         describe('user credentials', ()=>{
             it('success', etask._fn(function*(_this){
-                _this.timeout(6000);
                 nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).post('/update_lpm_stats')
                     .reply(200, {});
@@ -372,7 +361,6 @@ describe('manager', ()=>{
                 assert_has(result, {mock_result: true});
             }));
             it('login required', etask._fn(function*(_this){
-                _this.timeout(6000);
                 nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', token: '',
@@ -390,7 +378,6 @@ describe('manager', ()=>{
                 }
             }));
             it('update defaults', etask._fn(function*(_this){
-                _this.timeout(6000);
                 const updated = {_defaults: {customer: 'updated'}};
                 nock(api_base).get('/').times(3).reply(200, {});
                 nock(api_base).post('/update_lpm_stats')
@@ -408,7 +395,6 @@ describe('manager', ()=>{
         });
         describe('har logs', ()=>{
             it('fetches all the logs', etask._fn(function*(_this){
-                _this.timeout(6000);
                 app = yield app_with_args(['--customer', 'mock_user',
                     '--port', '24000']);
                 app.manager.loki.requests_clear();
@@ -426,7 +412,6 @@ describe('manager', ()=>{
         xdescribe('recent_stats', ()=>{
             const t = (name, expected)=>
             it(name, etask._fn(function*(_this){
-                _this.timeout(6000);
                 nock(api_base).get('/cp/lum_local_conf')
                     .query({customer: 'mock_user', proxy: pkg.version})
                     .reply(200, {mock_result: true, _defaults: true});
@@ -461,7 +446,6 @@ describe('manager', ()=>{
             log_stub.reset();
         });
         const t = (name, proxies, msg)=>it(name, etask._fn(function*(_this){
-            _this.timeout(6000);
             const err_matcher = sinon.match(msg);
             app = yield app_with_proxies(proxies);
             sinon.assert.calledWith(log_stub, err_matcher);
@@ -474,7 +458,6 @@ describe('manager', ()=>{
     });
     describe('using passwords', ()=>{
         it('take password from provided zone', etask._fn(function*(_this){
-            _this.timeout(6000);
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {zone1: {password: ['zone1_pass']}}};
@@ -487,7 +470,6 @@ describe('manager', ()=>{
             assert.equal(res.data.password, 'zone1_pass');
         }));
         it('uses password from default zone', etask._fn(function*(_this){
-            _this.timeout(6000);
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
@@ -500,7 +482,6 @@ describe('manager', ()=>{
             assert.equal(res.data.password, 'static_pass');
         }));
         it('uses new proxy custom password', etask._fn(function*(_this){
-            _this.timeout(8000);
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
@@ -513,7 +494,6 @@ describe('manager', ()=>{
             assert.equal(res.data.password, 'p1_pass');
         }));
         it('uses existing proxy custom password', etask._fn(function*(_this){
-            _this.timeout(6000);
             const _defaults = {zone: 'static', password: 'xyz', zones: {
                 static: {password: ['static_pass']},
                 zone2: {password: ['zone2_pass']},
@@ -542,7 +522,6 @@ describe('manager', ()=>{
     });
     describe('flags', ()=>{
         it('exits immediately with version on -v', etask._fn(function*(_this){
-            _this.timeout(6000);
             const exec = require('child_process').execFile;
             exec('node', ['./bin/index.js', '--version'], (err, res)=>{
                 this.continue();
@@ -557,7 +536,6 @@ describe('manager', ()=>{
         });
         const t = (name, should_run_migrations, config={}, cli={})=>
         it(name, etask._fn(function*(_this){
-            _this.timeout(6000);
             const notice = 'NOTICE: Migrating config file 1.116.387';
             const first_migration_match = sinon.match(notice);
             app = yield app_with_config({config, cli});

@@ -8,8 +8,8 @@ const string = require('./string.js');
 const date = require('./date.js');
 const qw = string.qw;
 
-const prop_by_type = (def, type)=>_.toPairs(def.properties)
-    .filter(p=>p[1].type==type).map(p=>p[0]);
+const prop_by_type = (props, type)=>
+    Object.keys(props).filter(k=>props[k].type==type);
 
 const conf = {
     version: pkg.version,
@@ -18,9 +18,11 @@ const conf = {
     is_electron: process.versions && !!process.versions.electron,
     proxy_fields: Object.assign({}, swagger.definitions.proxy.properties,
         swagger.definitions.manager.properties),
-    mgr_fields: _.keys(swagger.definitions.manager.properties),
-    numeric_fields: prop_by_type(swagger.definitions.proxy, 'integer'),
-    boolean_fields: prop_by_type(swagger.definitions.proxy, 'boolean'),
+    mgr_fields: Object.keys(swagger.definitions.manager.properties),
+    numeric_fields: prop_by_type(swagger.definitions.proxy.properties,
+        'integer'),
+    boolean_fields: prop_by_type(swagger.definitions.proxy.properties,
+        'boolean'),
     credential_fields: qw`customer zone password token token_auth`,
     default_superproxy_domain: 'zproxy.lum-superproxy.io',
     hola_agent: 'proxy='+pkg.version+' node='+process.version
@@ -28,8 +30,7 @@ const conf = {
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
     'version');
-conf.proxy_params = _(swagger.definitions.proxy.properties).pickBy(
-    k=>!conf.credential_fields.includes(k)).keys().value();
+conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
 conf.luminati_default = {
     port: 24000,
     zone: 'static',

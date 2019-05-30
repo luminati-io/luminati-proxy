@@ -1,11 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
-import {Note, Ext_tooltip} from '../common.js';
+import {Note} from '../common.js';
 import {Config, Tab_context} from './common.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 
 const pool_type_opt = [
@@ -42,8 +41,6 @@ export default class Rotation extends Pure_component {
         return !pool_type || pool_type=='long_availability';
     };
     render(){
-        if (_.get(this, 'state.form.ext_proxies'))
-            return <Note><Ext_tooltip/></Note>;
         if (!this.state.disabled_fields)
             return null;
         const form = this.state.form;

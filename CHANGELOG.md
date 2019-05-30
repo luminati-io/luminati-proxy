@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.137.946 Stable
+- :bug: Fixed Waterfall rule between external proxy and Luminati proxy
+
 ## 1.137.753 Stable
 - :bug: Fixes in residential pool
 - :bug: Improved order of applying rules (Waterfall always at the end)

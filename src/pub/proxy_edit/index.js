@@ -165,22 +165,13 @@ const Index = withRouter(class Index extends Pure_component {
         const form = Object.assign({}, _form);
         const last_preset = form.last_preset_applied ?
             presets[form.last_preset_applied] : null;
-        if (last_preset&&last_preset.key!=preset&&last_preset.clean)
+        if (last_preset && last_preset.key!=preset && last_preset.clean)
             last_preset.clean(form);
-        if (form.ext_proxies)
-        {
-            form.preset = '';
-            form.zone = '';
-            form.password = '';
-        }
-        else
-        {
-            form.preset = preset;
-            form.last_preset_applied = preset;
-            presets[preset].set(form);
-            const disabled_fields = presets[preset].disabled||{};
-            setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
-        }
+        form.preset = preset;
+        form.last_preset_applied = preset;
+        presets[preset].set(form);
+        const disabled_fields = presets[preset].disabled||{};
+        setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this.apply_rules(form);
         if (form.session===true)
         {
