@@ -857,6 +857,9 @@ class Actions extends Pure_component {
         const persist = this.props.proxy.proxy_type=='persist';
         const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
+        const href = window.location.href;
+        const is_local = href.includes('localhost')||
+            href.includes('127.0.0.1');
         return <div className="proxies_actions">
             {!!persist &&
               <React.Fragment>
@@ -871,9 +874,11 @@ class Actions extends Pure_component {
             <Action_icon id="refresh" scrolling={this.props.scrolling}
               on_click={this.refresh_sessions}
               tooltip="Refresh Sessions"/>
-            <Action_icon id="browser" scrolling={this.props.scrolling}
-              on_click={this.open_browser}
-              tooltip="Open browser configured with this port"/>
+            {is_local &&
+              <Action_icon id="browser" scrolling={this.props.scrolling}
+                on_click={this.open_browser}
+                tooltip="Open browser configured with this port"/>
+            }
             {!!persist &&
               <Portal>
                 <Modal_dialog title={delete_title}

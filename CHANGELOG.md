@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.138.101 
+
+## 1.138.100 Stable
+- :bug: Fixed presence of open browser button if host is not localhost
+
 ## 1.137.946 Stable
 - :bug: Fixed Waterfall rule between external proxy and Luminati proxy
 

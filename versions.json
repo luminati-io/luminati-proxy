@@ -1,5 +1,20 @@
 [
     {
+        "ver": "1.138.101",
+        "type": "stable/dev",
+        "changes": []
+    },
+    {
+        "ver": "1.138.100",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed presence of open browser button if host is not localhost"
+            }
+        ]
+    },
+    {
         "ver": "1.137.946",
         "type": "stable",
         "changes": [

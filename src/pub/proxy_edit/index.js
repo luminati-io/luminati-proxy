@@ -531,6 +531,9 @@ class Nav extends Pure_component {
             return {key, value: p};
         });
         const preset = this.props.form.preset;
+        const href = window.location.href;
+        const is_local = href.includes('localhost')||
+            href.includes('127.0.0.1');
         return <div className="nav">
               <Field on_change={this.update_zone} options={this.props.zones}
                 value={this.props.form.zone} disabled={this.props.disabled}
@@ -544,7 +547,9 @@ class Nav extends Pure_component {
                 value={preset} disabled={this.props.disabled} id="preset">
                 <Preset_description preset={preset} rule_clicked={()=>0}/>
               </Field>
-              <Open_browser_btn port={this.props.form.port}/>
+              {is_local &&
+                <Open_browser_btn port={this.props.form.port}/>
+              }
             </div>;
     }
 }
