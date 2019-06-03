@@ -1,8 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.138.101 
+## 1.138.327 Stable
+- :bug: Fixed debug: none option to skip all the debug headers
 
-## 1.138.100 Stable
+## 1.138.101 
 - :bug: Fixed presence of open browser button if host is not localhost
 
 ## 1.137.946 Stable

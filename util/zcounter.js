@@ -15,6 +15,10 @@ const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC;
 
+const default_host = env.NODE_ENV=='production'
+    ? 'zs-graphite.'+(env.DOMAIN||'hola.org') : 'localhost';
+const submit_url = env.ZCOUNTER_URL || `ws://${default_host}:3374`;
+
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
         if (process.env.IS_MOCHA)
@@ -344,86 +348,28 @@ function init(){
         cluster_ipc.worker_on('get_zcounters', loc_get_counters);
 }
 
-let ws_queue = new queue('zcounter');
-const ws_conn = new Map();
-let send_loop = ()=>etask(function*(){
-    if (send_loop.et)
-        zerr.perr('zcounter_double_conn');
-    this.finally(()=>send_loop.et = null);
-    send_loop.et = this;
-    for (;;)
-    {
-        const data = ws_format(yield ws_queue.wait());
-        if (!ws_conn.size)
-            return;
-        ws_conn.forEach(ws=>ws.json(data));
-    }
-});
-
-function ws_client(url){
-    if (ws_conn.has(url))
-        return ws_conn.get(url);
-    zerr.notice(`Opening zcounter conn to ${url}`);
-    let zws = require('./ws.js');
-    const label = url.split(':')[0];
-    const ws = new zws.Client(`ws://${url}`,
-        {label: `zcounter-${label}`, retry_interval: ms.SEC});
-    ws.on('connected', ()=>{
-        ws_conn.set(url, ws);
-        if (!send_loop.et)
-            send_loop();
-    });
-    ws.on('disconnected', ()=>ws_conn.delete(url));
-}
-
-function reconf_ws_servers(server_conf){
-    const conf_hosts = zutil.get(server_conf, 'zcounter.hosts', []);
-    const state = {};
-    for (let k of ws_conn.keys())
-        state[k] = -1;
-    const port = env.ZCOUNTER_PORT||3374;
-    const hosts = conf_hosts[env.SERVER_PRODUCT]||conf_hosts.hola;
-    for (let host of hosts)
-    {
-        const url = `${host}.${env.DOMAIN||'hola.org'}:${port}`;
-        state[url] = state[url]||0;
-        state[url]++;
-    }
-    for (let url in state)
-    {
-        if (state[url]>0)
-            ws_client(url);
-        if (state[url]<0)
-        {
-            zerr(`Closing zcounter conn to ${url}: not in config`);
-            ws_conn.get(url).close();
-        }
-    }
-}
+let ws, ws_queue = new queue('zcounter');
 
 function run(){
     init();
     if (cluster.isWorker)
         return;
-    const port = env.ZCOUNTER_PORT||3374;
-    if (env.NODE_ENV!='production')
-        ws_client(`localhost:${port}`);
-    else if (env.ZCOUNTER_URL)
-        ws_client(env.ZCOUNTER_URL);
-    else
-    {
-        const server = env.CONF_SERVER;
-        const system_db = require('../system/db/db.js');
-        const server_conf = system_db.use('server_conf', server);
-        system_db.on('server_conf', (...args)=>
-            reconf_ws_servers(server_conf, ...args), server);
-        etask(function*zcounter_wait_subscription(){
-            // If main code did not attempt to subscrube, try ourselves
-            yield etask.sleep(10*date.ms.SEC);
-            if (!system_db.has_updater(server))
-                yield system_db.subscribe(server);
+    let zws = require('./ws.js');
+    ws = new zws.Client(submit_url,
+        {label: 'zcounter', retry_interval: ms.SEC});
+    let et_send;
+    ws.on('connected', ()=>{
+        if (et_send)
+            zerr.perr('zcounter_double_conn');
+        et_send = etask(function*zcounter_send(){
+            for (;;)
+                ws.json(ws_format(yield ws_queue.wait()));
         });
-    }
+    });
+    ws.on('disconnected', ()=>{
+        if (et_send)
+            et_send = void et_send.return();
+    });
     etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
         let metrics = yield prepare();
         if (metrics.length)
@@ -439,7 +385,7 @@ E.flush = ()=>etask(function*zcounter_flush(){
     let metrics = yield prepare();
     if (metrics.length)
         ws_queue.put(metrics, max_age);
-    if (ws_conn.size)
+    if (ws)
         return;
     const dir = env.ZCOUNTER_DIR||'/run/shm/zcounter';
     for (;;)

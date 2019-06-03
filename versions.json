@@ -1,12 +1,17 @@
 [
     {
-        "ver": "1.138.101",
-        "type": "stable/dev",
-        "changes": []
+        "ver": "1.138.327",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed debug: none option to skip all the debug headers"
+            }
+        ]
     },
     {
-        "ver": "1.138.100",
-        "type": "stable",
+        "ver": "1.138.101",
+        "type": "stable/dev",
         "changes": [
             {
                 "type": "bug",

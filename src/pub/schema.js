@@ -52,7 +52,7 @@ const tooltips = t=>({
 });
 
 class Schema extends Pure_component {
-    state = {form: {}, proxies: []};
+    state = {form: {}, proxies: [], spcountry: 'us'};
     componentDidMount(){
         this.setdb_on('head.proxy_edit.form', (form={})=>{
             this.setState({form: {...form}});
@@ -76,6 +76,16 @@ class Schema extends Pure_component {
             if (zones)
                 this.setState({zones});
         });
+        this.setdb_on('head.proxy_edit.form.proxy', proxy=>{
+            const country_prefix = 'servercountry-';
+            if (proxy&&proxy.includes(country_prefix))
+            {
+                const start_index = proxy.indexOf(country_prefix)+
+                    country_prefix.length;
+                const spcountry = proxy.substring(start_index, start_index+2);
+                this.setState({spcountry});
+            }
+        });
     }
     render(){
         if (!this.state.zones)
@@ -93,7 +103,7 @@ class Schema extends Pure_component {
               </Layer>
               <Layer no_btn id="port_numbers"><T>Port</T> 22225</Layer>
               <Layer id="super_proxy">
-                <span className="flag-icon flag-icon-us"/>
+                <span className={'flag-icon flag-icon-'+this.state.spcountry}/>
                 <T>Super Proxy</T>
               </Layer>
               <Layer no_btn id="port_numbers"><T>Port</T> 80, 443</Layer>
