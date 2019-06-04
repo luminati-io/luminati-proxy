@@ -151,7 +151,7 @@ const _show_port_conflict = (port, force)=>etask(function*(){
     const tasks = yield get_lpm_tasks();
     if (!tasks.length)
     {
-        zerr.notice(`There is a conflict on port ${port}`);
+        zerr(`There is a conflict on port ${port}`);
         return E.manager.stop();
     }
     const pid = tasks[0].pid;

@@ -58,7 +58,6 @@ E.restore_case = function(headers, original_raw){
 E.browser_defaults = ()=>({
     connection: 'keep-alive',
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-    'cache-control': 'max-age=0',
     'upgrade-insecure-requests': '1',
     'accept-encoding': 'gzip, deflate, br',
     'accept-language': 'en-US,en;q=0.9',
@@ -85,7 +84,7 @@ E.like_browser_case_and_order = function(headers){
 };
 
 E.browser_default_headers_http2 = qw`:authority :method :path :scheme accept
-    accept-encoding accept-language cache-control cookie
+    accept-encoding accept-language cache-control cookie referer
     upgrade-insecure-requests user-agent`;
 
 E.like_browser_case_and_order_http2 = function(headers){

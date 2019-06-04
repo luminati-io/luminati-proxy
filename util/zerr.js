@@ -284,8 +284,8 @@ E.zexit = function(args){
         var e = new Error();
         stack = e.stack;
         __zerr(L.CRIT, arguments);
-        console.error(stack);
     }
+    console.error('zerr.zexit was called', new Error().stack);
     E.flush();
     // workaround for process.zon override issue
     if (process.zon && process.zon.main)

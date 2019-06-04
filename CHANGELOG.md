@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.138.518 Stable
+- :bug: Super Proxy's icon flag in LPM isn't changing
+- :bug: *_chrome_icon elements are not showed correctly on Mozilla
+
 ## 1.138.327 Stable
 - :bug: Fixed debug: none option to skip all the debug headers
 

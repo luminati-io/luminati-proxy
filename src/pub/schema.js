@@ -78,7 +78,7 @@ class Schema extends Pure_component {
         });
         this.setdb_on('head.proxy_edit.form.proxy', proxy=>{
             const country_prefix = 'servercountry-';
-            if (proxy&&proxy.includes(country_prefix))
+            if (proxy && proxy.includes(country_prefix))
             {
                 const start_index = proxy.indexOf(country_prefix)+
                     country_prefix.length;

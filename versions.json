@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.138.518",
+        "type": "stable",
+        "changes": [
+          {
+            "type": "bug",
+            "text": "Super Proxy's icon flag in LPM isn't changing"
+          },
+          {
+            "type": "bug",
+            "text": "*_chrome_icon elements are not showed correctly on Mozilla"
+          }
+        ]
+    },
+    {
         "ver": "1.138.327",
         "type": "stable",
         "changes": [

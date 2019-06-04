@@ -2675,6 +2675,38 @@ span.icon_link {
     &:hover { background-color: #333; }
     &.active { background-color: #2196f3; }
 }
+@-moz-document url-prefix() {
+.chrome_icon {
+    display: inline-block;
+    width: 28px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0);
+    background: url(/img/large_icons.png);
+    background-position: var(--spritesheet-position);
+    &.clear { --spritesheet-position: 0 143px; }
+    &.docker { --spritesheet-position: 55px 24px; }
+    &.close_logs { --spritesheet-position: 140px 0; }
+    &.resend { --spritesheet-position: 59px 1px; }
+    &.remove { --spritesheet-position: 83px 25px; }
+    &.filters { --spritesheet-position: -56px 116px; }
+    &.download { --spritesheet-position: 26px 144px; }
+    &.actions { --spritesheet-position: 81px 117px; }
+    &.add { --spritesheet-position: 113px 95px; }
+    &.trash { --spritesheet-position: 77px 23px; }
+    &.duplicate { --spritesheet-position: 49px 23px; }
+    &.refresh { --spritesheet-position: 136px 47px; }
+    &.browser { --spritesheet-position: 81px -49px; }
+    &:hover { background-color: rgba(0, 0, 0, 0); }
+    &.active { background-color: rgba(0, 0, 0, 0); }
+}
+.chrome {
+    .toolbar_container {
+        .toolbar_button:hover {
+            span.t_button { background-color: rgba(0, 0, 0, 0); }
+        }
+    }
+}
+}
 .expandable {
     cursor: pointer;
     display: flex;
