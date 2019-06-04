@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.138.603 Stable
+- :star: Added support for "carrier" option in Link Tester API
+- :bug: Improved error messages
+- :bug: Fixed IP rotation for external proxies
+
 ## 1.138.518 Stable
 - :bug: Super Proxy's icon flag in LPM isn't changing
 - :bug: *_chrome_icon elements are not showed correctly on Mozilla

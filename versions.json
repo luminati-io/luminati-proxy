@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.138.603",
+        "type": "stable",
+        "changes": [
+          {
+            "type": "star",
+            "text": "Added support for \"carrier\" option in Link Tester API"
+          },
+          {
+            "type": "bug",
+            "text": "Improved error messages"
+          },
+          {
+            "type": "bug",
+            "text": "Fixed IP rotation for external proxies"
+          }
+        ]
+    },
+    {
         "ver": "1.138.518",
         "type": "stable",
         "changes": [

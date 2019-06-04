@@ -5,7 +5,7 @@
 #
 
 # Pull base image.
-FROM node:10.11.0
+FROM node:10.15.3
 
 USER root
 RUN npm config set user root
