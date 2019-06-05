@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.138.758 
+- :bug: Fixed targeting mobile IPs
+
 ## 1.138.603 Stable
 - :star: Added support for "carrier" option in Link Tester API
 - :bug: Improved error messages

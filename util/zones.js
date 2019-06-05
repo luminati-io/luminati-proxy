@@ -63,6 +63,14 @@ E.is_static_proxy = (proxy, zones)=>{
     return plan && plan.type=='static';
 };
 
+E.is_mobile = (proxy, zones)=>{
+    const zone = zones.find(z=>z.zone==proxy.zone);
+    if (!zone)
+        return false;
+    const plan = E.get_plan(zone.plans);
+    return !!(plan && plan.mobile);
+};
+
 // XXX krzysztof: TODO
 function Zones_mgr(){
 }

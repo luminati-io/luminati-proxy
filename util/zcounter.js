@@ -15,9 +15,11 @@ const E = exports;
 const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC;
 
-const default_host = env.NODE_ENV=='production'
-    ? 'zs-graphite.'+(env.DOMAIN||'hola.org') : 'localhost';
-const submit_url = env.ZCOUNTER_URL || `ws://${default_host}:3374`;
+E.config = {hosts: {
+    hola: ['zs-graphite'],
+    spark: ['zs-graphite', 'zs-graphite-spark'],
+    lum: ['zs-graphite'],
+}};
 
 E.enable_submit = when=>{
     E.enable_submit = ()=>{
@@ -348,28 +350,57 @@ function init(){
         cluster_ipc.worker_on('get_zcounters', loc_get_counters);
 }
 
-let ws, ws_queue = new queue('zcounter');
+let ws_queue = new queue('zcounter');
+const ws_conn = new Map();
+let send_loop = ()=>etask(function*(){
+    if (send_loop.et)
+        zerr.perr('zcounter_double_conn');
+    this.finally(()=>send_loop.et = null);
+    send_loop.et = this;
+    for (;;)
+    {
+        const data = ws_format(yield ws_queue.wait());
+        if (!ws_conn.size)
+            return void (send_loop.et = null);
+        ws_conn.forEach(ws=>ws.json(data));
+    }
+});
+
+function ws_client(url){
+    if (!url.startsWith('ws'))
+        url = `ws://${url}`;
+    if (ws_conn.has(url))
+        return ws_conn.get(url);
+    zerr.notice(`Opening zcounter conn to ${url}`);
+    let zws = require('./ws.js');
+    const label = url.split(':')[1].replace(/^\/\//, '');
+    const ws = new zws.Client(url, {label: `zcounter-${label}`,
+        retry_interval: ms.SEC});
+    ws.on('connected', ()=>{
+        ws_conn.set(url, ws);
+        if (!send_loop.et)
+            send_loop();
+    });
+    ws.on('disconnected', ()=>ws_conn.delete(url));
+    return ws;
+}
 
 function run(){
     init();
     if (cluster.isWorker)
         return;
-    let zws = require('./ws.js');
-    ws = new zws.Client(submit_url,
-        {label: 'zcounter', retry_interval: ms.SEC});
-    let et_send;
-    ws.on('connected', ()=>{
-        if (et_send)
-            zerr.perr('zcounter_double_conn');
-        et_send = etask(function*zcounter_send(){
-            for (;;)
-                ws.json(ws_format(yield ws_queue.wait()));
-        });
-    });
-    ws.on('disconnected', ()=>{
-        if (et_send)
-            et_send = void et_send.return();
-    });
+    const port = env.ZCOUNTER_PORT||3374;
+    if (env.NODE_ENV!='production')
+        ws_client(`ws://localhost:${port}`);
+    else if (env.ZCOUNTER_URL)
+        ws_client(env.ZCOUNTER_URL);
+    else
+    {
+        const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'hola',
+            'zs-graphite');
+        for (let host of hosts)
+            ws_client(`ws://${host}.${env.DOMAIN||'hola.org'}:${port}`);
+    }
     etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
         let metrics = yield prepare();
         if (metrics.length)
@@ -385,7 +416,7 @@ E.flush = ()=>etask(function*zcounter_flush(){
     let metrics = yield prepare();
     if (metrics.length)
         ws_queue.put(metrics, max_age);
-    if (ws)
+    if (ws_conn.size)
         return;
     const dir = env.ZCOUNTER_DIR||'/run/shm/zcounter';
     for (;;)
@@ -400,4 +431,4 @@ E.flush = ()=>etask(function*zcounter_flush(){
     }
 });
 
-E.t = {loc_get_counters, get_agg_counters, _get, prepare};
+E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client};

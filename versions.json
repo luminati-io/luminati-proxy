@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.138.758",
+        "type": "stable/dev",
+        "changes": [
+          {
+            "type": "bug",
+            "text": "Fixed targeting mobile IPs"
+          }
+        ]
+    },
+    {
         "ver": "1.138.603",
         "type": "stable",
         "changes": [

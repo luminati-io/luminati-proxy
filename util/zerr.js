@@ -285,7 +285,8 @@ E.zexit = function(args){
         stack = e.stack;
         __zerr(L.CRIT, arguments);
     }
-    console.error('zerr.zexit was called', new Error().stack);
+    if ((args&&args.code)!='ERR_ASSERTION')
+        console.error('zerr.zexit was called', new Error().stack);
     E.flush();
     // workaround for process.zon override issue
     if (process.zon && process.zon.main)

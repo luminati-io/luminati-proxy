@@ -433,8 +433,14 @@ E.vmstat = function(){
 
 E.disk_page_io = function(){
     var vmstat = E.vmstat();
-    // pgpgin/pgpgout are reported in KB
-    return {read: vmstat.pgpgin*KB, write: vmstat.pgpgout*KB};
+    // pgpgin/pgpgout are reported in KB; nr_dirty is reported in 4K pages
+    return {
+        read: vmstat.pgpgin*KB,
+        write: vmstat.pgpgout*KB,
+        dirty: vmstat.nr_dirty*4*KB,
+        dirty_max: vmstat.nr_dirty_threshold*4*KB,
+        dirty_bg_max: vmstat.nr_dirty_background_threshold*4*KB,
+    };
 };
 
 function calc_diskstat(cur, prev){
