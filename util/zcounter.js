@@ -397,7 +397,7 @@ function run(){
     else
     {
         const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'hola',
-            'zs-graphite');
+            ['zs-graphite']);
         for (let host of hosts)
             ws_client(`ws://${host}.${env.DOMAIN||'hola.org'}:${port}`);
     }

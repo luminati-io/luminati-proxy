@@ -126,11 +126,11 @@ const check_conflicts = ()=>etask(function*(){
     restart();
 });
 
-const _run = (argv, run_config)=>etask(function*(){
+const _run = argv=>etask(function*(){
     yield check_conflicts();
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});
-    manager = new Manager(argv, run_config);
+    manager = new Manager(argv);
     auto_updater.logger = manager._log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
@@ -158,11 +158,12 @@ const _run = (argv, run_config)=>etask(function*(){
         handle_fatal();
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
+        // XXX krzysztof: probably zone_autoupdate is not used anymore-cleanup
         yield manager.stop('config change', true, true);
         setTimeout(()=>_run(argv, zone_autoupdate && zone_autoupdate.prev ? {
             warnings: [`Your default zone has been automatically changed from `
                 +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
-        } : {}), 0);
+        } : {}));
     }));
     manager.start();
 });

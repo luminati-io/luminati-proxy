@@ -13,6 +13,7 @@ const zsinon = require('../util/sinon.js');
 const lpm_config = require('../util/lpm_config.js');
 const Luminati = require('../lib/luminati.js');
 const Timeline = require('../lib/timeline.js');
+const Config = require('../lib/config.js');
 const {assert_has, http_proxy, http_ping} = require('./common.js');
 const qw = require('../util/string.js').qw;
 const test_url = {http: 'http://lumtest.com/test',
@@ -29,6 +30,10 @@ describe('proxy', ()=>{
         opt = opt||{};
         if (opt.ssl===true)
             opt.ssl = Object.assign({requestCert: false}, ssl());
+        const mgr = {
+            send_rule_mail: ()=>null,
+            config: new Config(),
+        };
         const l = new Luminati(Object.assign({
             proxy: '127.0.0.1',
             proxy_port: proxy.port,
@@ -36,7 +41,7 @@ describe('proxy', ()=>{
             password,
             log: 'none',
             port: 24000,
-        }, opt), {send_rule_mail: function(){}});
+        }, opt), mgr);
         l.test = etask._fn(function*(_this, req_opt){
             if (typeof req_opt=='string')
                 req_opt = {url: req_opt};
@@ -1048,8 +1053,8 @@ describe('proxy', ()=>{
                         ips,
                     });
                     inject_headers(l, '1.2.3.4');
-                    l.mgr.save_config = ()=>null;
                     l.mgr.proxies = [{port: 24000, ips}];
+                    sinon.stub(l.mgr.config, 'save');
                     yield l.test();
                     assert.ok(l.opt.ips.includes('1.2.3.4'));
                 }));
@@ -1069,7 +1074,6 @@ describe('proxy', ()=>{
                         ips,
                     });
                     inject_headers(l, '1.2.3.4');
-                    l.mgr.save_config = ()=>null;
                     l.mgr.proxies = [{port: 24000, ips}];
                     yield l.test();
                     assert.ok(!l.opt.ips.includes('1.2.3.4'));
@@ -1086,8 +1090,7 @@ describe('proxy', ()=>{
                         ips: ['1.2.3.4', '2.3.4.5'],
                     });
                     inject_headers(l, '1.2.3.4');
-                    l.mgr.save_config = ()=>null;
-                    const stub = sinon.stub(l.mgr, 'save_config');
+                    const stub = sinon.stub(l.mgr.config, 'save');
                     assert.ok(l.opt.ips.includes('1.2.3.4'));
                     yield l.test();
                     sinon.assert.calledOnce(stub);
@@ -1106,8 +1109,7 @@ describe('proxy', ()=>{
                         ips: ['1.2.3.4', '2.3.4.5'],
                     });
                     inject_headers(l, '1.2.3.4');
-                    l.mgr.save_config = ()=>null;
-                    const stub = sinon.stub(l.mgr, 'save_config');
+                    const stub = sinon.stub(l.mgr.config, 'save');
                     assert.equal(l.session_mgr.sessions.sessions.length, 2);
                     yield l.test();
                     sinon.assert.calledOnce(stub);

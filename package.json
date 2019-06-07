@@ -283,6 +283,7 @@
       "changelog.json",
       "lib/analytics.js",
       "lib/cities.js",
+      "lib/config.js",
       "lib/context.js",
       "lib/find_iface.js",
       "lib/hash.js",
@@ -310,6 +311,7 @@
       "lib/util.js",
       "publish_cn.js",
       "publish_validate.js",
+      "scripts/stress_test.js",
       "src/pub/app.js",
       "src/pub/app.less",
       "src/pub/chrome_widgets.js",
@@ -359,6 +361,7 @@
       "src/pub/whitelist_ips.js",
       "src/pub/ws.js",
       "test/common.js",
+      "test/config.js",
       "test/index.js",
       "test/manager.js",
       "test/migration.js",
@@ -371,7 +374,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "75023dbeb07c4032618f6d25b07c2aa3"
+    "md5": "fd9ac374a43429cdad4d21c7cf023bab"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -404,6 +407,7 @@
     "start": "bin/index.js",
     "test": "./node_modules/mocha/bin/mocha",
     "test-win": "node node_modules/mocha/bin/mocha",
+    "stress-test": "node scripts/stress_test.js",
     "build": "node_modules/webpack/bin/webpack.js"
   },
   "pkg": {
@@ -428,5 +432,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.138.758"
+  "version": "1.139.62"
 }

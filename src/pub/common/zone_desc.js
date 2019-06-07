@@ -27,6 +27,11 @@ export default class Zone_description extends Pure_component {
             label: 'Static residential',
             tooltip: 'Static residential IPs',
         },
+        unblocker: {
+            label: 'Unblocker',
+            tooltip: 'Smart proxy which automatically manages IPs, headers, '
+                +'and network',
+        },
     };
     ips_types = {
         shared: 'Shared',

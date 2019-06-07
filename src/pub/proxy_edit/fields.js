@@ -375,6 +375,11 @@ export const tabs = {
                     that you see in the console's log`,
                 ext: true,
             },
+            insecure: {
+                label: 'Insecure',
+                tooltop: `Allow "bad" certificates during SSL analyzing or
+                    not`,
+            },
             debug: {
                 label: 'Luminati request debug info',
                 tooltip: `Attach additional headers in the response of each

@@ -249,7 +249,7 @@ const columns = [
     },
     {
         key: 'ssl',
-        title: 'SSL Log',
+        title: 'SSL Analyzing',
         render: Boolean_cell,
         tooltip: 'In order to log HTTPS requests, enable SSL request logs in '
             +'proxy configuration',

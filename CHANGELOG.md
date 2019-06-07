@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.139.62 
+
 ## 1.138.758 
 - :bug: Fixed targeting mobile IPs
 

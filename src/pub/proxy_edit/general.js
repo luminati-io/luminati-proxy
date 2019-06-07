@@ -27,6 +27,12 @@ const log_level_opt = [
     {key: `info`, value: 'info'},
 ];
 
+const insecure_opt = [
+    {key: `Default (only trusted)`, value: false},
+    {key: `allow bad certs`, value: true},
+    {key: `only trusted`, value: false},
+];
+
 export default class General extends Pure_component {
     state = {};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
@@ -98,6 +104,7 @@ export default class General extends Pure_component {
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact/>
                 <Config type="select" id="log" data={log_level_opt}/>
+                <Config type="select" id="insecure" data={insecure_opt}/>
                 <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>
             </div>;
