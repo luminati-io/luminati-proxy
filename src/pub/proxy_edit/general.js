@@ -27,12 +27,6 @@ const log_level_opt = [
     {key: `info`, value: 'info'},
 ];
 
-const insecure_opt = [
-    {key: `Default (only trusted)`, value: false},
-    {key: `allow bad certs`, value: true},
-    {key: `only trusted`, value: false},
-];
-
 export default class General extends Pure_component {
     state = {};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
@@ -57,6 +51,10 @@ export default class General extends Pure_component {
         }
         this.set_field('pool_size', size);
         this.set_field('multiply', 1);
+    };
+    on_change_ssl = ssl=>{
+        if (!ssl && this.state.form.insecure)
+            this.set_field('insecure', false);
     };
     open_modal = ()=>$('#allocated_ips').modal('show');
     render(){
@@ -86,8 +84,10 @@ export default class General extends Pure_component {
                   val_id="port"/>
                 <Config type="text" id="password" disabled/>
                 <Config type="pins" id="whitelist_ips"/>
-                <Config type="yes_no" id="ssl"/>
+                <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="secure_proxy"/>
+                <Config type="yes_no" id="insecure"
+                    disabled={!this.state.form.ssl}/>
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"
                   data={[0, 5, 20, 100, 500]}
@@ -104,7 +104,6 @@ export default class General extends Pure_component {
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact/>
                 <Config type="select" id="log" data={log_level_opt}/>
-                <Config type="select" id="insecure" data={insecure_opt}/>
                 <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>
             </div>;

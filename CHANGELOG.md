@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.139.129 Stable
+- :star: Added Insecure field under General tab
+
 ## 1.139.62 
 
 ## 1.138.758 

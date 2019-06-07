@@ -377,8 +377,9 @@ export const tabs = {
             },
             insecure: {
                 label: 'Insecure',
-                tooltop: `Allow "bad" certificates during SSL analyzing or
-                    not`,
+                tooltip: `It works only when SSL analyzing is enabled. You can
+                    enable this option to ignore checking certificates of SSL
+                    connection`,
             },
             debug: {
                 label: 'Luminati request debug info',
