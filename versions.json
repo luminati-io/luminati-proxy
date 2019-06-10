@@ -1,11 +1,21 @@
 [
     {
+        "ver": "1.139.264",
+        "type": "stable",
+        "changes": [
+          {
+              "type": "bug",
+              "text": "fix LPM response when cert is wrong and not using insecure flag"
+          }
+        ]
+    },
+    {
         "ver": "1.139.129",
         "type": "stable",
         "changes": [
           {
-            "type": "star",
-            "text": "Added Insecure field under General tab"
+              "type": "star",
+              "text": "Added Insecure field under General tab"
           }
         ]
     },
@@ -18,42 +28,42 @@
         "ver": "1.138.758",
         "type": "stable/dev",
         "changes": [
-          {
-            "type": "bug",
-            "text": "Fixed targeting mobile IPs"
-          }
+            {
+                "type": "bug",
+                "text": "Fixed targeting mobile IPs"
+            }
         ]
     },
     {
         "ver": "1.138.603",
         "type": "stable",
         "changes": [
-          {
-            "type": "star",
-            "text": "Added support for \"carrier\" option in Link Tester API"
-          },
-          {
-            "type": "bug",
-            "text": "Improved error messages"
-          },
-          {
-            "type": "bug",
-            "text": "Fixed IP rotation for external proxies"
-          }
+            {
+                "type": "star",
+                "text": "Added support for \"carrier\" option in Link Tester API"
+            },
+            {
+                "type": "bug",
+                "text": "Improved error messages"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed IP rotation for external proxies"
+            }
         ]
     },
     {
         "ver": "1.138.518",
         "type": "stable",
         "changes": [
-          {
-            "type": "bug",
-            "text": "Super Proxy's icon flag in LPM isn't changing"
-          },
-          {
-            "type": "bug",
-            "text": "*_chrome_icon elements are not showed correctly on Mozilla"
-          }
+            {
+                "type": "bug",
+                "text": "Super Proxy's icon flag in LPM isn't changing"
+            },
+            {
+                "type": "bug",
+                "text": "*_chrome_icon elements are not showed correctly on Mozilla"
+            }
         ]
     },
     {

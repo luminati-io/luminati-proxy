@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.139.264 Stable
+- :bug: fix LPM response when cert is wrong and not using insecure flag
+
 ## 1.139.129 Stable
 - :star: Added Insecure field under General tab
 

@@ -4,8 +4,6 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import Cn from '/www/lum/pub/locale/zh_CN.json';
 import Ru from '/www/lum/pub/locale/ru.json';
-import Ko from '/www/lum/pub/locale/ko.json';
-import Tr from '/www/lum/pub/locale/tr.json';
 import setdb from '../../../util/setdb.js';
 
 const t = (key, translation)=>{
@@ -60,9 +58,7 @@ export const with_tt = (keys, Component)=>class extends Pure_component {
 export const langs = {
     en: {name: 'English', flag: 'gb'},
     ru: {name: 'русский', flag: 'ru', t: Ru},
-    tr: {name: 'Tϋrkçe', flag: 'tr', t: Tr},
     cn: {name: '简体中文', flag: 'cn', t: Cn},
-    ko: {name: '한국어', flag: 'kr', t: Ko},
 };
 
 export const set_lang = lang=>{
