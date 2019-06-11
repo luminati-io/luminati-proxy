@@ -80,7 +80,6 @@ class Lum_node_index extends Lum_common {
     }
     shutdown_on_child_exit(){ process.exit(); }
     create_child(){
-        // XXX vladislavl: setup env for debug purposes only
         process.env.LUM_MAIN_CHILD = true;
         this.child = child_process.fork(
             path.resolve(__dirname, 'lum_node.js'),

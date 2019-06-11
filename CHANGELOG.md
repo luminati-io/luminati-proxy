@@ -1,7 +1,8 @@
 Luminati Proxy manager - Change Log
 
-## 1.139.264 Stable
+## 1.139.623 Stable
 - :bug: fix LPM response when cert is wrong and not using insecure flag
+- :sparkles: Added new Rule action: "Ban IPs globally"
 
 ## 1.139.129 Stable
 - :star: Added Insecure field under General tab

@@ -1,22 +1,26 @@
 [
     {
-        "ver": "1.139.264",
+        "ver": "1.139.623",
         "type": "stable",
         "changes": [
-          {
-              "type": "bug",
-              "text": "fix LPM response when cert is wrong and not using insecure flag"
-          }
+            {
+                "type": "bug",
+                "text": "fix LPM response when cert is wrong and not using insecure flag"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added new Rule action: \"Ban IPs globally\""
+            }
         ]
     },
     {
         "ver": "1.139.129",
         "type": "stable",
         "changes": [
-          {
-              "type": "star",
-              "text": "Added Insecure field under General tab"
-          }
+            {
+                "type": "star",
+                "text": "Added Insecure field under General tab"
+            }
         ]
     },
     {

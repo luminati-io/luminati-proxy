@@ -35,6 +35,9 @@ E.action_types = [
     {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
         amount of time. Usually used for failed requests.`, min_req_time: true,
         type: 'post'},
+    {key: 'Ban IP globally', value: 'ban_ip_global', tooltip: `The same as
+        'Ban IP' action but will ban the IP globally for all the proxy ports
+        configured on this LPM.`, min_req_time: true, type: 'post'},
     {key: 'Ban IP per domain', value: 'ban_ip_domain', tooltip: `Will ban the
         IP for custom amount of time per domain.`, min_req_time: true,
         type: 'post'},
@@ -137,6 +140,11 @@ const get_action = rule=>{
         body += `opt.retry({port: ${rule.action.retry_port}});\n`;
     if (rule.action.ban_ip!=undefined)
         body += `opt.ban_ip({ts: ${rule.action.ban_ip}});\n`;
+    if (rule.action.ban_ip_global!=undefined)
+    {
+        body += `opt.ban_ip({ts: ${rule.action.ban_ip_global}, `
+            +`global: true});\n`;
+    }
     if (rule.action.ban_ip_domain!=undefined)
     {
         body += `opt.ban_ip({ts: ${rule.action.ban_ip_domain}, `

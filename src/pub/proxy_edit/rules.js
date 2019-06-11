@@ -26,6 +26,8 @@ const rule_prepare = rule=>{
         action.retry_port = Number(rule.retry_port);
     else if (rule.action=='ban_ip')
         action.ban_ip = (rule.ban_ip_duration||0)*ms.MIN;
+    else if (rule.action=='ban_ip_global')
+        action.ban_ip_global = (rule.ban_ip_duration||0)*ms.MIN;
     else if (rule.action=='ban_ip_domain')
         action.ban_ip_domain = (rule.ban_ip_duration||0)*ms.MIN;
     else if (rule.action=='refresh_ip')
@@ -94,6 +96,8 @@ export const map_rule_to_form = rule=>{
         result.fast_pool_size = rule.action.fast_pool_size;
     if (rule.action.ban_ip)
         result.ban_ip_duration = rule.action.ban_ip/ms.MIN;
+    if (rule.action.ban_ip_global)
+        result.ban_ip_duration = rule.action.ban_ip_global/ms.MIN;
     if (rule.action.ban_ip_domain)
         result.ban_ip_duration = rule.action.ban_ip_domain/ms.MIN;
     if (rule.action.process)
@@ -321,7 +325,7 @@ class Action extends Pure_component {
                 p.value!=this.props.match.params.port)[0];
             this.set_rule_field(val, def_port && def_port.value || '');
         }
-        if (val!='ban_ip' && val!='ban_ip_domain')
+        if (val!='ban_ip' && val!='ban_ip_domain' && val!='ban_ip_global')
             this.set_rule_field('ban_ip_duration', '');
         if (!val)
         {
@@ -363,6 +367,8 @@ class Action extends Pure_component {
         ports.unshift({key: '--Select--', value: ''});
         const fast_pool_note = <Fast_pool_note port={current_port}
           r={rule.trigger_url_regex}/>;
+        const ban_action = ['ban_ip', 'ban_ip_domain', 'ban_ip_global']
+            .includes(rule.action);
         return <React.Fragment>
               <div className="action ui">
                 {rule.trigger_type &&
@@ -381,7 +387,7 @@ class Action extends Pure_component {
                   <Rule_config id="switch_port" type="select" data={ports}
                     rule={rule}/>
                 }
-                {(rule.action=='ban_ip' || rule.action=='ban_ip_domain') &&
+                {ban_action &&
                   <Rule_config id="ban_ip_duration" type="select_number"
                     data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
                     note={<Ban_ips_note/>}/>

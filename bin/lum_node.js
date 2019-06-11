@@ -32,7 +32,7 @@ const gen_filename = name=>{
         `.luminati_${name}.json`.substr(is_win ? 1 : 0));
 };
 
-E.write_status_file = (status, error = null, config = null, reason = null)=>{
+E.write_status_file = (status, error=null, config=null, reason=null)=>{
     if (error)
         error = zerr.e2s(error);
     Object.assign(E.lpm_status, {
@@ -69,8 +69,8 @@ E.shutdown = (reason, error=null)=>{
         E.uninit();
         process.exit(1);
     }, shutdown_timeout);
-    E.write_status_file('shutdowning', error, E.manager&&E.manager._total_conf,
-        reason);
+    E.write_status_file('shutdowning', error,
+        E.manager && E.manager._total_conf, reason);
     if (E.manager)
     {
         E.manager.stop(reason, true);
@@ -81,7 +81,7 @@ E.shutdown = (reason, error=null)=>{
     else
         zerr.info(`Shutdown, reason is ${reason}`);
     file.rm_rf_e(Tracer.screenshot_dir);
-    E.write_status_file('shutdown', error, E.manager&&E.manager._total_conf,
+    E.write_status_file('shutdown', error, E.manager && E.manager._total_conf,
         reason);
 };
 
@@ -274,7 +274,7 @@ E.run = (argv, run_config)=>etask(function*(){
         add_alias_for_whitelist_ips();
     E.read_status_file();
     E.write_status_file('initializing', null,
-        E.manager&&E.manager._total_conf);
+        E.manager && E.manager._total_conf);
     E.manager = new Manager(argv, Object.assign({}, run_config));
     E.manager.on('stop', ()=>{
         zerr.flush();

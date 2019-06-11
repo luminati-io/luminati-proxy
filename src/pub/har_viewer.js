@@ -904,8 +904,9 @@ class Name_cell extends Pure_component {
         const rule_tip = 'At least one rule has been applied to this'
         +' request. Click to see more details';
         const status_check = req.details.context=='STATUS CHECK';
-        const bad = (rules||[])
-            .some(r=>Object.keys(r.action||{}).includes('ban_ip'));
+        const is_ban = r=>Object.keys(r.action||{})
+            .some(a=>a.startsWith('ban_ip'));
+        const bad = (rules||[]).some(is_ban);
         const icon_classes = classnames('small_icon', 'rules', {
             good: !bad, bad});
         return <div className="col_name">

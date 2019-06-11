@@ -10,7 +10,7 @@ const headers = {
 const headers_cmd = Object.entries(headers).reduce((acc, [name, value])=>
     acc+`-H "${name}: ${value}" `, ' ');
 const opt = {
-    c: 500,
+    c: 1500,
     t: 10,
     port: 24000,
     url: 'http://lumtest.com/myip.json',

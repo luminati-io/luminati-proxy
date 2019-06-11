@@ -24,7 +24,7 @@ const show_message = opt=>etask(function*(){
     return res;
 });
 const mgr_err = msg=>{
-    if (manager&&manager._log)
+    if (manager && manager._log)
         manager._log.error(msg);
     else
         console.log(msg);

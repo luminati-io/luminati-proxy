@@ -55,6 +55,8 @@ E.restore_case = function(headers, original_raw){
 
 // default chrome headers
 // XXX andreish: support other browsers
+// XXX josh: upgrade-insecure-requests might not be needed on 2nd request
+// onwards
 E.browser_defaults = ()=>({
     connection: 'keep-alive',
     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -83,9 +85,12 @@ E.like_browser_case_and_order = function(headers){
     return E.capitalize(ordered_headers);
 };
 
-E.browser_default_headers_http2 = qw`:authority :method :path :scheme accept
-    accept-encoding accept-language cache-control cookie referer
-    upgrade-insecure-requests user-agent`;
+// XXX josh/andreish: these are correct for chrome, need to set header order
+// per-browser for firefox/safari/edge
+// XXX josh: cache-control header might not be in the right order
+E.browser_default_headers_http2 = qw`:method :authority :scheme :path
+    upgrade-insecure-requests user-agent accept referer
+    accept-encoding accept-language cookie cache-control`;
 
 E.like_browser_case_and_order_http2 = function(headers){
     let ordered_headers = {};
