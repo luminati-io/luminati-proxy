@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.139.746 Development Latest
+- :star: More accurate BW measurement
+
 ## 1.139.623 Stable
 - :bug: fix LPM response when cert is wrong and not using insecure flag
 - :sparkles: Added new Rule action: "Ban IPs globally"
