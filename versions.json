@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.140.22",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix preserving the order on changes in DC IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.139.746",
         "type": "dev",
         "changes": [

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.140.22 Stable
+- :bug: fix preserving the order on changes in DC IPs
+
 ## 1.139.746 Development Latest
 - :star: More accurate BW measurement
 

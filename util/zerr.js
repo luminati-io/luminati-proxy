@@ -186,29 +186,26 @@ E.set_level = function(level){
     return prev;
 };
 
-E.print_stack_trace = function(opt){
+E.get_stack_trace = function(opt){
     if (!opt)
         opt = {};
     if (opt.limit===undefined)
         opt.limit = Infinity;
     if (opt.short===undefined)
         opt.short = true;
-    var old_stack_limit;
+    var old_stack_limit = Error.stackTraceLimit;
     if (opt.limit)
-    {
-        old_stack_limit = Error.stackTraceLimit;
         Error.stackTraceLimit = opt.limit;
-    }
     var stack = zerr.e2s(new Error());
+    if (opt.limit)
+        Error.stackTraceLimit = old_stack_limit;
     if (opt.short)
     {
         stack = stack
             .replace(/^.+util\/etask.+$/gm, '    ...')
             .replace(/( {4}\.\.\.\n)+/g, '    ...\n');
     }
-    zerr(stack);
-    if (opt.limit)
-        Error.stackTraceLimit = old_stack_limit;
+    return stack;
 };
 
 if (is_node)
