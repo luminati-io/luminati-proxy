@@ -53,27 +53,72 @@ E.restore_case = function(headers, original_raw){
     return res;
 };
 
-// default chrome headers
-// XXX andreish: support other browsers
+// default header values
 // XXX josh: upgrade-insecure-requests might not be needed on 2nd request
 // onwards
-E.browser_defaults = ()=>({
-    connection: 'keep-alive',
-    accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-    'upgrade-insecure-requests': '1',
-    'accept-encoding': 'gzip, deflate, br',
-    'accept-language': 'en-US,en;q=0.9',
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
-});
+E.browser_defaults = function(browser){
+    let defs = {
+        chrome: {
+            connection: 'keep-alive',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'upgrade-insecure-requests': '1',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US,en;q=0.9',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+        },
+        firefox: {
+            connection: 'keep-alive',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'upgrade-insecure-requests': '1',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US,en;q=0.5',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
+        },
+        edge: {
+            connection: 'keep-alive',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'upgrade-insecure-requests': '1',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763',
+        },
+        safari: {
+            connection: 'keep-alive',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'upgrade-insecure-requests': '1',
+            'accept-encoding': 'br, gzip, deflate',
+            'accept-language': 'en-us',
+            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15',
+        },
+    };
+    return defs[browser]||defs.chrome;
+};
 
-E.like_browser_case_and_order = function(headers){
+// XXX andreish: need to set header order for safari
+E.browser_default_header_order = function(browser){
+    let headers = {
+        chrome: qw`host connection pragma cache-control
+            upgrade-insecure-requests user-agent accept referer accept-encoding
+            accept-language cookie`,
+        firefox: qw`host user-agent accept accept-language accept-encoding
+            referer connection cookie upgrade-insecure-requests cache-control`,
+        edge: qw`referer cache-control accept accept-language
+            upgrade-insecure-requests user-agent accept-encoding host
+            connection`,
+        safari: qw`host cookie connection upgrade-insecure-requests accept
+            user-agent referer accept-language accept-encoding`,
+    };
+    return headers[browser]||headers.chrome;
+};
+
+E.like_browser_case_and_order = function(headers, browser){
     let ordered_headers = {};
-    const header_keys = qw`host connection cache-control
-        upgrade-insecure-requests user-agent accept accept-encoding
-        accept-language cookie`;
+    let source_header_keys = Object.keys(headers);
+    let header_keys = E.browser_default_header_order(browser);
     for (let header of header_keys)
     {
-        let value = headers[header];
+        let value = headers[source_header_keys
+            .find(h=>h.toLowerCase()==header)];
         if (value)
             ordered_headers[header] = value;
     }
@@ -85,16 +130,27 @@ E.like_browser_case_and_order = function(headers){
     return E.capitalize(ordered_headers);
 };
 
-// XXX josh/andreish: these are correct for chrome, need to set header order
-// per-browser for firefox/safari/edge
-// XXX josh: cache-control header might not be in the right order
-E.browser_default_headers_http2 = qw`:method :authority :scheme :path
-    upgrade-insecure-requests user-agent accept referer
-    accept-encoding accept-language cookie cache-control`;
+// XXX josh/andreish: need to set header order for safari
+E.browser_default_header_order_http2 = function(browser){
+    let headers = {
+        chrome: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests user-agent accept referer accept-encoding
+            accept-language cookie`,
+        firefox: qw`:method :path :authority :scheme user-agent accept
+            accept-language accept-encoding referer cookie
+            upgrade-insecure-requests cache-control te`,
+        edge: qw`:method :path :authority :scheme referer cache-control
+            accept accept-language upgrade-insecure-requests user-agent
+            accept-encoding cookie`,
+        safari: qw`:method :scheme :path :authority cookie accept
+            accept-encoding user-agent accept-language referer`,
+    };
+    return headers[browser]||headers.chrome;
+};
 
-E.like_browser_case_and_order_http2 = function(headers){
+E.like_browser_case_and_order_http2 = function(headers, browser){
     let ordered_headers = {};
-    const header_keys = E.browser_default_headers_http2;
+    let header_keys = E.browser_default_header_order_http2(browser);
     let req_headers = {};
     for (let h in headers)
         req_headers[h.toLowerCase()] = headers[h];

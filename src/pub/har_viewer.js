@@ -47,6 +47,10 @@ class Har_viewer extends Pure_component {
             if (proxies)
                 this.setState({proxies});
         });
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({logs: settings.logs});
+        });
         this.etask(function*(){
             const suggestions = yield ajax.json(
                 {url: '/api/logs_suggestions'});
@@ -121,41 +125,49 @@ class Har_viewer extends Pure_component {
             return null;
         const width = `calc(100% - ${this.state.tables_width}px`;
         const preview_style = {maxWidth: width, minWidth: width};
-        return <div id="har_viewer" className="har_viewer chrome">
-              <div className="main_panel vbox" ref={this.set_main_panel_ref}>
-                <Toolbar
-                  undock={this.undock}
-                  dock_mode={this.props.dock_mode}
-                  master_port={this.props.master_port}
-                  filters={this.state.filters}
-                  set_filter={this.set_filter}
-                  proxies={this.state.proxies}
-                  type_filter={this.state.type_filter}
-                  set_type_filter={this.set_type_filter}
-                  clear={this.clear}
-                  on_change_search={this.on_change_search}
-                  search_val={this.state.search}/>
-                <div className="split_widget vbox flex_auto">
-                  <Tables_container
-                    key={''+this.props.master_port}
+        const show = this.state.logs>0;
+        return <div id="har_viewer" className={(show ? 'har_viewer' :
+            'har_viewer_off')+" chrome"}>
+              {!show &&
+                <h4>Request logs are disabled. You can enable it back in&nbsp;
+                  <a href="/settings">General settings</a></h4>
+              }
+              {show &&
+                <div className="main_panel vbox" ref={this.set_main_panel_ref}>
+                  <Toolbar
+                    undock={this.undock}
+                    dock_mode={this.props.dock_mode}
                     master_port={this.props.master_port}
-                    main_panel_moving={this.main_panel_moving}
-                    main_panel_stopped_moving={this.main_panel_stopped_moving}
-                    main_panel={this.main_panel}
-                    open_preview={this.open_preview}
-                    width={this.state.tables_width}
-                    search={this.state.search}
-                    type_filter={this.state.type_filter}
                     filters={this.state.filters}
-                    cur_preview={this.state.cur_preview}/>
-                  <Preview cur_preview={this.state.cur_preview}
-                    style={preview_style}
-                    close={this.close_preview}/>
-                  <Tables_resizer show={!!this.state.cur_preview}
-                    start_moving={this.start_moving_width}
-                    offset={this.state.tables_width}/>
+                    set_filter={this.set_filter}
+                    proxies={this.state.proxies}
+                    type_filter={this.state.type_filter}
+                    set_type_filter={this.set_type_filter}
+                    clear={this.clear}
+                    on_change_search={this.on_change_search}
+                    search_val={this.state.search}/>
+                  <div className="split_widget vbox flex_auto">
+                    <Tables_container
+                      key={''+this.props.master_port}
+                      master_port={this.props.master_port}
+                      main_panel_moving={this.main_panel_moving}
+                      main_panel_stopped_moving={this.main_panel_stopped_moving}
+                      main_panel={this.main_panel}
+                      open_preview={this.open_preview}
+                      width={this.state.tables_width}
+                      search={this.state.search}
+                      type_filter={this.state.type_filter}
+                      filters={this.state.filters}
+                      cur_preview={this.state.cur_preview}/>
+                    <Preview cur_preview={this.state.cur_preview}
+                      style={preview_style}
+                      close={this.close_preview}/>
+                    <Tables_resizer show={!!this.state.cur_preview}
+                      start_moving={this.start_moving_width}
+                      offset={this.state.tables_width}/>
+                  </div>
                 </div>
-              </div>
+              }
             </div>;
     }
 }

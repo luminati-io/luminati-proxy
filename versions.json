@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.140.560",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved the performance of saving configuration"
+            }
+        ]
+    },
+    {
         "ver": "1.140.22",
         "type": "stable",
         "changes": [

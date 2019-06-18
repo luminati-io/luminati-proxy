@@ -393,7 +393,11 @@ function run(){
     if (env.NODE_ENV!='production')
         ws_client(`ws://localhost:${port}`);
     else if (env.ZCOUNTER_URL)
-        ws_client(env.ZCOUNTER_URL);
+    {
+        const urls = env.ZCOUNTER_URL.split(';');
+        for (let url of urls)
+            ws_client(url);
+    }
     else
     {
         const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'hola',

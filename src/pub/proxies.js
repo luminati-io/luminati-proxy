@@ -510,6 +510,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             loaded: false,
         };
         setdb.set('head.proxies.update', this.update);
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>{
@@ -532,6 +533,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.setState({zones});
         });
         window.setTimeout(this.req_status);
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({logs: settings.logs});
+        });
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
     }
     componentWillReceiveProps(props){
         if (props.master_port!=this.props.master_port)
@@ -540,6 +547,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 props.master_port);
             this.setState({filtered_proxies});
         }
+    }
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+    updateWindowDimensions() {
+        this.setState({height: window.innerHeight});
     }
     filter_proxies = (proxies, mp)=>{
         return proxies.filter(p=>{
@@ -668,6 +681,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return null;
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
+        const table_margin = 256;
+        let table_height = this.state.height-table_margin;
+        if (table_height<328||this.state.logs)
+            table_height = 328;
         return <div className="proxies_panel chrome">
               <div className="main_panel vbox">
                 <Toolbar proxy_add={this.proxy_add}
@@ -681,7 +698,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                       <AutoSizer disableHeight>
                         {({width})=>
                           <Table width={width}
-                            height={328}
+                            height={table_height}
                             onRowClick={this.on_row_click}
                             gridClassName="chrome_grid"
                             headerHeight={27}

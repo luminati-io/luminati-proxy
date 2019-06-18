@@ -11,10 +11,27 @@ import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
 class Overview extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {height: 0};
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+    }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>
             this.setState({proxies}));
         this.setdb_on('head.consts', consts=>this.setState({consts}));
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({logs: settings.logs});
+        });
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+    }
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+    updateWindowDimensions() {
+        this.setState({height: window.innerHeight});
     }
     render(){
         const master_port = this.props.match.params.master_port;
@@ -22,6 +39,11 @@ class Overview extends Pure_component {
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}
             </span> : <T>Overview</T>;
+        const panels_margin = 228;
+        let panels_height = this.state.height-panels_margin;
+        if (panels_height<356||this.state.logs)
+            panels_height = 356;
+        const fill_height = {flex: '0 0 '+panels_height+'px'};
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>
