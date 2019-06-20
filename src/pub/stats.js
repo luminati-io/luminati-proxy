@@ -22,11 +22,8 @@ class Stats extends Pure_component {
         stats: {},
         height: window.innerHeight,
     };
-    constructor(props){
-        super(props);
-        this.update_window_dimensions = ()=>
-            this.setState({height: window.innerHeight});
-    }
+    update_window_dimensions = ()=>
+        this.setState({height: window.innerHeight});
     componentWillMount(){
         this.setdb_on('head.recent_stats', stats=>{
             if (stats)

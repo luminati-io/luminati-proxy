@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.140.948 Stable
+- :bug: fixed session duration combined with pool
+
 ## 1.140.839 Stable
 - :star: replace HAR viewer with the message when logs are off
 

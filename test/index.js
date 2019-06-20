@@ -424,14 +424,12 @@ describe('proxy', ()=>{
             describe('session_duration', ()=>{
                 describe('change after specified timeout', ()=>{
                     const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                        _this.timeout(4000);
-                        l = yield lum(Object.assign({session_duration: 1},
+                        l = yield lum(Object.assign({session_duration: 0.1},
                             opt));
-                        const initial = yield l.test();
-                        yield etask.sleep(1500);
-                        const second = yield l.test();
-                        assert.notEqual(initial.body.auth.session,
-                            second.body.auth.session);
+                        const initial = yield l.test({fake: 1});
+                        yield etask.sleep(100);
+                        const second = yield l.test({fake: 1});
+                        assert.notEqual(initial.body, second.body);
                     }));
                     t('pool', {pool_size: 1});
                     t('sticky_ip', {sticky_ip: true});
@@ -439,21 +437,24 @@ describe('proxy', ()=>{
                 });
                 describe('does not change before specified timeout', ()=>{
                     const t = (name, opt)=>it(name, etask._fn(function*(_this){
-                        _this.timeout(4000);
                         l = yield lum(Object.assign({session_duration: 1},
                             opt));
-                        const initial = yield l.test();
-                        yield etask.sleep(500);
-                        const res1 = yield l.test();
-                        const res2 = yield l.test();
-                        assert.equal(initial.body.auth.session,
-                            res1.body.auth.session);
-                        assert.equal(initial.body.auth.session,
-                            res2.body.auth.session);
+                        const initial = yield l.test({fake: 1});
+                        const res1 = yield l.test({fake: 1});
+                        const res2 = yield l.test({fake: 1});
+                        assert.equal(initial.body, res1.body);
+                        assert.equal(initial.body, res2.body);
                     }));
-                    t('pool', {pool_size: 1});
                     t('sticky_ip', {sticky_ip: true});
                     t('session using seed', {seed: 'seed'});
+                    t('pool 1', {pool_size: 1});
+                    it('pool 3', etask._fn(function*(_this){
+                        l = yield lum({session_duration: 0.1, pool_size: 3});
+                        yield etask.sleep(150);
+                        const res1 = yield l.test({fake: 1});
+                        const res2 = yield l.test({fake: 1});
+                        assert.equal(res1.body, res2.body);
+                    }));
                 });
             });
             describe('fastest', ()=>{

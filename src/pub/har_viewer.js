@@ -6,7 +6,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
-import {withRouter} from 'react-router-dom';
+import {Route, withRouter, Link} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
@@ -126,12 +126,10 @@ class Har_viewer extends Pure_component {
         const width = `calc(100% - ${this.state.tables_width}px`;
         const preview_style = {maxWidth: width, minWidth: width};
         const show = this.state.logs>0;
-        const is_logs = window.location.href.includes('logs');
         return <div id="har_viewer" className={(show ? 'har_viewer' :
             'har_viewer_off')+' chrome'}>
-              {!show&&is_logs &&
-                <h4>Request logs are disabled. You can enable it back in&nbsp;
-                <a href="/settings">General settings</a></h4>
+              {!show &&
+                <Route path="/logs" component={Logs_off_notice}/>
               }
               {show &&
                 <div className="main_panel vbox" ref={this.set_main_panel_ref}>
@@ -351,6 +349,15 @@ const Tables_resizer = ({show, offset, start_moving})=>{
     return <div className="data_grid_resizer" style={{left: offset-2}}
       onMouseDown={start_moving}/>;
 };
+
+const Logs_off_notice = ()=>
+    <div>
+      <h4>
+        Request logs are disabled. You can enable it back in
+        &nbsp;
+        <Link to="/settings">General settings</Link>
+      </h4>
+    </div>;
 
 const table_cols = [
     {title: 'select', hidden: true, fixed: 27, tooltip: 'Select/unselect all'},

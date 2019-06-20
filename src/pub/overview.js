@@ -11,11 +11,11 @@ import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
 class Overview extends Pure_component {
+    update_window_dimensions = ()=>
+        this.setState({height: window.innerHeight});
     constructor(props){
         super(props);
         this.state = {height: window.innerHeight};
-        this.update_window_dimensions = ()=>
-            this.setState({height: window.innerHeight});
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>

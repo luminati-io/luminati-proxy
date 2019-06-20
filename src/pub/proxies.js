@@ -3,6 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ReactDOM from 'react-dom';
+import {Route, Link} from 'react-router-dom';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
@@ -497,6 +498,8 @@ class Columns_modal extends Pure_component {
 }
 
 const Proxies = withRouter(class Proxies extends Pure_component {
+    update_window_dimensions = ()=>
+        this.setState({height: window.innerHeight});
     constructor(props){
         super(props);
         let from_storage = JSON.parse(window.localStorage.getItem(
@@ -511,8 +514,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             height: window.innerHeight,
         };
         setdb.set('head.proxies.update', this.update);
-        this.update_window_dimensions = ()=>
-            this.setState({height: window.innerHeight});
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>{
@@ -680,7 +681,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return null;
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        const table_margin = 258;
+        const table_margin = 254;
         let table_height = this.state.height-table_margin;
         if (table_height<328||this.state.logs)
             table_height = 328;
@@ -728,9 +729,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                   </React.Fragment>
                 }
                 {!show_logs &&
-                  <div className="summary_bar">Request logs are disabled. You
-                  can enable it back in
-                  &nbsp;<a href="/settings">General settings</a></div>
+                  <div className="summary_bar">
+                    Request logs are disabled. You can enable it back in&nbsp;
+                    <Link to="/settings">General settings</Link>
+                  </div>
                 }
               </div>
               <Columns_modal selected_cols={this.state.selected_cols}
