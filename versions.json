@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.140.839",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "replace HAR viewer with the message when logs are off"
+            }
+        ]
+    },
+    {
         "ver": "1.140.560",
         "type": "stable",
         "changes": [

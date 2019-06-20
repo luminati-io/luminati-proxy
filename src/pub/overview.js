@@ -13,8 +13,9 @@ import {T} from './common/i18n.js';
 class Overview extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {height: 0};
-        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.state = {height: window.innerHeight};
+        this.update_window_dimensions = ()=>
+            this.setState({height: window.innerHeight});
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>
@@ -24,14 +25,11 @@ class Overview extends Pure_component {
             if (settings)
                 this.setState({logs: settings.logs});
         });
-        this.updateWindowDimensions();
-        window.addEventListener('resize', this.updateWindowDimensions);
+        this.update_window_dimensions();
+        window.addEventListener('resize', this.update_window_dimensions);
     }
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.updateWindowDimensions);
-    }
-    updateWindowDimensions() {
-        this.setState({height: window.innerHeight});
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.update_window_dimensions);
     }
     render(){
         const master_port = this.props.match.params.master_port;
@@ -39,10 +37,10 @@ class Overview extends Pure_component {
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}
             </span> : <T>Overview</T>;
-        const panels_margin = 228;
+        const panels_margin = 198;
         let panels_height = this.state.height-panels_margin;
-        if (panels_height<356||this.state.logs)
-            panels_height = 356;
+        if (panels_height<383||this.state.logs)
+            panels_height = 383;
         const fill_height = {flex: '0 0 '+panels_height+'px'};
         return <div className="overview_page">
               <div className="warnings">
@@ -51,7 +49,7 @@ class Overview extends Pure_component {
               <div className="proxies nav_header">
                 <h3>{title}</h3>
               </div>
-              <div className="panels">
+              <div className="panels" style={fill_height}>
                 <div className="proxies proxies_wrapper">
                   <Proxies master_port={master_port}/>
                 </div>

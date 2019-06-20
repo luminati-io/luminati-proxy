@@ -20,12 +20,29 @@ class Stats extends Pure_component {
         domains: {stats: []},
         protocols: {stats: []},
         stats: {},
+        height: window.innerHeight,
     };
+    constructor(props){
+        super(props);
+        this.update_window_dimensions = ()=>
+            this.setState({height: window.innerHeight});
+    }
     componentWillMount(){
         this.setdb_on('head.recent_stats', stats=>{
             if (stats)
                 this.setState({stats});
         });
+    }
+    componentDidMount(){
+        this.setdb_on('head.settings', settings=>{
+            if (settings)
+                this.setState({logs: settings.logs});
+        });
+        this.update_window_dimensions();
+        window.addEventListener('resize', this.update_window_dimensions);
+    }
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.update_window_dimensions);
     }
     enable_ssl_click = e=>{
         e.stopPropagation();
@@ -33,16 +50,24 @@ class Stats extends Pure_component {
     };
     show_reset_dialog = ()=>this.setState({show_reset: true});
     render(){
+        const panels_margin = 228;
+        let panels_height = this.state.height-panels_margin;
+        if (panels_height<353||this.state.logs)
+            panels_height = 353;
+        const st_height = (panels_height-26) / 3;
         return <div className="chrome stats_panel">
               <div className="main_panel">
                 <Toolbar stats={this.state.stats}/>
                 <Stat_table stats={this.state.stats} tooltip="Status code"
-                  row_key="status_code" logs="code" title="Code"/>
+                  row_key="status_code" logs="code" title="Code"
+                  height={st_height}/>
                 <Stat_table stats={this.state.stats} tooltip="Domain name"
-                  row_key="hostname" logs="domain" title="Domain"/>
+                  row_key="hostname" logs="domain" title="Domain"
+                  height={st_height}/>
                 <Stat_table stats={this.state.stats} tooltip="Protocol"
                   ssl_warning={this.state.stats.ssl_warning}
-                  row_key="protocol" logs="protocol" title="Protocol"/>
+                  row_key="protocol" logs="protocol" title="Protocol"
+                  height={st_height}/>
                 <Summary_bar enable_ssl_click={this.enable_ssl_click}
                   show={this.state.stats.ssl_enable}/>
               </div>
@@ -92,7 +117,8 @@ class Stat_table extends Pure_component {
     render(){
         const {title, stats, row_key, logs, ssl_warning, cols} = this.props;
         const cur_stats = stats[row_key]||[];
-        return <div className="tables_container vbox">
+        const container_style = {height: this.props.height};
+        return <div className="tables_container vbox" style={container_style}>
               <Header_container title={title} cols={cols}
                 tooltip={this.props.tooltip}
                 sorting={this.state.sorting} sort={this.sort}/>

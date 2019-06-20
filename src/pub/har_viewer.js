@@ -126,11 +126,12 @@ class Har_viewer extends Pure_component {
         const width = `calc(100% - ${this.state.tables_width}px`;
         const preview_style = {maxWidth: width, minWidth: width};
         const show = this.state.logs>0;
+        const is_logs = window.location.href.includes('logs');
         return <div id="har_viewer" className={(show ? 'har_viewer' :
-            'har_viewer_off')+" chrome"}>
-              {!show &&
+            'har_viewer_off')+' chrome'}>
+              {!show&&is_logs &&
                 <h4>Request logs are disabled. You can enable it back in&nbsp;
-                  <a href="/settings">General settings</a></h4>
+                <a href="/settings">General settings</a></h4>
               }
               {show &&
                 <div className="main_panel vbox" ref={this.set_main_panel_ref}>
@@ -151,7 +152,8 @@ class Har_viewer extends Pure_component {
                       key={''+this.props.master_port}
                       master_port={this.props.master_port}
                       main_panel_moving={this.main_panel_moving}
-                      main_panel_stopped_moving={this.main_panel_stopped_moving}
+                      main_panel_stopped_moving=
+                        {this.main_panel_stopped_moving}
                       main_panel={this.main_panel}
                       open_preview={this.open_preview}
                       width={this.state.tables_width}

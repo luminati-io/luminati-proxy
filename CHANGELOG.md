@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.140.839 Stable
+- :star: replace HAR viewer with the message when logs are off
+
 ## 1.140.560 Stable
 - :star: Improved the performance of saving configuration
 

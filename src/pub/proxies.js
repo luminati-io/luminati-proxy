@@ -508,9 +508,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             proxies: [],
             filtered_proxies: [],
             loaded: false,
+            height: window.innerHeight,
         };
         setdb.set('head.proxies.update', this.update);
-        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.update_window_dimensions = ()=>
+            this.setState({height: window.innerHeight});
     }
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>{
@@ -537,8 +539,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             if (settings)
                 this.setState({logs: settings.logs});
         });
-        this.updateWindowDimensions();
-        window.addEventListener('resize', this.updateWindowDimensions);
+        this.update_window_dimensions();
+        window.addEventListener('resize', this.update_window_dimensions);
     }
     componentWillReceiveProps(props){
         if (props.master_port!=this.props.master_port)
@@ -548,11 +550,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.setState({filtered_proxies});
         }
     }
-    componentWillUnmount() {
-        window.removeEventListener('resize', this.updateWindowDimensions);
-    }
-    updateWindowDimensions() {
-        this.setState({height: window.innerHeight});
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.update_window_dimensions);
     }
     filter_proxies = (proxies, mp)=>{
         return proxies.filter(p=>{
@@ -681,10 +680,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return null;
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        const table_margin = 256;
+        const table_margin = 258;
         let table_height = this.state.height-table_margin;
         if (table_height<328||this.state.logs)
             table_height = 328;
+        const show_logs = this.state.logs>0;
         return <div className="proxies_panel chrome">
               <div className="main_panel vbox">
                 <Toolbar proxy_add={this.proxy_add}
@@ -726,6 +726,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                       </div>
                     </div>
                   </React.Fragment>
+                }
+                {!show_logs &&
+                  <div className="summary_bar">Request logs are disabled. You
+                  can enable it back in
+                  &nbsp;<a href="/settings">General settings</a></div>
                 }
               </div>
               <Columns_modal selected_cols={this.state.selected_cols}
