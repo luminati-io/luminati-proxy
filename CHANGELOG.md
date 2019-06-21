@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.141.16 Stable
+- :bug: Fixed empty spaces (ui)
+
 ## 1.140.948 Stable
 - :bug: fixed session duration combined with pool
 

@@ -313,7 +313,7 @@ describe('proxy', ()=>{
                 function*(_this){
                     l = yield lum({pool_size: 1});
                     const spy = sinon.spy(l.session_mgr, 'reset_idle_pool');
-                    yield l.test();
+                    yield l.test({fake: 1});
                     sinon.assert.calledOnce(spy);
                 }));
                 it('should set idle time correctly', etask._fn(
@@ -322,7 +322,7 @@ describe('proxy', ()=>{
                     let offset = l.session_mgr.idle_date-Date.now();
                     assert.ok(Math.abs(offset-ms.HOUR)<100);
                     yield etask.sleep(500);
-                    yield l.test();
+                    yield l.test({fake: 1});
                     offset = l.session_mgr.idle_date-Date.now();
                     assert.ok(Math.abs(offset-ms.HOUR)<100);
                 }));
@@ -330,10 +330,9 @@ describe('proxy', ()=>{
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
                     l = yield lum({pool_size});
-                    yield l.test();
-                    assert.equal(proxy.history.length, 1);
-                    assert.equal(proxy.history[0].url, test_url.http);
-                    assert.equal(proxy.full_history.length, 1+pool_size);
+                    yield l.test({fake: 1});
+                    assert.equal(proxy.history.length, 0);
+                    assert.equal(proxy.full_history.length, pool_size);
                     assert.equal(l.session_mgr.sessions.sessions.length,
                         pool_size);
                     const sessions = {};
@@ -355,10 +354,9 @@ describe('proxy', ()=>{
                     assert.equal(l.session_mgr.opt.max_requests, 0);
                 }));
                 const test_call = ()=>etask(function*(){
-                    const res = yield l.test();
+                    const res = yield l.test({fake: 1});
                     assert.ok(res.body);
-                    assert.ok(res.body.auth);
-                    return res.body.auth.session;
+                    return res.body;
                 });
                 const t = (name, opt)=>it(name, etask._fn(function*(_this){
                     _this.timeout(12000);

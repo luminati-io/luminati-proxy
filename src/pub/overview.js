@@ -25,6 +25,8 @@ class Overview extends Pure_component {
             if (settings)
                 this.setState({logs: settings.logs});
         });
+        this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
+        this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
         this.update_window_dimensions();
         window.addEventListener('resize', this.update_window_dimensions);
     }
@@ -32,14 +34,18 @@ class Overview extends Pure_component {
         window.removeEventListener('resize', this.update_window_dimensions);
     }
     render(){
+        const {height, ver_last, ver_node, logs} = this.state;
         const master_port = this.props.match.params.master_port;
         const title = master_port ?
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}
             </span> : <T>Overview</T>;
-        const panels_margin = 198;
-        let panels_height = this.state.height-panels_margin;
-        if (panels_height<383||this.state.logs)
+        let panels_margin = 118;
+        const has_upgrade_panel = ver_last&&ver_last.newer&&ver_node;
+        if (has_upgrade_panel)
+            panels_margin = 198;
+        let panels_height = height-panels_margin;
+        if (panels_height<383||logs)
             panels_height = 383;
         const fill_height = {flex: '0 0 '+panels_height+'px'};
         return <div className="overview_page">

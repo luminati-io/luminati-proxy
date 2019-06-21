@@ -35,6 +35,8 @@ class Stats extends Pure_component {
             if (settings)
                 this.setState({logs: settings.logs});
         });
+        this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
+        this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
         this.update_window_dimensions();
         window.addEventListener('resize', this.update_window_dimensions);
     }
@@ -47,9 +49,13 @@ class Stats extends Pure_component {
     };
     show_reset_dialog = ()=>this.setState({show_reset: true});
     render(){
-        const panels_margin = 228;
-        let panels_height = this.state.height-panels_margin;
-        if (panels_height<353||this.state.logs)
+        const {height, ver_last, ver_node, logs} = this.state;
+        let panels_margin = 148;
+        const has_upgrade_panel = ver_last&&ver_last.newer&&ver_node;
+        if (has_upgrade_panel)
+            panels_margin = 228;
+        let panels_height = height-panels_margin;
+        if (panels_height<353||logs)
             panels_height = 353;
         const st_height = (panels_height-26) / 3;
         return <div className="chrome stats_panel">

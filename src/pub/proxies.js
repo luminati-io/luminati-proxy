@@ -535,6 +535,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             this.setState({zones});
         });
+        this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
+        this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
         window.setTimeout(this.req_status);
         this.setdb_on('head.settings', settings=>{
             if (settings)
@@ -681,10 +683,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return null;
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        const table_margin = 254;
+        let table_margin = 174;
+        const has_upgrade_panel = this.state.ver_last
+            &&this.state.ver_last.newer&&this.state.ver_node;
+        if (has_upgrade_panel)
+            table_margin = 254;
         let table_height = this.state.height-table_margin;
-        if (table_height<328||this.state.logs)
+        if (table_height<328)
             table_height = 328;
+        if (this.state.logs)
+            table_height = 355;
         const show_logs = this.state.logs>0;
         return <div className="proxies_panel chrome">
               <div className="main_panel vbox">

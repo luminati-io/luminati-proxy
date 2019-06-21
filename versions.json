@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.141.16",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed empty spaces (ui)"
+            }
+        ]
+    },
+    {
         "ver": "1.140.948",
         "type": "stable",
         "changes": [
