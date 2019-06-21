@@ -43,7 +43,12 @@ export default class Targeting extends Pure_component {
         let res = this.state.locations.countries.map(c=>({
             key: c.country_name, value: c.country_id, mob: c.mob}));
         const curr_plan = this.get_curr_plan();
-        if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
+        if (curr_plan && curr_plan.country)
+        {
+            res = res.filter(r=>
+                curr_plan.country.split(' ').includes(r.value));
+        }
+        else if (curr_plan && curr_plan.ip_alloc_preset=='shared_block')
         {
             res = res.filter(r=>
                 this.state.locations.shared_countries.includes(r.value));

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.141.40 Stable
+- :bug: Fixed targeting for datacenter
+
 ## 1.141.27 Stable
 - :bug: Fixed empty spaces (ui)
 

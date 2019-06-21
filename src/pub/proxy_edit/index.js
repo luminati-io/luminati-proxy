@@ -132,17 +132,17 @@ const Index = withRouter(class Index extends Pure_component {
             return false;
         }
         const details = proxy.zone.values.filter(z=>z.value==zone)[0];
-        const permissions = details&&details.perm.split(' ')||[];
-        const plan = details&&details.plans[details.plans.length-1]||{};
+        const permissions = details && details.perm.split(' ') || [];
+        const plan = details && details.plans[details.plans.length-1] || {};
         if (field_name=='vip')
             return !!plan.vip;
-        if (field_name=='country'&&plan.ip_alloc_preset=='shared_block')
+        if (field_name=='country' && plan.ip_alloc_preset=='shared_block')
             return true;
-        if (field_name=='country'&&plan.type=='static')
-            return false;
+        if (field_name=='country' && plan.type=='static')
+            return plan.country || plan.ip_alloc_preset;
         if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
             return permissions.includes(field_name);
-        if (field_name=='country'&&(plan.type=='static'||
+        if (field_name=='country' && (plan.type=='static'||
             ['domain', 'domain_p'].includes(plan.vips_type)))
         {
             return false;
