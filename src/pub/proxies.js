@@ -553,7 +553,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.setState({filtered_proxies});
         }
     }
-    componentWillUnmount(){
+    willUnmount(){
         window.removeEventListener('resize', this.update_window_dimensions);
     }
     filter_proxies = (proxies, mp)=>{

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.141.384 Stable
+- :bug: fixed callback leaks on overview page
+- :star: Added a button to refresh zones list/settings
+
 ## 1.141.40 Stable
 - :bug: Fixed targeting for datacenter
 

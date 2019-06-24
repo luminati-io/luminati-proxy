@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.141.384",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed callback leaks on overview page"
+            },
+            {
+                "type": "star",
+                "text": "Added a button to refresh zones list/settings"
+            }
+        ]
+    },
+    {
         "ver": "1.141.40",
         "type": "stable",
         "changes": [

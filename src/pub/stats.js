@@ -40,7 +40,7 @@ class Stats extends Pure_component {
         this.update_window_dimensions();
         window.addEventListener('resize', this.update_window_dimensions);
     }
-    componentWillUnmount(){
+    willUnmount(){
         window.removeEventListener('resize', this.update_window_dimensions);
     }
     enable_ssl_click = e=>{
