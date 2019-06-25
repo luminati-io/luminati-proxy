@@ -73,7 +73,6 @@ conf.manager_default = Object
     request_stats: true,
     logs: 1000,
     reverse_lookup_dns: false,
-    proxy_creds_check: true,
     force: false,
     session_termination: false,
     config: lpm_file.get_file_path(
@@ -83,6 +82,7 @@ conf.manager_default = Object
     cookie: lpm_file.get_file_path(
         '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
     high_perf: false,
+    local_login: false,
 });
 
 Object.assign(module.exports, conf);

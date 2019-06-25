@@ -42,7 +42,11 @@ E.open_cb_e = (path, flags, mode, cb)=>etask(function*open_cb_e(){
     yield E.close_e(fd);
     return ret;
 });
-E.write_e = (path, data)=>etask.nfn_apply(fs.writeFile, [path, data]);
+E.write_e = (path, data, opt)=>etask(function*write_e(){
+    opt = opt||{};
+    yield check_file(path, opt);
+    yield etask.nfn_apply(fs.writeFile, [path, data]);
+});
 E.rename_e = (old_path, new_path)=>
     etask.nfn_apply(fs.rename, [old_path, new_path]);
 E.unlink_e = path=>etask.nfn_apply(fs.unlink, [path]);
@@ -94,7 +98,9 @@ E.read_e = (path, opt)=>etask(function*read_e(){
     return data;
 });
 // XXX vladislav: should be named just 'copy'?
-E.copy_e = (old_path, new_path)=>etask(function*copy_e(){
+E.copy_e = (old_path, new_path, opt)=>etask(function*copy_e(){
+    opt = opt||{};
+    yield check_file(new_path, opt);
     let r_stream = fs.createReadStream(old_path);
     let w_stream = fs.createWriteStream(new_path, {flags: 'w+', mode: 0o777});
     let close = ()=>{

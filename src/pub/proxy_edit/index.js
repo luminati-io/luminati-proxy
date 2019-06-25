@@ -31,8 +31,8 @@ import {T} from '../common/i18n.js';
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {form: {zones: {}}, warnings: [], errors: {},
-            show_loader: false, saving: false};
+        this.state = {form: {}, warnings: [], errors: {}, show_loader: false,
+            saving: false};
         this.debounced_save = _.debounce(this.save, 500);
         setdb.set('head.proxy_edit.set_field', this.set_field);
         setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
@@ -59,8 +59,10 @@ const Index = withRouter(class Index extends Pure_component {
             this.apply_preset(form, form.last_preset_applied||'session_long');
             this.setState({proxies}, this.delayed_loader());
         });
-        this.setdb_on('head.consts', consts=>
-            this.setState({consts}, this.delayed_loader()));
+        this.setdb_on('head.zones', zones=>{
+            if (zones)
+                this.setState({zones}, this.delayed_loader());
+        });
         this.setdb_on('head.defaults', defaults=>
             this.setState({defaults}, this.delayed_loader()));
         this.setdb_on('head.callbacks', callbacks=>this.setState({callbacks}));
@@ -76,10 +78,10 @@ const Index = withRouter(class Index extends Pure_component {
     }
     update_loader = ()=>{
         this.setState(state=>{
-            const show_loader = !state.consts || !state.proxies ||
-                !state.defaults;
+            const show_loader = !state.proxies || !state.defaults ||
+                !state.zones;
             const zone_name = !show_loader &&
-                (state.form.zone||state.consts.proxy.zone.def);
+                (state.form.zone || state.zones.def);
             setdb.set('head.proxy_edit.zone_name', zone_name);
             return {show_loader};
         });
@@ -116,34 +118,34 @@ const Index = withRouter(class Index extends Pure_component {
         this.debounced_save();
     };
     is_valid_field = field_name=>{
-        const proxy = this.state.consts.proxy;
+        const zones = this.state.zones;
         const form = this.state.form;
-        if (!proxy)
+        if (!zones)
             return false;
         if (form.ext_proxies && all_fields[field_name] &&
             !all_fields[field_name].ext)
         {
             return false;
         }
-        const zone = form.zone||proxy.zone.def;
         if (['city', 'state'].includes(field_name) &&
             (!form.country||form.country=='*'))
         {
             return false;
         }
-        const details = proxy.zone.values.filter(z=>z.value==zone)[0];
-        const permissions = details && details.perm.split(' ') || [];
-        const plan = details && details.plans[details.plans.length-1] || {};
+        const zone = zones.zones.find(z=>z.name==(form.zone||zones.def));
+        if (!zone || !zone.plan)
+            return false;
+        const permissions = zone.perm.split(' ') || [];
         if (field_name=='vip')
-            return !!plan.vip;
-        if (field_name=='country' && plan.ip_alloc_preset=='shared_block')
+            return !!zone.plan.vip;
+        if (field_name=='country' && zone.plan.ip_alloc_preset=='shared_block')
             return true;
-        if (field_name=='country' && plan.type=='static')
-            return plan.country || plan.ip_alloc_preset;
+        if (field_name=='country' && zone.plan.type=='static')
+            return zone.plan.country || zone.plan.ip_alloc_preset;
         if (['country', 'state', 'city', 'asn', 'ip'].includes(field_name))
             return permissions.includes(field_name);
-        if (field_name=='country' && (plan.type=='static'||
-            ['domain', 'domain_p'].includes(plan.vips_type)))
+        if (field_name=='country' && (zone.plan.type=='static'||
+            ['domain', 'domain_p'].includes(zone.plan.vips_type)))
         {
             return false;
         }
@@ -152,9 +154,8 @@ const Index = withRouter(class Index extends Pure_component {
         return true;
     };
     is_disabled_ext_proxy = field_name=>{
-        const proxy = this.state.consts.proxy;
         const form = this.state.form;
-        if (proxy && form.ext_proxies && all_fields[field_name] &&
+        if (form.ext_proxies && all_fields[field_name] &&
             !all_fields[field_name].ext)
         {
             return true;
@@ -311,7 +312,7 @@ const Index = withRouter(class Index extends Pure_component {
             return save_form[attr]===undefined ?
                 this.state.defaults[attr] : save_form[attr];
         };
-        save_form.zone = save_form.zone||this.state.consts.proxy.zone.def;
+        save_form.zone = save_form.zone || this.state.zones.def;
         save_form.ssl = effective('ssl');
         save_form.max_requests = effective('max_requests');
         save_form.session_duration = effective('session_duration');
@@ -362,34 +363,19 @@ const Index = withRouter(class Index extends Pure_component {
         return save_form;
     };
     get_curr_plan = ()=>{
-        const zone_name = this.state.form.zone||
-            this.state.consts.proxy.zone.def;
-        // XXX krzysztof: use /api/zones instead od consts
-        const zones = this.state.consts.proxy.zone.values;
-        const curr_zone = zones.filter(p=>p.key==zone_name);
-        let curr_plan;
-        if (curr_zone.length)
-            curr_plan = curr_zone[0].plans.slice(-1)[0];
-        return curr_plan;
+        const zone_name = this.state.form.zone || this.state.zones.def;
+        const zone = this.state.zones.zones.find(p=>p.name==zone_name) || {};
+        return zone.plan;
     };
     render(){
-        let zones = this.state.consts &&
-            this.state.consts.proxy.zone.values || [];
-        zones = zones.filter(z=>{
-            const plan = z.plans && z.plans.slice(-1)[0] || {};
-            return !plan.archive && !plan.disable;
-        });
-        let sett = setdb.get('head.settings')||{}, def;
-        if (zones[0] && !zones[0].value && (def = sett.zone||zones[0].key))
-            zones[0] = {key: `Default (${def})`, value: ''};
-        const default_zone=this.state.consts &&
-            this.state.consts.proxy.zone.def;
-        const curr_plan = this.state.consts && this.get_curr_plan();
+        const curr_plan = this.state.zones && this.get_curr_plan();
         let type;
         if (curr_plan && curr_plan.type=='static')
             type = 'ips';
         else if (curr_plan && !!curr_plan.vip)
             type = 'vips';
+        const zone = this.state.form.zone ||
+            this.state.zones && this.state.zones.def;
         return <T>{t=><div className="proxy_edit">
               <Loader show={this.state.show_loader||this.state.loading}/>
               <div className="nav_wrapper">
@@ -401,19 +387,17 @@ const Index = withRouter(class Index extends Pure_component {
                     std_tooltip=
                     {t('All changes are automatically saved to LPM')}/>
                 </div>
-                <Nav zones={zones} default_zone={default_zone}
-                  disabled={!!this.state.form.ext_proxies}
+                <Nav disabled={!!this.state.form.ext_proxies}
                   form={this.state.form}
                   on_change_preset={this.apply_preset}/>
                 <Nav_tabs_wrapper/>
               </div>
-              {this.state.consts && <Main_window/>}
+              {this.state.zones && <Main_window/>}
               <Modal className="warnings_modal" id="save_proxy_errors"
                 title={t('Error')} no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
-              <Alloc_modal type={type} form={this.state.form}
-                zone={this.state.form.zone||default_zone}/>
+              <Alloc_modal type={type} form={this.state.form} zone={zone}/>
             </div>}</T>;
     }
 });
@@ -500,10 +484,10 @@ class Nav extends Pure_component {
         this._reset_fields();
     };
     update_zone = val=>{
-        const zone_name = val||this.props.default_zone;
+        const zone_name = val || this.state.zones.def;
         setdb.set('head.proxy_edit.zone_name', zone_name);
         this.props.form.zone = zone_name;
-        const zone = this.props.zones.filter(z=>z.key==zone_name)[0]||{};
+        const zone = this.state.zones.zones.find(z=>z.name==zone_name) || {};
         this.set_field('zone', val);
         this.set_field('password', zone.password);
         if (this.props.form.ips.length || this.props.form.vips.length)
@@ -524,6 +508,11 @@ class Nav extends Pure_component {
     render(){
         if (!this.state.zones)
             return null;
+        const def = this.state.zones.def;
+        const zone_opt = this.state.zones.zones.map(z=>{
+            const key = z.name==def ? `Default (${def})` : z.name;
+            return {key, value: z.name};
+        });
         const presets_opt = Object.keys(presets).map(p=>{
             let key = presets[p].title;
             if (presets[p].default)
@@ -535,7 +524,7 @@ class Nav extends Pure_component {
         const is_local = href.includes('localhost')||
             href.includes('127.0.0.1');
         return <div className="nav">
-              <Field on_change={this.update_zone} options={this.props.zones}
+              <Field on_change={this.update_zone} options={zone_opt}
                 value={this.props.form.zone} disabled={this.props.disabled}
                 id="zone">
                 <div className="zone_tooltip">

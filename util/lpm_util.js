@@ -64,6 +64,12 @@ E.init_args = args=>{
         usage.unshift('  docker run luminati/luminati-proxy '
             +'[docker port redirections]');
     }
+    const alias = {
+        help: ['h', '?'],
+        port: 'p',
+        daemon: 'd',
+        version: 'v',
+    };
     const defaults = Object.assign({}, lpm_config.manager_default,
         parse_env_params(process.env, lpm_config.proxy_fields));
     args = (args||process.argv.slice(2)).map(String);
@@ -74,7 +80,7 @@ E.init_args = args=>{
     .number(lpm_config.numeric_fields)
     .default(defaults)
     .help('h')
-    .alias({'help': ['h', '?'], port: 'p', daemon: 'd', 'version': 'v'})
+    .alias(alias)
     .version(()=>pkg.version)
     .argv;
     argv.native_args = args;

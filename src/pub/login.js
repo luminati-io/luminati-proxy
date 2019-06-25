@@ -13,7 +13,10 @@ import {T} from './common/i18n.js';
 const Login = withRouter(class Login extends Pure_component {
     state = {password: '', username: '', loading: false};
     componentDidMount(){
-        this.setdb_on('head.settings', settings=>this.setState({settings}));
+        this.setdb_on('head.argv', argv=>{
+            if (argv)
+                this.setState({argv});
+        });
         this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
         const url_o = zurl.parse(document.location.href);
         const qs_o = zurl.qs_parse((url_o.search||'').substr(1));
@@ -71,7 +74,9 @@ const Login = withRouter(class Login extends Pure_component {
     get_in = ()=>{
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', _this.get_in);
+            this.on('uncaught', e=>{
+                _this.setState({error_message: 'Cannot log in: '+e.message});
+            });
             const settings = yield ajax.json({url: '/api/settings'});
             window.ga('set', 'dimension1', settings.customer);
             setdb.set('head.settings', settings);
@@ -79,6 +84,8 @@ const Login = withRouter(class Login extends Pure_component {
             setdb.set('head.consts', consts);
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
+            const proxies = yield ajax.json({url: '/api/proxies_running'});
+            setdb.set('head.proxies_running', proxies);
             _this.props.history.push('/overview');
         });
     };
@@ -86,7 +93,7 @@ const Login = withRouter(class Login extends Pure_component {
         return <div className="lum_login">
               <Logo/>
               <Messages error_message={this.state.error_message}
-                settings={this.state.settings}
+                argv={this.state.argv}
                 ver_node={this.state.ver_node}/>
               <Loader show={this.state.loading}/>
               <Header/>
@@ -101,17 +108,16 @@ const Login = withRouter(class Login extends Pure_component {
     }
 });
 
-const parse_arguments = (settings={argv: ''})=>
-    settings.argv.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3')
-    .split('|||');
+const parse_arguments = argv=>
+    argv.replace(/(--password )(.+?)( --|$)/, '$1|||$2|||$3').split('|||');
 
-const Messages = ({error_message, settings, ver_node})=>
+const Messages = ({error_message, argv, ver_node})=>
     <div>
-      {settings && settings.argv &&
+      {argv &&
         <div className="warning">
           <div className="warning_icon"/>
           The application is running with the following arguments:
-          {parse_arguments(settings).map(a=><strong key={a}>{a}</strong>)}
+          {parse_arguments(argv).map(a=><strong key={a}>{a}</strong>)}
         </div>
       }
       {error_message &&

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.141.384",
+        "version": "1.141.582",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -521,10 +521,6 @@
                     "type": "string",
                     "description": "A Google authorization token for accessing luminati.io"
                 },
-                "proxy_creds_check": {
-                    "type": "boolean",
-                    "description": "Validate proxy credentials"
-                },
                 "high_perf": {
                     "type": "boolean"
                 },
@@ -556,6 +552,10 @@
                 "api": {
                     "type": "string",
                     "description": "Alternative domain url to luminati API"
+                },
+                "local_login": {
+                    "type": "boolean",
+                    "description": "Requires each browser to authenticate against LPM"
                 }
             }
         },

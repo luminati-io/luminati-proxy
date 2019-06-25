@@ -33,7 +33,7 @@ Please report issues or bugs to your Lumianti account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.141.384/luminati-proxy-manager-v1.141.384-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.141.582/luminati-proxy-manager-v1.141.582-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -222,7 +222,6 @@ Options:
                                                       [boolean] [default: false]
   --token                  A Google authorization token for accessing
                            luminati.io                                  [string]
-  --proxy_creds_check      Validate proxy credentials  [boolean] [default: true]
   --request_stats          Enable requests statistics  [boolean] [default: true]
   --test_url               A url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]

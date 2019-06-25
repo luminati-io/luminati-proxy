@@ -94,7 +94,6 @@ E.browser_defaults = function(browser){
     return defs[browser]||defs.chrome;
 };
 
-// XXX andreish: need to set header order for safari
 E.browser_default_header_order = function(browser){
     let headers = {
         chrome: qw`host connection pragma cache-control
@@ -130,7 +129,6 @@ E.like_browser_case_and_order = function(headers, browser){
     return E.capitalize(ordered_headers);
 };
 
-// XXX josh/andreish: need to set header order for safari
 E.browser_default_header_order_http2 = function(browser){
     let headers = {
         chrome: qw`:method :authority :scheme :path pragma cache-control

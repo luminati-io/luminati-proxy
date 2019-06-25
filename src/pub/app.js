@@ -37,6 +37,7 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/version'});
             setdb.set('head.version', version.version);
+            setdb.set('head.argv', version.argv);
         });
         this.etask(function*(){
             this.on('uncaught', e=>console.log(e));
@@ -48,6 +49,8 @@ const App = withRouter(class App extends Pure_component {
                 return _this.props.history.replace('/whitelist_ips');
             }
             _this.load_data();
+            if (mode.headers.get('x-lpm-local-login'))
+                return _this.props.history.replace('/login');
             const data = yield mode.json();
             if (data.logged_in)
             {

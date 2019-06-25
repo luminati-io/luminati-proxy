@@ -20,7 +20,6 @@ class Overview extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.proxies_running', proxies=>
             this.setState({proxies}));
-        this.setdb_on('head.consts', consts=>this.setState({consts}));
         this.setdb_on('head.settings', settings=>{
             if (settings)
                 this.setState({logs: settings.logs});

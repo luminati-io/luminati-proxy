@@ -79,6 +79,8 @@ describe('manager', ()=>{
                 args = args.concat(['--no-dropin']);
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
                 args.push('--no-cookie');
+            if (!get_param(args, '--local_login'))
+                args = args.concat(['--no-local_login']);
             args = args.concat('--loki', '/tmp/testdb');
         }
         Manager.prototype.check_conn = ()=>null;

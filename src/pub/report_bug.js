@@ -12,7 +12,7 @@ class Index extends Pure_component {
     state = {desc: '', email: '', sending: false};
     componentDidMount(){
         this.setdb_on('head.consts', consts=>{
-            if (consts&&consts.logins&&consts.logins.length==1)
+            if (consts && consts.logins && consts.logins.length==1)
                 this.setState({email: consts.logins[0]});
         });
     }
