@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.141.733",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added api/async_req endpoint"
+            }
+        ]
+    },
+    {
         "ver": "1.141.582",
         "type": "dev",
         "changes": [

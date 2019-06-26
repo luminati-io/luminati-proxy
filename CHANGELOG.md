@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.141.733 Stable
+- :star: Added api/async_req endpoint
+
 ## 1.141.582 Development Latest
 - :star: Added "local_login" flag to require each browser to authenticate separately
 
