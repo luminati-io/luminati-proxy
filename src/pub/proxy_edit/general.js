@@ -65,9 +65,9 @@ export default class General extends Pure_component {
         // XXX krzysztof: cleanup type
         const curr_plan = this.get_curr_plan();
         let type;
-        if (curr_plan&&curr_plan.type=='static')
+        if (curr_plan && curr_plan.type=='static')
             type = 'ips';
-        else if (curr_plan&&!!curr_plan.vip)
+        else if (curr_plan && !!curr_plan.vip)
             type = 'vips';
         const form = this.state.form;
         const note_ips = form.multiply_ips ?

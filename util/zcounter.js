@@ -17,7 +17,7 @@ const max_age = 30*ms.SEC;
 
 E.config = {hosts: {
     hola: ['zs-graphite', 'zs-graphite-hola'],
-    spark: ['zs-graphite', 'zs-graphite-spark'],
+    spark: ['zs-graphite-spark'],
     lum: ['zs-graphite'],
 }};
 
@@ -400,7 +400,7 @@ function run(){
     }
     else
     {
-        const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'hola',
+        const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'lum',
             ['zs-graphite']);
         for (let host of hosts)
             ws_client(`ws://${host}.${env.DOMAIN||'hola.org'}:${port}`);

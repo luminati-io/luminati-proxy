@@ -44,7 +44,7 @@ E.write_status_file = (status, error=null, config=null, reason=null)=>{
         customer_name: _.get(config, '_defaults.customer'),
     });
     try { file.write_e(E.status_filename, JSON.stringify(E.lpm_status)); }
-    catch(e){ zerr.notice(`Fail to write status file: ${zerr.e2s(e)}`); }
+    catch(e){ zerr(`Failed to write status file: ${e.message}`); }
 };
 
 E.read_status_file = ()=>{
@@ -93,8 +93,7 @@ E.handle_signal = (sig, err)=>{
         if (sig!='SIGINT' && sig!='SIGTERM')
         {
             yield zerr.perr('crash', {error: errstr, reason: sig,
-                customer: _.get(E.manager, '_defaults.customer'),
-                config: _.get(E.manager, '_total_conf')});
+                customer: _.get(E.manager, '_defaults.customer')});
         }
         E.shutdown(errstr, err);
     });
@@ -150,10 +149,7 @@ const get_lpm_tasks = ()=>etask(function*(){
 const _show_port_conflict = (port, force)=>etask(function*(){
     const tasks = yield get_lpm_tasks();
     if (!tasks.length)
-    {
-        zerr(`There is a conflict on port ${port}`);
-        return E.manager.stop();
-    }
+        return zerr(`There is a conflict on port ${port}`);
     const pid = tasks[0].pid;
     zerr.notice(`LPM is already running (${pid}) and uses port ${port}`);
     if (!force)
@@ -298,9 +294,10 @@ E.run = (argv, run_config)=>etask(function*(){
         {
             // XXX krzysztof: make a generic function for sending crashes
             etask(function*send_err(){
-                yield zerr.perr('crash', {error: zerr.e2s(e),
+                yield zerr.perr('crash', {
+                    error: zerr.e2s(e),
                     customer: _.get(E.manager, '_defaults.customer'),
-                    config: _.get(E.manager, '_total_conf')});
+                });
                 handle_fatal();
             });
         }

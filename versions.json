@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.142.102",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved performance when using a big number of proxy ports"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed zones/plans details"
+            }
+        ]
+    },
+    {
         "ver": "1.141.733",
         "type": "stable",
         "changes": [

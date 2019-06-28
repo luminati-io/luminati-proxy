@@ -1,24 +1,9 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
-const date = require('../util/date.js');
 const E = module.exports;
 
-E.get_plan = plans=>{
-    const d = date();
-    plans = plans||[];
-    for (let i=plans.length-1; i>=0; i--)
-    {
-        if (date(plans[i].start)<=d)
-        {
-            if (plans[i].end && d>=date(plans[i].end))
-                return;
-            return plans[i];
-        }
-    }
-};
-
 E.get_perm = zone=>{
-    const plan = E.get_plan(zone.plans);
+    const plan = zone.plan;
     if (!plan || !plan.type)
         return zone.perm;
     const perm = {
@@ -59,16 +44,14 @@ E.is_static_proxy = (proxy, zones)=>{
     const zone = zones.find(z=>z.zone==proxy.zone);
     if (!zone)
         return false;
-    const plan = E.get_plan(zone.plans);
-    return plan && plan.type=='static';
+    return zone.plan && zone.plan.type=='static';
 };
 
 E.is_mobile = (proxy, zones)=>{
     const zone = zones.find(z=>z.zone==proxy.zone);
     if (!zone)
         return false;
-    const plan = E.get_plan(zone.plans);
-    return !!(plan && plan.mobile);
+    return !!(zone.plan && zone.plan.mobile);
 };
 
 // XXX krzysztof: TODO

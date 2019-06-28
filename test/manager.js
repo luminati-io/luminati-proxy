@@ -212,7 +212,7 @@ describe('manager', ()=>{
             t2('default disabled', {config: {_defaults: {zone: 'gen'},
                 proxies: [simple_proxy]}}, [assign({}, simple_proxy,
                 {zone: 'static'})], {zone: 'static', zones: assign({}, zones,
-                    {gen: {plans: [{disable: 1}]}})});
+                    {gen: {plan: {disable: 1}}})});
         });
     });
     xdescribe('dropin', ()=>{
