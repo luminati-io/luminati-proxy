@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.142.291",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed small bugs"
+            }
+        ]
+    },
+    {
         "ver": "1.142.102",
         "type": "stable",
         "changes": [
