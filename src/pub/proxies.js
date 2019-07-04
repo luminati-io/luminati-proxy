@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ReactDOM from 'react-dom';
-import {Route, Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
@@ -27,6 +27,11 @@ import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
 import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
+
+const is_local = ()=>{
+    const href = window.location.href;
+    return href.includes('localhost') || href.includes('127.0.0.1');
+};
 
 const Actions_cell = ({proxy, mgr, scrolling})=>{
     return <Actions proxy={proxy} get_status={mgr.get_status}
@@ -671,6 +676,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.props.history.push(`/proxy/${proxy.port}`);
     };
     get_cols = ()=>{
+        if (!is_local())
+        {
+            const actions_idx = columns.findIndex(col=>col.key=='actions');
+            columns[actions_idx].width = 60;
+        }
         return columns.filter(col=>this.state.selected_cols.includes(col.key)
             || col.sticky || col.calc_show &&
             col.calc_show(this.state.filtered_proxies));
@@ -889,10 +899,8 @@ class Actions extends Pure_component {
         const persist = this.props.proxy.proxy_type=='persist';
         const delete_title = `Are you sure you want to delete proxy port
             ${this.props.proxy.port}?`;
-        const href = window.location.href;
-        const is_local = href.includes('localhost')||
-            href.includes('127.0.0.1');
-        return <div className="proxies_actions">
+        return <div className={is_local() ? 'proxies_actions' :
+          'proxies_actions_3'}>
             {!!persist &&
               <React.Fragment>
                 <Action_icon id="trash" scrolling={this.props.scrolling}
@@ -906,7 +914,7 @@ class Actions extends Pure_component {
             <Action_icon id="refresh" scrolling={this.props.scrolling}
               on_click={this.refresh_sessions}
               tooltip="Refresh Sessions"/>
-            {is_local &&
+            {is_local() &&
               <Action_icon id="browser" scrolling={this.props.scrolling}
                 on_click={this.open_browser}
                 tooltip="Open browser configured with this port"/>

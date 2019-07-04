@@ -2,6 +2,8 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const Manager = require('../lib/manager.js');
+const Worker = require('../lib/worker.js');
+const cluster = require('cluster');
 const Tracer = require('../lib/tracer.js');
 const file = require('../util/file.js');
 const etask = require('../util/etask.js');
@@ -408,7 +410,9 @@ if (!module.parent)
 {
     E.init_cmd();
     // XXX vladislavl: for debug purposes only
-    if (!process.env.LUM_MAIN_CHILD)
+    if (cluster.isWorker)
+        new Worker().run();
+    else if (!process.env.LUM_MAIN_CHILD)
     {
         const argv = lpm_util.init_args();
         E.init(argv);

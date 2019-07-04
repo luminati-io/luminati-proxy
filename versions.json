@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.142.833",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed empty space when there isn't open browser icon in proxies table"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed stability issues"
+            }
+        ]
+    },
+    {
         "ver": "1.142.291",
         "type": "stable",
         "changes": [

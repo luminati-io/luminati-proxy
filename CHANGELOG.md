@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.142.833 Stable
+- :bug: Fixed empty space when there isn't open browser icon in proxies table
+- :bug: Fixed stability issues
+
 ## 1.142.291 Stable
 - :bug: Fixed small bugs
 
