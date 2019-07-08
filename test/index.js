@@ -155,13 +155,12 @@ describe('proxy', ()=>{
             }));
         });
         describe('X-Hola-Context', ()=>{
-            let history;
-            const aggregator = data=>history.push(data);
             const t = (name, _url, opt, target, skip_res)=>it(name, ()=>etask(
             function*(){
                 const context = 'context-1';
-                history = [];
-                l = yield lum(Object.assign({handle_usage: aggregator}, opt));
+                l = yield lum(opt);
+                const history = [];
+                l.on('usage', data=>history.push(data));
                 let res = yield l.test({
                     url: _url(),
                     headers: {'x-hola-context': context},
@@ -594,14 +593,13 @@ describe('proxy', ()=>{
             }));
             after('after history aggregation', ()=>clock.uninstall());
             let history;
-            const aggregator = data=>history.push(data);
             beforeEach(()=>history = []);
             const t = (name, _url, expected, opt)=>it(name, ()=>etask(
             function*(){
                 ping.headers = ping.headers||{};
                 ping.headers.connection = 'close';
-                l = yield lum(Object.assign({history: true,
-                    handle_usage: aggregator}, opt));
+                l = yield lum(Object.assign({history: true}, opt));
+                l.on('usage', data=>history.push(data));
                 assert.equal(history.length, 0);
                 const res = yield l.test(_url());
                 yield etask.sleep(400);
@@ -646,9 +644,8 @@ describe('proxy', ()=>{
                 content_size: 0,
             }), pre_rule('null_response'));
             it('pool', etask._fn(function*(_this){
-                const one_each_aggregator = data=>history.push(data);
-                l = yield lum({pool_size: 1, keep_alive: 0.3,
-                    handle_usage: one_each_aggregator});
+                l = yield lum({pool_size: 1, keep_alive: 0.3});
+                l.on('usage', data=>history.push(data));
                 yield l.test();
                 yield etask.sleep(400);
                 assert_has(history, [
@@ -1409,12 +1406,12 @@ describe('proxy', ()=>{
     });
     describe('reserve session', ()=>{
         let history;
-        const aggregator = data=>history.push(data);
         beforeEach(etask._fn(function*(_this){
             const rules = [{action: {reserve_session: true}, status: '200'}];
             history = [];
-            l = yield lum({handle_usage: aggregator, rules, keep_alive: 0,
-                max_requests: 1, pool_size: 2});
+            l = yield lum({rules, keep_alive: 0, max_requests: 1,
+                pool_size: 2});
+            l.on('usage', data=>history.push(data));
         }));
         it('should use reserved_sessions', etask._fn(function*(_this){
             _this.timeout(6000);

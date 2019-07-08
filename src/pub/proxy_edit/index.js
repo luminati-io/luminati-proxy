@@ -368,9 +368,10 @@ const Index = withRouter(class Index extends Pure_component {
         return zone.plan;
     };
     render(){
+        // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.state.zones && this.get_curr_plan();
         let type;
-        if (curr_plan && curr_plan.type=='static')
+        if (curr_plan && (curr_plan.type||'').startsWith('static'))
             type = 'ips';
         else if (curr_plan && !!curr_plan.vip)
             type = 'vips';

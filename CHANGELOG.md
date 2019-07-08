@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.143.166 Stable
+- :bug: Fixed error: unable to get local issuer certificate
+- :bug: Fixed overriding passwords
+
 ## 1.142.833 Stable
 - :bug: Fixed empty space when there isn't open browser icon in proxies table
 - :bug: Fixed stability issues

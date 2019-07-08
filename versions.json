@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.143.166",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed error: unable to get local issuer certificate"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed overriding passwords"
+            }
+        ]
+    },
+    {
         "ver": "1.142.833",
         "type": "stable",
         "changes": [

@@ -202,7 +202,7 @@ const columns = [
             distinguished. Those don't change any proxy behavior and it's only
             cosmetic`,
         ext: true,
-        calc_show: proxies=>proxies.some(p=>p.config.internal_name),
+        calc_show: proxies=>proxies.some(p=>p.internal_name),
     },
     {
         key: 'port',
@@ -263,7 +263,7 @@ const columns = [
     },
     {
         key: 'secure_proxy',
-        title: 'SSL for super proxy',
+        title: 'SSL to Super Proxy',
         render: Boolean_cell,
         ext: true,
     },
@@ -355,7 +355,7 @@ const columns = [
     },
     {
         key: 'ip',
-        title: 'Datacenter IPs',
+        title: 'Static IPs',
         type: 'text',
     },
     {

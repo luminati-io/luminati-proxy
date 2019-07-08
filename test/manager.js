@@ -379,7 +379,7 @@ describe('manager', ()=>{
                 app = yield app_with_args(['--customer', 'mock_user',
                     '--port', '24000']);
                 app.manager.loki.requests_clear();
-                app.manager.proxies_running[24000]._handle_usage({
+                app.manager.proxies_running[24000].usage({
                     timeline: new Timeline(),
                     request: {url: 'http://bbc.com'},
                     response: {},

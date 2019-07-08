@@ -540,9 +540,11 @@ E.info = function(){
 };
 
 E.node = function(){
-    const dst = file.is_dir('/var/hola_server') ? 'hola_server' : 'hola_agent';
+    const dst = file.is_dir(file.normalize('/var/hola_agent')) ?
+        'hola_agent' : 'hola_server';
     let host = exec.get_line('/usr/local/bin/node -v').replace(/^v/, '');
-    let hola_server = file.read_line(`/var/${dst}/node_version`);
+    let hola_server = file.read_line(
+        file.normalize(`/var/${dst}/node_version`));
     return {host, hola_server};
 };
 
