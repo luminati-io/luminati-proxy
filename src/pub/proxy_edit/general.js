@@ -83,7 +83,6 @@ export default class General extends Pure_component {
                 <Config type="number" id="socks" disabled={true}
                   val_id="port"/>
                 <Config type="text" id="password" disabled/>
-                <Config type="pins" id="whitelist_ips"/>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="secure_proxy"/>
                 <Config type="yes_no" id="insecure"

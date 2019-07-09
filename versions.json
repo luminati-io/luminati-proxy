@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.143.412",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed whitelisting and moved it from proxy config to general settings"
+            }
+        ]
+    },
+    {
         "ver": "1.143.166",
         "type": "stable",
         "changes": [

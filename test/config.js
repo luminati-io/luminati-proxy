@@ -16,14 +16,13 @@ describe('config', ()=>{
             version: '1.2.3.',
             request_stats: true,
             stats: false,
-            _update: false,
         }];
         const conf_mgr = new Config(null, Manager.default);
         const s = conf_mgr.serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];
-        qw`stats proxy_type zones _update www_whitelist_ips request_stats logs
-        conflict version`.forEach(field=>
+        qw`stats proxy_type zones www_whitelist_ips request_stats logs conflict
+        version`.forEach(field=>
             assert.equal(proxy[field], undefined));
         assert.equal(proxy.port, 24000);
     });

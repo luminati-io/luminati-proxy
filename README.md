@@ -33,7 +33,7 @@ Please report issues or bugs to your Lumianti account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.143.166/luminati-proxy-manager-v1.143.166-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.143.412/luminati-proxy-manager-v1.143.412-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -207,7 +207,7 @@ Options:
   --race_reqs              Race several requests at once and choose fastest
                                                                         [number]
   --www                    HTTP port for browser admin UI       [default: 22999]
-  --www_whitelist_ips      Whitelist IPs to access browser admin UI. [string]
+  --www_whitelist_ips      Whitelist IPs to access browser admin UI.    [string]
                            [default:"127.0.0.1"]
                            [example: --www_whitelist_ips "212.17.0.1"]
   --ws                     WebSocket port used for request logs [default: 22998]
@@ -235,7 +235,7 @@ Options:
                                                       [boolean] [default: false]
   --version, -v            Show version number                         [boolean]
   --help, -h, -?           Show help                                   [boolean]
-  --api                                   [default: "https://lum-lpm.com"]
+  --api                                      [default: "https://lum-lpm.com"]
 
 ```
 

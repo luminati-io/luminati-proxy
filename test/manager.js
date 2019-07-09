@@ -367,7 +367,7 @@ describe('manager', ()=>{
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
                 try {
-                    yield app.manager.get_lum_local_conf(null, '123', true);
+                    yield app.manager.get_lum_local_conf(null, '123');
                     assert.fail('should have thrown exception');
                 } catch(e){
                     assert_has(e, {status: 403, message: 'login_required'});
@@ -482,10 +482,14 @@ describe('manager', ()=>{
             assert.equal(res.data.password, 'p1_pass');
         }));
         it('uses existing proxy custom password', etask._fn(function*(_this){
-            const _defaults = {zone: 'static', password: 'xyz', zones: {
-                static: {password: ['static_pass']},
-                zone2: {password: ['zone2_pass']},
-            }};
+            const _defaults = {
+                zone: 'static',
+                password: 'xyz',
+                zones: {
+                    static: {password: ['static_pass']},
+                    zone2: {password: ['zone2_pass']},
+                },
+            };
             nock(api_base).get('/').times(3).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
@@ -502,14 +506,11 @@ describe('manager', ()=>{
             ]};
             app = yield app_with_config({config, cli: {token: '123'}});
             const res = yield json('api/proxies_running');
-            const t = (port, pwd)=>{
-                assert.equal(res.find(p=>p.port==port).password, pwd);
-            };
-            t(24000, 'p1_pass');
-            t(24001, 'p2_pass');
-            t(24002, 'static_pass');
-            t(24003, 'zone2_pass');
-            t(24004, 'static_pass');
+            assert.equal(res.find(p=>p.port==24000).password, 'p1_pass');
+            assert.equal(res.find(p=>p.port==24001).password, 'p2_pass');
+            assert.equal(res.find(p=>p.port==24002).password, 'static_pass');
+            assert.equal(res.find(p=>p.port==24003).password, 'zone2_pass');
+            assert.equal(res.find(p=>p.port==24004).password, 'static_pass');
         }));
     });
     describe('flags', ()=>{

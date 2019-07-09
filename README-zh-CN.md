@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.143.166-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.143.412-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -144,6 +144,9 @@ Options:
   --race_reqs              Race several requests at once and choose fastest
                                                                         [number]
   --www                    HTTP port for browser admin UI       [default: 22999]
+  --www_whitelist_ips      Whitelist IPs to access browser admin UI.    [string]
+                           [default:"127.0.0.1"]
+                           [example: --www_whitelist_ips "212.17.0.1"]
   --ws                     WebSocket port used for request logs [default: 22998]
   --config                 Config file containing proxy definitions
                                [string] [default: "~/.luminati.json"]
@@ -169,7 +172,7 @@ Options:
                                                       [boolean] [default: false]
   --version, -v            Show version number                         [boolean]
   --help, -h, -?           Show help                                   [boolean]
-  --api                                   [default: "https://lum-lpm.com"]
+  --api                                      [default: "https://lum-lpm.com"]
 
 ```
 

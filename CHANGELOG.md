@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.143.412 
+- :bug: Fixed whitelisting and moved it from proxy config to general settings
+
 ## 1.143.166 Stable
 - :bug: Fixed error: unable to get local issuer certificate
 - :bug: Fixed overriding passwords

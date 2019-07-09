@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.143.166",
+        "version": "1.143.412",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -479,14 +479,19 @@
         "manager": {
             "type": "object",
             "properties": {
-                "www": {
-                    "type": "integer",
-                    "description": "HTTP port for browser admin UI"
+                "whitelist_ips": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Default for all proxies whitelist ip list for granting access to them"
                 },
                 "www_whitelist_ips": {
                     "type": "array",
                     "items": {"type": "string"},
                     "description": "Whitelist ip list for granting access to browser admin UI"
+                },
+                "www": {
+                    "type": "integer",
+                    "description": "HTTP port for browser admin UI"
                 },
                 "ws": {
                     "type": "integer",
@@ -535,11 +540,6 @@
                 "logs": {
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
-                },
-                "whitelist_ips": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Default for all proxies whitelist ip list for granting access to them"
                 },
                 "force": {
                     "type": "boolean",
@@ -736,11 +736,6 @@
                 "rules": {
                     "type": "object",
                     "description": "Proxy request rules"
-                },
-                "whitelist_ips": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Whitelist ip list for granting access to proxy"
                 },
                 "race_reqs": {
                     "type": "integer",

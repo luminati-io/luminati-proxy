@@ -320,15 +320,6 @@ export const tabs = {
                 tooltip: `The Zone password, as it appears in 'Zones' page in
                     Luminati's control panel http://luminati.io/cp/zones`,
             },
-            whitelist_ips: {
-                label: 'Whitelist IP access',
-                tooltip: `Grant proxy access to specific IPs. Only those IPs
-                    will be able to send requests via this proxy port. Any
-                    value set in this field will override the 'General
-                    settings' and 'Proxy whitelisted IPs' for this port.`,
-                placeholder: `e.g. 1.1.1.1, 23.23.23.23`,
-                ext: true,
-            },
             ssl: {
                 label: 'SSL analyzing',
                 tooltip: `Enable SSL request logs in order to save HTTPs

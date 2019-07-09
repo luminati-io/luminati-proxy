@@ -66,6 +66,7 @@ conf.manager_default = Object
     api: 'https://'+pkg.api_domain,
     www: 22999,
     www_whitelist_ips: [],
+    whitelist_ips: [],
     ws: 22998,
     dropin: true,
     dropin_port: 22225,

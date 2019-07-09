@@ -58,6 +58,8 @@ export class Pins extends Pure_component {
         this.props.on_change_wrapper(val);
     };
     save_pin = (id, val)=>{
+        if (this.state.pins.find(p=>p.id!=id && p.val==val))
+            return this.remove(id);
         this.setState(prev=>({
             pins: prev.pins.map(p=>{
                 if (p.id!=id)
