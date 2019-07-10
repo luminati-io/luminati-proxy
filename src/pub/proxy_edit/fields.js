@@ -292,8 +292,7 @@ export const tabs = {
     },
     general: {
         label: 'General',
-        tooltip: `General configuration such as 'port number', 'password', and
-            'bypassing'`,
+        tooltip: `General configuration such as 'port number'`,
         fields: {
             internal_name: {
                 label: 'Internal name',
@@ -314,11 +313,6 @@ export const tabs = {
                 tooltip: `A SOCKS 5 port is the same as a proxy port, and is
                     automatically created`,
                 ext: true,
-            },
-            password: {
-                label: 'Zone password',
-                tooltip: `The Zone password, as it appears in 'Zones' page in
-                    Luminati's control panel http://luminati.io/cp/zones`,
             },
             ssl: {
                 label: 'SSL analyzing',

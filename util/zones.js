@@ -34,10 +34,11 @@ E.get_perm = zone=>{
 };
 
 E.get_password = (proxy, zone_name, zones)=>{
-    if (proxy.password)
-        return proxy.password;
     const zone = zones.find(z=>z.zone==zone_name);
-    return zone && zone.password;
+    if (zone && zone.password)
+        return zone.password;
+    if (proxy && proxy.password)
+        return proxy.password;
 };
 
 E.is_static_proxy = (proxy, zones)=>{

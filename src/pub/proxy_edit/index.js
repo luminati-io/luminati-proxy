@@ -24,9 +24,9 @@ import Headers from './headers.js';
 import Logs from './logs.js';
 import {map_rule_to_form} from './rules.js';
 import Tooltip from '../common/tooltip.js';
-import Zone_description from '../common/zone_desc.js';
 import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
+import {Select_zone} from '../common/controls.js';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
@@ -308,15 +308,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (!this.is_valid_field(field)||save_form[field]===null)
                 save_form[field] = '';
         }
-        const effective = attr=>{
-            return save_form[attr]===undefined ?
-                this.state.defaults[attr] : save_form[attr];
-        };
         save_form.zone = save_form.zone || this.state.zones.def;
-        save_form.ssl = effective('ssl');
-        save_form.max_requests = effective('max_requests');
-        save_form.session_duration = effective('session_duration');
-        save_form.pool_size = effective('pool_size');
         save_form.proxy_type = 'persist';
         if (save_form.reverse_lookup=='dns')
             save_form.reverse_lookup_dns = true;
@@ -348,9 +340,9 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.city = save_form.city[0].id;
         else
             save_form.city = '';
-        if (save_form.asn.length)
+        if (save_form.asn.length==1)
             save_form.asn = Number(save_form.asn[0].id);
-        else
+        else if (!save_form.asn.length)
             save_form.asn = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
@@ -485,19 +477,15 @@ class Nav extends Pure_component {
         this._reset_fields();
     };
     update_zone = val=>{
-        const zone_name = val || this.state.zones.def;
-        setdb.set('head.proxy_edit.zone_name', zone_name);
-        this.props.form.zone = zone_name;
-        const zone = this.state.zones.zones.find(z=>z.name==zone_name) || {};
+        setdb.set('head.proxy_edit.zone_name', val);
         this.set_field('zone', val);
-        this.set_field('password', zone.password);
         if (this.props.form.ips.length || this.props.form.vips.length)
             this.set_field('pool_size', 0);
         this._reset_fields();
         const save_form = Object.assign({}, this.props.form);
         for (let field in save_form)
         {
-            if (!this.is_valid_field(field, zone_name))
+            if (!this.is_valid_field(field, val))
             {
                 let v = '';
                 if (field=='city'||field=='asn')
@@ -507,13 +495,6 @@ class Nav extends Pure_component {
         }
     };
     render(){
-        if (!this.state.zones)
-            return null;
-        const def = this.state.zones.def;
-        const zone_opt = this.state.zones.zones.map(z=>{
-            const key = z.name==def ? `Default (${def})` : z.name;
-            return {key, value: z.name};
-        });
         const presets_opt = Object.keys(presets).map(p=>{
             let key = presets[p].title;
             if (presets[p].default)
@@ -525,18 +506,14 @@ class Nav extends Pure_component {
         const is_local = href.includes('localhost')||
             href.includes('127.0.0.1');
         return <div className="nav">
-              <Field on_change={this.update_zone} options={zone_opt}
-                value={this.props.form.zone} disabled={this.props.disabled}
-                id="zone">
-                <div className="zone_tooltip">
-                  <Zone_description zones={this.state.zones}
-                    zone_name={this.props.form.zone}/>
-                </div>
-              </Field>
+              <Select_zone val={this.props.form.zone}
+                on_change_wrapper={this.update_zone}
+                disabled={this.props.disabled} preview/>
               <Field i18n on_change={this.update_preset} options={presets_opt}
-                value={preset} disabled={this.props.disabled} id="preset">
-                <Preset_description preset={preset} rule_clicked={()=>0}/>
-              </Field>
+                value={preset} disabled={this.props.disabled} id="preset"
+                tooltip={
+                  <Preset_description preset={preset} rule_clicked={()=>0}/>
+                }/>
               {is_local &&
                 <Open_browser_btn port={this.props.form.port}/>
               }
@@ -548,8 +525,8 @@ const Field = ({id, disabled, children, i18n, ...props})=>{
     const options = props.options||[];
     return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
           <React_tooltip id={id+'tip'} type="light" effect="solid"
-            place="bottom" delayHide={300} delayUpdate={300}>
-            {disabled ? <Ext_tooltip/> : children}
+            place="bottom" delayHide={0} delayUpdate={300}>
+            {disabled ? <Ext_tooltip/> : props.tooltip}
           </React_tooltip>
           <select value={props.value} disabled={disabled}
             onChange={e=>props.on_change(e.target.value)}>
@@ -571,10 +548,10 @@ class Alloc_modal extends Pure_component {
         items_per_page: 20,
     };
     componentDidMount(){
-        this.setdb_on('head.proxy_edit.zone_name', zone_name=>
+        this.setdb_on('head.proxy_edit.zone_name', ()=>
             this.setState({available_list: []}));
         this.setdb_on('head.proxies_running', proxies=>
-            proxies&&this.setState({proxies}));
+            proxies && this.setState({proxies}));
         $('#allocated_ips').on('show.bs.modal', this.load);
     }
     close = ()=>$('#allocated_ips').modal('hide');
@@ -582,13 +559,12 @@ class Alloc_modal extends Pure_component {
         if (this.state.available_list.length)
             return;
         this.loading(true);
-        const key = this.props.form.password||'';
         let endpoint;
         if (this.props.type=='ips')
             endpoint = '/api/allocated_ips';
         else
             endpoint = '/api/allocated_vips';
-        const url = `${endpoint}?zone=${this.props.zone}&key=${key}`;
+        const url = `${endpoint}?zone=${this.props.zone}`;
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{

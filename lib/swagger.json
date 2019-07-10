@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.143.412",
+        "version": "1.143.567",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -644,7 +644,7 @@
                     "description": "City"
                 },
                 "asn": {
-                    "type": "integer",
+                    "type": "string",
                     "description": "ASN"
                 },
                 "ip": {
@@ -721,12 +721,10 @@
                 },
                 "max_requests": {
                     "type": "string",
-                    "pattern": "^(\\d+(:\\d+)?)?$",
                     "description": "Maximum requests per session"
                 },
                 "session_duration": {
                     "type": "string",
-                    "pattern": "^(\\d+(:\\d+)?)?$",
                     "description": "Maximum duration of session (seconds)"
                 },
                 "throttle": {

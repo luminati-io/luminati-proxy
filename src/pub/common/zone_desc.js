@@ -8,6 +8,14 @@ import {flag_with_title, any_flag} from '../common.js';
 import {T} from './i18n.js';
 
 export default class Zone_description extends Pure_component {
+    state = {};
+    componentDidMount(){
+        this.setdb_on('head.zones', zones=>{
+            if (!zones || this.props.zones)
+                return;
+            this.setState({zones, zone: zones.def});
+        });
+    }
     network_types = {
         static: {
             label: 'Data center',
@@ -39,7 +47,12 @@ export default class Zone_description extends Pure_component {
         selective: 'Exclusive domains',
     };
     render(){
-        const {zone_name, zones} = this.props;
+        // XXX krzysztof: fix this, zones description should be generated once
+        // and reused in proxies table
+        const zones = this.state.zones || this.props.zones;
+        if (!zones)
+            return null;
+        const {zone_name} = this.props;
         const zone = zones.zones.find(z=>z.name==(zone_name||zones.def));
         if (!zone)
             return <span>This zone is disabled</span>;

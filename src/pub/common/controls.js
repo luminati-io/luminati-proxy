@@ -3,14 +3,19 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_select from 'react-select/lib/Creatable';
+import React_tooltip from 'react-tooltip';
 import classnames from 'classnames';
 import {Netmask} from 'netmask';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
+import setdb from '../../../util/setdb.js';
+import ajax from '../../../util/ajax.js';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
+import {Ext_tooltip, Loader} from '../common.js';
+import Zone_description from '../common/zone_desc.js';
 
 export class Pins extends Pure_component {
     state = {pins: [], max_id: 0};
@@ -412,3 +417,59 @@ export const Input = props=>{
           onBlur={props.on_blur}
           onKeyUp={props.on_key_up}/>;
 };
+
+export class Select_zone extends Pure_component {
+    state = {refreshing_zones: false, zones: {zones: []}};
+    componentDidMount(){
+        this.setdb_on('head.zones', zones=>{
+            if (zones)
+                this.setState({zones});
+        });
+    }
+    refresh_zones = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            this.on('finally', ()=>{
+                _this.setState({refreshing_zones: false});
+            });
+            _this.setState({refreshing_zones: true});
+            yield window.fetch('/api/refresh_zones', {method: 'POST'});
+            const zones = yield ajax.json({url: '/api/zones'});
+            setdb.set('head.zones', zones);
+        });
+    };
+    render(){
+        const {val, on_change_wrapper, disabled, preview} = this.props;
+        const tooltip = preview ? '' : this.props.tooltip;
+        const zone_opt = this.state.zones.zones.map(z=>{
+            if (z.name==this.state.zones.def)
+                return {key: `Default (${z.name})`, value: z.name};
+            return {key: z.name, value: z.name};
+        });
+        return <div className="select_zone">
+              <Tooltip title={tooltip}>
+                <span data-tip data-for="zone-tip">
+                  {preview &&
+                    <React_tooltip id="zone-tip" type="light" effect="solid"
+                      place="bottom" delayHide={0} delayUpdate={300}>
+                      {disabled ? <Ext_tooltip/> :
+                        <div className="zone_tooltip">
+                          <Zone_description zone_name={val}/>
+                        </div>
+                      }
+                    </React_tooltip>
+                  }
+                  <Select val={val} type="select"
+                    on_change_wrapper={on_change_wrapper} label="Default zone"
+                    tooltip={tooltip} data={zone_opt} disabled={disabled}/>
+                </span>
+              </Tooltip>
+              <Tooltip title="Refresh zones">
+                <div className="chrome_icon refresh"
+                  style={{top: 3, position: 'relative'}}
+                  onClick={this.refresh_zones}/>
+              </Tooltip>
+              <Loader show={this.state.refreshing_zones}/>
+            </div>;
+    }
+}

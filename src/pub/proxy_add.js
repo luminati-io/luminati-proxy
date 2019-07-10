@@ -14,7 +14,7 @@ import {withRouter} from 'react-router-dom';
 import prism from 'prismjs';
 import instructions from './instructions.js';
 import Tooltip from './common/tooltip.js';
-import {Textarea} from './common/controls.js';
+import {Textarea, Select_zone} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
@@ -34,15 +34,15 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         error_list: [],
     };
     componentDidMount(){
-        this.setdb_on('head.zones', zones=>{
-            if (!zones)
-                return;
-            this.setState({zones, zone: zones.def});
-        });
         this.setdb_on('head.proxies_running', proxies_running=>{
             if (!proxies_running)
                 return;
             this.setState({proxies_running});
+        });
+        this.setdb_on('head.zones', zones=>{
+            if (!zones)
+                return;
+            this.setState({def_zone: zones.def});
         });
     }
     persist = ()=>{
@@ -50,7 +50,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         if (this.state.cur_tab=='proxy_lum')
         {
             form.last_preset_applied = this.state.preset;
-            form.zone = this.state.zone || this.state.zones.def;
+            form.zone = this.state.zone;
         }
         else
         {
@@ -163,15 +163,15 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         const Footer_wrapper = <Footer save_clicked={this.save}
             advanced_clicked={this.advanced_clicked} disabled={disabled}
             created_port={this.state.created_port}/>;
-        if (!this.state.zones||!this.state.proxies_running)
+        if (!this.state.proxies_running)
             return null;
         let content;
         if (this.state.cur_tab=='proxy_lum')
         {
             content = <Lum_proxy
+                  def_zone={this.state.def_zone}
                   created_port={this.state.created_port}
                   zone={this.state.zone}
-                  zones={this.state.zones}
                   on_field_change={this.field_changed.bind(this)}
                   preset={this.state.preset}
                   rule_clicked={this.rule_clicked}
@@ -268,25 +268,19 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
 };
 
 const Lum_proxy = props=>{
-    const {zone, zones, on_field_change, preset, rule_clicked,
+    const {zone, def_zone, on_field_change, preset, rule_clicked,
         presets_opt} = props;
     const preset_tip = 'Presets is a set of preconfigured configurations '
-    +'for specific purposes';
+        +'for specific purposes';
     const zone_tip = `Zone that will be used by this proxy port`;
-    const zones_opt = zones.zones.map(z=>{
-        if (z.name==zones.def)
-            return {key: `Default (${z.name})`, value: z.name};
-        return {key: z.name, value: z.name};
-    });
-    const zone_obj = zones_opt.find(z=>z.value==zone);
-    const title = zone_obj && zone_obj.key || 'no zone';
     return <div className="lum_proxy">
           <div className="group">
-            <Field icon_class="zone_icon" val={zone} options={zones_opt}
-              title="Zone" on_change={on_field_change('zone')}
-              tooltip={zone_tip}/>
-            <Preview title={title}>
-              <Zone_description zones={zones} zone_name={zone}/>
+            <Field icon_class="zone_icon" title="Zone">
+              <Select_zone val={zone} tooltip={zone_tip}
+                on_change_wrapper={on_field_change('zone')}/>
+            </Field>
+            <Preview title={zone||def_zone}>
+              <Zone_description zone_name={zone}/>
               <a className="link" href="https://luminati.io/cp/zones"
                 target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
             </Preview>
@@ -324,15 +318,17 @@ const Field = props=>
           <div className={classnames('icon', props.icon_class)}/>
           <h4>{t(props.title)}:</h4>
         </div>
-        <Tooltip title={t(props.tooltip)}>
-          <select onChange={e=>props.on_change(e.target.value)}
-            value={props.val}>
-            {props.options.map((o, i)=>
-              <option key={i} value={o.value}>
-                {props.i18n ? t(o.key) : o.key}
-              </option>)}
-          </select>
-        </Tooltip>
+        {props.children ||
+          <Tooltip title={t(props.tooltip)}>
+            <select onChange={e=>props.on_change(e.target.value)}
+              value={props.val}>
+              {props.options.map((o, i)=>
+                <option key={i} value={o.value}>
+                  {props.i18n ? t(o.key) : o.key}
+                </option>)}
+            </select>
+          </Tooltip>
+        }
       </div>
     }</T>;
 

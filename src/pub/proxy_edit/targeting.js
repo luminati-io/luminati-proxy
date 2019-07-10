@@ -136,7 +136,7 @@ export default class Targeting extends Pure_component {
         const show_vips_note = curr_plan&&
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
         const carrier_disabled = !!this.state.form.asn &&
-            !! this.state.form.asn.length;
+            !!this.state.form.asn.length;
         return <div className="target">
               <Tab_context.Provider value="target">
                 {(show_dc_note||show_vips_note) &&
@@ -170,9 +170,11 @@ export default class Targeting extends Pure_component {
                   on_change={this.state_changed}/>
                 <Config type="typeahead" id="city" data={this.cities()}
                   on_change={this.city_changed}/>
-                <Config type="typeahead" id="asn" data={this.asns()}
-                  disabled={!!this.state.form.carrier} update_on_input
-                  depend_a={this.state.form.zone}/>
+                {!this.state.form.asn || !this.state.form.asn[1] &&
+                  <Config type="typeahead" id="asn" data={this.asns()}
+                    disabled={!!this.state.form.carrier} update_on_input
+                    depend_a={this.state.form.zone}/>
+                }
                 <Config type="select" id="carrier" data={this.carriers()}
                   note={carriers_note} disabled={carrier_disabled}
                   depend_a={this.state.form.zone}/>

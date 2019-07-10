@@ -503,14 +503,16 @@ describe('manager', ()=>{
                 {port: 24002, zone: 'static'},
                 {port: 24003, zone: 'zone2'},
                 {port: 24004},
+                {port: 24005, zone: 'unknown', password: 'p3_pass'},
             ]};
             app = yield app_with_config({config, cli: {token: '123'}});
             const res = yield json('api/proxies_running');
-            assert.equal(res.find(p=>p.port==24000).password, 'p1_pass');
-            assert.equal(res.find(p=>p.port==24001).password, 'p2_pass');
+            assert.equal(res.find(p=>p.port==24000).password, 'static_pass');
+            assert.equal(res.find(p=>p.port==24001).password, 'zone2_pass');
             assert.equal(res.find(p=>p.port==24002).password, 'static_pass');
             assert.equal(res.find(p=>p.port==24003).password, 'zone2_pass');
             assert.equal(res.find(p=>p.port==24004).password, 'static_pass');
+            assert.equal(res.find(p=>p.port==24005).password, 'p3_pass');
         }));
     });
     describe('flags', ()=>{

@@ -795,8 +795,8 @@ describe('proxy', ()=>{
         const inject_headers = (li, ip, ip_alt)=>{
             ip = ip||'ip';
             let call_count = 0;
-            const handle_proxy_resp_org = li._handle_proxy_resp.bind(li);
-            return sinon.stub(li, '_handle_proxy_resp', (...args)=>_res=>{
+            const handle_proxy_resp_org = li.handle_proxy_resp.bind(li);
+            return sinon.stub(li, 'handle_proxy_resp', (...args)=>_res=>{
                 const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
                 _res.headers['x-hola-timeline-debug'] = `1 2 3 ${ip_inj}`;
                 _res.headers['x-hola-ip'] = ip_inj;

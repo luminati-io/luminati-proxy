@@ -1,7 +1,17 @@
 [
     {
+        "ver": "1.143.567",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "UI improvements (zones list synchronization)"
+            }
+        ]
+    },
+    {
         "ver": "1.143.412",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",

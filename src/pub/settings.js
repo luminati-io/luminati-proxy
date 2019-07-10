@@ -2,12 +2,12 @@
 'use strict'; /*jslint react:true, es6:true*/
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
-import {Labeled_controller, Nav, Loader, Loader_small,
-    Note} from './common.js';
+import {Labeled_controller, Nav, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
 import _ from 'lodash';
+import {Select_zone} from './common/controls.js';
 
 export default function Settings(){
     return <div className="settings">
@@ -38,7 +38,7 @@ for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
 
 class Form extends Pure_component {
-    state = {saving: false, zones: {zones: []}};
+    state = {saving: false};
     logs_metric_opts = [
         {key: 'requests', value: 'requests'},
         {key: 'megabytes', value: 'megabytes'},
@@ -53,10 +53,6 @@ class Form extends Pure_component {
             s.whitelist_ips = s.whitelist_ips &&
                 s.whitelist_ips.join(',')||'';
             this.setState({settings: s});
-        });
-        this.setdb_on('head.zones', zones=>{
-            if (zones)
-                this.setState({zones});
         });
     }
     zone_change = val=>{
@@ -127,33 +123,14 @@ class Form extends Pure_component {
         });
     };
     debounced_save = _.debounce(this.save, 500);
-    refresh_zones = ()=>{
-        const _this = this;
-        this.etask(function*(){
-            this.on('finally', ()=>{
-                _this.setState({refreshing_zones: false});
-            });
-            _this.setState({refreshing_zones: true});
-            yield window.fetch('/api/refresh_zones', {method: 'POST'});
-            const zones = yield ajax.json({url: '/api/zones'});
-            setdb.set('head.zones', zones);
-        });
-    };
-    refresh_zones_note = <Note>
-      <a className="link" onClick={this.refresh_zones}>Refresh zones list</a>
-    </Note>;
     render(){
         if (!this.state.settings)
             return null;
-        const zone_opt = this.state.zones.zones.map(zone=>({
-            key: zone.name,
-            value: zone.name,
-        }));
         return <div className="settings_form">
-              <Labeled_controller val={this.state.settings.zone} type="select"
-                on_change_wrapper={this.zone_change} label="Default zone"
-                tooltip={tooltips.zone} data={zone_opt}
-                note={this.refresh_zones_note}/>
+              <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
+                <Select_zone val={this.state.settings.zone} preview
+                  on_change_wrapper={this.zone_change}/>
+              </Labeled_controller>
               <Labeled_controller val={this.state.settings.www_whitelist_ips}
                 type="pins" label="Admin whitelisted IPs"
                 on_change_wrapper={this.www_whitelist_ips_change}
@@ -172,8 +149,6 @@ class Form extends Pure_component {
                 label="Limit for request logs" default
                 tooltip={tooltips.logs}/>
               <Loader_small show={this.state.saving}/>
-              <Loader show={this.state.refreshing_zones}/>
             </div>;
     }
 }
-

@@ -1,6 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.143.412 
+## 1.143.567 Stable
+- :star: UI improvements (zones list synchronization)
+
+## 1.143.412 Stable
 - :bug: Fixed whitelisting and moved it from proxy config to general settings
 
 ## 1.143.166 Stable

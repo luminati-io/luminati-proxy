@@ -255,25 +255,27 @@ export const Field_row_raw = ({disabled, note, animated, ...props})=>{
         </div>;
 };
 
-export const Labeled_controller = ({id, disabled, note, sufix, ...props})=>
-    <Field_row_raw disabled={disabled} note={note} animated={props.animated}
-      inner_style={props.field_row_inner_style}>
+export const Labeled_controller = props=>
+    <Field_row_raw disabled={props.disabled} note={props.note}
+      animated={props.animated} inner_style={props.field_row_inner_style}>
       <T>{t=><React.Fragment>
         <div className="desc" style={props.desc_style}>
           <Tooltip title={t(props.tooltip)}>{t(props.label)}</Tooltip>
         </div>
         <div>
-          <div className="field" data-tip data-for={id+'tip'}>
-            <Form_controller disabled={disabled} {...props}/>
-            {sufix && <span className="sufix">{t(sufix)}</span>}
+          <div className="field" data-tip data-for={props.id+'tip'}>
+            {props.children ||
+              <Form_controller disabled={props.disabled} {...props}/>
+            }
+            {props.sufix && <span className="sufix">{t(props.sufix)}</span>}
             {props.field_tooltip &&
-              <React_tooltip id={id+'tip'} type="light" effect="solid"
+              <React_tooltip id={props.id+'tip'} type="light" effect="solid"
                 delayHide={30} delayUpdate={300} place="right">
                 {t(props.field_tooltip)}
               </React_tooltip>
             }
           </div>
-          {note && <Note>{t(note)}</Note>}
+          {props.note && <Note>{t(props.note)}</Note>}
         </div>
       </React.Fragment>}</T>
     </Field_row_raw>;
