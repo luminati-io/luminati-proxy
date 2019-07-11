@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.143.768 Stable
+- :bug: Fixed persisting the order of multiplied proxy ports
+- :bug: Fixed origin IP for incoming requests on SOCKS5
+
 ## 1.143.567 Stable
 - :star: UI improvements (zones list synchronization)
 

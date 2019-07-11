@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.143.768",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed persisting the order of multiplied proxy ports"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed origin IP for incoming requests on SOCKS5"
+            }
+        ]
+    },
+    {
         "ver": "1.143.567",
         "type": "stable",
         "changes": [

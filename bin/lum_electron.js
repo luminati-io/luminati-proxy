@@ -24,8 +24,8 @@ const show_message = opt=>etask(function*(){
     return res;
 });
 const mgr_err = msg=>{
-    if (manager && manager._log)
-        manager._log.error(msg);
+    if (manager && manager.log)
+        manager.log.error(msg);
     else
         console.log(msg);
 };
@@ -131,7 +131,7 @@ const _run = argv=>etask(function*(){
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});
     manager = new Manager(argv);
-    auto_updater.logger = manager._log;
+    auto_updater.logger = manager.log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
         opn(url);
