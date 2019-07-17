@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.144.356",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed overrding options when passing args in CLI"
+            }
+        ]
+    },
+    {
         "ver": "1.143.768",
         "type": "stable",
         "changes": [

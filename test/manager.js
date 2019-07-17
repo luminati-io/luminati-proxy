@@ -525,6 +525,15 @@ describe('manager', ()=>{
             yield this.wait();
         }));
     });
+    describe('whitelisting', ()=>{
+        it('takes whitelist ips from cmd', etask._fn(function*(_this){
+            app = yield app_with_proxies([{port: 24000}],
+                {whitelist_ips: '1.2.3.4'});
+            const {whitelist_ips} = app.manager.proxies_running[24000].opt;
+            assert.equal(whitelist_ips.length, 1);
+            assert.equal(whitelist_ips[0], '1.2.3.4');
+        }));
+    });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{
             log_stub.reset();

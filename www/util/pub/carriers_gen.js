@@ -19,6 +19,7 @@ const E = [
     {value: 'cosmote', label: 'Cosmote Mobile Telecommunications S.A.'},
     {value: 'cox', label: 'Cox'},
     {value: 'dt', label: 'Deutsche Telekom'},
+    {value: 'dialog_axiata', label: 'Dialog Axiata PLC.'},
     {value: 'docomo', label: 'Docomo'},
     {value: 'dtac', label: 'DTAC TriNet'},
     {value: 'entel_chile', label: 'ENTEL CHILE S.A.'},
