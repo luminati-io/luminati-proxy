@@ -50,14 +50,19 @@ export default class Alloc_modal extends Pure_component {
                 _available_list = res.ips;
             else
                 _available_list = res;
+            const available_set = new Set();
+            _available_list.forEach(v=>available_set.add(v));
             const chosen_set = new Set();
-            form[type].forEach(v=>chosen_set.add(v));
+            form[type].forEach(v=>{
+                if (available_set.has(v))
+                    chosen_set.add(v);
+            });
             const not_chosen_set = new Set();
             _available_list.forEach(v=>{
                 if (!chosen_set.has(v))
                     not_chosen_set.add(v);
             });
-            const available_list = [...form[type], ...not_chosen_set];
+            const available_list = [...chosen_set, ...not_chosen_set];
             _this.setState({available_list, cur_page: 0},
                 _this.sync_selected_vals);
             _this.loading(false);

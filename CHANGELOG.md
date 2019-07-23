@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.145.154 Stable
+- :bug: Bug fixes / UI improvements
+
 ## 1.144.356 Stable
 - :bug: Fixed overrding options when passing args in CLI
 

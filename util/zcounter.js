@@ -16,7 +16,7 @@ const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC;
 
 E.config = {hosts: {
-    hola: ['zs-graphite', 'zs-graphite-hola'],
+    hola: ['zs-graphite-hola'],
     spark: ['zs-graphite-spark'],
     lum: ['zs-graphite'],
 }};

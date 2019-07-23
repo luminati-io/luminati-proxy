@@ -82,9 +82,6 @@ E.is = function(level){ return level<=E.level; };
     E.is[l] = function(){ return level<=E.level; };
 });
 
-E.log_tail = function(size){
-    return (E.log||[]).join('\n').substr(-(size||4096)); };
-
 /* perr is a stub overridden by upper layers */
 E.perr = function(id, info, opt){
     E._zerr(!opt || opt.level===undefined ? L.ERR : opt.level,
@@ -208,6 +205,17 @@ E.get_stack_trace = function(opt){
     return stack;
 };
 
+E.log = [];
+E.log.max_size = 200;
+E.log_tail = function(size){
+    return (E.log||[]).join('\n').substr(-(size||4096)); };
+
+function log_tail_push(msg){
+    E.log.push(msg);
+    if (E.log.length>E.log.max_size)
+        E.log.splice(0, E.log.length - E.log.max_size/2);
+}
+
 if (is_node)
 { // zerr-node
 E.ZEXIT_LOG_DIR = env.ZEXIT_LOG_DIR||'/tmp/zexit_logs';
@@ -252,13 +260,16 @@ var __zerr = function(level, args){
     var prefix = E.hide_timestamp ? '' : E.prefix+date.to_sql_ms()+' ';
     if (env.CURRENT_SYSTEMD_UNIT_NAME)
         prefix = '<'+level+'>'+prefix;
-    console.error(prefix+k[level]+': '+msg);
+    var res = prefix+k[level]+': '+msg;
+    console.error(res);
+    log_tail_push(res);
 };
 
 E.set_logger = function(logger){
     __zerr = function(level, args){
         var msg = zerr_format(args);
         logger(level, msg);
+        log_tail_push(E.prefix+date.to_sql_ms()+': '+msg);
     };
 };
 
@@ -362,14 +373,12 @@ _zerr = function(l, args){
         .substr(0, 1024);
         var prefix = (E.hide_timestamp ? '' : date.to_sql_ms()+' ')
         +L_STR[l]+': ';
-        E.log.push(prefix+s);
         if (E.is(l))
         {
             Function.prototype.apply.bind(console[console_method(l)],
                 console)([prefix+fmt].concat(fmt_args));
         }
-        if (E.log.length>E.log.max_size)
-            E.log.splice(0, E.log.length - E.log.max_size/2);
+        log_tail_push(prefix+s);
     } catch(err){
         try { console.error('ERROR in zerr '+(err.stack||err), arguments); }
         catch(e){}
