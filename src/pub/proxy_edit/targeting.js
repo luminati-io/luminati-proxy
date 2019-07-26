@@ -137,6 +137,16 @@ export default class Targeting extends Pure_component {
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
         const carrier_disabled = !!this.state.form.asn &&
             !!this.state.form.asn.length;
+        const filter_by_asns = (option, props)=>{
+            let low_text = props.text.toLowerCase();
+            if (low_text=='a'||low_text=='as')
+                return false;
+            if (low_text.startsWith('as'))
+                low_text = low_text.substr(2);
+            if (option.label.startsWith(low_text))
+                return true;
+            return false;
+        };
         return <div className="target">
               <Tab_context.Provider value="target">
                 {(show_dc_note||show_vips_note) &&
@@ -173,7 +183,8 @@ export default class Targeting extends Pure_component {
                 {!this.state.form.asn || !this.state.form.asn[1] &&
                   <Config type="typeahead" id="asn" data={this.asns()}
                     disabled={!!this.state.form.carrier} update_on_input
-                    depend_a={this.state.form.zone}/>
+                    depend_a={this.state.form.zone}
+                    filterBy={filter_by_asns}/>
                 }
                 <Config type="select" id="carrier" data={this.carriers()}
                   note={carriers_note} disabled={carrier_disabled}

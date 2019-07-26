@@ -3073,7 +3073,7 @@
   "Luminati's network routes all requests through one of our super proxies, to the exit IP and then to the site, guaranteeing our IPs are entirely anonymous. With a 99.99% uptime, we allow for unlimited concurrent connections guaranteeing your success and ensuring your business is never put on pause. Stop limiting your operations due to your proxy provider!": "通过我们的超级代理器，Luminati网络将所有请求路由到出口IP，然后连接到站点，并保证IP地址的完全匿名。凭借99.99％的运行可靠率，我们能够保证无限的并发连接，为您的成功保驾护航，并确保您的业务永不陷入停顿。别让代理提供商成为您业务的羁绊！",
   "Limitless options": "无限选择",
   "Scale up or down based on your requirements. With our 24/7 support team in multiple languages, we are always here to assist. Speak with your personal account manager to get your proxy needs up and running in record time. Let them show you how to optimize your account, avoid captcha and never get blocked or banned again!": "您可根据需要调整网络规模。我们的支持团队为您提供7x24小时的全天候多语种支持，我们将随时随地为您提供协助。与您的专属客户经理联络，快速设置并运行您的代理需求。他们将向您展示如何优化您的帐号、规避验证码，以及如何不再被屏蔽或拦截！",
-  "https://luminati.io/proxies_for_ecommerce": "https://luminati.io/proxies_for_ecommerce?hl=zh_CN",
+  "https://luminati.io/use_cases/proxies_for_ecommerce": "https://luminati.io/use_cases/proxies_for_ecommerce?hl=zh_CN",
   "E-commerce Proxies": "电子商务代理服务",
   "Are you gathering data from  E-commerce websites? You need Luminati!": "如果您正在收集电子商务网站信息，您需要Luminati!",
   "Why do you need a proxy service for your data gathering operations?": "为什么您需要使用代理服务器进行信息抓取？",

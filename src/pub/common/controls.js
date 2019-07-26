@@ -378,7 +378,7 @@ export const Typeahead_wrapper = props=>
     <Typeahead options={props.data} maxResults={10}
       minLength={1} disabled={props.disabled} selectHintOnEnter
       onChange={props.on_change_wrapper} selected={props.val}
-      onInputChange={props.on_input_change}/>;
+      onInputChange={props.on_input_change} filterBy={props.filterBy}/>;
 
 export const Select = props=>{
     const update = val=>{

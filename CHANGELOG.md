@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.145.600 Stable
+- :star: AS prefix allowed for ASN field
+
 ## 1.145.154 Stable
 - :bug: Bug fixes / UI improvements
 
