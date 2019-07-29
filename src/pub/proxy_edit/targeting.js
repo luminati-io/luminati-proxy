@@ -184,7 +184,7 @@ export default class Targeting extends Pure_component {
                   <Config type="typeahead" id="asn" data={this.asns()}
                     disabled={!!this.state.form.carrier} update_on_input
                     depend_a={this.state.form.zone}
-                    filterBy={filter_by_asns}/>
+                    filter_by={filter_by_asns}/>
                 }
                 <Config type="select" id="carrier" data={this.carriers()}
                   note={carriers_note} disabled={carrier_disabled}

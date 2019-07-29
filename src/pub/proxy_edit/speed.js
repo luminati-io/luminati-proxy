@@ -19,7 +19,8 @@ const dns_opt = [
 export default class Speed extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
-    zagent_countries = ['au', 'cn', 'gb', 'in', 'nl', 'us'];
+    zagent_countries = ['au', 'cn', 'gb', 'in', 'nl', 'us', 'hk', 'de', 'sg',
+        'ca'];
     componentDidMount(){
         this.setdb_on('head.locations', locations=>{
             locations && this.setState({locations});

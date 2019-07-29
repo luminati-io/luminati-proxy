@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.146.94 Stable
+- :star: Added missing countries of super proxies
+- :sparkles: Show Static IPs column in multiplied proxy port overviews using a static zones
+
 ## 1.145.600 Stable
 - :star: AS prefix allowed for ASN field
 

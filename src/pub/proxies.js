@@ -357,6 +357,7 @@ const columns = [
         key: 'ip',
         title: 'Static IPs',
         type: 'text',
+        calc_show: (proxies, master)=>master&&proxies.some(p=>p.multiply_ips),
     },
     {
         key: 'vip',
@@ -682,8 +683,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             columns[actions_idx].width = 60;
         }
         return columns.filter(col=>this.state.selected_cols.includes(col.key)
-            || col.sticky || col.calc_show &&
-            col.calc_show(this.state.filtered_proxies));
+            || col.sticky || col.calc_show && col.calc_show(
+                this.state.filtered_proxies, this.props.master_port));
     };
     render(){
         const cols = this.get_cols();

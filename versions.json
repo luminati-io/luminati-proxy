@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.146.94",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added missing countries of super proxies"
+            },
+            {
+                "type": "sparkles",
+                "text": "Show Static IPs column in multiplied proxy port overviews using a static zones"
+            }
+        ]
+    },
+    {
         "ver": "1.145.600",
         "type": "stable",
         "changes": [
