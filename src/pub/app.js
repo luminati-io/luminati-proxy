@@ -92,7 +92,7 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});
             setdb.set('head.defaults', defaults);
-            ws.set_location(window.location.hostname, defaults.ws);
+            ws.set_location(window.location, defaults.ws);
         });
         this.etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});

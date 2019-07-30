@@ -26,9 +26,12 @@ function _hostname(){
 }
 
 function init(){
-    if (script_path)
+    let filename = script_path;
+    if (filename)
     {
-        let text = file.read(script_path+'.conf');
+        if (!file.exists(`${filename}.conf`) && file.is_symlink(filename))
+            filename = file.readlink(filename);
+        let text = file.read(`${filename}.conf`);
         if (text)
             Object.assign(env, parse(text));
     }

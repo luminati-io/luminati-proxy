@@ -4,15 +4,17 @@ import {EventTarget} from 'event-target-shim';
 import setdb from '../../util/setdb.js';
 
 class Ws_wrapper extends EventTarget {
-    set_location = (url, port)=>{
-        this.url = url;
+    set_location = (location, port)=>{
+        this.url = location.hostname;
         this.port = port;
+        this.protocol = location.protocol=='https:' ? 'wss' : 'ws';
         this.create_socket();
         this.start_checking();
     };
     create_socket = ()=>{
-        console.log('createing socket');
-        this.socket = new WebSocket(`ws://${this.url}:${this.port}`);
+        console.log('creating socket');
+        this.socket = new WebSocket(
+            `${this.protocol}://${this.url}:${this.port}`);
         const _this = this;
         this.socket.addEventListener('message', event=>{
             _this.dispatchEvent(event, 'message');

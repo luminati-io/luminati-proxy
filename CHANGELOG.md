@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.146.158 Stable
+- :bug: Fixed LPM WS connection when accessed with https
+- :bug: Fix socket hang up errors
+
 ## 1.146.94 Stable
 - :star: Added missing countries of super proxies
 - :sparkles: Show Static IPs column in multiplied proxy port overviews using a static zones
