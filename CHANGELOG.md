@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.146.158 Stable
+## 1.146.183 Stable
 - :bug: Fixed LPM WS connection when accessed with https
 - :bug: Fix socket hang up errors
 
