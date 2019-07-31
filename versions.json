@@ -1,6 +1,30 @@
 [
     {
+        "ver": "1.146.377",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fixed error: Hostname/IP does not match certificate's altnames"
+            },
+            {
+                "type": "bug",
+                "text": "Bug fixes / UI improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.146.183",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for domain param in /proxies/:port/banip and /proxies/:port/banips APIs"
+            }
+        ]
+    },
+    {
+        "ver": "1.146.158",
         "type": "stable",
         "changes": [
             {

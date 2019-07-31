@@ -1,6 +1,13 @@
 Luminati Proxy manager - Change Log
 
+## 1.146.377 Stable
+- :bug: fixed error: Hostname/IP does not match certificate's altnames
+- :bug: Bug fixes / UI improvements
+
 ## 1.146.183 Stable
+- :star: Added support for domain param in /proxies/:port/banip and /proxies/:port/banips APIs
+
+## 1.146.158 Stable
 - :bug: Fixed LPM WS connection when accessed with https
 - :bug: Fix socket hang up errors
 
