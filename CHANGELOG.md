@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.146.606 Stable
+- :bug: Fixed crashes for docker
+- :bug: Added more error handling
+
 ## 1.146.377 Stable
 - :bug: fixed error: Hostname/IP does not match certificate's altnames
 - :bug: Bug fixes / UI improvements

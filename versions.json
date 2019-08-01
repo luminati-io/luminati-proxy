@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.146.606",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed crashes for docker"
+            },
+            {
+                "type": "bug",
+                "text": "Added more error handling"
+            }
+        ]
+    },
+    {
         "ver": "1.146.377",
         "type": "stable",
         "changes": [

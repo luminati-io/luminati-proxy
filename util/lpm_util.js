@@ -84,8 +84,6 @@ E.init_args = args=>{
     .version(()=>pkg.version)
     .argv;
     argv.native_args = args;
-    if (argv.log instanceof Array)
-        argv.log = argv.log.pop();
     argv.log = argv.log.toLowerCase();
     if (argv.session=='true')
         argv.session = true;
