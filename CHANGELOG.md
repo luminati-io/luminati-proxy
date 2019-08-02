@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.146.711 Stable
+- :bug: Using correct password when Waterfall rule is applied
+
 ## 1.146.606 Stable
 - :bug: Fixed crashes for docker
 - :bug: Added more error handling

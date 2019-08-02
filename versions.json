@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.146.711",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Using correct password when Waterfall rule is applied"
+            }
+        ]
+    },
+    {
         "ver": "1.146.606",
         "type": "stable",
         "changes": [
