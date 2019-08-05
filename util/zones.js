@@ -41,15 +41,15 @@ E.get_password = (proxy, zone_name, zones)=>{
         return proxy.password;
 };
 
-E.is_static_proxy = (zone_name, zones)=>{
-    const zone = zones.find(z=>z.zone==zone_name);
+E.is_static_proxy = (proxy, zones)=>{
+    const zone = zones.find(z=>z.zone==proxy.zone);
     if (!zone)
         return false;
     return zone.plan && zone.plan.type=='static';
 };
 
-E.is_mobile = (zone_name, zones)=>{
-    const zone = zones.find(z=>z.zone==zone_name);
+E.is_mobile = (proxy, zones)=>{
+    const zone = zones.find(z=>z.zone==proxy.zone);
     if (!zone)
         return false;
     return !!(zone.plan && zone.plan.mobile);
