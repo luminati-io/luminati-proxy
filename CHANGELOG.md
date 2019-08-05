@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.147.52 Stable
+- :bug: Bug fixes
+
 ## 1.146.711 Stable
 - :bug: Using correct password when Waterfall rule is applied
 

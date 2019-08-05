@@ -823,8 +823,6 @@ class Actions extends Pure_component {
                 setdb.emit_path('head.proxies_running');
             });
             const params = {};
-            if (proxy.proxy_type!='duplicate')
-                params.with_details = true;
             if (!proxy.status)
                 proxy.status = 'testing';
             if (opt.force)
