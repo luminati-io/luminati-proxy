@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.147.269",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Bug fixes"
+            },
+            {
+                "type": "star",
+                "text": "Improved error handling"
+            }
+        ]
+    },
+    {
         "ver": "1.147.79",
         "type": "stable",
         "changes": [

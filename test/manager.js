@@ -166,11 +166,10 @@ describe('manager', ()=>{
             qw`--no-config --customer usr --password abc --token t --zone z`,
             qw`--no-config --customer usr --password abc --token t --zone z`);
     });
-    xdescribe('config load', ()=>{
-        const t = (name, config, expected)=>it(name, etask._fn(
-        function*(_this){
+    describe('config load', ()=>{
+        const t = (name, config, expected)=>it(name, etask._fn(function*(){
             app = yield app_with_config(config);
-            let proxies = yield json('api/proxies_running');
+            const proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
         }));
         const simple_proxy = {port: 24024};
@@ -178,23 +177,13 @@ describe('manager', ()=>{
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('main config only', {config: simple_proxy},
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
-        t('config file', {files: [simple_proxy]}, [simple_proxy]);
+        t('config file', {config: {proxies: [simple_proxy]}}, [simple_proxy]);
         t('config override cli', {cli: simple_proxy, config: {port: 24042}},
             [simple_proxy, {proxy_type: 'persist', port: 24042}]);
-        const multiple_proxies = [
-            assign({}, simple_proxy, {port: 25025}),
-            assign({}, simple_proxy, {port: 26026}),
-            assign({}, simple_proxy, {port: 27027}),
-        ];
-        t('multiple config files', {files: multiple_proxies},
-            multiple_proxies);
-        t('main + config files', {config: simple_proxy,
-            files: multiple_proxies}, [].concat([assign({}, simple_proxy,
-            {proxy_type: 'persist'})], multiple_proxies));
         describe('default zone', ()=>{
             const zone_static = {password: ['pass1']};
             const zone_gen = {password: ['pass2']};
-            const zones = {static: assign({}, zone_static),
+            const zones = {static: Object.assign({}, zone_static),
                 gen: assign({}, zone_gen)};
             const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
                 nock(api_base).get('/').reply(200, {});
@@ -204,16 +193,17 @@ describe('manager', ()=>{
                     .reply(200, {_defaults});
                 t(name, _.set(config, 'cli.customer', 'testc1'), expected);
             };
-            t2('invalid', {config: {_defaults: {zone: 'foo'},
-                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
-                {zone: 'static'})], {zone: 'static', zones});
-            t2('keep default', {config: {_defaults: {zone: 'gen'},
-                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
-                {zone: 'gen'})]);
-            t2('default disabled', {config: {_defaults: {zone: 'gen'},
-                proxies: [simple_proxy]}}, [assign({}, simple_proxy,
-                {zone: 'static'})], {zone: 'static', zones: assign({}, zones,
-                    {gen: {plan: {disable: 1}}})});
+            t2('from defaults', {
+                config: {_defaults: {zone: 'foo'}, proxies: [simple_proxy]},
+            }, [Object.assign({zone: 'foo'}, simple_proxy)],
+                {zone: 'static', zones});
+            t2('keep default', {
+                config: {_defaults: {zone: 'gen'}, proxies: [simple_proxy]},
+            }, [Object.assign({zone: 'gen'}, simple_proxy)]);
+            t2('empty zone should be overriden by default', {config: {
+                _defaults: {},
+                proxies: [Object.assign({zone: ''}, simple_proxy)],
+            }}, [{zone: 'static'}]);
         });
     });
     xdescribe('dropin', ()=>{
