@@ -33,6 +33,7 @@ describe('proxy', ()=>{
         const mgr = {
             send_rule_mail: ()=>null,
             config: new Config(),
+            first_lpm_action: ()=>null,
         };
         const l = new Luminati(Object.assign({
             proxy: '127.0.0.1',
@@ -1444,7 +1445,7 @@ describe('proxy', ()=>{
             const initial_sessions = l.session_mgr.sessions.sessions;
             assert.ok(initial_sessions[0].session.endsWith('1'));
             assert.ok(initial_sessions[9].session.endsWith('10'));
-            l.session_mgr.info_request = ()=>null;
+            l.session_mgr.send_info_request = ()=>null;
             yield etask.sleep(1500);
             const new_sessions = l.session_mgr.sessions.sessions;
             assert.equal(new_sessions.length, 10);

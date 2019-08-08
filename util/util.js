@@ -456,4 +456,9 @@ E.omit = function(obj, omit){
     return o;
 };
 
+E.if_set = function (val, o, name){
+    if (val)
+        o[name] = val;
+};
+
 return E; }); }());

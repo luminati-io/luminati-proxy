@@ -4,6 +4,7 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_select from 'react-select/lib/Creatable';
 import React_tooltip from 'react-tooltip';
+import {withRouter} from 'react-router-dom';
 import classnames from 'classnames';
 import {Netmask} from 'netmask';
 import {Typeahead} from 'react-bootstrap-typeahead';
@@ -418,7 +419,8 @@ export const Input = props=>{
           onKeyUp={props.on_key_up}/>;
 };
 
-export class Select_zone extends Pure_component {
+export const Select_zone = withRouter(
+class Select_zone extends Pure_component {
     state = {refreshing_zones: false, zones: {zones: []}};
     componentDidMount(){
         this.setdb_on('head.zones', zones=>{
@@ -429,12 +431,16 @@ export class Select_zone extends Pure_component {
     refresh_zones = ()=>{
         const _this = this;
         this.etask(function*(){
-            this.on('finally', ()=>{
+            this.on('uncaught', ()=>{
                 _this.setState({refreshing_zones: false});
             });
             _this.setState({refreshing_zones: true});
-            yield window.fetch('/api/refresh_zones', {method: 'POST'});
+            const result = yield window.fetch('/api/refresh_zones',
+                {method: 'POST'});
+            if (result.status!=200)
+                return _this.props.history.push({pathname: '/login'});
             const zones = yield ajax.json({url: '/api/zones'});
+            _this.setState({refreshing_zones: false});
             setdb.set('head.zones', zones);
         });
     };
@@ -472,4 +478,4 @@ export class Select_zone extends Pure_component {
               <Loader show={this.state.refreshing_zones}/>
             </div>;
     }
-}
+});

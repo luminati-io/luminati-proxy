@@ -5,7 +5,6 @@ import React from 'react';
 import {Loader} from './common.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import {detect_browser} from './util.js';
 import {Modal} from './common/modals.js';
 
 class Index extends Pure_component {
@@ -30,8 +29,7 @@ class Index extends Pure_component {
             const resp = yield window.fetch('/api/report_bug', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({desc, email: _this.state.email,
-                    browser: detect_browser()}),
+                body: JSON.stringify({desc, email: _this.state.email}),
             });
             _this.setState({sending: false});
             if (resp.status==200)
