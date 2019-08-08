@@ -892,22 +892,6 @@ describe('proxy', ()=>{
             l.rules.retry(_req, {}, {}, l.port);
             assert.equal(_req.retry, 2);
         }));
-        it('check action', ()=>etask(function*(){
-            l = yield lum({rules: []});
-            sinon.stub(l.rules, 'gen_session').returns('test');
-            const can_stub = sinon.stub(l.rules, 'can_retry').returns(false);
-            const retry_stub = sinon.stub(l.rules, 'retry');
-            const req = {};
-            let r = l.rules.action(req, {}, {}, {action: {}}, {});
-            assert.ok(!r);
-            assert.notEqual(req.session, 'test');
-            assert.ok(!retry_stub.called);
-            can_stub.returns(true);
-            r = l.rules.action(req, {}, {}, {action: {}}, {});
-            assert.ok(r);
-            assert.equal(req.session, 'test');
-            assert.ok(retry_stub.called);
-        }));
         it('check check_req_time_range', ()=>etask(function*(){
             const _date = '2013-08-13 14:00:00';
             zsinon.clock_set({now: _date});
@@ -1021,7 +1005,8 @@ describe('proxy', ()=>{
                 l = yield lum({rules: []});
                 sinon.stub(l.rules, 'can_retry').returns(true);
                 sinon.stub(l.rules, 'retry');
-                sinon.stub(l.rules, 'gen_session').returns('test');
+                const refresh_stub = sinon.stub(l.session_mgr,
+                    'refresh_sessions');
                 const add_stub = sinon.stub(l, 'banip').returns('test');
                 const req = {ctx: {}};
                 const opt = {_res: {
@@ -1030,7 +1015,17 @@ describe('proxy', ()=>{
                     opt);
                 assert.ok(r);
                 assert.ok(add_stub.called);
-                assert.equal(req.session, 'test');
+                assert.ok(refresh_stub.called);
+            }));
+            it('retry should refresh the session', ()=>etask(function*(){
+                l = yield lum({
+                    pool_size: 1,
+                    rules: [{action: {retry: true}, status: '200'}],
+                });
+                const session_a = l.session_mgr.sessions.sessions[0].session;
+                yield l.test({fake: 1});
+                const session_b = l.session_mgr.sessions.sessions[0].session;
+                assert.notEqual(session_a, session_b);
             }));
             describe('dc pool', ()=>{
                 it('adds to pool when prefill turned off and gathering',

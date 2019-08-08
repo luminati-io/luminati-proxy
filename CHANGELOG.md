@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.147.705 Stable
+- :bug: Bug fixes
+
 ## 1.147.566 Stable
 - :bug: UI bug fixes
 - :star: Adding UI supporting for cluster mode
