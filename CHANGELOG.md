@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.147.813 Stable
+- :bug: Fixed overriding parameters in CLI
+
 ## 1.147.705 Stable
 - :bug: Bug fixes
 

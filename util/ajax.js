@@ -51,6 +51,8 @@ function ajax(opt){
             ajopt.processData = false;
             delete ajopt.dataType;
         }
+        if (opt.async!==undefined)
+            ajopt.async = opt.async;
         xhr = $.ajax(ajopt);
         var _this = this;
         xhr.done(function(v){

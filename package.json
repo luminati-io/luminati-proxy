@@ -377,7 +377,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "802478fdbd14e50278974813609d8877"
+    "md5": "4e930ee94d6a2bcebcb19af26427a496"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -435,5 +435,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.147.705"
+  "version": "1.147.813"
 }

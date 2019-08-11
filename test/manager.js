@@ -205,15 +205,25 @@ describe('manager', ()=>{
                 proxies: [Object.assign({zone: ''}, simple_proxy)],
             }}, [{zone: 'static'}]);
         });
+        describe('args as default params for proxy ports', ()=>{
+            it('should use proxy from args', etask._fn(function*(_this){
+                app = yield app_with_args(['--proxy', '1.2.3.4',
+                    '--proxy_port', '3939', '--dropin']);
+                const dropin = app.manager.proxies_running[22225];
+                assert.equal(dropin.opt.proxy, '1.2.3.4');
+                assert.equal(dropin.opt.proxy_port, 3939);
+            }));
+        });
     });
-    xdescribe('dropin', ()=>{
-        const t = (name, args, expected)=>it(name, etask._fn(
-        function*(_this){
-            app = yield app_with_args(args);
-            let proxies = yield json('api/proxies_running');
-            assert_has(proxies, expected, 'proxies');
+    describe('dropin', ()=>{
+        it('off', etask._fn(function*(_this){
+            app = yield app_with_args(['--no-dropin']);
+            assert.ok(!app.manager.proxies_running[22225]);
         }));
-        t('off', ['--no-dropin'], []);
+        it('on', etask._fn(function*(_this){
+            app = yield app_with_args(['--dropin']);
+            assert.ok(!!app.manager.proxies_running[22225]);
+        }));
     });
     describe('api', ()=>{
         it('ssl', etask._fn(function*(_this){
@@ -391,37 +401,6 @@ describe('manager', ()=>{
                     {request: {url: 'http://bbc.com'}});
                 assert.equal(res.body.log.entries.length, 1);
             }));
-        });
-        xdescribe('recent_stats', ()=>{
-            const t = (name, expected)=>
-            it(name, etask._fn(function*(_this){
-                nock(api_base).get('/cp/lum_local_conf')
-                    .query({customer: 'mock_user', proxy: pkg.version})
-                    .reply(200, {mock_result: true, _defaults: true});
-                app = yield app_with_args(qw`--customer mock_user --port 24000
-                    --request_stats --ssl false`);
-                app.manager.loki.stats_clear();
-                yield etask.nfn_apply(request, [{
-                    proxy: 'http://127.0.0.1:24000',
-                    url: 'http://linkedin.com/',
-                    strictSSL: false,
-                }]);
-                yield etask.sleep(1500);
-                const res = yield api_json(`api/recent_stats`);
-                assert_has(res.body, expected);
-            }));
-            t('main', {
-                status_code: [{key: '200', reqs: 1}],
-                protocol: [{key: 'http', reqs: 1}],
-                hostname: [{key: 'linkedin.com', reqs: 1}],
-                ports: {24000: {
-                    reqs: 1,
-                    success: 1,
-                    url: 'http://linkedin.com/',
-                }},
-                success: 1,
-                total: 1,
-            });
         });
     });
     describe('crash on load error', ()=>{
