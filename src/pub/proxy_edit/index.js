@@ -198,8 +198,6 @@ const Index = withRouter(class Index extends Pure_component {
             form.ips = [];
         if (!form.vips)
             form.vips = [];
-        if (Array.isArray(form.whitelist_ips))
-            form.whitelist_ips = form.whitelist_ips.join(',');
         if (Array.isArray(form.smtp))
             form.smtp = form.smtp.join(',');
         if (form.city && !Array.isArray(form.city) && form.state)
@@ -324,13 +322,6 @@ const Index = withRouter(class Index extends Pure_component {
         else
             save_form.reverse_lookup_values = '';
         delete save_form.reverse_lookup;
-        if (save_form.whitelist_ips)
-        {
-            save_form.whitelist_ips = save_form.whitelist_ips.split(',')
-            .filter(Boolean);
-        }
-        else
-            save_form.whitelist_ips = [];
         // XXX krzysztof: extract the logic of mapping specific fields
         if (save_form.smtp)
             save_form.smtp = save_form.smtp.split(',').filter(Boolean);
