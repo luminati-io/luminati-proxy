@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.147.992 
+
 ## 1.147.960 Stable
 - :star: add a flag to ignore SSL to super proxy errors
 
