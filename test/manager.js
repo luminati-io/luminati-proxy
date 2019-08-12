@@ -84,6 +84,7 @@ describe('manager', ()=>{
                 args = args.concat(['--no-local_login']);
             args = args.concat('--loki', '/tmp/testdb');
         }
+        Manager.prototype.get_ip = ()=>null;
         Manager.prototype.check_conn = ()=>null;
         manager = new Manager(lpm_util.init_args(args));
         manager.on('error', this.throw_fn());
@@ -167,7 +168,9 @@ describe('manager', ()=>{
             qw`--no-config --customer usr --password abc --token t --zone z`);
     });
     describe('config load', ()=>{
-        const t = (name, config, expected)=>it(name, etask._fn(function*(){
+        const t = (name, config, expected)=>it(name, etask._fn(
+        function*(_this){
+            _this.timeout(6000);
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');

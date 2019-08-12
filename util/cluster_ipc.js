@@ -12,7 +12,7 @@ let handlers = {}, waiting = {}, incoming_pending = {};
 let send = (to, msg, sock)=>{
     if (to=='master')
         process.send(msg);
-    else
+    else if (cluster.workers[to])
         cluster.workers[to].send(msg, sock);
 };
 
@@ -104,6 +104,8 @@ let message_fn = sender=>(msg, sock)=>{
 };
 
 let init_worker = worker=>{
+    if (!worker)
+        return;
     if (waiting[worker.id])
         return;
     waiting[worker.id] = {};

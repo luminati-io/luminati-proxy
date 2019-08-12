@@ -30,11 +30,7 @@ describe('proxy', ()=>{
         opt = opt||{};
         if (opt.ssl===true)
             opt.ssl = Object.assign({requestCert: false}, ssl());
-        const mgr = {
-            send_rule_mail: ()=>null,
-            config: new Config(),
-            first_lpm_action: ()=>null,
-        };
+        const mgr = {config: new Config()};
         const l = new Luminati(Object.assign({
             proxy: '127.0.0.1',
             proxy_port: proxy.port,
@@ -872,9 +868,6 @@ describe('proxy', ()=>{
             };
             t({retry: 0}, {test: true}, false);
             t({retry: 0}, {retry: 1}, true);
-            const port_stub = sinon.stub(l, 'get_other_port').returns(false);
-            t({retry: 0}, {retry_port: 24001}, false);
-            port_stub.returns(l);
             t({retry: 0}, {retry_port: 24001}, true);
             t({retry: 5}, {retry: 1}, false);
         }));
@@ -1007,10 +1000,10 @@ describe('proxy', ()=>{
                 sinon.stub(l.rules, 'retry');
                 const refresh_stub = sinon.stub(l.session_mgr,
                     'refresh_sessions');
-                const add_stub = sinon.stub(l, 'banip').returns('test');
+                const add_stub = sinon.stub(l, 'banip');
                 const req = {ctx: {}};
                 const opt = {_res: {
-                    hola_headers: {'x-hola-timeline-debug': '1 2 3'}}};
+                    hola_headers: {'x-hola-timeline-debug': '1 2 3 1.2.3.4'}}};
                 const r = l.rules.action(req, {}, {}, {action: {ban_ip: 1000}},
                     opt);
                 assert.ok(r);
@@ -1169,7 +1162,7 @@ describe('proxy', ()=>{
                 const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
                 const req = {ctx: {}};
                 const opt = {_res:
-                    {hola_headers: {'x-hola-timeline-debug': '1 2 3'}}};
+                    {hola_headers: {'x-hola-timeline-debug': '1 2 3 ip'}}};
                 const r = l.rules.action(req, {}, {},
                     {action: {refresh_ip: true}}, opt);
                 assert.ok(r);
@@ -1181,34 +1174,30 @@ describe('proxy', ()=>{
             it('action null_response', ()=>etask(function*(){
                 l = yield lum({rules: [{action: {null_response: true,
                     email: 'test@mail'}}]});
-                const send_stub = sinon.stub(l.mgr, 'send_rule_mail',
-                    (port, to, _url)=>{
-                        assert.equal(port, 24000);
-                        assert.equal(to, 'test@mail');
-                        assert.equal(_url, 'lumtest.com');
-                    });
+                l.on('send_rule_mail', data=>{
+                    assert.equal(data.port, 24000);
+                    assert.equal(data.email, 'test@mail');
+                    assert.equal(data.url, 'lumtest.com');
+                });
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
                     log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
-                const r = yield l.rules.pre(_req, _res, {});
-                assert.ok(send_stub.called);
+                const r = l.rules.pre(_req, _res, {});
                 assert.equal(r.status_code, 200);
                 assert.equal(r.status_message, 'NULL');
             }));
             it('action direct', ()=>etask(function*(){
                 l = yield lum({rules: [{url: '', action: {direct: true,
                     email: 'test@mail'}}]});
-                const send_stub = sinon.stub(l.mgr, 'send_rule_mail',
-                    (port, to, _url)=>{
-                        assert.equal(port, 24000);
-                        assert.equal(to, 'test@mail');
-                        assert.equal(_url, 'lumtest.com');
-                    });
+                l.on('send_rule_mail', data=>{
+                    assert.equal(data.port, 24000);
+                    assert.equal(data.email, 'test@mail');
+                    assert.equal(data.url, 'lumtest.com');
+                });
                 const _req = {ctx: {response: {}, url: 'lumtest.com',
                     log: l.log, timeline: new Timeline(1)}};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
-                const r = yield l.rules.pre(_req, _res, {});
-                assert.ok(send_stub.called);
+                const r = l.rules.pre(_req, _res, {});
                 assert.equal(r, undefined);
                 assert.ok(_req.ctx.is_direct);
             }));
@@ -1260,14 +1249,6 @@ describe('proxy', ()=>{
                 yield l.test(ping.http.url);
                 sinon.assert.calledOnce(post_stub);
                 l2.stop(true);
-            }));
-            it('retry_port invalid port', ()=>etask(function*(){
-                l = yield lum({rules: [{action: {retry: true,
-                    retry_port: 24002}}]});
-                sinon.stub(l, 'get_other_port', ()=>null);
-                const post_stub = sinon.stub(l.rules, 'post');
-                yield l.test(ping.http.url);
-                sinon.assert.calledOnce(post_stub);
             }));
         });
         describe('banip combined with', ()=>{

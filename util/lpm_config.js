@@ -30,6 +30,8 @@ const conf = {
 };
 conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
     'version');
+conf.first_actions = lpm_file.get_file_path(
+    '.first_actions.json'.substr(conf.is_win ? 1 : 0));
 conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
 conf.luminati_default = {
     port: 24000,

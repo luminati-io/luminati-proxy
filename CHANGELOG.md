@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.147.960 Stable
+- :star: add a flag to ignore SSL to super proxy errors
+
 ## 1.147.813 Stable
 - :bug: Fixed overriding parameters in CLI
 
