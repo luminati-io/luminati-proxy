@@ -97,12 +97,15 @@ const presets = {
         set: opt=>{
             opt.pool_size = 1;
             opt.session = true;
+            opt.proxy_resolve = true;
         },
         clean: opt=>{
             opt.pool_size = 0;
+            opt.proxy_resolve = false;
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 1`},
+            {field: 'proxy_resolve', label: `Turns on 'Fixed super proxies'`},
         ],
         disabled: {
             sticky_ip: true,
@@ -111,6 +114,7 @@ const presets = {
             pool_type: true,
             seed: true,
             pool_size: true,
+            proxy_resolve: true,
             max_requests: true,
             session_duration: true,
             idle_pool: true,

@@ -472,6 +472,30 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.148.122', v=>{
+        it('should turn on proxy resolving when pool_size is >= 1', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000, pool_size: 0},
+                    {port: 24001, pool_size: 1},
+                    {port: 24002, pool_size: 100, opt: true},
+                    {port: 24003, opt: true},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000, pool_size: 0},
+                    {port: 24001, pool_size: 1, proxy_resolve: true},
+                    {port: 24002, pool_size: 100, opt: true,
+                        proxy_resolve: true},
+                    {port: 24003, opt: true},
+                ],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

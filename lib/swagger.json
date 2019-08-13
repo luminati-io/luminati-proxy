@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.148.122",
+        "version": "1.148.204",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -604,6 +604,10 @@
                 "proxy_count": {
                     "type": "integer",
                     "description": "Minimum number of super proxies to use"
+                },
+                "proxy_resolve": {
+                    "type": "boolean",
+                    "description": "Resolve domain name into number of first"
                 },
                 "secure_proxy": {
                     "type": "boolean",

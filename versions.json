@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.148.204",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Super proxies are resolved on each request by default"
+            }
+        ]
+    },
+    {
         "ver": "1.148.122",
         "type": "stable/dev",
         "changes": []

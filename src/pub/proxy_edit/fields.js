@@ -76,6 +76,13 @@ export const tabs = {
                 tooltip: `Number of failed requests (status 403, 429, 502, 503)
                     to switch to different super proxy`,
             },
+            proxy_resolve: {
+                label: 'Use fixed proxies',
+                tooltip: `Resolve domain name of super proxy into IPs in
+                    advance. This is required to keep the same IPs using
+                    sessions over time (useful when using 'Long session' preset
+                    or pool size)`,
+            },
             throttle: {
                 label: 'Throttle requests',
                 tooltip: `Throttle requests above the given number.

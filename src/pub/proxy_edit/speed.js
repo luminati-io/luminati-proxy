@@ -47,6 +47,7 @@ export default class Speed extends Pure_component {
                 <Config type="select_number" id="race_reqs"/>
                 <Config type="select_number" id="proxy_count"/>
                 <Config type="select_number" id="proxy_switch"/>
+                <Config type="yes_no" id="proxy_resolve"/>
                 <Config type="select_number" id="throttle"/>
                 <Config type="select" id="reverse_lookup"
                   data={reverse_lookup_opt}/>

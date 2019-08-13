@@ -2,6 +2,7 @@
 'use strict'; /*jslint node:true, mocha:true*/
 const _ = require('lodash');
 const assert = require('assert');
+const dns = require('dns');
 const socks = require('lum_socksv5');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
@@ -738,6 +739,33 @@ describe('proxy', ()=>{
                 } catch(e){ error = e.toString(); }
                 assert(error.includes('Client network socket disconnected '
                 +'before secure TLS connection was established'));
+            }));
+        });
+        describe('proxy_resolve', ()=>{
+            const dns_resolve = dns.resolve;
+            const ips = ['1.1.1.1', '2.2.2.2', '3.3.3.3'];
+            before(()=>{
+                dns.resolve = (domain, cb)=>{
+                    cb(null, ips);
+                };
+            });
+            after(()=>{
+                dns.resolve = dns_resolve;
+            });
+            it('should not resolve proxy by default', etask._fn(function*(){
+                l = yield lum({proxy: 'domain.com'});
+                assert.equal(l.hosts.length, 1);
+                assert.deepEqual(l.hosts[0], 'domain.com');
+            }));
+            it('should not resolve if it is IP', etask._fn(function*(){
+                l = yield lum({proxy: '1.2.3.4'});
+                assert.equal(l.hosts.length, 1);
+                assert.deepEqual(l.hosts[0], '1.2.3.4');
+            }));
+            it('should resolve if it is turned on', etask._fn(function*(){
+                l = yield lum({proxy: 'domain.com', proxy_resolve: true});
+                assert.equal(l.hosts.length, 3);
+                assert.deepEqual(l.hosts.sort(), ips);
             }));
         });
     });
