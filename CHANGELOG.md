@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.148.122 
+
 ## 1.148.74 Stable
 - :bug: fix whitelisting
 
