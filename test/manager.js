@@ -18,7 +18,9 @@ const etask = require('../util/etask.js');
 const pkg = require('../package.json');
 const qw = require('../util/string.js').qw;
 const lpm_util = require('../util/lpm_util.js');
+const lpm_config = require('../util/lpm_config.js');
 const assign = Object.assign;
+const {stub: sstub, match: smatch} = sinon;
 const customer = 'abc';
 const password = 'xyz';
 const {assert_has} = require('./common.js');
@@ -539,5 +541,74 @@ describe('manager', ()=>{
         t('should not run migrations if config does not exist', false);
         t('should not run migrations if config exists and version is new',
             false, {_defaults: {version: '1.120.0'}});
+    });
+    describe('first actions', ()=>{
+        const filepath = path.join(os.tmpdir(), 'first_actions.json');
+        const rm_actions_file = ()=>{
+            if (fs.existsSync(filepath))
+                fs.unlinkSync(filepath);
+        };
+        let perr_stub;
+        before(()=>lpm_config.first_actions = filepath);
+        after(()=>nock.cleanAll());
+        beforeEach(()=>{
+            nock(api_base).get('/').reply(200, {}).persist();
+            ['/update_lpm_stats', '/update_lpm_config'].forEach(p=>
+                nock(api_base).post(p).query(true).reply(200, {}).persist());
+            rm_actions_file();
+            perr_stub = sstub(Manager.prototype, 'perr');
+        });
+        afterEach(()=>{
+            rm_actions_file();
+            perr_stub.restore();
+        });
+        const make_successful_user_req = port=>api_json('api/test/'+port,
+            {method: 'POST', body: {url: 'http://lumtest.com/myip.json',
+                headers: {'x-lpm-fake': true}}});
+        const t = (name, called, action, conf_success=true, config={})=>
+        it(name, etask._fn(function*(_this){
+            const i = nock(api_base).get('/cp/lum_local_conf').query(true);
+            if (conf_success)
+                i.reply(200, {mock_result: true, _defaults: true});
+            else
+                i.reply(403);
+            app = yield app_with_config({config, cli: {token: '123'}});
+            action = `first_${action}`;
+            if (called)
+                sinon.assert.calledWith(perr_stub, smatch(action));
+            else
+                sinon.assert.neverCalledWith(perr_stub, smatch(action));
+        }));
+        t('triggers login on startup if logged', true, 'login');
+        t('does not triggers login on startup if not logged', false, 'login',
+            false);
+        t('triggers create_proxy_port on startup if custom port created', true,
+            'create_proxy_port', true,
+            {proxies: [{port: 24023}, {port: 24024}]});
+        t('does not trigger create_proxy_port on startup if no custom ports',
+            false, 'create_proxy_port');
+        t('never triggers send_request on startup', false, 'send_request');
+        t('never triggers send_request_successful on startup', false,
+            'send_request_successful');
+        it('does not trigger actions on zone password authentication', ()=>
+        etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true).reply(403);
+            app = yield app_with_config({config: {proxies: [{port: 24010}]},
+                cli: {customer: false, token: '123'}});
+            yield make_successful_user_req(24010);
+            sinon.assert.neverCalledWith(perr_stub, smatch('first'));
+        }));
+        it('triggers create_proxy_port_def when using dropin', ()=>
+        etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            app = yield app_with_config({cli: {token: '123', dropin: true}});
+            yield make_successful_user_req(22225);
+            const matches = ['login', 'create_proxy_port_def', 'send_request',
+                'send_request_successful'].map(e=>smatch(`first_${e}`));
+            matches.forEach(m=>sinon.assert.calledWith(perr_stub, m));
+            sinon.assert.neverCalledWith(perr_stub,
+                smatch(/^first_create_proxy_port$/));
+        }));
     });
 });

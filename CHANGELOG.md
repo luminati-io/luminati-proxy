@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.148.367 
+- :bug: bug fixes
+
 ## 1.148.204 Stable
 - :star: Super proxies are resolved on each request by default
 
