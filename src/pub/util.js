@@ -249,7 +249,6 @@ const presets = {
         subtitle: `Scrape data from shopping websites. This preset is
             configured for product pages but can be freely modified for any
             other use-cases`,
-        chceck: opt=>true,
         set: opt=>{
             opt.session = true;
             opt.dns = 'remote';

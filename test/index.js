@@ -13,8 +13,10 @@ const sinon = require('sinon');
 const zsinon = require('../util/sinon.js');
 const lpm_config = require('../util/lpm_config.js');
 const Luminati = require('../lib/luminati.js');
+const Rules = require('../lib/rules.js');
 const Timeline = require('../lib/timeline.js');
 const Config = require('../lib/config.js');
+const {decode_body} = require('../lib/util.js');
 const {assert_has, http_proxy, http_ping} = require('./common.js');
 const qw = require('../util/string.js').qw;
 const test_url = {http: 'http://lumtest.com/test',
@@ -828,6 +830,28 @@ describe('proxy', ()=>{
                 return handle_proxy_resp_org(...args)(_res);
             });
         };
+        const make_process_rule_req=(res, html, rules)=>etask(function*(){
+            const req = {ctx: {response: {}, proxies: [],
+                rules: new Rules(l, rules),
+                timeline: {track: ()=>null, req: {create: Date.now()}},
+                log: {info: ()=>null}, skip_rule: ()=>false}};
+            Object.assign(res, {
+                write: ()=>null, end: ()=>null,
+                on: function(event, fn){
+                    if (event=='data')
+                    {
+                        fn(Buffer.from(html));
+                        fn(Buffer.from('random data'));
+                    }
+                    else if (event=='end')
+                        fn();
+                    return this;
+                }
+            });
+            const et = etask.wait();
+            l.handle_proxy_resp(req, res, {}, et)(res);
+            return yield et;
+        });
         it('should process data', ()=>etask(function*(){
             l = yield lum({rules: []});
             const html = `
@@ -837,13 +861,13 @@ describe('proxy', ()=>{
                 </div>
               </body>`;
             const process = {price: `$('#priceblock_ourprice').text()`};
-            const req = {ctx: {response: {}}};
-            const _res = {headers: {'content-encoding': 'gzip'}};
-            l.rules.process_response(req, _res, html, {action: {process}});
+            const _res = {headers: {'content-encoding': 'text'}};
+            const response = yield make_process_rule_req(_res, html,
+                [{action: {process}, type: 'after_body'}]);
             assert.ok(!_res.headers['content-encoding']);
             assert.equal(_res.headers['content-type'],
                 'application/json; charset=utf-8');
-            const new_body = JSON.parse(req.ctx.response.body.toString());
+            const new_body = JSON.parse(decode_body(response.body).toString());
             assert.deepEqual(new_body, {price: '$12.99'});
         }));
         it('should process data with error', ()=>etask(function*(){
@@ -855,13 +879,13 @@ describe('proxy', ()=>{
                 </div>
               </body>`;
             const process = {price: 'a-b-v'};
-            const req = {ctx: {response: {}}};
-            const _res = {headers: {'content-encoding': 'gzip'}};
-            l.rules.process_response(req, _res, html, {action: {process}});
+            const _res = {headers: {'content-encoding': 'text'}};
+            const response = yield make_process_rule_req(_res, html,
+                [{action: {process}, type: 'after_body'}]);
             assert.ok(!_res.headers['content-encoding']);
             assert.equal(_res.headers['content-type'],
                 'application/json; charset=utf-8');
-            const new_body = JSON.parse(req.ctx.response.body.toString());
+            const new_body = JSON.parse(response.body.toString());
             assert.deepEqual(new_body, {price: {context: 'a-b-v',
                 error: 'processing data', message: 'a is not defined'}});
         }));
