@@ -562,10 +562,13 @@ describe('manager', ()=>{
             rm_actions_file();
             perr_stub.restore();
         });
-        const make_successful_user_req = port=>api_json('api/test/'+port,
+        const make_user_req = (port, status = 200)=>api_json('api/test/'+port,
             {method: 'POST', body: {url: 'http://lumtest.com/myip.json',
-                headers: {'x-lpm-fake': true}}});
-        const t = (name, called, action, conf_success=true, config={})=>
+                headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status}}});
+        const m = a=>smatch(`first_${a}`);
+        const perr_called_n_times_with = (a, n)=>assert.equal(
+            perr_stub.getCalls().filter(c=>c.args[0]==`first_${a}`).length, n);
+        const t = (name, called, action, config, conf_success=true)=>
         it(name, etask._fn(function*(_this){
             const i = nock(api_base).get('/cp/lum_local_conf').query(true);
             if (conf_success)
@@ -573,18 +576,16 @@ describe('manager', ()=>{
             else
                 i.reply(403);
             app = yield app_with_config({config, cli: {token: '123'}});
-            action = `first_${action}`;
             if (called)
-                sinon.assert.calledWith(perr_stub, smatch(action));
+                sinon.assert.calledWith(perr_stub, m(action));
             else
-                sinon.assert.neverCalledWith(perr_stub, smatch(action));
+                sinon.assert.neverCalledWith(perr_stub, m(action));
         }));
         t('triggers login on startup if logged', true, 'login');
         t('does not triggers login on startup if not logged', false, 'login',
-            false);
+            null, false);
         t('triggers create_proxy_port on startup if custom port created', true,
-            'create_proxy_port', true,
-            {proxies: [{port: 24023}, {port: 24024}]});
+            'create_proxy_port', {proxies: [{port: 24023}, {port: 24024}]});
         t('does not trigger create_proxy_port on startup if no custom ports',
             false, 'create_proxy_port');
         t('never triggers send_request on startup', false, 'send_request');
@@ -595,7 +596,7 @@ describe('manager', ()=>{
             nock(api_base).get('/cp/lum_local_conf').query(true).reply(403);
             app = yield app_with_config({config: {proxies: [{port: 24010}]},
                 cli: {customer: false, token: '123'}});
-            yield make_successful_user_req(24010);
+            yield make_user_req(24010);
             sinon.assert.neverCalledWith(perr_stub, smatch('first'));
         }));
         it('triggers create_proxy_port_def when using dropin', ()=>
@@ -603,12 +604,46 @@ describe('manager', ()=>{
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             app = yield app_with_config({cli: {token: '123', dropin: true}});
-            yield make_successful_user_req(22225);
+            yield make_user_req(22225);
             const matches = ['login', 'create_proxy_port_def', 'send_request',
-                'send_request_successful'].map(e=>smatch(`first_${e}`));
-            matches.forEach(m=>sinon.assert.calledWith(perr_stub, m));
+                'send_request_successful'].map(m);
+            matches.forEach(_m=>sinon.assert.calledWith(perr_stub, _m));
             sinon.assert.neverCalledWith(perr_stub,
                 smatch(/^first_create_proxy_port$/));
+        }));
+        it('triggers failed actions after error has happened', ()=>
+        etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            perr_stub.returns(etask.reject(Error('Network error')));
+            app = yield app_with_config({cli: {token: '123', dropin: true}});
+            yield make_user_req(22225);
+            perr_stub.resetBehavior();
+            yield make_user_req(22225);
+            perr_called_n_times_with('login', 2);
+            perr_called_n_times_with('create_proxy_port_def', 2);
+            perr_called_n_times_with('send_request', 2);
+            perr_called_n_times_with('send_request_successful', 2);
+        }));
+        it('stops retrying if action has already been retried', ()=>
+        etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            perr_stub.restore();
+            perr_stub = sstub(Manager.prototype, 'perr', id=>{
+                if (!id.startsWith('first'))
+                    return;
+                if (id == 'first_send_request')
+                    return;
+                return etask.reject(Error('Network error'));
+            });
+            app = yield app_with_config({cli: {token: '123', dropin: true}});
+            yield make_user_req(22225);
+            yield make_user_req(22225);
+            perr_called_n_times_with('login', 2);
+            perr_called_n_times_with('create_proxy_port_def', 2);
+            perr_called_n_times_with('send_request', 1);
+            perr_called_n_times_with('send_request_successful', 2);
         }));
     });
 });
