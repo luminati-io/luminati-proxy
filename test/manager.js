@@ -640,10 +640,12 @@ describe('manager', ()=>{
             app = yield app_with_config({cli: {token: '123', dropin: true}});
             yield make_user_req(22225);
             yield make_user_req(22225);
-            perr_called_n_times_with('login', 2);
-            perr_called_n_times_with('create_proxy_port_def', 2);
+            const failed = ['login', 'create_proxy_port_def',
+                'send_request_successful'];
             perr_called_n_times_with('send_request', 1);
-            perr_called_n_times_with('send_request_successful', 2);
+            failed.forEach(a=>perr_called_n_times_with(a, 2));
+            assert.equal(app.manager.first_actions.pending.filter(
+                d=>failed.includes(d.action)).length, failed.length);
         }));
     });
 });

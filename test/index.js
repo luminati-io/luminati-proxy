@@ -161,7 +161,7 @@ describe('proxy', ()=>{
                 l = yield lum(opt);
                 const history = [];
                 l.on('usage', data=>history.push(data));
-                let res = yield l.test({
+                const res = yield l.test({
                     url: _url(),
                     headers: {'x-hola-context': context},
                 });
@@ -187,7 +187,7 @@ describe('proxy', ()=>{
         describe('keep letter caseing and order', ()=>{
             const t = (name, _url, opt)=>it(name, ()=>etask(function*(){
                 const headers = {
-                    'Keep-Alive': 'Close',
+                    'Connection': 'keep-alive',
                     'X-Just-Testing': 'value',
                     'X-bizzare-Letter-cAsE': 'test',
                 };
