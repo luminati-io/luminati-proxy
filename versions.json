@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.149.104",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed 'Cannot read property slice of undefined' on startup"
+            }
+        ]
+    },
+    {
         "ver": "1.148.901",
         "type": "stable",
         "changes": [

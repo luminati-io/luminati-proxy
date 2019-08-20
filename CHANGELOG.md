@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.149.104 
+- :bug: Fixed 'Cannot read property slice of undefined' on startup
+
 ## 1.148.901 Stable
 - :star: Performance improvements
 
