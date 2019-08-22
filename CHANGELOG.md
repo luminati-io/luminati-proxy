@@ -1,10 +1,14 @@
 Luminati Proxy manager - Change Log
 
-## 1.149.104 
+## 1.149.544 Stable
+- :bug: Session termination has been redesigned to avoid infinite loops
+- :bug: Fixed install script for MacOS, now using Node 10.15.3
+
+## 1.149.104 Stable
 - :bug: Fixed 'Cannot read property slice of undefined' on startup
 
 ## 1.148.901 Stable
-- :star: Performance improvements
+- :star: Performance improvements (make use of HTTP agent to reuse open sockets
 
 ## 1.148.629 
 

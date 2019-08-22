@@ -13,7 +13,7 @@ const prop_by_type = (props, type)=>
 
 const conf = {
     version: pkg.version,
-    is_win: process.platform == 'win32',
+    is_win: process.platform=='win32',
     work_dir: lpm_file.work_dir,
     is_electron: process.versions && !!process.versions.electron,
     proxy_fields: Object.assign({}, swagger.definitions.proxy.properties,

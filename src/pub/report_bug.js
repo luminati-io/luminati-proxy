@@ -8,7 +8,7 @@ import $ from 'jquery';
 import {Modal} from './common/modals.js';
 
 class Index extends Pure_component {
-    success_msg = `You issue in being handled! We will be in touch as soon as
+    success_msg = `Your issue is being handled! We will be in touch as soon as
         possible.`;
     state = {desc: '', email: '', sending: false};
     componentDidMount(){
@@ -67,7 +67,7 @@ class Index extends Pure_component {
 }
 
 const Finish_modal = props=>
-    <Modal title="Report has been sent" id="finish_modal" no_cancel_btn>
+    <Modal title="Your report has been sent" id="finish_modal" no_cancel_btn>
       <h4>{props.msg}</h4>
     </Modal>;
 

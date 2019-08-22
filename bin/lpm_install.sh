@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.149.104"
+VERSION="1.149.544"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -21,7 +21,7 @@ INSTALL_NPM=0
 INSTALL_CURL=0
 INSTALL_BREW=0
 USE_NVM=0
-NODE_VER='10.11.0'
+NODE_VER='10.16.3'
 NPM_VER='6.4.1'
 NETWORK_RETRY=3
 NETWORK_ERROR=0
@@ -520,7 +520,8 @@ update_npm()
 
 reinstall_node_mac()
 {
-    NODE_VER='8.11.2'
+    update_npm
+    NODE_VER='10.15.3'
     install_nave_node
 }
 
@@ -529,7 +530,9 @@ check_env()
     echo "checking deps..."
     check_brew
     check_curl
-    check_wget
+    if ((INSTALL_CURL)); then
+        check_wget
+    fi
     # XXX romank: WIP
     #check_nvm
     check_node
@@ -551,7 +554,9 @@ deps_install()
     if ((INSTALL_NODE||UPDATE_NODE)); then
         install_node
     fi
-    check_npm
+    if ((!OS_MAC)); then
+        check_npm
+    fi
     if ((INSTALL_NPM)); then
         install_npm
     fi

@@ -17,6 +17,7 @@ const Rules = require('../lib/rules.js');
 const Timeline = require('../lib/timeline.js');
 const Config = require('../lib/config.js');
 const {decode_body} = require('../lib/util.js');
+const consts = require('../lib/consts.js');
 const {assert_has, http_proxy, http_ping} = require('./common.js');
 const qw = require('../util/string.js').qw;
 const test_url = {http: 'http://lumtest.com/test',
@@ -55,6 +56,11 @@ describe('proxy', ()=>{
                     'x-lpm-fake': true,
                     'x-lpm-fake-status': req_opt.fake.status,
                 };
+                if (req_opt.fake.headers)
+                {
+                    req_opt.headers['x-lpm-fake-headers'] =
+                        JSON.stringify(req_opt.fake.headers);
+                }
                 delete req_opt.fake;
             }
             return yield etask.nfn_apply(_this, '.request', [req_opt]);
@@ -1490,5 +1496,47 @@ describe('proxy', ()=>{
             yield l.test({fake: 1});
             assert.equal(l.session_mgr.sessions.sessions.length, 1);
         }));
+    });
+    describe('session_termination', ()=>{
+        describe('http', ()=>{
+            it('should terminate session', etask._fn(function*(_this){
+                l = yield lum({pool_size: 1, session_termination: true});
+                const r = yield l.test({fake: {
+                    status: 502,
+                    headers: {'x-luminati-error': consts.NO_PEERS_ERROR},
+                }});
+                assert.equal(r.body, consts.SESSION_TERMINATED_BODY);
+                assert.equal(r.statusCode, 400);
+                assert.ok(l.session_mgr.sessions.sessions[0].terminated);
+            }));
+            it('should not terminate when rotating', etask._fn(function*(){
+                l = yield lum({pool_size: 0, max_requests: 1,
+                    session_termination: true});
+                yield l.test({fake: {
+                    status: 502,
+                    headers: {'x-luminati-error': consts.NO_PEERS_ERROR},
+                }});
+                const r = yield l.test({fake: 1});
+                assert.equal(r.statusCode, 200);
+            }));
+            it('should not send requests on terminated', etask._fn(function*(){
+                l = yield lum({pool_size: 1, session_termination: true});
+                l.session_mgr.sessions.sessions[0].terminated = true;
+                const r = yield l.test({fake: 1});
+                assert.equal(r.body, consts.SESSION_TERMINATED_BODY);
+                assert.equal(r.statusCode, 400);
+            }));
+            it('should unblock when session refreshed', etask._fn(function*(){
+                l = yield lum({pool_size: 1, session_termination: true});
+                l.session_mgr.sessions.sessions[0].terminated = true;
+                l.session_mgr.refresh_sessions();
+                const r = yield l.test({fake: 1});
+                assert.equal(r.statusCode, 200);
+            }));
+        });
+        describe('https', ()=>{
+            // XXX krzysztof: to implement this test when better mocking for
+            // https is built
+        });
     });
 });

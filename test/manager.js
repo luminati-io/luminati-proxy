@@ -591,6 +591,23 @@ describe('manager', ()=>{
         t('never triggers send_request on startup', false, 'send_request');
         t('never triggers send_request_successful on startup', false,
             'send_request_successful');
+        it('maintains actions object structure when file does not exist', ()=>
+        etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            app = yield app_with_config({cli: {token: '123'}});
+            sinon.assert.match(app.manager.first_actions,
+                smatch({sent: {}, sending: {}, pending: []}));
+        }));
+        it('maintains actions object structure when file is missing fields',
+        ()=>etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            fs.writeFileSync(lpm_config.first_actions, JSON.stringify({}));
+            app = yield app_with_config({cli: {token: '123'}});
+            sinon.assert.match(app.manager.first_actions,
+                smatch({sent: {}, sending: {}, pending: []}));
+        }));
         it('does not trigger actions on zone password authentication', ()=>
         etask(function*(){
             nock(api_base).get('/cp/lum_local_conf').query(true).reply(403);
