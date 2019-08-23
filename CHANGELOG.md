@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.149.544 Stable
+## 1.149.570 Stable
 - :bug: Session termination has been redesigned to avoid infinite loops
 - :bug: Fixed install script for MacOS, now using Node 10.15.3
 
