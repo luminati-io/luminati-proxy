@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.149.570"
+VERSION="1.149.626"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -386,8 +386,8 @@ check_node()
         local node_ver=$(node -v)
         zerr "check_node: $node_ver"
         echo "node ${node_ver} is installed"
-        if ! [[ "$node_ver" =~ ^(v10\.) ]]; then
-            echo "required node version is 10"
+        if [ "$node_ver" != "v$NODE_VER" ]; then
+            echo "required node version is $NODE_VER"
             perr "check_node_bad_version" "$node_ver"
             UPDATE_NODE=1
         fi
@@ -703,7 +703,9 @@ on_exit()
         fi
         perr "exit_error_report" "$LOG"
     fi
-    rm $LOGFILE
+    if [ -f $LOGFILE ]; then
+        rm $LOGFILE
+    fi
 }
 
 signal_handler()

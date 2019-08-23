@@ -440,7 +440,7 @@ E.root_url_cmp = function(a, b){
 E.qs_strip = function(url){ return /^[^?#]*/.exec(url)[0]; };
 
 // mini-implementation of zescape.qs to avoid dependency of escape.js
-function qs_str(qs){
+E.qs_str = function(qs){
     var q = [];
     for (var k in qs)
     {
@@ -448,11 +448,11 @@ function qs_str(qs){
             q.push(encodeURIComponent(k)+'='+encodeURIComponent(v)); });
     }
     return q.join('&');
-}
+};
 
 E.qs_add = function(url, qs){
     var u = E.parse(url), q = assign(u.query ? E.qs_parse(u.query) : {}, qs);
-    u.path = u.pathname+'?'+qs_str(q);
+    u.path = u.pathname+'?'+E.qs_str(q);
     return E.uri_obj_href(u);
 };
 

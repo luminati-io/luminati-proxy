@@ -1,6 +1,6 @@
 [
     {
-        "ver": "1.149.570",
+        "ver": "1.149.626",
         "type": "stable",
         "changes": [
             {
@@ -10,6 +10,14 @@
             {
                 "type": "bug",
                 "text": "Fixed install script for MacOS, now using Node 10.15.3"
+            },
+            {
+                "type": "bug",
+                "text": "Fix typos in 'Report Bug' modal"
+            },
+            {
+                "type": "bug",
+                "text": "Enforce Node 10.16.3 on Linux"
             }
         ]
     },
