@@ -97,10 +97,8 @@ export default class Alloc_modal extends Pure_component {
         this.set_field('multiply', 1);
     };
     toggle = e=>{
-        let {value, checked} = e.target;
+        const {value, checked} = e.target;
         const {type, form} = this.props;
-        if (type=='vips')
-            value = Number(value);
         let new_alloc;
         if (checked)
         {

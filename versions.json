@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.149.883",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated geo locations and list of available carriers"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed gIP allocation modal checkboxes"
+            }
+        ]
+    },
+    {
         "ver": "1.149.626",
         "type": "stable",
         "changes": [

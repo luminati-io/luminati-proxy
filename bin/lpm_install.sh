@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.149.626"
+VERSION="1.149.883"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -107,7 +107,7 @@ usage()
     echo "ACTION:"
     echo "  setup         - setup lpm (DEFAULT)"
     echo "  clean         - clean cache and lpm related files"
-    echo "  dev-clean     - attempt to clean any traces of lpm and it's"
+    echo "  dev-setup     - attempt to clean any traces of lpm and it's"
     echo "                  dependencies"
     echo "                  WARNING: be careful, attempts to delete"
     echo "                           - several system packages"
@@ -392,7 +392,7 @@ check_node()
             UPDATE_NODE=1
         fi
     else
-        echo 'node is not installed'
+        echo "node is not installed"
         INSTALL_NODE=1
         perr "check_no_node"
     fi
@@ -418,7 +418,7 @@ check_curl()
 {
     echo "checking curl..."
     if ! is_cmd_defined "curl"; then
-        echo 'curl is not installed'
+        echo "curl is not installed"
         perr 'check_no_curl'
         INSTALL_CURL=1
     else
@@ -431,7 +431,7 @@ install_nave()
     if is_cmd_defined "nave"; then
         return 0
     fi
-    echo "installing nave"
+    echo "installing nave..."
     perr "install_nave"
     run_cmd "mkdir -p ~/.nave"
     local nave_path="$HOME/.nave/nave.sh"
@@ -445,21 +445,21 @@ install_nave()
 install_nave_node()
 {
     install_nave
-    echo "installing nave node $NODE_VER"
+    echo "installing nave node $NODE_VER..."
     perr "install_nave_node"
     sudo_cmd "rm -rf ~/.nave/cache/$NODE_VER"
     sudo_cmd "rm -rf /root/.nave/cache/v$NODE_VER"
     retry_sudo_cmd "nave usemain $NODE_VER" 1
     if ! is_cmd_defined "node"; then
         perr "install_error_node"
-        echo 'could not install node'
+        echo "could not install node"
         exit 1
     fi
 }
 
 install_nvm_node()
 {
-    echo "installing nvm node $NODE_VER"
+    echo "installing nvm node $NODE_VER..."
     perr "install_nvm_node"
     run_cmd "nvm install $NODE_VER"
     run_cmd "nvm alias default $NODE_VER"
@@ -472,7 +472,7 @@ install_node()
 
 install_npm()
 {
-    echo "installing npm"
+    echo "installing npm..."
     perr "install_npm"
     run_script "install_npm" "https://www.npmjs.com/install.sh"
     UPDATE_NPM=1
@@ -480,14 +480,14 @@ install_npm()
 
 install_wget()
 {
-    echo "installing wget"
+    echo "installing wget..."
     perr "install_wget"
     sys_install "wget"
 }
 
 install_curl()
 {
-    echo "installing curl"
+    echo "installing curl..."
     perr "install_curl"
     sys_install "curl"
 }
@@ -495,7 +495,7 @@ install_curl()
 install_build_tools()
 {
     if ((!OS_MAC)) && is_cmd_defined "apt-get"; then
-        echo "installing build tools"
+        echo "installing build tools..."
         perr "install_build_tools"
         sys_install "build-essential"
         sys_install "base-devel"
@@ -504,7 +504,7 @@ install_build_tools()
 
 install_brew()
 {
-    echo "installing brew"
+    echo "installing brew..."
     perr "install_brew"
     run_script "install_brew" \
         "https://raw.githubusercontent.com/Homebrew/install/master/install" \
@@ -540,7 +540,7 @@ check_env()
 
 deps_install()
 {
-    echo 'installing deps'
+    echo "installing deps..."
     if ((INSTALL_BREW)); then
         install_brew
     fi
@@ -599,7 +599,7 @@ lpm_clean()
 lpm_install()
 {
     perr "install" "lpm"
-    echo "installing Luminati proxy manager"
+    echo "installing Luminati proxy manager..."
     local cmd="npm install -g --unsafe-perm --loglevel error @luminati-io/luminati-proxy"
     if ((USE_NVM)); then
         retry_cmd "$cmd" 0 1
@@ -628,9 +628,9 @@ lpm_install()
 
 check_install()
 {
-    echo 'check install'
+    echo "check install"
     if ! $(npm bin -g)/luminati -v > /dev/null; then
-        echo 'there was an error installing Luminati'
+        echo "there was an error installing Luminati"
         perr "install_error_lpm_check"
         exit 1
     fi
@@ -638,8 +638,9 @@ check_install()
     perr "install_success_lpm_check"
 }
 
-dev_clean()
+dev_setup()
 {
+    echo "removing LPM dependencies..."
     local lib_path="$(npm prefix -g)/lib"
     if prompt "Remove curl, wget, nodejs and npm" n; then
         sys_rm "curl wget nodejs npm"
@@ -665,6 +666,7 @@ dev_clean()
         n; then
         sudo_cmd "rm -rf /usr/local/bin/{luminati,liminati-proxy,npm,nave,node}"
     fi
+    setup
 }
 
 setup()
@@ -732,9 +734,9 @@ main()
             lpm_clean
         fi
         ;;
-    dev-clean)
-        if prompt "Clean machine from lpm install?" n; then
-           dev_clean
+    dev-setup)
+        if prompt "Clean machine from lpm install and setup again?" n; then
+           dev_setup
         fi
         ;;
     esac
@@ -759,7 +761,7 @@ while [ "${1:0:1}" = - ]; do
     shift
 done
 
-if [[ -n "$1" && "$1" =~ (setup|dev-clean|clean) ]]; then
+if [[ -n "$1" && "$1" =~ (setup|dev-setup|clean) ]]; then
     ACTION="$1"
     shift
 fi

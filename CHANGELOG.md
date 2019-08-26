@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.149.883 
+- :star: Updated geo locations and list of available carriers
+- :bug: Fixed gIP allocation modal checkboxes
+
 ## 1.149.626 Stable
 - :bug: Session termination has been redesigned to avoid infinite loops
 - :bug: Fixed install script for MacOS, now using Node 10.15.3

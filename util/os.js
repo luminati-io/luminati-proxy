@@ -278,9 +278,20 @@ E.cpu_usage = function(cpus_curr, cpus_prev){
 if (!file.is_darwin)
     E.cpu_usage(); // init
 
+E.iface_list = ()=>{
+    if (file.is_win || file.is_darwin)
+        return Object.keys(os.networkInterfaces());
+    // https://github.com/nodejs/node/issues/498
+    let ifaces = cli.exec_get_lines('/sbin/ip link show');
+    return ifaces.map(str=>{
+        const match = /^\d+:\s(\w+):.*/.exec(str);
+        return match && match[1];
+    }).filter(i=>i);
+};
+
 E.eth_dev = ()=>{
     let is_ether = ifname=>/^(en|wl|eth)/.test(ifname);
-    let ifaces = Object.keys(os.networkInterfaces()).filter(is_ether);
+    let ifaces = E.iface_list().filter(is_ether);
     if (E.is_release(['c:trusty']))
         return {eth_dev: 'eth0', udptunnel_dev: 'eth1', ifaces};
     // https://cgit.freedesktop.org/systemd/systemd/tree/src/udev/udev-builtin-net_id.c#n20

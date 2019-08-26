@@ -8,7 +8,7 @@ if (!is_node)
 else
     define = function(){};
 
-define(['cookie'], function(cookie){
+define(['cookie', '/util/util.js'], function(cookie, zutil){
 var E = {};
 var storage;
 
@@ -33,7 +33,14 @@ function select_cookies(domain){
     };
 }
 
-E.init = function(domain){
+E.init = function(opt){
+    var domain;
+    if (typeof opt=='string')
+        domain = opt;
+    // XXX arik HACK: remove test_storage once all tests are fixed and we can
+    // enable it
+    if (E.is_test_storage = zutil.get(opt, 'test_storage') && zutil.is_mocha())
+        return E.test_storage = {};
     if (have_local_storage())
         return select_local_storage();
     console.error('cannot use localStorage, using cookies instead');
@@ -43,12 +50,17 @@ E.init();
 
 E.on_err = function(){};
 
+// XXX arik: add simple storage test
 E.set = function(key, val){
-    try { storage.setItem(key, val); }
+    if (E.is_test_storage)
+        return (E.test_storage[key] = val);
+    try { return storage.setItem(key, val); }
     catch(err){ E.on_err('storage_set', key, err); }
 };
 
 E.get = function(key){
+    if (E.is_test_storage)
+        return E.test_storage[key];
     try { return storage.getItem(key); }
     catch(err){ E.on_err('storage_get', key, err); }
 };
@@ -56,6 +68,8 @@ E.get = function(key){
 E.get_int = function(key){ return +E.get(key)||0; };
 
 E.clr = function(key){
+    if (E.is_test_storage)
+        return delete E.test_storage[key];
     try { storage.removeItem(key); }
     catch(err){ E.on_err('storage_clr', key, err); }
 };

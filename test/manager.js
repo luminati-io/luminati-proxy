@@ -126,12 +126,13 @@ describe('manager', ()=>{
     const app_with_proxies = (proxies, cli)=>etask(function*(){
         return yield app_with_config({config: {proxies}, cli});
     });
-    const api = (_path, method, data, json)=>etask(function*(){
+    const api = (_path, method, data, json, headers)=>etask(function*(){
         const opt = {
             url: app.admin+'/'+_path,
             method: method||'GET',
             json: json,
             body: data,
+            headers: headers || {'x-lpm-fake': true},
         };
         return yield etask.nfn_apply(request, [opt]);
     });
@@ -666,6 +667,14 @@ describe('manager', ()=>{
             failed.slice(1).forEach(a=>perr_called_n_times_with(a, 2));
             assert.equal(app.manager.first_actions.pending.filter(
                 d=>failed.includes(d.action)).length, failed.length);
+        }));
+        it('does not trigger send_request events on proxy status request', ()=>
+        etask(function*(){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            app = yield app_with_config({cli: {token: '123', dropin: true}});
+            yield api('api/proxy_status/22225');
+            sinon.assert.neverCalledWith(perr_stub, m('send_request'));
         }));
     });
 });

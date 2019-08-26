@@ -27,6 +27,7 @@ const E = [
     {value: 'hotwire', label: 'Hotwire Communications'},
     {value: 'drei', label: 'Hutchison Drei Austria GmbH'},
     {value: 'idea', label: 'Idea India'},
+    {value: 'indosat', label: 'INDOSAT Internet Network Provider'},
     {value: 'kcelljsc', label: 'KCell JSC'},
     {value: 'kyivstar', label: 'Kyivstar'},
     {value: 'meo', label: 'MEO Portugal'},
