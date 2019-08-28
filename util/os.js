@@ -19,6 +19,7 @@ var ffi;
 try { ffi = require('ffi'); } catch(e){}
 const libc = ffi && !file.is_darwin ? ffi.Library('libc',
     {fallocate: ['int', ['int', 'int', 'long', 'long']]}) : undefined;
+const bin_ip = exec.which('ip');
 
 var distro_release;
 var procfs_fmt = {
@@ -282,10 +283,10 @@ E.iface_list = ()=>{
     if (file.is_win || file.is_darwin)
         return Object.keys(os.networkInterfaces());
     // https://github.com/nodejs/node/issues/498
-    let ifaces = cli.exec_get_lines('/sbin/ip link show');
+    let ifaces = cli.exec_get_lines(`${bin_ip} link show`);
     return ifaces.map(str=>{
-        const match = /^\d+:\s(\w+):.*/.exec(str);
-        return match && match[1];
+        const match = /^\d+:\s([\w@]+):.*/.exec(str);
+        return match && match[1].replace(/@\w+$/, '');
     }).filter(i=>i);
 };
 
@@ -299,7 +300,7 @@ E.eth_dev = ()=>{
         throw new Error('No ethernet interfaces found');
     if (ifaces.length==1)
         return {eth_dev: ifaces[0], ifaces};
-    let routes = cli.exec_get_lines(`/sbin/ip -4 route`);
+    let routes = cli.exec_get_lines(`${bin_ip} -4 route`);
     let default_route = array.grep(routes, /^default/)[0];
     if (!default_route)
         throw new Error('Default route not found');

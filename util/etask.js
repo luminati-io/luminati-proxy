@@ -1470,7 +1470,7 @@ E._generator = function(gen, ctor, opt){
     }, function finally$(){
         // https://kangax.github.io/compat-table/es6/#test-generators_%GeneratorPrototype%.return
         // .return() supported only in node>=6.x.x
-        if (!done && gen.return)
+        if (!done && gen && gen.return)
             try { gen.return(); } catch(e){}
     }]);
 };

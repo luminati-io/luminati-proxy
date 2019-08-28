@@ -13,7 +13,6 @@ const sinon = require('sinon');
 const zsinon = require('../util/sinon.js');
 const lpm_config = require('../util/lpm_config.js');
 const Luminati = require('../lib/luminati.js');
-const Rules = require('../lib/rules.js');
 const Timeline = require('../lib/timeline.js');
 const Config = require('../lib/config.js');
 const {decode_body} = require('../lib/util.js');
@@ -785,20 +784,19 @@ describe('proxy', ()=>{
         const t = (name, status, rules=false, c=0)=>it(name,
         etask._fn(function*(_this){
             rules = rules || [{
-                    action: {ban_ip: 60*ms.MIN, retry: true},
-                    status,
-                    url: 'lumtest.com'
+                action: {ban_ip: 60*ms.MIN, retry: true},
+                status,
+                url: 'lumtest.com'
             }];
             l = yield lum({rules});
-            const old_req = l.lpm_request;
             let retry_count = 0;
-            l.lpm_request = function(req, res){
-                if (req.retry)
+            l.on('retry', opt=>{
+                if (opt.req.retry)
                     retry_count++;
-                return old_req.apply(l, arguments);
-            };
+                l.lpm_request(opt.req, opt.res, opt.head);
+                l.once('response', opt.post);
+            });
             let r = yield l.test();
-            yield etask.sleep(20);
             assert.equal(retry_count, c);
             return r;
         }));
@@ -813,16 +811,6 @@ describe('proxy', ()=>{
             status: '200',
             url: 'lumtest.com',
         }], 1);
-        it('should retry when banned ip', ()=>etask(function*(){
-            l = yield lum({rules: []});
-            const ban_stub = sinon.stub(l, 'is_ip_banned');
-            ban_stub.onFirstCall().returns(true);
-            ban_stub.onSecondCall().returns(true);
-            ban_stub.returns(false);
-            const retry_spy = sinon.spy(l.rules, 'retry');
-            yield l.test();
-            sinon.assert.calledTwice(retry_spy);
-        }));
     });
     describe('rules', ()=>{
         const inject_headers = (li, ip, ip_alt)=>{
@@ -836,13 +824,12 @@ describe('proxy', ()=>{
                 return handle_proxy_resp_org(...args)(_res);
             });
         };
-        const make_process_rule_req=(res, html, rules)=>etask(function*(){
+        const make_process_rule_req=(res, html)=>etask(function*(){
             const req = {ctx: {response: {}, proxies: [],
-                rules: new Rules(l, rules),
                 timeline: {track: ()=>null, req: {create: Date.now()}},
                 log: {info: ()=>null}, skip_rule: ()=>false}};
             Object.assign(res, {
-                write: ()=>null, end: ()=>null,
+                write: ()=>null, end: ()=>null, pipe: ()=>({pipe: ()=>null}),
                 on: function(event, fn){
                     if (event=='data')
                     {
@@ -859,17 +846,16 @@ describe('proxy', ()=>{
             return yield et;
         });
         it('should process data', ()=>etask(function*(){
-            l = yield lum({rules: []});
+            const process = {price: `$('#priceblock_ourprice').text()`};
+            l = yield lum({rules: [{action: {process}, type: 'after_body'}]});
             const html = `
               <body>
                 <div>
                   <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const process = {price: `$('#priceblock_ourprice').text()`};
             const _res = {headers: {'content-encoding': 'text'}};
-            const response = yield make_process_rule_req(_res, html,
-                [{action: {process}, type: 'after_body'}]);
+            const response = yield make_process_rule_req(_res, html);
             assert.ok(!_res.headers['content-encoding']);
             assert.equal(_res.headers['content-type'],
                 'application/json; charset=utf-8');
@@ -877,17 +863,16 @@ describe('proxy', ()=>{
             assert.deepEqual(new_body, {price: '$12.99'});
         }));
         it('should process data with error', ()=>etask(function*(){
-            l = yield lum({rules: []});
+            const process = {price: 'a-b-v'};
+            l = yield lum({rules: [{action: {process}, type: 'after_body'}]});
             const html = `
               <body>
                 <div>
                   <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const process = {price: 'a-b-v'};
             const _res = {headers: {'content-encoding': 'text'}};
-            const response = yield make_process_rule_req(_res, html,
-                [{action: {process}, type: 'after_body'}]);
+            const response = yield make_process_rule_req(_res, html);
             assert.ok(!_res.headers['content-encoding']);
             assert.equal(_res.headers['content-type'],
                 'application/json; charset=utf-8');
@@ -931,15 +916,16 @@ describe('proxy', ()=>{
         }));
         it('check retry', ()=>etask(function*(){
             l = yield lum({rules: []});
-            sinon.stub(l, 'get_other_port').returns(l);
             const _req = {ctx: {response: {}, url: 'lumtest.com', log: l.log,
                 proxies: []}};
-            const req_stub = sinon.stub(l, 'lpm_request', req=>{
-                assert.deepEqual(req, _req);
+            let called = false;
+            l.on('retry', opt=>{
+                assert.deepEqual(opt.req, _req);
+                called = true;
             });
             l.rules.retry(_req, {}, {}, l.port);
             assert.equal(_req.retry, 1);
-            assert.ok(req_stub.called);
+            assert.ok(called);
             l.rules.retry(_req, {}, {}, l.port);
             assert.equal(_req.retry, 2);
         }));
@@ -980,7 +966,6 @@ describe('proxy', ()=>{
         }));
         it('check can_retry', ()=>etask(function*(){
             l = yield lum({rules: []});
-            sinon.stub(l, 'get_other_port').returns(l);
             assert.ok(!l.rules.can_retry({}));
             assert.ok(l.rules.can_retry({retry: 2}, {retry: 5}));
             assert.ok(!l.rules.can_retry({retry: 5}));
@@ -1073,12 +1058,15 @@ describe('proxy', ()=>{
                     pool_size: 1,
                     rules: [{action: {retry: true}, status: '200'}],
                 });
+                l.on('retry', opt=>{
+                    l.lpm_request(opt.req, opt.res, opt.head);
+                });
                 const session_a = l.session_mgr.sessions.sessions[0].session;
                 yield l.test({fake: 1});
                 const session_b = l.session_mgr.sessions.sessions[0].session;
                 assert.notEqual(session_a, session_b);
             }));
-            describe('dc pool', ()=>{
+            xdescribe('dc pool', ()=>{
                 it('adds to pool when prefill turned off and gathering',
                 ()=>etask(function*(){
                     const ips = ['2.3.4.5'];
@@ -1262,6 +1250,14 @@ describe('proxy', ()=>{
             it('action retry_port', ()=>etask(function*(){
                 l = yield lum({rules: [{action: {retry_port: 1,
                     email: 'test@mail'}}]});
+                let called = false;
+                l.on('retry', opt=>{
+                    called = true;
+                    assert.deepEqual(opt.port, 1);
+                    assert.deepEqual(opt.req, _req);
+                    assert.deepEqual(opt.res, _res);
+                    assert.deepEqual(opt.head, _head);
+                });
                 const _req = {ctx: {
                     response: {},
                     url: 'lumtest.com',
@@ -1271,17 +1267,8 @@ describe('proxy', ()=>{
                 }};
                 const _res = {end: sinon.stub(), write: sinon.stub()};
                 const _head = {};
-                const get_port_stub = sinon.stub(l, 'get_other_port', port=>{
-                    assert.equal(port, 1);
-                    return {once: ()=>null, lpm_request: (req, res, head)=>{
-                        assert.deepEqual(req, _req);
-                        assert.deepEqual(res, _res);
-                        assert.deepEqual(head, _head);
-                    }};
-                });
                 const r = yield l.rules.pre(_req, _res, _head);
-                assert.ok(get_port_stub.called);
-                sinon.assert.calledWith(get_port_stub, 1);
+                assert.ok(called);
                 assert.equal(r, 'switched');
             }));
         });
@@ -1291,9 +1278,7 @@ describe('proxy', ()=>{
                     action: {[action]: true},
                     url: '.*'},
                 ]});
-                const post_stub = sinon.stub(l.rules, 'post');
                 yield l.test(ping.http.url);
-                sinon.assert.calledOnce(post_stub);
             }));
             t('null_response');
             t('bypass_proxy');
@@ -1302,10 +1287,14 @@ describe('proxy', ()=>{
                 l = yield lum({rules: [{action: {retry: true,
                     retry_port: 24001}}]});
                 const l2 = yield lum({port: 24001});
-                sinon.stub(l, 'get_other_port', ()=>l2);
-                const post_stub = sinon.stub(l.rules, 'post');
+                let called = false;
+                l.on('retry', opt=>{
+                    called = true;
+                    assert.equal(opt.port, 24001);
+                    l2.lpm_request(opt.req, opt.res, opt.head);
+                });
                 yield l.test(ping.http.url);
-                sinon.assert.calledOnce(post_stub);
+                assert.ok(called);
                 l2.stop(true);
             }));
         });
@@ -1331,13 +1320,22 @@ describe('proxy', ()=>{
             t_pre('null_response', false);
             // XXX krzysztof: broken test t_pre('bypass_proxy', false);
             t_pre('direct', true);
+            // XXX krzysztof: this test is not relevant here
+            // it tests multiple servers, should be moved to manager
             it('retry_port', ()=>etask(function*(){
-                l = yield lum({rules: [{action: {retry_port: true}},
-                    get_banip_rule()]});
-                const l2 = yield lum({port: 24001,
-                    rules: [get_banip_rule(30)]});
+                l = yield lum({rules: [
+                    {action: {retry_port: 24001}},
+                    get_banip_rule(),
+                ]});
+                const l2 = yield lum({
+                    port: 24001,
+                    rules: [get_banip_rule(30)],
+                });
+                l.on('retry', opt=>{
+                    l2.lpm_request(opt.req, opt.res, opt.head);
+                    l2.once('response', opt.post);
+                });
                 inject_headers(l2);
-                sinon.stub(l, 'get_other_port', ()=>l2);
                 const ban_stub = sinon.stub(l, 'banip');
                 const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
@@ -1349,9 +1347,12 @@ describe('proxy', ()=>{
                 l = yield lum({rules: [get_banip_rule(), get_retry_rule()]});
                 const l2 = yield lum({port: 24001,
                     rules: [get_banip_rule(30)]});
+                l.on('retry', opt=>{
+                    l2.lpm_request(opt.req, opt.res, opt.head);
+                    l2.once('response', opt.post);
+                });
                 const header_stub = inject_headers(l);
                 const header_stub_l2 = inject_headers(l2, 'ip2');
-                sinon.stub(l, 'get_other_port', ()=>l2);
                 const ban_stub = sinon.stub(l, 'banip');
                 const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
@@ -1370,9 +1371,12 @@ describe('proxy', ()=>{
                 l = yield lum({rules: [get_retry_rule(), get_banip_rule()]});
                 const l2 = yield lum({port: 24001,
                     rules: [get_banip_rule(30)]});
+                l.on('retry', opt=>{
+                    l2.lpm_request(opt.req, opt.res, opt.head);
+                    l2.once('response', opt.post);
+                });
                 inject_headers(l);
                 inject_headers(l2);
-                sinon.stub(l, 'get_other_port', ()=>l2);
                 const ban_stub = sinon.stub(l, 'banip');
                 const ban_stub_l2 = sinon.stub(l2, 'banip');
                 yield l.test(ping.http.url);
@@ -1491,10 +1495,14 @@ describe('proxy', ()=>{
         it('should not add duplicated sessions', etask._fn(function*(_this){
             const rules = [{status: '200', action: {reserve_session: true}}];
             l = yield lum({pool_size: 3, rules, pool_prefill: false});
-            l.mgr.proxies = [{port: 24000}];
+            const ips = {};
+            l.on('add_static_ip', data=>{
+                if (ips[data.ip])
+                    throw 'duplicate';
+                ips[data.ip] = true;
+            });
             yield l.test({fake: 1});
             yield l.test({fake: 1});
-            assert.equal(l.session_mgr.sessions.sessions.length, 1);
         }));
     });
     describe('session_termination', ()=>{

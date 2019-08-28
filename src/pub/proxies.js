@@ -114,6 +114,18 @@ const Session_cell = ({proxy})=>{
         return proxy.session;
 };
 
+const Static_ip_cell = ({proxy})=>{
+    if (proxy.ip)
+        return proxy.ip;
+    if (Array.isArray(proxy.ips))
+    {
+        if (proxy.pool_size == 1)
+            return proxy.ips[0];
+        return `Pool of ${proxy.pool_size} IPs`;
+    }
+    return null;
+};
+
 class Type_cell extends React.Component {
     render(){
         if (this.props.scrolling)
@@ -358,6 +370,7 @@ const columns = [
         title: 'Static IPs',
         type: 'text',
         calc_show: (proxies, master)=>master&&proxies.some(p=>p.multiply_ips),
+        render: Static_ip_cell,
     },
     {
         key: 'vip',

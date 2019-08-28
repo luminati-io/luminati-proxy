@@ -2,9 +2,12 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {withRouter} from 'react-router-dom';
+import _ from 'lodash';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
+import ajax from '../../../util/ajax.js';
+import conv from '../../../util/conv.js';
 import {migrate_trigger, migrate_action, trigger_types,
     action_types, default_action} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
@@ -12,7 +15,6 @@ import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
     Field_row_raw} from '../common.js';
 import {tabs} from './fields.js';
 import {Tester} from '../proxy_tester.js';
-import {Chrome_table} from '../chrome_widgets.js';
 import Tooltip from '../common/tooltip.js';
 import {T} from '../common/i18n.js';
 
@@ -198,27 +200,6 @@ export default class Rules extends Pure_component {
     }
 }
 
-const cols = [
-    {id: 'trigger_type', title: 'Trigger'},
-    {id: 'action', title: 'Action'},
-];
-
-class Rules_table extends Pure_component {
-    data = ()=>{
-        return this.props.rules;
-    };
-    render(){
-        return <Chrome_table title="Rules" cols={cols} fetch_data={this.data}>
-              {d=>
-                <tr key={d.id}>
-                  <td>{d.trigger_type}</td>
-                  <td>{d.action}</td>
-                </tr>
-              }
-            </Chrome_table>;
-    }
-}
-
 const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
     render(){
         return <div className="tester_wrapper">
@@ -311,9 +292,20 @@ class Action extends Pure_component {
         });
         this.setdb_on('head.proxy_edit.zone_name', cur_zone=>{
             if (cur_zone)
-                this.setState({cur_zone});
+                this.setState({cur_zone}, this.load_refresh_cost);
         });
     }
+    load_refresh_cost = ()=>{
+        const plan = this.get_cur_zone_plan();
+        if (plan.type != 'static' || !plan.ips)
+            return;
+        const _this = this;
+        this.etask(function*(){
+            const response = yield ajax.json({url: '/api/refresh_cost',
+                qs: {zone: _this.state.cur_zone}});
+            _this.setState({refresh_cost: response.cost});
+        });
+    };
     set_rule_field = (field, value)=>{
         setdb.emit('head.proxy_edit.update_rule', {rule_id: this.props.rule.id,
             field, value});
@@ -346,22 +338,38 @@ class Action extends Pure_component {
             port: this.props.match.params.port,
         }});
     };
+    get_cur_zone_plan = ()=>{
+        const {zones, cur_zone} = this.state;
+        const zone = (zones.zones||[]).find(z=>z.name==cur_zone) || {plan: {}};
+        return zone.plan;
+    };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {logins, defaults, settings, zones, cur_zone} = this.state;
+        const {logins, defaults, settings, zones, cur_zone,
+            refresh_cost} = this.state;
         if (!rule.trigger_type || !settings)
             return null;
         if (!zones || !cur_zone)
             return null;
-        const zone = (zones.zones||[]).find(z=>z.name==cur_zone) || {plan: {}};
-        const _action_types = [default_action].concat(action_types
+        let _action_types = [default_action].concat(_.cloneDeep(action_types)
         .filter(at=>at.value!='save_to_fast_pool' ||
             rule.trigger_type=='max_req_time')
         .filter(at=>rule.trigger_type=='url' && at.url ||
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
-            at.min_req_time)
-        .filter(at=>at.value!='refresh_ip'||zone.plan.type=='static'));
+            at.min_req_time));
+        if (this.get_cur_zone_plan().type=='static')
+        {
+            const refresh_ip_at = _action_types.find(
+                at=>at.value=='refresh_ip');
+            if (refresh_ip_at)
+            {
+                refresh_ip_at.key += refresh_cost ?
+                    ` (${conv.fmt_currency(refresh_cost)})` : '';
+            }
+        }
+        else
+            _action_types = _action_types.filter(at=>at.value!='refresh_ip');
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);
         ports.unshift({key: '--Select--', value: ''});

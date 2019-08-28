@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.150.274",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "IP refresh price now is shown in Refresh IP action rule"
+            },
+            {
+                "type": "sparkles",
+                "text": "Static IP column will now show IPs in the pool"
+            },
+            {
+                "type": "bug",
+                "text": "Fix shortcut problem for Windows home directories with '&' character"
+            }
+        ]
+    },
+    {
         "ver": "1.149.883",
         "type": "stable/dev",
         "changes": [

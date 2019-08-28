@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.150.274 
+- :sparkles: IP refresh price now is shown in Refresh IP action rule
+- :sparkles: Static IP column will now show IPs in the pool
+- :bug: Fix shortcut problem for Windows home directories with '&' character
+
 ## 1.149.883 
 - :star: Updated geo locations and list of available carriers
 - :bug: Fixed gIP allocation modal checkboxes

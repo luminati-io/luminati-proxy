@@ -2571,5 +2571,19 @@
   "You": "Tú",
   "Targeted website": "sitio web de destino",
   "price category": "las categorías de precios",
-  "Use the Luminati Waterfall to increase your request's success rate and reduce your proxy costs.": "Usar la cascada Luminati para aumentar la tasa de éxito de su solicitud y reducir sus costos de proxy."
+  "Use the Luminati Waterfall to increase your request's success rate and reduce your proxy costs.": "Usar la cascada Luminati para aumentar la tasa de éxito de su solicitud y reducir sus costos de proxy.",
+  "Install now": "Instalar ahora",
+  "curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh": "curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh",
+  "Create rules for automated rotation of IPs": "Crear reglas para la rotación automática de direcciones de IP",
+  "unique referral link": "link exclusivos de programa de referidos",
+  "Know a business that could benefit from Luminati": "Conoces algun negocio que podría beneficiarse de Luminati",
+  "and earn": "y ganar",
+  "when new customers start to generate revenue": "cuando los nuevos clientes empiezan a generar ingresos",
+  "Recommend Luminati": "recomendar Luminati",
+  "Embed the personal link": "Incrustar el vínculo personal",
+  "of your": "de tu",
+  "referral program FAQ": "FAQ programa de referidos",
+  "Get rewarded": "Ser recompensado",
+  "Get referral link": "Obtener enlace de referido",
+  "recommend Luminati": "recomendar Luminati"
 }

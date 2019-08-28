@@ -73,6 +73,11 @@ Caption "${PRODUCT_NAME} ${VERSION} Setup"
   Push "^ "
   Call StrRep
   Pop $escapedExe
+  Push "$escapedExe"
+  Push "&"
+  Push "^&"
+  Call StrRep
+  Pop $escapedExe
   CreateShortCut "$startMenuLink" "%comspec%" "/C $\"^$\"$escapedExe^$\"$\"" "$appExe" 0 "" "" "${APP_DESCRIPTION}"
   CreateShortCut "$desktopLink" "%comspec%" "/C $\"$escapedExe$\"" $appExe" 0 "" "" "${APP_DESCRIPTION}"
 !macroend
