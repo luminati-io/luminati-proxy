@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.150.351 
+- :sparkles: UI improvement: setting headers requires SSL Analyzing to reduce confusion
+- :bug: Fixed country targeting for static zones
+
 ## 1.150.274 
 - :sparkles: IP refresh price now is shown in Refresh IP action rule
 - :sparkles: Static IP column will now show IPs in the pool

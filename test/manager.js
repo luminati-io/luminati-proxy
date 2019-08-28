@@ -62,7 +62,6 @@ describe('manager', ()=>{
                 return manager.stop(true);
         });
         args = args||[];
-        const www = get_param(args, '--www')||Manager.default.www;
         if (!only_explicit)
         {
             let log = get_param(args, '--log');
@@ -89,10 +88,8 @@ describe('manager', ()=>{
         Manager.prototype.get_ip = ()=>null;
         Manager.prototype.check_conn = ()=>null;
         manager = new Manager(lpm_util.init_args(args));
-        manager.on('error', this.throw_fn());
         yield manager.start();
-        const admin = 'http://127.0.0.1:'+www;
-        return {manager, admin};
+        return {manager};
     });
     const app_with_config = opt=>etask(function*(){
         const args = [];
@@ -127,8 +124,9 @@ describe('manager', ()=>{
         return yield app_with_config({config: {proxies}, cli});
     });
     const api = (_path, method, data, json, headers)=>etask(function*(){
+        const admin = 'http://127.0.0.1:'+Manager.default.www;
         const opt = {
-            url: app.admin+'/'+_path,
+            url: admin+'/'+_path,
             method: method||'GET',
             json: json,
             body: data,

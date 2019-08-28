@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.150.351",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "UI improvement: setting headers requires SSL Analyzing to reduce confusion"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed country targeting for static zones"
+            }
+        ]
+    },
+    {
         "ver": "1.150.274",
         "type": "stable/dev",
         "changes": [
