@@ -1,5 +1,31 @@
 [
     {
+        "ver": "1.150.681",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed UI crash related to Static IP columns"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed proxy ports status column on specific errors"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed install for older MacOS versions"
+            },
+            {
+                "type": "sparkles",
+                "text": "Support for cluster mode (running on multiple CPUs) without session management"
+            },
+            {
+                "type": "sparkles",
+                "text": "Refresh IP action is now available for static residential zones"
+            }
+        ]
+    },
+    {
         "ver": "1.150.351",
         "type": "stable/dev",
         "changes": [

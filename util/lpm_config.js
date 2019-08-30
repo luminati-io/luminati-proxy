@@ -87,6 +87,7 @@ conf.manager_default = Object
         '.luminati.jar'.substr(conf.is_win ? 1 : 0)),
     high_perf: false,
     local_login: false,
+    cluster: 1,
 });
 
 Object.assign(module.exports, conf);

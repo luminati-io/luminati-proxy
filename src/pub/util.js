@@ -159,7 +159,7 @@ const presets = {
         set: opt=>{
             opt.pool_type = '';
             opt.session = true;
-            opt.max_requests = 1;
+            opt.max_requests = opt.max_requests||1;
         },
         clean: opt=>{
             opt.max_requests = 0;

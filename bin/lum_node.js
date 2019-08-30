@@ -2,8 +2,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const Manager = require('../lib/manager.js');
-const Worker = require('../lib/worker.js');
-const cluster = require('cluster');
 const Tracer = require('../lib/tracer.js');
 const file = require('../util/file.js');
 const etask = require('../util/etask.js');
@@ -118,10 +116,7 @@ const add_alias_for_whitelist_ips = ()=>{
         return;
     }
     if (/lpm_whitelist_ip/.test(bashrc)||/curl_add_ip/.test(bashrc))
-    {
-        zerr.notice(`${name} already installed`);
         return;
-    }
     zerr.notice(`installing ${name}`);
     try {
         const alias = `alias ${name}='${cmd}'`;
@@ -362,7 +357,9 @@ E.uninit_status = ()=>{};
 E.init_traps = ()=>{
     E.trap_handlers = ['SIGTERM', 'SIGINT', 'uncaughtException'].map(
         sig=>({sig, handler: E.handle_signal.bind(E, sig)}));
-    E.trap_handlers.forEach(({sig, handler})=>process.on(sig, handler));
+    E.trap_handlers.forEach(({sig, handler})=>{
+        process.on(sig, handler);
+    });
 };
 
 E.uninit_traps = ()=>{
@@ -372,8 +369,12 @@ E.uninit_traps = ()=>{
         handler));
 };
 
-E.init_cmd = ()=>{ process.on('message', E.handle_msg); };
-E.uninit_cmd = ()=>{ process.removeListener('message', E.handle_msg); };
+E.init_cmd = ()=>{
+    process.on('message', E.handle_msg);
+};
+E.uninit_cmd = ()=>{
+    process.removeListener('message', E.handle_msg);
+};
 
 E.init = argv=>{
     if (E.initialized)
@@ -410,9 +411,7 @@ if (!module.parent)
 {
     E.init_cmd();
     // XXX vladislavl: for debug purposes only
-    if (cluster.isWorker)
-        new Worker().run();
-    else if (!process.env.LUM_MAIN_CHILD)
+    if (!process.env.LUM_MAIN_CHILD)
     {
         const argv = lpm_util.init_args();
         E.init(argv);

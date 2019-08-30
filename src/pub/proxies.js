@@ -114,14 +114,17 @@ const Session_cell = ({proxy})=>{
         return proxy.session;
 };
 
-const Static_ip_cell = ({proxy})=>{
+const Static_ip_cell = ({proxy, mgr})=>{
     if (proxy.ip)
         return proxy.ip;
-    if (Array.isArray(proxy.ips))
+    const curr_zone = mgr.state.zones.zones.find(z=>z.name==proxy.zone);
+    const curr_plan = curr_zone && curr_zone.plan;
+    const is_static = curr_plan && (curr_plan.type||'').startsWith('static');
+    if (is_static && Array.isArray(proxy.ips) && proxy.pool_size)
     {
-        if (proxy.pool_size == 1)
+        if (proxy.ips.length==1)
             return proxy.ips[0];
-        return `Pool of ${proxy.pool_size} IPs`;
+        return `Pool of ${proxy.pool_size} IP${proxy.pool_size==1 ? '' : 's'}`;
     }
     return null;
 };
@@ -850,13 +853,13 @@ class Actions extends Pure_component {
             const res = yield ajax.json({url});
             if (res.status!='ok')
             {
-                let errors = res.status_details.filter(s=>s.lvl=='err');
+                let errors = (res.status_details||[]).filter(s=>s.lvl=='err');
                 res.status_details = errors.length ?
                     errors : [{msg: res.status}];
                 res.status = 'error';
             }
             proxy.status = res.status;
-            proxy.status_details = res.status_details;
+            proxy.status_details = res.status_details||[];
             setdb.emit_path('head.proxies_running');
         });
     };

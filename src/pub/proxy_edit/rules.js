@@ -297,7 +297,7 @@ class Action extends Pure_component {
     }
     load_refresh_cost = ()=>{
         const plan = this.get_cur_zone_plan();
-        if (plan.type != 'static' || !plan.ips)
+        if (!this.is_cur_zone_plan_static_or_static_res(plan) || !plan.ips)
             return;
         const _this = this;
         this.etask(function*(){
@@ -343,6 +343,10 @@ class Action extends Pure_component {
         const zone = (zones.zones||[]).find(z=>z.name==cur_zone) || {plan: {}};
         return zone.plan;
     };
+    is_cur_zone_plan_static_or_static_res = plan=>{
+        plan = plan||this.get_cur_zone_plan();
+        return ['static', 'static_res'].includes(plan.type);
+    };
     render(){
         const {rule, match, ports_opt} = this.props;
         const {logins, defaults, settings, zones, cur_zone,
@@ -358,7 +362,7 @@ class Action extends Pure_component {
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
             at.min_req_time));
-        if (this.get_cur_zone_plan().type=='static')
+        if (this.is_cur_zone_plan_static_or_static_res())
         {
             const refresh_ip_at = _action_types.find(
                 at=>at.value=='refresh_ip');

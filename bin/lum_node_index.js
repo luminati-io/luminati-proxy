@@ -78,7 +78,9 @@ class Lum_node_index extends Lum_common {
         this.child.removeListener('exit', this.restart_on_child_exit);
         setTimeout(()=>this.create_child(), 5000);
     }
-    shutdown_on_child_exit(){ process.exit(); }
+    shutdown_on_child_exit(){
+        process.exit();
+    }
     create_child(){
         process.env.LUM_MAIN_CHILD = true;
         this.child = child_process.fork(

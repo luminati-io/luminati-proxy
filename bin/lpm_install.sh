@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.150.351"
+VERSION="1.150.681"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -32,7 +32,7 @@ OS=""
 OS_MAC=0
 OS_LINUX=0
 ASSUME_YES=0
-SUDO_CMD="sudo -i -E env \"PATH=$PATH\" \"SHELL=/bin/bash\""
+SUDO_CMD="sudo -E env \"SHELL=/bin/bash\""
 NVM_DIR="$HOME/.nvm"
 LOGFILE="/tmp/lpm_install_$RID.log"
 LOG=""

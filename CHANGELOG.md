@@ -1,5 +1,12 @@
 Luminati Proxy manager - Change Log
 
+## 1.150.681 
+- :bug: Fixed UI crash related to Static IP columns
+- :bug: Fixed proxy ports status column on specific errors
+- :bug: Fixed install for older MacOS versions
+- :sparkles: Support for cluster mode (running on multiple CPUs) without session management
+- :sparkles: Refresh IP action is now available for static residential zones
+
 ## 1.150.351 
 - :sparkles: UI improvement: setting headers requires SSL Analyzing to reduce confusion
 - :bug: Fixed country targeting for static zones

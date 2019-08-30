@@ -12,7 +12,6 @@ const Manager = require('../lib/manager.js');
 const Luminati = require('../lib/luminati.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data', ()=>null);
-const Timeline = require('../lib/timeline.js');
 const zlog = require('../lib/log.js');
 const etask = require('../util/etask.js');
 const pkg = require('../package.json');
@@ -153,8 +152,12 @@ describe('manager', ()=>{
             return;
         app = null;
     }));
-    beforeEach(()=>temp_files = []);
-    afterEach('after manager 2', ()=>temp_files.forEach(f=>f.done()));
+    beforeEach(()=>{
+        temp_files = [];
+    });
+    afterEach('after manager 2', ()=>{
+        temp_files.forEach(f=>f.done());
+    });
     describe('get_params', ()=>{
         const t = (name, _args, expected)=>it(name, etask._fn(function(_this){
             const mgr = new Manager(lpm_util.init_args(_args));
@@ -213,7 +216,7 @@ describe('manager', ()=>{
             it('should use proxy from args', etask._fn(function*(_this){
                 app = yield app_with_args(['--proxy', '1.2.3.4',
                     '--proxy_port', '3939', '--dropin']);
-                const dropin = app.manager.proxies_running[22225];
+                const dropin = app.manager.proxy_ports[22225];
                 assert.equal(dropin.opt.proxy, '1.2.3.4');
                 assert.equal(dropin.opt.proxy_port, 3939);
             }));
@@ -222,11 +225,11 @@ describe('manager', ()=>{
     describe('dropin', ()=>{
         it('off', etask._fn(function*(_this){
             app = yield app_with_args(['--no-dropin']);
-            assert.ok(!app.manager.proxies_running[22225]);
+            assert.ok(!app.manager.proxy_ports[22225]);
         }));
         it('on', etask._fn(function*(_this){
             app = yield app_with_args(['--dropin']);
-            assert.ok(!!app.manager.proxies_running[22225]);
+            assert.ok(!!app.manager.proxy_ports[22225]);
         }));
     });
     describe('api', ()=>{
@@ -395,8 +398,9 @@ describe('manager', ()=>{
                 app = yield app_with_args(['--customer', 'mock_user',
                     '--port', '24000']);
                 app.manager.loki.requests_clear();
-                app.manager.proxies_running[24000].usage({
-                    timeline: new Timeline(),
+                app.manager.proxy_ports[24000].emit('usage', {
+                    timeline: null,
+                    url: 'http://bbc.com',
                     request: {url: 'http://bbc.com'},
                     response: {},
                 });
@@ -514,7 +518,7 @@ describe('manager', ()=>{
         it('takes whitelist ips from cmd', etask._fn(function*(_this){
             app = yield app_with_proxies([{port: 24000}],
                 {whitelist_ips: '1.2.3.4'});
-            const {whitelist_ips} = app.manager.proxies_running[24000].opt;
+            const {whitelist_ips} = app.manager.proxy_ports[24000].opt;
             assert.equal(whitelist_ips.length, 1);
             assert.equal(whitelist_ips[0], '1.2.3.4');
         }));
@@ -561,12 +565,21 @@ describe('manager', ()=>{
             rm_actions_file();
             perr_stub.restore();
         });
-        const make_user_req = (port, status = 200)=>api_json('api/test/'+port,
-            {method: 'POST', body: {url: 'http://lumtest.com/myip.json',
-                headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status}}});
+        const make_user_req = (port, status=200)=>{
+            return api_json('api/test/'+port, {
+                method: 'POST',
+                body: {
+                    url: 'http://lumtest.com/myip.json',
+                    headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status},
+                },
+            });
+        };
         const m = a=>smatch(`first_${a}`);
-        const perr_called_n_times_with = (a, n)=>assert.equal(
-            perr_stub.getCalls().filter(c=>c.args[0]==`first_${a}`).length, n);
+        const perr_called_n_times_with = (a, n)=>{
+            const event = `first_${a}`;
+            const calls = perr_stub.getCalls().filter(c=>c.args[0]==event);
+            assert.equal(calls.length, n);
+        };
         const t = (name, called, action, config, conf_success=true)=>
         it(name, etask._fn(function*(_this){
             const i = nock(api_base).get('/cp/lum_local_conf').query(true);
@@ -590,8 +603,8 @@ describe('manager', ()=>{
         t('never triggers send_request on startup', false, 'send_request');
         t('never triggers send_request_successful on startup', false,
             'send_request_successful');
-        it('maintains actions object structure when file does not exist', ()=>
-        etask(function*(){
+        it('maintains actions object structure when file does not exist',
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             app = yield app_with_config({cli: {token: '123'}});
@@ -599,7 +612,7 @@ describe('manager', ()=>{
                 smatch({sent: {}, sending: {}, pending: []}));
         }));
         it('maintains actions object structure when file is missing fields',
-        ()=>etask(function*(){
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             fs.writeFileSync(lpm_config.first_actions, JSON.stringify({}));
@@ -607,16 +620,16 @@ describe('manager', ()=>{
             sinon.assert.match(app.manager.first_actions,
                 smatch({sent: {}, sending: {}, pending: []}));
         }));
-        it('does not trigger actions on zone password authentication', ()=>
-        etask(function*(){
+        it('does not trigger actions on zone password authentication',
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true).reply(403);
             app = yield app_with_config({config: {proxies: [{port: 24010}]},
                 cli: {customer: false, token: '123'}});
             yield make_user_req(24010);
             sinon.assert.neverCalledWith(perr_stub, smatch('first'));
         }));
-        it('triggers create_proxy_port_def when using dropin', ()=>
-        etask(function*(){
+        it('triggers create_proxy_port_def when using dropin',
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             app = yield app_with_config({cli: {token: '123', dropin: true}});
@@ -627,8 +640,8 @@ describe('manager', ()=>{
             sinon.assert.neverCalledWith(perr_stub,
                 smatch(/^first_create_proxy_port$/));
         }));
-        it('triggers failed actions after error has happened', ()=>
-        etask(function*(){
+        it('triggers failed actions after error has happened',
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             perr_stub.returns(etask.reject(Error('Network error')));
@@ -642,8 +655,8 @@ describe('manager', ()=>{
             perr_called_n_times_with('send_request', 2);
             perr_called_n_times_with('send_request_successful', 2);
         }));
-        it('stops retrying if action has already been retried', ()=>
-        etask(function*(){
+        it('stops retrying if action has already been retried',
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             perr_stub.restore();
@@ -666,8 +679,8 @@ describe('manager', ()=>{
             assert.equal(app.manager.first_actions.pending.filter(
                 d=>failed.includes(d.action)).length, failed.length);
         }));
-        it('does not trigger send_request events on proxy status request', ()=>
-        etask(function*(){
+        it('does not trigger send_request events on proxy status request',
+        etask._fn(function*(_this){
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             app = yield app_with_config({cli: {token: '123', dropin: true}});
