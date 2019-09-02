@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.150.854",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed duplication proxy ports"
+            },
+            {
+                "type": "star",
+                "text": "Updated geo locations and list of available carriers"
+            }
+        ]
+    },
+    {
         "ver": "1.150.681",
         "type": "stable/dev",
         "changes": [

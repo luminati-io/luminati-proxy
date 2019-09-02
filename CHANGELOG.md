@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.150.854 Stable
+- :bug: Fixed duplication proxy ports
+- :star: Updated geo locations and list of available carriers
+
 ## 1.150.681 
 - :bug: Fixed UI crash related to Static IP columns
 - :bug: Fixed proxy ports status column on specific errors
