@@ -169,7 +169,7 @@ export const Form_controller = props=>{
     return <Input {...props}/>;
 };
 
-const Copy_btn = with_tt(['Copy to clipboard', 'Copy'],
+export const Copy_btn = with_tt(['Copy to clipboard', 'Copy'],
 class Copy_btn extends Pure_component {
     textarea = React.createRef();
     btn = React.createRef();
@@ -193,11 +193,11 @@ class Copy_btn extends Pure_component {
         } catch(e){ console.log('Oops, unable to copy'); }
     };
     render(){
-        const {t} = this.props;
-        return <div className="copy_btn">
+        return <div className="copy_btn" style={this.props.style}>
               <button onClick={this.copy} data-container="body"
+                style={this.props.inner_style}
                 ref={this.btn} className="btn btn_lpm btn_lpm_small btn_copy">
-                {t['Copy']}
+                {this.props.title||'Copy'}
               </button>
               <textarea ref={this.textarea}
                 style={{position: 'fixed', top: '-1000px'}}/>

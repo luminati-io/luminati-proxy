@@ -290,19 +290,19 @@ class Action extends Pure_component {
             if (zones)
                 this.setState({zones});
         });
-        this.setdb_on('head.proxy_edit.zone_name', cur_zone=>{
-            if (cur_zone)
-                this.setState({cur_zone}, this.load_refresh_cost);
+        this.setdb_on('head.proxy_edit.zone_name', curr_zone=>{
+            if (curr_zone)
+                this.setState({curr_zone}, this.load_refresh_cost);
         });
     }
     load_refresh_cost = ()=>{
-        const plan = this.get_cur_zone_plan();
-        if (!this.is_cur_zone_plan_static_or_static_res(plan) || !plan.ips)
+        const plan = this.get_curr_zone_plan();
+        if (!this.is_curr_zone_static(plan) || !plan.ips)
             return;
         const _this = this;
         this.etask(function*(){
             const response = yield ajax.json({url: '/api/refresh_cost',
-                qs: {zone: _this.state.cur_zone}});
+                qs: {zone: _this.state.curr_zone}});
             _this.setState({refresh_cost: response.cost});
         });
     };
@@ -338,22 +338,22 @@ class Action extends Pure_component {
             port: this.props.match.params.port,
         }});
     };
-    get_cur_zone_plan = ()=>{
-        const {zones, cur_zone} = this.state;
-        const zone = (zones.zones||[]).find(z=>z.name==cur_zone) || {plan: {}};
-        return zone.plan;
+    get_curr_zone_plan = ()=>{
+        const {zones, curr_zone} = this.state;
+        const zone = (zones.zones||[]).find(z=>z.name==curr_zone);
+        return zone && zone.plan || {};
     };
-    is_cur_zone_plan_static_or_static_res = plan=>{
-        plan = plan||this.get_cur_zone_plan();
+    is_curr_zone_static = plan=>{
+        plan = plan||this.get_curr_zone_plan();
         return ['static', 'static_res'].includes(plan.type);
     };
     render(){
         const {rule, match, ports_opt} = this.props;
-        const {logins, defaults, settings, zones, cur_zone,
+        const {logins, defaults, settings, zones, curr_zone,
             refresh_cost} = this.state;
         if (!rule.trigger_type || !settings)
             return null;
-        if (!zones || !cur_zone)
+        if (!zones || !curr_zone)
             return null;
         let _action_types = [default_action].concat(_.cloneDeep(action_types)
         .filter(at=>at.value!='save_to_fast_pool' ||
@@ -362,7 +362,7 @@ class Action extends Pure_component {
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
             at.min_req_time));
-        if (this.is_cur_zone_plan_static_or_static_res())
+        if (this.is_curr_zone_static())
         {
             const refresh_ip_at = _action_types.find(
                 at=>at.value=='refresh_ip');

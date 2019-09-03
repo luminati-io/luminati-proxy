@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.151.77",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed WSS traffic when SSL Analyzing is on"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed updating whitelist IPs in cluster mode"
+            }
+        ]
+    },
+    {
         "ver": "1.150.854",
         "type": "stable",
         "changes": [

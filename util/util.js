@@ -461,4 +461,22 @@ E.if_set = function (val, o, name){
         o[name] = val;
 };
 
+E.escape_dotted_keys = function(obj, repl){
+    repl = repl||'_';
+    for (var prop in obj)
+    {
+        if (E.own(obj, prop))
+        {
+            var new_prop = prop.replace(/\./g, repl);
+            if (prop != new_prop)
+            {
+                obj[new_prop] = obj[prop];
+                delete obj[prop];
+            }
+            if (is_object(obj[new_prop]))
+                E.escape_dotted_keys(obj[new_prop], repl);
+        }
+    }
+};
+
 return E; }); }());

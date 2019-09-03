@@ -616,7 +616,7 @@ describe('proxy', ()=>{
                 port: 24000,
                 url: ping.http.url,
                 method: 'GET',
-                super_proxy: '127.0.0.1'
+                super_proxy: '127.0.0.1:20001'
             }));
             t('https connect', ()=>ping.https.url, ()=>({
                 port: 24000,

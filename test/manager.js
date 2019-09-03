@@ -142,6 +142,15 @@ describe('manager', ()=>{
         assert.equal(res.statusCode, 200);
         return res.body;
     });
+    const make_user_req = (port=24000, status=200)=>{
+        return api_json('api/test/'+port, {
+            method: 'POST',
+            body: {
+                url: 'http://lumtest.com/myip.json',
+                headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status},
+            },
+        });
+    };
     afterEach('after manager', etask._fn(function*(_this){
         if (!app)
             return;
@@ -522,6 +531,22 @@ describe('manager', ()=>{
             assert.equal(whitelist_ips.length, 1);
             assert.equal(whitelist_ips[0], '1.2.3.4');
         }));
+        it('set whitelist in proxy ports', etask._fn(function*(_this){
+            app = yield app_with_proxies([{port: 24000}]);
+            app.manager.set_whitelist_ips(['2.2.2.2']);
+            const {whitelist_ips} = app.manager.proxy_ports[24000].opt;
+            assert.equal(whitelist_ips.length, 1);
+            assert.equal(whitelist_ips[0], '2.2.2.2');
+        }));
+        it('set whitelist in servers', etask._fn(function*(_this){
+            app = yield app_with_proxies([{port: 24000}]);
+            app.manager.set_whitelist_ips(['2.2.2.2']);
+            const res = yield make_user_req();
+            const whitelists = res.body.response.headers.find(
+                h=>h.name=='x-lpm-whitelist');
+            assert.ok(!!whitelists);
+            assert.equal(whitelists.value, '2.2.2.2');
+        }));
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{
@@ -565,15 +590,6 @@ describe('manager', ()=>{
             rm_actions_file();
             perr_stub.restore();
         });
-        const make_user_req = (port, status=200)=>{
-            return api_json('api/test/'+port, {
-                method: 'POST',
-                body: {
-                    url: 'http://lumtest.com/myip.json',
-                    headers: {'x-lpm-fake': true, 'x-lpm-fake-status': status},
-                },
-            });
-        };
         const m = a=>smatch(`first_${a}`);
         const perr_called_n_times_with = (a, n)=>{
             const event = `first_${a}`;

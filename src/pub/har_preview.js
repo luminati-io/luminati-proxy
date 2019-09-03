@@ -12,6 +12,7 @@ import classnames from 'classnames';
 import moment from 'moment';
 import $ from 'jquery';
 import {trigger_types, action_types} from '../../util/rules_util.js';
+import {Copy_btn} from './common.js';
 
 class Preview extends Pure_component {
     panes = [
@@ -78,8 +79,14 @@ const Pane_slider = ({panes, cur_pane})=>{
 };
 
 class Pane_headers extends Pure_component {
+    get_curl = ()=>{
+        const req = this.props.req;
+        const {username, password, super_proxy} = req.details;
+        return ['curl -x', username+':'+password+'@'+super_proxy,
+               req.request.url].join(' ');
+    };
     render(){
-        const {req} = this.props;
+        const req = this.props.req;
         const general_entries = [
             {name: 'Request URL', value: req.request.url},
             {name: 'Status code', value: req.response.status},
@@ -89,15 +96,20 @@ class Pane_headers extends Pure_component {
             {name: 'Password', value: req.details.password},
             {name: 'Sent from', value: req.details.remote_address},
         ].filter(e=>e.value!==undefined);
-        return <ol className="tree_outline">
-              <Preview_section title="General" pairs={general_entries}/>
-              <Preview_section title="Response headers"
-                pairs={req.response.headers}/>
-              <Preview_section title="Request headers"
-                pairs={req.request.headers}/>
-              <Body_section title="Request body"
-                body={req.request.postData && req.request.postData.text}/>
-             </ol>;
+        return <React.Fragment>
+              <Copy_btn val={this.get_curl()} title="Copy as cURL"
+                style={{position: 'absolute', right: 5, top: 5}}
+                inner_style={{width: 'auto'}}/>
+              <ol className="tree_outline">
+                <Preview_section title="General" pairs={general_entries}/>
+                <Preview_section title="Response headers"
+                  pairs={req.response.headers}/>
+                <Preview_section title="Request headers"
+                  pairs={req.request.headers}/>
+                <Body_section title="Request body"
+                  body={req.request.postData && req.request.postData.text}/>
+               </ol>
+             </React.Fragment>;
     }
 }
 

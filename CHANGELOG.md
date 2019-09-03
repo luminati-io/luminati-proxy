@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.151.77 Stable
+- :bug: Fixed WSS traffic when SSL Analyzing is on
+- :bug: Fixed updating whitelist IPs in cluster mode
+
 ## 1.150.854 Stable
 - :bug: Fixed duplication proxy ports
 - :star: Updated geo locations and list of available carriers
