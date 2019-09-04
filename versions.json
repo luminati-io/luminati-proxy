@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.151.372",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed WS traffic when SSL Analyzing is on"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed browser response when using Process data rule"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved the UX of whitelisting IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.151.77",
         "type": "stable",
         "changes": [

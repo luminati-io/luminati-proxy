@@ -7,7 +7,7 @@ import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import {ga_event} from './util.js';
 import _ from 'lodash';
-import {Select_zone} from './common/controls.js';
+import {Select_zone, Pins} from './common/controls.js';
 
 export default function Settings(){
     return <div className="settings">
@@ -124,26 +124,29 @@ class Form extends Pure_component {
     };
     debounced_save = _.debounce(this.save, 500);
     render(){
-        if (!this.state.settings)
+        const settings = this.state.settings;
+        if (!settings)
             return null;
         return <div className="settings_form">
               <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
-                <Select_zone val={this.state.settings.zone} preview
+                <Select_zone val={settings.zone} preview
                   on_change_wrapper={this.zone_change}/>
               </Labeled_controller>
-              <Labeled_controller val={this.state.settings.www_whitelist_ips}
-                type="pins" label="Admin whitelisted IPs"
-                on_change_wrapper={this.www_whitelist_ips_change}
-                tooltip={tooltips.www_whitelist_ips}/>
-              <Labeled_controller val={this.state.settings.whitelist_ips}
+              <Labeled_controller label="Admin whitelisted IPs"
+                tooltip={tooltips.www_whitelist_ips}>
+                <Pins val={settings.www_whitelist_ips}
+                  pending={settings.pending_www_ips}
+                  on_change_wrapper={this.www_whitelist_ips_change}/>
+              </Labeled_controller>
+              <Labeled_controller val={settings.whitelist_ips}
                 type="pins" label="Proxy whitelisted IPs"
                 on_change_wrapper={this.whitelist_ips_change}
                 tooltip={tooltips.whitelist_ips}/>
-              <Labeled_controller val={this.state.settings.request_stats}
+              <Labeled_controller val={settings.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default
                 tooltip={tooltips.request_stats}/>
-              <Labeled_controller val={this.state.settings.logs}
+              <Labeled_controller val={settings.logs}
                 type="select_number" on_change_wrapper={this.logs_changed}
                 data={[0, 100, 1000, 10000]}
                 label="Limit for request logs" default

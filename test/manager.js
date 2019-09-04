@@ -9,7 +9,7 @@ const assert = require('assert');
 const request = require('request');
 const sinon = require('sinon');
 const Manager = require('../lib/manager.js');
-const Luminati = require('../lib/luminati.js');
+const Server = require('../lib/server.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data', ()=>null);
 const zlog = require('../lib/log.js');
@@ -367,10 +367,10 @@ describe('manager', ()=>{
             it('should fail when any IP fails', ()=>etask(function*(_this){
                 const proxies = [{port: 24000}];
                 app = yield app_with_proxies(proxies, {});
-                sinon.stub(Luminati.prototype, 'banip', ip=>ip=='1.1.1.2');
+                sinon.stub(Server.prototype, 'banip', ip=>ip=='1.1.1.2');
                 const res = yield api_json('api/proxies/24000/banips',
                     {method: 'post', body: {ips: ['1.1.1.1', '1.1.1.2']}});
-                Luminati.prototype.banip.restore();
+                Server.prototype.banip.restore();
                 assert.equal(res.statusCode, 400);
             }));
         });

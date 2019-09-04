@@ -33,7 +33,7 @@ conf.default_fields = [].concat(conf.credential_fields, conf.mgr_fields,
 conf.first_actions = lpm_file.get_file_path(
     '.first_actions.json'.substr(conf.is_win ? 1 : 0));
 conf.proxy_params = Object.keys(swagger.definitions.proxy.properties);
-conf.luminati_default = {
+conf.server_default = {
     port: 24000,
     zone: 'static',
     customer: process.env.LUMINATI_CUSTOMER,
@@ -65,7 +65,7 @@ conf.luminati_default = {
     session: true,
 };
 conf.manager_default = Object
-.assign({}, _.omit(conf.luminati_default, 'port'), {
+.assign({}, _.omit(conf.server_default, 'port'), {
     api: 'https://'+pkg.api_domain,
     www: 22999,
     www_whitelist_ips: [],

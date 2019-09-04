@@ -170,30 +170,29 @@ export default class Rules extends Pure_component {
         return <div className="rules">
               {!this.state.form.ssl &&
                 <Note>
-                  <span><strong><T>Warning:</T></strong></span>
-                  <span>
-                    <T>we can't apply rules to HTTPS requests unless</T></span>
-                  <a onClick={this.goto_ssl} className="link">
-                    <T>SSL analyzing</T></a>
-                  <span><T>is turned on</T></span>
+                  <span><strong><T>Warning: </T></strong></span>
+                  <span><T>these options are available only when using </T>
+                    <a className="link" onClick={this.goto_ssl}>
+                    <T>SSL analyzing</T></a></span>
                 </Note>
               }
               {this.state.form.debug=='none' &&
                 <Note>
                   <span><strong><T>Warning:</T></strong></span>
-                  <span><T>some rules may not work correctly without</T></span>
+                  <span><T>some rules may not work correctly without </T>
+                  </span>
                   <a onClick={this.goto_debug} className="link">
                     <T>Request debug info</T></a>
                 </Note>
               }
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
-                onClick={this.rule_add}>
+                onClick={this.rule_add} disabled={!this.state.form.ssl}>
                 <T>New rule</T>
                 <i className="glyphicon glyphicon-plus"/>
               </button>
               {this.state.rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}
-                   www={this.state.www}/>
+                   www={this.state.www} disabled={!this.state.form.ssl}/>
               )}
               <Tester_wrapper/>
             </div>;
@@ -261,12 +260,12 @@ const Ban_ips_note = withRouter(({match, history})=>{
         </span>;
 });
 
-const Rule = ({rule_del, rule})=>
+const Rule = ({rule_del, rule, disabled})=>
     <div>
       <div className="rule_wrapper">
-        <Trigger rule={rule}/>
-        <Action rule={rule}/>
-        <Btn_rule_del on_click={()=>rule_del(rule.id)}/>
+        <Trigger rule={rule} disabled={disabled}/>
+        <Action rule={rule} disabled={disabled}/>
+        <Btn_rule_del on_click={()=>rule_del(rule.id)} disabled={disabled}/>
       </div>
     </div>;
 
@@ -348,7 +347,7 @@ class Action extends Pure_component {
         return ['static', 'static_res'].includes(plan.type);
     };
     render(){
-        const {rule, match, ports_opt} = this.props;
+        const {rule, match, ports_opt, disabled} = this.props;
         const {logins, defaults, settings, zones, curr_zone,
             refresh_cost} = this.state;
         if (!rule.trigger_type || !settings)
@@ -385,33 +384,35 @@ class Action extends Pure_component {
               <div className="action ui">
                 {rule.trigger_type &&
                   <Rule_config id="action" type="select" data={_action_types}
-                    on_change={this.action_changed} rule={rule}/>
+                    on_change={this.action_changed} rule={rule}
+                    disabled={disabled}/>
                 }
                 {rule.action=='retry' &&
                   <Rule_config id="retry_number" type="select_number"
-                    rule={rule}/>
+                    rule={rule} disabled={disabled}/>
                 }
                 {rule.action=='retry_port' &&
                   <Rule_config id="retry_port" type="select" data={ports}
-                    rule={rule}/>
+                    rule={rule} disabled={disabled}/>
                 }
                 {rule.action=='switch_port' &&
                   <Rule_config id="switch_port" type="select" data={ports}
-                    rule={rule}/>
+                    rule={rule} disabled={disabled}/>
                 }
                 {ban_action &&
                   <Rule_config id="ban_ip_duration" type="select_number"
                     data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
-                    note={<Ban_ips_note/>}/>
+                    note={<Ban_ips_note/>} disabled={disabled}/>
                 }
                 {rule.action=='save_to_fast_pool' &&
                   <Rule_config id="fast_pool_size" type="select_number"
-                    rule={rule} note={fast_pool_note}/>
+                    rule={rule} note={fast_pool_note} disabled={disabled}/>
                 }
                 {rule.action=='process' &&
                   <div>
-                    <Rule_config id="process" type="json" rule={rule}/>
-                    <Field_row_raw>
+                    <Rule_config id="process" type="json" rule={rule}
+                      disabled={disabled}/>
+                    <Field_row_raw disabled={disabled}>
                       Test data processing in
                       <a onClick={this.goto_tester} className="link api_link">
                         proxy tester</a>
@@ -420,7 +421,7 @@ class Action extends Pure_component {
                 }
                 {rule.action &&
                   <Rule_config id="send_email" type="yes_no" rule={rule}
-                    on_change={this.send_email_changed}/>
+                    on_change={this.send_email_changed} disabled={disabled}/>
                 }
                 {rule.send_email && logins &&
                   logins.length==1 &&
@@ -429,10 +430,11 @@ class Action extends Pure_component {
                 {rule.send_email && logins && logins.length>1 &&
                   <Rule_config id="email" type="select" rule={rule}
                     data={logins.map(l=>({key: l, value: l}))}
-                    note={<Email_note www={defaults.www_api}/>}/>
+                    note={<Email_note www={defaults.www_api}/>}
+                    disabled={disabled}/>
                 }
               </div>
-              <Action_code rule={rule}/>
+              <Action_code rule={rule} disabled={disabled}/>
             </React.Fragment>;
     }
 }));
@@ -448,14 +450,15 @@ class Action_code extends Pure_component {
         return {action_code};
     }
     render(){
-        const tip = 'See the action as JavaScript function. Currently it is'
-        +' Read-only. We are working on support for editing.';
-        return <Tooltip title={tip}>
-              <div className="action code">
-                <Cm_wrapper on_change={this.on_change} readonly
-                  val={this.state.action_code}/>
-              </div>
-            </Tooltip>;
+        const content = <div className="action code">
+          <Cm_wrapper on_change={this.on_change} readonly
+            val={this.state.action_code}/>
+        </div>;
+        if (this.props.disabled)
+            return content;
+        const tip = 'See the action as JavaScript function. Currently it '
+        +'is Read-only. We are working on support for editing.';
+        return <Tooltip title={tip}>{content}</Tooltip>;
     }
 }
 
@@ -507,7 +510,7 @@ class Trigger extends Pure_component {
         this.setState({ui_blocked: false});
     };
     render(){
-        const {rule} = this.props;
+        const {rule, disabled} = this.props;
         const {ui_blocked} = this.state;
         let tip = ' ';
         if (ui_blocked)
@@ -520,33 +523,39 @@ class Trigger extends Pure_component {
                 <Tooltip title={tip}>
                 <div className={classnames('mask', {active: ui_blocked})}>
                   <button className="btn btn_lpm btn_lpm_small reset_btn"
-                    onClick={this.unblock_ui}>
+                    onClick={this.unblock_ui} disabled={disabled}>
                     Restore
                   </button>
                 </div>
                 </Tooltip>
                 <Rule_config id="trigger_type" type="select"
                   data={trigger_types} on_change={this.trigger_changed}
-                  rule={rule}/>
+                  rule={rule} disabled={disabled}/>
                 {rule.trigger_type=='body' &&
-                  <Rule_config id="body_regex" type="text" rule={rule}/>}
+                  <Rule_config id="body_regex" type="text" rule={rule}
+                    disabled={disabled}/>}
                 {rule.trigger_type=='min_req_time' &&
                   <Rule_config id="min_req_time" type="select_number"
-                    range="ms" sufix="milliseconds" rule={rule}/>
+                    range="ms" sufix="milliseconds" rule={rule}
+                    disabled={disabled}/>
                 }
                 {rule.trigger_type=='max_req_time' &&
                   <Rule_config id="max_req_time" type="select_number"
-                    range="ms" sufix="milliseconds" rule={rule}/>
+                    range="ms" sufix="milliseconds" rule={rule}
+                    disabled={disabled}/>
                 }
                 {rule.trigger_type=='status' &&
-                  <Rule_config id="status" type="select_status" rule={rule}/>
+                  <Rule_config id="status" type="select_status" rule={rule}
+                    disabled={disabled}/>
                 }
                 {rule.trigger_type &&
                   <Rule_config id="trigger_url_regex" type="regex"
-                    rule={rule} style={{width: '100%'}}/>}
+                    rule={rule} style={{width: '100%'}}
+                    disabled={disabled}/>}
               </div>
               <Trigger_code rule={rule} type_changed={this.type_changed}
-                trigger_code_changed={this.trigger_code_changed}/>
+                trigger_code_changed={this.trigger_code_changed}
+                disabled={disabled}/>
             </React.Fragment>;
     }
 }
@@ -572,16 +581,18 @@ class Trigger_code extends Pure_component {
         return {trigger_code, type};
     }
     render(){
+        const {rule, type_changed, trigger_code_changed,
+            disabled} = this.props;
         if (!this.state.trigger_code)
             return null;
         return <div className="trigger code">
               <Rule_config id="type" type="select" data={this.type_opt}
-                rule={this.props.rule} val={this.state.type}
+                rule={rule} val={this.state.type}
                 desc_style={{width: 'auto', minWidth: 'initial'}}
-                on_change={this.props.type_changed}
-                field_row_inner_style={{paddingBottom: 6}}/>
-              <Cm_wrapper on_change={this.props.trigger_code_changed}
-                val={this.state.trigger_code}/>
+                field_row_inner_style={{paddingBottom: 6}}
+                on_change={type_changed} disabled={disabled}/>
+              <Cm_wrapper on_change={trigger_code_changed}
+                val={this.state.trigger_code} readonly={disabled}/>
             </div>;
     }
 }
@@ -593,5 +604,5 @@ const Email_note = ({www})=>
         here</a>
     </div>;
 
-const Btn_rule_del = ({on_click})=>
-    <div className="btn_rule_del" onClick={on_click}/>;
+const Btn_rule_del = ({on_click, disabled})=>
+    <button className="btn_rule_del" onClick={on_click} disabled={disabled}/>;

@@ -12,7 +12,7 @@ const {ms} = require('../util/date.js');
 const sinon = require('sinon');
 const zsinon = require('../util/sinon.js');
 const lpm_config = require('../util/lpm_config.js');
-const Luminati = require('../lib/luminati.js');
+const Server = require('../lib/server.js');
 const Timeline = require('../lib/timeline.js');
 const Config = require('../lib/config.js');
 const {decode_body} = require('../lib/util.js');
@@ -34,7 +34,7 @@ describe('proxy', ()=>{
         if (opt.ssl===true)
             opt.ssl = Object.assign({requestCert: false}, ssl());
         const mgr = {config: new Config()};
-        const l = new Luminati(Object.assign({
+        const l = new Server(Object.assign({
             proxy: '127.0.0.1',
             proxy_port: proxy.port,
             customer,
@@ -824,12 +824,12 @@ describe('proxy', ()=>{
                 return handle_proxy_resp_org(...args)(_res);
             });
         };
-        const make_process_rule_req=(res, html)=>etask(function*(){
+        const make_process_rule_req=(proxy_res, html, res)=>etask(function*(){
             const req = {ctx: {response: {}, proxies: [],
                 timeline: {track: ()=>null, req: {create: Date.now()}},
                 log: {info: ()=>null}, skip_rule: ()=>false}};
-            Object.assign(res, {
-                write: ()=>null, end: ()=>null, pipe: ()=>({pipe: ()=>null}),
+            Object.assign(proxy_res, {
+                end: ()=>null, pipe: ()=>({pipe: ()=>null}),
                 on: function(event, fn){
                     if (event=='data')
                     {
@@ -841,8 +841,9 @@ describe('proxy', ()=>{
                     return this;
                 }
             });
+            res.end = ()=>null;
             const et = etask.wait();
-            l.handle_proxy_resp(req, res, {}, et)(res);
+            l.handle_proxy_resp(req, res, {}, et)(proxy_res);
             return yield et;
         });
         it('should process data', ()=>etask(function*(){
@@ -854,13 +855,15 @@ describe('proxy', ()=>{
                   <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const _res = {headers: {'content-encoding': 'text'}};
-            const response = yield make_process_rule_req(_res, html);
-            assert.ok(!_res.headers['content-encoding']);
-            assert.equal(_res.headers['content-type'],
+            const proxy_res = {headers: {'content-encoding': 'text'}};
+            const res = {write: sinon.spy()};
+            const response = yield make_process_rule_req(proxy_res, html, res);
+            assert.ok(!proxy_res.headers['content-encoding']);
+            assert.equal(proxy_res.headers['content-type'],
                 'application/json; charset=utf-8');
             const new_body = JSON.parse(decode_body(response.body).toString());
             assert.deepEqual(new_body, {price: '$12.99'});
+            sinon.assert.calledWith(res.write, response.body[0]);
         }));
         it('should process data with error', ()=>etask(function*(){
             const process = {price: 'a-b-v'};
@@ -871,14 +874,16 @@ describe('proxy', ()=>{
                   <p id="priceblock_ourprice">$12.99</p>
                 </div>
               </body>`;
-            const _res = {headers: {'content-encoding': 'text'}};
-            const response = yield make_process_rule_req(_res, html);
-            assert.ok(!_res.headers['content-encoding']);
-            assert.equal(_res.headers['content-type'],
+            const proxy_res = {headers: {'content-encoding': 'text'}};
+            const res = {write: sinon.spy()};
+            const response = yield make_process_rule_req(proxy_res, html, res);
+            assert.ok(!proxy_res.headers['content-encoding']);
+            assert.equal(proxy_res.headers['content-type'],
                 'application/json; charset=utf-8');
             const new_body = JSON.parse(response.body.toString());
             assert.deepEqual(new_body, {price: {context: 'a-b-v',
                 error: 'processing data', message: 'a is not defined'}});
+            sinon.assert.calledWith(res.write, response.body[0]);
         }));
         it('check Trigger', ()=>{
             const Trigger = require('../lib/rules').Trigger;

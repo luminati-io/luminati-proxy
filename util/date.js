@@ -424,6 +424,13 @@ E.strptime = function(str, fmt){
     return d;
 };
 
+// tz in format shh:mm (for exmpl +01:00, -03:45)
+E.apply_tz = function(date, tz){
+    var timezone = +tz.slice(1, 3)*3600000+tz.slice(4, 6)*60000;
+    var sign = tz.slice(0, 1) == '+' ? 1 : -1;
+    return new Date(date.getTime()+sign*timezone);
+};
+
 var utc_local = {
     local: {
         getSeconds: function(d){ return d.getSeconds(); },

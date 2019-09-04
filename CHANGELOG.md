@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.151.372 
+- :bug: Fixed WS traffic when SSL Analyzing is on
+- :bug: Fixed browser response when using Process data rule
+- :sparkles: Improved the UX of whitelisting IPs
+
 ## 1.151.77 Stable
 - :bug: Fixed WSS traffic when SSL Analyzing is on
 - :bug: Fixed updating whitelist IPs in cluster mode

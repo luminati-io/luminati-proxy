@@ -120,9 +120,9 @@ const Static_ip_cell = ({proxy, mgr})=>{
     const curr_zone = mgr.state.zones.zones.find(z=>z.name==proxy.zone);
     const curr_plan = curr_zone && curr_zone.plan;
     const is_static = curr_plan && (curr_plan.type||'').startsWith('static');
-    if (is_static && Array.isArray(proxy.ips) && proxy.pool_size)
+    if (is_static && proxy.pool_size)
     {
-        if (proxy.ips.length==1)
+        if (Array.isArray(proxy.ips) && proxy.ips.length==1)
             return proxy.ips[0];
         return `Pool of ${proxy.pool_size} IP${proxy.pool_size==1 ? '' : 's'}`;
     }

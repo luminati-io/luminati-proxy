@@ -59,13 +59,5 @@ E.is_mobile = (zone_name, zones)=>{
 function Zones_mgr(){
 }
 
-Zones_mgr.prototype.get_zone = function(zone_name){
-};
-
 E.Zones_mgr = Zones_mgr;
-
-E.get_zone = function(c){
-    const zones = ((this.lum_conf||{})._defaults||{}).zones;
-    return zones && zones[c.zone];
-};
 

@@ -110,17 +110,50 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
     margin-right: 2px;
 }
 .whitelist_ips {
+    max-width: 800px;
+    margin: auto;
+    .user_choice {
+        display: flex;
+        .user {
+            cursor: pointer;
+            padding: 30px;
+            width: 240px;
+            height: 280px;
+            margin-right: 20px;
+            outline: 1px solid @grey_border;
+            &.active {
+                outline: 2px solid @first_color;
+            }
+            .img_wrapper {
+                width: 88px;
+                height: 88px;
+                margin: 0 auto 30px;
+                .img {
+                    width: 100%;
+                    height: 100%;
+                }
+                .admin { background-image: url(img/ic_admin.svg); }
+                .guest { background-image: url(img/ic_guest.svg); }
+            }
+            .user_title {
+                margin-bottom: 12px;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 1.2;
+            }
+            .user_desc {
+                font-size: 14px;
+                line-height: 1.2;
+            }
+        }
+    }
     .whitelist_header {
         h3 { font-size: 30px; }
         margin-bottom: 30px;
         margin-top: 30px;
-        max-width: 1000px;
-        margin: auto;
         text-align: left;
     }
     .steps {
-        max-width: 1000px;
-        margin: auto;
         margin-top: 50px;
         h3 { font-size: 17px; }
         .instructions { margin: 15px 10px; }
@@ -1126,10 +1159,10 @@ span.icon_link {
                     position: absolute;
                     top: 5px;
                     right: 5px;
-                    cursor: pointer;
                     background: url(/img/delete.svg);
                     width: 16px;
                     height: 16px;
+                    border: none;
                 }
             }
             .rule_add_btn {

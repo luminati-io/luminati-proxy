@@ -16,10 +16,12 @@ import ajax from '../../../util/ajax.js';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
 import {Ext_tooltip, Loader} from '../common.js';
-import Zone_description from '../common/zone_desc.js';
+import Zone_description from './zone_desc.js';
+import {Modal_dialog} from './modals.js';
 
 export class Pins extends Pure_component {
-    state = {pins: [], max_id: 0};
+    state = {pins: [], max_id: 0, modal_open: false,
+        pending: this.props.pending||[]};
     static getDerivedStateFromProps(props, state){
         if (props.val==state.raw_val||!props.val)
             return null;
@@ -30,11 +32,16 @@ export class Pins extends Pure_component {
             max_id: ips.length,
         };
     }
-    add_pin = ()=>{
+    add_pin = (pin='')=>{
         this.setState(prev=>({
-            pins: [...prev.pins, {id: prev.max_id+1, val: '', edit: true}],
+            pins: [...prev.pins, {id: prev.max_id+1, val: pin, edit: true}],
             max_id: prev.max_id+1,
         }));
+        if (pin && this.state.pending.includes(pin))
+            this.setState({pending: this.props.pending.filter(p=>p!=pin)});
+    };
+    add_empty_pin = ()=>{
+        this.add_pin('');
     };
     remove = id=>{
         this.setState(prev=>({
@@ -74,7 +81,11 @@ export class Pins extends Pure_component {
             }),
         }), this.fire_on_change);
     };
+    dismiss_modal = ()=>this.setState({modal_open: false});
+    open_modal = ()=>this.setState({modal_open: true});
     render(){
+        const pending = this.state.pending;
+        const pending_btn_title = `Add recent IPs (${pending.length})`;
         return <div className="pins_field">
               <div className="pins">
                 {this.state.pins.map(p=>
@@ -86,10 +97,31 @@ export class Pins extends Pure_component {
                   </Pin>
                 )}
               </div>
-              <Add_pin add_pin={this.add_pin}/>
+              <Pin_btn title="Add IP" tooltip="Add new IP to the list"
+                on_click={this.add_empty_pin}/>
+              {!!pending.length &&
+                <Pin_btn on_click={this.open_modal} title={pending_btn_title}/>
+              }
+              <Modal_dialog title="Add recent IPs"
+                open={this.state.modal_open}
+                ok_clicked={this.dismiss_modal} no_cancel_btn>
+                {pending.map(ip=>
+                  <Add_pending_btn key={ip} ip={ip}
+                    add_pin={this.add_pin}/>
+                )}
+                {!pending.length &&
+                  <span>No more pending IPs to whitelist</span>
+                }
+              </Modal_dialog>
             </div>;
     }
 }
+
+const Add_pending_btn = ({ip, add_pin})=>
+    <div>
+      <span style={{marginRight: 10}}>{ip}</span>
+      <Pin_btn title="Add IP" on_click={()=>add_pin(ip)}/>
+    </div>;
 
 class Pin extends Pure_component {
     input = React.createRef();
@@ -146,11 +178,11 @@ class Pin extends Pure_component {
     }
 }
 
-const Add_pin = ({add_pin})=>
-    <Tooltip title="Add new IP to the list">
+export const Pin_btn = ({on_click, title, tooltip, icon})=>
+    <Tooltip title={tooltip}>
       <button className="btn btn_lpm btn_lpm_small add_pin"
-        onClick={add_pin}>
-        <T>Add IP</T>
+        onClick={on_click}>
+        {title}
         <i className="glyphicon glyphicon-plus"/>
       </button>
     </Tooltip>;
