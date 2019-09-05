@@ -36,16 +36,13 @@ const rule_prepare = rule=>{
         action.refresh_ip = true;
     else if (rule.action=='save_to_pool')
         action.reserve_session = true;
-    else if (rule.action=='save_to_fast_pool')
-    {
-        action.fast_pool_session = true;
-        action.fast_pool_size = rule.fast_pool_size;
-    }
     else if (rule.action=='process')
     {
         try { action.process = JSON.parse(rule.process); }
         catch(e){ console.log('wrong json'); }
     }
+    else if (rule.action=='request_url')
+        action.request_url = rule.request_url;
     else if (rule.action=='null_response')
         action.null_response = true;
     else if (rule.action=='bypass_proxy')
@@ -94,8 +91,7 @@ export const map_rule_to_form = rule=>{
     result.action = rule.action_type;
     result.retry_port = rule.action.retry_port;
     result.retry_number = rule.action.retry;
-    if (rule.action.fast_pool_session)
-        result.fast_pool_size = rule.action.fast_pool_size;
+    result.request_url = rule.action.request_url;
     if (rule.action.ban_ip)
         result.ban_ip_duration = rule.action.ban_ip/ms.MIN;
     if (rule.action.ban_ip_global)
@@ -240,16 +236,6 @@ class Rule_config extends Pure_component {
     }
 }
 
-const Fast_pool_note = ({port, r})=>{
-    return <span>
-          <span>Check fast pool sessions by fetching </span>
-          <a href={window.location.origin+'/api/fast/'+port+'?r='+r}
-            target="_blank" className="link" rel="noopener noreferrer">
-            /api/fast/{port}?r={r}
-          </a>
-        </span>;
-};
-
 const Ban_ips_note = withRouter(({match, history})=>{
     const goto_banlist = ()=>{
         const port = match.params.port;
@@ -355,8 +341,6 @@ class Action extends Pure_component {
         if (!zones || !curr_zone)
             return null;
         let _action_types = [default_action].concat(_.cloneDeep(action_types)
-        .filter(at=>at.value!='save_to_fast_pool' ||
-            rule.trigger_type=='max_req_time')
         .filter(at=>rule.trigger_type=='url' && at.url ||
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
@@ -376,8 +360,6 @@ class Action extends Pure_component {
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);
         ports.unshift({key: '--Select--', value: ''});
-        const fast_pool_note = <Fast_pool_note port={current_port}
-          r={rule.trigger_url_regex}/>;
         const ban_action = ['ban_ip', 'ban_ip_domain', 'ban_ip_global']
             .includes(rule.action);
         return <React.Fragment>
@@ -404,10 +386,6 @@ class Action extends Pure_component {
                     data={[0, 1, 5, 10, 30, 60]} sufix="minutes" rule={rule}
                     note={<Ban_ips_note/>} disabled={disabled}/>
                 }
-                {rule.action=='save_to_fast_pool' &&
-                  <Rule_config id="fast_pool_size" type="select_number"
-                    rule={rule} note={fast_pool_note} disabled={disabled}/>
-                }
                 {rule.action=='process' &&
                   <div>
                     <Rule_config id="process" type="json" rule={rule}
@@ -418,6 +396,10 @@ class Action extends Pure_component {
                         proxy tester</a>
                     </Field_row_raw>
                   </div>
+                }
+                {rule.action=='request_url' &&
+                  <Rule_config id="request_url" type="url" rule={rule}
+                    disabled={disabled}/>
                 }
                 {rule.action &&
                   <Rule_config id="send_email" type="yes_no" rule={rule}
@@ -486,14 +468,7 @@ class Trigger extends Pure_component {
         if (val!='min_req_time')
             this.set_rule_field('min_req_time', '');
         if (val!='max_req_time')
-        {
             this.set_rule_field('max_req_time', '');
-            if (this.props.rule.action=='save_to_fast_pool')
-            {
-                this.set_rule_field('action', '');
-                this.set_rule_field('fast_pool_size', '');
-            }
-        }
         if (!val)
             this.set_rule_field('trigger_url_regex', '');
     };

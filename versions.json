@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.151.510",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Deprecated fast_session_pool in favor of regular pool"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed whitelisting IPs with ranges using API"
+            }
+        ]
+    },
+    {
         "ver": "1.151.372",
         "type": "stable/dev",
         "changes": [

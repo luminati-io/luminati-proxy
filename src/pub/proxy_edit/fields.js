@@ -148,12 +148,6 @@ export const tabs = {
                 tooltip: `The action to be executed when the rule's condition
                     is met`,
             },
-            fast_pool_size: {
-                label: 'Fast pool size',
-                tooltip: `The system will store fast IPs up to the selected
-                    pool size number. Once pool size is reached, the system
-                    will use IPs from the fast IPs pool to route requests.`,
-            },
             retry_number: {
                 label: 'Retries',
                 tooltip: 'Maximum number of retries to execute',
@@ -183,6 +177,7 @@ export const tabs = {
                     time (to timeout the request and retry).`,
             },
             process: {label: 'Processing rule'},
+            request_url: {label: 'URL'},
             send_email: {
                 label: 'Send email',
                 tooltip: `Every time the rule is triggered and executed, the

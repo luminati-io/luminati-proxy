@@ -10,9 +10,8 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import $ from 'jquery';
 import {bytes_format, presets} from './util.js';
-import {Pins, Select_status, Select_number, Yes_no,
-    Regex, Json, Textarea, Typeahead_wrapper, Input,
-    Select} from './common/controls.js';
+import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
+    Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, with_tt, Language} from './common/i18n.js';
 
@@ -156,6 +155,8 @@ export const Form_controller = props=>{
         return <Textarea {...props}/>;
     else if (type=='json')
         return <Json {...props}/>;
+    else if (type=='url')
+        return <Url_input {...props}/>;
     else if (type=='regex')
         return <Regex {...props}/>;
     else if (type=='yes_no')

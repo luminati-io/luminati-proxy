@@ -133,9 +133,8 @@ describe('manager', ()=>{
         };
         return yield etask.nfn_apply(request, [opt]);
     });
-    const api_json = (_path, options)=>etask(function*(){
-        let opt = options||{};
-        return yield api(_path, opt.method, opt.body, true);
+    const api_json = (_path, opt={})=>etask(function*(){
+        return yield api(_path, opt.method, opt.body, true, opt.headers);
     });
     const json = (_path, method, data)=>etask(function*(){
         const res = yield api(_path, method, data, true);
@@ -417,6 +416,61 @@ describe('manager', ()=>{
                 assert_has(res.body.log.entries[0],
                     {request: {url: 'http://bbc.com'}});
                 assert.equal(res.body.log.entries.length, 1);
+            }));
+        });
+        describe('add_wip', ()=>{
+            it('forbidden when token is not set', etask._fn(function*(_this){
+                app = yield app_with_config({config: {}});
+                const res = yield api_json('api/add_wip', {
+                    method: 'POST',
+                    headers: {Authorization: 'aaa'},
+                });
+                assert.equal(res.statusMessage, 'Forbidden');
+                assert.equal(res.statusCode, 403);
+            }));
+            it('forbidden when token is not correct',
+            etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa'}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/add_wip', {method: 'POST'});
+                assert.equal(res.statusMessage, 'Forbidden');
+                assert.equal(res.statusCode, 403);
+            }));
+            it('bad requests if no IP is passed', etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa'}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/add_wip', {
+                    method: 'POST',
+                    headers: {Authorization: 'aaa'},
+                });
+                assert.equal(res.statusMessage, 'Bad Request');
+                assert.equal(res.statusCode, 400);
+            }));
+            it('adds IP without a mask', etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa'}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/add_wip', {
+                    method: 'POST',
+                    headers: {Authorization: 'aaa'},
+                    body: {ip: '1.1.1.1'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.whitelist_ips.length, 1);
+                assert.equal(app.manager._defaults.whitelist_ips[0],
+                    '1.1.1.1');
+            }));
+            it('adds IP with a mask', etask._fn(function*(_this){
+                const config = {_defaults: {token_auth: 'aaa'}};
+                app = yield app_with_config({config});
+                const res = yield api_json('api/add_wip', {
+                    method: 'POST',
+                    headers: {Authorization: 'aaa'},
+                    body: {ip: '1.1.1.1/20'},
+                });
+                assert.equal(res.statusCode, 200);
+                assert.equal(app.manager._defaults.whitelist_ips.length, 1);
+                assert.equal(app.manager._defaults.whitelist_ips[0],
+                    '1.1.0.0/20');
             }));
         });
     });

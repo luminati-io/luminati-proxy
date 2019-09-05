@@ -48,9 +48,6 @@ E.action_types = [
     {key: 'Save IP to reserved pool', value: 'save_to_pool', tooltip: `Save
         the current IP to a pool of reserved IPs.  you can then download all
         the IPs at a later time.`, type: 'post'},
-    {key: 'Save IP to fast pool', value: 'save_to_fast_pool', tooltip: `Save
-        the current IP to fast IP pool to increase the speed of your requests.
-        You will need to specify the size of this pool.`, type: 'post'},
     {key: 'Null response', value: 'null_response', tooltip: `LPM will return a
         "null response" without proxying. It is useful when users do not want
         to make a request, but a browser expects 200 response.`, type: 'pre',
@@ -63,6 +60,8 @@ E.action_types = [
         only_url: true, url: true},
     {key: 'Process data', value: 'process', only_url: true, url: true,
         type: 'post'},
+    {key: 'Request URL', value: 'request_url', tooltip: `Defined URL will be
+        requested after current request is finished`, url: true, type: 'post'},
 ];
 
 const gen_function = (name, body)=>{
@@ -154,13 +153,10 @@ const get_action = rule=>{
         body += `opt.refresh_ip();\n`;
     if (rule.action.reserve_session)
         body += `opt.save_to_pool();\n`;
-    if (rule.action.fast_pool_session)
-    {
-        const size = rule.action.fast_pool_size||0;
-        body += `opt.save_to_pool({name: 'fast', size: ${size}});\n`;
-    }
     if (rule.action.process)
-        body += `opt.process(`+JSON.stringify(rule.action.process)+`);\n`;
+        body += `opt.process(${JSON.stringify(rule.action.process)});\n`;
+    if (rule.action.request_url)
+        body += `opt.request_url('${rule.action.request_url}');\n`;
     if (rule.action.null_response)
         body += `opt.null_response();\n`;
     if (rule.action.direct)

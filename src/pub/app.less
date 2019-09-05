@@ -478,7 +478,7 @@ h4 { margin: 0; }
     }
 }
 select, input[type=number], input[type=text], input[type=password],
-input[type=email], textarea, .code_mirror_wrapper {
+input[type=email], input[type=url], textarea, .code_mirror_wrapper {
     min-width: 100px;
     width: auto;
     height: 32px;
@@ -530,6 +530,7 @@ input.regex {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+input[type=url].error { border-color: @error_dark; }
 .react_select__control {
     .react_select__clear-indicator, .react_select__dropdown-indicator {
         padding: 1px;

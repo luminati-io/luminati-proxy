@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.151.510 Development Latest
+- :bug: Deprecated fast_session_pool in favor of regular pool
+- :bug: Fixed whitelisting IPs with ranges using API
+
 ## 1.151.372 
 - :bug: Fixed WS traffic when SSL Analyzing is on
 - :bug: Fixed browser response when using Process data rule

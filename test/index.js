@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 const dns = require('dns');
+const http = require('http');
 const socks = require('lum_socksv5');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
@@ -10,7 +11,6 @@ const lolex = require('lolex');
 const etask = require('../util/etask.js');
 const {ms} = require('../util/date.js');
 const sinon = require('sinon');
-const zsinon = require('../util/sinon.js');
 const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
 const Timeline = require('../lib/timeline.js');
@@ -934,41 +934,9 @@ describe('proxy', ()=>{
             l.rules.retry(_req, {}, {}, l.port);
             assert.equal(_req.retry, 2);
         }));
-        it('check check_req_time_range', ()=>etask(function*(){
-            const _date = '2013-08-13 14:00:00';
-            zsinon.clock_set({now: _date});
-            l = yield lum({rules: []});
-            const rs_stub = sinon.stub(l.session_mgr,
-                'remove_session_from_pool');
-            assert.ok(!l.rules.check_req_time_range({}, {}));
-            assert.ok(!rs_stub.called);
-            assert.ok(l.rules.check_req_time_range({ctx: {pool_key: 'test',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                max_req_time: 41}));
-            assert.ok(!rs_stub.called);
-            assert.ok(!l.rules.check_req_time_range({ctx: {pool_key: 'test',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                max_req_time: 39}));
-            assert.ok(!rs_stub.called);
-            assert.ok(!l.rules.check_req_time_range({ctx: {
-                pool_key: 'fast_pool',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                max_req_time: 39}));
-            assert.ok(rs_stub.called);
-            assert.ok(!l.rules.check_req_time_range({ctx: {pool_key: 'test',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                    max_req_time: 50, min_req_time: 45}));
-            assert.ok(l.rules.check_req_time_range({ctx: {pool_key: 'test',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                    max_req_time: 50, min_req_time: 39}));
-            assert.ok(l.rules.check_req_time_range({ctx: {pool_key: 'test',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                    min_req_time: 39}));
-            assert.ok(!l.rules.check_req_time_range({ctx: {pool_key: 'test',
-                timeline: {req: {create: Date.now()-40}}}}, {
-                    min_req_time: 45}));
-            zsinon.clock_restore();
-        }));
+        it('check check_req_time_range', ()=>{
+            // XXX krzysztof: to implement
+        });
         it('check can_retry', ()=>etask(function*(){
             l = yield lum({rules: []});
             assert.ok(!l.rules.can_retry({}));
@@ -1023,25 +991,6 @@ describe('proxy', ()=>{
             t({ctx: {url: 'test'}}, {}, undefined);
         }));
         describe('action', ()=>{
-            it('email, reserve_session, fast_pool_session', ()=>
-            etask(function*(){
-                l = yield lum({rules: []});
-                const cr_stub = sinon.stub(l.rules, 'can_retry')
-                    .returns(false);
-                const email_stub = sinon.stub(l, 'send_email');
-                const rps_stub = sinon.stub(l.session_mgr,
-                    'add_reserve_pool_session');
-                const fps_stub = sinon.stub(l.session_mgr,
-                    'add_fast_pool_session');
-                const r = l.rules.action({ctx: {set_rule: ()=>null}}, {}, {},
-                    {max_req_time: 1000, action: {email: true,
-                    reserve_session: true, fast_pool_session: true}}, {});
-                assert.ok(!r);
-                assert.ok(cr_stub.called);
-                assert.ok(email_stub.called);
-                assert.ok(rps_stub.called);
-                assert.ok(fps_stub.called);
-            }));
             it('ban_ip', ()=>etask(function*(){
                 l = yield lum({rules: []});
                 sinon.stub(l.rules, 'can_retry').returns(true);
@@ -1057,6 +1006,15 @@ describe('proxy', ()=>{
                 assert.ok(r);
                 assert.ok(add_stub.called);
                 assert.ok(refresh_stub.called);
+            }));
+            it('request_url', ()=>etask(function*(){
+                l = yield lum({rules: []});
+                const req_spy = sinon.spy(http, 'request');
+                const req = {ctx: {}};
+                const r = l.rules.action(req, {}, {},
+                    {action: {request_url: 'http://lumtest.com'}}, {});
+                assert.ok(!r);
+                sinon.assert.calledWith(req_spy, 'http://lumtest.com');
             }));
             it('retry should refresh the session', ()=>etask(function*(){
                 l = yield lum({
@@ -1447,37 +1405,6 @@ describe('proxy', ()=>{
                 }));
             });
         });
-    });
-    describe('reserve session', ()=>{
-        let history;
-        beforeEach(etask._fn(function*(_this){
-            const rules = [{action: {reserve_session: true}, status: '200'}];
-            history = [];
-            l = yield lum({rules, keep_alive: 0, max_requests: 1,
-                pool_size: 2});
-            l.on('usage', data=>history.push(data));
-        }));
-        it('should use reserved_sessions', etask._fn(function*(_this){
-            _this.timeout(6000);
-            for (let i=0; i<5; i++)
-            {
-                yield l.test();
-                yield etask.sleep(100);
-            }
-            yield l.test({headers: {'x-lpm-reserved': true}});
-            yield etask.sleep(400);
-            const unames = history.map(h=>h.username);
-            assert.notEqual(unames[0], unames[1]);
-            assert.equal(unames[unames.length-1], unames[0]);
-        }));
-        xit('should keep reserved session alive', etask._fn(function*(_this){
-            _this.timeout(6000);
-            yield l.test();
-            const hst = history.length;
-            assert.ok(hst<=2);
-            yield etask.sleep(3000);
-            assert.ok(hst<history.length);
-        }));
     });
     xdescribe('long_availability', ()=>{
         it('should keep the number of sessions', etask._fn(function*(_this){

@@ -13,6 +13,7 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
+import zurl from '../../../util/url.js';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
 import {Ext_tooltip, Loader} from '../common.js';
@@ -398,6 +399,27 @@ export class Json extends Pure_component {
         return <div className={classes}>
               <textarea ref={this.set_ref}/>
             </div>;
+    }
+}
+
+export class Url_input extends Pure_component {
+    constructor(props){
+        super(props);
+        this.state = {url: props.val, valid: true};
+    }
+    on_url_change = (url, id)=>{
+        const valid = zurl.is_valid_url(url);
+        if (valid)
+            this.props.on_change_wrapper(url, id);
+        this.setState({url, valid});
+    };
+    render(){
+        const input_props = Object.assign({}, this.props, {
+            val: this.state.url,
+            on_change_wrapper: this.on_url_change,
+            className: classnames({error: !this.state.valid}),
+        });
+        return <Input {...input_props}/>;
     }
 }
 
