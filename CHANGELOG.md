@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.151.641 Stable
+- :bug: Fix UI Error when accessing Targeting tab in static zones
+- :sparkles: Added option 'DNS check' to ignore requests without DNS resolution
+
 ## 1.151.510 Development Latest
 - :bug: Deprecated fast_session_pool in favor of regular pool
 - :bug: Fixed whitelisting IPs with ranges using API

@@ -44,6 +44,7 @@ export default class Speed extends Pure_component {
               <Tab_context.Provider value="speed">
                 <Config type="select" id="proxy" data={proxy_data}/>
                 <Config type="select" id="dns" data={dns_opt}/>
+                <Config type="yes_no" id="dns_check"/>
                 <Config type="select_number" id="race_reqs"/>
                 <Config type="select_number" id="proxy_count"/>
                 <Config type="select_number" id="proxy_switch"/>

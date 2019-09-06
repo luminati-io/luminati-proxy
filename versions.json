@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.151.641",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix UI Error when accessing Targeting tab in static zones"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added option 'DNS check' to ignore requests without DNS resolution"
+            }
+        ]
+    },
+    {
         "ver": "1.151.510",
         "type": "dev",
         "changes": [

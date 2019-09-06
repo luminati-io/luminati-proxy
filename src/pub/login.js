@@ -5,6 +5,7 @@ import {withRouter} from 'react-router-dom';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Typeahead} from 'react-bootstrap-typeahead';
 import ajax from '../../util/ajax.js';
+import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {Loader, Logo} from './common.js';
@@ -77,15 +78,36 @@ const Login = withRouter(class Login extends Pure_component {
             this.on('uncaught', e=>{
                 _this.setState({error_message: 'Cannot log in: '+e.message});
             });
-            const settings = yield ajax.json({url: '/api/settings'});
-            window.ga('set', 'dimension1', settings.customer);
-            setdb.set('head.settings', settings);
-            const consts = yield ajax.json({url: '/api/consts'});
-            setdb.set('head.consts', consts);
-            const zones = yield ajax.json({url: '/api/zones'});
-            setdb.set('head.zones', zones);
-            const proxies = yield ajax.json({url: '/api/proxies_running'});
-            setdb.set('head.proxies_running', proxies);
+            const ets = [];
+            ets.push(etask(function*_get_settings(){
+                const settings = yield ajax.json({url: '/api/settings'});
+                window.ga('set', 'dimension1', settings.customer);
+                setdb.set('head.settings', settings);
+            }));
+            ets.push(etask(function*_get_consts(){
+                const consts = yield ajax.json({url: '/api/consts'});
+                setdb.set('head.consts', consts);
+            }));
+            const curr_locations = setdb.get('head.locations');
+            if (!curr_locations || !curr_locations.shared_countries)
+            {
+                ets.push(etask(function*_get_locations(){
+                    const locations = yield ajax.json(
+                        {url: '/api/all_locations'});
+                    locations.countries_by_code = locations.countries.reduce(
+                    (acc, e)=>({...acc, [e.country_id]: e.country_name}), {});
+                    setdb.set('head.locations', locations);
+                }));
+            }
+            ets.push(etask(function*_get_zones(){
+                const zones = yield ajax.json({url: '/api/zones'});
+                setdb.set('head.zones', zones);
+            }));
+            ets.push(etask(function*_get_proxies_running(){
+                const proxies = yield ajax.json({url: '/api/proxies_running'});
+                setdb.set('head.proxies_running', proxies);
+            }));
+            yield etask.all(ets);
             _this.props.history.push('/overview');
         });
     };

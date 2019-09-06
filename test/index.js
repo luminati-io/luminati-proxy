@@ -775,6 +775,49 @@ describe('proxy', ()=>{
                 assert.deepEqual(l.hosts.sort(), ips);
             }));
         });
+        describe('dns_check', ()=>{
+            const dns_resolve = dns.resolve;
+            before(()=>{
+                dns.resolve = (domain, cb)=>{
+                    resolve_called = true;
+                    if (domain=='fake')
+                        return cb('DNS error');
+                    cb(null, ['1.2.3.4']);
+                };
+            });
+            let resolve_called;
+            beforeEach(()=>{
+                resolve_called = false;
+            });
+            after(()=>{
+                dns.resolve = dns_resolve;
+            });
+            describe('off', ()=>{
+                it('makes a request', etask._fn(function*(){
+                    l = yield lum({dns_check: false});
+                    const r = yield l.test({fake: 1});
+                    assert.equal(r.statusCode, 200);
+                    assert.ok(!resolve_called);
+                }));
+            });
+            describe('on', ()=>{
+                it('makes a request when dns resolves',
+                etask._fn(function*(){
+                    l = yield lum({dns_check: true});
+                    const r = yield l.test({fake: 1});
+                    assert.equal(r.statusCode, 200);
+                    assert.ok(resolve_called);
+                }));
+                it('does not make a request when dns does not resolve',
+                etask._fn(function*(){
+                    l = yield lum({dns_check: true});
+                    yield assert.rejects(etask._fn(function*(_this){
+                        yield l.test({fake: 1, url: 'http://fake'});
+                    }), /socket hang up/);
+                    assert.ok(resolve_called);
+                }));
+            });
+        });
     });
     describe('retry', ()=>{
         it('should set rules', ()=>etask(function*(){
@@ -1007,7 +1050,8 @@ describe('proxy', ()=>{
                 assert.ok(add_stub.called);
                 assert.ok(refresh_stub.called);
             }));
-            it('request_url', ()=>etask(function*(){
+            // XXX gabriel: enable when tested and monitored
+            it.skip('request_url', ()=>etask(function*(){
                 l = yield lum({rules: []});
                 const req_spy = sinon.spy(http, 'request');
                 const req = {ctx: {}};

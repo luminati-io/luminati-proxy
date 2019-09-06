@@ -60,6 +60,10 @@ export const tabs = {
                 label: 'DNS lookup',
                 tooltip: 'Location of DNS resolve',
             },
+            dns_check: {
+                label: 'DNS check',
+                tooltip: 'Try to resolve DNS before sending a request',
+            },
             race_reqs: {
                 label: 'Parallel race requests',
                 tooltip: `Sends multiple requests in parallel via different

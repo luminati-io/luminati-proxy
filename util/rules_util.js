@@ -60,8 +60,9 @@ E.action_types = [
         only_url: true, url: true},
     {key: 'Process data', value: 'process', only_url: true, url: true,
         type: 'post'},
-    {key: 'Request URL', value: 'request_url', tooltip: `Defined URL will be
-        requested after current request is finished`, url: true, type: 'post'},
+    // XXX gabriel: enable when tested and monitored
+    /*{key: 'Request URL', value: 'request_url', tooltip: `Defined URL will be
+        requested after current request is finished`, url: true, type: 'post'},*/
 ];
 
 const gen_function = (name, body)=>{

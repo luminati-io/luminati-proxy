@@ -362,8 +362,9 @@ export class Regex extends Pure_component {
                     {this.formats.map(f=>
                       <Tooltip key={f+!!this.state.checked[f]}
                         title={this.tip(f)}>
-                        <div onClick={this.toggle.bind(null, f)}
-                          className={this.classes(f)}>.{f}</div>
+                        <button onClick={this.toggle.bind(null, f)}
+                          className={this.classes(f)}
+                          disabled={this.props.disabled}>.{f}</button>
                       </Tooltip>
                     )}
                   </div>

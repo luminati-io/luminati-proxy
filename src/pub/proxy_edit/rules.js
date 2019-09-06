@@ -397,10 +397,11 @@ class Action extends Pure_component {
                     </Field_row_raw>
                   </div>
                 }
-                {rule.action=='request_url' &&
+                {// XXX gabriel: enable when tested and monitored
+                /*rule.action=='request_url' &&
                   <Rule_config id="request_url" type="url" rule={rule}
                     disabled={disabled}/>
-                }
+                */}
                 {rule.action &&
                   <Rule_config id="send_email" type="yes_no" rule={rule}
                     on_change={this.send_email_changed} disabled={disabled}/>

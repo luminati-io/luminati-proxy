@@ -1237,29 +1237,27 @@ span.icon_link {
             &.active { visibility: visible; }
             .checks { display: flex; }
             .check {
-                cursor: pointer;
                 margin: auto 2px;
                 line-height: 1.3;
                 padding: 3px;
                 background: transparent;
                 text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
+                border: none;
                 border-radius: 6px;
                 overflow: hidden;
-                &.active:not(.disabled), &:hover:not(.disabled) {
+                &:hover:not([disabled]) {
                     color: white;
                     text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
                 }
                 &.active {
+                    color: white;
+                    text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
                     background: rgba(0, 0, 0, 0.3);
                 }
-                &:hover:not(.active) {
+                &:hover:not(.active):not([disabled]) {
                     background: rgba(0, 0, 0, 0.2);
                 }
-                &.disabled {
-                    opacity: 0.5;
-                    &:hover, &.active { background: transparent; }
-                    cursor: default;
-                }
+                &[disabled] { opacity: 0.5; }
             }
         }
     }

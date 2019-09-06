@@ -63,6 +63,7 @@ conf.server_default = {
     pool_prefill: true,
     idle_pool: true,
     session: true,
+    dns_check: false,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.server_default, 'port'), {
