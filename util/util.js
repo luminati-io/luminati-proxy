@@ -457,7 +457,7 @@ E.omit = function(obj, omit){
 };
 
 E.if_set = function (val, o, name){
-    if (val)
+    if (val!==undefined)
         o[name] = val;
 };
 

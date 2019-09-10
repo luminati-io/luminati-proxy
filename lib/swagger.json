@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.151.641",
+        "version": "1.152.345",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -105,12 +105,17 @@
                     {
                         "name": "ip",
                         "in": "body",
-                        "description": "IP to whitelist"
+                        "description": "IP to whitelist",
+                        "schema": {
+                            "type": "string",
+                            "example": "10.0.0.0"
+                        }
                     },
                     {
                         "name": "Authorization",
                         "in": "header",
-                        "description": "token"
+                        "description": "token",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -193,6 +198,30 @@
                     },
                     "400": {
                         "description": "Error response"
+                    }
+                }
+            }
+        },
+        "/proxies/delete": {
+            "post": {
+                "description": "Delete existing proxies",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "ports",
+                        "in": "body",
+                        "description": "Existing proxy ports",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {"type": "number"},
+                            "example": [24000]
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response"
                     }
                 }
             }
@@ -326,7 +355,12 @@
                         "in": "body",
                         "description": "Description of any other headers that will be sent along with the requests\n\nExample:\n{'headers': {'Accept-Encoding': 'gzip', 'Cache-Control': 'no-cache'}}",
                         "required": false,
-                        "type": "object"
+                        "schema": {
+                            "type": "object",
+                            "example": {
+                                "Content-Type": "application/json"
+                            }
+                        }
                     }
                 ],
                 "responses": {
@@ -364,18 +398,28 @@
                         "type": "integer"
                      },
                      {
-                        "name": "ip",
+                        "name": "options",
                         "in": "body",
                         "required": true,
-                        "description": "Ip to ban",
-                        "type": "string"
-                     },
-                     {
-                        "name": "ms",
-                        "in": "body",
-                        "required": false,
-                        "description": "Time in milliseconds",
-                        "type": "integer"
+                        "description": "Ip ban options",
+                        "schema": {
+                            "type": "object",
+                            "required": ["ip"],
+                            "properties": {
+                                "ip": {
+                                    "type": "string",
+                                    "example": "10.0.0.0"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "facebook.com"
+                                },
+                                "ms": {
+                                    "type": "integer",
+                                    "example": 60000
+                                }
+                            }
+                        }
                      }
                 ],
                 "responses": {
@@ -396,19 +440,29 @@
                         "type": "integer"
                      },
                      {
-                        "name": "ips",
+                        "name": "options",
                         "in": "body",
                         "required": true,
-                        "description": "Ip to ban",
-                        "type": "array",
-                        "items": {"type": "string"}
-                     },
-                     {
-                        "name": "ms",
-                        "in": "body",
-                        "required": false,
-                        "description": "Time in milliseconds",
-                        "type": "integer"
+                        "description": "Ips ban options",
+                        "schema": {
+                            "type": "object",
+                            "required": ["ips"],
+                            "properties": {
+                                "ips": {
+                                    "type": "array",
+                                    "items": {"type": "string"},
+                                    "example": ["10.0.0.0", "10.0.0.1"]
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "facebook.com"
+                                },
+                                "ms": {
+                                    "type": "integer",
+                                    "example": 60000
+                                }
+                            }
+                        }
                      }
                 ],
                 "responses": {

@@ -325,8 +325,9 @@ const Action_section = ({actions})=>
 
 const Action = ({action, value})=>{
     const key = (action_types.find(a=>a.value==action)||{}).key;
+    const val = (action=='request_url' ? value&&value.url : value);
     return <div className="action">
-          {key} {value ? `: ${value}` : ''}
+          {key} {val ? `: ${val}` : ''}
         </div>;
 };
 

@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.152.345",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added rule action 'Request URL' to send a HTTP request"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved proxies overview UX, allowing deletion of multiple ports"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed default zone handling. Changing default zone will no more affect existing ports' zones"
+            },
+            {
+                "type": "sparkles",
+                "text": "Ban IP rule actions are now available with URL triggered rules"
+            }
+        ]
+    },
+    {
         "ver": "1.151.641",
         "type": "stable",
         "changes": [

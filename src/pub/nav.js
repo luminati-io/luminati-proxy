@@ -98,7 +98,8 @@ const Footer = ()=>
           <T>Contact</T></a>
       </div>
       <div>
-        <a href={swagger_url} className="link"><T>API</T></a>
+        <a rel="noopener noreferrer" target="_blank" href={swagger_url}
+          className="link"><T>API</T></a>
       </div>
     </div>;
 

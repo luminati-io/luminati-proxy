@@ -4,6 +4,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const dns = require('dns');
 const http = require('http');
+const https = require('https');
 const socks = require('lum_socksv5');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
@@ -1050,16 +1051,107 @@ describe('proxy', ()=>{
                 assert.ok(add_stub.called);
                 assert.ok(refresh_stub.called);
             }));
-            // XXX gabriel: enable when tested and monitored
-            it.skip('request_url', ()=>etask(function*(){
-                l = yield lum({rules: []});
-                const req_spy = sinon.spy(http, 'request');
-                const req = {ctx: {}};
-                const r = l.rules.action(req, {}, {},
-                    {action: {request_url: 'http://lumtest.com'}}, {});
-                assert.ok(!r);
-                sinon.assert.calledWith(req_spy, 'http://lumtest.com');
-            }));
+            describe('request_url', ()=>{
+                let req, http_req, https_req;
+                beforeEach(()=>etask(function*(){
+                    l = yield lum({rules: []});
+                    req = {ctx: {}};
+                    http_req = sinon.spy(http, 'request');
+                    https_req = sinon.spy(https, 'request');
+                }));
+                afterEach(()=>{
+                    http_req.restore();
+                    https_req.restore();
+                });
+                it('does nothing on invalid urls', ()=>{
+                    const rule = {url: 'blabla'};
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}}, {});
+                    assert.ok(!r);
+                    sinon.assert.notCalled(http_req);
+                    sinon.assert.notCalled(https_req);
+                });
+                it('sends request with http', ()=>{
+                    const rule = {url: 'http://lumtest.com'};
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}}, {});
+                    assert.ok(!r);
+                    sinon.assert.calledWith(http_req, 'http://lumtest.com');
+                });
+                it('sends request with https', ()=>{
+                    const rule = {url: 'https://lumtest.com'};
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}}, {});
+                    assert.ok(!r);
+                    sinon.assert.calledWith(https_req, 'https://lumtest.com');
+                });
+                it('sends request with custom method', ()=>{
+                    const rule = {url: 'http://lumtest.com', method: 'POST'};
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}}, {});
+                    assert.ok(!r);
+                    sinon.assert.calledWith(http_req, 'http://lumtest.com', {
+                        method: 'POST',
+                    });
+                });
+                it('sends request with custom payload', ()=>{
+                    const payload = {a: 1, b: 'str'};
+                    const payload_str = JSON.stringify(payload);
+                    const rule = {url: 'http://lumtest.com', method: 'POST',
+                        payload};
+                    http.request.restore();
+                    const write = sinon.spy();
+                    sinon.stub(http, 'request', ()=>({write,
+                        on: ()=>null, end: ()=>null}));
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}}, {});
+                    assert.ok(!r);
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(payload_str),
+                    };
+                    sinon.assert.calledWith(http.request, 'http://lumtest.com',
+                        {method: 'POST', headers});
+                    sinon.assert.calledWith(write, payload_str);
+                });
+                it('does not send payload in GET requests', ()=>{
+                    const payload = {a: 1, b: 'str'};
+                    const rule = {url: 'http://lumtest.com', method: 'GET',
+                        payload};
+                    http.request.restore();
+                    const write = sinon.spy();
+                    sinon.stub(http, 'request', ()=>({write,
+                        on: ()=>null, end: ()=>null}));
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}}, {});
+                    assert.ok(!r);
+                    sinon.assert.notCalled(write);
+                });
+                it('sends request with custom payload with IP', ()=>{
+                    const payload = {a: 1, b: '$IP'}, ip = '1.1.1.1';
+                    const actual_payload = {a: 1, b: ip};
+                    const payload_str = JSON.stringify(actual_payload);
+                    const rule = {url: 'http://lumtest.com', method: 'POST',
+                        payload};
+                    http.request.restore();
+                    const write = sinon.spy();
+                    sinon.stub(http, 'request', ()=>({write,
+                        on: ()=>null, end: ()=>null}));
+                    const r = l.rules.action(req, {}, {},
+                        {action: {request_url: rule}},
+                        {_res: {headers: {
+                            'x-hola-timeline-debug': `1 2 3 ${ip}`
+                        }}});
+                    assert.ok(!r);
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(payload_str),
+                    };
+                    sinon.assert.calledWith(http.request, 'http://lumtest.com',
+                        {method: 'POST', headers});
+                    sinon.assert.calledWith(write, payload_str);
+                });
+            });
             it('retry should refresh the session', ()=>etask(function*(){
                 l = yield lum({
                     pool_size: 1,

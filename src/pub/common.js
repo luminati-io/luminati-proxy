@@ -285,7 +285,8 @@ export const Checkbox = props=>
   <div className="form-check">
     <label className="form-check-label">
       <input className="form-check-input" type="checkbox" value={props.value}
-        onChange={e=>props.on_change(e)} checked={props.checked}/>
+        onChange={props.on_change} onClick={props.on_click}
+        checked={props.checked}/>
         {props.text}
     </label>
   </div>;

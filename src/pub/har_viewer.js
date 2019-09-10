@@ -682,8 +682,8 @@ class Summary_bar extends Pure_component {
             {total: 0, sum_in: 0, sum_out: 0};
         sum_out = bytes_format(sum_out)||'0 B';
         sum_in = bytes_format(sum_in)||'0 B';
-        const txt = t=>(`${total} ${t('requests')} | ${sum_out} ${t('sent')} `
-            +`| ${sum_in} ${t('received')}`);
+        const txt = t=>`${total} ${t('requests')} | ${sum_out} ${t('sent')} `
+            +`| ${sum_in} ${t('received')}`;
         return <div className="summary_bar">
               <span>
                 <T>{t=><Tooltip title={txt(t)}>{txt(t)}</Tooltip>}</T>
@@ -747,7 +747,9 @@ class Header_container extends Pure_component {
                           <th key={c.title} onClick={()=>this.click(c)}>
                             <div>
                               {c.title=='select' &&
-                                <Checkbox checked={this.state.checked_all}/>}
+                                <Checkbox checked={this.state.checked_all}
+                                  // no-op to remove React warning
+                                  on_change={()=>null}/>}
                               {c.title!='select' && t(c.title)}
                             </div>
                             <Sort_icon show={c.sort_by==sorted.field}
@@ -993,12 +995,12 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
 });
 
 const Time_cell = maybe_pending(({time, url, uuid})=>{
+    if (!url.endsWith(':443')||!time)
+        return <Tooltip_and_value val={time&&time+' ms'}/>;
     const enable_ssl_click = e=>{
         e.stopPropagation();
         $('#enable_ssl_modal').modal();
     };
-    if (!url.endsWith(':443')||!time)
-        return <Tooltip_and_value val={time&&time+' ms'}/>;
     return <div onClick={e=>e.stopPropagation()} className="disp_value">
           <React_tooltip id={'t'+uuid} type="info" effect="solid"
             delayHide={100} delayShow={0} delayUpdate={500}
@@ -1017,8 +1019,7 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
             </div>
           </React_tooltip>
           <div data-tip="React-tooltip" data-for={'t'+uuid}>
-             {time+' ms'}
-             {url.endsWith(':443')&&<div className="small_icon status info"/>}
+            — {url.endsWith(':443')&&<div className="small_icon status info"/>}
           </div>
         </div>;
 });

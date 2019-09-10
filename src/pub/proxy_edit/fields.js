@@ -182,6 +182,10 @@ export const tabs = {
             },
             process: {label: 'Processing rule'},
             request_url: {label: 'URL'},
+            request_method: {label: 'Method'},
+            request_payload: {label: 'Payload', tooltip: `Payload sent in the
+                request. The IP used for the request will be sent in a field
+                if its value equals "$IP"`},
             send_email: {
                 label: 'Send email',
                 tooltip: `Every time the rule is triggered and executed, the

@@ -1,5 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.152.345 
+- :sparkles: Added rule action 'Request URL' to send a HTTP request
+- :sparkles: Improved proxies overview UX, allowing deletion of multiple ports
+- :bug: Fixed default zone handling. Changing default zone will no more affect existing ports' zones
+- :sparkles: Ban IP rule actions are now available with URL triggered rules
+
 ## 1.151.641 Stable
 - :bug: Fix UI Error when accessing Targeting tab in static zones
 - :sparkles: Added option 'DNS check' to ignore requests without DNS resolution

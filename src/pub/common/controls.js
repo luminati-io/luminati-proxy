@@ -397,9 +397,11 @@ export class Json extends Pure_component {
     render(){
         const classes = classnames('code_mirror_wrapper', 'json',
             {error: !this.state.correct});
-        return <div className={classes}>
-              <textarea ref={this.set_ref}/>
-            </div>;
+        return <Tooltip title={this.props.tooltip}>
+          <div className={classes}>
+            <textarea ref={this.set_ref}/>
+          </div>
+        </Tooltip>;
     }
 }
 

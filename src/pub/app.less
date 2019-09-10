@@ -317,7 +317,12 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         }
     }
 }
-.tooltip.in { opacity: 1; }
+.tooltip {
+    z-index: 10000;
+}
+.tooltip.in {
+    opacity: 1;
+}
 .tooltip-proxy-status .tooltip-inner, .tooltip-default .tooltip-inner,
 .tooltip .tooltip-inner {
     word-break: break-word;
@@ -908,7 +913,9 @@ span.icon_link {
         }
         &.no_header { padding: 5px; }
     }
-    .modal-body { padding: 15px 20px 0; }
+    .modal-body {
+        padding: 15px 20px 0;
+    }
     .modal-footer {
         padding: 15px 20px;
         border: 0;
@@ -2770,27 +2777,32 @@ span.icon_link {
         }
         .actions { display: flex; }
     }
+    .tables_container .data_container table td .disp_value { display: block; }
+}
+.har_viewer, .proxies_panel {
     .tables_container {
-        .data_container {
-            table {
-                td {
-                    .disp_value { display: block; }
-                    label { margin: 0; }
-                    input[type=checkbox] {
-                        margin-top: 0;
-                        margin-left: 3px;
-                        top: 3px;
-                        position: relative;
-                    }
-                    &:nth-child(2) { border-left: none; }
-                }
+        table td, div.chrome_table div.chrome_td {
+            label { margin: 0; }
+            input[type=checkbox] {
+                margin-top: 0;
+                margin-left: 3px;
+                top: 3px;
+                position: relative;
             }
+            &:nth-child(2) { border-left: none; }
         }
-        .header_container {
-            table th {
+        .header_container, &.header_container {
+            table th, div.chrome_table div.chrome_th {
                 &:nth-child(2) { border-left: none; }
                 input[type=checkbox] { margin-left: 3px; }
                 label { margin: 0; }
+            }
+            div.chrome_table div.chrome_th {
+                &:first-child { text-align: center };
+                input[type=checkbox] {
+                    margin: 0;
+                    top: 2px;
+                }
             }
         }
     }

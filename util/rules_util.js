@@ -34,13 +34,13 @@ E.action_types = [
         configuration.`, min_req_time: true, url: true},
     {key: 'Ban IP', value: 'ban_ip', tooltip: `Will ban the IP for custom
         amount of time. Usually used for failed requests.`, min_req_time: true,
-        type: 'post'},
+        url: true, type: 'post'},
     {key: 'Ban IP globally', value: 'ban_ip_global', tooltip: `The same as
         'Ban IP' action but will ban the IP globally for all the proxy ports
-        configured on this LPM.`, min_req_time: true, type: 'post'},
+        configured on this LPM.`, min_req_time: true, url: true, type: 'post'},
     {key: 'Ban IP per domain', value: 'ban_ip_domain', tooltip: `Will ban the
         IP for custom amount of time per domain.`, min_req_time: true,
-        type: 'post'},
+        url: true, type: 'post'},
     {key: 'Refresh IP', value: 'refresh_ip', tooltip: `Refresh the current
         Data Center IP with new allocated IP. This action contain
         additional charges. View the cost of IP refreshing in your zones
@@ -60,9 +60,8 @@ E.action_types = [
         only_url: true, url: true},
     {key: 'Process data', value: 'process', only_url: true, url: true,
         type: 'post'},
-    // XXX gabriel: enable when tested and monitored
-    /*{key: 'Request URL', value: 'request_url', tooltip: `Defined URL will be
-        requested after current request is finished`, url: true, type: 'post'},*/
+    {key: 'Request URL', value: 'request_url', tooltip: `Defined URL will be
+        requested after current request is finished`, url: true, type: 'post'},
 ];
 
 const gen_function = (name, body)=>{
@@ -128,6 +127,21 @@ E.migrate_action = rule=>{
     return Object.assign({}, rule, {action_code: get_action(rule)});
 };
 
+const stringify_obj = obj=>{
+    let str = '{';
+    const keys = Object.keys(obj);
+    for (let i=0; i<keys.length; ++i)
+    {
+        const k = keys[i], v = obj[k];
+        const val = typeof v == 'object' ?
+            stringify_obj(v) : JSON.stringify(v);
+        str += `${k}: ${val}`;
+        if (i < keys.length - 1)
+            str += ', ';
+    }
+    return str + '}';
+};
+
 const get_action = rule=>{
     let body = '';
     if (!rule.action)
@@ -157,7 +171,10 @@ const get_action = rule=>{
     if (rule.action.process)
         body += `opt.process(${JSON.stringify(rule.action.process)});\n`;
     if (rule.action.request_url)
-        body += `opt.request_url('${rule.action.request_url}');\n`;
+    {
+        const str = stringify_obj(rule.action.request_url);
+        body += `opt.request_url(${str});\n`;
+    }
     if (rule.action.null_response)
         body += `opt.null_response();\n`;
     if (rule.action.direct)

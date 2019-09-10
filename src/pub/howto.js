@@ -104,7 +104,8 @@ class Code_instructions extends Pure_component {
               </div>
               <div>
                 View available API endpoints
-                <a className="link api_link" href={swagger_url}>here</a>
+                <a rel="noopener noreferrer" target="_blank"
+                  className="link api_link" href={swagger_url}>here</a>
               </div>
             </div>;
     }

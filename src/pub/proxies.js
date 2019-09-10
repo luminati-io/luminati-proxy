@@ -531,6 +531,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.state = {
             selected_cols: from_storage.length && from_storage || default_cols,
             proxies: [],
+            selected_proxies: {},
+            checked_all: false,
             filtered_proxies: [],
             loaded: false,
             height: window.innerHeight,
@@ -658,6 +660,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         });
     };
     update = ()=>{
+        this.setState({selected_proxies: {}, checked_all: false});
         this.etask(function*(){
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             setdb.set('head.proxies_running', proxies);
@@ -680,6 +683,33 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     update_selected_columns = new_columns=>
         this.setState({selected_cols: new_columns});
     proxy_add = ()=>$('#add_new_proxy_modal').modal('show');
+    select_renderer = function Select_renderer(props){
+        if (props.rowData=='filler')
+            return <div className="chrome_td"></div>;
+        const {selected_proxies} = this.state;
+        const checked = !!selected_proxies[props.rowData.port];
+        return <Checkbox checked={checked}
+          on_change={()=>this.on_row_select(props.rowData)}
+          on_click={e=>e.stopPropagation()}/>;
+    };
+    on_row_select = proxy=>{
+        const {selected_proxies} = this.state;
+        const new_selected = Object.assign({}, selected_proxies);
+        if (selected_proxies[proxy.port])
+            delete new_selected[proxy.port];
+        else
+            new_selected[proxy.port] = proxy;
+        this.setState({selected_proxies: new_selected});
+    };
+    all_rows_select = ()=>{
+        const checked_all = !this.state.checked_all;
+        const selected_proxies = checked_all ?
+            this.state.filtered_proxies.reduce((obj, p)=>{
+                obj[p.port] = p;
+                return obj;
+            }, {}) : {};
+        this.setState({selected_proxies, checked_all});
+    };
     cell_renderer = function Cell_renderer(props){
         return <Cell {...props} mgr={this}/>;
     };
@@ -725,7 +755,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               <div className="main_panel vbox">
                 <Toolbar proxy_add={this.proxy_add}
                   edit_columns={this.edit_columns}
-                  download_csv={this.download_csv}/>
+                  download_csv={this.download_csv}
+                  selected={this.state.selected_proxies}
+                  update_proxies={this.update}/>
                 {this.state.loaded && !!this.state.filtered_proxies.length &&
                   <React.Fragment>
                     <div className="chrome chrome_table vbox">
@@ -736,6 +768,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                           <Table width={width}
                             height={table_height}
                             onRowClick={this.on_row_click}
+                            // we use onHeaderClick here because the table
+                            // swallows clicks on headers
+                            onHeaderClick={({dataKey})=>dataKey=='select' &&
+                              this.all_rows_select()}
                             gridClassName="chrome_grid"
                             headerHeight={27}
                             headerClassName="chrome_th"
@@ -744,6 +780,16 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             rowCount={this.state.filtered_proxies.length+1}
                             rowGetter={({index})=>
                               this.state.filtered_proxies[index]||'filler'}>
+                            <Column key="select"
+                              cellRenderer={this.select_renderer.bind(this)}
+                              label={<Checkbox checked={this.state.checked_all}
+                                // no-op to remove React warning
+                                on_change={()=>null}/>}
+                              dataKey="select"
+                              className="chrome_td"
+                              flexGrow={0}
+                              flexShrink={1}
+                              width={27}/>
                             {cols.map(col=>
                               <Column key={col.key}
                                 cellRenderer={this.cell_renderer.bind(this)}
@@ -777,8 +823,18 @@ const Proxies = withRouter(class Proxies extends Pure_component {
 });
 
 class Toolbar extends Pure_component {
+    state = {open_delete_dialog: false};
+    open_delete_dialog = e=>{
+        e.stopPropagation();
+        this.setState({open_delete_dialog: true});
+    };
+    close_delete_dialog = ()=>{
+        this.setState({open_delete_dialog: false});
+    };
     render(){
-        const {proxy_add, edit_columns, download_csv} = this.props;
+        const {proxy_add, edit_columns, download_csv, selected} = this.props;
+        const to_delete = Object.values(selected)
+            .filter(p=>p.proxy_type=='persist');
         return <Toolbar_container>
               <Toolbar_row>
                 <Toolbar_button id="add" tooltip="Add new proxy"
@@ -791,6 +847,14 @@ class Toolbar extends Pure_component {
                   id="filters"/>
                 <Toolbar_button tooltip="Download all proxy ports as CSV"
                   on_click={download_csv} id="download"/>
+                {!!to_delete.length &&
+                <Toolbar_button tooltip="Delete selected proxies"
+                  on_click={this.open_delete_dialog} id="trash"/>
+                }
+                <Delete_dialog open={this.state.open_delete_dialog}
+                  close_dialog={this.close_delete_dialog}
+                  update_proxies={this.props.update_proxies}
+                  proxies={to_delete}/>
               </Toolbar_row>
             </Toolbar_container>;
     }
@@ -912,8 +976,6 @@ class Actions extends Pure_component {
     };
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
-        const delete_title = `Are you sure you want to delete proxy port
-            ${this.props.proxy.port}?`;
         return <div className={is_local() ? 'proxies_actions' :
           'proxies_actions_3'}>
             {!!persist &&
@@ -935,12 +997,10 @@ class Actions extends Pure_component {
                 tooltip="Open browser configured with this port"/>
             }
             {!!persist &&
-              <Portal>
-                <Modal_dialog title={delete_title}
-                  open={this.state.open_delete_dialog}
-                  ok_clicked={this.delete_proxy}
-                  cancel_clicked={this.close_delete_dialog}/>
-              </Portal>
+              <Delete_dialog open={this.state.open_delete_dialog}
+                close_dialog={this.close_delete_dialog}
+                update_proxies={this.props.update_proxies}
+                proxies={[this.props.proxy]}/>
             }
           </div>;
     }
@@ -948,6 +1008,37 @@ class Actions extends Pure_component {
 
 const Portal = props=>ReactDOM.createPortal(props.children,
     document.getElementById('del_modal'));
+
+class Delete_dialog extends Pure_component {
+    delete_proxies = e=>{
+        e.stopPropagation();
+        const _this = this;
+        const ports = _this.props.proxies.map(p=>p.port);
+        this.etask(function*(){
+            yield window.fetch('/api/proxies/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ports}),
+            });
+            yield _this.props.update_proxies();
+            _this.props.close_dialog();
+        });
+    };
+    render(){
+        const {proxies, open, close_dialog} = this.props;
+        let title = 'Are you sure you want to delete ';
+        if (proxies.length==1)
+            title += `proxy port ${proxies[0].port}?`;
+        else
+            title += `${proxies.length} proxy ports?`;
+        return <Portal>
+          <Modal_dialog open={open}
+            title={title}
+            ok_clicked={this.delete_proxies}
+            cancel_clicked={close_dialog} />
+        </Portal>;
+    }
+}
 
 const Action_icon = props=>{
     let {on_click, invisible, id, tooltip, scrolling} = props;
