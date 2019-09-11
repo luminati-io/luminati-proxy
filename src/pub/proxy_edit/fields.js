@@ -124,6 +124,14 @@ export const tabs = {
                 tooltip: `A string (regular expression) to be scanned in the
                     body of the response`,
             },
+            module_name: {
+                label: 'Rule module name to be required',
+                tooltip: `A string with the rule module name`,
+            },
+            module_config: {
+              label: 'Optional rule module JSON configuration',
+              tooltip: `The JSON configuration will be given to the module constructor while initializing the rule`,
+            },
             min_req_time: {
                 label: 'Request time more than',
                 placeholder: '500',

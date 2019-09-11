@@ -85,6 +85,13 @@ const rule_prepare = rule=>{
             result.trigger_code = rule.trigger_code||trigger_code;
         }
     }
+    if (rule.trigger_type === 'custom')
+    {
+        result.module_config = rule.module_config || '{}';
+        result.module_name = rule.module_name;
+        result.trigger_code = null;
+        result.url = null;
+    }
     return result;
 };
 export const map_rule_to_form = rule=>{
@@ -120,6 +127,13 @@ export const map_rule_to_form = rule=>{
     }
     result.trigger_code = rule.trigger_code;
     result.type = rule.type;
+    if (rule.trigger_type === 'custom')
+    {
+        result.module_config = rule.module_config || '{}';
+        result.module_name = rule.module_name;
+        result.trigger_code = null;
+        result.url = null;
+    }
     return result;
 };
 
@@ -263,7 +277,7 @@ class Rule extends Pure_component {
     state = {};
     componentDidMount(){
         const rule = this.props.rule;
-        if (rule && (rule.trigger_code || rule.type))
+        if (rule && (rule.trigger_type !== 'custom') && (rule.trigger_code || rule.type))
             this.setState({ui_blocked: true});
     }
     set_rule_field = (field, value)=>{
@@ -390,7 +404,7 @@ class Action extends Pure_component {
         const {rule, match, ports_opt, disabled} = this.props;
         const {logins, defaults, settings, zones, curr_zone,
             refresh_cost} = this.state;
-        if (!rule.trigger_type || !settings)
+        if (!rule.trigger_type || !settings || (rule.trigger_type === 'custom'))
             return null;
         if (!zones || !curr_zone)
             return null;
@@ -524,6 +538,11 @@ class Trigger extends Pure_component {
             set_rule_field('max_req_time', '');
         if (!val)
             set_rule_field('trigger_url_regex', '');
+        if (val === 'custom')
+        {
+            set_rule_field('type', 'before_send');
+            set_rule_field('module_config', '{}');
+        }
     };
     trigger_code_changed = val=>{
         this.props.change_ui_block(true);
@@ -567,7 +586,15 @@ class Trigger extends Pure_component {
                   <Rule_config id="status" type="select_status" rule={rule}
                     disabled={disabled}/>
                 }
-                {rule.trigger_type &&
+                {rule.trigger_type === 'custom' &&
+                  <div>
+                    <Rule_config id="module_name" type="text" rule={rule} style={{width: '35rem'}}
+                        disabled={disabled}/>
+                    <Rule_config id="module_config" type="json" rule={rule}
+                        disabled={disabled}/>
+                  </div>
+                }
+                {rule.trigger_type && rule.trigger_type !== 'custom' &&
                   <Rule_config id="trigger_url_regex" type="regex"
                     rule={rule} style={{width: '100%'}}
                     disabled={disabled}/>}
@@ -586,6 +613,10 @@ class Trigger_code extends Pure_component {
         {key: 'After body', value: 'after_body'},
         {key: 'Timeout', value: 'timeout'},
     ];
+    custom_type_opt = [
+        {key: 'Before send', value: 'before_send'},
+        {key: 'After body', value: 'after_body'},
+    ];
     state = {};
     static getDerivedStateFromProps(props, state){
         const rule = props.rule;
@@ -602,16 +633,24 @@ class Trigger_code extends Pure_component {
     render(){
         const {rule, type_changed, trigger_code_changed,
             disabled} = this.props;
-        if (!this.state.trigger_code)
+        if (!this.state.trigger_code && (rule.trigger_type !== 'custom'))
             return null;
+        let scheduleRuleOptions = this.type_opt;
+        let scheduleRuleOnChange = type_changed;
+        if (rule.trigger_type === 'custom') {
+            scheduleRuleOptions = this.custom_type_opt;
+            scheduleRuleOnChange = null;
+        }
         return <div className="trigger code">
-              <Rule_config id="type" type="select" data={this.type_opt}
+              <Rule_config id="type" type="select" data={scheduleRuleOptions}
                 rule={rule} val={this.state.type}
                 desc_style={{width: 'auto', minWidth: 'initial'}}
                 field_row_inner_style={{paddingBottom: 6}}
-                on_change={type_changed} disabled={disabled}/>
+                on_change={scheduleRuleOnChange} disabled={disabled}/>
+            {rule.trigger_type !== 'custom' &&
               <Cm_wrapper on_change={trigger_code_changed}
                 val={this.state.trigger_code} readonly={disabled}/>
+            }
             </div>;
     }
 }
