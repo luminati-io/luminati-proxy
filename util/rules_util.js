@@ -17,6 +17,7 @@ E.trigger_types = [
         type: 'pre'},
     {key: 'Request time less than', value: 'max_req_time',
         tooltip: `Triggers when the request time is below the selected value`},
+    {key: 'Custom', value: 'custom', tooltip: `The rule will be loaded from the defined module`},
 ];
 
 E.default_action = {key: '--Select--', value: '', tooltip: `Select an
