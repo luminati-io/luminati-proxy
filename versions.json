@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.152.924",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added 'High CPU usage' UI indicator and logs"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed HAR preview Timing tab ports display"
+            }
+        ]
+    },
+    {
         "ver": "1.152.345",
         "type": "stable/dev",
         "changes": [

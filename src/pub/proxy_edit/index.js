@@ -34,6 +34,7 @@ const Index = withRouter(class Index extends Pure_component {
         this.state = {form: {}, warnings: [], errors: {}, show_loader: false,
             saving: false};
         this.debounced_save = _.debounce(this.save, 500);
+        this.debounced = [];
         setdb.set('head.proxy_edit.set_field', this.set_field);
         setdb.set('head.proxy_edit.is_valid_field', this.is_valid_field);
         setdb.set('head.proxy_edit.is_disabled_ext_proxy',
@@ -75,6 +76,7 @@ const Index = withRouter(class Index extends Pure_component {
     willUnmount(){
         setdb.set('head.proxy_edit.form', undefined);
         setdb.set('head.proxy_edit', undefined);
+        this.debounced.forEach(d=>d.cancel());
     }
     update_loader = ()=>{
         this.setState(state=>{
@@ -86,7 +88,11 @@ const Index = withRouter(class Index extends Pure_component {
             return {show_loader};
         });
     };
-    delayed_loader = ()=>_.debounce(this.update_loader);
+    delayed_loader = ()=>{
+        const fn = _.debounce(this.update_loader);
+        this.debounced.push(fn);
+        return fn;
+    };
     goto_field = field=>{
         let tab;
         for (let [tab_id, tab_o] of Object.entries(tabs))

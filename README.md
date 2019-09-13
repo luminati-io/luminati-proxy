@@ -9,7 +9,7 @@ A forward HTTP/HTTPS proxy on your side, to accelerate/compress/rotate/distribut
 With Luminati HTTP/HTTPS Proxy manager you can drive the Luminati residential IPs or Luminati static IPs.
 
 This tool requires a [Luminati](https://luminati.io/?cam=github-proxy) account.
-Please report issues or bugs to your Lumianti account manager or from our [help center](https://luminati.io/faq#proxy)
+Please report issues or bugs to your Luminati account manager or from our [help center](https://luminati.io/faq#proxy)
 
 <em>Read this in [中文](https://lum-lpm.com/static/lpm/README-zh-CN.html).</em>
 
@@ -33,7 +33,7 @@ Please report issues or bugs to your Lumianti account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.152.345/luminati-proxy-manager-v1.152.345-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.152.924/luminati-proxy-manager-v1.152.924-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install

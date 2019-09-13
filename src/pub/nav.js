@@ -12,6 +12,7 @@ import {swagger_url} from './util.js';
 import Schema from './schema.js';
 import Notif from './notif_center.js';
 import Report_bug_modal from './report_bug.js';
+import Cpu_warning from './cpu_warning.js';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
@@ -109,6 +110,7 @@ const Logo = withRouter(({lock})=>
 const Nav_right = ()=>
     <div className="nav_top_right">
       <div className="schema"><Schema/></div>
+      <Cpu_warning/>
       <div className="notif_icon"><Notif/></div>
       <Patent/>
       <Language/>

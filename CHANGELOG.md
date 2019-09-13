@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.152.924 
+- :sparkles: Added 'High CPU usage' UI indicator and logs
+- :bug: Fixed HAR preview Timing tab ports display
+
 ## 1.152.345 
 - :sparkles: Added rule action 'Request URL' to send a HTTP request
 - :sparkles: Improved proxies overview UX, allowing deletion of multiple ports

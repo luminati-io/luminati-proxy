@@ -561,7 +561,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         });
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
         this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
-        window.setTimeout(this.req_status);
+        this.timeout_id = window.setTimeout(this.req_status);
         this.setdb_on('head.settings', settings=>{
             if (settings)
                 this.setState({logs: settings.logs});
@@ -578,6 +578,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         }
     }
     willUnmount(){
+        window.clearTimeout(this.timeout_id);
         window.removeEventListener('resize', this.update_window_dimensions);
     }
     filter_proxies = (proxies, mp)=>{
