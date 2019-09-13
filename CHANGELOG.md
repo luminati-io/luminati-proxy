@@ -1,6 +1,6 @@
 Luminati Proxy manager - Change Log
 
-## 1.152.924 
+## 1.152.929 
 - :sparkles: Added 'High CPU usage' UI indicator and logs
 - :bug: Fixed HAR preview Timing tab ports display
 
