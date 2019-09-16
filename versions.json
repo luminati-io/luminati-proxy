@@ -1,5 +1,10 @@
 [
     {
+        "ver": "1.153.222",
+        "type": "stable/dev",
+        "changes": []
+    },
+    {
         "ver": "1.153.189",
         "type": "stable/dev",
         "changes": [
@@ -10,6 +15,10 @@
             {
                 "type": "bug",
                 "text": "Fixed HAR preview Timing tab ports display"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed bug in Proxies list"
             }
         ]
     },
