@@ -29,9 +29,9 @@ class Pure_component extends React.PureComponent {
         }
         // XXX michaelg: 'let of' requires shim with babel+react+ie11
         // requires further investigation, leave as is till 01-Feb-2018
-        /*for (let l of Object.values(this.listeners))
+        /* for (let l of Object.values(this.listeners))
             setdb.off(l);*/
-        Object.values(this.listeners).forEach(l=>{setdb.off(l);});
+        Object.values(this.listeners).forEach(l=>{ setdb.off(l); });
         if (this.willUnmount)
             this.willUnmount();
         let t1 = Date.now();

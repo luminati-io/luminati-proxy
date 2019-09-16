@@ -16,9 +16,9 @@ const interval = 10*ms.SEC, counter_factor = ms.SEC/interval;
 const max_age = 30*ms.SEC;
 
 E.config = {hosts: {
-    hola: ['zs-graphite-hola'],
-    spark: ['zs-graphite-spark'],
-    lum: ['zs-graphite'],
+    hola: ['zs-graphite-hola.hola.org'],
+    spark: ['zs-graphite.holaspark.com'],
+    lum: ['zs-graphite.luminati.io'],
 }};
 
 E.enable_submit = when=>{
@@ -400,10 +400,9 @@ function run(){
     }
     else
     {
-        const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'lum',
-            ['zs-graphite']);
+        const hosts = zutil.get(E.config.hosts, env.SERVER_PRODUCT||'lum');
         for (let host of hosts)
-            ws_client(`ws://${host}.${env.DOMAIN||'hola.org'}:${port}`);
+            ws_client(`ws://${host}:${port}`);
     }
     etask.interval({ms: interval, mode: 'smart'}, function*zcounter_run(){
         let metrics = yield prepare();

@@ -3,7 +3,8 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const electron = require('electron');
 const child_process = require('child_process');
-const app = electron.app, dialog = electron.dialog;
+const app = electron.app;
+const dialog = electron.dialog;
 const opn = require('opn');
 let _info_bkp = console.info;
 console.info = function(){};
@@ -14,6 +15,7 @@ const zerr = require('../util/zerr.js');
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
+const pkg = require('../package.json');
 const E = module.exports;
 
 let manager, upgrade_available, can_upgrade;
@@ -127,6 +129,8 @@ const check_conflicts = ()=>etask(function*(){
 });
 
 const _run = argv=>etask(function*(){
+    zerr.notice('Running Luminati Proxy Manager v%s, PID: %s', pkg.version,
+        process.pid);
     yield check_conflicts();
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});

@@ -107,13 +107,6 @@ const Boolean_cell = ({proxy, col})=>{
     return <img src="/img/ic_off.svg"/>;
 };
 
-const Session_cell = ({proxy})=>{
-    if (proxy.session===true)
-        return <i className="fa fa-random"/>;
-    else if (proxy.session)
-        return proxy.session;
-};
-
 const Static_ip_cell = ({proxy, mgr})=>{
     if (proxy.ip)
         return proxy.ip;
@@ -341,11 +334,6 @@ const columns = [
         key: 'seed',
         title: 'Seed',
         type: 'text',
-    },
-    {
-        key: 'session',
-        title: 'Session',
-        render: Session_cell,
     },
     {
         key: 'proxy_count',
