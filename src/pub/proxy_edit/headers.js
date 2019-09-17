@@ -47,6 +47,11 @@ export default class Headers extends Pure_component {
         if (val)
             this.set_field('user_agent', '');
     };
+    random_user_agent_types = ()=>[
+        {key: 'No', value: ''},
+        {key: 'Desktop', value: 'desktop'},
+        {key: 'Mobile', value: 'mobile'},
+    ];
     goto_ssl = ()=>this.goto_field('ssl');
     render(){
         if (!this.state.form)
@@ -64,7 +69,8 @@ export default class Headers extends Pure_component {
                 <Config type="select" id="user_agent" data={util.user_agents}
                   disabled={this.state.form.random_user_agent ||
                       !this.state.form.ssl}/>
-                <Config type="yes_no" id="random_user_agent"
+                <Config type="select" id="random_user_agent"
+                  data={this.random_user_agent_types()}
                   on_change={this.random_user_agent_changed}
                   disabled={!this.state.form.ssl}/>
                 <Config type="yes_no" id="override_headers"

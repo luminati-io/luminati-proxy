@@ -1,6 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.153.425 
+- :sparkles: Reduced timeout period, improving memory management
+
 ## 1.153.222 
+- :sparkles: Better handling of timeout handlers
 
 ## 1.153.189 
 - :sparkles: Added 'High CPU usage' UI indicator and logs

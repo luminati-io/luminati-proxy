@@ -818,6 +818,34 @@ describe('proxy', ()=>{
                 }));
             });
         });
+        describe('request IP choice', ()=>{
+            it('should use IP sent in x-lpm-ip header', ()=>etask(function*(){
+                l = yield lum();
+                const ip = '1.2.3.4';
+                const r = yield l.test({headers: {'x-lpm-ip': ip}});
+                assert.ok(
+                    r.headers['x-lpm-authorization'].includes(`ip-${ip}`));
+            }));
+        });
+        describe('random user agent', ()=>{
+            it('should use desktop User-Agent header by default',
+            ()=>etask(function*(){
+                l = yield lum({random_user_agent: 1});
+                const r = yield l.test();
+                assert.ok(r.body.headers['user-agent'].includes('Macintosh'));
+            }));
+            it('should use desktop User-Agent header when specified',
+            ()=>etask(function*(){
+                l = yield lum({random_user_agent: 'desktop'});
+                const r = yield l.test();
+                assert.ok(r.body.headers['user-agent'].includes('Macintosh'));
+            }));
+            it('should use mobile User-Agent header', ()=>etask(function*(){
+                l = yield lum({random_user_agent: 'mobile'});
+                const r = yield l.test();
+                assert.ok(r.body.headers['user-agent'].includes('Android'));
+            }));
+        });
     });
     describe('retry', ()=>{
         it('should set rules', ()=>etask(function*(){

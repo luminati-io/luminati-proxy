@@ -496,6 +496,27 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.153.222', v=>{
+        it('should change random user agent truthy values to desktop', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, random_user_agent: 1},
+                    {port: 24002, random_user_agent: true},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, random_user_agent: 'desktop'},
+                    {port: 24002, random_user_agent: 'desktop'},
+                ],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

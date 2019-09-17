@@ -1,8 +1,23 @@
 [
     {
+        "ver": "1.153.425",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Reduced timeout period, improving memory management"
+            }
+        ]
+    },
+    {
         "ver": "1.153.222",
         "type": "stable/dev",
-        "changes": []
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Better handling of timeout handlers"
+            }
+        ]
     },
     {
         "ver": "1.153.189",
