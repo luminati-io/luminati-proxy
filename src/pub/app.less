@@ -669,7 +669,7 @@ ul.bullets {
     .add_pin {
         margin-left: 0;
         cursor: pointer;
-        height: 32px;
+        height: 31px;
         .glyphicon-plus {
             margin-left: 5px;
         }
@@ -2658,10 +2658,7 @@ span.icon_link {
                         div.chrome_td {
                             height: 100%;
                         }
-                        td, div.chrome_td {
-                            padding: 0;
-                            cursor: default;
-                        }
+                        td, div.chrome_td { cursor: default; }
                     }
                     &.error:not(.selected) { color: rgb(230, 0, 0); }
                     &.pending { color: #7a8c9f; }
@@ -2669,7 +2666,7 @@ span.icon_link {
                 td, div.chrome_td {
                     margin: 0;
                     border-left: 1px solid #e1e1e1;
-                    height: 21px;
+                    height: 22px;
                     cursor: pointer;
                     &:first-child { border-left: none; }
                     .disp_value {
@@ -2785,30 +2782,19 @@ span.icon_link {
     .tables_container .data_container table td .disp_value { display: block; }
 }
 .har_viewer, .proxies_panel {
-    .tables_container {
-        table td, div.chrome_table div.chrome_td {
-            label { margin: 0; }
-            input[type=checkbox] {
-                margin-top: 0;
-                margin-left: 3px;
-                top: 3px;
-                position: relative;
-            }
+    .tables_container, .header_container {
+        table td, table th, div.chrome_table div.chrome_td,
+        div.chrome_table div.chrome_th {
             &:nth-child(2) { border-left: none; }
+            label { margin: 0; }
+            .form-check { text-align: center; }
+            input[type=checkbox] {
+                margin: 0;
+                top: 2px;
+            }
         }
-        .header_container, &.header_container {
-            table th, div.chrome_table div.chrome_th {
-                &:nth-child(2) { border-left: none; }
-                input[type=checkbox] { margin-left: 3px; }
-                label { margin: 0; }
-            }
-            div.chrome_table div.chrome_th {
-                &:first-child { text-align: center };
-                input[type=checkbox] {
-                    margin: 0;
-                    top: 2px;
-                }
-            }
+        table th, div.chrome_table div.chrome_th {
+            &:first-child { text-align: center };
         }
     }
 }

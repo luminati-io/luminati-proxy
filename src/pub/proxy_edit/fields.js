@@ -290,7 +290,8 @@ export const tabs = {
             },
             random_user_agent: {
                 label: 'Random User-Agent',
-                tooltip: 'Set a random User-Agent header for each request',
+                tooltip: `Set a random User-Agent header targeting the
+                    specified device type for each request`,
             },
             override_headers: {
                 label: 'Override headers',

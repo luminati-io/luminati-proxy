@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.153.629 Stable
+- :bug: Fixed error logging
+
 ## 1.153.425 
 - :sparkles: Reduced timeout period, improving memory management
 
