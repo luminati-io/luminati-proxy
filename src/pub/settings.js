@@ -47,12 +47,7 @@ class Form extends Pure_component {
         this.setdb_on('head.settings', settings=>{
             if (!settings||this.state.settings)
                 return;
-            const s = {...settings};
-            s.www_whitelist_ips = s.www_whitelist_ips &&
-                s.www_whitelist_ips.join(',')||'';
-            s.whitelist_ips = s.whitelist_ips &&
-                s.whitelist_ips.join(',')||'';
-            this.setState({settings: s});
+            this.setState({settings: {...settings}});
         });
     }
     zone_change = val=>{
@@ -63,7 +58,11 @@ class Form extends Pure_component {
     whitelist_ips_change = val=>{
         ga_event('settings', 'change_field', 'whitelist_ips');
         this.setState(
-            prev=>({settings: {...prev.settings, whitelist_ips: val}}),
+            ({settings})=>{
+                const whitelist_ips = val.filter(
+                    ip=>!settings.cmd_whitelist_ips.includes(ip));
+                return {settings: {...settings, whitelist_ips}};
+            },
             this.debounced_save);
     };
     www_whitelist_ips_change = val=>{
@@ -124,29 +123,29 @@ class Form extends Pure_component {
     };
     debounced_save = _.debounce(this.save, 500);
     render(){
-        const settings = this.state.settings;
-        if (!settings)
+        const s = this.state.settings;
+        if (!s)
             return null;
+        const wl = s.cmd_whitelist_ips.concat(s.whitelist_ips);
         return <div className="settings_form">
               <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
-                <Select_zone val={settings.zone} preview
+                <Select_zone val={s.zone} preview
                   on_change_wrapper={this.zone_change}/>
               </Labeled_controller>
               <Labeled_controller label="Admin whitelisted IPs"
                 tooltip={tooltips.www_whitelist_ips}>
-                <Pins val={settings.www_whitelist_ips}
-                  pending={settings.pending_www_ips}
+                <Pins val={s.www_whitelist_ips} pending={s.pending_www_ips}
                   on_change_wrapper={this.www_whitelist_ips_change}/>
               </Labeled_controller>
-              <Labeled_controller val={settings.whitelist_ips}
+              <Labeled_controller val={wl} disabled={s.cmd_whitelist_ips}
                 type="pins" label="Proxy whitelisted IPs"
                 on_change_wrapper={this.whitelist_ips_change}
                 tooltip={tooltips.whitelist_ips}/>
-              <Labeled_controller val={settings.request_stats}
+              <Labeled_controller val={s.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default
                 tooltip={tooltips.request_stats}/>
-              <Labeled_controller val={settings.logs}
+              <Labeled_controller val={s.logs}
                 type="select_number" on_change_wrapper={this.logs_changed}
                 data={[0, 100, 1000, 10000]}
                 label="Limit for request logs" default

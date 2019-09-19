@@ -417,61 +417,6 @@ describe('migration', ()=>{
             ]});
         });
     });
-    describe_version('1.143.166', v=>{
-        it('should skip whitelists if its empty', ()=>{
-            const conf = {
-                _defaults: {whitelist_ips: []},
-                proxies: [{port: 24000, whitelist_ips: []}],
-            };
-            const _conf = migrations[v](conf);
-            assert.deepEqual(_conf, {
-                _defaults: {},
-                proxies: [{port: 24000}],
-            });
-        });
-        it('should not change whitelists if proxies have empty lists', ()=>{
-            const conf = {
-                _defaults: {whitelist_ips: ['1.2.3.4']},
-                proxies: [{port: 24000, whitelist_ips: []}],
-            };
-            const _conf = migrations[v](conf);
-            assert.deepEqual(_conf, {
-                _defaults: {whitelist_ips: ['1.2.3.4']},
-                proxies: [{port: 24000}],
-            });
-        });
-        it('should not change whitelists if no proxy defines it', ()=>{
-            const conf = {
-                _defaults: {whitelist_ips: ['1.2.3.4']},
-                proxies: [{port: 24000}],
-            };
-            const _conf = migrations[v](conf);
-            assert.deepEqual(_conf, {
-                _defaults: {whitelist_ips: ['1.2.3.4']},
-                proxies: [{port: 24000}],
-            });
-        });
-        it('should concatenate all lists', ()=>{
-            const conf = {
-                _defaults: {whitelist_ips: ['1.2.3.4']},
-                proxies: [
-                    {port: 24000, whitelist_ips: ['2.2.2.2']},
-                    {port: 24001, whitelist_ips: []},
-                    {port: 24002},
-                    {port: 24003, whitelist_ips: ['2.2.2.2', '3.3.3.3']},
-                    {port: 24004, whitelist_ips: ['1.2.3.4', '4.4.4.4']},
-                    {port: 24005, whitelist_ips: ['5.5.5.5']},
-                ],
-            };
-            const _conf = migrations[v](conf);
-            assert.deepEqual(_conf, {
-                _defaults: {whitelist_ips: ['2.2.2.2', '3.3.3.3', '1.2.3.4',
-                    '4.4.4.4', '5.5.5.5']},
-                proxies: [{port: 24000}, {port: 24001}, {port: 24002},
-                    {port: 24003}, {port: 24004}, {port: 24005}],
-            });
-        });
-    });
     describe_version('1.148.122', v=>{
         it('should turn on proxy resolving when pool_size is >= 1', ()=>{
             const conf = {

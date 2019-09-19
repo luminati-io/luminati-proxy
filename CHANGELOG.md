@@ -1,20 +1,25 @@
 Luminati Proxy manager - Change Log
 
+## 1.154.55 Development Latest
+- :sparkles: Added proxy port specific IPs whitelisting in General tab
+- :sparkles: Added option to unban IPs from UI in 'Banned IPs' table
+- :bug: Fixed 'Cannnot read property 'toLowerCase' of undefined' when running LPM on Docker
+
 ## 1.153.629 Stable
 - :bug: Fixed error logging
 
-## 1.153.425 
+## 1.153.425 Stable
 - :sparkles: Reduced timeout period, improving memory management
 
-## 1.153.222 
+## 1.153.222 Stable
 - :sparkles: Better handling of timeout handlers
 
-## 1.153.189 
+## 1.153.189 Stable
 - :sparkles: Added 'High CPU usage' UI indicator and logs
 - :bug: Fixed HAR preview Timing tab ports display
 - :bug: Fixed bug in Proxies list
 
-## 1.152.345 
+## 1.152.345 Stable
 - :sparkles: Added rule action 'Request URL' to send a HTTP request
 - :sparkles: Improved proxies overview UX, allowing deletion of multiple ports
 - :bug: Fixed default zone handling. Changing default zone will no more affect existing ports' zones
@@ -28,7 +33,7 @@ Luminati Proxy manager - Change Log
 - :bug: Deprecated fast_session_pool in favor of regular pool
 - :bug: Fixed whitelisting IPs with ranges using API
 
-## 1.151.372 
+## 1.151.372 Stable
 - :bug: Fixed WS traffic when SSL Analyzing is on
 - :bug: Fixed browser response when using Process data rule
 - :sparkles: Improved the UX of whitelisting IPs
@@ -41,23 +46,23 @@ Luminati Proxy manager - Change Log
 - :bug: Fixed duplication proxy ports
 - :star: Updated geo locations and list of available carriers
 
-## 1.150.681 
+## 1.150.681 Stable
 - :bug: Fixed UI crash related to Static IP columns
 - :bug: Fixed proxy ports status column on specific errors
 - :bug: Fixed install for older MacOS versions
 - :sparkles: Support for cluster mode (running on multiple CPUs) without session management
 - :sparkles: Refresh IP action is now available for static residential zones
 
-## 1.150.351 
+## 1.150.351 Stable
 - :sparkles: UI improvement: setting headers requires SSL Analyzing to reduce confusion
 - :bug: Fixed country targeting for static zones
 
-## 1.150.274 
+## 1.150.274 Stable
 - :sparkles: IP refresh price now is shown in Refresh IP action rule
 - :sparkles: Static IP column will now show IPs in the pool
 - :bug: Fix shortcut problem for Windows home directories with '&' character
 
-## 1.149.883 
+## 1.149.883 Stable
 - :star: Updated geo locations and list of available carriers
 - :bug: Fixed gIP allocation modal checkboxes
 
@@ -73,22 +78,22 @@ Luminati Proxy manager - Change Log
 ## 1.148.901 Stable
 - :star: Performance improvements (make use of HTTP agent to reuse open sockets
 
-## 1.148.629 
+## 1.148.629 Stable
 
-## 1.148.475 
+## 1.148.475 Stable
 
-## 1.148.367 
+## 1.148.367 Stable
 - :bug: bug fixes
 
 ## 1.148.204 Stable
 - :star: Super proxies are resolved on each request by default
 
-## 1.148.122 
+## 1.148.122 Stable
 
 ## 1.148.74 Stable
 - :bug: fix whitelisting
 
-## 1.147.992 
+## 1.147.992 Stable
 
 ## 1.147.960 Stable
 - :star: add a flag to ignore SSL to super proxy errors
@@ -204,9 +209,9 @@ Luminati Proxy manager - Change Log
 ## 1.139.129 Stable
 - :star: Added Insecure field under General tab
 
-## 1.139.62 
+## 1.139.62 Stable
 
-## 1.138.758 
+## 1.138.758 Stable
 - :bug: Fixed targeting mobile IPs
 
 ## 1.138.603 Stable
@@ -221,7 +226,7 @@ Luminati Proxy manager - Change Log
 ## 1.138.327 Stable
 - :bug: Fixed debug: none option to skip all the debug headers
 
-## 1.138.101 
+## 1.138.101 Stable
 - :bug: Fixed presence of open browser button if host is not localhost
 
 ## 1.137.946 Stable
@@ -266,7 +271,7 @@ Luminati Proxy manager - Change Log
 ## 1.135.636 Stable
 - :star: Added UI for choosing SMTP proxy targets under "General" tab
 
-## 1.135.547 
+## 1.135.547 Stable
 
 ## 1.135.418 Stable
 - :bug: Multiple bug fixed and improved error handling
@@ -289,7 +294,7 @@ Luminati Proxy manager - Change Log
 ## 1.133.416 Stable
 - :star: Added support for testing SMTP
 
-## 1.132.959 
+## 1.132.959 Stable
 
 ## 1.132.959 Stable
 - :star: List of banned IPs persists across changes in proxy port
@@ -307,7 +312,7 @@ Luminati Proxy manager - Change Log
 ## 1.131.176 Stable
 - :bug: Fix an issue causing empty HAR logs
 
-## 1.131.19 
+## 1.131.19 Stable
 - :bug: Fix lokijs related crashes
 - :star: Improved sessions management
 - :star: Introduced live data on the UI
@@ -343,7 +348,7 @@ Luminati Proxy manager - Change Log
 ## 1.127.526 Stable
 - :bug: Fix 'long availability' pool type
 
-## 1.126.871 
+## 1.126.871 Stable
 
 ## 1.125.699 Stable
 - :bug: Fix refresh IPs rule action
@@ -396,7 +401,7 @@ Luminati Proxy manager - Change Log
 ## 1.120.389 Stable
 - :bug: Fixed UI: incorrect cache
 
-## 1.120.280 
+## 1.120.280 Stable
 
 ## 1.120.149 Stable
 - :bug: Fixed installation script
@@ -458,7 +463,7 @@ Luminati Proxy manager - Change Log
 ## 1.115.736 Stable
 - :bug: Bug fixes
 
-## 1.115.628 
+## 1.115.628 Stable
 
 ## 1.114.998 Stable
 - :bug: fixed 502 erros handling with Rules
@@ -497,7 +502,7 @@ Luminati Proxy manager - Change Log
 ## 1.112.498 Stable
 - :star: Further development of 25 port support
 
-## 1.112.248 
+## 1.112.248 Stable
 
 ## 1.112.99 Stable
 - :sparkles: Updated Node and npm in Dockerfile
@@ -655,7 +660,7 @@ Luminati Proxy manager - Change Log
 - :star: Moved 'Regexp for bypass proxy' config into Rules tab
 - :star: Moved 'Regexp for super proxy' config into Rules tab
 
-## 1.103.790 
+## 1.103.790 Stable
 - :sparkles: Added regexp generator
 
 ## 1.103.508 Stable

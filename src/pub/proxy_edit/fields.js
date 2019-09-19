@@ -390,6 +390,11 @@ export const tabs = {
                 tooltip: `IPs that will be randomly chosen to proxy whole
                     traffic through SMTP protocol`,
             },
+            whitelist_ips: {
+                label: 'Whitelisted IPs',
+                tooltip: `Default access grant for this port. Only these
+                    IPs will be able to send requests to this port by default`
+            }
         },
     },
 };

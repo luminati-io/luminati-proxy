@@ -38,6 +38,9 @@ export default class General extends Pure_component {
         this.setdb_on('head.consts', consts=>{
             consts && consts.proxy && this.setState({proxy: consts.proxy});
         });
+        this.setdb_on('head.settings', settings=>{
+            settings && this.setState({settings});
+        });
     }
     multiply_changed = val=>{
         const {form} = this.state;
@@ -58,9 +61,7 @@ export default class General extends Pure_component {
     };
     open_modal = ()=>$('#allocated_ips').modal('show');
     render(){
-        if (!this.state.form)
-            return null;
-        if (!this.state.proxy)
+        if (!this.state.form || !this.state.proxy || !this.state.settings)
             return null;
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
         const curr_plan = this.get_curr_plan();
@@ -76,12 +77,15 @@ export default class General extends Pure_component {
         const note_vips = form.multiply_vips ?
             <a className="link" onClick={this.open_modal}>Select gIPs</a> :
             null;
+        const disabled_wl = (this.state.settings.cmd_whitelist_ips||[]).concat(
+            this.state.settings.whitelist_ips);
         return <div className="general">
               <Tab_context.Provider value="general">
                 <Config type="text" id="internal_name"/>
                 <Config type="number" id="port"/>
                 <Config type="number" id="socks" disabled={true}
                   val_id="port"/>
+                <Config type="pins" id="whitelist_ips" disabled={disabled_wl}/>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="secure_proxy"/>
                 <Config type="yes_no" id="insecure"

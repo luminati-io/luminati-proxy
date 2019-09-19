@@ -103,7 +103,10 @@ describe('manager', ()=>{
                 return;
             }
             args.push('--'+k);
-            args.push(cli[k]);
+            if (Array.isArray(cli[k]))
+                args.push(...cli[k]);
+            else
+                args.push(cli[k]);
         });
         if (opt.config)
         {
@@ -578,29 +581,57 @@ describe('manager', ()=>{
         }));
     });
     describe('whitelisting', ()=>{
-        it('takes whitelist ips from cmd', etask._fn(function*(_this){
-            app = yield app_with_proxies([{port: 24000}],
-                {whitelist_ips: '1.2.3.4'});
-            const {whitelist_ips} = app.manager.proxy_ports[24000].opt;
-            assert.equal(whitelist_ips.length, 1);
-            assert.equal(whitelist_ips[0], '1.2.3.4');
-        }));
-        it('set whitelist in proxy ports', etask._fn(function*(_this){
-            app = yield app_with_proxies([{port: 24000}]);
-            app.manager.set_whitelist_ips(['2.2.2.2']);
-            const {whitelist_ips} = app.manager.proxy_ports[24000].opt;
-            assert.equal(whitelist_ips.length, 1);
-            assert.equal(whitelist_ips[0], '2.2.2.2');
-        }));
-        it('set whitelist in servers', etask._fn(function*(_this){
-            app = yield app_with_proxies([{port: 24000}]);
-            app.manager.set_whitelist_ips(['2.2.2.2']);
+        const t = (name, proxies, default_calls, wh, cli)=>
+        it(name, etask._fn(function*(_this){
+            const port = proxies[0].port;
+            app = yield app_with_proxies(proxies, cli);
+            for (const c of default_calls)
+                app.manager.set_whitelist_ips(c);
+            const {whitelist_ips} = app.manager.proxy_ports[port].opt;
+            assert.deepEqual(whitelist_ips, wh);
             const res = yield make_user_req();
             const whitelists = res.body.response.headers.find(
                 h=>h.name=='x-lpm-whitelist');
             assert.ok(!!whitelists);
-            assert.equal(whitelists.value, '2.2.2.2');
+            assert.equal(whitelists.value, wh.join(' '));
         }));
+        const p = [{port: 24000}];
+        const p_w = [{port: 24000, whitelist_ips: ['1.1.1.1']}];
+        const w_cli = {whitelist_ips: ['1.2.3.4', '4.3.2.1']};
+        t('sets from cmd', p, [], ['1.2.3.4', '4.3.2.1'], w_cli);
+        t('sets default', p, [['2.2.2.2']], ['2.2.2.2']);
+        t('sets specific', p_w, [], ['1.1.1.1']);
+        t('sets cmd and default', p, [['2.2.2.2']],
+            ['1.2.3.4', '4.3.2.1', '2.2.2.2'], w_cli);
+        t('sets cmd and specific', p_w, [], ['1.2.3.4', '4.3.2.1', '1.1.1.1'],
+            w_cli);
+        t('sets default and specific', p_w, [['2.2.2.2']],
+            ['2.2.2.2', '1.1.1.1']);
+        t('sets cmd, default and specific', p_w, [['2.2.2.2']],
+            ['1.2.3.4', '4.3.2.1', '2.2.2.2', '1.1.1.1'], w_cli);
+        t('removes IPs from proxy port config when removed in default ', p_w,
+            [['2.2.2.2', '3.3.3.3'], []], ['1.2.3.4', '4.3.2.1', '1.1.1.1'],
+            w_cli);
+        it('updates proxy', ()=>etask(function*(){
+            app = yield app_with_proxies(p);
+            const whitelist_ips = ['1.1.1.1', '2.2.2.2', '3.0.0.0/8'];
+            const new_proxy = Object.assign({}, p[0], {whitelist_ips});
+            const opt = yield app.manager.proxy_update(p[0], new_proxy);
+            assert.deepEqual(opt.whitelist_ips, whitelist_ips);
+        }));
+        it('should not save default/cmd whitelist', ()=>etask(function*(){
+            const def = ['3.3.3.3', '4.4.4.4'], expected = ['7.8.9.10'];
+            const proxies = [{port: 24000, whitelist_ips:
+                w_cli.whitelist_ips.concat(def).concat(expected)}];
+            app = yield app_with_proxies(proxies, w_cli);
+            const m = app.manager;
+            m.set_whitelist_ips(def);
+            const s = m.config.serialize(m.proxies, m._defaults);
+            const config = JSON.parse(s);
+            const proxy = config.proxies[0];
+            assert.equal(proxy.port, proxies[0].port);
+            assert.deepEqual(proxy.whitelist_ips, expected);
+    }));
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{

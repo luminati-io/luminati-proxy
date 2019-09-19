@@ -627,7 +627,6 @@ ul.bullets {
 }
 .pins_field {
     display: flex;
-    align-items: baseline;
     .pins {
         display: flex;
         flex-flow: wrap;
@@ -640,6 +639,9 @@ ul.bullets {
             margin: 0 6px 2px 0;
             &.active {
                 border-color: @first_color;
+            }
+            &.disabled {
+                background-color: @dark_grey;
             }
             .x, .v {
                 width: 16px;
@@ -2781,7 +2783,7 @@ span.icon_link {
     }
     .tables_container .data_container table td .disp_value { display: block; }
 }
-.har_viewer, .proxies_panel {
+.har_viewer, .proxies_panel, .banned_ips_panel {
     .tables_container, .header_container {
         table td, table th, div.chrome_table div.chrome_td,
         div.chrome_table div.chrome_th {
@@ -3093,4 +3095,11 @@ span.icon_link {
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
         }
     }
+}
+.btn_unban {
+    border: none;
+    background: none;
+    display: block;
+    margin: auto;
+    padding: 0;
 }

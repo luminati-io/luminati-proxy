@@ -110,7 +110,18 @@ E.get_release = function(no_cache){
     }
     else if (!file.is_darwin)
     {
-        const info = exec.get_lines(['lsb_release', '-i', '-r', '-c', '-s']);
+        let info = exec.get_lines(['lsb_release', '-i', '-r', '-c', '-s']);
+        if (!info.length)
+        {
+            const os_info = exec.get_lines('cat /etc/os-release');
+            const get = k=>{
+                const start = `${k.toUpperCase()}=`;
+                const data = os_info.find(l=>l.startsWith(start));
+                return data &&
+                    data.slice(start.length).replace(/^"|"$/g, '') || '';
+            };
+            info = [get('id'), get('version_id'), get('version_codename')];
+        }
         distro_release = {
             id: info[0].toLowerCase(),
             version: info[1],

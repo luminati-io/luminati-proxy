@@ -153,8 +153,9 @@ export const Sort_icon = ({show, dir})=>{
 
 export class Chrome_table extends Pure_component {
     render(){
-        const {cols, title, children} = this.props;
-        return <T>{t=><div className="chrome chrome_table">
+        const {cols, title, children, class_name} = this.props;
+        const classes = classnames('chrome', 'chrome_table', class_name);
+        return <T>{t=><div className={classes}>
               <div className="main_panel vbox">
                 <Toolbar_container>
                   <Toolbar_row>

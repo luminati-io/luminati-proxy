@@ -26,10 +26,12 @@ export class Pins extends Pure_component {
     static getDerivedStateFromProps(props, state){
         if (props.val==state.raw_val||!props.val)
             return null;
-        const ips = props.val.split(',');
+        const ips = props.val||[];
+        const disabled_ips = props.disabled||[];
         return {
             raw_val: props.val,
-            pins: ips.map((p, id)=>({id, val: p, edit: false})),
+            pins: ips.map((p, id)=>({id, val: p, edit: false,
+                disabled: !!disabled_ips.find(i=>i==p)})),
             max_id: ips.length,
         };
     }
@@ -42,7 +44,7 @@ export class Pins extends Pure_component {
             this.setState({pending: this.props.pending.filter(p=>p!=pin)});
     };
     add_empty_pin = ()=>{
-        this.add_pin('');
+        this.add_pin();
     };
     remove = id=>{
         this.setState(prev=>({
@@ -68,7 +70,7 @@ export class Pins extends Pure_component {
         }));
     };
     fire_on_change = ()=>{
-        const val = this.state.pins.map(p=>p.val).join(',');
+        const val = this.state.pins.map(p=>p.val);
         this.props.on_change_wrapper(val);
     };
     save_pin = (id, val)=>{
@@ -93,7 +95,7 @@ export class Pins extends Pure_component {
                   <Pin key={p.id} update_pin={this.update_pin} id={p.id}
                     set_edit={this.set_edit} edit={p.edit}
                     exact={this.props.exact} save_pin={this.save_pin}
-                    remove={this.remove}>
+                    remove={this.remove} disabled={p.disabled}>
                     {p.val}
                   </Pin>
                 )}
@@ -134,7 +136,8 @@ class Pin extends Pure_component {
             this.input.current.focus();
     }
     edit = ()=>{
-        this.props.set_edit(this.props.id, true);
+        if (!this.props.disabled)
+            this.props.set_edit(this.props.id, true);
     };
     key_up = e=>{
         if (e.keyCode==13)
@@ -142,7 +145,7 @@ class Pin extends Pure_component {
     };
     validate_and_save = ()=>{
         let val = (this.props.children||'').trim();
-        if (this.props.exact)
+        if (this.props.exact && val)
             return this.props.save_pin(this.props.id, val);
         try {
             const netmask = new Netmask(val);
@@ -158,19 +161,20 @@ class Pin extends Pure_component {
     remove = ()=>this.props.remove(this.props.id);
     on_blur = ()=>this.validate_and_save();
     render(){
-        const {children} = this.props;
-        const input_classes = classnames({hidden: !this.props.edit});
-        return <div className={classnames('pin', {active: this.props.edit})}>
-              <div className="x" onClick={this.remove}>
+        const {children, edit, disabled} = this.props;
+        const input_classes = classnames({hidden: !edit});
+        return <div className={classnames('pin', {active: edit, disabled})}>
+              {!disabled &&
+                <div className="x" onClick={this.remove}>
                 <div className="glyphicon glyphicon-remove"/>
-              </div>
+              </div>}
               <div className="content" onClick={this.edit}>
-                {!this.props.edit && children}
+                {!edit && children}
                 <input ref={this.input} type="text" value={children}
                   onChange={this.on_change} onBlur={this.on_blur}
                   className={input_classes} onKeyUp={this.key_up}/>
               </div>
-              {this.props.edit &&
+              {edit &&
                 <div className="v">
                   <div className="glyphicon glyphicon-ok"/>
                 </div>

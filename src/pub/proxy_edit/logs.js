@@ -11,6 +11,7 @@ import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import {with_tt} from '../common/i18n.js';
+import Tooltip from '../common/tooltip.js';
 
 moment.relativeTimeThreshold('ss', 60);
 moment.relativeTimeThreshold('s', 50);
@@ -49,13 +50,14 @@ const Nav = ({set_tab, cur_tab})=>
     </Nav_tabs>;
 
 const banned_ips_cols = [
+    {id: 'unban', width: 25},
     {id: 'ip', title: 'IP'},
     {id: 'domain', title: 'Domain'},
     {id: 'ms', title: 'Expire'},
 ];
 
 const Banned_ips = withRouter(class Banned_ips extends Pure_component {
-    state = {ips: []};
+    state = {ips: [], unbanning: false};
     componentDidMount(){
         const _this = this;
         this.etask(function*(){
@@ -72,12 +74,37 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
             return data.ips;
         });
     };
+    unbanip = ip=>{
+        const _this = this;
+        this.setState({unbanning: true});
+        return this.etask(function*(){
+            this.on('finally', ()=>_this.setState({unbanning: false}));
+            const port = _this.props.match.params.port;
+            yield ajax.json({
+                url: `/api/proxies/${port}/banip`,
+                method: 'DELETE',
+                data: {ip},
+            });
+            const ips = _this.state.ips;
+            _this.setState({ips: ips.filter(d=>d.ip!=ip)});
+        });
+    };
     render(){
+        const {ips, unbanning} = this.state;
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        return <Chrome_table title="Banned IPs" cols={banned_ips_cols}>
-              {this.state.ips.map(d=>
+        return <Chrome_table title="Banned IPs" cols={banned_ips_cols}
+            class_name="banned_ips_panel">
+              {ips.map(d=>
                 <tr key={d.ip}>
+                  <td>
+                    <Tooltip title="Unban IP">
+                      <button className="btn_unban" disabled={unbanning}
+                        onClick={()=>this.unbanip(d.ip)}>
+                        <i className="glyphicon glyphicon-remove"/>
+                      </button>
+                    </Tooltip>
+                  </td>
                   <td>{d.ip}</td>
                   <td>{d.domain||' - '}</td>
                   <td>{d.to ? moment(d.to).fromNow() : ' - '}</td>

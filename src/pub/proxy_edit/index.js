@@ -330,7 +330,7 @@ const Index = withRouter(class Index extends Pure_component {
         delete save_form.reverse_lookup;
         // XXX krzysztof: extract the logic of mapping specific fields
         if (save_form.smtp)
-            save_form.smtp = save_form.smtp.split(',').filter(Boolean);
+            save_form.smtp = save_form.smtp.filter(Boolean);
         else
             save_form.smtp = [];
         if (save_form.city.length)
