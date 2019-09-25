@@ -161,11 +161,12 @@ class Lum_node_index extends Lum_common {
             readline.createInterface({input: process.stdin, output:
                 process.stdout}).on('SIGINT', ()=>process.emit('SIGINT'));
         }
+        // XXX krzysztof: duplication of handling siganls: why?
         ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
             process.on(sig, e=>{
                 this.child.send({
                     command: 'shutdown',
-                    reason: sig+(e ? 'master: error = '+zerr.e2s(e) : ''),
+                    reason: sig+(e ? ', master: error = '+zerr.e2s(e) : ''),
                     error: zerr.e2s(e),
                 });
                 setTimeout(()=>process.exit(), 5000);

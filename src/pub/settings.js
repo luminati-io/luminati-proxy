@@ -49,6 +49,14 @@ class Form extends Pure_component {
                 return;
             this.setState({settings: {...settings}});
         });
+        this.setdb_on('head.save_settings', save_settings=>{
+            this.save_settings = save_settings;
+            if (save_settings && this.resave)
+            {
+                delete this.resave;
+                this.save();
+            }
+        });
     }
     zone_change = val=>{
         ga_event('settings', 'change_field', 'zone');
@@ -83,7 +91,7 @@ class Form extends Pure_component {
     };
     lock_nav = lock=>setdb.set('head.lock_navigation', lock);
     save = ()=>{
-        if (this.saving)
+        if (this.saving || !this.save_settings)
         {
             this.resave = true;
             return;
@@ -105,18 +113,12 @@ class Form extends Pure_component {
                 ga_event('settings', 'save', 'successful');
                 if (_this.resave)
                 {
-                    _this.resave = false;
+                    delete _this.resave;
                     _this.save();
                 }
             });
             const body = {..._this.state.settings};
-            const raw = yield window.fetch('/api/settings', {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(body),
-            });
-            const settings = yield raw.json();
-            setdb.set('head.settings', settings);
+            yield _this.save_settings(body);
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
         });

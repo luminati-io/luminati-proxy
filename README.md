@@ -33,7 +33,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.154.55/luminati-proxy-manager-v1.154.55-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.154.894/luminati-proxy-manager-v1.154.894-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -164,14 +164,8 @@ Options:
   --proxy                  Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
   --proxy_port             Super proxy port            [number] [default: 22225]
-  --proxy_count            Minimum number of super proxies to use
-                                                           [number] [default: 1]
-  --secure_proxy           Use SSL when accessing super proxy
-                                                      [boolean] [default: false]
-  --short_username         Use Shorthand username for super proxy credentials
-                                                      [boolean] [default: false]
-  --proxy_switch           Automatically switch super proxy on failure
-                                                           [number] [default: 5]
+  --proxy_connection_type  Connection type between LPM and Super Proxy
+                                                      [string] [default: http]
   --proxy_retry            Automatically retry on super proxy failure
                                                            [number] [default: 2]
   --insecure               Enable SSL connection/analyzing to insecure hosts

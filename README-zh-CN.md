@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.154.55-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.154.894-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -101,14 +101,8 @@ Options:
   --proxy                  Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
   --proxy_port             Super proxy port            [number] [default: 22225]
-  --proxy_count            Minimum number of super proxies to use
-                                                           [number] [default: 1]
-  --secure_proxy           Use SSL when accessing super proxy
-                                                      [boolean] [default: false]
-  --short_username         Use Shorthand username for super proxy credentials
-                                                      [boolean] [default: false]
-  --proxy_switch           Automatically switch super proxy on failure
-                                                           [number] [default: 5]
+  --proxy_connection_type  Connection type between LPM and Super Proxy
+                                                      [string] [default: http]
   --proxy_retry            Automatically retry on super proxy failure
                                                            [number] [default: 2]
   --insecure               Enable SSL connection/analyzing to insecure hosts
@@ -221,7 +215,6 @@ const proxy = new Server({
     customer: 'CUSTOMER', // your customer name
     password: 'PASSWORD', // your password
     zone: 'gen', // zone to use
-    proxy_count: 5, //minimum number of proxies to use for distributing requests
 });
 proxy.on('response', res=>console.log('Response:', res));
 proxy.listen(0, '127.0.0.1').then(()=>new Promise((resolve, reject)=>{
@@ -248,7 +241,6 @@ etask(function*(){
         customer: 'CUSTOMER', // your customer name
         password: 'PASSWORD', // your password
         zone: 'gen', // zone to use
-        proxy_count: 5, //minimum number of proxies to use for distributing requests
     });
     yield proxy.listen(0, '127.0.0.1'); // port and ip to listen to
     let res = yield etask.nfn_apply(proxy, '.request',

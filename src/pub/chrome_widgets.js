@@ -7,9 +7,10 @@ import _ from 'lodash';
 import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
-export const Toolbar_button = ({id, tooltip, active, href, ...props})=>
+export const Toolbar_button = ({id, tooltip, active, href, placement,
+    ...props})=>
     <T>{t=>
-    <Tooltip title={t(tooltip)} placement={'bottom'}>
+    <Tooltip title={t(tooltip)} placement={placement||'bottom'}>
       <a className={classnames('toolbar_item toolbar_button', id, {active})}
         onClick={props.on_click||(()=>null)} href={href}>
         <span className={classnames(id, 't_button', 'chrome_icon')}/>

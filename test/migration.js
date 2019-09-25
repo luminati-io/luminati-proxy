@@ -462,6 +462,68 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.153.629', v=>{
+        it('should rename and change secure proxy truthy values to https',
+        ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, secure_proxy: 1},
+                    {port: 24002, secure_proxy: true},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, proxy_connection_type: 'https'},
+                    {port: 24002, proxy_connection_type: 'https'},
+                ],
+            });
+        });
+    });
+    describe_version('1.154.55', v=>{
+        it('should not do anything if preset not set', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, last_preset_applied: 'rotating'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, preset: 'rotating'},
+                ],
+            });
+        });
+    });
+    describe_version('1.154.56', v=>{
+        it('should convert high_performance preset -> rotating', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, preset: 'high_performance'},
+                    {port: 24002, preset: 'long_session'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, preset: 'rotating'},
+                    {port: 24002, preset: 'long_session'},
+                ],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

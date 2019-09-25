@@ -3,8 +3,8 @@
 (function(){
 var define, node_util;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object' && !!global.nativeRequire
+    || typeof navigator=='object' && navigator.product=='ReactNative';
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 if (is_ff_addon)
@@ -35,7 +35,7 @@ E.is_mocha = function(){
 
 E.is_lxc = function(){ return is_node && +process.env.LXC; };
 
-E.f_mset = function(flags, mask, bits){ return (flags &~ mask) | bits; };
+E.f_mset = function(flags, mask, bits){ return flags&~mask | bits; };
 E.f_lset = function(flags, bits, logic){
     return E.f_mset(flags, bits, logic ? bits : 0); };
 E.f_meq = function(flags, mask, bits){ return (flags & mask)==bits; };
@@ -309,7 +309,7 @@ E.find_prop = function(obj, prop, val){
     return E.find(obj, function(o){ return o[prop]===val; }); };
 E.isspace = function(c){ return /\s/.test(c); };
 E.isdigit = function(c){ return c>='0' && c<='9'; };
-E.isalpha = function(c){ return (c>='a' && c<='z') || (c>='A' && c<='Z'); };
+E.isalpha = function(c){ return c>='a'&&c<='z' || c>='A'&&c<='Z'; };
 E.isalnum = function(c){ return E.isdigit(c)||E.isalpha(c); };
 
 E.obj_pluck = function(obj, prop){
@@ -346,11 +346,8 @@ E.get = function(o, path, def){
     for (var i=0; i<path.length; i++)
     {
         // XXX vladimir/ron: decide on implementation without in operator
-        if (!o || (typeof o!='object' && typeof o!='function') ||
-            !(path[i] in o))
-        {
+        if (!o || typeof o!='object'&&typeof o!='function' || !(path[i] in o))
             return def;
-        }
         o = o[path[i]];
     }
     return o;
@@ -400,7 +397,8 @@ E.clone_inplace = function(dst, src){
     }
     else if (typeof dst=='object')
     {
-        for (var k in src)
+        var k;
+        for (k in src)
             dst[k] = src[k];
         for (k in dst)
         {
@@ -456,7 +454,7 @@ E.omit = function(obj, omit){
     return o;
 };
 
-E.if_set = function (val, o, name){
+E.if_set = function(val, o, name){
     if (val!==undefined)
         o[name] = val;
 };
@@ -477,6 +475,14 @@ E.escape_dotted_keys = function(obj, repl){
                 E.escape_dotted_keys(obj[new_prop], repl);
         }
     }
+};
+
+E.ensure_array = function(v, split){
+    if (v==null || Array.isArray(v))
+        return v||[];
+    if (split && typeof v=='string')
+        return v.split(split==true ? /[ ,]+/ : split).filter(Boolean);
+    return [v];
 };
 
 return E; }); }());

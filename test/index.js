@@ -12,6 +12,7 @@ const {ms} = require('../util/date.js');
 const sinon = require('sinon');
 const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
+const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
 const Config = require('../lib/config.js');
 const {decode_body} = require('../lib/util.js');
@@ -775,49 +776,6 @@ describe('proxy', ()=>{
                 assert.deepEqual(l.hosts.sort(), ips);
             }));
         });
-        describe('dns_check', ()=>{
-            const dns_resolve = dns.resolve;
-            before(()=>{
-                dns.resolve = (domain, cb)=>{
-                    resolve_called = true;
-                    if (domain=='fake')
-                        return cb('DNS error');
-                    cb(null, ['1.2.3.4']);
-                };
-            });
-            let resolve_called;
-            beforeEach(()=>{
-                resolve_called = false;
-            });
-            after(()=>{
-                dns.resolve = dns_resolve;
-            });
-            describe('off', ()=>{
-                it('makes a request', etask._fn(function*(){
-                    l = yield lum({dns_check: false});
-                    const r = yield l.test({fake: 1});
-                    assert.equal(r.statusCode, 200);
-                    assert.ok(!resolve_called);
-                }));
-            });
-            describe('on', ()=>{
-                it('makes a request when dns resolves',
-                etask._fn(function*(){
-                    l = yield lum({dns_check: true});
-                    const r = yield l.test({fake: 1});
-                    assert.equal(r.statusCode, 200);
-                    assert.ok(resolve_called);
-                }));
-                it('does not make a request when dns does not resolve',
-                etask._fn(function*(){
-                    l = yield lum({dns_check: true});
-                    yield assert.rejects(etask._fn(function*(_this){
-                        yield l.test({fake: 1, url: 'http://fake'});
-                    }), /socket hang up/);
-                    assert.ok(resolve_called);
-                }));
-            });
-        });
         describe('request IP choice', ()=>{
             it('should use IP sent in x-lpm-ip header', ()=>etask(function*(){
                 l = yield lum();
@@ -827,7 +785,7 @@ describe('proxy', ()=>{
                     r.headers['x-lpm-authorization'].includes(`ip-${ip}`));
             }));
         });
-        describe('random user agent', ()=>{
+        describe('random_user_agent', ()=>{
             it('should use desktop User-Agent header by default',
             ()=>etask(function*(){
                 l = yield lum({random_user_agent: 1});
@@ -845,6 +803,18 @@ describe('proxy', ()=>{
                 const r = yield l.test();
                 assert.ok(r.body.headers['user-agent'].includes('Android'));
             }));
+        });
+        describe('proxy_connection_type', ()=>{
+            const t = (name, options, type)=>it(name, ()=>etask(function*(){
+                l = yield lum(options);
+                assert.ok(l.requester instanceof type);
+            }));
+            t('should default to HTTP requester', {},
+                requester.t.Http_requester);
+            t('should use HTTPS requester when specified',
+                {proxy_connection_type: 'https'}, requester.t.Https_requester);
+            t('should use SOCKS requester when specified',
+                {proxy_connection_type: 'socks'}, requester.t.Socks_requester);
         });
     });
     describe('retry', ()=>{

@@ -33,6 +33,7 @@ setdb.setMaxListeners(30);
 
 const App = withRouter(class App extends Pure_component {
     componentDidMount(){
+        setdb.set('head.save_settings', this.save_settings);
         const _this = this;
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/version'});
@@ -110,6 +111,17 @@ const App = withRouter(class App extends Pure_component {
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
         });
+    };
+    save_settings = settings=>{
+      return this.etask(function*(){
+          const raw = yield window.fetch('/api/settings', {
+              method: 'PUT',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(settings),
+          });
+          const new_settings = yield raw.json();
+          setdb.set('head.settings', new_settings);
+      });
     };
     render(){
         return <div className="page_wrapper">

@@ -49,43 +49,16 @@ export const tabs = {
         tooltip: 'Control the speed of your request to improve performance',
         fields: {
             proxy: {
-                label: `Super-Proxy's location`,
-                tooltip: `For a shorter latency to the Super-Proxy, you can
-                    choose its location. Please note that this does not
-                    restrict the IPs chosen country but will simply improve
-                    performances by using #Super-Proxies which have shorter
-                    roundtrips relative to your current location.`,
-            },
-            dns: {
-                label: 'DNS lookup',
-                tooltip: 'Location of DNS resolve',
-            },
-            dns_check: {
-                label: 'DNS check',
-                tooltip: 'Try to resolve DNS before sending a request',
+                label: `Super Proxy location`,
+                tooltip: `Location of Super Proxy is chosen automatically.
+                    Sometimes choosing Chinese Super Proxy works better when
+                    also using Chinese peers`,
             },
             race_reqs: {
                 label: 'Parallel race requests',
                 tooltip: `Sends multiple requests in parallel via different
-                    Super-Proxies and uses the fastest request.`,
+                    Super Proxies and uses the fastest request.`,
                 placeholder: 'Number of parallel requests'
-            },
-            proxy_count: {
-                label: 'Minimum number of super proxies',
-                tooltip: `The minimal number of Super-Proxies to use in
-                    parallel.`,
-            },
-            proxy_switch: {
-                label: 'Switch super proxy on failure',
-                tooltip: `Number of failed requests (status 403, 429, 502, 503)
-                    to switch to different super proxy`,
-            },
-            proxy_resolve: {
-                label: 'Use fixed proxies',
-                tooltip: `Resolve domain name of super proxy into IPs in
-                    advance. This is required to keep the same IPs using
-                    sessions over time (useful when using 'Long session' preset
-                    or pool size)`,
             },
             throttle: {
                 label: 'Throttle requests',
@@ -93,8 +66,12 @@ export const tabs = {
                     Allow a maximal number of parallel requests.`,
                 ext: true,
             },
+            dns: {
+                label: 'DNS lookup',
+                tooltip: 'Location of DNS resolve',
+            },
             reverse_lookup: {
-                label: 'Reverse resolve',
+                label: 'Reverse DNS lookup',
                 tooltip: 'Resolve DNS from IP to url',
                 ext: true,
             },
@@ -319,30 +296,23 @@ export const tabs = {
                     proxy configuration`,
                 ext: true,
             },
-            socks: {
-                label: 'SOCKS 5 port',
-                tooltip: `A SOCKS 5 port is the same as a proxy port, and is
-                    automatically created`,
-                ext: true,
-            },
             ssl: {
                 label: 'SSL analyzing',
                 tooltip: `Enable SSL request logs in order to save HTTPs
                     requests`,
                 ext: true,
             },
-            secure_proxy: {
-                label: 'SSL to super proxy',
-                tooltip: `Encrypt requests sent to the Super-Proxy to avoid
-                    detection on DNS`,
+            proxy_connection_type: {
+                label: 'Connection to Super Proxy',
+                tooltip: 'Connection type between LPM and Super Proxy',
             },
             route_err: {
                 label: 'Route',
                 tooltip: `<div><b>pass_dyn:</b> If a request can't pass via `
-                    +`peer, automatically pass it via the Super-Proxy`
+                    +`peer, automatically pass it via the Super Proxy`
                     +`<br><b>block</b> If a `
                     +`request can't pass via peer, block it and don't `
-                    +`send via Super-Proxy</div>`,
+                    +`send via Super Proxy</div>`,
             },
             multiply: {
                 label: 'Multiply proxy port',

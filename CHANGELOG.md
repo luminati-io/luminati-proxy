@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.154.894 Development Latest
+- :sparkles: Added option to use SOCKS to connect LPM and Super Proxy
+- :sparkles: Dashboard UI improvements, allowing to enable/disable recent stats panel
+
 ## 1.154.55 Development Latest
 - :sparkles: Added proxy port specific IPs whitelisting in General tab
 - :sparkles: Added option to unban IPs from UI in 'Banned IPs' table

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.154.55",
+        "version": "1.154.894",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -655,25 +655,10 @@
                     "type": "integer",
                     "description": "Super proxy port"
                 },
-                "proxy_count": {
-                    "type": "integer",
-                    "description": "Minimum number of super proxies to use"
-                },
-                "proxy_resolve": {
-                    "type": "boolean",
-                    "description": "Resolve domain name into number of first"
-                },
-                "secure_proxy": {
-                    "type": "boolean",
-                    "description": "Use SSL when accessing super proxy"
-                },
-                "short_username": {
-                    "type": "boolean",
-                    "description": "Use Shorthand username for super proxy credentials"
-                },
-                "proxy_switch": {
-                    "type": "integer",
-                    "description": "Automatically switch super proxy on failure"
+                "proxy_connection_type": {
+                    "type": "string",
+                    "pattern": "^(http|https|socks)?$",
+                    "description": "Determines what kind of connection will be used between LPM and Super Proxy"
                 },
                 "proxy_retry": {
                     "type": "integer",
@@ -804,6 +789,9 @@
                     "description": "Stop maintaining the pool after 1h of inactivity to save bandwidth"
                 },
                 "pool_prefill": {
+                    "type": "boolean"
+                },
+                "override_headers": {
                     "type": "boolean"
                 },
                 "headers":{

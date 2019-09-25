@@ -97,15 +97,12 @@ const presets = {
         set: opt=>{
             opt.pool_size = 1;
             opt.session = true;
-            opt.proxy_resolve = true;
         },
         clean: opt=>{
             opt.pool_size = 0;
-            opt.proxy_resolve = false;
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 1`},
-            {field: 'proxy_resolve', label: `Turns on 'Fixed super proxies'`},
         ],
         disabled: {
             sticky_ip: true,
@@ -114,41 +111,8 @@ const presets = {
             pool_type: true,
             seed: true,
             pool_size: true,
-            proxy_resolve: true,
             max_requests: true,
             session_duration: true,
-            idle_pool: true,
-            pool_prefill: true,
-        },
-    },
-    sticky_ip: {
-        title: 'Session (IP) per machine',
-        subtitle: `Each requesting machine will have its own session (IP).
-            For connecting several computers to a single Luminati Proxy
-            Manager, each of them having its own single session (IP)`,
-        set: function(opt){
-            opt.pool_size = 0;
-            opt.sticky_ip = true;
-        },
-        clean: opt=>{
-            opt.max_requests = 0;
-            opt.session_duration = 0;
-        },
-        rules: [
-            {field: 'pool_size', label: `Sets 'Pool size' to 0`},
-            {field: 'sticky_ip', label: `Enables 'Sticky Ip'`},
-            {field: 'multiply', label: `Disables 'Multiply' options`},
-        ],
-        disabled: {
-            multiply: true,
-            multiply_ips: true,
-            multiply_vips: true,
-            sticky_ip: true,
-            session_random: true,
-            session: true,
-            pool_type: true,
-            seed: true,
-            pool_size: true,
             idle_pool: true,
             pool_prefill: true,
         },
@@ -183,38 +147,70 @@ const presets = {
             idle_pool: true,
         },
     },
-    high_performance: {
-        title: 'High performance',
-        subtitle: 'Maximum request speed',
+    long_availability: {
+        title: 'Long availability',
+        subtitle: `Creates a pool of IPs and always uses the most stable IP
+            from the pool`,
         set: opt=>{
-            opt.pool_size = 50;
-            opt.pool_type = '';
-            opt.proxy_count = 20;
-            opt.max_requests = 1;
-            opt.race_reqs = 2;
+            opt.pool_size = 20;
             opt.session = true;
+            opt.pool_type = 'long_availability';
         },
         clean: opt=>{
             opt.pool_size = 0;
-            opt.proxy_count = '';
-            opt.race_reqs = '';
+            opt.pool_type = undefined;
         },
+        rules: [
+            {field: 'pool_size', label: `Sets 'Pool size' to 20`},
+            {field: 'pool_type',
+                label: `Sets pool type to 'Long availability'`},
+        ],
         disabled: {
             sticky_ip: true,
             session_random: true,
             session: true,
             pool_type: true,
             seed: true,
-            pool_size: true,
+            max_requests: true,
+            session_duration: true,
             idle_pool: true,
+            pool_prefill: true,
+        },
+    },
+    sticky_ip: {
+        title: 'Session (IP) per machine',
+        subtitle: `Each requesting machine will have its own session (IP).
+            For connecting several computers to a single Luminati Proxy
+            Manager, each of them having its own single session (IP)`,
+        set: function(opt){
+            opt.pool_size = 0;
+            opt.sticky_ip = true;
+        },
+        clean: opt=>{
+            opt.max_requests = 0;
+            opt.session_duration = 0;
+            opt.sticky_ip = false;
         },
         rules: [
-            {field: 'pool_size', label: `Sets 'Pool size' to 50`},
-            {field: 'race_reqs', label: `Uses race requests`},
-            {field: 'proxy_count', label: `Uses 20 different super proxies`},
-            {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
-                sense to choose any other positive number`},
+            {field: 'pool_size', label: `Sets 'Pool size' to 0`},
+            {field: 'sticky_ip', label: `Enables 'Sticky Ip'`},
+            {field: 'multiply', label: `Disables 'Multiply' options`},
         ],
+        disabled: {
+            multiply: true,
+            multiply_ips: true,
+            multiply_vips: true,
+            sticky_ip: true,
+            session_random: true,
+            session: true,
+            pool_type: true,
+            max_requests: true,
+            session_duration: true,
+            seed: true,
+            pool_size: true,
+            idle_pool: true,
+            pool_prefill: true,
+        },
     },
     rnd_usr_agent_and_cookie_header: {
         title: 'Random User-Agent',

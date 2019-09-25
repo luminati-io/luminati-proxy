@@ -336,7 +336,6 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
 }
 .tooltip.har_tooltip {
     .tooltip-inner {
-        top: 7px;
         position: relative;
         max-width: 550px;
         background: hsl(0, 0%, 95%);
@@ -357,12 +356,16 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         font-family: Roboto, Ubuntu, Arial, sans-serif;
     }
     .tooltip-arrow { display: none; }
+    &.top {
+        .tooltip-inner { top: 7px; }
+    }
     &.bottom {
         margin-top: 0;
         padding-top: 0;
         margin-left: 9px;
         .tooltip-inner { top: 4px; }
     }
+    &.left { margin-left: 0; }
 }
 .tooltip.wide .tooltip-inner { max-width: 600px; }
 .tooltip.top .tooltip-arrow { border-top-color: @tooltip; }
@@ -1311,23 +1314,27 @@ span.icon_link {
     }
     .panels {
         display: flex;
-        flex: 0 0 356px;
+        flex: 3;
+        position: relative;
+        padding-left: 15px;
+        padding-right: 15px;
     }
     .proxies_wrapper {
         flex: 1;
         overflow: auto;
-        margin-left: 15px;
-        margin-right: 7px;
     }
     .stats_wrapper {
         width: 305px;
         min-width: 305px;
         max-width: 305px;
-        margin-left: 7px;
-        margin-right: 15px;
+        margin-left: 15px;
         .stats_panel {
+            height: 100%;
+            .main_panel {
+                display: flex;
+                flex-direction: column;
+            }
             .tables_container {
-                height: 100px;
                 .data_container {
                     position: initial;
                     flex: 1;
@@ -1365,12 +1372,21 @@ span.icon_link {
             }
         }
     }
+    .enable_stats_btn {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        margin-right: 15px;
+        background: none;
+        border: 1px solid;
+        border-radius: 50%;
+    }
     .logs_wrapper {
-        flex: 1;
         display: flex;
         .har_viewer {
             height: auto;
             padding: 15px;
+            min-height: initial;
         }
     }
 }
@@ -2459,7 +2475,7 @@ span.icon_link {
                 span.t_button { background-color: #333; }
             }
             &.active { span.t_button { background-color: #2196f3; } }
-            &.close_logs { float: right; }
+            &.close_logs { float: right; margin-left: auto; }
         }
         .devider {
             background-color: #ccc;
@@ -2767,6 +2783,7 @@ span.icon_link {
 }
 .har_viewer_off {
     width: 100%;
+    padding-bottom: 15px;
 }
 .har_viewer {
     &.waiting * { cursor: wait !important; }

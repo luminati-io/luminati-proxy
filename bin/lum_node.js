@@ -79,7 +79,7 @@ E.shutdown = (reason, error=null)=>{
     if (error)
         zerr(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
     else
-        zerr.info(`Shutdown, reason is ${reason}`);
+        zerr.notice(`Shutdown, reason is ${reason}`);
     file.rm_rf_e(Tracer.screenshot_dir);
     E.write_status_file('shutdown', error, E.manager && E.manager._total_conf,
         reason);
@@ -87,15 +87,16 @@ E.shutdown = (reason, error=null)=>{
 
 E.handle_signal = (sig, err)=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
-    if (err)
-        zerr.crit(errstr);
+    if (err && sig!='SIGINT' && sig!='SIGTERM')
+        zerr.error(errstr);
     etask(function*handle_signal_lum_node(){
         if (sig!='SIGINT' && sig!='SIGTERM')
         {
             yield zerr.perr('crash', {error: errstr, reason: sig,
                 customer: _.get(E.manager, '_defaults.customer')});
+            return E.shutdown(errstr, err);
         }
-        E.shutdown(errstr, err);
+        return E.shutdown(errstr);
     });
 };
 

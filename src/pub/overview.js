@@ -11,42 +11,18 @@ import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
 
 class Overview extends Pure_component {
-    update_window_dimensions = ()=>
-        this.setState({height: window.innerHeight});
-    constructor(props){
-        super(props);
-        this.state = {height: window.innerHeight};
-    }
+    state = {show_logs: false};
     componentDidMount(){
-        this.setdb_on('head.proxies_running', proxies=>
-            this.setState({proxies}));
-        this.setdb_on('head.settings', settings=>{
-            if (settings)
-                this.setState({logs: settings.logs});
-        });
-        this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
-        this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
-        this.update_window_dimensions();
-        window.addEventListener('resize', this.update_window_dimensions);
-    }
-    willUnmount(){
-        window.removeEventListener('resize', this.update_window_dimensions);
+        this.setdb_on('head.settings', settings=>settings &&
+            this.setState({show_logs: settings.logs>0}));
     }
     render(){
-        const {height, ver_last, ver_node, logs} = this.state;
+        const {show_logs} = this.state;
         const master_port = this.props.match.params.master_port;
         const title = master_port ?
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}
             </span> : <T>Overview</T>;
-        let panels_margin = 118;
-        const has_upgrade_panel = ver_last&&ver_last.newer&&ver_node;
-        if (has_upgrade_panel)
-            panels_margin = 198;
-        let panels_height = height-panels_margin;
-        if (panels_height<383||logs)
-            panels_height = 383;
-        const fill_height = {flex: '0 0 '+panels_height+'px'};
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>
@@ -54,15 +30,13 @@ class Overview extends Pure_component {
               <div className="proxies nav_header">
                 <h3>{title}</h3>
               </div>
-              <div className="panels" style={fill_height}>
+              <div className="panels">
                 <div className="proxies proxies_wrapper">
                   <Proxies master_port={master_port}/>
                 </div>
-                <div className="stats_wrapper">
-                  <Stats master_port={master_port}/>
-                </div>
+                <Stats/>
               </div>
-              <div className="logs_wrapper">
+              <div className="logs_wrapper" style={{flex: show_logs ? 2 : 0}}>
                 <Har_viewer master_port={master_port}/>
               </div>
             </div>;

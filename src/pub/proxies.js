@@ -270,9 +270,9 @@ const columns = [
         ext: true,
     },
     {
-        key: 'secure_proxy',
-        title: 'SSL to Super Proxy',
-        render: Boolean_cell,
+        key: 'proxy_connection_type',
+        title: 'Proxy connection type',
+        tooltip: 'Connection type between LPM and Super Proxy',
         ext: true,
     },
     {
@@ -336,11 +336,6 @@ const columns = [
         type: 'text',
     },
     {
-        key: 'proxy_count',
-        title: 'Minimum super proxies',
-        type: 'number',
-    },
-    {
         key: 'race_reqs',
         title: 'Parallel race requests',
         type: 'number',
@@ -375,11 +370,6 @@ const columns = [
         key: 'proxy',
         title: 'Super Proxy',
         type: 'text'
-    },
-    {
-        key: 'proxy_switch',
-        title: 'Autoswitch super proxy on failure',
-        type: 'number',
     },
     {
         key: 'throttle',
@@ -729,16 +719,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             return null;
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        let table_margin = 174;
-        const has_upgrade_panel = this.state.ver_last
-            &&this.state.ver_last.newer&&this.state.ver_node;
-        if (has_upgrade_panel)
-            table_margin = 254;
-        let table_height = this.state.height-table_margin;
-        if (table_height<328)
-            table_height = 328;
-        if (this.state.logs)
-            table_height = 355;
         const show_logs = this.state.logs>0;
         return <div className="proxies_panel chrome">
               <div className="main_panel vbox">
@@ -752,10 +732,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                     <div className="chrome chrome_table vbox">
                       <div className="tables_container header_container hack">
                       <div className="chrome_table">
-                      <AutoSizer disableHeight>
-                        {({width})=>
+                      <AutoSizer>
+                        {({height, width})=>
                           <Table width={width}
-                            height={table_height}
+                            height={height}
                             onRowClick={this.on_row_click}
                             // we use onHeaderClick here because the table
                             // swallows clicks on headers

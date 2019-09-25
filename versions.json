@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.154.894",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added option to use SOCKS to connect LPM and Super Proxy"
+            },
+            {
+                "type": "sparkles",
+                "text": "Dashboard UI improvements, allowing to enable/disable recent stats panel"
+            }
+        ]
+    },
+    {
         "ver": "1.154.55",
         "type": "dev",
         "changes": [

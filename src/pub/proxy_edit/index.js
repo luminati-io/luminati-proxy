@@ -57,7 +57,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (!proxy)
                 this.props.history.push('/overview');
             const form = Object.assign({}, proxy.config);
-            this.apply_preset(form, form.last_preset_applied||'session_long');
+            this.apply_preset(form, form.preset||'session_long');
             this.setState({proxies}, this.delayed_loader());
         });
         this.setdb_on('head.zones', zones=>{
@@ -170,12 +170,10 @@ const Index = withRouter(class Index extends Pure_component {
     };
     apply_preset = (_form, preset)=>{
         const form = Object.assign({}, _form);
-        const last_preset = form.last_preset_applied ?
-            presets[form.last_preset_applied] : null;
+        const last_preset = form.preset ? presets[form.preset] : null;
         if (last_preset && last_preset.key!=preset && last_preset.clean)
             last_preset.clean(form);
         form.preset = preset;
-        form.last_preset_applied = preset;
         presets[preset].set(form);
         const disabled_fields = presets[preset].disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
@@ -288,8 +286,7 @@ const Index = withRouter(class Index extends Pure_component {
             if (_this.props.match.params.port!=_this.state.form.port)
             {
                 const port = _this.state.form.port;
-                const tab = _this.props.match.params.tab;
-                _this.props.history.push({pathname: `/proxy/${port}/${tab}`});
+                _this.props.history.push({pathname: `/proxy/${port}/general`});
             }
             if (_this.resave)
             {
@@ -343,7 +340,6 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.asn = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
-        delete save_form.preset;
         if (save_form.session_random)
             save_form.session = true;
         delete save_form.session_random;

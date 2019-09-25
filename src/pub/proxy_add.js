@@ -49,16 +49,16 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         const form = {};
         if (this.state.cur_tab=='proxy_lum')
         {
-            form.last_preset_applied = this.state.preset;
+            form.preset = this.state.preset;
             form.zone = this.state.zone;
         }
         else
         {
-            form.last_preset_applied = 'rotating';
+            form.preset = 'rotating';
             form.ext_proxies = this.state.parsed_ips_list;
         }
         form.proxy_type = 'persist';
-        presets[form.last_preset_applied].set(form);
+        presets[form.preset].set(form);
         const _this = this;
         return etask(function*(){
             this.on('uncaught', e=>{
