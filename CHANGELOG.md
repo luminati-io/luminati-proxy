@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.155.263 
+- :bug: Fixed API for bannip/unbanning IPs
+
 ## 1.155.206 Stable
 - :sparkles: Improved logging
 
