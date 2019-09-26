@@ -202,8 +202,6 @@ const Index = withRouter(class Index extends Pure_component {
             form.ips = [];
         if (!form.vips)
             form.vips = [];
-        if (Array.isArray(form.smtp))
-            form.smtp = form.smtp.join(',');
         if (form.city && !Array.isArray(form.city) && form.state)
         {
             form.city = [{id: form.city,

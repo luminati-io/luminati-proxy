@@ -53,7 +53,6 @@ describe('ws', ()=>{
         s_mock.verify();
     });
     it('closes socket on proxy req error', ()=>{
-        sinon.stub(ws_handler._log, 'error');
         stub_proxy_req_event('error', Error('network problem'));
         s_mock.expects('end').once();
         ws_handler.handle_connection(req, socket);

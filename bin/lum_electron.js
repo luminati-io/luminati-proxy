@@ -16,6 +16,7 @@ const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
 const pkg = require('../package.json');
+const logger = require('../lib/logger.js');
 const E = module.exports;
 
 let manager, upgrade_available, can_upgrade;
@@ -25,12 +26,6 @@ const show_message = opt=>etask(function*(){
         [opt]);
     return res;
 });
-const mgr_err = msg=>{
-    if (manager && manager.log)
-        manager.log.error(msg);
-    else
-        console.log(msg);
-};
 
 // XXX vladislavl: need refactor restart themself - electron does not support
 // fork child other path js process run
@@ -129,7 +124,7 @@ const check_conflicts = ()=>etask(function*(){
 });
 
 const _run = argv=>etask(function*(){
-    zerr.notice('Running Luminati Proxy Manager v%s, PID: %s', pkg.version,
+    logger.notice('Running Luminati Proxy Manager v%s, PID: %s', pkg.version,
         process.pid);
     yield check_conflicts();
     if (process.send)
@@ -155,7 +150,7 @@ const _run = argv=>etask(function*(){
         let handle_fatal = ()=>{
             if (fatal)
             {
-                mgr_err(e_msg);
+                logger.error(e_msg);
                 process.exit();
             }
         };
@@ -177,7 +172,7 @@ let quit = err=>{
     {
         if (!manager)
             zerr.perr(err);
-        mgr_err('uncaught exception '+zerr.e2s(err));
+        logger.error('uncaught exception '+zerr.e2s(err));
     }
     app.quit();
 };

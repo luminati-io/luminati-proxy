@@ -18,15 +18,6 @@ const debug_opt = [
     {key: 'full', value: 'full'},
 ];
 
-const log_level_opt = [
-    {key: `Default (error)`, value: ''},
-    {key: `none`, value: 'none'},
-    {key: `error`, value: 'error'},
-    {key: `warn`, value: 'warn'},
-    {key: `notice`, value: 'notice'},
-    {key: `info`, value: 'info'},
-];
-
 const proxy_connection_type_opt = [
     {key: 'Default (HTTP)', value: ''},
     {key: 'HTTP', value: 'http'},
@@ -111,7 +102,6 @@ export default class General extends Pure_component {
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact/>
-                <Config type="select" id="log" data={log_level_opt}/>
                 <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>
             </div>;

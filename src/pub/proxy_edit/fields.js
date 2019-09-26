@@ -335,12 +335,6 @@ export const tabs = {
                     +'the local machine is running',
                 ext: true,
             },
-            log: {
-                label: 'Log level',
-                tooltip: `Decide how elaborate is the debugging information
-                    that you see in the console's log`,
-                ext: true,
-            },
             insecure: {
                 label: 'Insecure',
                 tooltip: `It works only when SSL analyzing is enabled. You can

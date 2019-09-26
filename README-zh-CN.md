@@ -36,7 +36,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.154.894-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.155.88-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -92,7 +92,7 @@ Options:
   --multiply               Multiply the port definition given number of times
                                                                         [number]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --log                    Log level                 [string] [default: "error"]
+  --log                    Log level                [string] [default: "notice"]
   --iface                  Interface or IP to listen on
                                                    [string] [default: "0.0.0.0"]
   --customer               Luminati customer                            [string]

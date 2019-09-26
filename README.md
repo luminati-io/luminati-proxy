@@ -33,7 +33,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.154.894/luminati-proxy-manager-v1.154.894-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.155.88/luminati-proxy-manager-v1.155.88-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -155,7 +155,7 @@ Options:
   --multiply               Multiply the port definition given number of times
                                                                         [number]
   --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --log                    Log level                 [string] [default: "error"]
+  --log                    Log level                [string] [default: "notice"]
   --iface                  Interface or IP to listen on
                                                    [string] [default: "0.0.0.0"]
   --customer               Luminati customer                            [string]

@@ -33,9 +33,19 @@ const tooltips = {
     request_stats: `Enable saving statistics to database`,
     logs: `Specify how many requests you want to keep in database. The
         limit may be set as a number or maximum database size.`,
+    log: `Decide how elaborate is the debugging information
+        that you see in the console's log`,
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
+
+const log_level_opt = [
+    {key: `Default (notice)`, value: ''},
+    {key: `error`, value: 'error'},
+    {key: `warn`, value: 'warn'},
+    {key: `notice`, value: 'notice'},
+    {key: `info`, value: 'info'},
+];
 
 class Form extends Pure_component {
     state = {saving: false};
@@ -81,6 +91,10 @@ class Form extends Pure_component {
     };
     logs_changed = val=>{
         this.setState(prev=>({settings: {...prev.settings, logs: +val}}),
+            this.debounced_save);
+    };
+    log_changed = val=>{
+        this.setState(prev=>({settings: {...prev.settings, log: val}}),
             this.debounced_save);
     };
     request_stats_changed = val=>{
@@ -143,6 +157,10 @@ class Form extends Pure_component {
                 type="pins" label="Proxy whitelisted IPs"
                 on_change_wrapper={this.whitelist_ips_change}
                 tooltip={tooltips.whitelist_ips}/>
+              {false && <Labeled_controller val={s.log}
+                type="select" data={log_level_opt}
+                label="Log level" on_change_wrapper={this.log_changed}
+                tooltip={tooltips.log}/>}
               <Labeled_controller val={s.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default

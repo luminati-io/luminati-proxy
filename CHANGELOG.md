@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.155.88 Stable
+- :bug: Fixed SMTP settings in proxy port's General tab
+
 ## 1.154.894 Development Latest
 - :sparkles: Added option to use SOCKS to connect LPM and Super Proxy
 - :sparkles: Dashboard UI improvements, allowing to enable/disable recent stats panel

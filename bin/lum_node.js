@@ -26,6 +26,7 @@ const path = require('path');
 const ws = require('lum_windows-shortcuts');
 const install_path = path.resolve(os.homedir(), 'luminati_proxy_manager');
 const exe_path = path.resolve(install_path, 'lpm.exe');
+const logger = require('../lib/logger.js');
 
 const gen_filename = name=>{
     return lpm_file.get_file_path(
@@ -44,7 +45,9 @@ E.write_status_file = (status, error=null, config=null, reason=null)=>{
         customer_name: _.get(config, '_defaults.customer'),
     });
     try { file.write_e(E.status_filename, JSON.stringify(E.lpm_status)); }
-    catch(e){ zerr(`Failed to write status file: ${e.message}`); }
+    catch(e){
+        logger.error(`Failed to write status file: ${e.message}`);
+    }
 };
 
 E.read_status_file = ()=>{
@@ -65,7 +68,7 @@ E.shutdown = (reason, error=null)=>{
     E.shutdown_timeout = setTimeout(()=>{
         if (!E.shutdowning)
             return;
-        zerr.crit('Forcing exit after 3 sec');
+        logger.error('Forcing exit after 3 sec');
         E.uninit();
         process.exit(1);
     }, shutdown_timeout);
@@ -77,9 +80,9 @@ E.shutdown = (reason, error=null)=>{
         E.manager = null;
     }
     if (error)
-        zerr(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
+        logger.error(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
     else
-        zerr.notice(`Shutdown, reason is ${reason}`);
+        logger.notice(`Shutdown, reason is ${reason}`);
     file.rm_rf_e(Tracer.screenshot_dir);
     E.write_status_file('shutdown', error, E.manager && E.manager._total_conf,
         reason);
@@ -88,7 +91,7 @@ E.shutdown = (reason, error=null)=>{
 E.handle_signal = (sig, err)=>{
     const errstr = sig+(err ? ', error = '+zerr.e2s(err) : '');
     if (err && sig!='SIGINT' && sig!='SIGTERM')
-        zerr.error(errstr);
+        logger.error(errstr);
     etask(function*handle_signal_lum_node(){
         if (sig!='SIGINT' && sig!='SIGTERM')
         {
@@ -113,18 +116,18 @@ const add_alias_for_whitelist_ips = ()=>{
     let bashrc;
     try { bashrc = file.read_e(bashrc_path); }
     catch(e){
-        zerr.notice(`.bashrc not found! alias for whitelisting failed`);
+        logger.notice(`.bashrc not found! alias for whitelisting failed`);
         return;
     }
     if (/lpm_whitelist_ip/.test(bashrc)||/curl_add_ip/.test(bashrc))
         return;
-    zerr.notice(`installing ${name}`);
+    logger.notice(`installing ${name}`);
     try {
         const alias = `alias ${name}='${cmd}'`;
         file.append_e(bashrc_path, func+'\n'+alias);
         child_process.execSync(func);
         child_process.execSync(alias);
-    } catch(e){ zerr.warn(`Failed to install ${name}: ${e.message}`); }
+    } catch(e){ logger.warn(`Failed to install ${name}: ${e.message}`); }
 };
 
 let conflict_shown = false;
@@ -147,15 +150,15 @@ const get_lpm_tasks = ()=>etask(function*(){
 const _show_port_conflict = (port, force)=>etask(function*(){
     const tasks = yield get_lpm_tasks();
     if (!tasks.length)
-        return zerr(`There is a conflict on port ${port}`);
+        return logger.error(`There is a conflict on port ${port}`);
     const pid = tasks[0].pid;
-    zerr.notice(`LPM is already running (${pid}) and uses port ${port}`);
+    logger.notice(`LPM is already running (${pid}) and uses port ${port}`);
     if (!force)
     {
-        zerr.notice('If you want to kill other instances use --force flag');
+        logger.notice('If you want to kill other instances use --force flag');
         return process.exit();
     }
-    zerr.notice('Trying to kill it and restart.');
+    logger.notice('Trying to kill it and restart.');
     for (const t of tasks)
         process.kill(t.ppid, 'SIGTERM');
     E.manager.restart();
@@ -167,8 +170,8 @@ const check_running = argv=>etask(function*(){
         return;
     if (!argv.dir)
     {
-        zerr.notice(`LPM is already running (${tasks[0].pid})`);
-        zerr.notice('You need to pass a separate path to the directory for'
+        logger.notice(`LPM is already running (${tasks[0].pid})`);
+        logger.notice('You need to pass a separate path to the directory for'
             +' this LPM instance. Use --dir flag');
         process.exit();
     }
@@ -176,26 +179,27 @@ const check_running = argv=>etask(function*(){
 
 const upgrade_win = function(){
     try {
-        zerr.notice('Copying %s to %s', process.execPath, exe_path);
+        logger.notice('Copying %s to %s', process.execPath, exe_path);
         file.copy_e(process.execPath, exe_path);
         const subprocess = child_process.spawn(exe_path, ['--cleanup_win',
             process.execPath, '--kill_pid', process.pid],
             {detached: true, stdio: 'ignore', shell: true});
         subprocess.unref();
     } catch(e){
-        zerr.notice(e.message);
+        logger.notice(e.message);
     }
 };
 
 const install_win = ()=>etask(function*lum_node_install_win(){
     this.on('uncaught', e=>{
-        zerr('There was an error while installing on Windows: %s', e.message);
+        logger.error('There was an error while installing on Windows: %s',
+            e.message);
     });
-    zerr.notice('Checking installation on Windows');
+    logger.notice('Checking installation on Windows');
     if (!file.exists(install_path))
     {
         file.mkdir_e(install_path);
-        zerr.notice('Created %s', install_path);
+        logger.notice('Created %s', install_path);
     }
     if (process.execPath!=exe_path)
         upgrade_win();
@@ -222,40 +226,40 @@ const install_win = ()=>etask(function*lum_node_install_win(){
     if (file.exists(old_puppeteer_path))
     {
         const new_puppeteer_path = path.resolve(install_path, 'chromium');
-        zerr.notice('Copying puppeteer from %s to %s', old_puppeteer_path,
+        logger.notice('Copying puppeteer from %s to %s', old_puppeteer_path,
             new_puppeteer_path);
         file.rename_e(old_puppeteer_path, new_puppeteer_path);
-        return zerr.notice('Puppeteer reused from previous installation');
+        return logger.notice('Puppeteer reused from previous installation');
     }
-    zerr.notice('Started fetching puppeteer binary');
+    logger.notice('Started fetching puppeteer binary');
     yield download(`http://${pkg.api_domain}/static/lpm/puppeteer.zip`, 'tmp');
     const source = path.join(process.cwd(), 'tmp', 'puppeteer.zip');
     extract(source, {dir: install_path}, err=>{
         if (err)
             return this.throw(err);
-        zerr.notice('Puppeteer fetched');
+        logger.notice('Puppeteer fetched');
     });
 });
 
 const cleanup_win = function(_path){
-    zerr.notice('Cleaning up after installation. Deleting file %s', _path);
+    logger.notice('Cleaning up after installation. Deleting file %s', _path);
     try {
         file.unlink_e(_path);
     } catch(e){
-        zerr.notice(e.message);
+        logger.notice(e.message);
     }
 };
 
 E.run = (argv, run_config)=>etask(function*(){
-    zerr.notice('Running Luminati Proxy Manager v%s, PID: %s', pkg.version,
-        process.pid);
     if (is_pkg && argv.kill_pid)
     {
-        zerr.notice('Killing previous process %s', argv.kill_pid);
+        logger.notice('Killing previous process %s', argv.kill_pid);
         try {
             process.kill(argv.kill_pid);
             yield etask.sleep(4000);
-        } catch(e){ zerr.notice('Could not kill process %s', argv.kill_pid); }
+        } catch(e){
+            logger.notice('Could not kill process %s', argv.kill_pid);
+        }
     }
     yield check_running(argv);
     if (is_pkg && argv.upgrade_win)
@@ -271,6 +275,7 @@ E.run = (argv, run_config)=>etask(function*(){
         E.manager && E.manager._total_conf);
     E.manager = new Manager(argv, Object.assign({}, run_config));
     E.manager.on('stop', ()=>{
+        // XXX krzysztof: do I need to flush logger too?
         zerr.flush();
         if (E.shutdown_timeout)
             clearTimeout(E.shutdown_timeout);
@@ -281,7 +286,7 @@ E.run = (argv, run_config)=>etask(function*(){
         let match;
         if (match = e.message.match(/EADDRINUSE.+:(\d+)/))
             return show_port_conflict(match[1], argv.force);
-        zerr(e.raw ? e.message : 'Unhandled error: '+e);
+        logger.error(e.raw ? e.message : 'Unhandled error: '+e);
         const handle_fatal = ()=>{
             if (fatal)
                 E.manager.stop();

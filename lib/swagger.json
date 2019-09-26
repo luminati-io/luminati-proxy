@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.154.894",
+        "version": "1.155.88",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -537,6 +537,11 @@
                     "items": {"type": "string"},
                     "description": "Whitelist ip list for granting access to browser admin UI"
                 },
+                "log": {
+                    "type": "string",
+                    "pattern": "^(error|warn|notice|info|debug)?$",
+                    "description": "Log level"
+                },
                 "www": {
                     "type": "integer",
                     "description": "HTTP port for browser admin UI"
@@ -625,11 +630,6 @@
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
-                },
-                "log": {
-                    "type": "string",
-                    "pattern": "^(none|error|warn|verbose)?$",
-                    "description": "Log level"
                 },
                 "iface": {
                     "type": "string",

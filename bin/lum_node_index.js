@@ -12,6 +12,7 @@ check_compat();
 const _ = require('lodash');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
+const logger = require('../lib/logger.js');
 const lpm_config = require('../util/lpm_config.js');
 const Lum_common = require('./lum_common.js');
 const pm2 = require('pm2');
@@ -27,7 +28,9 @@ const download = require('download');
 
 class Lum_node_index extends Lum_common {
     pm2_cmd(command, opt){ return etask(function*pm2_cmd(){
-        this.on('uncaught', e=>zerr('PM2: Uncaught exception: '+zerr.e2s(e)));
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
         yield etask.nfn_apply(pm2, '.connect', []);
         if (!Array.isArray(opt))
             opt = [opt];
@@ -65,7 +68,7 @@ class Lum_node_index extends Lum_common {
                 child_process.execSync(pm2_bin+' startup');
                 child_process.execSync(pm2_bin+' save');
             } catch(e){
-                zerr.warn('Failed to install startup script automatically, '
+                logger.warn('Failed to install startup script automatically, '
                     +`try run:\n${e.stdout.toString('utf-8')}\n${pm2_bin}`
                     +`save`);
             }
@@ -115,19 +118,19 @@ class Lum_node_index extends Lum_common {
         const cmd = lpm_config.is_win ? npm_cmd :
             `bash -c "${npm_cmd} > ${log_file} 2>&1"`;
         const opt = {name: 'Luminati Proxy Manager'};
-        zerr.notice('Upgrading proxy manager');
+        logger.notice('Upgrading proxy manager');
         sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
             if (cb)
                 cb(e);
             if (e)
             {
-                zerr('Error during upgrade: '+zerr.e2s(e));
+                logger.error('Error during upgrade: '+zerr.e2s(e));
                 if (!lpm_config.is_win)
-                    zerr(`Look at ${log_file} for more details`);
+                    logger.error(`Look at ${log_file} for more details`);
                 return;
             }
             if (stderr)
-                zerr('NPM stderr: '+stderr);
+                logger.error('NPM stderr: '+stderr);
             check_compat();
         });
     }
@@ -140,7 +143,7 @@ class Lum_node_index extends Lum_common {
         const newer = r.body.ver && semver.lt(pkg.version, r.body.ver);
         if (!newer)
             return cb();
-        zerr.notice('Upgrading proxy manager');
+        logger.notice('Upgrading proxy manager');
         const install_path = path.resolve(os.homedir(),
             'luminati_proxy_manager');
         const download_url = `http://${pkg.api_domain}/static/lpm/`
@@ -177,10 +180,10 @@ class Lum_node_index extends Lum_common {
         this.upgrade(e=>{
             if (e)
             {
-                zerr(`Error during upgrade: ${zerr.e2s(e)}`);
+                logger.error(`Error during upgrade: ${zerr.e2s(e)}`);
                 process.exit();
             }
-            zerr.notice('Upgrade completed successfully');
+            logger.notice('Upgrade completed successfully');
             this.create_child();
         });
     }
