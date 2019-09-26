@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.155.206 Stable
+- :sparkles: Improved logging
+
 ## 1.155.133 Stable
 - :bug: Fixed SMTP settings in proxy port's General tab
 

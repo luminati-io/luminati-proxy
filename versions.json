@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.155.206",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved logging"
+            }
+        ]
+    },
+    {
         "ver": "1.155.133",
         "type": "stable",
         "changes": [
