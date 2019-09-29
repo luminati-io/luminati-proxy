@@ -729,7 +729,6 @@ class Header_container extends Pure_component {
             return null;
         if (only_name)
             cols = [cols[1]];
-
         return <div className="header_container">
               <table>
                 <colgroup>
@@ -744,7 +743,8 @@ class Header_container extends Pure_component {
                     {cols.map(c=>
                       <T key={c.title}>{t=>
                         <Tooltip title={t(c.tooltip||c.title)}>
-                          <th key={c.title} onClick={()=>this.click(c)}>
+                          <th key={c.title} onClick={()=>this.click(c)}
+                            style={{textAlign: only_name ? 'left' : null}}>
                             <div>
                               {c.title=='select' &&
                                 <Checkbox checked={this.state.checked_all}
@@ -942,8 +942,7 @@ class Name_cell extends Pure_component {
                 }
                 <Tooltip title={req.request.url}>
                   <div className="disp_value">
-                    {status_check && 'status check'}
-                    {!status_check && req.request.url}
+                    {req.request.url + (status_check ? ' (status check)' : '')}
                   </div>
                 </Tooltip>
               </div>

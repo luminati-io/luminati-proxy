@@ -201,12 +201,6 @@ export const tabs = {
                     should be turned off only in advanced cases when you want
                     to build a pool of IPs based on the rules`,
             },
-            session_random: {
-                label: 'Random session',
-                tooltip: `Each session is generated randomly. Disable this
-                    if you want to define sessions manually`,
-                ext: true,
-            },
             session: {
                 label: 'Explicit session',
                 tooltip: `Insert a session ID to maintain the same IP for as
@@ -234,24 +228,11 @@ export const tabs = {
                     seconds`,
                 ext: true,
             },
-            seed: {
-                label: 'Session ID seed',
-                tooltip: `A string that will be used to maintain unified
-                    session structure. Each new session will be associated with
-                    a serial number starting from 1. (e.g. session seed 'test'
-                    will have the following sessions: test-1, test-2 ..)`,
-                placeholder: `e.g. test_session`,
-            },
             session_termination: {
                 label: 'Session termination',
                 tooltip: `Stop sending new requests when the peer IP becomes
                     unavailable and redirect to confirmation page before new IP
                     is taken`,
-            },
-            idle_pool: {
-                label: 'Idle pool',
-                tooltip: `Stop maintaining the pool after 1 hour of inactivity
-                    to save bandwidth`,
             },
         },
     },
@@ -264,11 +245,6 @@ export const tabs = {
                 label: 'User-Agent',
                 tooltip: `Choose a User-Agent header that will be used for
                     sending requests`,
-            },
-            random_user_agent: {
-                label: 'Random User-Agent',
-                tooltip: `Set a random User-Agent header targeting the
-                    specified device type for each request`,
             },
             override_headers: {
                 label: 'Override headers',

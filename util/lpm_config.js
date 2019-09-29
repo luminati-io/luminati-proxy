@@ -56,9 +56,7 @@ conf.server_default = {
     multiply: 0,
     max_requests: 0,
     session_duration: 0,
-    random_user_agent: false,
     pool_prefill: true,
-    idle_pool: true,
     session: true,
     override_headers: true,
 };

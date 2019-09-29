@@ -33,7 +33,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.155.263/luminati-proxy-manager-v1.155.263-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.155.475/luminati-proxy-manager-v1.155.475-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -191,8 +191,6 @@ Options:
                            host                       [boolean] [default: false]
   --pool_size              Session pool size               [number] [default: 3]
   --pool_type              Pool session iteration order                 [string]
-  --seed                   Session ID seed used for identifying sessions from
-                           this proxy                                   [string]
   --max_requests           Maximum requests per session   [string] [default: 50]
   --session_duration       Maximum duration of session (seconds)        [string]
   --throttle               Throttle requests above given number         [number]

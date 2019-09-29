@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.155.475",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed CSS on big request stats panels"
+            }
+        ]
+    },
+    {
         "ver": "1.155.263",
         "type": "stable/dev",
         "changes": [

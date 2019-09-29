@@ -13,6 +13,7 @@ import moment from 'moment';
 import $ from 'jquery';
 import {trigger_types, action_types} from '../../util/rules_util.js';
 import {Copy_btn} from './common.js';
+import {Toolbar_button} from './chrome_widgets.js';
 
 class Preview extends Pure_component {
     panes = [
@@ -38,13 +39,8 @@ class Preview extends Pure_component {
         const req = this.props.cur_preview;
         return <div style={this.props.style} className="har_preview chrome">
               <div className="tabbed_pane_header">
-                <div className="left_pane">
-                  <div onClick={this.props.close}
-                    className="close_btn_wrapper">
-                    <div className="small_icon close_btn"/>
-                    <div className="medium_icon close_btn_h"/>
-                  </div>
-                </div>
+                <Toolbar_button id="close_btn" tooltip="Close" placement="top"
+                  on_click={this.props.close}/>
                 <div className="right_panes">
                   {this.panes.map((p, idx)=>
                     <Pane key={p.id} width={p.width} id={p.id} idx={idx}
@@ -73,7 +69,7 @@ const Pane_slider = ({panes, cur_pane})=>{
     const offset = panes.slice(0, cur_pane).reduce((acc, e)=>acc+e.width, 0);
     const slider_style = {
         width: panes[cur_pane].width,
-        transform: `translateX(${offset+24}px)`,
+        transform: `translateX(${offset+28}px)`,
     };
     return <div className={slider_class} style={slider_style}/>;
 };
@@ -325,7 +321,7 @@ const Action_section = ({actions})=>
 
 const Action = ({action, value})=>{
     const key = (action_types.find(a=>a.value==action)||{}).key;
-    const val = (action=='request_url' ? value&&value.url : value);
+    const val = action=='request_url' ? value&&value.url : value;
     return <div className="action">
           {key} {val ? `: ${val}` : ''}
         </div>;

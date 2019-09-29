@@ -331,11 +331,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'seed',
-        title: 'Seed',
-        type: 'text',
-    },
-    {
         key: 'race_reqs',
         title: 'Parallel race requests',
         type: 'number',

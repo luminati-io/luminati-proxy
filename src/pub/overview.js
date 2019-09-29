@@ -19,6 +19,8 @@ class Overview extends Pure_component {
     render(){
         const {show_logs} = this.state;
         const master_port = this.props.match.params.master_port;
+        const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
+        const logs_wrapper_style = {flex: show_logs ? 2 : 0};
         const title = master_port ?
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}
@@ -30,13 +32,13 @@ class Overview extends Pure_component {
               <div className="proxies nav_header">
                 <h3>{title}</h3>
               </div>
-              <div className="panels">
+              <div className="panels" style={panels_style}>
                 <div className="proxies proxies_wrapper">
                   <Proxies master_port={master_port}/>
                 </div>
                 <Stats/>
               </div>
-              <div className="logs_wrapper" style={{flex: show_logs ? 2 : 0}}>
+              <div className="logs_wrapper" style={logs_wrapper_style}>
                 <Har_viewer master_port={master_port}/>
               </div>
             </div>;

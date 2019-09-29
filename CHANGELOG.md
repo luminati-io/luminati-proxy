@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.155.475 
+- :bug: Fixed CSS on big request stats panels
+
 ## 1.155.263 
 - :bug: Fixed API for bannip/unbanning IPs
 

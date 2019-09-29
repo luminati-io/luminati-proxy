@@ -252,7 +252,7 @@ class Toolbar extends Pure_component {
                 <Devider/>
                 <Success_ratio total={this.props.stats.total}
                   success={this.props.stats.success}/>
-                <Toolbar_button id="close_logs" tooltip="Disable"
+                <Toolbar_button id="close_btn" tooltip="Disable"
                   placement="left" on_click={this.props.disable_stats}/>
               </Toolbar_row>
             </Toolbar_container>;

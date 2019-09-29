@@ -393,9 +393,6 @@ describe('proxy', ()=>{
                 t('1, sticky_ip', {max_requests: 1, sticky_ip: true});
                 t('2, sticky_ip', {max_requests: 2, sticky_ip: true});
                 t('5, sticky_ip', {max_requests: 5, sticky_ip: true});
-                t('1, session using seed', {max_requests: 1});
-                t('2, session using seed', {max_requests: 2});
-                t('5, session using seed', {max_requests: 5});
                 it('no pool size', etask._fn(function*(_this){
                     _this.timeout(4000);
                     l = yield lum({max_requests: 1, pool_size: 0});
@@ -422,7 +419,6 @@ describe('proxy', ()=>{
                 t('pool', {pool_size: 1}, [1, 1, 2]);
                 t('sticky_ip', {sticky_ip: true}, [0, 0, 1]);
                 t('session explicit', {session: 'test'}, [1, 1, 2]);
-                t('session using seed', {seed: 'seed'}, [0, 0, 1]);
             });
             describe('session_duration', ()=>{
                 describe('change after specified timeout', ()=>{
@@ -436,7 +432,6 @@ describe('proxy', ()=>{
                     }));
                     t('pool', {pool_size: 1});
                     t('sticky_ip', {sticky_ip: true});
-                    t('session using seed', {seed: 'seed'});
                 });
                 describe('does not change before specified timeout', ()=>{
                     const t = (name, opt)=>it(name, etask._fn(function*(_this){
@@ -449,7 +444,6 @@ describe('proxy', ()=>{
                         assert.equal(initial.body, res2.body);
                     }));
                     t('sticky_ip', {sticky_ip: true});
-                    t('session using seed', {seed: 'seed'});
                     t('pool 1', {pool_size: 1});
                     it('pool 3', etask._fn(function*(_this){
                         l = yield lum({session_duration: 0.1, pool_size: 3});
@@ -500,7 +494,6 @@ describe('proxy', ()=>{
             t('raw', {raw: true});
             t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});
-            t('session using seed', {seed: 'seed'}, {session: 'seed_1'});
             describe('lower case and spaces', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'newyork'});
@@ -573,8 +566,6 @@ describe('proxy', ()=>{
                 /24000_[0-9a-f]+_2/);
             t1('sticky_ip', {sticky_ip: true},
                 /24000_127_0_0_1_[0-9a-f]+_1/, /24000_127_0_0_1_[0-9a-f]+_2/);
-            t1('session using seed', {seed: 'seed'},
-                /seed_1/, /seed_2/);
             it('default', ()=>etask(function*(){
                 // XXX krzysztof: should it refresh all the sessions or one?
                 l = yield lum({pool_size: 3});
@@ -785,21 +776,22 @@ describe('proxy', ()=>{
                     r.headers['x-lpm-authorization'].includes(`ip-${ip}`));
             }));
         });
-        describe('random_user_agent', ()=>{
-            it('should use desktop User-Agent header by default',
+        describe('user_agent', ()=>{
+            it('should use User-Agent header',
             ()=>etask(function*(){
-                l = yield lum({random_user_agent: 1});
+                l = yield lum({user_agent: 'Mozilla'});
+                const r = yield l.test();
+                assert.ok(r.body.headers['user-agent']=='Mozilla');
+            }));
+            it('should use random desktop User-Agent header',
+            ()=>etask(function*(){
+                l = yield lum({user_agent: 'random_desktop'});
                 const r = yield l.test();
                 assert.ok(r.body.headers['user-agent'].includes('Macintosh'));
             }));
-            it('should use desktop User-Agent header when specified',
+            it('should use random mobile User-Agent header',
             ()=>etask(function*(){
-                l = yield lum({random_user_agent: 'desktop'});
-                const r = yield l.test();
-                assert.ok(r.body.headers['user-agent'].includes('Macintosh'));
-            }));
-            it('should use mobile User-Agent header', ()=>etask(function*(){
-                l = yield lum({random_user_agent: 'mobile'});
+                l = yield lum({user_agent: 'random_mobile'});
                 const r = yield l.test();
                 assert.ok(r.body.headers['user-agent'].includes('Android'));
             }));
@@ -1505,7 +1497,7 @@ describe('proxy', ()=>{
                     assert.ok(first_session!=second_session);
                 }));
                 t('long session');
-                t('random user agent', {random_user_agent: true});
+                t('random user agent', {user_agent: 'random_desktop'});
                 t('custom', {session: false});
                 it('default pool', ()=>etask(function*(){
                     yield prepare_lum({pool_size: 0});

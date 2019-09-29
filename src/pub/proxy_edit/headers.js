@@ -4,7 +4,7 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
-import {Remove_icon, Add_icon, Field_row_raw, Note} from '../common.js';
+import {Remove_icon, Add_icon, Field_row_raw, Warning} from '../common.js';
 import * as util from '../util.js';
 import Tooltip from '../common/tooltip.js';
 import {Input} from '../common/controls.js';
@@ -43,38 +43,24 @@ export default class Headers extends Pure_component {
                 return h;
             return {...h, [name]: value};
         }));
-    random_user_agent_changed = val=>{
-        if (val)
-            this.set_field('user_agent', '');
-    };
-    random_user_agent_types = ()=>[
-        {key: 'No', value: ''},
-        {key: 'Desktop', value: 'desktop'},
-        {key: 'Mobile', value: 'mobile'},
-    ];
     goto_ssl = ()=>this.goto_field('ssl');
     render(){
         if (!this.state.form)
             return null;
+        if (!this.state.form.ssl)
+        {
+            return <Warning text={
+                <React.Fragment>
+                  <span><T>These options are available only when using </T>
+                  <a className="link" onClick={this.goto_ssl}>
+                  <T>SSL analyzing</T></a></span>
+                </React.Fragment>
+            }/>;
+        }
         return <div className="headers">
-              {!this.state.form.ssl &&
-                <Note>
-                  <span><strong><T>Warning: </T></strong></span>
-                  <span><T>these options are available only when using </T>
-                    <a className="link" onClick={this.goto_ssl}>
-                    <T>SSL analyzing</T></a></span>
-                </Note>
-              }
               <Tab_context.Provider value="headers">
-                <Config type="select" id="user_agent" data={util.user_agents}
-                  disabled={this.state.form.random_user_agent ||
-                      !this.state.form.ssl}/>
-                <Config type="select" id="random_user_agent"
-                  data={this.random_user_agent_types()}
-                  on_change={this.random_user_agent_changed}
-                  disabled={!this.state.form.ssl}/>
-                <Config type="yes_no" id="override_headers"
-                  disabled={!this.state.form.ssl}/>
+                <Config type="select" id="user_agent" data={util.user_agents}/>
+                <Config type="yes_no" id="override_headers"/>
                 <Field_row_raw inner_class_name="headers">
                   <div className="desc">
                     <Tooltip title="Custom headers">
@@ -86,7 +72,7 @@ export default class Headers extends Pure_component {
                       <Header last={i+1==this.state.headers.length} key={i}
                         name={h.name} value={h.value} update={this.update(i)}
                         remove_clicked={this.remove} add_clicked={this.add}
-                        idx={i} disabled={!this.state.form.ssl}/>
+                        idx={i}/>
                     )}
                   </div>
                 </Field_row_raw>
@@ -96,16 +82,14 @@ export default class Headers extends Pure_component {
 }
 
 const Header = ({name, value, idx, add_clicked, remove_clicked, last,
-    update, disabled})=>
+    update})=>
     <div className="single_header">
       <div className="desc">Name</div>
-      <Input type="text" val={name} on_change_wrapper={update('name')}
-        disabled={disabled}/>
+      <Input type="text" val={name} on_change_wrapper={update('name')}/>
       <div className="desc">Value</div>
-      <Input type="text" val={value} on_change_wrapper={update('value')}
-        disabled={disabled}/>
-      {!disabled && <div className="action_icons">
+      <Input type="text" val={value} on_change_wrapper={update('value')}/>
+      <div className="action_icons">
         <Remove_icon tooltip="Remove header" click={()=>remove_clicked(idx)}/>
         {last && <Add_icon tooltip="Add header" click={add_clicked}/>}
-      </div>}
+      </div>
     </div>;

@@ -249,6 +249,23 @@ html, body, #react_root, .page_wrapper, .page_wrapper>div, .page_body {
         a { margin: 0 6px; }
         &.choose_customer { margin: 0 0 20px !important; }
     }
+    .two_step_input {
+        height: 34px;
+        width: 100%;
+        padding-left: 5px;
+        margin-top: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .btn.btn_resend_email {
+        line-height: 1;
+        background-color: @light;
+        border-color: @light;
+        &:hover {
+            background-color: @x_light;
+            border-color: @x_light;
+        }
+    }
     .btn.btn_lpm.btn_login {
         margin: 20px 0;
         width: 100%;
@@ -1315,6 +1332,7 @@ span.icon_link {
     .panels {
         display: flex;
         flex: 3;
+        height: 100%;
         position: relative;
         padding-left: 15px;
         padding-right: 15px;
@@ -1328,6 +1346,7 @@ span.icon_link {
         min-width: 305px;
         max-width: 305px;
         margin-left: 15px;
+        overflow-y: auto;
         .stats_panel {
             height: 100%;
             .main_panel {
@@ -2403,15 +2422,6 @@ span.icon_link {
         &.sort_asc { --spritesheet-position: -20px 10px; }
         &.sort_desc { --spritesheet-position: -80px 30px; }
     }
-    .medium_icon {
-        background-image: url(/img/medium_icons.png);
-        background-position: var(--spritesheet-position);
-        &.close_btn_h {
-            --spritesheet-position: 0px 16px;
-            width: 16px;
-            height: 16px;
-        }
-    }
     .devtools_link {
         color: rgb(17, 85, 204);
         text-decoration: underline;
@@ -2475,7 +2485,7 @@ span.icon_link {
                 span.t_button { background-color: #333; }
             }
             &.active { span.t_button { background-color: #2196f3; } }
-            &.close_logs { float: right; margin-left: auto; }
+            &.close_btn { float: right; margin-left: auto; }
         }
         .devider {
             background-color: #ccc;
@@ -2731,7 +2741,7 @@ span.icon_link {
     mask-position: var(--spritesheet-position);
     &.clear { --spritesheet-position: 0 143px; }
     &.docker { --spritesheet-position: 55px 24px; }
-    &.close_logs { --spritesheet-position: 140px 0; }
+    &.close_btn { --spritesheet-position: 140px 0; }
     &.resend { --spritesheet-position: 59px 1px; }
     &.remove { --spritesheet-position: 83px 25px; }
     &.filters { --spritesheet-position: -56px 116px; }
@@ -2829,23 +2839,6 @@ span.icon_link {
         border-bottom: 1px solid #ccc;
         background-color: #f3f3f3;
         position: relative;
-        .left_pane {
-            display: flex;
-            align-items: center;
-            margin: 0 3px 0 5px;
-            .close_btn_wrapper {
-                display: flex;
-                align-items: center;
-                width: 16px;
-                height: 16px;
-                .close_btn { margin: auto; }
-                .close_btn_h { display: none; }
-                &:hover {
-                    .close_btn { display: none; }
-                    .close_btn_h { display: block; }
-                }
-            }
-        }
         .right_panes {
             overflow: hidden;
             flex: auto;

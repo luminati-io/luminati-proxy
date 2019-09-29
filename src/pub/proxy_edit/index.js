@@ -178,13 +178,6 @@ const Index = withRouter(class Index extends Pure_component {
         const disabled_fields = presets[preset].disabled||{};
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this.apply_rules(form);
-        if (form.session===true)
-        {
-            form.session_random = true;
-            form.session = true;
-        }
-        else
-            form.session_random = false;
         if (form.reverse_lookup===undefined)
         {
             if (form.reverse_lookup_dns)
@@ -338,9 +331,6 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.asn = '';
         if (!save_form.max_requests)
             save_form.max_requests = 0;
-        if (save_form.session_random)
-            save_form.session = true;
-        delete save_form.session_random;
         if (save_form.headers)
             save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
         return save_form;

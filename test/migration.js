@@ -524,6 +524,29 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.155.263', v=>{
+        it('should merge random_user_agent and user_agent options', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24002, random_user_agent: 'desktop'},
+                    {port: 24002, random_user_agent: 'mobile'},
+                    {port: 24002, user_agent: 'Mozilla'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24002, user_agent: 'random_desktop'},
+                    {port: 24002, user_agent: 'random_mobile'},
+                    {port: 24002, user_agent: 'Mozilla'},
+                ],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

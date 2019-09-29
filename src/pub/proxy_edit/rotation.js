@@ -69,15 +69,12 @@ export default class Rotation extends Pure_component {
                 <Config type="select" id="pool_type" data={pool_type_opt}/>
                 <Config type="select_number" id="pool_size"
                   note={pool_size_note} disabled={pool_size_disabled}/>
-                <Config type="yes_no" id="idle_pool"/>
                 <Config type="yes_no" id="pool_prefill"/>
                 <Config type="select_number" id="max_requests"/>
                 <Config type="select_number" id="session_duration"
                   sufix="seconds"/>
                 <Config type="yes_no" id="sticky_ip"/>
-                <Config type="yes_no" id="session_random"/>
-                {!form.session_random && <Config type="text" id="session"/>}
-                <Config type="text" id="seed"/>
+                <Config type="text" id="session"/>
                 <Config type="yes_no" id="session_termination"
                   note={sess_note}/>
               </Tab_context.Provider>

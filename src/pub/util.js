@@ -26,10 +26,11 @@ const formatted_user_agents = user_agent_gen.map(u=>({
     value: u.value,
 }));
 
-export const user_agents = [{
-    key: 'None',
-    value: '',
-}, ...formatted_user_agents];
+export const user_agents = [
+    {key: 'None', value: ''},
+    {key: 'Random (desktop)', value: 'random_desktop'},
+    {key: 'Random (mobile)', value: 'random_mobile'},
+    ...formatted_user_agents];
 
 export const status_codes = {
     200: 'OK',
@@ -106,14 +107,11 @@ const presets = {
         ],
         disabled: {
             sticky_ip: true,
-            session_random: true,
             session: true,
             pool_type: true,
-            seed: true,
             pool_size: true,
             max_requests: true,
             session_duration: true,
-            idle_pool: true,
             pool_prefill: true,
         },
     },
@@ -137,14 +135,11 @@ const presets = {
         ],
         disabled: {
             sticky_ip: true,
-            session_random: true,
             session: true,
             multiply: true,
             multiply_ips: true,
             multiply_vips: true,
             pool_type: true,
-            seed: true,
-            idle_pool: true,
         },
     },
     long_availability: {
@@ -167,13 +162,10 @@ const presets = {
         ],
         disabled: {
             sticky_ip: true,
-            session_random: true,
             session: true,
             pool_type: true,
-            seed: true,
             max_requests: true,
             session_duration: true,
-            idle_pool: true,
             pool_prefill: true,
         },
     },
@@ -201,14 +193,11 @@ const presets = {
             multiply_ips: true,
             multiply_vips: true,
             sticky_ip: true,
-            session_random: true,
             session: true,
             pool_type: true,
             max_requests: true,
             session_duration: true,
-            seed: true,
             pool_size: true,
-            idle_pool: true,
             pool_prefill: true,
         },
     },
@@ -219,24 +208,21 @@ const presets = {
             opt.session = true;
             opt.pool_type = '';
             opt.session_duration = 0;
-            opt.random_user_agent = true;
+            opt.user_agent = 'random_desktop';
             opt.override_headers = true;
         },
         clean: opt=>{
             opt.pool_size = 0;
-            opt.random_user_agent = '';
+            opt.user_agent = '';
             opt.override_headers = false;
         },
         disabled: {
-            random_user_agent: true,
+            user_agent: 'random_desktop',
             sticky_ip: true,
-            session_random: true,
             session: true,
             pool_type: true,
-            seed: true,
             pool_size: true,
             override_headers: true,
-            idle_pool: true,
             pool_prefill: true,
         },
     },
@@ -248,7 +234,7 @@ const presets = {
         set: opt=>{
             opt.session = true;
             opt.dns = 'remote';
-            opt.random_user_agent = true;
+            opt.user_agent = 'random_desktop';
             opt.override_headers = true;
             opt.ssl = true;
             opt.rules = opt.rules||[];
@@ -271,24 +257,21 @@ const presets = {
         },
         clean: opt=>{
             opt.dns = '';
-            opt.random_user_agent = false;
+            opt.user_agent = '';
             if (!opt.rules)
                 return;
             opt.rules = opt.rules.filter(r=>!r.action || !r.action.process);
         },
         disabled: {
-            random_user_agent: true,
+            user_agent: 'random_desktop',
             sticky_ip: true,
-            session_random: true,
             session: true,
-            seed: true,
             ssl: true,
-            idle_pool: true,
             pool_prefill: true,
         },
         rules: [
             {field: 'dns', label: `Sets DNS to resolve remotely`},
-            {field: 'random_user_agent',
+            {field: 'user_agent',
                 label: 'Generates random User-Agent for each request'},
             {field: 'trigger_type', label: 'Creates an explanatory rule for '
                 +'post-processing each request to scrape data you need'},
@@ -306,8 +289,6 @@ const presets = {
             opt.pool_type = null;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.seed = '';
-            opt.idle_pool = true;
             opt.pool_prefill = true;
         },
     },

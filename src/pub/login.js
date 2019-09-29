@@ -11,8 +11,16 @@ import zurl from '../../util/url.js';
 import {Loader, Logo} from './common.js';
 import {T} from './common/i18n.js';
 
+const token_err_msg = {
+    'bad token': 'Invalid token',
+    'token expired': 'Expired token. A new token has been sent',
+    default: 'Something went wrong'
+};
+
 const Login = withRouter(class Login extends Pure_component {
-    state = {password: '', username: '', loading: false};
+    state = {password: '', username: '', loading: false, two_step: false,
+        two_step_verified: false, customer_selected: false,
+        sending_email: false};
     componentDidMount(){
         this.setdb_on('head.argv', argv=>{
             if (argv)
@@ -30,6 +38,10 @@ const Login = withRouter(class Login extends Pure_component {
     update_password = ({target: {value}})=>this.setState({password: value});
     update_username = ({target: {value}})=>this.setState({username: value});
     select_customer = customer=>this.setState({customer});
+    select_final_customer = ()=>{
+        this.setState({customer_selected: true});
+        this.save_user();
+    };
     save_user = ()=>{
         const creds = {};
         if (this.token)
@@ -60,16 +72,46 @@ const Login = withRouter(class Login extends Pure_component {
                 _this.setState({error_message:
                     res.error.message||'Something went wrong'});
             }
-            else if (res.customers)
+            else if (res.customers || res.ask_two_step)
             {
                 _this.setState({
                     user_customers: res.customers,
                     error_message: '',
-                    user_data: {customer: res.customers[0]},
+                    two_step: res.ask_two_step,
                 });
             }
             else
                 _this.get_in();
+        });
+    };
+    verify_two_step = data=>{
+        const _this = this;
+        this.etask(function*(){
+            this.on('finally', ()=>_this.setState({loading: false}));
+            _this.setState({loading: true});
+            const res = yield ajax.json({url: '/api/verify_two_step',
+                method: 'POST', data, no_throw: true});
+            if (res && res.error)
+            {
+                _this.setState({error_message:
+                    token_err_msg[res.message]||token_err_msg.default});
+            }
+            else
+                _this.setState({two_step_verified: true}, _this.save_user);
+        });
+    };
+    send_two_step_email = ()=>{
+        const _this = this;
+        this.etask(function*(){
+            this.on('finally', ()=>_this.setState({sending_email: false}));
+            _this.setState({sending_email: true});
+            const res = yield ajax.json({url: '/api/send_two_step_email',
+                method: 'POST', no_throw: true});
+            if (res && res.error)
+            {
+                _this.setState({error_message:
+                    res.error.message||'Something went wrong'});
+            }
         });
     };
     get_in = ()=>{
@@ -121,11 +163,18 @@ const Login = withRouter(class Login extends Pure_component {
               <Header/>
               <Form save_user={this.save_user}
                 user_customers={this.state.user_customers}
+                customer_selected={this.state.customer_selected}
+                two_step={this.state.two_step}
                 password={this.state.password}
                 username={this.state.username}
+                loading={this.state.loading}
+                sending_email={this.state.sending_email}
                 update_password={this.update_password}
                 update_username={this.update_username}
-                select_customer={this.select_customer}/>
+                select_customer={this.select_customer}
+                select_final_customer={this.select_final_customer}
+                send_two_step_email={this.send_two_step_email}
+                verify_two_step={this.verify_two_step}/>
             </div>;
     }
 });
@@ -196,11 +245,18 @@ const Form = props=>{
             l.protocol+'//'+l.hostname+':'+(l.port||80)+'?api_version=3');
         window.location = href;
     };
-    if (props.user_customers)
+    if (props.user_customers && !props.customer_selected)
     {
         return <Customers_form user_customers={props.user_customers}
-              save_user={props.save_user}
+              select_final_customer={props.select_final_customer}
               select_customer={props.select_customer}/>;
+    }
+    if (props.two_step)
+    {
+        return <Two_step_form verify_two_step={props.verify_two_step}
+              send_two_step_email={props.send_two_step_email}
+              email={props.username} verifying_token={props.loading}
+              sending_email={props.sending_email}/>;
     }
     return <First_form password={props.password}
           username={props.username}
@@ -234,10 +290,48 @@ class Customers_form extends Pure_component {
                   val={this.state.cur_customer} on_change={this.on_change}/>
               </div>
               <button
-                onClick={this.props.save_user}
+                onClick={this.props.select_final_customer}
                 className="btn btn_lpm btn_login"
                 disabled={this.props.saving_user}>
                 {this.props.saving_user ? t('Logging in...') : t('Log in')}
+              </button>
+            </div>}</T>;
+    }
+}
+
+class Two_step_form extends Pure_component {
+    state = {token: ''};
+    componentDidMount(){
+      this.props.send_two_step_email();
+    }
+    on_key_up = e=>{
+        if (e.keyCode==13)
+            this.props.verify_two_step(this.state);
+    };
+    on_token_change = e=>this.setState({token: e.target.value});
+    render(){
+        const {verify_two_step, send_two_step_email, verifying_token,
+            sending_email, email} = this.props;
+        return <T>{t=><div className="row customers_form">
+              <div className="warning choose_customer">
+                2-Step Verification
+              </div>
+              {t('A Luminati 2-Step Verification email containing a token '
+              +'was sent to ')}
+              {email}
+              {t('. The token is valid for 3 minutes.')}
+              <div className="form-group">
+                <input className="two_step_input" onKeyUp={this.on_key_up}
+                  onChange={this.on_token_change} placeholder={t('Token')}/>
+              </div>
+              {t('Can’t find it? Check your spam folder or click here to ')}
+                <button className="btn btn_resend_email"
+                  disabled={sending_email} onClick={send_two_step_email}>
+                  {t(sending_email ? 'Sending...' : 'Resend email')}
+              </button>
+              <button onClick={()=>verify_two_step(this.state)}
+                className="btn btn_lpm btn_login" disabled={verifying_token}>
+                {verifying_token ? t('Verifying...') : t('Verify')}
               </button>
             </div>}</T>;
     }
