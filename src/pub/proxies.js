@@ -319,12 +319,6 @@ const columns = [
         ext: true,
     },
     {
-        key: 'pool_type',
-        title: 'Pool type',
-        type: 'options',
-        ext: true,
-    },
-    {
         key: 'sticky_ip',
         title: 'Sticky IP',
         render: Boolean_cell,

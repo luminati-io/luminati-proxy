@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.155.637 Development Latest
+- :sparkles: Improved UX and simplified UI
+
 ## 1.155.475 
 - :bug: Fixed CSS on big request stats panels
 

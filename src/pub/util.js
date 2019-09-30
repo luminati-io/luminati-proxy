@@ -97,7 +97,7 @@ const presets = {
             long as possible`,
         set: opt=>{
             opt.pool_size = 1;
-            opt.session = true;
+            opt.session = '';
         },
         clean: opt=>{
             opt.pool_size = 0;
@@ -108,20 +108,17 @@ const presets = {
         disabled: {
             sticky_ip: true,
             session: true,
-            pool_type: true,
-            pool_size: true,
             max_requests: true,
             session_duration: true,
-            pool_prefill: true,
         },
     },
     rotating: {
         title: 'Rotating (IPs)',
         subtitle: 'For changing the IP on each request',
         set: opt=>{
-            opt.pool_type = '';
-            opt.session = true;
-            opt.max_requests = opt.max_requests||1;
+            opt.session = '';
+            if (!opt.session_duration)
+                opt.max_requests = opt.max_requests||1;
         },
         clean: opt=>{
             opt.max_requests = 0;
@@ -129,17 +126,12 @@ const presets = {
             opt.pool_size = 0;
         },
         rules: [
-            {field: 'multiply', label: `Disables 'Multiply' options`},
             {field: 'max_requests', label: `Sets 'Max requests' to 1. It makes
                 sense to choose any other positive number`},
         ],
         disabled: {
             sticky_ip: true,
             session: true,
-            multiply: true,
-            multiply_ips: true,
-            multiply_vips: true,
-            pool_type: true,
         },
     },
     long_availability: {
@@ -148,25 +140,18 @@ const presets = {
             from the pool`,
         set: opt=>{
             opt.pool_size = 20;
-            opt.session = true;
-            opt.pool_type = 'long_availability';
+            opt.session = '';
         },
         clean: opt=>{
             opt.pool_size = 0;
-            opt.pool_type = undefined;
         },
         rules: [
             {field: 'pool_size', label: `Sets 'Pool size' to 20`},
-            {field: 'pool_type',
-                label: `Sets pool type to 'Long availability'`},
         ],
         disabled: {
             sticky_ip: true,
             session: true,
-            pool_type: true,
-            max_requests: true,
             session_duration: true,
-            pool_prefill: true,
         },
     },
     sticky_ip: {
@@ -194,21 +179,18 @@ const presets = {
             multiply_vips: true,
             sticky_ip: true,
             session: true,
-            pool_type: true,
-            max_requests: true,
             session_duration: true,
             pool_size: true,
-            pool_prefill: true,
         },
     },
     rnd_usr_agent_and_cookie_header: {
         title: 'Random User-Agent',
         subtitle: 'Rotate User-Agent on each request',
         set: opt=>{
-            opt.session = true;
-            opt.pool_type = '';
             opt.session_duration = 0;
             opt.user_agent = 'random_desktop';
+            opt.session = '';
+            opt.random_user_agent = true;
             opt.override_headers = true;
         },
         clean: opt=>{
@@ -220,10 +202,7 @@ const presets = {
             user_agent: 'random_desktop',
             sticky_ip: true,
             session: true,
-            pool_type: true,
-            pool_size: true,
             override_headers: true,
-            pool_prefill: true,
         },
     },
     shop: {
@@ -232,7 +211,7 @@ const presets = {
             configured for product pages but can be freely modified for any
             other use-cases`,
         set: opt=>{
-            opt.session = true;
+            opt.session = '';
             opt.dns = 'remote';
             opt.user_agent = 'random_desktop';
             opt.override_headers = true;
@@ -267,7 +246,6 @@ const presets = {
             sticky_ip: true,
             session: true,
             ssl: true,
-            pool_prefill: true,
         },
         rules: [
             {field: 'dns', label: `Sets DNS to resolve remotely`},
@@ -284,12 +262,9 @@ const presets = {
             use cases`,
         set: function(opt){},
         clean: opt=>{
-            opt.session = null;
             opt.pool_size = 0;
-            opt.pool_type = null;
             opt.max_requests = 0;
             opt.session_duration = 0;
-            opt.pool_prefill = true;
         },
     },
 };

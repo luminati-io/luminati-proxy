@@ -20,7 +20,8 @@ class Overview extends Pure_component {
         const {show_logs} = this.state;
         const master_port = this.props.match.params.master_port;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const logs_wrapper_style = {flex: show_logs ? 2 : 0};
+        const logs_wrapper_style = {flex: show_logs ? 2 : 0,
+            minHeight: show_logs ? '150px' : undefined};
         const title = master_port ?
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}

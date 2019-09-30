@@ -547,6 +547,28 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.155.264', v=>{
+        it('should change preset to long availability if pool type set', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, preset: 'high_performance',
+                        pool_type: 'long_availability'},
+                    {port: 24002, preset: 'long_session'},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000},
+                    {port: 24001, preset: 'long_availability'},
+                    {port: 24002, preset: 'long_session'},
+                ],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

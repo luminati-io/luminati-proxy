@@ -1166,7 +1166,6 @@ describe('proxy', ()=>{
                 ()=>etask(function*(){
                     const ips = ['2.3.4.5'];
                     l = yield lum({
-                        pool_prefill: false,
                         keep_alive: 0,
                         rules: [{
                             action: {reserve_session: true},
@@ -1187,7 +1186,6 @@ describe('proxy', ()=>{
                 ()=>etask(function*(){
                     const ips = ['2.3.4.5', '3.4.5.6'];
                     l = yield lum({
-                        pool_prefill: false,
                         keep_alive: 0,
                         rules: [{
                             action: {reserve_session: true},
@@ -1223,7 +1221,6 @@ describe('proxy', ()=>{
                 }));
                 it('does not replace session on remove', ()=>etask(function*(){
                     l = yield lum({
-                        pool_prefill: false,
                         keep_alive: 0,
                         rules: [{
                             action_type: 'ban_ip',
@@ -1541,7 +1538,7 @@ describe('proxy', ()=>{
     xdescribe('long_availability', ()=>{
         it('should keep the number of sessions', etask._fn(function*(_this){
             _this.timeout(6000);
-            l = yield lum({pool_type: 'long_availability', pool_size: 10});
+            l = yield lum({preset: 'long_availability', pool_size: 10});
             yield l.test();
             assert.equal(l.session_mgr.sessions.sessions.length, 10);
             const initial_sessions = l.session_mgr.sessions.sessions;
@@ -1558,7 +1555,7 @@ describe('proxy', ()=>{
     describe('gather and consume', ()=>{
         it('should not add duplicated sessions', etask._fn(function*(_this){
             const rules = [{status: '200', action: {reserve_session: true}}];
-            l = yield lum({pool_size: 3, rules, pool_prefill: false});
+            l = yield lum({pool_size: 3, rules});
             const ips = {};
             l.on('add_static_ip', data=>{
                 if (ips[data.ip])

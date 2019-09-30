@@ -27,6 +27,11 @@ class Stats extends Pure_component {
         });
         this.setdb_on('head.save_settings', save_settings=>{
             this.save_settings = save_settings;
+            if (typeof this.saved_stats == 'boolean')
+            {
+                this.toggle_stats(this.saved_stats);
+                delete this.saved_stats;
+            }
         });
     }
     enable_ssl_click = e=>{

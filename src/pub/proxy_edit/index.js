@@ -210,6 +210,8 @@ const Index = withRouter(class Index extends Pure_component {
             this.original_form = form;
         form.country = (form.country||'').toLowerCase();
         form.state = (form.state||'').toLowerCase();
+        if (form.session==='true'||form.session===true)
+            delete form.session;
         this.setState({form});
         setdb.set('head.proxy_edit.form', form);
         for (let i in form)
@@ -333,6 +335,11 @@ const Index = withRouter(class Index extends Pure_component {
             save_form.max_requests = 0;
         if (save_form.headers)
             save_form.headers = save_form.headers.filter(h=>h.name&&h.value);
+        if (save_form.session && save_form.session.replace)
+        {
+            save_form.session = save_form.session.replace(/-/g, '')
+                .replace(/ /g, '');
+        }
         return save_form;
     };
     get_curr_plan = ()=>{

@@ -180,11 +180,32 @@ class Toolbar extends Pure_component {
             this.setState({select_visible: visible}));
         this.setdb_on('har_viewer.select_mode', actions_visible=>
             this.setState({actions_visible}));
+        this.setdb_on('head.save_settings', save_settings=>{
+            this.save_settings = save_settings;
+            if (this.disable)
+            {
+                this.disable_logs();
+                delete this.disable;
+            }
+        });
     }
     toggle_filters = ()=>
         this.setState({filters_visible: !this.state.filters_visible});
     toggle_actions = ()=>{
         setdb.set('har_viewer.select_mode', !this.state.actions_visible);
+    };
+    disable_logs = ()=>{
+        if (!this.save_settings)
+        {
+            this.disable = true;
+            return;
+        }
+        const _this = this;
+        this.etask(function*(){
+            const settings = Object.assign({}, setdb.get('head.settings'));
+            settings.logs = 0;
+            yield _this.save_settings(settings);
+        });
     };
     render(){
         const {clear, search_val, on_change_search, type_filter,
@@ -205,6 +226,8 @@ class Toolbar extends Pure_component {
                 <Toolbar_button id="actions" on_click={this.toggle_actions}
                   active={this.state.actions_visible}
                   tooltip="Show/hide additional actions"/>
+                <Toolbar_button id="close_btn" tooltip="Disable"
+                  placement="left" on_click={this.disable_logs}/>
               </Toolbar_row>
               {this.state.actions_visible &&
                 <Toolbar_row>

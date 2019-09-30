@@ -1333,6 +1333,7 @@ span.icon_link {
         display: flex;
         flex: 3;
         height: 100%;
+        min-height: 250px;
         position: relative;
         padding-left: 15px;
         padding-right: 15px;
@@ -2422,6 +2423,15 @@ span.icon_link {
         &.sort_asc { --spritesheet-position: -20px 10px; }
         &.sort_desc { --spritesheet-position: -80px 30px; }
     }
+    .medium_icon {
+        background-image: url(/img/medium_icons.png);
+        background-position: var(--spritesheet-position);
+        &.close_btn_h {
+            --spritesheet-position: 0px 16px;
+            width: 16px;
+            height: 16px;
+        }
+    }
     .devtools_link {
         color: rgb(17, 85, 204);
         text-decoration: underline;
@@ -2839,6 +2849,23 @@ span.icon_link {
         border-bottom: 1px solid #ccc;
         background-color: #f3f3f3;
         position: relative;
+        .left_pane {
+            display: flex;
+            align-items: center;
+            margin: 0 3px 0 5px;
+            .close_btn_wrapper {
+                display: flex;
+                align-items: center;
+                width: 16px;
+                height: 16px;
+                .close_btn { margin: auto; }
+                .close_btn_h { display: none; }
+                &:hover {
+                    .close_btn { display: none; }
+                    .close_btn_h { display: block; }
+                }
+            }
+        }
         .right_panes {
             overflow: hidden;
             flex: auto;

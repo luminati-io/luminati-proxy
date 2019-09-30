@@ -181,12 +181,6 @@ export const tabs = {
         label: 'IP control',
         tooltip: 'Set the conditions for which your IPs will change',
         fields: {
-            pool_type: {
-                label: 'Pool type',
-                tooltip: `The order of pulling sessions for the following
-                    requests.`,
-                ext: true,
-            },
             pool_size: {
                 label: 'Pool size',
                 tooltip: `A pool of sessions that is used for the requests.
@@ -195,17 +189,11 @@ export const tabs = {
                     alive`,
                 ext: true,
             },
-            pool_prefill: {
-                label: 'Pool prefill',
-                tooltip: `Automatically prefill pool with random sessions. This
-                    should be turned off only in advanced cases when you want
-                    to build a pool of IPs based on the rules`,
-            },
             session: {
                 label: 'Explicit session',
-                tooltip: `Insert a session ID to maintain the same IP for as
-                    long as possible.`,
-                placeholder: `e.g. session-1234`,
+                tooltip: `Insert a session ID. You cannot use dash "-"
+                    character`,
+                placeholder: `e.g. session_123`,
             },
             sticky_ip: {
                 label: 'Sticky IP',

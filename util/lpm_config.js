@@ -38,7 +38,6 @@ conf.server_default = {
     zone: 'static',
     customer: process.env.LUMINATI_CUSTOMER,
     password: process.env.LUMINATI_PASSWORD,
-    pool_type: 'default',
     sticky_ip: false,
     insecure: false,
     proxy_connection_type: 'http',
@@ -56,7 +55,7 @@ conf.server_default = {
     multiply: 0,
     max_requests: 0,
     session_duration: 0,
-    pool_prefill: true,
+    random_user_agent: false,
     session: true,
     override_headers: true,
 };

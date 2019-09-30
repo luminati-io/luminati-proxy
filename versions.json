@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.155.637",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved UX and simplified UI"
+            }
+        ]
+    },
+    {
         "ver": "1.155.475",
         "type": "stable/dev",
         "changes": [

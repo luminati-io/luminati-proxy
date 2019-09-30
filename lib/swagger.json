@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.155.475",
+        "version": "1.155.637",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -746,11 +746,6 @@
                     "type": "integer",
                     "description": "Session pool size"
                 },
-                "pool_type": {
-                    "type": "string",
-                    "pattern": "^(default|long_availability)?$",
-                    "description": "Pool session iteration order"
-                },
                 "max_requests": {
                     "type": "string",
                     "description": "Maximum requests per session"
@@ -778,9 +773,6 @@
                 "smtp": {
                     "type": "array",
                     "items": {"type": "string"}
-                },
-                "pool_prefill": {
-                    "type": "boolean"
                 },
                 "override_headers": {
                     "type": "boolean"

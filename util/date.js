@@ -258,6 +258,7 @@ E.align = function(d, align){
 
 E.add = function(d, dur){
     d = E.get(d, 1);
+    dur = normalize_dur(dur);
     if (dur.year)
         d.setUTCFullYear(d.getUTCFullYear()+dur.year);
     if (dur.month)
@@ -268,6 +269,19 @@ E.add = function(d, dur){
     });
     return d;
 };
+
+function normalize_dur(dur){
+    var aliases = {
+        years: 'year', months: 'month', days: 'day', hours: 'hour',
+        minutes: 'min', minute: 'min', mins: 'min',
+        seconds: 'sec', second: 'sec', secs: 'sec',
+        y: 'year', mo: 'month', d: 'day', h: 'hour', m: 'min', s: 'sec',
+    };
+    var norm = {};
+    for (var k in dur)
+        norm[aliases[k]||k] = dur[k];
+    return norm;
+}
 
 E.describe_interval = function(_ms){
     return _ms<2*ms.MIN ? Math.round(_ms/ms.SEC)+' sec' :
