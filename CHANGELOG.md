@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.156.75 Stable
+- :bug: Fixed 403 status when acessing sites that use cloudflare
+
 ## 1.156.38 Stable
 - :bug: Fixed error when the first IP was whitelisted to use admin UI through the API
 - :sparkles: Swagger documentation improvements

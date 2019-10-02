@@ -87,9 +87,7 @@ const Stats_off_btn = props=>
   <Tooltip title="Recent stats are disabled. Click here to turn it on again"
     placement="left">
     <button className="enable_stats_btn" disabled={props.disabled}
-      onClick={props.turn_on_stats}>
-      <i className="glyphicon glyphicon-stats"/>
-    </button>
+      onClick={props.turn_on_stats}/>
   </Tooltip>;
 
 const Empty_row = ()=>

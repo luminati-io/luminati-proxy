@@ -2,7 +2,7 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const E = module.exports;
 
-E.trigger_types = [
+E.no_ssl_trigger_types = [
     {key: '--Select--', value: '', tooltip: `Choose a trigger type.
         For each request the system will check if the trigger is matching
         the response`},
@@ -10,6 +10,10 @@ E.trigger_types = [
         requests to the selected URL`, type: 'pre'},
     {key: 'Status code', value: 'status', tooltip: `Trigger will be pulled
         for all the requests that returns the matching status code`},
+];
+
+E.trigger_types = [
+    ...E.no_ssl_trigger_types,
     {key: 'Response body', value: 'body', tooltip: `Trigger will be
         pulled when the response body contain the selected string`},
     {key: 'Request time more than', value: 'min_req_time',

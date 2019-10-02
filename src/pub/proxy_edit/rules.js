@@ -8,7 +8,7 @@ import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import conv from '../../../util/conv.js';
-import {migrate_trigger, migrate_action, trigger_types,
+import {migrate_trigger, migrate_action, no_ssl_trigger_types, trigger_types,
     action_types, default_action} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
 import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
@@ -176,17 +176,18 @@ export default class Rules extends Pure_component {
     render(){
         if (!this.state.form)
             return null;
-        if (!this.state.form.ssl)
-        {
-            return <Warning text={
-                <React.Fragment>
-                  <span><T>These options are available only when using </T>
-                  <a className="link" onClick={this.goto_ssl}>
-                  <T>SSL analyzing</T></a></span>
-                </React.Fragment>
-            }/>;
-        }
         return <div className="rules">
+              {!this.state.form.ssl &&
+                <Warning text={
+                  <React.Fragment>
+                    <span><T>Most of the options here are available only when
+                      using </T>
+                      <a className="link" onClick={this.goto_ssl}>
+                      <T>SSL analyzing</T></a>
+                    </span>
+                  </React.Fragment>
+                }/>
+              }
               {this.state.form.debug=='none' &&
                 <Note>
                   <span><strong><T>Warning:</T></strong></span>
@@ -203,7 +204,7 @@ export default class Rules extends Pure_component {
               </button>
               {this.state.rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}
-                  www={this.state.www}/>
+                  www={this.state.www} ssl={this.state.form.ssl}/>
               )}
               <Tester_wrapper/>
             </div>;
@@ -283,11 +284,11 @@ class Rule extends Pure_component {
         }
     };
     render(){
-        const {rule_del, rule} = this.props;
+        const {rule_del, rule, ssl} = this.props;
         const {ui_blocked} = this.state;
         return <div>
           <div className="rule_wrapper">
-            <Trigger rule={rule} ui_blocked={ui_blocked}
+            <Trigger rule={rule} ui_blocked={ui_blocked} ssl={ssl}
               set_rule_field={this.set_rule_field}
               change_ui_block={this.change_ui_block}/>
             <Action rule={rule} set_rule_field={this.set_rule_field}
@@ -526,7 +527,7 @@ class Trigger extends Pure_component {
         this.props.set_rule_field('trigger_code', val);
     };
     render(){
-        const {rule, ui_blocked, change_ui_block} = this.props;
+        const {rule, ui_blocked, change_ui_block, ssl} = this.props;
         let tip = ' ';
         if (ui_blocked)
         {
@@ -544,8 +545,8 @@ class Trigger extends Pure_component {
                 </div>
                 </Tooltip>
                 <Rule_config id="trigger_type" type="select"
-                  data={trigger_types} on_change={this.trigger_changed}
-                  rule={rule}/>
+                  data={ssl ? trigger_types : no_ssl_trigger_types}
+                  on_change={this.trigger_changed} rule={rule}/>
                 {rule.trigger_type=='body' &&
                   <Rule_config id="body_regex" type="text" rule={rule}/>}
                 {rule.trigger_type=='min_req_time' &&

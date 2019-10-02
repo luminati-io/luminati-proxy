@@ -214,6 +214,15 @@ describe('proxy', ()=>{
                 Object.assign(pre_rule('bypass_proxy', 'match'),
                 {insecure: true}));
         });
+        describe('added headers in request', ()=>{
+            it('should set User-Agent only when user_agent field is set',
+            ()=>etask(function*(){
+                const req = {headers: {'user-agent': 'from_req'}};
+                l = yield lum({override_headers: true});
+                l.add_headers(req);
+                assert.ok(req.headers['user-agent']=='from_req');
+            }));
+        });
     });
     it('should listen without specifying port number', ()=>etask(function*(){
         l = yield lum({port: false});
