@@ -66,10 +66,13 @@ class Stats extends Pure_component {
                   <Toolbar stats={stats}
                     disable_stats={()=>this.toggle_stats(false)}/>
                   <Stat_table stats={stats} tooltip="Status code"
+                    style={{flex: 1, overflowY: 'auto'}}
                     row_key="status_code" logs="code" title="Code"/>
                   <Stat_table stats={stats} tooltip="Domain name"
+                    style={{flex: 1, overflowY: 'auto'}}
                     row_key="hostname" logs="domain" title="Domain"/>
                   <Stat_table stats={stats} tooltip="Protocol"
+                    style={{flex: 1, overflowY: 'auto'}}
                     ssl_warning={stats.ssl_warning} row_key="protocol"
                     logs="protocol" title="Protocol"/>
                   <Summary_bar enable_ssl_click={this.enable_ssl_click}

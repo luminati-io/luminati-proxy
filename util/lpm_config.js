@@ -55,7 +55,6 @@ conf.server_default = {
     multiply: 0,
     max_requests: 0,
     session_duration: 0,
-    random_user_agent: false,
     session: true,
     override_headers: true,
 };

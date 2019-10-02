@@ -12,7 +12,7 @@ import {Loader, Warnings, Loader_small, Preset_description,
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import React_tooltip from 'react-tooltip';
 import {tabs, all_fields} from './fields.js';
-import {presets} from '../util.js';
+import presets from '../common/presets.js';
 import {withRouter, Switch, Route, Redirect} from 'react-router-dom';
 import Rules from './rules.js';
 import Targeting from './targeting.js';

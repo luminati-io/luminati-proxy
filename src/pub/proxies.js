@@ -69,36 +69,18 @@ const Status_cell = ({proxy, scrolling})=>{
     if (!details.length && status!='ok')
         details = status;
     if (status=='testing')
-    {
-        return <T>
-            {t=>
-              <Tooltip title={t('Status is being tested')}>
-                {t('Testing')}
-              </Tooltip>
-            }</T>;
-    }
+        return <Tooltip title="Status is being tested">Testing</Tooltip>;
     else if (status && status!='ok')
-        return <T>{t=><Tooltip title={t(details)}>{t('Error')}</Tooltip>}</T>;
+        return <Tooltip title={details}>{`Error (${details})`}</Tooltip>;
     else if (status=='ok' && details)
     {
-        return <T>{t=><Tooltip title={t(details)}>
-              <span>
-                {t('OK')}
-                <div className="ic_warning"/>
-              </span>
-              </Tooltip>
-            }</T>;
+        return <Tooltip title={details}>
+            <span>OK<div className="ic_warning"/></span>
+          </Tooltip>;
     }
     else if (status=='ok' && !details)
-    {
-        return <T>{t=>
-              <Tooltip title={t('This proxy works correctly')}>
-                {t('OK')}
-              </Tooltip>
-            }</T>;
-    }
-    return <T>{t=>
-        <Tooltip title={t('Status of this proxy is unknown')}>?</Tooltip>}</T>;
+        return <Tooltip title="This proxy works correctly">OK</Tooltip>;
+    return <Tooltip title="Status of this proxy is unknown">?</Tooltip>;
 };
 
 const Boolean_cell = ({proxy, col})=>{
@@ -335,12 +317,6 @@ const columns = [
         type: 'options',
     },
     {
-        key: 'log',
-        title: 'Log Level',
-        type: 'options',
-        ext: true,
-    },
-    {
         key: 'ip',
         title: 'Static IPs',
         type: 'text',
@@ -427,6 +403,7 @@ const columns = [
         width: 60,
     },
 ];
+
 const columns_obj = Object.keys(columns)
     .reduce((acc, col)=>({...acc, [columns[col].key]: columns[col]}), {});
 

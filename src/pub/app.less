@@ -1333,7 +1333,7 @@ span.icon_link {
         display: flex;
         flex: 3;
         height: 100%;
-        min-height: 250px;
+        min-height: 400px;
         position: relative;
         padding-left: 15px;
         padding-right: 15px;
@@ -1347,7 +1347,6 @@ span.icon_link {
         min-width: 305px;
         max-width: 305px;
         margin-left: 15px;
-        overflow-y: auto;
         .stats_panel {
             height: 100%;
             .main_panel {
@@ -2762,6 +2761,7 @@ span.icon_link {
     &.duplicate { --spritesheet-position: 49px 23px; }
     &.refresh { --spritesheet-position: 136px 47px; }
     &.browser { --spritesheet-position: 81px -49px; }
+    &.return { --spritesheet-position: 25px 167px; }
     &:hover { background-color: #333; }
     &.active { background-color: #2196f3; }
 }
@@ -2801,10 +2801,7 @@ span.icon_link {
     }
     &.open:before { -webkit-mask-position: -16px 0; }
 }
-.har_viewer_off {
-    width: 100%;
-    padding-bottom: 15px;
-}
+.har_viewer_off { padding-bottom: 15px; }
 .har_viewer {
     &.waiting * { cursor: wait !important; }
     width: 100%;
@@ -3139,4 +3136,5 @@ span.icon_link {
     display: block;
     margin: auto;
     padding: 0;
+    .chrome_icon { width: 20px; }
 }

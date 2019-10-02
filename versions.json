@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.156.38",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed error when the first IP was whitelisted to use admin UI through the API"
+            },
+            {
+                "type": "sparkles",
+                "text": "Swagger documentation improvements"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed LPM crash on subsequent Proxy Tester calls with unexistent proxy ports"
+            }
+        ]
+    },
+    {
         "ver": "1.155.637",
         "type": "dev",
         "changes": [

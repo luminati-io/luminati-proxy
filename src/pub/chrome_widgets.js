@@ -116,7 +116,8 @@ export const with_resizable_cols = (cols, Table)=>{
             this.setState({moving: false});
         };
         render(){
-            return <div style={this.style} ref={this.set_ref}
+            const style = Object.assign({}, this.style, this.props.style||{});
+            return <div style={style} ref={this.set_ref}
                   className={classnames({moving: this.state.moving})}>
                   <Table {...this.props} cols={this.state.cols}
                     resize_columns={this.resize_columns}

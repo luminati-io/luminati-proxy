@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.156.38 Stable
+- :bug: Fixed error when the first IP was whitelisted to use admin UI through the API
+- :sparkles: Swagger documentation improvements
+- :bug: Fixed LPM crash on subsequent Proxy Tester calls with unexistent proxy ports
+
 ## 1.155.637 Development Latest
 - :sparkles: Improved UX and simplified UI
 

@@ -59,19 +59,15 @@ const banned_ips_cols = [
 const Banned_ips = withRouter(class Banned_ips extends Pure_component {
     state = {ips: [], unbanning: false};
     componentDidMount(){
-        const _this = this;
-        this.etask(function*(){
-            const ips = yield _this.fetch_data();
-            _this.setState({ips});
-        });
+        this.fetch_ips_data();
     }
-    fetch_data = ()=>{
+    fetch_ips_data = ()=>{
         const _this = this;
         return this.etask(function*(){
             const port = _this.props.match.params.port;
             const url = `/api/banlist/${port}?full=true`;
             const data = yield ajax.json({url});
-            return data.ips;
+            _this.setState({ips: data.ips});
         });
     };
     unbanip = ip=>{
@@ -80,13 +76,12 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         return this.etask(function*(){
             this.on('finally', ()=>_this.setState({unbanning: false}));
             const port = _this.props.match.params.port;
-            yield ajax.json({
-                url: `/api/proxies/${port}/banip`,
-                method: 'DELETE',
+            const data = yield ajax.json({
+                url: `/api/proxies/${port}/unbanip`,
+                method: 'POST',
                 data: {ip},
             });
-            const ips = _this.state.ips;
-            _this.setState({ips: ips.filter(d=>d.ip!=ip)});
+            _this.setState({ips: data.ips});
         });
     };
     render(){
@@ -96,12 +91,12 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         return <Chrome_table title="Banned IPs" cols={banned_ips_cols}
             class_name="banned_ips_panel">
               {ips.map(d=>
-                <tr key={d.ip}>
+                <tr key={`${d.ip}-${d.domain}`}>
                   <td>
                     <Tooltip title="Unban IP">
                       <button className="btn_unban" disabled={unbanning}
                         onClick={()=>this.unbanip(d.ip)}>
-                        <i className="glyphicon glyphicon-remove"/>
+                        <i className="chrome_icon return"/>
                       </button>
                     </Tooltip>
                   </td>
