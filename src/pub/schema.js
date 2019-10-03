@@ -37,8 +37,8 @@ const tooltips = t=>({
         </ul>`
         +t('and more. View full list of features by clicking any proxy port '
             +'in the')
-        +`<strong>${t('Proxies')}</strong> ${t('table')}`,
-    super_proxy: t('Load balancing servers, that manage the traffic between '
+        +`<strong> ${t('Proxies')}</strong> ${t('table')}`,
+    super_proxy: t('Load balancing servers that manage the traffic between '
         +'the Luminati Proxy Manager and the peer'),
     peer: `${t('Exit node (IP) - This might be:')}
         <ul>

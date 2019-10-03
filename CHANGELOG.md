@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.156.236 Stable
+- :bug: Fixed rule email sending for cluster mode
+
 ## 1.156.75 Stable
 - :bug: Fixed 403 status when acessing sites that use cloudflare
 

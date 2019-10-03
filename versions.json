@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.156.236",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed rule email sending for cluster mode"
+            }
+        ]
+    },
+    {
         "ver": "1.156.75",
         "type": "stable",
         "changes": [

@@ -313,6 +313,7 @@
       "lib/ws.js",
       "publish_cn.js",
       "publish_validate.js",
+      "scripts/changelog_validate.js",
       "scripts/stress_test.js",
       "src/pub/app.js",
       "src/pub/app.less",
@@ -370,6 +371,7 @@
       "test/index.js",
       "test/manager.js",
       "test/migration.js",
+      "test/scripts.js",
       "test/util.js",
       "test/ws.js",
       "util/config.js",
@@ -380,7 +382,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "957e8bf0467ba418b5f8b40e6dfed4fd"
+    "md5": "3f3d603e09b25d3ca7f1f7493e246d2d"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -438,5 +440,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.156.75"
+  "version": "1.156.236"
 }
