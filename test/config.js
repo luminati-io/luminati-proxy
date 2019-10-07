@@ -1,7 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, mocha:true*/
 const assert = require('assert');
+const fs = require('fs');
+const sinon = require('sinon');
 const {qw} = require('../util/string.js');
+const file = require('../util/file.js');
 const Manager = require('../lib/manager.js');
 const Config = require('../lib/config.js');
 
@@ -26,5 +29,15 @@ describe('config', ()=>{
         version customer`.forEach(field=>
             assert.equal(proxy[field], undefined));
         assert.equal(proxy.port, 24000);
+    });
+    it('should not save file on read only mode', ()=>{
+        const conf = new Config({opts: {read_only: true}}, Manager.default,
+            {filname: '.luminati.json'});
+        sinon.stub(fs, 'writeFileSync');
+        sinon.stub(file, 'write_e');
+        conf.save();
+        conf.set_string('');
+        sinon.assert.notCalled(fs.writeFileSync);
+        sinon.assert.notCalled(file.write_e);
     });
 });

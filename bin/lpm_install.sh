@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.156.236"
+VERSION="1.156.820"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -513,7 +513,7 @@ install_brew()
 
 update_npm()
 {
-    echo "updating npm to $NPM_VER"
+    echo "updating npm to $NPM_VER..."
     perr "update_npm" "$NPM_VER"
     retry_sudo_cmd "npm install -g npm@$NPM_VER > /dev/null"
 }
@@ -571,7 +571,7 @@ deps_install()
 
 lpm_clean()
 {
-    echo "cleaning lpm related node packages and npm cache"
+    echo "cleaning lpm related node packages and npm cache..."
     local lib_path="$(npm prefix -g)/lib"
     local clean_cmd=(
         "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
@@ -591,7 +591,7 @@ lpm_clean()
     done
     if ((!USE_NVM)); then
         sudo_cmd "rm -rf /root/.npm"
-        echo "removing luminati links"
+        echo "removing luminati links..."
         sudo_cmd "rm -rf /usr/{local/bin,bin}/{luminati,luminati-proxy}"
     fi
 }
@@ -614,7 +614,7 @@ lpm_install()
     if ((!USE_NVM)); then
         if ((LUM)); then
             # fix luminati binary not found on luminati ubuntu
-            echo "running nave relink"
+            echo "running nave relink..."
             sudo_cmd "nave relink"
         elif ! [ -f "/usr/local/bin/luminati" ]; then
             sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"

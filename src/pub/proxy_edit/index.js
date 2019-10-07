@@ -378,7 +378,8 @@ const Index = withRouter(class Index extends Pure_component {
                 title={t('Error')} no_cancel_btn>
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
-              <Alloc_modal type={type} form={this.state.form} zone={zone}/>
+              <Alloc_modal type={type} form={this.state.form} zone={zone}
+                plan={curr_plan||{}}/>
             </div>}</T>;
     }
 });

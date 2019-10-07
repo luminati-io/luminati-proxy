@@ -3,7 +3,7 @@
 'use strict'; /*jslint node:true*/
 if (!module.parent)
     global.zon_config_fallback = {};
-require('../../../util/config.js');
+require('../util/config.js');
 const changelog = require('../versions.json');
 
 const validate = _changelog=>{

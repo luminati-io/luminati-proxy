@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.156.820",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added --read_only CLI option that prevents LPM from writing to the config file"
+            }
+        ]
+    },
+    {
         "ver": "1.156.236",
         "type": "stable",
         "changes": [

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.156.236",
+        "version": "1.156.820",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1332,6 +1332,10 @@
                     "type": "string",
                     "description": "Config file containing proxy definitions"
                 },
+                "read_only": {
+                    "type": "boolean",
+                    "description": "Avoid saving current config in the config file"
+                },
                 "test_url": {
                         "type": "string",
                         "description": "Url for testing proxy"
@@ -1480,6 +1484,10 @@
                 "local_login": {
                     "type": "boolean",
                     "description": "Requires each browser to authenticate against LPM"
+                },
+                "read_only": {
+                    "type": "boolean",
+                    "description": "Avoid saving current config in the config file"
                 }
             }
         },

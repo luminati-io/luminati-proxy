@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.156.820 
+- :sparkles: Added --read_only CLI option that prevents LPM from writing to the config file
+
 ## 1.156.236 Stable
 - :bug: Fixed rule email sending for cluster mode
 

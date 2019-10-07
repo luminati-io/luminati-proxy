@@ -76,6 +76,8 @@ E.meminfo_parse = function(info){
 
 // os.freemem does not include buffers and cached as freemem
 E.meminfo = function(){
+    if (file.is_darwin)
+        return {memtotal: os.totalmem(), memfree_all: os.freemem()};
     var info = cyg_read('/proc/meminfo');
     var mem = E.meminfo_parse(info);
     mem.buffers = mem.buffers||0; // openvz does not always have Buffers
@@ -173,6 +175,8 @@ E.swapon = function(){
 };
 E.swapoff = function(){ cli.exec_rt('swapoff '+swapfile); };
 E.swap_usage = function(){
+    if (file.is_darwin)
+        return {count: 0, usage: 0};
     let swaps = cyg_read_lines('/proc/swaps').slice(1);
     let ret = {count: swaps.length, usage: 0};
     if (!swaps.length)
@@ -213,10 +217,25 @@ function cpus_diff(prev, curr){
 
 // XXX vadim: cleanup
 E.cpus = function(){
-    var ll = cyg_read_lines('/proc/stat');
     var cpus = [];
     var items = ['user', 'nice', 'system', 'idle', 'iowait', 'irq', 'softirq',
         'steal', 'guest', 'guest_nice'];
+    if (file.is_darwin)
+    {
+        const names = {system: 'sys'};
+        const res = os.cpus();
+        for (let i=0; i<res.length; i++)
+        {
+            let c = cpus[i] = {};
+            for (let item of items)
+                c[item] = res[i].times[names[item]||item]|0;
+        }
+        cpus.all = {};
+        for (let item of items)
+            cpus.all[item] = cpus.reduce((p, c)=>p+c[item], 0)/res.length;
+        return cpus;
+    }
+    var ll = cyg_read_lines('/proc/stat');
     ll.forEach(l=>{
         if (!/^cpu\d* /.test(l))
             return;
@@ -578,9 +597,11 @@ E.ps = function(){
 
 E.fd_use = opt=>etask(function*(){
     opt = opt||{};
-    let pids = opt.pids||E.ps();
     let res = {use: -1, pid: -1, pids: {}, glob: {open: -1, max: -1, use: 0}};
-    if (!pids.length||file.is_win)
+    if (file.is_win||file.is_darwin)
+        return res;
+    let pids = opt.pids||E.ps();
+    if (!pids.length)
         return res;
     let calc = (o, m)=>o<0 ? 0 : 100*o/m;
     let ln = file.read_line('/proc/sys/fs/file-nr').split('\t');

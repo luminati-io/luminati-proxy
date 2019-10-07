@@ -106,12 +106,14 @@ class Config extends Pure_component {
     render(){
         const panel_class = classnames('panel code_panel flex_auto vbox', {
             editable: this.state.editable});
+        const read_only = this.state.settings && this.state.settings.read_only;
         return <div className="config vbox">
               <Nav title={this.title} subtitle={this.subtitle}
                 warning={this.state.warning}/>
               <div className={panel_class}>
                 <div className="panel_body flex_auto vbox">
                   <Nav_buttons editable={this.state.editable}
+                    read_only={read_only}
                     changed={this.state.changed}
                     click_edit={this.click_edit.bind(this)}
                     click_save={this.check.bind(this)}
@@ -136,9 +138,11 @@ const Nav_buttons = props=>{
                 classes={save_class} id="ok"/>
             </div>;
     }
+    const tooltip = props.read_only ? 'It is not possible to edit the config '
+    +'in read only mode' : 'Edit config';
     return <div className="nav_buttons">
-          <Link_icon tooltip="Edit config" on_click={props.click_edit}
-            id="pencil"/>
+          <Link_icon tooltip={tooltip} on_click={props.click_edit}
+            id="pencil" disabled={props.read_only}/>
           <Link_icon tooltip="Download as JSON"
             on_click={props.click_download} id="download"/>
         </div>;

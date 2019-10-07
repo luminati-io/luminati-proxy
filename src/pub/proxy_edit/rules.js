@@ -325,8 +325,7 @@ class Action extends Pure_component {
         });
     }
     load_refresh_cost = ()=>{
-        const plan = this.get_curr_zone_plan();
-        if (!this.is_curr_zone_static(plan) || !plan.ips)
+        if (!this.should_show_refresh())
             return;
         const _this = this;
         this.etask(function*(){
@@ -376,14 +375,11 @@ class Action extends Pure_component {
             port: this.props.match.params.port,
         }});
     };
-    get_curr_zone_plan = ()=>{
+    should_show_refresh = ()=>{
         const {zones, curr_zone} = this.state;
         const zone = (zones.zones||[]).find(z=>z.name==curr_zone);
-        return zone && zone.plan || {};
-    };
-    is_curr_zone_static = plan=>{
-        plan = plan||this.get_curr_zone_plan();
-        return ['static', 'static_res'].includes(plan.type);
+        const plan = zone && zone.plan || {};
+        return ['static', 'static_res'].includes(plan.type) && plan.ips;
     };
     request_methods = ()=>
         ['GET', 'POST', 'PUT', 'DELETE'].map(m=>({key: m, value: m}));
@@ -400,7 +396,7 @@ class Action extends Pure_component {
             rule.trigger_type!='url' && !at.only_url)
         .filter(at=>rule.trigger_type!='min_req_time' ||
             at.min_req_time));
-        if (this.is_curr_zone_static())
+        if (this.should_show_refresh())
         {
             const refresh_ip_at = _action_types.find(
                 at=>at.value=='refresh_ip');

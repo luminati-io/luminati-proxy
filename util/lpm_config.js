@@ -83,6 +83,7 @@ conf.manager_default = Object
     high_perf: false,
     local_login: false,
     cluster: 1,
+    read_only: false,
 });
 
 Object.assign(module.exports, conf);
