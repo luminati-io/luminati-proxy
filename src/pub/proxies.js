@@ -71,7 +71,7 @@ const Status_cell = ({proxy, scrolling})=>{
     if (status=='testing')
         return <Tooltip title="Status is being tested">Testing</Tooltip>;
     else if (status && status!='ok')
-        return <Tooltip title={details}>{`Error (${details})`}</Tooltip>;
+        return <Tooltip title={details}>{details}</Tooltip>;
     else if (status=='ok' && details)
     {
         return <Tooltip title={details}>
@@ -341,11 +341,6 @@ const columns = [
         title: 'Throttle concurrent connections',
         type: 'number',
         ext: true,
-    },
-    {
-        key: 'debug',
-        title: 'Debug info',
-        type: 'options',
     },
     {
         key: 'success',
@@ -834,7 +829,7 @@ class Actions extends Pure_component {
         return this.etask(function*(){
             this.on('uncaught', e=>{
                 proxy.status = 'error';
-                proxy.status_details = [{msg: 'Failed to get proxy status'}];
+                proxy.status_details = [{msg: e.message}];
                 setdb.emit_path('head.proxies_running');
             });
             const params = {};

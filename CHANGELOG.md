@@ -1,5 +1,12 @@
 Luminati Proxy manager - Change Log
 
+## 1.157.37 Stable
+- :bug: Fixed connected from MLA when SSL analyzing is on
+- :bug: Fixed specific IPs selection for static shared zones
+- :bug: Fixed link tester in Docker containers
+- :bug: Fixed error handling for SOCKS5 connections between LPM and Super Proxies
+- :bug: Fixed 2-Step error shown when logging in
+
 ## 1.156.820 
 - :sparkles: Added --read_only CLI option that prevents LPM from writing to the config file
 

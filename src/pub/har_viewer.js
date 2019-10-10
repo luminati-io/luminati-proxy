@@ -465,6 +465,7 @@ class Tables_container extends Pure_component {
         setdb.set('head.har_viewer.reqs', []);
         setdb.set('head.har_viewer.stats', null);
         setdb.set('har_viewer', null);
+        this.take_reqs_from_pool.cancel();
     }
     fetch_missing_data = pos=>{
         if (this.state.stats&&this.state.stats.total&&

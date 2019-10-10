@@ -33,7 +33,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.156.820/luminati-proxy-manager-v1.156.820-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.157.37/luminati-proxy-manager-v1.157.37-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -254,7 +254,7 @@ You can add many more options to this run.
 To use lpm's config file, docker volumes can be used:
 https://docs.docker.com/storage/volumes/
 
-Following this instructions will make your docker runs with specific config file:
+Following these instructions will make your docker run with a specific config file:
 
 - create volume
 ```sh

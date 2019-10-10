@@ -291,7 +291,6 @@ describe('proxy', ()=>{
                 zone: 'zzz',
                 direct: true,
                 session: 'sss',
-                debug: 'full',
                 country: 'us',
                 state: 'fl',
                 city: 'miami',
@@ -303,7 +302,6 @@ describe('proxy', ()=>{
                 zone: 'zzz',
                 direct: true,
                 session: 'sss',
-                debug: 'full',
                 country: 'us',
                 state: 'fl',
                 city: 'miami',
@@ -343,7 +341,7 @@ describe('proxy', ()=>{
             });
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
-                    l = yield lum({pool_size});
+                    l = yield lum({pool_size, preset: 'long_availability'});
                     yield l.test({fake: 1});
                     assert.equal(proxy.history.length, 0);
                     assert.equal(proxy.full_history.length, pool_size);
@@ -499,7 +497,6 @@ describe('proxy', ()=>{
             t('ASN', {zone: 'asn', asn: 28133});
             t('mobile', {zone: 'mobile', mobile: 'true'});
             t('DNS', {dns: 'local'});
-            t('debug', {debug: 'none'});
             t('raw', {raw: true});
             t('direct', pre_rule('direct'), {direct: true});
             t('session explicit', {session: 'test_session'});

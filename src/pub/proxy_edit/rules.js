@@ -11,7 +11,7 @@ import conv from '../../../util/conv.js';
 import {migrate_trigger, migrate_action, no_ssl_trigger_types, trigger_types,
     action_types, default_action} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
-import {Labeled_controller, Note, with_proxy_ports, Cm_wrapper,
+import {Labeled_controller, with_proxy_ports, Cm_wrapper,
     Field_row_raw, Warning} from '../common.js';
 import {tabs} from './fields.js';
 import {Tester} from '../proxy_tester.js';
@@ -172,7 +172,6 @@ export default class Rules extends Pure_component {
         this.set_field('rules', rules);
     };
     goto_ssl = ()=>this.goto_field('ssl');
-    goto_debug = ()=>this.goto_field('debug');
     render(){
         if (!this.state.form)
             return null;
@@ -187,15 +186,6 @@ export default class Rules extends Pure_component {
                     </span>
                   </React.Fragment>
                 }/>
-              }
-              {this.state.form.debug=='none' &&
-                <Note>
-                  <span><strong><T>Warning:</T></strong></span>
-                  <span><T>some rules may not work correctly without </T>
-                  </span>
-                  <a onClick={this.goto_debug} className="link">
-                    <T>Request debug info</T></a>
-                </Note>
               }
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
                 onClick={this.rule_add}>

@@ -39,7 +39,8 @@ const Login = withRouter(class Login extends Pure_component {
     update_username = ({target: {value}})=>this.setState({username: value});
     select_customer = customer=>this.setState({customer});
     select_final_customer = ()=>{
-        this.setState({customer_selected: true});
+        if (this.state.customer)
+            this.setState({customer_selected: true});
         this.save_user();
     };
     save_user = ()=>{
@@ -69,8 +70,12 @@ const Login = withRouter(class Login extends Pure_component {
                 method: 'POST', data: creds, timeout: 60000});
             if (res.error)
             {
-                _this.setState({error_message:
-                    res.error.message||'Something went wrong'});
+                _this.setState({
+                    customer: null,
+                    user_customers: null,
+                    customer_selected: false,
+                    error_message: res.error.message||'Something went wrong',
+                });
             }
             else if (res.customers || res.ask_two_step)
             {
@@ -81,19 +86,18 @@ const Login = withRouter(class Login extends Pure_component {
                 });
             }
             else
-                _this.get_in();
+                yield _this.get_in();
         });
     };
     verify_two_step = data=>{
         const _this = this;
         this.etask(function*(){
-            this.on('finally', ()=>_this.setState({loading: false}));
             _this.setState({loading: true});
             const res = yield ajax.json({url: '/api/verify_two_step',
                 method: 'POST', data, no_throw: true});
             if (res && res.error)
             {
-                _this.setState({error_message:
+                _this.setState({loading: false, error_message:
                     token_err_msg[res.message]||token_err_msg.default});
             }
             else
@@ -116,7 +120,7 @@ const Login = withRouter(class Login extends Pure_component {
     };
     get_in = ()=>{
         const _this = this;
-        this.etask(function*(){
+        return this.etask(function*(){
             this.on('uncaught', e=>{
                 _this.setState({error_message: 'Cannot log in: '+e.message});
             });
@@ -324,11 +328,16 @@ class Two_step_form extends Pure_component {
                 <input className="two_step_input" onKeyUp={this.on_key_up}
                   onChange={this.on_token_change} placeholder={t('Token')}/>
               </div>
-              {t('Can’t find it? Check your spam folder or click here to ')}
-                <button className="btn btn_resend_email"
-                  disabled={sending_email} onClick={send_two_step_email}>
-                  {t(sending_email ? 'Sending...' : 'Resend email')}
-              </button>
+              {sending_email ?
+                  t('Sending email...') :
+                  <React.Fragment>
+                    {t('Can’t find it? Check your spam folder or click ')}
+                    <a className="link" onClick={send_two_step_email}>
+                      {t('here')}
+                    </a>
+                    {t(' to resend the email.')}
+                  </React.Fragment>
+              }
               <button onClick={()=>verify_two_step(this.state)}
                 className="btn btn_lpm btn_login" disabled={verifying_token}>
                 {verifying_token ? t('Verifying...') : t('Verify')}

@@ -5,17 +5,12 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
+import {Note} from '../common.js';
 
 const route_err_opt = [
     {key: 'Default (pass_dyn)', value: ''},
     {key: 'pass_dyn', value: 'pass_dyn'},
     {key: 'block', value: 'block'}
-];
-
-const debug_opt = [
-    {key: `Default (full)`, value: ''},
-    {key: 'none', value: 'none'},
-    {key: 'full', value: 'full'},
 ];
 
 const proxy_connection_type_opt = [
@@ -69,6 +64,7 @@ export default class General extends Pure_component {
         else if (curr_plan && !!curr_plan.vip)
             type = 'vips';
         const form = this.state.form;
+        const has_socks_permission = curr_plan && curr_plan.socks5;
         const note_ips = form.multiply_ips ?
             <a className="link" onClick={this.open_modal}>Select IPs</a> :
             null;
@@ -84,6 +80,10 @@ export default class General extends Pure_component {
                 <Config type="pins" id="whitelist_ips" disabled={disabled_wl}/>
                 <Config type="select" data={proxy_connection_type_opt}
                   id="proxy_connection_type"/>
+                {form.proxy_connection_type=='socks' &&
+                    !has_socks_permission &&
+                    <Note>Your zone does not have SOCKS permission.</Note>
+                }
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="insecure"
                     disabled={!this.state.form.ssl}/>
@@ -102,7 +102,6 @@ export default class General extends Pure_component {
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact/>
-                <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>
             </div>;
     }

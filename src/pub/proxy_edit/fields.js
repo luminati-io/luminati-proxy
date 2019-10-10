@@ -305,14 +305,6 @@ export const tabs = {
                     enable this option to ignore checking certificates of SSL
                     connection`,
             },
-            debug: {
-                label: 'Luminati request debug info',
-                tooltip: `Attach additional headers in the response of each
-                    request with debug info, such as "Peer IP" or the timeline
-                    of the request. You can resign from it to save bandwidth
-                    (very little) or if the additional headers are breaking
-                    your operations`,
-            },
             smtp: {
                 label: 'Proxy through SMTP',
                 tooltip: `IPs that will be randomly chosen to proxy whole

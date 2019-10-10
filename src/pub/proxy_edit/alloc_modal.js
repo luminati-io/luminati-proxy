@@ -254,14 +254,10 @@ export default class Alloc_modal extends Pure_component {
                 cur_page={this.state.cur_page}
                 page_change={this.page_change} top
                 update_items_per_page={this.update_items_per_page}>
-                {refresh_enabled &&
-                    <React.Fragment>
-                      <Link_icon tooltip="Unselect all" on_click={this.reset}
-                        id="unchecked"/>
-                      <Link_icon tooltip="Select all"
-                        on_click={this.select_all} id="check"/>
-                    </React.Fragment>
-                }
+                <Link_icon tooltip="Unselect all" on_click={this.reset}
+                  id="unchecked"/>
+                <Link_icon tooltip="Select all"
+                  on_click={this.select_all} id="check"/>
               </Pagination_panel>
               {this.state.displayed_list.map(row=>
                 <Entry toggle={this.toggle} key={row} val={row}
@@ -285,14 +281,11 @@ export default class Alloc_modal extends Pure_component {
 
 const Entry = props=>
     <div style={{display: 'flex'}}>
-      {props.refresh_enabled ?
-          <React.Fragment>
-            <Checkbox on_change={props.toggle} text={props.val}
-              value={props.val} checked={props.checked}/>
-            <div className="chrome_icon refresh"
-              onClick={()=>props.refresh(props.val)}
-              style={{top: 1, position: 'relative', left: 3}}/>
-          </React.Fragment> :
-          <span>{props.val}</span>
+      <Checkbox on_change={props.toggle} text={props.val}
+        value={props.val} checked={props.checked}/>
+      {props.refresh_enabled &&
+          <div className="chrome_icon refresh"
+            onClick={()=>props.refresh(props.val)}
+            style={{top: 1, position: 'relative', left: 3}}/>
       }
     </div>;

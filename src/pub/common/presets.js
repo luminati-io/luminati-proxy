@@ -52,7 +52,8 @@ const presets = {
         subtitle: `Creates a pool of IPs and always uses the most stable IP
             from the pool`,
         set: opt=>{
-            opt.pool_size = 20;
+            if (!opt.pool_size || opt.pool_size==1)
+                opt.pool_size = 20;
             opt.session = '';
         },
         clean: opt=>{
@@ -65,6 +66,7 @@ const presets = {
             sticky_ip: true,
             session: true,
             session_duration: true,
+            max_requests: true,
         },
     },
     sticky_ip: {
@@ -75,6 +77,7 @@ const presets = {
         set: function(opt){
             opt.pool_size = 0;
             opt.sticky_ip = true;
+            opt.max_requests = 0;
         },
         clean: opt=>{
             opt.max_requests = 0;
@@ -94,6 +97,7 @@ const presets = {
             session: true,
             session_duration: true,
             pool_size: true,
+            max_requests: true,
         },
     },
     rnd_usr_agent_and_cookie_header: {

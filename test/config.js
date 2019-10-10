@@ -33,11 +33,13 @@ describe('config', ()=>{
     it('should not save file on read only mode', ()=>{
         const conf = new Config({opts: {read_only: true}}, Manager.default,
             {filname: '.luminati.json'});
-        sinon.stub(fs, 'writeFileSync');
-        sinon.stub(file, 'write_e');
+        const write_sync_stub = sinon.stub(fs, 'writeFileSync');
+        const write_e_sync = sinon.stub(file, 'write_e');
         conf.save();
         conf.set_string('');
         sinon.assert.notCalled(fs.writeFileSync);
         sinon.assert.notCalled(file.write_e);
+        write_sync_stub.restore();
+        write_e_sync.restore();
     });
 });

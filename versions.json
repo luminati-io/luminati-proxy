@@ -1,5 +1,31 @@
 [
     {
+        "ver": "1.157.37",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed connected from MLA when SSL analyzing is on"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed specific IPs selection for static shared zones"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed link tester in Docker containers"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed error handling for SOCKS5 connections between LPM and Super Proxies"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed 2-Step error shown when logging in"
+            }
+        ]
+    },
+    {
         "ver": "1.156.820",
         "type": "stable/dev",
         "changes": [

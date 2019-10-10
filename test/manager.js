@@ -26,27 +26,6 @@ const api_base = 'https://'+pkg.api_domain;
 
 logger.transports.forEach(t=>{ t.silent = true; });
 
-let tmp_file_counter = 0;
-const temp_file_path = (ext, pre)=>{
-    const p = path.join(os.tmpdir(),
-        `${pre||'test'}-${Date.now()}-${tmp_file_counter++}.${ext||'tmp'}`);
-    const done = ()=>{
-        if (this.path)
-        {
-            try {
-                fs.unlinkSync(path);
-            } catch(e){}
-            this.path = null;
-        }
-    };
-    return {path: p, done: done};
-};
-
-const temp_file = (content, ext, pre)=>{
-    const temp = temp_file_path(ext, pre);
-    fs.writeFileSync(temp.path, JSON.stringify(content));
-    return temp;
-};
 
 describe('manager', ()=>{
     const logger_stub = sinon.stub(logger, 'notice');
@@ -91,6 +70,28 @@ describe('manager', ()=>{
         yield manager.start();
         return {manager};
     });
+    let tmp_file_counter = 0;
+    const temp_file_path = (ext='tmp')=>{
+        const p = path.join(os.tmpdir(),
+            `test-${Date.now()}-${tmp_file_counter++}.${ext}`);
+        const done = ()=>{
+            if (this.path)
+            {
+                try {
+                    fs.unlinkSync(path);
+                } catch(e){
+                    console.error(e.message);
+                }
+                this.path = null;
+            }
+        };
+        return {path: p, done};
+    };
+    const temp_file = (content, ext)=>{
+        const temp = temp_file_path(ext);
+        fs.writeFileSync(temp.path, JSON.stringify(content));
+        return temp;
+    };
     const app_with_config = opt=>etask(function*(){
         const args = [];
         const cli = opt.cli||{};
@@ -116,11 +117,6 @@ describe('manager', ()=>{
             args.push(config_file.path);
             temp_files.push(config_file);
         }
-        (opt.files||[]).forEach(c=>{
-            const file = temp_file(c, 'json');
-            args.push(file.path);
-            temp_files.push(file);
-        });
         return yield app_with_args(args, opt.only_explicit);
     });
     const app_with_proxies = (proxies, cli)=>etask(function*(){
