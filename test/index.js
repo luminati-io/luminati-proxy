@@ -866,7 +866,8 @@ describe('proxy', ()=>{
         const make_process_rule_req=(proxy_res, html, res)=>etask(function*(){
             const req = {ctx: {response: {}, proxies: [],
                 timeline: {track: ()=>null, req: {create: Date.now()}},
-                log: {info: ()=>null}, skip_rule: ()=>false}};
+                log: {info: ()=>null}, skip_rule: ()=>false,
+                init_res_stats: ()=>null}};
             Object.assign(proxy_res, {
                 end: ()=>null, pipe: ()=>({pipe: ()=>null}),
                 on: function(event, fn){

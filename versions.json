@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.157.243",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved requests bandwith calculation"
+            }
+        ]
+    },
+    {
         "ver": "1.157.37",
         "type": "stable",
         "changes": [

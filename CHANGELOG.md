@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.157.243 Stable
+- :sparkles: Improved requests bandwith calculation
+
 ## 1.157.37 Stable
 - :bug: Fixed connected from MLA when SSL analyzing is on
 - :bug: Fixed specific IPs selection for static shared zones

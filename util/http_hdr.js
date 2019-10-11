@@ -94,6 +94,43 @@ E.browser_defaults = function(browser){
     return defs[browser]||defs.chrome;
 };
 
+E.browser_accept = function(browser, type){
+    let defs = {
+        document: {
+            chrome: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            firefox: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            edge: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            safari: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+        image: {
+            chrome: 'image/webp,image/apng,image/*,*/*;q=0.8',
+            firefox: 'image/webp,*/*',
+            safari: '*/*',
+        },
+        video: {
+            chrome: '*/*',
+            firefox: 'video/webm,video/ogg,video/*;q=0.9,application/ogg;q=0.7,audio/*;q=0.6,*/*;q=0.5',
+        },
+        audio: {
+            chrome: '*/*',
+            firefox: 'audio/webm,audio/ogg,audio/wav,audio/*;q=0.9,application/ogg;q=0.7,video/*;q=0.6,*/*;q=0.5',
+            safari: '*/*',
+        },
+        script: {
+            chrome: '*/*',
+            firefox: '*/*',
+            safari: '*/*',
+        },
+        css: {
+            chrome: 'text/css,*/*;q=0.1',
+            firefox: 'text/css,*/*;q=0.1',
+            safari: 'text/css,*/*;q=0.1',
+        },
+    };
+    let kind = defs[type]||defs.document;
+    return kind[browser]||kind.chrome;
+};
+
 E.browser_default_header_order = function(browser){
     let headers = {
         chrome: qw`host connection pragma cache-control

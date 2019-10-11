@@ -147,16 +147,24 @@ E.exec_in_zon_tree = (filename, exe_in_tree, args, opt)=>{
     });
 };
 
-E.zon_root = ()=>{
-    const zon_dir = file.normalize(env.PROJECT_PATH || `${env.HOME}/.zon`);
+E.zon_root = product=>{
+    const zon_dir = file.normalize(product ? `${env.HOME}/.zon.${product}` :
+        env.PROJECT_PATH||`${env.HOME}.zon`);
     if (!zon_dir)
         E.zexit('PROJECT_PATH environment variable is not set');
     if (!file.exists(zon_dir))
     {
         console.error(`checking out zon to ${zon_dir}`);
+        let _env;
+        if (product)
+        {
+            const domain = product=='lum' ? 'luminati.io' :
+                product=='spark' ? 'holaspark.com' : 'hola.org';
+            _env = {CVSROOT: `:pserver:${env.USER}@cvs.${domain}:/arch/cvs`};
+        }
         const res = exec.sys_sync(
             ['cvs', '-q', 'co', '-d', path.basename(zon_dir), 'zon'],
-            {opt: {cwd: path.dirname(zon_dir)}});
+            {opt: {cwd: path.dirname(zon_dir), env: _env}});
         if (res.retval)
             E.zexit(`cvs co returned error:\n${res.stdall}`);
         console.error(string.align`

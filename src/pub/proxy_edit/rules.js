@@ -37,18 +37,14 @@ const rule_prepare = rule=>{
     else if (rule.action=='save_to_pool')
         action.reserve_session = true;
     else if (rule.action=='process')
-    {
-        try { action.process = JSON.parse(rule.process); }
-        catch(e){ console.log('wrong process json'); }
-    }
+        action.process = rule.process && JSON.parse(rule.process);
     else if (rule.action=='request_url')
     {
         action.request_url = {
             url: rule.request_url,
             method: rule.request_method,
+            payload: rule.request_payload && JSON.parse(rule.request_payload),
         };
-        try { action.request_url.payload = JSON.parse(rule.request_payload); }
-        catch(e){ console.log('wrong payload json'); }
     }
     else if (rule.action=='null_response')
         action.null_response = true;
@@ -442,7 +438,7 @@ class Action extends Pure_component {
                     <Rule_config id="request_method" type="select" rule={rule}
                         data={this.request_methods()}
                         on_change={this.request_method_changed}/>
-                    {rule.request_method != 'GET' &&
+                    {rule.request_method && rule.request_method != 'GET' &&
                       <Rule_config id="request_payload" type="json"
                         rule={rule}/>
                     }
