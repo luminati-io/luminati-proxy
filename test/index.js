@@ -265,48 +265,6 @@ describe('proxy', ()=>{
                 assert.equal(res.body.auth.password, 'abc');
             }));
         });
-        // XXX krzysztof: to remove
-        xdescribe('short_username', ()=>{
-            const t = (name, user, short, expected)=>it(name, ()=>etask(
-            function*(){
-                l = yield lum({short_username: short});
-                const res = yield l.test({headers: {
-                    'proxy-authorization': 'Basic '+
-                        Buffer.from(user+':pass').toString('base64'),
-                }});
-                const m = res.body.headers['proxy-authorization']
-                .match(/^Basic (.*)/);
-                const h = Buffer.from(m[1], 'base64').toString('ascii');
-                const parts = h.split(':');
-                assert_has(res.body.auth, expected);
-                if (short)
-                    assert.ok(parts[0].length <= user.length);
-                else
-                    assert.ok(parts[0].length >= user.length);
-            }));
-            t('short notation',
-                'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
-                true, {
-                customer: 'ttt',
-                zone: 'zzz',
-                direct: true,
-                session: 'sss',
-                country: 'us',
-                state: 'fl',
-                city: 'miami',
-            });
-            t('long notation',
-                'lum-cu-ttt-z-zzz-d-s-sss-to-5-dbg-full-cy-us-st-fl-ct-miami',
-                false, {
-                customer: 'ttt',
-                zone: 'zzz',
-                direct: true,
-                session: 'sss',
-                country: 'us',
-                state: 'fl',
-                city: 'miami',
-            });
-        });
         describe('pool', ()=>{
             describe('idle_pool', ()=>{
                 it('should idle', etask._fn(function*(_this){
@@ -876,7 +834,10 @@ describe('proxy', ()=>{
                         fn(Buffer.from(html));
                         fn(Buffer.from('random data'));
                     }
-                    else if (event=='end')
+                    return this;
+                },
+                once: function(event, fn){
+                    if (event=='end')
                         fn();
                     return this;
                 }

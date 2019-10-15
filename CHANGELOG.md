@@ -1,8 +1,12 @@
 Luminati Proxy manager - Change Log
 
+## 1.157.566 Stable
+- :bug: Fix EventEmitter listeners issues and ECONNREFUSED errors
+
 ## 1.157.534 Stable
 - :sparkles: Improved --upgrade argument behavior: it will now upgrade LPM and restart previously running daemons
 - :sparkles: Added missing carriers
+- :bug: Fixed LPM's memory usage
 
 ## 1.157.243 Stable
 - :sparkles: Improved requests bandwith calculation

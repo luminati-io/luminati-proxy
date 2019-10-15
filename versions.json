@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.157.566",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix EventEmitter listeners issues and ECONNREFUSED errors"
+            }
+        ]
+    },
+    {
         "ver": "1.157.534",
         "type": "stable",
         "changes": [
@@ -10,6 +20,10 @@
             {
                 "type": "sparkles",
                 "text": "Added missing carriers"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed LPM's memory usage"
             }
         ]
     },
