@@ -844,7 +844,7 @@ class Actions extends Pure_component {
                 setdb.emit_path('head.proxies_running');
             const uri = '/api/proxy_status/'+proxy.port;
             const url = zescape.uri(uri, params);
-            const res = yield ajax.json({url});
+            const res = yield ajax.json({url, timeout: 25000});
             if (res.status!='ok')
             {
                 let errors = (res.status_details||[]).filter(s=>s.lvl=='err');

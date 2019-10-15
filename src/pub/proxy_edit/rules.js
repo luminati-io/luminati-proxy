@@ -41,7 +41,8 @@ const rule_prepare = rule=>{
     else if (rule.action=='request_url')
     {
         action.request_url = {
-            url: rule.request_url,
+            url: /^https?:\/\//.test(rule.request_url) ?
+                rule.request_url : 'http://'+rule.request_url,
             method: rule.request_method,
             payload: rule.request_payload && JSON.parse(rule.request_payload),
         };

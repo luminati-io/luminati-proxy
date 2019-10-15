@@ -149,7 +149,7 @@ E.exec_in_zon_tree = (filename, exe_in_tree, args, opt)=>{
 
 E.zon_root = product=>{
     const zon_dir = file.normalize(product ? `${env.HOME}/.zon.${product}` :
-        env.PROJECT_PATH||`${env.HOME}.zon`);
+        env.PROJECT_PATH||`${env.HOME}/.zon`);
     if (!zon_dir)
         E.zexit('PROJECT_PATH environment variable is not set');
     if (!file.exists(zon_dir))

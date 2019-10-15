@@ -12,6 +12,7 @@ check_compat();
 const _ = require('lodash');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
+require('../lib/perr.js').run({});
 const logger = require('../lib/logger.js');
 const lpm_config = require('../util/lpm_config.js');
 const Lum_common = require('./lum_common.js');
@@ -34,8 +35,9 @@ class Lum_node_index extends Lum_common {
         yield etask.nfn_apply(pm2, '.connect', []);
         if (!Array.isArray(opt))
             opt = [opt];
-        yield etask.nfn_apply(pm2, '.'+command, opt);
+        const ret = yield etask.nfn_apply(pm2, '.'+command, opt);
         yield etask.nfn_apply(pm2, '.disconnect', []);
+        return ret;
     }); }
     run_daemon(){
         let dopt = _.pick(this.argv.daemon_opt,
@@ -43,9 +45,9 @@ class Lum_node_index extends Lum_common {
         if (!Object.keys(dopt).length)
             return;
         const daemon_start_opt = {
-            name: this.proc_name,
+            name: lpm_config.daemon_name,
             script: this.argv.$0,
-            'merge-logs': false,
+            mergeLogs: false,
             output: '/dev/null',
             error: '/dev/null',
             autorestart: true,
@@ -56,11 +58,11 @@ class Lum_node_index extends Lum_common {
         if (dopt.start)
             this.pm2_cmd('start', daemon_start_opt);
         else if (dopt.stop)
-            this.pm2_cmd('stop', this.proc_name);
+            this.pm2_cmd('stop', lpm_config.daemon_name);
         else if (dopt.delete)
-            this.pm2_cmd('delete', this.proc_name);
+            this.pm2_cmd('delete', lpm_config.daemon_name);
         else if (dopt.restart)
-            this.pm2_cmd('restart', this.proc_name);
+            this.pm2_cmd('restart', lpm_config.daemon_name);
         else if (dopt.startup)
         {
             let pm2_bin = path.resolve(__dirname, '../node_modules/.bin/pm2');
@@ -167,24 +169,44 @@ class Lum_node_index extends Lum_common {
         // XXX krzysztof: duplication of handling siganls: why?
         ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
             process.on(sig, e=>{
-                this.child.send({
-                    command: 'shutdown',
-                    reason: sig+(e ? ', master: error = '+zerr.e2s(e) : ''),
-                    error: zerr.e2s(e),
-                });
+                if (this.child)
+                {
+                    const error = zerr.e2s(e);
+                    this.child.send({
+                        command: 'shutdown',
+                        reason: sig+(e ? ', master: error = '+error : ''),
+                        error,
+                    });
+                }
                 setTimeout(()=>process.exit(), 5000);
             });
         });
         if (!this.argv.upgrade)
             return this.create_child();
-        this.upgrade(e=>{
-            if (e)
-            {
-                logger.error(`Error during upgrade: ${zerr.e2s(e)}`);
-                process.exit();
-            }
-            logger.notice('Upgrade completed successfully');
-            this.create_child();
+        const _this = this;
+        const log = console.log.bind(console);
+        return etask(function*_upgrade(){
+            yield zerr.perr('upgrade_start');
+            const pm2_list = yield _this.pm2_cmd('list');
+            const daemon = pm2_list.find(p=>p.name==lpm_config.daemon_name);
+            const running_daemon = !!daemon &&
+                ['online', 'launching'].includes(daemon.pm2_env.status);
+            _this.upgrade(e=>etask(function*_cb_upgrade(){
+                if (e)
+                {
+                    if (e.message != 'User did not grant permission.')
+                        yield zerr.perr('upgrade_error', {error: e});
+                    return;
+                }
+                logger.notice('Upgrade completed successfully');
+                if (running_daemon)
+                {
+                    logger.notice('Restarting daemon');
+                    yield _this.pm2_cmd('restart', lpm_config.daemon_name);
+                    logger.notice('Daemon restarted');
+                }
+                yield zerr.perr('upgrade_finish');
+            }));
         });
     }
 }

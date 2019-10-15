@@ -513,6 +513,7 @@ class Select_zone extends Pure_component {
                 return {key: `Default (${z.name})`, value: z.name};
             return {key: z.name, value: z.name};
         });
+        const selected = val || this.state.zones.def;
         return <div className="select_zone">
               <Tooltip title={tooltip}>
                 <span data-tip data-for="zone-tip">
@@ -521,19 +522,18 @@ class Select_zone extends Pure_component {
                       place="bottom" delayHide={0} delayUpdate={300}>
                       {disabled ? <Ext_tooltip/> :
                         <div className="zone_tooltip">
-                          <Zone_description zone_name={val}/>
+                          <Zone_description zone_name={selected}/>
                         </div>
                       }
                     </React_tooltip>
                   }
-                  <Select val={val} type="select"
+                  <Select val={selected} type="select"
                     on_change_wrapper={on_change_wrapper} label="Default zone"
                     tooltip={tooltip} data={zone_opt} disabled={disabled}/>
                 </span>
               </Tooltip>
               <Tooltip title="Refresh zones">
                 <div className="chrome_icon refresh"
-                  style={{top: 3, position: 'relative'}}
                   onClick={this.refresh_zones}/>
               </Tooltip>
               <Loader show={this.state.refreshing_zones}/>

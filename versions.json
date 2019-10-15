@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.157.534",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved --upgrade argument behavior: it will now upgrade LPM and restart previously running daemons"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added missing carriers"
+            }
+        ]
+    },
+    {
         "ver": "1.157.243",
         "type": "stable",
         "changes": [

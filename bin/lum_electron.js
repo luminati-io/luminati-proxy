@@ -12,6 +12,7 @@ const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
+require('../lib/perr.js').run({});
 const Manager = require('../lib/manager.js');
 const tasklist = require('tasklist');
 const taskkill = require('taskkill');
@@ -19,7 +20,7 @@ const pkg = require('../package.json');
 const logger = require('../lib/logger.js');
 const E = module.exports;
 
-let manager, upgrade_available, can_upgrade;
+let manager, upgrade_available, can_upgrade, is_upgrading;
 
 const show_message = opt=>etask(function*(){
     let [res] = yield etask.cb_apply({ret_a: true}, dialog, '.showMessageBox',
@@ -49,22 +50,28 @@ let upgrade = ver=>etask(function*(){
             +' will be installed on exit',
             buttons: ['Install on exit', 'Install now']});
         if (!res)
-            return void console.log('Update postponed until exit');
+            return void logger.notice('Update postponed until exit');
     }
-    console.log('Starting upgrade');
+    logger.notice('Starting upgrade');
+    is_upgrading = true;
+    zerr.perr('upgrade_start');
     auto_updater.quitAndInstall();
 });
 
 auto_updater.allowDowngrade = true;
 auto_updater.autoDownload = false;
-auto_updater.on('error', ()=>{});
+auto_updater.on('error', e=>zerr.perr('upgrade_error', {error: e}));
+auto_updater.on('before-quit', ()=>{
+    if (is_upgrading)
+        zerr.perr('upgrade_finish');
+});
 
 auto_updater.on('update-available', e=>etask(function*(){
     const changelog_url = 'https://github.com/luminati-io/luminati-proxy/blob/'
     +'master/CHANGELOG.md';
     const update_msg = `Update version ${e.version} is available. Full list of`
     +` changes is available here: ${changelog_url}`;
-    console.log(update_msg);
+    logger.notice(update_msg);
     if (!can_upgrade)
     {
         let res = yield show_message({type: 'info',
@@ -73,14 +80,14 @@ auto_updater.on('update-available', e=>etask(function*(){
             +' is available, would you like to download it?',
             buttons: ['No', 'Yes']});
         if (!res)
-            return void console.log('Will not download update');
+            return void logger.notice('Will not download update');
     }
-    console.log(`Downloading version ${e.version}`);
+    logger.notice(`Downloading version ${e.version}`);
     auto_updater.downloadUpdate();
 }));
 
 auto_updater.on('update-downloaded', e=>{
-    console.log('Update downloaded');
+    logger.notice('Update downloaded');
     upgrade_available = true;
     upgrade(e.version);
 });

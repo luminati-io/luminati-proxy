@@ -33,6 +33,10 @@ const gen_filename = name=>{
         `.luminati_${name}.json`.substr(is_win ? 1 : 0));
 };
 
+const perr_info = info=>Object.assign({}, info, {
+    customer: _.get(E.manager, '_defaults.customer'),
+});
+
 E.write_status_file = (status, error=null, config=null, reason=null)=>{
     if (error)
         error = zerr.e2s(error);
@@ -95,8 +99,7 @@ E.handle_signal = (sig, err)=>{
     etask(function*handle_signal_lum_node(){
         if (sig!='SIGINT' && sig!='SIGTERM')
         {
-            yield zerr.perr('crash', {error: errstr, reason: sig,
-                customer: _.get(E.manager, '_defaults.customer')});
+            yield zerr.perr('crash', perr_info({error: errstr, reason: sig}));
             return E.shutdown(errstr, err);
         }
         return E.shutdown(errstr);
@@ -297,10 +300,7 @@ E.run = (argv, run_config)=>etask(function*(){
         {
             // XXX krzysztof: make a generic function for sending crashes
             etask(function*send_err(){
-                yield zerr.perr('crash', {
-                    error: zerr.e2s(e),
-                    customer: _.get(E.manager, '_defaults.customer'),
-                });
+                yield zerr.perr('crash', perr_info({error: zerr.e2s(e)}));
                 handle_fatal();
             });
         }
@@ -316,6 +316,7 @@ E.run = (argv, run_config)=>etask(function*(){
     .on('upgrade', cb=>{
         if (E.on_upgrade_finished)
             return;
+        zerr.perr('upgrade_start', perr_info());
         process.send({command: 'upgrade'});
         E.on_upgrade_finished = cb;
     }).on('restart', ()=>process.send({command: 'restart'}));
@@ -327,6 +328,10 @@ E.handle_upgrade_finished = msg=>{
     if (E.on_upgrade_finished)
         E.on_upgrade_finished(msg.error);
     E.on_upgrade_finished = undefined;
+    if (msg.error)
+        zerr.perr('upgrade_error', perr_info({error: msg.error}));
+    else
+        zerr.perr('upgrade_finish', perr_info());
 };
 
 E.handle_shutdown = msg=>{
