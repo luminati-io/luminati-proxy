@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "body-parser": "1.15.2",
-    "check-node-version": "2.0.1",
+    "check-node-version": "4.0.1",
     "electron-updater": "2.8.9",
     "express": "4.14.0",
     "flag-icon-css": "3.2.1",
@@ -78,6 +78,7 @@
     "node-forge": "0.6.46",
     "pm2": "2.10.1",
     "request": "2.79.0",
+    "request-stats": "2.0.1",
     "semver": "5.3.0",
     "sudo-prompt": "6.2.1",
     "taskkill": "2.0.0",
@@ -285,6 +286,7 @@
       "lib/config.js",
       "lib/consts.js",
       "lib/context.js",
+      "lib/https_agent.js",
       "lib/hutil-loader.js",
       "lib/ip_cache.js",
       "lib/locations.js",
@@ -381,7 +383,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "a829c98a1777727024f9dbb2b554066d"
+    "md5": "27c046ce58f3d7cbd932e06faf1dbbad"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -439,5 +441,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.157.566"
+  "version": "1.158.189"
 }

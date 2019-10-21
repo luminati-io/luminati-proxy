@@ -20,7 +20,7 @@ import {Checkbox, any_flag, flag_with_title,
 import {withRouter} from 'react-router-dom';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
-import {T, with_tt} from './common/i18n.js';
+import {T} from './common/i18n.js';
 import {Toolbar_container, Toolbar_row, Toolbar_button,
     Devider} from './chrome_widgets.js';
 import {AutoSizer, Table, Column} from 'react-virtualized';
@@ -62,7 +62,7 @@ class Targeting_cell extends Pure_component {
     }
 }
 
-const Status_cell = ({proxy, scrolling})=>{
+const Status_cell = ({proxy})=>{
     const status = proxy.status;
     const status_details = proxy.status_details;
     let details = (status_details||[]).map(d=>d.msg).join(',');
@@ -138,13 +138,15 @@ const Port_cell = ({proxy, mgr, scrolling})=>{
     return <Tooltip title={title}>{val}</Tooltip>;
 };
 
-const Success_rate_cell = with_tt(['Total', 'Success'], ({proxy, t})=>{
+const Success_rate_cell = ({proxy})=>{
     const val = !proxy.reqs ? '—' :
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
-    const title = `${t['Total']}: ${proxy.reqs},
-        ${t['Success']}: ${proxy.success}`;
+    const title = <span>
+      <T>Total</T>: {proxy.reqs||0},
+      <T>Success</T>: {proxy.success||0}
+    </span>;
     return <Tooltip title={title}>{val}</Tooltip>;
-});
+};
 
 const Reqs_cell = ({proxy})=>{
     const reqs = proxy.reqs||0;
@@ -482,7 +484,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.setdb_on('head.proxies_running', proxies=>{
             if (!proxies)
                 return;
-            proxies = this.prepare_proxies(proxies||[]);
+            proxies = this.prepare_proxies(proxies);
             const filtered_proxies = this.filter_proxies(proxies,
                 this.props.master_port);
             this.setState({proxies, filtered_proxies, loaded: true});
@@ -498,8 +500,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                 return;
             this.setState({zones});
         });
-        this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
-        this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));
         this.timeout_id = window.setTimeout(this.req_status);
         this.setdb_on('head.settings', settings=>{
             if (settings)
@@ -840,7 +840,7 @@ class Actions extends Pure_component {
                 proxy.status = 'testing';
                 params.force = true;
             }
-            if (proxy.status=='testing' || opt.force)
+            if (proxy.status=='testing')
                 setdb.emit_path('head.proxies_running');
             const uri = '/api/proxy_status/'+proxy.port;
             const url = zescape.uri(uri, params);

@@ -4,6 +4,7 @@ const _ = require('lodash');
 const assert = require('assert');
 const http = require('http');
 const https = require('https');
+const http_shutdown = require('http-shutdown');
 const net = require('net');
 const url = require('url');
 const request = require('request');
@@ -80,6 +81,7 @@ E.http_proxy = port=>etask(function*(){
             return handler(req, res, head);
         proxy.connection(()=>handler(req, res, head), req);
     });
+    http_shutdown(proxy.http);
     const headers = {};
     proxy.http.on('connect', (req, res, head)=>etask(function*(){
         let _url = req.url;
@@ -95,6 +97,7 @@ E.http_proxy = port=>etask(function*(){
                         handler(_req, _res, _head);
                     }
                 );
+                http_shutdown(proxy.https);
                 yield etask.nfn_apply(proxy.https, '.listen', [0]);
             }
             _url = '127.0.0.1:'+proxy.https.address().port;
@@ -130,9 +133,9 @@ E.http_proxy = port=>etask(function*(){
         proxy.http._connections--;
     };
     proxy.stop = etask._fn(function*(_this){
-        yield etask.nfn_apply(_this.http, '.close', []);
+        yield etask.nfn_apply(_this.http, '.shutdown', []);
         if (_this.https)
-            yield etask.nfn_apply(_this.https, '.close', []);
+            yield etask.nfn_apply(_this.https, '.shutdown', []);
     });
     proxy.request = etask._fn(function*(_this, _url){
         return yield etask.nfn_apply(request, [{

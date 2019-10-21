@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.158.189 Development Latest
+- :sparkles: Improved HTTPS requests performance
+- :bug: Fixed stats not being updated in overview panel
+
 ## 1.157.566 Stable
 - :bug: Fix EventEmitter listeners issues and ECONNREFUSED errors
 

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.158.189",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved HTTPS requests performance"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed stats not being updated in overview panel"
+            }
+        ]
+    },
+    {
         "ver": "1.157.566",
         "type": "stable",
         "changes": [

@@ -47,7 +47,6 @@ conf.server_default = {
     test_url: 'http://lumtest.com/myip.json',
     proxy: conf.default_superproxy_domain,
     proxy_port: 22225,
-    socks_proxy_port: 22228,
     proxy_retry: 2,
     socket_inactivity_timeout: 120*date.ms.SEC,
     preset: 'session_long',

@@ -5,7 +5,6 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
-import {Note} from '../common.js';
 
 const route_err_opt = [
     {key: 'Default (pass_dyn)', value: ''},
@@ -17,7 +16,6 @@ const proxy_connection_type_opt = [
     {key: 'Default (HTTP)', value: ''},
     {key: 'HTTP', value: 'http'},
     {key: 'HTTPS', value: 'https'},
-    {key: 'SOCKS5', value: 'socks'},
 ];
 
 export default class General extends Pure_component {
@@ -64,7 +62,6 @@ export default class General extends Pure_component {
         else if (curr_plan && !!curr_plan.vip)
             type = 'vips';
         const form = this.state.form;
-        const has_socks_permission = curr_plan && curr_plan.socks5;
         const note_ips = form.multiply_ips ?
             <a className="link" onClick={this.open_modal}>Select IPs</a> :
             null;
@@ -80,10 +77,6 @@ export default class General extends Pure_component {
                 <Config type="pins" id="whitelist_ips" disabled={disabled_wl}/>
                 <Config type="select" data={proxy_connection_type_opt}
                   id="proxy_connection_type"/>
-                {form.proxy_connection_type=='socks' &&
-                    !has_socks_permission &&
-                    <Note>Your zone does not have SOCKS permission.</Note>
-                }
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="insecure"
                     disabled={!this.state.form.ssl}/>

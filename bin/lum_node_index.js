@@ -90,7 +90,7 @@ class Lum_node_index extends Lum_common {
         process.env.LUM_MAIN_CHILD = true;
         this.child = child_process.fork(
             path.resolve(__dirname, 'lum_node.js'),
-            [], {stdio: 'inherit', env: process.env});
+            process.argv.slice(2), {stdio: 'inherit', env: process.env});
         this.child.on('message', this.msg_handler.bind(this));
         this.child.on('exit', this.shutdown_on_child_exit);
         this.child.send({command: 'run', argv: this.argv});
@@ -184,7 +184,6 @@ class Lum_node_index extends Lum_common {
         if (!this.argv.upgrade)
             return this.create_child();
         const _this = this;
-        const log = console.log.bind(console);
         return etask(function*_upgrade(){
             yield zerr.perr('upgrade_start');
             const pm2_list = yield _this.pm2_cmd('list');

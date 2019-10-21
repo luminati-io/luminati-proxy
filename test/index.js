@@ -86,7 +86,7 @@ describe('proxy', ()=>{
         ping = yield http_ping();
         console.log('End prep', new Date());
     }));
-    after('after all', ()=>etask._fn(function*after(_this){
+    after('after all', etask._fn(function*after(_this){
         _this.timeout(3000);
         if (proxy)
             yield proxy.stop();
@@ -769,8 +769,6 @@ describe('proxy', ()=>{
                 requester.t.Http_requester);
             t('should use HTTPS requester when specified',
                 {proxy_connection_type: 'https'}, requester.t.Https_requester);
-            t('should use SOCKS requester when specified',
-                {proxy_connection_type: 'socks'}, requester.t.Socks_requester);
         });
     });
     describe('retry', ()=>{
@@ -824,8 +822,7 @@ describe('proxy', ()=>{
         const make_process_rule_req=(proxy_res, html, res)=>etask(function*(){
             const req = {ctx: {response: {}, proxies: [],
                 timeline: {track: ()=>null, req: {create: Date.now()}},
-                log: {info: ()=>null}, skip_rule: ()=>false,
-                init_res_stats: ()=>null}};
+                log: {info: ()=>null}, skip_rule: ()=>false}};
             Object.assign(proxy_res, {
                 end: ()=>null, pipe: ()=>({pipe: ()=>null}),
                 on: function(event, fn){
