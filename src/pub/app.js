@@ -78,6 +78,10 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.locations', locations);
         });
         this.etask(function*(){
+            const carriers = yield ajax.json({url: '/api/all_carriers'});
+            setdb.set('head.carriers', carriers);
+        });
+        this.etask(function*(){
             const settings = yield ajax.json({url: '/api/settings'});
             setdb.set('head.settings', settings);
             window.ga('set', 'dimension1', settings.customer);

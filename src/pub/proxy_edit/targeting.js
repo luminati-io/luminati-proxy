@@ -2,16 +2,10 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
-import carriers_gen from '/www/util/pub/carriers_gen.js';
 import setdb from '../../../util/setdb.js';
 import {Note, Ext_tooltip} from '../common.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
-
-const carriers = [
-    {value: '', key: 'None'},
-    ...carriers_gen.map(c=>({value: c.value, key: c.label}))
-];
 
 const carriers_note = (()=>{
     const subject = 'Add new carrier option';
@@ -34,6 +28,12 @@ export default class Targeting extends Pure_component {
             if (!locations)
                 return;
             this.setState({locations});
+        });
+        this.setdb_on('head.carriers', carriers=>{
+            if (!carriers)
+                return;
+            carriers = carriers.map(c=>({value: c.value, key: c.label}));
+            this.setState({carriers});
         });
         this.setdb_on('head.proxy_edit.form', form=>{
             form && this.setState({form});
@@ -106,7 +106,7 @@ export default class Targeting extends Pure_component {
     };
     carriers = ()=>{
         const {country} = this.state.form;
-        const {locations} = this.state;
+        const {locations, carriers} = this.state;
         let res;
         if (!country)
         {
@@ -125,9 +125,7 @@ export default class Targeting extends Pure_component {
             this.set_field('state', e[0].region);
     };
     render(){
-        if (!this.state.locations)
-            return null;
-        if (!this.state.form)
+        if (!this.state.locations || !this.state.carriers || !this.state.form)
             return null;
         if (this.state.form.ext_proxies)
             return <Note><Ext_tooltip/></Note>;

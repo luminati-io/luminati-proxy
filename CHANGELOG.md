@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.158.559 Development Latest
+- :sparkles: Introduced carriers list automatic update
+
 ## 1.158.189 Development Latest
 - :sparkles: Improved HTTPS requests performance
 - :bug: Fixed stats not being updated in overview panel

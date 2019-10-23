@@ -20,7 +20,7 @@ const pkg = require('../package.json');
 const logger = require('../lib/logger.js');
 const E = module.exports;
 
-let manager, upgrade_available, can_upgrade, is_upgrading;
+let manager, upgrade_available, can_upgrade, is_upgrading, upgrade_cb;
 
 const show_message = opt=>etask(function*(){
     let [res] = yield etask.cb_apply({ret_a: true}, dialog, '.showMessageBox',
@@ -77,7 +77,7 @@ auto_updater.on('update-available', e=>etask(function*(){
         let res = yield show_message({type: 'info',
             title: `Luminati update ${e.version} is available`,
             message: 'Luminati version '+e.version
-            +' is available, would you like to download it?',
+            +' is available. Would you like to download it?',
             buttons: ['No', 'Yes']});
         if (!res)
             return void logger.notice('Will not download update');
@@ -92,6 +92,12 @@ auto_updater.on('update-downloaded', e=>{
     upgrade(e.version);
 });
 
+auto_updater.on('update-not-available', ()=>{
+    if (upgrade_cb)
+        upgrade_cb('Update not available');
+    upgrade_cb = null;
+});
+
 const check_conflicts = ()=>etask(function*(){
     let tasks;
     try { tasks = yield tasklist(); }
@@ -104,7 +110,7 @@ const check_conflicts = ()=>etask(function*(){
         type: 'warning',
         title: 'Address in use',
         message: `LPM is already running (${tasks[0].pid})\n`
-            +'Click OK to stopping the '
+            +'Click OK to stop the '
             +'offending processes or Cancel to close LPM.\n\n'
             +'Suspected processes:\n'
             +'PID\t Image Name\t Session Name\t Mem Usage\n'
@@ -143,6 +149,7 @@ const _run = argv=>etask(function*(){
         opn(url);
     })
     .on('upgrade', cb=>{
+        upgrade_cb = cb;
         can_upgrade = true;
         if (upgrade_available)
             upgrade();
