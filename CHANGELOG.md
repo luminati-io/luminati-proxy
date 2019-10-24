@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.158.722 Stable
+- :bug: Fixed upgrade for Windows
+
 ## 1.158.559 Development Latest
 - :sparkles: Introduced carriers list automatic update
 

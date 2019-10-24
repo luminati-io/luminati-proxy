@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.158.722",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed upgrade for Windows"
+            }
+        ]
+    },
+    {
         "ver": "1.158.559",
         "type": "dev",
         "changes": [
