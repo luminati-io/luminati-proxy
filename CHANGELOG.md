@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.158.770 Stable
+- :sparkles: Updated gIP management
+
 ## 1.158.722 Stable
 - :bug: Fixed upgrade for Windows
 
