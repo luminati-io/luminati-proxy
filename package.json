@@ -75,7 +75,7 @@
     "flag-icon-css": "3.2.1",
     "http-shutdown": "1.1.0",
     "json-stable-stringify": "1.0.1",
-    "lodash": "4.17.11",
+    "lodash": "4.17.15",
     "node-forge": "0.6.46",
     "pm2": "2.10.1",
     "request": "2.79.0",
