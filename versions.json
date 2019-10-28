@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.159.78",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed memory leak"
+            }
+        ]
+    },
+    {
         "ver": "1.158.770",
         "type": "stable",
         "changes": [

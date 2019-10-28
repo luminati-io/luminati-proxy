@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.159.78 
+- :bug: Fixed memory leak
+
 ## 1.158.770 Stable
 - :sparkles: Updated gIP management
 

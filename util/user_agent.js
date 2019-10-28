@@ -10,7 +10,6 @@ else
 define(function(){
 var E = {};
 
-// XXX arik: sync: util/user_agent.js <-> svc/cdn/pub/play_loader.js
 var win_versions = {
     '10.0': '10.0',
     '6.3': '8.1',
