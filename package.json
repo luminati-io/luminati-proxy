@@ -131,7 +131,7 @@
     "event-target-shim": "5.0.0",
     "file-loader": "0.11.2",
     "html-webpack-plugin": "2.30.1",
-    "jquery": "3.1.1",
+    "jquery": "3.4.1",
     "less": "2.7.2",
     "less-loader": "4.0.5",
     "lolex": "2.1.1",
