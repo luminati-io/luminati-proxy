@@ -6,7 +6,8 @@ import setdb from '../../util/setdb.js';
 import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
-import {Loader, Warnings, Code, Preset_description} from './common.js';
+import {Loader, Warnings, Code, Preset_description,
+    with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {ga_event} from './util.js';
 import presets from './common/presets.js';
@@ -268,7 +269,7 @@ const Ext_proxy = ({ips_list, on_field_change, parse_error})=>{
         </div>;
 };
 
-const Lum_proxy = props=>{
+const Lum_proxy = with_www_api(props=>{
     const {zone, def_zone, on_field_change, preset, rule_clicked,
         presets_opt} = props;
     const preset_tip = 'Presets is a set of preconfigured configurations '
@@ -282,7 +283,7 @@ const Lum_proxy = props=>{
             </Field>
             <Preview title={zone||def_zone}>
               <Zone_description zone_name={zone}/>
-              <a className="link" href="https://luminati.io/cp/zones"
+              <a className="link" href={`${props.www_api}/cp/zones`}
                 target="_blank" rel="noopener noreferrer"><T>Edit zone</T></a>
             </Preview>
           </div>
@@ -295,7 +296,7 @@ const Lum_proxy = props=>{
             </Preview>
           </div>
         </div>;
-};
+});
 
 const Preview = ({title, children})=>{
     return <div className="preview">

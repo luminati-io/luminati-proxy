@@ -146,6 +146,25 @@ export const with_proxy_ports = Component=>{
     return With_proxy_ports;
 };
 
+export const with_www_api = Component=>{
+    class With_www_api extends Pure_component {
+        state = {};
+        componentDidMount(){
+            this.setdb_on('head.defaults', defaults=>{
+                if (defaults)
+                    this.setState({www_api: defaults.www_api});
+            });
+        }
+        render(){
+            if (!this.state.www_api)
+                return <Loader show/>;
+            return React.createElement(Component,
+                {...this.props, www_api: this.state.www_api});
+        }
+    }
+    return With_www_api;
+};
+
 export const Form_controller = props=>{
     const type = props.type;
     if (type=='select')
@@ -372,14 +391,14 @@ export const Remove_icon = ({click, tooltip})=>
       </span>
     </Tooltip>;
 
-export class Logo extends Pure_component {
+export const Logo = with_www_api(class Logo extends Pure_component {
     state = {};
     componentDidMount(){
         this.setdb_on('head.version', ver=>this.setState({ver}));
     }
     render(){
         return <div className="nav_top">
-              <a href="https://luminati.io/cp" rel="noopener noreferrer"
+              <a href={`${this.props.www_api}/cp`} rel="noopener noreferrer"
                 target="_blank" className="logo_big"/>
               <div className="version">V{this.state.ver}</div>
               <div className="nav_top_right">
@@ -387,7 +406,7 @@ export class Logo extends Pure_component {
               </div>
             </div>;
     }
-}
+});
 
 export const any_flag = <T>{t=>
       <Tooltip title={t('Any')}>
@@ -429,8 +448,11 @@ export const Preset_description = ({preset, rule_clicked})=>{
         </div>}</T>;
 };
 
-export const Ext_tooltip = ()=><div>
+export const Ext_tooltip = with_www_api(props=>
+    <div>
       This feature is only available when using{' '}
-      <a className="link" target="_blank" href="https://luminati.io/cp/zones"
-        rel="noopener noreferrer">proxies by Luminati network</a>
-    </div>;
+        <a className="link" target="_blank" rel="noopener noreferrer"
+          href={`${props.www_api}/cp/zones`}>
+            proxies by Luminati network
+        </a>
+    </div>);

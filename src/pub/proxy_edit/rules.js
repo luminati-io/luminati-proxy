@@ -358,7 +358,7 @@ class Action extends Pure_component {
     };
     goto_tester = ()=>{
         this.props.history.push({pathname: `/proxy_tester`, state: {
-            url: 'https://luminati.io/lpm/templates/product',
+            url: `${this.state.defaults.www_api}/lpm/templates/product`,
             port: this.props.match.params.port,
         }});
     };

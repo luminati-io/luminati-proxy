@@ -19,6 +19,7 @@ import {T} from './i18n.js';
 import {Ext_tooltip, Loader} from '../common.js';
 import Zone_description from './zone_desc.js';
 import {Modal_dialog} from './modals.js';
+const ANY_IP = '0.0.0.0/0';
 
 export class Pins extends Pure_component {
     state = {pins: [], max_id: 0, modal_open: false,
@@ -89,12 +90,14 @@ export class Pins extends Pure_component {
     render(){
         const pending = this.state.pending;
         const pending_btn_title = `Add recent IPs (${pending.length})`;
+        const has_any = this.state.pins.find(p=>p.val==ANY_IP);
         return <div className="pins_field">
               <div className="pins">
                 {this.state.pins.map(p=>
                   <Pin key={p.id} update_pin={this.update_pin} id={p.id}
                     set_edit={this.set_edit} edit={p.edit}
                     exact={this.props.exact} save_pin={this.save_pin}
+                    show_any={!this.props.no_any && !has_any}
                     remove={this.remove} disabled={p.disabled}>
                     {p.val}
                   </Pin>
@@ -158,22 +161,38 @@ class Pin extends Pure_component {
         this.props.save_pin(this.props.id, val);
     };
     on_change = e=>this.props.update_pin(this.props.id, e.target.value);
+    on_any_click = ()=>{
+        this.props.update_pin(this.props.id, ANY_IP);
+        this.setState({children: ANY_IP}, this.validate_and_save);
+    };
     remove = ()=>this.props.remove(this.props.id);
-    on_blur = ()=>this.validate_and_save();
+    on_blur = e=>{
+        const target = e.relatedTarget;
+        const any_click = target && target.classList.contains('any');
+        if (!any_click)
+            this.validate_and_save();
+    };
+    get_label = ip=>ip==ANY_IP ? 'any' : ip;
     render(){
-        const {children, edit, disabled} = this.props;
+        const {children, edit, disabled, show_any} = this.props;
         const input_classes = classnames({hidden: !edit});
-        return <div className={classnames('pin', {active: edit, disabled})}>
+        return <div className={classnames('pin', {active: edit, disabled})}
+            onBlur={this.on_blur}>
               {!disabled &&
                 <div className="x" onClick={this.remove}>
                 <div className="glyphicon glyphicon-remove"/>
               </div>}
               <div className="content" onClick={this.edit}>
-                {!edit && children}
+                {!edit && this.get_label(children)}
                 <input ref={this.input} type="text" value={children}
-                  onChange={this.on_change} onBlur={this.on_blur}
-                  className={input_classes} onKeyUp={this.key_up}/>
+                  onChange={this.on_change} className={input_classes}
+                  onKeyUp={this.key_up}/>
               </div>
+              {edit && show_any &&
+                <button className="any" onClick={this.on_any_click}>
+                    any
+                </button>
+              }
               {edit &&
                 <div className="v">
                   <div className="glyphicon glyphicon-ok"/>

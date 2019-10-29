@@ -17,6 +17,7 @@ import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {Language} from './common/i18n.js';
+import {with_www_api} from './common.js';
 
 const Nav = ()=>
     <div className="nav">
@@ -88,10 +89,10 @@ class Nav_top extends Pure_component {
     }
 }
 
-const Footer = ()=>
+const Footer = with_www_api(props=>
     <div className="footer">
       <div>
-        <a href="http://luminati.io/faq#proxy" rel="noopener noreferrer"
+        <a href={`${props.www_api}/faq#proxy`} rel="noopener noreferrer"
           target="_blank" className="link"><T>FAQ</T></a>
       </div>
       <div>
@@ -102,7 +103,8 @@ const Footer = ()=>
         <a rel="noopener noreferrer" target="_blank" href={swagger_url}
           className="link"><T>API</T></a>
       </div>
-    </div>;
+    </div>
+);
 
 const Logo = withRouter(({lock})=>
     <Link to="/overview" className={classnames('logo', {lock})}/>);
@@ -117,14 +119,15 @@ const Nav_right = ()=>
       <Account/>
     </div>;
 
-const Patent = ()=>
+const Patent = with_www_api(props=>
     <div className="patent_note">
       Patent:
-      <a className="link" href="https://luminati.io/patent-marking"
+      <a className="link" href={`${props.www_api}/patent-marking`}
         rel="noopener noreferrer" target="_blank">
-        https://luminati.io/patent-marking
+        {`${props.www_api}/patent-marking`}
       </a>
-    </div>;
+    </div>
+);
 
 const show_reload = function(){
     $('#restarting').modal({

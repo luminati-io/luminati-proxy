@@ -45,7 +45,7 @@ class Form extends Pure_component {
     ];
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
-            if (!settings||this.state.settings)
+            if (!settings)
                 return;
             this.setState({settings: {...settings}});
         });
@@ -68,7 +68,7 @@ class Form extends Pure_component {
         this.setState(
             ({settings})=>{
                 const whitelist_ips = val.filter(
-                    ip=>!settings.cmd_whitelist_ips.includes(ip));
+                    ip=>!settings.fixed_whitelist_ips.includes(ip));
                 return {settings: {...settings, whitelist_ips}};
             },
             this.debounced_save);
@@ -132,7 +132,7 @@ class Form extends Pure_component {
         const s = this.state.settings;
         if (!s)
             return null;
-        const wl = s.cmd_whitelist_ips.concat(s.whitelist_ips);
+        const wl = s.fixed_whitelist_ips.concat(s.whitelist_ips);
         return <div className="settings_form">
               <Labeled_controller label="Default zone" tooltip={tooltips.zone}>
                 <Select_zone val={s.zone} preview
@@ -143,7 +143,7 @@ class Form extends Pure_component {
                 <Pins val={s.www_whitelist_ips} pending={s.pending_www_ips}
                   on_change_wrapper={this.www_whitelist_ips_change}/>
               </Labeled_controller>
-              <Labeled_controller val={wl} disabled={s.cmd_whitelist_ips}
+              <Labeled_controller val={wl} disabled={s.fixed_whitelist_ips}
                 type="pins" label="Proxy whitelisted IPs"
                 on_change_wrapper={this.whitelist_ips_change}
                 tooltip={tooltips.whitelist_ips}/>

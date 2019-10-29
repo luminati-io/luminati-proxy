@@ -68,8 +68,8 @@ export default class General extends Pure_component {
         const note_vips = form.multiply_vips ?
             <a className="link" onClick={this.open_modal}>Select gIPs</a> :
             null;
-        const disabled_wl = (this.state.settings.cmd_whitelist_ips||[]).concat(
-            this.state.settings.whitelist_ips);
+        const disabled_wl = (this.state.settings.fixed_whitelist_ips||[])
+            .concat(this.state.settings.whitelist_ips);
         return <div className="general">
               <Tab_context.Provider value="general">
                 <Config type="text" id="internal_name"/>
@@ -94,7 +94,7 @@ export default class General extends Pure_component {
                 }
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
-                <Config type="pins" id="smtp" exact/>
+                <Config type="pins" id="smtp" exact no_any/>
               </Tab_context.Provider>
             </div>;
     }

@@ -3,7 +3,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
-import {Logo, Code} from './common.js';
+import {Logo, Code, with_www_api} from './common.js';
 import {Instructions, Li} from './common/bullets.js';
 
 export default class Whitelist_ips extends Pure_component {
@@ -98,7 +98,7 @@ const User = ({type, on_click, active})=>
       <div className="user_desc">{user_types[type].desc}</div>
     </div>;
 
-const Steps = ({cur_user, ip})=>{
+const Steps = with_www_api(({cur_user, ip, www_api})=>{
     if (!cur_user)
         return null;
     const User_steps = user_types[cur_user].steps;
@@ -108,9 +108,9 @@ const Steps = ({cur_user, ip})=>{
             <span>For more information on how to enable this feature see the
               related topic on our FAQ page: </span>
             <a className="link"
-              href="https://luminati.io/faq#proxy-security">
-              https://luminati.io/faq#proxy-security
+              href={`${www_api}/faq#proxy-security`}>
+              {`${www_api}/faq#proxy-security`}
             </a>
           </div>
         </div>;
-};
+});

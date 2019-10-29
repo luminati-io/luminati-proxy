@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.159.78",
+        "version": "1.159.270",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1323,10 +1323,10 @@
                     "items": {"type": "string"},
                     "description": "Default for all proxies whitelist ip list for granting access to them"
                 },
-                "cmd_whitelist_ips": {
+                "fixed_whitelist_ips": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "Default whitelisted IPs list with granted access for all proxies passed via command line"
+                    "description": "Default whitelisted IPs list with granted access for all proxies passed via command line or from www_whitelist_ips"
                 },
                 "config": {
                     "type": "string",

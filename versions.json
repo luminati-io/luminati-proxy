@@ -1,7 +1,29 @@
 [
     {
+        "ver": "1.159.270",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed carriers.json updates"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added 'any' option to ease whitelisting all IPs through the UI"
+            },
+            {
+                "type": "sparkles",
+                "text": "Admin whitelisted IPs will now automatically be added to proxies whitelist"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed usage in China"
+            }
+        ]
+    },
+    {
         "ver": "1.159.78",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",

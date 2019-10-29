@@ -567,10 +567,11 @@ describe('manager', ()=>{
         }));
     });
     describe('whitelisting', ()=>{
-        const t = (name, proxies, default_calls, wh, cli)=>
+        const t = (name, proxies, default_calls, wh, cli, www_whitelist)=>
         it(name, etask._fn(function*(_this){
             const port = proxies[0].port;
             app = yield app_with_proxies(proxies, cli);
+            app.manager.set_www_whitelist_ips(www_whitelist||[]);
             for (const c of default_calls)
                 app.manager.set_whitelist_ips(c);
             const {whitelist_ips} = app.manager.proxy_ports[port].opt;
@@ -585,16 +586,24 @@ describe('manager', ()=>{
         const p_w = [{port: 24000, whitelist_ips: ['1.1.1.1']}];
         const w_cli = {whitelist_ips: ['1.2.3.4', '4.3.2.1']};
         t('sets from cmd', p, [], ['1.2.3.4', '4.3.2.1'], w_cli);
+        t('sets from www', p, [], ['1.1.1.1'], null, ['1.1.1.1']);
         t('sets default', p, [['2.2.2.2']], ['2.2.2.2']);
         t('sets specific', p_w, [], ['1.1.1.1']);
         t('sets cmd and default', p, [['2.2.2.2']],
             ['1.2.3.4', '4.3.2.1', '2.2.2.2'], w_cli);
         t('sets cmd and specific', p_w, [], ['1.2.3.4', '4.3.2.1', '1.1.1.1'],
             w_cli);
+        t('sets cmd and www', p, [], ['1.2.3.4', '4.3.2.1', '1.1.1.1'],
+            w_cli, ['1.1.1.1']);
         t('sets default and specific', p_w, [['2.2.2.2']],
             ['2.2.2.2', '1.1.1.1']);
+        t('sets default and www', p, [['2.2.2.2']],
+            ['1.1.1.1', '2.2.2.2'], null, ['1.1.1.1']);
         t('sets cmd, default and specific', p_w, [['2.2.2.2']],
             ['1.2.3.4', '4.3.2.1', '2.2.2.2', '1.1.1.1'], w_cli);
+        t('sets cmd, default, www and specific', p_w, [['2.2.2.2']],
+            ['1.2.3.4', '4.3.2.1', '10.1.1.1', '2.2.2.2', '1.1.1.1'], w_cli,
+            ['10.1.1.1']);
         t('removes IPs from proxy port config when removed in default ', p_w,
             [['2.2.2.2', '3.3.3.3'], []], ['1.2.3.4', '4.3.2.1', '1.1.1.1'],
             w_cli);
@@ -617,7 +626,7 @@ describe('manager', ()=>{
             const proxy = config.proxies[0];
             assert.equal(proxy.port, proxies[0].port);
             assert.deepEqual(proxy.whitelist_ips, expected);
-    }));
+        }));
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{

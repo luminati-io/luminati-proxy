@@ -1,6 +1,12 @@
 Luminati Proxy manager - Change Log
 
-## 1.159.78 
+## 1.159.270 Stable
+- :bug: Fixed carriers.json updates
+- :sparkles: Added 'any' option to ease whitelisting all IPs through the UI
+- :sparkles: Admin whitelisted IPs will now automatically be added to proxies whitelist
+- :bug: Fixed usage in China
+
+## 1.159.78 Stable
 - :bug: Fixed memory leak
 
 ## 1.158.770 Stable

@@ -4,12 +4,11 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ajax from '../../../util/ajax.js';
 import {Instructions, Li} from './bullets.js';
-import {Loader} from '../common.js';
+import {Loader, with_www_api} from '../common.js';
 import {Modal} from './modals.js';
 
-export default class Enable_ssl_modal extends Pure_component {
+export default with_www_api(class Enable_ssl_modal extends Pure_component {
     state = {loading: false};
-    faq_cert_url = 'https://luminati.io/faq#proxy-certificate';
     enable_ssl = ()=>{
         const _this = this;
         this.etask(function*(){
@@ -20,6 +19,7 @@ export default class Enable_ssl_modal extends Pure_component {
         });
     };
     render(){
+        const faq_cert_url = `${this.props.www_api}/faq#proxy-certificate`;
         return <React.Fragment>
             <Loader show={this.state.loading}/>
             <Modal id={this.props.id||'enable_ssl_modal'}
@@ -38,7 +38,7 @@ export default class Enable_ssl_modal extends Pure_component {
                 <Li>
                   Add the certificate to your browser.
                   You can find more detailed
-                  instructions <a className="link" href={this.faq_cert_url}
+                  instructions <a className="link" href={faq_cert_url}
                     rel="noopener noreferrer" target="_blank">here</a>
                 </Li>
                 <Li>Refresh the page</Li>
@@ -46,4 +46,4 @@ export default class Enable_ssl_modal extends Pure_component {
             </Modal>
         </React.Fragment>;
     }
-}
+});

@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../../util/setdb.js';
-import {Note, Ext_tooltip} from '../common.js';
+import {Note, Ext_tooltip, with_www_api} from '../common.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
 
@@ -18,7 +18,7 @@ const carriers_note = (()=>{
     return <a className="link" href={mailto}><T>More carriers</T></a>;
 })();
 
-export default class Targeting extends Pure_component {
+export default with_www_api(class Targeting extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -28,6 +28,11 @@ export default class Targeting extends Pure_component {
             if (!locations)
                 return;
             this.setState({locations});
+        });
+        this.setdb_on('head.defaults', defaults=>{
+            if (!defaults)
+                return;
+            this.setState({defaults});
         });
         this.setdb_on('head.carriers', carriers=>{
             if (!carriers)
@@ -167,7 +172,7 @@ export default class Targeting extends Pure_component {
                     }
                     <a className="link" target="_blank"
                       rel="noopener noreferrer"
-                      href="https://luminati.io/cp/zones">zone page</a>
+                      href={`${this.props.www_api}/cp/zones`}>zone page</a>
                     <span> and change your zone plan.</span>
                   </Note>
                 }
@@ -190,4 +195,4 @@ export default class Targeting extends Pure_component {
               </Tab_context.Provider>
             </div>;
     }
-}
+});

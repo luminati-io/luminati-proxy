@@ -8,7 +8,7 @@ import ajax from '../../util/ajax.js';
 import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
-import {Loader, Logo} from './common.js';
+import {Loader, Logo, with_www_api} from './common.js';
 import {T} from './common/i18n.js';
 
 const token_err_msg = {
@@ -346,7 +346,7 @@ class Two_step_form extends Pure_component {
     }
 }
 
-class First_form extends Pure_component {
+const First_form = with_www_api(class First_form extends Pure_component {
     on_key_up = e=>{
         if (e.keyCode==13)
             this.props.save_user();
@@ -393,7 +393,7 @@ class First_form extends Pure_component {
                 <div className="row">
                   <div className="signup">
                     {t('Don\'t have a Luminati account?')}
-                    <a href="https://luminati.io/?need_signup=1"
+                    <a href={`${this.props.www_api}/?need_signup=1`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="link">
@@ -404,6 +404,6 @@ class First_form extends Pure_component {
               </div>
             }</T></div>;
     }
-}
+});
 
 export default Login;
