@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.159.461",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed support for SMTP connection"
+            }
+        ]
+    },
+    {
         "ver": "1.159.270",
         "type": "stable",
         "changes": [

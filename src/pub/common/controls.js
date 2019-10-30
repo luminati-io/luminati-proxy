@@ -29,10 +29,14 @@ export class Pins extends Pure_component {
             return null;
         const ips = props.val||[];
         const disabled_ips = props.disabled||[];
+        const pins = ips.map((p, id)=>({id, val: p, edit: false,
+            disabled: !!disabled_ips.find(i=>i==p)}));
+        const edited_pin = state.pins.find(p=>p.edit);
+        if (edited_pin)
+            pins.push(edited_pin);
         return {
             raw_val: props.val,
-            pins: ips.map((p, id)=>({id, val: p, edit: false,
-                disabled: !!disabled_ips.find(i=>i==p)})),
+            pins,
             max_id: ips.length,
         };
     }

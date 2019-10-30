@@ -2,15 +2,15 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {withRouter} from 'react-router-dom';
-import _ from 'lodash';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import conv from '../../../util/conv.js';
 import {migrate_trigger, migrate_action, no_ssl_trigger_types, trigger_types,
-    action_types, default_action} from '../../../util/rules_util.js';
+    action_types, default_action, WWW_API} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
+import zutil from '../../../util/util.js';
 import {Labeled_controller, with_proxy_ports, Cm_wrapper,
     Field_row_raw, Warning} from '../common.js';
 import {tabs} from './fields.js';
@@ -370,19 +370,25 @@ class Action extends Pure_component {
     };
     request_methods = ()=>
         ['GET', 'POST', 'PUT', 'DELETE'].map(m=>({key: m, value: m}));
+    action_types_with_updated_domain = ()=>{
+        const _action_types = zutil.clone_deep(action_types);
+        _action_types.forEach(at=>at.tooltip = (at.tooltip||'')
+            .replace(WWW_API, this.state.defaults.www_api));
+        return _action_types;
+    };
     render(){
         const {rule, match, ports_opt} = this.props;
         const {logins, defaults, settings, zones, curr_zone,
             refresh_cost} = this.state;
-        if (!rule.trigger_type || !settings)
+        if (!rule.trigger_type || !settings || !defaults)
             return null;
         if (!zones || !curr_zone)
             return null;
-        let _action_types = [default_action].concat(_.cloneDeep(action_types)
-        .filter(at=>rule.trigger_type=='url' && at.url ||
-            rule.trigger_type!='url' && !at.only_url)
-        .filter(at=>rule.trigger_type!='min_req_time' ||
-            at.min_req_time));
+        let _action_types = this.action_types_with_updated_domain()
+            .filter(at=>rule.trigger_type=='url' && at.url ||
+                rule.trigger_type!='url' && !at.only_url)
+            .filter(at=>rule.trigger_type != 'min_req_time' ||
+                at.min_req_time);
         if (this.should_show_refresh())
         {
             const refresh_ip_at = _action_types.find(
@@ -395,6 +401,7 @@ class Action extends Pure_component {
         }
         else
             _action_types = _action_types.filter(at=>at.value!='refresh_ip');
+        _action_types = [default_action].concat(_action_types);
         const current_port = match.params.port;
         const ports = ports_opt.filter(p=>p.value!=current_port);
         ports.unshift({key: '--Select--', value: ''});

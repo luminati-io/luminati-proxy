@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.159.461 Stable
+- :bug: Fixed support for SMTP connection
+
 ## 1.159.270 Stable
 - :bug: Fixed carriers.json updates
 - :sparkles: Added 'any' option to ease whitelisting all IPs through the UI
