@@ -35,6 +35,8 @@ function select_cookies(domain){
 
 E.init = function(opt){
     var domain;
+    try { domain = document.location.hostname; }
+    catch(e){ domain = 'luminati.io'; }
     if (typeof opt=='string')
         domain = opt;
     // XXX arik HACK: remove test_storage once all tests are fixed and we can
@@ -44,7 +46,7 @@ E.init = function(opt){
     if (have_local_storage())
         return select_local_storage();
     console.error('cannot use localStorage, using cookies instead');
-    select_cookies(domain||'hola.org');
+    select_cookies(domain);
 };
 E.init();
 
@@ -53,16 +55,16 @@ E.on_err = function(){};
 // XXX arik: add simple storage test
 E.set = function(key, val){
     if (E.is_test_storage)
-        return (E.test_storage[key] = val);
+        return E.test_storage[key] = val;
     try { return storage.setItem(key, val); }
-    catch(err){ E.on_err('storage_set', key, err); }
+    catch(e){ E.on_err('storage_set', key, e); }
 };
 
 E.get = function(key){
     if (E.is_test_storage)
         return E.test_storage[key];
     try { return storage.getItem(key); }
-    catch(err){ E.on_err('storage_get', key, err); }
+    catch(e){ E.on_err('storage_get', key, e); }
 };
 
 E.get_int = function(key){ return +E.get(key)||0; };
@@ -71,12 +73,12 @@ E.clr = function(key){
     if (E.is_test_storage)
         return delete E.test_storage[key];
     try { storage.removeItem(key); }
-    catch(err){ E.on_err('storage_clr', key, err); }
+    catch(e){ E.on_err('storage_clr', key, e); }
 };
 
 E.set_json = function(key, val){
     try { return E.set(key, JSON.stringify(val||null)); }
-    catch(err){ E.on_err('storage_set_json', key, err); }
+    catch(e){ E.on_err('storage_set_json', key, e); }
 };
 
 E.get_json = function(key){
@@ -84,7 +86,7 @@ E.get_json = function(key){
     if (!val)
         return val;
     try { val = JSON.parse(val); }
-    catch(err){ console.log('err '+err); }
+    catch(e){ console.log('err '+e); }
     return val;
 };
 

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.159.711",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added auto restart to worker processes when they die"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed message shown when --stop-daemon is used with no daemon process"
+            }
+        ]
+    },
+    {
         "ver": "1.159.461",
         "type": "stable",
         "changes": [

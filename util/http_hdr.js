@@ -65,6 +65,9 @@ E.browser_defaults = function(browser){
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'en-US,en;q=0.9',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-user': '?1',
+            'sec-fetch-site': 'none',
         },
         firefox: {
             connection: 'keep-alive',
@@ -134,8 +137,9 @@ E.browser_accept = function(browser, type){
 E.browser_default_header_order = function(browser){
     let headers = {
         chrome: qw`host connection pragma cache-control
-            upgrade-insecure-requests user-agent accept referer accept-encoding
-            accept-language cookie`,
+            upgrade-insecure-requests sec-fetch-mode sec-fetch-user user-agent
+            accept sec-fetch-site referer accept-encoding accept-language
+            cookie`,
         firefox: qw`host user-agent accept accept-language accept-encoding
             referer connection cookie upgrade-insecure-requests cache-control`,
         edge: qw`referer cache-control accept accept-language
@@ -169,8 +173,9 @@ E.like_browser_case_and_order = function(headers, browser){
 E.browser_default_header_order_http2 = function(browser){
     let headers = {
         chrome: qw`:method :authority :scheme :path pragma cache-control
-            upgrade-insecure-requests user-agent accept referer accept-encoding
-            accept-language cookie`,
+            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
+            accept sec-fetch-site referer accept-encoding accept-language
+            cookie`,
         firefox: qw`:method :path :authority :scheme user-agent accept
             accept-language accept-encoding referer cookie
             upgrade-insecure-requests cache-control te`,

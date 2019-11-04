@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.159.711 Stable
+- :sparkles: Added auto restart to worker processes when they die
+- :bug: Fixed message shown when --stop-daemon is used with no daemon process
+
 ## 1.159.461 Stable
 - :bug: Fixed support for SMTP connection
 

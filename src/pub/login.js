@@ -323,7 +323,7 @@ class Two_step_form extends Pure_component {
               {t('A Luminati 2-Step Verification email containing a token '
               +'was sent to ')}
               {email}
-              {t('. The token is valid for 3 minutes.')}
+              {t('. The token is valid for ')+'15 '+ t('minutes.')}
               <div className="form-group">
                 <input className="two_step_input" onKeyUp={this.on_key_up}
                   onChange={this.on_token_change} placeholder={t('Token')}/>

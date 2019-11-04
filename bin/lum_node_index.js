@@ -30,14 +30,16 @@ const download = require('download');
 class Lum_node_index extends Lum_common {
     pm2_cmd(command, opt){ return etask(function*pm2_cmd(){
         this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+            if (e.message=='process name not found')
+                logger.notice('There is no running LPM daemon process');
+            else
+                logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
         yield etask.nfn_apply(pm2, '.connect', []);
         if (!Array.isArray(opt))
             opt = [opt];
-        const ret = yield etask.nfn_apply(pm2, '.'+command, opt);
-        yield etask.nfn_apply(pm2, '.disconnect', []);
-        return ret;
+        try { return yield etask.nfn_apply(pm2, '.'+command, opt); }
+        finally { yield etask.nfn_apply(pm2, '.disconnect', []); }
     }); }
     run_daemon(){
         let dopt = _.pick(this.argv.daemon_opt,
