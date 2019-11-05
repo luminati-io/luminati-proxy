@@ -21,7 +21,7 @@ describe('config', ()=>{
             stats: false,
             customer: 'wrong_cust',
         }];
-        const conf_mgr = new Config({opts: {}}, Manager.default);
+        const conf_mgr = new Config(new Manager([]), Manager.default);
         const s = conf_mgr.serialize(proxies, {});
         const config = JSON.parse(s);
         const proxy = config.proxies[0];

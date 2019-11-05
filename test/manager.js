@@ -567,7 +567,7 @@ describe('manager', ()=>{
         }));
     });
     describe('whitelisting', ()=>{
-        const t = (name, proxies, default_calls, wh, cli, www_whitelist)=>
+        let t = (name, proxies, default_calls, wh, cli, www_whitelist)=>
         it(name, etask._fn(function*(_this){
             const port = proxies[0].port;
             app = yield app_with_proxies(proxies, cli);
@@ -614,19 +614,23 @@ describe('manager', ()=>{
             const opt = yield app.manager.proxy_update(p[0], new_proxy);
             assert.deepEqual(opt.whitelist_ips, whitelist_ips);
         }));
-        it('should not save default/cmd whitelist', ()=>etask(function*(){
-            const def = ['3.3.3.3', '4.4.4.4'], expected = ['7.8.9.10'];
+        t = (name, def, default_calls, expected)=>
+        it(name, etask._fn(function*(_this){
             const proxies = [{port: 24000, whitelist_ips:
                 w_cli.whitelist_ips.concat(def).concat(expected)}];
             app = yield app_with_proxies(proxies, w_cli);
             const m = app.manager;
-            m.set_whitelist_ips(def);
+            default_calls.forEach(d=>m.set_whitelist_ips(d));
             const s = m.config.serialize(m.proxies, m._defaults);
             const config = JSON.parse(s);
             const proxy = config.proxies[0];
             assert.equal(proxy.port, proxies[0].port);
             assert.deepEqual(proxy.whitelist_ips, expected);
         }));
+        const def = ['3.3.3.3', '4.4.4.4'];
+        t('should not save default/cmd whitelist', def, [def], ['7.8.9.10']);
+        t('should rm from port after rm from default/cmd whitelist', def,
+            [def, def.slice(1)], ['7.8.9.10']);
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{

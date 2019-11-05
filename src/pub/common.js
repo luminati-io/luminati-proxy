@@ -156,10 +156,11 @@ export const with_www_api = Component=>{
             });
         }
         render(){
-            if (!this.state.www_api)
-                return <Loader show/>;
+            let www_api = 'https://luminati.io';
+            if (this.state.www_api)
+                www_api = this.state.www_api;
             return React.createElement(Component,
-                {...this.props, www_api: this.state.www_api});
+                {...this.props, www_api});
         }
     }
     return With_www_api;
