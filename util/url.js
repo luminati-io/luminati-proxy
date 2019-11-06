@@ -3,8 +3,8 @@
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
-    (typeof navigator=='object' && navigator.product=='ReactNative');
+var is_rn = typeof global=='object'&&!!global.nativeRequire ||
+    typeof navigator=='object'&&navigator.product=='ReactNative';
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 var qs;
@@ -77,7 +77,7 @@ E.get_root_domain = function(domain){
 
 // XXX josh: move to email.js:get_domain
 E.get_domain_email = function(email){
-    var match = email.toLowerCase().match(/^[a-z0-9_\.\-\+]+@(.*)$/);
+    var match = email.toLowerCase().match(/^[a-z0-9_.\-+]+@(.*)$/);
     return match && match[1];
 };
 
@@ -123,13 +123,13 @@ E.is_ip_mask = function(host){
         return false;
     var final = false;
     var check_num_mask = function(num){
-        var arr = (num >>> 0).toString(2).split(''), final = false;
+        var arr = (num >>> 0).toString(2).split(''), _final = false;
         for (var i=0; i<arr.length; i++)
         {
-            if (final && arr[i]=='1')
+            if (_final && arr[i]=='1')
                 return false;
-            if (!final && arr[i]=='0')
-                final = true;
+            if (!_final && arr[i]=='0')
+                _final = true;
         }
         return true;
     };
@@ -199,7 +199,8 @@ E.is_hola_domain = function(domain){
 
 // XXX josh: move to email.js:is_valid
 E.is_valid_email = function(email){
-    var n = email.toLowerCase().match(/^[a-z0-9_\.\-\+]+@(.*)$/);
+    var re = /^[a-z0-9_\-+]+(?:\.[a-z0-9_\-+]+)*@(.*)$/;
+    var n = email.toLowerCase().match(re);
     return !!(n && E.is_valid_domain(n[1]));
 };
 
@@ -207,7 +208,7 @@ E.is_valid_email = function(email){
 E.is_alias_email = function(email){
     if (!E.is_valid_email(email))
         return false;
-    var n = email.toLowerCase().match(/^([a-z0-9_\.\-\+]+)@.*$/);
+    var n = email.toLowerCase().match(/^([a-z0-9_.\-+]+)@.*$/);
     return !!(n && /.+\+.+/.test(n[1]));
 };
 
@@ -457,7 +458,7 @@ E.qs_add = function(url, qs){
 };
 
 E.qs_parse_url = function(url){
-    return E.qs_parse(url.replace(/(^.*\?)|(^[^\?]*$)/, ''));
+    return E.qs_parse(url.replace(/(^.*\?)|(^[^?]*$)/, ''));
 };
 
 return E; }); }());

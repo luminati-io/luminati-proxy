@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.160.316 Stable
+- :sparkles: Logs are now shown up to when the UI is ready running in daemon mode
+- :sparkles: Easy way for adding recent IPs to whitelist from the UI
+- :star: Improved logs (added port number and access denied warnings)
+
 ## 1.160.116 Stable
 - :bug: Fixed rules working with SMTP
 

@@ -24,10 +24,10 @@ function ajax(opt){
     var method = opt.method||opt.type||'GET';
     var data_type = opt.json ? 'json' : 'text';
     var t0 = Date.now();
-    var xhr;
+    var ajopt, xhr;
     zerr.debug('ajax('+data_type+') url '+url+' retry '+retry);
     return etask([function(){
-        var ajopt = {dataType: data_type, type: method, url: url,
+        ajopt = {dataType: data_type, type: method, url: url,
             data: data, timeout: timeout, xhrFields: {}};
         if (opt.headers)
             ajopt.headers = opt.headers;
@@ -75,7 +75,7 @@ function ajax(opt){
             zerr.json(data).substr(0, 200)+' status: '+xhr.status+' '+
             xhr.statusText+'\nresponseText: '+
             (xhr.responseText||'').substr(0, 200));
-        if (retry && (!opt.should_retry||opt.should_retry(err, xhr)))
+        if (retry && (!opt.should_retry||opt.should_retry(err, xhr, ajopt)))
             return this.return(ajax(assign({}, opt, {retry: retry-1})));
         if (xhr.statusText=='timeout')
             E.events.emit('timeout', this);
@@ -97,15 +97,15 @@ function ajax(opt){
         err.x_error = xhr.getResponseHeader('X-Luminati-Error') ||
             xhr.getResponseHeader('X-Hola-Error');
         throw err;
-    }, function(data){
+    }, function(_data){
         var t = Date.now()-t0;
         zerr[t>slow ? 'err' : 'debug'](
             'ajax('+data_type+') '+(t>slow ? 'SLOW ' : 'ok ')+t+'ms url '+url);
         if (t>slow && perr)
             perr({id: 'be_ajax_slow', info: t+'ms '+url});
         if (E.do_op)
-            E.do_op(data&&data.do_op);
-        return this.return(data);
+            E.do_op(_data&&_data.do_op);
+        return this.return(_data);
     }, function abort(){
         // reachable only via E.abort
         xhr.abort();

@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.160.316",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Logs are now shown up to when the UI is ready running in daemon mode"
+            },
+            {
+                "type": "sparkles",
+                "text": "Easy way for adding recent IPs to whitelist from the UI"
+            },
+            {
+                "type": "star",
+                "text": "Improved logs (added port number and access denied warnings)"
+            }
+        ]
+    },
+    {
         "ver": "1.160.116",
         "type": "stable",
         "changes": [

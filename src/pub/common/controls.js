@@ -22,15 +22,23 @@ import {Modal_dialog} from './modals.js';
 const ANY_IP = '0.0.0.0/0';
 
 export class Pins extends Pure_component {
-    state = {pins: [], max_id: 0, modal_open: false,
-        pending: this.props.pending||[]};
+    state = {
+        pins: [],
+        max_id: 0,
+        modal_open: false,
+        pending: this.props.pending||[],
+    };
     static getDerivedStateFromProps(props, state){
         if (props.val==state.raw_val||!props.val)
             return null;
         const ips = props.val||[];
         const disabled_ips = props.disabled||[];
-        const pins = ips.map((p, id)=>({id, val: p, edit: false,
-            disabled: !!disabled_ips.find(i=>i==p)}));
+        const pins = ips.map((p, id)=>({
+            id,
+            val: p,
+            edit: false,
+            disabled: !!disabled_ips.find(i=>i==p),
+        }));
         const edited_pin = state.pins.find(p=>p.edit);
         if (edited_pin)
             pins.push(edited_pin);
@@ -46,7 +54,7 @@ export class Pins extends Pure_component {
             max_id: prev.max_id+1,
         }));
         if (pin && this.state.pending.includes(pin))
-            this.setState({pending: this.props.pending.filter(p=>p!=pin)});
+            this.setState({pending: this.state.pending.filter(p=>p!=pin)});
     };
     add_empty_pin = ()=>{
         this.add_pin();

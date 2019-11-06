@@ -41,14 +41,15 @@ class Lum_node_index extends Lum_common {
         try { return yield etask.nfn_apply(pm2, '.'+command, opt); }
         finally { yield etask.nfn_apply(pm2, '.disconnect', []); }
     }); }
-    run_daemon(){
-        let dopt = _.pick(this.argv.daemon_opt,
-            ['start', 'stop', 'delete', 'restart', 'startup']);
-        if (!Object.keys(dopt).length)
-            return;
+    start_daemon(){
+        const _this = this;
+        return etask(function*_start_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
         const daemon_start_opt = {
             name: lpm_config.daemon_name,
-            script: this.argv.$0,
+            script: _this.argv.$0,
             mergeLogs: false,
             output: '/dev/null',
             error: '/dev/null',
@@ -57,8 +58,27 @@ class Lum_node_index extends Lum_common {
             restartDelay: 5000,
             args: process.argv.filter(arg=>arg!='-d'&&!arg.includes('daemon')),
         };
+        yield etask.nfn_apply(pm2, '.connect', []);
+        yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        bus.on('log:out', data=>{
+            if (data.process.name != daemon_start_opt.name)
+                return;
+            process.stdout.write(data.data);
+            if (data.data.includes('Open admin browser'))
+                return this.continue();
+        });
+        yield this.wait();
+        yield etask.nfn_apply(pm2, '.disconnect', []);
+        });
+    }
+    run_daemon(){
+        let dopt = _.pick(this.argv.daemon_opt,
+            ['start', 'stop', 'delete', 'restart', 'startup']);
+        if (!Object.keys(dopt).length)
+            return;
         if (dopt.start)
-            this.pm2_cmd('start', daemon_start_opt);
+            this.start_daemon();
         else if (dopt.stop)
             this.pm2_cmd('stop', lpm_config.daemon_name);
         else if (dopt.delete)
@@ -122,13 +142,15 @@ class Lum_node_index extends Lum_common {
         const cmd = lpm_config.is_win ? npm_cmd :
             `bash -c "${npm_cmd} > ${log_file} 2>&1"`;
         const opt = {name: 'Luminati Proxy Manager'};
-        logger.notice('Upgrading proxy manager');
+        logger.notice('Upgrading proxy manager...');
         sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
             if (cb)
                 cb(e);
             if (e)
             {
-                logger.error('Error during upgrade: '+zerr.e2s(e));
+                const msg = e.message=='User did not grant permission.' ?
+                    e.message : zerr.e2s(e);
+                logger.error('Error during upgrade: '+msg);
                 if (!lpm_config.is_win)
                     logger.error(`Look at ${log_file} for more details`);
                 return;
@@ -147,7 +169,7 @@ class Lum_node_index extends Lum_common {
         const newer = r.body.ver && semver.lt(pkg.version, r.body.ver);
         if (!newer)
             return cb();
-        logger.notice('Upgrading proxy manager');
+        logger.notice('Upgrading proxy manager...');
         const install_path = path.resolve(os.homedir(),
             'luminati_proxy_manager');
         const download_url = `http://${pkg.api_domain}/static/lpm/`
@@ -202,7 +224,7 @@ class Lum_node_index extends Lum_common {
                 logger.notice('Upgrade completed successfully');
                 if (running_daemon)
                 {
-                    logger.notice('Restarting daemon');
+                    logger.notice('Restarting daemon...');
                     yield _this.pm2_cmd('restart', lpm_config.daemon_name);
                     logger.notice('Daemon restarted');
                 }

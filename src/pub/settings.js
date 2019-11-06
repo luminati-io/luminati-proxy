@@ -143,10 +143,12 @@ class Form extends Pure_component {
                 <Pins val={s.www_whitelist_ips} pending={s.pending_www_ips}
                   on_change_wrapper={this.www_whitelist_ips_change}/>
               </Labeled_controller>
-              <Labeled_controller val={wl} disabled={s.fixed_whitelist_ips}
-                type="pins" label="Proxy whitelisted IPs"
-                on_change_wrapper={this.whitelist_ips_change}
-                tooltip={tooltips.whitelist_ips}/>
+              <Labeled_controller type="pins" label="Proxy whitelisted IPs"
+                tooltip={tooltips.whitelist_ips}>
+                <Pins val={wl} pending={s.pending_ips}
+                  disabled={s.fixed_whitelist_ips}
+                  on_change_wrapper={this.whitelist_ips_change}/>
+              </Labeled_controller>
               <Labeled_controller val={s.request_stats}
                 type="yes_no" on_change_wrapper={this.request_stats_changed}
                 label="Enable recent stats" default
