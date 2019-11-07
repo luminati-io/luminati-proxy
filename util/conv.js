@@ -96,12 +96,28 @@ E.inet_ntoa_t = function(ip){
 };
 
 E.inet_addr = function(ip){
-    var parts = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(ip);
-    if (parts===null)
+    var code, res = 0, shift = 24, num = undefined;
+    ip = ''+ip;
+    for (var i = 0, l = ip.length; i < l; ++i)
+    {
+    	code = ip.charCodeAt(i);
+        if (code>47&&code<58)
+        {
+            num = (num||0)*10+code-48;
+            continue;
+        }
+        if (code==46)
+	{
+            if (num==undefined||num>255)
+	        return null;
+	    res += num<<shift;
+	    num = undefined;
+	    shift -= 8;
+            continue;
+	}
         return null;
-    if (parts[1]>255 || parts[2]>255 || parts[3]>255 || parts[4]>255)
-        return null; // not an IP address
-    return (parts[1]<<24)+(parts[2]<<16)+(parts[3]<<8)+(parts[4]|0)>>>0;
+    }
+    return shift==0 && num!=undefined && num<256 ? res+(num|0)>>>0 : null;
 };
 
 function flags_to_str_once(flags, conv){

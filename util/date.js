@@ -11,6 +11,22 @@ else
 define([], function(){
 var E = date_get;
 
+E.sec = {
+    NANO: 0.000000001,
+    MS: 0.001,
+    SEC: 1,
+    MIN: 60,
+    HOUR: 60*60,
+    DAY: 24*60*60,
+    WEEK: 7*24*60*60,
+    MONTH: 30*24*60*60,
+    YEAR: 365*24*60*60,
+};
+E.ms = {};
+for (var key in E.sec)
+    E.ms[key] = E.sec[key]*1000;
+var ms = E.ms;
+
 function pad(num, size){ return ('000'+num).slice(-size); }
 
 E.ms_to_dur = function(_ms){
@@ -69,10 +85,25 @@ E.init = function(){
     }
     else if (is_node && !global.mocha_running)
     {
-        // brings libuv monotonic time since process start
-        var timer = process.binding('timer_wrap').Timer;
-        adjust = Date.now()-timer.now();
-        E.monotonic = function(){ return timer.now()+adjust; };
+        var now_fn;
+        var node_major = parseInt(process.version.slice(1,
+            process.version.indexOf('.')));
+        if (node_major >= 11)
+        {
+            now_fn = function(){
+                var data = process.hrtime();
+                var seconds = data[0], nanos = data[1];
+                return seconds * E.ms.SEC + nanos * E.ms.NANO;
+            };
+        }
+        else
+        {
+            // brings libuv monotonic time since process start
+            var timer = process.binding('timer_wrap').Timer;
+            now_fn = timer.now.bind(timer);
+        }
+        adjust = Date.now()-now_fn();
+        E.monotonic = function(){ return now_fn()+adjust; };
     }
     else
     {
@@ -220,21 +251,6 @@ E.from_rcs = function(d){
     return new Date(Date.UTC(m[1], m[2]-1, m[3], m[4], m[5], m[6]));
 };
 E.to_rcs = function(d){ return E.to_sql_sec(d).replace(/[-: ]/g, '.'); };
-
-E.sec = {
-    MS: 0.001,
-    SEC: 1,
-    MIN: 60,
-    HOUR: 60*60,
-    DAY: 24*60*60,
-    WEEK: 7*24*60*60,
-    MONTH: 30*24*60*60,
-    YEAR: 365*24*60*60,
-};
-E.ms = {};
-for (var key in E.sec)
-    E.ms[key] = E.sec[key]*1000;
-var ms = E.ms;
 
 E.align = function(d, align){
     d = E.get(d, 1);

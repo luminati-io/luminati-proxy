@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.160.574 Stable
+- :sparkles: Added --status flag to check current proxy manager status
+
 ## 1.160.316 Stable
 - :sparkles: Logs are now shown up to when the UI is ready running in daemon mode
 - :sparkles: Easy way for adding recent IPs to whitelist from the UI

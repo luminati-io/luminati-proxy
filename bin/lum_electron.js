@@ -137,8 +137,6 @@ const check_conflicts = ()=>etask(function*(){
 });
 
 const _run = argv=>etask(function*(){
-    logger.notice('Running Luminati Proxy Manager v%s, PID: %s', pkg.version,
-        process.pid);
     yield check_conflicts();
     if (process.send)
         process.send({cmd: 'lpm_restart_init'});

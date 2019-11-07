@@ -55,6 +55,7 @@ E.init_args = args=>{
         'stop-daemon': 'Stop running daemon',
         upgrade: 'Upgrade proxy manager',
         'dir': 'Path to the directory with database and configuration files',
+        'status': 'Show proxy manager processes current status',
     };
     const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)

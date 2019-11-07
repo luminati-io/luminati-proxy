@@ -16,6 +16,7 @@ require('../lib/perr.js').run({});
 const logger = require('../lib/logger.js');
 const lpm_config = require('../util/lpm_config.js');
 const Lum_common = require('./lum_common.js');
+const lum_node = require('./lum_node.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
@@ -28,6 +29,11 @@ const os = require('os');
 const download = require('download');
 
 class Lum_node_index extends Lum_common {
+    is_daemon_running(list){
+        const daemon = list.find(p=>p.name==lpm_config.daemon_name);
+        return !!daemon &&
+            ['online', 'launching'].includes(daemon.pm2_env.status);
+    }
     pm2_cmd(command, opt){ return etask(function*pm2_cmd(){
         this.on('uncaught', e=>{
             if (e.message=='process name not found')
@@ -35,18 +41,19 @@ class Lum_node_index extends Lum_common {
             else
                 logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
+        this.on('finally', ()=>pm2.disconnect());
         yield etask.nfn_apply(pm2, '.connect', []);
         if (!Array.isArray(opt))
             opt = [opt];
-        try { return yield etask.nfn_apply(pm2, '.'+command, opt); }
-        finally { yield etask.nfn_apply(pm2, '.disconnect', []); }
+        return yield etask.nfn_apply(pm2, '.'+command, opt);
     }); }
     start_daemon(){
         const _this = this;
-        return etask(function*_start_daemon(){
+        return etask(function*start_daemon(){
         this.on('uncaught', e=>{
             logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
+        this.on('finally', ()=>pm2.disconnect());
         const daemon_start_opt = {
             name: lpm_config.daemon_name,
             script: _this.argv.$0,
@@ -62,14 +69,45 @@ class Lum_node_index extends Lum_common {
         yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
         const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
         bus.on('log:out', data=>{
-            if (data.process.name != daemon_start_opt.name)
+            if (data.process.name != lpm_config.daemon_name)
                 return;
             process.stdout.write(data.data);
             if (data.data.includes('Open admin browser'))
-                return this.continue();
+                this.continue();
         });
         yield this.wait();
-        yield etask.nfn_apply(pm2, '.disconnect', []);
+        });
+    }
+    stop_daemon(){
+        const _this = this;
+        return etask(function*start_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
+        this.on('finally', ()=>pm2.disconnect());
+        yield etask.nfn_apply(pm2, '.connect', []);
+        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
+        if (!_this.is_daemon_running(pm2_list))
+            return logger.notice('There is no running LPM daemon process');
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        let start_logging;
+        bus.on('log:out', data=>{
+            if (data.process.name != lpm_config.daemon_name)
+                return;
+            start_logging = start_logging||data.data.includes('Shutdown');
+            if (!start_logging || !data.data.includes('NOTICE'))
+                return;
+            process.stdout.write(data.data);
+        });
+        bus.on('process:event', data=>{
+            if (data.process.name == lpm_config.daemon_name &&
+                data.event=='stop')
+            {
+                this.continue();
+            }
+        });
+        yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
+        yield this.wait();
         });
     }
     run_daemon(){
@@ -80,7 +118,7 @@ class Lum_node_index extends Lum_common {
         if (dopt.start)
             this.start_daemon();
         else if (dopt.stop)
-            this.pm2_cmd('stop', lpm_config.daemon_name);
+            this.stop_daemon();
         else if (dopt.delete)
             this.pm2_cmd('delete', lpm_config.daemon_name);
         else if (dopt.restart)
@@ -98,6 +136,30 @@ class Lum_node_index extends Lum_common {
             }
         }
         return true;
+    }
+    show_status(){
+        const _this = this;
+        return etask(function*status(){
+        this.on('uncaught', e=>{
+            logger.error('Status: Uncaught exception: '+zerr.e2s(e));
+        });
+        const pm2_list = yield _this.pm2_cmd('list');
+        const running_daemon = _this.is_daemon_running(pm2_list);
+        const tasks = yield lum_node.get_lpm_tasks(true);
+        if (!tasks.length && !running_daemon)
+            return logger.notice('There is no LPM process running');
+        let msg = 'Proxy manager status:\n';
+        if (running_daemon)
+        {
+            msg += 'Running in daemon mode. You can close it by '+
+            'running \'luminati --stop-daemon\'\n';
+        }
+        const pid = tasks.find(t=>t.cmd.includes('lum_node.js')).pid;
+        const cpu = tasks.reduce((acc, t)=>acc+t.cpu, 0);
+        const memory = tasks.reduce((acc, t)=>acc+t.memory, 0);
+        msg += `PID: ${pid}\nCPU usage: ${cpu}%\nMemory usage: ${memory}%`;
+        logger.notice(msg);
+        });
     }
     restart_on_child_exit(){
         if (!this.child)
@@ -183,6 +245,8 @@ class Lum_node_index extends Lum_common {
     run(){
         if (this.run_daemon())
             return;
+        if (this.argv.status)
+            return this.show_status();
         this.init_log();
         if (lpm_config.is_win)
         {
@@ -211,9 +275,7 @@ class Lum_node_index extends Lum_common {
         return etask(function*_upgrade(){
             yield zerr.perr('upgrade_start');
             const pm2_list = yield _this.pm2_cmd('list');
-            const daemon = pm2_list.find(p=>p.name==lpm_config.daemon_name);
-            const running_daemon = !!daemon &&
-                ['online', 'launching'].includes(daemon.pm2_env.status);
+            const running_daemon = _this.is_daemon_running(pm2_list);
             _this.upgrade(e=>etask(function*_cb_upgrade(){
                 if (e)
                 {

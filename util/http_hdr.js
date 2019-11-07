@@ -4,7 +4,7 @@ require('./config.js');
 const string = require('./string.js');
 const {qw} = string;
 const HTTPParser = process.binding('http_parser').HTTPParser;
-const E = exports;
+const E = exports, assign = Object.assign;
 
 const special_case_words = {
     te: 'TE',
@@ -56,15 +56,21 @@ E.restore_case = function(headers, original_raw){
 // default header values
 // XXX josh: upgrade-insecure-requests might not be needed on 2nd request
 // onwards
-E.browser_defaults = function(browser){
+E.browser_defaults = function(browser, opt){
+    opt = opt||{};
     let defs = {
         chrome: {
             connection: 'keep-alive',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'upgrade-insecure-requests': '1',
-            'accept-encoding': 'gzip, deflate, br',
+            'accept-encoding': 'gzip, deflate',
             'accept-language': 'en-US,en;q=0.9',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
+        },
+        chrome_https: {
+            'accept-encoding': 'gzip, deflate, br',
+        },
+        chrome_sec_fetch: {
             'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
@@ -94,7 +100,18 @@ E.browser_defaults = function(browser){
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15',
         },
     };
-    return defs[browser]||defs.chrome;
+    let result = defs[browser];
+    if (!result)
+    {
+        result = defs.chrome;
+        browser = 'chrome';
+    }
+    if (browser=='chrome' && opt.https)
+    {
+        result = assign(result, defs.chrome_https,
+            opt.major>75 ? defs.chrome_sec_fetch : {});
+    }
+    return result;
 };
 
 E.browser_accept = function(browser, type){
@@ -137,7 +154,7 @@ E.browser_accept = function(browser, type){
 E.browser_default_header_order = function(browser){
     let headers = {
         chrome: qw`host connection pragma cache-control
-            upgrade-insecure-requests sec-fetch-mode sec-fetch-user user-agent
+            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
             cookie`,
         firefox: qw`host user-agent accept accept-language accept-encoding

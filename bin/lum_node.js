@@ -141,17 +141,17 @@ const show_port_conflict = (port, force)=>etask(function*(){
     yield _show_port_conflict(port, force);
 });
 
-const get_lpm_tasks = ()=>etask(function*(){
+E.get_lpm_tasks = all_processes=>etask(function*(){
+    const regex = all_processes ? /.*luminati-proxy.*/ : /.*lum_node\.js.*/;
     let tasks;
     try { tasks = yield ps_list(); }
     catch(e){ process.exit(); }
     return tasks.filter(t=>t.name.includes('node') &&
-        /.*lum_node\.js.*/.test(t.cmd) && t.ppid!=process.pid &&
-        t.pid!=process.pid);
+        regex.test(t.cmd) && t.ppid!=process.pid && t.pid!=process.pid);
 });
 
 const _show_port_conflict = (port, force)=>etask(function*(){
-    const tasks = yield get_lpm_tasks();
+    const tasks = yield E.get_lpm_tasks();
     if (!tasks.length)
         return logger.error(`There is a conflict on port ${port}`);
     const pid = tasks[0].pid;
@@ -168,7 +168,7 @@ const _show_port_conflict = (port, force)=>etask(function*(){
 });
 
 const check_running = argv=>etask(function*(){
-    const tasks = yield get_lpm_tasks();
+    const tasks = yield E.get_lpm_tasks();
     if (!tasks.length)
         return;
     if (!argv.dir)
