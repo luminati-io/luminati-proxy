@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.160.654",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "CPU and mem usage are now shown per LPM process in --status"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed request retry with banned IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.160.574",
         "type": "stable",
         "changes": [

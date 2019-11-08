@@ -15,7 +15,6 @@ const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
 const logger = require('../lib/logger.js');
 const lpm_config = require('../util/lpm_config.js');
-const Lum_common = require('./lum_common.js');
 const lum_node = require('./lum_node.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
@@ -28,7 +27,14 @@ const util_lib = require('../lib/util.js');
 const os = require('os');
 const download = require('download');
 
-class Lum_node_index extends Lum_common {
+class Lum_node_index {
+    constructor(argv){
+        this.argv = argv;
+    }
+    init_log(){
+        process.env.LPM_LOG_FILE = 'luminati_proxy_manager.log';
+        process.env.LPM_LOG_DIR = lpm_config.work_dir;
+    }
     is_daemon_running(list){
         const daemon = list.find(p=>p.name==lpm_config.daemon_name);
         return !!daemon &&
@@ -145,7 +151,7 @@ class Lum_node_index extends Lum_common {
         });
         const pm2_list = yield _this.pm2_cmd('list');
         const running_daemon = _this.is_daemon_running(pm2_list);
-        const tasks = yield lum_node.get_lpm_tasks(true);
+        const tasks = yield lum_node.get_lpm_tasks({all_processes: true});
         if (!tasks.length && !running_daemon)
             return logger.notice('There is no LPM process running');
         let msg = 'Proxy manager status:\n';
@@ -154,10 +160,17 @@ class Lum_node_index extends Lum_common {
             msg += 'Running in daemon mode. You can close it by '+
             'running \'luminati --stop-daemon\'\n';
         }
-        const pid = tasks.find(t=>t.cmd.includes('lum_node.js')).pid;
-        const cpu = tasks.reduce((acc, t)=>acc+t.cpu, 0);
-        const memory = tasks.reduce((acc, t)=>acc+t.memory, 0);
-        msg += `PID: ${pid}\nCPU usage: ${cpu}%\nMemory usage: ${memory}%`;
+        const fmt_num = n=>
+            (+n).toLocaleString('en-GB', {maximumFractionDigits: 2});
+        const get_task_str = (prefix, t)=>`${prefix} = `+
+        `CPU: ${fmt_num(t.cpu)}%, Memory: ${fmt_num(t.memory)}%`;
+        const manager = tasks.find(t=>t.cmd.includes('lum_node.js'));
+        const workers = tasks.filter(t=>t.cmd.includes('worker.js'));
+        const pid = manager.pid;
+        msg += `PID: ${pid}\n`;
+        msg += `${get_task_str('Manager (lum_node.js)', manager)}`;
+        workers.forEach((w, i)=>
+            msg += `\n${get_task_str(`Worker ${i} (worker.js)`, w)}`);
         logger.notice(msg);
         });
     }

@@ -141,8 +141,9 @@ const show_port_conflict = (port, force)=>etask(function*(){
     yield _show_port_conflict(port, force);
 });
 
-E.get_lpm_tasks = all_processes=>etask(function*(){
-    const regex = all_processes ? /.*luminati-proxy.*/ : /.*lum_node\.js.*/;
+E.get_lpm_tasks = (opt={})=>etask(function*(){
+    const regex = opt.all_processes ?
+        /.*luminati-proxy.*/ : /.*lum_node\.js.*/;
     let tasks;
     try { tasks = yield ps_list(); }
     catch(e){ process.exit(); }

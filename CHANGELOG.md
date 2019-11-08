@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.160.654 Stable
+- :sparkles: CPU and mem usage are now shown per LPM process in --status
+- :bug: Fixed request retry with banned IPs
+
 ## 1.160.574 Stable
 - :sparkles: Added --status flag to check current proxy manager status
 
