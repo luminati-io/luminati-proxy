@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.160.911",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed WSS connections handling"
+            }
+        ]
+    },
+    {
         "ver": "1.160.654",
         "type": "stable",
         "changes": [

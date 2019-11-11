@@ -33,6 +33,7 @@ export const user_agents = [
     ...formatted_user_agents];
 
 export const status_codes = {
+    101: 'Switching Protocols',
     200: 'OK',
     201: 'Created',
     202: 'Accepted',
