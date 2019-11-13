@@ -408,7 +408,6 @@ class Tables_container extends Pure_component {
             sorted: {field: 'timestamp', dir: 1},
         };
         this.reqs_to_render = [];
-        this.reqs_to_abort = [];
         this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
     }
     componentDidUpdate(prev_props){
@@ -601,17 +600,6 @@ class Tables_container extends Pure_component {
             this.on_request_message(json.data);
         else if (json.type=='har_viewer_start')
             this.on_request_started_message(json.data);
-        else if (json.type=='har_viewer_abort')
-            this.on_request_aborted_message(json.data);
-    };
-    on_request_aborted_message = uuid=>{
-        if (this.reqs_to_render.map(r=>r.uuid).includes(uuid))
-        {
-            return this.reqs_to_render =
-                this.reqs_to_render.filter(r=>r.uuid!=uuid);
-        }
-        this.reqs_to_abort.push(uuid);
-        this.take_reqs_from_pool();
     };
     on_request_started_message = req=>{
         req.pending = true;
@@ -622,7 +610,7 @@ class Tables_container extends Pure_component {
         this.take_reqs_from_pool();
     };
     take_reqs_from_pool = ()=>{
-        if (!this.reqs_to_render.length && !this.reqs_to_abort.length)
+        if (!this.reqs_to_render.length)
             return;
         const reqs = this.reqs_to_render.filter(this.is_visible);
         const all_reqs = this.reqs_to_render;
@@ -633,8 +621,6 @@ class Tables_container extends Pure_component {
         }
         const new_reqs_set = {};
         [...this.state.reqs, ...reqs].forEach(r=>{
-            if (this.reqs_to_abort.includes(r.uuid))
-                return;
             if (!new_reqs_set[r.uuid])
                 return new_reqs_set[r.uuid] = r;
             if (new_reqs_set[r.uuid].pending)
@@ -652,7 +638,6 @@ class Tables_container extends Pure_component {
             return val_a > val_b ? -1*dir : dir;
         }).slice(0, Math.max(this.state.reqs.length, this.batch_size));
         this.reqs_to_render = [];
-        this.reqs_to_abort = [];
         this.setState(prev=>{
             const new_state = {reqs: new_reqs};
             new_state.stats = {
@@ -984,7 +969,7 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
             r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
         if (status==502&&err_header)
             return err_header.value;
-        return status_codes[status];
+        return status=='canceled' ? '' : status_codes[status];
     };
     if (status=='unknown')
     {

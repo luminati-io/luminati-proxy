@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.161.309 Stable
+- :sparkles: Improve High CPU usage message
+- :sparkles: Add --show-logs feature that follows LPM daemon process logs
+- :sparkles: Canceled requests will now be saved and shown in HAR viewer
+
 ## 1.161.127 Stable
 - :sparkles: Node 12 support
 

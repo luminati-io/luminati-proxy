@@ -75,6 +75,15 @@ E.browser_defaults = function(browser, opt){
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
         },
+        mobile_chrome: {
+            'user-agent': 'Mozilla/5.0 (Linux; Android 9; MBOX) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            'accept-encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US,en;q=0.9',
+            'sec-fetch-site': 'navigate',
+            'sec-fetch-user': '?1',
+            'sec-fetch-mode': 'none',
+        },
         firefox: {
             connection: 'keep-alive',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -99,6 +108,13 @@ E.browser_defaults = function(browser, opt){
             'accept-language': 'en-us',
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15',
         },
+        mobile_safari: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'accept-encoding': 'gzip, deflate, br',
+            'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.1 Mobile/15E148 Safari/604.1',
+            'accept-language': 'en-us',
+            referer: '',
+        },
     };
     let result = defs[browser];
     if (!result)
@@ -106,10 +122,10 @@ E.browser_defaults = function(browser, opt){
         result = defs.chrome;
         browser = 'chrome';
     }
-    if (browser=='chrome' && opt.https)
+    if ({chrome: 1, mobile_chrome: 1}[browser] && opt.https)
     {
-        result = assign(result, defs.chrome_https,
-            opt.major>75 ? defs.chrome_sec_fetch : {});
+        result = assign(result, defs[browser+'_https'],
+            opt.major>75 ? defs[browser+'_sec_fetch'] : {});
     }
     return result;
 };
@@ -118,9 +134,11 @@ E.browser_accept = function(browser, type){
     let defs = {
         document: {
             chrome: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            mobile_chrome: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             firefox: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             edge: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             safari: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            mobile_safari: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         },
         image: {
             chrome: 'image/webp,image/apng,image/*,*/*;q=0.8',
@@ -151,12 +169,19 @@ E.browser_accept = function(browser, type){
     return kind[browser]||kind.chrome;
 };
 
-E.browser_default_header_order = function(browser){
+E.browser_default_header_order = function(browser, opt){
+    opt = opt||{};
     let headers = {
         chrome: qw`host connection pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
             cookie`,
+        chrome_78: qw`host connection cache-control upgrade-insecure-requests
+            user-agent sec-fetch-user accept sec-fetch-site sec-fetch-mode
+            accept-encoding accept-language cookie`,
+        mobile_chrome: qw`host connection upgrade-insecure-requests user-agent
+            sec-fetch-user accept sec-fetch-site sec-fetch-mode referer
+            accept-encoding accept-language`,
         firefox: qw`host user-agent accept accept-language accept-encoding
             referer connection cookie upgrade-insecure-requests cache-control`,
         edge: qw`referer cache-control accept accept-language
@@ -164,14 +189,20 @@ E.browser_default_header_order = function(browser){
             connection`,
         safari: qw`host cookie connection upgrade-insecure-requests accept
             user-agent referer accept-language accept-encoding`,
+        mobile_safari: qw`host connection accept user-agent accept-language
+            referer accept-encoding`,
     };
-    return headers[browser]||headers.chrome;
+    if (!headers[browser])
+        browser = 'chrome';
+    if (browser=='chrome' && opt.major>77)
+        browser = 'chrome_78';
+    return headers[browser];
 };
 
-E.like_browser_case_and_order = function(headers, browser){
+E.like_browser_case_and_order = function(headers, browser, opt){
     let ordered_headers = {};
     let source_header_keys = Object.keys(headers);
-    let header_keys = E.browser_default_header_order(browser);
+    let header_keys = E.browser_default_header_order(browser, opt);
     for (let header of header_keys)
     {
         let value = headers[source_header_keys
@@ -187,12 +218,21 @@ E.like_browser_case_and_order = function(headers, browser){
     return E.capitalize(ordered_headers);
 };
 
-E.browser_default_header_order_http2 = function(browser){
+E.browser_default_header_order_http2 = function(browser, opt){
+    opt = opt||{};
     let headers = {
         chrome: qw`:method :authority :scheme :path pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
             cookie`,
+        chrome_78: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests user-agent sec-fetch-user accept
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`,
+        mobile_chrome: qw`:method :authority :scheme :path cache-control
+            upgrade-insecure-requests user-agent sec-fetch-user accept
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`,
         firefox: qw`:method :path :authority :scheme user-agent accept
             accept-language accept-encoding referer cookie
             upgrade-insecure-requests cache-control te`,
@@ -201,8 +241,14 @@ E.browser_default_header_order_http2 = function(browser){
             accept-encoding cookie`,
         safari: qw`:method :scheme :path :authority cookie accept
             accept-encoding user-agent accept-language referer`,
+        mobile_safari: qw`:method :scheme :path :authority accept
+            accept-encoding user-agent accept-language referer cookie`,
     };
-    return headers[browser]||headers.chrome;
+    if (!headers[browser])
+        browser = 'chrome';
+    if (browser=='chrome' && opt.major>77)
+        browser = 'chrome_78';
+    return headers[browser];
 };
 
 // reverse pseudo headers (e.g. :method) because nodejs reverse it
@@ -222,9 +268,9 @@ function reverse_http2_pseudo_headers_order(headers){
   return Object.assign(pseudo, other);
 }
 
-E.like_browser_case_and_order_http2 = function(headers, browser){
+E.like_browser_case_and_order_http2 = function(headers, browser, opt){
     let ordered_headers = {};
-    let header_keys = E.browser_default_header_order_http2(browser);
+    let header_keys = E.browser_default_header_order_http2(browser, opt);
     let req_headers = {};
     for (let h in headers)
         req_headers[h.toLowerCase()] = headers[h];

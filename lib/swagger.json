@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.161.127",
+        "version": "1.161.309",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",

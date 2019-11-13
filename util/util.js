@@ -64,7 +64,7 @@ E.revcmp = function(a, b){
     return a>b ? -1 : a<b ? 1 : 0; };
 
 /* Union given objects, using fn to resolve conflicting keys */
-E.union_with = function(fn /*[o1, [o2, [...]]]*/){
+E.union_with = function(fn /* [o1, [o2, [...]]]*/){
     var res = {}, args;
     if (arguments.length==2 && typeof arguments[1]=='object')
         args = arguments[1];
@@ -460,6 +460,8 @@ E.if_set = function(val, o, name){
 };
 
 E.escape_dotted_keys = function(obj, repl){
+    if (!Array.isArray(obj) && !is_object(obj))
+        return obj;
     repl = repl||'_';
     for (var prop in obj)
     {
@@ -471,7 +473,13 @@ E.escape_dotted_keys = function(obj, repl){
                 obj[new_prop] = obj[prop];
                 delete obj[prop];
             }
-            if (is_object(obj[new_prop]))
+            if (Array.isArray(obj[new_prop]))
+            {
+                obj[new_prop].forEach(function(e){
+                    E.escape_dotted_keys(e, repl);
+                });
+            }
+            else if (is_object(obj[new_prop]))
                 E.escape_dotted_keys(obj[new_prop], repl);
         }
     }

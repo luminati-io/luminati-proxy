@@ -77,8 +77,11 @@ class Lum_node_index {
             if (data.process.name != lpm_config.daemon_name)
                 return;
             process.stdout.write(data.data);
-            if (data.data.includes('Open admin browser'))
+            if (data.data.includes('Open admin browser') ||
+                data.data.includes('Shutdown'))
+            {
                 this.continue();
+            }
         });
         yield this.wait();
         });
@@ -106,7 +109,7 @@ class Lum_node_index {
         });
         bus.on('process:event', data=>{
             if (data.process.name == lpm_config.daemon_name &&
-                data.event=='stop')
+                ['delete', 'stop'].includes(data.event))
             {
                 this.continue();
             }
@@ -161,6 +164,26 @@ class Lum_node_index {
         }
         msg += util_lib.get_status_tasks_msg(tasks);
         logger.notice(msg);
+        });
+    }
+    show_logs(){
+        const _this = this;
+        return etask(function*start_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('Show logs: Uncaught exception: '+zerr.e2s(e));
+        });
+        this.on('finally', ()=>pm2.disconnect());
+        yield etask.nfn_apply(pm2, '.connect', []);
+        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
+        if (!_this.is_daemon_running(pm2_list))
+            return logger.notice('There is no running LPM daemon process');
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        bus.on('log:out', data=>{
+            if (data.process.name != lpm_config.daemon_name)
+                return;
+            process.stdout.write(data.data);
+        });
+        yield this.wait();
         });
     }
     restart_on_child_exit(){
@@ -249,6 +272,8 @@ class Lum_node_index {
             return;
         if (this.argv.status)
             return this.show_status();
+        if (this.argv.showLogs)
+            return this.show_logs();
         this.init_log();
         if (lpm_config.is_win)
         {

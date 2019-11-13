@@ -807,7 +807,7 @@ E.regions = {
     GU: ['Micronesia', 'APAC'],
     GW: ['Western Africa', 'EMEA'],
     GY: ['South America', 'EMEA'],
-    HK: ['Eastern Asia', 'APAC'],
+    HK: ['Eastern Asia', 'China'],
     HN: ['Central America', 'AMER'],
     HR: ['South-Eastern Europe', 'EMEA'],
     HT: ['Caribbean', 'AMER'],

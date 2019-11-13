@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.161.309",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improve High CPU usage message"
+            },
+            {
+                "type": "sparkles",
+                "text": "Add --show-logs feature that follows LPM daemon process logs"
+            },
+            {
+                "type": "sparkles",
+                "text": "Canceled requests will now be saved and shown in HAR viewer"
+            }
+        ]
+    },
+    {
         "ver": "1.161.127",
         "type": "stable",
         "changes": [
