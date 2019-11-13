@@ -1,4 +1,5 @@
 {
+  "Reduce annual costs by": "一年节省",
   "sales@luminati.io": "sales@luminati-china.io",
   "luminati.io": "luminati-china.io",
   "Bhutan": "不丹",
@@ -1790,7 +1791,7 @@
   "Users": "用户",
   "Explain your issue here": "请在此描述您的问题",
   "Send": "发送",
-  "Thank you!": "谢谢您！",
+  "Thank you!": "谢谢！",
   "We will contact you shortly at": "我们很快将与您联络",
   "expired from": "到期时间为",
   "eval till": "重新运算直到",
@@ -3941,7 +3942,7 @@
   "To shorten your registration procedure, we advise you to use your corporate email": "为了缩短注册过程，我们建议您使用公司的电子邮箱。",
   "You won't be asked for 2-Step Verification code on this device": "不会要求您在此设备上输入双重验证码",
   "Password should contain digits, upper and lower case letters": "密码应包含数字和大小写字母",
-  "The email address is not registered. If you signed up with Google signup button, you should login with Google login button.": "此电子邮件地址未注册。如果您使用Google注册按钮进行注册，则应使用Google登录按钮进行登录。",
+  "The email address or password is incorrect. If you signed up with Google signup button, you should login with Google login button.": "电子邮件地址或密码不正确。如果您使用Google注册按钮进行注册，则应使用Google登录按钮进行登录。",
   "Password is too short": "密码太短",
   "Enter a password": "输入密码",
   "Creating account...": "创建账户、、、",
@@ -4339,5 +4340,11 @@
   "Domain and all its subdomains": "域及其所有子域",
   "Subnet": "子网",
   "Passwords successfully changed": "密码修改成功",
-  "Delete Account Data": "删除账户数据"
+  "Delete Account Data": "删除账户数据",
+  "Reduce your proxy expenses with our advanced payment options.": "想要节省您的代理费用吗？欢迎使用我们的高级模式。",
+  "For more questions contact your account manager.": "如有任何疑问，请联系您的客户经理。",
+  "* Max discount based on the current run-rate": "*这是基于您当前运行率而提供的最大折扣",
+  "Interested": "有兴趣",
+  "Thanks, your account manager will contact you in the next 24 hours to update your plan.": "谢谢。您的客户经理将在24小时以内联系您并为您升级账户。",
+  "For any questions please contact your account manager or": "如有任何问题，请联系您的客户经理或者"
 }

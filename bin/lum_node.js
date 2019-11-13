@@ -12,7 +12,6 @@ const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
 const pkg = require('../package.json');
 const _ = require('lodash');
-const ps_list = require('ps-list');
 const analytics = require('../lib/analytics.js');
 const E = module.exports = {};
 const is_win = process.platform=='win32';
@@ -27,6 +26,7 @@ const ws = require('lum_windows-shortcuts');
 const install_path = path.resolve(os.homedir(), 'luminati_proxy_manager');
 const exe_path = path.resolve(install_path, 'lpm.exe');
 const logger = require('../lib/logger.js');
+const util_lib = require('../lib/util.js');
 
 const gen_filename = name=>{
     return lpm_file.get_file_path(
@@ -141,14 +141,9 @@ const show_port_conflict = (port, force)=>etask(function*(){
     yield _show_port_conflict(port, force);
 });
 
-E.get_lpm_tasks = (opt={})=>etask(function*(){
-    const regex = opt.all_processes ?
-        /.*luminati-proxy.*/ : /.*lum_node\.js.*/;
-    let tasks;
-    try { tasks = yield ps_list(); }
+E.get_lpm_tasks = ()=>etask(function*(){
+    try { return yield util_lib.get_lpm_tasks(); }
     catch(e){ process.exit(); }
-    return tasks.filter(t=>t.name.includes('node') &&
-        regex.test(t.cmd) && t.ppid!=process.pid && t.pid!=process.pid);
 });
 
 const _show_port_conflict = (port, force)=>etask(function*(){

@@ -3147,7 +3147,7 @@
   "In order to implement the waterfall solution, use the Luminati Proxy Manager and set 'retry using different port' rules": "Для реализации решения «Водопад» используйте Luminati Proxy Manager с установленным правилом «повторить попытку с использованием другого порта».",
   "500,000+ IPs": "500,000+ IP-адресов",
   "The password is incorrect": "Пароль неверен",
-  "The email address is not registered. If you signed up with Google signup button, you should login with Google login button.": "Адрес электронной почты не зарегистрирован. Если Вы зарегистрировались с помощью Google, войдите в систему с помощью кнопки входа Google.",
+  "The email address or password is incorrect. If you signed up with Google signup button, you should login with Google login button.": "Адрес электронной почты или пароль не верен. Если Вы зарегистрировались с помощью Google, войдите в систему с помощью кнопки входа Google.",
   "Testimonials": "Отзывы",
   "A word from our customers": "От наших клиентов",
   "Luminati is an ethical proxy network that requires consent from its Residential peers, has tight compliance procedures for its customers and serves Fortune 500 enterprises": "В соответствие с этикой Luminati, мы требуем согласия держателя IP на его использование, а также имеем процедуру верификации клиентов и работаем со списком Fortune 500 предприятий",

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.161.127 Stable
+- :sparkles: Node 12 support
+
 ## 1.160.911 Stable
 - :bug: Fixed WSS connections handling
 

@@ -6,6 +6,7 @@ const lpm_file = require('./lpm_file.js');
 const pkg = require('../package.json');
 const string = require('./string.js');
 const date = require('./date.js');
+const file = require('./file.js');
 const qw = string.qw;
 
 const prop_by_type = (props, type)=>
@@ -14,6 +15,7 @@ const prop_by_type = (props, type)=>
 const conf = {
     version: pkg.version,
     is_win: process.platform=='win32',
+    is_lum: file.exists(file.cyg2unix('/usr/local/hola/zon_config.sh')),
     daemon_name: 'luminati_proxy_manager',
     work_dir: lpm_file.work_dir,
     is_electron: process.versions && !!process.versions.electron,

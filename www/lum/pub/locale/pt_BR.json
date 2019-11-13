@@ -3263,7 +3263,7 @@
   "In my browser": "Em meu navegador",
   "Choose any country (or city), select your IP from a range of DataCenter, Residential and Mobile IPs.": "Escolha qualquer país (ou cidade), selecione o seu IP a partir de uma gama de DataCenter, Residencial e IPs móveis.",
   "Use Luminati Proxy Network via shell command (curl).": "Use Luminati de rede Proxy através do comando shell (curl).",
-  "The email address is not registered. If you signed up with Google signup button, you should login with Google login button.": "O endereço de e-mail não está registrado. Se você se inscreveu com o botão Google inscrição, você deve entrar com o botão de login do Google.",
+  "The email address or password is incorrect. If you signed up with Google signup button, you should login with Google login button.": "O endereço de e-mail ou a senha está incorreto. Se você se inscreveu com o botão Google, você deve entrar com o botão de login da Google.",
   "Hide": "ocultar",
   "Use Luminati API in Node.js, Java, C#, VB, Python, Ruby, PHP, via shell command (curl).": "Use Luminati API em Node.js, Java, C #, VB, Python, Ruby, PHP, através do comando shell (curl).",
   "Choose any country (or city), select your IP from a range of DataCenter, Residential and Mobile IPs, and even customize your http request headers.": "Escolha qualquer país (ou cidade), selecione o seu IP a partir de uma gama de DataCenter, IPs residenciais e móveis, e até mesmo personalizar seus http cabeçalhos de solicitação.",

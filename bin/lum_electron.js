@@ -3,6 +3,7 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const electron = require('electron');
 const child_process = require('child_process');
+const semver = require('semver');
 const app = electron.app;
 const dialog = electron.dialog;
 const opn = require('opn');
@@ -10,6 +11,7 @@ let _info_bkp = console.info;
 console.info = function(){};
 const auto_updater = require('electron-updater').autoUpdater;
 console.info = _info_bkp;
+const config = require('../util/lpm_config.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
@@ -67,6 +69,15 @@ auto_updater.on('before-quit', ()=>{
 });
 
 auto_updater.on('update-available', e=>etask(function*(){
+    if (semver.lt(e.version, pkg.version))
+    {
+        if (!config.is_lum)
+        {
+            zerr.perr('upgrade_invalid_version',
+                {upgrade_v: e.version, current_v: pkg.version});
+        }
+        return;
+    }
     const changelog_url = 'https://github.com/luminati-io/luminati-proxy/blob/'
     +'master/CHANGELOG.md';
     const update_msg = `Update version ${e.version} is available. Full list of`

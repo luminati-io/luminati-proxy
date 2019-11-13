@@ -15,7 +15,6 @@ const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
 const logger = require('../lib/logger.js');
 const lpm_config = require('../util/lpm_config.js');
-const lum_node = require('./lum_node.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
@@ -151,7 +150,7 @@ class Lum_node_index {
         });
         const pm2_list = yield _this.pm2_cmd('list');
         const running_daemon = _this.is_daemon_running(pm2_list);
-        const tasks = yield lum_node.get_lpm_tasks({all_processes: true});
+        const tasks = yield util_lib.get_lpm_tasks({all_processes: true});
         if (!tasks.length && !running_daemon)
             return logger.notice('There is no LPM process running');
         let msg = 'Proxy manager status:\n';
@@ -160,17 +159,7 @@ class Lum_node_index {
             msg += 'Running in daemon mode. You can close it by '+
             'running \'luminati --stop-daemon\'\n';
         }
-        const fmt_num = n=>
-            (+n).toLocaleString('en-GB', {maximumFractionDigits: 2});
-        const get_task_str = (prefix, t)=>`${prefix} = `+
-        `CPU: ${fmt_num(t.cpu)}%, Memory: ${fmt_num(t.memory)}%`;
-        const manager = tasks.find(t=>t.cmd.includes('lum_node.js'));
-        const workers = tasks.filter(t=>t.cmd.includes('worker.js'));
-        const pid = manager.pid;
-        msg += `PID: ${pid}\n`;
-        msg += `${get_task_str('Manager (lum_node.js)', manager)}`;
-        workers.forEach((w, i)=>
-            msg += `\n${get_task_str(`Worker ${i} (worker.js)`, w)}`);
+        msg += util_lib.get_status_tasks_msg(tasks);
         logger.notice(msg);
         });
     }

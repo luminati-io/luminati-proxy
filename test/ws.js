@@ -19,17 +19,14 @@ describe('ws', ()=>{
         dst.destroy();
     });
     it('pipes both sockets on proxy req upgrade', ()=>{
-        const match = sinon.match('HTTP/1.1 101 Switching Protocols');
-        s_mock.expects('write').once().withArgs(match);
         d_mock.expects('pipe').returns(socket).once().withArgs(socket);
         s_mock.expects('pipe').once().withArgs(dst);
-        ws_handler.handle_connection(socket, {}, dst);
+        ws_handler.handle_connection(socket, dst);
         s_mock.verify();
         d_mock.verify();
     });
     it('destroy sockets on stop', ()=>{
-        sinon.stub(socket, 'write');
-        ws_handler.handle_connection(socket, {}, dst);
+        ws_handler.handle_connection(socket, dst);
         s_mock.expects('destroy').once();
         d_mock.expects('destroy').once();
         ws_handler.stop();
