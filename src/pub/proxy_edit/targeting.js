@@ -106,7 +106,7 @@ export default with_www_api(class Targeting extends Pure_component {
                 .reduce((acc, el)=>Object.assign(acc, el), {});
         }
         else
-            asns = locations.asns[country];
+            asns = locations.asns[country]||{};
         return Object.keys(asns).map(a=>({id: a, label: a}));
     };
     carriers = ()=>{
@@ -122,7 +122,7 @@ export default with_www_api(class Targeting extends Pure_component {
             res = locations.carriers[country];
         return [
             {value: '', key: 'None'},
-            ...carriers.filter(c=>res.includes(c.value)),
+            ...carriers.filter(c=>(res||[]).includes(c.value)),
         ];
     };
     city_changed = e=>{

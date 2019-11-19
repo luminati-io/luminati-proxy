@@ -14,7 +14,7 @@ class Cpu_warning extends React.Component {
         ws.removeEventListener('message', this.on_message);
     }
     shouldComponentUpdate(_, next_state){
-        return this.state.usage != next_state.usage;
+        return this.state.usage!=next_state.usage;
     }
     on_message = event=>{
         const json = JSON.parse(event.data);

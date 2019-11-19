@@ -139,10 +139,10 @@ const stringify_obj = obj=>{
     for (let i=0; i<keys.length; ++i)
     {
         const k = keys[i], v = obj[k];
-        const val = typeof v == 'object' ?
+        const val = typeof v=='object' ?
             stringify_obj(v) : JSON.stringify(v);
         str += `${k}: ${val}`;
-        if (i < keys.length - 1)
+        if (i<keys.length-1)
             str += ', ';
     }
     return str + '}';

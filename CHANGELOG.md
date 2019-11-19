@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.161.831 Development Latest
+- :sparkles: Added status code classes (2**, 3**, ...) filtering to HAR viewer
+- :bug: Fix running 'luminati' command without specifying whole path
+- :bug: Fixed memory leak when using rules
+
 ## 1.161.309 Stable
 - :sparkles: Improve High CPU usage message
 - :sparkles: Add --show-logs feature that follows LPM daemon process logs

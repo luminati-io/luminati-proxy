@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.161.831",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added status code classes (2**, 3**, ...) filtering to HAR viewer"
+            },
+            {
+                "type": "bug",
+                "text": "Fix running 'luminati' command without specifying whole path"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed memory leak when using rules"
+            }
+        ]
+    },
+    {
         "ver": "1.161.309",
         "type": "stable",
         "changes": [

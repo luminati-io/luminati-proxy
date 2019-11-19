@@ -18,16 +18,17 @@ class Urlp {
         if (!opt || typeof opt=='string')
             opt = {url: opt};
         this.url = opt.url||window&&window.location.href;
-        let raw = zurl.parse(this.url);
-        raw.qs = zurl.qs_parse(raw.query||'');
-        raw.hs = zurl.qs_parse((raw.hash||'').substr(1));
+        Object.assign(this, zurl.parse(this.url));
+        let qs = zurl.qs_parse(this.query||'');
+        let hs = zurl.qs_parse((this.hash||'').substr(1));
         if (!opt.validate)
-            return void Object.assign(this, raw);
-        this.qs = this.hs = {};
+            return void Object.assign(this, {qs, hs});
+        this.qs = {};
+        this.hs = {};
         for (let p in opt.validate.qs||opt.validate)
-            this.qs[p] = validate(raw.qs[p], opt.validate[p]);
+            this.qs[p] = validate(qs[p], opt.validate[p]);
         for (let p in opt.validate.hs||{})
-            this.hs[p] = validate(raw.hs[p], opt.validate[p]);
+            this.hs[p] = validate(hs[p], opt.validate[p]);
     }
     uri(){
         return zescape.uri(this.pathname, this.qs, this.hs);

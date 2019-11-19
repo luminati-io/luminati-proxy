@@ -6,7 +6,7 @@ const child_process = require('child_process');
 const semver = require('semver');
 const app = electron.app;
 const dialog = electron.dialog;
-const opn = require('opn');
+const open = require('open');
 let _info_bkp = console.info;
 console.info = function(){};
 const auto_updater = require('electron-updater').autoUpdater;
@@ -155,7 +155,7 @@ const _run = argv=>etask(function*(){
     auto_updater.logger = manager.log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);
     manager.on('www_ready', url=>{
-        opn(url);
+        open(url, {url: true});
     })
     .on('upgrade', cb=>{
         upgrade_cb = cb;

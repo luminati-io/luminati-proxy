@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
-import React_select from 'react-select/lib/Creatable';
+import React_select from 'react-select/creatable';
 import React_tooltip from 'react-tooltip';
 import {withRouter} from 'react-router-dom';
 import classnames from 'classnames';
@@ -283,25 +283,30 @@ export class Select_number extends Pure_component {
 
 class Select_multiple extends Pure_component {
     styles = {
-        option: (base, state)=>{
-            return {
-                ...base,
-                padding: '2px 12px',
-                'background-color': state.isFocused ? '#f5f5f5' : 'white',
-                color: '#004d74',
-            };
-        },
-        control: (base, state)=>{
-            return {
-                display: 'flex',
-                height: 32,
-                'border-radius': 3,
-                border: 'solid 1px',
-                'border-color': state.isFocused ? '#004d74' :
-                    state.isDisabled ? '#e0e9ee' : '#ccdbe3',
-                'background-color': state.isDisabled ? '#f5f5f5;' : 'white',
-            };
-        },
+        clearIndicator: base=>({
+            ...base,
+            padding: '1px',
+        }),
+        dropdownIndicator: base=>({
+            ...base,
+            padding: '1px',
+        }),
+        option: (base, state)=>({
+            ...base,
+            padding: '2px 12px',
+            backgroundColor: state.isFocused ? '#f5f5f5' : 'white',
+            color: '#004d74',
+        }),
+        control: (_, state)=>({
+            alignItems: 'center',
+            display: 'flex',
+            height: 32,
+            borderRadius: 3,
+            border: 'solid 1px',
+            borderColor: state.isFocused ? '#004d74' :
+                state.isDisabled ? '#e0e9ee' : '#ccdbe3',
+            backgroundColor: state.isDisabled ? '#f5f5f5;' : 'white',
+        }),
         singleValue: (base, state)=>({
             ...base,
             color: state.isDisabled ? '#8e8e8e' : '#004d74',
@@ -315,16 +320,12 @@ class Select_multiple extends Pure_component {
             classNamePrefix="react_select"
             value={this.props.value_to_option(this.props.val)}
             onChange={this.props.on_change}
-            simpleValue
-            autoBlur
             options={this.props.options}
             isValidNewOption={this.props.validation}
-            promptTextCreator={l=>l}
             pageSize={9}
-            shouldKeyDownEventCreateNewOption={()=>true}
             placeholder={this.props.placeholder}
-            isDisabled={this.props.disabled}
-            onSelectResetsInput={!this.props.update_on_input}/>;
+            blurInputOnSelect={true}
+            isDisabled={this.props.disabled}/>;
     }
 }
 
@@ -468,7 +469,7 @@ export const Textarea = props=>{
 };
 
 export const Typeahead_wrapper = props=>
-    <Typeahead options={props.data} maxResults={10}
+    <Typeahead id={props.id} options={props.data} maxResults={10}
       minLength={1} disabled={props.disabled} selectHintOnEnter
       onChange={props.on_change_wrapper} selected={props.val}
       onInputChange={props.on_input_change} filterBy={props.filter_by}/>;

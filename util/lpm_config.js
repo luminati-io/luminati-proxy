@@ -44,7 +44,6 @@ conf.server_default = {
     sticky_ip: false,
     insecure: false,
     proxy_connection_type: 'http',
-    short_username: false,
     ssl: false,
     test_url: 'http://lumtest.com/myip.json',
     proxy: conf.default_superproxy_domain,

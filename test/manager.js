@@ -56,12 +56,15 @@ describe('manager', ()=>{
                 args = args.concat(['--customer', customer]);
             if (!get_param(args, '--password'))
                 args = args.concat(['--password', password]);
-            if (!get_param(args, '--dropin'))
+            if (!get_param(args, '--dropin')&&!get_param(args, '--no-dropin'))
                 args = args.concat(['--no-dropin']);
             if (!get_param(args, '--cookie')&&!get_param(args, '--no-cookie'))
                 args.push('--no-cookie');
-            if (!get_param(args, '--local_login'))
+            if (!get_param(args, '--local_login') &&
+                !get_param(args, '--no-local_login'))
+            {
                 args = args.concat(['--no-local_login']);
+            }
             args = args.concat('--loki', '/tmp/testdb');
         }
         Manager.prototype.get_ip = ()=>null;
@@ -171,10 +174,10 @@ describe('manager', ()=>{
             const mgr = new Manager(lpm_util.init_args(_args));
             assert.deepEqual(expected, mgr.get_params());
         }));
-        t('default', qw`--foo 1 --bar 2`, ['--foo', 1, '--bar', 2]);
-        t('credentials',
-            qw`--foo 1 --bar 2 --customer test_user --password abcdefgh`,
-            ['--foo', 1, '--bar', 2]);
+        const def = '--cluster 2 --throttle 2';
+        t('default', qw(def), ['--cluster', 2, '--throttle', 2]);
+        t('credentials', qw`${def} --customer test_user --password abcdefgh`,
+            ['--cluster', 2, '--throttle', 2]);
         t('credentials with no-config',
             qw`--no-config --customer usr --password abc --token t --zone z`,
             qw`--no-config --customer usr --password abc --token t --zone z`);
@@ -766,7 +769,7 @@ describe('manager', ()=>{
             perr_stub = sstub(Manager.prototype, 'perr', id=>{
                 if (!id.startsWith('first'))
                     return;
-                if (id == 'first_send_request')
+                if (id=='first_send_request')
                     return;
                 return etask.reject(Error('Network error'));
             });

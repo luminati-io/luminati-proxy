@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ReactDOM from 'react-dom';
-import {Link} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
@@ -17,7 +17,6 @@ import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title,
     Tooltip_bytes} from './common.js';
-import {withRouter} from 'react-router-dom';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
@@ -508,11 +507,11 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.update_window_dimensions();
         window.addEventListener('resize', this.update_window_dimensions);
     }
-    componentWillReceiveProps(props){
-        if (props.master_port!=this.props.master_port)
+    componentDidUpdate(prev_props){
+        if (prev_props.master_port!=this.props.master_port)
         {
             const filtered_proxies = this.filter_proxies(this.state.proxies,
-                props.master_port);
+                this.props.master_port);
             this.setState({filtered_proxies});
         }
     }

@@ -232,7 +232,7 @@ export default class Alloc_modal extends Pure_component {
     page_change = page=>this.paginate(page-1);
     is_refresh_enabled = ()=>{
         const {plan, type} = this.props;
-        return type != 'ips' || !!plan.ips;
+        return type!='ips' || !!plan.ips;
     };
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';

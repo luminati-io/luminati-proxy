@@ -189,7 +189,7 @@ class Shutdown_modal extends Pure_component {
 
 const Account = withRouter(class Account extends Pure_component {
     state = {};
-    componentWillMount(){
+    componentDidMount(){
         this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
     }

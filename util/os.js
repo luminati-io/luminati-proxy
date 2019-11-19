@@ -62,6 +62,8 @@ E.meminfo_parse = function(info){
         if (!n[i])
             continue;
         var m = /^([A-Za-z0-9_()]+):\s+([0-9]+)( kB)?$/.exec(n[i]);
+        if (!m)
+           zerr(`meminfo_parse: can't parse line "${n[i]}"`);
         assert(m);
         switch (m[1])
         {

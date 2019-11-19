@@ -387,7 +387,7 @@ class Action extends Pure_component {
         let _action_types = this.action_types_with_updated_domain()
             .filter(at=>rule.trigger_type=='url' && at.url ||
                 rule.trigger_type!='url' && !at.only_url)
-            .filter(at=>rule.trigger_type != 'min_req_time' ||
+            .filter(at=>rule.trigger_type!='min_req_time' ||
                 at.min_req_time);
         if (this.should_show_refresh())
         {
@@ -446,7 +446,7 @@ class Action extends Pure_component {
                     <Rule_config id="request_method" type="select" rule={rule}
                         data={this.request_methods()}
                         on_change={this.request_method_changed}/>
-                    {rule.request_method && rule.request_method != 'GET' &&
+                    {rule.request_method && rule.request_method!='GET' &&
                       <Rule_config id="request_payload" type="json"
                         rule={rule}/>
                     }

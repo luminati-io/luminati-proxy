@@ -273,8 +273,8 @@ const Form = props=>{
 const filter_by = (option, props)=>{
     return option.indexOf(props.text)==0;
 };
-const Typeahead_wrapper = ({data, disabled, on_change, val})=>
-    <Typeahead options={data} maxResults={10}
+const Typeahead_wrapper = ({id, data, disabled, on_change, val})=>
+    <Typeahead id={id} options={data} maxResults={10}
       minLength={0} disabled={disabled} selectHintOnEnter
       filterBy={filter_by} onChange={on_change} selected={val}/>;
 
@@ -290,7 +290,8 @@ class Customers_form extends Pure_component {
                 {t('Please choose a customer.')}</div>
               <div className="form-group">
                 <label htmlFor="user_customer">{t('Customer')}</label>
-                <Typeahead_wrapper data={this.props.user_customers}
+                <Typeahead_wrapper id="user_customer"
+                  data={this.props.user_customers}
                   val={this.state.cur_customer} on_change={this.on_change}/>
               </div>
               <button

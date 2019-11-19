@@ -7,7 +7,9 @@ const file = require('./file.js');
 const E = module.exports;
 const yargs = require('yargs');
 
-const dir = yargs(process.argv.slice(2).map(String)).argv.dir;
+// tells Yargs to show help message from lpm_util usage instead of default one
+yargs.help(false);
+const dir = yargs.parse(process.argv.slice(2).map(String)).dir;
 E.work_dir = dir||path.resolve(os.homedir(), 'luminati_proxy_manager');
 try { file.mkdirp_e(E.work_dir); }
 catch(e){ E.work_dir = path.resolve(os.homedir()); }

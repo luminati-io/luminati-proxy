@@ -80,9 +80,11 @@ E.browser_defaults = function(browser, opt){
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'en-US,en;q=0.9',
-            'sec-fetch-site': 'navigate',
+        },
+        mobile_chrome_sec_fetch: {
+            'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
-            'sec-fetch-mode': 'none',
+            'sec-fetch-site': 'none',
         },
         firefox: {
             connection: 'keep-alive',
@@ -116,6 +118,8 @@ E.browser_defaults = function(browser, opt){
             referer: '',
         },
     };
+    if (opt.override)
+        defs = assign({}, defs, opt.override);
     let result = defs[browser];
     if (!result)
     {
@@ -176,12 +180,19 @@ E.browser_default_header_order = function(browser, opt){
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
             cookie`,
-        chrome_78: qw`host connection cache-control upgrade-insecure-requests
-            user-agent sec-fetch-user accept sec-fetch-site sec-fetch-mode
-            accept-encoding accept-language cookie`,
-        mobile_chrome: qw`host connection upgrade-insecure-requests user-agent
-            sec-fetch-user accept sec-fetch-site sec-fetch-mode referer
-            accept-encoding accept-language`,
+        chrome_78: qw`host connection pragma cache-control
+            upgrade-insecure-requests user-agent sec-fetch-user accept
+            sec-fetch-site sec-fetch-mode accept-encoding accept-language
+            cookie`,
+        // XXX andreish: check sec-fetch-user with real chrome 77 on android
+        mobile_chrome: qw`host connection pragma cache-control
+            upgrade-insecure-requests sec-fetch-mode sec-fetch-user
+            user-agent accept sec-fetch-site referer accept-encoding
+            accept-language cookie`,
+        mobile_chrome_78: qw`host connection pragma cache-control
+            upgrade-insecure-requests user-agent sec-fetch-user
+            accept sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`,
         firefox: qw`host user-agent accept accept-language accept-encoding
             referer connection cookie upgrade-insecure-requests cache-control`,
         edge: qw`referer cache-control accept accept-language
@@ -192,10 +203,12 @@ E.browser_default_header_order = function(browser, opt){
         mobile_safari: qw`host connection accept user-agent accept-language
             referer accept-encoding`,
     };
+    if (opt.override)
+        headers = assign({}, headers, opt.override);
     if (!headers[browser])
         browser = 'chrome';
-    if (browser=='chrome' && opt.major>77)
-        browser = 'chrome_78';
+    if ({chrome: 1, mobile_chrome: 1}[browser] && opt.major>77)
+        browser = browser+'_78';
     return headers[browser];
 };
 
@@ -229,9 +242,14 @@ E.browser_default_header_order_http2 = function(browser, opt){
             upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`,
-        mobile_chrome: qw`:method :authority :scheme :path cache-control
-            upgrade-insecure-requests user-agent sec-fetch-user accept
-            sec-fetch-site sec-fetch-mode referer accept-encoding
+        // XXX andreish: check sec-fetch-user with real chrome 77 on android
+        mobile_chrome: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests sec-fetch-mode sec-fetch-user
+            user-agent accept sec-fetch-site referer accept-encoding
+            accept-language cookie`,
+        mobile_chrome_78: qw`:method :authority :scheme :path pragma
+            cache-control upgrade-insecure-requests user-agent sec-fetch-user
+            accept sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`,
         firefox: qw`:method :path :authority :scheme user-agent accept
             accept-language accept-encoding referer cookie
@@ -241,13 +259,15 @@ E.browser_default_header_order_http2 = function(browser, opt){
             accept-encoding cookie`,
         safari: qw`:method :scheme :path :authority cookie accept
             accept-encoding user-agent accept-language referer`,
-        mobile_safari: qw`:method :scheme :path :authority accept
-            accept-encoding user-agent accept-language referer cookie`,
+        mobile_safari: qw`:method :scheme :path :authority cookie accept
+            accept-encoding user-agent accept-language referer`,
     };
+    if (opt.override)
+        headers = assign({}, headers, opt.override);
     if (!headers[browser])
         browser = 'chrome';
-    if (browser=='chrome' && opt.major>77)
-        browser = 'chrome_78';
+    if ({chrome: 1, mobile_chrome: 1}[browser] && opt.major>77)
+        browser = browser+'_78';
     return headers[browser];
 };
 

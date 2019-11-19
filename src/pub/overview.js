@@ -48,7 +48,7 @@ class Overview extends Pure_component {
 
 class Upgrade extends Pure_component {
     state = {};
-    componentWillMount(){
+    componentDidMount(){
         this.setdb_on('head.version', version=>this.setState({version}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
         this.setdb_on('head.ver_node', ver_node=>this.setState({ver_node}));

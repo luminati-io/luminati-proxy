@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.161.309"
+VERSION="1.161.831"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -616,12 +616,12 @@ lpm_install()
             # fix luminati binary not found on luminati ubuntu
             echo "running nave relink..."
             sudo_cmd "nave relink"
-        elif ! [ -f "/usr/local/bin/luminati" ]; then
-            sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"
         fi
         if [ -f "/usr/local/bin/luminati" ]; then
-            sudo_cmd "chmod a+x /usr/local/bin/luminati"
+            sudo_cmd "rm /usr/local/bin/luminati"
         fi
+        sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"
+        sudo_cmd "chmod a+x /usr/local/bin/luminati"
     fi
     perr "install_success_lpm"
 }

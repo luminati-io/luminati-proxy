@@ -11,10 +11,10 @@ export class Modal_dialog extends React.Component {
             this.props.cancel_clicked && this.props.cancel_clicked();
         });
     }
-    componentWillReceiveProps(new_props){
-        if (this.props.open==new_props.open)
+    componentDidUpdate(prev_props){
+        if (this.props.open==prev_props.open)
             return;
-        if (new_props.open)
+        if (this.props.open)
             $(this.ref).modal();
         else
             $(this.ref).modal('hide');

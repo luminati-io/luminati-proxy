@@ -52,10 +52,12 @@ E.init_args = args=>{
         'no-config': 'Working without a config file',
         'no-cookie': 'Working without a cookie file',
         daemon: 'Start as a daemon',
+        'restart-daemon': 'Restart running daemon',
         'stop-daemon': 'Stop running daemon',
+        'delete-daemon': 'Delete daemon instance',
         upgrade: 'Upgrade proxy manager',
-        'dir': 'Path to the directory with database and configuration files',
-        'status': 'Show proxy manager processes current status',
+        dir: 'Path to the directory with database and configuration files',
+        status: 'Show proxy manager processes current status',
         'show-logs': 'Show logs of the currently running LPM instance',
     };
     const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
@@ -67,7 +69,7 @@ E.init_args = args=>{
     const alias = {
         help: ['h', '?'],
         port: 'p',
-        daemon: 'd',
+        daemon: ['d', 'start-daemon'],
         version: 'v',
     };
     const defaults = Object.assign({}, lpm_config.manager_default,
@@ -79,9 +81,10 @@ E.init_args = args=>{
     .describe(added_descriptions)
     .number(lpm_config.numeric_fields)
     .default(defaults)
-    .help('h')
+    .help()
+    .strict()
+    .version(pkg.version)
     .alias(alias)
-    .version(()=>pkg.version)
     .argv;
     argv.native_args = args;
     argv.log = argv.log.toLowerCase();

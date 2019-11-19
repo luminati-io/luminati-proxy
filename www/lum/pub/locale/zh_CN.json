@@ -1473,7 +1473,7 @@
   "Select dates": "选择日期",
   "Zone name cannot be empty": "通道名称不能为空",
   "Zone name must be shorter than 31 symbols": "通道名称必须少于31个字符",
-  "Zone name can contain only a-z, A-Z, 0-9, _": "通道名称仅可以包含 a-z, A-Z, 0-9, _",
+  "Zone name can contain only a-z, 0-9, _": "通道名称仅可以包含 a-z, 0-9, _",
   "Duplicate zone name": "复制通道名称",
   "Access google search result page.": "访问谷歌搜索结果页面。",
   "Create separate zone for Google only ending with _gsearch.": "为谷歌另行创建仅以_gsearch结尾的通道。",
@@ -4346,5 +4346,12 @@
   "* Max discount based on the current run-rate": "*这是基于您当前运行率而提供的最大折扣",
   "Interested": "有兴趣",
   "Thanks, your account manager will contact you in the next 24 hours to update your plan.": "谢谢。您的客户经理将在24小时以内联系您并为您升级账户。",
-  "For any questions please contact your account manager or": "如有任何问题，请联系您的客户经理或者"
+  "For any questions please contact your account manager or": "如有任何问题，请联系您的客户经理或者",
+  "Save[context=money]": "一年可节省",
+  "a year": "美元",
+  "Contact me": "联系我",
+  "Pay now": "立即付款",
+  "Thanks, your account manager will contact you soon.": "谢谢！您的客户经理会尽快与您联系。",
+  "You can save": "您可以节省",
+  "over the next year with an up-front annual payment of": "预付一年的年签费"
 }

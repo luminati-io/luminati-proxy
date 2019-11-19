@@ -2170,7 +2170,7 @@
   "Mobile IPs": "IPs móveis",
   "No data": "não existem dados",
   "Zone name cannot be empty": "Nome da zona não pode estar vazio",
-  "Zone name can contain only a-z, A-Z, 0-9, _": "O nome da zona precisa conter apenas um-z, A-Z, 0-9, _",
+  "Zone name can contain only a-z, 0-9, _": "O nome da zona precisa conter apenas um-z, 0-9, _",
   "You are about to create a new Zone:": "Você está prestes a criar uma nova zona:",
   "IPs weren't allocated since your account is disabled. Contact sales@luminati.io to activate your account.": "IPs não foram alocados pois a sua conta está desativada. Contactar sales@luminati.io para ativar sua conta.",
   "Residential IPs activation": "Ative as IPs residenciais",

@@ -74,7 +74,7 @@ class Lum_node_index {
         yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
         const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
         bus.on('log:out', data=>{
-            if (data.process.name != lpm_config.daemon_name)
+            if (data.process.name!=lpm_config.daemon_name)
                 return;
             process.stdout.write(data.data);
             if (data.data.includes('Open admin browser') ||
@@ -100,7 +100,7 @@ class Lum_node_index {
         const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
         let start_logging;
         bus.on('log:out', data=>{
-            if (data.process.name != lpm_config.daemon_name)
+            if (data.process.name!=lpm_config.daemon_name)
                 return;
             start_logging = start_logging||data.data.includes('Shutdown');
             if (!start_logging || !data.data.includes('NOTICE'))
@@ -108,7 +108,7 @@ class Lum_node_index {
             process.stdout.write(data.data);
         });
         bus.on('process:event', data=>{
-            if (data.process.name == lpm_config.daemon_name &&
+            if (data.process.name==lpm_config.daemon_name &&
                 ['delete', 'stop'].includes(data.event))
             {
                 this.continue();
@@ -179,7 +179,7 @@ class Lum_node_index {
             return logger.notice('There is no running LPM daemon process');
         const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
         bus.on('log:out', data=>{
-            if (data.process.name != lpm_config.daemon_name)
+            if (data.process.name!=lpm_config.daemon_name)
                 return;
             process.stdout.write(data.data);
         });
@@ -306,7 +306,7 @@ class Lum_node_index {
             _this.upgrade(e=>etask(function*_cb_upgrade(){
                 if (e)
                 {
-                    if (e.message != 'User did not grant permission.')
+                    if (e.message!='User did not grant permission.')
                         yield zerr.perr('upgrade_error', {error: e});
                     return;
                 }

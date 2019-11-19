@@ -462,7 +462,7 @@ describe('proxy', ()=>{
                 t('long', {state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'newyork'});
                 t('short',
-                    {state: 'NY', city: 'New York', short_username: true},
+                    {state: 'NY', city: 'New York'},
                     {state: 'ny', city: 'newyork'});
             });
             it('explicit any', ()=>etask(function*(){
@@ -884,7 +884,7 @@ describe('proxy', ()=>{
             sinon.assert.calledWith(res.write, response.body[0]);
         }));
         it('check Trigger', ()=>{
-            const Trigger = require('../lib/rules').Trigger;
+            const Trigger = require('../lib/rules').t.Trigger;
             const t = (code, _url, expected)=>{
                 const cond = new Trigger({trigger_code: code});
                 assert.equal(cond.test({url: _url}), expected);
@@ -905,6 +905,7 @@ describe('proxy', ()=>{
                 'http://facebook.com', true);
             t('function trigger(opt){ return true; }', 'http://google.com',
                 true);
+            t('function trigger(opt){ throw Error(\'error\') }', '', false);
         });
         it('check can_retry', ()=>etask(function*(){
             l = yield lum({rules: []});

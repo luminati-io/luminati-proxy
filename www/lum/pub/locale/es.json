@@ -3051,7 +3051,7 @@
   "Note: zone usage is updated once a minute and may": "Nota: el uso de la zona se actualiza una vez por minuto y puede",
   "Zone active": "zona activa",
   "exceed the limit during this time": "exceder el límite durante este tiempo",
-  "Zone name can contain only a-z, A-Z, 0-9, _": "Nombre de zona puede contener solamente a-z, A-Z, 0-9, _",
+  "Zone name can contain only a-z, 0-9, _": "Nombre de zona puede contener solamente a-z, 0-9, _",
   "Zone name cannot be empty": "Nombre de zona no puede estar vacía",
   "Minimum 50 IPs are required to purchase unlimited bandwidth IPs": "Se requiere un mínimo de 50 IPs para comprar IPs ancho de banda ilimitado",
   "Zone successfully added": "Zona añadida correctamente",
