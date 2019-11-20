@@ -409,7 +409,6 @@ class Tables_container extends Pure_component {
             sorted: {field: 'timestamp', dir: 1},
         };
         this.reqs_to_render = [];
-        this.reqs_to_abort = [];
         this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
     }
     componentDidUpdate(prev_props){
@@ -602,17 +601,6 @@ class Tables_container extends Pure_component {
             this.on_request_message(json.data);
         else if (json.type=='har_viewer_start')
             this.on_request_started_message(json.data);
-        else if (json.type=='har_viewer_abort')
-            this.on_request_aborted_message(json.data);
-    };
-    on_request_aborted_message = uuid=>{
-        if (this.reqs_to_render.map(r=>r.uuid).includes(uuid))
-        {
-            return this.reqs_to_render =
-                this.reqs_to_render.filter(r=>r.uuid!=uuid);
-        }
-        this.reqs_to_abort.push(uuid);
-        this.take_reqs_from_pool();
     };
     on_request_started_message = req=>{
         req.pending = true;
@@ -623,7 +611,7 @@ class Tables_container extends Pure_component {
         this.take_reqs_from_pool();
     };
     take_reqs_from_pool = ()=>{
-        if (!this.reqs_to_render.length && !this.reqs_to_abort.length)
+        if (!this.reqs_to_render.length)
             return;
         const reqs = this.reqs_to_render.filter(this.is_visible);
         const all_reqs = this.reqs_to_render;
@@ -634,8 +622,6 @@ class Tables_container extends Pure_component {
         }
         const new_reqs_set = {};
         [...this.state.reqs, ...reqs].forEach(r=>{
-            if (this.reqs_to_abort.includes(r.uuid))
-                return;
             if (!new_reqs_set[r.uuid])
                 return new_reqs_set[r.uuid] = r;
             if (new_reqs_set[r.uuid].pending)
@@ -653,7 +639,6 @@ class Tables_container extends Pure_component {
             return val_a > val_b ? -1*dir : dir;
         }).slice(0, Math.max(this.state.reqs.length, this.batch_size));
         this.reqs_to_render = [];
-        this.reqs_to_abort = [];
         this.setState(prev=>{
             const new_state = {reqs: new_reqs};
             new_state.stats = {
@@ -883,7 +868,7 @@ class Data_row extends React.Component {
         });
         return <tr className={classes}>
               {cols.map((c, idx)=>
-                <td key={c.title} onClick={()=>idx!=0&&open_preview(req)}>
+                <td key={c.title} onClick={()=>idx!=0 && open_preview(req)}>
                   <Cell_value col={c.title} req={req}
                     checked_all={this.props.checked_all}/>
                 </td>
@@ -924,7 +909,8 @@ class Cell_value extends React.Component {
         else if (col=='Time')
         {
             return <Time_cell time={req.time} url={req.request.url}
-                  pending={!!req.pending} uuid={req.uuid}/>;
+                  pending={!!req.pending} uuid={req.uuid}
+                  port={req.details.port}/>;
         }
         else if (col=='Peer proxy')
         {
@@ -975,17 +961,18 @@ class Name_cell extends Pure_component {
     }
 }
 
-const Status_code_cell = maybe_pending(({status, uuid, req})=>{
-    const enable_ssl_click = e=>{
-        e.stopPropagation();
-        $('#enable_ssl_modal').modal();
+const Status_code_cell = withRouter(maybe_pending(props=>{
+    const {history, status, uuid, req} = props;
+    const enable_ssl_click = ()=>{
+        history.push({pathname: `/proxy/${req.details.port}`,
+            state: {field: 'ssl'}});
     };
     const get_desc = ()=>{
         const err_header = req.response.headers.find(
             r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
-        if (status==502&&err_header)
+        if (status==502 && err_header)
             return err_header.value;
-        return status_codes[status];
+        return status=='canceled' ? '' : status_codes[status];
     };
     if (status=='unknown')
     {
@@ -994,16 +981,15 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
                 delayHide={100} delayShow={0} delayUpdate={500}
                 offset={{top: -10}}>
                 <div>
-                  <T>
-                    Status code of this request could not be parsed because the
-                    connection is encrypted.
-                  </T>
+                  Status code of this request could not be parsed because the
+                  connection is encrypted.
                 </div>
                 <div style={{marginTop: 10}}>
                   <a onClick={enable_ssl_click} className="link">
-                    <T>Enable SSL analyzing</T></a>
-                    <T>to see the status codes and other information about
-                      requests</T>
+                    Enable SSL analyzing
+                  </a>
+                  to see the status codes and other information about
+                  requests
                 </div>
               </React_tooltip>
               <div data-tip="React-tooltip" data-for={'s'+uuid}>
@@ -1016,14 +1002,15 @@ const Status_code_cell = maybe_pending(({status, uuid, req})=>{
     return <Tooltip title={`${status} ${desc}`}>
           <div className="disp_value">{status}</div>
         </Tooltip>;
-});
+}));
 
-const Time_cell = maybe_pending(({time, url, uuid})=>{
+const Time_cell = withRouter(maybe_pending(props=>{
+    const {port, time, url, uuid, history} = props;
     if (!url.endsWith(':443')||!time)
         return <Tooltip_and_value val={time&&time+' ms'}/>;
-    const enable_ssl_click = e=>{
-        e.stopPropagation();
-        $('#enable_ssl_modal').modal();
+    const enable_ssl_click = ()=>{
+        history.push({pathname: `/proxy/${port}`,
+            state: {field: 'ssl'}});
     };
     return <div onClick={e=>e.stopPropagation()} className="disp_value">
           <React_tooltip id={'t'+uuid} type="info" effect="solid"
@@ -1046,7 +1033,7 @@ const Time_cell = maybe_pending(({time, url, uuid})=>{
             — {url.endsWith(':443')&&<div className="small_icon status info"/>}
           </div>
         </div>;
-});
+}));
 
 class Select_cell extends React.Component {
     state = {checked: false};

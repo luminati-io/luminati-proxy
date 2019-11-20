@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.161.831",
+        "version": "1.162.197",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -836,6 +836,10 @@
                                 "ip": {
                                     "type": "string",
                                     "example": "10.0.0.0"
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "example": "lumtest.com"
                                 }
                             }
                         }

@@ -4347,7 +4347,7 @@
   "Interested": "有兴趣",
   "Thanks, your account manager will contact you in the next 24 hours to update your plan.": "谢谢。您的客户经理将在24小时以内联系您并为您升级账户。",
   "For any questions please contact your account manager or": "如有任何问题，请联系您的客户经理或者",
-  "Save[context=money]": "一年可节省",
+  "cp_zones.money.Save": "一年可节省",
   "a year": "美元",
   "Contact me": "联系我",
   "Pay now": "立即付款",

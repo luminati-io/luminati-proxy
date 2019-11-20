@@ -420,7 +420,10 @@ E.is_debug = title=>{
     let system_db = require('../system/db/db.js');
     let agent_conf = system_db.use('agent_conf', env.CONF_SERVER);
     let debug = agent_conf.debug_zcounter;
-    return debug && debug[title];
+    let v = debug && debug[title];
+    if (typeof v=='object')
+        return v.includes(+env.AGENT_NUM);
+    return v;
 };
 
 E.t = {loc_get_counters, get_agg_counters, _get, prepare, ws_client};

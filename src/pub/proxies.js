@@ -16,7 +16,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
 import {Checkbox, any_flag, flag_with_title,
-    Tooltip_bytes} from './common.js';
+    Tooltip_bytes, Loader_small} from './common.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
@@ -673,10 +673,14 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     };
     render(){
         const cols = this.get_cols();
-        if (!this.state.zones)
-            return null;
-        if (!this.state.countries)
-            return null;
+        if (!this.state.zones || !this.state.countries)
+        {
+            return <div className="proxies_panel chrome">
+              <div className="main_panel vbox">
+                <Loader_small show loading_msg="Loading..."/>
+              </div>
+            </div>;
+        }
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
         const show_logs = this.state.logs>0;
@@ -697,8 +701,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                           <Table width={width}
                             height={height}
                             onRowClick={this.on_row_click}
-                            // we use onHeaderClick here because the table
-                            // swallows clicks on headers
                             onHeaderClick={({dataKey})=>dataKey=='select' &&
                               this.all_rows_select()}
                             gridClassName="chrome_grid"

@@ -14,6 +14,7 @@ const lpm_config = require('../util/lpm_config.js');
 const Server = require('../lib/server.js');
 const requester = require('../lib/requester.js');
 const Timeline = require('../lib/timeline.js');
+const Ip_cache = require('../lib/ip_cache.js');
 const Config = require('../lib/config.js');
 const {decode_body} = require('../lib/util.js');
 const consts = require('../lib/consts.js');
@@ -1204,59 +1205,49 @@ describe('proxy', ()=>{
                     assert.equal(l.session_mgr.sessions.sessions.length, 1);
                 }));
             });
-            xdescribe('ban_ip per domain', ()=>{
+            describe('ban_ip per domain', ()=>{
+                const ban_period = 1000, domain = 'abc.com', ip = '10.0.0.2';
                 let ban_spy;
-                const t = (url, expected, ban_count=0)=>{
-                    const req = {ctx: {url, skip_rule: ()=>false}};
-                    l.rules.post(req, {}, {}, {status_code: 200,
-                        headers: {'x-hola-timeline-debug': '1 2 3 ip'}});
-                    Object.entries(expected).forEach(([d, c])=>{
-                        const req_count = l.rules._post[0].domains.domains
-                            .get(d).length;
-                        assert.equal(req_count, c);
-                    });
-                    sinon.assert.callCount(ban_spy, ban_count);
-                };
                 beforeEach(()=>etask(function*(){
-                    l = yield lum({rules: [{action_type: 'ban_ip',
-                        status: '200', action: {ban_ip: 10*ms.MIN,
-                        ban_ip_domain_reqs: 4, ban_ip_domain_time: 200}}]});
+                    l = yield lum({rules: [{action_type: 'ban_ip_domain',
+                        status: '200', action: {ban_ip_domain: ban_period},
+                        trigger_type: 'status', url: domain}]});
                     ban_spy = sinon.spy(l, 'banip');
                 }));
-                it('group requests by domain', ()=>{
-                    t('http://lumtest.com/test', {'lumtest.com': 1});
-                    t('http://lumtest.com/another', {'lumtest.com': 2});
-                    t('http://anotherdomain.com/test', {'lumtest.com': 2,
-                        'anotherdomain.com': 1});
-                    t('http://lumtest.com/test', {'lumtest.com': 3,
-                        'anotherdomain.com': 1});
-                    t('http://anotherdomain.com/test', {'lumtest.com': 3,
-                        'anotherdomain.com': 2});
+                const t = (name, url, ban_count=0)=>it(name, ()=>{
+                    const session = {session: 'sess1'};
+                    const req = {ctx: {url, skip_rule: ()=>false, session}};
+                    l.rules.post(req, {}, {}, {status_code: 200,
+                        headers: {'x-hola-timeline-debug': `1 2 3 ${ip}`}});
+                    sinon.assert.callCount(ban_spy, ban_count);
+                    if (ban_count)
+                    {
+                        sinon.assert.calledWith(ban_spy, ip, ban_period,
+                            session, domain);
+                    }
                 });
-                it('remove expired requests', ()=>etask(function*(){
-                    t('http://lumtest.com/test', {'lumtest.com': 1});
-                    yield etask.sleep(100);
-                    t('http://lumtest.com/test', {'lumtest.com': 2});
-                    yield etask.sleep(100);
-                    t('http://lumtest.com/test', {'lumtest.com': 2});
-                    yield etask.sleep(200);
-                    t('http://lumtest.com/test', {'lumtest.com': 1});
-                }));
-                it('ban when reach limit', ()=>{
-                    t('http://lumtest.com/test', {'lumtest.com': 1});
-                    t('http://lumtest.com/test', {'lumtest.com': 2});
-                    t('http://anotherdomain.com/test', {'lumtest.com': 2,
-                        'anotherdomain.com': 1});
-                    t('http://lumtest.com/test', {'lumtest.com': 3,
-                        'anotherdomain.com': 1});
-                    t('http://anotherdomain.com/test', {'lumtest.com': 3,
-                        'anotherdomain.com': 2});
-                    t('http://lumtest.com/test', {'lumtest.com': 4,
-                        'anotherdomain.com': 2}, 1);
-                    t('http://anotherdomain.com/test', {'lumtest.com': 4,
-                        'anotherdomain.com': 3}, 1);
-                    t('http://anotherdomain.com/test', {'lumtest.com': 4,
-                        'anotherdomain.com': 4}, 2);
+                t('does not trigger on diff domains',
+                    'http://lumtest.com/test');
+                t('triggers', `http://${domain}/test`, 1);
+            });
+            describe('ip_cache', ()=>{
+                let ip_cache;
+                beforeEach(()=>ip_cache = new Ip_cache());
+                afterEach(()=>ip_cache.clear_timeouts());
+                it('has added entries', ()=>{
+                    ip_cache.add('10.0.0.1', 1000);
+                    ip_cache.add('10.0.0.2', 1000, 'lumtest.com');
+                    assert.ok(ip_cache.has('10.0.0.1'));
+                    assert.ok(ip_cache.has('10.0.0.2', 'lumtest.com'));
+                    assert.ok(!ip_cache.has('10.0.0.3'));
+                });
+                it('has IP/domain entry when IP entry exists', ()=>{
+                    ip_cache.add('10.0.0.2', 1000);
+                    assert.ok(ip_cache.has('10.0.0.2', 'lumtest.com'));
+                });
+                it('does not have IP entry when IP/domain entry exists', ()=>{
+                    ip_cache.add('10.0.0.2', 1000, 'lumtest.com');
+                    assert.ok(!ip_cache.has('10.0.0.2'));
                 });
             });
             it('refresh_ip', ()=>etask(function*(){

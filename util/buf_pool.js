@@ -4,6 +4,7 @@ require('./config.js');
 const array = require('./array.js');
 const conv = require('./conv.js');
 const zcounter = require('./zcounter.js');
+const {env} = process;
 const KB = 1024, MB = 1024*KB;
 
 class BufPool {
@@ -19,6 +20,8 @@ class BufPool {
         return new BufPool(max_free_size, free_ttl, name);
     }
     counter(bp){
+        if (env.AGENT_NUM && !zcounter.is_debug('bp'))
+            return;
         let name = zcounter.to_valid_id('bp_'+this.name+bp.name+'_');
         zcounter.set_level(name+'used', bp.used.length);
         zcounter.set_level(name+'free', bp.free.length);

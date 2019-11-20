@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.162.197 Stable
+- :bug: Fixed canceled requests shown in HAR viewer
+- :bug: Fixed banning/unbanning IPs banned per domain
+
 ## 1.161.831 Development Latest
 - :sparkles: Added status code classes (2**, 3**, ...) filtering to HAR viewer
 - :bug: Fix running 'luminati' command without specifying whole path

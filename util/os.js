@@ -381,7 +381,7 @@ E.net_dev_stats = function(net_dev){
         return;
     net_dev.forEach((dev, index)=>{
         var ifname = index ? '_'+dev : '';
-        var stats = ['rx_bytes', 'tx_bytes', 'tx_packets', 'rx_packets'];
+        var stats = ['rx_bytes', 'tx_bytes'];
         for (var i in stats)
         {
             try {

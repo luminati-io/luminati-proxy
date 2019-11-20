@@ -2,10 +2,9 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {withRouter} from 'react-router-dom';
-import $ from 'jquery';
 import {ga_event, status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
-import {Tooltip_bytes} from './common.js';
+import {Tooltip_bytes, Loader_small} from './common.js';
 import Tooltip from './common/tooltip.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import setdb from '../../util/setdb.js';
@@ -15,7 +14,7 @@ import {Toolbar_button, Devider, Sort_icon,
 import {T} from './common/i18n.js';
 
 class Stats extends Pure_component {
-    state = {stats: {}, request_stats: false, toggling: false};
+    state = {stats: {}, toggling: false};
     componentDidMount(){
         this.setdb_on('head.recent_stats', stats=>{
             if (stats)
@@ -34,10 +33,6 @@ class Stats extends Pure_component {
             }
         });
     }
-    enable_ssl_click = e=>{
-        e.stopPropagation();
-        $('#enable_ssl_modal').modal();
-    };
     toggle_stats = val=>{
         if (!this.save_settings)
         {
@@ -55,7 +50,7 @@ class Stats extends Pure_component {
     };
     render(){
         const {toggling, request_stats, stats} = this.state;
-        if (!request_stats)
+        if (request_stats!==undefined && !request_stats)
         {
             return <Stats_off_btn turn_on_stats={()=>this.toggle_stats(true)}
               disabled={toggling}/>;
@@ -63,20 +58,23 @@ class Stats extends Pure_component {
         return <div className="stats_wrapper">
               <div className="chrome stats_panel">
                 <div className="main_panel">
-                  <Toolbar stats={stats}
-                    disable_stats={()=>this.toggle_stats(false)}/>
-                  <Stat_table stats={stats} tooltip="Status code"
-                    style={{flex: 1, overflowY: 'auto'}}
-                    row_key="status_code" logs="code" title="Code"/>
-                  <Stat_table stats={stats} tooltip="Domain name"
-                    style={{flex: 1, overflowY: 'auto'}}
-                    row_key="hostname" logs="domain" title="Domain"/>
-                  <Stat_table stats={stats} tooltip="Protocol"
-                    style={{flex: 1, overflowY: 'auto'}}
-                    ssl_warning={stats.ssl_warning} row_key="protocol"
-                    logs="protocol" title="Protocol"/>
-                  <Summary_bar enable_ssl_click={this.enable_ssl_click}
-                    show={stats.ssl_enable}/>
+                  {!request_stats &&
+                    <Loader_small show loading_msg="Loading..."/>
+                  }
+                  {request_stats && <React.Fragment>
+                    <Toolbar stats={stats}
+                      disable_stats={()=>this.toggle_stats(false)}/>
+                    <Stat_table stats={stats} tooltip="Status code"
+                      style={{flex: 1, overflowY: 'auto'}}
+                      row_key="status_code" logs="code" title="Code"/>
+                    <Stat_table stats={stats} tooltip="Domain name"
+                      style={{flex: 1, overflowY: 'auto'}}
+                      row_key="hostname" logs="domain" title="Domain"/>
+                    <Stat_table stats={stats} tooltip="Protocol"
+                      style={{flex: 1, overflowY: 'auto'}}
+                      ssl_warning={stats.ssl_warning} row_key="protocol"
+                      logs="protocol" title="Protocol"/>
+                  </React.Fragment>}
                 </div>
               </div>
             </div>;
@@ -225,24 +223,6 @@ const Row = withRouter(class Row extends Pure_component {
             </tr>;
     }
 });
-
-const Summary_bar = ({enable_ssl_click, show})=>{
-    const tooltip = 'Enable HTTPS analyzing for all your proxies. You will '
-    +'also need to install SSL certificate. It allows you to use rules and '
-    +'logs for HTTPS requests';
-    return <div className="summary_bar">
-          {show &&
-            <a className="link enable_https" onClick={enable_ssl_click}>
-              <T>{t=>
-                <Tooltip title={t(tooltip)}>
-                  {t('Enable HTTPS request logging and debugging')}
-                </Tooltip>
-              }</T>
-            </a>
-          }
-          {!show && <span>-</span>}
-        </div>;
-};
 
 class Toolbar extends Pure_component {
     clear = ()=>{

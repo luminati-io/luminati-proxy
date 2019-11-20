@@ -10,7 +10,6 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import classnames from 'classnames';
 import moment from 'moment';
-import $ from 'jquery';
 import {trigger_types, action_types} from '../../util/rules_util.js';
 import {Copy_btn} from './common.js';
 
@@ -254,7 +253,7 @@ const Status_value = ({value})=>{
     const info = value=='unknown';
     const green = /2../.test(value);
     const yellow = /3../.test(value);
-    const red = /(4|5)../.test(value);
+    const red = /(canceled)|([45]..)/.test(value);
     const classes = classnames('small_icon', 'status', {
         info, green, yellow, red});
     return <div className="status_wrapper">
@@ -351,7 +350,7 @@ class Pane_timing extends Pure_component {
                 Total: {this.props.req.time} ms</div>
               {this.props.req.request.url.endsWith('443') &&
                 this.state.stats && this.state.stats.ssl_enable &&
-                <Enable_https/>
+                <Enable_https port={this.props.req.details.port}/>
               }
             </div>;
     }
@@ -439,19 +438,22 @@ const Timing_row = ({title, id, left, right, time})=>
       <td><div className="timing_bar_title">{time} ms</div></td>
     </tr>;
 
-class Enable_https extends Pure_component {
-    click = ()=>$('#enable_ssl_modal').modal();
-    render(){
-        return <div className="footer_link">
-              <a className="devtools_link" role="link" tabIndex="0"
-                target="_blank" rel="noopener noreferrer"
-                onClick={this.click}
-                style={{display: 'inline', cursor: 'pointer'}}>
-                Enable HTTPS logging
-              </a> to view this timeline
-            </div>;
-    }
-}
+const Enable_https = withRouter(props=>{
+    const click = ()=>{
+        props.history.push({
+            pathname: `/proxy/${props.port}`,
+            state: {field: 'ssl'},
+        });
+    };
+    return <div className="footer_link">
+          <a className="devtools_link" role="link" tabIndex="0"
+            target="_blank" rel="noopener noreferrer"
+            onClick={click}
+            style={{display: 'inline', cursor: 'pointer'}}>
+            Enable HTTPS logging
+          </a> to view this timeline
+        </div>;
+});
 
 const is_json_str = str=>{
     let resp;

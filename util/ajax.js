@@ -79,6 +79,8 @@ function ajax(opt){
             return this.return(ajax(assign({}, opt, {retry: retry-1})));
         if (xhr.statusText=='timeout')
             E.events.emit('timeout', this);
+        if (xhr.status==403)
+            E.events.emit('unauthorized', this);
         if (opt.no_throw)
         {
             return {

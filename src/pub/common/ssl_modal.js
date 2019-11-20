@@ -19,15 +19,23 @@ export default with_www_api(class Enable_ssl_modal extends Pure_component {
         });
     };
     render(){
-        const faq_cert_url = `${this.props.www_api}/faq#proxy-certificate`;
         return <React.Fragment>
             <Loader show={this.state.loading}/>
             <Modal id={this.props.id||'enable_ssl_modal'}
               title="Enable SSL analyzing for all proxies" no_cancel_btn
-              no_ok_close click_ok={this.enable_ssl} ok_href="/ssl"
-              ok_btn_title='Download certificate' className="enable_ssl_modal">
+              no_ok_close click_ok={this.enable_ssl}
+              ok_btn_title='Enable SSL analyzing' className="enable_ssl_modal">
+            </Modal>
+        </React.Fragment>;
+    }
+});
+
+class Install_cert_modal extends Pure_component {
+    faq_cert_url = `${this.props.www_api}/faq#proxy-certificate`;
+    render(){
+        return <Modal id="install_cert_modal">
               <p className="cert_info">
-                You will also need to add a certificate file to browsers.
+                You need to add a certificate file to browsers.
                 Gathering stats for HTTPS requests requires setting a
                 certificate key.
               </p>
@@ -38,12 +46,11 @@ export default with_www_api(class Enable_ssl_modal extends Pure_component {
                 <Li>
                   Add the certificate to your browser.
                   You can find more detailed
-                  instructions <a className="link" href={faq_cert_url}
+                  instructions <a className="link" href={this.faq_cert_url}
                     rel="noopener noreferrer" target="_blank">here</a>
                 </Li>
                 <Li>Refresh the page</Li>
               </Instructions>
-            </Modal>
-        </React.Fragment>;
+            </Modal>;
     }
-});
+}

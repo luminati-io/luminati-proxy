@@ -43,7 +43,7 @@ export const Warnings = props=>
 export const Warning = props=>
     <div className="warning">
       <div className="warning_icon"/>
-      <div className="text">{props.text}</div>
+      <div className="text">{props.text||props.children}</div>
     </div>;
 
 export const Loader = ({show})=>{

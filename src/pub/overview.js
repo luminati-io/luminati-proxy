@@ -9,6 +9,7 @@ import $ from 'jquery';
 import semver from 'semver';
 import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
+import {Warning, Warnings} from './common.js';
 
 class Overview extends Pure_component {
     state = {show_logs: false};
@@ -29,6 +30,7 @@ class Overview extends Pure_component {
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>
+                <Warnings warnings={this.state.warnings}/>
               </div>
               <div className="proxies nav_header">
                 <h3>{title}</h3>
@@ -59,7 +61,7 @@ class Upgrade extends Pure_component {
     upgrade = ()=>{ $('#upgrade_modal').modal(); };
     new_versions = ()=>{
         const ver_cur = this.state.version;
-        if (!ver_cur)
+        if (!ver_cur || !this.state.ver_last)
             return [];
         const changelog = this.state.ver_last.versions
             .filter(v=>semver.lt(ver_cur, v.ver));
@@ -67,12 +69,12 @@ class Upgrade extends Pure_component {
     };
     render(){
         const {upgrading, upgrade_error, ver_last, ver_node} = this.state;
-        const is_upgradable = ver_last&&ver_last.newer;
+        const is_upgradable = ver_last && ver_last.newer;
         const is_electron = window.process && window.process.versions.electron;
-        const electron = ver_node&&ver_node.is_electron||is_electron;
-        if (!is_upgradable||!ver_node)
+        const electron = ver_node && ver_node.is_electron || is_electron;
+        if (!is_upgradable || !ver_node)
             return null;
-        const disabled = upgrading||upgrade_error||!ver_node.satisfied&&
+        const disabled = upgrading || upgrade_error || !ver_node.satisfied &&
             !electron;
         const versions = this.new_versions();
         const changes = versions.reduce((acc, ver)=>{
@@ -87,11 +89,10 @@ class Upgrade extends Pure_component {
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
         return <Tooltip className="wide" title={tooltip} placement="bottom">
-            <div className="warning">
-              <div className="warning_icon"/>
+            <Warning>
               <div>
                 A new <strong>{upgrade_type}</strong> version <strong>
-                {this.state.ver_last.version} </strong>
+                {(this.state.ver_last||{}).version} </strong>
                 is available. You are <strong>{versions.length}
                 </strong> releases behind the newest version.
               </div>
@@ -102,13 +103,13 @@ class Upgrade extends Pure_component {
                       upgrade_error ? 'Error' : 'Upgrade'}
                 </button>
               </div>
-              {ver_node&&!ver_node.satisfied&&!electron&&
+              {ver_node && !ver_node.satisfied && !electron &&
                 <div>
                   To upgrade Luminati Proxy Manager, you need to update Node.js
                   to version {this.state.ver_node.recommended}.
                 </div>
               }
-            </div>
+            </Warning>
             </Tooltip>;
     }
 }

@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.162.197",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed canceled requests shown in HAR viewer"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed banning/unbanning IPs banned per domain"
+            }
+        ]
+    },
+    {
         "ver": "1.161.831",
         "type": "dev",
         "changes": [

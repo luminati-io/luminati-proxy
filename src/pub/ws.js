@@ -9,7 +9,6 @@ class Ws_wrapper extends EventTarget {
         this.port = port;
         this.protocol = location.protocol=='https:' ? 'wss' : 'ws';
         this.create_socket();
-        this.start_checking();
     };
     create_socket = ()=>{
         console.log('creating socket');
@@ -24,6 +23,9 @@ class Ws_wrapper extends EventTarget {
             if (e.code=='ECONNREFUSED')
                 console.log('need to reconnect');
         });
+        this.socket.addEventListener('close', ()=>{
+            setTimeout(()=>this.create_socket(), 1000);
+        });
     };
     global_handler = event=>{
         const json = JSON.parse(event.data);
@@ -33,13 +35,6 @@ class Ws_wrapper extends EventTarget {
         if (path.endsWith('.remove') || path.endsWith('.add'))
             return setdb.emit('ws.'+path, payload);
         setdb.set('ws.'+path, payload);
-    };
-    start_checking = ()=>{
-        const _this = this;
-        window.setInterval(()=>{
-            if (_this.socket.readyState==_this.socket.CLOSED)
-                this.create_socket();
-        }, 1000);
     };
 }
 

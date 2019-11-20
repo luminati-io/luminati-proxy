@@ -67,7 +67,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
             _this.setState({ips: data.ips});
         });
     };
-    unbanip = ip=>{
+    unbanip = (ip, domain)=>{
         const _this = this;
         this.setState({unbanning: true});
         return this.etask(function*(){
@@ -76,7 +76,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
             const data = yield ajax.json({
                 url: `/api/proxies/${port}/unbanip`,
                 method: 'POST',
-                data: {ip},
+                data: {ip, domain},
             });
             _this.setState({ips: data.ips});
         });
@@ -92,7 +92,7 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
                   <td>
                     <Tooltip title="Unban IP">
                       <button className="btn_unban" disabled={unbanning}
-                        onClick={()=>this.unbanip(d.ip)}>
+                        onClick={()=>this.unbanip(d.ip, d.domain)}>
                         <i className="chrome_icon return"/>
                       </button>
                     </Tooltip>

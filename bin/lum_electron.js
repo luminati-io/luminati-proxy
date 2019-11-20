@@ -148,9 +148,13 @@ const check_conflicts = ()=>etask(function*(){
 });
 
 const _run = argv=>etask(function*(){
-    yield check_conflicts();
     if (process.send)
+    {
         process.send({cmd: 'lpm_restart_init'});
+        // give some time to parent process to exit before checking conflicts
+        yield etask.sleep(2000);
+    }
+    yield check_conflicts();
     manager = new Manager(argv);
     auto_updater.logger = manager.log;
     setTimeout(()=>auto_updater.checkForUpdates(), 15000);

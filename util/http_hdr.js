@@ -184,11 +184,10 @@ E.browser_default_header_order = function(browser, opt){
             upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode accept-encoding accept-language
             cookie`,
-        // XXX andreish: check sec-fetch-user with real chrome 77 on android
         mobile_chrome: qw`host connection pragma cache-control
-            upgrade-insecure-requests sec-fetch-mode sec-fetch-user
-            user-agent accept sec-fetch-site referer accept-encoding
-            accept-language cookie`,
+            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
+            accept sec-fetch-site referer accept-encoding accept-language
+            cookie`,
         mobile_chrome_78: qw`host connection pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-user
             accept sec-fetch-site sec-fetch-mode referer accept-encoding
@@ -242,10 +241,9 @@ E.browser_default_header_order_http2 = function(browser, opt){
             upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`,
-        // XXX andreish: check sec-fetch-user with real chrome 77 on android
         mobile_chrome: qw`:method :authority :scheme :path pragma cache-control
-            upgrade-insecure-requests sec-fetch-mode sec-fetch-user
-            user-agent accept sec-fetch-site referer accept-encoding
+            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
+            accept sec-fetch-site referer accept-encoding
             accept-language cookie`,
         mobile_chrome_78: qw`:method :authority :scheme :path pragma
             cache-control upgrade-insecure-requests user-agent sec-fetch-user

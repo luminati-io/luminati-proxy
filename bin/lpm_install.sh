@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.161.831"
+VERSION="1.162.197"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -686,7 +686,6 @@ setup()
     perr "complete"
     echo "Luminati install script complete. Install id: $RID"
     echo "To run the process enter 'luminati'"
-    echo "if this does not work try $(npm bin -g)/luminati"
 }
 
 on_exit()
