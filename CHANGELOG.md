@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.162.728 Stable
+- :bug: Fixed initializing websocket
+
 ## 1.162.700 Stable
 - :sparkles: Improved the installation for Linux and Mac OS - fetching chromium binary only when needed
 

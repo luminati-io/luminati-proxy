@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.162.728",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed initializing websocket"
+            }
+        ]
+    },
+    {
         "ver": "1.162.700",
         "type": "stable",
         "changes": [
