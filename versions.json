@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.162.700",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved the installation for Linux and Mac OS - fetching chromium binary only when needed"
+            }
+        ]
+    },
+    {
         "ver": "1.162.197",
         "type": "stable",
         "changes": [

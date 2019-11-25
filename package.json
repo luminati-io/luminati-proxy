@@ -166,6 +166,7 @@
   "license": "ISC",
   "lpm": {
     "files": [
+      ".npmrc",
       "bin/ca.crt",
       "bin/ca.key",
       "bin/check_compat.js",
@@ -381,7 +382,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "8d226dc7e63539414ddc5ef19758d275"
+    "md5": "3e4eea3a45f525bddbca6a8bf0d00cd9"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -439,5 +440,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.162.197"
+  "version": "1.162.700"
 }

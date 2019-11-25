@@ -351,6 +351,43 @@ E.JSON_stringify = function(obj, opt){
         else
             replacer = replace_inf;
     }
+    if (opt.circular)
+    {
+        var ignore_circular = opt.circular=='ignore';
+        var orig_replacer = replacer, keys, objects, stack;
+        replacer = function(k, v){
+            if (!k)
+            {
+                keys = [];
+                stack = [];
+                objects = [{keys: '', value: v}];
+                return orig_replacer ? orig_replacer.call(this, k, v) : v;
+            }
+            while (stack.length && this!==stack[0])
+            {
+                stack.shift();
+                keys.pop();
+            }
+            var found;
+            for (var i = 0; i<objects.length; i++)
+            {
+                if (objects[i].value===v)
+                {
+                    found = objects[i];
+                    break;
+                }
+            }
+            if (!found)
+            {
+                keys.push(k);
+                stack.unshift(v);
+                objects.push({keys: keys.join('.'), value: v});
+                return orig_replacer ? orig_replacer.call(this, k, v) : v;
+            }
+            if (!ignore_circular)
+                return {__Ref__: found.keys};
+        };
+    }
     try { s = JSON.stringify(obj, replacer, opt.spaces); }
     finally {
         if (_date)
@@ -408,9 +445,34 @@ function parse_obj(v, opt){
     return v;
 }
 
+function traverse_obj(obj, key, parent, cb){
+    cb(obj, key, parent);
+    if (!obj || typeof obj!='object')
+        return;
+    for (var k in obj)
+        traverse_obj(obj[k], k, obj, cb);
+}
+
+function deref_obj(obj){
+    traverse_obj(obj, null, null, function(v, key, parent){
+        if (v && typeof v.__Ref__=='string')
+            parent[key] = zutil.get(obj, v.__Ref__);
+    });
+}
+
 E.JSON_parse = function(s, opt){
-    opt = Object.assign({date: true, re: true, func: true, inf: true}, opt);
-    return JSON.parse(s, function(k, v){ return parse_leaf(v, opt); });
+    opt = Object.assign({date: true, re: true, func: true, inf: true,
+        circular: true}, opt);
+    var has_circular;
+    var ret = JSON.parse(s, function(k, v){
+        v = parse_leaf(v, opt);
+        if (v && typeof v.__Ref__=='string')
+            has_circular = true;
+        return v;
+    });
+    if (has_circular && opt.circular)
+        deref_obj(ret);
+    return ret;
 };
 
 E.JSON_parse_obj = function(v, opt){

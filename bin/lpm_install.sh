@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.162.197"
+VERSION="1.162.700"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -617,11 +617,14 @@ lpm_install()
             echo "running nave relink..."
             sudo_cmd "nave relink"
         fi
-        if [ -f "/usr/local/bin/luminati" ]; then
-            sudo_cmd "rm /usr/local/bin/luminati"
+        # create symlink to /usr/local/bin if necessary
+        if ! [ $(npm bin -g) -ef /usr/local/bin ]; then
+            if [ -f "/usr/local/bin/luminati" ]; then
+                sudo_cmd "rm /usr/local/bin/luminati"
+            fi
+            sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"
+            sudo_cmd "chmod a+x /usr/local/bin/luminati"
         fi
-        sudo_cmd "ln -s $(npm bin -g)/luminati /usr/local/bin/luminati"
-        sudo_cmd "chmod a+x /usr/local/bin/luminati"
     fi
     perr "install_success_lpm"
 }

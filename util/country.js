@@ -773,7 +773,7 @@ E.regions = {
     CR: ['Central America', 'AMER'],
     CU: ['Caribbean', 'AMER'],
     CV: ['Western Africa', 'EMEA'],
-    CW: ['Caribbean', ''],
+    CW: ['Caribbean', 'AMER'],
     CX: ['Australia and New Zealand', 'APAC'],
     CY: ['South-Eastern Europe', 'EMEA'],
     CZ: ['Eastern Europe', 'EMEA'],

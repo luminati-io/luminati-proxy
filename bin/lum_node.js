@@ -18,8 +18,6 @@ const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
 const os = require('os');
-const download = require('download');
-const extract = require('extract-zip');
 const is_pkg = typeof process.pkg!=='undefined';
 const path = require('path');
 const ws = require('lum_windows-shortcuts');
@@ -189,56 +187,50 @@ const upgrade_win = function(){
     }
 };
 
-const install_win = ()=>etask(function*lum_node_install_win(){
-    this.on('uncaught', e=>{
+const install_win = ()=>{
+    try {
+        logger.notice('Checking installation on Windows');
+        if (!file.exists(install_path))
+        {
+            file.mkdir_e(install_path);
+            logger.notice('Created %s', install_path);
+        }
+        if (process.execPath!=exe_path)
+            upgrade_win();
+        const lnk_path = path.resolve(os.homedir(),
+            'Desktop/Luminati Proxy Manager.lnk');
+        if (!file.exists(lnk_path))
+        {
+            ws.create(lnk_path, {
+                target: exe_path,
+                icon: path.join(__dirname, '../build/pkgcon.ico'),
+            }, e=>{
+                if (e)
+                    return console.log('ERR while creating a shortcut: %s', e);
+                console.log('shortcut created: %s', lnk_path);
+            });
+        }
+        const puppeteer_path = path.resolve(install_path, 'chromium');
+        if (file.exists(puppeteer_path))
+            return;
+        const old_install_path = path.resolve(os.homedir(),
+            'AppData/Local/Programs/@luminati-ioluminati-proxy');
+        const old_puppeteer_path = path.resolve(old_install_path,
+            'resources/app/node_modules/puppeteer/.local-chromium');
+        if (file.exists(old_puppeteer_path))
+        {
+            const new_puppeteer_path = path.resolve(install_path, 'chromium');
+            logger.notice('Copying puppeteer from %s to %s',
+                old_puppeteer_path, new_puppeteer_path);
+            file.rename_e(old_puppeteer_path, new_puppeteer_path);
+            return logger.notice(
+                'Puppeteer reused from previous installation');
+        }
+    } catch(e){
         logger.error('There was an error while installing on Windows: %s',
             e.message);
-    });
-    logger.notice('Checking installation on Windows');
-    if (!file.exists(install_path))
-    {
-        file.mkdir_e(install_path);
-        logger.notice('Created %s', install_path);
     }
-    if (process.execPath!=exe_path)
-        upgrade_win();
-    const lnk_path = path.resolve(os.homedir(),
-        'Desktop/Luminati Proxy Manager.lnk');
-    if (!file.exists(lnk_path))
-    {
-        ws.create(lnk_path, {
-            target: exe_path,
-            icon: path.join(__dirname, '../build/pkgcon.ico'),
-        }, e=>{
-            if (e)
-                return console.log('ERR while creating a shortcut: %s', e);
-            console.log('shortcut created: %s', lnk_path);
-        });
-    }
-    const puppeteer_path = path.resolve(install_path, 'chromium');
-    if (file.exists(puppeteer_path))
-        return;
-    const old_install_path = path.resolve(os.homedir(),
-        'AppData/Local/Programs/@luminati-ioluminati-proxy');
-    const old_puppeteer_path = path.resolve(old_install_path,
-        'resources/app/node_modules/puppeteer/.local-chromium');
-    if (file.exists(old_puppeteer_path))
-    {
-        const new_puppeteer_path = path.resolve(install_path, 'chromium');
-        logger.notice('Copying puppeteer from %s to %s', old_puppeteer_path,
-            new_puppeteer_path);
-        file.rename_e(old_puppeteer_path, new_puppeteer_path);
-        return logger.notice('Puppeteer reused from previous installation');
-    }
-    logger.notice('Started fetching puppeteer binary');
-    yield download(`http://${pkg.api_domain}/static/lpm/puppeteer.zip`, 'tmp');
-    const source = path.join(process.cwd(), 'tmp', 'puppeteer.zip');
-    extract(source, {dir: install_path}, err=>{
-        if (err)
-            return this.throw(err);
-        logger.notice('Puppeteer fetched');
-    });
-});
+};
 
 const cleanup_win = function(_path){
     logger.notice('Cleaning up after installation. Deleting file %s', _path);

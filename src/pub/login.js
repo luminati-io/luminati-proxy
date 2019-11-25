@@ -270,9 +270,8 @@ const Form = props=>{
           update_username={props.update_username}/>;
 };
 
-const filter_by = (option, props)=>{
-    return option.indexOf(props.text)==0;
-};
+const filter_by = (option, props)=>option.startsWith(props.text);
+
 const Typeahead_wrapper = ({id, data, disabled, on_change, val})=>
     <Typeahead id={id} options={data} maxResults={10}
       minLength={0} disabled={disabled} selectHintOnEnter

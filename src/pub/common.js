@@ -15,6 +15,7 @@ import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
     Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
 import Tooltip from './common/tooltip.js';
 import {T, with_tt, Language} from './common/i18n.js';
+import {Toolbar_button} from './chrome_widgets.js';
 
 export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
     bytes = bytes||0;
@@ -37,14 +38,45 @@ export const Tooltip_bytes = ({bytes, chrome_style, bytes_out, bytes_in})=>{
 
 export const Warnings = props=>
     <div>
-      {(props.warnings||[]).map((w, i)=><Warning key={i} text={w.msg}/>)}
+      {(props.warnings||[]).map((w, i)=>
+          <Warning key={i} text={w.msg} id={w.id}/>
+      )}
     </div>;
 
-export const Warning = props=>
-    <div className="warning">
-      <div className="warning_icon"/>
-      <div className="text">{props.text||props.children}</div>
-    </div>;
+export class Warning extends Pure_component {
+    constructor(props){
+        super(props);
+        const dismissed_warnings = JSON.parse(window.localStorage.getItem(
+            'dismissed-warnings'))||{};
+        this.state = {dismissed: props.id && dismissed_warnings[props.id]};
+    }
+    dismiss = ()=>{
+        this.setState({dismissed: true}, this.store);
+    };
+    store = ()=>{
+        const dismissed_warnings = JSON.parse(window.localStorage.getItem(
+            'dismissed-warnings'))||{};
+        dismissed_warnings[this.props.id] = true;
+        window.localStorage.setItem('dismissed-warnings', JSON.stringify(
+            dismissed_warnings));
+    };
+    render(){
+        if (this.state.dismissed)
+            return null;
+        const content = this.props.text||this.props.children;
+        return <Tooltip className="wide" title={this.props.tooltip}
+              placement="bottom">
+              <div className="warning">
+                <div className="warning_icon"/>
+                <div className="hbox">{content}</div>
+                {this.props.id &&
+                  <Toolbar_button tooltip="Dismiss" id="close_btn"
+                    placement="left" on_click={this.dismiss}/>
+                }
+              </div>
+            </Tooltip>;
+    }
+}
 
 export const Loader = ({show})=>{
     if (!show)

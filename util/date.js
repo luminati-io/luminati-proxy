@@ -455,9 +455,16 @@ E.strptime = function(str, fmt){
 };
 
 // tz in format shh:mm (for exmpl +01:00, -03:45)
-E.apply_tz = function(date, tz){
-    var timezone = +tz.slice(1, 3)*3600000+tz.slice(4, 6)*60000;
+E.apply_tz = function(date, tz, opt){
+    if (!date)
+        return date;
+    date = E.get(date);
+    tz = (tz||E.local_tz).replace(':', '');
+    opt = opt||{};
+    var timezone = +tz.slice(1, 3)*E.ms.HOUR+tz.slice(3, 5)*E.ms.MIN;
     var sign = tz.slice(0, 1) == '+' ? 1 : -1;
+    if (opt.inverse)
+        sign *= -1;
     return new Date(date.getTime()+sign*timezone);
 };
 
@@ -632,6 +639,8 @@ E.strftime = function(fmt, d, opt){
     }); }
     return replace(fmt);
 };
+
+E.local_tz = E.strftime('%z', E.get(), {utc: false});
 
 // For a string like '11:00-23:30', returns a function that checks whether a
 // given date (moment in time) belongs to the set.

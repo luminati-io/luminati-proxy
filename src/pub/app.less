@@ -849,7 +849,7 @@ span.icon_link {
     display: flex;
     align-items: center;
     border-radius: 2px;
-    padding: 17px 20px;
+    padding: 10px 20px;
     .warning_icon {
         background: url(/img/warning.svg);
         width: 18px;
@@ -857,17 +857,20 @@ span.icon_link {
         height: 18px;
         margin-right: 22px;
      }
+    .close_btn {
+        position: absolute;
+        right: 1px;
+        top: 6px;
+    }
 }
-.buttons_upgrade {
-    position: absolute;
-    right: 5px;
-    top: 8px;
-}
+.buttons_upgrade { flex: 1; }
 .btn_upgrade {
     width: 100px;
     height: 32px;
     font-size: 14px;
     font-weight: 300;
+    float: right;
+    margin-right: 10px;
 }
 .panel {
     margin-bottom: 10px;
@@ -1335,7 +1338,6 @@ span.icon_link {
     .warning {
         position: relative;
         margin: 15px;
-        height: 48px;
     }
     .panels {
         display: flex;
@@ -3133,6 +3135,12 @@ span.icon_link {
     .chrome_icon { width: 20px; }
 }
 .select_zone {
+    display: flex;
+    align-items: center;
+}
+.hbox {
+    white-space: pre-wrap;
+    flex: 1;
     display: flex;
     align-items: center;
 }

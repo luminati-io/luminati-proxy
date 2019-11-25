@@ -7,15 +7,16 @@ import Har_viewer from './har_viewer';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import semver from 'semver';
-import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
-import {Warning, Warnings} from './common.js';
+import {Warning, Warnings, with_www_api} from './common.js';
 
 class Overview extends Pure_component {
-    state = {show_logs: false};
+    state = {show_logs: false, tls_warning: false};
     componentDidMount(){
         this.setdb_on('head.settings', settings=>settings &&
             this.setState({show_logs: settings.logs>0}));
+        this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
+            this.setState({tls_warning}));
     }
     render(){
         const {show_logs} = this.state;
@@ -30,6 +31,7 @@ class Overview extends Pure_component {
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>
+                <Tls_warning show={this.state.tls_warning}/>
                 <Warnings warnings={this.state.warnings}/>
               </div>
               <div className="proxies nav_header">
@@ -47,6 +49,21 @@ class Overview extends Pure_component {
             </div>;
     }
 }
+
+const Tls_warning = with_www_api(props=>{
+    const faq_url = props.www_api+'/faq#proxy-certificate';
+    if (!props.show)
+        return null;
+    return <Warning id="tls_warning">
+          <span>
+            <strong>TLS errors have been detected. </strong>
+            <span>
+              Your browser or crawler has to install the certificate. </span>
+            <a target="_blank" rel="noopener noreferrer" className="link"
+              href={faq_url}>Check the instructions here.</a>
+          </span>
+        </Warning>;
+});
 
 class Upgrade extends Pure_component {
     state = {};
@@ -69,6 +86,8 @@ class Upgrade extends Pure_component {
     };
     render(){
         const {upgrading, upgrade_error, ver_last, ver_node} = this.state;
+        if (!ver_last)
+            return null;
         const is_upgradable = ver_last && ver_last.newer;
         const is_electron = window.process && window.process.versions.electron;
         const electron = ver_node && ver_node.is_electron || is_electron;
@@ -88,29 +107,27 @@ class Upgrade extends Pure_component {
         }
         const major = versions.some(v=>v.type=='dev');
         const upgrade_type = major ? 'major' : 'minor';
-        return <Tooltip className="wide" title={tooltip} placement="bottom">
-            <Warning>
+        return <Warning tooltip={tooltip} id={this.state.ver_last.version}>
+            <div>
+              A new <strong>{upgrade_type}</strong> version <strong>
+              {this.state.ver_last.version} </strong>
+              is available. You are <strong>{versions.length}
+              </strong> releases behind the newest version.
+            </div>
+            <div className="buttons buttons_upgrade">
+              <button className="btn btn_lpm btn_upgrade"
+                onClick={this.upgrade} disabled={disabled}>
+                {upgrading ? 'Upgrading...' :
+                    upgrade_error ? 'Error' : 'Upgrade'}
+              </button>
+            </div>
+            {ver_node && !ver_node.satisfied && !electron &&
               <div>
-                A new <strong>{upgrade_type}</strong> version <strong>
-                {(this.state.ver_last||{}).version} </strong>
-                is available. You are <strong>{versions.length}
-                </strong> releases behind the newest version.
+                To upgrade Luminati Proxy Manager, you need to update Node.js
+                to version {this.state.ver_node.recommended}.
               </div>
-              <div className="buttons buttons_upgrade">
-                <button className="btn btn_lpm btn_upgrade"
-                  onClick={this.upgrade} disabled={disabled}>
-                  {upgrading ? 'Upgrading...' :
-                      upgrade_error ? 'Error' : 'Upgrade'}
-                </button>
-              </div>
-              {ver_node && !ver_node.satisfied && !electron &&
-                <div>
-                  To upgrade Luminati Proxy Manager, you need to update Node.js
-                  to version {this.state.ver_node.recommended}.
-                </div>
-              }
-            </Warning>
-            </Tooltip>;
+            }
+        </Warning>;
     }
 }
 

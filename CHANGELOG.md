@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.162.700 Stable
+- :sparkles: Improved the installation for Linux and Mac OS - fetching chromium binary only when needed
+
 ## 1.162.197 Stable
 - :bug: Fixed canceled requests shown in HAR viewer
 - :bug: Fixed banning/unbanning IPs banned per domain

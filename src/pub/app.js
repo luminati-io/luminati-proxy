@@ -115,6 +115,10 @@ const App = withRouter(class App extends Pure_component {
             const zones = yield ajax.json({url: '/api/zones'});
             setdb.set('head.zones', zones);
         });
+        this.etask(function*(){
+            const w = yield ajax.json({url: '/api/tls_warning'});
+            setdb.set('ws.tls_warning', w);
+        });
     };
     save_settings = settings=>{
       return this.etask(function*(){
