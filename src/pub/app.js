@@ -27,6 +27,7 @@ import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import './app.less';
 import ws from './ws.js';
+import {report_exception} from './util.js';
 
 window.setdb = setdb;
 setdb.setMaxListeners(30);
@@ -41,7 +42,9 @@ const App = withRouter(class App extends Pure_component {
             setdb.set('head.argv', version.argv);
         });
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             const mode = yield window.fetch('/api/mode');
             let block_ip;
             if (block_ip = mode.headers.get('x-lpm-block-ip'))

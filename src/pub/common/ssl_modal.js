@@ -6,13 +6,16 @@ import ajax from '../../../util/ajax.js';
 import {Instructions, Li} from './bullets.js';
 import {Loader, with_www_api} from '../common.js';
 import {Modal} from './modals.js';
+import {report_exception} from '../util.js';
 
 export default with_www_api(class Enable_ssl_modal extends Pure_component {
     state = {loading: false};
     enable_ssl = ()=>{
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             _this.setState({loading: true});
             yield ajax({url: '/api/enable_ssl', method: 'POST'});
             _this.setState({loading: false});

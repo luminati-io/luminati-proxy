@@ -2381,7 +2381,10 @@ span.icon_link {
 }
 .flex_auto { flex: auto; }
 .chrome {
-    &.chrome_table { height: 100%; }
+    &.chrome_table {
+        height: 100%;
+        &.in_modal_table { height: 300px; }
+    }
     font-size: 12px;
     font-family: Roboto, Ubuntu, Arial, sans-serif !important;
     color: rgb(48, 57, 66);
@@ -2614,7 +2617,7 @@ span.icon_link {
         }
         &.header_container, .header_container {
             height: 27px;
-            overflow-x: hidden;
+            overflow: hidden;
             table, .chrome_table {
                 .chrome_tr {
                     background-color: #f3f3f3;

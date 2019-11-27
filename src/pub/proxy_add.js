@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {Loader, Warnings, Code, Preset_description,
     with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
-import {ga_event} from './util.js';
+import {ga_event, report_exception} from './util.js';
 import presets from './common/presets.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
@@ -63,11 +63,11 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         presets[form.preset].set(form);
         const _this = this;
         return etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
                 ga_event('add-new-port', 'failed saved', e.message);
                 _this.setState({show_loader: false});
-            });
+            }));
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             let port = 24000;
             proxies.forEach(p=>{
@@ -90,7 +90,9 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     save = (opt={})=>{
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{ console.log(e); });
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             _this.setState({show_loader: true});
             const resp = yield _this.persist();
             if (resp.errors)

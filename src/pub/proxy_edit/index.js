@@ -27,6 +27,7 @@ import Tooltip from '../common/tooltip.js';
 import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
+import {report_exception} from '../util.js';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
@@ -195,6 +196,8 @@ const Index = withRouter(class Index extends Pure_component {
             form.ips = [];
         if (!form.vips)
             form.vips = [];
+        if (!form.users)
+            form.users = [];
         if (form.city && !Array.isArray(form.city) && form.state)
         {
             form.city = [{id: form.city,
@@ -247,12 +250,11 @@ const Index = withRouter(class Index extends Pure_component {
         this.saving = true;
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                // XXX krzysztof: use perr
-                console.log(e);
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
                 _this.setState({error_list: [{msg: 'Something went wrong'}]});
                 $('#save_proxy_errors').modal('show');
-            });
+            }));
             this.on('finally', ()=>{
                 _this.setState({saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
@@ -455,8 +457,10 @@ class Nav extends Pure_component {
     _reset_fields = ()=>{
         this.set_field('ips', []);
         this.set_field('vips', []);
+        this.set_field('users', []);
         this.set_field('multiply_ips', false);
         this.set_field('multiply_vips', false);
+        this.set_field('multiply_users', false);
         this.set_field('multiply', 0);
     };
     update_preset = val=>{

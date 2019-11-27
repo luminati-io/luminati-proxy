@@ -9,7 +9,7 @@ import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import $ from 'jquery';
-import {bytes_format} from './util.js';
+import {bytes_format, report_exception} from './util.js';
 import presets from './common/presets.js';
 import {Pins, Select_status, Select_number, Yes_no, Regex, Json, Textarea,
     Typeahead_wrapper, Input, Select, Url_input} from './common/controls.js';
@@ -126,7 +126,11 @@ class Code extends Pure_component {
             .tooltip('fixTitle')
             .tooltip('show').attr('title', t['Copy to clipboard'])
             .tooltip('fixTitle');
-        } catch(e){ console.log('Oops, unable to copy'); }
+        } catch(e){
+            this.etask(function*(){
+                yield report_exception(e);
+            });
+        }
     }
     render(){
         const {t} = this.props;
@@ -244,7 +248,11 @@ class Copy_btn extends Pure_component {
             .tooltip('fixTitle')
             .tooltip('show').attr('title', t['Copy to clipboard'])
             .tooltip('fixTitle');
-        } catch(e){ console.log('Oops, unable to copy'); }
+        } catch(e){
+            this.etask(function*(){
+                yield report_exception(e);
+            });
+        }
     };
     render(){
         return <div className="copy_btn" style={this.props.style}>
@@ -339,7 +347,7 @@ export const Checkbox = props=>
     <label className="form-check-label">
       <input className="form-check-input" type="checkbox" value={props.value}
         onChange={props.on_change} onClick={props.on_click}
-        checked={props.checked}/>
+        checked={props.checked} readOnly={props.readonly}/>
         {props.text}
     </label>
   </div>;

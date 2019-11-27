@@ -14,10 +14,10 @@ export default class Error_boundry extends Pure_component {
     log_error = (error, info)=>{
         const {message, stack} = error;
         this.etask(function*(){
-            yield window.fetch('/api/react_error', {
+            yield window.fetch('/api/error', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({backtrace: stack, message,
+                body: JSON.stringify({type: 'react', backtrace: stack, message,
                     stack: info.componentStack}),
             });
         });

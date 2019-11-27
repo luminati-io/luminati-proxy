@@ -266,6 +266,11 @@ export const tabs = {
                     requests`,
                 ext: true,
             },
+            http2: {
+                label: 'Use HTTP2',
+                tooltip: `Enable HTTP2 requests forwarding (experimental)`,
+                ext: true,
+            },
             proxy_connection_type: {
                 label: 'Connection to Super Proxy',
                 tooltip: 'Connection type between LPM and Super Proxy',
@@ -293,6 +298,11 @@ export const tabs = {
                 tooltip: `Create a proxy port for every selected gIP from pool
                     of available gIPs in your zone`,
             },
+            multiply_users: {
+                label: 'Multiply proxy port per user',
+                tooltip: `Create a proxy port for every selected LPM user
+                    configured in control panel`,
+            },
             iface: {
                 label: 'Interface',
                 tooltip: 'Define a specific network interface on which '
@@ -300,7 +310,7 @@ export const tabs = {
                 ext: true,
             },
             insecure: {
-                label: 'Insecure',
+                label: 'Ignore certificates',
                 tooltip: `It works only when SSL analyzing is enabled. You can
                     enable this option to ignore checking certificates of SSL
                     connection`,
@@ -314,7 +324,13 @@ export const tabs = {
                 label: 'Whitelisted IPs',
                 tooltip: `Default access grant for this port. Only these
                     IPs will be able to send requests to this port by default`
-            }
+            },
+            bw_limit: {
+                label: 'Bandwidth limit (GB)',
+                tooltip: `Set a limit of bandwidth for this proxy port. After
+                    reached specified limit the proxy port will deny further
+                    connections`,
+            },
         },
     },
 };

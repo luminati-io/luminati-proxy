@@ -5,6 +5,7 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
+import Users_modal from './users_modal.js';
 
 const route_err_opt = [
     {key: 'Default (pass_dyn)', value: ''},
@@ -33,14 +34,19 @@ export default class General extends Pure_component {
             settings && this.setState({settings});
         });
     }
-    multiply_changed = val=>{
+    multiply_users_changed = val=>{
+        console.log('mult users changed');
+        if (val)
+            this.open_users_modal();
+    };
+    multiply_static_changed = val=>{
         const {form} = this.state;
         const size = Math.max(form.ips.length, form.vips.length);
         if (val)
         {
             this.set_field('pool_size', 1);
             this.set_field('multiply', size);
-            this.open_modal();
+            this.open_static_modal();
             return;
         }
         this.set_field('pool_size', size);
@@ -50,7 +56,8 @@ export default class General extends Pure_component {
         if (!ssl && this.state.form.insecure)
             this.set_field('insecure', false);
     };
-    open_modal = ()=>$('#allocated_ips').modal('show');
+    open_static_modal = ()=>$('#allocated_ips').modal('show');
+    open_users_modal = ()=>$('#users_modal').modal('show');
     render(){
         if (!this.state.form || !this.state.proxy || !this.state.settings)
             return null;
@@ -63,35 +70,46 @@ export default class General extends Pure_component {
             type = 'vips';
         const form = this.state.form;
         const note_ips = form.multiply_ips ?
-            <a className="link" onClick={this.open_modal}>Select IPs</a> :
-            null;
+            <a className="link" onClick={this.open_static_modal}>
+              Select IPs
+            </a> : null;
         const note_vips = form.multiply_vips ?
-            <a className="link" onClick={this.open_modal}>Select gIPs</a> :
-            null;
+            <a className="link" onClick={this.open_static_modal}>
+              Select gIPs
+            </a> : null;
         const disabled_wl = (this.state.settings.fixed_whitelist_ips||[])
             .concat(this.state.settings.whitelist_ips);
+        const note_users = form.multiply_users ?
+            <a className="link" onClick={this.open_users_modal}>
+              Select users
+            </a> : null;
         return <div className="general">
               <Tab_context.Provider value="general">
+                <Users_modal form={this.state.form}/>
                 <Config type="text" id="internal_name"/>
                 <Config type="number" id="port"/>
                 <Config type="pins" id="whitelist_ips" disabled={disabled_wl}/>
                 <Config type="select" data={proxy_connection_type_opt}
                   id="proxy_connection_type"/>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
+                <Config type="yes_no" id="http2"
+                  disabled={!this.state.form.ssl}/>
                 <Config type="yes_no" id="insecure"
-                    disabled={!this.state.form.ssl}/>
+                  disabled={!this.state.form.ssl}/>
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"
-                  data={[0, 5, 20, 100, 500]}
-                  disabled={form.multiply_ips||form.multiply_vips}/>
+                  data={[0, 5, 20, 100, 500]}/>
                 {type=='ips' &&
                   <Config type="yes_no" id="multiply_ips"
-                    on_change={this.multiply_changed} note={note_ips}/>
+                    on_change={this.multiply_static_changed} note={note_ips}/>
                 }
                 {type=='vips' &&
                   <Config type="yes_no" id="multiply_vips"
-                    on_change={this.multiply_changed} note={note_vips}/>
+                    on_change={this.multiply_static_changed} note={note_vips}/>
                 }
+                <Config type="yes_no" id="multiply_users"
+                  on_change={this.multiply_users_changed} note={note_users}/>
+                {false && <Config type="select_number" id="bw_limit"/>}
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact no_any/>

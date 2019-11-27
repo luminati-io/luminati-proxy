@@ -2,6 +2,7 @@
 'use strict'; /*jslint browser:true, es6:true*/
 
 import user_agent_gen from '/www/util/pub/user_agent_gen.js';
+import etask from '../../util/etask.js';
 
 export const bytes_format = (bytes, number)=>{
     if (!bytes||isNaN(parseFloat(bytes))||!isFinite(bytes))
@@ -95,3 +96,13 @@ export const swagger_url = 'http://petstore.swagger.io/?url=https://'
 
 export const swagger_link_tester_url = swagger_url
 +'/get_proxies__port__link_test_json';
+
+export const report_exception = error=>etask(function*(){
+    this.on('uncaught', e=>console.log(e));
+    const {message=error, stack}=error;
+    yield window.fetch('/api/error', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({type: 'fe_warn', message, stack}),
+    });
+});

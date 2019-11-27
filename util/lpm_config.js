@@ -45,6 +45,7 @@ conf.server_default = {
     insecure: false,
     proxy_connection_type: 'http',
     ssl: false,
+    http2: false,
     test_url: 'http://lumtest.com/myip.json',
     proxy: conf.default_superproxy_domain,
     proxy_port: 22225,
@@ -53,11 +54,13 @@ conf.server_default = {
     preset: 'session_long',
     multiply_ips: false,
     multiply_vips: false,
+    multiply_users: false,
     multiply: 0,
     max_requests: 0,
     session_duration: 0,
     session: true,
     override_headers: true,
+    bw_limit: 0,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.server_default, 'port'), {

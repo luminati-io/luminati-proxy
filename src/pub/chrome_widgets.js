@@ -6,18 +6,17 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import Tooltip from './common/tooltip.js';
 import {T} from './common/i18n.js';
+import {Checkbox} from './common.js';
 
 export const Toolbar_button = ({id, tooltip, active, href, placement,
     ...props})=>
-    <T>{t=>
-    <Tooltip title={t(tooltip)} placement={placement||'bottom'}>
+    <Tooltip title={tooltip} placement={placement||'bottom'}>
       <a className={classnames('toolbar_item toolbar_button', id, {active})}
         onClick={props.on_click||(()=>null)} href={href}>
         <span className={classnames(id, 't_button', 'chrome_icon')}/>
         {props.children}
       </a>
-    </Tooltip>
-    }</T>;
+    </Tooltip>;
 
 export const Devider = ()=><div className="devider"/>;
 
@@ -155,7 +154,8 @@ export const Sort_icon = ({show, dir})=>{
 
 export class Chrome_table extends Pure_component {
     render(){
-        const {cols, title, children, class_name} = this.props;
+        const {selectable, cols, title, children, class_name,
+            selected_all, toggle_all} = this.props;
         const classes = classnames('chrome', 'chrome_table', class_name);
         return <T>{t=><div className={classes}>
               <div className="main_panel vbox">
@@ -165,18 +165,25 @@ export class Chrome_table extends Pure_component {
                   </Toolbar_row>
                 </Toolbar_container>
                 <div className="tables_container vbox">
-                  <Header_container cols={cols}/>
-                  <Data_container cols={cols}>{children}</Data_container>
+                  <Header_container selectable={selectable}
+                    selected_all={selected_all} toggle_all={toggle_all}
+                    cols={cols}/>
+                  <Data_container selectable={selectable} cols={cols}>
+                    {children}
+                  </Data_container>
                 </div>
               </div>
             </div>}</T>;
     }
 }
 
-const Data_container = ({cols=[], children})=>{
+const Data_container = ({cols=[], children, selectable})=>{
     return <div className="data_container">
           <table>
             <colgroup>
+              {selectable &&
+                <col key="select_all" style={{width: 20}}/>
+              }
               {cols.map((c, idx)=>
                 <col key={idx} style={{width: c.width}}/>
               )}
@@ -184,6 +191,7 @@ const Data_container = ({cols=[], children})=>{
             <tbody>
               {children}
               <tr className="filler">
+                {selectable && <td key="select_filler"/>}
                 {cols.map(c=><td key={c.id}></td>)}
               </tr>
             </tbody>
@@ -191,15 +199,21 @@ const Data_container = ({cols=[], children})=>{
         </div>;
 };
 
-const Header_container = ({cols})=>
+const Header_container = ({cols, selectable, selected_all, toggle_all})=>
     <div className="header_container">
       <table>
         <colgroup>
+          {selectable && <col key="select_all" style={{width: 20}}/>}
           {(cols||[]).map((c, idx)=><col key={idx} style={{width: c.width}}/>)}
         </colgroup>
         <tbody>
           <tr>
-            {(cols||[]).map((c, idx)=><th key={idx}><T>{c.title}</T></th>)}
+            {selectable &&
+              <th key="select_all" onClick={toggle_all}>
+                <Checkbox checked={selected_all} readonly/>
+              </th>
+            }
+            {(cols||[]).map((c, idx)=><th key={idx}>{c.title}</th>)}
           </tr>
         </tbody>
       </table>

@@ -11,7 +11,7 @@ import csv from '../../util/csv.js';
 import etask from '../../util/etask.js';
 import classnames from 'classnames';
 import filesaver from 'file-saver';
-import {get_static_country} from './util.js';
+import {get_static_country, report_exception} from './util.js';
 import _ from 'lodash';
 import $ from 'jquery';
 import Proxy_blank from './proxy_blank.js';
@@ -140,11 +140,10 @@ const Port_cell = ({proxy, mgr, scrolling})=>{
 const Success_rate_cell = ({proxy})=>{
     const val = !proxy.reqs ? '—' :
         (proxy.success/proxy.reqs*100).toFixed(2)+'%';
-    const title = <span>
-      <T>Total</T>: {proxy.reqs||0},
-      <T>Success</T>: {proxy.success||0}
-    </span>;
-    return <Tooltip title={title}>{val}</Tooltip>;
+    return <T>{t=>
+          <Tooltip title={`${t('Total')}: ${proxy.reqs||0}, ${
+            t('Success')}: ${proxy.success||0}`}>{val}</Tooltip>
+        }</T>;
 };
 
 const Reqs_cell = ({proxy})=>{
@@ -321,8 +320,17 @@ const columns = [
         key: 'ip',
         title: 'Static IPs',
         type: 'text',
-        calc_show: (proxies, master)=>master&&proxies.some(p=>p.multiply_ips),
+        calc_show: (proxies, master)=>
+            master && proxies.some(p=>p.multiply_ips),
         render: Static_ip_cell,
+    },
+    {
+        key: 'user',
+        title: 'User',
+        type: 'text',
+        ext: true,
+        calc_show: (proxies, master)=>
+            master && proxies.some(p=>p.multiply_users),
     },
     {
         key: 'vip',
@@ -385,6 +393,15 @@ const columns = [
         tooltip: 'Data transmitted to destination website. This includes'
             +'request headers, request data, response headers, response data',
         dynamic: true,
+        width: 90,
+    },
+    {
+        key: 'bw_limit',
+        title: 'BW Limit',
+        render: ({proxy})=>Tooltip_bytes(
+            {bytes: proxy.bw_limit*1000*1000*1000}),
+        calc_show: (proxies, master)=>master && master.bw_limit,
+        ext: true,
         width: 90,
     },
     {
@@ -540,7 +557,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     req_status = ()=>{
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             const params = {};
             if (_this.props.master_port)
                 params.master_port = _this.props.master_port;
@@ -894,7 +913,9 @@ class Actions extends Pure_component {
         event.stopPropagation();
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>console.log(e));
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             yield window.fetch('/api/proxy_dup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

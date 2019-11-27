@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.36 Stable
+- :sparkles: Introduced users management and multiplying ports by users
+
 ## 1.162.728 Stable
 - :bug: Fixed initializing websocket
 

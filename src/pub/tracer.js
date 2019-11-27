@@ -8,7 +8,7 @@ import etask from '../../util/etask.js';
 import Proxy_blank from './proxy_blank.js';
 import {Loader, Nav, Loader_small, Warning,
     with_proxy_ports} from './common.js';
-import {swagger_link_tester_url} from './util.js';
+import {swagger_link_tester_url, report_exception} from './util.js';
 import Preview from './har_preview.js';
 import ws from './ws.js';
 import {Instructions, Li} from './common/bullets.js';
@@ -41,7 +41,9 @@ export default withRouter(class Tracer extends Pure_component {
                 ws.removeEventListener('message', _this.on_message);
                 _this.setState({loading: false});
             });
-            this.on('uncaught', e=>console.log(e));
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             ws.addEventListener('message', _this.on_message);
             const raw_trace = yield window.fetch('/api/trace', {
                 method: 'POST',

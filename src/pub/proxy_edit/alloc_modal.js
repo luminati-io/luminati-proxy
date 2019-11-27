@@ -8,6 +8,7 @@ import ajax from '../../../util/ajax.js';
 import zurl from '../../../util/url.js';
 import {Modal} from '../common/modals.js';
 import {Pagination_panel, Link_icon, Checkbox} from '../common.js';
+import {report_exception} from '../util.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
@@ -39,11 +40,10 @@ export default class Alloc_modal extends Pure_component {
         const url = `${endpoint}?zone=${this.props.zone}`;
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                // XXX krzysztof: use perr
-                console.log(e);
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
                 _this.loading(false);
-            });
+            }));
             const res = yield ajax.json({url});
             let _available_list;
             if (type=='ips')
@@ -128,10 +128,9 @@ export default class Alloc_modal extends Pure_component {
     refresh = vals=>{
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                // XXX krzysztof: use perr
-                console.log(e);
-            });
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             this.on('finally', ()=>{
                 _this.loading(false);
             });
@@ -150,11 +149,7 @@ export default class Alloc_modal extends Pure_component {
             }
             const res = yield ajax.json({method: 'POST', url, data});
             if (res.error || !res.ips && !res.vips)
-            {
-                // XXX krzysztof: use perr
-                console.log(`error: ${res.error}`);
-                return;
-            }
+                return void (yield report_exception(res.error));
             const new_vals = _this.props.type=='ips' ?
                 res.ips.map(i=>i.ip) : res.vips.map(v=>v.vip);
             const norm_vals = _this.normalize_vals(new_vals);
@@ -186,9 +181,10 @@ export default class Alloc_modal extends Pure_component {
         const old_vals = this.state.available_list;
         if (old_vals.length!=new_vals.length)
         {
-            // XXX krzysztof: use perr
-            console.log('error ips/vips length mismatch');
-            return;
+            this.etask(function*(){
+                yield report_exception('error ips/vips length mismatch');
+                return;
+            });
         }
         const old_set = new Set();
         old_vals.forEach(v=>old_set.add(v));

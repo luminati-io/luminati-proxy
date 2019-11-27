@@ -5,7 +5,7 @@ import React from 'react';
 import {Labeled_controller, Nav, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import {ga_event} from './util.js';
+import {ga_event, report_exception} from './util.js';
 import _ from 'lodash';
 import {Select_zone, Pins} from './common/controls.js';
 
@@ -106,10 +106,10 @@ class Form extends Pure_component {
         this.saving = true;
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.log(e);
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
                 ga_event('settings', 'save', 'failed');
-            });
+            }));
             this.on('finally', ()=>{
                 _this.setState({saving: false});
                 _this.saving = false;
