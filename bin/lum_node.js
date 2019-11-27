@@ -7,14 +7,10 @@ const file = require('../util/file.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const lpm_util = require('../util/lpm_util.js');
-const lpm_file = require('../util/lpm_file.js');
-const zdate = require('../util/date.js');
 require('../lib/perr.js').run({});
-const pkg = require('../package.json');
 const _ = require('lodash');
 const analytics = require('../lib/analytics.js');
 const E = module.exports = {};
-const is_win = process.platform=='win32';
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
 const os = require('os');
@@ -26,42 +22,9 @@ const exe_path = path.resolve(install_path, 'lpm.exe');
 const logger = require('../lib/logger.js');
 const util_lib = require('../lib/util.js');
 
-const gen_filename = name=>{
-    return lpm_file.get_file_path(
-        `.luminati_${name}.json`.substr(is_win ? 1 : 0));
-};
-
 const perr_info = info=>Object.assign({}, info, {
     customer: _.get(E.manager, '_defaults.customer'),
 });
-
-E.write_status_file = (status, error=null, config=null, reason=null)=>{
-    if (error)
-        error = zerr.e2s(error);
-    Object.assign(E.lpm_status, {
-        last_updated: zdate(),
-        status,
-        reason,
-        error,
-        config,
-        customer_name: _.get(config, '_defaults.customer'),
-    });
-    try { file.write_e(E.status_filename, JSON.stringify(E.lpm_status)); }
-    catch(e){
-        logger.error(`Failed to write status file: ${e.message}`);
-    }
-};
-
-E.read_status_file = ()=>{
-    let status_file;
-    const invalid_start = {'running': 1, 'initializing': 1, 'shutdowning': 1};
-    try { status_file = JSON.parse(file.read_e(E.status_filename)); }
-    catch(e){ status_file = {}; }
-    if (status_file)
-        E.lpm_status = status_file;
-    if (status_file && invalid_start[status_file.status])
-        zerr.perr('crash_sudden', E.lpm_status);
-};
 
 E.shutdown = (reason, error=null)=>{
     if (E.shutdowning)
@@ -74,8 +37,6 @@ E.shutdown = (reason, error=null)=>{
         E.uninit();
         process.exit(1);
     }, shutdown_timeout);
-    E.write_status_file('shutdowning', error,
-        E.manager && E.manager._total_conf, reason);
     if (E.manager)
     {
         E.manager.stop(reason, true);
@@ -86,8 +47,6 @@ E.shutdown = (reason, error=null)=>{
     else
         logger.notice(`Shutdown, reason is ${reason}`);
     file.rm_rf_e(Tracer.screenshot_dir);
-    E.write_status_file('shutdown', error, E.manager && E.manager._total_conf,
-        reason);
 };
 
 E.handle_signal = (sig, err)=>{
@@ -261,12 +220,8 @@ E.run = (argv, run_config)=>etask(function*(){
         install_win();
     if (!is_pkg)
         add_alias_for_whitelist_ips();
-    E.read_status_file();
-    E.write_status_file('initializing', null,
-        E.manager && E.manager._total_conf);
     E.manager = new Manager(argv, Object.assign({}, run_config));
     E.manager.on('stop', ()=>{
-        // XXX krzysztof: do I need to flush logger too?
         zerr.flush();
         if (E.shutdown_timeout)
             clearTimeout(E.shutdown_timeout);
@@ -294,7 +249,6 @@ E.run = (argv, run_config)=>etask(function*(){
         }
     })
     .on('config_changed', etask.fn(function*(zone_autoupdate){
-        E.write_status_file('changing_config', null, zone_autoupdate);
         yield E.manager.stop('config change', true, true);
         setTimeout(()=>E.run(argv, zone_autoupdate&&zone_autoupdate.prev ? {
             warnings: [`Your default zone has been automatically changed from `
@@ -309,7 +263,6 @@ E.run = (argv, run_config)=>etask(function*(){
         E.on_upgrade_finished = cb;
     }).on('restart', ()=>process.send({command: 'restart'}));
     E.manager.start();
-    E.write_status_file('running', null, E.manager&&E.manager._total_conf);
 });
 
 E.handle_upgrade_finished = msg=>{
@@ -337,21 +290,6 @@ E.handle_msg = msg=>{
         break;
     }
 };
-
-E.init_status = ()=>{
-    E.status_filename = gen_filename('status');
-    E.lpm_status = {
-        status: 'initializing',
-        config: null,
-        error: null,
-        create_date: zdate(),
-        update_date: zdate(),
-        customer_name: null,
-        version: pkg.version,
-    };
-};
-
-E.uninit_status = ()=>{};
 
 E.init_traps = ()=>{
     E.trap_handlers = ['SIGTERM', 'SIGINT', 'uncaughtException'].map(
@@ -383,14 +321,12 @@ E.init = argv=>{
     E.shutdowning = false;
     E.manager = null;
     E.on_upgrade_finished = null;
-    E.init_status();
     E.init_traps();
     if (process.env.DEBUG_ETASKS)
         E.start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
 };
 
 E.uninit = ()=>{
-    E.uninit_status();
     E.uninit_traps();
     E.uninit_cmd();
     if (E.debug_etask_itv)

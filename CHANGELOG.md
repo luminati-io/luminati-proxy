@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.69 Stable
+- :star: Improvements in users management
+
 ## 1.163.36 Stable
 - :sparkles: Introduced users management and multiplying ports by users
 

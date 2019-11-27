@@ -130,7 +130,8 @@ class Har_viewer extends Pure_component {
         return <div id="har_viewer" className={(show ? 'har_viewer' :
             'har_viewer_off')+' chrome'}>
               {!show &&
-                <Route path="/logs" component={Logs_off_notice}/>
+                <Route path={['/logs', '/proxy/:port/logs/har']}
+                  component={Logs_off_notice}/>
               }
               {show &&
                 <div className="main_panel vbox" ref={this.set_main_panel_ref}>

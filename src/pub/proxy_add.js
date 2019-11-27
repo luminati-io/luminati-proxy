@@ -129,23 +129,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         ga_event('add-new-port', 'rules clicked', field);
         this.save({redirect: true, field});
     };
-    advanced_clicked = ()=>{
-        if (this.state.proxies_running.length==1)
-        {
-            $('#add_new_proxy_modal').modal('hide');
-            this.props.history.push({pathname: '/howto/code'});
-            return;
-        }
-        if (this.state.created_port)
-        {
-            $('#add_new_proxy_modal').modal('hide');
-            this.props.history.push(
-                {pathname: `/proxy/${this.state.created_port}`});
-            return;
-        }
-        ga_event('add-new-port', 'click save');
-        this.save({redirect: true});
-    };
     field_changed = id=>value=>{
         this.setState({[id]: value});
         if (id=='zone')
@@ -165,8 +148,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         const disabled = this.state.cur_tab=='proxy_ext'&&
             !this.state.valid_json;
         const Footer_wrapper = <Footer save_clicked={this.save}
-            advanced_clicked={this.advanced_clicked} disabled={disabled}
-            created_port={this.state.created_port}/>;
+            disabled={disabled} created_port={this.state.created_port}/>;
         if (!this.state.proxies_running)
             return null;
         let content;
@@ -338,7 +320,6 @@ const Field = props=>
 
 const Footer = props=>{
     const save_clicked = ()=>{
-        ga_event('add-new-port', 'click advanced');
         if (props.disabled)
             return;
         props.save_clicked();
@@ -346,23 +327,16 @@ const Footer = props=>{
     const ok_clicked = ()=>$('#add_new_proxy_modal').modal('hide');
     const classes = classnames('btn', 'btn_lpm', 'btn_lpm_primary',
         {disabled: props.disabled});
-    const adv_tip = 'Creates a proxy port and moves to the configuration page';
-    return <T>{t=><div className="footer">
-          <Tooltip title={adv_tip}>
-            <a onClick={props.advanced_clicked} className="link"
-              style={{float: 'left'}}>{t('Advanced options')}</a>
-          </Tooltip>
+    return <div className="footer">
           {!props.created_port &&
             <button onClick={save_clicked} className={classes}>
               <T>Save</T>
             </button>
           }
           {!!props.created_port &&
-            <button onClick={ok_clicked} className={classes}>
-            {t('OK')}
-            </button>
+            <button onClick={ok_clicked} className={classes}>OK</button>
           }
-        </div>}</T>;
+        </div>;
 };
 
 export default Proxy_add;

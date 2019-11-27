@@ -56,7 +56,7 @@ const Index = withRouter(class Index extends Pure_component {
             const port = this.props.match.params.port;
             const proxy = proxies.filter(p=>p.port==port)[0];
             if (!proxy)
-                this.props.history.push('/overview');
+                return this.props.history.push('/overview');
             const form = Object.assign({}, proxy.config);
             this.apply_preset(form, form.preset||'session_long');
             this.setState({proxies}, this.delayed_loader());
