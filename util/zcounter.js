@@ -416,9 +416,13 @@ E.flush = ()=>etask(function*zcounter_flush(){
     }
 });
 
+let agent_conf;
 E.is_debug = title=>{
-    let system_db = require('../system/db/db.js');
-    let agent_conf = system_db.use('agent_conf', env.CONF_SERVER);
+    if (!agent_conf)
+    {
+        let system_db = require('../system/db/db.js');
+        agent_conf = system_db.use('agent_conf', env.CONF_SERVER);
+    }
     let debug = agent_conf.debug_zcounter;
     let v = debug && debug[title];
     if (typeof v=='object')

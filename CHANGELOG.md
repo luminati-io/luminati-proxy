@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.144 Stable
+- :bug: Fix database (Lokijs) errors
+- :star: Improved the UI in the dashboard (easy to hide/show components)
+
 ## 1.163.69 Stable
 - :star: Improvements in users management
 

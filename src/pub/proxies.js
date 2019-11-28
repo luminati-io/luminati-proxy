@@ -3,7 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import ReactDOM from 'react-dom';
-import {Link, withRouter} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import ajax from '../../util/ajax.js';
 import setdb from '../../util/setdb.js';
 import zescape from '../../util/escape.js';
@@ -517,10 +517,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             this.setState({zones});
         });
         this.timeout_id = window.setTimeout(this.req_status);
-        this.setdb_on('head.settings', settings=>{
-            if (settings)
-                this.setState({logs: settings.logs});
-        });
         this.update_window_dimensions();
         window.addEventListener('resize', this.update_window_dimensions);
     }
@@ -702,7 +698,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         }
         if (this.state.loaded && !this.state.filtered_proxies.length)
             return <Proxy_blank/>;
-        const show_logs = this.state.logs>0;
         return <div className="proxies_panel chrome">
               <div className="main_panel vbox">
                 <Toolbar proxy_add={this.proxy_add}
@@ -758,12 +753,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                       </div>
                     </div>
                   </React.Fragment>
-                }
-                {!show_logs &&
-                  <div className="summary_bar">
-                    Request logs are disabled. You can enable it back in&nbsp;
-                    <Link to="/settings">General settings</Link>
-                  </div>
                 }
               </div>
               <Columns_modal selected_cols={this.state.selected_cols}

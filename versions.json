@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.163.144",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix database (Lokijs) errors"
+            },
+            {
+                "type": "star",
+                "text": "Improved the UI in the dashboard (easy to hide/show components)"
+            }
+        ]
+    },
+    {
         "ver": "1.163.69",
         "type": "stable",
         "changes": [

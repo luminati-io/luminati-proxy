@@ -1390,20 +1390,30 @@ span.icon_link {
             .success_value { margin-left: 5px; }
         }
     }
-    .enable_stats_btn {
+    .enable_btn {
         padding: 0;
-        margin-left: 15px;
         background-color: #f3f3f3;
         border: 1px solid #d0d0d0;
+        &_stats { margin-left: 15px; }
+        &_logs {
+            min-height: 18px;
+            line-height: initial;
+            margin: 10px 15px;
+        }
     }
     .logs_wrapper {
         display: flex;
+        flex: 2;
+        min-height: 230px;
         .har_viewer {
             height: auto;
             padding: 15px;
             min-height: initial;
         }
     }
+    .main_panel { justify-content: center; }
+    .loader_small { justify-content: center; }
+    >.loader_small { margin-bottom: 10px; }
 }
 .ic_warning {
     background-image: url(/img/ic_warning.svg);

@@ -8,22 +8,33 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import semver from 'semver';
 import {T} from './common/i18n.js';
-import {Warning, Warnings, with_www_api} from './common.js';
+import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
+import Tooltip from './common/tooltip.js';
+import setdb from '../../util/setdb.js';
 
 class Overview extends Pure_component {
-    state = {show_logs: false, tls_warning: false};
+    state = {show_logs: null, tls_warning: false};
     componentDidMount(){
         this.setdb_on('head.settings', settings=>settings &&
             this.setState({show_logs: settings.logs>0}));
         this.setdb_on('ws.tls_warning', tls_warning=>tls_warning!==undefined &&
             this.setState({tls_warning}));
+        this.setdb_on('head.save_settings', save_settings=>
+            this.save_settings = save_settings);
     }
+    toggle_logs = val=>{
+        const _this = this;
+        this.setState({show_logs: null});
+        this.etask(function*(){
+            const settings = Object.assign({}, setdb.get('head.settings'));
+            settings.logs = val;
+            yield _this.save_settings(settings);
+        });
+    };
     render(){
         const {show_logs} = this.state;
         const master_port = this.props.match.params.master_port;
         const panels_style = {maxHeight: show_logs ? '50vh' : undefined};
-        const logs_wrapper_style = {flex: show_logs ? 2 : 0,
-            minHeight: show_logs ? '230px' : undefined};
         const title = master_port ?
             <span>
               <T>Overview of multiplied proxy port</T> - {master_port}
@@ -43,12 +54,24 @@ class Overview extends Pure_component {
                 </div>
                 <Stats/>
               </div>
-              <div className="logs_wrapper" style={logs_wrapper_style}>
-                <Har_viewer master_port={master_port}/>
-              </div>
+              {show_logs===null &&
+                <Loader_small show loading_msg="Loading..."/>}
+              {show_logs &&
+                <div className="logs_wrapper">
+                  <Har_viewer master_port={master_port}/>
+                </div>}
+              {show_logs===false &&
+                <Logs_off_btn turn_on={()=>this.toggle_logs(1000)}/>}
             </div>;
     }
 }
+
+const Logs_off_btn = props=>
+  <Tooltip title="Logs are disabled. Click here to turn it on again">
+    <button className="enable_btn enable_btn_logs" onClick={props.turn_on}>
+      <i className="glyphicon glyphicon-chevron-up"/>
+    </button>
+  </Tooltip>;
 
 const Tls_warning = with_www_api(props=>{
     const faq_url = props.www_api+'/faq#proxy-certificate';

@@ -66,7 +66,7 @@ export default class Users_modal extends Pure_component {
     save = ()=>{
         const selected = Object.keys(this.state.selected)
             .filter(s=>this.state.selected[s]);
-        if (selected.length>this.props.form.multiply)
+        if (selected.length>(this.props.form.multiply||0))
             this.set_field('multiply', selected.length);
         this.set_field('users', selected);
     };
