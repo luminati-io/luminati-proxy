@@ -8,6 +8,9 @@ const path = require('path');
 const assert = require('assert');
 const request = require('request');
 const sinon = require('sinon');
+const winston = require('winston');
+// needed to make lpm_file.js to set work dir to tmp dir
+process.argv.push('--dir', os.tmpdir());
 const Manager = require('../lib/manager.js');
 const cities = require('../lib/cities');
 sinon.stub(cities, 'ensure_data', ()=>null);
@@ -15,6 +18,7 @@ const logger = require('../lib/logger.js');
 const etask = require('../util/etask.js');
 const pkg = require('../package.json');
 const qw = require('../util/string.js').qw;
+const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
 const lpm_config = require('../util/lpm_config.js');
 const assign = Object.assign;
@@ -24,12 +28,16 @@ const password = 'xyz';
 const {assert_has} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
 
-logger.transports.forEach(t=>{ t.silent = true; });
-
-
 describe('manager', ()=>{
-    const logger_stub = sinon.stub(logger, 'notice');
-    let app, temp_files;
+    let app, temp_files, logger_stub;
+    const stub_logger = ()=>{
+        logger.transports.forEach(t=>{ t.silent = true; });
+        logger_stub = sinon.stub(logger, 'notice');
+    };
+    const unstub_logger = ()=>{
+        logger_stub.restore();
+        logger.transports.forEach(t=>{ t.silent = false; });
+    };
     const get_param = (args, param)=>{
         let i = args.indexOf(param)+1;
         return i ? args[i] : null;
@@ -116,7 +124,7 @@ describe('manager', ()=>{
         });
         if (opt.config)
         {
-            const config_file = temp_file(opt.config||[], 'json');
+            const config_file = temp_file(opt.config, 'json');
             args.push('--config');
             args.push(config_file.path);
             temp_files.push(config_file);
@@ -154,6 +162,7 @@ describe('manager', ()=>{
             },
         });
     };
+    before(stub_logger);
     afterEach('after manager', etask._fn(function*(_this){
         if (!app)
             return;
@@ -233,6 +242,40 @@ describe('manager', ()=>{
                 assert.equal(dropin.opt.proxy_port, 3939);
             }));
         });
+    });
+    describe('report_bug', ()=>{
+        before(()=>{
+            unstub_logger();
+            const console_t = logger.transports.find(
+                t=>t instanceof winston.transports.Console);
+            console_t.silent = true;
+        });
+        after(stub_logger);
+        // can't rm current log file because transports rely on it
+        beforeEach(()=>fs.truncateSync(logger.lpm_filename, 0));
+        it('should send logs, har and config', etask._fn(function*(_this){
+            app = yield app_with_config({config: {}, cli: {log: 'notice'}});
+            const desc = 'bug description', email = 'test@luminati.io';
+            const ua = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '+
+            'Gecko/20100101 Firefox/47.0';
+            const req = {body: {desc, email}, get: ()=>ua};
+            const res = {
+                status: sinon.stub().returnsThis(),
+                json: sinon.stub(),
+            };
+            const request_stub = sinon.stub(app.manager, 'api_request');
+            request_stub.returns({statusCode: 200, body: 'ok'});
+            yield app.manager.report_bug_api(req, res);
+            const report = request_stub.firstCall.args[0].form.report;
+            assert.ok(report.config);
+            assert.ok(report.log);
+            assert.ok(report.har);
+            assert.equal(report.desc, desc);
+            assert.equal(report.email, email);
+            assert.equal(report.browser, user_agent.guess_browser(ua).browser);
+            sinon.assert.calledWith(res.status, 200);
+            sinon.assert.calledWith(res.json, 'ok');
+        }));
     });
     describe('dropin', ()=>{
         it('off', etask._fn(function*(_this){

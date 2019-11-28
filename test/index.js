@@ -628,7 +628,7 @@ describe('proxy', ()=>{
                 l = yield lum({whitelist_ips: ['1.1.1.1']});
                 sinon.stub(l, 'is_whitelisted').onFirstCall().returns(false);
                 let res = yield l.test({url: test_url.http});
-                assert.equal(res.statusCode, 403);
+                assert.equal(res.statusCode, 407);
                 assert.equal(res.body, undefined);
             }));
             it('https', etask._fn(function*(){
@@ -644,7 +644,7 @@ describe('proxy', ()=>{
                     yield l.test({url: test_url.https});
                 } catch(e){ error = e.toString(); }
                 assert(error.includes('tunneling socket could not be '
-                +'established, statusCode=403'));
+                +'established, statusCode=407'));
             }));
             it('socks http', etask._fn(function*(){
                 l = yield lum();
@@ -671,7 +671,7 @@ describe('proxy', ()=>{
                     rejectUnauthorized: false,
                     url: test_url.http,
                 }]);
-                assert.equal(res.statusCode, 403);
+                assert.equal(res.statusCode, 407);
             }));
             it('socks https', etask._fn(function*(){
                 l = yield lum();

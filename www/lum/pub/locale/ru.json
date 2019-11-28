@@ -1851,7 +1851,7 @@
   "Create new Zone": "Создать новую зону",
   "Zone name": "Название зоны",
   "Shared (Pay per usage)": "Общий (оплата за трафик)",
-  "(Security check)": "(Проверка безопасности)",
+  "(this is merely a security measure)": "(Проверка безопасности)",
   "Select payment method": "Выберите способ оплаты",
   "Selected per request": "Выбирается при подключение",
   "This is for authentication, you will not be charged.": "Требуется для аутентификации, с Вас не будет взята оплата.",

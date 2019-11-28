@@ -2116,7 +2116,7 @@
   "Easily switch between shared proxies, data-center private proxy, residential IPs and mobile IPs": "在共享代理、数据中心私人代理、住宅IP和移动IP中快速切换",
   "24/7 support from the engineers who built the product": "产品开发工程师提供24小时支持",
   "Speed up your project with a free proxy manager and built-in data gathering templates": "利用免费的代理管理器和嵌入式抓取工具加快计划",
-  " (Security check)": "（安全检查）",
+  " (this is merely a security measure)": "（安全检查）",
   " custom rules you can easily create": "者通过创建自定义规则来循环切换IP",
   ".": "。",
   " Rotate IPs automatically and combine between the different IP networks to optimize costs and success rate": "自动循环切换IP并结合不同的IP网络来优化成本并提高成功率。",

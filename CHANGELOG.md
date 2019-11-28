@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.237 Stable
+- :star: Adjustments for LPM <> Extension integration
+
 ## 1.163.144 Stable
 - :bug: Fix database (Lokijs) errors
 - :star: Improved the UI in the dashboard (easy to hide/show components)
