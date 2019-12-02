@@ -81,8 +81,10 @@ class Pane_headers extends Pure_component {
     get_curl = ()=>{
         const req = this.props.req;
         const {username, password, super_proxy} = req.details;
+        const headers = req.request.headers.map(h=>`-H "${h.name}: `
+            +`${h.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
         return ['curl -x', username+':'+password+'@'+super_proxy,
-               req.request.url].join(' ');
+               req.request.url, ...headers].join(' ');
     };
     render(){
         const req = this.props.req;

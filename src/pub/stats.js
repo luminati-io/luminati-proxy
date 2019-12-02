@@ -2,7 +2,7 @@
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
 import {withRouter} from 'react-router-dom';
-import {ga_event, status_codes} from './util.js';
+import {status_codes} from './util.js';
 import ajax from '../../util/ajax.js';
 import {Tooltip_bytes, Loader_small} from './common.js';
 import Tooltip from './common/tooltip.js';
@@ -226,7 +226,6 @@ const Row = withRouter(class Row extends Pure_component {
 
 class Toolbar extends Pure_component {
     clear = ()=>{
-        ga_event('stats panel', 'click', 'reset btn');
         this.etask(function*(){
             yield ajax({url: '/api/logs_reset'});
             setdb.emit_path('head.har_viewer.reset_reqs');

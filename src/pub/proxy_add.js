@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import {Loader, Warnings, Code, Preset_description,
     with_www_api} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
-import {ga_event, report_exception} from './util.js';
+import {report_exception} from './util.js';
 import presets from './common/presets.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {withRouter} from 'react-router-dom';
@@ -65,7 +65,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         return etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e);
-                ga_event('add-new-port', 'failed saved', e.message);
                 _this.setState({show_loader: false});
             }));
             const proxies = yield ajax.json({url: '/api/proxies_running'});
@@ -83,7 +82,6 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             const resp = yield raw_resp.json();
             if (resp.errors)
                 return resp;
-            ga_event('add-new-port', 'successfully saved');
             return {port};
         });
     };
@@ -125,24 +123,9 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
             }
         });
     };
-    rule_clicked = field=>{
-        ga_event('add-new-port', 'rules clicked', field);
-        this.save({redirect: true, field});
-    };
-    field_changed = id=>value=>{
-        this.setState({[id]: value});
-        if (id=='zone')
-            ga_event('add-new-port', 'zone selected', value);
-        else if (id=='preset')
-        {
-            ga_event('add-new-port', 'preset selected',
-                `${this.state.preset}_${value}`);
-        }
-    };
-    set_tab = id=>{
-        ga_event('add-new-port', 'changed proxy type', id);
-        this.setState({cur_tab: id});
-    };
+    rule_clicked = field=>this.save({redirect: true, field});
+    field_changed = id=>value=>this.setState({[id]: value});
+    set_tab = id=>this.setState({cur_tab: id});
     on_hidden = ()=>this.setState({created_port: null});
     render(){
         const disabled = this.state.cur_tab=='proxy_ext'&&

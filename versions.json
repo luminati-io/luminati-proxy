@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.163.474",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added --downgrade option that will downgrade LPM to the version before upgrades"
+            },
+            {
+                "type": "star",
+                "text": "Removed usage of Google Analytics"
+            },
+            {
+                "type": "sparkles",
+                "text": "Merged HTTP and WS to use single port"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added devtool nosources-source-map to Webpack config"
+            }
+        ]
+    },
+    {
         "ver": "1.163.237",
         "type": "stable",
         "changes": [

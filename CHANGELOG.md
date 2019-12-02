@@ -1,5 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.474 Stable
+- :star: Added --downgrade option that will downgrade LPM to the version before upgrades
+- :star: Removed usage of Google Analytics
+- :sparkles: Merged HTTP and WS to use single port
+- :sparkles: Added devtool nosources-source-map to Webpack config
+
 ## 1.163.237 Stable
 - :star: Adjustments for LPM <> Extension integration
 

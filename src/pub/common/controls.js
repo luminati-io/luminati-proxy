@@ -344,7 +344,7 @@ export class Yes_no extends Pure_component {
 }
 
 export class Regex extends Pure_component {
-    state = {recognized: false, checked: {}};
+    state = {recognized: false, checked: {}, invalid_regexp: undefined};
     formats = ['png', 'jpg', 'jpeg', 'svg', 'gif', 'mp3', 'mp4', 'avi'];
     componentDidMount(){
         this.recognize_regexp();
@@ -386,27 +386,40 @@ export class Regex extends Pure_component {
             return `Remove file format ${f} from regexp`;
         return `Add file format ${f} to regexp`;
     };
+    check_regexp = regexp=>{
+        try {
+            new RegExp(regexp);
+            return true;
+        } catch(e){ return false; }
+    };
     on_input_change = regexp=>{
-        this.props.on_change_wrapper(regexp, this.props.id);
+        const is_regexp_valid = this.check_regexp(regexp);
+        this.setState({invalid_regexp: !is_regexp_valid ? regexp : undefined});
+        if (is_regexp_valid)
+            this.props.on_change_wrapper(regexp, this.props.id);
     };
     render(){
         const val = this.props.val||'';
         return <div className="regex_field">
               <div className="regex_input">
-                <div className="tip_box active">
+                {!this.props.no_tip_box && <div className="tip_box active">
                   <div className="checks">
                     {this.formats.map(f=>
                       <Tooltip key={f+!!this.state.checked[f]}
                         title={this.tip(f)}>
                         <button onClick={this.toggle.bind(null, f)}
                           className={this.classes(f)}
-                          disabled={this.props.disabled}>.{f}</button>
+                          disabled={this.props.disabled||
+                              !!this.state.invalid_regexp}>.{f}</button>
                       </Tooltip>
                     )}
                   </div>
-                </div>
-                <Input className="regex" {...this.props} val={val} type="text"
+                </div>}
+                <Input className="regex" {...this.props}
+                  val={this.state.invalid_regexp||val} type="text"
                   on_change_wrapper={this.on_input_change}/>
+                <span className={classnames('regex_error',
+                    {active: this.state.invalid_regexp})}>Invalid regex</span>
               </div>
             </div>;
     }

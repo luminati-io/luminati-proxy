@@ -87,7 +87,6 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const settings = yield ajax.json({url: '/api/settings'});
             setdb.set('head.settings', settings);
-            window.ga('set', 'dimension1', settings.customer);
         });
         this.etask(function*(){
             const conn = yield ajax.json({url: '/api/conn'});
@@ -100,7 +99,7 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});
             setdb.set('head.defaults', defaults);
-            ws.set_location(window.location, defaults.ws);
+            ws.set_location(window.location, defaults.www);
         });
         this.etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});

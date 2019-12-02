@@ -8,7 +8,6 @@ import {Loader, Warnings, Nav, with_proxy_ports, Add_icon,
 import {Input} from './common/controls.js';
 import classnames from 'classnames';
 import ajax from '../../util/ajax.js';
-import {ga_event} from './util.js';
 import Preview from './har_preview.js';
 import Proxy_blank from './proxy_blank.js';
 import {withRouter} from 'react-router-dom';
@@ -16,6 +15,7 @@ import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import date from '../../util/date.js';
 import {T} from './common/i18n.js';
+import {report_exception} from './util.js';
 const {SEC} = date.ms;
 
 const Proxy_tester = ()=>
@@ -59,7 +59,6 @@ class Request extends Pure_component {
         this.setdb_on('head.lock_navigation', lock=>this.setState({lock}));
     }
     add_header = ()=>{
-        ga_event('proxy_tester', 'add header');
         this.setState(prev_state=>({
             headers: [...prev_state.headers, {idx: prev_state.max_idx+1,
                 header: '', value: ''}],
@@ -67,7 +66,6 @@ class Request extends Pure_component {
         }));
     };
     remove_header = idx=>{
-        ga_event('proxy_tester', 'remove header');
         if (this.state.headers.length==1)
             return this.setState({headers: [this.first_header]});
         this.setState(prev_state=>(
@@ -91,7 +89,6 @@ class Request extends Pure_component {
             this.go();
     };
     go = ()=>{
-        ga_event('proxy_tester', 'run test');
         const port = this.state.params.port||this.props.def_port;
         const url = '/api/test/'+port;
         const data = {
@@ -105,10 +102,9 @@ class Request extends Pure_component {
         this.setState({show_loader: true});
         const _this = this;
         this.etask(function*(){
-            this.on('uncaught', e=>{
-                console.error(e);
-                ga_event('proxy_tester', 'unexpected error', e.message);
-            });
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             this.on('finally', ()=>_this.setState({show_loader: false}));
             const resp = yield ajax.json({method: 'POST', url, data,
                 timeout: 120*SEC});
@@ -116,13 +112,9 @@ class Request extends Pure_component {
             {
                 _this.setState({warnings: [{msg: resp.error}]});
                 $('#warnings_modal').modal();
-                ga_event('proxy_tester', 'response has errors', resp.error);
             }
             else
-            {
-                ga_event('proxy_tester', 'response successful');
                 _this.props.update_response(resp);
-            }
         });
     };
     render(){

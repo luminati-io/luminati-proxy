@@ -127,7 +127,6 @@ const Login = withRouter(class Login extends Pure_component {
             const ets = [];
             ets.push(etask(function*_get_settings(){
                 const settings = yield ajax.json({url: '/api/settings'});
-                window.ga('set', 'dimension1', settings.customer);
                 setdb.set('head.settings', settings);
             }));
             ets.push(etask(function*_get_consts(){

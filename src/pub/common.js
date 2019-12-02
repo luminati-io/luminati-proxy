@@ -216,6 +216,8 @@ export const Form_controller = props=>{
         return <Url_input {...props}/>;
     else if (type=='regex')
         return <Regex {...props}/>;
+    else if (type=='regex_text')
+        return <Regex {...props} no_tip_box={true}/>;
     else if (type=='yes_no')
         return <Yes_no {...props}/>;
     else if (type=='select_number')

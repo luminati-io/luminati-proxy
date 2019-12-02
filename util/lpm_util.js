@@ -4,7 +4,7 @@
 const _ = require('lodash');
 const yargs = require('yargs');
 const pkg = require('../package.json');
-const analytics = require('../lib/analytics.js');
+const perr = require('../lib/perr.js');
 const lpm_config = require('./lpm_config.js');
 const zerr = require('../util/zerr.js');
 const E = module.exports;
@@ -56,6 +56,7 @@ E.init_args = args=>{
         'stop-daemon': 'Stop running daemon',
         'delete-daemon': 'Delete daemon instance',
         upgrade: 'Upgrade proxy manager',
+        downgrade: 'Downgrade proxy manager (if backup exists on disk)',
         dir: 'Path to the directory with database and configuration files',
         status: 'Show proxy manager processes current status',
         'show-logs': 'Show logs of the currently running LPM instance',
@@ -112,6 +113,6 @@ E.init_args = args=>{
             acc[curr.name] = curr.value||true;
         return acc;
     }, {});
-    analytics.enabled = !argv.no_usage_stats;
+    perr.enabled = !argv.no_usage_stats;
     return argv;
 };

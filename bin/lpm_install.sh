@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.163.237"
+VERSION="1.163.474"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -572,10 +572,9 @@ deps_install()
 lpm_clean()
 {
     echo "cleaning lpm related node packages and npm cache..."
-    local lib_path="$(npm prefix -g)/lib"
     local clean_cmd=(
         "npm uninstall -g luminati-proxy @luminati-io/luminati-proxy > /dev/null"
-        "rm -rf $lib_path/node_modules/{@luminati-io,luminati-proxy}"
+        "rm -rf $(npm root -g)/{@luminati-io,luminati-proxy}"
         "rm -rf $HOME/.npm"
         "mkdir -p $HOME/.npm/_cacache"
         "mkdir -p $HOME/.npm/_logs"

@@ -16,12 +16,6 @@ export const bytes_format = (bytes, number)=>{
     return n+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
 };
 
-export const ga_event = (category, action, label)=>{
-    if (!window.ga)
-        return;
-    window.ga('send', 'event', category, action, label);
-};
-
 const formatted_user_agents = user_agent_gen.map(u=>({
     key: u.name,
     value: u.value,

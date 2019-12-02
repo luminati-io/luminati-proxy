@@ -1300,6 +1300,16 @@ span.icon_link {
                 &[disabled] { opacity: 0.5; }
             }
         }
+        .regex_error {
+            color: @error_dark;
+            display: block;
+            visibility: hidden;
+            padding-bottom: 1em;
+            margin-bottom: -2em;
+            &.active {
+                visibility: visible;
+            }
+        }
     }
 }
 .report_bug {

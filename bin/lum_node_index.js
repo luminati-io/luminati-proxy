@@ -219,32 +219,49 @@ class Lum_node_index {
             break;
         }
     }
+    run_script(script_f, log_f, cb){
+        const opt = {name: 'Luminati Proxy Manager'};
+        const full_path = `$(npm root -g)/${pkg.name}/bin/${script_f}`;
+        const cmd = `bash "${full_path}" ${log_f}`;
+        sudo_prompt.exec(cmd, opt, cb);
+    }
+    handle_upgrade_downgrade_error(e, stderr, log_file, is_downgrade){
+        const script = is_downgrade ? 'downgrade' : 'upgrade';
+        if (e)
+        {
+            const msg = e.message=='User did not grant permission.' ?
+                e.message : zerr.e2s(e);
+            logger.error(`Error during ${script}: ${msg}`);
+            if (!lpm_config.is_win)
+                logger.error(`Look at ${log_file} for more details`);
+            return true;
+        }
+        if (stderr)
+            logger.error(`${script} stderr: ${stderr}`);
+        check_compat();
+    }
     upgrade(cb){
         if (is_pkg)
             return this.upgrade_pkg(cb);
-        const log_file = path.join(lpm_config.work_dir,
-            'luminati_upgrade.log');
-        const npm_cmd = 'npm install --unsafe-perm -g '
-            +'@luminati-io/luminati-proxy';
-        const cmd = lpm_config.is_win ? npm_cmd :
-            `bash -c "${npm_cmd} > ${log_file} 2>&1"`;
-        const opt = {name: 'Luminati Proxy Manager'};
+        const log_file = path.join(lpm_config.work_dir, 'upgrade.log');
         logger.notice('Upgrading proxy manager...');
-        sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
+        this.run_script('lpm_upgrade.sh', log_file, (e, stdout, stderr)=>{
             if (cb)
                 cb(e);
-            if (e)
+            this.handle_upgrade_downgrade_error(e, stderr, log_file);
+        });
+    }
+    downgrade(){
+        const log_file = path.join(lpm_config.work_dir, 'downgrade.log');
+        logger.notice('Downgrading proxy manager...');
+        this.run_script('lpm_downgrade.sh', log_file, (e, stdout, stderr)=>{
+            if (e && e.code==1)
             {
-                const msg = e.message=='User did not grant permission.' ?
-                    e.message : zerr.e2s(e);
-                logger.error('Error during upgrade: '+msg);
-                if (!lpm_config.is_win)
-                    logger.error(`Look at ${log_file} for more details`);
-                return;
+                return logger.warn('Luminati proxy manager backup version '
+                +'does not exist!');
             }
-            if (stderr)
-                logger.error('NPM stderr: '+stderr);
-            check_compat();
+            if (!this.handle_upgrade_downgrade_error(e, stderr, log_file, 1))
+                logger.notice('Downgrade completed successfully');
         });
     }
     upgrade_pkg(cb){
@@ -296,6 +313,8 @@ class Lum_node_index {
                 setTimeout(()=>process.exit(), 5000);
             });
         });
+        if (this.argv.downgrade)
+            return this.downgrade();
         if (!this.argv.upgrade)
             return this.create_child();
         const _this = this;

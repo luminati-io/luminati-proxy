@@ -9,12 +9,11 @@ import instructions from './instructions.js';
 import {Code} from './common.js';
 import {Nav_tabs, Nav_tab} from './common/nav_tabs.js';
 import {T} from './common/i18n.js';
-import {ga_event, swagger_url} from './util.js';
+import {swagger_url} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 
 const Howto = withRouter(class Howto extends Pure_component {
     choose_click = option=>{
-        ga_event('How-to-tab', 'select code/browser', option);
         const pathname = `/howto/${option}`;
         this.props.history.push({pathname});
     };
@@ -66,11 +65,9 @@ const Lang_btn = props=>{
 const Code_instructions = withRouter(
 class Code_instructions extends Pure_component {
     click_lang = lang=>{
-        ga_event('How-to-tab', 'select option', lang);
         const pathname = `/howto/code/${lang}`;
         this.props.history.push({pathname});
     };
-    click_copy = lang=>ga_event('How-to-tab', 'click copy', lang);
     render(){
         const lang = this.props.match.params.suboption||'shell';
         const Lang_btn_clickable = props=>
@@ -96,7 +93,7 @@ class Code_instructions extends Pure_component {
               <div className="well instructions_well">
                 <pre>
                   <code>
-                    <Code on_click={()=>this.click_copy(lang)}>
+                    <Code>
                       <div dangerouslySetInnerHTML={{__html: code}}/>
                     </Code>
                   </code>
@@ -116,7 +113,6 @@ class Browser_instructions extends Pure_component {
     port = window.localStorage.getItem('quickstart-first-proxy')||24000;
     browser_changed = e=>{
         const browser = e.target.value;
-        ga_event('How-to-tab', 'select option', browser);
         const pathname = `/howto/browser/${browser}`;
         this.props.history.push({pathname});
     };

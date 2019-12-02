@@ -11,7 +11,6 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
-import {ga_event} from './util.js';
 import {Modal} from './common/modals.js';
 
 class Config extends Pure_component {
@@ -42,7 +41,6 @@ class Config extends Pure_component {
     check(){
         if (!this.state.changed)
             return;
-        ga_event('configuration', 'click save');
         const _this = this;
         this.etask(function*(){
             const check_url = '/api/config_check';
@@ -53,10 +51,7 @@ class Config extends Pure_component {
             });
             const check = yield raw_check.json();
             if (check.length)
-            {
-                ga_event('configuration', 'wrong format');
                 _this.setState({warning: check[0]});
-            }
             else
                 $('#conf_confirmation_modal').modal();
         });
@@ -71,7 +66,6 @@ class Config extends Pure_component {
         });
     }
     save(){
-        ga_event('configuration', 'click save in modal');
         this.set_editable(false);
         const _this = this;
         this.etask(function*(){
@@ -88,20 +82,17 @@ class Config extends Pure_component {
         });
     }
     download(){
-        ga_event('configuration', 'click download');
         const blob = new Blob([this.cm.doc.getValue()],
             {type: 'text/plain;charset=utf-8'});
         filesaver.saveAs(blob, `${this.state.settings.customer}_config.json`);
     }
     click_edit(){
         this.set_editable(true);
-        ga_event('configuration', 'click edit');
     }
     click_cancel(){
         this.cm.doc.setValue(this.state.persisted_config);
         this.setState({warning: undefined});
         this.set_editable(false);
-        ga_event('configuration', 'click cancel');
     }
     render(){
         const panel_class = classnames('panel code_panel flex_auto vbox', {

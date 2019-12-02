@@ -85,7 +85,6 @@
     "taskkill": "3.1.0",
     "tasklist": "4.0.1",
     "tough-cookie-file-store": "1.2.0",
-    "universal-analytics": "0.4.20",
     "yargs": "14.2.0",
     "open": "7.0.0",
     "prismjs": "1.17.1",
@@ -171,6 +170,9 @@
       "bin/ca.key",
       "bin/check_compat.js",
       "bin/index.js",
+      "bin/lpm_downgrade.sh",
+      "bin/lpm_upgrade.sh",
+      "bin/lpm_util.sh",
       "bin/lum_electron.js",
       "bin/lum_electron_index.js",
       "bin/lum_node.js",
@@ -280,7 +282,6 @@
       "bin/pub/img/zones.svg",
       "bin/pub/img/zone_icon.png",
       "changelog.json",
-      "lib/analytics.js",
       "lib/cities.js",
       "lib/config.js",
       "lib/consts.js",
@@ -384,7 +385,7 @@
       "util/zones.js",
       "webpack.config.js"
     ],
-    "md5": "c1245d6a24185f3104e49c8628a50d86"
+    "md5": "355139edca3fc82924fe152855578cbd"
   },
   "main": "bin/index.js",
   "name": "@luminati-io/luminati-proxy",
@@ -442,5 +443,5 @@
       "node_modules/lum_windows-shortcuts/lib/shortcut/Shortcut.exe"
     ]
   },
-  "version": "1.163.237"
+  "version": "1.163.474"
 }

@@ -11,7 +11,7 @@ import React_tooltip from 'react-tooltip';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
-import {status_codes, bytes_format} from './util.js';
+import {status_codes, bytes_format, report_exception} from './util.js';
 import {Waypoint} from 'react-waypoint';
 import {Toolbar_button, Devider, Sort_icon, with_resizable_cols,
     Toolbar_container, Toolbar_row} from './chrome_widgets.js';
@@ -264,8 +264,11 @@ class Actions extends Pure_component {
         if (!Object.keys(list).length)
             return;
         const uuids = Object.keys(list).filter(o=>list[o]);
+        const _this = this;
         this.etask(function*(){
-            this.on('uncaught', console.error);
+            this.on('uncaught', e=>_this.etask(function*(){
+                yield report_exception(e);
+            }));
             yield window.fetch('/api/logs_resend', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

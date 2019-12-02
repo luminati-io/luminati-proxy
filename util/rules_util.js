@@ -95,8 +95,8 @@ E.migrate_trigger = rule=>{
     }
     else if (t=='post' && rule.status)
     {
-        body += `if (!/${rule.status}/.test(opt.status))\n`
-        +`  return false;\n`;
+        body += `if (!new RegExp(String.raw\`${rule.status}\`)`
+        +`.test(opt.status))\n  return false;\n`;
         type = 'after_hdr';
     }
     else if (t=='post' && rule.max_req_time)
@@ -113,7 +113,7 @@ E.migrate_trigger = rule=>{
     }
     else if (t=='post' && rule.body)
     {
-        body += `if (!/${rule.body}/.test(opt.body))\n`
+        body += `if (!new RegExp(String.raw\`${rule.body}\`).test(opt.body))\n`
         +`  return false;\n`;
         type = 'after_body';
     }
@@ -121,7 +121,7 @@ E.migrate_trigger = rule=>{
         type = 'after_body';
     if (rule.url)
     {
-        body += `if (!/${rule.url}/.test(opt.url))\n`
+        body += `if (!new RegExp(String.raw\`${rule.url}\`).test(opt.url))\n`
         +`  return false;\n`;
     }
     body += `return true;`;

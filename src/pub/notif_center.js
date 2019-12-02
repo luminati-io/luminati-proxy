@@ -3,7 +3,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import {ga_event} from './util.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import semver from 'semver';
@@ -53,13 +52,11 @@ class Notif_center extends Pure_component {
     open(){
         if (this.state.loaded)
         {
-            ga_event('notif-center', 'open');
             this.mark_read();
             $('#notif_modal').modal();
         }
     }
     message_clicked(message){
-        ga_event('notif-center', 'notif-clicked', message.title);
         this.etask(function*(){
             yield window.fetch('/api/update_notifs', {
                 method: 'POST',

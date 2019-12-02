@@ -7,9 +7,9 @@ const file = require('../util/file.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const lpm_util = require('../util/lpm_util.js');
-require('../lib/perr.js').run({});
+const perr = require('../lib/perr.js');
+perr.run({});
 const _ = require('lodash');
-const analytics = require('../lib/analytics.js');
 const E = module.exports = {};
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
@@ -237,7 +237,7 @@ E.run = (argv, run_config)=>etask(function*(){
             if (fatal)
                 E.manager.stop();
         };
-        if (!analytics.enabled || e.raw)
+        if (!perr.enabled || e.raw)
             handle_fatal();
         else
         {
@@ -266,8 +266,7 @@ E.run = (argv, run_config)=>etask(function*(){
 });
 
 E.handle_upgrade_finished = msg=>{
-    if (E.on_upgrade_finished)
-        E.on_upgrade_finished(msg.error);
+    E.on_upgrade_finished(msg.error);
     E.on_upgrade_finished = undefined;
     if (msg.error)
         zerr.perr('upgrade_error', perr_info({error: msg.error}));

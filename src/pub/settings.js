@@ -5,7 +5,7 @@ import React from 'react';
 import {Labeled_controller, Nav, Loader_small} from './common.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
-import {ga_event, report_exception} from './util.js';
+import {report_exception} from './util.js';
 import _ from 'lodash';
 import {Select_zone, Pins} from './common/controls.js';
 
@@ -59,12 +59,10 @@ class Form extends Pure_component {
         });
     }
     zone_change = val=>{
-        ga_event('settings', 'change_field', 'zone');
         this.setState(prev=>({settings: {...prev.settings, zone: val}}),
             this.debounced_save);
     };
     whitelist_ips_change = val=>{
-        ga_event('settings', 'change_field', 'whitelist_ips');
         this.setState(
             ({settings})=>{
                 const whitelist_ips = val.filter(
@@ -74,7 +72,6 @@ class Form extends Pure_component {
             this.debounced_save);
     };
     www_whitelist_ips_change = val=>{
-        ga_event('settings', 'change_field', 'www_whitelist_ips');
         this.setState(
             prev=>({settings: {...prev.settings, www_whitelist_ips: val}}),
             this.debounced_save);
@@ -88,7 +85,6 @@ class Form extends Pure_component {
             this.debounced_save);
     };
     request_stats_changed = val=>{
-        ga_event('settings', 'change_field', 'request_stats');
         this.setState(
             prev=>({settings: {...prev.settings, request_stats: val}}),
             this.debounced_save);
@@ -100,7 +96,6 @@ class Form extends Pure_component {
             this.resave = true;
             return;
         }
-        ga_event('settings', 'save', 'start');
         this.lock_nav(true);
         this.setState({saving: true});
         this.saving = true;
@@ -108,13 +103,11 @@ class Form extends Pure_component {
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e);
-                ga_event('settings', 'save', 'failed');
             }));
             this.on('finally', ()=>{
                 _this.setState({saving: false});
                 _this.saving = false;
                 _this.lock_nav(false);
-                ga_event('settings', 'save', 'successful');
                 if (_this.resave)
                 {
                     delete _this.resave;

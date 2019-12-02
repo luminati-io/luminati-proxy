@@ -538,7 +538,10 @@ class Trigger extends Pure_component {
                   data={ssl ? trigger_types : no_ssl_trigger_types}
                   on_change={this.trigger_changed} rule={rule}/>
                 {rule.trigger_type=='body' &&
-                  <Rule_config id="body_regex" type="text" rule={rule}/>}
+                  <Rule_config id="body_regex" type="regex_text" rule={rule}
+                    field_row_inner_style={{paddingBottom: '1em'}}
+                    style={{borderRadius: '4px'}}
+                    />}
                 {rule.trigger_type=='min_req_time' &&
                   <Rule_config id="min_req_time" type="select_number"
                     range="ms" sufix="milliseconds" rule={rule}/>
@@ -552,7 +555,8 @@ class Trigger extends Pure_component {
                 }
                 {rule.trigger_type &&
                   <Rule_config id="trigger_url_regex" type="regex"
-                    rule={rule} style={{width: '100%'}}/>}
+                    rule={rule} style={{width: '100%'}}
+                    field_row_inner_style={{paddingBottom: '1em'}}/>}
               </div>
               <Trigger_code rule={rule}
                 type_changed={()=>change_ui_block(true)}

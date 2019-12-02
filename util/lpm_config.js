@@ -68,7 +68,6 @@ conf.manager_default = Object
     www: 22999,
     www_whitelist_ips: [],
     whitelist_ips: [],
-    ws: 22998,
     dropin: true,
     dropin_port: 22225,
     no_usage_stats: false,

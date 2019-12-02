@@ -343,7 +343,7 @@ describe('migration', ()=>{
         t('simple', {}, `function trigger(opt){\n`
             +`  return true;\n}`, 'before_send');
         t('with url', {url: 'facebook'}, `function trigger(opt){\n`
-            +`  if (!/facebook/.test(opt.url))\n`
+            +`  if (!new RegExp(String.raw\`facebook\`).test(opt.url))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'before_send');
         t('min_req_time / retry', {min_req_time: 200, action_type: 'retry',
@@ -354,7 +354,7 @@ describe('migration', ()=>{
             min_req_time: 200, action_type: 'retry_port', url: 'facebook'},
             `function trigger(opt){\n`
             +`  opt.timeout = 200;\n`
-            +`  if (!/facebook/.test(opt.url))\n`
+            +`  if (!new RegExp(String.raw\`facebook\`).test(opt.url))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'timeout');
         t('min_req_time ban_ip', {min_req_time: 100, action_type: 'ban_ip',
@@ -364,14 +364,14 @@ describe('migration', ()=>{
             +`  return true;\n}`, 'after_hdr');
         t('status_code', {status: '200'},
             `function trigger(opt){\n`
-            +`  if (!/200/.test(opt.status))\n`
+            +`  if (!new RegExp(String.raw\`200\`).test(opt.status))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'after_hdr');
         t('status_code with url', {status: '(4|5)..', url: 'facebook'},
             `function trigger(opt){\n`
-            +`  if (!/(4|5)../.test(opt.status))\n`
+            +`  if (!new RegExp(String.raw\`(4|5)..\`).test(opt.status))\n`
             +`    return false;\n`
-            +`  if (!/facebook/.test(opt.url))\n`
+            +`  if (!new RegExp(String.raw\`facebook\`).test(opt.url))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'after_hdr');
         t('max_req_time', {max_req_time: 500}, `function trigger(opt){\n`
@@ -379,7 +379,7 @@ describe('migration', ()=>{
             +`    return false;\n`
             +`  return true;\n}`, 'after_hdr');
         t('http body', {body: 'captcha'}, `function trigger(opt){\n`
-            +`  if (!/captcha/.test(opt.body))\n`
+            +`  if (!new RegExp(String.raw\`captcha\`).test(opt.body))\n`
             +`    return false;\n`
             +`  return true;\n}`, 'after_body');
         t('process data', {action: {process: {
