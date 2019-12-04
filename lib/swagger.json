@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.163.474",
+        "version": "1.163.762",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -565,207 +565,6 @@
                 "responses": {
                     "204": {
                         "description": "Successful response"
-                    }
-                }
-            }
-        },
-        "/proxies/{port}/link_test.json": {
-            "get": {
-                "description": "Link Tester API. See all the redirections for a given URL",
-                "tags": ["Proxy"],
-                "parameters": [
-                    {
-                        "name": "port",
-                        "in": "path",
-                        "description": "Existing proxy port",
-                        "required": true,
-                        "type": "integer"
-                    },
-                    {
-                        "name": "url",
-                        "in": "query",
-                        "description": "Target URL that needs to be tested",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "screenshot",
-                        "in": "query",
-                        "description": "Flag determining if to take a screenshot of the final page",
-                        "required": false,
-                        "type": "boolean"
-                    },
-                    {
-                        "name": "html",
-                        "in": "query",
-                        "description": "Flag determining if to include the full html body of the final page",
-                        "required": false,
-                        "type": "boolean"
-                    },
-                    {
-                        "name": "country",
-                        "in": "query",
-                        "description": "Target country in ISO 3166-1 alpha-2 format, e.g 'us' for United States",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "state",
-                        "in": "query",
-                        "description": "Target state, e.g 'ny' for New York",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "city",
-                        "in": "query",
-                        "description": "The city from which IP will be allocated",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "user_agent",
-                        "in": "query",
-                        "description": "Content of the User-Agent header",
-                        "required": false,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "redirects": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "url": {"type": "string"},
-                                            "code": {"type": "integer"},
-                                            "req_log": {"type": "object"}
-                                        }
-                                    }
-                                },
-                                "redirects_count": {"type": "number"},
-                                "err": {"type": "string"}
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request. Invalid proxy port"
-                    },
-                    "422": {
-                        "description": "Unprocessable entity. Proxy port does not have SSL Analyzing on"
-                    }
-                }
-            },
-            "post": {
-                "description": "Link Tester API. See all the redirections for a given URL",
-                "tags": ["Proxy"],
-                "parameters": [
-                    {
-                        "name": "port",
-                        "in": "path",
-                        "description": "Existing proxy port",
-                        "required": true,
-                        "type": "integer"
-                    },
-                    {
-                        "name": "url",
-                        "in": "query",
-                        "description": "Target URL that needs to be tested",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "screenshot",
-                        "in": "query",
-                        "description": "Flag determining if to take a screenshot of the final page",
-                        "required": false,
-                        "type": "boolean"
-                    },
-                    {
-                        "name": "html",
-                        "in": "query",
-                        "description": "Flag determining if to include the full html body of the final page",
-                        "required": false,
-                        "type": "boolean"
-                    },
-                    {
-                        "name": "country",
-                        "in": "query",
-                        "description": "Target country in ISO 3166-1 alpha-2 format, e.g 'us' for United States",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "state",
-                        "in": "query",
-                        "description": "Target state, e.g 'ny' for New York",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "city",
-                        "in": "query",
-                        "description": "The city from which IP will be allocated",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "user_agent",
-                        "in": "query",
-                        "description": "Content of the User-Agent header",
-                        "required": false,
-                        "type": "string"
-                    },
-                    {
-                        "name": "options",
-                        "in": "body",
-                        "description": "Link tester options",
-                        "required": false,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "headers": {
-                                    "type": "object",
-                                    "example": {
-                                        "Content-Type": "application/json"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "redirects": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "url": {"type": "string"},
-                                            "code": {"type": "integer"},
-                                            "req_log": {"type": "object"}
-                                        }
-                                    }
-                                },
-                                "redirects_count": {"type": "number"},
-                                "err": {"type": "string"}
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request. Invalid proxy port"
-                    },
-                    "422": {
-                        "description": "Unprocessable entity. Proxy port does not have SSL Analyzing on"
                     }
                 }
             }
@@ -1416,11 +1215,6 @@
                     "items": {"type": "string"},
                     "description": "Whitelist ip list for granting access to browser admin UI"
                 },
-                "log": {
-                    "type": "string",
-                    "pattern": "^(error|warn|notice|info|debug)?$",
-                    "description": "Log level"
-                },
                 "www": {
                     "type": "integer",
                     "description": "HTTP and WebSocket port used for browser admin UI and request logs"
@@ -1488,10 +1282,6 @@
                 "read_only": {
                     "type": "boolean",
                     "description": "Avoid saving current config in the config file"
-                },
-                "log_level": {
-                    "type": "string",
-                    "description": "Log level: error, warn, notice, info, debug"
                 }
             }
         },
@@ -1501,6 +1291,11 @@
                 "port": {
                     "type": "integer",
                     "description": "Port for the HTTP proxy"
+                },
+                "log": {
+                    "type": "string",
+                    "pattern": "^(error|warn|notice|info|debug)?$",
+                    "description": "Log level"
                 },
                 "proxy_type": {
                      "type": "string",

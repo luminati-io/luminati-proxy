@@ -19,6 +19,7 @@ const presets = {
             {field: 'pool_size', label: `Sets 'Pool size' to 1`},
         ],
         disabled: {
+            pool_size: true,
             sticky_ip: true,
             session: true,
             max_requests: true,

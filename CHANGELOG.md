@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.762 Stable
+- :star: Added x-lpm-* headers support for country, state and city
+- :bug: Fixed external IPs rotating in SSL analyzing mode
+
 ## 1.163.474 Stable
 - :star: Added --downgrade option that will downgrade LPM to the version before upgrades
 - :star: Removed usage of Google Analytics

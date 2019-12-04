@@ -88,9 +88,6 @@ export const swagger_url = 'http://petstore.swagger.io/?url=https://'
 +'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/'
 +'swagger.json#/Proxy';
 
-export const swagger_link_tester_url = swagger_url
-+'/get_proxies__port__link_test_json';
-
 export const report_exception = error=>etask(function*(){
     this.on('uncaught', e=>console.log(e));
     const {message=error, stack}=error;

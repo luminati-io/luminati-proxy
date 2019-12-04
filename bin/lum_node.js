@@ -2,7 +2,6 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const Manager = require('../lib/manager.js');
-const Tracer = require('../lib/tracer.js');
 const file = require('../util/file.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
@@ -46,7 +45,6 @@ E.shutdown = (reason, error=null)=>{
         logger.error(`Shutdown, reason is ${reason}: ${zerr.e2s(error)}`);
     else
         logger.notice(`Shutdown, reason is ${reason}`);
-    file.rm_rf_e(Tracer.screenshot_dir);
 };
 
 E.handle_signal = (sig, err)=>{

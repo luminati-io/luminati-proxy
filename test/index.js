@@ -741,6 +741,45 @@ describe('proxy', ()=>{
                     r.headers['x-lpm-authorization'].includes(`ip-${ip}`));
             }));
         });
+        describe('request country choice', ()=>{
+            it('should use country sent in x-lpm-country header',
+                ()=>etask(function*(){
+                    l = yield lum();
+                    const country = 'us';
+                    const r = yield l.test({headers:
+                        {'x-lpm-country': country}});
+                    assert.ok(r.headers['x-lpm-authorization']
+                        .includes(`country-${country}`));
+                }));
+        });
+        describe('request state choice', ()=>{
+            it('should use state sent in x-lpm-state header',
+                ()=>etask(function*(){
+                    l = yield lum();
+                    const state = 'us';
+                    const r = yield l.test({headers: {'x-lpm-state': state}});
+                    assert.ok(r.headers['x-lpm-authorization']
+                        .includes(`state-${state}`));
+                }));
+        });
+        describe('request city choice', ()=>{
+            it('should use city sent in x-lpm-city header',
+                ()=>etask(function*(){
+                    l = yield lum();
+                    const city = 'washington';
+                    const r = yield l.test({headers: {'x-lpm-city': city}});
+                    assert.ok(r.headers['x-lpm-authorization']
+                        .includes(`city-${city}`));
+                }));
+            it('should use escaped city sent in x-lpm-city header',
+                ()=>etask(function*(){
+                    l = yield lum();
+                    const city = 'New-York';
+                    const r = yield l.test({headers: {'x-lpm-city': city}});
+                    assert.ok(r.headers['x-lpm-authorization']
+                        .includes(`city-newyork`));
+                }));
+        });
         describe('user_agent', ()=>{
             it('should use User-Agent header',
             ()=>etask(function*(){

@@ -1748,63 +1748,6 @@ span.icon_link {
         }
     }
 }
-.tracer {
-    select, input { width: 100%; }
-    padding: 0 15px;
-    .request {
-        .fields {
-            display: flex;
-            .field {
-                margin: 0 5px;
-                &:first-child { margin-left: 0; }
-                &:last-child { margin-right: 0; }
-                &.url { flex: auto }
-                &.uid { flex: auto }
-                .title {
-                    margin-bottom: 3px;
-                    margin-left: 2px;
-                }
-            }
-        }
-        .go_btn_wrapper {
-            margin-top: 10px;
-            .btn { margin: 0; }
-        }
-    }
-    .live_preview {
-        position: relative;
-        display: inline-block;
-        margin-top: 30px;
-        padding: 10px;
-        border: solid 1px #ddd;
-        width: 822px;
-        height: 622px;
-        .loader_wrapper {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            .mask { display: none; }
-            .loader { position: absolute; }
-        }
-    }
-    .single_instruction { overflow-wrap: break-word; }
-    .step_title {
-        display: inline-flex;
-    }
-    .preview_wrapper {
-        overflow: hidden;
-        height: 0;
-        transition: height .3s;
-        .har_preview {
-            margin-top: 10px;
-            border: 1px solid #cdcdcd;
-        }
-        &.open { height: 260px; }
-    }
-    .status_code { margin-left: 3px; }
-}
 .proxy_tester {
     select, input { width: 100%; }
     height: 100%;
@@ -2117,7 +2060,6 @@ span.icon_link {
         .proxies { background-image: url('img/proxies.svg'); }
         .overview { background-image: url('img/proxies.svg'); }
         .logs { background-image: url('img/stats.svg'); }
-        .tracer { background-image: url('img/zones.svg'); }
         .proxy_tester { background-image: url('img/tester.svg'); }
         .tools { background-image: url('img/tools.svg'); }
         .config { background-image: url('img/tools.svg'); }

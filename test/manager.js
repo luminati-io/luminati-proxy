@@ -139,7 +139,7 @@ describe('manager', ()=>{
         const opt = {
             url: admin+'/'+_path,
             method: method||'GET',
-            json: json,
+            json,
             body: data,
             headers: headers || {'x-lpm-fake': true},
         };

@@ -61,6 +61,7 @@ conf.server_default = {
     session: true,
     override_headers: true,
     bw_limit: 0,
+    log: 'notice',
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.server_default, 'port'), {
@@ -72,7 +73,6 @@ conf.manager_default = Object
     dropin_port: 22225,
     no_usage_stats: false,
     request_stats: true,
-    log: 'notice',
     logs: 1000,
     reverse_lookup_dns: false,
     force: false,

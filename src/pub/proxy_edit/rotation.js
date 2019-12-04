@@ -56,11 +56,10 @@ export default class Rotation extends Pure_component {
               <a className="link" onClick={this.move_to_ssl}>SSL analyzing</a>
               <span> is turned on.</span>
             </Note>;
-        const pool_size_disabled = form.ips.length||form.vips.length;
         return <div className="rotation">
               <Tab_context.Provider value="rotation">
                 <Config type="select_number" id="pool_size"
-                  note={pool_size_note} disabled={pool_size_disabled}/>
+                  note={pool_size_note}/>
                 <Config type="select_number" id="max_requests"/>
                 <Config type="select_number" id="session_duration"
                   sufix="seconds"/>

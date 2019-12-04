@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.163.762",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added x-lpm-* headers support for country, state and city"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed external IPs rotating in SSL analyzing mode"
+            }
+        ]
+    },
+    {
         "ver": "1.163.474",
         "type": "stable",
         "changes": [

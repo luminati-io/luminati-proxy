@@ -14,6 +14,7 @@ const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
 const logger = require('../lib/logger.js');
+const ssl = require('../lib/ssl.js');
 const lpm_config = require('../util/lpm_config.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
@@ -186,6 +187,10 @@ class Lum_node_index {
         yield this.wait();
         });
     }
+    gen_cert(){
+        logger.notice('Generating cert');
+        ssl.gen_cert();
+    }
     restart_on_child_exit(){
         if (!this.child)
             return;
@@ -291,6 +296,8 @@ class Lum_node_index {
             return this.show_status();
         if (this.argv.showLogs)
             return this.show_logs();
+        if (this.argv.genCert)
+            return this.gen_cert();
         this.init_log();
         if (lpm_config.is_win)
         {
