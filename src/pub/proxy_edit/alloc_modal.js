@@ -7,16 +7,14 @@ import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import zurl from '../../../util/url.js';
 import {Modal} from '../common/modals.js';
-import {Pagination_panel, Link_icon, Checkbox} from '../common.js';
+import {Checkbox} from '../common.js';
 import {report_exception} from '../util.js';
+import {Chrome_table} from '../chrome_widgets.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     state = {
         available_list: [],
-        displayed_list: [],
-        cur_page: 0,
-        items_per_page: 20,
     };
     componentDidMount(){
         this.setdb_on('head.proxy_edit.zone_name', ()=>
@@ -41,7 +39,7 @@ export default class Alloc_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'alloc_modal.Alloc_modal.load');
                 _this.loading(false);
             }));
             const res = yield ajax.json({url});
@@ -62,9 +60,9 @@ export default class Alloc_modal extends Pure_component {
                 if (!chosen_set.has(v))
                     not_chosen_set.add(v);
             });
-            const available_list = [...chosen_set, ...not_chosen_set];
-            _this.setState({available_list, cur_page: 0},
-                _this.sync_selected_vals);
+            const available_list = [...chosen_set, ...not_chosen_set]
+                .slice(0, 200);
+            _this.setState({available_list}, _this.sync_selected_vals);
             _this.loading(false);
         });
     };
@@ -74,17 +72,6 @@ export default class Alloc_modal extends Pure_component {
             this.state.available_list.includes(v));
         this.set_field(this.props.type, new_vals);
         this.update_multiply_and_pool_size(new_vals.length);
-        this.paginate();
-    };
-    paginate = (page=-1)=>{
-        page = page>-1 ? page : this.state.cur_page;
-        const pages = Math.ceil(
-            this.state.available_list.length/this.state.items_per_page);
-        const cur_page = Math.min(pages, page);
-        const displayed_list = this.state.available_list.slice(
-            cur_page*this.state.items_per_page,
-            (cur_page+1)*this.state.items_per_page);
-        this.setState({displayed_list, cur_page});
     };
     loading = loading=>{
         setdb.set('head.proxy_edit.loading', loading);
@@ -129,7 +116,8 @@ export default class Alloc_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e,
+                    'alloc_modal.Alloc_modal.refresh.uncaught');
             }));
             this.on('finally', ()=>{
                 _this.loading(false);
@@ -149,14 +137,16 @@ export default class Alloc_modal extends Pure_component {
             }
             const res = yield ajax.json({method: 'POST', url, data});
             if (res.error || !res.ips && !res.vips)
-                return void (yield report_exception(res.error));
+            {
+                return void (yield report_exception(res.error,
+                    'alloc_modal.Alloc_modal.refresh'));
+            }
             const new_vals = _this.props.type=='ips' ?
                 res.ips.map(i=>i.ip) : res.vips.map(v=>v.vip);
             const norm_vals = _this.normalize_vals(new_vals);
             const map = _this.map_vals(norm_vals);
             const new_ips = _this.props.form.ips.map(val=>map[val]);
             const new_vips = _this.props.form.vips.map(val=>map[val]);
-            _this.setState({available_list: norm_vals}, _this.paginate);
             _this.set_field('ips', new_ips);
             _this.set_field('vips', new_vips);
             yield _this.update_other_proxies(map);
@@ -182,7 +172,8 @@ export default class Alloc_modal extends Pure_component {
         if (old_vals.length!=new_vals.length)
         {
             this.etask(function*(){
-                yield report_exception('error ips/vips length mismatch');
+                yield report_exception('error ips/vips length mismatch',
+                   'alloc_modal.Alloc_modal.normalize_vals');
                 return;
             });
         }
@@ -223,65 +214,47 @@ export default class Alloc_modal extends Pure_component {
             this.set_field('multiply', size);
         }
     };
-    update_items_per_page = items_per_page=>
-        this.setState({items_per_page}, ()=>this.paginate(0));
-    page_change = page=>this.paginate(page-1);
     is_refresh_enabled = ()=>{
         const {plan, type} = this.props;
         return type!='ips' || !!plan.ips;
     };
+    cols = [
+        {id: 'ip', title: 'IP'},
+    ];
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';
         const title = 'Select the '+type_label+' ('+this.props.zone+')';
         const refresh_enabled = this.is_refresh_enabled();
         const Footer = <div className="default_footer">
               {refresh_enabled &&
-                  <button onClick={this.refresh_chosen}
-                    className="btn btn_lpm">Refresh</button>
+                <button onClick={this.refresh_chosen}
+                  className="btn btn_lpm">Refresh</button>
               }
               <button onClick={this.close}
                 className="btn btn_lpm btn_lpm_primary">OK</button>
             </div>;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
               title={title} footer={Footer}>
-              <Pagination_panel
-                entries={this.state.available_list}
-                items_per_page={this.state.items_per_page}
-                cur_page={this.state.cur_page}
-                page_change={this.page_change} top
-                update_items_per_page={this.update_items_per_page}>
-                <Link_icon tooltip="Unselect all" on_click={this.reset}
-                  id="unchecked"/>
-                <Link_icon tooltip="Select all"
-                  on_click={this.select_all} id="check"/>
-              </Pagination_panel>
-              {this.state.displayed_list.map(row=>
-                <Entry toggle={this.toggle} key={row} val={row}
-                  checked={this.checked(row)} refresh={this.refresh_one}
-                  refresh_enabled={refresh_enabled}/>
-              )}
-              <Pagination_panel
-                entries={this.state.available_list}
-                items_per_page={this.state.items_per_page}
-                cur_page={this.state.cur_page}
-                page_change={this.page_change} bottom
-                update_items_per_page={this.update_items_per_page}>
-                <Link_icon tooltip="Unselect all"
-                  on_click={this.reset} id="unchecked"/>
-                <Link_icon tooltip="Select all"
-                  on_click={this.select_all.bind(this)} id="check"/>
-              </Pagination_panel>
+              <Chrome_table cols={this.cols} class_name="in_modal_table"
+                selectable selected_all={this.state.selected_all}
+                toggle_all={this.select_all}>
+                {this.state.available_list.map(ip=>
+                  <tr key={ip}>
+                    <td>
+                      <Checkbox checked={this.checked(ip)}
+                        on_change={this.toggle} value={ip} text={ip}/>
+                    </td>
+                    <td>
+                    {ip}
+                    {refresh_enabled &&
+                      <div className="chrome_icon refresh"
+                        onClick={()=>this.refresh_one(ip)}
+                        style={{top: 1, position: 'relative', left: 3}}/>
+                    }
+                    </td>
+                  </tr>
+                )}
+              </Chrome_table>
             </Modal>;
     }
 }
-
-const Entry = props=>
-    <div style={{display: 'flex'}}>
-      <Checkbox on_change={props.toggle} text={props.val}
-        value={props.val} checked={props.checked}/>
-      {props.refresh_enabled &&
-          <div className="chrome_icon refresh"
-            onClick={()=>props.refresh(props.val)}
-            style={{top: 1, position: 'relative', left: 3}}/>
-      }
-    </div>;

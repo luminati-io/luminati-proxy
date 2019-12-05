@@ -22,7 +22,6 @@ module.exports = {
         publicPath: '/',
         filename: '[chunkhash].[name].js',
     },
-    devtool: 'nosources-source-map',
     plugins: [
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new webpack.optimize.CommonsChunkPlugin({

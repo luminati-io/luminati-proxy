@@ -554,7 +554,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'proxies.Proxies.req_status');
             }));
             const params = {};
             if (_this.props.master_port)
@@ -757,15 +757,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               </div>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns}/>
-              <Fetching_chrome_modal/>
             </div>;
     }
 });
-
-const Fetching_chrome_modal = ()=>
-    <Modal id="fetching_chrome_modal"
-      title="Chrome is being fetched now. Please wait..." no_cancel_btn>
-    </Modal>;
 
 class Toolbar extends Pure_component {
     state = {open_delete_dialog: false};
@@ -903,7 +897,7 @@ class Actions extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'proxies.Actions.duplicate');
             }));
             yield window.fetch('/api/proxy_dup', {
                 method: 'POST',

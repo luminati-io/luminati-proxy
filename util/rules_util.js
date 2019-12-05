@@ -129,10 +129,6 @@ E.migrate_trigger = rule=>{
         trigger_code: gen_function('trigger', body)});
 };
 
-E.migrate_action = rule=>{
-    return Object.assign({}, rule, {action_code: get_action(rule)});
-};
-
 const stringify_obj = obj=>{
     let str = '{';
     const keys = Object.keys(obj);
@@ -146,47 +142,4 @@ const stringify_obj = obj=>{
             str += ', ';
     }
     return str + '}';
-};
-
-const get_action = rule=>{
-    let body = '';
-    if (!rule.action)
-        return '';
-    if (rule.action.email)
-        body += `opt.notify({mail: '${rule.action.email}'});\n`;
-    if (rule.action.retry)
-        body += `opt.retry(${+rule.action.retry});\n`;
-    if (rule.action.retry_port)
-        body += `opt.retry({port: ${rule.action.retry_port}});\n`;
-    if (rule.action.ban_ip!=undefined)
-        body += `opt.ban_ip({ts: ${rule.action.ban_ip}});\n`;
-    if (rule.action.ban_ip_global!=undefined)
-    {
-        body += `opt.ban_ip({ts: ${rule.action.ban_ip_global}, `
-            +`global: true});\n`;
-    }
-    if (rule.action.ban_ip_domain!=undefined)
-    {
-        body += `opt.ban_ip({ts: ${rule.action.ban_ip_domain}, `
-        +`per_domain: true});\n`;
-    }
-    if (rule.action.refresh_ip)
-        body += `opt.refresh_ip();\n`;
-    if (rule.action.reserve_session)
-        body += `opt.save_to_pool();\n`;
-    if (rule.action.process)
-        body += `opt.process(${JSON.stringify(rule.action.process)});\n`;
-    if (rule.action.request_url)
-    {
-        const str = stringify_obj(rule.action.request_url);
-        body += `opt.request_url(${str});\n`;
-    }
-    if (rule.action.null_response)
-        body += `opt.null_response();\n`;
-    if (rule.action.direct)
-        body += `opt.direct()\n`;
-    if (rule.action.bypass_proxy)
-        body += `opt.bypass_proxy()\n`;
-    body += `return true;`;
-    return gen_function('action', body);
 };

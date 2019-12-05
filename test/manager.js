@@ -20,6 +20,7 @@ const pkg = require('../package.json');
 const qw = require('../util/string.js').qw;
 const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
+const util_lib = require('../lib/util.js');
 const lpm_config = require('../util/lpm_config.js');
 const assign = Object.assign;
 const {stub: sstub, match: smatch} = sinon;
@@ -273,6 +274,7 @@ describe('manager', ()=>{
             assert.equal(report.desc, desc);
             assert.equal(report.email, email);
             assert.equal(report.browser, user_agent.guess_browser(ua).browser);
+            assert.equal(report.os, util_lib.format_platform(os.platform()));
             sinon.assert.calledWith(res.status, 200);
             sinon.assert.calledWith(res.json, 'ok');
         }));

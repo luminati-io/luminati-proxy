@@ -251,7 +251,7 @@ const Index = withRouter(class Index extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'proxy_edit/index.Index.save');
                 _this.setState({error_list: [{msg: 'Something went wrong'}]});
                 $('#save_proxy_errors').modal('show');
             }));
@@ -414,7 +414,9 @@ class Open_browser_btn extends Pure_component {
         const _this = this;
         this.etask(function*(){
             const url = `/api/browser/${_this.props.port}`;
-            yield ajax.get(url);
+            const res = yield window.fetch(url);
+            if (res.status==206)
+                $('#fetching_chrome_modal').modal();
         });
     };
     render(){

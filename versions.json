@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.163.916",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Added OS support for submitting bug report"
+            },
+            {
+                "type": "sparkles",
+                "text": "Improved fe_warn metrics"
+            }
+        ]
+    },
+    {
         "ver": "1.163.762",
         "type": "stable",
         "changes": [

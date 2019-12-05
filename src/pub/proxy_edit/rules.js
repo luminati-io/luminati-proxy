@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import conv from '../../../util/conv.js';
-import {migrate_trigger, migrate_action, no_ssl_trigger_types, trigger_types,
+import {migrate_trigger, no_ssl_trigger_types, trigger_types,
     action_types, default_action, WWW_API} from '../../../util/rules_util.js';
 import {ms} from '../../../util/date.js';
 import zutil from '../../../util/util.js';
@@ -466,32 +466,9 @@ class Action extends Pure_component {
                     note={<Email_note www={defaults.www_api}/>}/>
                 }
               </div>
-              <Action_code rule={rule}/>
             </React.Fragment>;
     }
 }));
-
-class Action_code extends Pure_component {
-    state = {};
-    on_change = val=>{
-        console.log(val);
-    };
-    static getDerivedStateFromProps(props, state){
-        const prepared = rule_prepare(props.rule);
-        const {action_code} = migrate_action(prepared)||{};
-        return {action_code};
-    }
-    render(){
-        const tip = 'See the action as JavaScript function. Currently it '
-        +'is Read-only. We are working on support for editing.';
-        return <Tooltip title={tip}>
-            <div className="action code">
-              <Cm_wrapper on_change={this.on_change} readonly
-                val={this.state.action_code}/>
-            </div>
-        </Tooltip>;
-    }
-}
 
 class Trigger extends Pure_component {
     trigger_changed = val=>{

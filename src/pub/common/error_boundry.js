@@ -2,6 +2,7 @@
 'use strict'; /*jslint react:true*/
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
+import {perr} from '../util.js';
 
 export default class Error_boundry extends Pure_component {
     state = {error: false};
@@ -13,14 +14,7 @@ export default class Error_boundry extends Pure_component {
     }
     log_error = (error, info)=>{
         const {message, stack} = error;
-        this.etask(function*(){
-            yield window.fetch('/api/error', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({type: 'react', backtrace: stack, message,
-                    stack: info.componentStack}),
-            });
-        });
+        perr('react', message, info.componentStack+'\n\n'+stack);
     };
     render(){
         if (this.state.error)

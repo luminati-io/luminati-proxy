@@ -88,12 +88,16 @@ export const swagger_url = 'http://petstore.swagger.io/?url=https://'
 +'raw.githubusercontent.com/luminati-io/luminati-proxy/master/lib/'
 +'swagger.json#/Proxy';
 
-export const report_exception = error=>etask(function*(){
+export const report_exception = (error, context)=>etask(function*(){
     this.on('uncaught', e=>console.log(e));
-    const {message=error, stack}=error;
-    yield window.fetch('/api/error', {
+    const {message=error} = error;
+    yield perr('fe_warn', message, null, context);
+});
+
+export const perr = (type, message, stack, context)=>etask(function*(){
+    yield window.fetch('/api/perr', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({type: 'fe_warn', message, stack}),
+        body: JSON.stringify({type, message, stack, context}),
     });
 });

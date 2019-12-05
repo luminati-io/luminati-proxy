@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.163.916 Stable
+- :sparkles: Added OS support for submitting bug report
+- :sparkles: Improved fe_warn metrics
+
 ## 1.163.762 Stable
 - :star: Added x-lpm-* headers support for country, state and city
 - :bug: Fixed external IPs rotating in SSL analyzing mode

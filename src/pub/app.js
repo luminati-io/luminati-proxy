@@ -24,6 +24,7 @@ import {Logs, Dock_logs} from './logs.js';
 import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
+import {Modal} from './common/modals.js';
 import './app.less';
 import ws from './ws.js';
 import {report_exception} from './util.js';
@@ -42,7 +43,7 @@ const App = withRouter(class App extends Pure_component {
         });
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'app.App.componentDidMount');
             }));
             const mode = yield window.fetch('/api/mode');
             let block_ip;
@@ -191,6 +192,9 @@ const Old_modals = ()=>
           </div>
         </div>
       </div>
+      <Modal id="fetching_chrome_modal"
+        title="Downloading Chromium. Please wait..." no_cancel_btn>
+      </Modal>
     </div>;
 
 const Page = ()=>

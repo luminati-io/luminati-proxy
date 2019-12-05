@@ -9,6 +9,7 @@ import $ from 'jquery';
 import semver from 'semver';
 import {T} from './common/i18n.js';
 import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
+import {perr} from './util.js';
 import Tooltip from './common/tooltip.js';
 import setdb from '../../util/setdb.js';
 
@@ -83,7 +84,9 @@ const Tls_warning = with_www_api(props=>{
             <span>
               Your browser or crawler has to install the certificate. </span>
             <a target="_blank" rel="noopener noreferrer" className="link"
-              href={faq_url}>Check the instructions here.</a>
+              onClick={()=>perr('tls.check_instructions')} href={faq_url}>
+              Check the instructions.
+            </a>
           </span>
         </Warning>;
 });

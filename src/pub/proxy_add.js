@@ -64,7 +64,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         const _this = this;
         return etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'proxy_add.Proxy_add.persist');
                 _this.setState({show_loader: false});
             }));
             const proxies = yield ajax.json({url: '/api/proxies_running'});
@@ -89,7 +89,7 @@ const Proxy_add = withRouter(class Proxy_add extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'proxy_add.Proxy_add.save');
             }));
             _this.setState({show_loader: true});
             const resp = yield _this.persist();

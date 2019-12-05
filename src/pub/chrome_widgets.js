@@ -5,7 +5,6 @@ import Pure_component from '/www/util/pub/pure_component.js';
 import classnames from 'classnames';
 import _ from 'lodash';
 import Tooltip from './common/tooltip.js';
-import {T} from './common/i18n.js';
 import {Checkbox} from './common.js';
 
 export const Toolbar_button = ({id, tooltip, active, href, placement,
@@ -152,16 +151,74 @@ export const Sort_icon = ({show, dir})=>{
     return <div className="sort_icon"><span className={classes}/></div>;
 };
 
+
+import {AutoSizer, Table, Column} from 'react-virtualized';
+export class Infinite_chrome_table extends Pure_component {
+    state = {};
+    render(){
+        const rows = this.props.rows||[];
+        return <div className="chrome">
+            <div className="main_panel vbox">
+              <Toolbar_container>
+                <Toolbar_row>
+                  <div className="title_wrapper">{this.props.title}</div>
+                </Toolbar_row>
+              </Toolbar_container>
+              <React.Fragment>
+                <div className="chrome chrome_table vbox">
+                  <div className="tables_container header_container hack">
+                    <div className="chrome_table">
+                      <AutoSizer>
+                        {({height, width})=>
+                          <Table width={width}
+                            height={height}
+                            onRowClick={this.on_row_click}
+                            onHeaderClick={({dataKey})=>dataKey=='select' &&
+                              this.all_rows_select()}
+                            gridClassName="chrome_grid"
+                            headerHeight={27}
+                            headerClassName="chrome_th"
+                            rowClassName="chrome_tr"
+                            rowHeight={22}
+                            rowCount={rows.length+1}
+                            rowGetter={({index})=>rows[index]||'filler'}>
+                            <Column key="select"
+                              label={<Checkbox checked={this.state.checked_all}
+                                // no-op to remove React warning
+                                on_change={()=>null}/>}
+                              dataKey="select"
+                              className="chrome_td"
+                              flexGrow={0}
+                              flexShrink={1}
+                              width={27}/>
+                            {this.props.cols.map(col=>
+                              <Column key={col.key}
+                                label={col.title}
+                                className="chrome_td"
+                                dataKey={col.key}/>
+                            )}
+                          </Table>
+                        }
+                      </AutoSizer>
+                    </div>
+                  </div>
+                </div>
+              </React.Fragment>
+            </div>
+          </div>;
+    }
+}
+
 export class Chrome_table extends Pure_component {
     render(){
         const {selectable, cols, title, children, class_name,
             selected_all, toggle_all} = this.props;
         const classes = classnames('chrome', 'chrome_table', class_name);
-        return <T>{t=><div className={classes}>
+        return <div className={classes}>
               <div className="main_panel vbox">
                 <Toolbar_container>
                   <Toolbar_row>
-                    <div className="title_wrapper">{t(title)}</div>
+                    <div className="title_wrapper">{title}</div>
                   </Toolbar_row>
                 </Toolbar_container>
                 <div className="tables_container vbox">
@@ -173,7 +230,7 @@ export class Chrome_table extends Pure_component {
                   </Data_container>
                 </div>
               </div>
-            </div>}</T>;
+            </div>;
     }
 }
 

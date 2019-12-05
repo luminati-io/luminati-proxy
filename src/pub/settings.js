@@ -102,7 +102,7 @@ class Form extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'settings.Form.save');
             }));
             this.on('finally', ()=>{
                 _this.setState({saving: false});

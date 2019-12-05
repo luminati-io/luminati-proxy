@@ -14,7 +14,8 @@ export default with_www_api(class Enable_ssl_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>_this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e,
+                    'ssl_modal.Enable_ssl_modal.enable_ssl');
             }));
             _this.setState({loading: true});
             yield ajax({url: '/api/enable_ssl', method: 'POST'});

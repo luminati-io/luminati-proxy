@@ -3,7 +3,6 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React_tooltip from 'react-tooltip';
-import {Pagination} from 'react-bootstrap';
 import classnames from 'classnames';
 import codemirror from 'codemirror/lib/codemirror';
 import 'codemirror/mode/javascript/javascript';
@@ -128,7 +127,7 @@ class Code extends Pure_component {
             .tooltip('fixTitle');
         } catch(e){
             this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'common.Code.copy');
             });
         }
     }
@@ -252,7 +251,7 @@ class Copy_btn extends Pure_component {
             .tooltip('fixTitle');
         } catch(e){
             this.etask(function*(){
-                yield report_exception(e);
+                yield report_exception(e, 'common.Copy_btn.copy');
             });
         }
     };
@@ -365,39 +364,6 @@ const Warning_msg = ({warning})=>{
     if (!warning)
         return null;
     return <Warning text={warning}/>;
-};
-
-export const Pagination_panel = props=>{
-    let {entries, items_per_page, cur_page, page_change, children, top, bottom,
-        update_items_per_page, max_buttons, total} = props;
-    total = total||entries&&entries.length||0;
-    let pagination = null;
-    if (total>items_per_page)
-    {
-        let next = false;
-        let pages = Math.ceil(total/items_per_page);
-        if (cur_page+1<pages)
-            next = 'Next';
-        pagination = <Pagination next={next} boundaryLinks
-            activePage={cur_page+1}
-            bsSize="small" onSelect={page_change}
-            items={pages} maxButtons={max_buttons||5}/>;
-    }
-    let buttons = null;
-    if (top)
-        buttons = <div className="table_buttons">{children}</div>;
-    const display_opt = [10, 50, 100, 500, 1000];
-    const from = Math.min(cur_page*items_per_page+1, total);
-    const to = Math.min((cur_page+1)*items_per_page, total);
-    return <div className={classnames('pagination_panel', {top, bottom})}>
-          {pagination}
-          <div className="numbers">
-            <strong>{from}-{to}</strong> of <strong>{total}</strong>
-          </div>
-          <Select_number val={items_per_page} data={display_opt}
-            on_change_wrapper={update_items_per_page} default={10}/>
-          {buttons}
-        </div>;
 };
 
 export const Link_icon = props=>{
