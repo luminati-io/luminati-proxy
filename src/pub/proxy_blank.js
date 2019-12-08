@@ -3,6 +3,7 @@
 import React from 'react';
 import $ from 'jquery';
 import Tooltip from './common/tooltip.js';
+import './css/proxy_blank.less';
 
 const open_modal = ()=>{ $('#add_new_proxy_modal').modal(); };
 

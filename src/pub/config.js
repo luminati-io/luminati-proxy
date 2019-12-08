@@ -12,6 +12,7 @@ import 'codemirror/lib/codemirror.css';
 import filesaver from 'file-saver';
 import $ from 'jquery';
 import {Modal} from './common/modals.js';
+import './css/config.less';
 
 class Config extends Pure_component {
     state = {editable: false, changed: false, persisted_config: ''};

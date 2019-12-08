@@ -1,0 +1,64 @@
+@import (reference) 'common.less';
+.nav_left {
+    .menu {
+        z-index: 10;
+        background-color: @x_light;
+        top: 60px;
+        position: fixed;
+        width: 50px;
+        .menu_item {
+            opacity: 0.65;
+            background-color: @x_light;
+            height: 40px;
+            position: relative;
+            cursor: pointer;
+            &.active {
+                background-color: @light;
+                cursor: default;
+                .text { color: @first_color; }
+            }
+            &.active, &:hover { opacity: 1; }
+        }
+        .icon {
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 10px;
+            left: 15px;
+        }
+        .howto { background-image: url('img/howto.svg'); }
+        .proxies { background-image: url('img/proxies.svg'); }
+        .overview { background-image: url('img/proxies.svg'); }
+        .logs { background-image: url('img/stats.svg'); }
+        .proxy_tester { background-image: url('img/tester.svg'); }
+        .tools { background-image: url('img/tools.svg'); }
+        .config { background-image: url('img/tools.svg'); }
+        .general_config { background-image: url('img/config.svg'); }
+        .faq { background-image: url('img/faq.svg'); }
+        &.lock {
+            pointer-events: none;
+            .menu_item {
+                opacity: 0.4;
+                cursor: default;
+            }
+        }
+    }
+    .menu_filler {
+        background-color: @x_light;
+        height: 100%;
+        position: fixed;
+        width: 50px;
+        z-index: 1;
+        top: 10px;
+    }
+    .footer {
+        z-index: 5;
+        font-size: 13px;
+        color: @link;
+        width: 50px;
+        position: fixed;
+        bottom: 100px;
+        a { margin: 3px; }
+    }
+}

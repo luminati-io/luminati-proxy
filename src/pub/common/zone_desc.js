@@ -6,6 +6,7 @@ import Tooltip from './tooltip.js';
 import {get_static_country} from '../util.js';
 import {flag_with_title, any_flag} from '../common.js';
 import {T} from './i18n.js';
+import '../css/zone_desc.less';
 
 export default class Zone_description extends Pure_component {
     state = {};

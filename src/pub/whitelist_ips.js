@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Logo, Code, with_www_api} from './common.js';
 import {Instructions, Li} from './common/bullets.js';
+import './css/whitelist_ips.less';
 
 export default class Whitelist_ips extends Pure_component {
     state = {};

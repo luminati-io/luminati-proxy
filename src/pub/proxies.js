@@ -26,6 +26,7 @@ import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
 import {OverlayTrigger, Tooltip as B_tooltip} from 'react-bootstrap';
+import './css/proxies.less';
 
 const is_local = ()=>{
     const href = window.location.href;
@@ -728,7 +729,6 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             <Column key="select"
                               cellRenderer={this.select_renderer.bind(this)}
                               label={<Checkbox checked={this.state.checked_all}
-                                // no-op to remove React warning
                                 on_change={()=>null}/>}
                               dataKey="select"
                               className="chrome_td"
@@ -738,7 +738,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             {cols.map(col=>
                               <Column key={col.key}
                                 cellRenderer={this.cell_renderer.bind(this)}
-                                label={<T>{col.title}</T>}
+                                label={col.title}
                                 className="chrome_td"
                                 dataKey={col.key}
                                 flexGrow={col.grow!==undefined ? col.grow : 1}

@@ -5,6 +5,7 @@ import Har_viewer from './har_viewer.js';
 import {withRouter} from 'react-router-dom';
 import zurl from '../../util/url.js';
 import Pure_component from '/www/util/pub/pure_component.js';
+import './css/logs.less';
 
 export const Logs = withRouter(class Logs extends Pure_component {
     state = {cur_tab: 'har'};

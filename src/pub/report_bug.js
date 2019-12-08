@@ -6,6 +6,7 @@ import {Loader} from './common.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import {Modal} from './common/modals.js';
+import './css/report_bug.less';
 
 class Index extends Pure_component {
     success_msg = `Your issue is being handled! We will be in touch as soon as

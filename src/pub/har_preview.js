@@ -12,6 +12,7 @@ import classnames from 'classnames';
 import moment from 'moment';
 import {trigger_types, action_types} from '../../util/rules_util.js';
 import {Copy_btn} from './common.js';
+import './css/har_preview.less';
 
 class Preview extends Pure_component {
     panes = [

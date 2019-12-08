@@ -3,6 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
+import '../css/tooltip.less';
 
 export default class Tooltip extends Pure_component {
     componentDidMount(){

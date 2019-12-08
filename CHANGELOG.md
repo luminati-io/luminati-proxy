@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.164.164 Stable
+- :sparkles: app.less stylesheet split per page/component
+
 ## 1.163.916 Stable
 - :sparkles: Added OS support for submitting bug report
 - :sparkles: Improved fe_warn metrics

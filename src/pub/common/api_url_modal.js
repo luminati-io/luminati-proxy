@@ -9,6 +9,7 @@ import etask from '../../../util/etask.js';
 import ajax from '../../../util/ajax.js';
 import classnames from 'classnames';
 import {Instructions, Li} from './bullets.js';
+import '../css/api_url_modal.less';
 
 export default class Api_url_modal extends Pure_component {
     state = {url: '', loading: false, saving: false};

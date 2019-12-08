@@ -7,14 +7,14 @@ import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import zurl from '../../../util/url.js';
 import {Modal} from '../common/modals.js';
-import {Checkbox} from '../common.js';
 import {report_exception} from '../util.js';
-import {Chrome_table} from '../chrome_widgets.js';
+import {Infinite_chrome_table} from '../chrome_widgets.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     state = {
         available_list: [],
+        selected_all: false,
     };
     componentDidMount(){
         this.setdb_on('head.proxy_edit.zone_name', ()=>
@@ -22,6 +22,14 @@ export default class Alloc_modal extends Pure_component {
         this.setdb_on('head.proxies_running', proxies=>
             proxies && this.setState({proxies}));
         $('#allocated_ips').on('show.bs.modal', this.load);
+    }
+    static getDerivedStateFromProps(props, state){
+        if (!state.available_list.length)
+            return null;
+        return {
+            selected_all: (props.form[props.type]||[]).length==
+                state.available_list.length,
+        };
     }
     close = ()=>$('#allocated_ips').modal('hide');
     load = ()=>{
@@ -60,8 +68,7 @@ export default class Alloc_modal extends Pure_component {
                 if (!chosen_set.has(v))
                     not_chosen_set.add(v);
             });
-            const available_list = [...chosen_set, ...not_chosen_set]
-                .slice(0, 200);
+            const available_list = [...chosen_set, ...not_chosen_set];
             _this.setState({available_list}, _this.sync_selected_vals);
             _this.loading(false);
         });
@@ -78,13 +85,9 @@ export default class Alloc_modal extends Pure_component {
         this.setState({loading});
     };
     checked = row=>(this.props.form[this.props.type]||[]).includes(row);
-    reset = ()=>{
-        this.set_field(this.props.type, []);
-        this.set_field('pool_size', '');
-        this.set_field('multiply', 1);
-    };
     toggle = e=>{
-        const {value, checked} = e.target;
+        const value = e.rowData;
+        const checked = !this.checked(value);
         const {type, form} = this.props;
         let new_alloc;
         if (checked)
@@ -98,6 +101,11 @@ export default class Alloc_modal extends Pure_component {
             new_alloc = form[type].filter(r=>r!=value);
         this.set_field(type, new_alloc);
         this.update_multiply_and_pool_size(new_alloc.length);
+    };
+    unselect_all = ()=>{
+        this.set_field(this.props.type, []);
+        this.set_field('pool_size', '');
+        this.set_field('multiply', 1);
     };
     select_all = ()=>{
         this.set_field(this.props.type, this.state.available_list);
@@ -147,6 +155,7 @@ export default class Alloc_modal extends Pure_component {
             const map = _this.map_vals(norm_vals);
             const new_ips = _this.props.form.ips.map(val=>map[val]);
             const new_vips = _this.props.form.vips.map(val=>map[val]);
+            _this.setState({available_list: norm_vals});
             _this.set_field('ips', new_ips);
             _this.set_field('vips', new_vips);
             yield _this.update_other_proxies(map);
@@ -235,26 +244,16 @@ export default class Alloc_modal extends Pure_component {
             </div>;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
               title={title} footer={Footer}>
-              <Chrome_table cols={this.cols} class_name="in_modal_table"
-                selectable selected_all={this.state.selected_all}
-                toggle_all={this.select_all}>
-                {this.state.available_list.map(ip=>
-                  <tr key={ip}>
-                    <td>
-                      <Checkbox checked={this.checked(ip)}
-                        on_change={this.toggle} value={ip} text={ip}/>
-                    </td>
-                    <td>
-                    {ip}
-                    {refresh_enabled &&
-                      <div className="chrome_icon refresh"
-                        onClick={()=>this.refresh_one(ip)}
-                        style={{top: 1, position: 'relative', left: 3}}/>
-                    }
-                    </td>
-                  </tr>
-                )}
-              </Chrome_table>
+              <Infinite_chrome_table cols={this.cols}
+                class_name="in_modal_table"
+                selectable
+                toggle={this.toggle}
+                select_all={this.select_all}
+                unselect_all={this.unselect_all}
+                selected_list={this.props.form[this.props.type]||[]}
+                selected_all={this.state.selected_all}
+                rows={this.state.available_list}>
+              </Infinite_chrome_table>
             </Modal>;
     }
 }

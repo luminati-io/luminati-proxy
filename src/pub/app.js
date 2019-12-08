@@ -10,6 +10,7 @@ import 'flag-icon-css/css/flag-icon.css';
 import 'es6-shim';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
+import './css/app.less';
 import Proxy_edit from './proxy_edit/index.js';
 import Howto from './howto.js';
 import Nav from './nav.js';
@@ -25,7 +26,6 @@ import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
-import './app.less';
 import ws from './ws.js';
 import {report_exception} from './util.js';
 

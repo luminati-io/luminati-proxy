@@ -16,6 +16,7 @@ import {Modal} from './common/modals.js';
 import date from '../../util/date.js';
 import {T} from './common/i18n.js';
 import {report_exception} from './util.js';
+import './css/proxy_tester.less';
 const {SEC} = date.ms;
 
 const Proxy_tester = ()=>

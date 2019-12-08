@@ -28,6 +28,7 @@ import {Modal} from '../common/modals.js';
 import {T} from '../common/i18n.js';
 import {Select_zone} from '../common/controls.js';
 import {report_exception} from '../util.js';
+import '../css/proxy_edit.less';
 
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){

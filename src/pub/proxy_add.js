@@ -20,6 +20,7 @@ import {Textarea, Select_zone} from './common/controls.js';
 import Zone_description from './common/zone_desc.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
+import './css/proxy_add.less';
 
 const Proxy_add = withRouter(class Proxy_add extends Pure_component {
     presets_opt = Object.keys(presets).map(p=>{

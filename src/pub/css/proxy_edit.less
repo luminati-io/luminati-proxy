@@ -1,0 +1,247 @@
+@import (reference) 'common.less';
+.proxy_edit {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    margin: 0 15px;
+    .info_icon {
+        background: url(/img/info.svg);
+        width: 11px;
+        height: 11px;
+        opacity: 0.4;
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        cursor: pointer;
+    }
+    .nav_wrapper {
+        .nav_header {
+            display: flex;
+            align-items: center;
+        }
+    }
+    .nav {
+        display: flex;
+        margin: 5px 0 10px;
+        .field {
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        .action_buttons {
+            flex-grow: 3;
+            display: flex;
+            direction: rtl;
+            .btn_save { margin-right: 0; order: 1; }
+            .btn_cancel { margin-left: 0; order: 2; }
+        }
+        .btn_browse {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .browse_icon {
+                background: url(/img/ic_browse.svg);
+                width: 18px;
+                height: 18px;
+                background-size: contain;
+                margin-left: 3px;
+            }
+            &:hover {
+               .browse_icon {
+                   filter: grayscale(100%) brightness(3);
+               }
+            }
+        }
+    }
+    .warnings_modal {
+        .modal-body { padding: 10px 20px 0; }
+    }
+    .note { font-size: 13px; margin-bottom: 15px; }
+    .main_window {
+        flex: 1;
+        margin-top: 10px;
+        .in_logs {
+            .window_wrapper {
+                flex: 1;
+                padding: 15px 0;
+            }
+            .logs {
+                width: 100%;
+                .logs_panel { margin: 0; }
+            }
+        }
+        .target .desc { width: 100px; }
+        .speed .desc { width: 175px; }
+        .rotation .desc { width: 125px; }
+        .headers .desc { width: 145px; }
+        .general .desc { width: 195px; }
+        .rules {
+            max-width: 100%;
+            .desc { width: 200px; min-width: 200px; }
+            .rule_wrapper {
+                position: relative;
+                margin-top: 15px;
+                border: solid 1px @grey;
+                border-radius: 4px;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                grid-template-rows: auto auto;
+                .action, .trigger, .ui, .code { padding: 8px; }
+                .trigger.ui {
+                    position: relative;
+                    .mask {
+                        position: absolute;
+                        background-color: rgba(0, 0, 0, 0.05);
+                        border-top-left-radius: 2px;
+                        width: 100%;
+                        height: 100%;
+                        top: 0;
+                        left: 0;
+                        z-index: 5;
+                        display: none;
+                        &.active { display: block; }
+                        .reset_btn {
+                            position: absolute;
+                            right: 9px;
+                            top: 11px;
+                        }
+                    }
+                }
+                .trigger.code {
+                    grid-column-start: 2;
+                    grid-column-end: -1;
+                    grid-row-start: 1;
+                    grid-row-end: -1;
+                }
+                .action { border-top: 1px solid @grey; }
+                .code {
+                    border-left: 1px solid @grey;
+                    overflow: hidden;
+                }
+                .btn_rule_del {
+                    position: absolute;
+                    top: 5px;
+                    right: 5px;
+                    background: url(/img/delete.svg);
+                    width: 16px;
+                    height: 16px;
+                    border: none;
+                }
+            }
+            .rule_add_btn {
+                width: 90px;
+                margin-left: 0;
+                i { left: 4px; }
+            }
+        }
+        .headers {
+            .field_row_inner.headers {
+                position: absolute;
+                align-items: baseline;
+                input[type=text] {
+                    margin-right: 9px;
+                    width: 100px;
+                }
+                .list {
+                    .single_header {
+                        width: 365px;
+                        display: flex;
+                        align-items: center;
+                        padding: 3px;
+                    }
+                }
+            }
+            .desc { padding-right: 0; }
+            .action_icons {
+                width: 45px;
+                flex-shrink: 0;
+            }
+        }
+        .header {
+            font-size: 16px;
+            font-weight: bold;
+            height: 40px;
+        }
+        .note { margin-bottom: 5px; }
+        .desc {
+            line-height: 1.07;
+            padding-right: 10px;
+        }
+        align-items: center;
+        .sufix { margin-left: 10px; }
+        .double_field {
+            input { width: 109px; }
+            .devider { margin: 0 5px; }
+        }
+    }
+    .allocated_ips_modal {
+        .action_buttons {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    }
+    .regex_field {
+        width: 100%;
+        display: flex;
+        outline: none;
+        position: relative;
+        &:hover .tip_box { visibility: visible; }
+        .tip_box {
+            color: #8e8e8e;
+            height: 32px;
+            border-bottom: none;
+            border: solid 1px @grey;
+            border-bottom: none;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            padding: 3px 5px;
+            visibility: hidden;
+            &.active { visibility: visible; }
+            .checks { display: flex; }
+            .check {
+                margin: auto 2px;
+                line-height: 1.3;
+                padding: 3px;
+                background: transparent;
+                text-shadow: rgba(255, 255, 255, 0.5) 0 1px 0;
+                border: none;
+                border-radius: 6px;
+                overflow: hidden;
+                &:hover:not([disabled]) {
+                    color: white;
+                    text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
+                }
+                &.active {
+                    color: white;
+                    text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;
+                    background: rgba(0, 0, 0, 0.3);
+                }
+                &:hover:not(.active):not([disabled]) {
+                    background: rgba(0, 0, 0, 0.2);
+                }
+                &[disabled] { opacity: 0.5; }
+            }
+        }
+        .regex_error {
+            color: @error_dark;
+            display: block;
+            visibility: hidden;
+            padding-bottom: 1em;
+            margin-bottom: -2em;
+            &.active {
+                visibility: visible;
+            }
+        }
+    }
+}
+.banned_ips_panel {
+    .panel_container();
+}
+.btn_unban {
+    border: none;
+    background: none;
+    display: block;
+    margin: auto;
+    padding: 0;
+    .chrome_icon { width: 20px; }
+}

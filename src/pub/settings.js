@@ -8,6 +8,7 @@ import ajax from '../../util/ajax.js';
 import {report_exception} from './util.js';
 import _ from 'lodash';
 import {Select_zone, Pins} from './common/controls.js';
+import './css/settings.less';
 
 export default function Settings(){
     return <div className="settings">

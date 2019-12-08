@@ -18,6 +18,7 @@ import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {Language} from './common/i18n.js';
 import {with_www_api} from './common.js';
+import './css/nav.less';
 
 const Nav = ()=>
     <div className="nav">

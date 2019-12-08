@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import Tooltip from './common/tooltip.js';
 import {Checkbox} from './common.js';
+import './css/chrome_widgets.less';
 
 export const Toolbar_button = ({id, tooltip, active, href, placement,
     ...props})=>
@@ -155,8 +156,27 @@ export const Sort_icon = ({show, dir})=>{
 import {AutoSizer, Table, Column} from 'react-virtualized';
 export class Infinite_chrome_table extends Pure_component {
     state = {};
+    cell_renderer = function Cell_renderer(props){
+        if (props.rowData=='filler')
+            return <div className="chrome_td"></div>;
+        return <span key={props.rowData}>{props.rowData}</span>;
+    };
+    select_renderer = function Select_renderer(props){
+        if (props.rowData=='filler')
+            return <div className="chrome_td"></div>;
+        return <Checkbox
+          checked={this.props.selected_list.includes(props.rowData)}
+          on_change={()=>null}/>;
+    };
+    toggle_all = ()=>{
+        if (this.props.selected_all)
+            this.props.unselect_all();
+        else
+            this.props.select_all();
+    };
     render(){
         const rows = this.props.rows||[];
+        const class_name = this.props.class_name;
         return <div className="chrome">
             <div className="main_panel vbox">
               <Toolbar_container>
@@ -165,16 +185,16 @@ export class Infinite_chrome_table extends Pure_component {
                 </Toolbar_row>
               </Toolbar_container>
               <React.Fragment>
-                <div className="chrome chrome_table vbox">
+                <div className={classnames('chrome_table vbox', class_name)}>
                   <div className="tables_container header_container hack">
                     <div className="chrome_table">
                       <AutoSizer>
                         {({height, width})=>
                           <Table width={width}
                             height={height}
-                            onRowClick={this.on_row_click}
+                            onRowClick={this.props.toggle}
                             onHeaderClick={({dataKey})=>dataKey=='select' &&
-                              this.all_rows_select()}
+                              this.toggle_all()}
                             gridClassName="chrome_grid"
                             headerHeight={27}
                             headerClassName="chrome_th"
@@ -183,19 +203,24 @@ export class Infinite_chrome_table extends Pure_component {
                             rowCount={rows.length+1}
                             rowGetter={({index})=>rows[index]||'filler'}>
                             <Column key="select"
-                              label={<Checkbox checked={this.state.checked_all}
-                                // no-op to remove React warning
-                                on_change={()=>null}/>}
+                              cellRenderer={this.select_renderer.bind(this)}
+                              label={
+                                <Checkbox checked={this.props.selected_all}
+                                  on_change={()=>null}/>
+                              }
                               dataKey="select"
                               className="chrome_td"
                               flexGrow={0}
                               flexShrink={1}
-                              width={27}/>
+                              width={20}/>
                             {this.props.cols.map(col=>
-                              <Column key={col.key}
+                              <Column key={col.id}
+                                cellRenderer={this.cell_renderer}
                                 label={col.title}
                                 className="chrome_td"
-                                dataKey={col.key}/>
+                                dataKey={col.id}
+                                flexGrow={1}
+                                width={100}/>
                             )}
                           </Table>
                         }

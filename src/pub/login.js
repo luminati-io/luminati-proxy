@@ -10,6 +10,7 @@ import setdb from '../../util/setdb.js';
 import zurl from '../../util/url.js';
 import {Loader, Logo, with_www_api} from './common.js';
 import {T} from './common/i18n.js';
+import './css/login.less';
 
 const token_err_msg = {
     'bad token': 'Invalid token',

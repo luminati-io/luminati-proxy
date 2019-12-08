@@ -3,6 +3,7 @@
 import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
 import React from 'react';
+import './css/json_viewer.less';
 
 const has_children = o=>!!o && typeof o=='object' && Object.keys(o).length;
 

@@ -5,6 +5,7 @@ import classnames from 'classnames';
 import {withRouter, Route} from 'react-router-dom';
 import Tooltip from './tooltip.js';
 import {T} from './i18n.js';
+import '../css/nav_tabs.less';
 
 export const Nav_tabs = ({children, narrow, set_tab, cur_tab})=>
     <div className={classnames('nav_tabs', {narrow})}>

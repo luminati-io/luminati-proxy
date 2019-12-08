@@ -20,6 +20,7 @@ import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
 import Tooltip from './common/tooltip.js';
 import ws from './ws.js';
+import './css/har_viewer.less';
 
 const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),

@@ -9,6 +9,7 @@ import semver from 'semver';
 import Tooltip from './common/tooltip.js';
 import {Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
+import './css/notif_center.less';
 
 class Notif_center extends Pure_component {
     state = {loaded: false, notifs: []};

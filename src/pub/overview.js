@@ -12,6 +12,7 @@ import {Warning, Warnings, with_www_api, Loader_small} from './common.js';
 import {perr} from './util.js';
 import Tooltip from './common/tooltip.js';
 import setdb from '../../util/setdb.js';
+import './css/overview.less';
 
 class Overview extends Pure_component {
     state = {show_logs: null, tls_warning: false};
