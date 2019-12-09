@@ -947,15 +947,15 @@ span.icon_link {
     background-repeat: no-repeat;
     margin-right: 4px;
     &.crawlera {
-        background-image: url(/img/logo-crawlera.svg);
+        background-image: url(/img/logo_crawlera.svg);
         width: 20px;
     }
     &.import {
-        background-image: url(/img/logo-import.svg);
+        background-image: url(/img/logo_import.svg);
         width: 100px;
     }
     &.legs {
-        background-image: url(/img/logo-80legs.svg);
+        background-image: url(/img/logo_80legs.svg);
         width: 56px;
     }
 }
@@ -969,3 +969,134 @@ span.icon_link {
     display: flex;
     align-items: center;
 }
+.alert.alert-info { margin: 0 15px 20px; }
+.default_cursor { cursor: default; }
+.page-body {
+    padding: 0;
+    margin-left: 50px;
+    a {
+        color: @link;
+        outline: 3px solid transparent;
+        border: 1px solid transparent;
+        &:hover {
+            color: white;
+            background: @link;
+            border-color: @link;
+            text-decoration: none;
+            box-shadow: @link -2px 0 0 1px, @link 2px 0 0 1px;
+            border-radius: .15em;
+        }
+    }
+    .messages a.custom_link:hover {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+}
+.pointer { cursor: pointer; }
+.opened,
+.table-hover>tbody>tr.opened:hover { background-color: @x_light; }
+.table-hover>tbody>tr>td { border: none; }
+.table-hover .no-hover:hover { background: none; }
+.modal-open .modal { overflow-y: scroll; }
+.pagination>li>a:hover, .pagination>.disabled>a:hover { box-shadow: none; }
+.pagination {
+    margin: 0;
+    .active>a, .active>a:focus, .active>span {
+        background: none;
+        color: @first_color;
+        font-weight: bold;
+        &:hover {
+            background: none;
+            color: @first_color;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    }
+    li>a, li>span, li>a:focus {
+        &:hover {
+            border: none;
+            background: none;
+            color: white;
+            background: @link;
+            text-decoration: none;
+        }
+        font-size: 14px;
+        padding: 0 5px;
+        color: @link;
+        line-height: 1.4;
+        background: none;
+        border: none;
+    }
+    li.disabled>a { padding: 0 2px; }
+}
+.pagination_panel {
+    height: 35px;
+    margin-right: 5px;
+    .pagination { display: inline-block; }
+    .select_multiple {
+        float: right;
+        width: auto;
+        margin-left: 5px;
+        background-position: right 7px center;
+        padding: 0 4px;
+        .react_select__control {
+            height: 24px;
+            width: 90px;
+        }
+    }
+    .table_buttons {
+        display: inline-block;
+        float: right;
+        position: relative;
+        top: -3px;
+    }
+    .numbers {
+        float: right;
+        margin-left: 5px;
+    }
+    &.bottom { margin-top: 5px; }
+}
+.tooltip_block {
+    width: 100%;
+    height: 100%;
+}
+.rbt {
+    &.open {
+        width: 100%;
+        min-width: 100px;
+        &.clearfix:before { content: none; }
+    }
+    .rbt-input {
+        padding: 1px 25px 1px 10px;
+        color: @first_color;
+        border-radius: 3px;
+        border: solid 1px @grey;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+        cursor: text;
+        &[disabled] {
+            cursor: default;
+            background-color: @light_grey;
+            border-color: @grey_border;
+            color: @grey;
+        }
+    }
+    .rbt-input-wrapper {
+        input { height: auto; }
+        position: relative;
+        top: 5px;
+    }
+    .rbt-input-hint-container {
+        input { width: 100%; }
+        .rbt-input-hint { top: 5px !important; }
+    }
+    .dropdown-menu {
+        width: 100%;
+        .dropdown-item {
+            color: @first_color;
+            mark { color: @first_color; }
+        }
+    }
+}
+.modal-backdrop.fade.in { opacity: 0.15; }

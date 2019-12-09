@@ -36,7 +36,7 @@ export default class Users_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('finally', ()=>{
-                console.log('finally');
+                // XXX krzysztof: add loader and finish it here
             });
             this.on('uncaught', e=>_this.etask(function*(){
                 yield report_exception(e, 'users_modal.Users_modal.load');

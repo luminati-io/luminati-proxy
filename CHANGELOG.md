@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.164.328 Stable
+- :star: Added support for generating custom certificates
+
 ## 1.164.164 Stable
 - :sparkles: app.less stylesheet split per page/component
 

@@ -75,6 +75,6 @@ module.exports = {
         },
     },
     resolveLoader: {
-        alias: {'hutil-loader': `${__dirname}/lib/hutil-loader.js`},
+        alias: {'hutil-loader': `${__dirname}/lib/hutil_loader.js`},
     },
 };
