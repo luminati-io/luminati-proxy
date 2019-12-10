@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.164.431 
+- :bug: Fixed MacOS --upgrade/--downgrade options
+- :star: UI improvements: added number of allocate/banned IPs
+
 ## 1.164.400 Stable
 - :bug: Fixed certificate for MacOS Catalina
 - :star: Added users management API

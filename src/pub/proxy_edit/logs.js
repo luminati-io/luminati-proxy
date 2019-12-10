@@ -85,8 +85,8 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         const {ips, unbanning} = this.state;
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        return <Chrome_table title="Banned IPs" cols={banned_ips_cols}
-            class_name="banned_ips_panel">
+        return <Chrome_table title={`Banned IPs (${this.state.ips.length})`}
+            cols={banned_ips_cols} class_name="banned_ips_panel">
               {ips.map(d=>
                 <tr key={`${d.ip}-${d.domain}`}>
                   <td>

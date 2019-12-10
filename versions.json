@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.164.431",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed MacOS --upgrade/--downgrade options"
+            },
+            {
+                "type": "star",
+                "text": "UI improvements: added number of allocate/banned IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.164.400",
         "type": "stable",
         "changes": [

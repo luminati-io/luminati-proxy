@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LICENSE_CODE ZON ISC
-DIR=$(dirname "$(readlink -f "$0")")
+DIR=$(dirname "$0")
 . "$DIR/lpm_util.sh"
 LOGFILE=$1
 

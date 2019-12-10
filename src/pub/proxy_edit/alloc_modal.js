@@ -78,7 +78,6 @@ export default class Alloc_modal extends Pure_component {
         const new_vals = curr_vals.filter(v=>
             this.state.available_list.includes(v));
         this.set_field(this.props.type, new_vals);
-        this.update_multiply_and_pool_size(new_vals.length);
     };
     loading = loading=>{
         setdb.set('head.proxy_edit.loading', loading);
@@ -242,15 +241,20 @@ export default class Alloc_modal extends Pure_component {
               <button onClick={this.close}
                 className="btn btn_lpm btn_lpm_primary">OK</button>
             </div>;
+        const selected_list = this.props.form[this.props.type]||[];
+        const sub_title = `IPs: ${selected_list.length}/`
+        +`${this.props.form.pool_size} out of`
+        +` ${this.state.available_list.length} available`;
         return <Modal id="allocated_ips" className="allocated_ips_modal"
               title={title} footer={Footer}>
               <Infinite_chrome_table cols={this.cols}
+                title={sub_title}
                 class_name="in_modal_table"
                 selectable
                 toggle={this.toggle}
                 select_all={this.select_all}
                 unselect_all={this.unselect_all}
-                selected_list={this.props.form[this.props.type]||[]}
+                selected_list={selected_list}
                 selected_all={this.state.selected_all}
                 rows={this.state.available_list}>
               </Infinite_chrome_table>

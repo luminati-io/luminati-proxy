@@ -331,6 +331,10 @@ export const tabs = {
                     reached specified limit the proxy port will deny further
                     connections`,
             },
+            debug: {
+                label: 'Debug',
+                tooltip: `Luminati request debug info`,
+            },
         },
     },
 };

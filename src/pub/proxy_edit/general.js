@@ -19,6 +19,12 @@ const proxy_connection_type_opt = [
     {key: 'HTTPS', value: 'https'},
 ];
 
+const debug_opt = [
+    {key: 'Default (Yes)', value: ''},
+    {key: 'Yes', value: 'full'},
+    {key: 'No', value: 'none'},
+];
+
 export default class General extends Pure_component {
     state = {};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
@@ -113,6 +119,7 @@ export default class General extends Pure_component {
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact no_any/>
+                <Config type="select" id="debug" data={debug_opt}/>
               </Tab_context.Provider>
             </div>;
     }
