@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.164.400",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed certificate for MacOS Catalina"
+            },
+            {
+                "type": "star",
+                "text": "Added users management API"
+            }
+        ]
+    },
+    {
         "ver": "1.164.328",
         "type": "stable",
         "changes": [

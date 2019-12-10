@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.164.400 Stable
+- :bug: Fixed certificate for MacOS Catalina
+- :star: Added users management API
+
 ## 1.164.328 Stable
 - :star: Added support for generating custom certificates
 
