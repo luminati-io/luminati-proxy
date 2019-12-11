@@ -940,8 +940,8 @@ class Name_cell extends Pure_component {
     go_to_rules = e=>setdb.emit('har_viewer.set_pane', 4);
     render(){
         const {req, rules} = this.props;
-        const rule_tip = 'At least one rule has been applied to this'
-        +' request. Click to see more details';
+        const rule_tip = 'At least one rule has been applied to this '
+        +'request. Click to see more details';
         const status_check = req.details.context=='STATUS CHECK';
         const is_ban = r=>Object.keys(r.action||{})
             .some(a=>a.startsWith('ban_ip'));

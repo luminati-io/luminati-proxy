@@ -128,8 +128,8 @@ function flags_to_str_once(flags, conv){
         if (!conv.hasOwnProperty(i))
             continue;
         f += 'if (flags & '+conv[i]+') '
-            +'{ s += '+JSON.stringify(i.toLowerCase())+'+" ";'
-            +' flags &= ~'+conv[i]+'; }\n';
+            +'{ s += '+JSON.stringify(i.toLowerCase())+'+" "; '
+            +'flags &= ~'+conv[i]+'; }\n';
     }
     f += 'if (flags && conv.__conv_to_str.err) '
         +'conv.__conv_to_str.err(flags, conv);\n';

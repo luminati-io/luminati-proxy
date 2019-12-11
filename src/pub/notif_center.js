@@ -74,8 +74,8 @@ class Notif_center extends Pure_component {
     }
     render(){
         const number = this.state.notifs.filter(n=>n.status=='new').length;
-        const tip = 'Notification center: you will receive updates on new'
-        +' features in LPM here';
+        const tip = 'Notification center: you will receive updates on new '
+            +'features in LPM here';
         return <div className="notif">
               <Modal_portal>
                 <div className="notif_modal">

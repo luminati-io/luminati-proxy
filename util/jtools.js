@@ -174,8 +174,8 @@ E.zon_root = product=>{
     }
     else if (!file.is_dir(`${zon_dir}/CVS`))
     {
-        E.zexit(`${zon_dir} exists, but there is no CVS directory`
-            +' inside. please remove it and run again');
+        E.zexit(`${zon_dir} exists, but there is no CVS directory `
+            +'inside. please remove it and run again');
     }
     return zon_dir;
 };

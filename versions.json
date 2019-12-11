@@ -1,7 +1,21 @@
 [
     {
+        "ver": "1.164.586",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added request method to HAR viewer"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed logging from extension when local_login flag enabled"
+            }
+        ]
+    },
+    {
         "ver": "1.164.431",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",

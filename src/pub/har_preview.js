@@ -85,12 +85,14 @@ class Pane_headers extends Pure_component {
         const headers = req.request.headers.map(h=>`-H "${h.name}: `
             +`${h.value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
         return ['curl -x', username+':'+password+'@'+super_proxy,
-               req.request.url, ...headers].join(' ');
+               '-X', req.request.method, '"'+req.request.url+'"', ...headers]
+               .join(' ');
     };
     render(){
         const req = this.props.req;
         const general_entries = [
             {name: 'Request URL', value: req.request.url},
+            {name: 'Request method', value: req.request.method},
             {name: 'Status code', value: req.response.status},
             {name: 'Super proxy IP', value: req.details.super_proxy},
             {name: 'Peer proxy IP', value: req.details.proxy_peer},

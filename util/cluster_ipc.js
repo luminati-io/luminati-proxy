@@ -77,8 +77,8 @@ let on_response = (sender, msg)=>{
     }
     if (+env.VERBOSE_IPC)
     {
-        zerr.notice(`cluster_ipc: received ${msg.type}`
-            +` from ${sender}.${msg.handler} cookie ${msg.cookie}`);
+        zerr.notice(`cluster_ipc: received ${msg.type} `
+            +`from ${sender}.${msg.handler} cookie ${msg.cookie}`);
     }
     if (msg.type=='ipc_result')
         handler.continue(msg.msg);
@@ -138,8 +138,8 @@ let call = (to, name, args, sock)=>etask(function*ipc_call(){
         waiting[to][key] = this;
         if (+env.VERBOSE_IPC)
         {
-            zerr.notice(`cluster_ipc: sending ipc_call to ${to}.${name}`
-                +` cookie ${cookie}`);
+            zerr.notice(`cluster_ipc: sending ipc_call to ${to}.${name} `
+                +`cookie ${cookie}`);
         }
         let msg = {type: 'ipc_call', handler: name, msg: args, cookie: cookie};
         send(to, msg, sock);

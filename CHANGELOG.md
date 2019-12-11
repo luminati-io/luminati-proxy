@@ -1,6 +1,10 @@
 Luminati Proxy manager - Change Log
 
-## 1.164.431 
+## 1.164.586 Stable
+- :star: Added request method to HAR viewer
+- :bug: Fixed logging from extension when local_login flag enabled
+
+## 1.164.431 Stable
 - :bug: Fixed MacOS --upgrade/--downgrade options
 - :star: UI improvements: added number of allocate/banned IPs
 

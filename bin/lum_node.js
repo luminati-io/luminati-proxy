@@ -125,8 +125,8 @@ const check_running = argv=>etask(function*(){
     if (!argv.dir)
     {
         logger.notice(`LPM is already running (${tasks[0].pid})`);
-        logger.notice('You need to pass a separate path to the directory for'
-            +' this LPM instance. Use --dir flag');
+        logger.notice('You need to pass a separate path to the directory for '
+            +'this LPM instance. Use --dir flag');
         process.exit();
     }
 });

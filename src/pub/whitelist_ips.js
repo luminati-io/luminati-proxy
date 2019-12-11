@@ -57,8 +57,8 @@ const user_types = {
     },
     guest: {
         title: 'Company user',
-        desc: 'Login to specific zone. Credentials can be obtain from your'
-            +' system admin.',
+        desc: 'Login to specific zone. Credentials can be obtain from your '
+            +'system admin.',
         steps: Guest_steps,
     },
 };
