@@ -121,7 +121,7 @@ export const map_rule_to_form = rule=>{
 };
 
 export default class Rules extends Pure_component {
-    state = {rules: [{id: 0}], max_id: 0};
+    state = {rules: [{id: 0}], max_id: 0, disabled_fields: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     goto_field = setdb.get('head.proxy_edit.goto_field');
     componentDidMount(){
@@ -134,6 +134,8 @@ export default class Rules extends Pure_component {
             this.setState({rules, max_id: Math.max(...rules.map(r=>r.id))});
         });
         this.setdb_on('head.proxy_edit.update_rule', this.update_rule);
+        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
+            disabled_fields&&this.setState({disabled_fields}));
     }
     update_rule = rule=>{
         if (!rule)
@@ -170,10 +172,11 @@ export default class Rules extends Pure_component {
     };
     goto_ssl = ()=>this.goto_field('ssl');
     render(){
-        if (!this.state.form)
+        const {form, rules, disabled_fields, www} = this.state;
+        if (!form)
             return null;
         return <div className="rules">
-              {!this.state.form.ssl &&
+              {!form.ssl &&
                 <Warning text={
                   <React.Fragment>
                     <span><T>Most of the options here are available only when
@@ -185,13 +188,13 @@ export default class Rules extends Pure_component {
                 }/>
               }
               <button className="btn btn_lpm btn_lpm_small rule_add_btn"
-                onClick={this.rule_add}>
+                onClick={this.rule_add} disabled={disabled_fields.rules}>
                 <T>New rule</T>
                 <i className="glyphicon glyphicon-plus"/>
               </button>
-              {this.state.rules.map(r=>
+              {rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}
-                  www={this.state.www} ssl={this.state.form.ssl}/>
+                  www={www} ssl={form.ssl} disabled={disabled_fields.rules}/>
               )}
               <Tester_wrapper/>
             </div>;
@@ -210,6 +213,11 @@ const Tester_wrapper = withRouter(class Tester_wrapper extends Pure_component {
 });
 
 class Rule_config extends Pure_component {
+    state = {disabled_fields: {}};
+    componentDidMount(){
+        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
+            disabled_fields&&this.setState({disabled_fields}));
+    }
     value_change = value=>{
         if (this.props.on_change)
             this.props.on_change(value);
@@ -219,6 +227,7 @@ class Rule_config extends Pure_component {
     render(){
         const id = this.props.id;
         const tab_id = 'rules';
+        const disabled = this.props.disabled||this.state.disabled_fields[id];
         return <Labeled_controller
               id={id}
               style={this.props.style}
@@ -230,7 +239,7 @@ class Rule_config extends Pure_component {
               range={this.props.range}
               on_change_wrapper={this.value_change}
               val={this.props.val||this.props.rule[id]||''}
-              disabled={this.props.disabled}
+              disabled={disabled}
               note={this.props.note}
               placeholder={tabs[tab_id].fields[id].placeholder||''}
               on_blur={this.on_blur}
@@ -271,12 +280,12 @@ class Rule extends Pure_component {
         }
     };
     render(){
-        const {rule_del, rule, ssl} = this.props;
+        const {rule_del, rule, ssl, disabled} = this.props;
         const {ui_blocked} = this.state;
         return <div>
           <div className="rule_wrapper">
             <Trigger rule={rule} ui_blocked={ui_blocked} ssl={ssl}
-              set_rule_field={this.set_rule_field}
+              set_rule_field={this.set_rule_field} disabled={disabled}
               change_ui_block={this.change_ui_block}/>
             <Action rule={rule} set_rule_field={this.set_rule_field}
               change_ui_block={this.change_ui_block}/>
@@ -494,7 +503,7 @@ class Trigger extends Pure_component {
         this.props.set_rule_field('trigger_code', val);
     };
     render(){
-        const {rule, ui_blocked, change_ui_block, ssl} = this.props;
+        const {rule, ui_blocked, change_ui_block, ssl, disabled} = this.props;
         let tip = ' ';
         if (ui_blocked)
         {
@@ -535,7 +544,7 @@ class Trigger extends Pure_component {
                     rule={rule} style={{width: '100%'}}
                     field_row_inner_style={{paddingBottom: '1em'}}/>}
               </div>
-              <Trigger_code rule={rule}
+              <Trigger_code rule={rule} disabled={disabled}
                 type_changed={()=>change_ui_block(true)}
                 trigger_code_changed={this.trigger_code_changed}/>
             </React.Fragment>;
@@ -563,7 +572,8 @@ class Trigger_code extends Pure_component {
         return {trigger_code, type};
     }
     render(){
-        const {rule, type_changed, trigger_code_changed} = this.props;
+        const {rule, type_changed, trigger_code_changed,
+            disabled} = this.props;
         if (!this.state.trigger_code)
             return null;
         return <div className="trigger code">
@@ -573,7 +583,7 @@ class Trigger_code extends Pure_component {
                 field_row_inner_style={{paddingBottom: 6}}
                 on_change={type_changed}/>
               <Cm_wrapper on_change={trigger_code_changed}
-                val={this.state.trigger_code}/>
+                val={this.state.trigger_code} readonly={disabled}/>
             </div>;
     }
 }

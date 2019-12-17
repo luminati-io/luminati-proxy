@@ -19,17 +19,13 @@ const lpm_config = require('../util/lpm_config.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
-const semver = require('semver');
 const sudo_prompt = require('sudo-prompt');
-const pkg = require('../package.json');
-const is_pkg = typeof process.pkg!=='undefined';
 const util_lib = require('../lib/util.js');
-const os = require('os');
-const download = require('download');
 
 class Lum_node_index {
     constructor(argv){
         this.argv = argv;
+        this.upgrader_started = false;
     }
     init_log(){
         process.env.LPM_LOG_FILE = 'luminati_proxy_manager.log';
@@ -191,23 +187,24 @@ class Lum_node_index {
         logger.notice('Generating cert');
         ssl.gen_cert();
     }
-    restart_on_child_exit(){
+    restart_on_child_exit(is_upgraded){
         if (!this.child)
             return;
         this.child.removeListener('exit', this.restart_on_child_exit);
-        setTimeout(()=>this.create_child(), 5000);
+        setTimeout(()=>this.create_child(is_upgraded), 5000);
     }
     shutdown_on_child_exit(){
         process.exit();
     }
-    create_child(){
+    create_child(is_upgraded){
+        this.start_autoupgrade();
         process.env.LUM_MAIN_CHILD = true;
         this.child = child_process.fork(
             path.resolve(__dirname, 'lum_node.js'),
             process.argv.slice(2), {stdio: 'inherit', env: process.env});
         this.child.on('message', this.msg_handler.bind(this));
         this.child.on('exit', this.shutdown_on_child_exit);
-        this.child.send({command: 'run', argv: this.argv});
+        this.child.send({command: 'run', argv: this.argv, is_upgraded});
     }
     msg_handler(msg){
         switch (msg.command)
@@ -215,25 +212,32 @@ class Lum_node_index {
         case 'shutdown_master': return process.exit();
         case 'restart':
             this.child.removeListener('exit', this.shutdown_on_child_exit);
-            this.child.on('exit', this.restart_on_child_exit.bind(this));
+            this.child.on('exit', this.restart_on_child_exit.bind(this,
+                msg.is_upgraded));
             this.child.kill();
             break;
         case 'upgrade':
             this.upgrade(e=>this.child.send({command: 'upgrade_finished',
                 error: e}));
             break;
+        case 'downgrade':
+            this.downgrade(e=>this.child.send({command: 'downgrade_finished',
+                error: e}));
+            break;
         }
     }
-    run_script(script_f, log_f, cb){
+    run_upgrader(op, log_f, cb){
         const opt = {name: 'Luminati Proxy Manager'};
-        const full_path = `$(npm root -g)/${pkg.name}/bin/${script_f}`;
-        const cmd = `bash "${full_path}" ${log_f}`;
+        const args = (op? ` --${op}` : '')+` --log_file=${log_f}`;
+        const cmd = `node ${path.resolve(__dirname, 'upgrader.js')}`+args;
         sudo_prompt.exec(cmd, opt, cb);
     }
     handle_upgrade_downgrade_error(e, stderr, log_file, is_downgrade){
         const script = is_downgrade ? 'downgrade' : 'upgrade';
         if (e)
         {
+            if (e.signal=='SIGINT')
+                return;
             const msg = e.message=='User did not grant permission.' ?
                 e.message : zerr.e2s(e);
             logger.error(`Error during ${script}: ${msg}`);
@@ -245,50 +249,42 @@ class Lum_node_index {
             logger.error(`${script} stderr: ${stderr}`);
         check_compat();
     }
-    upgrade(cb){
-        if (is_pkg)
-            return this.upgrade_pkg(cb);
+    upgrade(cb, is_auto){
         const log_file = path.join(lpm_config.work_dir, 'upgrade.log');
-        logger.notice('Upgrading proxy manager...');
-        this.run_script('lpm_upgrade.sh', log_file, (e, stdout, stderr)=>{
-            if (cb)
-                cb(e);
-            this.handle_upgrade_downgrade_error(e, stderr, log_file);
-        });
+        if (!is_auto)
+            logger.notice('Upgrading proxy manager...');
+        this.run_upgrader(!is_auto ? 'upgrade' : '', log_file,
+            (e, stdout, stderr)=>{
+                if (cb)
+                    cb(e);
+                this.handle_upgrade_downgrade_error(e, stderr, log_file);
+            });
     }
-    downgrade(){
+    downgrade(cb){
         const log_file = path.join(lpm_config.work_dir, 'downgrade.log');
         logger.notice('Downgrading proxy manager...');
-        this.run_script('lpm_downgrade.sh', log_file, (e, stdout, stderr)=>{
-            if (e && e.code==1)
-            {
-                return logger.warn('Luminati proxy manager backup version '
-                +'does not exist!');
-            }
+        this.run_upgrader('downgrade', log_file, (e, stdout, stderr)=>{
+            if (stdout=='BACKUP_NOT_EXISTS')
+                e = 'Luminati proxy manager backup version does not exist!';
+            if (cb)
+                cb(e);
+            if (stdout=='BACKUP_NOT_EXISTS')
+                return logger.warn(e);
             if (!this.handle_upgrade_downgrade_error(e, stderr, log_file, 1))
                 logger.notice('Downgrade completed successfully');
         });
     }
-    upgrade_pkg(cb){
-    return etask(function*(){
-        const r = yield util_lib.json({
-            url: `${pkg.api_domain}/lpm_config.json`,
-            qs: {md5: pkg.lpm.md5, ver: pkg.version},
-        });
-        const newer = r.body.ver && semver.lt(pkg.version, r.body.ver);
-        if (!newer)
-            return cb();
-        logger.notice('Upgrading proxy manager...');
-        const install_path = path.resolve(os.homedir(),
-            'luminati_proxy_manager');
-        const download_url = `http://${pkg.api_domain}/static/lpm/`
-            +`luminati-proxy-${r.body.ver}-beta.exe`;
-        const upgrade_path = path.resolve(install_path, 'upgrade.exe');
-        yield download(download_url, upgrade_path);
-        child_process.spawn(upgrade_path, ['--upgrade_win', 1, '--kill_pid',
-            process.pid], {detached: true});
-        cb();
-    }); }
+    start_autoupgrade(){
+        if (this.argv.autoUpgrade && !this.upgrader_started)
+        {
+            this.upgrader_started = true;
+            this.upgrade(e=>{
+                this.upgrader_started = false;
+                if (this.child)
+                    this.child.send({command: 'upgrade_finished', error: e});
+            }, true);
+        }
+    }
     run(){
         if (this.run_daemon())
             return;

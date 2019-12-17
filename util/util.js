@@ -493,4 +493,37 @@ E.ensure_array = function(v, split){
     return [v];
 };
 
+E.reduce_obj = function(coll, key_cb, val_cb){
+    if (coll==null)
+        return {};
+    if (key_cb==null)
+        key_cb = function(it){ return it; };
+    else if (typeof key_cb=='string')
+    {
+        var kpath = E.path(key_cb);
+        key_cb = function(it){ return E.get(it, kpath); };
+    }
+    if (val_cb==null)
+        val_cb = function(it){ return it; };
+    else if (typeof val_cb=='string')
+    {
+        var vpath = E.path(val_cb);
+        val_cb = function(it){ return E.get(it, vpath); };
+    }
+    var obj = {};
+    if (Array.isArray(coll))
+    {
+        coll.forEach(function(item, i){
+            obj[key_cb(item, i)] = val_cb(item, i); });
+    }
+    else if (typeof coll=='object')
+    {
+        Object.keys(coll).forEach(function(k){
+            var item = coll[k];
+            obj[key_cb(item, k)] = val_cb(item, k);
+        });
+    }
+    return obj;
+};
+
 return E; }); }());

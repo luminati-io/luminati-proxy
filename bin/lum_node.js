@@ -13,11 +13,6 @@ const E = module.exports = {};
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
 const os = require('os');
-const is_pkg = typeof process.pkg!=='undefined';
-const path = require('path');
-const ws = require('lum_windows-shortcuts');
-const install_path = path.resolve(os.homedir(), 'luminati_proxy_manager');
-const exe_path = path.resolve(install_path, 'lpm.exe');
 const logger = require('../lib/logger.js');
 const util_lib = require('../lib/util.js');
 
@@ -131,94 +126,13 @@ const check_running = argv=>etask(function*(){
     }
 });
 
-const upgrade_win = function(){
-    try {
-        logger.notice('Copying %s to %s', process.execPath, exe_path);
-        file.copy_e(process.execPath, exe_path);
-        const subprocess = child_process.spawn(exe_path, ['--cleanup_win',
-            process.execPath, '--kill_pid', process.pid],
-            {detached: true, stdio: 'ignore', shell: true});
-        subprocess.unref();
-    } catch(e){
-        logger.notice(e.message);
-    }
-};
-
-const install_win = ()=>{
-    try {
-        logger.notice('Checking installation on Windows');
-        if (!file.exists(install_path))
-        {
-            file.mkdir_e(install_path);
-            logger.notice('Created %s', install_path);
-        }
-        if (process.execPath!=exe_path)
-            upgrade_win();
-        const lnk_path = path.resolve(os.homedir(),
-            'Desktop/Luminati Proxy Manager.lnk');
-        if (!file.exists(lnk_path))
-        {
-            ws.create(lnk_path, {
-                target: exe_path,
-                icon: path.join(__dirname, '../build/pkgcon.ico'),
-            }, e=>{
-                if (e)
-                    return console.log('ERR while creating a shortcut: %s', e);
-                console.log('shortcut created: %s', lnk_path);
-            });
-        }
-        const puppeteer_path = path.resolve(install_path, 'chromium');
-        if (file.exists(puppeteer_path))
-            return;
-        const old_install_path = path.resolve(os.homedir(),
-            'AppData/Local/Programs/@luminati-ioluminati-proxy');
-        const old_puppeteer_path = path.resolve(old_install_path,
-            'resources/app/node_modules/puppeteer/.local-chromium');
-        if (file.exists(old_puppeteer_path))
-        {
-            const new_puppeteer_path = path.resolve(install_path, 'chromium');
-            logger.notice('Copying puppeteer from %s to %s',
-                old_puppeteer_path, new_puppeteer_path);
-            file.rename_e(old_puppeteer_path, new_puppeteer_path);
-            return logger.notice(
-                'Puppeteer reused from previous installation');
-        }
-    } catch(e){
-        logger.error('There was an error while installing on Windows: %s',
-            e.message);
-    }
-};
-
-const cleanup_win = function(_path){
-    logger.notice('Cleaning up after installation. Deleting file %s', _path);
-    try {
-        file.unlink_e(_path);
-    } catch(e){
-        logger.notice(e.message);
-    }
-};
-
 E.run = (argv, run_config)=>etask(function*(){
-    if (is_pkg && argv.kill_pid)
-    {
-        logger.notice('Killing previous process %s', argv.kill_pid);
-        try {
-            process.kill(argv.kill_pid);
-            yield etask.sleep(4000);
-        } catch(e){
-            logger.notice('Could not kill process %s', argv.kill_pid);
-        }
-    }
+    const backup_exist_raw = child_process.execSync('test -d "$(npm root -g)'
+    +'/@luminati-io/luminati-proxy.old" && printf 1 || printf 0');
+    const backup_exist = +Buffer.from(backup_exist_raw).toString();
     yield check_running(argv);
-    if (is_pkg && argv.upgrade_win)
-        upgrade_win();
-    else if (is_pkg && argv.cleanup_win)
-        cleanup_win(argv.cleanup_win);
-    if (is_pkg)
-        install_win();
-    if (!is_pkg)
-        add_alias_for_whitelist_ips();
-    E.manager = new Manager(argv, Object.assign({}, run_config));
+    add_alias_for_whitelist_ips();
+    E.manager = new Manager(argv, Object.assign({backup_exist}, run_config));
     E.manager.on('stop', ()=>{
         zerr.flush();
         if (E.shutdown_timeout)
@@ -259,17 +173,36 @@ E.run = (argv, run_config)=>etask(function*(){
         zerr.perr('upgrade_start', perr_info());
         process.send({command: 'upgrade'});
         E.on_upgrade_finished = cb;
-    }).on('restart', ()=>process.send({command: 'restart'}));
+    })
+    .on('downgrade', cb=>{
+        if (E.on_downgrade_finished)
+            return;
+        zerr.perr('downgrade_start', perr_info());
+        process.send({command: 'downgrade'});
+        E.on_downgrade_finished = cb;
+    }).on('restart', is_upgraded=>
+        process.send({command: 'restart', is_upgraded}));
     E.manager.start();
 });
 
-E.handle_upgrade_finished = msg=>{
-    E.on_upgrade_finished(msg.error);
-    E.on_upgrade_finished = undefined;
+E.handle_upgrade_downgrade_finished = (msg, is_downgrade)=>{
+    if (!is_downgrade && E.on_upgrade_finished)
+    {
+        E.on_upgrade_finished(msg.error);
+        E.on_upgrade_finished = undefined;
+    }
+    if (is_downgrade && E.on_downgrade_finished)
+    {
+        E.on_downgrade_finished(msg.error);
+        E.on_downgrade_finished = undefined;
+    }
+    else if (E.manager)
+        E.manager.restart_when_idle(msg.error);
+    const op = is_downgrade ? 'downgrade' : 'upgrade';
     if (msg.error)
-        zerr.perr('upgrade_error', perr_info({error: msg.error}));
+        zerr.perr(`${op}_error`, perr_info({error: msg.error}));
     else
-        zerr.perr('upgrade_finish', perr_info());
+        zerr.perr(`${op}_finish`, perr_info());
 };
 
 E.handle_shutdown = msg=>{
@@ -279,11 +212,14 @@ E.handle_shutdown = msg=>{
 E.handle_msg = msg=>{
     switch (msg.command||msg.cmd)
     {
-    case 'upgrade_finished': E.handle_upgrade_finished(msg); break;
+    case 'upgrade_finished': E.handle_upgrade_downgrade_finished(msg); break;
+    case 'downgrade_finished':
+        E.handle_upgrade_downgrade_finished(msg, 1);
+        break;
     case 'shutdown': E.handle_shutdown(msg); break;
     case 'run':
         E.init(msg.argv);
-        E.run(msg.argv);
+        E.run(msg.argv, {is_upgraded: msg.is_upgraded});
         break;
     }
 };

@@ -48,6 +48,38 @@ const presets = {
             session: true,
         },
     },
+    unblocker: {
+        title: 'Automatic (Unblocker)',
+        subtitle: 'Unblocker handles IP management automatically',
+        set: opt=>{
+            opt.session = '';
+            opt.max_requests = 1;
+            opt.insecure = true;
+        },
+        clean: opt=>{
+            opt.max_requests = 0;
+            opt.insecure = false;
+        },
+        disabled: {
+            pool_size: true,
+            max_requests: true,
+            sticky_ip: true,
+            session_duration: true,
+            session: true,
+            session_termination: true,
+            headers: true,
+            rules: true,
+            proxy: true,
+            dns: true,
+            reverse_lookup: true,
+            insecure: true,
+            smtp: true,
+            trigger_type: true,
+            user_agent: true,
+            override_headers: true,
+        },
+        hidden: true,
+    },
     long_availability: {
         title: 'Long availability',
         subtitle: `Creates a pool of IPs and always uses the most stable IP

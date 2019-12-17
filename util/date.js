@@ -288,9 +288,9 @@ E.add = function(d, dur){
 
 function normalize_dur(dur){
     var aliases = {
-        years: 'year', months: 'month', days: 'day', hours: 'hour',
-        minutes: 'min', minute: 'min', mins: 'min',
-        seconds: 'sec', second: 'sec', secs: 'sec',
+        years: 'year', months: 'month', days: 'day',
+        hours: 'hour', minutes: 'min', seconds: 'sec',
+        minute: 'min', mins: 'min', second: 'sec', secs: 'sec',
         y: 'year', mo: 'month', d: 'day', h: 'hour', m: 'min', s: 'sec',
     };
     var norm = {};
@@ -633,7 +633,8 @@ E.strftime = function(fmt, d, opt){
             if (utc)
                 return '+0000';
             var off = typeof tz=='number' ? tz : -d.getTimezoneOffset();
-            return (off<0 ? '-' : '+')+pad(Math.abs(off/60), 2)+pad(off%60, 2);
+            return (off<0 ? '-' : '+')+pad(Math.abs(Math.trunc(off/60)), 2)+
+                pad(off%60, 2);
         default: return c;
         }
     }); }

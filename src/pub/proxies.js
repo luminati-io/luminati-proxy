@@ -856,7 +856,7 @@ class Actions extends Pure_component {
             const res = yield ajax.json({url, timeout: 25000});
             if (res.status!='ok')
             {
-                let errors = (res.status_details||[]).filter(s=>s.lvl=='err');
+                const errors = res.status_details||[];
                 res.status_details = errors.length ?
                     errors : [{msg: res.status}];
                 res.status = 'error';

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.164.586",
+        "version": "1.165.256",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -391,10 +391,6 @@
                                         "type": "object",
                                         "properties": {
                                             "msg": {"type": "string"},
-                                            "lvl": {
-                                                "type": "string",
-                                                "enum": ["err"]
-                                            },
                                             "field": {"type": "string"}
                                         }
                                     }
@@ -1055,6 +1051,59 @@
                     }
                 }
             }
+        },
+        "/lpm_users": {
+            "get": {
+                "description": "List of all the available LPM users for the account",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "vips": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/lpm_user_object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/lpm_user": {
+            "post": {
+                "description": "Creates a new LPM user",
+                "tags": ["Manager"],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/general_logs": {
+            "get": {
+                "description": "Returns the tail from the log file",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of the lines from the log file",
+                        "type": "number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+
         }
     },
     "definitions": {
@@ -1080,6 +1129,13 @@
                 "vip": {"type": "string"},
                 "mapping": {"type": "string"},
                 "country": {"type": "string"}
+            }
+        },
+        "lpm_user_object": {
+            "type": "object",
+            "properties": {
+                "email": {"type": "string"},
+                "password": {"type": "string"}
             }
         },
         "stat": {
@@ -1304,6 +1360,14 @@
                 "multiply": {
                     "type": "integer",
                     "description": "Multiply the port definition given number of times"
+                },
+                "multiply_users": {
+                    "type": "boolean"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "List of users. This option has to be used along with \"multiply_users\""
                 },
                 "ssl": {
                     "type": "boolean",

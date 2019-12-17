@@ -33,7 +33,7 @@ import '../css/proxy_edit.less';
 const Index = withRouter(class Index extends Pure_component {
     constructor(props){
         super(props);
-        this.state = {form: {}, warnings: [], errors: {}, show_loader: false,
+        this.state = {form: {}, errors: {}, show_loader: false,
             saving: false};
         this.debounced_save = _.debounce(this.save, 500);
         this.debounced = [];
@@ -247,7 +247,6 @@ const Index = withRouter(class Index extends Pure_component {
             return;
         }
         const data = this.prepare_to_save();
-        const check_url = '/api/proxy_check/'+this.props.match.params.port;
         this.saving = true;
         const _this = this;
         this.etask(function*(){
@@ -260,25 +259,18 @@ const Index = withRouter(class Index extends Pure_component {
                 _this.setState({saving: false}, ()=>_this.lock_nav(false));
                 _this.saving = false;
             });
-            const raw_check = yield window.fetch(check_url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data),
-            });
-            const json_check = yield raw_check.json();
-            const errors = json_check.filter(e=>e.lvl=='err');
-            _this.set_errors(errors);
-            if (errors.length)
-                return $('#save_proxy_errors').modal('show');
-            const warnings = json_check.filter(w=>w.lvl=='warn');
-            if (warnings.length)
-                _this.setState({warnings});
             const update_url = '/api/proxies/'+_this.props.match.params.port;
-            yield window.fetch(update_url, {
+            const raw_resp = yield window.fetch(update_url, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({proxy: data}),
             });
+            const json_resp = yield raw_resp.json();
+            if (json_resp.errors)
+            {
+                _this.set_errors(json_resp.errors);
+                return $('#save_proxy_errors').modal('show');
+            }
             if (_this.props.match.params.port!=_this.state.form.port)
             {
                 const port = _this.state.form.port;
@@ -346,17 +338,19 @@ const Index = withRouter(class Index extends Pure_component {
         return save_form;
     };
     get_curr_plan = ()=>{
+        if (!this.state.zones)
+            return {};
         const zone_name = this.state.form.zone || this.state.zones.def;
         const zone = this.state.zones.zones.find(p=>p.name==zone_name) || {};
-        return zone.plan;
+        return zone.plan || {};
     };
     render(){
         // XXX krzysztof: cleanup type (index.js rotation.js general.js)
-        const curr_plan = this.state.zones && this.get_curr_plan();
+        const curr_plan = this.get_curr_plan();
         let type;
-        if (curr_plan && (curr_plan.type||'').startsWith('static'))
+        if ((curr_plan.type||'').startsWith('static'))
             type = 'ips';
-        else if (curr_plan && !!curr_plan.vip)
+        else if (curr_plan.vip)
             type = 'vips';
         const zone = this.state.form.zone ||
             this.state.zones && this.state.zones.def;
@@ -372,7 +366,7 @@ const Index = withRouter(class Index extends Pure_component {
                     {t('All changes are automatically saved to LPM')}/>
                 </div>
                 <Nav disabled={!!this.state.form.ext_proxies}
-                  form={this.state.form}
+                  form={this.state.form} plan={curr_plan}
                   on_change_preset={this.apply_preset}/>
                 <Nav_tabs_wrapper/>
               </div>
@@ -382,7 +376,7 @@ const Index = withRouter(class Index extends Pure_component {
                 <Warnings warnings={this.state.error_list}/>
               </Modal>
               <Alloc_modal type={type} form={this.state.form} zone={zone}
-                plan={curr_plan||{}}/>
+                plan={curr_plan}/>
             </div>}</T>;
     }
 });
@@ -472,16 +466,25 @@ class Nav extends Pure_component {
         setdb.set('head.proxy_edit.disabled_fields', disabled_fields);
         this._reset_fields();
     };
-    update_zone = val=>{
-        setdb.set('head.proxy_edit.zone_name', val);
-        this.set_field('zone', val);
+    update_zone = new_zone=>{
+        let new_preset;
+        const curr_zone = this.props.form.zone;
+        if (this.is_unblocker(curr_zone) && !this.is_unblocker(new_zone))
+            new_preset = Object.keys(presets).find(p=>presets[p].default);
+        else if (!this.is_unblocker(curr_zone) && this.is_unblocker(new_zone))
+            new_preset = 'unblocker';
         if (this.props.form.ips.length || this.props.form.vips.length)
             this.set_field('pool_size', 0);
-        this._reset_fields();
+        if (new_preset)
+            this.update_preset(new_preset);
+        else
+            this._reset_fields();
+        setdb.set('head.proxy_edit.zone_name', new_zone);
+        this.set_field('zone', new_zone);
         const save_form = Object.assign({}, this.props.form);
         for (let field in save_form)
         {
-            if (!this.is_valid_field(field, val))
+            if (!this.is_valid_field(field, new_zone))
             {
                 let v = '';
                 if (field=='city'||field=='asn')
@@ -490,14 +493,31 @@ class Nav extends Pure_component {
             }
         }
     };
+    is_unblocker(zone_name){
+        if (!this.state.zones)
+            return false;
+        const zone = this.state.zones.zones.find(z=>z.name==zone_name)||{};
+        return zone.plan && zone.plan.type=='unblocker';
+    }
     render(){
-        const presets_opt = Object.keys(presets).map(p=>{
-            let key = presets[p].title;
-            if (presets[p].default)
-                key = `Default (${key})`;
-            return {key, value: p};
-        });
+        let presets_opt;
+        // XXX krzysztof: hide this logic to presets module: filtering,
+        // preparing options
+        if (this.is_unblocker(this.props.form.zone))
+            presets_opt = [{key: presets.unblocker.title, value: 'unblocker'}];
+        else
+        {
+            presets_opt = Object.keys(presets).filter(p=>!presets[p].hidden)
+                .map(p=>{
+                let key = presets[p].title;
+                if (presets[p].default)
+                    key = `Default (${key})`;
+                return {key, value: p};
+            });
+        }
         const preset = this.props.form.preset;
+        const is_unblocker = this.props.plan.type=='unblocker';
+        const preset_disabled = this.props.disabled || is_unblocker;
         const href = window.location.href;
         const is_local = href.includes('localhost')||
             href.includes('127.0.0.1');
@@ -506,7 +526,8 @@ class Nav extends Pure_component {
                 on_change_wrapper={this.update_zone}
                 disabled={this.props.disabled} preview/>
               <Field i18n on_change={this.update_preset} options={presets_opt}
-                value={preset} disabled={this.props.disabled} id="preset"
+                value={preset} disabled={preset_disabled}
+                ext_tooltip={!is_unblocker} id="preset"
                 tooltip={
                   <Preset_description preset={preset} rule_clicked={()=>0}/>
                 }/>
@@ -517,12 +538,12 @@ class Nav extends Pure_component {
     }
 }
 
-const Field = ({id, disabled, children, i18n, ...props})=>{
+const Field = ({id, disabled, children, i18n, ext_tooltip, ...props})=>{
     const options = props.options||[];
     return <T>{t=><div className="field" data-tip data-for={id+'tip'}>
           <React_tooltip id={id+'tip'} type="light" effect="solid"
             place="bottom" delayHide={0} delayUpdate={300}>
-            {disabled ? <Ext_tooltip/> : props.tooltip}
+            {disabled && ext_tooltip ? <Ext_tooltip/> : props.tooltip}
           </React_tooltip>
           <select value={props.value} disabled={disabled}
             onChange={e=>props.on_change(e.target.value)}>

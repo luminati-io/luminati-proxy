@@ -27,25 +27,33 @@ export class Pins extends Pure_component {
         max_id: 0,
         modal_open: false,
         pending: this.props.pending||[],
+        disabled: false,
     };
     static getDerivedStateFromProps(props, state){
-        if (props.val==state.raw_val||!props.val)
+        if (state.disabled==props.disabled &&
+            (props.val==state.raw_val||!props.val))
+        {
             return null;
+        }
         const ips = props.val||[];
-        const disabled_ips = props.disabled||[];
+        const disabled_ips = props.disabled_ips||[];
         const pins = ips.map((p, id)=>({
             id,
             val: p,
             edit: false,
-            disabled: !!disabled_ips.find(i=>i==p),
+            disabled: props.disabled || !!disabled_ips.find(i=>i==p),
         }));
-        const edited_pin = state.pins.find(p=>p.edit);
-        if (edited_pin)
-            pins.push(edited_pin);
+        if (!props.disabled)
+        {
+            const edited_pin = state.pins.find(p=>p.edit);
+            if (edited_pin)
+                pins.push(edited_pin);
+        }
         return {
             raw_val: props.val,
             pins,
             max_id: ips.length,
+            disabled: props.disabled,
         };
     }
     add_pin = (pin='')=>{
@@ -100,12 +108,12 @@ export class Pins extends Pure_component {
     dismiss_modal = ()=>this.setState({modal_open: false});
     open_modal = ()=>this.setState({modal_open: true});
     render(){
-        const pending = this.state.pending;
+        const {pending, disabled, pins} = this.state;
         const pending_btn_title = `Add recent IPs (${pending.length})`;
-        const has_any = this.state.pins.find(p=>p.val==ANY_IP);
+        const has_any = pins.find(p=>p.val==ANY_IP);
         return <div className="pins_field">
               <div className="pins">
-                {this.state.pins.map(p=>
+                {pins.map(p=>
                   <Pin key={p.id} update_pin={this.update_pin} id={p.id}
                     set_edit={this.set_edit} edit={p.edit}
                     exact={this.props.exact} save_pin={this.save_pin}
@@ -116,8 +124,8 @@ export class Pins extends Pure_component {
                 )}
               </div>
               <Pin_btn title="Add IP" tooltip="Add new IP to the list"
-                on_click={this.add_empty_pin}/>
-              {!!pending.length &&
+                on_click={this.add_empty_pin} disabled={disabled}/>
+              {!!pending.length && !disabled &&
                 <Pin_btn on_click={this.open_modal} title={pending_btn_title}/>
               }
               <Modal_dialog title="Add recent IPs"
@@ -214,10 +222,10 @@ class Pin extends Pure_component {
     }
 }
 
-export const Pin_btn = ({on_click, title, tooltip, icon})=>
+export const Pin_btn = ({on_click, title, tooltip, disabled})=>
     <Tooltip title={tooltip}>
       <button className="btn btn_lpm btn_lpm_small add_pin"
-        onClick={on_click}>
+        onClick={on_click} disabled={disabled}>
         {title}
         <i className="glyphicon glyphicon-plus"/>
       </button>

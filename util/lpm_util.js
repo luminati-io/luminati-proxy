@@ -61,6 +61,7 @@ E.init_args = args=>{
         status: 'Show proxy manager processes current status',
         'show-logs': 'Show logs of the currently running LPM instance',
         'gen-cert': 'Generate cert',
+        'auto-upgrade': 'Enable auto upgrade',
     };
     const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)

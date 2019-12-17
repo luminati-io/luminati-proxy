@@ -94,7 +94,8 @@ export default class General extends Pure_component {
                 <Users_modal form={this.state.form}/>
                 <Config type="text" id="internal_name"/>
                 <Config type="number" id="port"/>
-                <Config type="pins" id="whitelist_ips" disabled={disabled_wl}/>
+                <Config type="pins" id="whitelist_ips"
+                  disabled_ips={disabled_wl}/>
                 <Config type="select" data={proxy_connection_type_opt}
                   id="proxy_connection_type"/>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>

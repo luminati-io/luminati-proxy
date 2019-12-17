@@ -25,7 +25,8 @@ const Nav = ()=>
       <Nav_top/>
       <Nav_left/>
       <Report_bug_modal/>
-      <Upgrade_modal/>
+      <Upgrade_downgrade_modal action='upgrade'/>
+      <Upgrade_downgrade_modal action='downgrade'/>
       <Shutdown_modal/>
     </div>;
 
@@ -135,21 +136,37 @@ const show_reload = function(){
     });
 };
 
-class Upgrade_modal extends Pure_component {
+class Upgrade_downgrade_modal extends Pure_component {
     confirm(){
-        window.setTimeout(()=>$('#upgrading').modal(), 500);
+        const loading_modal = this.props.action=='upgrade' ?
+            '#upgrading' : '#downgrading';
+        window.setTimeout(()=>$(loading_modal).modal(), 500);
+        const _this = this;
         this.etask(function*(){
             this.on('uncaught', e=>{
-                $('#upgrading').modal('hide');
-                setdb.set('head.upgrade_error', e.message);
-                setdb.set('head.upgrading', false);
+                $(loading_modal).modal('hide');
+                if (_this.props.action=='upgrade')
+                {
+                    setdb.set('head.upgrade_error', e.message);
+                    setdb.set('head.upgrading', false);
+                }
             });
             setdb.set('head.upgrading', true);
-            yield ajax({url: '/api/upgrade', method: 'POST', timeout: 600000});
+            if (_this.props.action=='upgrade')
+            {
+                yield ajax({url: '/api/upgrade', method: 'POST',
+                    timeout: 600000});
+            }
+            else
+            {
+                yield ajax({url: '/api/downgrade', method: 'POST',
+                    timeout: 100000});
+            }
             yield ajax({url: '/api/restart', method: 'POST'});
-            $('#upgrading').modal('hide');
+            $(loading_modal).modal('hide');
             show_reload();
-            setdb.set('head.upgrading', false);
+            if (_this.props.action=='upgrade')
+                setdb.set('head.upgrading', false);
             setTimeout(function _check_reload(){
                 const retry_cb = ()=>{ setTimeout(_check_reload, 500); };
                 etask(function*(){
@@ -161,9 +178,12 @@ class Upgrade_modal extends Pure_component {
         });
     }
     render(){
-        return <Modal id="upgrade_modal"
-              click_ok={this.confirm.bind(this)}
-              title="The application will be upgraded and restarted"/>;
+        const action = this.props.action=='upgrade' ?
+            'upgraded' : 'downgraded';
+        const id = this.props.action=='upgrade' ?
+            'upgrade_modal' : 'downgrade_modal';
+        return <Modal id={id} click_ok={this.confirm.bind(this)}
+              title={'The application will be '+action+' and restarted'}/>;
     }
 }
 
@@ -191,9 +211,12 @@ const Account = withRouter(class Account extends Pure_component {
     componentDidMount(){
         this.setdb_on('head.settings', settings=>this.setState({settings}));
         this.setdb_on('head.ver_last', ver_last=>this.setState({ver_last}));
+        this.setdb_on('head.backup_exist', backup_exist=>
+            this.setState({backup_exist}));
     }
     open_report_bug = ()=>$('#report_bug_modal').modal();
     upgrade = ()=>$('#upgrade_modal').modal();
+    downgrade = ()=>$('#downgrade_modal').modal();
     shutdown = ()=>$('#shutdown_modal').modal();
     logout = ()=>{
         const _this = this;
@@ -220,6 +243,9 @@ const Account = withRouter(class Account extends Pure_component {
               <ul className="dropdown-menu dropdown-menu-right">
                 {is_upgradable &&
                   <li><a onClick={this.upgrade}>{t('Upgrade')}</a></li>
+                }
+                {!!this.state.backup_exist &&
+                    <li><a onClick={this.downgrade}>{t('Downgrade')}</a></li>
                 }
                 <li>
                   <a onClick={this.open_report_bug}>{t('Report a bug')}</a>

@@ -31,14 +31,26 @@ E.leaky_bucket = function leaky_bucket(size, rate){
     this.level = 0;
 };
 
-E.leaky_bucket.prototype.inc = function(inc){
-    if (inc===undefined)
-        inc = 1;
+E.leaky_bucket.prototype._update_level = function(){
     var now = Date.now();
     this.level -= this.rate * (now - this.time);
     this.time = now;
     if (this.level<0)
         this.level = 0;
+};
+
+E.leaky_bucket.prototype.inc_would_exceed = function(inc){
+    if (inc===undefined)
+        inc = 1;
+    this._update_level();
+    var new_level = this.level + inc;
+    return new_level>this.size;
+};
+
+E.leaky_bucket.prototype.inc = function(inc){
+    if (inc===undefined)
+        inc = 1;
+    this._update_level();
     var new_level = this.level + inc;
     if (new_level>this.size)
         return false;

@@ -41,18 +41,24 @@ E.get_password = (proxy, zone_name, zones)=>{
         return proxy.password;
 };
 
-E.is_static_proxy = (zone_name, zones)=>{
+const get_plan = (zone_name, zones, type)=>{
     const zone = zones.find(z=>z.zone==zone_name);
-    if (!zone)
-        return false;
-    return zone.plan && zone.plan.type=='static';
+    return zone && zone.plan || {};
+};
+
+E.is_static_proxy = (zone_name, zones)=>{
+    const plan = get_plan(zone_name, zones);
+    return plan.type=='static';
+};
+
+E.is_unblocker = (zone_name, zones)=>{
+    const plan = get_plan(zone_name, zones);
+    return plan.type=='unblocker' || plan.unblocker;
 };
 
 E.is_mobile = (zone_name, zones)=>{
-    const zone = zones.find(z=>z.zone==zone_name);
-    if (!zone)
-        return false;
-    return !!(zone.plan && zone.plan.mobile);
+    const plan = get_plan(zone_name, zones);
+    return !!plan.mobile;
 };
 
 // XXX krzysztof: TODO

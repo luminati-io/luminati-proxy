@@ -12,7 +12,7 @@ import {T} from '../common/i18n.js';
 
 export default class Headers extends Pure_component {
     first_header = {name: '', value: ''};
-    state = {headers: [this.first_header]};
+    state = {headers: [this.first_header], disabled_fields: {}};
     goto_field = setdb.get('head.proxy_edit.goto_field');
     set_field = setdb.get('head.proxy_edit.set_field');
     componentDidMount(){
@@ -25,6 +25,8 @@ export default class Headers extends Pure_component {
         this.setdb_on('head.proxy_edit.form', form=>{
             form && this.setState({form});
         });
+        this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
+            disabled_fields&&this.setState({disabled_fields}));
     }
     add = ()=>this.set_field('headers', [
         ...this.state.headers, {name: '', value: ''}]);
@@ -72,7 +74,7 @@ export default class Headers extends Pure_component {
                       <Header last={i+1==this.state.headers.length} key={i}
                         name={h.name} value={h.value} update={this.update(i)}
                         remove_clicked={this.remove} add_clicked={this.add}
-                        idx={i}/>
+                        idx={i} disabled={this.state.disabled_fields.headers}/>
                     )}
                   </div>
                 </Field_row_raw>
@@ -82,14 +84,19 @@ export default class Headers extends Pure_component {
 }
 
 const Header = ({name, value, idx, add_clicked, remove_clicked, last,
-    update})=>
+    update, disabled})=>
     <div className="single_header">
       <div className="desc">Name</div>
-      <Input type="text" val={name} on_change_wrapper={update('name')}/>
+      <Input type="text" val={name} on_change_wrapper={update('name')}
+        disabled={disabled}/>
       <div className="desc">Value</div>
-      <Input type="text" val={value} on_change_wrapper={update('value')}/>
-      <div className="action_icons">
-        <Remove_icon tooltip="Remove header" click={()=>remove_clicked(idx)}/>
-        {last && <Add_icon tooltip="Add header" click={add_clicked}/>}
-      </div>
+      <Input type="text" val={value} on_change_wrapper={update('value')}
+        disabled={disabled}/>
+      {!disabled &&
+        <div className="action_icons">
+          <Remove_icon tooltip="Remove header"
+            click={()=>remove_clicked(idx)}/>
+          {last && <Add_icon tooltip="Add header" click={add_clicked}/>}
+        </div>
+      }
     </div>;

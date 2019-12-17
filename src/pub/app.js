@@ -39,6 +39,8 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const version = yield ajax.json({url: '/api/version'});
             setdb.set('head.version', version.version);
+            setdb.set('head.is_upgraded', version.is_upgraded);
+            setdb.set('head.backup_exist', version.backup_exist);
             setdb.set('head.argv', version.argv);
         });
         this.etask(function*(){
@@ -170,6 +172,20 @@ const Old_modals = ()=>
             <div className="modal-header">
               <h4 className="modal-title">
                 Luminati Proxy Manager is upgrading</h4>
+            </div>
+            <div className="modal-body">
+              Please wait...
+            </div>
+            <div className="modal-footer"/>
+          </div>
+        </div>
+      </div>
+      <div id="downgrading" className="modal fade" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">
+                Luminati Proxy Manager is downgrading</h4>
             </div>
             <div className="modal-body">
               Please wait...

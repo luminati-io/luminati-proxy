@@ -414,6 +414,7 @@ class Tables_container extends Pure_component {
             sorted: {field: 'timestamp', dir: 1},
         };
         this.reqs_to_render = [];
+        this.temp_total = 0;
         this.take_reqs_from_pool = _.throttle(this.take_reqs_from_pool, 100);
     }
     componentDidUpdate(prev_props){
@@ -436,16 +437,7 @@ class Tables_container extends Pure_component {
                 reqs: [],
                 stats: {total: 0, sum_out: 0, sum_in: 0},
             });
-        });
-        this.setdb_on('head.har_viewer.refresh', refresh=>{
-            if (!refresh)
-                return;
-            this.loaded.to = 0;
-            this.setState({
-                reqs: [],
-                stats: {total: 0, sum_out: 0, sum_in: 0},
-            });
-        });
+        }, {init: false});
         this.setdb_on('head.har_viewer.reqs', reqs=>{
             if (reqs)
                 this.setState({reqs});
@@ -473,13 +465,13 @@ class Tables_container extends Pure_component {
         this.take_reqs_from_pool.cancel();
     }
     fetch_missing_data = pos=>{
-        if (this.state.stats&&this.state.stats.total&&
+        if (this.state.stats && this.state.stats.total &&
             this.state.reqs.length==this.state.stats.total)
         {
             return;
         }
         if (pos=='bottom')
-            this.get_data({skip: this.loaded.to});
+            this.get_data({skip: this.loaded.to-this.temp_total});
     };
     get_params = opt=>{
         const params = opt;
@@ -538,9 +530,13 @@ class Tables_container extends Pure_component {
             });
             setdb.set('head.har_viewer.reqs', new_reqs_unique);
             _this.loaded.to = opt.skip+reqs.length;
-            const stats = {total: res.total, sum_out: res.sum_out,
-                sum_in: res.sum_in};
-            if (!_this.state.stats||!_this.state.stats.total)
+            const stats = {
+                total: res.total+_this.temp_total,
+                sum_out: res.sum_out,
+                sum_in: res.sum_in,
+            };
+            _this.temp_total = 0;
+            if (!_this.state.stats)
                 setdb.set('head.har_viewer.stats', stats);
         });
     };
@@ -646,13 +642,19 @@ class Tables_container extends Pure_component {
         this.reqs_to_render = [];
         this.setState(prev=>{
             const new_state = {reqs: new_reqs};
-            new_state.stats = {
-                total: prev.stats.total + all_reqs.filter(r=>r.pending).length,
-                sum_out: prev.stats.sum_out + all_reqs.reduce((acc, r)=>
-                    acc+r.details.out_bw||0, 0),
-                sum_in: prev.stats.sum_in + all_reqs.reduce((acc, r)=>
-                    acc+r.details.in_bw||0, 0),
-            };
+            if (prev.stats)
+            {
+                new_state.stats = {
+                    total: prev.stats.total+
+                        all_reqs.filter(r=>r.pending).length,
+                    sum_out: prev.stats.sum_out+all_reqs.reduce((acc, r)=>
+                        acc+r.details.out_bw||0, 0),
+                    sum_in: prev.stats.sum_in+all_reqs.reduce((acc, r)=>
+                        acc+r.details.in_bw||0, 0),
+                };
+            }
+            else
+                this.temp_total += all_reqs.filter(r=>r.pending).length;
             return new_state;
         });
     };
@@ -820,6 +822,7 @@ class Data_container extends Pure_component {
                   checked_all={this.state.checked_all} focused={focused}/>
               </table>
               <Waypoint key={reqs.length} scrollableAncestor={this.dc.current}
+                bottomOffset="-50px"
                 onEnter={this.handle_viewpoint_enter}/>
             </div>;
     }

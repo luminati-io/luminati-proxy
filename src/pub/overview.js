@@ -44,6 +44,7 @@ class Overview extends Pure_component {
         return <div className="overview_page">
               <div className="warnings">
                 <Upgrade/>
+                <Upgrade_warning/>
                 <Tls_warning show={this.state.tls_warning}/>
                 <Warnings warnings={this.state.warnings}/>
               </div>
@@ -155,6 +156,31 @@ class Upgrade extends Pure_component {
               </div>
             }
         </Warning>;
+    }
+}
+
+class Upgrade_warning extends Pure_component {
+    state = {is_upgraded: false};
+    componentDidMount(){
+        this.setdb_on('head.version', ver=>this.setState({ver}));
+        this.setdb_on('head.is_upgraded', is_upgraded=>
+            this.setState({is_upgraded}));
+    }
+    on_click(){
+        $('#downgrade_modal').modal();
+    }
+    render(){
+        const {is_upgraded, ver} = this.state;
+        if (!is_upgraded||!ver)
+            return null;
+        return <Warning id={'upgrade_alert'+ver}>
+              <span>
+                <strong><T>LPM was upgraded in the background. </T></strong>
+                <T>Click here to </T>
+                <a className="link"
+                  onClick={this.on_click.bind(this)}><T>downgrade.</T></a>
+              </span>
+            </Warning>;
     }
 }
 

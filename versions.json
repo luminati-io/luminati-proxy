@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.165.256",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Improved upgrading mechanism"
+            },
+            {
+                "type": "star",
+                "text": "Added --auto-upgrade option"
+            }
+        ]
+    },
+    {
         "ver": "1.164.586",
         "type": "stable",
         "changes": [
