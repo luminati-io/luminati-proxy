@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.165.449 Stable
+- :bug: Fixed check for a backup version on windows
+
 ## 1.165.421 
 
 ## 1.165.256 Stable

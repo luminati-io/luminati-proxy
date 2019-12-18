@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.165.449",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed check for a backup version on windows"
+            }
+        ]
+    },
+    {
         "ver": "1.165.421",
         "type": "stable/dev",
         "changes": []
