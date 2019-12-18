@@ -2,17 +2,17 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
 const child_process = require('child_process');
+const path = require('path');
 const argv = require('yargs').argv;
 const util_lib = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const etask = require('../util/etask.js');
-const pkg = require('../package.json');
 const {manager_default} = require('../util/lpm_config.js');
 const E = module.exports = {};
 
 E.run_script = (script_f, log_f, cb)=>{
     const opt = {name: 'Luminati Proxy Manager'};
-    const full_path = `$(npm root -g)/${pkg.name}/bin/${script_f}`;
+    const full_path = path.resolve(__dirname, script_f);
     const cmd = `bash "${full_path}" ${log_f}`;
     child_process.exec(cmd, opt, cb);
 };
@@ -55,7 +55,7 @@ E.run = ()=>{
         if (E.upgrading)
             return;
         const v = yield util_lib.get_last_version(manager_default.api);
-        if (v.newer && v.auto_update)
+        if (v.newer)
         {
             E.upgrading = true;
             E.upgrade(e=>{

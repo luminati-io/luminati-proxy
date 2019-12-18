@@ -27,10 +27,6 @@ class Lum_node_index {
         this.argv = argv;
         this.upgrader_started = false;
     }
-    init_log(){
-        process.env.LPM_LOG_FILE = 'luminati_proxy_manager.log';
-        process.env.LPM_LOG_DIR = lpm_config.work_dir;
-    }
     is_daemon_running(list){
         const daemon = list.find(p=>p.name==lpm_config.daemon_name);
         return !!daemon &&
@@ -228,7 +224,7 @@ class Lum_node_index {
     }
     run_upgrader(op, log_f, cb){
         const opt = {name: 'Luminati Proxy Manager'};
-        const args = (op? ` --${op}` : '')+` --log_file=${log_f}`;
+        const args = (op ? ` --${op}` : '')+` --log_file=${log_f}`;
         const cmd = `node ${path.resolve(__dirname, 'upgrader.js')}`+args;
         sudo_prompt.exec(cmd, opt, cb);
     }
@@ -274,52 +270,7 @@ class Lum_node_index {
                 logger.notice('Downgrade completed successfully');
         });
     }
-    start_autoupgrade(){
-        if (this.argv.autoUpgrade && !this.upgrader_started)
-        {
-            this.upgrader_started = true;
-            this.upgrade(e=>{
-                this.upgrader_started = false;
-                if (this.child)
-                    this.child.send({command: 'upgrade_finished', error: e});
-            }, true);
-        }
-    }
-    run(){
-        if (this.run_daemon())
-            return;
-        if (this.argv.status)
-            return this.show_status();
-        if (this.argv.showLogs)
-            return this.show_logs();
-        if (this.argv.genCert)
-            return this.gen_cert();
-        this.init_log();
-        if (lpm_config.is_win)
-        {
-            const readline = require('readline');
-            readline.createInterface({input: process.stdin, output:
-                process.stdout}).on('SIGINT', ()=>process.emit('SIGINT'));
-        }
-        // XXX krzysztof: duplication of handling siganls: why?
-        ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
-            process.on(sig, e=>{
-                if (this.child)
-                {
-                    const error = zerr.e2s(e);
-                    this.child.send({
-                        command: 'shutdown',
-                        reason: sig+(e ? ', master: error = '+error : ''),
-                        error,
-                    });
-                }
-                setTimeout(()=>process.exit(), 5000);
-            });
-        });
-        if (this.argv.downgrade)
-            return this.downgrade();
-        if (!this.argv.upgrade)
-            return this.create_child();
+    upgrade_cli(){
         const _this = this;
         return etask(function*_upgrade(){
             yield zerr.perr('upgrade_start');
@@ -342,6 +293,54 @@ class Lum_node_index {
                 yield zerr.perr('upgrade_finish');
             }));
         });
+    }
+    start_autoupgrade(){
+        if (!this.argv.autoUpgrade || this.upgrader_started)
+            return;
+        this.upgrader_started = true;
+        this.upgrade(e=>{
+            this.upgrader_started = false;
+            if (this.child)
+                this.child.send({command: 'upgrade_finished', error: e});
+        }, true);
+    }
+    run(){
+        if (this.run_daemon())
+            return;
+        else if (this.argv.status)
+            return this.show_status();
+        else if (this.argv.showLogs)
+            return this.show_logs();
+        else if (this.argv.genCert)
+            return this.gen_cert();
+        if (lpm_config.is_win)
+        {
+            const readline = require('readline');
+            readline.createInterface({
+                input: process.stdin,
+                output: process.stdout,
+            }).on('SIGINT', ()=>process.emit('SIGINT'));
+        }
+        // XXX krzysztof: duplication of handling siganls: why?
+        ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
+            process.on(sig, e=>{
+                if (this.child)
+                {
+                    const error = zerr.e2s(e);
+                    this.child.send({
+                        command: 'shutdown',
+                        reason: sig+(e ? ', master: error = '+error : ''),
+                        error,
+                    });
+                }
+                setTimeout(()=>process.exit(), 5000);
+            });
+        });
+        if (this.argv.upgrade)
+            return this.upgrade_cli();
+        else if (this.argv.downgrade)
+            return this.downgrade();
+        return this.create_child();
     }
 }
 module.exports = Lum_node_index;

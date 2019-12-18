@@ -45,7 +45,6 @@ conf.server_default = {
     insecure: false,
     proxy_connection_type: 'http',
     ssl: false,
-    http2: false,
     test_url: 'http://lumtest.com/myip.json',
     proxy: conf.default_superproxy_domain,
     proxy_port: 22225,

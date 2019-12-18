@@ -99,8 +99,6 @@ export default class General extends Pure_component {
                 <Config type="select" data={proxy_connection_type_opt}
                   id="proxy_connection_type"/>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
-                <Config type="yes_no" id="http2"
-                  disabled={!this.state.form.ssl}/>
                 <Config type="yes_no" id="insecure"
                   disabled={!this.state.form.ssl}/>
                 <Config type="select" data={route_err_opt} id="route_err"/>

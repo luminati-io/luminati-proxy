@@ -266,11 +266,6 @@ export const tabs = {
                     requests`,
                 ext: true,
             },
-            http2: {
-                label: 'Use HTTP2',
-                tooltip: `Enable HTTP2 requests forwarding (experimental)`,
-                ext: true,
-            },
             proxy_connection_type: {
                 label: 'Connection to Super Proxy',
                 tooltip: 'Connection type between LPM and Super Proxy',

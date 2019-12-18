@@ -151,14 +151,6 @@ describe('proxy', ()=>{
                 const res = yield l.test(ping.http.url);
                 assert.ok(!res.body.headers['x-hola-agent']);
             }));
-            it('not added when using external proxy', ()=>etask(function*(){
-                l = yield lum({ext_proxies: ['username:password@1.1.1.1']});
-                // XXX krzysztof: this needs completely new logic for testing
-                // const stub = sinon.stub(l.http, 'request').returns({});
-                // request that stubbs connection to the internet
-                // const res = yield l.test(ping.http.url);
-                // assert.ok(!res.body.headers['x-hola-agent']);
-            }));
         });
         describe('X-Hola-Context', ()=>{
             const t = (name, _url, opt, target, skip_res)=>it(name, ()=>etask(

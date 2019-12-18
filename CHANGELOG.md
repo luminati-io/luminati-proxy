@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.165.421 
+
 ## 1.165.256 Stable
 - :sparkles: Improved upgrading mechanism
 - :star: Added --auto-upgrade option
