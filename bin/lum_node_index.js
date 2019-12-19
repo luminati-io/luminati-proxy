@@ -226,13 +226,12 @@ class Lum_node_index {
             break;
         }
     }
-    run_upgrader(op, log_f, cb){
+    run_upgrader(cb){
         const opt = {name: 'Luminati Proxy Manager'};
-        const args = (op ? ` --${op}` : '')+` --log_file=${log_f}`;
-        const cmd = `node ${path.resolve(__dirname, 'upgrader.js')}`+args;
+        const cmd = `node ${path.resolve(__dirname, 'upgrader.js')}`;
         sudo_prompt.exec(cmd, opt, cb);
     }
-    handle_upgrade_downgrade_error(e, stderr, log_file, is_downgrade){
+    handle_upgrade_downgrade_error(e, stderr, is_downgrade){
         const script = is_downgrade ? 'downgrade' : 'upgrade';
         if (e)
         {
@@ -241,33 +240,28 @@ class Lum_node_index {
             const msg = e.message=='User did not grant permission.' ?
                 e.message : zerr.e2s(e);
             logger.error(`Error during ${script}: ${msg}`);
-            if (!lpm_config.is_win)
-                logger.error(`Look at ${log_file} for more details`);
             return true;
         }
         if (stderr)
             logger.error(`${script} stderr: ${stderr}`);
         check_compat();
     }
-    upgrade(cb, is_auto){
-        const log_file = path.join(lpm_config.work_dir, 'upgrade.log');
-        this.run_upgrader(!is_auto ? 'upgrade' : '', log_file,
-            (e, stdout, stderr)=>{
-                if (cb)
-                    cb(e);
-                this.handle_upgrade_downgrade_error(e, stderr, log_file);
-            });
+    upgrade(cb){
+        this.run_upgrader((e, stdout, stderr)=>{
+            if (cb)
+                cb(e);
+            this.handle_upgrade_downgrade_error(e, stderr);
+        });
     }
     downgrade(cb){
-        const log_file = path.join(lpm_config.work_dir, 'downgrade.log');
-        this.run_upgrader('downgrade', log_file, (e, stdout, stderr)=>{
+        this.run_upgrader((e, stdout, stderr)=>{
             if (stdout=='BACKUP_NOT_EXISTS')
                 e = 'Luminati proxy manager backup version does not exist!';
             if (cb)
                 cb(e);
             if (stdout=='BACKUP_NOT_EXISTS')
                 return logger.warn(e);
-            if (!this.handle_upgrade_downgrade_error(e, stderr, log_file, 1))
+            if (!this.handle_upgrade_downgrade_error(e, stderr, 1))
                 logger.notice('Downgrade completed successfully');
         });
     }
@@ -278,7 +272,7 @@ class Lum_node_index {
             const pm2_list = yield _this.pm2_cmd('list');
             const running_daemon = _this.is_daemon_running(pm2_list);
             _this.upgrade(e=>etask(function*_cb_upgrade(){
-                ipc.server.stop();
+                _this.stop_ipc();
                 if (e)
                 {
                     if (e.message!='User did not grant permission.')
@@ -304,18 +298,26 @@ class Lum_node_index {
             this.upgrader_started = false;
             if (this.child)
                 this.child.send({command: 'upgrade_finished', error: e});
-        }, true);
+        });
     }
     start_ipc(){
         ipc.serve(()=>{
             ipc.server.on('upgrader_connected', (data, socket)=>{
                 logger.notice('Upgrader connected');
+                if (this.argv.upgrade)
+                    return ipc.server.emit(socket, 'upgrade');
+                else if (this.argv.downgrade)
+                    return ipc.server.emit(socket, 'downgrade');
+                ipc.server.emit(socket, 'start_auto_upgrade');
             });
             ipc.server.on('log', data=>{
                 logger[data.level||'notice'](data.msg);
             });
         });
         ipc.server.start();
+    }
+    stop_ipc(){
+        ipc.server.stop();
     }
     run(){
         if (this.run_daemon())
@@ -347,14 +349,14 @@ class Lum_node_index {
                         error,
                     });
                 }
-                ipc.server.stop();
+                this.stop_ipc();
                 setTimeout(()=>process.exit(), 5000);
             });
         });
         if (this.argv.upgrade)
             return this.upgrade_cli();
         else if (this.argv.downgrade)
-            return this.downgrade(()=>ipc.server.stop());
+            return this.downgrade(this.stop_ipc);
         return this.create_child();
     }
 }

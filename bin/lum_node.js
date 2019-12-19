@@ -13,9 +13,10 @@ const E = module.exports = {};
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
 const os = require('os');
+const fs = require('fs');
+const path = require('path');
 const logger = require('../lib/logger.js');
 const util_lib = require('../lib/util.js');
-const lpm_config = require('../util/lpm_config.js');
 
 const perr_info = info=>Object.assign({}, info, {
     customer: _.get(E.manager, '_defaults.customer'),
@@ -127,21 +128,9 @@ const check_running = argv=>etask(function*(){
     }
 });
 
-const win_backup_check_cmd = '@echo off & FOR /F %g IN (\'npm root -g\') do '
-+'(IF EXIST %g\\@luminati-io\\luminati-proxy.old (echo 1) ELSE (echo 0))';
-const unix_backup_check_cmd = 'test -d "$(npm root -g)/@luminati-io/'
-+'luminati-proxy.old" && printf 1 || printf 0';
-
 E.run = (argv, run_config)=>etask(function*(){
-    let backup_exist;
-    try {
-        const backup_exist_raw = child_process.execSync(lpm_config.is_win ?
-            win_backup_check_cmd : unix_backup_check_cmd);
-        backup_exist = +Buffer.from(backup_exist_raw).toString();
-    } catch(e){
-        backup_exist = 0;
-        zerr.perr('backup_check_fail', perr_info({error: zerr.e2s(e)}));
-    }
+    const backup_exist = fs.existsSync(path.resolve(__dirname,
+        './../../luminati-proxy.old/'));
     yield check_running(argv);
     add_alias_for_whitelist_ips();
     E.manager = new Manager(argv, Object.assign({backup_exist}, run_config));

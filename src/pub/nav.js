@@ -244,7 +244,7 @@ const Account = withRouter(class Account extends Pure_component {
                 {is_upgradable &&
                   <li><a onClick={this.upgrade}>{t('Upgrade')}</a></li>
                 }
-                {!!this.state.backup_exist &&
+                {this.state.backup_exist &&
                     <li><a onClick={this.downgrade}>{t('Downgrade')}</a></li>
                 }
                 <li>

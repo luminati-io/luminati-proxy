@@ -1,6 +1,9 @@
 Luminati Proxy manager - Change Log
 
-## 1.165.523 
+## 1.165.644 Stable
+- :bug: Fixes in SMTP rules
+
+## 1.165.523 Stable
 - :bug: Fixed HAR viewer: now always showing Peer IP in the columns
 
 ## 1.165.449 Stable

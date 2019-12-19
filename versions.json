@@ -1,7 +1,17 @@
 [
     {
+        "ver": "1.165.644",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixes in SMTP rules"
+            }
+        ]
+    },
+    {
         "ver": "1.165.523",
-        "type": "stable/dev",
+        "type": "stable",
         "changes": [
             {
                 "type": "bug",

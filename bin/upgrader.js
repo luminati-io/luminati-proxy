@@ -3,12 +3,11 @@
 'use strict'; /*jslint node:true, esnext:true*/
 const child_process = require('child_process');
 const path = require('path');
-const argv = require('yargs').argv;
 const ipc = require('node-ipc');
 const util_lib = require('../lib/util.js');
 const consts = require('../lib/consts.js');
 const etask = require('../util/etask.js');
-const {manager_default} = require('../util/lpm_config.js');
+const lpm_config = require('../util/lpm_config.js');
 const E = module.exports = {};
 
 ipc.config.id = 'lpm_upgrader';
@@ -30,37 +29,40 @@ E.run_script = (script_f, log_f, cb)=>{
 };
 
 E.upgrade = cb=>{
-    logger.notice('Upgrading proxy manager...');
-    E.run_script('lpm_upgrade.sh', E.log_file, (e, stdout, stderr)=>{
-        E.handle_upgrade_downgrade_error(e, stderr);
+    const log_file = path.join(lpm_config.work_dir, 'upgrade.log');
+    E.run_script('lpm_upgrade.sh', log_file, (e, stdout, stderr)=>{
+        E.handle_upgrade_downgrade_error(e, stderr, log_file);
         cb(e);
     });
 };
 
 E.downgrade = cb=>{
-    logger.notice('Downgrading proxy manager...');
-    E.run_script('lpm_downgrade.sh', E.log_file, (e, stdout, stderr)=>{
+    const log_file = path.join(lpm_config.work_dir, 'downgrade.log');
+    E.run_script('lpm_downgrade.sh', log_file, (e, stdout, stderr)=>{
         if (e && e.code==1)
             process.stdout.write('BACKUP_NOT_EXISTS');
         else
-            E.handle_upgrade_downgrade_error(e, stderr, 1);
+            E.handle_upgrade_downgrade_error(e, stderr, log_file, 1);
         cb(e);
     });
 };
 
-E.handle_upgrade_downgrade_error = (e, stderr, is_downgrade)=>{
+E.handle_upgrade_downgrade_error = (e, stderr, log_file, is_downgrade)=>{
     const script = is_downgrade ? 'downgrade' : 'upgrade';
     if (e)
+    {
+        if (!lpm_config.is_win)
+            logger.error(`Look at ${log_file} for more details`);
         throw e;
+    }
     if (stderr)
         logger.error(`${script} stderr: ${stderr}`);
 };
 
-E.run = ()=>{
-    if (argv.upgrade)
-        return E.upgrade(()=>E.uninit());
-    if (argv.downgrade)
-        return E.downgrade(()=>E.uninit());
+E.start_auto_upgrade = ()=>{
+    if (E.started_auto_upgrade)
+        return;
+    E.started_auto_upgrade = true;
     util_lib.set_interval(etask._fn(function*start_auto_upgrade(){
         this.on('uncaught', e=>{
             process.stderr.write('get_last_version error: '+e.msg+'\n');
@@ -69,7 +71,8 @@ E.run = ()=>{
             return E.shutdown();
         if (E.upgrading)
             return;
-        const v = yield util_lib.get_last_version(manager_default.api);
+        const v = yield util_lib.get_last_version(
+            lpm_config.manager_default.api);
         if (v.newer)
         {
             logger.notice(`New ${v.ver} version is available!`);
@@ -117,6 +120,17 @@ E.init = ()=>{
         ipc.of.lum_node_index.on('connect', ()=>{
             emit_message('upgrader_connected');
         });
+        ipc.of.lum_node_index.on('start_auto_upgrade', ()=>{
+            E.start_auto_upgrade();
+        });
+        ipc.of.lum_node_index.on('upgrade', ()=>{
+            logger.notice('Upgrading proxy manager...');
+            E.upgrade(()=>E.uninit());
+        });
+        ipc.of.lum_node_index.on('downgrade', ()=>{
+            logger.notice('Downgrading proxy manager...');
+            E.downgrade(()=>E.uninit());
+        });
     });
 };
 
@@ -127,4 +141,3 @@ E.uninit = ()=>{
 };
 
 E.init();
-E.run();

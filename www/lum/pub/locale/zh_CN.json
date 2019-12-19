@@ -2823,7 +2823,7 @@
   "LPM": "LPM",
   "Unselect all": "全部取消选择",
   "Saving proxy": "保存代理",
-  "Total": "总",
+  "Total": "通道数量",
   "Datacenter IP": "数据中心IP",
   "gIP": "gIP",
   "Country resolution": "国家解析",
@@ -3897,7 +3897,7 @@
   "Mobile - 3,000,000 IPs available": "移动 - 300万IP",
   "Residential (Static) - 50,000 IPs available": "静态住宅 - 5万IP",
   "Residential (Static) IPs": "静态住宅IP",
-  "P2P residential network. Millions of IPs from real devices": "P2P住宅网络。来自真实设备的数百上千万个IP",
+  "P2P residential network. Millions of IPs from real devices": "P2P住宅网络。来自真实设备的数百千万个IP",
   "Monthly traffic": "每月流量",
   "Bosnia And Herzegovina": "波黑（波斯尼亚和黑塞哥维那）",
   "China": "中国",
@@ -4117,5 +4117,12 @@
   "SSL Processing": "SSL处理",
   "Whitelisted IPs": "白名单IP",
   "input_list.Add": "添加",
-  "Local timezone": "本地时区"
+  "Local timezone": "本地时区",
+  "deleted": "已删除",
+  "No limit": "无限制",
+  "Cost/GB": "价格/GB",
+  "Zone doesn't have Whitelisted IPs": "此通道没有白名单",
+  "Zone plan, settings and usage statistics": "通道方案、设置以及使用统计",
+  "Disable": "关闭",
+  "Enable": "开启"
 }
