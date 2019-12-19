@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.165.523 
+- :bug: Fixed HAR viewer: now always showing Peer IP in the columns
+
 ## 1.165.449 Stable
 - :bug: Fixed check for a backup version on windows
 

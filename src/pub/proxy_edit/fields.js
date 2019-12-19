@@ -309,6 +309,7 @@ export const tabs = {
                 tooltip: `It works only when SSL analyzing is enabled. You can
                     enable this option to ignore checking certificates of SSL
                     connection`,
+                ext: true,
             },
             smtp: {
                 label: 'Proxy through SMTP',

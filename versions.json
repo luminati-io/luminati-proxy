@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.165.523",
+        "type": "stable/dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed HAR viewer: now always showing Peer IP in the columns"
+            }
+        ]
+    },
+    {
         "ver": "1.165.449",
         "type": "stable",
         "changes": [

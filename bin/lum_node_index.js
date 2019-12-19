@@ -20,7 +20,11 @@ const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
 const sudo_prompt = require('sudo-prompt');
+const ipc = require('node-ipc');
 const util_lib = require('../lib/util.js');
+
+ipc.config.id = 'lum_node_index';
+ipc.config.silent = true;
 
 class Lum_node_index {
     constructor(argv){
@@ -247,8 +251,6 @@ class Lum_node_index {
     }
     upgrade(cb, is_auto){
         const log_file = path.join(lpm_config.work_dir, 'upgrade.log');
-        if (!is_auto)
-            logger.notice('Upgrading proxy manager...');
         this.run_upgrader(!is_auto ? 'upgrade' : '', log_file,
             (e, stdout, stderr)=>{
                 if (cb)
@@ -258,7 +260,6 @@ class Lum_node_index {
     }
     downgrade(cb){
         const log_file = path.join(lpm_config.work_dir, 'downgrade.log');
-        logger.notice('Downgrading proxy manager...');
         this.run_upgrader('downgrade', log_file, (e, stdout, stderr)=>{
             if (stdout=='BACKUP_NOT_EXISTS')
                 e = 'Luminati proxy manager backup version does not exist!';
@@ -277,6 +278,7 @@ class Lum_node_index {
             const pm2_list = yield _this.pm2_cmd('list');
             const running_daemon = _this.is_daemon_running(pm2_list);
             _this.upgrade(e=>etask(function*_cb_upgrade(){
+                ipc.server.stop();
                 if (e)
                 {
                     if (e.message!='User did not grant permission.')
@@ -304,6 +306,17 @@ class Lum_node_index {
                 this.child.send({command: 'upgrade_finished', error: e});
         }, true);
     }
+    start_ipc(){
+        ipc.serve(()=>{
+            ipc.server.on('upgrader_connected', (data, socket)=>{
+                logger.notice('Upgrader connected');
+            });
+            ipc.server.on('log', data=>{
+                logger[data.level||'notice'](data.msg);
+            });
+        });
+        ipc.server.start();
+    }
     run(){
         if (this.run_daemon())
             return;
@@ -313,6 +326,7 @@ class Lum_node_index {
             return this.show_logs();
         else if (this.argv.genCert)
             return this.gen_cert();
+        this.start_ipc();
         if (lpm_config.is_win)
         {
             const readline = require('readline');
@@ -333,13 +347,14 @@ class Lum_node_index {
                         error,
                     });
                 }
+                ipc.server.stop();
                 setTimeout(()=>process.exit(), 5000);
             });
         });
         if (this.argv.upgrade)
             return this.upgrade_cli();
         else if (this.argv.downgrade)
-            return this.downgrade();
+            return this.downgrade(()=>ipc.server.stop());
         return this.create_child();
     }
 }
