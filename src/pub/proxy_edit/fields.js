@@ -42,6 +42,10 @@ export const tabs = {
                 label: 'Carrier',
                 tooltip: 'Network provider company name',
             },
+            os: {
+                label: 'Operating System',
+                tooltip: 'Operating System',
+            },
         },
     },
     speed: {

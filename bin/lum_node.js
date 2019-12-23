@@ -192,7 +192,7 @@ E.handle_upgrade_downgrade_finished = (msg, is_downgrade)=>{
         E.on_upgrade_finished(msg.error);
         E.on_upgrade_finished = undefined;
     }
-    if (is_downgrade && E.on_downgrade_finished)
+    else if (is_downgrade && E.on_downgrade_finished)
     {
         E.on_downgrade_finished(msg.error);
         E.on_downgrade_finished = undefined;

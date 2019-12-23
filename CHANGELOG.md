@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.165.910 Stable
+- :star: Improvements in --auto-upgrade option
+- :star: Added "Operating System" option under "Targeting" tab
+
 ## 1.165.644 Stable
 - :bug: Fixes in SMTP rules
 

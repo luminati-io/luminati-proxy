@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.165.910",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improvements in --auto-upgrade option"
+            },
+            {
+                "type": "star",
+                "text": "Added \"Operating System\" option under \"Targeting\" tab"
+            }
+        ]
+    },
+    {
         "ver": "1.165.644",
         "type": "stable",
         "changes": [

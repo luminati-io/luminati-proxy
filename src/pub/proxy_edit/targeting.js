@@ -21,6 +21,12 @@ const carriers_note = (()=>{
 export default with_www_api(class Targeting extends Pure_component {
     state = {};
     def_value = {key: 'Any (default)', value: ''};
+    os_opt = [
+        this.def_value,
+       {key: 'Windows', value: 'win'},
+       {key: 'MacOS', value: 'mac'},
+       {key: 'Android', value: 'android'},
+   ];
     set_field = setdb.get('head.proxy_edit.set_field');
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     componentDidMount(){
@@ -135,8 +141,8 @@ export default with_www_api(class Targeting extends Pure_component {
         if (this.state.form.ext_proxies)
             return <Note><Ext_tooltip/></Note>;
         const curr_plan = this.get_curr_plan();
-        const show_dc_note = curr_plan&&curr_plan.type=='static';
-        const show_vips_note = curr_plan&&
+        const is_static = curr_plan && curr_plan.type=='static';
+        const show_vips_note = curr_plan &&
             (curr_plan.vips_type=='domain'||curr_plan.vips_type=='domain_p');
         const carrier_disabled = !!this.state.form.asn &&
             !!this.state.form.asn.length;
@@ -152,9 +158,9 @@ export default with_www_api(class Targeting extends Pure_component {
         };
         return <div className="target">
               <Tab_context.Provider value="target">
-                {(show_dc_note||show_vips_note) &&
+                {(is_static || show_vips_note) &&
                   <Note>
-                    {show_dc_note &&
+                    {is_static &&
                       <span>
                       <div>
                         This port is configured to use Data Center IPs.</div>
@@ -192,6 +198,8 @@ export default with_www_api(class Targeting extends Pure_component {
                 <Config type="select" id="carrier" data={this.carriers()}
                   note={carriers_note} disabled={carrier_disabled}
                   depend_a={this.state.form.zone}/>
+                <Config type="select" id="os" data={this.os_opt}
+                  disabled={is_static}/>
               </Tab_context.Provider>
             </div>;
     }

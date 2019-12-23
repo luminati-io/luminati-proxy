@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.165.644",
+        "version": "1.165.910",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1103,7 +1103,67 @@
                     }
                 }
             }
-
+        },
+        "/logs": {
+            "get": {
+                "description": "Returns e",
+                "tags": ["Manager"],
+                "parameters": [
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Number of requests to be skipped from the beginning",
+                        "type": "number"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of requests to be fetched",
+                        "type": "number"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Regex search query for the URL",
+                        "type": "string"
+                    },
+                    {
+                        "name": "port_from",
+                        "in": "query",
+                        "description": "Lower bound for port number",
+                        "type": "number"
+                    },
+                    {
+                        "name": "port_to",
+                        "in": "query",
+                        "description": "Upper bound for port number",
+                        "type": "number"
+                    },
+                    {
+                        "name": "status_code",
+                        "in": "query",
+                        "description": "Filter requests by status code",
+                        "type": "number"
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Parameter to be sorted by",
+                        "type": "string"
+                    },
+                    {
+                        "name": "sort_desc",
+                        "in": "query",
+                        "description": "Sorting asc or desc",
+                        "type": "boolean"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1514,6 +1574,10 @@
                 },
                 "override_headers": {
                     "type": "boolean"
+                },
+                "os": {
+                    "type": "string",
+                    "description": "Operating System of the Peer IP"
                 },
                 "headers":{
                     "type":"array",
