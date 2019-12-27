@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.166.405 Stable
+- :bug: Fixed error: cannot read property 'socket2headers' of undefined
+- :bug: Fixed error: incorrect headers check
+
 ## 1.165.910 Stable
 - :star: Improvements in --auto-upgrade option
 - :star: Added "Operating System" option under "Targeting" tab

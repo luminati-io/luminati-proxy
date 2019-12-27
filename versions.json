@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.166.405",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed error: cannot read property 'socket2headers' of undefined"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed error: incorrect headers check"
+            }
+        ]
+    },
+    {
         "ver": "1.165.910",
         "type": "stable",
         "changes": [

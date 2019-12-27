@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.165.910",
+        "version": "1.166.405",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1432,6 +1432,10 @@
                 "ssl": {
                     "type": "boolean",
                     "description": "Enable SSL analyzing"
+                },
+                "ssl_limit": {
+                    "type": "number",
+                    "description": "Number of bytes to store when SSL analyzing"
                 },
                 "iface": {
                     "type": "string",
