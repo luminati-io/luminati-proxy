@@ -8,6 +8,7 @@ import moment from 'moment';
 import classnames from 'classnames';
 import {Route, withRouter, Link} from 'react-router-dom';
 import React_tooltip from 'react-tooltip';
+import etask from '../../util/etask.js';
 import setdb from '../../util/setdb.js';
 import ajax from '../../util/ajax.js';
 import zescape from '../../util/escape.js';
@@ -26,6 +27,20 @@ const loader = {
     start: ()=>$('#har_viewer').addClass('waiting'),
     end: ()=>$('#har_viewer').removeClass('waiting'),
 };
+
+const enable_ssl_click = port=>etask(function*(){
+    this.on('finally', ()=>{
+        loader.end();
+    });
+    loader.start();
+    yield window.fetch('/api/enable_ssl', {
+        method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({port}),
+    });
+    const proxies = yield ajax.json({url: '/api/proxies_running'});
+    setdb.set('head.proxies_running', proxies);
+});
 
 class Har_viewer extends Pure_component {
     moving_width = false;
@@ -969,12 +984,8 @@ class Name_cell extends Pure_component {
     }
 }
 
-const Status_code_cell = withRouter(maybe_pending(props=>{
-    const {history, status, uuid, req} = props;
-    const enable_ssl_click = ()=>{
-        history.push({pathname: `/proxy/${req.details.port}`,
-            state: {field: 'ssl'}});
-    };
+const Status_code_cell = maybe_pending(props=>{
+    const {status, uuid, req} = props;
     const get_desc = ()=>{
         const err_header = req.response.headers.find(
             r=>r.name=='x-luminati-error'||r.name=='x-lpm-error');
@@ -984,64 +995,74 @@ const Status_code_cell = withRouter(maybe_pending(props=>{
     };
     if (status=='unknown')
     {
-        return <div onClick={e=>e.stopPropagation()} className="disp_value">
-              <React_tooltip id={'s'+uuid} type="info" effect="solid"
-                delayHide={100} delayShow={0} delayUpdate={500}
-                offset={{top: -10}}>
-                <div>
-                  Status code of this request could not be parsed because the
-                  connection is encrypted.
-                </div>
-                <div style={{marginTop: 10}}>
-                  <a onClick={enable_ssl_click} className="link">
-                    Enable SSL analyzing
-                  </a>
-                  to see the status codes and other information about
-                  requests
-                </div>
-              </React_tooltip>
-              <div data-tip="React-tooltip" data-for={'s'+uuid}>
-                <span>unknown</span>
-                <div className="small_icon status info"/>
-              </div>
-            </div>;
+        return <Encrypted_cell name="Status code" id={`s${uuid}`}
+            port={req.details.port}/>;
     }
     const desc = get_desc(status);
     return <Tooltip title={`${status} ${desc}`}>
           <div className="disp_value">{status}</div>
         </Tooltip>;
-}));
+});
 
-const Time_cell = withRouter(maybe_pending(props=>{
-    const {port, time, url, uuid, history} = props;
-    if (!url.endsWith(':443')||!time)
-        return <Tooltip_and_value val={time&&time+' ms'}/>;
-    const enable_ssl_click = ()=>{
-        history.push({pathname: `/proxy/${port}`,
-            state: {field: 'ssl'}});
+const Time_cell = maybe_pending(props=>{
+    const {port, time, url, uuid} = props;
+    if (!url.endsWith(':443') || !time)
+        return <Tooltip_and_value val={time && time+' ms'}/>;
+    return <Encrypted_cell name="Timing" id={`t${uuid}`} port={port}/>;
+});
+
+class Encrypted_cell extends Pure_component {
+    state = {proxies: []};
+    componentDidMount(){
+        this.setdb_on('head.proxies_running', proxies=>{
+            if (!proxies)
+                return;
+            this.setState({proxies});
+        });
+    }
+    is_ssl_on = port=>{
+        const proxy = this.state.proxies.find(p=>p.port==port);
+        if (!proxy)
+            return false;
+        return proxy.ssl;
     };
-    return <div onClick={e=>e.stopPropagation()} className="disp_value">
-          <React_tooltip id={'t'+uuid} type="info" effect="solid"
-            delayHide={100} delayShow={0} delayUpdate={500}
-            offset={{top: -10}}>
-            <div>
-              <T>
-                Timing of this request could not be parsed because the
-                connection is encrypted.
-              </T>
-            </div>
-            <div style={{marginTop: 10}}>
-              <a onClick={enable_ssl_click} className="link">
-                <T>Enable SSL analyzing</T>
-              </a>
-              <T>to see the timing and other information about requests</T>
-            </div>
-          </React_tooltip>
-          <div data-tip="React-tooltip" data-for={'t'+uuid}>
-            — {url.endsWith(':443')&&<div className="small_icon status info"/>}
-          </div>
-        </div>;
-}));
+    render(){
+        const {id, name, port} = this.props;
+        const ssl = this.is_ssl_on(port);
+        return <div onClick={e=>e.stopPropagation()} className="disp_value">
+              <React_tooltip id={id} type="info" effect="solid"
+                delayHide={100} delayShow={0} delayUpdate={500}
+                offset={{top: -10}}>
+                <div>
+                  {name} of this request could not be parsed because the
+                  connection is encrypted.
+                </div>
+                {!ssl &&
+                    <div style={{marginTop: 10}}>
+                      <a onClick={()=>enable_ssl_click(port)}
+                        className="link">
+                        Enable SSL analyzing
+                      </a>
+                      <span>
+                        to see {name} and other information about requests
+                      </span>
+                    </div>
+                }
+                {ssl &&
+                    <div style={{marginTop: 10}}>
+                      SSL analyzing is already turned on and all the future
+                      requestes will be decoded. This request can't be decoded
+                      retroactively
+                    </div>
+                }
+              </React_tooltip>
+              <div data-tip="React-tooltip" data-for={id}>
+                <span>unknown</span>
+                <div className="small_icon status info"/>
+              </div>
+            </div>;
+    }
+}
 
 class Select_cell extends React.Component {
     state = {checked: false};

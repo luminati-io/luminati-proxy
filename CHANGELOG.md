@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.166.867 Stable
+- :bug: HAR viewer: UI improvements
+
 ## 1.166.405 Stable
 - :bug: Fixed error: cannot read property 'socket2headers' of undefined
 - :bug: Fixed error: incorrect headers check

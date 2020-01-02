@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.166.867",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "HAR viewer: UI improvements"
+            }
+        ]
+    },
+    {
         "ver": "1.166.405",
         "type": "stable",
         "changes": [

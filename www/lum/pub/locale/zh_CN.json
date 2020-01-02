@@ -4124,5 +4124,11 @@
   "Zone doesn't have Whitelisted IPs": "此通道没有白名单",
   "Zone plan, settings and usage statistics": "通道方案、设置以及使用统计",
   "Disable": "关闭",
-  "Enable": "开启"
+  "Enable": "开启",
+  "We have been using Luminati for almost a year now. Luminati has a great API that is easy to integrate with our systems. Also, their offerings include a variety of solutions which address different business needs. We decided to switch over to Luminati for their proxy location feature.": "Luminati的API特别棒，可以很简便地与我们的系统集成。此外他们的产品还提供了满足不同业务需求的解决方案。因此当时我们就决定要使用Luminati的代理定位功能。",
+  "CEO of Web Scraper": "Web Scraper公司CEO",
+  "Luminati’s breadth of software solutions, network size, and customer service allow us to offer the most professional ad-security testing with Adsecure, as well as being able to be the most reliable ad network with ExoClick": "Luminati的全面软件解决方案，网络规模以及客户服务，使我们能够和AdSecure一起提供最专业的广告安全测试，并能和ExoClick成为最可靠的广告网络。",
+  "COO at ExoClick & EXOGROUP": "ExoClick & EXOGROUP集团公司的首席运营官.",
+  "Enable now!": "立即启用",
+  "Zone will be enabled. Are you sure?": "此通道将被启用，您确定吗？"
 }

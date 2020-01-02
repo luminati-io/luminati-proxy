@@ -616,7 +616,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     };
     update = ()=>{
         this.setState({selected_proxies: {}, checked_all: false});
-        this.etask(function*(){
+        return this.etask(function*(){
             const proxies = yield ajax.json({url: '/api/proxies_running'});
             setdb.set('head.proxies_running', proxies);
         });
