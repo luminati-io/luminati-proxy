@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.167.220",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed auto upgrader"
+            }
+        ]
+    },
+    {
         "ver": "1.166.867",
         "type": "stable",
         "changes": [

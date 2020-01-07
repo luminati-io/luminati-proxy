@@ -50,7 +50,7 @@ class Lum_node_index {
     }); }
     start_daemon(){
         const _this = this;
-        return etask(function*start_daemon(){
+    return etask(function*start_daemon(){
         this.on('uncaught', e=>{
             logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
@@ -80,11 +80,10 @@ class Lum_node_index {
             }
         });
         yield this.wait();
-        });
-    }
+    }); }
     stop_daemon(){
         const _this = this;
-        return etask(function*start_daemon(){
+    return etask(function*stop_daemon(){
         this.on('uncaught', e=>{
             logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
@@ -112,13 +111,8 @@ class Lum_node_index {
         });
         yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
         yield this.wait();
-        });
-    }
-    run_daemon(){
-        let dopt = _.pick(this.argv.daemon_opt,
-            ['start', 'stop', 'delete', 'restart', 'startup']);
-        if (!Object.keys(dopt).length)
-            return;
+    }); }
+    run_daemon(dopt){
         if (dopt.start)
             this.start_daemon();
         else if (dopt.stop)
@@ -139,7 +133,6 @@ class Lum_node_index {
                     +`save`);
             }
         }
-        return true;
     }
     show_status(){
         const _this = this;
@@ -279,6 +272,8 @@ class Lum_node_index {
         ipc.serve(()=>{
             ipc.server.on('upgrader_connected', (data, socket)=>{
                 this.upgrader_socket = socket;
+                if (!this.ipc_cb)
+                    return;
                 this.ipc_cb();
                 delete this.ipc_cb;
             });
@@ -311,26 +306,9 @@ class Lum_node_index {
         if (ipc.server)
             ipc.server.stop();
     }
-    run(){
-        if (this.run_daemon())
-            return;
-        else if (this.argv.status)
-            return this.show_status();
-        else if (this.argv.showLogs)
-            return this.show_logs();
-        else if (this.argv.genCert)
-            return this.gen_cert();
-        this.start_ipc();
-        if (lpm_config.is_win)
-        {
-            const readline = require('readline');
-            readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-            }).on('SIGINT', ()=>process.emit('SIGINT'));
-        }
+    init_traps(){
         // XXX krzysztof: duplication of handling siganls: why?
-        ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
+        this.traps = ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
             process.on(sig, e=>{
                 if (this.child && this.child.connected)
                 {
@@ -345,6 +323,30 @@ class Lum_node_index {
                 setTimeout(()=>process.exit(), 5000);
             });
         });
+        process.on('exit', ()=>{
+            this.emit_message('stop');
+        });
+        if (lpm_config.is_win)
+        {
+            const readline = require('readline');
+            readline.createInterface({
+                input: process.stdin,
+                output: process.stdout,
+            }).on('SIGINT', ()=>process.emit('SIGINT'));
+        }
+    }
+    run(){
+        const dopt = _.pick(this.argv.daemon_opt,
+            ['start', 'stop', 'delete', 'restart', 'startup']);
+        if (Object.keys(dopt).length)
+            return this.run_daemon(dopt);
+        else if (this.argv.status)
+            return this.show_status();
+        else if (this.argv.showLogs)
+            return this.show_logs();
+        else if (this.argv.genCert)
+            return this.gen_cert();
+        this.init_traps();
         if (this.argv.upgrade)
         {
             this.ipc_cb = ()=>this.start_upgrade_downgrade_cli();
@@ -360,6 +362,7 @@ class Lum_node_index {
             this.ipc_cb = ()=>this.emit_message('start_auto_upgrade');
             this.run_upgrader();
         }
+        this.start_ipc();
         this.create_child();
     }
 }

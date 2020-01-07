@@ -622,6 +622,8 @@ E.fd_use = opt=>etask(function*(){
         let ln_re = cyg_read('/proc/'+pid+'/limits'), nmax = -1, m;
         if (m = /Max open files\s+([0-9]+)/g.exec(ln_re))
             nmax = +m[1];
+        if (!nmax)
+            continue;
         let use = calc(nopen, nmax);
         if (res.use<use)
         {

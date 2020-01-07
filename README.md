@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.166.867/luminati-proxy-manager-v1.166.867-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.167.220/luminati-proxy-manager-v1.167.220-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -58,7 +58,7 @@ sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm
 ```
 If you are trying to install the Proxy Manager from china on Mac/Linux please run the following command first to make sure npm is installing with allowed registry:
 ```sh
- npm config set registry https://registry.npm.taobao.org
+ npm config set registry https://r.cnpmjs.org/
 ```
 After this command ran successfully install using:
 ```sh

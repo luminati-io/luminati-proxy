@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.166.867"
+VERSION="1.167.220"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -538,6 +538,13 @@ check_env()
     check_node
 }
 
+setup_npm_registry()
+{
+    if curl -s http://lumtest.com/myip.json | grep -q '"country":"CN"'; then
+        npm config set registry https://r.cnpmjs.org/
+    fi
+}
+
 deps_install()
 {
     echo "installing deps..."
@@ -560,6 +567,7 @@ deps_install()
     if ((INSTALL_NPM)); then
         install_npm
     fi
+    setup_npm_registry
     if ((UPDATE_NPM)); then
         update_npm
     fi

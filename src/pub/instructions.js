@@ -11,8 +11,9 @@ E.code = (proxy=24000)=>({
     shell: `curl --proxy 127.0.0.1:${proxy} "http://lumtest.com/myip.json"`,
     node: `#!/usr/bin/env node
 require('request-promise')({
-    url: 'http://lumtest.com/myip.json',
-    proxy: 'http://127.0.0.1:${proxy}'
+    url: 'https://lumtest.com/myip.json',
+    proxy: 'http://127.0.0.1:${proxy}',
+    rejectUnauthorized: false
 }).then(function(data){
     console.log(data);
 }, function(err){
@@ -20,17 +21,34 @@ require('request-promise')({
 });`,
     java: `package example;
 
-import org.apache.http.HttpHost;
-import org.apache.http.client.fluent.*;
+import java.io.*;
+import java.net.*;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.*;
 
 public class Example {
     public static void main(String[] args) throws Exception {
-        HttpHost proxy = new HttpHost("127.0.0.1", ${proxy});
-        String res = Executor.newInstance()
-            .execute(Request.Get("http://lumtest.com/myip.json")
-            .viaProxy(proxy))
-            .returnContent().asString();
-        System.out.println(res);
+        SSLContext sc = SSLContext.getInstance("SSL");
+        TrustManager trust_manager = new X509TrustManager(){
+            public X509Certificate[] getAcceptedIssuers(){ return null; }
+            public void checkClientTrusted(
+                X509Certificate[] certs, String authType){}
+            public void checkServerTrusted(
+                X509Certificate[] certs, String authType){}
+        };
+        TrustManager[] trust_all = new TrustManager[]{ trust_manager };
+        sc.init(null, trust_all, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        URL url = new URL("https://lumtest.com/myip.json");
+        Proxy proxy = new Proxy(Proxy.Type.HTTP,
+            new InetSocketAddress("127.0.0.1", ${proxy}));
+        URLConnection yc = url.openConnection(proxy);
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+            yc.getInputStream()));
+        String input_line;
+        while ((input_line = in.readLine()) != null)
+            System.out.println(input_line);
+        in.close();
     }
 }`,
     csharp: `using System;
@@ -40,10 +58,12 @@ class Example
 {
     static void Main()
     {
+        ServicePointManager.ServerCertificateValidationCallback =
+            delegate { return true; };
         var client = new WebClient();
         client.Proxy = new WebProxy("127.0.0.1:${proxy}");
         Console.WriteLine(client.DownloadString(
-            "http://lumtest.com/myip.json"));
+            "https://lumtest.com/myip.json"));
     }
 }`,
     vb: `Imports System.Net
@@ -60,19 +80,24 @@ End Module`,
 print('If you get error "ImportError: No module named \\'six\\'"'+\\
     'install six:\\n$ sudo pip install six');
 import sys
+import ssl
 if sys.version_info[0]==2:
     import six
     from six.moves.urllib import request
+    ctx = ssl.create_default_context()
+    ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = request.build_opener(
-        request.ProxyHandler(
-            {'http': 'http://127.0.0.1:${proxy}'}))
-    print(opener.open('http://lumtest.com/myip.json').read())
+        request.ProxyHandler({'http': 'http://127.0.0.1:${proxy}'}),
+        request.HTTPSHandler(context=ctx))
+    print(opener.open('https://lumtest.com/myip.json').read())
 if sys.version_info[0]==3:
     import urllib.request
+    ctx = ssl.create_default_context()
+    ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = urllib.request.build_opener(
-        urllib.request.ProxyHandler(
-            {'http': 'http://127.0.0.1:${proxy}'}))
-    print(opener.open('http://lumtest.com/myip.json').read())`,
+        urllib.request.ProxyHandler({'http': 'http://127.0.0.1:${proxy}'}),
+        urllib.request.HTTPSHandler(context=ctx))
+    print(opener.open('https://lumtest.com/myip.json').read())`,
     ruby: `#!/usr/bin/ruby
 
 require 'uri'
@@ -89,8 +114,9 @@ end
 
 puts result.body`,
     php: `<?php
-    $curl = curl_init('http://lumtest.com/myip.json');
+    $curl = curl_init('https://lumtest.com/myip.json');
     curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:${proxy}');
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_exec($curl);
 ?>`,
     perl: `#!/usr/bin/perl
