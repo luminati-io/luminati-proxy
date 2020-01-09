@@ -256,8 +256,6 @@ E.init = argv=>{
     E.manager = null;
     E.on_upgrade_finished = null;
     E.init_traps();
-    if (process.env.DEBUG_ETASKS)
-        E.start_debug_etasks(+process.env.DEBUG_ETASKS*1000);
 };
 
 E.uninit = ()=>{
@@ -268,18 +266,9 @@ E.uninit = ()=>{
     E.initialized = false;
 };
 
-E.start_debug_etasks = (interval = 10000)=>{
-    E.debug_etask_itv = setInterval(()=>{
-        console.log('=======================================');
-        console.log('counter ps', etask.ps());
-        console.log('=======================================');
-    }, interval);
-};
-
 if (!module.parent)
 {
     E.init_cmd();
-    // XXX vladislavl: for debug purposes only
     if (!process.env.LUM_MAIN_CHILD)
     {
         const argv = lpm_util.init_args();

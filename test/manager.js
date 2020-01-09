@@ -185,10 +185,10 @@ describe('manager', ()=>{
             const mgr = new Manager(lpm_util.init_args(_args));
             assert.deepEqual(expected, mgr.get_params());
         }));
-        const def = '--cluster 2 --throttle 2';
-        t('default', qw(def), ['--cluster', 2, '--throttle', 2]);
+        const def = '--cluster --throttle 2';
+        t('default', qw(def), ['--cluster', true, '--throttle', 2]);
         t('credentials', qw`${def} --customer test_user --password abcdefgh`,
-            ['--cluster', 2, '--throttle', 2]);
+            ['--cluster', true, '--throttle', 2]);
         t('credentials with no-config',
             qw`--no-config --customer usr --password abc --token t --zone z`,
             qw`--no-config --customer usr --password abc --token t --zone z`);

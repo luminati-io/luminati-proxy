@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.167.493 Stable
+- :star: Improved upgrader
+- :star: Added better examples
+
 ## 1.167.220 Stable
 - :bug: Fixed auto upgrader
 

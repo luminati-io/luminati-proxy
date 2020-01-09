@@ -20,8 +20,12 @@ const emit_message = (msg, data)=>ipc.of.lum_node_index &&
     ipc.of.lum_node_index.emit(msg, data);
 
 const logger = {};
-Object.keys(levels).forEach(level=>
-    logger[level] = msg=>emit_message('log', {msg, level}));
+Object.keys(levels).forEach(level=>{
+    logger[level] = msg=>{
+        console.log('%s: %s', level, msg);
+        emit_message('log', {msg, level});
+    };
+});
 
 E.run_script = (script_f, log_f, cb)=>{
     const opt = {name: 'Luminati Proxy Manager'};

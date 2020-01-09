@@ -59,7 +59,6 @@ E.init_args = args=>{
         downgrade: 'Downgrade proxy manager (if backup exists on disk)',
         dir: 'Path to the directory with database and configuration files',
         status: 'Show proxy manager processes current status',
-        'show-logs': 'Show logs of the currently running LPM instance',
         'gen-cert': 'Generate cert',
         'auto-upgrade': 'Enable auto upgrade',
     };

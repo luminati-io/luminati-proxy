@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.167.493",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Improved upgrader"
+            },
+            {
+                "type": "star",
+                "text": "Added better examples"
+            }
+        ]
+    },
+    {
         "ver": "1.167.220",
         "type": "stable",
         "changes": [

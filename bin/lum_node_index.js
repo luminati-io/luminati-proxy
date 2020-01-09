@@ -9,7 +9,6 @@ const check_compat = ()=>{
 };
 check_compat();
 
-const _ = require('lodash');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
@@ -112,28 +111,6 @@ class Lum_node_index {
         yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
         yield this.wait();
     }); }
-    run_daemon(dopt){
-        if (dopt.start)
-            this.start_daemon();
-        else if (dopt.stop)
-            this.stop_daemon();
-        else if (dopt.delete)
-            this.pm2_cmd('delete', lpm_config.daemon_name);
-        else if (dopt.restart)
-            this.pm2_cmd('restart', lpm_config.daemon_name);
-        else if (dopt.startup)
-        {
-            let pm2_bin = path.resolve(__dirname, '../node_modules/.bin/pm2');
-            try {
-                child_process.execSync(pm2_bin+' startup');
-                child_process.execSync(pm2_bin+' save');
-            } catch(e){
-                logger.warn('Failed to install startup script automatically, '
-                    +`try run:\n${e.stdout.toString('utf-8')}\n${pm2_bin}`
-                    +`save`);
-            }
-        }
-    }
     show_status(){
         const _this = this;
         return etask(function*status(){
@@ -153,26 +130,6 @@ class Lum_node_index {
         }
         msg += util_lib.get_status_tasks_msg(tasks);
         logger.notice(msg);
-        });
-    }
-    show_logs(){
-        const _this = this;
-        return etask(function*start_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('Show logs: Uncaught exception: '+zerr.e2s(e));
-        });
-        this.on('finally', ()=>pm2.disconnect());
-        yield etask.nfn_apply(pm2, '.connect', []);
-        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
-        if (!_this.is_daemon_running(pm2_list))
-            return logger.notice('There is no running LPM daemon process');
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            process.stdout.write(data.data);
-        });
-        yield this.wait();
         });
     }
     gen_cert(){
@@ -244,10 +201,13 @@ class Lum_node_index {
         }
         ipc.server.emit(this.upgrader_socket, msg, data);
     }
-    start_upgrade_downgrade_cli(is_downgrade){
-        const op = is_downgrade ? 'downgrade' : 'upgrade';
-        zerr.perr(`${op}_start`);
-        this.emit_message(op, {cli: true});
+    start_upgrade_cli(){
+        zerr.perr('upgrade_start');
+        this.emit_message('upgrade', {cli: true});
+    }
+    start_downgrade_cli(){
+        zerr.perr('downgrade_start');
+        this.emit_message('downgrade', {cli: true});
     }
     upgrade_downgrade_cli(e, is_downgrade){
         this.emit_message('stop');
@@ -336,26 +296,26 @@ class Lum_node_index {
         }
     }
     run(){
-        const dopt = _.pick(this.argv.daemon_opt,
-            ['start', 'stop', 'delete', 'restart', 'startup']);
-        if (Object.keys(dopt).length)
-            return this.run_daemon(dopt);
+        if (this.argv.daemon_opt.start)
+            return this.start_daemon();
+        else if (this.argv.daemon_opt.stop)
+            return this.stop_daemon();
         else if (this.argv.status)
             return this.show_status();
-        else if (this.argv.showLogs)
-            return this.show_logs();
         else if (this.argv.genCert)
             return this.gen_cert();
         this.init_traps();
         if (this.argv.upgrade)
         {
-            this.ipc_cb = ()=>this.start_upgrade_downgrade_cli();
-            return this.run_upgrader();
+            this.ipc_cb = ()=>this.start_upgrade_cli();
+            this.run_upgrader();
+            return this.start_ipc();
         }
         else if (this.argv.downgrade)
         {
-            this.ipc_cb = ()=>this.start_upgrade_downgrade_cli(1);
-            return this.run_upgrader();
+            this.ipc_cb = ()=>this.start_downgrade_cli(1);
+            this.run_upgrader();
+            return this.start_ipc();
         }
         else if (this.argv.autoUpgrade)
         {
