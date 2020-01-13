@@ -1,18 +1,10 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
-
-const check_compat = ()=>{
-    delete require.cache[require.resolve('./check_compat.js')];
-    if (!require('./check_compat.js').is_env_compat())
-        process.exit();
-};
-check_compat();
-
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 require('../lib/perr.js').run({});
-const logger = require('../lib/logger.js');
+const logger = require('../lib/logger.js').child({category: 'lum_node_index'});
 const ssl = require('../lib/ssl.js');
 const lpm_config = require('../util/lpm_config.js');
 const pm2 = require('pm2');
@@ -46,70 +38,6 @@ class Lum_node_index {
         if (!Array.isArray(opt))
             opt = [opt];
         return yield etask.nfn_apply(pm2, '.'+command, opt);
-    }); }
-    start_daemon(){
-        const _this = this;
-    return etask(function*start_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
-        });
-        this.on('finally', ()=>pm2.disconnect());
-        const daemon_start_opt = {
-            name: lpm_config.daemon_name,
-            script: _this.argv.$0,
-            mergeLogs: false,
-            output: '/dev/null',
-            error: '/dev/null',
-            autorestart: true,
-            killTimeout: 5000,
-            restartDelay: 5000,
-            args: process.argv.filter(arg=>arg!='-d'&&!arg.includes('daemon')),
-        };
-        yield etask.nfn_apply(pm2, '.connect', []);
-        yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            process.stdout.write(data.data);
-            if (data.data.includes('Open admin browser') ||
-                data.data.includes('Shutdown'))
-            {
-                this.continue();
-            }
-        });
-        yield this.wait();
-    }); }
-    stop_daemon(){
-        const _this = this;
-    return etask(function*stop_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
-        });
-        this.on('finally', ()=>pm2.disconnect());
-        yield etask.nfn_apply(pm2, '.connect', []);
-        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
-        if (!_this.is_daemon_running(pm2_list))
-            return logger.notice('There is no running LPM daemon process');
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        let start_logging;
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            start_logging = start_logging||data.data.includes('Shutdown');
-            if (!start_logging || !data.data.includes('NOTICE'))
-                return;
-            process.stdout.write(data.data);
-        });
-        bus.on('process:event', data=>{
-            if (data.process.name==lpm_config.daemon_name &&
-                ['delete', 'stop'].includes(data.event))
-            {
-                this.continue();
-            }
-        });
-        yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
-        yield this.wait();
     }); }
     show_status(){
         const _this = this;
@@ -215,11 +143,10 @@ class Lum_node_index {
         const op = is_downgrade ? 'downgrade' : 'upgrade';
         const _this = this;
         return etask(function*_upgrade_downgrade_cli(){
-            const pm2_list = yield _this.pm2_cmd('list');
-            const running_daemon = _this.is_daemon_running(pm2_list);
             if (e)
                 return yield zerr.perr(`${op}_error`, {error: e});
-            if (running_daemon)
+            const pm2_list = yield _this.pm2_cmd('list');
+            if (_this.is_daemon_running(pm2_list))
             {
                 logger.notice('Restarting daemon...');
                 yield _this.pm2_cmd('restart', lpm_config.daemon_name);
@@ -263,28 +190,19 @@ class Lum_node_index {
         ipc.server.start();
     }
     stop_ipc(){
+        logger.debug('stopping IPC');
         if (ipc.server)
             ipc.server.stop();
     }
     init_traps(){
-        // XXX krzysztof: duplication of handling siganls: why?
-        this.traps = ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
+        ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
             process.on(sig, e=>{
-                if (this.child && this.child.connected)
-                {
-                    const error = zerr.e2s(e);
-                    this.child.send({
-                        command: 'shutdown',
-                        reason: sig+(e ? ', master: error = '+error : ''),
-                        error,
-                    });
-                }
-                this.stop_ipc();
                 setTimeout(()=>process.exit(), 5000);
             });
         });
         process.on('exit', ()=>{
             this.emit_message('stop');
+            this.stop_ipc();
         });
         if (lpm_config.is_win)
         {
@@ -296,13 +214,9 @@ class Lum_node_index {
         }
     }
     run(){
-        if (this.argv.daemon_opt.start)
-            return this.start_daemon();
-        else if (this.argv.daemon_opt.stop)
-            return this.stop_daemon();
-        else if (this.argv.status)
+        if (this.argv.status)
             return this.show_status();
-        else if (this.argv.genCert)
+        if (this.argv.genCert)
             return this.gen_cert();
         this.init_traps();
         if (this.argv.upgrade)

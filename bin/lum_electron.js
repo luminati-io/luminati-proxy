@@ -183,13 +183,9 @@ const _run = argv=>etask(function*(){
         };
         handle_fatal();
     })
-    .on('config_changed', etask.fn(function*(zone_autoupdate){
-        // XXX krzysztof: probably zone_autoupdate is not used anymore-cleanup
+    .on('config_changed', etask.fn(function*(){
         yield manager.stop('config change', true, true);
-        setTimeout(()=>_run(argv, zone_autoupdate && zone_autoupdate.prev ? {
-            warnings: [`Your default zone has been automatically changed from `
-                +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
-        } : {}));
+        setTimeout(()=>_run(argv));
     }));
     manager.start();
 });

@@ -15,8 +15,9 @@ const child_process = require('child_process');
 const os = require('os');
 const fs = require('fs');
 const path = require('path');
-const logger = require('../lib/logger.js');
-const util_lib = require('../lib/util.js');
+const logger = require('../lib/logger.js').child({category: 'lum_node'});
+const pm2 = require('pm2');
+const lpm_config = require('../util/lpm_config.js');
 
 const perr_info = info=>Object.assign({}, info, {
     customer: _.get(E.manager, '_defaults.customer'),
@@ -85,53 +86,89 @@ const add_alias_for_whitelist_ips = ()=>{
     } catch(e){ logger.warn(`Failed to install ${name}: ${e.message}`); }
 };
 
-let conflict_shown = false;
-const show_port_conflict = (port, force)=>etask(function*(){
-    if (conflict_shown)
-        return;
-    conflict_shown = true;
-    yield _show_port_conflict(port, force);
-});
+E.start_daemon = ()=>{
+    E.uninit();
+    return etask(function*start_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
+        this.on('finally', ()=>pm2.disconnect());
+        const script = path.resolve(__dirname, 'index.js');
+        logger.notice('Running in daemon: %s', script);
+        const daemon_start_opt = {
+            name: lpm_config.daemon_name,
+            script,
+            mergeLogs: false,
+            output: '/dev/null',
+            error: '/dev/null',
+            autorestart: true,
+            killTimeout: 5000,
+            restartDelay: 5000,
+            args: process.argv.filter(arg=>arg!='-d'&&!arg.includes('daemon')),
+        };
+        yield etask.nfn_apply(pm2, '.connect', []);
+        yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        bus.on('log:out', data=>{
+            if (data.process.name!=lpm_config.daemon_name)
+                return;
+            process.stdout.write(data.data);
+            if (data.data.includes('Open admin browser') ||
+                data.data.includes('Shutdown'))
+            {
+                this.continue();
+            }
+        });
+        yield this.wait();
+    });
+};
 
-E.get_lpm_tasks = ()=>etask(function*(){
-    try { return yield util_lib.get_lpm_tasks(); }
-    catch(e){ process.exit(); }
-});
+E.is_daemon_running = list=>{
+    const daemon = list.find(p=>p.name==lpm_config.daemon_name);
+    return !!daemon &&
+        ['online', 'launching'].includes(daemon.pm2_env.status);
+};
 
-const _show_port_conflict = (port, force)=>etask(function*(){
-    const tasks = yield E.get_lpm_tasks();
-    if (!tasks.length)
-        return logger.error(`There is a conflict on port ${port}`);
-    const pid = tasks[0].pid;
-    logger.notice(`LPM is already running (${pid}) and uses port ${port}`);
-    if (!force)
-    {
-        logger.notice('If you want to kill other instances use --force flag');
-        return process.exit();
-    }
-    logger.notice('Trying to kill it and restart.');
-    for (const t of tasks)
-        process.kill(t.ppid, 'SIGTERM');
-    E.manager.restart();
-});
+E.stop_daemon = ()=>{
+    E.uninit();
+    return etask(function*stop_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
+        this.on('finally', ()=>pm2.disconnect());
+        yield etask.nfn_apply(pm2, '.connect', []);
+        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
+        if (!E.is_daemon_running(pm2_list))
+            return logger.notice('There is no running LPM daemon process');
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        let start_logging;
+        bus.on('log:out', data=>{
+            if (data.process.name!=lpm_config.daemon_name)
+                return;
+            start_logging = start_logging||data.data.includes('Shutdown');
+            if (!start_logging || !data.data.includes('NOTICE'))
+                return;
+            process.stdout.write(data.data);
+        });
+        bus.on('process:event', data=>{
+            if (data.process.name==lpm_config.daemon_name &&
+                ['delete', 'stop'].includes(data.event))
+            {
+                this.continue();
+            }
+        });
+        yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
+        yield this.wait();
+    });
+};
 
-const check_running = argv=>etask(function*(){
-    const tasks = yield E.get_lpm_tasks();
-    if (!tasks.length)
-        return;
-    if (!argv.dir)
-    {
-        logger.notice(`LPM is already running (${tasks[0].pid})`);
-        logger.notice('You need to pass a separate path to the directory for '
-            +'this LPM instance. Use --dir flag');
-        process.exit();
-    }
-});
-
-E.run = (argv, run_config)=>etask(function*(){
+E.run = (argv, run_config)=>{
+    if (argv.daemon_opt.start)
+        return E.start_daemon();
+    if (argv.daemon_opt.stop)
+        return E.stop_daemon();
     const backup_exist = fs.existsSync(path.resolve(__dirname,
         './../../luminati-proxy.old/'));
-    yield check_running(argv);
     add_alias_for_whitelist_ips();
     E.manager = new Manager(argv, Object.assign({backup_exist}, run_config));
     E.manager.on('stop', ()=>{
@@ -141,32 +178,9 @@ E.run = (argv, run_config)=>etask(function*(){
         E.uninit();
         process.exit();
     })
-    .on('error', (e, fatal)=>{
-        let match;
-        if (match = e.message.match(/EADDRINUSE.+:(\d+)/))
-            return show_port_conflict(match[1], argv.force);
-        logger.error(e.raw ? e.message : 'Unhandled error: '+e);
-        const handle_fatal = ()=>{
-            if (fatal)
-                E.manager.stop();
-        };
-        if (!perr.enabled || e.raw)
-            handle_fatal();
-        else
-        {
-            // XXX krzysztof: make a generic function for sending crashes
-            etask(function*send_err(){
-                yield zerr.perr('crash', perr_info({error: zerr.e2s(e)}));
-                handle_fatal();
-            });
-        }
-    })
-    .on('config_changed', etask.fn(function*(zone_autoupdate){
+    .on('config_changed', etask.fn(function*(){
         yield E.manager.stop('config change', true, true);
-        setTimeout(()=>E.run(argv, zone_autoupdate&&zone_autoupdate.prev ? {
-            warnings: [`Your default zone has been automatically changed from `
-                +`'${zone_autoupdate.prev}' to '${zone_autoupdate.zone}'.`],
-        } : {}), 0);
+        setTimeout(()=>E.run(argv));
     }))
     .on('upgrade', cb=>{
         if (E.on_upgrade_finished)
@@ -184,7 +198,7 @@ E.run = (argv, run_config)=>etask(function*(){
     }).on('restart', is_upgraded=>
         process.send({command: 'restart', is_upgraded}));
     E.manager.start();
-});
+};
 
 E.handle_upgrade_downgrade_finished = (msg, is_downgrade)=>{
     if (!is_downgrade && E.on_upgrade_finished)
@@ -266,13 +280,10 @@ E.uninit = ()=>{
     E.initialized = false;
 };
 
-if (!module.parent)
+E.init_cmd();
+if (!process.env.LUM_MAIN_CHILD)
 {
-    E.init_cmd();
-    if (!process.env.LUM_MAIN_CHILD)
-    {
-        const argv = lpm_util.init_args();
-        E.init(argv);
-        E.run(argv);
-    }
+    const argv = lpm_util.init_args();
+    E.init(argv);
+    E.run(argv);
 }

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.167.729 Stable
+- :star: turn on SSL to SP by default if connecting from CN
+
 ## 1.167.493 Stable
 - :star: Improved upgrader
 - :star: Added better examples

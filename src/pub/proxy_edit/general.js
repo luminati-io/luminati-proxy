@@ -3,6 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
+import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
 import Users_modal from './users_modal.js';
@@ -13,12 +14,6 @@ const route_err_opt = [
     {key: 'block', value: 'block'}
 ];
 
-const proxy_connection_type_opt = [
-    {key: 'Default (HTTP)', value: ''},
-    {key: 'HTTP', value: 'http'},
-    {key: 'HTTPS', value: 'https'},
-];
-
 const debug_opt = [
     {key: 'Default (Yes)', value: ''},
     {key: 'Yes', value: 'full'},
@@ -26,10 +21,21 @@ const debug_opt = [
 ];
 
 export default class General extends Pure_component {
-    state = {};
+    state = {default_proxy_connect_type: 'http'};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     set_field = setdb.get('head.proxy_edit.set_field');
+    proxy_connection_type_opt(){
+        let def = this.state.default_proxy_connect_type=='https' ?
+            'Default (HTTPS)' : 'Default (HTTP)';
+        return [{key: def, value: ''},
+            {key: 'HTTP', value: 'http'},
+            {key: 'HTTPS', value: 'https'}];
+    }
     componentDidMount(){
+        this.setdb_on('head.defaults', defaults=>{
+            this.setState({default_proxy_connect_type: _.get(defaults,
+                'proxy_connection_type', 'http')});
+        });
         this.setdb_on('head.proxy_edit.form', form=>{
             form && this.setState({form});
         });
@@ -96,7 +102,7 @@ export default class General extends Pure_component {
                 <Config type="number" id="port"/>
                 <Config type="pins" id="whitelist_ips"
                   disabled_ips={disabled_wl}/>
-                <Config type="select" data={proxy_connection_type_opt}
+                <Config type="select" data={this.proxy_connection_type_opt()}
                   id="proxy_connection_type"/>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="insecure"
