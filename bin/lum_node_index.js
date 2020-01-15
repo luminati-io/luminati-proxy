@@ -168,16 +168,10 @@ class Lum_node_index {
             this.child.kill();
             break;
         case 'upgrade':
-            upgrader.upgrade(error=>{
-                this.child.send({command: 'upgrade_finished', error});
-                this.restart_daemon();
-            });
+            this.upgrade();
             break;
         case 'downgrade':
-            upgrader.downgrade(error=>{
-                this.child.send({command: 'downgrade_finished', error});
-                this.restart_daemon();
-            });
+            this.downgrade();
             break;
         }
     }
@@ -196,6 +190,20 @@ class Lum_node_index {
             }).on('SIGINT', ()=>process.emit('SIGINT'));
         }
     }
+    upgrade(opt={}){
+        upgrader.upgrade(error=>{
+            if (this.child)
+                this.child.send({command: 'upgrade_finished', error});
+            this.restart_daemon();
+        });
+    }
+    downgrade(){
+        upgrader.downgrade(error=>{
+            if (this.child)
+                this.child.send({command: 'downgrade_finished', error});
+            this.restart_daemon();
+        });
+    }
     run(){
         if (this.argv.startUpgrader)
             return upgrader.start_upgrader();
@@ -210,9 +218,9 @@ class Lum_node_index {
         if (this.argv.genCert)
             return this.gen_cert();
         if (this.argv.upgrade)
-            return upgrader.upgrade();
+            return this.upgrade();
         if (this.argv.downgrade)
-            return upgrader.downgrade();
+            return this.downgrade();
         this.init_traps();
         this.create_child();
     }

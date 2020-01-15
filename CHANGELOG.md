@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.168.142 Stable
+- :bug: Fix upgrading mechanism
+
 ## 1.168.67 Stable
 - :star: update alternative domain without restarting lpm
 - :star: use actual hostname in howto

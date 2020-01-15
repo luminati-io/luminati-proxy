@@ -46,7 +46,8 @@ E.upgrade = cb=>etask(function*(){
             logger.notice('Finished upgrading!');
             zerr.perr('upgrade_finish');
         }
-        cb(e);
+        if (cb)
+            cb(e);
     });
 });
 
@@ -66,7 +67,8 @@ E.downgrade = cb=>{
             logger.notice('Finished downgrading!');
             zerr.perr('downgrade_finish');
         }
-        cb(e);
+        if (cb)
+            cb(e);
     });
 };
 
@@ -96,7 +98,8 @@ const add_cron_job = ()=>etask(function*(){
     const script = path.resolve(__dirname, 'index.js');
     const set_path = `PATH=${process.env.PATH}`;
     const stream = '>> /tmp/up_log.txt 2>&1';
-    const cron_cmd = `${set_path} ${node_path} ${script} --upgrade ${stream}`;
+    const flag = '--upgrade';
+    const cron_cmd = `${set_path} ${node_path} ${script} ${flag} ${stream}`;
     crontab.create(cron_cmd, '*/15 * * * *', JOB_NAME);
     crontab.save(function(err){
         if (err)

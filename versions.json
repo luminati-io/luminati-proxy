@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.168.142",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix upgrading mechanism"
+            }
+        ]
+    },
+    {
         "ver": "1.168.67",
         "type": "stable",
         "changes": [
