@@ -12,7 +12,7 @@ import {Instructions, Li} from './bullets.js';
 import '../css/api_url_modal.less';
 
 export default class Api_url_modal extends Pure_component {
-    state = {url: '', loading: false, saving: false};
+    state = {url: '', saving: false};
     componentDidMount(){
         this.setdb_on('head.conn', conn=>{
             if (!conn)
@@ -29,16 +29,14 @@ export default class Api_url_modal extends Pure_component {
         const _this = this;
         this.etask(function*(){
             this.on('finally', ()=>{
-                _this.setState({loading: false});
+                _this.setState({saving: false});
             });
-            _this.setState({loading: true, saving: true});
-            yield window.fetch('/api/api_url', {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({url: _this.state.url}),
-            });
+            _this.setState({saving: true});
+            let resp = yield ajax.put('/api/api_url',
+                {data: {url: _this.state.url}});
+            if (!resp.res)
+                return _this.setState({error: true});
             $('#restarting').modal({backdrop: 'static', keyboard: false});
-            yield etask.sleep(3000);
             yield _this.check_reload();
         });
     };
@@ -58,14 +56,13 @@ export default class Api_url_modal extends Pure_component {
     render(){
         if (!this.state.settings)
             return null;
-        const open = this.state.conn && !this.state.conn.domain &&
-            !this.state.saving;
+        const open = this.state.conn && !this.state.conn.domain;
         const phone_link = 'https://zingaya.com/widget/680d22dda1bf4092ab04c1d'
             +'9a7062b0a';
         const mail_domain = this.state.settings.mail_domain;
         const mail_link = `mailto:support@${mail_domain}`;
         return <React.Fragment>
-              <Loader show={this.state.loading}/>
+              <Loader show={this.state.saving}/>
               <Modal_dialog open={open}
                 title="Cannot connect to Luminati"
                 ok_clicked={this.click_ok} ok_disabled={!this.valid_url()}
@@ -109,6 +106,9 @@ export default class Api_url_modal extends Pure_component {
                       val={this.state.url} type="text"
                       placeholder="New domain url"
                       on_change_wrapper={this.url_changed}/>
+                    {this.state.error && <span className="text-danger">
+                      failed to connect, try another domain
+                    </span>}
                   </Li>
                   <Li>
                     Click OK to save and wait till the LPM restarts

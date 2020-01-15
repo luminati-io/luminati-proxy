@@ -7,12 +7,12 @@ import {T} from './common/i18n.js';
 
 const E = {};
 
-E.code = (proxy=24000)=>({
-    shell: `curl --proxy 127.0.0.1:${proxy} "http://lumtest.com/myip.json"`,
+E.code = (proxy=24000, hostname=document.location.hostname)=>({
+    shell: `curl --proxy ${hostname}:${proxy} "http://lumtest.com/myip.json"`,
     node: `#!/usr/bin/env node
 require('request-promise')({
     url: 'https://lumtest.com/myip.json',
-    proxy: 'http://127.0.0.1:${proxy}',
+    proxy: 'http://${hostname}:${proxy}',
     rejectUnauthorized: false
 }).then(function(data){
     console.log(data);
@@ -41,7 +41,7 @@ public class Example {
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         URL url = new URL("https://lumtest.com/myip.json");
         Proxy proxy = new Proxy(Proxy.Type.HTTP,
-            new InetSocketAddress("127.0.0.1", ${proxy}));
+            new InetSocketAddress("${hostname}", ${proxy}));
         URLConnection yc = url.openConnection(proxy);
         BufferedReader in = new BufferedReader(new InputStreamReader(
             yc.getInputStream()));
@@ -61,7 +61,7 @@ class Example
         ServicePointManager.ServerCertificateValidationCallback =
             delegate { return true; };
         var client = new WebClient();
-        client.Proxy = new WebProxy("127.0.0.1:${proxy}");
+        client.Proxy = new WebProxy("${hostname}:${proxy}");
         Console.WriteLine(client.DownloadString(
             "https://lumtest.com/myip.json"));
     }
@@ -71,7 +71,7 @@ class Example
 Module Example
     Sub Main()
         Dim Client As New WebClient
-        Client.Proxy = New WebProxy("http://127.0.0.1:${proxy}")
+        Client.Proxy = New WebProxy("http://${hostname}:${proxy}")
         Console.WriteLine(Client.DownloadString(
             "http://lumtest.com/myip.json"))
     End Sub
@@ -87,7 +87,7 @@ if sys.version_info[0]==2:
     ctx = ssl.create_default_context()
     ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = request.build_opener(
-        request.ProxyHandler({'http': 'http://127.0.0.1:${proxy}'}),
+        request.ProxyHandler({'http': 'http://${hostname}:${proxy}'}),
         request.HTTPSHandler(context=ctx))
     print(opener.open('https://lumtest.com/myip.json').read())
 if sys.version_info[0]==3:
@@ -95,7 +95,7 @@ if sys.version_info[0]==3:
     ctx = ssl.create_default_context()
     ctx.verify_flags = ssl.VERIFY_DEFAULT
     opener = urllib.request.build_opener(
-        urllib.request.ProxyHandler({'http': 'http://127.0.0.1:${proxy}'}),
+        urllib.request.ProxyHandler({'http': 'http://${hostname}:${proxy}'}),
         urllib.request.HTTPSHandler(context=ctx))
     print(opener.open('https://lumtest.com/myip.json').read())`,
     ruby: `#!/usr/bin/ruby
@@ -104,7 +104,7 @@ require 'uri'
 require 'net/http'
 
 uri = URI.parse('{{example.user_url}}')
-proxy = Net::HTTP::Proxy('127.0.0.1', ${proxy})
+proxy = Net::HTTP::Proxy('${hostname}', ${proxy})
 
 req = Net::HTTP::Get.new(uri.path)
 
@@ -115,14 +115,14 @@ end
 puts result.body`,
     php: `<?php
     $curl = curl_init('https://lumtest.com/myip.json');
-    curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:${proxy}');
+    curl_setopt($curl, CURLOPT_PROXY, 'http://${hostname}:${proxy}');
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     curl_exec($curl);
 ?>`,
     perl: `#!/usr/bin/perl
 use LWP::UserAgent;
 my $agent = LWP::UserAgent->new();
-$agent->proxy(['http', 'https'], "http://127.0.0.1:${proxy}");
+$agent->proxy(['http', 'https'], "http://${hostname}:${proxy}");
 print $agent->get('http://lumtest.com/myip.json')->content();`,
 });
 
@@ -133,7 +133,7 @@ const Last_step = ()=>
       <T>and start browsing.</T>
     </Li>;
 
-E.browser = (proxy=24000)=>({
+E.browser = (proxy=24000, hostname=document.location.hostname)=>({
     chrome_win:
         <Instructions>
           <Li><T>Open</T><Code>chrome://settings/</Code> <T>in a</T>
@@ -151,7 +151,7 @@ E.browser = (proxy=24000)=>({
           </Li>
           <Li>
             <T>Enter</T><code><T>Address</T></code>:
-            <Code>127.0.0.1</Code> <T>and</T> <code> <T>Port</T></code>:
+            <Code>{hostname}</Code> <T>and</T> <code> <T>Port</T></code>:
             <Code> {proxy}</Code>
           </Li>
           <Li>
@@ -179,7 +179,7 @@ E.browser = (proxy=24000)=>({
             <T>Choose</T><code><T>Web Proxy (HTTP)</T></code><T>and</T><code>
             <T>Secure Web Proxy (HTTPS)</T></code></Li>
           <Li>
-            <T>Enter</T><code><T>Address</T></code>: <Code>127.0.0.1</Code>
+            <T>Enter</T><code><T>Address</T></code>: <Code>{hostname}</Code>
             <T>and</T><code><T>Port</T></code>: <Code> {proxy}</Code>
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
@@ -199,7 +199,7 @@ E.browser = (proxy=24000)=>({
             <T>check-box.</T>
           </Li>
           <Li>
-            <T>Enter</T><code><T>Address</T></code>: <Code>127.0.0.1</Code>
+            <T>Enter</T><code><T>Address</T></code>: <Code>{hostname}</Code>
             <T>and</T>
             <code><T>Port</T></code>: <Code> {proxy}</Code>
           </Li>
@@ -224,7 +224,7 @@ E.browser = (proxy=24000)=>({
             <T>radio button.</T>
           </Li>
           <Li>
-            <T>Enter</T><code><T>HTTP Proxy</T></code>: <Code>127.0.0.1</Code>
+            <T>Enter</T><code><T>HTTP Proxy</T></code>: <Code>{hostname}</Code>
             <T>and</T><code><T>Port</T></code>: <Code>{proxy}</Code>
           </Li>
           <Li>
@@ -233,7 +233,7 @@ E.browser = (proxy=24000)=>({
             <T>check-box.</T>
           </Li>
           <Li>
-            <T>Add</T><code>localhost,127.0.0.1</code>
+            <T>Add</T><code>localhost,{hostname}</code>
             <T>to "No proxy for:" text area</T>
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>
@@ -257,7 +257,7 @@ E.browser = (proxy=24000)=>({
           <Li><T>Choose</T><code><T>Web Proxy (HTTP)</T></code></Li>
           <Li>
             <T>Enter</T><code><T>Web Proxy Server</T></code>:
-            <Code>127.0.0.1</Code><T>and</T><code>Port</code>:
+            <Code>{hostname}</Code><T>and</T><code>Port</code>:
             <Code> {proxy}</Code>
           </Li>
           <Li><T>Save changes by pressing</T><code><T>OK</T></code></Li>

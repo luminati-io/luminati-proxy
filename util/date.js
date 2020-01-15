@@ -151,10 +151,8 @@ E.locale = {months_long: E.months_long, months_short: E.months_short,
 E.get = date_get;
 function date_get(d, _new){
     var y, mon, day, H, M, S, _ms;
-    if (d===undefined)
-        return new Date();
     if (d==null)
-        return new Date(null);
+        return new Date();
     if (d instanceof Date)
         return _new ? new Date(d) : d;
     if (typeof d=='string')

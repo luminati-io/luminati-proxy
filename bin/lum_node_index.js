@@ -10,12 +10,8 @@ const lpm_config = require('../util/lpm_config.js');
 const pm2 = require('pm2');
 const child_process = require('child_process');
 const path = require('path');
-const sudo_prompt = require('sudo-prompt');
-const ipc = require('node-ipc');
 const util_lib = require('../lib/util.js');
-
-ipc.config.id = 'lum_node_index';
-ipc.config.silent = true;
+const upgrader = require('./upgrader.js');
 
 class Lum_node_index {
     constructor(argv){
@@ -39,6 +35,84 @@ class Lum_node_index {
             opt = [opt];
         return yield etask.nfn_apply(pm2, '.'+command, opt);
     }); }
+    start_daemon(){
+        const _this = this;
+    return etask(function*start_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
+        this.on('finally', ()=>pm2.disconnect());
+        const script = _this.argv.$0;
+        logger.notice('Running in daemon: %s', script);
+        const daemon_start_opt = {
+            name: lpm_config.daemon_name,
+            script,
+            mergeLogs: false,
+            output: '/dev/null',
+            error: '/dev/null',
+            autorestart: true,
+            killTimeout: 5000,
+            restartDelay: 5000,
+            args: process.argv.filter(arg=>arg!='-d'&&!arg.includes('daemon')),
+        };
+        yield etask.nfn_apply(pm2, '.connect', []);
+        yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        bus.on('log:out', data=>{
+            if (data.process.name!=lpm_config.daemon_name)
+                return;
+            process.stdout.write(data.data);
+            if (data.data.includes('Open admin browser') ||
+                data.data.includes('Shutdown'))
+            {
+                this.continue();
+            }
+        });
+        yield this.wait();
+    }); }
+    stop_daemon(){
+        const _this = this;
+    return etask(function*stop_daemon(){
+        this.on('uncaught', e=>{
+            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
+        });
+        this.on('finally', ()=>pm2.disconnect());
+        yield etask.nfn_apply(pm2, '.connect', []);
+        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
+        if (!_this.is_daemon_running(pm2_list))
+            return logger.notice('There is no running LPM daemon process');
+        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
+        let start_logging;
+        bus.on('log:out', data=>{
+            if (data.process.name!=lpm_config.daemon_name)
+                return;
+            start_logging = start_logging||data.data.includes('Shutdown');
+            if (!start_logging || !data.data.includes('NOTICE'))
+                return;
+            process.stdout.write(data.data);
+        });
+        bus.on('process:event', data=>{
+            if (data.process.name==lpm_config.daemon_name &&
+                ['delete', 'stop'].includes(data.event))
+            {
+                this.continue();
+            }
+        });
+        yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
+        yield this.wait();
+    }); }
+    restart_daemon(){
+        const _this = this;
+        return etask(function*(){
+            const pm2_list = yield _this.pm2_cmd('list');
+            if (_this.is_daemon_running(pm2_list))
+            {
+                logger.notice('Restarting daemon...');
+                yield _this.pm2_cmd('restart', lpm_config.daemon_name);
+                logger.notice('Daemon restarted');
+            }
+        });
+    }
     show_status(){
         const _this = this;
         return etask(function*status(){
@@ -85,124 +159,33 @@ class Lum_node_index {
     msg_handler(msg){
         switch (msg.command)
         {
-        case 'shutdown_master': return process.exit();
+        case 'shutdown_master':
+            return process.exit();
         case 'restart':
             this.child.removeListener('exit', this.shutdown_on_child_exit);
             this.child.on('exit', this.restart_on_child_exit.bind(this,
                 msg.is_upgraded));
             this.child.kill();
             break;
-        case 'upgrade': this.emit_message('upgrade'); break;
-        case 'downgrade': this.emit_message('downgrade'); break;
+        case 'upgrade':
+            upgrader.upgrade(error=>{
+                this.child.send({command: 'upgrade_finished', error});
+                this.restart_daemon();
+            });
+            break;
+        case 'downgrade':
+            upgrader.downgrade(error=>{
+                this.child.send({command: 'downgrade_finished', error});
+                this.restart_daemon();
+            });
+            break;
         }
-    }
-    run_upgrader(){
-        if (this.upgrader_started)
-            return;
-        this.upgrader_started = true;
-        const opt = {name: 'Luminati Proxy Manager'};
-        const cmd = `node ${path.resolve(__dirname, 'upgrader.js')}`;
-        sudo_prompt.exec(cmd, opt, (e, stdout, stderr)=>{
-            this.upgrader_started = false;
-            if (e)
-            {
-                if (e.signal=='SIGINT')
-                    return;
-                const msg = e.message=='User did not grant permission.' ?
-                    e.message : zerr.e2s(e);
-                logger.error(`Upgrader error: ${msg}`);
-            }
-            if (stderr)
-                logger.error(`Upgrader stderr: ${stderr}`);
-        });
-    }
-    emit_message(msg, data){
-        if (!ipc.server)
-        {
-            logger.error('IPC server is not running, starting...');
-            return this.start_ipc();
-        }
-        if (!this.upgrader_socket)
-        {
-            this.run_upgrader();
-            return this.ipc_cb = ()=>this.emit_message(msg, data);
-        }
-        ipc.server.emit(this.upgrader_socket, msg, data);
-    }
-    start_upgrade_cli(){
-        zerr.perr('upgrade_start');
-        this.emit_message('upgrade', {cli: true});
-    }
-    start_downgrade_cli(){
-        zerr.perr('downgrade_start');
-        this.emit_message('downgrade', {cli: true});
-    }
-    upgrade_downgrade_cli(e, is_downgrade){
-        this.emit_message('stop');
-        this.stop_ipc();
-        const op = is_downgrade ? 'downgrade' : 'upgrade';
-        const _this = this;
-        return etask(function*_upgrade_downgrade_cli(){
-            if (e)
-                return yield zerr.perr(`${op}_error`, {error: e});
-            const pm2_list = yield _this.pm2_cmd('list');
-            if (_this.is_daemon_running(pm2_list))
-            {
-                logger.notice('Restarting daemon...');
-                yield _this.pm2_cmd('restart', lpm_config.daemon_name);
-                logger.notice('Daemon restarted');
-            }
-            yield zerr.perr(`${op}_finish`);
-        });
-    }
-    start_ipc(){
-        ipc.serve(()=>{
-            ipc.server.on('upgrader_connected', (data, socket)=>{
-                this.upgrader_socket = socket;
-                if (!this.ipc_cb)
-                    return;
-                this.ipc_cb();
-                delete this.ipc_cb;
-            });
-            ipc.server.on('upgrade_finished', ({error, cli})=>{
-                if (cli)
-                    this.upgrade_downgrade_cli(error);
-                else if (this.child)
-                    this.child.send({command: 'upgrade_finished', error});
-            });
-            ipc.server.on('downgrade_finished', ({error, cli})=>{
-                if (cli)
-                    this.upgrade_downgrade_cli(error, 1);
-                else if (this.child)
-                    this.child.send({command: 'downgrade_finished', error});
-            });
-            ipc.server.on('auto_upgrade_finished', ({error})=>{
-                if (this.child)
-                    this.child.send({command: 'upgrade_finished', error});
-            });
-            ipc.server.on('log', data=>{
-                logger[data.level||'notice'](data.msg);
-            });
-            ipc.server.on('socket.disconnected', ()=>{
-                delete this.upgrader_socket;
-            });
-        });
-        ipc.server.start();
-    }
-    stop_ipc(){
-        logger.debug('stopping IPC');
-        if (ipc.server)
-            ipc.server.stop();
     }
     init_traps(){
         ['SIGTERM', 'SIGINT', 'uncaughtException'].forEach(sig=>{
             process.on(sig, e=>{
                 setTimeout(()=>process.exit(), 5000);
             });
-        });
-        process.on('exit', ()=>{
-            this.emit_message('stop');
-            this.stop_ipc();
         });
         if (lpm_config.is_win)
         {
@@ -214,29 +197,23 @@ class Lum_node_index {
         }
     }
     run(){
+        if (this.argv.startUpgrader)
+            return upgrader.start_upgrader();
+        if (this.argv.stopUpgrader)
+            return upgrader.stop_upgrader();
+        if (this.argv.daemon_opt.start)
+            return this.start_daemon();
+        if (this.argv.daemon_opt.stop)
+            return this.stop_daemon();
         if (this.argv.status)
             return this.show_status();
         if (this.argv.genCert)
             return this.gen_cert();
-        this.init_traps();
         if (this.argv.upgrade)
-        {
-            this.ipc_cb = ()=>this.start_upgrade_cli();
-            this.run_upgrader();
-            return this.start_ipc();
-        }
-        else if (this.argv.downgrade)
-        {
-            this.ipc_cb = ()=>this.start_downgrade_cli(1);
-            this.run_upgrader();
-            return this.start_ipc();
-        }
-        else if (this.argv.autoUpgrade)
-        {
-            this.ipc_cb = ()=>this.emit_message('start_auto_upgrade');
-            this.run_upgrader();
-        }
-        this.start_ipc();
+            return upgrader.upgrade();
+        if (this.argv.downgrade)
+            return upgrader.downgrade();
+        this.init_traps();
         this.create_child();
     }
 }

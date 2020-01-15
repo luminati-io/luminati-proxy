@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.168.67",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "update alternative domain without restarting lpm"
+            },
+            {
+                "type": "star",
+                "text": "use actual hostname in howto"
+            }
+        ]
+    },
+    {
         "ver": "1.167.729",
         "type": "stable",
         "changes": [

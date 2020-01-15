@@ -16,8 +16,6 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../lib/logger.js').child({category: 'lum_node'});
-const pm2 = require('pm2');
-const lpm_config = require('../util/lpm_config.js');
 
 const perr_info = info=>Object.assign({}, info, {
     customer: _.get(E.manager, '_defaults.customer'),
@@ -86,87 +84,7 @@ const add_alias_for_whitelist_ips = ()=>{
     } catch(e){ logger.warn(`Failed to install ${name}: ${e.message}`); }
 };
 
-E.start_daemon = ()=>{
-    E.uninit();
-    return etask(function*start_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
-        });
-        this.on('finally', ()=>pm2.disconnect());
-        const script = path.resolve(__dirname, 'index.js');
-        logger.notice('Running in daemon: %s', script);
-        const daemon_start_opt = {
-            name: lpm_config.daemon_name,
-            script,
-            mergeLogs: false,
-            output: '/dev/null',
-            error: '/dev/null',
-            autorestart: true,
-            killTimeout: 5000,
-            restartDelay: 5000,
-            args: process.argv.filter(arg=>arg!='-d'&&!arg.includes('daemon')),
-        };
-        yield etask.nfn_apply(pm2, '.connect', []);
-        yield etask.nfn_apply(pm2, '.start', [daemon_start_opt]);
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            process.stdout.write(data.data);
-            if (data.data.includes('Open admin browser') ||
-                data.data.includes('Shutdown'))
-            {
-                this.continue();
-            }
-        });
-        yield this.wait();
-    });
-};
-
-E.is_daemon_running = list=>{
-    const daemon = list.find(p=>p.name==lpm_config.daemon_name);
-    return !!daemon &&
-        ['online', 'launching'].includes(daemon.pm2_env.status);
-};
-
-E.stop_daemon = ()=>{
-    E.uninit();
-    return etask(function*stop_daemon(){
-        this.on('uncaught', e=>{
-            logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
-        });
-        this.on('finally', ()=>pm2.disconnect());
-        yield etask.nfn_apply(pm2, '.connect', []);
-        const pm2_list = yield etask.nfn_apply(pm2, '.list', []);
-        if (!E.is_daemon_running(pm2_list))
-            return logger.notice('There is no running LPM daemon process');
-        const bus = yield etask.nfn_apply(pm2, '.launchBus', []);
-        let start_logging;
-        bus.on('log:out', data=>{
-            if (data.process.name!=lpm_config.daemon_name)
-                return;
-            start_logging = start_logging||data.data.includes('Shutdown');
-            if (!start_logging || !data.data.includes('NOTICE'))
-                return;
-            process.stdout.write(data.data);
-        });
-        bus.on('process:event', data=>{
-            if (data.process.name==lpm_config.daemon_name &&
-                ['delete', 'stop'].includes(data.event))
-            {
-                this.continue();
-            }
-        });
-        yield etask.nfn_apply(pm2, '.stop', [lpm_config.daemon_name]);
-        yield this.wait();
-    });
-};
-
 E.run = (argv, run_config)=>{
-    if (argv.daemon_opt.start)
-        return E.start_daemon();
-    if (argv.daemon_opt.stop)
-        return E.stop_daemon();
     const backup_exist = fs.existsSync(path.resolve(__dirname,
         './../../luminati-proxy.old/'));
     add_alias_for_whitelist_ips();
@@ -185,39 +103,17 @@ E.run = (argv, run_config)=>{
     .on('upgrade', cb=>{
         if (E.on_upgrade_finished)
             return;
-        zerr.perr('upgrade_start', perr_info());
         process.send({command: 'upgrade'});
         E.on_upgrade_finished = cb;
     })
     .on('downgrade', cb=>{
         if (E.on_downgrade_finished)
             return;
-        zerr.perr('downgrade_start', perr_info());
         process.send({command: 'downgrade'});
         E.on_downgrade_finished = cb;
     }).on('restart', is_upgraded=>
         process.send({command: 'restart', is_upgraded}));
     E.manager.start();
-};
-
-E.handle_upgrade_downgrade_finished = (msg, is_downgrade)=>{
-    if (!is_downgrade && E.on_upgrade_finished)
-    {
-        E.on_upgrade_finished(msg.error);
-        E.on_upgrade_finished = undefined;
-    }
-    else if (is_downgrade && E.on_downgrade_finished)
-    {
-        E.on_downgrade_finished(msg.error);
-        E.on_downgrade_finished = undefined;
-    }
-    else if (E.manager)
-        E.manager.restart_when_idle(msg.error);
-    const op = is_downgrade ? 'downgrade' : 'upgrade';
-    if (msg.error)
-        zerr.perr(`${op}_error`, perr_info({error: msg.error}));
-    else
-        zerr.perr(`${op}_finish`, perr_info());
 };
 
 E.handle_shutdown = msg=>{
@@ -227,11 +123,19 @@ E.handle_shutdown = msg=>{
 E.handle_msg = msg=>{
     switch (msg.command||msg.cmd)
     {
-    case 'upgrade_finished': E.handle_upgrade_downgrade_finished(msg); break;
-    case 'downgrade_finished':
-        E.handle_upgrade_downgrade_finished(msg, 1);
+    case 'upgrade_finished':
+        if (E.on_upgrade_finished)
+            E.on_upgrade_finished(msg.error);
+        E.on_upgrade_finished = undefined;
         break;
-    case 'shutdown': E.handle_shutdown(msg); break;
+    case 'downgrade_finished':
+        if (E.on_downgrade_finished)
+            E.on_downgrade_finished(msg.error);
+        E.on_downgrade_finished = undefined;
+        break;
+    case 'shutdown':
+        E.handle_shutdown(msg);
+        break;
     case 'run':
         E.init(msg.argv);
         E.run(msg.argv, {is_upgraded: msg.is_upgraded});

@@ -1,158 +1,150 @@
 #!/usr/bin/env node
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true, esnext:true*/
+const sudo_prompt = require('sudo-prompt');
+const yargs = require('yargs');
 const child_process = require('child_process');
+const logger = require('../lib/logger.js').child({category: 'Upgrader'});
 const path = require('path');
-const ipc = require('node-ipc');
-const util_lib = require('../lib/util.js');
-const consts = require('../lib/consts.js');
 const etask = require('../util/etask.js');
-const zerr = require('../util/zerr.js');
 const lpm_config = require('../util/lpm_config.js');
-const {levels} = require('../lib/logger.js');
+const util_lib = require('../lib/util.js');
+const zerr = require('../util/zerr.js');
+const JOB_NAME = 'lpm upgrader';
 const E = module.exports = {};
+let crontab;
 
-ipc.config.id = 'lpm_upgrader';
-ipc.config.silent = true;
-ipc.config.maxRetries = 100;
-
-const emit_message = (msg, data)=>ipc.of.lum_node_index &&
-    ipc.of.lum_node_index.emit(msg, data);
-
-const logger = {};
-Object.keys(levels).forEach(level=>{
-    logger[level] = msg=>{
-        console.log('%s: %s', level, msg);
-        emit_message('log', {msg, level});
-    };
-});
-
-E.run_script = (script_f, log_f, cb)=>{
-    const opt = {name: 'Luminati Proxy Manager'};
-    const full_path = path.resolve(__dirname, script_f);
-    const cmd = `bash "${full_path}" ${log_f}`;
-    child_process.exec(cmd, opt, cb);
+E.start_upgrader = ()=>{
+    sudo_run(upgrader_cmd('--add-cron-job'));
 };
 
-E.upgrade = cb=>{
-    const log_file = path.join(lpm_config.work_dir, 'upgrade.log');
-    E.run_script('lpm_upgrade.sh', log_file, (e, stdout, stderr)=>{
-        E.handle_upgrade_downgrade_error(e, stderr, log_file);
-        cb(e);
-    });
+E.stop_upgrader = ()=>{
+    sudo_run(upgrader_cmd('--remove-cron-job'));
 };
 
-E.downgrade = cb=>{
-    const log_file = path.join(lpm_config.work_dir, 'downgrade.log');
-    E.run_script('lpm_downgrade.sh', log_file, (e, stdout, stderr)=>{
-        if (e && e.code==1)
+const upgrader_cmd = flag=>{
+    const script = path.resolve(__dirname, 'upgrader.js');
+    const node_path = process.argv[0];
+    return `${node_path} ${script} ${flag}`;
+};
+
+E.upgrade = cb=>etask(function*(){
+    zerr.perr('upgrade_start');
+    logger.notice('Started upgrading...');
+    const v = yield util_lib.get_last_version(
+        lpm_config.manager_default.api);
+    if (!v.newer)
+        return logger.notice('Already the newest version');
+    sudo_run(bash_cmd('lpm_upgrade.sh'), e=>{
+        if (e)
         {
-            e = 'Luminati proxy manager backup version does not exist!';
-            logger.warn(e);
+            logger.error('Could not upgrade: %s', e.message);
+            zerr.perr('upgrade_error');
         }
         else
-            E.handle_upgrade_downgrade_error(e, stderr, log_file, 1);
+        {
+            logger.notice('Finished upgrading!');
+            zerr.perr('upgrade_finish');
+        }
+        cb(e);
+    });
+});
+
+E.downgrade = cb=>{
+    zerr.perr('downgrade_start');
+    logger.notice('Downgrading...');
+    sudo_run(bash_cmd('lpm_downgrade.sh'), e=>{
+        if (e && e.code==1)
+            e = 'Luminati proxy manager backup version does not exist!';
+        if (e)
+        {
+            logger.warn(e);
+            zerr.perr('downgrade_error');
+        }
+        if (!e)
+        {
+            logger.notice('Finished downgrading!');
+            zerr.perr('downgrade_finish');
+        }
         cb(e);
     });
 };
 
-E.handle_upgrade_downgrade_error = (e, stderr, log_file, is_downgrade)=>{
-    const script = is_downgrade ? 'downgrade' : 'upgrade';
-    if (e)
-    {
-        logger.error(`Error during ${script}: ${zerr.e2s(e)}`);
-        if (!lpm_config.is_win)
-            logger.error(`Look at ${log_file} for more details`);
-    }
-    if (stderr)
-        logger.error(`${script} stderr: ${stderr}`);
-};
+const bash_cmd = script=>'bash '+path.resolve(__dirname, script)+' /tmp/lpm_l';
 
-E.start_auto_upgrade = ()=>{
-    if (E.started_auto_upgrade)
-        return;
-    E.started_auto_upgrade = true;
-    util_lib.set_interval(etask._fn(function*start_auto_upgrade(){
-        this.on('uncaught', e=>{
-            logger.error('get_last_version error: '+e.msg);
-        });
-        if (E.upgrading)
-            return;
-        const v = yield util_lib.get_last_version(
-            lpm_config.manager_default.api);
-        if (!v.newer)
-            return;
-        logger.notice(`New ${v.ver} version is available!`);
-        E.upgrading = true;
-        E.upgrade(e=>{
-            E.upgrading = false;
-            emit_message('auto_upgrade_finished', {error: e});
-        });
-    }), consts.UPGRADE_CHECK_INTERVAL);
-};
-
-E.shutdown = ()=>{
-    if (E.shutdowning)
-        return;
-    E.shutdowning = true;
-    util_lib.clear_timeouts();
-    E.uninit();
-    process.exit(0);
-};
-
-E.init_traps = ()=>{
-    E.trap_handlers = ['SIGTERM', 'SIGINT', 'uncaughtException'].map(
-        sig=>({sig, handler: E.shutdown.bind(E)}));
-    E.trap_handlers.forEach(({sig, handler})=>{
-        process.on(sig, handler);
+const sudo_run = (cmd, cb)=>{
+    const opt = {name: 'Upgrader LPM'};
+    const exec = process.getuid()===0 ?
+        child_process.exec.bind(child_process) :
+        sudo_prompt.exec.bind(sudo_prompt);
+    exec(cmd, opt, (e, stdout, stderr)=>{
+        if (cb)
+            cb(e, stdout, stderr);
+        if (e)
+            return logger.error(e.message);
+        if (stderr)
+            logger.error(stderr);
     });
 };
 
-E.uninit_traps = ()=>{
-    if (!E.trap_handlers)
-        return;
-    E.trap_handlers.forEach(({sig, handler})=>process.removeListener(sig,
-        handler));
-};
-
-E.init = ()=>{
-    E.upgrading = false;
-    E.shutdowning = false;
-    E.init_traps();
-    ipc.connectTo('lum_node_index', ()=>{
-        ipc.of.lum_node_index.on('connect', ()=>{
-            emit_message('upgrader_connected');
-        });
-        ipc.of.lum_node_index.on('stop', ()=>{
-            logger.notice('Stopping upgrader...');
-            E.shutdown();
-        });
-        ipc.of.lum_node_index.on('start_auto_upgrade', ()=>{
-            E.start_auto_upgrade();
-        });
-        ipc.of.lum_node_index.on('upgrade', (opt={})=>{
-            logger.notice('Upgrading proxy manager...');
-            E.upgrade(e=>{
-                if (!e)
-                    logger.notice('Upgrade completed successfully');
-                emit_message('upgrade_finished', {error: e, cli: opt.cli});
-            });
-        });
-        ipc.of.lum_node_index.on('downgrade', (opt={})=>{
-            logger.notice('Downgrading proxy manager...');
-            E.downgrade(e=>{
-                if (!e)
-                    logger.notice('Downgrade completed successfully');
-                emit_message('downgrade_finished', {error: e, cli: opt.cli});
-            });
-        });
+const add_cron_job = ()=>etask(function*(){
+    const _this = this;
+    const jobs = crontab.find({comment: JOB_NAME});
+    if (jobs.length)
+        return console.log('CRON job already exists');
+    const node_path = process.argv[0];
+    const script = path.resolve(__dirname, 'index.js');
+    const set_path = `PATH=${process.env.PATH}`;
+    const stream = '>> /tmp/up_log.txt 2>&1';
+    const cron_cmd = `${set_path} ${node_path} ${script} --upgrade ${stream}`;
+    crontab.create(cron_cmd, '*/15 * * * *', JOB_NAME);
+    crontab.save(function(err){
+        if (err)
+            console.error('could not save crontab: %s', err);
+        _this.continue();
     });
-};
+    yield _this.wait();
+});
 
-E.uninit = ()=>{
-    E.uninit_traps();
-    ipc.disconnect('lum_node_index');
-    ipc.config.stopRetrying = true;
-};
+const remove_cron_job = ()=>etask(function*(){
+    const _this = this;
+    const jobs = crontab.find({comment: JOB_NAME});
+    if (!jobs.length)
+        return console.log('CRON job does not exist');
+    crontab.remove(jobs[0]);
+    crontab.save(function(err){
+        if (err)
+            console.error('could not delete job: %s', err);
+        _this.continue();
+    });
+    yield _this.wait();
+});
 
-E.init();
+const load_cron = ()=>etask(function*(){
+    const _this = this;
+    require('crontab').load(function(err, _crontab){
+        if (err)
+        {
+            console.error('could not load crontab: %s', err);
+            return process.exit();
+        }
+        _this.continue(_crontab);
+    });
+    return yield _this.wait();
+});
+
+const main = ()=>etask(function*(){
+    const args = process.argv.slice(2).map(String);
+    const argv = yargs(args).argv;
+    if (!argv.addCronJob && !argv.removeCronJob)
+        return;
+    if (process.getuid()!==0)
+        return console.error('you need to run the process with sudo');
+    crontab = yield load_cron();
+    if (argv.addCronJob)
+        return yield add_cron_job();
+    if (argv.removeCronJob)
+        return yield remove_cron_job();
+});
+
+main();

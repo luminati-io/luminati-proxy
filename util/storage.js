@@ -1,5 +1,5 @@
 // LICENSE_CODE ZON ISC
-'use strict'; /*zlint br*//*jslint node:true*/
+'use strict'; /*zlint br*//*jslint node:true, browser:true*/
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports;

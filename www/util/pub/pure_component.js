@@ -1,14 +1,6 @@
 // LICENSE_CODE ZON
-'use strict'; /*jslint node:true, react:true*/
-var define;
-var is_node = typeof module=='object' && module.exports;
-if (is_node)
-    define = require('../../../util/require_node.js').define(module, '..');
-else
-    define = self.define;
-
+'use strict'; /*jslint react:true*/
 define(['react', '/util/etask.js', '/util/setdb.js'], (React, etask, setdb)=>{
-
 const LONG_CB_MS = 100;
 
 // XXX krzysztof: copied from android/who/app/components, removed local
@@ -85,6 +77,4 @@ class Pure_component extends React.PureComponent {
     }
 }
 
-return Pure_component;
-
-});
+return Pure_component; }); // eslint-disable-line

@@ -100,21 +100,21 @@ E.inet_addr = function(ip){
     ip = ''+ip;
     for (var i = 0, l = ip.length; i < l; ++i)
     {
-    	code = ip.charCodeAt(i);
+            code = ip.charCodeAt(i);
         if (code>47&&code<58)
         {
             num = (num||0)*10+code-48;
             continue;
         }
         if (code==46)
-	{
+        {
             if (num==undefined||num>255)
-	        return null;
-	    res += num<<shift;
-	    num = undefined;
-	    shift -= 8;
+                return null;
+            res += num<<shift;
+            num = undefined;
+            shift -= 8;
             continue;
-	}
+        }
         return null;
     }
     return shift==0 && num!=undefined && num<256 ? res+(num|0)>>>0 : null;

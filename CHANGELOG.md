@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.168.67 Stable
+- :star: update alternative domain without restarting lpm
+- :star: use actual hostname in howto
+
 ## 1.167.729 Stable
 - :star: turn on SSL to SP by default if connecting from CN
 

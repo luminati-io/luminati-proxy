@@ -61,6 +61,8 @@ E.init_args = args=>{
         status: 'Show proxy manager processes current status',
         'gen-cert': 'Generate cert',
         'auto-upgrade': 'Enable auto upgrade',
+        'start-upgrader': 'Install CRON process that checks upgrades',
+        'stop-upgrader': 'Removes CRON process that checks upgrades',
     };
     const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)
