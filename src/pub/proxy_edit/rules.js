@@ -179,8 +179,11 @@ export default class Rules extends Pure_component {
               {!form.ssl &&
                 <Warning text={
                   <React.Fragment>
-                    <span><T>Most of the options here are available only when
-                      using </T>
+                    <span>
+                      <T>
+                        Most of the options here are available only when using
+                      </T>
+                      {' '}
                       <a className="link" onClick={this.goto_ssl}>
                       <T>SSL analyzing</T></a>
                     </span>
@@ -254,7 +257,9 @@ const Ban_ips_note = withRouter(({match, history})=>{
         history.push({pathname: `/proxy/${port}/logs/banned_ips`});
     };
     return <span>
-          <a className="link" onClick={goto_banlist}>Currently banned IPs</a>
+          <a className="link" onClick={goto_banlist}>
+            <T>Currently banned IPs</T>
+          </a>
         </span>;
 });
 

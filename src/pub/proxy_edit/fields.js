@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint react:true, es6:true*/
 import React from 'react';
+import {T} from '../common/i18n.js';
 
 export const tabs = {
     logs: {
@@ -31,7 +32,7 @@ export const tabs = {
                     <a className="link"
                       href="http://bgp.potaroo.net/cidr/autnums.html"
                       target="_blank" rel="noopener noreferrer">
-                      list
+                      <T>list</T>
                     </a>)
                     </span>,
                 tooltip: `Select specific Internet Service Provider (ISP), or
@@ -197,7 +198,7 @@ export const tabs = {
                 label: 'Explicit session',
                 tooltip: `Insert a session ID. You cannot use dash "-"
                     character`,
-                placeholder: `e.g. session_123`,
+                placeholder: `e.g. test_session`,
             },
             sticky_ip: {
                 label: 'Sticky IP',

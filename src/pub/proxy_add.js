@@ -185,9 +185,12 @@ const Created_port = ({port})=>{
     const code = prism.highlight(to_copy, prism.languages.clike);
     return <div className="howto animated fadeInUp">
           <h3 style={{marginBottom: 15, marginTop: -20}}>
-            Congratulation! You just created a port {port}</h3>
+            <T>Congratulation! You just created a port</T> {port}
+          </h3>
           <span>
-            You can start using the port by running the following command:
+            <T>
+              You can start using the port by running the following command:
+            </T>
           </span>
           <div className="well instructions_well">
             <pre>
@@ -318,7 +321,7 @@ const Footer = props=>{
             </button>
           }
           {!!props.created_port &&
-            <button onClick={ok_clicked} className={classes}>OK</button>
+            <button onClick={ok_clicked} className={classes}><T>OK</T></button>
           }
         </div>;
 };

@@ -11,6 +11,7 @@ import Har_viewer from '../har_viewer.js';
 import setdb from '../../../util/setdb.js';
 import {Nav_tabs, Nav_tab} from '../common/nav_tabs.js';
 import Tooltip from '../common/tooltip.js';
+import {T} from '../common/i18n.js';
 
 moment.relativeTimeThreshold('ss', 60);
 moment.relativeTimeThreshold('s', 50);
@@ -43,7 +44,7 @@ export default Logs;
 const Nav = ({set_tab, cur_tab})=>
     <Nav_tabs narrow set_tab={set_tab} cur_tab={cur_tab}>
       <Nav_tab id="har" title="HAR viewer"/>
-      <Nav_tab id="banned_ips" title="Banned IPs"/>
+      <Nav_tab id="banned_ips" title="lpm_banned_ip"/>
     </Nav_tabs>;
 
 const banned_ips_cols = [
@@ -85,7 +86,8 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
         const {ips, unbanning} = this.state;
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
-        return <Chrome_table title={`Banned IPs (${this.state.ips.length})`}
+        return <Chrome_table
+            title={<T>{t=>t('lpm_banned_ip')+` (${ips.length})`}</T>}
             cols={banned_ips_cols} class_name="banned_ips_panel">
               {ips.map(d=>
                 <tr key={`${d.ip}-${d.domain}`}>

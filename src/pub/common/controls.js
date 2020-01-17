@@ -123,8 +123,9 @@ export class Pins extends Pure_component {
                   </Pin>
                 )}
               </div>
-              <Pin_btn title="Add IP" tooltip="Add new IP to the list"
-                on_click={this.add_empty_pin} disabled={disabled}/>
+              <T>{t=><Pin_btn title={t('Add IP')}
+                tooltip={t('Add new IP to the list')}
+                on_click={this.add_empty_pin} disabled={disabled}/>}</T>
               {!!pending.length && !disabled &&
                 <Pin_btn on_click={this.open_modal} title={pending_btn_title}/>
               }
@@ -210,7 +211,7 @@ class Pin extends Pure_component {
               </div>
               {edit && show_any &&
                 <button className="any" onClick={this.on_any_click}>
-                    any
+                    <T>any</T>
                 </button>
               }
               {edit &&
@@ -233,20 +234,19 @@ export const Pin_btn = ({on_click, title, tooltip, disabled})=>
 
 export class Select_status extends Pure_component {
     status_types = ['200', '2..', '403', '404', '500', '503', '(4|5)..'];
-    value_to_option = value=>{
+    value_to_option = (t, value)=>{
         if (!value)
-            return {value: '', label: '--Select--'};
+            return {value: '', label: t('--Select--')};
         return {value, label: value};
     };
     on_change = e=>this.props.on_change_wrapper(e && e.value || '');
     render(){
-        const options = this.status_types.map(this.value_to_option);
-        return <Select_multiple {...this.props}
+        return <T>{t=><Select_multiple {...this.props}
               class_name="status"
-              options={options}
+              options={this.status_types.map(v=>this.value_to_option(t, v))}
               on_change={this.on_change}
               validation={v=>!!v}
-              value_to_option={this.value_to_option}/>;
+              value_to_option={this.value_to_option.bind(this, t)}/>}</T>;
     }
 }
 
@@ -256,7 +256,7 @@ export class Select_number extends Pure_component {
     value_to_option = value=>{
         if (value==null)
             return false;
-        const label = value==0 ? 'Disabled' : this._fmt_num(+value);
+        const label = value==0 ? <T>Disabled</T> : this._fmt_num(+value);
         return {value, label};
     };
     opt_from_range = ()=>{
@@ -338,16 +338,16 @@ class Select_multiple extends Pure_component {
 }
 
 export class Yes_no extends Pure_component {
-    options = ()=>{
+    options = t=>{
         const default_label = this.props.default ? 'Yes' : 'No';
         return [
             {key: 'No', value: false},
-            {key: 'Default ('+default_label+')', value: ''},
+            {key: t('Default')+' ('+t(default_label)+')', value: ''},
             {key: 'Yes', value: true},
         ];
     };
     render(){
-        return <Select {...this.props} data={this.options()}/>;
+        return <T>{t=><Select {...this.props} data={this.options(t)}/>}</T>;
     }
 }
 
@@ -522,15 +522,15 @@ export const Input = props=>{
         if (props.on_change_wrapper)
             props.on_change_wrapper(val, props.id);
     };
-    return <input style={props.style}
+    return <T>{t=><input style={props.style}
           type={props.type}
           value={props.val}
           disabled={props.disabled}
           onChange={e=>update(e.target.value)}
           className={props.className}
-          placeholder={props.placeholder}
+          placeholder={t(props.placeholder)}
           onBlur={props.on_blur}
-          onKeyUp={props.on_key_up}/>;
+          onKeyUp={props.on_key_up}/>}</T>;
 };
 
 export const Select_zone = withRouter(
@@ -585,10 +585,10 @@ class Select_zone extends Pure_component {
                     tooltip={tooltip} data={zone_opt} disabled={disabled}/>
                 </span>
               </Tooltip>
-              <Tooltip title="Refresh zones">
+              <T>{t=><Tooltip title={t('Refresh zones')}>
                 <div className="chrome_icon refresh"
                   onClick={this.refresh_zones}/>
-              </Tooltip>
+              </Tooltip>}</T>
               <Loader show={this.state.refreshing_zones}/>
             </div>;
     }

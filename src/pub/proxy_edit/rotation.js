@@ -3,6 +3,7 @@
 import React from 'react';
 import {Note} from '../common.js';
 import {Config, Tab_context} from './common.js';
+import {T} from '../common/i18n.js';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
 import setdb from '../../../util/setdb.js';
@@ -61,8 +62,8 @@ export default class Rotation extends Pure_component {
                 <Config type="select_number" id="pool_size"
                   note={pool_size_note}/>
                 <Config type="select_number" id="max_requests"/>
-                <Config type="select_number" id="session_duration"
-                  sufix="seconds"/>
+                <T>{t=><Config type="select_number" id="session_duration"
+                  sufix={t('seconds')}/>}</T>
                 <Config type="yes_no" id="sticky_ip"/>
                 <Config type="text" id="session"/>
                 <Config type="yes_no" id="session_termination"

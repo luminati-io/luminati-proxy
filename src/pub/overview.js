@@ -137,16 +137,19 @@ class Upgrade extends Pure_component {
         const upgrade_type = major ? 'major' : 'minor';
         return <Warning tooltip={tooltip} id={this.state.ver_last.version}>
             <div>
-              A new <strong>{upgrade_type}</strong> version <strong>
-              {this.state.ver_last.version} </strong>
-              is available. You are <strong>{versions.length}
-              </strong> releases behind the newest version.
+              <T>lpm_new_ver</T>{' '}
+              <strong><T>{'lpm_new_ver_'+upgrade_type}</T></strong>{' '}
+              <T>lpm_new_ver_version</T>{' '}
+              <strong>{this.state.ver_last.version}</strong>{' '}
+              <T>is available. You are</T>{' '}
+              <strong>{versions.length}</strong>{' '}
+              <T>releases behind the newest version.</T>
             </div>
             <div className="buttons buttons_upgrade">
               <button className="btn btn_lpm btn_upgrade"
                 onClick={this.upgrade} disabled={disabled}>
-                {upgrading ? 'Upgrading...' :
-                    upgrade_error ? 'Error' : 'Upgrade'}
+                <T>{upgrading ? 'Upgrading...' :
+                    upgrade_error ? 'Error' : 'Upgrade'}</T>
               </button>
             </div>
             {ver_node && !ver_node.satisfied && !electron &&

@@ -7,6 +7,7 @@ import _ from 'lodash';
 import Tooltip from './common/tooltip.js';
 import {Checkbox} from './common.js';
 import './css/chrome_widgets.less';
+import {T} from './common/i18n.js';
 
 export const Toolbar_button = ({id, tooltip, active, href, placement,
     ...props})=>
@@ -295,7 +296,7 @@ const Header_container = ({cols, selectable, selected_all, toggle_all})=>
                 <Checkbox checked={selected_all} readonly/>
               </th>
             }
-            {(cols||[]).map((c, idx)=><th key={idx}>{c.title}</th>)}
+            {(cols||[]).map((c, idx)=><th key={idx}><T>{c.title}</T></th>)}
           </tr>
         </tbody>
       </table>

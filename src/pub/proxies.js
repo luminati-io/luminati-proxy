@@ -176,7 +176,7 @@ const Zone_cell = ({proxy, mgr, scrolling})=>{
 const columns = [
     {
         key: 'actions',
-        title: 'Actions',
+        title: 'lpm_ports_actions',
         tooltip: `Delete/duplicate/refresh sessions/open browser`,
         ext: true,
         sticky: true,
@@ -713,7 +713,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                       <div className="chrome_table">
                       <AutoSizer>
                         {({height, width})=>
-                          <Table width={width}
+                          <T>{t=><Table width={width}
                             height={height}
                             onRowClick={this.on_row_click}
                             onHeaderClick={({dataKey})=>dataKey=='select' &&
@@ -738,7 +738,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                             {cols.map(col=>
                               <Column key={col.key}
                                 cellRenderer={this.cell_renderer.bind(this)}
-                                label={col.title}
+                                label={t(col.title)}
                                 className="chrome_td"
                                 dataKey={col.key}
                                 flexGrow={col.grow!==undefined ? col.grow : 1}
@@ -746,7 +746,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                                   col.shrink : 1}
                                 width={col.width||100}/>
                             )}
-                          </Table>
+                          </Table>}</T>
                         }
                       </AutoSizer>
                       </div>
@@ -776,11 +776,11 @@ class Toolbar extends Pure_component {
             .filter(p=>p.proxy_type=='persist');
         return <Toolbar_container>
               <Toolbar_row>
-                <Toolbar_button id="add" tooltip="Add new proxy"
+                <T>{t=><Toolbar_button id="add" tooltip={t('Add new proxy')}
                   on_click={proxy_add}>
                   <span style={{marginRight: 5, position: 'relative',
                     top: -3}}><T>Add new proxy</T></span>
-                </Toolbar_button>
+                </Toolbar_button>}</T>
                 <Devider/>
                 <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
                   id="filters"/>

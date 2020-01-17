@@ -46,6 +46,13 @@ export default class Headers extends Pure_component {
             return {...h, [name]: value};
         }));
     goto_ssl = ()=>this.goto_field('ssl');
+    user_agents(t){
+        return [
+            {key: t('None'), value: ''},
+            {key: t('Random (desktop)'), value: 'random_desktop'},
+            {key: t('Random (mobile)'), value: 'random_mobile'},
+            ...util.formatted_user_agents];
+    }
     render(){
         if (!this.state.form)
             return null;
@@ -61,13 +68,14 @@ export default class Headers extends Pure_component {
         }
         return <div className="headers">
               <Tab_context.Provider value="headers">
-                <Config type="select" id="user_agent" data={util.user_agents}/>
+                <T>{t=><Config type="select" id="user_agent"
+                  data={this.user_agents(t)}/>}</T>
                 <Config type="yes_no" id="override_headers"/>
                 <Field_row_raw inner_class_name="headers">
                   <div className="desc">
-                    <Tooltip title="Custom headers">
-                      <span>Headers</span>
-                    </Tooltip>
+                    <T>{t=><Tooltip title={t('Custom headers')}>
+                      <span><T>Headers</T></span>
+                    </Tooltip>}</T>
                   </div>
                   <div className="list">
                     {this.state.headers.map((h, i)=>
@@ -86,17 +94,17 @@ export default class Headers extends Pure_component {
 const Header = ({name, value, idx, add_clicked, remove_clicked, last,
     update, disabled})=>
     <div className="single_header">
-      <div className="desc">Name</div>
+      <div className="desc"><T>Name</T></div>
       <Input type="text" val={name} on_change_wrapper={update('name')}
         disabled={disabled}/>
-      <div className="desc">Value</div>
+      <div className="desc"><T>Value</T></div>
       <Input type="text" val={value} on_change_wrapper={update('value')}
         disabled={disabled}/>
       {!disabled &&
-        <div className="action_icons">
-          <Remove_icon tooltip="Remove header"
+        <T>{t=><div className="action_icons">
+          <Remove_icon tooltip={t('Remove header')}
             click={()=>remove_clicked(idx)}/>
-          {last && <Add_icon tooltip="Add header" click={add_clicked}/>}
-        </div>
+          {last && <Add_icon tooltip={t('Add header')} click={add_clicked}/>}
+        </div>}</T>
       }
     </div>;

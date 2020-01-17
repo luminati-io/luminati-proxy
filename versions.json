@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.168.496",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "update Chinese translations"
+            }
+        ]
+    },
+    {
         "ver": "1.168.142",
         "type": "stable",
         "changes": [

@@ -13,6 +13,7 @@ import moment from 'moment';
 import {trigger_types, action_types} from '../../util/rules_util.js';
 import {Copy_btn} from './common.js';
 import './css/har_preview.less';
+import {T} from './common/i18n.js';
 
 class Preview extends Pure_component {
     panes = [
@@ -65,7 +66,7 @@ class Preview extends Pure_component {
 const Pane = ({id, idx, width, on_click, active})=>
     <div onClick={()=>on_click(idx)} style={{width}}
       className={classnames('pane', id, {active})}>
-      <span>{id}</span>
+      <span><T>{id}</T></span>
     </div>;
 
 const Pane_slider = ({panes, cur_pane})=>{
@@ -107,7 +108,8 @@ class Pane_headers extends Pure_component {
                 style={{position: 'absolute', right: 5, top: 5}}
                 inner_style={{width: 'auto'}}/>
               <ol className="tree_outline">
-                <Preview_section title="General" pairs={general_entries}/>
+                <Preview_section title="lpm_har_general"
+                  pairs={general_entries}/>
                 <Preview_section title="Response headers"
                   pairs={req.response.headers}/>
                 <Preview_section title="Request headers"
@@ -234,7 +236,7 @@ class Preview_section extends Pure_component {
             <li key="li" onClick={this.toggle}
               className={classnames('parent_title', 'expandable',
               {open: this.state.open})}>
-              {this.props.title}
+              <T>{this.props.title}</T>
               {!this.state.open ? ` (${this.props.pairs.length})` : ''}
             </li>,
             <ol key="ol"

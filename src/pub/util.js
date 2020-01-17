@@ -16,16 +16,10 @@ export const bytes_format = (bytes, number)=>{
     return n+' '+['B', 'KB', 'MB', 'GB', 'TB', 'PB'][number];
 };
 
-const formatted_user_agents = user_agent_gen.map(u=>({
+export const formatted_user_agents = user_agent_gen.map(u=>({
     key: u.name,
     value: u.value,
 }));
-
-export const user_agents = [
-    {key: 'None', value: ''},
-    {key: 'Random (desktop)', value: 'random_desktop'},
-    {key: 'Random (mobile)', value: 'random_mobile'},
-    ...formatted_user_agents];
 
 export const status_codes = {
     101: 'Switching Protocols',

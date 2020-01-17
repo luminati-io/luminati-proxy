@@ -219,5 +219,13 @@
   "Luminati is not working": "Luminati is not working",
   "I was not satisfied with the service":
     "I was not satisfied with the service",
-  "I found another solution": "I found another solution"
+  "I found another solution": "I found another solution",
+  "Actions": "Actions",
+  "lpm_ports_actions": "Actions",
+  "lpm_har_general": "General",
+  "lpm_banned_ip": "Banned IPs",
+  "lpm_new_ver": "A new",
+  "lpm_new_ver_version": "version",
+  "lpm_new_ver_major": "major",
+  "lpm_new_ver_minor": "minor"
 }

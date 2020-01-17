@@ -6,6 +6,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
+import {T} from '../common/i18n.js';
 import Users_modal from './users_modal.js';
 
 const route_err_opt = [
@@ -24,9 +25,9 @@ export default class General extends Pure_component {
     state = {default_proxy_connect_type: 'http'};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     set_field = setdb.get('head.proxy_edit.set_field');
-    proxy_connection_type_opt(){
+    proxy_connection_type_opt(t){
         let def = this.state.default_proxy_connect_type=='https' ?
-            'Default (HTTPS)' : 'Default (HTTP)';
+            t('Default (HTTPS)') : t('Default (HTTP)');
         return [{key: def, value: ''},
             {key: 'HTTP', value: 'http'},
             {key: 'HTTPS', value: 'https'}];
@@ -93,7 +94,7 @@ export default class General extends Pure_component {
             .concat(this.state.settings.whitelist_ips);
         const note_users = form.multiply_users ?
             <a className="link" onClick={this.open_users_modal}>
-              Select users
+              <T>Select users</T>
             </a> : null;
         return <div className="general">
               <Tab_context.Provider value="general">
@@ -102,8 +103,9 @@ export default class General extends Pure_component {
                 <Config type="number" id="port"/>
                 <Config type="pins" id="whitelist_ips"
                   disabled_ips={disabled_wl}/>
-                <Config type="select" data={this.proxy_connection_type_opt()}
-                  id="proxy_connection_type"/>
+                <T>{t=><Config type="select"
+                  data={this.proxy_connection_type_opt(t)}
+                  id="proxy_connection_type"/>}</T>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="insecure"
                   disabled={!this.state.form.ssl}/>

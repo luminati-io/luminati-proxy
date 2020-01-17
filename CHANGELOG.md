@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.168.496 Stable
+- :star: update Chinese translations
+
 ## 1.168.142 Stable
 - :bug: Fix upgrading mechanism
 

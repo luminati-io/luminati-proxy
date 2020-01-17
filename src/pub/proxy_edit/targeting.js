@@ -163,8 +163,11 @@ export default with_www_api(class Targeting extends Pure_component {
                     {is_static &&
                       <span>
                       <div>
-                        This port is configured to use Data Center IPs.</div>
-                      <span>To change Data Center country visit your </span>
+                        <T>This port is configured to use Data Center IPs.</T>
+                      </div>
+                      <span>
+                        <T>To change Data Center country visit your</T>{' '}
+                      </span>
                       </span>
                     }
                     {show_vips_note &&
@@ -178,8 +181,10 @@ export default with_www_api(class Targeting extends Pure_component {
                     }
                     <a className="link" target="_blank"
                       rel="noopener noreferrer"
-                      href={`${this.props.www_api}/cp/zones`}>zone page</a>
-                    <span> and change your zone plan.</span>
+                      href={`${this.props.www_api}/cp/zones`}>
+                      <T>zone page</T>
+                    </a>
+                    <span>{' '}<T>and change your zone plan.</T></span>
                   </Note>
                 }
                 <Config type="select" id="country"

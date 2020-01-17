@@ -4,12 +4,14 @@ import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import Cn from '/www/lum/pub/locale/zh_CN.json';
 import Ru from '/www/lum/pub/locale/ru.json';
+import En from '/www/lum/pub/locale/en.json';
 import setdb from '../../../util/setdb.js';
 
 const t = (key, translation)=>{
     if (!key || !translation)
         return key;
-    if (!translation[key])
+    // warn only for non-english translations
+    if (!translation[key] && translation.Actions!='Actions')
         console.info('missing translation for \'%s\'', key);
     return translation[key]||key;
 };
@@ -56,7 +58,7 @@ export const with_tt = (keys, Component)=>class extends Pure_component {
 };
 
 export const langs = {
-    en: {name: 'English', flag: 'gb'},
+    en: {name: 'English', flag: 'gb', t: En},
     ru: {name: 'русский', flag: 'ru', t: Ru},
     cn: {name: '简体中文', flag: 'cn', t: Cn},
 };

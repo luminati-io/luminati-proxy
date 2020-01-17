@@ -228,15 +228,16 @@ export const Form_controller = props=>{
     return <Input {...props}/>;
 };
 
-export const Copy_btn = with_tt(['Copy to clipboard', 'Copy'],
+export const Copy_btn = with_tt(['Copy to clipboard', 'Copy', 'Copied!'],
 class Copy_btn extends Pure_component {
     textarea = React.createRef();
     btn = React.createRef();
-    componentDidMount(){
-        const {t} = this.props;
-        $(this.btn.current).tooltip('show')
-        .attr('title', t['Copy to clipboard']).tooltip('fixTitle');
+    refreshTooltip(){
+        $(this.btn.current)
+        .attr('title', this.props.t['Copy to clipboard']).tooltip('fixTitle');
     }
+    componentDidMount(){ this.refreshTooltip(); }
+    componentDidUpdate(){ this.refreshTooltip(); }
     copy = ()=>{
         const {t} = this.props;
         const txt = this.textarea.current;
@@ -245,7 +246,7 @@ class Copy_btn extends Pure_component {
         area.select();
         try {
             document.execCommand('copy');
-            $(this.btn.current).attr('title', 'Copied!')
+            $(this.btn.current).attr('title', t['Copied!'])
             .tooltip('fixTitle')
             .tooltip('show').attr('title', t['Copy to clipboard'])
             .tooltip('fixTitle');
@@ -260,7 +261,7 @@ class Copy_btn extends Pure_component {
               <button onClick={this.copy} data-container="body"
                 style={this.props.inner_style}
                 ref={this.btn} className="btn btn_lpm btn_lpm_small btn_copy">
-                {this.props.title||'Copy'}
+                <T>{this.props.title||'Copy'}</T>
               </button>
               <textarea ref={this.textarea}
                 style={{position: 'fixed', top: '-1000px'}}/>
