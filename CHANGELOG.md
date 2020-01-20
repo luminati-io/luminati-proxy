@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.168.796 Development Latest
+- :star: Added support for the headers changes in Luminati API
+
 ## 1.168.496 Stable
 - :star: update Chinese translations
 

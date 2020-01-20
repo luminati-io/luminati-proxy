@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.168.796",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Added support for the headers changes in Luminati API"
+            }
+        ]
+    },
+    {
         "ver": "1.168.496",
         "type": "stable",
         "changes": [

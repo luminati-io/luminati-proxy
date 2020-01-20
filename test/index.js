@@ -266,12 +266,6 @@ describe('proxy', ()=>{
                     yield etask.sleep(900);
                     assert.equal(proxy.full_history.length, 3);
                 }));
-                it('should not idle', etask._fn(function*(_this){
-                    l = yield lum({pool_size: 1, idle_pool: false,
-                        keep_alive: 0.1});
-                    yield etask.sleep(490);
-                    assert.equal(proxy.full_history.length, 5);
-                }));
                 it('should call reset idle pool on each connection', etask._fn(
                 function*(_this){
                     l = yield lum({pool_size: 1});
@@ -370,7 +364,7 @@ describe('proxy', ()=>{
                     yield l.test();
                     assert.equal(proxy.history.length, 1);
                     assert_keep_alive(ex[1]);
-                    yield etask.sleep(0.2*ms.SEC);
+                    yield etask.sleep(0.25*ms.SEC);
                     assert.equal(proxy.history.length, 1);
                     assert_keep_alive(ex[2]);
                 }));
@@ -846,8 +840,7 @@ describe('proxy', ()=>{
             const handle_proxy_resp_org = li.handle_proxy_resp.bind(li);
             return sinon.stub(li, 'handle_proxy_resp', (...args)=>_res=>{
                 const ip_inj = ip_alt && call_count++%2 ? ip_alt : ip;
-                _res.headers['x-hola-timeline-debug'] = `1 2 3 ${ip_inj}`;
-                _res.headers['x-hola-ip'] = ip_inj;
+                _res.headers['x-luminati-ip'] = ip_inj;
                 return handle_proxy_resp_org(...args)(_res);
             });
         };
@@ -1031,7 +1024,7 @@ describe('proxy', ()=>{
                 const add_stub = sinon.stub(l, 'banip');
                 const req = {ctx: {}};
                 const opt = {_res: {
-                    hola_headers: {'x-hola-timeline-debug': '1 2 3 1.2.3.4'}}};
+                    hola_headers: {'x-luminati-ip': '1.2.3.4'}}};
                 const r = l.rules.action(req, {}, {}, {action: {ban_ip: 1000}},
                     opt);
                 assert.ok(r);
@@ -1115,9 +1108,7 @@ describe('proxy', ()=>{
                     const rule = {url, method: 'POST', payload};
                     const r = l.rules.action(req, {}, {},
                         {action: {request_url: rule}},
-                        {_res: {headers: {
-                            'x-hola-timeline-debug': `1 2 3 ${ip}`
-                        }}});
+                        {_res: {headers: {'x-luminati-ip': ip}}});
                     assert.ok(!r);
                     const headers = {
                         'Content-Type': 'application/json',
@@ -1249,7 +1240,7 @@ describe('proxy', ()=>{
                     const session = {session: 'sess1'};
                     const req = {ctx: {url, skip_rule: ()=>false, session}};
                     l.rules.post(req, {}, {}, {status_code: 200,
-                        headers: {'x-hola-timeline-debug': `1 2 3 ${ip}`}});
+                        headers: {'x-luminati-ip': ip}});
                     sinon.assert.callCount(ban_spy, ban_count);
                     if (ban_count)
                     {
@@ -1287,8 +1278,7 @@ describe('proxy', ()=>{
                 sinon.stub(l.rules, 'retry');
                 const ref_stub = sinon.stub(l, 'refresh_ip').returns('test');
                 const req = {ctx: {}};
-                const opt = {_res:
-                    {hola_headers: {'x-hola-timeline-debug': '1 2 3 ip'}}};
+                const opt = {_res: {hola_headers: {'x-luminati-ip': 'ip'}}};
                 const r = l.rules.action(req, {}, {},
                     {action: {refresh_ip: true}}, opt);
                 assert.ok(r);
