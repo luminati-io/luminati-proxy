@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.169.16",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix cannot read property 'x-luminati-ip' of undefined"
+            }
+        ]
+    },
+    {
         "ver": "1.168.796",
         "type": "dev",
         "changes": [

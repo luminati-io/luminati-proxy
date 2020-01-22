@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.169.16 Development Latest
+- :bug: Fix cannot read property 'x-luminati-ip' of undefined
+
 ## 1.168.796 Development Latest
 - :star: Added support for the headers changes in Luminati API
 

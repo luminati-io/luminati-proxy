@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.168.796",
+        "version": "1.169.16",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1365,6 +1365,9 @@
                     "description": "A Google authorization token for accessing luminati.io"
                 },
                 "high_perf": {
+                    "type": "boolean"
+                },
+                "cloud": {
                     "type": "boolean"
                 },
                 "cluster": {
