@@ -1,6 +1,7 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
 require('./config.js');
+const _ = require('lodash');
 const string = require('./string.js');
 const {qw} = string;
 const HTTPParser = process.binding('http_parser').HTTPParser;
@@ -173,47 +174,117 @@ E.browser_accept = function(browser, type){
     return kind[browser]||kind.chrome;
 };
 
-E.browser_default_header_order = function(browser, opt){
-    opt = opt||{};
-    let headers = {
-        chrome: qw`host connection pragma cache-control
+const header_rules = [
+    // http1 rules
+    {match: {browser: 'chrome'},
+        rules: {order: qw`host connection pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
-            cookie`,
-        chrome_78: qw`host connection pragma cache-control
+            cookie`}},
+    {match: {browser: 'chrome', type: 'xhr'},
+        rules: {order: qw`host connection pragma cache-control accept
+            x-requested-with user-agent sec-fetch-mode content-type
+            sec-fetch-site referer accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', version_min: 78},
+        rules: {order: qw`host connection pragma cache-control origin
             upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode accept-encoding accept-language
-            cookie`,
-        mobile_chrome: qw`host connection pragma cache-control
+            cookie`}},
+    {match: {browser: 'chrome', version_min: 78, type: 'xhr'},
+        rules: {order: qw`host connection pragma cache-control accept
+            x-requested-with user-agent content-type sec-fetch-site
+            sec-fetch-mode referer accept-encoding accept-language cookie`}},
+    {match: {browser: 'mobile_chrome'},
+        rules: {order: qw`host connection pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
-            cookie`,
-        mobile_chrome_78: qw`host connection pragma cache-control
+            cookie`}},
+    {match: {browser: 'mobile_chrome', version_min: 78},
+        rules: {order: qw`host connection pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-user
             accept sec-fetch-site sec-fetch-mode referer accept-encoding
-            accept-language cookie`,
-        firefox: qw`host user-agent accept accept-language accept-encoding
-            referer connection cookie upgrade-insecure-requests cache-control`,
-        edge: qw`referer cache-control accept accept-language
+            accept-language cookie`}},
+    {match: {browser: 'firefox'},
+        rules: {order: qw`host user-agent accept accept-language
+            accept-encoding referer connection cookie
+            upgrade-insecure-requests cache-control`}},
+    {match: {browser: 'edge'},
+        rules: {order: qw`referer cache-control accept accept-language
             upgrade-insecure-requests user-agent accept-encoding host
-            connection`,
-        safari: qw`host cookie connection upgrade-insecure-requests accept
-            user-agent referer accept-language accept-encoding`,
-        mobile_safari: qw`host connection accept user-agent accept-language
-            referer accept-encoding`,
-    };
-    if (opt.override)
-        headers = assign({}, headers, opt.override);
-    if (!headers[browser])
+            connection`}},
+    {match: {browser: 'safari'},
+        rules: {order: qw`host cookie connection upgrade-insecure-requests
+            accept user-agent referer accept-language accept-encoding`}},
+    {match: {browser: 'mobile_safari'},
+        rules: {order: qw`host connection accept user-agent accept-language
+            referer accept-encoding`}},
+    // http2 rules
+    {match: {browser: 'chrome', http2: true},
+        rules: {order: qw`:method :authority :scheme :path pragma
+            cache-control upgrade-insecure-requests user-agent sec-fetch-mode
+            sec-fetch-user accept sec-fetch-site referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, type: 'xhr'},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            accept x-requested-with user-agent sec-fetch-mode content-type
+            sec-fetch-site referer accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 78},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            origin upgrade-insecure-requests user-agent sec-fetch-user accept
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: '', http2: true, version_min: 78, type: 'xhr'},
+        rules: {order: qw`:method :authority :scheme :path pragma
+            cache-control accept x-requested-with user-agent content-type
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'mobile_chrome', http2: true},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
+            accept sec-fetch-site referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'mobile_chrome', http2: true, version_min: 78},
+        rules: {order: qw`:method :authority :scheme :path pragma
+            cache-control upgrade-insecure-requests user-agent sec-fetch-user
+            accept sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'firefox', http2: true},
+        rules: {order: qw`:method :path :authority :scheme user-agent accept
+            accept-language accept-encoding referer cookie
+            upgrade-insecure-requests cache-control te`}},
+    {match: {browser: 'edge', http2: true},
+        rules: {order: qw`:method :path :authority :scheme referer
+            cache-control accept accept-language upgrade-insecure-requests
+            user-agent accept-encoding cookie`}},
+    {match: {browser: 'safari', http2: true},
+        rules: {order: qw`:method :scheme :path :authority cookie accept
+            accept-encoding user-agent accept-language referer`}},
+    {match: {browser: 'mobile_safari', http2: true},
+        rules: {order: qw`:method :scheme :path :authority cookie accept
+            accept-encoding user-agent accept-language referer`}},
+];
+
+function is_browser_supported(browser){
+    return qw`chrome firefox edge safari mobile_chrome mobile_safari`
+        .includes(browser);
+}
+
+E.browser_default_header_order = function(browser, opt){
+    opt = opt||{};
+    if (!is_browser_supported(browser))
         browser = 'chrome';
-    if ({chrome: 1, mobile_chrome: 1}[browser] && opt.major>77)
-        browser = browser+'_78';
-    return headers[browser];
+    return select_rules(header_rules, {
+        browser: browser,
+        version: opt.major,
+        type: opt.req_type,
+    }).order;
 };
 
 E.like_browser_case_and_order = function(headers, browser, opt){
     let ordered_headers = {};
     let source_header_keys = Object.keys(headers);
+    if (source_header_keys.find(h=>h.toLowerCase()=='x-requested-with'))
+        opt = assign({req_type: 'xhr'}, opt);
     let header_keys = E.browser_default_header_order(browser, opt);
     for (let header of header_keys)
     {
@@ -232,41 +303,14 @@ E.like_browser_case_and_order = function(headers, browser, opt){
 
 E.browser_default_header_order_http2 = function(browser, opt){
     opt = opt||{};
-    let headers = {
-        chrome: qw`:method :authority :scheme :path pragma cache-control
-            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
-            accept sec-fetch-site referer accept-encoding accept-language
-            cookie`,
-        chrome_78: qw`:method :authority :scheme :path pragma cache-control
-            upgrade-insecure-requests user-agent sec-fetch-user accept
-            sec-fetch-site sec-fetch-mode referer accept-encoding
-            accept-language cookie`,
-        mobile_chrome: qw`:method :authority :scheme :path pragma cache-control
-            upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
-            accept sec-fetch-site referer accept-encoding
-            accept-language cookie`,
-        mobile_chrome_78: qw`:method :authority :scheme :path pragma
-            cache-control upgrade-insecure-requests user-agent sec-fetch-user
-            accept sec-fetch-site sec-fetch-mode referer accept-encoding
-            accept-language cookie`,
-        firefox: qw`:method :path :authority :scheme user-agent accept
-            accept-language accept-encoding referer cookie
-            upgrade-insecure-requests cache-control te`,
-        edge: qw`:method :path :authority :scheme referer cache-control
-            accept accept-language upgrade-insecure-requests user-agent
-            accept-encoding cookie`,
-        safari: qw`:method :scheme :path :authority cookie accept
-            accept-encoding user-agent accept-language referer`,
-        mobile_safari: qw`:method :scheme :path :authority cookie accept
-            accept-encoding user-agent accept-language referer`,
-    };
-    if (opt.override)
-        headers = assign({}, headers, opt.override);
-    if (!headers[browser])
+    if (!is_browser_supported(browser))
         browser = 'chrome';
-    if ({chrome: 1, mobile_chrome: 1}[browser] && opt.major>77)
-        browser = browser+'_78';
-    return headers[browser];
+    return select_rules(header_rules, {
+        browser: browser,
+        version: opt.major,
+        type: opt.req_type,
+        http2: true,
+    }).order;
 };
 
 // reverse pseudo headers (e.g. :method) because nodejs reverse it
@@ -288,6 +332,8 @@ function reverse_http2_pseudo_headers_order(headers){
 
 E.like_browser_case_and_order_http2 = function(headers, browser, opt){
     let ordered_headers = {};
+    if (Object.keys(headers).find(h=>h.toLowerCase()=='x-requested-with'))
+        opt = assign({req_type: 'xhr'}, opt);
     let header_keys = E.browser_default_header_order_http2(browser, opt);
     let req_headers = {};
     for (let h in headers)
@@ -326,3 +372,27 @@ E.parse_request = buffer=>{
         ret.headers[ret.raw_headers[i].toLowerCase()] = ret.raw_headers[i+1];
     return ret;
 };
+
+function select_rules(all_rules, selector){
+    let matches = all_rules.filter(x=>matches_rule(x.match, selector));
+    return _.merge({}, ...matches.map(x=>x.rules), (dest, src)=>{
+        if (Array.isArray(src))
+            return src;
+    });
+}
+
+function matches_rule(rule, data){
+    for (let k in rule)
+    {
+        if (k=='version_min')
+        {
+            if ((rule[k]||0)>(data.version||0))
+                return false;
+        }
+        else if (rule[k]!=data[k])
+            return false;
+    }
+    return true;
+}
+
+E.t = {header_rules, select_rules};

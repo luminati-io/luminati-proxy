@@ -693,10 +693,9 @@ describe('proxy', ()=>{
         });
         describe('proxy_resolve', ()=>{
             const dns_resolve = dns.resolve;
-            const ips = ['1.1.1.1', '2.2.2.2', '3.3.3.3'];
             before(()=>{
                 dns.resolve = (domain, cb)=>{
-                    cb(null, ips);
+                    cb(null, ['1.1.1.1', '2.2.2.2', '3.3.3.3']);
                 };
             });
             after(()=>{
@@ -711,11 +710,6 @@ describe('proxy', ()=>{
                 l = yield lum({proxy: '1.2.3.4'});
                 assert.equal(l.hosts.length, 1);
                 assert.deepEqual(l.hosts[0], '1.2.3.4');
-            }));
-            it('should resolve if it is turned on', etask._fn(function*(){
-                l = yield lum({proxy: 'domain.com', proxy_resolve: true});
-                assert.equal(l.hosts.length, 3);
-                assert.deepEqual(l.hosts.sort(), ips);
             }));
         });
         describe('request IP choice', ()=>{

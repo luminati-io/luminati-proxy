@@ -5,8 +5,6 @@ var define, process;
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
     (typeof navigator=='object' && navigator.product=='ReactNative');
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
 if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
@@ -18,7 +16,7 @@ if (is_rn)
         env: {},
     };
 }
-else if (!is_node && !is_ff_addon)
+else if (!is_node)
 {
     define = self.define;
     process = {env: {}};
@@ -26,9 +24,7 @@ else if (!is_node && !is_ff_addon)
 else
 {
     define = require('./require_node.js').define(module, '../');
-    if (is_ff_addon)
-        process = {env: {}};
-    else if (is_node)
+    if (is_node)
     {
         process = global.process||require('_process');
         require('./config.js');

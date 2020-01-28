@@ -14,7 +14,7 @@ var storage;
 
 function have_local_storage(){
     try {
-        var _ = localStorage;
+        var _ = window.localStorage;
         if (_.length)
             return true;
         _.setItem('_', 0);
@@ -23,7 +23,7 @@ function have_local_storage(){
     } catch(e){}
 }
 
-function select_local_storage(){ storage = localStorage; }
+function select_local_storage(){ storage = window.localStorage; }
 
 function select_cookies(domain){
     var cookie_opt = {domain: '.'+domain, path: '/', expires: 30};

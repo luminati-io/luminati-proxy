@@ -65,6 +65,8 @@ conf.server_default = {
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.server_default, 'port'), {
+    api_domain: pkg.api_domain,
+    // XXX krzysztof: get rid of api and leave only api_domain
     api: 'https://'+pkg.api_domain,
     www: 22999,
     www_whitelist_ips: [],

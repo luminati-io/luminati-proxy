@@ -5,11 +5,7 @@ var define, node_util;
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = typeof global=='object' && !!global.nativeRequire
     || typeof navigator=='object' && navigator.product=='ReactNative';
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
-if (is_ff_addon)
-    define = require('./require_node.js').define(module, '../');
-else if (is_rn)
+if (is_rn)
 {
     define = require('./require_node.js').define(module, '../',
         require('/util/array.js'));
@@ -514,13 +510,17 @@ E.reduce_obj = function(coll, key_cb, val_cb){
     if (Array.isArray(coll))
     {
         coll.forEach(function(item, i){
-            obj[key_cb(item, i)] = val_cb(item, i); });
+            var k = key_cb(item, i), v = val_cb(item, i);
+            if (k!==undefined && v!==undefined)
+                obj[k] = v;
+        });
     }
     else if (typeof coll=='object')
     {
-        Object.keys(coll).forEach(function(k){
-            var item = coll[k];
-            obj[key_cb(item, k)] = val_cb(item, k);
+        Object.keys(coll).forEach(function(i){
+            var k = key_cb(coll[i], i), v = val_cb(coll[i], i);
+            if (k!==undefined && v!==undefined)
+                obj[k] = v;
         });
     }
     return obj;

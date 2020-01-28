@@ -5,13 +5,9 @@ var define, hash, assert, zerr, vm;
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = typeof global=='object' && !!global.nativeRequire ||
     typeof navigator=='object' && navigator.product=='ReactNative';
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
 if (!is_node)
 {
-    if (is_ff_addon)
-        define = require('./require_node.js').define(module, '../');
-    else if (is_rn)
+    if (is_rn)
     {
         define = require('./require_node.js').define(module, '../',
             require('/util/util.js'));
@@ -20,7 +16,7 @@ if (!is_node)
         define = self.define;
     assert = function(){}; // XXX romank: add proper assert
     // XXX romank: use zerr.js
-    if (!is_ff_addon && !is_rn && self.hola && self.hola.zerr)
+    if (!is_rn && self.hola && self.hola.zerr)
         zerr = self.hola.zerr;
     else
     {

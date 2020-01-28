@@ -5,13 +5,9 @@ var define, process, zerr, assert;
 var is_node = typeof module=='object' && module.exports && module.children;
 var is_rn = typeof global=='object' && !!global.nativeRequire ||
     typeof navigator=='object' && navigator.product=='ReactNative';
-var is_ff_addon = typeof module=='object' && module.uri
-    && !module.uri.indexOf('resource://');
 if (!is_node)
 {
-    if (is_ff_addon)
-        define = require('./require_node.js').define(module, '../');
-    else if (is_rn)
+    if (is_rn)
     {
         define = require('./require_node.js').define(module, '../',
             require('/util/events.js'), require('/util/array.js'),
@@ -25,7 +21,7 @@ if (!is_node)
     };
     // XXX romank: use zerr.js
     // XXX bahaa: require bext/pub/zerr.js for extensions
-    if (!is_ff_addon && !is_rn && self.hola && self.hola.zerr)
+    if (!is_rn && self.hola && self.hola.zerr)
         zerr = self.hola.zerr;
     else
     {
@@ -538,11 +534,12 @@ E.prototype.spawn = function(child, replace){
     if (!(child instanceof Etask)) // promise already completed?
     {
         this.emit('child', child);
-        return;
+        return child;
     }
     if (!replace && child.parent)
         assert(0, 'child already has a parent\n'+child.parent.ps());
     child.spawn_parent(this);
+    return child;
 };
 
 E.prototype._spawn_parent_guess = function(parent){

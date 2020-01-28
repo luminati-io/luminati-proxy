@@ -39,6 +39,13 @@ var check_webview = / Version\/(\d+)(\.\d)/;
 
 var is_browser = !is_node_ff && typeof window!='undefined';
 
+// starting iOS13 iPad returns the same user-agent as MacOS Safari, but
+// we still need to detect it as mobile (install links to AppStore etc)
+function is_ipad_os(ua){
+    return /Macintosh/.test(ua) && typeof navigator=='object' &&
+        navigator.maxTouchPoints>1;
+}
+
 function ios_ua(ua, safari_ver){
     var res;
     if (res = /(?:iPhone|iPad|iPod|iPod touch);.*?OS ([\d._]+)/.exec(ua))
@@ -217,10 +224,17 @@ E.guess = function(ua, platform){
     }
     if (/Windows Phone/.exec(ua))
         return {os: 'winphone', mobile: true};
-    if (res = /Macintosh.*; (?:Intel|PPC) Mac OS X (\d+[._]\d+)/.exec(ua))
-        return {os: 'macos', version: res[1].replace('_', '.'), mobile: false};
     if (/Macintosh/.exec(ua))
+    {
+        if (is_ipad_os(ua))
+            return {os: 'ios', mobile: true};
+        if (res = /Macintosh.*; (?:Intel|PPC) Mac OS X (\d+[._]\d+)/.exec(ua))
+        {
+            return {os: 'macos', version: res[1].replace('_', '.'),
+                mobile: false};
+        }
         return {os: 'macos', mobile: false};
+    }
     if (/Web0S.*SmartTV/.exec(ua))
     {
         return {os: 'webos', version: /Chrome/.test(ua) ? '3' : '2',
@@ -260,6 +274,8 @@ E.guess_device = function(ua){
     ua = ua || (is_browser ? navigator.userAgent : '');
     if (res = /(iPhone|iPad|iPod)/.exec(ua))
         return {device: res[1].toLowerCase()};
+    if (/Macintosh/.test(ua))
+        return {device: is_ipad_os(ua) ? 'ipad' : 'mac'};
     return {};
 };
 

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.169.16",
+        "version": "1.169.751",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1394,6 +1394,10 @@
                     "description": "Stop sending new requests when the peer IP becomes unavailable and redirect to confimration page before new IP is taken"
                 },
                 "api": {
+                    "type": "string",
+                    "description": "Alternative url to luminati API"
+                },
+                "api_domain": {
                     "type": "string",
                     "description": "Alternative domain url to luminati API"
                 },

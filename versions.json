@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.169.751",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "sparkles",
+                "text": "Proxy resolution based on API instead of DNS"
+            },
+            {
+                "type": "sparkles",
+                "text": "Multiple performance optimizations"
+            }
+        ]
+    },
+    {
         "ver": "1.169.16",
         "type": "dev",
         "changes": [

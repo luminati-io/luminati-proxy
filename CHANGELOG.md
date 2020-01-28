@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.169.751 Development Latest
+- :sparkles: Proxy resolution based on API instead of DNS
+- :sparkles: Multiple performance optimizations
+
 ## 1.169.16 Development Latest
 - :bug: Fix cannot read property 'x-luminati-ip' of undefined
 

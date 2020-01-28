@@ -840,34 +840,4 @@ describe('manager', ()=>{
             sinon.assert.neverCalledWith(perr_stub, m('send_request'));
         }));
     });
-    describe('should_resolve_proxy', ()=>{
-        it('rotating, no max_requests', ()=>{
-            const conf = {preset: 'rotating', max_requests: 0};
-            assert.ok(!Manager.should_resolve_proxy(conf));
-        });
-        it('rotating 0', ()=>{
-            const conf = {preset: 'rotating', max_requests: 0};
-            assert.ok(!Manager.should_resolve_proxy(conf));
-        });
-        it('rotating 1', ()=>{
-            const conf = {preset: 'rotating', max_requests: 1};
-            assert.ok(!Manager.should_resolve_proxy(conf));
-        });
-        it('rotating 5', ()=>{
-            const conf = {preset: 'rotating', max_requests: 5};
-            assert.ok(Manager.should_resolve_proxy(conf));
-        });
-        it('long single session', ()=>{
-            const conf = {preset: 'session_long'};
-            assert.ok(Manager.should_resolve_proxy(conf));
-        });
-        it('long-availability', ()=>{
-            const conf = {preset: 'long_availability'};
-            assert.ok(Manager.should_resolve_proxy(conf));
-        });
-        it('sticky_ip', ()=>{
-            const conf = {preset: 'sticky_ip'};
-            assert.ok(Manager.should_resolve_proxy(conf));
-        });
-    });
 });

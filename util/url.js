@@ -3,15 +3,15 @@
 (function(){
 var define;
 var is_node = typeof module=='object' && module.exports && module.children;
-var is_rn = typeof global=='object'&&!!global.nativeRequire ||
-    typeof navigator=='object'&&navigator.product=='ReactNative';
+var is_rn = (typeof global=='object' && !!global.nativeRequire) ||
+    (typeof navigator=='object' && navigator.product=='ReactNative');
 var is_ff_addon = typeof module=='object' && module.uri
     && !module.uri.indexOf('resource://');
 var qs;
 
 if (is_rn)
     define = require('./require_node.js').define(module, '../');
-else if (!is_node && !is_ff_addon)
+else if (!is_node)
     define = self.define;
 else
 {
@@ -20,11 +20,13 @@ else
     // even thoguh it never reaches this if (it is done in pre-processing)
     // so we fool him
     var _require = require;
-    qs = _require(is_ff_addon ? 'sdk/querystring' : 'querystring');
+    qs = _require('querystring');
 }
 define([], function(){
 var assign = Object.assign;
 var E = {};
+
+function replace_slashes(url){ return url.replace(/\\/g, '/'); }
 
 E.add_proto = function(url){
     if (!url.match(/^([a-z0-9]+:)?\/\//i))
@@ -43,7 +45,7 @@ E.get_top_level_domain = function(host){
 };
 
 E.get_host = function(url){
-    var n = url.match(/^(https?:)?\/\/([^\/]+)\/.*$/);
+    var n = replace_slashes(url).match(/^(https?:)?\/\/([^\/]+)\/.*$/);
     return n ? n[2] : '';
 };
 
@@ -99,7 +101,7 @@ E.get_proto = function(url){
 };
 
 E.get_host_gently = function(url){
-    var n = url.match(/^(?:(?:[a-z0-9]+?:)?\/\/)?([^\/]+)/);
+    var n = replace_slashes(url).match(/^(?:(?:[a-z0-9]+?:)?\/\/)?([^\/]+)/);
     return n ? n[1] : '';
 };
 
@@ -194,7 +196,8 @@ E.is_valid_domain = function(domain){
     return /^([a-z0-9]([a-z0-9-_]*[a-z0-9])?\.)+[a-z]{2,63}$/.test(domain); };
 
 E.is_hola_domain = function(domain){
-    return domain.search(/^(.*\.)?(hola\.org|holacdn\.com|h-cdn\.com)$/)!=-1;
+    return E.is_valid_domain(domain) &&
+        domain.search(/^(.*\.)?(hola\.org|holacdn\.com|h-cdn\.com)$/)!=-1;
 };
 
 // XXX josh: move to email.js:is_valid
@@ -278,7 +281,7 @@ E.uri_obj_href = function(uri){
 
 var protocol_re = /^((?:about|http|https|file|ftp|ws|wss):)?(\/\/)?/i;
 var host_section_re = /^(.*?)(?:[\/?#]|$)/;
-var host_re = /^(?:(([^:@]*):?([^:@]*))?@)?([^:]*)(?::(\d*))?/;
+var host_re = /^(?:(([^:@]*):?([^:@]*))?@)?([a-zA-Z0-9._+-]*)(?::(\d*))?/;
 var path_section_re = /^([^?#]*)(\?[^#]*)?(#.*)?$/;
 var path_re_loose = /^(\/(?:.(?![^\/]*\.[^\/.]+$))*\/?)?([^\/]*?(?:\.([^.]+))?)$/;
 var path_re_strict = /^(\/(?:.(?![^\/]*(?:\.[^\/.]+)?$))*\/?)?([^\/]*?(?:\.([^.]+))?)$/;
@@ -294,7 +297,9 @@ E.parse = function(url, strict){
         return m;
     }
     url = url||location.href;
-    var m, uri = {orig: url}, remaining = url;
+    var uri = {orig: url};
+    url = replace_slashes(url);
+    var m, remaining = url;
     // protocol
     if (!(m = re(protocol_re, remaining)))
         return {};
