@@ -1,5 +1,10 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.30 Stable
+- :bug: update error messages for google login
+- :sparkles: Added basic WS connection with Luminati servers
+- :star: HAR viewer filter can now search by session id
+
 ## 1.169.751 Development Latest
 - :sparkles: Proxy resolution based on API instead of DNS
 - :sparkles: Multiple performance optimizations

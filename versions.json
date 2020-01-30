@@ -1,5 +1,23 @@
 [
     {
+        "ver": "1.170.30",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "update error messages for google login"
+            },
+            {
+                "type": "sparkles",
+                "text": "Added basic WS connection with Luminati servers"
+            },
+            {
+                "type": "star",
+                "text": "HAR viewer filter can now search by session id"
+            }
+        ]
+    },
+    {
         "ver": "1.169.751",
         "type": "dev",
         "changes": [

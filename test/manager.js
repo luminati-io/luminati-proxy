@@ -165,6 +165,7 @@ describe('manager', ()=>{
     };
     before(stub_logger);
     afterEach('after manager', etask._fn(function*(_this){
+        nock.cleanAll();
         if (!app)
             return;
         yield app.manager.stop(true);
@@ -413,7 +414,7 @@ describe('manager', ()=>{
         });
         describe('user credentials', ()=>{
             it('success', etask._fn(function*(_this){
-                nock(api_base).get('/').times(3).reply(200, {});
+                nock(api_base).get('/').reply(200, {});
                 nock(api_base).post('/update_lpm_stats').reply(200, {});
                 nock(api_base).post('/update_lpm_config').reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf').query(true)
@@ -423,11 +424,11 @@ describe('manager', ()=>{
                 assert_has(res, {mock_result: true});
             }));
             it('login required', etask._fn(function*(_this){
-                nock(api_base).get('/').times(3).reply(200, {});
+                nock(api_base).get('/').reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf')
                     .query(true)
                     .reply(403, 'login_required');
-                nock(api_base).get('/cp/lum_local_conf').times(2)
+                nock(api_base).get('/cp/lum_local_conf')
                     .query(true)
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
@@ -438,22 +439,71 @@ describe('manager', ()=>{
                     assert_has(e, {status: 403, message: 'login_required'});
                 }
             }));
+            it('passing error message on login fail, token',
+            etask._fn(function*(_this){
+                nock(api_base).get('/cp/lum_local_conf').query(true).times(4)
+                .reply(403, 'No zones enabled for');
+                app = yield app_with_args(['--customer', 'mock_user']);
+                let res = yield app.manager.login_user('123');
+                assert.deepEqual(res,
+                    {error: {message: 'No zones enabled for'}});
+            }));
+            it('passing error message on login fail, password',
+            etask._fn(function*(_this){
+                nock(api_base).get('/').reply(200, {});
+                nock(api_base).get('/cp/lum_local_conf').query(true).times(4)
+                .reply(403, 'No zones enabled for');
+                nock(api_base).post('/users/auth/basic/check_credentials')
+                .reply(200, 'ok');
+                nock(api_base).get('/users/auth/basic/login').reply(200, '');
+                app = yield app_with_args(['--customer', 'mock_user']);
+                let jar = request.jar();
+                jar.setCookie('a=b', api_base);
+                sinon.stub(app.manager, 'get_cookie_jar', ()=>jar);
+                let res = yield app.manager.login_user(null, 'user', 'pass');
+                assert.deepEqual(res,
+                    {error: {message: 'No zones enabled for'}});
+                app.manager.get_cookie_jar.restore();
+            }));
         });
         describe('har logs', ()=>{
-            it('fetches all the logs', etask._fn(function*(_this){
+            beforeEach(()=>etask(function*(){
                 app = yield app_with_args(['--customer', 'mock_user',
                     '--port', '24000']);
                 app.manager.loki.requests_clear();
                 app.manager.proxy_ports[24000].emit('usage', {
                     timeline: null,
                     url: 'http://bbc.com',
+                    username: 'lum-customer-test_user-zone-static-session-qwe',
                     request: {url: 'http://bbc.com'},
                     response: {},
                 });
+            }));
+            it('fetches all the logs', etask._fn(function*(_this){
                 const res = yield api_json(`api/logs_har`);
                 assert_has(res.body.log.entries[0],
                     {request: {url: 'http://bbc.com'}});
                 assert.equal(res.body.log.entries.length, 1);
+            }));
+            it('search by url', etask._fn(function*(_this){
+                const res = yield api_json('api/logs_har?search=bbc');
+                assert_has(res.body.log.entries[0],
+                    {request: {url: 'http://bbc.com'}});
+                assert.equal(res.body.log.entries.length, 1);
+            }));
+            it('search by url, no results', etask._fn(function*(_this){
+                const res = yield api_json('api/logs_har?search=bbcc');
+                assert.equal(res.body.log.entries.length, 0);
+            }));
+            it('search by session', etask._fn(function*(_this){
+                const res = yield api_json('api/logs_har?search=qwe');
+                assert_has(res.body.log.entries[0],
+                    {request: {url: 'http://bbc.com'}});
+                assert.equal(res.body.log.entries.length, 1);
+            }));
+            it('search only by session', etask._fn(function*(_this){
+                const res = yield api_json('api/logs_har?search=test_user');
+                assert.equal(res.body.log.entries.length, 0);
             }));
         });
         describe('add_wip', ()=>{
@@ -532,6 +582,7 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {zone1: {password: ['zone1_pass']}}};
+            nock(api_base).get('/').times(2).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
@@ -547,7 +598,7 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
-            nock(api_base).get('/').times(3).reply(200, {});
+            nock(api_base).get('/').times(2).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
@@ -580,7 +631,7 @@ describe('manager', ()=>{
                     zone2: {password: ['zone2_pass']},
                 },
             };
-            nock(api_base).get('/').times(3).reply(200, {});
+            nock(api_base).get('/').times(2).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
@@ -714,7 +765,6 @@ describe('manager', ()=>{
         };
         let perr_stub;
         before(()=>lpm_config.first_actions = filepath);
-        after(()=>nock.cleanAll());
         beforeEach(()=>{
             nock(api_base).get('/').reply(200, {}).persist();
             ['/update_lpm_stats', '/update_lpm_config'].forEach(p=>

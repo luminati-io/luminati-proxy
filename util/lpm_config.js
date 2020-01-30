@@ -89,7 +89,7 @@ conf.manager_default = Object
     local_login: false,
     cluster: 1,
     read_only: false,
-    cloud: false,
+    cloud: true,
 });
 
 Object.assign(module.exports, conf);
