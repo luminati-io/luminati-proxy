@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.170.174",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix bug when banned ip might be re-added to the pool"
+            }
+        ]
+    },
+    {
         "ver": "1.170.30",
         "type": "stable",
         "changes": [

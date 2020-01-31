@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.174 Stable
+- :bug: fix bug when banned ip might be re-added to the pool
+
 ## 1.170.30 Stable
 - :bug: update error messages for google login
 - :sparkles: Added basic WS connection with Luminati servers

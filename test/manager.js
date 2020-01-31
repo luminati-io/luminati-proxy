@@ -79,6 +79,7 @@ describe('manager', ()=>{
         Manager.prototype.get_ip = ()=>null;
         Manager.prototype.check_conn = ()=>null;
         Manager.prototype.lpm_users_get = ()=>null;
+        Manager.prototype.init_lpm_f_ws = ()=>null;
         manager = new Manager(lpm_util.init_args(args));
         yield manager.start();
         return {manager};
@@ -246,6 +247,7 @@ describe('manager', ()=>{
         });
     });
     describe('report_bug', ()=>{
+        // XXX krzysztof: get rid of this
         before(()=>{
             unstub_logger();
             const console_t = logger.transports.find(

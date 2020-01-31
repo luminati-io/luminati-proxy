@@ -63,10 +63,10 @@ E.leaky_bucket.prototype.inc_size = function(inc){
     if (inc===undefined)
         inc = 1;
     var new_size = this.size + inc;
-    if (typeof this.opt.get_min_size == 'function')
-        new_size = Math.max(new_size, this.opt.get_min_size());
-    if (typeof this.opt.get_max_size == 'function')
-        new_size = Math.min(new_size, this.opt.get_max_size());
+    if (this.opt.min_size)
+        new_size = Math.max(new_size, this.opt.min_size);
+    if (this.opt.max_size)
+        new_size = Math.min(new_size, this.opt.max_size);
     var factor = new_size/this.size;
     this.size = new_size;
     this.rate *= factor;
