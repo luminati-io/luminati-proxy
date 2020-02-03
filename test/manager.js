@@ -891,5 +891,14 @@ describe('manager', ()=>{
             yield api('api/proxy_status/22225');
             sinon.assert.neverCalledWith(perr_stub, m('send_request'));
         }));
+        it('proxy_status_get_api return no errors for persist proxy',
+        etask._fn(function*(_this){
+            nock(api_base).get('/cp/lum_local_conf').query(true)
+                .reply(200, {mock_result: true, _defaults: true});
+            app = yield app_with_config({
+                config: {proxies: [{port: 24010}, {port: 24010}]}});
+            let res = yield api('api/proxy_status/24010');
+            assert.equal(res.body, '{"status":"ok","status_details":[]}');
+        }));
     });
 });

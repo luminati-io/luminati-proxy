@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.170.414",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix response tab in HAR viewer"
+            }
+        ]
+    },
+    {
         "ver": "1.170.174",
         "type": "stable",
         "changes": [

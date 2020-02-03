@@ -61,7 +61,7 @@ conf.server_default = {
     override_headers: true,
     bw_limit: 0,
     log: 'notice',
-    ssl_limit: 1024,
+    har_limit: 1024,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.server_default, 'port'), {

@@ -1088,7 +1088,7 @@ class Select_cell extends React.Component {
     };
     render(){
         return <Checkbox checked={this.state.checked||this.props.checked_all}
-          on_change={this.toggle}/>;
+              on_change={this.toggle}/>;
     }
 }
 

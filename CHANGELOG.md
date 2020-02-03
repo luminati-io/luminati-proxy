@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.414 Stable
+- :bug: fix response tab in HAR viewer
+
 ## 1.170.174 Stable
 - :bug: fix bug when banned ip might be re-added to the pool
 

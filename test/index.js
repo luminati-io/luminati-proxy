@@ -55,6 +55,7 @@ describe('proxy', ()=>{
                 req_opt.headers = {
                     'x-lpm-fake': true,
                     'x-lpm-fake-status': req_opt.fake.status,
+                    'x-lpm-fake-data': req_opt.fake.data,
                 };
                 if (req_opt.fake.headers)
                 {
@@ -67,6 +68,8 @@ describe('proxy', ()=>{
         });
         yield l.listen();
         l.session_mgr._request_session({}, {init: true});
+        l.history = [];
+        l.on('usage', data=>l.history.push(data));
         return l;
     });
     let l, waiting;
@@ -157,8 +160,6 @@ describe('proxy', ()=>{
             function*(){
                 const context = 'context-1';
                 l = yield lum(opt);
-                const history = [];
-                l.on('usage', data=>history.push(data));
                 const res = yield l.test({
                     url: _url(),
                     headers: {'x-hola-context': context},
@@ -171,8 +172,8 @@ describe('proxy', ()=>{
                     assert.equal(target_req['x-hola-context'], undefined);
                 }
                 yield etask.sleep(400);
-                assert.equal(history.length, 1);
-                assert.equal(history[0].context, context);
+                assert.equal(l.history.length, 1);
+                assert.equal(l.history[0].context, context);
             }));
             t('bypass proxy', ()=>ping.http.url, pre_rule('bypass_proxy'),
                 ()=>ping.history[0]);
@@ -540,20 +541,17 @@ describe('proxy', ()=>{
                     setImmediate clearImmediate`,
             }));
             after('after history aggregation', ()=>clock.uninstall());
-            let history;
-            beforeEach(()=>history = []);
             const t = (name, _url, expected, opt)=>it(name, ()=>etask(
             function*(){
                 ping.headers = ping.headers||{};
                 ping.headers.connection = 'close';
                 l = yield lum(Object.assign({history: true}, opt));
-                l.on('usage', data=>history.push(data));
-                assert.equal(history.length, 0);
+                assert.equal(l.history.length, 0);
                 const res = yield l.test(_url());
                 yield etask.sleep(400);
                 res.socket.destroy();
-                assert.equal(history.length, 1);
-                assert_has(history[0], expected());
+                assert.equal(l.history.length, 1);
+                assert_has(l.history[0], expected());
             }));
             t('http', ()=>ping.http.url, ()=>({
                 port: 24000,
@@ -593,15 +591,14 @@ describe('proxy', ()=>{
             }), pre_rule('null_response'));
             it('pool', etask._fn(function*(_this){
                 l = yield lum({pool_size: 1, keep_alive: 0.3});
-                l.on('usage', data=>history.push(data));
                 yield l.test();
                 yield etask.sleep(400);
-                assert_has(history, [
+                assert_has(l.history, [
                     {context: 'SESSION KEEP ALIVE'},
                     {context: 'RESPONSE'},
                     {context: 'SESSION KEEP ALIVE'},
                 ]);
-                assert.equal(history.length, 3);
+                assert.equal(l.history.length, 3);
             }));
         });
         describe('whitelist', ()=>{
@@ -789,6 +786,23 @@ describe('proxy', ()=>{
                 requester.t.Http_requester);
             t('should use HTTPS requester when specified',
                 {proxy_connection_type: 'https'}, requester.t.Https_requester);
+        });
+        describe('har_limit', ()=>{
+            it('default limit is 1024', ()=>etask(function*(){
+                l = yield lum();
+                assert.equal(l.opt.har_limit, 1024);
+            }));
+            it('should save whole the response', ()=>etask(function*(){
+                l = yield lum();
+                yield l.test({fake: {data: 100}});
+                assert.equal(l.history[0].response_body.length, 100);
+            }));
+            it('should save part of the response', ()=>etask(function*(){
+                l = yield lum({har_limit: 3});
+                yield l.test({fake: {data: 100}});
+                assert.equal(l.history[0].response_body.length, 3);
+            }));
+            // XXX krzysztof: add https with tests first support fake requests
         });
     });
     describe('retry', ()=>{
