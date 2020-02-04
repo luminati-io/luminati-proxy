@@ -373,6 +373,21 @@ E.parse_request = buffer=>{
     return ret;
 };
 
+E.to_raw_headers = function(headers){
+    let raw_headers = [];
+    for (let name in headers)
+    {
+        if (Array.isArray(headers[name]))
+        {
+            for (let value of headers[name])
+                raw_headers.push(name, value);
+        }
+        else
+            raw_headers.push(name, headers[name]);
+    }
+    return raw_headers;
+};
+
 function select_rules(all_rules, selector){
     let matches = all_rules.filter(x=>matches_rule(x.match, selector));
     return _.merge({}, ...matches.map(x=>x.rules), (dest, src)=>{

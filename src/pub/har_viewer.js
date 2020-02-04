@@ -230,23 +230,24 @@ class Toolbar extends Pure_component {
             set_type_filter, filters, set_filter, master_port, undock,
             dock_mode} = this.props;
         return <Toolbar_container>
-              <Toolbar_row>
-                <Toolbar_button id="clear" tooltip="Clear" on_click={clear}/>
+              <T>{t=><Toolbar_row>
+                <Toolbar_button id="clear" tooltip={t('Clear')}
+                  on_click={clear}/>
                 {!dock_mode &&
-                  <Toolbar_button id="docker"
-                    tooltip="Undock into separate window" on_click={undock}/>
+                  <Toolbar_button id="docker" on_click={undock}
+                    tooltip={t('Undock into separate window')}/>
                 }
-                <Toolbar_button id="filters" tooltip="Show/hide filters"
+                <Toolbar_button id="filters" tooltip={t('Show/hide filters')}
                   on_click={this.toggle_filters}
                   active={this.state.filters_visible}/>
-                <Toolbar_button id="download" tooltip="Export as HAR file"
+                <Toolbar_button id="download" tooltip={t('Export as HAR file')}
                   href="/api/logs_har"/>
                 <Toolbar_button id="actions" on_click={this.toggle_actions}
                   active={this.state.actions_visible}
-                  tooltip="Show/hide additional actions"/>
-                <Toolbar_button id="close_btn" tooltip="Disable"
+                  tooltip={t('Show/hide additional actions')}/>
+                <Toolbar_button id="close_btn" tooltip={t('Disable')}
                   placement="left" on_click={this.disable_logs}/>
-              </Toolbar_row>
+              </Toolbar_row>}</T>
               {this.state.actions_visible &&
                 <Toolbar_row>
                   <Actions/>

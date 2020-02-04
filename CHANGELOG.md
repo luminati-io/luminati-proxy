@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.508 Stable
+- :bug: merge duplicated config objects to avoid config discrepancy
+- :star: update Chinese translations
+
 ## 1.170.414 Stable
 - :bug: fix response tab in HAR viewer
 

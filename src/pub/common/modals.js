@@ -4,8 +4,9 @@ import React from 'react';
 import $ from 'jquery';
 import classnames from 'classnames';
 import etask from '../../../util/etask.js';
+import Pure_component from '/www/util/pub/pure_component.js';
 
-export class Modal_dialog extends React.Component {
+export class Modal_dialog extends Pure_component {
     componentDidMount(){
         $(this.ref).on('hide.bs.modal', ()=>{
             this.props.cancel_clicked && this.props.cancel_clicked();
@@ -18,6 +19,9 @@ export class Modal_dialog extends React.Component {
             $(this.ref).modal();
         else
             $(this.ref).modal('hide');
+    }
+    willUnmount(){
+        $(this.ref).modal('hide');
     }
     set_ref = e=>{ this.ref = e; };
     stop = e=>{

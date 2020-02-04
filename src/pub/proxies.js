@@ -33,9 +33,10 @@ const is_local = ()=>{
     return href.includes('localhost') || href.includes('127.0.0.1');
 };
 
-const Actions_cell = ({proxy, mgr, scrolling})=>{
+const Actions_cell = ({proxy, mgr, scrolling, open_delete_dialog})=>{
     return <Actions proxy={proxy} get_status={mgr.get_status}
-          update_proxies={mgr.update} scrolling={scrolling}/>;
+          update_proxies={mgr.update} scrolling={scrolling}
+          open_delete_dialog={open_delete_dialog}/>;
 };
 
 class Targeting_cell extends Pure_component {
@@ -494,6 +495,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             filtered_proxies: [],
             loaded: false,
             height: window.innerHeight,
+            open_delete_dialog: false,
+            delete_proxies: [],
         };
         setdb.set('head.proxies.update', this.update);
     }
@@ -666,7 +669,8 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.setState({selected_proxies, checked_all});
     };
     cell_renderer = function Cell_renderer(props){
-        return <Cell {...props} mgr={this}/>;
+        return <Cell {...props} mgr={this}
+              open_delete_dialog={this.open_delete_dialog}/>;
     };
     on_row_click = e=>{
         const proxy = e.rowData;
@@ -687,6 +691,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             || col.sticky || col.calc_show && col.calc_show(
                 this.state.filtered_proxies, this.props.master_port));
     };
+    open_delete_dialog = proxies=>{
+        this.setState({delete_proxies: proxies, open_delete_dialog: true});
+    };
+    close_delete_dialog = ()=>{
+        this.setState({open_delete_dialog: false});
+    };
     render(){
         const cols = this.get_cols();
         if (!this.state.zones || !this.state.countries)
@@ -705,7 +715,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                   edit_columns={this.edit_columns}
                   download_csv={this.download_csv}
                   selected={this.state.selected_proxies}
-                  update_proxies={this.update}/>
+                  open_delete_dialog={this.open_delete_dialog}/>
                 {this.state.loaded && !!this.state.filtered_proxies.length &&
                   <React.Fragment>
                     <div className="chrome chrome_table vbox">
@@ -757,23 +767,58 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               </div>
               <Columns_modal selected_cols={this.state.selected_cols}
                 update_selected_cols={this.update_selected_columns}/>
+              <Delete_dialog open={this.state.open_delete_dialog}
+                close_dialog={this.close_delete_dialog}
+                proxies={this.state.delete_proxies}
+                update_proxies={this.update}/>
             </div>;
     }
 });
 
-class Toolbar extends Pure_component {
-    state = {open_delete_dialog: false};
-    open_delete_dialog = e=>{
+class Delete_dialog extends Pure_component {
+    delete_proxies = e=>{
         e.stopPropagation();
-        this.setState({open_delete_dialog: true});
-    };
-    close_delete_dialog = ()=>{
-        this.setState({open_delete_dialog: false});
+        const _this = this;
+        const ports = _this.props.proxies.map(p=>p.port);
+        this.etask(function*(){
+            yield window.fetch('/api/proxies/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ports}),
+            });
+            yield _this.props.update_proxies();
+            _this.props.close_dialog();
+        });
     };
     render(){
-        const {proxy_add, edit_columns, download_csv, selected} = this.props;
-        const to_delete = Object.values(selected)
-            .filter(p=>p.proxy_type=='persist');
+        const {proxies, open, close_dialog} = this.props;
+        let title = 'Are you sure you want to delete ';
+        if (proxies.length==1)
+            title += `proxy port ${proxies[0].port}?`;
+        else
+            title += `${proxies.length} proxy ports?`;
+        return <Portal>
+          <Modal_dialog open={open}
+            title={title}
+            ok_clicked={this.delete_proxies}
+            cancel_clicked={close_dialog} />
+        </Portal>;
+    }
+}
+
+
+class Toolbar extends Pure_component {
+    open_delete_dialog_with_proxies = e=>{
+        e.stopPropagation();
+        this.props.open_delete_dialog(this.get_to_delete());
+    };
+    get_to_delete = ()=>{
+        const {selected} = this.props;
+        return Object.values(selected).filter(p=>p.proxy_type=='persist');
+    };
+    render(){
+        const {proxy_add, edit_columns, download_csv} = this.props;
+        const to_delete = this.get_to_delete();
         return <Toolbar_container>
               <Toolbar_row>
                 <T>{t=><Toolbar_button id="add" tooltip={t('Add new proxy')}
@@ -788,12 +833,8 @@ class Toolbar extends Pure_component {
                   on_click={download_csv} id="download"/>
                 {!!to_delete.length &&
                 <Toolbar_button tooltip="Delete selected proxies"
-                  on_click={this.open_delete_dialog} id="trash"/>
+                  on_click={this.open_delete_dialog_with_proxies} id="trash"/>
                 }
-                <Delete_dialog open={this.state.open_delete_dialog}
-                  close_dialog={this.close_delete_dialog}
-                  update_proxies={this.props.update_proxies}
-                  proxies={to_delete}/>
               </Toolbar_row>
             </Toolbar_container>;
     }
@@ -818,14 +859,14 @@ class Cell extends React.Component {
         {
             const S_cell = col.render;
             return <S_cell proxy={props.rowData} mgr={props.mgr}
-              col={props.dataKey}/>;
+              col={props.dataKey}
+              open_delete_dialog={props.open_delete_dialog}/>;
         }
         return props.cellData||'';
     }
 }
 
 class Actions extends Pure_component {
-    state = {open_delete_dialog: false};
     componentDidMount(){
         if (!this.props.proxy.status)
             this.get_status();
@@ -866,23 +907,6 @@ class Actions extends Pure_component {
             setdb.emit_path('head.proxies_running');
         });
     };
-    open_delete_dialog = e=>{
-        e.stopPropagation();
-        this.setState({open_delete_dialog: true});
-    };
-    close_delete_dialog = ()=>{
-        this.setState({open_delete_dialog: false});
-    };
-    delete_proxy = e=>{
-        e.stopPropagation();
-        const _this = this;
-        this.etask(function*(){
-            yield ajax.json({url: '/api/proxies/'+_this.props.proxy.port,
-                method: 'DELETE'});
-            yield _this.props.update_proxies();
-            _this.close_delete_dialog();
-        });
-    };
     refresh_sessions = e=>{
         e.stopPropagation();
         const _this = this;
@@ -917,6 +941,10 @@ class Actions extends Pure_component {
                 $('#fetching_chrome_modal').modal();
         });
     };
+    open_delete_dialog_with_port = e=>{
+        e.stopPropagation();
+        this.props.open_delete_dialog([this.props.proxy]);
+    };
     render(){
         const persist = this.props.proxy.proxy_type=='persist';
         return <div className={is_local() ? 'proxies_actions' :
@@ -924,7 +952,7 @@ class Actions extends Pure_component {
             {!!persist &&
               <React.Fragment>
                 <Action_icon id="trash" scrolling={this.props.scrolling}
-                  on_click={this.open_delete_dialog}
+                  on_click={this.open_delete_dialog_with_port}
                   tooltip="Delete" invisible={!persist}/>
                 <Action_icon id="duplicate" on_click={this.duplicate}
                   tooltip="Duplicate proxy port" invisible={!persist}
@@ -939,49 +967,12 @@ class Actions extends Pure_component {
                 on_click={this.open_browser}
                 tooltip="Open browser configured with this port"/>
             }
-            {!!persist &&
-              <Delete_dialog open={this.state.open_delete_dialog}
-                close_dialog={this.close_delete_dialog}
-                update_proxies={this.props.update_proxies}
-                proxies={[this.props.proxy]}/>
-            }
           </div>;
     }
 }
 
 const Portal = props=>ReactDOM.createPortal(props.children,
     document.getElementById('del_modal'));
-
-class Delete_dialog extends Pure_component {
-    delete_proxies = e=>{
-        e.stopPropagation();
-        const _this = this;
-        const ports = _this.props.proxies.map(p=>p.port);
-        this.etask(function*(){
-            yield window.fetch('/api/proxies/delete', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ports}),
-            });
-            yield _this.props.update_proxies();
-            _this.props.close_dialog();
-        });
-    };
-    render(){
-        const {proxies, open, close_dialog} = this.props;
-        let title = 'Are you sure you want to delete ';
-        if (proxies.length==1)
-            title += `proxy port ${proxies[0].port}?`;
-        else
-            title += `${proxies.length} proxy ports?`;
-        return <Portal>
-          <Modal_dialog open={open}
-            title={title}
-            ok_clicked={this.delete_proxies}
-            cancel_clicked={close_dialog} />
-        </Portal>;
-    }
-}
 
 const Action_icon = props=>{
     let {on_click, invisible, id, tooltip, scrolling} = props;

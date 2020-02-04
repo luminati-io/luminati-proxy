@@ -53,9 +53,11 @@ export default class Rotation extends Pure_component {
         }
         const sess_note =
             <Note>
-              <span>Should be used only when </span>
-              <a className="link" onClick={this.move_to_ssl}>SSL analyzing</a>
-              <span> is turned on.</span>
+              <span><T>Should be used only when</T></span>{' '}
+              <a className="link" onClick={this.move_to_ssl}>
+                <T>SSL analyzing</T>
+              </a>{' '}
+              <span><T>is turned on.</T></span>
             </Note>;
         return <div className="rotation">
               <Tab_context.Provider value="rotation">

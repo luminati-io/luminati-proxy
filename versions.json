@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.170.508",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "merge duplicated config objects to avoid config discrepancy"
+            },
+            {
+                "type": "star",
+                "text": "update Chinese translations"
+            }
+        ]
+    },
+    {
         "ver": "1.170.414",
         "type": "stable",
         "changes": [
