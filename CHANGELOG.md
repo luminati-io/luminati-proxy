@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.700 Stable
+- :bug: fixed deleting logs only related to the specific port
+
 ## 1.170.508 Stable
 - :bug: merge duplicated config objects to avoid config discrepancy
 - :star: update Chinese translations

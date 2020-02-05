@@ -1541,15 +1541,12 @@ describe('proxy', ()=>{
     describe('gather and consume', ()=>{
         it('should not add duplicated sessions', etask._fn(function*(_this){
             const rules = [{status: '200', action: {reserve_session: true}}];
-            l = yield lum({pool_size: 3, rules});
-            const ips = {};
-            l.on('add_static_ip', data=>{
-                if (ips[data.ip])
-                    throw 'duplicate';
-                ips[data.ip] = true;
-            });
+            l = yield lum({pool_size: 3, static: true, rules});
+            const ips = [];
+            l.on('add_static_ip', data=>ips.push(data));
             yield l.test({fake: 1});
             yield l.test({fake: 1});
+            assert.equal(ips.length, 1);
         }));
     });
     describe('session_termination', ()=>{

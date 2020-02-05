@@ -108,10 +108,14 @@ class Har_viewer extends Pure_component {
         $(this.main_panel).removeClass('moving');
     };
     clear = ()=>{
+        const params = {};
+        if (this.props.match && this.props.match.params.port)
+            params.port = this.props.match.params.port;
+        const url = zescape.uri('/api/logs_reset', params);
         const _this = this;
         this.etask(function*(){
             loader.start();
-            yield ajax({url: '/api/logs_reset'});
+            yield ajax({url});
             _this.close_preview();
             setdb.emit_path('head.har_viewer.reset_reqs');
             loader.end();
