@@ -21,7 +21,7 @@ class Config extends Pure_component {
     componentDidMount(){
         this.cm = codemirror.fromTextArea(this.textarea,
             {mode: 'javascript', readOnly: 'nocursor'});
-        this.cm.on('change', this.on_cm_change.bind(this));
+        this.cm.on('change', this.on_cm_change);
         const _this = this;
         this.etask(function*(){
             const config = yield ajax.json({url: '/api/config'});
@@ -30,43 +30,37 @@ class Config extends Pure_component {
         });
         this.setdb_on('head.settings', settings=>this.setState({settings}));
     }
-    on_cm_change(e){
+    on_cm_change = e=>{
         this.setState({changed:
             this.state.persisted_config!=e.doc.getValue()});
-    }
-    set_textarea(el){ this.textarea = el; }
-    set_editable(editable){
+    };
+    set_textarea = el=>{
+        this.textarea = el;
+    };
+    set_editable = editable=>{
         this.setState({editable});
         this.cm.setOption('readOnly', editable ? false : 'nocursor');
-    }
-    check(){
+    };
+    check = ()=>{
         if (!this.state.changed)
             return;
+        try {
+            JSON.parse(this.cm.doc.getValue());
+            $('#conf_confirmation_modal').modal();
+        } catch(e){
+            this.setState({warning: e.message});
+        }
+    };
+    check_reload = ()=>{
         const _this = this;
-        this.etask(function*(){
-            const check_url = '/api/config_check';
-            const raw_check = yield window.fetch(check_url, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({config: _this.cm.doc.getValue()}),
-            });
-            const check = yield raw_check.json();
-            if (check.length)
-                _this.setState({warning: check[0]});
-            else
-                $('#conf_confirmation_modal').modal();
-        });
-    }
-    check_reload(){
-        const _this = this;
-        const retry = ()=>{ setTimeout(_this.check_reload.bind(_this), 500); };
+        const retry = ()=>{ setTimeout(_this.check_reload, 500); };
         return etask(function*(){
             this.on('uncaught', retry);
             yield ajax.json({url: 'api/proxies_running'});
             window.location.reload();
         });
-    }
-    save(){
+    };
+    save = ()=>{
         this.set_editable(false);
         const _this = this;
         this.etask(function*(){
@@ -81,20 +75,20 @@ class Config extends Pure_component {
             yield etask.sleep(3000);
             yield _this.check_reload();
         });
-    }
-    download(){
+    };
+    download = ()=>{
         const blob = new Blob([this.cm.doc.getValue()],
             {type: 'text/plain;charset=utf-8'});
         filesaver.saveAs(blob, `${this.state.settings.customer}_config.json`);
-    }
-    click_edit(){
+    };
+    click_edit = ()=>{
         this.set_editable(true);
-    }
-    click_cancel(){
+    };
+    click_cancel = ()=>{
         this.cm.doc.setValue(this.state.persisted_config);
         this.setState({warning: undefined});
         this.set_editable(false);
-    }
+    };
     render(){
         const panel_class = classnames('panel code_panel flex_auto vbox', {
             editable: this.state.editable});
@@ -107,14 +101,14 @@ class Config extends Pure_component {
                   <Nav_buttons editable={this.state.editable}
                     read_only={read_only}
                     changed={this.state.changed}
-                    click_edit={this.click_edit.bind(this)}
-                    click_save={this.check.bind(this)}
-                    click_download={this.download.bind(this)}
-                    click_cancel={this.click_cancel.bind(this)}/>
-                  <textarea ref={this.set_textarea.bind(this)}/>
+                    click_edit={this.click_edit}
+                    click_save={this.check}
+                    click_download={this.download}
+                    click_cancel={this.click_cancel}/>
+                  <textarea ref={this.set_textarea}/>
                 </div>
               </div>
-              <Conf_modal click_ok={this.save.bind(this)}/>
+              <Conf_modal click_ok={this.save}/>
             </div>;
     }
 }

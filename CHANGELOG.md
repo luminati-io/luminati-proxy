@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.768 Stable
+- :star: stats optimization: using only top level domain
+
 ## 1.170.700 Stable
 - :bug: fixed deleting logs only related to the specific port
 

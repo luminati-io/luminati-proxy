@@ -206,11 +206,9 @@ describe('manager', ()=>{
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
-        t('main config only', {config: simple_proxy},
+        t('main config only', {config: {proxies: [simple_proxy]}},
             [assign({}, simple_proxy, {proxy_type: 'persist'})]);
         t('config file', {config: {proxies: [simple_proxy]}}, [simple_proxy]);
-        t('config override cli', {cli: simple_proxy, config: {port: 24042}},
-            [simple_proxy, {proxy_type: 'persist', port: 24042}]);
         describe('default zone', ()=>{
             const zone_static = {password: ['pass1']};
             const zone_gen = {password: ['pass2']};
@@ -418,7 +416,6 @@ describe('manager', ()=>{
             it('success', etask._fn(function*(_this){
                 nock(api_base).get('/').reply(200, {});
                 nock(api_base).post('/update_lpm_stats').reply(200, {});
-                nock(api_base).post('/update_lpm_config').reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf').query(true)
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
@@ -589,8 +586,6 @@ describe('manager', ()=>{
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
                 .reply(200, {});
-            nock(api_base).post('/update_lpm_config').query(true)
-                .reply(200, {});
             app = yield app_with_config({config, cli: {token: '123'}});
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'zone1'}});
@@ -604,8 +599,6 @@ describe('manager', ()=>{
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
-                .reply(200, {});
-            nock(api_base).post('/update_lpm_config').query(true)
                 .reply(200, {});
             app = yield app_with_config({config, cli: {token: '123'}});
             const res = yield json('api/proxies', 'post',
@@ -637,8 +630,6 @@ describe('manager', ()=>{
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
-                .reply(200, {});
-            nock(api_base).post('/update_lpm_config').query(true)
                 .reply(200, {});
             const config = {proxies: [
                 {port: 24000, zone: 'static', password: 'p1_pass'},
@@ -723,7 +714,7 @@ describe('manager', ()=>{
             app = yield app_with_proxies(proxies, w_cli);
             const m = app.manager;
             default_calls.forEach(d=>m.set_whitelist_ips(d));
-            const s = m.config.serialize(m.proxies, m._defaults);
+            const s = m.config._serialize(m.proxies, m._defaults);
             const config = JSON.parse(s);
             const proxy = config.proxies[0];
             assert.equal(proxy.port, proxies[0].port);
@@ -769,8 +760,8 @@ describe('manager', ()=>{
         before(()=>lpm_config.first_actions = filepath);
         beforeEach(()=>{
             nock(api_base).get('/').reply(200, {}).persist();
-            ['/update_lpm_stats', '/update_lpm_config'].forEach(p=>
-                nock(api_base).post(p).query(true).reply(200, {}).persist());
+            nock(api_base).post('/update_lpm_stats').query(true).reply(200, {})
+            .persist();
             rm_actions_file();
             perr_stub = sstub(Manager.prototype, 'perr');
         });
