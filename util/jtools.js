@@ -210,6 +210,7 @@ E.split_debug_flags = opt=>{
         case '--throw-deprecation':
         case '--trace-deprecation':
         case '--allow-natives-syntax':
+        case '--http-parser':
         case '--expose-internals':
         case '--inspect':
         case '--inspect-brk':

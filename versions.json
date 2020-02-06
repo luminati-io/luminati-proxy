@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.170.919",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed crashing when the domain name is empty"
+            },
+            {
+                "type": "star",
+                "text": "Added limit for reconnecting on websocket"
+            }
+        ]
+    },
+    {
         "ver": "1.170.768",
         "type": "stable",
         "changes": [

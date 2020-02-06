@@ -5,6 +5,8 @@ const _ = require('lodash');
 const string = require('./string.js');
 const {qw} = string;
 const HTTPParser = process.binding('http_parser').HTTPParser;
+const semver = require('semver');
+const node_v12 = semver.gte(process.version, '12.0.0');
 const E = exports, assign = Object.assign;
 
 const special_case_words = {
@@ -359,8 +361,13 @@ E.parse_request = buffer=>{
         status_message, upgrade, should_keep_alive)=>
         ret = {version_major, version_minor, raw_headers, method, url,
             upgrade, should_keep_alive};
-    parser.reinitialize(HTTPParser.REQUEST, !!parser_usages);
-    parser_usages++;
+    if (node_v12)
+        parser.initialize(HTTPParser.REQUEST, {});
+    else
+    {
+        parser.reinitialize(HTTPParser.REQUEST, !!parser_usages);
+        parser_usages++;
+    }
     let exec_res = parser.execute(buffer);
     if (exec_res instanceof Error)
         throw exec_res;

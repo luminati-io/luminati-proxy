@@ -2159,7 +2159,7 @@
   "You can have full control over the IP rotation or let Luminati automatically select a different IP for every session, from a country of your choice.": "您可以完全控制IP循环切换的方式,也可以让Luminati从您所选择的国家中,自动为每一个会话选择不同的IP。",
   "You don’t have to choose between our fast and stable data-center IPs from across 1000s of subnets, our peer-to-peer residential proxy network with tens of millions of peers around the globe and our 3G mobile IPs - take advantage of them all instead!": "您无需从来自1000个子网快速且稳定的数据中心IP、在全球拥有数千万个节点的点对点住宅代理网络和我们的3G移动IP中做出选择-相反,您应该把它们每一个都利用起来!",
   "You will not be charged, authentication only.": "我们不会向您收费，仅限身份验证。",
-  "Your account will be charged with $1 for verification purpose only (Non refundable)": "您的帐户将被收取$1美金。此费用仅用作验证目的(不可退款)。",
+  "Your account will be charged with $1 for verification purposes only (Non refundable)": "您的帐户将被收取$1美金。此费用仅用作验证目的(不可退款)。",
   "Your real location and identity will never be exposed.": "您的真实位置和身份绝不会暴露。",
   "Unlike residential IP’s that are assigned by an ISP, data center IPs can be easily detected. Today most websites already know how to detect data center IPs and are able to block them. Residential proxies are the IPs of real user devices, making them undetectable when used correctly.": "与由网络服务提供商分配的住宅IP相比，数据中心IP更容易被探测到。现今，大多数网站不仅知道如何探测数据中心IP，还能拦截它们。而住宅代理运用的是真实用户设备的IP，只要使用得当，它们就无法被探测出来。",
   "Browser": "浏览器",
