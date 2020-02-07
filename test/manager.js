@@ -76,7 +76,7 @@ describe('manager', ()=>{
             }
             args = args.concat('--loki', '/tmp/testdb');
         }
-        Manager.prototype.get_ip = ()=>null;
+        Manager.prototype.set_current_country = ()=>null;
         Manager.prototype.check_conn = ()=>null;
         Manager.prototype.lpm_users_get = ()=>null;
         Manager.prototype.init_lpm_f_ws = ()=>null;

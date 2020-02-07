@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.170.998",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Stop writing extra options to the config file"
+            }
+        ]
+    },
+    {
         "ver": "1.170.919",
         "type": "stable",
         "changes": [

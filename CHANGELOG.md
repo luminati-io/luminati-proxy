@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.170.998 Development Latest
+- :bug: Stop writing extra options to the config file
+
 ## 1.170.919 Stable
 - :bug: Fixed crashing when the domain name is empty
 - :star: Added limit for reconnecting on websocket
