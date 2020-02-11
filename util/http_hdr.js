@@ -78,6 +78,9 @@ E.browser_defaults = function(browser, opt){
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
         },
+        chrome_79: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        },
         mobile_chrome: {
             'user-agent': 'Mozilla/5.0 (Linux; Android 9; MBOX) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -88,6 +91,9 @@ E.browser_defaults = function(browser, opt){
             'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
+        },
+        mobile_chrome_79: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         },
         firefox: {
             connection: 'keep-alive',
@@ -129,10 +135,15 @@ E.browser_defaults = function(browser, opt){
         result = defs.chrome;
         browser = 'chrome';
     }
-    if ({chrome: 1, mobile_chrome: 1}[browser] && opt.https)
+    if ({chrome: 1, mobile_chrome: 1}[browser])
     {
-        result = assign(result, defs[browser+'_https'],
-            opt.major>75 ? defs[browser+'_sec_fetch'] : {});
+        if (opt.https)
+        {
+            result = assign(result, defs[browser+'_https'],
+                opt.major>75 ? defs[browser+'_sec_fetch'] : {});
+        }
+        if (opt.major>78)
+            result = assign(result, defs[browser+'_79']);
     }
     return result;
 };
@@ -190,8 +201,8 @@ const header_rules = [
     {match: {browser: 'chrome', version_min: 78},
         rules: {order: qw`host connection pragma cache-control origin
             upgrade-insecure-requests user-agent sec-fetch-user accept
-            sec-fetch-site sec-fetch-mode accept-encoding accept-language
-            cookie`}},
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
     {match: {browser: 'chrome', version_min: 78, type: 'xhr'},
         rules: {order: qw`host connection pragma cache-control accept
             x-requested-with user-agent content-type sec-fetch-site

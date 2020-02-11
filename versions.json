@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.171.357",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "fix bug when reserved pool might be overloaded"
+            }
+        ]
+    },
+    {
         "ver": "1.170.998",
         "type": "dev",
         "changes": [

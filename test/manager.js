@@ -202,6 +202,12 @@ describe('manager', ()=>{
             app = yield app_with_config(config);
             const proxies = yield json('api/proxies_running');
             assert_has(proxies, expected, 'proxies');
+            for (let prop of ['hosts', 'mobile', 'ssl_perm', 'static'])
+            {
+                assert(prop in proxies[0]);
+                assert(!(prop in proxies[0].config),
+                    'calculated config values are leaked into raw config');
+            }
         }));
         const simple_proxy = {port: 24024};
         t('cli only', {cli: simple_proxy, config: []},

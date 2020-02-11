@@ -1548,6 +1548,15 @@ describe('proxy', ()=>{
             yield l.test({fake: 1});
             assert.equal(ips.length, 1);
         }));
+        it('should not add sessions when pool_size is not defined', etask._fn(
+        function*(_this){
+            const rules = [{status: '200', action: {reserve_session: true}}];
+            l = yield lum({static: true, rules});
+            const ips = [];
+            l.on('add_static_ip', data=>ips.push(data));
+            yield l.test({fake: 1});
+            assert.equal(ips.length, 0);
+        }));
     });
     describe('session_termination', ()=>{
         describe('http', ()=>{

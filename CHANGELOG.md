@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.171.357 Stable
+- :bug: fix bug when reserved pool might be overloaded
+
 ## 1.170.998 Development Latest
 - :bug: Stop writing extra options to the config file
 
