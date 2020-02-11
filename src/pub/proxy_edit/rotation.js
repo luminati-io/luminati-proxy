@@ -44,7 +44,6 @@ export default class Rotation extends Pure_component {
             form.preset!='long_availability';
         let pool_size_note;
         if (!this.state.disabled_fields.pool_size && render_modal)
-
         {
             pool_size_note =
                 <a className="link" onClick={this.open_modal}>

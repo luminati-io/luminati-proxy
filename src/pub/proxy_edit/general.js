@@ -3,7 +3,6 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
-import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 import {Config, Tab_context} from './common.js';
 import {T} from '../common/i18n.js';
@@ -22,21 +21,19 @@ const debug_opt = [
 ];
 
 export default class General extends Pure_component {
-    state = {default_proxy_connect_type: 'http'};
+    state = {defaults: {}};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
     set_field = setdb.get('head.proxy_edit.set_field');
     proxy_connection_type_opt(t){
-        let def = this.state.default_proxy_connect_type=='https' ?
+        let def = this.state.defaults.proxy_connection_type=='https' ?
             t('Default (HTTPS)') : t('Default (HTTP)');
         return [{key: def, value: ''},
             {key: 'HTTP', value: 'http'},
             {key: 'HTTPS', value: 'https'}];
     }
     componentDidMount(){
-        this.setdb_on('head.defaults', defaults=>{
-            this.setState({default_proxy_connect_type: _.get(defaults,
-                'proxy_connection_type', 'http')});
-        });
+        this.setdb_on('head.defaults',
+            defaults=>this.setState({defaults: defaults||{}}));
         this.setdb_on('head.proxy_edit.form', form=>{
             form && this.setState({form});
         });
@@ -96,6 +93,8 @@ export default class General extends Pure_component {
             <a className="link" onClick={this.open_users_modal}>
               <T>Select users</T>
             </a> : null;
+        let {ssl} = form, def_ssl = this.state.defaults.ssl;
+        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
         return <div className="general">
               <Tab_context.Provider value="general">
                 <Users_modal form={this.state.form}/>
@@ -108,7 +107,7 @@ export default class General extends Pure_component {
                   id="proxy_connection_type"/>}</T>
                 <Config type="yes_no" id="ssl" on_change={this.on_change_ssl}/>
                 <Config type="yes_no" id="insecure"
-                  disabled={!this.state.form.ssl}/>
+                  disabled={!ssl_analyzing_enabled}/>
                 <Config type="select" data={route_err_opt} id="route_err"/>
                 <Config type="select_number" id="multiply"
                   data={[0, 5, 20, 100, 500]}/>

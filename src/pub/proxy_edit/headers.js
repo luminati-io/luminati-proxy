@@ -12,7 +12,7 @@ import {T} from '../common/i18n.js';
 
 export default class Headers extends Pure_component {
     first_header = {name: '', value: ''};
-    state = {headers: [this.first_header], disabled_fields: {}};
+    state = {headers: [this.first_header], disabled_fields: {}, defaults: {}};
     goto_field = setdb.get('head.proxy_edit.goto_field');
     set_field = setdb.get('head.proxy_edit.set_field');
     componentDidMount(){
@@ -27,6 +27,8 @@ export default class Headers extends Pure_component {
         });
         this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
             disabled_fields&&this.setState({disabled_fields}));
+        this.setdb_on('head.defaults',
+            defaults=>this.setState({defaults: defaults||{}}));
     }
     add = ()=>this.set_field('headers', [
         ...this.state.headers, {name: '', value: ''}]);
@@ -56,7 +58,9 @@ export default class Headers extends Pure_component {
     render(){
         if (!this.state.form)
             return null;
-        if (!this.state.form.ssl)
+        let {ssl} = this.state.form, def_ssl = this.state.defaults.ssl;
+        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
+        if (!ssl_analyzing_enabled)
         {
             return <Warning text={
                 <React.Fragment>

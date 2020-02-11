@@ -56,8 +56,7 @@ E.http_proxy = port=>etask(function*(){
             let status = 200;
             if (req.url=='http://lumtest.com/fail_url')
                 status = 500;
-            res.writeHead(status,
-                {'content-type': 'application/json', 'x-hola-response': 1});
+            res.writeHead(status, {'content-type': 'application/json'});
             res.write(JSON.stringify(body));
             proxy.full_history.push(body);
             if (body.url!='http://lumtest.com/myip.json')

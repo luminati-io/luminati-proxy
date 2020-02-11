@@ -668,6 +668,7 @@ describe('manager', ()=>{
     describe('whitelisting', ()=>{
         let t = (name, proxies, default_calls, wh, cli, www_whitelist)=>
         it(name, etask._fn(function*(_this){
+            _this.timeout(6000);
             const port = proxies[0].port;
             app = yield app_with_proxies(proxies, cli);
             app.manager.set_www_whitelist_ips(www_whitelist||[]);

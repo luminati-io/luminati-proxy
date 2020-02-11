@@ -1,7 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.171.435 Stable
+- :bug: Correctly show UI warnings when using --ssl true
+- :bug: Fixed statistics aggregation for HTTPS requests
+
 ## 1.171.357 Stable
-- :bug: fix bug when reserved pool might be overloaded
+- :bug: Fixed bug when reserved pool might be overloaded
 
 ## 1.170.998 Development Latest
 - :bug: Stop writing extra options to the config file
@@ -11,23 +15,23 @@ Luminati Proxy manager - Change Log
 - :star: Added limit for reconnecting on websocket
 
 ## 1.170.768 Stable
-- :star: stats optimization: using only top level domain
+- :star: Stats optimization: using only top level domain
 
 ## 1.170.700 Stable
-- :bug: fixed deleting logs only related to the specific port
+- :bug: Fixed deleting logs only related to the specific port
 
 ## 1.170.508 Stable
-- :bug: merge duplicated config objects to avoid config discrepancy
-- :star: update Chinese translations
+- :bug: Merged duplicated config objects to avoid config discrepancy
+- :star: Updated Chinese translations
 
 ## 1.170.414 Stable
-- :bug: fix response tab in HAR viewer
+- :bug: Fixed response tab in HAR viewer
 
 ## 1.170.174 Stable
-- :bug: fix bug when banned ip might be re-added to the pool
+- :bug: Fixed bug when banned ip might be re-added to the pool
 
 ## 1.170.30 Stable
-- :bug: update error messages for google login
+- :bug: Updated error messages for google login
 - :sparkles: Added basic WS connection with Luminati servers
 - :star: HAR viewer filter can now search by session id
 
@@ -36,7 +40,7 @@ Luminati Proxy manager - Change Log
 - :sparkles: Multiple performance optimizations
 
 ## 1.169.16 Development Latest
-- :bug: Fix cannot read property 'x-luminati-ip' of undefined
+- :bug: Fixed cannot read property 'x-luminati-ip' of undefined
 
 ## 1.168.796 Development Latest
 - :star: Added support for the headers changes in Luminati API

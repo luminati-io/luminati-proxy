@@ -121,7 +121,7 @@ export const map_rule_to_form = rule=>{
 };
 
 export default class Rules extends Pure_component {
-    state = {rules: [{id: 0}], max_id: 0, disabled_fields: {}};
+    state = {rules: [{id: 0}], max_id: 0, disabled_fields: {}, defaults: {}};
     set_field = setdb.get('head.proxy_edit.set_field');
     goto_field = setdb.get('head.proxy_edit.goto_field');
     componentDidMount(){
@@ -136,6 +136,8 @@ export default class Rules extends Pure_component {
         this.setdb_on('head.proxy_edit.update_rule', this.update_rule);
         this.setdb_on('head.proxy_edit.disabled_fields', disabled_fields=>
             disabled_fields&&this.setState({disabled_fields}));
+        this.setdb_on('head.defaults',
+            defaults=>this.setState({defaults: defaults||{}}));
     }
     update_rule = rule=>{
         if (!rule)
@@ -175,8 +177,10 @@ export default class Rules extends Pure_component {
         const {form, rules, disabled_fields, www} = this.state;
         if (!form)
             return null;
+        let {ssl} = form, def_ssl = this.state.defaults.ssl;
+        let ssl_analyzing_enabled = ssl || ssl!==false && def_ssl;
         return <div className="rules">
-              {!form.ssl &&
+              {!ssl_analyzing_enabled &&
                 <Warning text={
                   <React.Fragment>
                     <span>
@@ -197,7 +201,8 @@ export default class Rules extends Pure_component {
               </button>
               {rules.map(r=>
                 <Rule key={r.id} rule={r} rule_del={this.rule_del}
-                  www={www} ssl={form.ssl} disabled={disabled_fields.rules}/>
+                  www={www} ssl={ssl_analyzing_enabled}
+                  disabled={disabled_fields.rules}/>
               )}
               <Tester_wrapper/>
             </div>;

@@ -1,11 +1,25 @@
 [
     {
+        "ver": "1.171.435",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Correctly show UI warnings when using --ssl true"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed statistics aggregation for HTTPS requests"
+            }
+        ]
+    },
+    {
         "ver": "1.171.357",
         "type": "stable",
         "changes": [
             {
                 "type": "bug",
-                "text": "fix bug when reserved pool might be overloaded"
+                "text": "Fixed bug when reserved pool might be overloaded"
             }
         ]
     },
@@ -39,7 +53,7 @@
         "changes": [
             {
                 "type": "star",
-                "text": "stats optimization: using only top level domain"
+                "text": "Stats optimization: using only top level domain"
             }
         ]
     },
@@ -49,7 +63,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "fixed deleting logs only related to the specific port"
+                "text": "Fixed deleting logs only related to the specific port"
             }
         ]
     },
@@ -59,11 +73,11 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "merge duplicated config objects to avoid config discrepancy"
+                "text": "Merged duplicated config objects to avoid config discrepancy"
             },
             {
                 "type": "star",
-                "text": "update Chinese translations"
+                "text": "Updated Chinese translations"
             }
         ]
     },
@@ -73,7 +87,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "fix response tab in HAR viewer"
+                "text": "Fixed response tab in HAR viewer"
             }
         ]
     },
@@ -83,7 +97,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "fix bug when banned ip might be re-added to the pool"
+                "text": "Fixed bug when banned ip might be re-added to the pool"
             }
         ]
     },
@@ -93,7 +107,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "update error messages for google login"
+                "text": "Updated error messages for google login"
             },
             {
                 "type": "sparkles",
@@ -125,7 +139,7 @@
         "changes": [
             {
                 "type": "bug",
-                "text": "Fix cannot read property 'x-luminati-ip' of undefined"
+                "text": "Fixed cannot read property 'x-luminati-ip' of undefined"
             }
         ]
     },
