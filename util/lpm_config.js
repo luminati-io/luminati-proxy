@@ -62,6 +62,7 @@ conf.server_default = {
     bw_limit: 0,
     log: 'notice',
     har_limit: 1024,
+    debug_logs: false,
 };
 conf.manager_default = Object
 .assign({}, _.omit(conf.server_default, 'port'), {

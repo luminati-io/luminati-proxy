@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.171.545 Stable
+- :bug: Possible to choose OS when using mobile zone
+- :star: More detailed debug logs, allow to switch it per port
+
 ## 1.171.435 Stable
 - :bug: Correctly show UI warnings when using --ssl true
 - :bug: Fixed statistics aggregation for HTTPS requests

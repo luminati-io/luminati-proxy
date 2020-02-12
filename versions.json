@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.171.545",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Possible to choose OS when using mobile zone"
+            },
+            {
+                "type": "star",
+                "text": "More detailed debug logs, allow to switch it per port"
+            }
+        ]
+    },
+    {
         "ver": "1.171.435",
         "type": "stable",
         "changes": [

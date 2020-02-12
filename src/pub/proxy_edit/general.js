@@ -20,6 +20,12 @@ const debug_opt = [
     {key: 'No', value: 'none'},
 ];
 
+const debug_logs_opt = [
+    {key: 'Default (No)', value: ''},
+    {key: 'Yes', value: true},
+    {key: 'No', value: false}
+];
+
 export default class General extends Pure_component {
     state = {defaults: {}};
     get_curr_plan = setdb.get('head.proxy_edit.get_curr_plan');
@@ -126,6 +132,7 @@ export default class General extends Pure_component {
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact no_any/>
                 <Config type="select" id="debug" data={debug_opt}/>
+                <Config type="select" id="debug_logs" data={debug_logs_opt}/>
               </Tab_context.Provider>
             </div>;
     }
