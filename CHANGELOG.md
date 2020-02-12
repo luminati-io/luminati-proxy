@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.171.623 Development Latest
+- :star: Remove detailed debug logs
+- :bug: Fixed choosing OS on mobile zones
+
 ## 1.171.545 Stable
 - :bug: Possible to choose OS when using mobile zone
 - :star: More detailed debug logs, allow to switch it per port

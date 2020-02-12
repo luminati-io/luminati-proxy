@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.171.623",
+        "type": "dev",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Remove detailed debug logs"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed choosing OS on mobile zones"
+            }
+        ]
+    },
+    {
         "ver": "1.171.545",
         "type": "stable",
         "changes": [

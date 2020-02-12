@@ -6,9 +6,10 @@ const file = require('../util/file.js');
 const etask = require('../util/etask.js');
 const zerr = require('../util/zerr.js');
 const lpm_util = require('../util/lpm_util.js');
+const util = require('../lib/util.js');
+// XXX krzysztof: is perr.run() needed here?
 const perr = require('../lib/perr.js');
 perr.run({});
-const _ = require('lodash');
 const E = module.exports = {};
 const shutdown_timeout = 3000;
 const child_process = require('child_process');
@@ -16,10 +17,6 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../lib/logger.js').child({category: 'lum_node'});
-
-const perr_info = info=>Object.assign({}, info, {
-    customer: _.get(E.manager, '_defaults.customer'),
-});
 
 E.shutdown = (reason, error=null)=>{
     if (E.shutdowning)
@@ -50,7 +47,7 @@ E.handle_signal = (sig, err)=>{
     etask(function*handle_signal_lum_node(){
         if (sig!='SIGINT' && sig!='SIGTERM')
         {
-            yield zerr.perr('crash', perr_info({error: errstr, reason: sig}));
+            yield util.perr('crash', {error: errstr});
             return E.shutdown(errstr, err);
         }
         return E.shutdown(errstr);

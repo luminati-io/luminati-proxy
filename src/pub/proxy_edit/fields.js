@@ -336,10 +336,6 @@ export const tabs = {
                 label: 'Debug',
                 tooltip: `Luminati request debug info`,
             },
-            debug_logs: {
-                label: 'Debug logs',
-                tooltip: 'Detailed debug logs',
-            },
         },
     },
 };

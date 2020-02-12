@@ -9,8 +9,13 @@ describe('username', ()=>{
         const res = username.calculate_username(opt);
         assert.equal(res.password, 'pass');
     });
-    it('should skip mobile if os is passed', ()=>{
+    it('should set mobile false if os and mobile are passed', ()=>{
         const opt = {country: 'us', mobile: true, os: 'win'};
+        const res = username.calculate_username(opt);
+        assert.equal(res.username, 'lum-country-us-mobile-false-os-win');
+    });
+    it('should skip mobile false if os and mobile are passed', ()=>{
+        const opt = {country: 'us', mobile: false, os: 'win'};
         const res = username.calculate_username(opt);
         assert.equal(res.username, 'lum-country-us-os-win');
     });

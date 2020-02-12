@@ -770,7 +770,7 @@ describe('manager', ()=>{
             nock(api_base).post('/update_lpm_stats').query(true).reply(200, {})
             .persist();
             rm_actions_file();
-            perr_stub = sstub(Manager.prototype, 'perr');
+            perr_stub = sstub(util_lib, 'perr');
         });
         afterEach(()=>{
             rm_actions_file();
@@ -862,7 +862,7 @@ describe('manager', ()=>{
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {mock_result: true, _defaults: true});
             perr_stub.restore();
-            perr_stub = sstub(Manager.prototype, 'perr', id=>{
+            perr_stub = sstub(util_lib, 'perr', id=>{
                 if (!id.startsWith('first'))
                     return;
                 if (id=='first_send_request')
