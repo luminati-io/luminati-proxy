@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const assert = require('assert');
 const dns = require('dns');
+const net = require('net');
 const socks = require('lum_socksv5');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
@@ -1599,5 +1600,23 @@ describe('proxy', ()=>{
             // XXX krzysztof: to implement this test when better mocking for
             // https is built
         });
+    });
+    describe.skip('smtp with rules', function(){
+        let rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
+            body: '220', trigger_type: 'body'}];
+        // XXX viktor: don't use zs-smtp-test, setup fake smtp server
+        let smtp = ['34.233.106.120'];
+        const t = (name, opt, close)=>it(name, ()=>etask(function*(){
+            proxy.fake = false;
+            l = yield lum(Object.assign({history: true}, opt));
+            let socket = net.connect(24000, '127.0.0.1');
+            socket.on('data', ()=>close && socket.end('QUIT'));
+            socket.on('end', ()=>this.continue());
+            yield this.wait();
+            assert.equal(_.get(l, 'history.0.rules.length'), 1);
+        }));
+        t('rules is triggered', {rules, smtp}, true);
+        // XXX viktor: npm run test -- --timeout 120000 -g 'smtp with rules'
+        t('rules is triggered on timeout', {rules, smtp});
     });
 });

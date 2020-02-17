@@ -569,6 +569,24 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.171.624', v=>{
+        it('remove extra fields from config', ()=>{
+            const conf = {
+                _defaults: {},
+                proxies: [
+                    {port: 24000, zone: 'z', ips: ['1.1.1.1'], ssl: true,
+                        hosts: ['1.1.1.1'], mobile: true, static: true,
+                        ssl_perm: true, unblock: true},
+                ],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {},
+                proxies: [
+                    {port: 24000, zone: 'z', ips: ['1.1.1.1'], ssl: true}],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

@@ -148,11 +148,13 @@ E.browser_defaults = function(browser, opt){
     return result;
 };
 
-E.browser_accept = function(browser, type){
+E.browser_accept = function(browser, type, opt={}){
     let defs = {
         document: {
             chrome: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            chrome_79: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             mobile_chrome: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            mobile_chrome_79: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             firefox: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             edge: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             safari: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -184,7 +186,12 @@ E.browser_accept = function(browser, type){
         },
     };
     let kind = defs[type]||defs.document;
-    return kind[browser]||kind.chrome;
+    let browser_re = new RegExp(`^${browser}_(\\d+)$`);
+    let versions = Object.keys(kind).filter(k=>browser_re.test(k))
+        .map(k=>+k.match(browser_re)[1]).sort((a, b)=>b - a);
+    let version = versions.find(v=>opt.major >= v);
+    let v_key = `${browser}_${version}`;
+    return kind[v_key]||kind[browser]||kind.chrome;
 };
 
 const header_rules = [

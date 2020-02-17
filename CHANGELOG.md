@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.172.46 Development Latest
+- :bug: Remove extra options from config file
+
 ## 1.171.623 Development Latest
 - :star: Remove detailed debug logs
 - :bug: Fixed choosing OS on mobile zones
