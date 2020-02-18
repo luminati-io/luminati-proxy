@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.172.201",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fix untriggered rules for long requests"
+            }
+        ]
+    },
+    {
         "ver": "1.172.46",
         "type": "dev",
         "changes": [

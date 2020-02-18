@@ -316,7 +316,7 @@ describe('manager', ()=>{
         });
         describe('proxies', ()=>{
             describe('get', ()=>{
-                it('normal', ()=>etask._fn(function*(_this){
+                it('normal', etask._fn(function*(_this){
                     const proxies = [{port: 24023}, {port: 24024}];
                     app = yield app_with_proxies(proxies);
                     let res = yield json('api/proxies');
@@ -326,7 +326,7 @@ describe('manager', ()=>{
                 }));
             });
             describe('post', ()=>{
-                it('normal non-persist', ()=>etask._fn(function*(_this){
+                it('normal non-persist', etask._fn(function*(_this){
                     const sample_proxy = {
                         port: 24001,
                         proxy_type: 'non-persist',

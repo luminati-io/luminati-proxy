@@ -11,6 +11,7 @@ const request = require('request');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
+const date = require('../util/date.js');
 const restore_case = require('../util/http_hdr.js').restore_case;
 const customer = 'abc';
 const password = 'xyz';
@@ -117,6 +118,7 @@ E.http_proxy = port=>etask(function*(){
         }).on('close', ()=>delete headers[req_port]).on('error',
             this.throw_fn());
         res.pipe(socket).pipe(res);
+        res.on('error', ()=>socket.end());
         req.on('end', ()=>socket.end());
     }));
     yield etask.nfn_apply(proxy.http, '.listen', [port||20001]);
@@ -145,6 +147,27 @@ E.http_proxy = port=>etask(function*(){
         }]);
     });
     return proxy;
+});
+
+E.smtp_test_server = port=>etask(function*(){
+    let smtp = net.createServer(socket=>{
+        smtp.last_connection = socket;
+        socket.write('220 smtp-tester ESMTP is glad to see you!\n');
+        socket.on('data', chunk=>{
+            switch (chunk.toString())
+            {
+            case 'QUIT':
+                socket.end('221 Bye\n');
+                break;
+            default:
+                socket.write('500 Error: command not recognized\n');
+            }
+        })
+        .setTimeout(20*date.ms.SEC, ()=>socket.end());
+    });
+    smtp.listen(port, ()=>this.continue());
+    yield this.wait();
+    return smtp;
 });
 
 E.http_ping = ()=>etask(function*(){

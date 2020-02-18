@@ -19,18 +19,21 @@ const Ip_cache = require('../lib/ip_cache.js');
 const Config = require('../lib/config.js');
 const {decode_body} = require('../lib/util.js');
 const consts = require('../lib/consts.js');
-const {assert_has, http_proxy, http_ping} = require('./common.js');
+const common = require('./common.js');
+const {assert_has, http_proxy, smtp_test_server, http_ping} = common;
 const qw = require('../util/string.js').qw;
 const test_url = {http: 'http://lumtest.com/test',
     https: 'https://lumtest.com/test'};
 const customer = 'abc';
 const password = 'xyz';
 
+const TEST_SMTP_PORT = 10025;
+
 const pre_rule = (type, regex)=>({
     rules: [{action: {[type]: true}, url: regex}],
 });
 describe('proxy', ()=>{
-    let proxy, ping;
+    let proxy, ping, smtp;
     const lum = opt=>etask(function*(){
         opt = opt||{};
         if (opt.ssl===true)
@@ -88,6 +91,7 @@ describe('proxy', ()=>{
         _this.timeout(30000);
         console.log('Start prep', new Date());
         proxy = yield http_proxy();
+        smtp = yield smtp_test_server(TEST_SMTP_PORT);
         ping = yield http_ping();
         console.log('End prep', new Date());
     }));
@@ -96,6 +100,7 @@ describe('proxy', ()=>{
         if (proxy)
             yield proxy.stop();
         proxy = null;
+        smtp.close();
         if (ping)
             yield ping.stop();
         ping = null;
@@ -115,7 +120,7 @@ describe('proxy', ()=>{
         l = null;
     }));
     describe('sanity', ()=>{
-        const t = (name, req, opt)=>it(name, ()=>etask._fn(function*(_this){
+        const t = (name, req, opt)=>it(name, etask._fn(function*(_this){
             _this.timeout(5000);
             proxy.fake = false;
             req = req();
@@ -1601,22 +1606,31 @@ describe('proxy', ()=>{
             // https is built
         });
     });
-    describe.skip('smtp with rules', function(){
-        let rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
-            body: '220', trigger_type: 'body'}];
-        // XXX viktor: don't use zs-smtp-test, setup fake smtp server
-        let smtp = ['34.233.106.120'];
-        const t = (name, opt, close)=>it(name, ()=>etask(function*(){
+    describe('smtp rules', function(){
+        const t = (name, config, opt)=>it(name, etask._fn(function*(_this){
+            opt = opt||{};
             proxy.fake = false;
-            l = yield lum(Object.assign({history: true}, opt));
+            l = yield lum(Object.assign({history: true}, config));
             let socket = net.connect(24000, '127.0.0.1');
-            socket.on('data', ()=>close && socket.end('QUIT'));
-            socket.on('end', ()=>this.continue());
+            socket.on('connect', ()=>opt.abort && socket.destroy());
+            socket.on('data', ()=>{
+                if (opt.close)
+                    socket.end('QUIT');
+                if (opt.smtp_close)
+                    smtp.last_connection.end();
+            });
+            l.on('usage', ()=>this.continue());
             yield this.wait();
             assert.equal(_.get(l, 'history.0.rules.length'), 1);
         }));
-        t('rules is triggered', {rules, smtp}, true);
-        // XXX viktor: npm run test -- --timeout 120000 -g 'smtp with rules'
-        t('rules is triggered on timeout', {rules, smtp});
+        let config = {
+            rules: [{action: {ban_ip: 0}, action_type: 'ban_ip',
+                body: '220', trigger_type: 'body'}],
+            smtp: ['127.0.0.1:'+TEST_SMTP_PORT]};
+        t('rules is triggered regular req', config, {close: true});
+        // XXX viktor: no history entry at all (no 'usage' event)
+        // t('rules is triggered on abort', config, {abort: true});
+        t('rules is triggered when server ends connection', config,
+            {smtp_close: true});
     });
 });

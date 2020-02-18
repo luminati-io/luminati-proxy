@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.172.46/luminati-proxy-manager-v1.172.46-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.172.201/luminati-proxy-manager-v1.172.201-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -52,17 +52,13 @@ curl -L https://luminati.io/static/lpm/luminati-proxy-latest-setup.sh | bash
 ```sh
 sudo npm install -g @luminati-io/luminati-proxy
 ```
-If the command is returning an error try installing using --unsafe-perm flag
-```sh
-sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm
-```
 If you are trying to install the Proxy Manager from china on Mac/Linux please run the following command first to make sure npm is installing with allowed registry:
 ```sh
  npm config set registry https://r.cnpmjs.org/
 ```
 After this command ran successfully install using:
 ```sh
-sudo npm install -g @luminati-io/luminati-proxy --unsafe-perm=true --allow-root
+sudo npm install -g @luminati-io/luminati-proxy --allow-root
 ```
 ### Upgrade
 - Use npm to upgrade
@@ -98,10 +94,6 @@ luminati
 Point your browser to the app admin UI
 [http://127.0.0.1:22999](http://127.0.0.1:22999) to set up credentials
 and configure your proxies.
-
-After logging in, you will see that the default configuration for the Luminati
-proxy includes a "dropin" proxy running on port 22225. This mode is explained
-in detail below.
 
 ### Run as daemon
 To run the proxy manager in the background:
@@ -227,7 +219,6 @@ Options:
   --local_login            Requires each browser to authenticate against LPM
                                                       [boolean] [default: false]
   --read_only              Avoid saving current config in config file  [boolean]
-
 ```
 
 ### Docker

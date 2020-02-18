@@ -36,13 +36,12 @@ class Lum_node_index {
         return yield etask.nfn_apply(pm2, '.'+command, opt);
     }); }
     start_daemon(){
-        const _this = this;
     return etask(function*start_daemon(){
         this.on('uncaught', e=>{
             logger.error('PM2: Uncaught exception: '+zerr.e2s(e));
         });
         this.on('finally', ()=>pm2.disconnect());
-        const script = _this.argv.$0;
+        const script = path.resolve(__dirname, 'index.js');
         logger.notice('Running in daemon: %s', script);
         const daemon_start_opt = {
             name: lpm_config.daemon_name,

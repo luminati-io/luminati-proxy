@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.172.201 Stable
+- :bug: Fix untriggered rules for long requests
+
 ## 1.172.46 Development Latest
 - :bug: Remove extra options from config file
 
