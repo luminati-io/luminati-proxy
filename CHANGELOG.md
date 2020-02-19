@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.172.386 Stable
+- :bug: Fix bug when pool might not be used after restart
+
 ## 1.172.201 Stable
 - :bug: Fix untriggered rules for long requests
 
