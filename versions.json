@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.172.589",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Add an option to set log level in the UI"
+            }
+        ]
+    },
+    {
         "ver": "1.172.386",
         "type": "stable",
         "changes": [

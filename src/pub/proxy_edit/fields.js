@@ -326,15 +326,9 @@ export const tabs = {
                 tooltip: `Default access grant for this port. Only these
                     IPs will be able to send requests to this port by default`
             },
-            bw_limit: {
-                label: 'Bandwidth limit (GB)',
-                tooltip: `Set a limit of bandwidth for this proxy port. After
-                    reached specified limit the proxy port will deny further
-                    connections`,
-            },
             debug: {
                 label: 'Debug',
-                tooltip: `Luminati request debug info`,
+                tooltip: 'Luminati request debug info',
             },
         },
     },

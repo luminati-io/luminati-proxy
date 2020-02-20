@@ -34,6 +34,7 @@ const tooltips = {
     request_stats: `Enable saving statistics to database`,
     logs: `Specify how many requests you want to keep in database. The
         limit may be set as a number or maximum database size.`,
+    log_level: 'Define how much log you want to keep in the file',
 };
 for (let f in tooltips)
     tooltips[f] = tooltips[f].replace(/\s+/g, ' ').replace(/\n/g, ' ');
@@ -43,6 +44,15 @@ class Form extends Pure_component {
     logs_metric_opts = [
         {key: 'requests', value: 'requests'},
         {key: 'megabytes', value: 'megabytes'},
+    ];
+    // XXX krzysztof: support list of simple values
+    // XXX krzysztof: import log levels
+    log_level_opts = [
+        {key: 'error', value: 'error'},
+        {key: 'warn', value: 'warn'},
+        {key: 'notice', value: 'notice'},
+        {key: 'info', value: 'info'},
+        {key: 'debug', value: 'debug'},
     ];
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
@@ -81,7 +91,7 @@ class Form extends Pure_component {
         this.setState(prev=>({settings: {...prev.settings, logs: +val}}),
             this.debounced_save);
     };
-    log_changed = val=>{
+    log_level_changed = val=>{
         this.setState(prev=>({settings: {...prev.settings, log: val}}),
             this.debounced_save);
     };
@@ -152,6 +162,10 @@ class Form extends Pure_component {
                 data={[0, 100, 1000, 10000]}
                 label="Limit for request logs" default
                 tooltip={tooltips.logs}/>
+              <Labeled_controller val={s.log}
+                type="select" on_change_wrapper={this.log_level_changed}
+                data={this.log_level_opts}
+                label="Log level" tooltip={tooltips.log_level}/>
               <Loader_small show={this.state.saving}/>
             </div>;
     }

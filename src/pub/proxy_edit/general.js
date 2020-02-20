@@ -121,7 +121,6 @@ export default class General extends Pure_component {
                 }
                 <Config type="yes_no" id="multiply_users"
                   on_change={this.multiply_users_changed} note={note_users}/>
-                {false && <Config type="select_number" id="bw_limit"/>}
                 <Config type="select" id="iface"
                   data={this.state.proxy.iface.values}/>
                 <Config type="pins" id="smtp" exact no_any/>

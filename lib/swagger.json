@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.172.386",
+        "version": "1.172.589",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -1271,11 +1271,6 @@
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
                 },
-                "log": {
-                    "type": "string",
-                    "pattern": "^(error|warn|notice|info|debug)?$",
-                    "description": "Log level"
-                },
                 "request_stats": {
                         "type": "boolean",
                         "description": "Enable requests statistics"
@@ -1381,6 +1376,11 @@
                     "type": "string",
                     "description": "Url for testing proxy"
                 },
+                "log": {
+                    "type": "string",
+                    "pattern": "^(error|warn|notice|info|debug)?$",
+                    "description": "Log level"
+                },
                 "logs": {
                     "type": "boolean",
                     "description": "Enable logs for all proxies"
@@ -1417,11 +1417,6 @@
                 "port": {
                     "type": "integer",
                     "description": "Port for the HTTP proxy"
-                },
-                "log": {
-                    "type": "string",
-                    "pattern": "^(error|warn|notice|info|debug)?$",
-                    "description": "Log level"
                 },
                 "proxy_type": {
                      "type": "string",

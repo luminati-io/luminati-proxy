@@ -398,15 +398,6 @@ const columns = [
         width: 90,
     },
     {
-        key: 'bw_limit',
-        title: 'BW Limit',
-        render: ({proxy})=>Tooltip_bytes(
-            {bytes: proxy.bw_limit*1000*1000*1000}),
-        calc_show: (proxies, master)=>master && master.bw_limit,
-        ext: true,
-        width: 90,
-    },
-    {
         key: 'reqs',
         title: 'Requests',
         render: Reqs_cell,

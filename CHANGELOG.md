@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.172.589 Stable
+- :bug: Add an option to set log level in the UI
+
 ## 1.172.386 Stable
 - :bug: Fix bug when pool might not be used after restart
 

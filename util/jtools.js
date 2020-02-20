@@ -212,6 +212,8 @@ E.split_debug_flags = opt=>{
         case '--allow-natives-syntax':
         case '--http-parser':
         case '--tls-max-v1.2':
+        case '--tls-min-v1.1':
+        case '--tls-min-v1.0':
         case '--expose-internals':
         case '--inspect':
         case '--inspect-brk':
