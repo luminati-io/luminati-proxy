@@ -1,7 +1,8 @@
 Luminati Proxy manager - Change Log
 
-## 1.172.589 Stable
+## 1.172.674 Stable
 - :bug: Add an option to set log level in the UI
+- :bug: Fixed installation script for CentOS
 
 ## 1.172.386 Stable
 - :bug: Fix bug when pool might not be used after restart

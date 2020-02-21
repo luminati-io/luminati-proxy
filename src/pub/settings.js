@@ -45,15 +45,7 @@ class Form extends Pure_component {
         {key: 'requests', value: 'requests'},
         {key: 'megabytes', value: 'megabytes'},
     ];
-    // XXX krzysztof: support list of simple values
-    // XXX krzysztof: import log levels
-    log_level_opts = [
-        {key: 'error', value: 'error'},
-        {key: 'warn', value: 'warn'},
-        {key: 'notice', value: 'notice'},
-        {key: 'info', value: 'info'},
-        {key: 'debug', value: 'debug'},
-    ];
+    log_level_opts = ['error', 'warn', 'notice', 'info', 'debug'];
     componentDidMount(){
         this.setdb_on('head.settings', settings=>{
             if (!settings)

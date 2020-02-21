@@ -91,5 +91,12 @@ conf.manager_default = Object
     read_only: false,
     cloud: true,
 });
+conf.log_levels = {
+    error: 0,
+    warn: 1,
+    notice: 2,
+    info: 3,
+    debug: 4,
+};
 
 Object.assign(module.exports, conf);

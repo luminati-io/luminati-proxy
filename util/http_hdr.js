@@ -2,11 +2,7 @@
 'use strict'; /*jslint node:true*/
 require('./config.js');
 const _ = require('lodash');
-const string = require('./string.js');
-const {qw} = string;
-const HTTPParser = process.binding('http_parser').HTTPParser;
-const semver = require('semver');
-const node_v12 = semver.gte(process.version, '12.0.0');
+const string = require('./string.js'), {qw} = string;
 const E = exports, assign = Object.assign;
 
 const special_case_words = {
@@ -369,33 +365,6 @@ E.like_browser_case_and_order_http2 = function(headers, browser, opt){
            ordered_headers[h] = req_headers[h];
     }
     return reverse_http2_pseudo_headers_order(ordered_headers);
-};
-
-let parser = new HTTPParser(HTTPParser.REQUEST), parser_usages = 0;
-E.parse_request = buffer=>{
-    let ret;
-    parser[HTTPParser.kOnHeadersComplete] =
-        (version_major, version_minor, raw_headers, method, url, status_code,
-        status_message, upgrade, should_keep_alive)=>
-        ret = {version_major, version_minor, raw_headers, method, url,
-            upgrade, should_keep_alive};
-    if (node_v12)
-        parser.initialize(HTTPParser.REQUEST, {});
-    else
-    {
-        parser.reinitialize(HTTPParser.REQUEST, !!parser_usages);
-        parser_usages++;
-    }
-    let exec_res = parser.execute(buffer);
-    if (exec_res instanceof Error)
-        throw exec_res;
-    if (!ret)
-        return;
-    // ugly, not 100% accurate, but fast!
-    ret.headers = {};
-    for (let i=0; i<ret.raw_headers.length; i+=2)
-        ret.headers[ret.raw_headers[i].toLowerCase()] = ret.raw_headers[i+1];
-    return ret;
 };
 
 E.to_raw_headers = function(headers){

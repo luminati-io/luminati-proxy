@@ -7,7 +7,7 @@ if [ $(id -u) = 0 ]; then
     IS_ROOT=1
 fi
 LUM=0
-VERSION="1.172.589"
+VERSION="1.172.674"
 if [ -f  "/usr/local/hola/zon_config.sh" ]; then
     LUM=1
 fi
@@ -457,6 +457,13 @@ install_nave_node()
     fi
 }
 
+install_node_yum()
+{
+    echo "installing nodejs from yum"
+    perr "install_yum_node"
+    sudo_cmd "yum install nodejs -y"
+}
+
 install_nvm_node()
 {
     echo "installing nvm node $NODE_VER..."
@@ -467,7 +474,11 @@ install_nvm_node()
 
 install_node()
 {
-    install_nave_node
+    if is_cmd_defined "yum" ; then
+        install_node_yum
+    else
+        install_nave_node
+    fi
 }
 
 install_npm()

@@ -1,11 +1,15 @@
 [
     {
-        "ver": "1.172.589",
+        "ver": "1.172.674",
         "type": "stable",
         "changes": [
             {
                 "type": "bug",
                 "text": "Add an option to set log level in the UI"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed installation script for CentOS"
             }
         ]
     },
