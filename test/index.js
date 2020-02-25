@@ -74,6 +74,7 @@ describe('proxy', ()=>{
         l.session_mgr._request_session({}, {init: true});
         l.history = [];
         l.on('usage', data=>l.history.push(data));
+        l.on('usage_abort', data=>l.history.push(data));
         return l;
     });
     let l, waiting;
@@ -110,6 +111,7 @@ describe('proxy', ()=>{
         proxy.connection = null;
         proxy.history = [];
         proxy.full_history = [];
+        smtp.silent = false;
         waiting = [];
         ping.history = [];
     });
@@ -1609,28 +1611,48 @@ describe('proxy', ()=>{
     describe('smtp rules', function(){
         const t = (name, config, opt)=>it(name, etask._fn(function*(_this){
             opt = opt||{};
+            smtp.silent = !!opt.silent_timeout;
             proxy.fake = false;
             l = yield lum(Object.assign({history: true}, config));
             let socket = net.connect(24000, '127.0.0.1');
-            socket.on('connect', ()=>opt.abort && socket.destroy());
+            socket.on('connect', ()=>{
+                if (opt.abort)
+                    socket.end();
+                if (opt.silent_timeout)
+                    setTimeout(()=>socket.end(), 20);
+            });
             socket.on('data', ()=>{
                 if (opt.close)
                     socket.end('QUIT');
                 if (opt.smtp_close)
                     smtp.last_connection.end();
             });
+            l.on('retry', _opt=>{
+                l.lpm_request(_opt.req, _opt.res, _opt.head);
+                l.once('response', _opt.post);
+            });
             l.on('usage', ()=>this.continue());
+            l.on('usage_abort', ()=>this.continue());
             yield this.wait();
+            assert.equal(_.get(l, 'history.0.status_code'), 200);
             assert.equal(_.get(l, 'history.0.rules.length'), 1);
         }));
-        let config = {
-            rules: [{action: {ban_ip: 0}, action_type: 'ban_ip',
-                body: '220', trigger_type: 'body'}],
-            smtp: ['127.0.0.1:'+TEST_SMTP_PORT]};
-        t('rules is triggered regular req', config, {close: true});
-        // XXX viktor: no history entry at all (no 'usage' event)
-        // t('rules is triggered on abort', config, {abort: true});
-        t('rules is triggered when server ends connection', config,
-            {smtp_close: true});
+        let config = {smtp: ['127.0.0.1:'+TEST_SMTP_PORT]};
+        let rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
+            body: '220', trigger_type: 'body'}];
+        t('rules is triggered regular req',
+            _.assign({}, config, {rules}), {close: true});
+        t('rules is triggered when server ends connection',
+            _.assign({}, config, {rules}), {smtp_close: true});
+        // XXX viktor: fix code for test to pass
+        // rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
+        //     body: '^$', trigger_type: 'body'}];
+        // t('rules is triggered on abort',
+        //     _.assign({}, config, {rules}), {abort: true});
+        // XXX viktor: fix code for test to pass
+        // rules = [{action: {retry: 2}, action_type: 'retry',
+        //     body: '^$', trigger_type: 'body'}];
+        // t('retry rule on timeout',
+        //     _.assign({}, config, {rules}), {silent_timeout: true});
     });
 });

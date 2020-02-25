@@ -57,7 +57,12 @@ E.handle_signal = (sig, err)=>{
 const add_alias_for_whitelist_ips = ()=>{
     const func =
         `curl_add_ip(){\n`+
-        `    ENDPOINT="http://127.0.0.1:22999/api/add_whitelist_ip"\n`+
+        `    if (($2)); then\n`+
+        `        PORT=$2\n`+
+        `    else\n`+
+        `        PORT=22999\n`+
+        `    fi\n`+
+        `    ENDPOINT="http://127.0.0.1:$PORT/api/add_whitelist_ip"\n`+
         `    DATA="ip="$1\n`+
         `    curl $ENDPOINT -X POST -d $DATA\n`+
         `}`;

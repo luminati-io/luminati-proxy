@@ -26,7 +26,6 @@ import Enable_ssl_modal from './common/ssl_modal.js';
 import Api_url_modal from './common/api_url_modal.js';
 import Error_boundry from './common/error_boundry.js';
 import {Modal} from './common/modals.js';
-import ws from './ws.js';
 import {report_exception} from './util.js';
 
 window.setdb = setdb;
@@ -101,7 +100,6 @@ const App = withRouter(class App extends Pure_component {
         this.etask(function*(){
             const defaults = yield ajax.json({url: '/api/defaults'});
             setdb.set('head.defaults', defaults);
-            ws.set_location(window.location, defaults.www);
         });
         this.etask(function*(){
             const node = yield ajax.json({url: '/api/node_version'});

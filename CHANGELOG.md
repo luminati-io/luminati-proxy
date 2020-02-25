@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.173.48 Stable
+- :bug: Fixed websocket on non-standard ports
+
 ## 1.172.674 Stable
 - :bug: Add an option to set log level in the UI
 - :bug: Fixed installation script for CentOS

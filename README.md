@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.172.674/luminati-proxy-manager-v1.172.674-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.173.48/luminati-proxy-manager-v1.173.48-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install

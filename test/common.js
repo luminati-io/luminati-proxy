@@ -152,7 +152,8 @@ E.http_proxy = port=>etask(function*(){
 E.smtp_test_server = port=>etask(function*(){
     let smtp = net.createServer(socket=>{
         smtp.last_connection = socket;
-        socket.write('220 smtp-tester ESMTP is glad to see you!\n');
+        if (!smtp.silent)
+            socket.write('220 smtp-tester ESMTP is glad to see you!\n');
         socket.on('data', chunk=>{
             switch (chunk.toString())
             {

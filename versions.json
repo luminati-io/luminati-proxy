@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.173.48",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed websocket on non-standard ports"
+            }
+        ]
+    },
+    {
         "ver": "1.172.674",
         "type": "stable",
         "changes": [

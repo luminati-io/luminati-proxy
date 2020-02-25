@@ -5,13 +5,25 @@ import classnames from 'classnames';
 import Pure_component from '/www/util/pub/pure_component.js';
 import {Logo, Code, with_www_api} from './common.js';
 import {Instructions, Li} from './common/bullets.js';
+import ws from './ws.js';
 import './css/whitelist_ips.less';
 
 export default class Whitelist_ips extends Pure_component {
     state = {};
     componentDidMount(){
         this.setdb_on('head.blocked_ip', ip=>this.setState({ip}));
+        ws.addEventListener('message', this.on_message);
     }
+    willUnmount(){
+        ws.removeEventListener('message', this.on_message);
+    }
+    on_message = event=>{
+        const json = JSON.parse(event.data);
+        if (json.type!='whitelisted')
+            return;
+        if (this.state.ip==json.data)
+            window.location.reload();
+    };
     render(){
         return <div className="whitelist_ips">
               <Logo/>
@@ -20,21 +32,26 @@ export default class Whitelist_ips extends Pure_component {
     }
 }
 
-const Admin_steps = ({ip})=>
-    <div className="steps">
-      <h3>How to whitelist your IP?</h3>
-      <Instructions>
-        <Li>
-          Connect to the server where the Proxy Manager is
-          running (using SSH).
-        </Li>
-        <Li>
-          In your remote server's terminal, run:
-          <Code>lpm_whitelist_ip {ip}</Code>
-        </Li>
-        <Li>Reload this page. Your IP should already be whitelisted.</Li>
-      </Instructions>
-    </div>;
+const Admin_steps = ({ip})=>{
+    const port = location.origin.split(':').slice(-1)[0]||80;
+    let cmd = `lpm_whitelist_ip ${ip}`;
+    if (port!=22999)
+        cmd += ' '+port;
+    return <div className="steps">
+          <h3>How to whitelist your IP?</h3>
+          <Instructions>
+            <Li>
+              Connect to the server where the Proxy Manager is
+              running (using SSH).
+            </Li>
+            <Li>
+              In your remote server's terminal, run:
+              <Code>{cmd}</Code>
+            </Li>
+            <Li>Reload this page. Your IP should already be whitelisted.</Li>
+          </Instructions>
+        </div>;
+};
 
 const Guest_steps = ({ip})=>
     <div className="steps">
