@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.173.180 Stable
+- :bug: Fixed state permission
+
 ## 1.173.48 Stable
 - :bug: Fixed websocket on non-standard ports
 

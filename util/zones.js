@@ -7,11 +7,8 @@ E.get_perm = zone=>{
     if (!plan || !plan.type)
         return zone.perm;
     const perm = {
-        full: 'country state city g1 cid ip asn carrier pass_ip mobile '+
-            'port_all port_whois',
         city: 'country state city vip',
         asn: 'country state asn carrier vip',
-        g1: 'country g1 vip',
         static: 'country ip route_all route_dedicated',
         mobile: 'country mobile asn carrier state city vip',
     };
@@ -30,6 +27,8 @@ E.get_perm = zone=>{
         res += ' vip_all';
     if (plan.google_search)
         res += ' google_search';
+    if (plan.state)
+        res += ' state';
     return res;
 };
 
