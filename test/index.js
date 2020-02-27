@@ -268,37 +268,12 @@ describe('proxy', ()=>{
             }));
         });
         describe('pool', ()=>{
-            describe('idle_pool', ()=>{
-                it('should idle', etask._fn(function*(_this){
-                    l = yield lum({pool_size: 1, idle_pool: 500,
-                        keep_alive: 0.2});
-                    yield etask.sleep(900);
-                    assert.equal(proxy.full_history.length, 3);
-                }));
-                it('should call reset idle pool on each connection', etask._fn(
-                function*(_this){
-                    l = yield lum({pool_size: 1});
-                    const spy = sinon.spy(l.session_mgr, 'reset_idle_pool');
-                    yield l.test({fake: 1});
-                    sinon.assert.calledOnce(spy);
-                }));
-                it('should set idle time correctly', etask._fn(
-                function*(_this){
-                    l = yield lum({pool_size: 1});
-                    let offset = l.session_mgr.idle_date-Date.now();
-                    assert.ok(Math.abs(offset-ms.HOUR)<100);
-                    yield etask.sleep(500);
-                    yield l.test({fake: 1});
-                    offset = l.session_mgr.idle_date-Date.now();
-                    assert.ok(Math.abs(offset-ms.HOUR)<100);
-                }));
-            });
             describe('pool_size', ()=>{
                 const t = pool_size=>it(''+pool_size, ()=>etask(function*(){
-                    l = yield lum({pool_size, preset: 'long_availability'});
+                    l = yield lum({pool_size});
                     yield l.test({fake: 1});
                     assert.equal(proxy.history.length, 0);
-                    assert.equal(proxy.full_history.length, pool_size);
+                    assert.equal(proxy.full_history.length, 0);
                     assert.equal(l.session_mgr.sessions.sessions.length,
                         pool_size);
                     const sessions = {};
@@ -361,25 +336,6 @@ describe('proxy', ()=>{
                     const s2 = yield test_call();
                     assert.notEqual(s1, s2);
                 }));
-            });
-            describe('keep_alive', ()=>{
-                const assert_keep_alive = num=>assert.equal(
-                    proxy.full_history.length-proxy.history.length, num);
-                const t = (name, opt, ex)=>it(name, etask._fn(function*(_this){
-                    l = yield lum(Object.assign({keep_alive: 0.15}, opt));
-                    yield etask.sleep(50);
-                    assert.equal(proxy.history.length, 0);
-                    assert_keep_alive(ex[0]);
-                    yield l.test();
-                    assert.equal(proxy.history.length, 1);
-                    assert_keep_alive(ex[1]);
-                    yield etask.sleep(0.25*ms.SEC);
-                    assert.equal(proxy.history.length, 1);
-                    assert_keep_alive(ex[2]);
-                }));
-                t('pool', {pool_size: 1}, [1, 1, 2]);
-                t('sticky_ip', {sticky_ip: true}, [0, 0, 1]);
-                t('session explicit', {session: 'test'}, [1, 1, 2]);
             });
             describe('session_duration', ()=>{
                 describe('change after specified timeout', ()=>{
@@ -597,17 +553,6 @@ describe('proxy', ()=>{
                 super_proxy: null,
                 content_size: 0,
             }), pre_rule('null_response'));
-            it('pool', etask._fn(function*(_this){
-                l = yield lum({pool_size: 1, keep_alive: 0.3});
-                yield l.test();
-                yield etask.sleep(400);
-                assert_has(l.history, [
-                    {context: 'SESSION KEEP ALIVE'},
-                    {context: 'RESPONSE'},
-                    {context: 'SESSION KEEP ALIVE'},
-                ]);
-                assert.equal(l.history.length, 3);
-            }));
         });
         describe('whitelist', ()=>{
             it('http', etask._fn(function*(){
@@ -1171,7 +1116,6 @@ describe('proxy', ()=>{
                 ()=>etask(function*(){
                     const ips = ['2.3.4.5'];
                     l = yield lum({
-                        keep_alive: 0,
                         rules: [{
                             action: {reserve_session: true},
                             action_type: 'save_to_pool',
@@ -1191,7 +1135,6 @@ describe('proxy', ()=>{
                 ()=>etask(function*(){
                     const ips = ['2.3.4.5', '3.4.5.6'];
                     l = yield lum({
-                        keep_alive: 0,
                         rules: [{
                             action: {reserve_session: true},
                             action_type: 'save_to_pool',
@@ -1208,7 +1151,6 @@ describe('proxy', ()=>{
                 }));
                 it('removes from pool on ban', ()=>etask(function*(){
                     l = yield lum({
-                        keep_alive: 0,
                         rules: [{
                             action_type: 'ban_ip',
                             status: '200',
@@ -1226,7 +1168,6 @@ describe('proxy', ()=>{
                 }));
                 it('does not replace session on remove', ()=>etask(function*(){
                     l = yield lum({
-                        keep_alive: 0,
                         rules: [{
                             action_type: 'ban_ip',
                             status: '200',
@@ -1528,23 +1469,6 @@ describe('proxy', ()=>{
                 }));
             });
         });
-    });
-    xdescribe('long_availability', ()=>{
-        it('should keep the number of sessions', etask._fn(function*(_this){
-            _this.timeout(6000);
-            l = yield lum({preset: 'long_availability', pool_size: 10});
-            yield l.test();
-            assert.equal(l.session_mgr.sessions.sessions.length, 10);
-            const initial_sessions = l.session_mgr.sessions.sessions;
-            assert.ok(initial_sessions[0].session.endsWith('1'));
-            assert.ok(initial_sessions[9].session.endsWith('10'));
-            l.session_mgr.send_info_request = ()=>null;
-            yield etask.sleep(1500);
-            const new_sessions = l.session_mgr.sessions.sessions;
-            assert.equal(new_sessions.length, 10);
-            assert.ok(new_sessions[0].session.endsWith('11'));
-            assert.ok(new_sessions[9].session.endsWith('20'));
-        }));
     });
     describe('gather and consume', ()=>{
         it('should not add duplicated sessions', etask._fn(function*(_this){

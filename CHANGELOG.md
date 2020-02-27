@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.173.424 Stable
+- :star: Performance optimizations
+
 ## 1.173.180 Stable
 - :bug: Fixed state permission
 

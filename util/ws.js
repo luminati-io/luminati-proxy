@@ -402,13 +402,10 @@ class WS extends events.EventEmitter {
         this.abort(1002, 'Idle timeout');
     }
     _update_idle(){
-        this.idle_since = Date.now();
-        if (this.idle_timeout)
-        {
-            clearTimeout(this.idle_timer);
-            this.idle_timer = setTimeout(this._idle.bind(this),
-                this.idle_timeout);
-        }
+        if (!this.idle_timeout)
+            return;
+        clearTimeout(this.idle_timer);
+        this.idle_timer = setTimeout(this._idle.bind(this), this.idle_timeout);
     }
     close(code, reason){
         if (!this.ws)

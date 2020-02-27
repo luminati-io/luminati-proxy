@@ -1529,6 +1529,9 @@ E._class = function(cls){
     for (var i=0; i<keys.length; i++)
     {
         var key = keys[i];
+        var descr = Object.getOwnPropertyDescriptor(proto, key);
+        if (descr.get||descr.set)
+            continue;
         var p = proto[key];
         if (p && p.constructor && p.constructor.name=='GeneratorFunction')
             proto[key] = E._fn(p);

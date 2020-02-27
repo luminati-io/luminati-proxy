@@ -40,8 +40,7 @@ export default class Rotation extends Pure_component {
         if (!form)
             return null;
         const type = this.get_type();
-        const render_modal = ['ips', 'vips'].includes(type) &&
-            form.preset!='long_availability';
+        const render_modal = ['ips', 'vips'].includes(type);
         let pool_size_note;
         if (!this.state.disabled_fields.pool_size && render_modal)
         {
