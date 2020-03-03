@@ -795,9 +795,10 @@ class IPC_client {
                 +`unexpected IPC cookie ${msg.cookie}`);
         }
         if (msg.type=='ipc_result')
-            task.continue({value: msg.msg});
-        else
-            task.throw(new Error(msg.msg));
+            return void task.continue({value: msg.msg});
+        let err = new Error(msg.msg);
+        err._ws = ''+this._ws;
+        task.throw(err);
     }
     _on_status(status){
         for (let task of this._pending.values())

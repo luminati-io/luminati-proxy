@@ -187,10 +187,10 @@ describe('manager', ()=>{
             const mgr = new Manager(lpm_util.init_args(_args));
             assert.deepEqual(expected, mgr.get_params());
         }));
-        const def = '--cluster --throttle 2';
-        t('default', qw(def), ['--cluster', true, '--throttle', 2]);
+        const def = '--throttle 2';
+        t('default', qw(def), ['--throttle', 2]);
         t('credentials', qw`${def} --customer test_user --password abcdefgh`,
-            ['--cluster', true, '--throttle', 2]);
+            ['--throttle', 2]);
         t('credentials with no-config',
             qw`--no-config --customer usr --password abc --token t --zone z`,
             qw`--no-config --customer usr --password abc --token t --zone z`);
@@ -731,6 +731,20 @@ describe('manager', ()=>{
         t('should not save default/cmd whitelist', def, [def], ['7.8.9.10']);
         t('should rm from port after rm from default/cmd whitelist', def,
             [def, def.slice(1)], ['7.8.9.10']);
+    });
+    describe('pool ips', ()=>{
+        let t = (name, proxies, expected)=>it(name, etask._fn(function*(_this){
+            _this.timeout(6000);
+            app = yield app_with_proxies(proxies);
+            let data = {port: 24000, ip: '1.1.1.1'};
+            app.manager.proxy_ports[24000].emit('add_static_ip', data);
+            sinon.assert.match(app.manager.proxies,
+                [sinon.match(expected)]);
+        }));
+        t('add ip', [{port: 24000, pool_size: 1}],
+            {port: 24000, ips: ['1.1.1.1']});
+        t('overloading', [{port: 24000, pool_size: 1, ips: ['2.2.2.2']}],
+            {port: 24000, ips: ['2.2.2.2']});
     });
     xdescribe('migrating', ()=>{
         beforeEach(()=>{

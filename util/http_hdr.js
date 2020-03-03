@@ -332,7 +332,7 @@ E.browser_default_header_order_http2 = function(browser, opt){
 // reverse pseudo headers (e.g. :method) because nodejs reverse it
 // before send to server
 // https://github.com/nodejs/node/blob/v12.x/lib/internal/http2/util.js#L473
-function reverse_http2_pseudo_headers_order(headers){
+E.reverse_http2_pseudo_headers_order = headers=>{
   let pseudo = {};
   let other = Object.keys(headers).reduce((r, h)=>{
       if (h[0]==':')
@@ -344,7 +344,7 @@ function reverse_http2_pseudo_headers_order(headers){
   pseudo = Object.keys(pseudo).reverse()
       .reduce((r, h)=>{ r[h] = pseudo[h]; return r; }, {});
   return Object.assign(pseudo, other);
-}
+};
 
 E.like_browser_case_and_order_http2 = function(headers, browser, opt){
     let ordered_headers = {};
@@ -364,7 +364,7 @@ E.like_browser_case_and_order_http2 = function(headers, browser, opt){
         if (!header_keys.includes(h))
            ordered_headers[h] = req_headers[h];
     }
-    return reverse_http2_pseudo_headers_order(ordered_headers);
+    return E.reverse_http2_pseudo_headers_order(ordered_headers);
 };
 
 E.to_raw_headers = function(headers){

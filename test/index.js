@@ -478,10 +478,9 @@ describe('proxy', ()=>{
                 yield l.session_mgr.refresh_sessions();
                 yield test_session(after);
             }));
-            t1('pool', {pool_size: 1}, /24000_[0-9a-f]+_1/,
-                /24000_[0-9a-f]+_2/);
-            t1('sticky_ip', {sticky_ip: true},
-                /24000_127_0_0_1_[0-9a-f]+_1/, /24000_127_0_0_1_[0-9a-f]+_2/);
+            t1('pool', {pool_size: 1}, /24000_1/, /24000_2/);
+            t1('sticky_ip', {sticky_ip: true}, /24000_127_0_0_1_1/,
+                /24000_127_0_0_1_2/);
             it('default', ()=>etask(function*(){
                 // XXX krzysztof: should it refresh all the sessions or one?
                 l = yield lum({pool_size: 3});
@@ -1533,7 +1532,9 @@ describe('proxy', ()=>{
         });
     });
     describe('smtp rules', function(){
-        const t = (name, config, opt)=>it(name, etask._fn(function*(_this){
+        const t = (name, config, expected_status, expected_rules, opt)=>
+            it(name, etask._fn(
+        function*(_this){
             opt = opt||{};
             smtp.silent = !!opt.silent_timeout;
             proxy.fake = false;
@@ -1558,25 +1559,25 @@ describe('proxy', ()=>{
             l.on('usage', ()=>this.continue());
             l.on('usage_abort', ()=>this.continue());
             yield this.wait();
-            assert.equal(_.get(l, 'history.0.status_code'), 200);
-            assert.equal(_.get(l, 'history.0.rules.length'), 1);
+            assert.equal(_.get(l, 'history.0.status_code'), expected_status);
+            assert.equal(_.get(l, 'history.0.rules.length'), expected_rules);
         }));
         let config = {smtp: ['127.0.0.1:'+TEST_SMTP_PORT]};
         let rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
             body: '220', trigger_type: 'body'}];
         t('rules is triggered regular req',
-            _.assign({}, config, {rules}), {close: true});
+            _.assign({}, config, {rules}), 200, 1, {close: true});
         t('rules is triggered when server ends connection',
-            _.assign({}, config, {rules}), {smtp_close: true});
+            _.assign({}, config, {rules}), 200, 1, {smtp_close: true});
         // XXX viktor: fix code for test to pass
         // rules = [{action: {ban_ip: 0}, action_type: 'ban_ip',
         //     body: '^$', trigger_type: 'body'}];
         // t('rules is triggered on abort',
-        //     _.assign({}, config, {rules}), {abort: true});
+        //     _.assign({}, config, {rules}), 'canceled', 0, {abort: true});
         // XXX viktor: fix code for test to pass
         // rules = [{action: {retry: 2}, action_type: 'retry',
         //     body: '^$', trigger_type: 'body'}];
-        // t('retry rule on timeout',
-        //     _.assign({}, config, {rules}), {silent_timeout: true});
+        // t('retry rule on timeout', _.assign({}, config, {rules}),
+        //     'canceled', 1, {silent_timeout: true});
     });
 });

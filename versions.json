@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.173.820",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Running LPM on all the CPUs for all the presets"
+            },
+            {
+                "type": "bug",
+                "text": "Fix bug when parallel requests might cause pool overloading"
+            }
+        ]
+    },
+    {
         "ver": "1.173.424",
         "type": "stable",
         "changes": [
