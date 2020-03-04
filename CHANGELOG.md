@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.173.955 Stable
+- :star: Show IPs refresh cost in pool IPs popup
+
 ## 1.173.820 Stable
 - :star: Running LPM on all the CPUs for all the presets
 - :bug: Fix bug when parallel requests might cause pool overloading

@@ -2164,7 +2164,7 @@
   "Now you can open your browser and go to: \"[Server IP]:22999\"": "Ahora puede abrir su navegador y vaya a: \"[IP de servidor]: 22999\"",
   "Click \"Save\" to confirm the email": "Haga clic en \"Guardar\" para confirmar el correo electrónico",
   "Currently we have no peers in the region you requested": "Actualmente no tenemos peers de la región que ha solicitado",
-  "Suspending/reactivating my account": "Suspender / reactivar mi cuenta",
+  "Suspending / reactivating my account": "Suspender / reactivar mi cuenta",
   "Which services are supported?": "¿Qué servicios son compatibles?",
   "Authorization type: IPv4 address segment access": "Tipo de autorización: IPv4 acceso segmento de dirección",
   "Failed with captcha response (403/redirect to captcha) after several retries": "Error con la respuesta código de imagen (403 / redirigir a código de imagen) después de varios reintentos",

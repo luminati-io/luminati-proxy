@@ -9,19 +9,27 @@ import zurl from '../../../util/url.js';
 import {Modal} from '../common/modals.js';
 import {report_exception} from '../util.js';
 import {Infinite_chrome_table} from '../chrome_widgets.js';
+import conv from '../../../util/conv.js';
 
 export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     state = {
         available_list: [],
         selected_all: false,
+        refresh_cost: 0,
     };
     componentDidMount(){
-        this.setdb_on('head.proxy_edit.zone_name', ()=>
-            this.setState({available_list: []}));
+        this.setdb_on('head.proxy_edit.zone_name', ()=>{
+            this.setState({available_list: []});
+        });
         this.setdb_on('head.proxies_running', proxies=>
             proxies && this.setState({proxies}));
         $('#allocated_ips').on('show.bs.modal', this.load);
+        this.load_refresh_cost();
+    }
+    componentDidUpdate(prevProps){
+        if (prevProps.zone!=this.props.zone)
+            this.load_refresh_cost();
     }
     static getDerivedStateFromProps(props, state){
         if (!state.available_list.length)
@@ -229,19 +237,33 @@ export default class Alloc_modal extends Pure_component {
     cols = [
         {id: 'ip', title: 'IP'},
     ];
+    load_refresh_cost(){
+        if (!this.props.zone || !this.is_refresh_enabled())
+            return;
+        const _this = this;
+        this.etask(function*(){
+            const response = yield ajax.json({url: '/api/refresh_cost',
+                qs: {zone: _this.props.zone}});
+            _this.setState({refresh_cost: response.cost});
+        });
+    }
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';
         const title = 'Select the '+type_label+' ('+this.props.zone+')';
         const refresh_enabled = this.is_refresh_enabled();
+        const selected_list = this.props.form[this.props.type]||[];
+        const refresh_cost = selected_list.length*this.state.refresh_cost;
         const Footer = <div className="default_footer">
               {refresh_enabled &&
-                <button onClick={this.refresh_chosen}
-                  className="btn btn_lpm">Refresh</button>
+                <button onClick={this.refresh_chosen} className="btn btn_lpm"
+                  disabled={!selected_list.length}>
+                  Refresh
+                  {refresh_cost>0 && ` (${conv.fmt_currency(refresh_cost)})`}
+                </button>
               }
               <button onClick={this.close}
                 className="btn btn_lpm btn_lpm_primary">OK</button>
             </div>;
-        const selected_list = this.props.form[this.props.type]||[];
         const sub_title = `IPs: ${selected_list.length}/`
         +`${this.props.form.pool_size} out of`
         +` ${this.state.available_list.length} available`;
