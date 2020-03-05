@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.174.267 Stable
+- :star: Updated User-Agent in the headers randomization
+
 ## 1.174.208 Stable
 - :bug: Filter out wrong IPs from config
 - :bug: Add decoding fallback for pages wrongly encoded with raw deflate

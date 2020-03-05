@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.174.267",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Updated User-Agent in the headers randomization"
+            }
+        ]
+    },
+    {
         "ver": "1.174.208",
         "type": "stable",
         "changes": [

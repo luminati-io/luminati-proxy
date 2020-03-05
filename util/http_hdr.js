@@ -52,7 +52,8 @@ E.restore_case = function(headers, original_raw){
     return res;
 };
 
-
+// default header values
+// XXX andreish/dmitriie: merge with rules_orders
 const rules_headers = [
     {match: {browser: 'chrome'},
         rules: {
@@ -69,7 +70,6 @@ const rules_headers = [
         }},
     {match: {browser: 'chrome', https: true, version_min: 76},
         rules: {
-            'sec-fetch-dest': 'document',
             'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
@@ -78,6 +78,8 @@ const rules_headers = [
         rules: {
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
         }},
+    {match: {browser: 'chrome', https: true, version_min: 80},
+        rules: {'sec-fetch-dest': 'document'}},
     {match: {browser: 'mobile_chrome'},
         rules: {
             'user-agent': 'Mozilla/5.0 (Linux; Android 9; MBOX) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
@@ -145,7 +147,6 @@ const rules_headers = [
         }},
 ];
 
-// default header values
 // XXX josh: upgrade-insecure-requests might not be needed on 2nd request
 // onwards
 E.browser_defaults = function(browser, opt){
@@ -221,10 +222,20 @@ const rules_orders = [
             upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
+    {match: {browser: 'chrome', version_min: 80},
+        rules: {order: qw`host connection pragma cache-control origin
+            upgrade-insecure-requests user-agent sec-fetch-dest accept
+            sec-fetch-site sec-fetch-mode sec-fetch-user referer
+            accept-encoding accept-language cookie`}},
     {match: {browser: 'chrome', version_min: 78, type: 'xhr'},
         rules: {order: qw`host connection pragma cache-control accept
             x-requested-with user-agent content-type sec-fetch-site
             sec-fetch-mode referer accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', version_min: 80, type: 'xhr'},
+        rules: {order: qw`host connection pragma cache-control accept
+            sec-fetch-dest x-requested-with user-agent content-type
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
     {match: {browser: 'mobile_chrome'},
         rules: {order: qw`host connection pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
@@ -264,15 +275,20 @@ const rules_orders = [
             origin upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 78, type: 'xhr'},
+        rules: {order: qw`:method :authority :scheme :path pragma
+            cache-control accept x-requested-with user-agent content-type
+            sec-fetch-site sec-fetch-mode referer accept-encoding
+            accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 80},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             origin upgrade-insecure-requests user-agent sec-fetch-dest accept
             sec-fetch-site sec-fetch-mode sec-fetch-user referer
             accept-encoding accept-language cookie`}},
-    {match: {browser: '', http2: true, version_min: 78, type: 'xhr'},
-        rules: {order: qw`:method :authority :scheme :path pragma
-            cache-control accept x-requested-with user-agent content-type
-            sec-fetch-site sec-fetch-mode referer accept-encoding
+    {match: {browser: 'chrome', http2: true, version_min: 80, type: 'xhr'},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length accept sec-fetch-dest x-requested-with user-agent
+            origin sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
     {match: {browser: 'mobile_chrome', http2: true},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control

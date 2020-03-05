@@ -739,13 +739,13 @@ describe('proxy', ()=>{
             ()=>etask(function*(){
                 l = yield lum({user_agent: 'random_desktop'});
                 const r = yield l.test();
-                assert.ok(r.body.headers['user-agent'].includes('Macintosh'));
+                assert.ok(r.body.headers['user-agent'].includes('Windows NT'));
             }));
             it('should use random mobile User-Agent header',
             ()=>etask(function*(){
                 l = yield lum({user_agent: 'random_mobile'});
                 const r = yield l.test();
-                assert.ok(r.body.headers['user-agent'].includes('Android'));
+                assert.ok(r.body.headers['user-agent'].includes('iPhone'));
             }));
         });
         describe('proxy_connection_type', ()=>{
