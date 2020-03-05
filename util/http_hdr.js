@@ -52,96 +52,111 @@ E.restore_case = function(headers, original_raw){
     return res;
 };
 
-// default header values
-// XXX josh: upgrade-insecure-requests might not be needed on 2nd request
-// onwards
-E.browser_defaults = function(browser, opt){
-    opt = opt||{};
-    let defs = {
-        chrome: {
+
+const rules_headers = [
+    {match: {browser: 'chrome'},
+        rules: {
             connection: 'keep-alive',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'upgrade-insecure-requests': '1',
             'accept-encoding': 'gzip, deflate',
             'accept-language': 'en-US,en;q=0.9',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
-        },
-        chrome_https: {
+        }},
+    {match: {browser: 'chrome', https: true},
+        rules: {
             'accept-encoding': 'gzip, deflate, br',
-        },
-        chrome_sec_fetch: {
+        }},
+    {match: {browser: 'chrome', https: true, version_min: 76},
+        rules: {
+            'sec-fetch-dest': 'document',
             'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
-        },
-        chrome_79: {
+        }},
+    {match: {browser: 'chrome', version_min: 79},
+        rules: {
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        },
-        mobile_chrome: {
+        }},
+    {match: {browser: 'mobile_chrome'},
+        rules: {
             'user-agent': 'Mozilla/5.0 (Linux; Android 9; MBOX) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'en-US,en;q=0.9',
-        },
-        mobile_chrome_sec_fetch: {
+        }},
+    {match: {browser: 'mobile_chrome', https: true, version_min: 76},
+        rules: {
             'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
             'sec-fetch-site': 'none',
-        },
-        mobile_chrome_79: {
+        }},
+    {match: {browser: 'mobile_chrome', version_min: 79},
+        rules: {
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        },
-        firefox: {
+        }},
+    {match: {browser: 'firefox'},
+        rules: {
             connection: 'keep-alive',
-            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'upgrade-insecure-requests': '1',
-            'accept-encoding': 'gzip, deflate, br',
+            'accept-encoding': 'gzip, deflate',
             'accept-language': 'en-US,en;q=0.5',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
-        },
-        edge: {
+        }},
+    {match: {browser: 'firefox', https: true},
+        rules: {
+            'accept-encoding': 'gzip, deflate, br',
+            te: 'trailers',
+        }},
+    {match: {browser: 'edge'},
+        rules: {
             connection: 'keep-alive',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'upgrade-insecure-requests': '1',
             'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'en-US',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/18.17763',
-        },
-        safari: {
+        }},
+    {match: {browser: 'safari'},
+        rules: {
             connection: 'keep-alive',
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'upgrade-insecure-requests': '1',
-            'accept-encoding': 'br, gzip, deflate',
+            'accept-encoding': 'gzip, deflate',
             'accept-language': 'en-us',
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15',
-        },
-        mobile_safari: {
+        }},
+    {match: {browser: 'firefox', https: true},
+        rules: {
+            'accept-encoding': 'br, gzip, deflate',
+        }},
+    {match: {browser: 'firefox', https: true, version_min: 13},
+        rules: {
+            'accept-encoding': 'gzip, deflate, br',
+        }},
+    {match: {browser: 'mobile_safari'},
+        rules: {
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'accept-encoding': 'gzip, deflate, br',
             'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_1_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.1 Mobile/15E148 Safari/604.1',
             'accept-language': 'en-us',
             referer: '',
-        },
-    };
-    if (opt.override)
-        defs = assign({}, defs, opt.override);
-    let result = defs[browser];
-    if (!result)
-    {
-        result = defs.chrome;
+        }},
+];
+
+// default header values
+// XXX josh: upgrade-insecure-requests might not be needed on 2nd request
+// onwards
+E.browser_defaults = function(browser, opt){
+    opt = assign({}, opt);
+    if (!is_browser_supported(browser))
         browser = 'chrome';
-    }
-    if ({chrome: 1, mobile_chrome: 1}[browser])
-    {
-        if (opt.https)
-        {
-            result = assign(result, defs[browser+'_https'],
-                opt.major>75 ? defs[browser+'_sec_fetch'] : {});
-        }
-        if (opt.major>78)
-            result = assign(result, defs[browser+'_79']);
-    }
-    return result;
+    return select_rules(rules_headers, {
+        browser: browser,
+        version: opt.major,
+        https: opt.https,
+    });
 };
 
 E.browser_accept = function(browser, type, opt={}){
@@ -190,7 +205,7 @@ E.browser_accept = function(browser, type, opt={}){
     return kind[v_key]||kind[browser]||kind.chrome;
 };
 
-const header_rules = [
+const rules_orders = [
     // http1 rules
     {match: {browser: 'chrome'},
         rules: {order: qw`host connection pragma cache-control
@@ -249,6 +264,11 @@ const header_rules = [
             origin upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 80},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            origin upgrade-insecure-requests user-agent sec-fetch-dest accept
+            sec-fetch-site sec-fetch-mode sec-fetch-user referer
+            accept-encoding accept-language cookie`}},
     {match: {browser: '', http2: true, version_min: 78, type: 'xhr'},
         rules: {order: qw`:method :authority :scheme :path pragma
             cache-control accept x-requested-with user-agent content-type
@@ -275,6 +295,9 @@ const header_rules = [
     {match: {browser: 'safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
             accept-encoding user-agent accept-language referer`}},
+    {match: {browser: 'safari', http2: true, version_min: 13},
+        rules: {order: qw`:method :scheme :path :authority cookie user-agent
+            accept accept-language accept-encoding referer`}},
     {match: {browser: 'mobile_safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
             accept-encoding user-agent accept-language referer`}},
@@ -286,10 +309,10 @@ function is_browser_supported(browser){
 }
 
 E.browser_default_header_order = function(browser, opt){
-    opt = opt||{};
+    opt = assign({}, opt);
     if (!is_browser_supported(browser))
         browser = 'chrome';
-    return select_rules(header_rules, {
+    return select_rules(rules_orders, {
         browser: browser,
         version: opt.major,
         type: opt.req_type,
@@ -318,10 +341,10 @@ E.like_browser_case_and_order = function(headers, browser, opt){
 };
 
 E.browser_default_header_order_http2 = function(browser, opt){
-    opt = opt||{};
+    opt = assign({}, opt);
     if (!is_browser_supported(browser))
         browser = 'chrome';
-    return select_rules(header_rules, {
+    return select_rules(rules_orders, {
         browser: browser,
         version: opt.major,
         type: opt.req_type,
@@ -404,4 +427,4 @@ function matches_rule(rule, data){
     return true;
 }
 
-E.t = {header_rules, select_rules};
+E.t = {rules_orders, select_rules};

@@ -147,6 +147,25 @@ describe('proxy', ()=>{
             return {url: ping.https.url, method: 'POST', body: 'test body'};
         }, {insecure: true});
     });
+    describe('encoding', ()=>{
+        const t = (name, encoding)=>it(name, etask._fn(function*(_this){
+            _this.timeout(5000);
+            proxy.fake = false;
+            l = yield lum();
+            let req = {url: ping.http.url,
+                headers: {'accept-encoding': encoding}};
+            let w = etask.wait();
+            l.on('usage', ()=>w.continue());
+            l.on('usage_abort', ()=>w.continue());
+            yield l.test(req);
+            yield w;
+            sinon.assert.match(JSON.parse(l.history[0].response_body),
+                sinon.match({url: '/'}));
+        }));
+        t('gzip', 'gzip');
+        t('deflate', 'deflate');
+        t('raw deflate', 'deflate-raw');
+    });
     describe('headers', ()=>{
         describe('X-Hola-Agent', ()=>{
             it('added to super proxy request', ()=>etask(function*(){

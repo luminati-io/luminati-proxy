@@ -684,7 +684,9 @@ describe('manager', ()=>{
         }));
         const p = [{port: 24000}];
         const p_w = [{port: 24000, whitelist_ips: ['1.1.1.1']}];
+        const p_wi = [{port: 24000, whitelist_ips: ['1.1.1.1', '300/40']}];
         const w_cli = {whitelist_ips: ['1.2.3.4', '4.3.2.1']};
+        t('invalid ips in config', p_wi, [], ['1.1.1.1']);
         t('sets from cmd', p, [], ['1.2.3.4', '4.3.2.1'], w_cli);
         t('sets from www', p, [], ['1.1.1.1'], null, ['1.1.1.1']);
         t('sets default', p, [['2.2.2.2']], ['2.2.2.2']);

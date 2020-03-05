@@ -7,6 +7,7 @@ const https = require('https');
 const http_shutdown = require('http-shutdown');
 const net = require('net');
 const url = require('url');
+const zlib = require('zlib');
 const request = require('request');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
@@ -176,13 +177,33 @@ E.http_ping = ()=>etask(function*(){
     const handler = (req, res)=>{
         let body = to_body(req);
         ping.history.push(body);
-        res.writeHead(200, 'PONG', {'content-type': 'application/json'});
         if (req.headers['content-length'])
+        {
+            res.writeHead(200, 'PONG', {'content-type': 'application/json'});
             req.pipe(res);
+        }
         else
         {
-            res.write(JSON.stringify(body));
-            res.end();
+            let headers = {'content-type': 'application/json'};
+            switch (req.headers['accept-encoding'])
+            {
+            case 'gzip':
+                headers['content-encoding'] = 'gzip';
+                body = zlib.gzipSync(JSON.stringify(body));
+                break;
+            case 'deflate':
+                headers['content-encoding'] = 'deflate';
+                body = zlib.deflateSync(JSON.stringify(body));
+                break;
+            case 'deflate-raw':
+                headers['content-encoding'] = 'deflate';
+                body = zlib.deflateRawSync(JSON.stringify(body));
+                break;
+            default:
+                body = JSON.stringify(body);
+            }
+            res.writeHead(200, 'PONG', headers);
+            res.end(body);
         }
     };
     const _http = http.createServer(handler);

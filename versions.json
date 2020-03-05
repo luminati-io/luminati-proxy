@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.174.208",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Filter out wrong IPs from config"
+            },
+            {
+                "type": "bug",
+                "text": "Add decoding fallback for pages wrongly encoded with raw deflate"
+            }
+        ]
+    },
+    {
         "ver": "1.173.955",
         "type": "stable",
         "changes": [

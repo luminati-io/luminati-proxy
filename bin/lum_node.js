@@ -80,7 +80,7 @@ const add_alias_for_whitelist_ips = ()=>{
     logger.notice(`installing ${name}`);
     try {
         const alias = `alias ${name}='${cmd}'`;
-        file.append_e(bashrc_path, func+'\n'+alias);
+        file.append_e(bashrc_path, func+'\n'+alias+'\n');
         child_process.execSync(func);
         child_process.execSync(alias);
     } catch(e){ logger.warn(`Failed to install ${name}: ${e.message}`); }

@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.174.208 Stable
+- :bug: Filter out wrong IPs from config
+- :bug: Add decoding fallback for pages wrongly encoded with raw deflate
+
 ## 1.173.955 Stable
 - :star: Show IPs refresh cost in pool IPs popup
 

@@ -2053,7 +2053,6 @@
   "KB/MB/GB/TB": "千字节/兆字节/技嘉/兆兆字节",
   "KB": "千字节",
   "MB": "兆字节",
-  "GB": "技嘉",
   "TB": "兆兆字节",
   "Exclusive domains": "独家域名",
   "All except China": "除中国外",
@@ -3616,7 +3615,7 @@
   "Upload": "上传",
   "Bank details:": "银行信息：",
   "ACTION REQUIRED": "请立即采取行动",
-  "Ok": "好",
+  "Ok": "确定",
   "You are about to set auto recharge to": "您即将把自动充值设置为",
   "page": "页",
   "Credit line": "信用额度",
@@ -4248,5 +4247,11 @@
   "Our": "我们的",
   "If you need my help I'm always available to help. You can contact me via": "如果您需要帮助，欢迎联系我。您可以随时通过电子邮件或",
   "Got it": "知道了",
-  "This website uses cookies to improve the user experience. To learn more about our cookie policy or withdraw from it, please check our Privacy Policy and Cookie Policy": "本网站使用cookie来改善用户体验。如需了解有关我们Cookie政策的更多信息，或想要从中退出，请查看我们的隐私政策和Cookie政策。"
+  "This website uses cookies to improve the user experience. To learn more about our cookie policy or withdraw from it, please check our Privacy Policy and Cookie Policy": "本网站使用cookie来改善用户体验。如需了解有关我们Cookie政策的更多信息，或想要从中退出，请查看我们的隐私政策和Cookie政策。",
+  "Change plan": "改变套餐",
+  "Additional": "更多信息",
+  "You are about to change your plan. Are you sure?": "您即将更改您的套餐，您确定吗？",
+  "month": "月",
+  "domain": "域名",
+  "day": "天"
 }
