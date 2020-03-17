@@ -12,7 +12,7 @@ define([], function(){
 var E = date_get;
 
 E.sec = {
-    NANO: 0.000000001,
+    NANO: 1/1e9,
     MS: 0.001,
     SEC: 1,
     MIN: 60,
@@ -85,23 +85,11 @@ E.init = function(){
     }
     else if (is_node && !global.mocha_running)
     {
-        var now_fn;
-        var node_major = parseInt(process.version.slice(1,
-            process.version.indexOf('.')));
-        if (node_major >= 11)
-        {
-            now_fn = function(){
-                var data = process.hrtime();
-                var seconds = data[0], nanos = data[1];
-                return seconds * E.ms.SEC + nanos * E.ms.NANO;
-            };
-        }
-        else
-        {
-            // brings libuv monotonic time since process start
-            var timer = process.binding('timer_wrap').Timer;
-            now_fn = timer.now.bind(timer);
-        }
+        var now_fn = function(){
+            var data = process.hrtime();
+            var seconds = data[0], nanos = data[1];
+            return Math.floor(seconds * E.ms.SEC + nanos * E.ms.NANO);
+        };
         adjust = Date.now()-now_fn();
         E.monotonic = function(){ return now_fn()+adjust; };
     }

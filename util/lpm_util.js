@@ -47,49 +47,26 @@ const parse_env_params = (env, fields)=>{
 E.t = {parse_env_params};
 
 E.init_args = args=>{
-    const added_descriptions = {
-        'no-www': 'Disable local web',
-        'no-config': 'Working without a config file',
-        'no-cookie': 'Working without a cookie file',
-        daemon: 'Start as a daemon',
-        'restart-daemon': 'Restart running daemon',
-        'stop-daemon': 'Stop running daemon',
-        'delete-daemon': 'Delete daemon instance',
-        upgrade: 'Upgrade proxy manager',
-        downgrade: 'Downgrade proxy manager (if backup exists on disk)',
-        dir: 'Path to the directory with database and configuration files',
-        status: 'Show proxy manager processes current status',
-        'gen-cert': 'Generate cert',
-        'auto-upgrade': 'Enable auto upgrade',
-        'start-upgrader': 'Install CRON process that checks upgrades',
-        'stop-upgrader': 'Removes CRON process that checks upgrades',
-    };
     const usage = ['Usage:\n  $0 [options] config1 config2 ...'];
     if (process.env.DOCKER)
     {
         usage.unshift('  docker run luminati/luminati-proxy '
             +'[docker port redirections]');
     }
-    const alias = {
-        help: ['h', '?'],
-        port: 'p',
-        daemon: ['d', 'start-daemon'],
-        version: 'v',
-    };
     const defaults = Object.assign({}, lpm_config.manager_default,
         parse_env_params(process.env, lpm_config.proxy_fields));
     args = (args||process.argv.slice(2)).map(String);
     const argv = yargs(args)
     .usage(usage.join(' \n'))
     .options(lpm_config.proxy_fields)
-    .describe(added_descriptions)
+    .describe(lpm_config.args.added_descriptions)
     .number(lpm_config.numeric_fields)
     .default(defaults)
     .help()
     .strict()
     .version(pkg.version)
-    .alias(alias)
-    .argv;
+    .alias(lpm_config.args.alias)
+    .parse();
     argv.native_args = args;
     argv.log = argv.log.toLowerCase();
     if (argv.session=='true')

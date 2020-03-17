@@ -421,7 +421,7 @@ E.is_debug = title=>{
     if (!agent_conf)
     {
         let system_db = require('../system/db/db.js');
-        agent_conf = system_db.use('agent_conf', env.CONF_SERVER);
+        agent_conf = system_db.use('agent_conf');
     }
     let debug = agent_conf.debug_zcounter;
     let v = debug && debug[title];

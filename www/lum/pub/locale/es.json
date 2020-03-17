@@ -2680,6 +2680,7 @@
   "page": "página",
   "Weak Zone password, in Zone": "contraseña  de zona débil, en la zona",
   "Enter a valid email address": "Introduzca una dirección de correo electrónico válida",
+  "Too many attempts to login. Try again in few minutes." : "Demasiados intentos para iniciar sesión. Inténtelo de nuevo en pocos minutos.",
   "Show graph": "Mostrar gráfico",
   "Luminati Proxy Manager is already installed": "Luminati Proxy Manager ya está instalado",
   "Run it manually from outside your browser": "Ejecutarlo manualmente desde el exterior de su navegador",

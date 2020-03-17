@@ -3,6 +3,7 @@
 import React from 'react';
 import Pure_component from '/www/util/pub/pure_component.js';
 import $ from 'jquery';
+import _ from 'lodash';
 import setdb from '../../../util/setdb.js';
 import ajax from '../../../util/ajax.js';
 import zurl from '../../../util/url.js';
@@ -15,12 +16,20 @@ export default class Alloc_modal extends Pure_component {
     set_field = setdb.get('head.proxy_edit.set_field');
     state = {
         available_list: [],
+        rendered_list: [],
         selected_all: false,
         refresh_cost: 0,
+        ip_filter: '',
     };
+    constructor(props){
+        super(props);
+        let sync_rendered_list = ()=>this.setState(
+            {rendered_list: this.filter_ips(this.state.available_list)});
+        this.sync_rendered_list = _.debounce(sync_rendered_list, 300);
+    }
     componentDidMount(){
         this.setdb_on('head.proxy_edit.zone_name', ()=>{
-            this.setState({available_list: []});
+            this.setState({available_list: [], rendered_list: []});
         });
         this.setdb_on('head.proxies_running', proxies=>
             proxies && this.setState({proxies}));
@@ -77,7 +86,9 @@ export default class Alloc_modal extends Pure_component {
                     not_chosen_set.add(v);
             });
             const available_list = [...chosen_set, ...not_chosen_set];
-            _this.setState({available_list}, _this.sync_selected_vals);
+            _this.setState({available_list,
+                rendered_list: _this.filter_ips(available_list)},
+                _this.sync_selected_vals);
             _this.loading(false);
         });
     };
@@ -162,7 +173,8 @@ export default class Alloc_modal extends Pure_component {
             const map = _this.map_vals(norm_vals);
             const new_ips = _this.props.form.ips.map(val=>map[val]);
             const new_vips = _this.props.form.vips.map(val=>map[val]);
-            _this.setState({available_list: norm_vals});
+            _this.setState({available_list: norm_vals,
+                rendered_list: _this.filter_ips(norm_vals)});
             _this.set_field('ips', new_ips);
             _this.set_field('vips', new_vips);
             yield _this.update_other_proxies(map);
@@ -247,6 +259,15 @@ export default class Alloc_modal extends Pure_component {
             _this.setState({refresh_cost: response.cost});
         });
     }
+    on_filter_change(e){
+        this.setState({ip_filter: e.target.value}, this.sync_rendered_list);
+    }
+    filter_ips(available_list){
+        let rows = available_list;
+        if (this.state.ip_filter)
+            rows = rows.filter(ip=>ip.indexOf(this.state.ip_filter)>=0);
+        return rows;
+    }
     render(){
         const type_label = this.props.type=='ips' ? 'IPs' : 'gIPs';
         const title = 'Select the '+type_label+' ('+this.props.zone+')';
@@ -271,6 +292,10 @@ export default class Alloc_modal extends Pure_component {
               title={title} footer={Footer}>
               <Infinite_chrome_table cols={this.cols}
                 title={sub_title}
+                toolbar={<div className="search_box">
+                  <input value={this.state.ip_filter} placeholder="IP filter"
+                    onChange={e=>this.on_filter_change(e)}/>
+                </div>}
                 class_name="in_modal_table"
                 selectable
                 toggle={this.toggle}
@@ -278,7 +303,7 @@ export default class Alloc_modal extends Pure_component {
                 unselect_all={this.unselect_all}
                 selected_list={selected_list}
                 selected_all={this.state.selected_all}
-                rows={this.state.available_list}>
+                rows={this.state.rendered_list}>
               </Infinite_chrome_table>
             </Modal>;
     }

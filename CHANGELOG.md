@@ -1,5 +1,11 @@
 Luminati Proxy manager - Change Log
 
+## 1.175.680 Stable
+- :star: Add IP filter to the IPs managing popup
+- :star: Add proxy filter by internal name
+- :sparkles: Autogenerate cli options for readme file
+- :sparkles: Fix /proxies/{port}/banip API endpoint to accept residential IPs
+
 ## 1.174.267 Stable
 - :star: Updated User-Agent in the headers randomization
 

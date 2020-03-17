@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.174.267-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.175.680-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -83,88 +83,136 @@ Usage:
   luminati [options] config1 config2 ...
 
 Options:
-  --port, -p               Port for the HTTP proxy                      [number]
-  --proxy_type             Decide if to save proxy into the configuration file.
-                           Specifying "persist" in "proxy_type" value will
-                           create port and save it in the configuration file.
-                                                                        [string]
-  --multiply               Multiply the port definition given number of times
-                                                                        [number]
-  --ssl                    Enable SSL analyzing       [boolean] [default: false]
-  --log                    Log level                [string] [default: "notice"]
-  --iface                  Interface or IP to listen on
-                                                   [string] [default: "0.0.0.0"]
-  --customer               Luminati customer                            [string]
-  --zone                   Zone                     [string] [default: "static"]
-  --password               Zone password                                [string]
-  --proxy                  Hostname or IP of super proxy
+  --help, -h, -?                Show help                              [boolean]
+  --version, -v                 Show version number                    [boolean]
+  --port, -p                    Port for the HTTP proxy                 [number]
+  --proxy_type                  Decide if to save proxy into the configuration
+                                file. Specifying "persist" in "proxy_type" value
+                                will create port and save it in the
+                                configuration file.                     [string]
+  --multiply                    Multiply the port definition given number of
+                                times                      [number] [default: 0]
+  --multiply_users                                    [boolean] [default: false]
+  --users                       List of users. This option has to be used along
+                                with "multiply_users"                    [array]
+  --ssl                         Enable SSL analyzing  [boolean] [default: false]
+  --har_limit                   Number of bytes to store[number] [default: 1024]
+  --iface                       Interface or IP to listen on            [string]
+  --customer                    Luminati customer                       [string]
+  --zone                        Zone                [string] [default: "static"]
+  --password                    Zone password                           [string]
+  --proxy                       Hostname or IP of super proxy
                                   [string] [default: "zproxy.lum-superproxy.io"]
-  --proxy_port             Super proxy port            [number] [default: 22225]
-  --proxy_connection_type  Connection type between LPM and Super Proxy
-                                                      [string] [default: http]
-  --proxy_retry            Automatically retry on super proxy failure
+  --proxy_port                  Super proxy port       [number] [default: 22225]
+  --proxy_connection_type       Determines what kind of connection will be used
+                                between LPM and Super Proxy
+                                                      [string] [default: "http"]
+  --proxy_retry                 Automatically retry on super proxy failure
                                                            [number] [default: 2]
-  --insecure               Enable SSL connection/analyzing to insecure hosts
+  --insecure                    Enable SSL connection/analyzing to insecure
+                                hosts                 [boolean] [default: false]
+  --country                     Country                                 [string]
+  --state                       State                                   [string]
+  --city                        City                                    [string]
+  --asn                         ASN                                     [string]
+  --ip                          Data center IP                          [string]
+  --vip                         gIP                                     [number]
+  --ext_proxies                 A list of proxies from external vendors. Format:
+                                [username:password@]ip[:port]            [array]
+  --ext_proxy_username          default username for external vendor ips[string]
+  --ext_proxy_password          default password for external vendor ips[string]
+  --ext_proxy_port              default port for external vendor ips    [number]
+  --dns                         DNS resolving                           [string]
+  --reverse_lookup_dns          Process reverse lookup via DNS
                                                       [boolean] [default: false]
-  --country                Country                                      [string]
-  --state                  State                                        [string]
-  --city                   City                                         [string]
-  --asn                    ASN                                          [number]
-  --ip                     Data center IP                               [string]
-  --vip                    gIP                                          [number]
-  --ext_proxies            A list of proxies from external vendors. Format:
-                           [username:password@]ip[:port]                 [array]
-  --ext_proxy_username     default username for external vendor ips     [string]
-  --ext_proxy_password     default password for external vendor ips     [string]
-  --ext_proxy_port         default port for external vendor ips         [number]
-  --dns                    DNS resolving                                [string]
-  --reverse_lookup_dns     Process reverse lookup via DNS
-                                                      [boolean] [default: false]
-  --reverse_lookup_file    Process reverse lookup via file              [string]
-  --reverse_lookup_values  Process reverse lookup via value              [array]
-  --session                Luminati session for all proxy requests      [string]
-  --pool_size              Session pool size               [number] [default: 3]
-  --max_requests           Maximum requests per session   [string] [default: 50]
-  --session_duration       Maximum duration of session (seconds)        [string]
-  --throttle               Throttle requests above given number         [number]
-  --whitelist_ips          Whitelist ip list for granting access to proxy
-                                                           [array] [default: []]
-  --race_reqs              Race several requests at once and choose fastest
+  --reverse_lookup_file         Process reverse lookup via file         [string]
+  --reverse_lookup_values       Process reverse lookup via value         [array]
+  --session                     Luminati session for all proxy requests
+                                                        [string] [default: true]
+  --sticky_ip                   Use session per requesting host to maintain IP
+                                per host              [boolean] [default: false]
+  --pool_size                   Session pool size                       [number]
+  --max_requests                Maximum requests per session
+                                                           [string] [default: 0]
+  --session_duration            Maximum duration of session (seconds)
+                                                           [string] [default: 0]
+  --throttle                    Throttle requests above given number    [number]
+  --rules                       Proxy request rules                      [array]
+  --race_reqs                   Race several requests at once and choose fastest
                                                                         [number]
-  --www                    HTTP and WebSocket port used for browser admin UI
-                           and request logs            [number] [default: 22999]       
-  --www_whitelist_ips      Whitelist IPs to access browser admin UI.    [string]
-                           [default:"127.0.0.1"]
-                           [example: --www_whitelist_ips "212.17.0.1"]
-  --config                 Config file containing proxy definitions
-                               [string] [default: "~/.luminati.json"]
-  --cookie                 Cookie Jar file
-                                [string] [default: "~/.luminati.jar"]
-  --dropin                 Create dropin mode proxy port (default: 22225)
+  --route_err                   Block or allow requests to be automatically sent
+                                through super proxy on error            [string]
+  --smtp                                                                 [array]
+  --override_headers                                   [boolean] [default: true]
+  --os                          Operating System of the Peer IP         [string]
+  --headers                     Request headers                          [array]
+  --debug                       Luminati request debug info             [string]
+  --whitelist_ips               Default for all proxies whitelist ip list for
+                                granting access to them    [array] [default: []]
+  --www_whitelist_ips           Whitelist ip list for granting access to browser
+                                admin UI                   [array] [default: []]
+  --www                         HTTP and WebSocket port used for browser admin
+                                UI and request logs             [default: 22999]
+  --config                      Config file containing proxy definitions
+                   [string] [default: "~/luminati_proxy_manager/.luminati.json"]
+  --cookie                      Cookie Jar file
+                    [string] [default: "~/luminati_proxy_manager/.luminati.jar"]
+  --mode                        Defines a set of permissible operations within
+                                the UI/API                              [string]
+  --dropin                      Create dropin mode proxy port (default: 22225)
                                                        [boolean] [default: true]
-  --dropin_port            Port for dropin mode                 [default: 22225]
-  --no_usage_stats         Disable collection of usage statistics
+  --dropin_port                 Port for dropin mode            [default: 22225]
+  --no_usage_stats              Disable collection of usage statistics
                                                       [boolean] [default: false]
-  --token                  A Google authorization token for accessing
-                           luminati.io                                  [string]
-  --request_stats          Enable requests statistics  [boolean] [default: true]
-  --test_url               A url for testing proxy
+  --token                       A Google authorization token for accessing
+                                luminati.io                             [string]
+  --high_perf                                         [boolean] [default: false]
+  --cloud                                              [boolean] [default: true]
+  --cluster                                            [boolean] [default: true]
+  --request_stats               Enable requests statistics
+                                                       [boolean] [default: true]
+  --test_url                    Url for testing proxy
                               [string] [default: "http://lumtest.com/myip.json"]
-  --no-www                 Disable local web
-  --no-config              Working without a config file
-  --no-cookie              Working without a cookie file
-  --daemon, -d             Start as a daemon
-  --stop-daemon            Stop running daemon
-  --upgrade                Upgrade proxy manager
-  --force                  Force LPM to run and kill other processes if needed
+  --log                         Log level           [string] [default: "notice"]
+  --logs                        Enable logs for all proxies
+                                                       [boolean] [default: 1000]
+  --force                       Kill other instances of LPM if there are any
                                                       [boolean] [default: false]
-  --version, -v            Show version number                         [boolean]
-  --help, -h, -?           Show help                                   [boolean]
-  --api                                      [default: "https://lum-lpm.com"]
-  --local_login            Requires each browser to authenticate against LPM
+  --session_termination         Stop sending new requests when the peer IP
+                                becomes unavailable and redirect to confimration
+                                page before new IP is taken
                                                       [boolean] [default: false]
-  --read_only              Avoid saving current config in config file  [boolean]
-
+  --api                         Alternative url to luminati API
+                                       [string] [default: "https://lum-lpm.com"]
+  --api_domain                  Alternative domain url to luminati API
+                                               [string] [default: "lum-lpm.com"]
+  --local_login                 Requires each browser to authenticate against
+                                LPM                   [boolean] [default: false]
+  --read_only                   Avoid saving current config in the config file
+                                                      [boolean] [default: false]
+  --no-www                      Disable local web
+  --no-config                   Working without a config file
+  --no-cookie                   Working without a cookie file
+  --daemon, -d, --start-daemon  Start as a daemon
+  --restart-daemon              Restart running daemon
+  --stop-daemon                 Stop running daemon
+  --delete-daemon               Delete daemon instance
+  --upgrade                     Upgrade proxy manager
+  --downgrade                   Downgrade proxy manager (if backup exists on
+                                disk)
+  --dir                         Path to the directory with database and
+                                configuration files
+  --status                      Show proxy manager processes current status
+  --gen-cert                    Generate cert
+  --auto-upgrade                Enable auto upgrade
+  --start-upgrader              Install CRON process that checks upgrades
+  --stop-upgrader               Removes CRON process that checks upgrades
+  --socket_inactivity_timeout                                  [default: 120000]
+  --preset                                             [default: "session_long"]
+  --multiply_ips                                                [default: false]
+  --multiply_vips                                               [default: false]
+  --bw_limit                                                        [default: 0]
+  --loki                      [default: "~/luminati_proxy_manager/.luminati.db"]
 ```
 
 ### Docker

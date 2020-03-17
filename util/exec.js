@@ -27,6 +27,8 @@ E.process_opt = opt=>{
     // XXX sergey: must use pipes only on required ios
     if (opt.stdin || opt.stdout || opt.stderr)
         opt.piped = true;
+    if (opt.cmd_shell)
+        opt.opt = assign({shell: true}, opt.opt);
     return opt;
 };
 E.get_cmd = (cmd, opt)=>{
@@ -34,10 +36,12 @@ E.get_cmd = (cmd, opt)=>{
     // XXX vladimir: rm process.zon from hutil
     if (opt.node && process.zon && process.zon.main)
         throw 'Unable to spawn node process from embedded Node';
-    let command = opt.shell ? '/bin/bash' :
-        opt.node ? process.argv[0] : args.shift();
+    let command = opt.cmd_shell ? `"${args.shift()}"` :
+        opt.shell ? '/bin/bash' : opt.node ? process.argv[0] : args.shift();
     command = file.normalize(command);
-    if (opt.shell)
+    if (opt.cmd_shell)
+        args = args.map(a=>`"${a}"`);
+    else if (opt.shell)
         args = ['-c', args.join(' ')];
     else if (opt.node&&args.length)
         args[0] = file.normalize(args[0]);

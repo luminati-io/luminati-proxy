@@ -21,7 +21,7 @@ import Zone_description from './common/zone_desc.js';
 import {Modal_dialog, Modal} from './common/modals.js';
 import {T} from './common/i18n.js';
 import {Toolbar_container, Toolbar_row, Toolbar_button,
-    Devider} from './chrome_widgets.js';
+    Devider, Search_box} from './chrome_widgets.js';
 import {AutoSizer, Table, Column} from 'react-virtualized';
 import 'react-virtualized/styles.css';
 import Tooltip from './common/tooltip.js';
@@ -483,6 +483,7 @@ const Proxies = withRouter(class Proxies extends Pure_component {
             proxies: [],
             selected_proxies: {},
             checked_all: false,
+            proxy_filter: '',
             filtered_proxies: [],
             loaded: false,
             height: window.innerHeight,
@@ -495,10 +496,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         this.setdb_on('head.proxies_running', proxies=>{
             if (!proxies)
                 return;
+            let proxy_filter = proxies.length ? this.state.proxy_filter : '';
             proxies = this.prepare_proxies(proxies);
-            const filtered_proxies = this.filter_proxies(proxies,
-                this.props.master_port);
-            this.setState({proxies, filtered_proxies, loaded: true});
+            const filtered_proxies = this.filter_proxies(
+                proxies, this.props.master_port, proxy_filter);
+            this.setState(
+                {proxies, filtered_proxies, proxy_filter, loaded: true});
         });
         this.setdb_on('head.locations', locations=>{
             if (!locations)
@@ -527,8 +530,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
         window.clearTimeout(this.timeout_id);
         window.removeEventListener('resize', this.update_window_dimensions);
     }
-    filter_proxies = (proxies, mp)=>{
+    filter_proxies = (proxies, mp, proxy_filter)=>{
+        if (proxy_filter===undefined)
+            proxy_filter = this.state.proxy_filter;
         return proxies.filter(p=>{
+            if (proxy_filter && !(p.internal_name||'').includes(proxy_filter))
+                return false;
             if (mp)
                 return ''+p.port==mp||''+p.master_port==mp;
             return p.proxy_type!='duplicate';
@@ -688,6 +695,12 @@ const Proxies = withRouter(class Proxies extends Pure_component {
     close_delete_dialog = ()=>{
         this.setState({open_delete_dialog: false});
     };
+    set_proxy_filter(e){
+        let proxy_filter = e.target.value;
+        const filtered_proxies = this.filter_proxies(this.state.proxies,
+            this.props.master_port, proxy_filter);
+        this.setState({proxy_filter, filtered_proxies, selected_proxies: {}});
+    }
     render(){
         const cols = this.get_cols();
         if (!this.state.zones || !this.state.countries)
@@ -698,7 +711,9 @@ const Proxies = withRouter(class Proxies extends Pure_component {
               </div>
             </div>;
         }
-        if (this.state.loaded && !this.state.filtered_proxies.length)
+        let {proxies, proxy_filter} = this.state;
+        let show_table = !!proxies.length;
+        if (this.state.loaded && !show_table)
             return <Proxy_blank/>;
         return <div className="proxies_panel chrome">
               <div className="main_panel vbox">
@@ -706,8 +721,10 @@ const Proxies = withRouter(class Proxies extends Pure_component {
                   edit_columns={this.edit_columns}
                   download_csv={this.download_csv}
                   selected={this.state.selected_proxies}
-                  open_delete_dialog={this.open_delete_dialog}/>
-                {this.state.loaded && !!this.state.filtered_proxies.length &&
+                  open_delete_dialog={this.open_delete_dialog}
+                  proxy_filter={proxy_filter}
+                  on_proxy_filter_change={e=>this.set_proxy_filter(e)}/>
+                {this.state.loaded && show_table &&
                   <React.Fragment>
                     <div className="chrome chrome_table vbox">
                       <div className="tables_container header_container hack">
@@ -799,6 +816,9 @@ class Delete_dialog extends Pure_component {
 
 
 class Toolbar extends Pure_component {
+    state = {
+        filters: false,
+    };
     open_delete_dialog_with_proxies = e=>{
         e.stopPropagation();
         this.props.open_delete_dialog(this.get_to_delete());
@@ -807,6 +827,9 @@ class Toolbar extends Pure_component {
         const {selected} = this.props;
         return Object.values(selected).filter(p=>p.proxy_type=='persist');
     };
+    toggle_filters(){
+        this.setState({filters: !this.state.filters});
+    }
     render(){
         const {proxy_add, edit_columns, download_csv} = this.props;
         const to_delete = this.get_to_delete();
@@ -818,8 +841,10 @@ class Toolbar extends Pure_component {
                     top: -3}}><T>Add new proxy</T></span>
                 </Toolbar_button>}</T>
                 <Devider/>
+                <Toolbar_button tooltip="Filters"
+                  on_click={()=>this.toggle_filters()} id="filters"/>
                 <Toolbar_button tooltip="Edit columns" on_click={edit_columns}
-                  id="filters"/>
+                  id="actions"/>
                 <Toolbar_button tooltip="Download all proxy ports as CSV"
                   on_click={download_csv} id="download"/>
                 {!!to_delete.length &&
@@ -827,6 +852,10 @@ class Toolbar extends Pure_component {
                   on_click={this.open_delete_dialog_with_proxies} id="trash"/>
                 }
               </Toolbar_row>
+            {this.state.filters && <Toolbar_row>
+              <Search_box val={this.props.proxy_filter}
+                on_change={this.props.on_proxy_filter_change}/>
+            </Toolbar_row>}
             </Toolbar_container>;
     }
 }

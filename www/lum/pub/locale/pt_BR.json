@@ -2103,6 +2103,7 @@
   "Some fields are not filled properly": "Alguns campos não estão preenchidos corretamente",
   "Work phone": "Telefone de Trabalho",
   "Enter a valid email address": "Digite um endereço de e-mail válido",
+  "Too many attempts to login. Try again in few minutes." : "Demasiadas tentativas de login. Tente novamente em poucos minutos.",
   "Required": "Requeridos",
   "Enter a valid URL": "Digite uma URL válida",
   "Filtered:": "filtrada:",

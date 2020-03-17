@@ -1,9 +1,10 @@
 // LICENSE_CODE ZON ISC
 'use strict'; /*jslint node:true*/
 require('./config.js');
-const _ = require('lodash');
+const {select_rules} = require('./rules.js');
 const string = require('./string.js'), {qw} = string;
 const E = exports, assign = Object.assign;
+const exists = /./;
 
 const special_case_words = {
     te: 'TE',
@@ -53,7 +54,6 @@ E.restore_case = function(headers, original_raw){
 };
 
 // default header values
-// XXX andreish/dmitriie: merge with rules_orders
 const rules_headers = [
     {match: {browser: 'chrome'},
         rules: {
@@ -65,9 +65,7 @@ const rules_headers = [
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36',
         }},
     {match: {browser: 'chrome', https: true},
-        rules: {
-            'accept-encoding': 'gzip, deflate, br',
-        }},
+        rules: {'accept-encoding': 'gzip, deflate, br'}},
     {match: {browser: 'chrome', https: true, version_min: 76},
         rules: {
             'sec-fetch-mode': 'navigate',
@@ -75,11 +73,32 @@ const rules_headers = [
             'sec-fetch-site': 'none',
         }},
     {match: {browser: 'chrome', version_min: 79},
-        rules: {
-            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        }},
+        rules: {accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'}},
     {match: {browser: 'chrome', https: true, version_min: 80},
         rules: {'sec-fetch-dest': 'document'}},
+    {match: {browser: 'chrome', type: 'image'},
+        rules: {accept: 'image/webp,image/apng,image/*,*/*;q=0.8'}},
+    {match: {browser: 'chrome', https: true, version_min: 76, type: 'image'},
+        rules: {
+            'sec-fetch-mode': 'no-cors',
+            'sec-fetch-site': 'same-origin',
+        }},
+    {match: {browser: 'chrome', https: true, version_min: 80, type: 'image'},
+        rules: {'sec-fetch-dest': 'image'}},
+    {match: {browser: 'chrome', https: true, version_min: 76, type: 'script'},
+        rules: {
+            'sec-fetch-mode': 'no-cors',
+            'sec-fetch-site': 'same-origin',
+        }},
+    {match: {browser: 'chrome', https: true, version_min: 80, type: 'script'},
+        rules: {'sec-fetch-dest': 'script'}},
+    {match: {browser: 'chrome', https: true, version_min: 76, type: 'ajax'},
+        rules: {
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-origin',
+        }},
+    {match: {browser: 'chrome', https: true, version_min: 80, type: 'ajax'},
+        rules: {'sec-fetch-dest': 'empty'}},
     {match: {browser: 'mobile_chrome'},
         rules: {
             'user-agent': 'Mozilla/5.0 (Linux; Android 9; MBOX) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
@@ -106,6 +125,8 @@ const rules_headers = [
             'accept-language': 'en-US,en;q=0.5',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
         }},
+    {match: {browser: 'firefox', type: 'image'},
+        rules: {accept: 'image/webp,*/*'}},
     {match: {browser: 'firefox', https: true},
         rules: {
             'accept-encoding': 'gzip, deflate, br',
@@ -129,14 +150,12 @@ const rules_headers = [
             'accept-language': 'en-us',
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15',
         }},
-    {match: {browser: 'firefox', https: true},
-        rules: {
-            'accept-encoding': 'br, gzip, deflate',
-        }},
-    {match: {browser: 'firefox', https: true, version_min: 13},
-        rules: {
-            'accept-encoding': 'gzip, deflate, br',
-        }},
+    {match: {browser: 'safari', type: 'image'},
+        rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
+    {match: {browser: 'safari', https: true},
+        rules: {'accept-encoding': 'br, gzip, deflate'}},
+    {match: {browser: 'safari', https: true, version_min: 13},
+        rules: {'accept-encoding': 'gzip, deflate, br'}},
     {match: {browser: 'mobile_safari'},
         rules: {
             accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -145,6 +164,12 @@ const rules_headers = [
             'accept-language': 'en-us',
             referer: '',
         }},
+    {match: {type: 'script'},
+        rules: {accept: '*/*'}},
+    {match: {type: 'ajax'},
+        rules: {accept: '*/*'}},
+    {match: {type: 'css'},
+        rules: {'accept': 'text/css,*/*;q=0.1'}},
 ];
 
 // XXX josh: upgrade-insecure-requests might not be needed on 2nd request
@@ -157,9 +182,11 @@ E.browser_defaults = function(browser, opt){
         browser: browser,
         version: opt.major,
         https: opt.https,
+        type: opt.type==='document' ? undefined : opt.type,
     });
 };
 
+// XXX dmitriie: deprecated
 E.browser_accept = function(browser, type, opt={}){
     let defs = {
         document: {
@@ -213,7 +240,7 @@ const rules_orders = [
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
             accept sec-fetch-site referer accept-encoding accept-language
             cookie`}},
-    {match: {browser: 'chrome', type: 'xhr'},
+    {match: {browser: 'chrome', type: 'ajax'},
         rules: {order: qw`host connection pragma cache-control accept
             x-requested-with user-agent sec-fetch-mode content-type
             sec-fetch-site referer accept-encoding accept-language cookie`}},
@@ -227,11 +254,11 @@ const rules_orders = [
             upgrade-insecure-requests user-agent sec-fetch-dest accept
             sec-fetch-site sec-fetch-mode sec-fetch-user referer
             accept-encoding accept-language cookie`}},
-    {match: {browser: 'chrome', version_min: 78, type: 'xhr'},
+    {match: {browser: 'chrome', version_min: 78, type: 'ajax'},
         rules: {order: qw`host connection pragma cache-control accept
             x-requested-with user-agent content-type sec-fetch-site
             sec-fetch-mode referer accept-encoding accept-language cookie`}},
-    {match: {browser: 'chrome', version_min: 80, type: 'xhr'},
+    {match: {browser: 'chrome', version_min: 80, type: 'ajax'},
         rules: {order: qw`host connection pragma cache-control accept
             sec-fetch-dest x-requested-with user-agent content-type
             sec-fetch-site sec-fetch-mode referer accept-encoding
@@ -266,7 +293,7 @@ const rules_orders = [
             cache-control upgrade-insecure-requests user-agent sec-fetch-mode
             sec-fetch-user accept sec-fetch-site referer accept-encoding
             accept-language cookie`}},
-    {match: {browser: 'chrome', http2: true, type: 'xhr'},
+    {match: {browser: 'chrome', http2: true, type: 'ajax'},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             accept x-requested-with user-agent sec-fetch-mode content-type
             sec-fetch-site referer accept-encoding accept-language cookie`}},
@@ -275,7 +302,7 @@ const rules_orders = [
             origin upgrade-insecure-requests user-agent sec-fetch-user accept
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
-    {match: {browser: 'chrome', http2: true, version_min: 78, type: 'xhr'},
+    {match: {browser: 'chrome', http2: true, version_min: 78, type: 'ajax'},
         rules: {order: qw`:method :authority :scheme :path pragma
             cache-control accept x-requested-with user-agent content-type
             sec-fetch-site sec-fetch-mode referer accept-encoding
@@ -285,11 +312,19 @@ const rules_orders = [
             origin upgrade-insecure-requests user-agent sec-fetch-dest accept
             sec-fetch-site sec-fetch-mode sec-fetch-user referer
             accept-encoding accept-language cookie`}},
-    {match: {browser: 'chrome', http2: true, version_min: 80, type: 'xhr'},
+    {match: {browser: 'chrome', http2: true, version_min: 80, type: 'ajax'},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
-            content-length accept sec-fetch-dest x-requested-with user-agent
+            content-length user-agent sec-fetch-dest accept x-requested-with
             origin sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
+    {
+        match: {browser: 'chrome', http2: true, version_min: 80, type: 'ajax',
+            headers: {'content-type': exists}},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            content-length sec-fetch-dest user-agent content-type accept
+            x-requested-with origin sec-fetch-site sec-fetch-mode referer
+            accept-encoding accept-language cookie`}
+    },
     {match: {browser: 'mobile_chrome', http2: true},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user
@@ -303,17 +338,23 @@ const rules_orders = [
     {match: {browser: 'firefox', http2: true},
         rules: {order: qw`:method :path :authority :scheme user-agent accept
             accept-language accept-encoding referer cookie
-            upgrade-insecure-requests cache-control te`}},
+            upgrade-insecure-requests cache-control content-type te`}},
     {match: {browser: 'edge', http2: true},
         rules: {order: qw`:method :path :authority :scheme referer
             cache-control accept accept-language upgrade-insecure-requests
             user-agent accept-encoding cookie`}},
     {match: {browser: 'safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
-            accept-encoding user-agent accept-language referer`}},
-    {match: {browser: 'safari', http2: true, version_min: 13},
+            content-type accept-encoding user-agent accept-language referer`}},
+    {match: {browser: 'safari', http2: true, type: 'document'},
         rules: {order: qw`:method :scheme :path :authority cookie user-agent
             accept accept-language accept-encoding referer`}},
+    {
+        match: {browser: 'safari', http2: true, type: 'ajax',
+            headers: {'content-type': exists}},
+        rules: {order: qw`:method :scheme :path :authority cookie accept
+            content-type accept-encoding user-agent referer accept-language`}
+    },
     {match: {browser: 'mobile_safari', http2: true},
         rules: {order: qw`:method :scheme :path :authority cookie accept
             accept-encoding user-agent accept-language referer`}},
@@ -330,16 +371,23 @@ E.browser_default_header_order = function(browser, opt){
         browser = 'chrome';
     return select_rules(rules_orders, {
         browser: browser,
-        version: opt.major,
-        type: opt.req_type,
+        version: +opt.major,
+        type: opt.req_type||'document',
+        http2: opt.http2,
+        headers: opt.headers,
     }).order;
+};
+
+E.browser_default_header_order_http2 = function(browser, opt){
+    opt = assign({}, opt, {http2: true});
+    return E.browser_default_header_order(browser, opt);
 };
 
 E.like_browser_case_and_order = function(headers, browser, opt){
     let ordered_headers = {};
     let source_header_keys = Object.keys(headers);
     if (source_header_keys.find(h=>h.toLowerCase()=='x-requested-with'))
-        opt = assign({req_type: 'xhr'}, opt);
+        opt = assign({req_type: 'ajax'}, opt);
     let header_keys = E.browser_default_header_order(browser, opt);
     for (let header of header_keys)
     {
@@ -354,18 +402,6 @@ E.like_browser_case_and_order = function(headers, browser, opt){
             ordered_headers[header] = headers[header];
     }
     return E.capitalize(ordered_headers);
-};
-
-E.browser_default_header_order_http2 = function(browser, opt){
-    opt = assign({}, opt);
-    if (!is_browser_supported(browser))
-        browser = 'chrome';
-    return select_rules(rules_orders, {
-        browser: browser,
-        version: opt.major,
-        type: opt.req_type,
-        http2: true,
-    }).order;
 };
 
 // reverse pseudo headers (e.g. :method) because nodejs reverse it
@@ -388,7 +424,7 @@ E.reverse_http2_pseudo_headers_order = headers=>{
 E.like_browser_case_and_order_http2 = function(headers, browser, opt){
     let ordered_headers = {};
     if (Object.keys(headers).find(h=>h.toLowerCase()=='x-requested-with'))
-        opt = assign({req_type: 'xhr'}, opt);
+        opt = assign({req_type: 'ajax'}, opt);
     let header_keys = E.browser_default_header_order_http2(browser, opt);
     let req_headers = {};
     for (let h in headers)
@@ -421,26 +457,4 @@ E.to_raw_headers = function(headers){
     return raw_headers;
 };
 
-function select_rules(all_rules, selector){
-    let matches = all_rules.filter(x=>matches_rule(x.match, selector));
-    return _.merge({}, ...matches.map(x=>x.rules), (dest, src)=>{
-        if (Array.isArray(src))
-            return src;
-    });
-}
-
-function matches_rule(rule, data){
-    for (let k in rule)
-    {
-        if (k=='version_min')
-        {
-            if ((rule[k]||0)>(data.version||0))
-                return false;
-        }
-        else if (rule[k]!=data[k])
-            return false;
-    }
-    return true;
-}
-
-E.t = {rules_orders, select_rules};
+E.t = {rules_orders};

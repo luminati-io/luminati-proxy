@@ -376,6 +376,25 @@ describe('manager', ()=>{
                     assert.equal(res.statusCode, 400);
                     assert_has(res.body, {errors: []}, 'proxies');
                 }));
+                let t = (name, status_code)=>it(name, ()=>etask(function*(){
+                    let sample_proxy = {port: 24000,
+                        ext_proxies: ['127.0.0.1:8888']};
+                    nock(api_base).get('/').times(2).reply(200, {});
+                    nock(api_base).get('/cp/lum_local_conf').query(true)
+                        .reply(200, {mock_result: true, _defaults: true});
+                    nock(api_base).post('/update_lpm_stats').query(true)
+                        .reply(200, {});
+                    nock(api_base).post('/ext_proxy_created').query(true)
+                        .reply(status_code, {});
+                    app = yield app_with_config({cli: {token: '123'}});
+                    let res = yield json('api/proxies', 'post',
+                        {proxy: sample_proxy});
+                    assert_has(res, {data: sample_proxy}, 'proxies');
+                    res = yield json('api/proxies_running');
+                    assert_has(res, [sample_proxy], 'proxies');
+                }));
+                t('external', 200);
+                t('external, backend is down', 500);
             });
             describe('put', ()=>{
                 it('normal', etask._fn(function*(_this){
@@ -417,6 +436,18 @@ describe('manager', ()=>{
                     assert.equal(res.statusCode, 204);
                 }));
             });
+            describe('banip', ()=>{
+                let t = (name, body, status_code)=>it(name, etask._fn(
+                function*(_this){
+                    app = yield app_with_proxies([{port: 24000}], {});
+                    let res = yield api_json('api/proxies/24000/banip',
+                        {method: 'post', body});
+                    assert.equal(res.statusCode, status_code);
+                }));
+                t('no ip', {}, 400);
+                t('ip', {ip: '1.1.1.1'}, 204);
+                t('no ip', {ip: 'r0123456789abcdef0123456789ABCDEF'}, 204);
+            });
         });
         describe('user credentials', ()=>{
             it('success', etask._fn(function*(_this){
@@ -443,32 +474,6 @@ describe('manager', ()=>{
                 } catch(e){
                     assert_has(e, {status: 403, message: 'login_required'});
                 }
-            }));
-            it('passing error message on login fail, token',
-            etask._fn(function*(_this){
-                nock(api_base).get('/cp/lum_local_conf').query(true).times(4)
-                .reply(403, 'No zones enabled for');
-                app = yield app_with_args(['--customer', 'mock_user']);
-                let res = yield app.manager.login_user('123');
-                assert.deepEqual(res,
-                    {error: {message: 'No zones enabled for'}});
-            }));
-            it('passing error message on login fail, password',
-            etask._fn(function*(_this){
-                nock(api_base).get('/').reply(200, {});
-                nock(api_base).get('/cp/lum_local_conf').query(true).times(4)
-                .reply(403, 'No zones enabled for');
-                nock(api_base).post('/users/auth/basic/check_credentials')
-                .reply(200, 'ok');
-                nock(api_base).get('/users/auth/basic/login').reply(200, '');
-                app = yield app_with_args(['--customer', 'mock_user']);
-                let jar = request.jar();
-                jar.setCookie('a=b', api_base);
-                sinon.stub(app.manager, 'get_cookie_jar', ()=>jar);
-                let res = yield app.manager.login_user(null, 'user', 'pass');
-                assert.deepEqual(res,
-                    {error: {message: 'No zones enabled for'}});
-                app.manager.get_cookie_jar.restore();
             }));
         });
         describe('har logs', ()=>{

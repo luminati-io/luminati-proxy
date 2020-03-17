@@ -1,5 +1,27 @@
 [
     {
+        "ver": "1.175.680",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "star",
+                "text": "Add IP filter to the IPs managing popup"
+            },
+            {
+                "type": "star",
+                "text": "Add proxy filter by internal name"
+            },
+            {
+                "type": "sparkles",
+                "text": "Autogenerate cli options for readme file"
+            },
+            {
+                "type": "sparkles",
+                "text": "Fix /proxies/{port}/banip API endpoint to accept residential IPs"
+            }
+        ]
+    },
+    {
         "ver": "1.174.267",
         "type": "stable",
         "changes": [

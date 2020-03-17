@@ -147,7 +147,7 @@ const load_cron = ()=>etask(function*(){
 
 const main = ()=>etask(function*(){
     const args = process.argv.slice(2).map(String);
-    const argv = yargs(args).argv;
+    const argv = yargs(args).help(false).parse();
     if (!argv.addCronJob && !argv.removeCronJob)
         return;
     if (process.getuid()!==0)

@@ -177,13 +177,14 @@ export class Infinite_chrome_table extends Pure_component {
     };
     render(){
         const rows = this.props.rows||[];
-        const class_name = this.props.class_name;
+        const {class_name, toolbar} = this.props;
         return <div className="chrome">
             <div className="main_panel vbox">
               <Toolbar_container>
                 <Toolbar_row>
                   <div className="title_wrapper">{this.props.title}</div>
                 </Toolbar_row>
+                {toolbar && <Toolbar_row>{toolbar}</Toolbar_row>}
               </Toolbar_container>
               <React.Fragment>
                 <div className={classnames('chrome_table vbox', class_name)}>
@@ -310,4 +311,12 @@ export const Toolbar_container = ({children})=>
 export const Toolbar_row = ({children})=>
     <div className="toolbar">
       {children}
+    </div>;
+
+export const Search_box = ({val, on_change})=>
+    <div className="search_box">
+      <input value={val}
+        onChange={on_change}
+        type="text"
+        placeholder="Filter"/>
     </div>;

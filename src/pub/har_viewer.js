@@ -15,7 +15,7 @@ import zescape from '../../util/escape.js';
 import {status_codes, bytes_format, report_exception} from './util.js';
 import {Waypoint} from 'react-waypoint';
 import {Toolbar_button, Devider, Sort_icon, with_resizable_cols,
-    Toolbar_container, Toolbar_row} from './chrome_widgets.js';
+    Toolbar_container, Toolbar_row, Search_box} from './chrome_widgets.js';
 import {T} from './common/i18n.js';
 import Preview from './har_preview.js';
 import {Tooltip_bytes, Checkbox} from './common.js';
@@ -383,14 +383,6 @@ const Type_filter = ({name, cur, tooltip, on_click})=>
       <div className={classnames('filter', {active: cur==name})}
         onClick={on_click}>{name}</div>
     </Tooltip>;
-
-const Search_box = ({val, on_change})=>
-    <div className="search_box">
-      <input value={val}
-        onChange={on_change}
-        type="text"
-        placeholder="Filter"/>
-    </div>;
 
 const Tables_resizer = ({show, offset, start_moving})=>{
     if (!show)

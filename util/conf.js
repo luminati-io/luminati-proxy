@@ -38,19 +38,6 @@ function init(){
     }
     if (env.ZERR)
         zerr.set_level();
-    if (+env.HTTP_PARSER_JS)
-    {
-        let http_parser = process.binding('http_parser');
-        let hc = require('_http_common');
-        if (hc.HTTPParser && hc.HTTPParser!==http_parser.HTTPParser)
-        {
-            throw new Error('HTTP_PARSER_JS=1 requires --http-parser=legacy '
-                +'in Node 12.x');
-        }
-        let http_parser_js = require('http-parser-js').HTTPParser;
-        http_parser_js.encoding = 'utf-8';
-        http_parser.HTTPParser = http_parser_js;
-    }
 }
 
 init();

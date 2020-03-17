@@ -1708,6 +1708,7 @@
   "Required": "Обязательно",
   "Work phone": "Рабочий телефон",
   "Enter a valid email address": "Введите действующий электронный адрес",
+  "Too many attempts to login. Try again in few minutes." : "Слишком много попыток войти в систему. Повторите через несколько минут",
   "Use your business email": "Используйте свою корпоративную электронную почту",
   "Recent requests sent from Luminati Proxy Manager. Table represents the last 1K requests for each port. To see full logs, launch LPM.": "Текущие запросы, отправленные с Luminati Proxy Manager. В таблице представлены последние 1K запросов для каждого порта. Для всей истории запросов запустите LPM.",
   "Creating account...": "Создание аккаунта...",
