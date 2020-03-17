@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.175.756",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed crashing on a process start"
+            }
+        ]
+    },
+    {
         "ver": "1.175.680",
         "type": "stable",
         "changes": [

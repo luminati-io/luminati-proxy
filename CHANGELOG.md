@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.175.756 Stable
+- :bug: Fixed crashing on a process start
+
 ## 1.175.680 Stable
 - :star: Add IP filter to the IPs managing popup
 - :star: Add proxy filter by internal name
