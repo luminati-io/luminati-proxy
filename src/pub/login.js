@@ -306,7 +306,7 @@ class Customers_form extends Pure_component {
 class Two_step_form extends Pure_component {
     state = {token: ''};
     componentDidMount(){
-      this.props.send_two_step_email();
+        this.props.send_two_step_email();
     }
     on_key_up = e=>{
         if (e.keyCode==13)

@@ -3641,5 +3641,21 @@
   "Hide ...": "Ocultar ...",
   "View in": "Ver em",
   "Workshops": "Workshops",
-  "Back to Workshops": "Voltar para Workshops"
+  "Back to Workshops": "Voltar para Workshops",
+  "Access to this page has been blocked": "O acesso a esta página foi bloqueado",
+  "For some reason, we think you're a bot.": "Por alguma razão, achamos que és um robot.",
+  "This may happen because:": "Isto pode acontecer porque:",
+  "JavaScript is disabled or not running properly on your browser": "O JavaScript está desactivado ou não está a correr correctamente no seu navegador",
+  "Your browsing behaviour is not likely to be that of a regular user": "Não é provável que o seu comportamento de navegação seja o de um utilizador regular",
+  "Your email has been blocked!": "Seu email foi bloqueado!",
+  "Signing up wth your email has been denied.": "Inscrevendo-se com o seu e-mail foi negado.",
+  "Forbidden domain": "Domínio proibido",
+  "Disposable email address": "Endereço de E-mail descartável",
+  "Access to this page has been denied": "O acesso a esta página foi negado",
+  "click here": "clicar",
+  "You seem to be located in a country we do not provide services to. For more information": "Você parece estar localizado em um país para o qual não prestamos serviços. Para mais informações",
+  "Your registration has been denied.": "O seu registo foi negado.",
+  "The IP you tried to sign-up with has been blocked.": "O IP que tentou inscrever-se foi bloqueado.",
+  "This may happen because our system has identified that this IP address has been abused": "Isso pode acontecer porque nosso sistema identificou que este endereço IP foi abusado",
+  "We detected too many signups from your IP.": "Detectámos demasiadas inscrições do seu IP."
 }

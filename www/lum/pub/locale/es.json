@@ -3504,5 +3504,21 @@
   "View in": "Ver en",
   "Hide ...": "Esconder ...",
   "Workshops": "Talleres de trabajo",
-  "Back to Workshops": "Volver a Talleres"
+  "Back to Workshops": "Volver a Talleres",
+  "Access to this page has been blocked":"El acceso a esta página ha sido bloqueado",
+  "For some reason, we think you're a bot.":"Por alguna razón, creemos que eres un bot.",
+  "This may happen because:":"Esto puede suceder porque:",
+  "JavaScript is disabled or not running properly on your browser":"JavaScript está deshabilitado o no se ejecuta correctamente en su navegador",
+  "Your browsing behaviour is not likely to be that of a regular user":"Su comportamiento de navegación no es probable que sea el de un usuario normal",
+  "Your email has been blocked!":"Su correo electrónico ha sido bloqueado!",
+  "Signing up wth your email has been denied.":"Registrarse con su correo electrónico ha sido denegado.",
+  "Forbidden domain":"Dominio prohibido",
+  "Disposable email address":"Dirección de correo electrónico desechable",
+  "Access to this page has been denied":"El acceso a esta página ha sido denegado",
+  "click here":"Haga clic aquí",
+  "You seem to be located in a country we do not provide services to. For more information":"Parece que estás ubicado en un país al que no brindamos servicios. Para más información",
+  "Your registration has been denied.":"Su registro ha sido denegado.",
+  "The IP you tried to sign-up with has been blocked.":"La IP con la que intentaste registrarte ha sido bloqueada.",
+  "This may happen because our system has identified that this IP address has been abused":"Esto puede suceder porque nuestro sistema ha identificado que esta dirección IP ha sido abusada",
+  "We detected too many signups from your IP.":"Detectamos demasiados registros de su IP."
 }

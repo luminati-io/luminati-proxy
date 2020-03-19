@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.175.943 Stable
+- :bug: Fixed possible endless loop for https requests when all available IPs are banned
+
 ## 1.175.756 Stable
 - :bug: Fixed crashing on a process start
 

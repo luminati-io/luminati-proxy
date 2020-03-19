@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.175.943",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed possible endless loop for https requests when all available IPs are banned"
+            }
+        ]
+    },
+    {
         "ver": "1.175.756",
         "type": "stable",
         "changes": [

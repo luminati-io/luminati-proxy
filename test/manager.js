@@ -242,6 +242,7 @@ describe('manager', ()=>{
         });
         describe('args as default params for proxy ports', ()=>{
             it('should use proxy from args', etask._fn(function*(_this){
+                _this.timeout(6000);
                 app = yield app_with_args(['--proxy', '1.2.3.4',
                     '--proxy_port', '3939', '--dropin']);
                 const dropin = app.manager.proxy_ports[22225];
@@ -262,6 +263,7 @@ describe('manager', ()=>{
         // can't rm current log file because transports rely on it
         beforeEach(()=>fs.truncateSync(logger.lpm_filename, 0));
         it('should send logs, har and config', etask._fn(function*(_this){
+            _this.timeout(6000);
             app = yield app_with_config({config: {}, cli: {log: 'notice'}});
             const desc = 'bug description', email = 'test@luminati.io';
             const ua = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) '+
@@ -286,7 +288,8 @@ describe('manager', ()=>{
             sinon.assert.calledWith(res.json, 'ok');
         }));
     });
-    describe('dropin', ()=>{
+    describe('dropin', function(){
+        this.timeout(6000);
         it('off', etask._fn(function*(_this){
             app = yield app_with_args(['--no-dropin']);
             assert.ok(!app.manager.proxy_ports[22225]);
@@ -476,7 +479,8 @@ describe('manager', ()=>{
                 }
             }));
         });
-        describe('har logs', ()=>{
+        describe('har logs', function(){
+            this.timeout(6000);
             beforeEach(()=>etask(function*(){
                 app = yield app_with_args(['--customer', 'mock_user',
                     '--port', '24000']);
@@ -778,7 +782,8 @@ describe('manager', ()=>{
         t('should not run migrations if config exists and version is new',
             false, {_defaults: {version: '1.120.0'}});
     });
-    describe('first actions', ()=>{
+    describe('first actions', function(){
+        this.timeout(6000);
         const filepath = path.join(os.tmpdir(), 'first_actions.json');
         const rm_actions_file = ()=>{
             if (fs.existsSync(filepath))
