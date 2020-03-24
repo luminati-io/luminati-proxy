@@ -33,7 +33,7 @@ const pre_rule = (type, regex)=>({
     rules: [{action: {[type]: true}, url: regex}],
 });
 describe('proxy', ()=>{
-    let proxy, ping, smtp;
+    let proxy, ping, smtp, sandbox;
     const lum = opt=>etask(function*(){
         opt = opt||{};
         if (opt.ssl===true)
@@ -107,6 +107,7 @@ describe('proxy', ()=>{
         ping = null;
     }));
     beforeEach(()=>{
+        sandbox = sinon.sandbox.create();
         proxy.fake = true;
         proxy.connection = null;
         proxy.history = [];
@@ -120,6 +121,7 @@ describe('proxy', ()=>{
             return;
         yield l.stop(true);
         l = null;
+        sandbox.verifyAndRestore();
     }));
     describe('sanity', ()=>{
         const t = (name, req, opt)=>it(name, etask._fn(function*(_this){
@@ -994,22 +996,53 @@ describe('proxy', ()=>{
             t({ctx: {url: 'test'}}, {}, undefined);
         }));
         describe('action', ()=>{
-            it('ban_ip', ()=>etask(function*(){
-                l = yield lum({rules: []});
-                sinon.stub(l.rules, 'can_retry').returns(true);
-                sinon.stub(l.rules, 'retry');
-                const refresh_stub = sinon.stub(l.session_mgr,
-                    'refresh_sessions');
-                const add_stub = sinon.stub(l, 'banip');
-                const req = {ctx: {}};
-                const opt = {_res: {
-                    hola_headers: {'x-luminati-ip': '1.2.3.4'}}};
-                const r = l.rules.action(req, {}, {}, {action: {ban_ip: 1000}},
-                    opt);
-                assert.ok(r);
-                assert.ok(add_stub.called);
-                assert.ok(refresh_stub.called);
-            }));
+            describe('ban_ip', ()=>{
+                it('ban_ip', ()=>etask(function*(){
+                    l = yield lum({rules: []});
+                    sinon.stub(l.rules, 'can_retry').returns(true);
+                    sinon.stub(l.rules, 'retry');
+                    const refresh_stub = sinon.stub(l.session_mgr,
+                        'refresh_sessions');
+                    const add_stub = sinon.stub(l, 'banip');
+                    const req = {ctx: {}};
+                    const opt = {_res: {
+                        hola_headers: {'x-luminati-ip': '1.2.3.4'}}};
+                    const r = l.rules.action(req, {}, {},
+                        {action: {ban_ip: 1000}}, opt);
+                    assert.ok(r);
+                    assert.ok(add_stub.called);
+                    assert.ok(refresh_stub.called);
+                }));
+                let t = (name, req, fake)=>it(name, ()=>etask(function*(){
+                    proxy.fake = !!fake;
+                    sandbox.stub(Server, 'get_random_ip', ()=>'1.1.1.1');
+                    sandbox.stub(common, 'get_random_ip', ()=>'1.1.1.1');
+                    l = yield lum({rules: [{
+                        action: {ban_ip: 0},
+                        action_type: 'ban_ip',
+                        status: '200',
+                        trigger_type: 'status',
+                    }], insecure: true, ssl: true});
+                    l.on('retry', opt=>{
+                        l.lpm_request(opt.req, opt.res, opt.head);
+                    });
+                    for (let i=0; i<2; i++)
+                    {
+                        let w = etask.wait();
+                        l.on('usage', data=>w.return(data));
+                        let res = yield l.test(req());
+                        let usage = yield w;
+                        assert.equal(res.statusCode, 200);
+                        assert.deepStrictEqual(usage.rules, [{
+                            action: {ban_ip: 0}, action_type: 'ban_ip',
+                            status: '200', trigger_type: 'status',
+                            type: 'after_hdr'}]);
+                    }
+                }));
+                t('ban_ip fake req', ()=>({fake: 1}));
+                t('ban_ip http req', ()=>({url: ping.http.url}));
+                t('ban_ip https req', ()=>({url: ping.https.url}), true);
+            });
             describe('request_url', ()=>{
                 let req, req_stub;
                 beforeEach(()=>etask(function*(){

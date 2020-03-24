@@ -20,7 +20,8 @@ const conf = {
         'integer'),
     boolean_fields: prop_by_type(swagger.definitions.proxy.properties,
         'boolean'),
-    credential_fields: ['customer', 'zone', 'password', 'token', 'token_auth'],
+    credential_fields: ['customer', 'zone', 'password', 'google_token',
+        'token_auth'],
     default_superproxy_domain: 'zproxy.lum-superproxy.io',
     hola_agent: undefined,
     args: {
@@ -69,6 +70,7 @@ conf.server_default = {
     socket_inactivity_timeout: 120000,
     preset: 'session_long',
     multiply_ips: false,
+    max_ban_retries: 10,
     multiply_vips: false,
     multiply_users: false,
     multiply: 0,

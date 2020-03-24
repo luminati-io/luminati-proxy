@@ -1,5 +1,19 @@
 [
     {
+        "ver": "1.176.452",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "Fixed authentication issues"
+            },
+            {
+                "type": "bug",
+                "text": "Fixed /refresh_ips endpoint"
+            }
+        ]
+    },
+    {
         "ver": "1.175.943",
         "type": "stable",
         "changes": [

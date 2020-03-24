@@ -35,7 +35,7 @@
 - <a href="https://nodejs.org/en/download/">Node.js</a> 6+版
 
 ### Windows
-下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.175.943-setup.exe">代理管理安装器</a>.
+下载 <a href="https://lum-lpm.com/static/lpm/luminati-proxy-manager-v1.176.452-setup.exe">代理管理安装器</a>.
 
 ### Linux/MacOS
 - 安装 Node.js 10.15.3版 (最好用x
@@ -164,7 +164,7 @@ Options:
   --dropin_port                 Port for dropin mode            [default: 22225]
   --no_usage_stats              Disable collection of usage statistics
                                                       [boolean] [default: false]
-  --token                       A Google authorization token for accessing
+  --google_token                A Google authorization token for accessing
                                 luminati.io                             [string]
   --high_perf                                         [boolean] [default: false]
   --cloud                                              [boolean] [default: true]
@@ -210,6 +210,7 @@ Options:
   --socket_inactivity_timeout                                  [default: 120000]
   --preset                                             [default: "session_long"]
   --multiply_ips                                                [default: false]
+  --max_ban_retries                                                [default: 10]
   --multiply_vips                                               [default: false]
   --bw_limit                                                        [default: 0]
   --loki                      [default: "~/luminati_proxy_manager/.luminati.db"]

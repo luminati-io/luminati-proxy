@@ -9,6 +9,7 @@ const net = require('net');
 const url = require('url');
 const zlib = require('zlib');
 const request = require('request');
+const {Netmask} = require('netmask');
 const username = require('../lib/username.js');
 const ssl = require('../lib/ssl.js');
 const etask = require('../util/etask.js');
@@ -46,6 +47,15 @@ const to_body = req=>({
     headers: restore_case(req.headers, req.rawHeaders),
 });
 
+let last_ip;
+E.get_random_ip = ()=>{
+    if (!last_ip)
+        last_ip = new Netmask('1.1.1.1');
+    else
+        last_ip = last_ip.next();
+    return last_ip.base;
+};
+
 E.http_proxy = port=>etask(function*(){
     const proxy = {history: [], full_history: []};
     const handler = (req, res, head)=>{
@@ -73,7 +83,7 @@ E.http_proxy = port=>etask(function*(){
             headers: _.omit(req.headers, 'proxy-authorization'),
         }).on('response', _res=>{
             res.writeHead(_res.statusCode, _res.statusMessage,
-                _res.headers);
+                _.assign({'x-luminati-ip': E.get_random_ip()}, _res.headers));
             _res.pipe(res);
         }).on('error', this.throw_fn()));
     };

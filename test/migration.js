@@ -587,6 +587,30 @@ describe('migration', ()=>{
             });
         });
     });
+    describe_version('1.175.938', v=>{
+        it('renames token -> google_token', ()=>{
+            const conf = {
+                _defaults: {customer: 'test', token: 'token123'},
+                proxies: [],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {customer: 'test', google_token: 'token123'},
+                proxies: [],
+            });
+        });
+        it('leaves config untouched if there is no token attribute', ()=>{
+            const conf = {
+                _defaults: {customer: 'test', password: 'pass'},
+                proxies: [],
+            };
+            const _conf = migrations[v](conf);
+            assert.deepEqual(_conf, {
+                _defaults: {customer: 'test', password: 'pass'},
+                proxies: [],
+            });
+        });
+    });
     it('ensures that each production migration has a test', ()=>{
         for (let v in migrations)
         {

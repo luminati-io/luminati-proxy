@@ -1,5 +1,9 @@
 Luminati Proxy manager - Change Log
 
+## 1.176.452 Stable
+- :bug: Fixed authentication issues
+- :bug: Fixed /refresh_ips endpoint
+
 ## 1.175.943 Stable
 - :bug: Fixed possible endless loop for https requests when all available IPs are banned
 

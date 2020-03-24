@@ -108,8 +108,11 @@ class WS extends events.EventEmitter {
         this.time_parse = opt.time_parse;
         if (opt.ipc_server)
         {
-            new IPC_server(this, opt.ipc_server,
-                {zjson: opt.ipc_zjson, sync: opt.ipc_sync});
+            new IPC_server(this, opt.ipc_server, {
+                zjson: opt.ipc_zjson,
+                sync: opt.ipc_sync,
+                call_zerr: opt.ipc_call_zerr,
+            });
         }
         this.mux = opt.mux ? new Mux(this, opt.backpressuring) : undefined;
         if (this.zc && !zcounter)
@@ -820,6 +823,7 @@ class IPC_server {
             this.methods = methods;
         this.zjson = !!opt.zjson;
         this.sync = !!opt.sync;
+        this.call_zerr = !!opt.call_zerr;
         this.pending = this.sync ? undefined : new Set();
         this.ws.addListener(this.zjson ? 'zjson' : 'json',
             this._on_call.bind(this));
@@ -878,6 +882,8 @@ class IPC_server {
                 else
                     _this.ws.json(res);
             } catch(e){
+                if (type=='ipc_call' && _this.call_zerr)
+                    zerr(`${_this.ws}: ${cmd}: ${zerr.e2s(e)}`);
                 if (type=='ipc_post')
                     return zerr(`${_this.ws}: ${cmd}: ${zerr.e2s(e)}`);
                 _this.ws.json({

@@ -146,7 +146,6 @@ const presets = {
         clean: opt=>{
             opt.pool_size = 0;
             opt.user_agent = '';
-            opt.override_headers = false;
         },
         disabled: {
             user_agent: 'random_desktop',
