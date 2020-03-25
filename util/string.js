@@ -99,6 +99,8 @@ E.align = function(){
 };
 // merge lines
 E.nl2sp = function(){ return E.es6_str(arguments).replace(/\n\s*/g, ' '); };
+// join lines
+E.nl2jn = function(){ return E.es6_str(arguments).replace(/\n\s*/g, ''); };
 
 // V8 often keeps large strings in memory when only a short substring is
 // referenced, see https://bugs.chromium.org/p/v8/issues/detail?id=2869

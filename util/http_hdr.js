@@ -119,13 +119,27 @@ const rules_headers = [
     {match: {browser: 'firefox'},
         rules: {
             connection: 'keep-alive',
-            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'upgrade-insecure-requests': '1',
             'accept-encoding': 'gzip, deflate',
             'accept-language': 'en-US,en;q=0.5',
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:67.0) Gecko/20100101 Firefox/67.0',
         }},
+    {match: {browser: 'firefox', version_min: 65},
+        rules: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        }},
+    {match: {browser: 'firefox', version_min: 66},
+        rules: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        }},
+    {match: {browser: 'firefox', version_min: 72},
+        rules: {
+            accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        }},
     {match: {browser: 'firefox', type: 'image'},
+        rules: {accept: '*/*'}},
+    {match: {browser: 'firefox', type: 'image', version_min: 65},
         rules: {accept: 'image/webp,*/*'}},
     {match: {browser: 'firefox', https: true},
         rules: {
@@ -151,8 +165,10 @@ const rules_headers = [
             'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.3 Safari/605.1.15',
         }},
     {match: {browser: 'safari', type: 'image'},
+        rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5'}},
+    {match: {browser: 'safari', version_min: 11, type: 'image'},
         rules: {accept: 'image/png,image/svg+xml,image/*;q=0.8,video/*;q=0.8,*/*;q=0.5'}},
-    {match: {browser: 'safari', https: true},
+    {match: {browser: 'safari', https: true, version_min: 11},
         rules: {'accept-encoding': 'br, gzip, deflate'}},
     {match: {browser: 'safari', https: true, version_min: 13},
         rules: {'accept-encoding': 'gzip, deflate, br'}},
@@ -290,12 +306,26 @@ const rules_orders = [
     // http2 rules
     {match: {browser: 'chrome', http2: true},
         rules: {order: qw`:method :authority :scheme :path pragma
+            cache-control upgrade-insecure-requests user-agent accept referer
+            accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, type: 'ajax'},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            x-requested-with user-agent content-type accept referer
+            accept-encoding accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 76},
+        rules: {order: qw`:method :authority :scheme :path pragma
             cache-control upgrade-insecure-requests user-agent sec-fetch-mode
             sec-fetch-user accept sec-fetch-site referer accept-encoding
             accept-language cookie`}},
-    {match: {browser: 'chrome', http2: true, type: 'ajax'},
+    {match: {browser: 'chrome', http2: true, version_min: 76,
+        type: ['script', 'image']},
+        rules: {order: qw`:method :authority :scheme :path pragma
+            cache-control upgrade-insecure-requests sec-fetch-mode user-agent
+            sec-fetch-user accept sec-fetch-site referer accept-encoding
+            accept-language cookie`}},
+    {match: {browser: 'chrome', http2: true, version_min: 76, type: 'ajax'},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
-            accept x-requested-with user-agent sec-fetch-mode content-type
+            sec-fetch-mode x-requested-with user-agent content-type accept
             sec-fetch-site referer accept-encoding accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 78},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
@@ -303,10 +333,9 @@ const rules_orders = [
             sec-fetch-site sec-fetch-mode referer accept-encoding
             accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 78, type: 'ajax'},
-        rules: {order: qw`:method :authority :scheme :path pragma
-            cache-control accept x-requested-with user-agent content-type
-            sec-fetch-site sec-fetch-mode referer accept-encoding
-            accept-language cookie`}},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            x-requested-with user-agent content-type accept sec-fetch-site
+            sec-fetch-mode referer accept-encoding accept-language cookie`}},
     {match: {browser: 'chrome', http2: true, version_min: 80},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             origin upgrade-insecure-requests user-agent sec-fetch-dest accept
@@ -325,6 +354,11 @@ const rules_orders = [
             x-requested-with origin sec-fetch-site sec-fetch-mode referer
             accept-encoding accept-language cookie`}
     },
+    {match: {browser: 'chrome', http2: true, version_min: 81},
+        rules: {order: qw`:method :authority :scheme :path pragma cache-control
+            origin upgrade-insecure-requests user-agent content-type accept
+            sec-fetch-site sec-fetch-mode sec-fetch-user sec-fetch-dest referer
+            accept-encoding accept-language cookie`}},
     {match: {browser: 'mobile_chrome', http2: true},
         rules: {order: qw`:method :authority :scheme :path pragma cache-control
             upgrade-insecure-requests user-agent sec-fetch-mode sec-fetch-user

@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.176.648 Stable
+- :bug: Fixed setting default values on the UI
+
 ## 1.176.452 Stable
 - :bug: Fixed authentication issues
 - :bug: Fixed /refresh_ips endpoint

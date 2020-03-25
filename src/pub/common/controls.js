@@ -509,7 +509,9 @@ export const Select = props=>{
           <T>{t=><select value={''+props.val}
             onChange={e=>update(e.target.value)} disabled={props.disabled}>
             {(props.data||[]).map((c, i)=>
-              <option key={i} value={c.value||c}>{t(c.key||c)}</option>
+              <option key={i} value={c.value !== undefined ? c.value : c}>
+                {t(c.key||c)}
+              </option>
             )}
           </select>}</T>
         </Tooltip>;
