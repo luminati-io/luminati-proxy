@@ -4460,5 +4460,22 @@
   "Your registration has been denied.": "您的注册被拒绝。",
   "The IP you tried to sign-up with has been blocked.": "您尝试注册的IP已被阻止。",
   "This may happen because our system has identified that this IP address has been abused": "这可能发生，因为我们的系统已经确定此IP地址已被滥用",
-  "We detected too many signups from your IP.":"我们从您的IP中检测到太多注册。"
+  "We detected too many signups from your IP.":"我们从您的IP中检测到太多注册。",
+  "Welcome to Luminati!": "欢迎来到Luminati！",
+  "Are you signing up on behalf of a company?": "您是代表公司注册吗？",
+  "Freelancer": "自由职业者",
+  "Non-company": "非公司",
+  "Registered Company": "注册公司",
+  "Choose your use cases": "请选择您的用例",
+  "Please select the use cases that most fit your needs:": "请选择最适合您需求的用例：",
+  "Website Testing": "网站测试",
+  "SERP": "谷歌搜索(SERP)",
+  "Market Research": "市场调查",
+  "Market Research": "市场调查",
+  "Fintech": "金融科技",
+  "Cyber Security": "网络安全",
+  "Other:": "其它：",
+  "Skip": "跳过",
+  "Sending request": "正在发送请求",
+  "Integrating": ""
 }

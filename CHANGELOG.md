@@ -1,5 +1,8 @@
 Luminati Proxy manager - Change Log
 
+## 1.177.194 Stable
+- :bug: Fixed stability issues and crashing on auth fail
+
 ## 1.176.648 Stable
 - :bug: Fixed setting default values on the UI
 

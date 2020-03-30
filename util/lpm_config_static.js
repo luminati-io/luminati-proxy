@@ -20,8 +20,8 @@ const conf = {
         'integer'),
     boolean_fields: prop_by_type(swagger.definitions.proxy.properties,
         'boolean'),
-    credential_fields: ['customer', 'zone', 'password', 'google_token',
-        'token_auth'],
+    credential_fields: ['customer', 'zone', 'password', 'token_auth',
+        'lpm_token'],
     default_superproxy_domain: 'zproxy.lum-superproxy.io',
     hola_agent: undefined,
     args: {

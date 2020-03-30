@@ -32,7 +32,7 @@ Please report issues or bugs to your Luminati account manager or from our [help 
 ## Installation
 
 ### Windows
-Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.176.648/luminati-proxy-manager-v1.176.648-setup.exe)
+Download the [Luminati Proxy Manager installer](https://github.com/luminati-io/luminati-proxy/releases/download/v1.177.194/luminati-proxy-manager-v1.177.194-setup.exe)
 
 ### Linux/MacOS - Install script
 - Run the setup script to install
@@ -219,8 +219,7 @@ Options:
   --dropin_port                 Port for dropin mode            [default: 22225]
   --no_usage_stats              Disable collection of usage statistics
                                                       [boolean] [default: false]
-  --google_token                A Google authorization token for accessing
-                                luminati.io                             [string]
+  --lpm_token                   An authorization token                  [string]
   --high_perf                                         [boolean] [default: false]
   --cloud                                              [boolean] [default: true]
   --cluster                                            [boolean] [default: true]

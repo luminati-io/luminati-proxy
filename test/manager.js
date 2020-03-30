@@ -21,8 +21,6 @@ const qw = require('../util/string.js').qw;
 const user_agent = require('../util/user_agent.js');
 const lpm_util = require('../util/lpm_util.js');
 const util_lib = require('../lib/util.js');
-const lpm_config = require('../util/lpm_config.js');
-const {stub: sstub, match: smatch} = sinon;
 const customer = 'abc';
 const password = 'xyz';
 const {assert_has} = require('./common.js');
@@ -76,7 +74,7 @@ describe('manager', ()=>{
         Manager.prototype.check_conn = ()=>null;
         Manager.prototype.lpm_users_get = ()=>null;
         Manager.prototype.init_lpm_f_ws = ()=>null;
-        Manager.prototype.get_lum_local_conf = function(){
+        Manager.prototype.get_lpm_conf = function(){
             this.lum_conf = {};
             return {};
         };
@@ -106,7 +104,7 @@ describe('manager', ()=>{
         fs.writeFileSync(temp.path, JSON.stringify(content));
         return temp;
     };
-    const app_with_config = opt=>etask(function*(){
+    const app_with_config = (opt={})=>etask(function*(){
         const args = [];
         const cli = opt.cli||{};
         Object.keys(cli).forEach(k=>{
@@ -192,10 +190,10 @@ describe('manager', ()=>{
         t('credentials', qw`${def} --customer test_user --password abcdefgh`,
             ['--throttle', 2]);
         t('credentials with no-config',
-            ['--no-config', '--customer', 'usr', '--google_token', 't',
-                '--password', 'abc', '--zone', 'z'],
-            ['--no-config', '--customer', 'usr', '--google_token', 't',
-                '--password', 'abc', '--zone', 'z']);
+            ['--no-config', '--customer', 'usr', '--password', 'abc',
+                '--zone', 'z'],
+            ['--no-config', '--customer', 'usr', '--password', 'abc',
+                '--zone', 'z']);
     });
     describe('config load', ()=>{
         const t = (name, config, expected)=>it(name, etask._fn(
@@ -363,7 +361,7 @@ describe('manager', ()=>{
                         .reply(200, {});
                     nock(api_base).post('/ext_proxy_created').query(true)
                         .reply(status_code, {});
-                    app = yield app_with_config({cli: {google_token: '123'}});
+                    app = yield app_with_config();
                     let res = yield json('api/proxies', 'post',
                         {proxy: sample_proxy});
                     assert_has(res, {data: sample_proxy}, 'proxies');
@@ -433,7 +431,7 @@ describe('manager', ()=>{
                 nock(api_base).get('/cp/lum_local_conf').query(true)
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
-                const res = yield app.manager.get_lum_local_conf(null, '123');
+                const res = yield app.manager.get_lpm_conf(null, '123');
                 assert_has(res, {mock_result: true});
             }));
             it('login required', etask._fn(function*(_this){
@@ -446,7 +444,7 @@ describe('manager', ()=>{
                     .reply(403, 'login_required');
                 app = yield app_with_args(['--customer', 'mock_user']);
                 try {
-                    yield app.manager.get_lum_local_conf(null, '123');
+                    yield app.manager.get_lpm_conf(null, '123');
                     assert.fail('should have thrown exception');
                 } catch(e){
                     assert_has(e, {status: 403, message: 'login_required'});
@@ -495,7 +493,7 @@ describe('manager', ()=>{
             }));
         });
         describe('add_wip', ()=>{
-            it('forbidden when google_token is not set',
+            it('forbidden when token is not set',
             etask._fn(function*(_this){
                 app = yield app_with_config({config: {}});
                 const res = yield api_json('api/add_wip', {
@@ -505,7 +503,7 @@ describe('manager', ()=>{
                 assert.equal(res.statusMessage, 'Forbidden');
                 assert.equal(res.statusCode, 403);
             }));
-            it('forbidden when google_token is not correct',
+            it('forbidden when token is not correct',
             etask._fn(function*(_this){
                 const config = {_defaults: {token_auth: 'aaa'}};
                 app = yield app_with_config({config});
@@ -576,7 +574,7 @@ describe('manager', ()=>{
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
                 .reply(200, {});
-            app = yield app_with_config({config, cli: {google_token: '123'}});
+            app = yield app_with_config({config});
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'zone1'}});
             assert.equal(res.data.password, 'zone1_pass');
@@ -590,7 +588,7 @@ describe('manager', ()=>{
                 .reply(200, {_defaults});
             nock(api_base).post('/update_lpm_stats').query(true)
                 .reply(200, {});
-            app = yield app_with_config({config, cli: {google_token: '123'}});
+            app = yield app_with_config({config});
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'static'}});
             assert.equal(res.data.password, 'static_pass');
@@ -599,9 +597,9 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
-            app = yield app_with_config({config, cli: {}});
+            app = yield app_with_config({config});
             nock(api_base).get('/cp/lum_local_conf')
-            .query({customer: 'abc', proxy: pkg.version, google_token: ''})
+            .query({customer: 'abc', proxy: pkg.version})
             .reply(200, {_defaults});
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'static', password: 'p1_pass'}});
@@ -629,7 +627,7 @@ describe('manager', ()=>{
                 {port: 24004},
                 {port: 24005, zone: 'unknown', password: 'p3_pass'},
             ]};
-            app = yield app_with_config({config, cli: {google_token: '123'}});
+            app = yield app_with_config({config});
             const res = yield json('api/proxies_running');
             assert.equal(res.find(p=>p.port==24000).password, 'static_pass');
             assert.equal(res.find(p=>p.port==24001).password, 'zone2_pass');
@@ -756,152 +754,5 @@ describe('manager', ()=>{
         t('should not run migrations if config does not exist', false);
         t('should not run migrations if config exists and version is new',
             false, {_defaults: {version: '1.120.0'}});
-    });
-    xdescribe('first actions', function(){
-        this.timeout(6000);
-        const filepath = path.join(os.tmpdir(), 'first_actions.json');
-        const rm_actions_file = ()=>{
-            if (fs.existsSync(filepath))
-                fs.unlinkSync(filepath);
-        };
-        let perr_stub;
-        before(()=>lpm_config.first_actions = filepath);
-        beforeEach(()=>{
-            nock(api_base).get('/').reply(200, {}).persist();
-            nock(api_base).post('/update_lpm_stats').query(true).reply(200, {})
-            .persist();
-            rm_actions_file();
-            perr_stub = sstub(util_lib, 'perr');
-        });
-        afterEach(()=>{
-            rm_actions_file();
-            perr_stub.restore();
-        });
-        const m = a=>smatch(`first_${a}`);
-        const perr_called_n_times_with = (a, n)=>{
-            const event = `first_${a}`;
-            const calls = perr_stub.getCalls().filter(c=>c.args[0]==event);
-            assert.equal(calls.length, n);
-        };
-        const t = (name, called, action, config, conf_success=true)=>
-        it(name, etask._fn(function*(_this){
-            const i = nock(api_base).get('/cp/lum_local_conf').query(true);
-            if (conf_success)
-                i.reply(200, {mock_result: true, _defaults: true});
-            else
-                i.reply(403);
-            app = yield app_with_config({config, cli: {google_token: '123'}});
-            if (called)
-                sinon.assert.calledWith(perr_stub, m(action));
-            else
-                sinon.assert.neverCalledWith(perr_stub, m(action));
-        }));
-        t('triggers login on startup if logged', true, 'login');
-        t('does not trigger login on startup if not logged', false, 'login',
-            null, false);
-        t('triggers create_proxy_port on startup if custom port created', true,
-            'create_proxy_port', {proxies: [{port: 24023}, {port: 24024}]});
-        t('does not trigger create_proxy_port on startup if no custom ports',
-            false, 'create_proxy_port');
-        t('never triggers send_request on startup', false, 'send_request');
-        t('never triggers send_request_successful on startup', false,
-            'send_request_successful');
-        it('maintains actions object structure when file does not exist',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            app = yield app_with_config({cli: {google_token: '123'}});
-            sinon.assert.match(app.manager.first_actions,
-                smatch({sent: {}, sending: {}, pending: []}));
-        }));
-        it('maintains actions object structure when file is missing fields',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            fs.writeFileSync(lpm_config.first_actions, JSON.stringify({}));
-            app = yield app_with_config({cli: {google_token: '123'}});
-            sinon.assert.match(app.manager.first_actions,
-                smatch({sent: {}, sending: {}, pending: []}));
-        }));
-        it('does not trigger actions on zone password authentication',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true).reply(403);
-            app = yield app_with_config({config: {proxies: [{port: 24010}]},
-                cli: {customer: false, google_token: '123'}});
-            yield make_user_req(24010);
-            sinon.assert.neverCalledWith(perr_stub, smatch('first'));
-        }));
-        it('triggers create_proxy_port_def when using dropin',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            app = yield app_with_config({cli: {google_token: '123',
-                dropin: true}});
-            yield make_user_req(22225);
-            const matches = ['login', 'create_proxy_port_def', 'send_request',
-                'send_request_successful'].map(m);
-            matches.forEach(_m=>sinon.assert.calledWith(perr_stub, _m));
-            sinon.assert.neverCalledWith(perr_stub,
-                smatch(/^first_create_proxy_port$/));
-        }));
-        it('triggers failed actions after error has happened',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            perr_stub.returns(etask.reject(Error('Network error')));
-            app = yield app_with_config({cli: {google_token: '123',
-                dropin: true}});
-            yield make_user_req(22225);
-            perr_stub.resetBehavior();
-            yield make_user_req(22225);
-            // called 3 times due to logged_update and retry on mgr.start
-            perr_called_n_times_with('login', 3);
-            perr_called_n_times_with('create_proxy_port_def', 2);
-            perr_called_n_times_with('send_request', 2);
-            perr_called_n_times_with('send_request_successful', 2);
-        }));
-        it('stops retrying if action has already been retried',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            perr_stub.restore();
-            perr_stub = sstub(util_lib, 'perr', id=>{
-                if (!id.startsWith('first'))
-                    return;
-                if (id=='first_send_request')
-                    return;
-                return etask.reject(Error('Network error'));
-            });
-            app = yield app_with_config({cli: {google_token: '123',
-                dropin: true}});
-            yield make_user_req(22225);
-            yield make_user_req(22225);
-            const failed = ['login', 'create_proxy_port_def',
-                'send_request_successful'];
-            perr_called_n_times_with('send_request', 1);
-            // called 3 times due to logged_update and retry on mgr.start
-            perr_called_n_times_with('login', 3);
-            failed.slice(1).forEach(a=>perr_called_n_times_with(a, 2));
-            assert.equal(app.manager.first_actions.pending.filter(
-                d=>failed.includes(d.action)).length, failed.length);
-        }));
-        it('does not trigger send_request events on proxy status request',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            app = yield app_with_config({cli: {google_token: '123',
-                dropin: true}});
-            yield api('api/proxy_status/22225');
-            sinon.assert.neverCalledWith(perr_stub, m('send_request'));
-        }));
-        it('proxy_status_get_api return no errors for persist proxy',
-        etask._fn(function*(_this){
-            nock(api_base).get('/cp/lum_local_conf').query(true)
-                .reply(200, {mock_result: true, _defaults: true});
-            app = yield app_with_config({
-                config: {proxies: [{port: 24010}, {port: 24010}]}});
-            let res = yield api('api/proxy_status/24010');
-            assert.equal(res.body, '{"status":"ok","status_details":[]}');
-        }));
     });
 });
