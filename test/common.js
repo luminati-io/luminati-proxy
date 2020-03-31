@@ -47,13 +47,10 @@ const to_body = req=>({
     headers: restore_case(req.headers, req.rawHeaders),
 });
 
-let last_ip;
+E.last_ip = new Netmask('1.1.1.0');
 E.get_random_ip = ()=>{
-    if (!last_ip)
-        last_ip = new Netmask('1.1.1.1');
-    else
-        last_ip = last_ip.next();
-    return last_ip.base;
+    E.last_ip = E.last_ip.next();
+    return E.last_ip.base;
 };
 
 E.http_proxy = port=>etask(function*(){

@@ -1,5 +1,15 @@
 [
     {
+        "ver": "1.177.331",
+        "type": "stable",
+        "changes": [
+            {
+                "type": "bug",
+                "text": "When using pool rotate session on 'retry' rule instead of recreating it"
+            }
+        ]
+    },
+    {
         "ver": "1.177.194",
         "type": "stable",
         "changes": [

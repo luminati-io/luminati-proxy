@@ -5,6 +5,7 @@ const assert = require('assert');
 const dns = require('dns');
 const net = require('net');
 const socks = require('lum_socksv5');
+const {Netmask} = require('netmask');
 const ssl = require('../lib/ssl.js');
 const request = require('request');
 const lolex = require('lolex');
@@ -107,6 +108,9 @@ describe('proxy', ()=>{
         ping = null;
     }));
     beforeEach(()=>{
+        Server.session_to_ip = {};
+        Server.last_ip = new Netmask('1.1.1.0');
+        common.last_ip = new Netmask('1.1.1.0');
         sandbox = sinon.sandbox.create();
         proxy.fake = true;
         proxy.connection = null;
@@ -1134,19 +1138,62 @@ describe('proxy', ()=>{
                     }));
                 });
             });
-            it('retry should refresh the session', ()=>etask(function*(){
-                l = yield lum({
-                    pool_size: 1,
-                    rules: [{action: {retry: true}, status: '200'}],
-                });
-                l.on('retry', opt=>{
-                    l.lpm_request(opt.req, opt.res, opt.head);
-                });
-                const session_a = l.session_mgr.sessions.sessions[0].session;
-                yield l.test({fake: 1});
-                const session_b = l.session_mgr.sessions.sessions[0].session;
-                assert.notEqual(session_a, session_b);
-            }));
+            describe('retry', ()=>{
+                it('retry should refresh the session', ()=>etask(function*(){
+                    l = yield lum({
+                        pool_size: 1,
+                        rules: [{action: {retry: true}, status: '200'}],
+                    });
+                    l.on('retry', opt=>{
+                        l.lpm_request(opt.req, opt.res, opt.head);
+                    });
+                    let session_a = l.session_mgr.sessions.sessions[0].session;
+                    yield l.test({fake: 1});
+                    let session_b = l.session_mgr.sessions.sessions[0].session;
+                    assert.notEqual(session_a, session_b);
+                }));
+                it('retry should rotate the session if it has ip',
+                    ()=>etask(
+                function*(){
+                    l = yield lum({pool_size: 2, ips: ['1.1.1.1', '1.1.1.2'],
+                        rules: [
+                            {action: {reserve_session: true},
+                                action_type: 'save_to_pool', status: '201'},
+                            {action: {retry: true}, status: '200'}]});
+                    l.on('retry', opt=>{
+                        l.lpm_request(opt.req, opt.res, opt.head);
+                    });
+                    let [sb1, sb2] = l.session_mgr.sessions.sessions;
+                    yield l.test({fake: 1});
+                    let [sa1, sa2] = l.session_mgr.sessions.sessions;
+                    assert.equal(sb1.session, sa2.session);
+                    assert.equal(sb1.ip, sa2.ip);
+                    assert.equal(sb2.session, sa1.session);
+                    assert.equal(sb2.ip, sa1.ip);
+                    assert.equal(sa2.count, 0);
+                }));
+                it('retry should not add session if pool is not full',
+                    ()=>etask(
+                function*(){
+                    l = yield lum({pool_size: 2, ips: ['1.1.1.1'],
+                        rules: [
+                            {action: {reserve_session: true},
+                                action_type: 'save_to_pool', status: '201'},
+                            {action: {retry: 2}, status: '200'}]});
+                    l.on('retry', opt=>{
+                        l.lpm_request(opt.req, opt.res, opt.head);
+                    });
+                    let [sb1, sb2] = l.session_mgr.sessions.sessions;
+                    let res = yield l.test({fake: 1});
+                    assert.equal(res.body, '1.1.1.3');
+                    let [sa1, sa2] = l.session_mgr.sessions.sessions;
+                    assert.equal(sb1.session, sa1.session);
+                    assert.equal(sb1.ip, sa1.ip);
+                    assert.equal(sa1.count, 0);
+                    assert.equal(sb2, undefined);
+                    assert.equal(sa2, undefined);
+                }));
+            });
             it('retry_port should update context port', ()=>etask(function*(){
                 l = yield lum({
                     rules: [{action: {retry_port: 24001}, status: '200'}],

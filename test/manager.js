@@ -27,7 +27,7 @@ const {assert_has} = require('./common.js');
 const api_base = 'https://'+pkg.api_domain;
 
 describe('manager', ()=>{
-    let app, temp_files, logger_stub;
+    let app, temp_files, logger_stub, sandbox;
     const stub_logger = ()=>{
         logger.transports.forEach(t=>{ t.silent = true; });
         logger_stub = sinon.stub(logger, 'notice');
@@ -176,8 +176,13 @@ describe('manager', ()=>{
     }));
     beforeEach(()=>{
         temp_files = [];
+        sandbox = sinon.sandbox.create();
+        sandbox.stub(os, 'cpus').returns([1, 1]);
+        nock(api_base).get('/').times(2).reply(200, {});
+        nock(api_base).post('/lpm/update_stats').query(true).reply(200, {});
     });
     afterEach('after manager 2', ()=>{
+        sandbox.verifyAndRestore();
         temp_files.forEach(f=>f.done());
     });
     describe('get_params', ()=>{
@@ -221,8 +226,6 @@ describe('manager', ()=>{
             const zones = {static: Object.assign({}, zone_static),
                 gen: Object.assign({}, zone_gen)};
             const t2 = (name, config, expected, _defaults={zone: 'static'})=>{
-                nock(api_base).get('/').reply(200, {});
-                nock(api_base).post('/update_lpm_stats').reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf')
                     .query({customer: 'testc1', proxy: pkg.version})
                     .reply(200, {_defaults});
@@ -354,11 +357,8 @@ describe('manager', ()=>{
                 const t = (name, status_code)=>it(name, ()=>etask(function*(){
                     const sample_proxy = {port: 24000,
                         ext_proxies: ['127.0.0.1:8888']};
-                    nock(api_base).get('/').times(2).reply(200, {});
                     nock(api_base).get('/cp/lum_local_conf').query(true)
                         .reply(200, {mock_result: true, _defaults: true});
-                    nock(api_base).post('/update_lpm_stats').query(true)
-                        .reply(200, {});
                     nock(api_base).post('/ext_proxy_created').query(true)
                         .reply(status_code, {});
                     app = yield app_with_config();
@@ -426,8 +426,6 @@ describe('manager', ()=>{
         });
         xdescribe('user credentials', ()=>{
             it('success', etask._fn(function*(_this){
-                nock(api_base).get('/').reply(200, {});
-                nock(api_base).post('/update_lpm_stats').reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf').query(true)
                     .reply(200, {mock_result: true, _defaults: true});
                 app = yield app_with_args(['--customer', 'mock_user']);
@@ -435,7 +433,6 @@ describe('manager', ()=>{
                 assert_has(res, {mock_result: true});
             }));
             it('login required', etask._fn(function*(_this){
-                nock(api_base).get('/').reply(200, {});
                 nock(api_base).get('/cp/lum_local_conf')
                     .query(true)
                     .reply(403, 'login_required');
@@ -569,11 +566,8 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {zone1: {password: ['zone1_pass']}}};
-            nock(api_base).get('/').times(2).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
-            nock(api_base).post('/update_lpm_stats').query(true)
-                .reply(200, {});
             app = yield app_with_config({config});
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'zone1'}});
@@ -583,11 +577,8 @@ describe('manager', ()=>{
             const config = {proxies: []};
             const _defaults = {zone: 'static', password: 'xyz',
                 zones: {static: {password: ['static_pass']}}};
-            nock(api_base).get('/').times(2).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
-            nock(api_base).post('/update_lpm_stats').query(true)
-                .reply(200, {});
             app = yield app_with_config({config});
             const res = yield json('api/proxies', 'post',
                 {proxy: {port: 24000, zone: 'static'}});
@@ -614,11 +605,8 @@ describe('manager', ()=>{
                     zone2: {password: ['zone2_pass']},
                 },
             };
-            nock(api_base).get('/').times(2).reply(200, {});
             nock(api_base).get('/cp/lum_local_conf').query(true)
                 .reply(200, {_defaults});
-            nock(api_base).post('/update_lpm_stats').query(true)
-                .reply(200, {});
             const config = {proxies: [
                 {port: 24000, zone: 'static', password: 'p1_pass'},
                 {port: 24001, zone: 'zone2', password: 'p2_pass'},
