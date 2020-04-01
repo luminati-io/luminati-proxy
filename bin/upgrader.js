@@ -32,7 +32,7 @@ E.upgrade = cb=>etask(function*(){
     zerr.perr('upgrade_start');
     logger.notice('Started upgrading...');
     const v = yield util_lib.get_last_version(
-        lpm_config.manager_default.api);
+        lpm_config.manager_default.api_domain);
     if (!v.newer)
         return logger.notice('Already the newest version');
     sudo_run(bash_cmd('lpm_upgrade.sh'), e=>{

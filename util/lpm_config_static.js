@@ -22,7 +22,6 @@ const conf = {
         'boolean'),
     credential_fields: ['customer', 'zone', 'password', 'token_auth',
         'lpm_token'],
-    default_superproxy_domain: 'zproxy.lum-superproxy.io',
     hola_agent: undefined,
     args: {
         added_descriptions: {
@@ -64,7 +63,7 @@ conf.server_default = {
     proxy_connection_type: 'http',
     ssl: false,
     test_url: 'http://lumtest.com/myip.json',
-    proxy: conf.default_superproxy_domain,
+    proxy: 'zproxy.lum-superproxy.io',
     proxy_port: 22225,
     proxy_retry: 2,
     socket_inactivity_timeout: 120000,
@@ -84,7 +83,6 @@ conf.server_default = {
 };
 conf.manager_default = Object.assign({}, _.omit(conf.server_default, 'port'), {
     api_domain: undefined,
-    // XXX krzysztof: get rid of api and leave only api_domain
     api: undefined,
     www: 22999,
     www_whitelist_ips: [],

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.177.331",
+        "version": "1.177.584",
         "title": "Luminati Proxy Manager",
         "license": {
             "name": "MIT",
@@ -666,6 +666,26 @@
                               }
                           }
                       }
+                    }
+                }
+            }
+        },
+        "/proxies/{port}/unbanips": {
+            "post": {
+                "description": "Unban all IPs on a specific port",
+                "tags": ["Proxy"],
+                "parameters": [
+                    {
+                        "name": "port",
+                        "in": "path",
+                        "description": "Existing proxy port",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                      "description": "Successful response"
                     }
                 }
             }

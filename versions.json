@@ -1,5 +1,10 @@
 [
     {
+        "ver": "1.177.584",
+        "type": "stable/dev",
+        "changes": []
+    },
+    {
         "ver": "1.177.331",
         "type": "stable",
         "changes": [

@@ -82,12 +82,31 @@ const Banned_ips = withRouter(class Banned_ips extends Pure_component {
             _this.setState({ips: data.ips});
         });
     };
+    unbanips = ()=>{
+        const _this = this;
+        this.setState({unbanning: true});
+        return this.etask(function*(){
+            this.on('finally', ()=>_this.setState({unbanning: false}));
+            const port = _this.props.match.params.port;
+            yield ajax.json({url: `/api/proxies/${port}/unbanips`,
+                method: 'POST'});
+            _this.setState({ips: []});
+        });
+    };
     render(){
         const {ips, unbanning} = this.state;
         if (setdb.get('head.proxy_edit.form.ext_proxies'))
             return <Note><Ext_tooltip/></Note>;
         return <Chrome_table
-            title={<T>{t=>t('lpm_banned_ip')+` (${ips.length})`}</T>}
+            title={<React.Fragment>
+                <Tooltip title="Unban all IPs">
+                  <button className="btn_unban" disabled={unbanning}
+                    onClick={()=>this.unbanips()}>
+                    <i className="chrome_icon clear unban_all"/>
+                  </button>
+                </Tooltip>
+                <T>{t=>t('lpm_banned_ip')+` (${ips.length})`}</T>
+              </React.Fragment>}
             cols={banned_ips_cols} class_name="banned_ips_panel">
               {ips.map(d=>
                 <tr key={`${d.ip}-${d.domain}`}>

@@ -1,5 +1,7 @@
 Luminati Proxy manager - Change Log
 
+## 1.177.584 
+
 ## 1.177.331 Stable
 - :bug: When using pool rotate session on 'retry' rule instead of recreating it
 
